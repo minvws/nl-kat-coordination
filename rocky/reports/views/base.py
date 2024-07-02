@@ -96,6 +96,7 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = self.get_breadcrumbs()
         context["next"] = self.get_next()
+        context["current"] = self.get_current()
         context["previous"] = self.get_previous()
         return context
 
@@ -356,7 +357,7 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
         has_parent: bool,
         observed_at: datetime,
     ) -> ReportOOI:
-        report_name = self.request.POST.get("report-name") + " (" + str(self.request.POST.get("reference-date")) + ")"
+        report_name = self.request.POST.get("full_report_name")
         report_ooi = ReportOOI(
             name=report_name,
             report_type=str(report_type.id),

@@ -129,30 +129,6 @@ class ReportTypesSelectionGenerateReportView(
         return context
 
 
-class ExportSetupGenerateReportView(
-    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportPluginView, TemplateView
-):
-    """
-    Shows the export setup page where users can set their export preferences.
-    """
-
-    template_name = "generate_report/export_setup.html"
-    breadcrumbs_step = 6
-    current_step = 4
-
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.selected_report_types:
-            messages.error(request, _("Select at least one report type to proceed."))
-            return redirect(self.get_previous())
-
-        return super().get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["reference_date"] = datetime.now(timezone.utc)
-        return context
-
-
 class SaveGenerateReportMixin(ReportPluginView):
     def save_report(self) -> ReportOOI:
         error_reports = []
@@ -263,6 +239,8 @@ class SetupScanGenerateReportView(
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        del request.session["report_name"]  # delete session
+        del request.session["reference_date"]  # delete session
         if not self.report_has_required_plugins() or self.plugins_enabled():
             return redirect(self.get_next())
         if not self.selected_report_types:
@@ -273,6 +251,56 @@ class SetupScanGenerateReportView(
         if not self.plugins:
             return redirect(self.get_previous())
         return super().get(request, *args, **kwargs)
+
+
+class ExportSetupGenerateReportView(
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportPluginView, TemplateView
+):
+    """
+    Shows the export setup page where users can set their export preferences.
+    """
+
+    template_name = "generate_report/export_setup.html"
+    breadcrumbs_step = 6
+    current_step = 4
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.selected_report_types:
+            messages.error(request, _("Select at least one report type to proceed."))
+            return redirect(self.get_previous())
+        if "report_name" not in request.session:
+            request.session["report_name"] = self.set_report_name()
+
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        new_report_name = self.request.POST.get("report-name")
+        new_reference_date = str(self.request.POST.get("reference-date"))
+        request.session["report_name"] = new_report_name
+        request.session["reference_date"] = new_reference_date
+        return redirect(self.get_current())
+
+    def set_report_name(self):
+        if len(self.oois_pk) > 1 or len(self.report_types) > 1:
+            return "Concatenated Report"
+        else:
+            return self.report_types[0].name + " for " + Reference.from_str(self.oois_pk[0]).human_readable
+
+    def set_full_report_name(self):
+        report_name = self.request.session.get("report_name", "")
+        reference_date = self.request.session.get("reference_date", "")
+
+        if reference_date:
+            return report_name + " (" + reference_date + ")"
+        else:
+            return report_name
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["reference_date"] = datetime.now(timezone.utc)
+        context["report_name"] = self.request.session.get("report_name", "")
+        context["full_report_name"] = self.set_full_report_name()
+        return context
 
 
 class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportView, ReportPluginView, TemplateView):

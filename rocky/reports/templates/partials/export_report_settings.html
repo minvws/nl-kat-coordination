@@ -24,13 +24,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            {% if index_url_aggregate_report in request.path|urlencode %}
-                                <td>{% translate "Aggregate Report" %}</td>
-                            {% elif selected_oois|length > 1 or selected_report_types|length > 1 %}
-                                <td>{% translate "Concatenated Report" %}</td>
-                            {% else %}
-                                <td>{{ selected_report_types.0|get_report_type_name }} for {{ selected_oois.0|human_readable }}</td>
-                            {% endif %}
+                            <td>{{ full_report_name }}</td>
                             <td>
                                 <button class="icon ti-edit action-button modal-trigger" data-target={{ dialogid }}>Edit {{ dialogid }}
                                 </button>
@@ -48,9 +42,9 @@
                             <button class="icon-only ti-x close-modal-button"
                                     aria-label="{% translate "Close modal" %}"></button>
                         </section>
-                        <form id="generate_report" class="inline" method="post" action="{{ next }}">
+                        <form id="change_name" class="inline" method="post" action="{{ current }}">
+                            {% csrf_token %}
                             <section class="content">
-                                {% csrf_token %}
                                 {% url "aggregate_report_landing" organization.code as index_url_aggregate_report %}
                                 <p>
                                     {% blocktranslate %}
@@ -61,25 +55,11 @@
                                 </p>
                                 <p>
                                     <label for="report-name">{% translate "Report name" %}</label>
-                                    {% if index_url_aggregate_report in request.path|urlencode %}
-                                        <input id="report-name"
-                                               name="report-name"
-                                               type="text"
-                                               autocomplete="on"
-                                               value="Aggregate Report">
-                                    {% elif selected_oois|length > 1 or selected_report_types|length > 1 %}
-                                        <input id="report-name"
-                                               name="report-name"
-                                               type="text"
-                                               autocomplete="on"
-                                               value="Concatenated Report">
-                                    {% else %}
-                                        <input id="report-name"
-                                               name="report-name"
-                                               type="text"
-                                               autocomplete="on"
-                                               value="{{ selected_report_types.0|get_report_type_name }} for {{ selected_oois.0|human_readable }}">
-                                    {% endif %}
+                                    <input id="report-name"
+                                           name="report-name"
+                                           type="text"
+                                           autocomplete="on"
+                                           value="{{ report_name }}">
                                     <div>
                                         <label for="reference-date">{% translate "Add reference date" %}</label>
                                         <select id="reference-date" name="reference-date" required>
@@ -99,14 +79,19 @@
                             </section>
                             <section class="footer">
                                 <div class="toolbar">
-                                    <button type="submit">
-                                        {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
-                                    </button>
+                                    <button type="submit">{% translate "Ok" %}</button>
                                 </div>
                             </section>
                         </form>
                     </div>
                 </dialog>
+                <form id="generate_report" class="inline" method="post" action="{{ next }}">
+                    {% csrf_token %}
+                    <input type="hidden" name="full_report_name" value="{{ full_report_name }}">
+                    <button type="submit">
+                        {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
+                    </button>
+                </form>
             </div>
         {% else %}
             <a class="button ghost" href="{{ previous }}">
