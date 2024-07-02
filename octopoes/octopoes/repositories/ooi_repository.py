@@ -22,6 +22,7 @@ from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
+from octopoes.models.ooi.reports import Report
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Direction, Path, Segment, get_paths_to_neighours
 from octopoes.models.transaction import TransactionRecord
@@ -31,7 +32,7 @@ from octopoes.repositories.repository import Repository
 from octopoes.xtdb import Datamodel, FieldSet, ForeignKey
 from octopoes.xtdb.client import OperationType as XTDBOperationType
 from octopoes.xtdb.client import XTDBSession
-from octopoes.xtdb.query import Query
+from octopoes.xtdb.query import Aliased, Query
 from octopoes.xtdb.query_builder import generate_pull_query, str_val
 from octopoes.xtdb.related_field_generator import RelatedFieldNode
 
@@ -142,6 +143,12 @@ class OOIRepository(Repository):
         offset,
         limit,
     ) -> Paginated[Finding]:
+        raise NotImplementedError
+
+    def list_reports(self, valid_time, offset, limit) -> Paginated[Report]:
+        raise NotImplementedError
+
+    def get_report(self, report_id) -> Report:
         raise NotImplementedError
 
     def get_bit_configs(self, source: OOI, bit_definition: BitDefinition, valid_time: datetime) -> list[Config]:
@@ -757,6 +764,61 @@ class XTDBOOIRepository(OOIRepository):
         return Paginated(
             count=count,
             items=[x[0] for x in self.query(finding_query, valid_time)],
+        )
+
+    def simplify_keys(self, data: dict[str, Any]) -> dict[str, Any]:
+        new_data: dict[str, Any] = {}
+        for key, value in data.items():
+            if isinstance(value, list):
+                new_data[key.split("/")[-1]] = [
+                    self.simplify_keys(item) if isinstance(item, dict) else item for item in value
+                ]
+            elif isinstance(value, dict):
+                new_data[key.split("/")[-1]] = self.simplify_keys(value)
+            else:
+                new_key = key.split("/")[-1] if key.startswith("Report/") else key
+                new_data[new_key] = value
+        return new_data
+
+    def list_reports(self, valid_time, offset, limit) -> Paginated[tuple[Report, list[Report | None]]]:
+        count_query = """
+                            {
+                                :query {
+                                    :find [(count ?report)]
+                                    :where [[?report :object_type "Report"]
+                                        [?report :Report/has_parent false]]
+                                }
+                            }
+                        """
+        count_results = self.session.client.query(count_query, valid_time)
+        count = 0
+        if count_results and count_results[0]:
+            count = count_results[0][0]
+
+        date = Aliased(Report, field="date_generated")
+        query = (
+            Query(Report)
+            .pull(Report, fields="[* {:Report/_parent_report [*]}]")
+            .find(date)
+            .where(Report, has_parent=False, date_generated=date)
+            .order_by(date, ascending=False)
+            .limit(limit)
+            .offset(offset)
+        )
+
+        results = [
+            (
+                self.simplify_keys(x[0]),
+                [self.simplify_keys(y) for y in x[0]["Report/_parent_report"]]
+                if "Report/_parent_report" in x[0]
+                else [],
+            )
+            for x in self.session.client.query(query)
+        ]
+
+        return Paginated(
+            count=count,
+            items=results,
         )
 
     def query(self, query: str | Query, valid_time: datetime) -> list[OOI | tuple]:
