@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import collections
 import datetime
-import json
 import uuid
 from enum import Enum
 from logging import getLogger
@@ -154,6 +154,7 @@ class LazyTaskList:
         else:
             raise TypeError("Invalid slice argument type.")
 
+        logger.info("Getting max %s lazy items at offset %s with filter %s", limit, offset, self.kwargs)
         res = self.scheduler_client.list_tasks(
             limit=limit,
             offset=offset,
@@ -195,13 +196,26 @@ class SchedulerClient:
         self,
         **kwargs,
     ) -> PaginatedTasksResponse:
-        kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
-        res = self._client.get("/tasks", params=kwargs)
+        filter_key = "filters"
+        params = {k: v for k, v in kwargs.items() if v is not None if k != filter_key}  # filter Nones from kwargs
+        endpoint = "/tasks"
+        res = self._client.post(endpoint, params=params, json=kwargs.get(filter_key, None))
+        try:
+            res.raise_for_status()
+        except HTTPStatusError as exc:
+            logger.warning(
+                "Unexpected response %s from endpoint %s with args %s which returns code %s. Exception: %s",
+                res.content,
+                endpoint,
+                kwargs,
+                res.status_code,
+                exc,
+            )
         return PaginatedTasksResponse.model_validate_json(res.content)
 
     def get_lazy_task_list(
         self,
-        scheduler_id: str,
+        scheduler_id: str | None,
         task_type: str | None = None,
         status: str | None = None,
         min_created_at: datetime.datetime | None = None,
@@ -209,17 +223,19 @@ class SchedulerClient:
         input_ooi: str | None = None,
         plugin_id: str | None = None,
         boefje_name: str | None = None,
+        filters: dict | None = None,
     ) -> LazyTaskList:
         return LazyTaskList(
             self,
             scheduler_id=scheduler_id,
-            type=task_type,
+            task_type=task_type,
             status=status,
             min_created_at=min_created_at,
             max_created_at=max_created_at,
             input_ooi=input_ooi,
             plugin_id=plugin_id,
             boefje_name=boefje_name,
+            filters=filters,
         )
 
     def get_task_details(self, organization_code: str, task_id: str) -> Task:
@@ -262,14 +278,41 @@ class SchedulerClient:
         health_endpoint.raise_for_status()
         return ServiceHealth.model_validate_json(health_endpoint.content)
 
-    def get_task_stats(self, organization_code: str, task_type: str) -> dict:
+    def _get(self, path: str) -> dict:
+        """Helper to do a get request."""
         try:
-            res = self._client.get(f"/tasks/stats/{task_type}-{organization_code}")
+            res = self._client.get(path)
             res.raise_for_status()
         except HTTPError:
-            raise SchedulerError()
-        task_stats = json.loads(res.content)
-        return task_stats
+            raise SchedulerError(path)
+        return res.json()
+
+    def _get_task_stats(self, scheduler_id: str) -> dict:
+        """Return task stats for specific scheduler."""
+        return self._get(f"/tasks/stats/{scheduler_id}")
+
+    def get_task_stats(self, organization_code: str, task_type: str) -> dict:
+        """Return task stats for specific organization and task combination."""
+        return self._get_task_stats(scheduler_id=f"{task_type}-{organization_code}")
+
+    @staticmethod
+    def _merge_stat_dicts(dicts: list[dict]) -> dict:
+        """Merge multiple stats dicts."""
+        stat_sum: dict[str, collections.Counter] = collections.defaultdict(collections.Counter)
+        for dct in dicts:
+            for timeslot, counts in dct.items():
+                stat_sum[timeslot].update(counts)
+        return dict(stat_sum)
+
+    def get_all_task_stats(self, task_type: str, scheduler_ids: list | None = None) -> dict:
+        """Return all task stats for specific task type (e.g. 'boefje')."""
+        return SchedulerClient._merge_stat_dicts(
+            dicts=[
+                self._get_task_stats(scheduler_id=scheduler.get("id"))
+                for scheduler in self._get(f"/schedulers/by_type/{task_type}")
+                if (scheduler_ids is None or scheduler["id"] in scheduler_ids)
+            ]
+        )
 
 
 client = SchedulerClient(settings.SCHEDULER_API)
