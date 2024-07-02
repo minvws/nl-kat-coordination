@@ -1,6 +1,8 @@
 from dataclasses import dataclass
+from collections.abc import Sequence
 from datetime import datetime, timezone
 from functools import cached_property
+from operator import attrgetter
 
 import structlog
 from account.mixins import OrganizationView
@@ -22,6 +24,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
+from octopoes.models.ooi.reports import Report
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import get_relations
@@ -255,6 +258,136 @@ class FindingList:
             return hydrated_findings
 
         raise NotImplementedError("FindingList only supports slicing")
+
+
+class HydratedReport:
+    parent_report: Report
+    children_reports: list[Report] | None
+    total_children_reports: int
+    total_objects: int
+    report_type_summary: dict[str, int]
+
+
+class ReportList:
+    HARD_LIMIT = 99_999_999
+
+    def __init__(
+        self,
+        octopoes_connector: OctopoesAPIConnector,
+        valid_time: datetime,
+        parent_report_id: str | None = None,
+    ):
+        self.octopoes_connector = octopoes_connector
+        self.valid_time = valid_time
+        self.ordered = True
+        self._count = None
+        self.parent_report_id = parent_report_id
+
+        self.subreports = None
+        if self.parent_report_id and self.parent_report_id is not None:
+            self.subreports = self.get_subreports(self.parent_report_id)
+
+    @cached_property
+    def count(self) -> int:
+        if self.subreports is not None:
+            return len(self.subreports)
+        return self.octopoes_connector.list_reports(
+            valid_time=self.valid_time,
+            limit=0,
+        ).count
+
+    def __len__(self):
+        return self.count
+
+    def __getitem__(self, key: int | slice) -> Sequence[HydratedReport | tuple[str, Report]]:
+        if isinstance(key, slice):
+            offset = key.start or 0
+            limit = self.HARD_LIMIT
+            if key.stop:
+                limit = key.stop - offset
+
+            if self.subreports is not None:
+                return self.subreports[offset : offset + limit]
+
+            reports = self.octopoes_connector.list_reports(
+                valid_time=self.valid_time,
+                offset=offset,
+                limit=limit,
+            ).items
+
+            return self.hydrate_report_list(reports)
+
+        raise NotImplementedError("ReportList only supports slicing")
+
+    def get_subreports(self, report_id: str) -> list[tuple[str, Report]]:
+        """
+        Get child reports with parent id.
+        """
+        # TODO: is better to use query over query_many as we use one parent id.
+        # query will only return 50 items as we do not have pagination (offset and limit)
+        # yet implemented for query requests. We use query_many to get more then 50 items at once.
+
+        subreports = self.octopoes_connector.query_many(
+            "Report.<parent_report [is Report]",
+            self.valid_time,
+            [report_id],
+        )
+
+        subreports = sorted(subreports, key=lambda x: (x[1].report_type, x[1].input_oois))
+
+        return subreports
+
+    def hydrate_report_list(self, reports: list[Report]) -> list[HydratedReport]:
+        hydrated_reports: list[HydratedReport] = []
+
+        for report in reports:
+            hydrated_report: HydratedReport = HydratedReport()
+
+            parent_report, children_reports = report
+
+            hydrated_report.total_children_reports = len(children_reports)
+
+            if len(parent_report.input_oois) > 0:
+                hydrated_report.total_objects = len(parent_report.input_oois)
+            else:
+                hydrated_report.total_objects = len(self.get_children_input_oois(children_reports))
+
+            hydrated_report.report_type_summary = self.report_type_summary(children_reports)
+
+            if not parent_report.has_parent:
+                hydrated_children_reports: list[Report] = []
+                for child_report in children_reports:
+                    if str(child_report.parent_report) == str(parent_report):
+                        hydrated_children_reports.append(child_report)
+                    if len(hydrated_children_reports) >= 5:  # We want to show only 5 children reports
+                        break
+
+                hydrated_report.children_reports = sorted(hydrated_children_reports, key=attrgetter("name"))
+
+            hydrated_report.parent_report = parent_report
+            hydrated_reports.append(hydrated_report)
+
+        return hydrated_reports
+
+    @staticmethod
+    def get_children_input_oois(children_reports: list[Report]) -> set[str]:
+        return {input_ooi for child_report in children_reports for input_ooi in child_report.input_oois}
+
+    @staticmethod
+    def report_type_summary(reports: list[Report]) -> dict[str, int]:
+        """
+        Calculates per report type how many objects it consumed.
+        """
+
+        summary: dict[str, int] = {}
+        report_types: set[str] = {report.report_type for report in reports}
+
+        for report_type in sorted(report_types):
+            summary[report_type] = sum(
+                [len(report.input_oois) for report in reports if report_type == report.report_type]
+            )
+
+        return summary
 
 
 class ConnectorFormMixin:
