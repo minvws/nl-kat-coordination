@@ -19,7 +19,8 @@ from octopoes.models import OOI, Reference
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.definitions import BaseReportType, MultiReport, Report
 from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
-from rocky.views.ooi_view import BaseOOIListView
+from rocky.views.mixins import OOIList
+from rocky.views.ooi_view import OOIFilterView
 
 REPORTS_PRE_SELECTION = {
     "clearance_level": ["2", "3", "4"],
@@ -88,7 +89,7 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
         return context
 
 
-class OOISelectionView(BaseOOIListView):
+class OOISelectionView(OOIFilterView):
     """
     Shows a list of OOIs to select from and handles OOIs selection requests.
     """
@@ -96,24 +97,42 @@ class OOISelectionView(BaseOOIListView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.selected_oois = self.get_ooi_selection()
+        self.oois = self.get_oois()
+        self.oois_pk = self.get_oois_pk()
 
     def get_ooi_selection(self) -> list[str]:
+        selected_oois = self.request.GET.getlist("ooi", [])
+        if "all" in selected_oois:
+            return selected_oois
         return sorted(set(self.request.POST.getlist("ooi", [])))
 
     def get_total_objects(self) -> int:
+        if "all" in self.selected_oois:
+            return len(self.oois_pk)
         return len(self.selected_oois)
 
     def get_ooi_references(self) -> set[Reference]:
         return {Reference.from_str(ooi) for ooi in self.selected_oois}
 
-    def get_oois(self) -> list[OOI | None]:
-        try:
-            return self.octopoes_api_connector.load_objects_bulk(
-                references=self.get_ooi_references(), valid_time=self.observed_at
-            )
-        except Exception:
-            logger.warning("Fetching oois failed.")
-        return []
+    def get_oois_pk(self) -> list[str]:
+        oois_pk = self.selected_oois
+        if "all" in self.selected_oois:
+            oois_pk = [ooi.primary_key for ooi in self.oois]
+        return oois_pk
+
+    def get_oois(self) -> list[OOI]:
+        if "all" in self.selected_oois:
+            return self.octopoes_api_connector.list_objects(
+                self.get_ooi_types(),
+                valid_time=self.observed_at,
+                limit=OOIList.HARD_LIMIT,
+                scan_level=self.get_ooi_scan_levels(),
+                scan_profile_type=self.get_ooi_profile_types(),
+            ).items
+
+        return self.octopoes_api_connector.load_objects_bulk(
+            references=self.get_ooi_references(), valid_time=self.observed_at
+        )
 
     def get_ooi_filter_forms(self, ooi_types: Iterable[type[OOI]]) -> dict[str, Form]:
         return {
@@ -132,8 +151,8 @@ class OOISelectionView(BaseOOIListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(self.get_ooi_filter_forms(self.ooi_types))
         context["selected_oois"] = self.selected_oois
+        context.update(self.get_ooi_filter_forms(self.ooi_types))
         return context
 
 

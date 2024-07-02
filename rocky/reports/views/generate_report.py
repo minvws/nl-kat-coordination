@@ -24,6 +24,7 @@ from reports.views.base import (
     get_selection,
 )
 from reports.views.view_helpers import GenerateReportStepsMixin
+from rocky.views.ooi_view import BaseOOIListView
 
 
 class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
@@ -68,7 +69,9 @@ class LandingGenerateReportView(BreadcrumbsGenerateReportView):
         )
 
 
-class OOISelectionGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenerateReportView, OOISelectionView):
+class OOISelectionGenerateReportView(
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseOOIListView, OOISelectionView
+):
     """
     Select objects for the 'Generate Report' flow.
     """
@@ -79,9 +82,8 @@ class OOISelectionGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenera
     ooi_types = get_ooi_types_with_report()
 
     def post(self, request, *args, **kwargs):
-        if not self.ooi_selection_is_valid():
-            return self.get(request, *args, **kwargs)
-        return redirect(self.get_next())
+        self.ooi_selection_is_valid()
+        return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -100,17 +102,16 @@ class ReportTypesSelectionGenerateReportView(
     template_name = "generate_report/select_report_types.html"
     breadcrumbs_step = 4
     current_step = 2
-    ooi_types = get_ooi_types_with_report()
 
     def post(self, request, *args, **kwargs):
         if not self.ooi_selection_is_valid():
             return redirect(self.get_previous())
-        return redirect(self.get_next())
+        return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["oois"] = self.get_oois()
-        context["available_report_types"] = self.get_report_types(get_report_types_for_oois(self.selected_oois))
+        context["oois"] = self.oois
+        context["available_report_types"] = self.get_report_types(get_report_types_for_oois(self.get_oois_pk()))
         context["total_oois"] = self.get_total_objects()
         return context
 
@@ -150,7 +151,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, OOISelectionView, Report
     report_types: Sequence[type[Report]]
     ooi_types = get_ooi_types_with_report()
 
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.report_type_selection_is_valid():
             return redirect(
                 reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(request)

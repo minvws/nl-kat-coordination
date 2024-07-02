@@ -55,9 +55,10 @@
                     </div>
                 </div>
             {% endif %}
-            <form method="post"
+            <form novalidate
+                  method="post"
                   action="{{ next }}"
-                  class="inline layout-wide checkboxes_required">
+                  class="inline layout-wide">
                 {% csrf_token %}
                 {% if "all" in selected_oois %}
                     {% include "forms/report_form_fields.html" %}
@@ -83,7 +84,7 @@
                         {% for object in ooi_list %}
                             <tr>
                                 <td>
-                                    <input type="checkbox" id="submit-form" name="ooi" value={{ object.primary_key }} {% if object.primary_key in selected_oois or "all" in request.GET.ooi %}checked{% endif %} {% if "all" in request.GET.ooi %}disabled{% endif %}>
+                                    <input type="checkbox" name="ooi" value={{ object.primary_key }} {% if object.primary_key in selected_oois or "all" in request.GET.ooi %}checked{% endif %} {% if "all" in request.GET.ooi %}disabled{% endif %}>
                                 </td>
                                 <td>{{ object.human_readable }}</td>
                                 <td>{{ object.ooi_type }}</td>
@@ -105,7 +106,7 @@
         {% endif %}
     </div>
 </section>
-<form id="select_all_objects_form" class="inline" method="get">
+<form novalidate id="select_all_objects_form" class="inline" method="get">
     {% include "forms/report_form_fields.html" with selected_oois=None %}
 
     {% if "all" not in selected_oois %}<input type="hidden" name="ooi" value="all">{% endif %}
