@@ -1,4 +1,6 @@
+import logging
 from collections.abc import Sequence
+from datetime import datetime, timezone
 from typing import Any
 
 from django.contrib import messages
@@ -26,6 +28,8 @@ from reports.views.base import (
 from reports.views.view_helpers import GenerateReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
 
+logger = logging.getLogger(__name__)
+
 
 class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
     def build_breadcrumbs(self):
@@ -39,7 +43,7 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
             },
             {
                 "url": reverse("generate_report_select_oois", kwargs=kwargs) + selection,
-                "text": _("Select Objects"),
+                "text": _("Select objects"),
             },
             {
                 "url": reverse("generate_report_select_report_types", kwargs=kwargs) + selection,
@@ -48,6 +52,10 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
             {
                 "url": reverse("generate_report_setup_scan", kwargs=kwargs) + selection,
                 "text": _("Configuration"),
+            },
+            {
+                "url": reverse("generate_report_export_setup", kwargs=kwargs) + selection,
+                "text": _("Export setup"),
             },
             {
                 "url": reverse("generate_report_view", kwargs=kwargs) + selection,
@@ -128,7 +136,6 @@ class SaveGenerateReportMixin(ReportPluginView):
         by_type: dict[str, list[str]] = {}
 
         number_of_reports = 0
-
         for ooi in self.get_oois_pk():
             ooi_type = Reference.from_str(ooi).class_
 
@@ -138,7 +145,6 @@ class SaveGenerateReportMixin(ReportPluginView):
             by_type[ooi_type].append(ooi)
 
         sorted_report_types = list(filter(lambda x: x in self.report_types, REPORTS))
-
         for report_class in sorted_report_types:
             oois = {
                 ooi for ooi_type in report_class.input_ooi_types for ooi in by_type.get(ooi_type.get_object_type(), [])
@@ -146,7 +152,6 @@ class SaveGenerateReportMixin(ReportPluginView):
 
             try:
                 results = report_class(self.octopoes_api_connector).collect_data(oois, self.observed_at)
-
             except ObjectNotFoundException:
                 error_reports.append(report_class.id)
                 continue
@@ -234,21 +239,68 @@ class SetupScanGenerateReportView(
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        del request.session["report_name"]  # delete session
+        del request.session["reference_date"]  # delete session
+        if not self.report_has_required_plugins() or self.plugins_enabled():
+            return redirect(self.get_next())
         if not self.selected_report_types:
             messages.error(self.request, _("Select at least one report type to proceed."))
             return redirect(
                 reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(self.request)
             )
-        if not self.report_has_required_plugins() or self.plugins_enabled():
-            report_ooi = self.save_report()
-            return redirect(
-                reverse("view_report", kwargs={"organization_code": self.organization.code})
-                + "?"
-                + urlencode({"report_id": report_ooi.reference})
-            )
         if not self.plugins:
             return redirect(self.get_previous())
         return super().get(request, *args, **kwargs)
+
+
+class ExportSetupGenerateReportView(
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportPluginView, TemplateView
+):
+    """
+    Shows the export setup page where users can set their export preferences.
+    """
+
+    template_name = "generate_report/export_setup.html"
+    breadcrumbs_step = 6
+    current_step = 4
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.selected_report_types:
+            messages.error(request, _("Select at least one report type to proceed."))
+            return redirect(self.get_previous())
+        if "report_name" not in request.session:
+            request.session["report_name"] = self.set_report_name()
+
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        new_report_name = self.request.POST.get("report-name")
+        new_reference_date = str(self.request.POST.get("reference-date"))
+        request.session["report_name"] = new_report_name
+        request.session["reference_date"] = new_reference_date
+        return redirect(self.get_current())
+
+    def set_report_name(self):
+        if len(self.oois_pk) > 1 or len(self.report_types) > 1:
+            return "Concatenated Report"
+        else:
+            return self.report_types[0].name + " for " + Reference.from_str(self.oois_pk[0]).human_readable
+
+    def set_full_report_name(self):
+        report_name = self.request.session.get("report_name", "")
+        reference_date = self.request.session.get("reference_date", "")
+
+        if reference_date:
+            return report_name + " (" + reference_date + ")"
+        else:
+            return report_name
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["reference_date"] = datetime.now(timezone.utc)
+        context["report_name"] = self.request.session.get("report_name", "")
+        context["full_report_name"] = self.set_full_report_name()
+        return context
 
 
 class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportView, ReportPluginView, TemplateView):

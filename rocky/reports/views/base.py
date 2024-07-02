@@ -96,6 +96,7 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = self.get_breadcrumbs()
         context["next"] = self.get_next()
+        context["current"] = self.get_current()
         context["previous"] = self.get_previous()
         return context
 
@@ -190,7 +191,6 @@ class ReportTypeView(BaseSelectionView):
         self.report_types: Sequence[type[Report] | type[MultiReport] | type[AggregateReport]] = (
             self.get_report_types_from_choice()
         )
-
         self.report_ids = [report.id for report in self.report_types]
 
     def get_report_types_from_choice(
@@ -357,8 +357,9 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
         has_parent: bool,
         observed_at: datetime,
     ) -> ReportOOI:
+        report_name = self.request.POST.get("full_report_name")
         report_ooi = ReportOOI(
-            name=str(report_type.name),
+            name=report_name,
             report_type=str(report_type.id),
             template=report_type.template_path,
             report_id=uuid4(),
@@ -540,6 +541,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
             report_types = self.get_report_types([self.report_ooi])
 
         context["report_data"] = report_data
+        context["report_name"] = self.report_ooi.name
         context["report_types"] = [
             report_type for x in REPORTS for report_type in report_types if report_type["id"] == x.id
         ]

@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Sequence
 from typing import Any
 
@@ -25,6 +26,8 @@ from reports.views.base import (
 from reports.views.view_helpers import AggregateReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
 
+logger = logging.getLogger(__name__)
+
 
 class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
     def build_breadcrumbs(self):
@@ -38,7 +41,7 @@ class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
             },
             {
                 "url": reverse("aggregate_report_select_oois", kwargs=kwargs) + selection,
-                "text": _("Select Objects"),
+                "text": _("Select objects"),
             },
             {
                 "url": reverse("aggregate_report_select_report_types", kwargs=kwargs) + selection,
@@ -47,6 +50,10 @@ class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
             {
                 "url": reverse("aggregate_report_setup_scan", kwargs=kwargs) + selection,
                 "text": _("Configuration"),
+            },
+            {
+                "url": reverse("aggregate_report_export_setup", kwargs=kwargs) + selection,
+                "text": _("Export setup"),
             },
             {
                 "url": reverse("aggregate_report_save", kwargs=kwargs) + selection,
@@ -233,12 +240,35 @@ class SetupScanAggregateReportView(
         return super().get(request, *args, **kwargs)
 
 
+class ExportSetupAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportPluginView):
+    """
+    Shows the export setup page where users can set their export preferences.
+    """
+
+    template_name = "aggregate_report/export_setup.html"
+    breadcrumbs_step = 6
+    current_step = 4
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.selected_report_types:
+            messages.error(request, _("Select at least one report type to proceed."))
+            return redirect(
+                reverse("aggregate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(request)
+            )
+
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
 class SaveAggregateReportView(SaveAggregateReportMixin, BreadcrumbsAggregateReportView, ReportPluginView):
     """
     Save the report and redirect to the saved report
     """
 
-    current_step = 6
+    current_step = 5
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
     report_types: Sequence[type[Report]]
 

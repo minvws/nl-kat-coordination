@@ -7,7 +7,7 @@
         <caption class="visually-hidden">{% translate "Reports:" %}</caption>
         <thead>
             <tr>
-                <th scope="col">{% translate "Report ID" %}</th>
+                <th scope="col">{% translate "Name" %}</th>
                 <th scope="col">{% translate "Report type" %}</th>
                 <th scope="col">{% translate "Input Objects" %}</th>
                 <th scope="col">{% translate "Reference date" %}</th>
@@ -20,7 +20,7 @@
                 <tr>
                     <td>
                         <a href="{% url "view_report" organization.code %}?report_id={{ report.parent_report.reference }}&observed_at={{ report.parent_report.observed_at|date:"Y-m-d H:i:s:u" }}"
-                           title="{% translate "Shows parent report details" %}">{{ report.parent_report.reference }}</a>
+                           title="{% translate "Shows parent report details" %}">{{ report.parent_report.name }}</a>
                     </td>
                     <td>
                         {% if report.parent_report.report_type == "concatenated-report" or report.parent_report.report_type is None %}

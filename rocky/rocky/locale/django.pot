@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-27 09:18+0000\n"
+"POT-Creation-Date: 2024-07-01 15:33+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,6 +30,8 @@ msgstr ""
 #: katalogus/templates/plugin_settings_list.html
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/tls_report/report.html
+#: reports/templates/partials/export_report_settings.html
+#: reports/templates/report_overview/report_history_table.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/templates/partials/ooi_detail_related_object.html
@@ -802,6 +804,7 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/katalogus_settings.html
+#: reports/templates/partials/export_report_settings.html
 #: reports/templates/partials/report_setup_scan.html
 #: reports/templates/partials/report_types_selection.html
 #: rocky/templates/two_factor/core/otp_required.html
@@ -1321,6 +1324,7 @@ msgstr ""
 #: onboarding/templates/account/step_2a_organization_update.html
 #: onboarding/templates/account/step_2b_indemnification_setup.html
 #: onboarding/templates/step_3d_clearance_level_introduction.html
+#: reports/templates/partials/report_setup_scan.html
 msgid "Continue"
 msgstr ""
 
@@ -2598,6 +2602,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/concatenated_report/report.py
+#: reports/templates/partials/export_report_settings.html
 msgid "Concatenated Report"
 msgstr ""
 
@@ -3353,6 +3358,78 @@ msgstr ""
 msgid "for"
 msgstr ""
 
+#: reports/templates/partials/export_report_settings.html
+msgid "Report name"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid ""
+"Give your report a name. Currently, it is only possible to give a name to "
+"the parent report. Subreports cannot be given a name."
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Report names:"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+#: reports/templates/partials/report_navigation.html
+msgid "Aggregate Report"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Change report name"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Close modal"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid ""
+"\n"
+"                                        Give your report a custom name and "
+"optionally add the reports' reference date\n"
+"                                        to the name. To do so you can select "
+"a standard option or use a Python\n"
+"                                        strftime code in the report name.\n"
+"                                    "
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Add reference date"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Select option"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "No reference date"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Day"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Week"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Month"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Year"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+#: reports/templates/report_overview/report_overview_header.html
+#: reports/views/generate_report.py
+msgid "Generate report"
+msgstr ""
+
 #: reports/templates/partials/generate_report_sidemenu.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Table of contents"
@@ -3397,10 +3474,6 @@ msgid "Ready"
 msgstr ""
 
 #: reports/templates/partials/report_header.html
-msgid "OpenKAT Report"
-msgstr ""
-
-#: reports/templates/partials/report_header.html
 msgid ""
 "All selected report types for the selected objects are displayed one below "
 "the other."
@@ -3420,10 +3493,6 @@ msgstr ""
 
 #: reports/templates/partials/report_navigation.html
 msgid "Generate Report"
-msgstr ""
-
-#: reports/templates/partials/report_navigation.html
-msgid "Aggregate Report"
 msgstr ""
 
 #: reports/templates/partials/report_navigation.html
@@ -3586,12 +3655,6 @@ msgstr ""
 msgid "Show more suggested plugins"
 msgstr ""
 
-#: reports/templates/partials/report_setup_scan.html
-#: reports/templates/report_overview/report_overview_header.html
-#: reports/views/generate_report.py
-msgid "Generate report"
-msgstr ""
-
 #: reports/templates/partials/report_severity_totals.html
 #: reports/templates/partials/report_severity_totals_table.html
 msgid "Findings overview"
@@ -3674,11 +3737,6 @@ msgid "Reports:"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-#: reports/templates/report_overview/subreports_table.html
-msgid "Report ID"
-msgstr ""
-
-#: reports/templates/report_overview/report_history_table.html
 msgid "Input Objects"
 msgstr ""
 
@@ -3723,6 +3781,11 @@ msgstr[1] ""
 #: reports/templates/report_overview/subreports_header.html
 #: reports/views/report_overview.py
 msgid "Subreports"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Report ID"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
@@ -3831,12 +3894,18 @@ msgid "Aggregate report"
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
-msgid "Select Objects"
+#: reports/views/multi_report.py
+msgid "Select objects"
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 #: reports/views/multi_report.py
 msgid "Select report types"
+msgstr ""
+
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+#: reports/views/multi_report.py
+msgid "Export setup"
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
@@ -3855,6 +3924,7 @@ msgid ""
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
+#: reports/views/multi_report.py
 msgid "Select at least one report type to proceed."
 msgstr ""
 
@@ -3865,10 +3935,6 @@ msgstr ""
 
 #: reports/views/multi_report.py
 msgid "Multi report"
-msgstr ""
-
-#: reports/views/multi_report.py
-msgid "Select OOIs"
 msgstr ""
 
 #: reports/views/multi_report.py
@@ -3885,6 +3951,14 @@ msgstr ""
 
 #: reports/views/view_helpers.py
 msgid "3: Configuration"
+msgstr ""
+
+#: reports/views/view_helpers.py
+msgid "4: Export setup"
+msgstr ""
+
+#: reports/views/view_helpers.py
+msgid "3: Export setup"
 msgstr ""
 
 #: tools/forms/base.py
