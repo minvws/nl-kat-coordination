@@ -52,18 +52,13 @@ class RemoteBoefjesRunner:
             logger.info(request.model_dump_json())
             response = httpx.post(url=REMOTE_URL, data=request.model_dump_json(), timeout=Timeout(timeout=10))
 
-            logger.info("SOUF WAS HERE")
-
             if response.is_error:
-                logger.exception("SOUF HAS GONE WRONG 1")
                 logger.exception(response)
 
                 self.boefje_meta.ended_at = datetime.now(timezone.utc)
                 self.bytes_api_client.save_boefje_meta(self.boefje_meta)  # The task didn't create a boefje_meta object
                 self.bytes_api_client.save_raw(task_id, response, stderr_mime_types.union({"error/boefje"}))
                 self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
-
-                logger.exception("SOUF HAS GONE WRONG 2")
 
                 # have to raise exception to prevent _start_working function from setting status to completed
                 raise RuntimeError("Boefje did not call output API endpoint")

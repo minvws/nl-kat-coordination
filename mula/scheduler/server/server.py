@@ -496,7 +496,6 @@ class Server:
         return stats
 
     def get_queues(self) -> Any:
-        self.logger.info("SOUF: GETTING QUEUES")
         return [models.Queue(**s.queue.dict(include_pq=False)) for s in self.schedulers.copy().values()]
 
     def get_queue(self, queue_id: str) -> Any:

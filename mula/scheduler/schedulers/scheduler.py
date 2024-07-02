@@ -106,7 +106,6 @@ class Scheduler(abc.ABC):
             remote=p_item.remote,
         )
 
-        self.logger.info("SOUF CREATING/UPDATING IN TASKSTORE")
         self.logger.info(task.model_dump_json())
 
         task_db = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
@@ -243,10 +242,7 @@ class Scheduler(abc.ABC):
             )
             raise exc
         except Exception as e:
-            self.logger.info("SOUF SOMETHING ELSE WENT WRONG")
             self.logger.info(e)
-        finally:
-            self.logger.info("SOUF finally")
 
         self.logger.debug(
             "Pushed item %s to queue %s with priority %s ",
@@ -314,7 +310,6 @@ class Scheduler(abc.ABC):
             QueueFullError: When the queue is full.
         """
         tries = 0
-        self.logger.info("SOUF STARTED PUSHING TO QUEUE")
 
         while not self.is_space_on_queue() and (tries < max_tries or max_tries == -1):
             self.logger.debug(
@@ -329,9 +324,7 @@ class Scheduler(abc.ABC):
         if tries >= max_tries and max_tries != -1:
             raise queues.errors.QueueFullError()
 
-        self.logger.info("SOUF ALMOST DONE PUSHIN")
         self.push_item_to_queue(p_item)
-        self.logger.info("SOUF PUSHED TO QUEUE")
 
     def run_in_thread(
         self,
