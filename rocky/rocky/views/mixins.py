@@ -1,5 +1,5 @@
-from dataclasses import dataclass
 from collections.abc import Sequence
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import cached_property
 from operator import attrgetter
