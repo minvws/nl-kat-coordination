@@ -1,7 +1,7 @@
 FROM python:3.11-slim
 
 WORKDIR /app
-RUN apt-get update && apt-get install -y nmap && apt-get install -y coreutils && pip install httpx
+RUN apt-get update && apt-get install -y nmap && pip install httpx
 
 ARG BOEFJE_PATH=./boefjes/plugins/kat_remote_scanner
 ENV PYTHONPATH=/app:$BOEFJE_PATH
