@@ -6,18 +6,9 @@
         <h1>{% translate "Configuration" %}</h1>
         <p class="emphasized">{% translate "Set up the required plugins for this report." %}</p>
         {% if selected_oois and selected_report_types %}
-            <form id="change_selection"
-                  novalidate
-                  method="post"
-                  action="{{ next }}"
-                  class="inline layout-wide">
-                {% csrf_token %}
-                {% include "forms/report_form_fields.html" %}
-
-                <button type="submit" class="button">
-                    <span class="icon ti-chevron-left"></span>{% translate "Change selection" %}
-                </button>
-            </form>
+            <a href="{{ previous }}" class="button ghost">
+                <span class="icon ti-chevron-left"></span>{% translate "Change selection" %}
+            </a>
             <h2>{% translate "Plugins" %}</h2>
             <p>
                 <strong>{% translate "KAT will be able to generate a full report when all the required and suggested boefjes are enabled." %}</strong>
