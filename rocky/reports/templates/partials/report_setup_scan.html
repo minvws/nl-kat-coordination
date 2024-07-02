@@ -92,12 +92,8 @@
                     </div>
                 </div>
             {% endif %}
-            <form id="generate_report" class="inline" method="get" action="{{ next }}">
-                {% include "forms/report_form_fields.html" %}
-
-                {% for report_type in selected_report_types %}
-                    <input type="hidden" name="report_type" value={{ report_type }}>
-                {% endfor %}
+            <form id="generate_report" class="inline" method="post" action="{{ next }}">
+                {% csrf_token %}
                 <button type="submit">
                     {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
                 </button>
