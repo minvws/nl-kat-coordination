@@ -82,7 +82,7 @@ buttons.forEach((button) => {
             escapeHTMLEntities(encodeURIComponent(organization_code));
           let object_list = "";
           // set the observed at time a fews seconds into the future, as the job finish time is not the same as the ooi-creation time. Due to async reasons the object might be a bit slow.
-          data["timestamp"] = Date.parse(data["valid_time"]+"z");
+          data["timestamp"] = Date.parse(data["valid_time"]+"Z");
           data["valid_time_async"] = new Date(data["timestamp"] + asyncoffset)
             .toISOString()
             .substring(0, 19); // strip milliseconds
