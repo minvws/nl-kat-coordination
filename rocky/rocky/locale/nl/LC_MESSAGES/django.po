@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-24 15:42+0000\n"
+"POT-Creation-Date: 2024-06-27 09:18+0000\n"
 "PO-Revision-Date: 2024-06-26 12:09+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -802,6 +802,7 @@ msgstr "Geselecteerde objecten"
 
 #: katalogus/templates/change_clearance_level.html
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/report_overview/report_history_table.html
 #: reports/templates/summary/ooi_selection.html
 #: rocky/templates/partials/task_history.html
 msgid "Object"
@@ -1095,6 +1096,7 @@ msgid "Actions"
 msgstr "Acties"
 
 #: katalogus/templates/partials/plugins_navigation.html
+#: reports/templates/report_overview/report_overview_navigation.html
 msgid "Plugins Navigation"
 msgstr "Plug-insnavigatie"
 
@@ -1753,8 +1755,9 @@ msgstr "Onboarding overslaan"
 msgid "Choose a report - Introduction"
 msgstr "Kies een rapport – Introductie"
 
-#: onboarding/templates/step_2a_choose_report_info.html reports/views/base.py
-#: rocky/templates/header.html
+#: onboarding/templates/step_2a_choose_report_info.html
+#: reports/templates/report_overview/report_overview_header.html
+#: reports/views/base.py rocky/templates/header.html
 msgid "Reports"
 msgstr "Rapporten"
 
@@ -2434,7 +2437,7 @@ msgstr "{name} met succes aangemaakt."
 msgid "Filter by OOI types"
 msgstr "Filter op OOI-types"
 
-#: reports/forms.py
+#: reports/forms.py reports/templates/report_overview/report_history_table.html
 msgid "Report types"
 msgstr "Rapporttypes"
 
@@ -2460,6 +2463,8 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/plugin_overview_table.html
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
 #: reports/templates/summary/report_asset_overview.html
 msgid "Report type"
 msgstr "Rapporttype"
@@ -2988,6 +2993,10 @@ msgstr ""
 "(PACS) en radiologie-informatiesystemen (RIS). DICOM-servers slaan "
 "patiëntspecifieke medische beelden, zoals röntgenfoto’s, CT-scans en MRI’s "
 "op en beheren deze met behulp van een gestandaardiseerd formaat."
+
+#: reports/report_types/concatenated_report/report.py
+msgid "Concatenated Report"
+msgstr ""
 
 #: reports/report_types/dns_report/report.html
 msgid "Records found"
@@ -3931,6 +3940,7 @@ msgstr[0] "Selecteer %(total_oois)s object"
 msgstr[1] "Selecteer alle %(total_oois)s objecten"
 
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/report_overview/report_history_table.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: tools/view_helpers.py rocky/templates/admin/delete_confirmation.html
 #: rocky/templates/admin/delete_selected_confirmation.html
@@ -4052,6 +4062,7 @@ msgid "Show more suggested plugins"
 msgstr "Meer voorgestelde plug-ins tonen"
 
 #: reports/templates/partials/report_setup_scan.html
+#: reports/templates/report_overview/report_overview_header.html
 #: reports/views/generate_report.py
 msgid "Generate report"
 msgstr "Rapport genereren"
@@ -4125,6 +4136,135 @@ msgstr "Alle rapporten die beschikbaar zijn voor uw selectie."
 msgid "Toggle all report types"
 msgstr "Selecteer alle rapporttypes"
 
+#: reports/templates/report_overview/report_history.html
+#: reports/views/report_overview.py
+msgid "Reports history"
+msgstr ""
+
+#: reports/templates/report_overview/report_history.html
+msgid "An overview of all your generated reports."
+msgstr ""
+
+#: reports/templates/report_overview/report_history.html
+#, python-format
+msgid "Showing %(length)s of %(total)s reports"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Reports:"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Report ID"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Input Objects"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Reference date"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Creation date"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Shows parent report details"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Close children report object details"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Subreports details:"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#, python-format
+msgid ""
+"\n"
+"                                    This report consist of %(counter)s "
+"subreport with the following report type and object.\n"
+"                                "
+msgid_plural ""
+"\n"
+"                                    This report consist of %(counter)s "
+"subreports with the following report types and objects.\n"
+"                                "
+msgstr[0] ""
+msgstr[1] ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_header.html
+#: reports/views/report_overview.py
+msgid "Subreports"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Shows subreport details"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "View all subreports"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_header.html
+msgid "Overview of reports"
+msgstr "Overzicht van rapporten"
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Recent"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Presets"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Scheduled"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Folders"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "History"
+msgstr ""
+
+#: reports/templates/report_overview/subreports.html
+#, python-format
+msgid "Showing %(length)s of %(total)s subreports"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_header.html
+msgid "Back to Reports History"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_header.html
+msgid "An overview of all underlying reports of"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_header.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Shows report details"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_table.html
+msgid "Subreports:"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_table.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+msgid "Input Object"
+msgstr "Inputobject"
+
 #: reports/templates/summary/report_asset_overview.html
 msgid ""
 "The objects listed in the table below were used to generate this report. For "
@@ -4191,18 +4331,13 @@ msgid "Select report types"
 msgstr "Selecteer rapporttypes"
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
-#: reports/views/multi_report.py
-msgid "View report"
-msgstr "Toon rapport"
+msgid "Save report"
+msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 #: reports/views/multi_report.py
 msgid "Select at least one OOI to proceed."
 msgstr "Selecteer minstens één OOI om door te gaan."
-
-#: reports/views/aggregate_report.py reports/views/generate_report.py
-msgid "Select at least one report type to proceed."
-msgstr "Selecteer minstens één rapporttype om door te gaan."
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 msgid ""
@@ -4211,6 +4346,10 @@ msgid ""
 msgstr ""
 "Er zijn geen gegevens gevonden voor %(report_types). Object(en) bestaan niet "
 "op %(date)s."
+
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+msgid "Select at least one report type to proceed."
+msgstr "Selecteer minstens één rapporttype om door te gaan."
 
 #: reports/views/base.py
 #, python-format
@@ -4224,6 +4363,10 @@ msgstr "Multi-rapport"
 #: reports/views/multi_report.py
 msgid "Select OOIs"
 msgstr "Selecteer OOI’s"
+
+#: reports/views/multi_report.py
+msgid "View report"
+msgstr "Toon rapport"
 
 #: reports/views/view_helpers.py
 msgid "1: Select objects"
@@ -6442,10 +6585,6 @@ msgstr "Lijst van taken voor normalizers"
 msgid "No scans found for this object."
 msgstr "Geen scans gevonden voor dit object."
 
-#: rocky/templates/tasks/partials/boefje_task_history.html
-msgid "Input Object"
-msgstr "Inputobject"
-
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Normalizer"
 msgstr "Normalizer"
@@ -7530,9 +7669,6 @@ msgstr "Raw-bestand met succes toegevoegd."
 
 #~ msgid "Web system compliance:"
 #~ msgstr "Compliance websysteem:"
-
-#~ msgid "Overview of reports"
-#~ msgstr "Overzicht van rapporten"
 
 #~ msgid "Objects:"
 #~ msgstr "Objecten:"
