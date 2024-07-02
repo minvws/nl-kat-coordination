@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import collections
 import datetime
-import json
 import uuid
 from enum import Enum
 from logging import getLogger
@@ -197,18 +196,20 @@ class SchedulerClient:
         self,
         **kwargs,
     ) -> PaginatedTasksResponse:
-        kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
+        filter_key = "filters"
+        params = {k: v for k, v in kwargs.items() if v is not None if k != filter_key}  # filter Nones from kwargs
         endpoint = "/tasks"
-        logger.debug("Making request to %s with args %s", endpoint, kwargs)
-        # Endpoint expects a str.
-        res = self._client.post(endpoint, params=kwargs, data=json.dumps(kwargs.get("filters", None)))  # type: ignore
-        if res.status_code != httpx.codes.OK:
+        res = self._client.post(endpoint, params=params, json=kwargs.get(filter_key, None))
+        try:
+            res.raise_for_status()
+        except HTTPStatusError as exc:
             logger.warning(
-                "Unexpected response %s from endpoint %s with args %s which returns code %s.",
+                "Unexpected response %s from endpoint %s with args %s which returns code %s. Exception: %s",
                 res.content,
                 endpoint,
                 kwargs,
                 res.status_code,
+                exc,
             )
         return PaginatedTasksResponse.model_validate_json(res.content)
 
