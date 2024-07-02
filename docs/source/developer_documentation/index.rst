@@ -18,3 +18,4 @@ Contains documentation for developers and contributors.
    octopoes_research
    keiko
    reports
+   development_tutorial/index

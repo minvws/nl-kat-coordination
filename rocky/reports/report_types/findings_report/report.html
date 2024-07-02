@@ -1,10 +1,11 @@
 {% load i18n %}
+{% load ooi_extra %}
 
 {% if data.finding_types %}
     {% if show_introduction %}
         <p>
             {% blocktranslate trimmed %}
-                The findings report provides an overview of the identified findings on the scanned
+                The Findings Report provides an overview of the identified findings on the scanned
                 systems. For each finding it shows the risk level and the number of occurrences of
                 the finding. Under the 'Details' section a description, impact, recommendation and
                 location of the finding can be found. The risk level may be different for your
@@ -56,7 +57,7 @@
                                 <ul class="accordion break-title">
                                     {% for occurrence in info.occurrences %}
                                         <li>
-                                            <button aria-expanded="false">{{ occurrence.finding.ooi.human_readable }}</button>
+                                            <button aria-expanded="false">{{ occurrence.finding.ooi|human_readable }}</button>
                                             <div aria-labelledby="finding-details">
                                                 <h5>{% translate "First seen" %}</h5>
                                                 <p>{{ occurrence.first_seen }}</p>

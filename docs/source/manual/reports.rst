@@ -13,60 +13,86 @@ There are 3 different kinds of reports available. These are:
 The table below gives an overview of the 12 reports available. It also describes which Object needs to be selected and whether the report is available as a normal and/or as an aggregate report.
 
 .. list-table:: Report overview table
-   :widths: 25 50 25 75
+   :widths: 25 50 25 25 25 25
    :header-rows: 1
 
    * - Report type
      - Description
-     - Object
+     - Input object
+     - Required plugins
+     - Optional plugins
      - Normal or Aggregate report
    * - DNS
      - The DNS report gives an overview of the identified DNS settings for the scanned hostnames.
      - Hostname
+     - dns-records, dns-sec
+     - dns-zone
      - Normal
    * - Findings
      - Shows all the finding types and their occurrences.
      - **Any**
+     -
+     -
      - Normal
    * - IPv6
      - Check whether hostnames point to IPv6 addresses.
-     - Hostname
+     - Hostname, IPAddressV4, IPAddressV6
+     - dns-records
+     -
      - Normal + aggregate
    * - Mail
      - System specific mail report that focusses on IP addresses and hostnames.
-     - Hostname
+     - Hostname, IPAddressV4, IPAddressV6
+     - dns-records
+     -
      - Normal + aggregate
    * - Name server
      - Name server report checks name servers on basic security standards.
-     - Hostname
+     - Hostname, IPAddressV4, IPAddressV6
+     - nmap, dns-records, dns-sec
+     -
      - Normal + aggregate
    * - Open ports
      - Find open ports of IP addresses.
-     - Hostname
+     - Hostname, IPAddressV4, IPAddressV6
+     - nmap
+     - shodan, nmap-udp, nmap-ports, nmap-ip-range, masscan
      - Normal + aggregate
    * - RPKI
      - Shows whether the IP is covered by a valid RPKI ROA. For a hostname it shows the IP addresses and whether they are covered by a valid RPKI ROA.
-     - Hostname
+     - Hostname, IPAddressV4, IPAddressV6
+     - dns-records, rpki
+     -
      - Normal + aggregate
    * - Safe connections
      - Shows whether the IPService contains safe ciphers.
-     - Hostname
+     - Hostname, IPAddressV4, IPAddressV6
+     - dns-records, testssl-sh-ciphers, nmap
+     -
      - Normal + aggregate
    * - System
      - Combine IP addresses, hostnames and services into systems.
-     - Hostname
+     - Hostname, IPAddressV4, IPAddressV6
+     - dns-records, nmap
+     - nmap-udp
      - Normal + aggregate
    * - TLS
      - TLS reports assess the security of data encryption and transmission protocols.
      - **IPService**
+     - testssl-sh-ciphers
+     -
      - Normal
    * - Vulnerability
      - Vulnerabilities found are grouped for each system.
-     - Hostname
+     - Hostname, IPAddressV4, IPAddressV6
+     - dns-records, nmap, webpage-analysis
+     - nmap-udp, nmap-ports, shodan
      - Normal + aggregate
    * - Web system
      - Web system reports check web systems on basic security standards.
-     - Hostname
+     - Hostname, IPAddressV4, IPAddressV6
+     - nmap, dns-records, security_txt_downloader, testssl-sh-ciphers, ssl-version, ssl-certificates,webpage-analysis
+     -
      - Normal + aggregate
 
 

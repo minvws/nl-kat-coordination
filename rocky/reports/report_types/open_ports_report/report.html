@@ -7,7 +7,7 @@
         {% endif %}
         <p>
             {% blocktranslate trimmed %}
-                The open ports report provides an overview of the open ports identified on
+                The Open Ports Report provides an overview of the open ports identified on
                 a system. The ports that are marked as <b>bold</b> were identified by direct
                 scans performed by OpenKAT (such as nmap). Ports that are not marked in bold
                 were identified through external services and/or scans (such as Shodan). Scans
@@ -26,7 +26,7 @@
             <tbody>
                 {% for ip, detailed_data in data.items %}
                     <tr>
-                        <td>{{ ip.tokenized.address }}</td>
+                        <td>{{ ip }}</td>
                         {# djLint formatting adds spaces before the comma. #}
                         {# djlint:off #}
                         <td>
