@@ -5,6 +5,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
+from urllib.parse import quote
 
 from fastapi.testclient import TestClient
 
@@ -850,221 +851,127 @@ class APISchemaEndpointTestCase(APITemplateTestCase):
     def setUp(self):
         super().setUp()
 
-        first_schedule = models.Schema(
-            scheduler_id=self.scheduler.scheduler_id,
-            p_item=functions.create_p_item("test_scheduler_id", 1),
-            deadline_at=datetime.now(timezone.utc) + timedelta(days=1),
-        )
-
-        response = self.client.post(
-            "/schema",
-            data=json.dumps(
-                {"schedule": first_schedule.model_dump()}, cls=UUIDEncoder, default=str
-            ),
-        )
-        self.assertEqual(201, response.status_code)
-        first_schedule_id = response.json().get("id")
-
-        self.first_schedule_api = self.client.get(f"/schema/{first_schedule_id}").json()
-
-        second_schedule = models.Schema(
-            scheduler_id=self.scheduler.scheduler_id,
-            p_item=functions.create_p_item("test_scheduler_id", 1),
-            deadline_at=datetime.now(timezone.utc) + timedelta(days=2),
-        )
-
-        response = self.client.post(
-            "/schema",
-            data=json.dumps(
-                {"schedule": second_schedule.model_dump()}, cls=UUIDEncoder, default=str
-            ),
-        )
-        self.assertEqual(201, response.status_code)
-        second_schedule_id = response.json().get("id")
-
-        self.second_schedule_api = self.client.get(
-            f"/schema/{second_schedule_id}"
-        ).json()
-
-    def test_create_schedule(self):
-        # Arrange
-        schedule = {
-            "schedule": models.Schema(
+        first_item = functions.create_item(self.scheduler.scheduler_id, 1)
+        self.first_schedule = self.mock_ctx.datastores.schedule_store.create_schedule(
+            models.Schedule(
                 scheduler_id=self.scheduler.scheduler_id,
-                p_item=functions.create_p_item("test_scheduler_id", 1),
-            ).model_dump()
-        }
-
-        # Act
-        response_post = self.client.post(
-            "/schema", data=json.dumps(schedule, cls=UUIDEncoder, default=str)
+                hash=first_item.hash,
+                data=first_item.data,
+                deadline_at=datetime.now(timezone.utc) + timedelta(days=1),
+            )
         )
-        response_get = self.client.get(f"/schema/{response_post.json().get('id')}")
 
-        # Assert
-        self.assertEqual(201, response_post.status_code)
-        self.assertEqual(200, response_get.status_code)
-
-    def test_create_schedule_validate_malformed_cron_expresssion(self):
-        # Arrange
-        cron_expression = "malformed"
-
-        schedule = {
-            "schedule": models.Schema(
+        second_item = functions.create_item(self.scheduler.scheduler_id, 1)
+        self.second_schedule = self.mock_ctx.datastores.schedule_store.create_schedule(
+            models.Schedule(
                 scheduler_id=self.scheduler.scheduler_id,
-                p_item=functions.create_p_item("test_scheduler_id", 1),
-                cron_expression=cron_expression,
-            ).model_dump()
-        }
-
-        # Act
-        response_post = self.client.post(
-            "/schema", data=json.dumps(schedule, cls=UUIDEncoder, default=str)
+                hash=second_item.hash,
+                data=second_item.data,
+                deadline_at=datetime.now(timezone.utc) + timedelta(days=2),
+            )
         )
 
-        # Assert
-        self.assertEqual(400, response_post.status_code)
-        self.assertTrue(
-            response_post.json().get("detail").startswith("Invalid cron expression")
-        )
-
-    def test_list_schema(self):
-        response = self.client.get("/schema")
+    def test_list_schedules(self):
+        response = self.client.get("/schedules")
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, response.json()["count"])
         self.assertEqual(2, len(response.json()["results"]))
 
-    def test_list_schema_scheduler_id(self):
-        response = self.client.get(
-            f"/schema?scheduler_id={self.scheduler.scheduler_id}"
-        )
-        self.assertEqual(200, response.status_code)
-        self.assertEqual(2, response.json()["count"])
-        self.assertEqual(2, len(response.json()["results"]))
-        self.assertEqual(
-            self.first_schedule_api.get("scheduler_id"),
-            response.json()["results"][0]["scheduler_id"],
-        )
-
-    def test_list_schema_enabled(self):
-        response = self.client.get("/schema?enabled=true")
+    def test_list_schedules_enabled(self):
+        response = self.client.get("/schedules?enabled=true")
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, response.json()["count"])
         self.assertEqual(2, len(response.json()["results"]))
 
-        response = self.client.get("/schema?enabled=false")
+        response = self.client.get("/schedules?enabled=false")
         self.assertEqual(200, response.status_code)
         self.assertEqual(0, response.json()["count"])
         self.assertEqual(0, len(response.json()["results"]))
 
-    def test_list_schema_min_deadline(self):
+    def test_list_schedules_min_deadline(self):
         response = self.client.get(
-            f"/schema?min_deadline={self.first_schedule_api.get('deadline_at')}"
+            f"/schedules?min_deadline_at={quote(self.first_schedule.deadline_at.isoformat())}"
         )
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, response.json()["count"])
         self.assertEqual(2, len(response.json()["results"]))
 
         response = self.client.get(
-            f"/schema?min_deadline={self.second_schedule_api.get('deadline_at')}"
+            f"/schedules?min_deadline_at={quote(self.second_schedule.deadline_at.isoformat())}"
         )
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()["count"])
         self.assertEqual(1, len(response.json()["results"]))
         self.assertEqual(
-            self.second_schedule_api.get("id"), response.json()["results"][0]["id"]
+            str(self.second_schedule.id), response.json()["results"][0]["id"]
         )
 
-    def test_list_schema_max_deadline(self):
+    def test_list_schedules_max_deadline(self):
         response = self.client.get(
-            f"/schema?max_deadline={self.second_schedule_api.get('deadline_at')}"
+            f"/schedules?max_deadline_at={quote(self.second_schedule.deadline_at.isoformat())}"
         )
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, response.json()["count"])
         self.assertEqual(2, len(response.json()["results"]))
 
         response = self.client.get(
-            f"/schema?max_deadline={self.first_schedule_api.get('deadline_at')}"
+            f"/schedules?max_deadline_at={quote(self.first_schedule.deadline_at.isoformat())}"
         )
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()["count"])
         self.assertEqual(1, len(response.json()["results"]))
         self.assertEqual(
-            self.first_schedule_api.get("id"), response.json()["results"][0]["id"]
+            str(self.first_schedule.id), response.json()["results"][0]["id"]
         )
 
-    def test_list_schema_min_and_max_deadline(self):
+    def test_list_schedules_min_and_max_deadline(self):
         response = self.client.get(
-            f"/schema?min_deadline={self.first_schedule_api.get('deadline_at')}&max_deadline={self.second_schedule_api.get('deadline_at')}"
+            f"/schedules?min_deadline_at={quote(self.first_schedule.deadline_at.isoformat())}&max_deadline_at={quote(self.second_schedule.deadline_at.isoformat())}"
         )
+
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, response.json()["count"])
         self.assertEqual(2, len(response.json()["results"]))
 
         response = self.client.get(
-            f"/schema?min_deadline={self.first_schedule_api.get('deadline_at')}&max_deadline={self.first_schedule_api.get('deadline_at')}"
+            f"/schedules?min_deadline_at={quote(self.first_schedule.deadline_at.isoformat())}&max_deadline_at={quote(self.first_schedule.deadline_at.isoformat())}"
         )
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()["count"])
         self.assertEqual(1, len(response.json()["results"]))
         self.assertEqual(
-            self.first_schedule_api.get("id"), response.json()["results"][0]["id"]
+            str(self.first_schedule.id), response.json()["results"][0]["id"]
         )
 
-    def test_list_schema_min_greater_than_max_deadline(self):
+    def test_list_schedules_min_greater_than_max_deadline(self):
         response = self.client.get(
-            f"/schema?min_deadline={self.second_schedule_api.get('deadline_at')}&max_deadline={self.first_schedule_api.get('deadline_at')}"
+            f"/schedules?min_deadline_at={quote(self.second_schedule.deadline_at.isoformat())}&max_deadline_at={quote(self.first_schedule.deadline_at.isoformat())}"
         )
         self.assertEqual(400, response.status_code)
         self.assertEqual(
             "min_deadline must be less than max_deadline", response.json().get("detail")
         )
 
-    def test_get_schema_filter(self):
-        response = self.client.post(
-            "/schema",
-            json={
-                "filters": {
-                    "filters": [
-                        {
-                            "column": "p_item",
-                            "field": "id",
-                            "operator": "eq",
-                            "value": self.first_schedule_api.get("p_item").get("id"),
-                        }
-                    ]
-                }
-            },
-        )
-        self.assertEqual(200, response.status_code)
-        self.assertEqual(1, len(response.json()["results"]))
+    # TODO: hash, enabled, created_at, modified_at, pagination
 
     def test_get_schedule(self):
-        response = self.client.get(f"/schema/{self.first_schedule_api.get('id')}")
+        response = self.client.get(f"/schedules/{str(self.first_schedule.id)}")
         self.assertEqual(200, response.status_code)
-        self.assertEqual(self.first_schedule_api.get("id"), response.json().get("id"))
+        self.assertEqual(str(self.first_schedule.id), response.json().get("id"))
 
     def test_patch_schedule(self):
         response = self.client.patch(
-            f"/schema/{self.first_schedule_api.get('id')}", json={"enabled": False}
+            f"/schedules/{str(self.first_schedule.id)}", json={"enabled": False}
         )
         self.assertEqual(200, response.status_code)
         self.assertEqual(False, response.json().get("enabled"))
 
     def test_patch_schedule_validate_malformed_cron_expression(self):
         response = self.client.patch(
-            f"/schema/{self.first_schedule_api.get('id')}",
+            f"/schedules/{str(self.first_schedule.id)}",
             json={"cron_expression": "malformed"},
         )
         self.assertEqual(400, response.status_code)
         self.assertTrue(
             response.json().get("detail").startswith("Invalid cron expression")
         )
-
-    def test_delete_schedule(self):
-        response = self.client.delete(f"/schema/{self.first_schedule_api.get('id')}")
-        self.assertEqual(204, response.status_code)
-
-        response = self.client.get(f"/schema/{self.first_schedule_api.get('id')}")
-        self.assertEqual(404, response.status_code)
-        self.assertEqual("schedule not found", response.json().get("detail"))

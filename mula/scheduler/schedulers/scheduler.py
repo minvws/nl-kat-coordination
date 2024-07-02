@@ -283,6 +283,7 @@ class Scheduler(abc.ABC):
         # TODO: check exception handling here
         try:
             # FIXME: task.schedule instead of get
+            # TODO: test that there should only be one scheduler for a hash
             schedule = self.ctx.datastores.schedule_store.get_schedule_by_hash(
                 item.hash
             )
@@ -290,12 +291,15 @@ class Scheduler(abc.ABC):
                 # TODO: naive cron schedule determination, should be improved
                 # with a random jitter approach to avoid scheduling tasks
                 # during office hours
+                # TODO: data field in schedule, write test that checks
+                # if a new task gets created that is correct
                 now = datetime.now(timezone.utc)
                 cron_expression = self.evaluate_schedule(item)
                 schedule_db = self.ctx.datastores.schedule_store.create_schedule(
                     models.Schedule(
                         scheduler_id=self.scheduler_id,
                         hash=item.hash,
+                        data=item.data,
                         schedule=cron_expression,
                         deadline_at=cron.next_run(cron_expression),
                         created_at=now,

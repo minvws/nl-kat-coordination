@@ -196,7 +196,7 @@ class TaskAPI:
                 detail="failed to get tasks",
             ) from exc
 
-        return utils.paginate(request, results, count=count, offset=offset, limit=limit)
+        return utils.paginate(request, results, count, offset, limit)
 
     def get(self, task_id: uuid.UUID) -> Any:
         try:
@@ -219,7 +219,7 @@ class TaskAPI:
                 detail="task not found",
             )
 
-        return models.Task(**task.model_dump())
+        return task
 
     # NOTE: serializers.Task instead of models.Task is needed for patch
     # endpoints # to allow for partial updates.
@@ -256,6 +256,11 @@ class TaskAPI:
         # Update task in database
         try:
             self.ctx.datastores.task_store.update_task(updated_task)
+        except storage.errors.StorageError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"error occurred while accessing the database [exception: {exc}]",
+            ) from exc
         except Exception as exc:
             self.logger.exception(exc)
             raise fastapi.HTTPException(

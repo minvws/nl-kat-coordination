@@ -1,17 +1,11 @@
-import datetime
-import uuid
-from typing import Any
-
 import fastapi
 import structlog
 import uvicorn
 from fastapi import status
 
-from scheduler import context, models, queues, schedulers, storage, version
-from scheduler.config import settings
-from scheduler.models.errors import ValidationError
+from scheduler import context, schedulers
 
-from . import handlers, serializers
+from . import handlers
 
 
 class Server:
@@ -28,7 +22,7 @@ class Server:
     def __init__(
         self,
         ctx: context.AppContext,
-        schedulers: dict[str, schedulers.Scheduler],
+        s: dict[str, schedulers.Scheduler],
     ):
         """Initializer of the Server class.
 
@@ -41,13 +35,13 @@ class Server:
         self.ctx: context.AppContext = ctx
         self.api: fastapi.FastAPI = fastapi.FastAPI(
             title="Scheduler",
-            version=version.VERSION,
             description="Scheduler API",
         )
-        self.scheduler: dict[str, schedulers.Scheduler] = schedulers
+        self.schedulers: dict[str, schedulers.Scheduler] = s
 
         # Set up API endpoints
-        handlers.SchedulerAPI(self.api, self.ctx, schedulers)
+        handlers.SchedulerAPI(self.api, self.ctx, s)
+        handlers.QueueAPI(self.api, self.ctx, s)
         handlers.ScheduleAPI(self.api, self.ctx)
         handlers.TaskAPI(self.api, self.ctx)
         handlers.MetricsAPI(self.api, self.ctx)

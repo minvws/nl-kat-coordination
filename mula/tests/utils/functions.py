@@ -53,6 +53,7 @@ def create_task_in(priority: int, data: TestModel | None = None) -> str:
     )
 
 
+# TODO: rename to task
 def create_item(
     scheduler_id: str, priority: int, task: models.Task | None = None
 ) -> models.Task:
@@ -69,17 +70,12 @@ def create_item(
     return item
 
 
-def create_schema(scheduler_id: str, data: Any | None = None) -> models.Schedule:
-    if data is None:
-        data = TestModel(
-            id=uuid.uuid4().hex,
-            name=uuid.uuid4().hex,
-        )
-
+def create_schedule(scheduler_id: str, data: Any | None = None) -> models.Schedule:
+    item = data or create_test_model()
     return models.Schedule(
         scheduler_id=scheduler_id,
-        hash=data.hash,
-        data=data.model_dump(),
+        hash=item.hash,
+        data=item.model_dump(),
     )
 
 
