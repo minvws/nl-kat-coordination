@@ -13,7 +13,7 @@ from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import settings
 from boefjes.docker_boefjes_runner import DockerBoefjesRunner
 from boefjes.job_models import BoefjeMeta, NormalizerMeta, SerializedOOI, SerializedOOIValue
-from boefjes.katalogus.local_repository import LocalPluginRepository
+from boefjes.local_repository import LocalPluginRepository
 from boefjes.plugins.models import _default_mime_types
 from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
 from octopoes.api.models import Affirmation, Declaration, Observation

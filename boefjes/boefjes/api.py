@@ -15,7 +15,7 @@ from boefjes.clients.scheduler_client import SchedulerAPIClient, TaskStatus
 from boefjes.config import settings
 from boefjes.job_handler import get_environment_settings, get_octopoes_api_connector, serialize_ooi
 from boefjes.job_models import BoefjeMeta
-from boefjes.katalogus.local_repository import LocalPluginRepository, get_local_repository
+from boefjes.local_repository import LocalPluginRepository, get_local_repository
 from boefjes.plugins.models import _default_mime_types
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException

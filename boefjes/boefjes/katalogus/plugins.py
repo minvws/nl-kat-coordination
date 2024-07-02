@@ -5,16 +5,16 @@ from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel, Field
 
-from boefjes.katalogus.api.organisations import check_organisation_exists
-from boefjes.katalogus.dependencies.plugins import (
+from boefjes.dependencies.plugins import (
     PluginService,
     get_pagination_parameters,
     get_plugin_service,
     get_plugins_filter_parameters,
 )
-from boefjes.katalogus.models import FilterParameters, PaginationParameters, PluginType
-from boefjes.katalogus.storage.interfaces import PluginStorage
+from boefjes.katalogus.organisations import check_organisation_exists
+from boefjes.models import FilterParameters, PaginationParameters, PluginType
 from boefjes.sql.plugin_storage import get_plugin_storage
+from boefjes.storage.interfaces import PluginStorage
 
 router = APIRouter(
     prefix="/organisations/{organisation_id}",

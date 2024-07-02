@@ -4,7 +4,7 @@ import pkgutil
 from pathlib import Path
 from typing import Any
 
-from boefjes.katalogus.models import PluginType
+from boefjes.models import PluginType
 from boefjes.plugins.models import (
     BOEFJE_DEFINITION_FILE,
     BOEFJES_DIR,

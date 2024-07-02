@@ -6,8 +6,8 @@ from unittest.mock import MagicMock
 from requests.models import CaseInsensitiveDict, PreparedRequest, Response
 
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
-from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
+from boefjes.local_repository import LocalPluginRepository
 from tests.loading import get_dummy_data
 
 

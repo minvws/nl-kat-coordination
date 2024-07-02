@@ -6,19 +6,12 @@ import alembic.config
 from sqlalchemy.orm import sessionmaker
 
 from boefjes.config import settings
-from boefjes.katalogus.models import Boefje, Normalizer, Organisation
-from boefjes.katalogus.storage.interfaces import (
-    OrganisationNotFound,
-    PluginNotFound,
-    PluginStateNotFound,
-    SettingsNotFound,
-    StorageError,
-)
+from boefjes.models import Boefje, Normalizer, Organisation
+from boefjes.sql.config_storage import SQLConfigStorage, create_encrypter
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
-from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
 from boefjes.sql.plugin_storage import SQLPluginStorage
-from boefjes.sql.setting_storage import SQLSettingsStorage, create_encrypter
+from boefjes.storage.interfaces import ConfigNotFound, OrganisationNotFound, PluginNotFound, StorageError
 
 
 @skipIf(os.environ.get("CI") != "1", "Needs a CI database.")
@@ -28,8 +21,7 @@ class TestRepositories(TestCase):
 
         session = sessionmaker(bind=get_engine())()
         self.organisation_storage = SQLOrganisationStorage(session, settings)
-        self.settings_storage = SQLSettingsStorage(session, create_encrypter())
-        self.plugin_state_storage = SQLPluginEnabledStorage(session, settings)
+        self.config_storage = SQLConfigStorage(session, create_encrypter())
         self.plugin_storage = SQLPluginStorage(session, settings)
 
     def tearDown(self) -> None:
@@ -64,45 +56,55 @@ class TestRepositories(TestCase):
         organisation_id = "test"
         plugin_id = 64 * "a"
 
+        with self.plugin_storage as storage:
+            storage.create_boefje(Boefje(id=plugin_id, name="Test"))
+
         org = Organisation(id=organisation_id, name="Test")
         with self.organisation_storage as storage:
             storage.create(org)
 
-        with self.settings_storage as settings_storage:
-            settings_storage.upsert({"TEST_SETTING": "123.9", "TEST_SETTING2": 12}, organisation_id, plugin_id)
+        with self.config_storage as settings_storage:
+            settings_storage.upsert(organisation_id, plugin_id, {"TEST_SETTING": "123.9", "TEST_SETTING2": 12})
 
-        with self.settings_storage as settings_storage:
-            settings_storage.upsert({"TEST_SETTING": "123.9", "TEST_SETTING2": 13}, organisation_id, plugin_id)
+        with self.config_storage as settings_storage:
+            settings_storage.upsert(organisation_id, plugin_id, {"TEST_SETTING": "123.9", "TEST_SETTING2": 13})
 
-        returned_settings = settings_storage.get_all(organisation_id, plugin_id)
+        returned_settings = settings_storage.get_all_settings(organisation_id, plugin_id)
         self.assertEqual("123.9", returned_settings["TEST_SETTING"])
         self.assertEqual(13, returned_settings["TEST_SETTING2"])
 
-        with self.assertRaises(SettingsNotFound):
+        with self.assertRaises(ConfigNotFound):
             settings_storage.delete("no organisation!", plugin_id)
 
-        self.assertEqual({"TEST_SETTING": "123.9", "TEST_SETTING2": 13}, settings_storage.get_all(org.id, plugin_id))
-        self.assertEqual(dict(), settings_storage.get_all(org.id, "wrong"))
-        self.assertEqual(dict(), settings_storage.get_all("wrong", plugin_id))
+        self.assertEqual(
+            {"TEST_SETTING": "123.9", "TEST_SETTING2": 13}, settings_storage.get_all_settings(org.id, plugin_id)
+        )
+        self.assertEqual(dict(), settings_storage.get_all_settings(org.id, "wrong"))
+        self.assertEqual(dict(), settings_storage.get_all_settings("wrong", plugin_id))
 
-        with self.settings_storage as settings_storage:
+        with self.config_storage as settings_storage:
             settings_storage.delete(org.id, plugin_id)
 
-        self.assertEqual(dict(), settings_storage.get_all(org.id, plugin_id))
+        self.assertEqual(dict(), settings_storage.get_all_settings(org.id, plugin_id))
 
-        with self.assertRaises(StorageError), self.settings_storage as settings_storage:
-            settings_storage.upsert({"TEST_SETTING": "123.9"}, organisation_id, 65 * "a")
+        with self.assertRaises(StorageError), self.config_storage as settings_storage:
+            settings_storage.upsert(organisation_id, 65 * "a", {"TEST_SETTING": "123.9"})
 
     def test_settings_storage_values_field_limits(self):
         organisation_id = "test"
         plugin_id = 64 * "a"
 
+        with self.plugin_storage as storage:
+            storage.create_boefje(Boefje(id=plugin_id, name="Test"))
+
         org = Organisation(id=organisation_id, name="Test")
         with self.organisation_storage as storage:
             storage.create(org)
 
-        with self.settings_storage as settings_storage:
+        with self.config_storage as settings_storage:
             settings_storage.upsert(
+                organisation_id,
+                plugin_id,
                 {
                     "TEST_SETTING": 12 * "123.9",
                     "TEST_SETTING2": 12000,
@@ -111,8 +113,6 @@ class TestRepositories(TestCase):
                     "TEST_SETTING5": 10 * "b",
                     "TEST_SETTING6": 123456789,
                 },
-                organisation_id,
-                plugin_id,
             )
 
         self.assertEqual(
@@ -124,7 +124,7 @@ class TestRepositories(TestCase):
                 "TEST_SETTING5": 10 * "b",
                 "TEST_SETTING6": 123456789,
             },
-            settings_storage.get_all(org.id, plugin_id),
+            settings_storage.get_all_settings(org.id, plugin_id),
         )
 
     def test_plugin_enabled_storage(self):
@@ -132,34 +132,38 @@ class TestRepositories(TestCase):
             org = Organisation(id="test", name="Test")
             storage.create(org)
 
-        with self.plugin_state_storage as plugin_state_storage:
-            plugin = Boefje(
-                id="test-boefje-1",
-                name="Test Boefje 1",
-                version="0.1",
-                consumes={"WebPage"},
-                produces=["text/html"],
-                enabled=True,
-            )
-            plugin_state_storage.create(plugin.id, plugin.enabled, org.id)
+        plugin = Boefje(
+            id="test-boefje-1",
+            name="Test Boefje 1",
+            version="0.1",
+            consumes={"WebPage"},
+            produces=["text/html"],
+            enabled=True,
+        )
 
-        returned_state = plugin_state_storage.get_by_id(plugin.id, org.id)
+        with self.plugin_storage as storage:
+            storage.create_boefje(plugin)
+
+        with self.config_storage as storage:
+            storage.upsert(org.id, plugin.id, enabled=plugin.enabled)
+
+        returned_state = storage.is_enabled_by_id(plugin.id, org.id)
         self.assertTrue(returned_state)
 
-        with self.plugin_state_storage as plugin_state_storage:
-            plugin_state_storage.update_or_create_by_id(plugin.id, False, org.id)
+        with self.config_storage as storage:
+            storage.upsert(org.id, plugin.id, enabled=False)
 
-        returned_state = plugin_state_storage.get_by_id(plugin.id, org.id)
+        returned_state = storage.is_enabled_by_id(plugin.id, org.id)
         self.assertFalse(returned_state)
 
-        with self.assertRaises(PluginStateNotFound):
-            plugin_state_storage.get_by_id("wrong", org.id)
+        with self.assertRaises(ConfigNotFound):
+            storage.is_enabled_by_id("wrong", org.id)
 
-        with self.assertRaises(PluginStateNotFound):
-            plugin_state_storage.get_by_id("wrong", org.id)
+        with self.assertRaises(ConfigNotFound):
+            storage.is_enabled_by_id("wrong", org.id)
 
-        with self.assertRaises(PluginStateNotFound):
-            plugin_state_storage.get_by_id(plugin.id, "wrong")
+        with self.assertRaises(ConfigNotFound):
+            storage.is_enabled_by_id(plugin.id, "wrong")
 
     def test_bare_boefje_storage(self):
         boefje = Boefje(id="test_boefje", name="Test", static=False)

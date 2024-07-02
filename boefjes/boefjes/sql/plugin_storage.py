@@ -4,11 +4,11 @@ from collections.abc import Iterator
 from sqlalchemy.orm import Session
 
 from boefjes.config import Settings, settings
-from boefjes.katalogus.models import Boefje, Normalizer, PluginType
-from boefjes.katalogus.storage.interfaces import PluginNotFound, PluginStorage
+from boefjes.models import Boefje, Normalizer, PluginType
 from boefjes.sql.db import ObjectNotFoundException, session_managed_iterator
 from boefjes.sql.db_models import BoefjeInDB, NormalizerInDB
 from boefjes.sql.session import SessionMixin
+from boefjes.storage.interfaces import NotAllowed, PluginNotFound, PluginStorage
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +41,13 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
         self.session.add(boefje_in_db)
 
     def update_boefje(self, boefje_id: str, data: dict) -> None:
+        if not data:
+            return
+
         instance = self._db_boefje_instance_by_id(boefje_id)
+
+        if instance.static:
+            raise NotAllowed(f"Plugin with id '{boefje_id}' is static, so updating it is not allowed")
 
         for key, value in data.items():
             setattr(instance, key, value)
@@ -55,7 +61,13 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
         self.session.add(normalizer_in_db)
 
     def update_normalizer(self, normalizer_id: str, data: dict) -> None:
+        if not data:
+            return
+
         instance = self._db_normalizer_instance_by_id(normalizer_id)
+
+        if instance.static:
+            raise NotAllowed(f"Plugin with id '{normalizer_id}' is static, so updating it is not allowed")
 
         for key, value in data.items():
             setattr(instance, key, value)
@@ -102,6 +114,7 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             oci_image=boefje.oci_image,
             oci_arguments=boefje.oci_arguments,
             version=boefje.version,
+            static=boefje.static,
         )
 
     @staticmethod
@@ -115,6 +128,7 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             produces=normalizer.produces,
             environment_keys=normalizer.environment_keys,
             version=normalizer.version,
+            static=normalizer.static,
         )
 
     @staticmethod
@@ -132,7 +146,7 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             oci_image=boefje_in_db.oci_image,
             oci_arguments=boefje_in_db.oci_arguments,
             version=boefje_in_db.version,
-            static=False,
+            static=boefje_in_db.static,
         )
 
     @staticmethod
@@ -147,7 +161,7 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             produces=normalizer_in_db.produces,
             environment_keys=normalizer_in_db.environment_keys,
             version=normalizer_in_db.version,
-            static=False,
+            static=normalizer_in_db.static,
         )
 
 

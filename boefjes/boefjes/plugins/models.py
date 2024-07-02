@@ -5,7 +5,7 @@ from inspect import isfunction, signature
 from pathlib import Path
 from typing import Protocol
 
-from boefjes.katalogus.models import Boefje, Normalizer
+from boefjes.models import Boefje, Normalizer
 
 BOEFJES_DIR = Path(__file__).parent
 

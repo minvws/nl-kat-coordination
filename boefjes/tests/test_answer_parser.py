@@ -5,8 +5,8 @@ import pytest
 from pydantic import ValidationError
 
 from boefjes.job_models import NormalizerMeta
-from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.local import LocalNormalizerJobRunner
+from boefjes.local_repository import LocalPluginRepository
 from tests.loading import get_dummy_data
 
 

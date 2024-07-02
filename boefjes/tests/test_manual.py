@@ -5,8 +5,8 @@ from unittest import TestCase
 from pydantic_core import Url
 
 from boefjes.job_models import NormalizerMeta, NormalizerResults
-from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.local import LocalNormalizerJobRunner
+from boefjes.local_repository import LocalPluginRepository
 from octopoes.models import Reference
 from tests.loading import get_dummy_data
 

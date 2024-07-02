@@ -13,8 +13,8 @@ from alembic import op
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import sessionmaker
 
+from boefjes.sql.config_storage import create_encrypter
 from boefjes.sql.db import get_engine
-from boefjes.sql.setting_storage import create_encrypter
 
 # revision identifiers, used by Alembic.
 revision = "cd34fdfafdaf"
