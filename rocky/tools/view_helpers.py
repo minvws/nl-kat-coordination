@@ -1,4 +1,3 @@
-import logging
 import uuid
 from datetime import date, datetime, timezone
 from typing import TypedDict
@@ -199,7 +198,6 @@ def schedule_task(request: HttpRequest, organization_code: str, p_item: Prioriti
 # task info from the scheduler. Task data should be available from the context
 # from which the task is created.
 def reschedule_task(request: HttpRequest, organization_code: str, task_id: str) -> None:
-    logger = logging.Logger("SOUFLOGGER")
     try:
         task = client.get_task_details(organization_code, task_id)
     except SchedulerError as error:
@@ -211,10 +209,7 @@ def reschedule_task(request: HttpRequest, organization_code: str, task_id: str) 
         return
 
     try:
-        logger.info("Creating new p_item")
-        new_p_item = PrioritizedItem(data=task.p_item.data, priority=1, remote=task.remote)
-        logger.info(new_p_item.model_dump_json())
-        logger.info(task.model_dump_json())
+        new_p_item = PrioritizedItem(data=task.p_item.data, priority=1, remote=task.p_item.remote)
 
         schedule_task(request, organization_code, new_p_item)
     except SchedulerError as error:

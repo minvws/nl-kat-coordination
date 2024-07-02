@@ -136,6 +136,7 @@ class BoefjeTask(BaseModel):
     boefje: Boefje
     input_ooi: str | None
     organization: str
+    remote: bool = False
 
     dispatches: list[Normalizer] = Field(default_factory=list)
 

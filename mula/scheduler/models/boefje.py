@@ -11,6 +11,7 @@ class Boefje(BaseModel):
     id: str
     name: str | None = Field(default=None)
     version: str | None = Field(default=None)
+    remote: bool = False
 
 
 class BoefjeMeta(BaseModel):

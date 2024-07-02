@@ -561,9 +561,10 @@ class BoefjeScheduler(Scheduler):
 
         """
         task = BoefjeTask(
-            boefje=Boefje.parse_obj(boefje.dict()),
+            boefje=Boefje.model_validate(boefje.model_dump()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
+            remote=boefje.remote,
         )
         if not self.is_task_allowed_to_run(boefje, ooi):
             self.logger.debug(
