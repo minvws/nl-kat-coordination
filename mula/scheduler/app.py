@@ -60,7 +60,9 @@ class App:
 
         self.schedulers: dict[
             str,
-            schedulers.Scheduler | schedulers.BoefjeScheduler | schedulers.NormalizerScheduler,
+            schedulers.Scheduler
+            | schedulers.BoefjeScheduler
+            | schedulers.NormalizerScheduler,
         ] = {}
         self.server: server.Server | None = None
 
@@ -76,7 +78,9 @@ class App:
         # Katalogus service. We will add/remove schedulers based on the
         # difference between these two sets.
         scheduler_orgs: set[str] = {
-            s.organisation.id for s in current_schedulers.values() if hasattr(s, "organisation")
+            s.organisation.id
+            for s in current_schedulers.values()
+            if hasattr(s, "organisation")
         }
         try:
             orgs = self.ctx.services.katalogus.get_organisations()
@@ -87,10 +91,14 @@ class App:
         katalogus_orgs = {org.id for org in orgs}
 
         additions = katalogus_orgs.difference(scheduler_orgs)
-        self.logger.debug("Organisations to add: %s", len(additions), additions=sorted(additions))
+        self.logger.debug(
+            "Organisations to add: %s", len(additions), additions=sorted(additions)
+        )
 
         removals = scheduler_orgs.difference(katalogus_orgs)
-        self.logger.debug("Organisations to remove: %s", len(removals), removals=sorted(removals))
+        self.logger.debug(
+            "Organisations to remove: %s", len(removals), removals=sorted(removals)
+        )
 
         # We need to get scheduler ids of the schedulers that are associated
         # with the removed organisations
@@ -119,7 +127,9 @@ class App:
             try:
                 org = self.ctx.services.katalogus.get_organisation(org_id)
             except ExternalServiceError as e:
-                self.logger.error("Failed to get organisation from Katalogus", error=e, org_id=org_id)
+                self.logger.error(
+                    "Failed to get organisation from Katalogus", error=e, org_id=org_id
+                )
                 continue
 
             scheduler_boefje = schedulers.BoefjeScheduler(
@@ -138,7 +148,9 @@ class App:
 
             with self.lock:
                 self.schedulers[scheduler_boefje.scheduler_id] = scheduler_boefje
-                self.schedulers[scheduler_normalizer.scheduler_id] = scheduler_normalizer
+                self.schedulers[scheduler_normalizer.scheduler_id] = (
+                    scheduler_normalizer
+                )
 
             scheduler_normalizer.run()
             scheduler_boefje.run()
@@ -167,7 +179,9 @@ class App:
                     s.queue.qsize(),
                 )
 
-                status_counts = self.ctx.datastores.task_store.get_status_counts(s.scheduler_id)
+                status_counts = self.ctx.datastores.task_store.get_status_counts(
+                    s.scheduler_id
+                )
                 for status, count in status_counts.items():
                     self.ctx.metrics_task_status_counts.labels(
                         scheduler_id=s.scheduler_id,
