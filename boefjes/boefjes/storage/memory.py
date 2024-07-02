@@ -96,14 +96,9 @@ class ConfigStorageMemory(ConfigStorage):
     def upsert(
         self, organisation_id: str, plugin_id: str, settings: dict | None = None, enabled: bool | None = None
     ) -> None:
-        if organisation_id not in self._data:
-            self._data[organisation_id] = {}
-
-        if organisation_id not in self._enabled:
-            self._enabled[organisation_id] = {}
-
-        if plugin_id not in self._data[organisation_id]:
-            self._data[organisation_id][plugin_id] = {}
+        self._data.setdefault(organisation_id, {})
+        self._data[organisation_id].setdefault(plugin_id, {})
+        self._enabled.setdefault(organisation_id, {})
 
         if settings is not None:
             self._data[organisation_id][plugin_id] = settings
