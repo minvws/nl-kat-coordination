@@ -3,7 +3,7 @@ import { language, organization_code } from "./utils.js";
 const buttons = document.querySelectorAll(
   ".expando-button.normalizer-list-table-row",
 );
-const asyncoffset = 5; // time (in seconds) to allow for the database to actually safe the OOIs
+const asyncoffset = 5; // time (in seconds) to allow for the database to actually save the OOIs
 
 buttons.forEach((button) => {
   const raw_task_id = button.closest("tr").getAttribute("data-task-id");
