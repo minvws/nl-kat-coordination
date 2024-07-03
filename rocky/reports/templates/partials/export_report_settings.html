@@ -26,8 +26,8 @@
                         <tr>
                             <td>{{ full_report_name }}</td>
                             <td>
-                                <button class="icon ti-edit action-button modal-trigger" data-target={{ dialogid }}>Edit {{ dialogid }}
-                                </button>
+                                <button class="icon ti-edit action-button modal-trigger"
+                                        data-target="{{ dialogid }}">Edit {{ dialogid }}</button>
                             </td>
                         </tr>
                     </tbody>
@@ -45,7 +45,6 @@
                         <form id="change_name" class="inline" method="post" action="{{ current }}">
                             {% csrf_token %}
                             <section class="content">
-                                {% url "aggregate_report_landing" organization.code as index_url_aggregate_report %}
                                 <p>
                                     {% blocktranslate %}
                                         Give your report a custom name and optionally add the reports' reference date

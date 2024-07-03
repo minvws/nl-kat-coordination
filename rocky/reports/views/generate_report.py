@@ -1,4 +1,3 @@
-import logging
 from collections.abc import Sequence
 from datetime import datetime, timezone
 from typing import Any
@@ -27,8 +26,6 @@ from reports.views.base import (
 )
 from reports.views.view_helpers import GenerateReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
-
-logger = logging.getLogger(__name__)
 
 
 class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
@@ -136,6 +133,7 @@ class SaveGenerateReportMixin(ReportPluginView):
         by_type: dict[str, list[str]] = {}
 
         number_of_reports = 0
+
         for ooi in self.get_oois_pk():
             ooi_type = Reference.from_str(ooi).class_
 
@@ -145,6 +143,7 @@ class SaveGenerateReportMixin(ReportPluginView):
             by_type[ooi_type].append(ooi)
 
         sorted_report_types = list(filter(lambda x: x in self.report_types, REPORTS))
+
         for report_class in sorted_report_types:
             oois = {
                 ooi for ooi_type in report_class.input_ooi_types for ooi in by_type.get(ooi_type.get_object_type(), [])
@@ -152,6 +151,7 @@ class SaveGenerateReportMixin(ReportPluginView):
 
             try:
                 results = report_class(self.octopoes_api_connector).collect_data(oois, self.observed_at)
+
             except ObjectNotFoundException:
                 error_reports.append(report_class.id)
                 continue
@@ -239,15 +239,17 @@ class SetupScanGenerateReportView(
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        del request.session["report_name"]  # delete session
-        del request.session["reference_date"]  # delete session
-        if not self.report_has_required_plugins() or self.plugins_enabled():
-            return redirect(self.get_next())
+        if self.request.session.get("report_name", ""):
+            del request.session["report_name"]
+        if self.request.session.get("reference_date", ""):
+            del request.session["reference_date"]
         if not self.selected_report_types:
             messages.error(self.request, _("Select at least one report type to proceed."))
             return redirect(
                 reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(self.request)
             )
+        if not self.report_has_required_plugins() or self.plugins_enabled():
+            return redirect(self.get_next())
         if not self.plugins:
             return redirect(self.get_previous())
         return super().get(request, *args, **kwargs)
@@ -273,14 +275,12 @@ class ExportSetupGenerateReportView(
 
         return super().get(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        new_report_name = self.request.POST.get("report-name")
-        new_reference_date = str(self.request.POST.get("reference-date"))
-        request.session["report_name"] = new_report_name
-        request.session["reference_date"] = new_reference_date
+    def post(self, request, *args, **kwargs) -> HttpResponse:
+        request.session["report_name"] = self.request.POST.get("report-name")
+        request.session["reference_date"] = str(self.request.POST.get("reference-date"))
         return redirect(self.get_current())
 
-    def set_report_name(self):
+    def set_report_name(self) -> str:
         if len(self.oois_pk) > 1 or len(self.report_types) > 1:
             return "Concatenated Report"
         else:
