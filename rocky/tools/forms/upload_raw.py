@@ -1,14 +1,14 @@
 from datetime import datetime, timezone
 
 from django import forms
-from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
-from tools.forms.base import BaseRockyForm, DataListInput
+from tools.forms.base import BaseRockyForm, DataListInput, DateTimeInput
+from tools.forms.settings import RAW_FILE_DATETIME_HELP_TEXT
 
 
 class UploadRawForm(BaseRockyForm):
@@ -35,10 +35,12 @@ class UploadRawForm(BaseRockyForm):
         widget=DataListInput(attrs={"placeholder": _("Click to select one of the available options")}),
     )
 
-    def clean_mime_types(self) -> set[str]:
-        mime_types = self.cleaned_data["mime_types"]
-
-        return {mime_type.strip() for mime_type in mime_types.split(",") if mime_type.strip()}
+    date = forms.DateTimeField(
+        label=_("Date/Time (UTC)"),
+        widget=DateTimeInput(format="%Y-%m-%dT%H:%M"),
+        initial=lambda: datetime.now(tz=timezone.utc),
+        help_text=RAW_FILE_DATETIME_HELP_TEXT,
+    )
 
     def __init__(
         self,
@@ -51,10 +53,24 @@ class UploadRawForm(BaseRockyForm):
         super().__init__(*args, **kwargs)
         self.set_choices_for_widget("ooi_id", ooi_list)
 
-    def clean_ooi_id(self):
+    def clean_mime_types(self) -> set[str]:
+        mime_types = self.cleaned_data["mime_types"]
+
+        return {mime_type.strip() for mime_type in mime_types.split(",") if mime_type.strip()}
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        date = self.cleaned_data["date"]
+        ooi_id = self.cleaned_data["ooi_id"]
+
+        # date should not be in the future
+        if date > datetime.now(tz=timezone.utc):
+            self.add_error("date", _("Doc! I'm from the future, I'm here to take you back!"))
+
         try:
-            data = self.cleaned_data["ooi_id"]
-            self.octopoes_connector.get(Reference.from_str(data), datetime.now(timezone.utc))
-            return data
+            cleaned_data["ooi"] = self.octopoes_connector.get(Reference.from_str(ooi_id), date)
         except ObjectNotFoundException:
-            raise ValidationError(_("OOI doesn't exist"))
+            self.add_error("ooi_id", _("OOI doesn't exist, try another valid time"))
+
+        return cleaned_data

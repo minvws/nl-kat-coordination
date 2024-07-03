@@ -95,8 +95,7 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
     def process_raw(self, form):
         raw_file = form.cleaned_data["raw_file"]
         mime_types = form.cleaned_data["mime_types"]
-        ooi_id = form.cleaned_data["ooi_id"]
-        input_ooi = self.octopoes_api_connector.get(ooi_id, valid_time=datetime.now(timezone.utc))
+        input_ooi = form.cleaned_data["ooi"]
 
         try:
             get_bytes_client(self.organization.code).upload_raw(
