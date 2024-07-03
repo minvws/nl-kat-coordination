@@ -96,10 +96,15 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         raw_file = form.cleaned_data["raw_file"]
         mime_types = form.cleaned_data["mime_types"]
         input_ooi = form.cleaned_data["ooi"]
+        valid_time = form.cleaned_data["date"]
 
         try:
             get_bytes_client(self.organization.code).upload_raw(
-                raw_file.read(), mime_types, input_ooi=input_ooi.primary_key, input_dict=serialize_ooi(input_ooi)
+                raw_file.read(),
+                mime_types,
+                input_ooi=input_ooi.primary_key,
+                input_dict=serialize_ooi(input_ooi),
+                valid_time=valid_time,
             )
         except HTTPStatusError as exc:
             return self.add_error_notification(
