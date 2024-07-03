@@ -1122,6 +1122,7 @@ def mock_scheduler_client_task_list(mocker):
     mock_scheduler_client_session = mocker.patch("rocky.scheduler.client._client")
     response = Response(
         200,
+        request="",
         content=(
             json.dumps(
                 {
