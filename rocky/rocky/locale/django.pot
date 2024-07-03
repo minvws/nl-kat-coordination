@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-27 09:18+0000\n"
+"POT-Creation-Date: 2024-07-03 13:48+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3971,7 +3971,7 @@ msgstr ""
 msgid "Finding type already exists"
 msgstr ""
 
-#: tools/forms/finding_type.py
+#: tools/forms/finding_type.py tools/forms/upload_raw.py
 msgid "Click to select one of the available options"
 msgstr ""
 
@@ -4000,11 +4000,11 @@ msgstr ""
 msgid "Please explain how to reproduce your finding"
 msgstr ""
 
-#: tools/forms/finding_type.py
+#: tools/forms/finding_type.py tools/forms/upload_raw.py
 msgid "Date/Time (UTC)"
 msgstr ""
 
-#: tools/forms/finding_type.py
+#: tools/forms/finding_type.py tools/forms/upload_raw.py
 msgid "Doc! I'm from the future, I'm here to take you back!"
 msgstr ""
 
@@ -4123,6 +4123,10 @@ msgid "Add the date and time of your finding (UTC)"
 msgstr ""
 
 #: tools/forms/settings.py
+msgid "Add the date and time of when the raw file was generated (UTC)"
+msgstr ""
+
+#: tools/forms/settings.py
 msgid ""
 "OpenKAT stores a time indication with every observation, so it is possible "
 "to see the status of your network through time. Select a datetime to change "
@@ -4193,6 +4197,10 @@ msgstr ""
 #: tools/forms/upload_raw.py rocky/templates/partials/ooi_list_toolbar.html
 #: rocky/templates/upload_raw.html
 msgid "Upload raw file"
+msgstr ""
+
+#: tools/forms/upload_raw.py
+msgid "OOI doesn't exist, try another valid time"
 msgstr ""
 
 #: tools/models.py
@@ -6250,6 +6258,15 @@ msgstr ""
 
 #: rocky/templates/upload_raw.html
 msgid "Automate the creation of multiple objects by uploading a raw file."
+msgstr ""
+
+#: rocky/templates/upload_raw.html
+msgid ""
+"An input OOI can be selected for the normalizer to attach newly yielded OOIs "
+"to. If no input OOI was used for the raw file, a placeholder Scan OOI can be "
+"used. Scan OOIs can be created from the objects page. When a new version of "
+"the raw file is generated, the same Scan OOI should be chosen to ensure that "
+"old results are overwritten."
 msgstr ""
 
 #: rocky/templates/upload_raw.html rocky/views/upload_raw.py
