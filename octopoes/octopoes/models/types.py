@@ -58,7 +58,7 @@ from octopoes.models.ooi.network import (
     Network,
 )
 from octopoes.models.ooi.question import Question
-from octopoes.models.ooi.reports import ReportData
+from octopoes.models.ooi.reports import Report, ReportData
 from octopoes.models.ooi.scans import Scan
 from octopoes.models.ooi.service import IPService, Service, TLSCipher
 from octopoes.models.ooi.software import Software, SoftwareInstance
@@ -160,6 +160,7 @@ ConcreteOOIType = (
     | Question
     | ReportsType
     | ScanType
+    | Report
 )
 
 OOIType = ConcreteOOIType | NetworkType | FindingTypeType
