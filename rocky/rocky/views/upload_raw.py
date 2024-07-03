@@ -95,7 +95,7 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
 
     def get_ooi_options(self) -> list[tuple[str, str]]:
         objects = self.octopoes_api_connector.list_objects(
-            OOI_TYPES.values(), valid_time=datetime.now(timezone.utc)
+            set(OOI_TYPES.values()), valid_time=datetime.now(timezone.utc)
         ).items
 
         # generate options
