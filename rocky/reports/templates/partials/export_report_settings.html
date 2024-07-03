@@ -38,7 +38,7 @@
                         id="{{ dialogid }}">
                     <div class="content-wrapper">
                         <section class="header">
-                            <h2>{% translate "Change report name" %}</h2>
+                            <h2>{% translate "Edit " %}{{ report_name }}</h2>
                             <button class="icon-only ti-x close-modal-button"
                                     aria-label="{% translate "Close modal" %}"></button>
                         </section>
@@ -48,8 +48,8 @@
                                 <p>
                                     {% blocktranslate %}
                                         Give your report a custom name and optionally add the reports' reference date
-                                        to the name. To do so you can select a standard option or use a Python
-                                        strftime code in the report name.
+                                        to the name. To do so you can select a standard option or use a
+                                        <a href="https://strftime.org/">Python strftime code</a> in the report name.
                                     {% endblocktranslate %}
                                 </p>
                                 <p>
