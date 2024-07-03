@@ -77,7 +77,7 @@ class BytesClient:
         input_ooi: str | None = None,
         input_dict: dict | None = None,
         valid_time: datetime | None = None,
-    ):
+    ) -> str:
         self.login()
 
         boefje_meta = BoefjeMeta(
@@ -91,7 +91,8 @@ class BytesClient:
         )
 
         self._save_boefje_meta(boefje_meta)
-        self._save_raw(boefje_meta.id, raw, {"boefje/manual"}.union(manual_mime_types))
+        raw_id = self._save_raw(boefje_meta.id, raw, {"boefje/manual"}.union(manual_mime_types))
+        return raw_id
 
     def _save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
         response = self.session.post(
