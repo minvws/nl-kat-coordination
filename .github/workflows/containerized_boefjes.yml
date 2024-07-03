@@ -56,7 +56,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build container image for ${{ matrix.image }}
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           # We don't use git context because that doesn't process .dockerignore
           # https://github.com/docker/cli/issues/2827
