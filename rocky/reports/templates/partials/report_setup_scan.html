@@ -99,7 +99,7 @@
                 {% include "forms/report_form_fields.html" %}
 
                 {% for report_type in selected_report_types %}
-                    <input type="hidden" name="report_type" value={{ report_type }}>
+                    <input type="hidden" name="report_type" value="{{ report_type }}">
                 {% endfor %}
                 <button type="submit">
                     {% translate "Continue" %}<span class="icon ti-chevron-right"></span>

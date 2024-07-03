@@ -64,14 +64,16 @@
                                         <select id="reference-date" name="reference-date" required>
                                             <option disabled selected value="">-- {% translate "Select option" %} --</option>
                                             <option value="">{% translate "No reference date" %}</option>
-                                            <option value="{{ reference_date|date:"N jS Y, H:i" }}">
-                                                {% translate "Day" %} ({{ reference_date|date:"N jS Y, H:i" }})
+                                            <option value="{{ current_datetime|date:"N jS Y, H:i" }}">
+                                                {% translate "Day" %} ({{ current_datetime|date:"N jS Y, H:i" }})
                                             </option>
-                                            <option value="{% translate "Week" %} {{ reference_date|date:"W, Y" }}">
-                                                {% translate "Week" %} ({% translate "Week" %} {{ reference_date|date:"W, Y" }})
+                                            <option value="{% translate "Week" %} {{ current_datetime|date:"W, Y" }}">
+                                                {% translate "Week" %} ({% translate "Week" %} {{ current_datetime|date:"W, Y" }})
                                             </option>
-                                            <option value="{{ reference_date|date:"N, Y" }}">{% translate "Month" %} ({{ reference_date|date:"N, Y" }})</option>
-                                            <option value="{{ reference_date|date:"Y" }}">{% translate "Year" %} ({{ reference_date|date:"Y" }})</option>
+                                            <option value="{{ current_datetime|date:"N, Y" }}">
+                                                {% translate "Month" %} ({{ current_datetime|date:"N, Y" }})
+                                            </option>
+                                            <option value="{{ current_datetime|date:"Y" }}">{% translate "Year" %} ({{ current_datetime|date:"Y" }})</option>
                                         </select>
                                     </div>
                                 </p>
