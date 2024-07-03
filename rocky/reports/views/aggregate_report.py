@@ -22,6 +22,7 @@ from reports.views.base import (
     get_selection,
 )
 from reports.views.view_helpers import AggregateReportStepsMixin
+from rocky.views.ooi_view import BaseOOIListView
 
 
 class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
@@ -66,7 +67,9 @@ class LandingAggregateReportView(BreadcrumbsAggregateReportView):
         )
 
 
-class OOISelectionAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggregateReportView, OOISelectionView):
+class OOISelectionAggregateReportView(
+    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseOOIListView, OOISelectionView
+):
     """
     Select Objects for the 'Aggregate Report' flow.
     """
@@ -77,9 +80,8 @@ class OOISelectionAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggr
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
     def post(self, request, *args, **kwargs):
-        if not self.ooi_selection_is_valid():
-            return self.get(request, *args, **kwargs)
-        return redirect(self.get_next())
+        self.ooi_selection_is_valid()
+        return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -112,7 +114,7 @@ class ReportTypesSelectionAggregateReportView(
     def post(self, request, *args, **kwargs):
         if not self.ooi_selection_is_valid():
             return redirect(self.get_previous())
-        return redirect(self.get_next())
+        return self.get(request, *args, **kwargs)
 
     def get_report_types_for_aggregate_report(
         self, reports_dict: dict[str, set[type[Report]]]

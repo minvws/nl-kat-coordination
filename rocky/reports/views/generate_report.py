@@ -110,7 +110,6 @@ class ReportTypesSelectionGenerateReportView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["oois"] = self.oois
         context["available_report_types"] = self.get_report_types(get_report_types_for_oois(self.get_oois_pk()))
         context["total_oois"] = self.get_total_objects()
         return context

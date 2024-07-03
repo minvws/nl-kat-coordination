@@ -18,6 +18,7 @@ from reports.views.base import (
     get_selection,
 )
 from reports.views.view_helpers import MultiReportStepsMixin
+from rocky.views.ooi_view import BaseOOIListView
 
 
 class BreadcrumbsMultiReportView(ReportBreadcrumbs):
@@ -62,7 +63,7 @@ class LandingMultiReportView(BreadcrumbsMultiReportView):
         )
 
 
-class OOISelectionMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView, OOISelectionView):
+class OOISelectionMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView, BaseOOIListView, OOISelectionView):
     """
     Select OOIs for the 'Multi Report' flow.
     """
@@ -73,9 +74,8 @@ class OOISelectionMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportV
     ooi_types = MultiOrganizationReport.input_ooi_types
 
     def post(self, request, *args, **kwargs):
-        if not self.ooi_selection_is_valid():
-            return self.get(request, *args, **kwargs)
-        return redirect(self.get_next())
+        self.ooi_selection_is_valid()
+        return self.get(request, *args, **kwargs)
 
 
 class ReportTypesSelectionMultiReportView(
@@ -96,7 +96,7 @@ class ReportTypesSelectionMultiReportView(
     def post(self, request, *args, **kwargs):
         if not self.ooi_selection_is_valid():
             return redirect(self.get_previous())
-        return redirect(self.get_next())
+        return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -163,6 +163,8 @@ class OOISelectionView(OOIFilterView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["selected_oois"] = self.selected_oois
+        context["oois_pk"] = self.oois_pk
+        context["oois"] = self.oois
         context.update(self.get_ooi_filter_forms(self.ooi_types))
         return context
 

@@ -29,7 +29,7 @@
                    href="{% url 'ooi_list' organization_code=organization.code %}">{% translate "Go to the object page" %}</a>
             </div>
         {% else %}
-            {% if "all" in request.GET.ooi %}
+            {% if "all" in selected_oois %}
                 <div class="horizontal-view horizontal-scroll toolbar start">
                     <p class="de-emphasized">{{ total_oois }} {% translate "objects selected" %}</p>
                     <a class="select_all_objects_element">{% translate "Deselect all objects" %}</a>
@@ -73,7 +73,7 @@
                         <th>
                             <input class="select_all_objects_element"
                                    type="checkbox"
-                                   {% if "all" in request.GET.ooi %}checked{% endif %}>
+                                   {% if "all" in selected_oois %}checked{% endif %}>
                         </th>
                         <th>{% translate "Object" %}</th>
                         <th>{% translate "Type" %}</th>
@@ -84,7 +84,7 @@
                         {% for object in ooi_list %}
                             <tr>
                                 <td>
-                                    <input type="checkbox" name="ooi" value={{ object.primary_key }} {% if object.primary_key in selected_oois or "all" in request.GET.ooi %}checked{% endif %} {% if "all" in request.GET.ooi %}disabled{% endif %}>
+                                    <input type="checkbox" name="ooi" value={{ object.primary_key }} {% if object.primary_key in selected_oois or "all" in selected_oois %}checked{% endif %} {% if "all" in selected_oois %}disabled{% endif %}>
                                 </td>
                                 <td>{{ object.human_readable }}</td>
                                 <td>{{ object.ooi_type }}</td>
