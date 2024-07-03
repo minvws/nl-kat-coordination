@@ -54,7 +54,7 @@
                     </div>
                     <div class="column-4 tiles plugins images-cover">
                         {% for required_plugin in plugins.required|dictsort:"enabled" %}
-                            {% include "partials/plugin_tile.html" with plugin=required_plugin show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types %}
+                            {% include "partials/plugin_tile.html" with plugin=required_plugin plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types %}
 
                         {% endfor %}
                     </div>
@@ -92,12 +92,8 @@
                     </div>
                 </div>
             {% endif %}
-            <form id="generate_report" class="inline" method="get" action="{{ next }}">
-                {% include "forms/report_form_fields.html" %}
-
-                {% for report_type in selected_report_types %}
-                    <input type="hidden" name="report_type" value={{ report_type }}>
-                {% endfor %}
+            <form id="generate_report" class="inline" method="post" action="{{ next }}">
+                {% csrf_token %}
                 <button type="submit">
                     {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
                 </button>

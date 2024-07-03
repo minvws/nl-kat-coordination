@@ -138,12 +138,12 @@ def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_ti
     assert len(data["services"]["Web"]["IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"]["hostnames"]) == 4
 
     assert data["open_ports"] == {
-        "IPAddressV4|test|192.0.2.3": {
+        "192.0.2.3": {
             "ports": {22: False, 25: False, 443: False},
             "services": {22: ["ssh"], 25: ["smtp"], 443: ["https"]},
             "hostnames": [x.replace("Hostname|test|", "") for x in v4_test_hostnames],
         },
-        "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230": {
+        "3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230": {
             "ports": {80: False},
             "services": {80: ["http"]},
             "hostnames": ["c.example.com", "d.example.com", "example.com", "f.example.com"],
