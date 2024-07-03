@@ -24,7 +24,7 @@ from reports.views.base import (
     ReportTypeView,
     get_selection,
 )
-from reports.views.view_helpers import AggregateReportStepsMixin
+from reports.views.view_helpers import AggregateReportStepsMixin, create_full_report_name
 from rocky.views.ooi_view import BaseOOIListView
 
 logger = logging.getLogger(__name__)
@@ -257,12 +257,6 @@ class ExportSetupAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggre
         reference_date = str(self.request.POST.get("reference-date"))
         return redirect(f"{self.get_current()}&report_name={report_name}&reference_date={reference_date}")
 
-    def create_full_report_name(self, report_name, reference_date) -> str:
-        if reference_date:
-            return report_name + " (" + reference_date + ")"
-        else:
-            return report_name
-
     def get_context_data(self, **kwargs):
         report_name = self.request.GET.get("report_name", "") or _("Aggregate Report")
         reference_date = self.request.GET.get("reference_date", "") or ""
@@ -270,7 +264,7 @@ class ExportSetupAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggre
         context = super().get_context_data(**kwargs)
         context["current_datetime"] = datetime.now(timezone.utc)
         context["report_name"] = report_name
-        context["full_report_name"] = self.create_full_report_name(report_name, reference_date)
+        context["full_report_name"] = create_full_report_name(report_name, reference_date)
         return context
 
 
