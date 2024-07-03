@@ -1,4 +1,3 @@
-from collections.abc import Sequence
 from typing import Any
 
 from django.contrib import messages
@@ -13,7 +12,6 @@ from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
 from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.report_types.concatenated_report.report import ConcatenatedReport
-from reports.report_types.definitions import Report
 from reports.report_types.helpers import REPORTS, get_ooi_types_with_report, get_report_by_id, get_report_types_for_oois
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
@@ -82,7 +80,8 @@ class OOISelectionGenerateReportView(
     ooi_types = get_ooi_types_with_report()
 
     def post(self, request, *args, **kwargs):
-        self.ooi_selection_is_valid()
+        if not self.selected_oois:
+            messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
         return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -104,7 +103,8 @@ class ReportTypesSelectionGenerateReportView(
     current_step = 2
 
     def post(self, request, *args, **kwargs):
-        if not self.ooi_selection_is_valid():
+        if not self.selected_oois:
+            messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
             return redirect(self.get_previous())
         return self.get(request, *args, **kwargs)
 
@@ -245,7 +245,7 @@ class SetupScanGenerateReportView(
         return super().get(request, *args, **kwargs)
 
 
-class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportView, ReportPluginView, TemplateView):
+class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportView, ReportPluginView):
     """
     Save the report generated.
     """
@@ -253,8 +253,6 @@ class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportV
     template_name = "generate_report.html"
     breadcrumbs_step = 6
     current_step = 6
-    report_types: Sequence[type[Report]]
-    ooi_types = get_ooi_types_with_report()
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         report_ooi = self.save_report()

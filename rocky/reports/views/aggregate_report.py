@@ -1,4 +1,3 @@
-from collections.abc import Sequence
 from typing import Any
 
 from django.contrib import messages
@@ -80,7 +79,8 @@ class OOISelectionAggregateReportView(
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
     def post(self, request, *args, **kwargs):
-        self.ooi_selection_is_valid()
+        if not self.selected_oois:
+            messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
         return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -112,7 +112,8 @@ class ReportTypesSelectionAggregateReportView(
         )
 
     def post(self, request, *args, **kwargs):
-        if not self.ooi_selection_is_valid():
+        if not self.selected_oois:
+            messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
             return redirect(self.get_previous())
         return self.get(request, *args, **kwargs)
 
@@ -237,8 +238,6 @@ class SaveAggregateReportView(SaveAggregateReportMixin, BreadcrumbsAggregateRepo
     """
 
     current_step = 6
-    ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
-    report_types: Sequence[type[Report]]
 
     def post(self, request, *args, **kwargs):
         report_ooi = self.save_report()

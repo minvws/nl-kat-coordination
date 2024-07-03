@@ -105,6 +105,8 @@ class OOISelectionView(OOIFilterView):
     Shows a list of OOIs to select from and handles OOIs selection requests.
     """
 
+    NONE_OOI_SELECTION_MESSAGE = _("Select at least one OOI to proceed.")
+
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.selected_oois = self.get_ooi_selection()
@@ -153,13 +155,6 @@ class OOISelectionView(OOIFilterView):
             )
         }
 
-    def ooi_selection_is_valid(self) -> bool:
-        is_valid = True
-        if not self.selected_oois:
-            is_valid = False
-            messages.error(self.request, _("Select at least one OOI to proceed."))
-        return is_valid
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["selected_oois"] = self.selected_oois
@@ -175,10 +170,14 @@ class ReportTypeSelectionView(TemplateView):
     Handles all request for report types selections.
     """
 
+    NONE_REPORT_TYPE_SELECTION_MESSAGE = _("Select at least one report type to proceed.")
+
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.selected_report_types = self.get_report_type_selection()
-        self.report_types: Sequence[type[Report] | type[MultiReport]] = self.get_report_types_from_choice()
+        self.report_types: list[type[Report] | type[MultiReport] | type[AggregateReport]] = (
+            self.get_report_types_from_choice()
+        )
         self.report_type_ids = [report_type for report_type in self.selected_report_types]
 
     def get_report_type_selection(self) -> list[str]:
@@ -208,13 +207,6 @@ class ReportTypeSelectionView(TemplateView):
             }
             for report_type in reports
         ]
-
-    def report_type_selection_is_valid(self):
-        is_valid = True
-        if not self.selected_report_types:
-            is_valid = False
-            messages.error(self.request, _("Select at least one report type to proceed."))
-        return is_valid
 
 
 class ReportPluginView(OOISelectionView, ReportTypeSelectionView):
