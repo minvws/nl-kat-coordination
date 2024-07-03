@@ -86,8 +86,8 @@
 
     table {
       caption {
-        --table-base-caption-font-size: var(--heading-normal-font-size);
-        --table-base-caption-text-color: var(--text-color-dark);
+        --table-caption-font-size: var(--heading-normal-font-size);
+        --table-caption-text-color: var(--text-color-dark);
 
         font-family: var(--headings-base-set-font-family);
         font-weight: 600;
@@ -100,9 +100,17 @@ span {
   &.label {
     display: inline-flex;
     max-width: 18.75rem;
+    border: 1px solid #ffffff;
     border-radius: var(--spacing-grid-050);
     padding: var(--spacing-grid-050) var(--spacing-grid-100);
     font-size: var(--tile-font-size);
     font-weight: var(--list-item-completed-font-weight);
+    margin: var(--spacing-grid-050) var(--spacing-grid-100)
+      var(--spacing-grid-050) 0;
+
+    &.tags-color-grey-2 {
+      color: var(--colors-grey-10);
+      background-color: var(--colors-grey-2);
+    }
   }
 }
