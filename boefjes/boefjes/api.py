@@ -13,7 +13,7 @@ from uvicorn import Config, Server
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient, TaskStatus
 from boefjes.config import settings
-from boefjes.job_handler import get_environment_settings, get_octopoes_api_connector, serialize_ooi
+from boefjes.job_handler import get_environment_settings, get_octopoes_api_connector
 from boefjes.job_models import BoefjeMeta
 from boefjes.katalogus.local_repository import LocalPluginRepository, get_local_repository
 from boefjes.plugins.models import _default_mime_types
@@ -165,7 +165,7 @@ def create_boefje_meta(task, local_repository):
         except ObjectNotFoundException as e:
             raise ObjectNotFoundException(f"Object {reference} not found in Octopoes") from e
 
-        arguments["input"] = serialize_ooi(ooi)
+        arguments["input"] = ooi.serialize
 
     boefje_meta = BoefjeMeta(
         id=task.id,

@@ -1,6 +1,4 @@
 from datetime import datetime, timezone
-from enum import Enum
-from typing import Any, TypeAlias
 from urllib.parse import unquote
 
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
@@ -13,40 +11,8 @@ from django.views.generic.edit import FormView
 from httpx import HTTPError, HTTPStatusError
 from tools.forms.upload_raw import UploadRawForm
 
-from octopoes.models import OOI, PrimaryKeyToken, Reference
 from octopoes.models.types import OOI_TYPES
 from rocky.bytes_client import get_bytes_client
-
-SerializedOOIValue: TypeAlias = None | str | int | float | dict[str, str | PrimaryKeyToken] | list["SerializedOOIValue"]
-SerializedOOI: TypeAlias = dict[str, SerializedOOIValue]
-
-
-def _serialize_value(value: Any, required: bool) -> SerializedOOIValue:
-    if isinstance(value, list):
-        return [_serialize_value(item, required) for item in value]
-    if isinstance(value, Reference):
-        try:
-            return value.tokenized.root
-        except AttributeError:
-            if required:
-                raise
-
-            return None
-    if isinstance(value, Enum):
-        return value.value
-    if isinstance(value, int | float):
-        return value
-    else:
-        return str(value)
-
-
-def serialize_ooi(ooi: OOI) -> SerializedOOI:
-    serialized_oois = {}
-    for key, value in ooi:
-        if key not in ooi.model_fields:
-            continue
-        serialized_oois[key] = _serialize_value(value, ooi.model_fields[key].is_required())
-    return serialized_oois
 
 
 class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
@@ -103,7 +69,7 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
                 raw_file.read(),
                 mime_types,
                 input_ooi=input_ooi.primary_key,
-                input_dict=serialize_ooi(input_ooi),
+                input_dict=input_ooi.serialize(),
                 valid_time=valid_time,
             )
         except HTTPStatusError as exc:
