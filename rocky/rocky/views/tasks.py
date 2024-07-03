@@ -169,7 +169,7 @@ class AllTaskListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
-            context["stats"] = client.get_all_task_stats(self.plugin_type, scheduler_ids=self.schedulers)
+            context["stats"] = client.get_combined_schedulers_stats(scheduler_ids=self.schedulers)
         except SchedulerError as exc:
             context["stats_error"] = True
             logging.warning("Stats error %s", exc)

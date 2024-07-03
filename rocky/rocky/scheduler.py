@@ -304,14 +304,10 @@ class SchedulerClient:
                 stat_sum[timeslot].update(counts)
         return dict(stat_sum)
 
-    def get_all_task_stats(self, task_type: str, scheduler_ids: list | None = None) -> dict:
-        """Return all task stats for specific task type (e.g. 'boefje')."""
+    def get_combined_schedulers_stats(self, scheduler_ids: list) -> dict:
+        """Return merged stats for a set of scheduler ids."""
         return SchedulerClient._merge_stat_dicts(
-            dicts=[
-                self._get_task_stats(scheduler_id=scheduler.get("id"))
-                for scheduler in self._get(f"/schedulers/by_type/{task_type}")
-                if (scheduler_ids is None or scheduler["id"] in scheduler_ids)
-            ]
+            dicts=[self._get_task_stats(scheduler_id=scheduler_id) for scheduler_id in scheduler_ids]
         )
 
 
