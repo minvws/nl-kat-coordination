@@ -246,8 +246,8 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
     def setUp(self):
         super().setUp()
 
-        self.mock_is_task_running = mock.patch(
-            "scheduler.schedulers.NormalizerScheduler.is_task_running",
+        self.mock_has_normalizer_task_started_running = mock.patch(
+            "scheduler.schedulers.NormalizerScheduler.has_normalizer_task_started_running",
             return_value=False,
         ).start()
 
@@ -401,7 +401,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             NormalizerFactory(),
         ]
         self.mock_has_normalizer_task_permission_to_run.return_value = True
-        self.mock_is_task_running.return_value = True
+        self.mock_has_normalizer_task_started_running.return_value = True
 
         # Act
         self.scheduler.push_tasks_for_received_raw_data(raw_data_event)
@@ -445,7 +445,9 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             NormalizerFactory(),
         ]
         self.mock_has_normalizer_task_permission_to_run.return_value = True
-        self.mock_is_task_running.side_effect = Exception("Something went wrong")
+        self.mock_has_normalizer_task_started_running.side_effect = Exception(
+            "Something went wrong"
+        )
 
         # Act
         self.scheduler.push_tasks_for_received_raw_data(raw_data_event)

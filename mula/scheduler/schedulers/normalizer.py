@@ -187,7 +187,7 @@ class NormalizerScheduler(Scheduler):
             return
 
         try:
-            if self.is_task_running(normalizer_task):
+            if self.has_normalizer_task_started_running(normalizer_task):
                 self.logger.debug(
                     "Task is still running: %s",
                     normalizer_task.id,
@@ -263,6 +263,77 @@ class NormalizerScheduler(Scheduler):
             caller=caller,
         )
 
+    @tracer.start_as_current_span("normalizer_has_normalizer_task_permission_to_run")
+    def has_normalizer_task_permission_to_run(
+        self, normalizer_task: models.NormalizerTask
+    ) -> bool:
+        """Check if the task is allowed to run.
+
+        Args:
+            normalizer: The normalizer to check.
+
+        Returns:
+            True if the task is allowed to run, False otherwise.
+        """
+        # TODO: check if we can optimize this call
+        normalizer = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+            normalizer_task.normalizer.id,
+            self.organisation.id,
+        )
+
+        if not normalizer.enabled:
+            self.logger.debug(
+                "Normalizer: %s is disabled",
+                normalizer.id,
+                normalizer_id=normalizer.id,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+            )
+            return False
+
+        return True
+
+    @tracer.start_as_current_span("normalizer_has_normalizer_task_started_running")
+    def has_normalizer_task_started_running(self, task: NormalizerTask) -> bool:
+        """Check if the same task is already running.
+
+        Args:
+            task: The NormalizerTask to check.
+
+        Returns:
+            True if the task is still running, False otherwise.
+        """
+        # Get the last tasks that have run or are running for the hash
+        # of this particular NormalizerTask.
+        try:
+            task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
+        except Exception as exc_db:
+            self.logger.error(
+                "Could not get latest task by hash: %s",
+                task.hash,
+                task_id=task.id,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+                exc_info=exc_db,
+            )
+            raise exc_db
+
+        # Is task still running according to the datastore?
+        if task_db is not None and task_db.status not in [
+            TaskStatus.COMPLETED,
+            TaskStatus.FAILED,
+        ]:
+            self.logger.debug(
+                "Task is still running, according to the datastore",
+                task_id=task_db.id,
+                task_hash=task.hash,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+            )
+            return True
+
+        return False
+
     def get_normalizers_for_mime_type(self, mime_type: str) -> list[Plugin]:
         """Get available normalizers for a given mime type.
 
@@ -310,74 +381,3 @@ class NormalizerScheduler(Scheduler):
         )
 
         return normalizers
-
-    @tracer.start_as_current_span("normalizer_has_normalizer_task_permission_to_run")
-    def has_normalizer_task_permission_to_run(
-        self, normalizer_task: models.NormalizerTask
-    ) -> bool:
-        """Check if the task is allowed to run.
-
-        Args:
-            normalizer: The normalizer to check.
-
-        Returns:
-            True if the task is allowed to run, False otherwise.
-        """
-        # TODO: check if we can optimize this call
-        normalizer = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
-            normalizer_task.normalizer.id,
-            self.organisation.id,
-        )
-
-        if not normalizer.enabled:
-            self.logger.debug(
-                "Normalizer: %s is disabled",
-                normalizer.id,
-                normalizer_id=normalizer.id,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-            )
-            return False
-
-        return True
-
-    @tracer.start_as_current_span("normalizer_is_task_running")
-    def is_task_running(self, task: NormalizerTask) -> bool:
-        """Check if the same task is already running.
-
-        Args:
-            task: The NormalizerTask to check.
-
-        Returns:
-            True if the task is still running, False otherwise.
-        """
-        # Get the last tasks that have run or are running for the hash
-        # of this particular NormalizerTask.
-        try:
-            task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
-        except Exception as exc_db:
-            self.logger.error(
-                "Could not get latest task by hash: %s",
-                task.hash,
-                task_id=task.id,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-                exc_info=exc_db,
-            )
-            raise exc_db
-
-        # Is task still running according to the datastore?
-        if task_db is not None and task_db.status not in [
-            TaskStatus.COMPLETED,
-            TaskStatus.FAILED,
-        ]:
-            self.logger.debug(
-                "Task is still running, according to the datastore",
-                task_id=task_db.id,
-                task_hash=task.hash,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-            )
-            return True
-
-        return False
