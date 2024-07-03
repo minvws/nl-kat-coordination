@@ -362,19 +362,18 @@ class OnboardingReportView(
     current_step = 4
     permission_required = "tools.can_scan_organization"
 
-    def get_oois_pk(self) -> list[str]:
-        """
-        Gets the Hostname primary key out of the URL object specified by the ooi query parameter.
-        """
-        ooi_pk = self.request.GET.get("ooi", "")
-        ooi = self.get_ooi(ooi_pk)
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        ooi = self.get_ooi(self.request.GET.get("ooi", ""))
+        self.oois = Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network)
+        self.selected_oois = [self.oois.primary_key]
 
-        return [Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network).primary_key]
+    def get_report_type_selection(self) -> list[str]:
+        return [self.request.GET.get("report_type", "")]
 
     def post(self, request, *args, **kwargs):
-        self.set_member_onboarded()
-
         report_ooi = self.save_report()
+        self.set_member_onboarded()
 
         return redirect(
             reverse("view_report", kwargs={"organization_code": self.organization.code})

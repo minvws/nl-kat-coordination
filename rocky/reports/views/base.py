@@ -217,7 +217,7 @@ class ReportTypeSelectionView(TemplateView):
         return is_valid
 
 
-class ReportPluginView(OrganizationView, ReportTypeSelectionView):
+class ReportPluginView(OOISelectionView, ReportTypeSelectionView):
     """
     This view shows the required and optional plugins.
     Needs ReportTypeView to know which report type is selected to get their plugins.
