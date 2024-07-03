@@ -56,8 +56,9 @@
             <p>{% translate "All report types that are available for your selection." %}</p>
             <a class="toggle-all" data-toggle-target="report_type">{% translate "Toggle all report types" %}</a>
             <form class="inline layout-wide checkboxes_required"
-                  method="get"
+                  method="post"
                   action="{{ next }}">
+                {% csrf_token %}
                 {% include "forms/report_form_fields.html" %}
 
                 <div class="column-4 tiles">

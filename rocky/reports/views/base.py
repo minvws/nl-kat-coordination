@@ -171,8 +171,7 @@ class OOISelectionView(OOIFilterView):
 
 class ReportTypeSelectionView(TemplateView):
     """
-    Shows report types based on the OOIs selections.
-    Handles all request for report types selections.
+    Shows report types and handles selections and requests.
     """
 
     def setup(self, request, *args, **kwargs):
@@ -209,15 +208,20 @@ class ReportTypeSelectionView(TemplateView):
             for report_type in reports
         ]
 
-    def report_type_selection_is_valid(self):
+    def report_type_selection_is_valid(self) -> bool:
         is_valid = True
         if not self.selected_report_types:
             is_valid = False
             messages.error(self.request, _("Select at least one report type to proceed."))
         return is_valid
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["selected_report_types"] = self.selected_report_types
+        return context
 
-class ReportPluginView(OrganizationView, ReportTypeSelectionView):
+
+class ReportPluginView(OOISelectionView, ReportTypeSelectionView):
     """
     This view shows the required and optional plugins.
     Needs ReportTypeView to know which report type is selected to get their plugins.
@@ -386,12 +390,9 @@ class ReportPluginView(OrganizationView, ReportTypeSelectionView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["created_at"] = datetime.now()
-        context["selected_oois"] = self.selected_oois
-        context["selected_report_types"] = self.selected_report_types
         context["plugins"] = self.plugins
         context["all_plugins_enabled"] = self.all_plugins_enabled
         context["plugin_data"] = self.get_plugin_data()
-        context["oois"] = self.get_oois()
         return context
 
 

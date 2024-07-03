@@ -120,7 +120,7 @@ class SetupScanMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView
         return super().get(request, *args, **kwargs)
 
 
-class MultiReportView(BreadcrumbsMultiReportView, OOISelectionView, ReportPluginView):
+class MultiReportView(BreadcrumbsMultiReportView, ReportPluginView):
     """
     Shows the multi report from OOIS and report types.
     """
