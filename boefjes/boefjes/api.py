@@ -165,7 +165,7 @@ def create_boefje_meta(task, local_repository):
         except ObjectNotFoundException as e:
             raise ObjectNotFoundException(f"Object {reference} not found in Octopoes") from e
 
-        arguments["input"] = ooi.serialize
+        arguments["input"] = ooi.serialize()
 
     boefje_meta = BoefjeMeta(
         id=task.id,
