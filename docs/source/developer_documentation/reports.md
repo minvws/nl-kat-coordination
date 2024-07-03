@@ -1,4 +1,4 @@
-# Technical Report Documentation
+# Reports
 
 ## Creating reports
 
