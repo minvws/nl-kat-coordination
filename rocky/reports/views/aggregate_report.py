@@ -1,5 +1,6 @@
 import logging
 from collections.abc import Sequence
+from datetime import datetime, timezone
 from typing import Any
 
 from django.contrib import messages
@@ -221,19 +222,17 @@ class SetupScanAggregateReportView(
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if self.request.session.get("report_name", ""):
+            del request.session["report_name"]
+        if self.request.session.get("reference_date", ""):
+            del request.session["reference_date"]
         if not self.selected_report_types:
             messages.error(self.request, _("Select at least one report type to proceed."))
             return redirect(
                 reverse("aggregate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(self.request)
             )
         if not self.report_has_required_plugins() or self.plugins_enabled():
-            report_ooi = self.save_report()
-
-            return redirect(
-                reverse("view_report", kwargs={"organization_code": self.organization.code})
-                + "?"
-                + urlencode({"report_id": report_ooi.reference})
-            )
+            return redirect(self.get_next())
         if not self.plugins:
             return redirect(self.get_previous())
 
@@ -252,14 +251,31 @@ class ExportSetupAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggre
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.selected_report_types:
             messages.error(request, _("Select at least one report type to proceed."))
-            return redirect(
-                reverse("aggregate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(request)
-            )
+            return redirect(self.get_previous())
+        if "report_name" not in request.session:
+            request.session["report_name"] = "Aggregate Report"
 
         return super().get(request, *args, **kwargs)
 
+    def post(self, request, *args, **kwargs) -> HttpResponse:
+        request.session["report_name"] = self.request.POST.get("report-name")
+        request.session["reference_date"] = str(self.request.POST.get("reference-date"))
+        return redirect(self.get_current())
+
+    def set_full_report_name(self) -> str:
+        report_name = self.request.session.get("report_name", "")
+        reference_date = self.request.session.get("reference_date", "")
+
+        if reference_date:
+            return report_name + " (" + reference_date + ")"
+        else:
+            return report_name
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["reference_date"] = datetime.now(timezone.utc)
+        context["report_name"] = self.request.session.get("report_name", "")
+        context["full_report_name"] = self.set_full_report_name()
         return context
 
 
