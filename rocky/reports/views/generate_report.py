@@ -277,26 +277,31 @@ class ExportSetupGenerateReportView(
         reference_date = str(self.request.POST.get("reference-date"))
         return redirect(f"{self.get_current()}&report_name={report_name}&reference_date={reference_date}")
 
-    def set_report_name(self) -> str:
-        if len(self.oois_pk) > 1 or len(self.report_types) > 1:
+    def create_report_name(self, oois_pk, report_types) -> str:
+        first_report_type = Reference.from_str(oois_pk[0]).human_readable
+        if len(report_types) > 1 and len(oois_pk) > 1:
             return "Concatenated Report"
+        elif len(report_types) > 1 and len(oois_pk) == 1:
+            return "Concatenated Report for " + first_report_type
         else:
-            return self.report_types[0].name + " for " + Reference.from_str(self.oois_pk[0]).human_readable
+            return report_types[0].name + " for " + first_report_type
 
-    def set_full_report_name(self, report_name, reference_date):
+    def create_full_report_name(self, report_name, reference_date):
         if reference_date:
             return report_name + " (" + reference_date + ")"
         else:
             return report_name
 
     def get_context_data(self, **kwargs):
-        report_name = self.request.GET.get("report_name", "") or self.set_report_name()
+        report_name = self.request.GET.get("report_name", "") or self.create_report_name(
+            self.oois_pk, self.report_types
+        )
         reference_date = self.request.GET.get("reference_date", "") or ""
 
         context = super().get_context_data(**kwargs)
         context["current_datetime"] = datetime.now(timezone.utc)
         context["report_name"] = report_name
-        context["full_report_name"] = self.set_full_report_name(report_name, reference_date)
+        context["full_report_name"] = self.create_full_report_name(report_name, reference_date)
         return context
 
 

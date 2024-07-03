@@ -257,7 +257,7 @@ class ExportSetupAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggre
         reference_date = str(self.request.POST.get("reference-date"))
         return redirect(f"{self.get_current()}&report_name={report_name}&reference_date={reference_date}")
 
-    def set_full_report_name(self, report_name, reference_date) -> str:
+    def create_full_report_name(self, report_name, reference_date) -> str:
         if reference_date:
             return report_name + " (" + reference_date + ")"
         else:
@@ -270,7 +270,7 @@ class ExportSetupAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggre
         context = super().get_context_data(**kwargs)
         context["current_datetime"] = datetime.now(timezone.utc)
         context["report_name"] = report_name
-        context["full_report_name"] = self.set_full_report_name(report_name, reference_date)
+        context["full_report_name"] = self.create_full_report_name(report_name, reference_date)
         return context
 
 
