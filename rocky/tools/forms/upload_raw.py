@@ -31,7 +31,7 @@ class UploadRawForm(BaseRockyForm):
     )
 
     ooi_id = forms.CharField(
-        label="Scan OOI",
+        label="Input or Scan OOI",
         widget=DataListInput(attrs={"placeholder": _("Click to select one of the available options")}),
     )
 
