@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -75,7 +76,8 @@ class OOISelectionGenerateReportView(
     ooi_types = get_ooi_types_with_report()
 
     def post(self, request, *args, **kwargs):
-        self.ooi_selection_is_valid()
+        if not self.selected_oois:
+            messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
         return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -97,7 +99,8 @@ class ReportTypesSelectionGenerateReportView(
     current_step = 2
 
     def post(self, request, *args, **kwargs):
-        if not self.ooi_selection_is_valid():
+        if not self.selected_oois:
+            messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
             return redirect(self.get_previous())
         return self.get(request, *args, **kwargs)
 
@@ -135,7 +138,8 @@ class SetupScanGenerateReportView(
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        if not self.report_type_selection_is_valid():
+        if not self.selected_report_types:
+            messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
             return redirect(self.get_previous())
         return self.get(request, *args, **kwargs)
 

@@ -84,7 +84,11 @@
                         {% for object in ooi_list %}
                             <tr>
                                 <td>
-                                    <input type="checkbox" name="ooi" value={{ object.primary_key }} {% if object.primary_key in selected_oois or "all" in selected_oois %}checked{% endif %} {% if "all" in selected_oois %}disabled{% endif %}>
+                                    <input type="checkbox"
+                                           name="ooi"
+                                           value="{{ object.primary_key }}"
+                                           {% if object.primary_key in selected_oois or "all" in selected_oois %}checked{% endif %}
+                                           {% if "all" in selected_oois %}disabled{% endif %}>
                                 </td>
                                 <td>{{ object.human_readable }}</td>
                                 <td>{{ object.ooi_type }}</td>
