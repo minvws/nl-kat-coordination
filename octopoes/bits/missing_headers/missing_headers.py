@@ -5,7 +5,6 @@ from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.web import HTTPHeader, HTTPResource
 
-
 DEPRECATED_HEADER = {
     "x-forwarded-host",
     "x-forwarded-proto",
