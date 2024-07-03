@@ -211,7 +211,7 @@ class OOI(BaseModel):
     def traversable(cls) -> bool:
         return cls._traversable
 
-    def serialize(self) -> dict:
+    def serialize(self) -> SerializedOOI:
         serialized_oois = {}
         for key, value in self:
             if key not in self.model_fields:
