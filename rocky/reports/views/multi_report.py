@@ -156,7 +156,7 @@ class ExportSetupMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportVi
             return report_name
 
     def get_context_data(self, **kwargs):
-        report_name = self.request.GET.get("report_name", "") or "Multi Report"
+        report_name = self.request.GET.get("report_name", "") or _("Multi Report")
         reference_date = self.request.GET.get("reference_date", "") or ""
 
         context = super().get_context_data(**kwargs)

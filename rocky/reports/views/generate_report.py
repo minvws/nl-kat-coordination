@@ -280,9 +280,9 @@ class ExportSetupGenerateReportView(
     def create_report_name(self, oois_pk, report_types) -> str:
         first_report_type = Reference.from_str(oois_pk[0]).human_readable
         if len(report_types) > 1 and len(oois_pk) > 1:
-            return "Concatenated Report"
+            return _("Concatenated Report")
         elif len(report_types) > 1 and len(oois_pk) == 1:
-            return "Concatenated Report for " + first_report_type
+            return _("Concatenated Report for {report_type}").format(report_type=first_report_type)
         else:
             return report_types[0].name + " for " + first_report_type
 

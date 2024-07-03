@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-01 15:33+0000\n"
+"POT-Creation-Date: 2024-07-03 13:12+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2274,10 +2274,6 @@ msgid "server"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
-msgid "OpenKAT Aggregate Report"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/introduction.html
 #: reports/templates/partials/report_header.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Export"
@@ -2602,7 +2598,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/concatenated_report/report.py
-#: reports/templates/partials/export_report_settings.html
+#: reports/views/generate_report.py
 msgid "Concatenated Report"
 msgstr ""
 
@@ -3373,11 +3369,6 @@ msgid "Report names:"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-#: reports/templates/partials/report_navigation.html
-msgid "Aggregate Report"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
 msgid "Change report name"
 msgstr ""
 
@@ -3422,6 +3413,10 @@ msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
 msgid "Year"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Ok"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -3496,6 +3491,12 @@ msgid "Generate Report"
 msgstr ""
 
 #: reports/templates/partials/report_navigation.html
+#: reports/views/aggregate_report.py
+msgid "Aggregate Report"
+msgstr ""
+
+#: reports/templates/partials/report_navigation.html
+#: reports/views/multi_report.py
 msgid "Multi Report"
 msgstr ""
 
@@ -3931,6 +3932,11 @@ msgstr ""
 #: reports/views/base.py
 #, python-format
 msgid "Report type '%s' does not exist."
+msgstr ""
+
+#: reports/views/generate_report.py
+#, python-brace-format
+msgid "Concatenated Report for {report_type}"
 msgstr ""
 
 #: reports/views/multi_report.py
