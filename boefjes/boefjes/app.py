@@ -100,7 +100,7 @@ class SchedulerWorkerManager(WorkerManager):
 
         for queue_type in queues:
             try:
-                p_item = self.scheduler_client.pop_item(queue_type.id)
+                p_item = self.scheduler_client.pop_non_remote_item(queue_type.id)
             except (HTTPError, ValidationError):
                 logger.exception("Popping task from scheduler failed, sleeping 10 seconds")
                 time.sleep(10)

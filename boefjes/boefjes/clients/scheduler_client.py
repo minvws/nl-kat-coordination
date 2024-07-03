@@ -2,6 +2,7 @@ import datetime
 import logging
 import uuid
 from enum import Enum
+from typing import Literal
 
 from httpx import Client, HTTPTransport, Response
 from pydantic import BaseModel, TypeAdapter
@@ -51,11 +52,23 @@ class Task(BaseModel):
     remote: bool
 
 
+# TODO: SOUF ask where to put this
+class Filter(BaseModel):
+    column: str
+    field: str | None = None
+    operator: Literal["=="] = "=="
+    value: bool
+
+
+class QueuePopModel(BaseModel):
+    filters: list[Filter]
+
+
 class SchedulerClientInterface:
     def get_queues(self) -> list[Queue]:
         raise NotImplementedError()
 
-    def pop_item(self, queue: str) -> QueuePrioritizedItem | None:
+    def pop_non_remote_item(self, queue: str) -> QueuePrioritizedItem | None:
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
@@ -82,8 +95,9 @@ class SchedulerAPIClient(SchedulerClientInterface):
 
         return TypeAdapter(list[Queue]).validate_json(response.content)
 
-    def pop_item(self, queue: str) -> QueuePrioritizedItem | None:
-        response = self._session.post(f"/queues/{queue}/pop")  # TODO: SOUF only pop non-remote items
+    def pop_non_remote_item(self, queue: str) -> QueuePrioritizedItem | None:
+        non_remote_filter = QueuePopModel(filters=[Filter(column="remote", operator="==", value=False)])
+        response = self._session.post(f"/queues/{queue}/pop", json=non_remote_filter.model_dump())
         self._verify_response(response)
 
         return TypeAdapter(QueuePrioritizedItem | None).validate_json(response.content)

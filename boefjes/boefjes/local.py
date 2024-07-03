@@ -18,6 +18,7 @@ from boefjes.runtime_interfaces import BoefjeJobRunner, JobRuntimeError, Normali
 from octopoes.models import OOI, DeclaredScanProfile
 
 logger = logging.getLogger(__name__)
+# TODO: SOUF change filename to `local_boefjes_runner` for consistency
 
 
 class TemporaryEnvironment:

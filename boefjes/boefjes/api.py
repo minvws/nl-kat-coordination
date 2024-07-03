@@ -159,7 +159,7 @@ def create_boefje_meta(task, local_repository):
     arguments = {"oci_arguments": boefje_resource.oci_arguments}
 
     if input_ooi:
-        reference = Reference.from_str(input_ooi)
+        reference = Reference.from_str(input_ooi)  # TODO SOUF why is this here? Just giving `input_ooi` works too
         try:
             ooi = get_octopoes_api_connector(organization).get(reference, valid_time=datetime.now(timezone.utc))
         except ObjectNotFoundException as e:
@@ -170,7 +170,7 @@ def create_boefje_meta(task, local_repository):
     boefje_meta = BoefjeMeta(
         id=task.id,
         boefje=boefje,
-        input_ooi=input_ooi,
+        input_ooi=input_ooi,  # `input_ooi` is of type str, and we just give it an instance here?
         arguments=arguments,
         organization=organization,
         environment=environment,
