@@ -356,10 +356,12 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
         parent: Reference | None,
         has_parent: bool,
         observed_at: datetime,
+        name: str,
     ) -> ReportOOI:
-        report_name = self.request.POST.get("full_report_name")
+        if not name or name.isspace() or name is None:
+            name = report_type.name
         report_ooi = ReportOOI(
-            name=report_name,
+            name=name,
             report_type=str(report_type.id),
             template=report_type.template_path,
             report_id=uuid4(),

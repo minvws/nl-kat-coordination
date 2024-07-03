@@ -145,7 +145,7 @@ class ReportTypesSelectionAggregateReportView(
 
 
 class SaveAggregateReportMixin(ReportPluginView):
-    def save_report(self) -> ReportOOI:
+    def save_report(self, name) -> ReportOOI:
         input_oois = self.get_oois()
 
         aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
@@ -200,6 +200,7 @@ class SaveAggregateReportMixin(ReportPluginView):
             parent=None,
             has_parent=False,
             observed_at=observed_at,
+            name=name,
         )
 
         # Save the child reports to bytes
@@ -289,7 +290,7 @@ class SaveAggregateReportView(SaveAggregateReportMixin, BreadcrumbsAggregateRepo
     report_types: Sequence[type[Report]]
 
     def post(self, request, *args, **kwargs):
-        report_ooi = self.save_report()
+        report_ooi = self.save_report(self.request.POST.get("full_report_name"))
 
         return redirect(
             reverse("view_report", kwargs={"organization_code": self.organization.code})

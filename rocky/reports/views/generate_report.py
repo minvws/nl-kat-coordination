@@ -127,7 +127,7 @@ class ReportTypesSelectionGenerateReportView(
 
 
 class SaveGenerateReportMixin(ReportPluginView):
-    def save_report(self) -> ReportOOI:
+    def save_report(self, name) -> ReportOOI:
         error_reports = []
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
         by_type: dict[str, list[str]] = {}
@@ -182,6 +182,7 @@ class SaveGenerateReportMixin(ReportPluginView):
                 parent=None,
                 has_parent=False,
                 observed_at=observed_at,
+                name=name,
             )
             for report_type, ooi_data in report_data.items():
                 for ooi, data in ooi_data.items():
@@ -193,6 +194,7 @@ class SaveGenerateReportMixin(ReportPluginView):
                         parent=report_ooi.reference,
                         has_parent=True,
                         observed_at=observed_at,
+                        name=str(get_report_by_id(report_type).name),
                     )
         # if its a single report we can just save it as complete
         else:
@@ -209,6 +211,7 @@ class SaveGenerateReportMixin(ReportPluginView):
                 parent=None,
                 has_parent=False,
                 observed_at=observed_at,
+                name=name,
             )
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if error_reports:
@@ -315,7 +318,7 @@ class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportV
     ooi_types = get_ooi_types_with_report()
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        report_ooi = self.save_report()
+        report_ooi = self.save_report(request.POST.get("full_report_name"))
 
         return redirect(
             reverse("view_report", kwargs={"organization_code": self.organization.code})
