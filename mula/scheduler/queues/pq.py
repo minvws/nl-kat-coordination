@@ -338,7 +338,6 @@ class PriorityQueue(abc.ABC):
 
         return response
 
-    @abc.abstractmethod
     def create_hash(self, task: models.Task) -> str:
         """Create a hash for the given item. This hash is used to determine if
         the item is already in the queue.
@@ -353,4 +352,5 @@ class PriorityQueue(abc.ABC):
         Returns:
             A string representing the hash of the item.
         """
-        raise NotImplementedError
+        item = self.item_type(**task.data)
+        return item.hash

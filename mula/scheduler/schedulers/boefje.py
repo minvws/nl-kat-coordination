@@ -3,6 +3,7 @@ from collections.abc import Callable
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
+from typing import Any
 
 import structlog
 from opentelemetry import trace
@@ -38,6 +39,8 @@ class BoefjeScheduler(Scheduler):
         organisation: The organisation that this scheduler is for.
     """
 
+    ITEM_TYPE: Any = BoefjeTask
+
     def __init__(
         self,
         ctx: context.AppContext,
@@ -57,11 +60,12 @@ class BoefjeScheduler(Scheduler):
         """
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.organisation: Organisation = organisation
+        self.create_schedule = True
 
-        self.queue = queue or queues.BoefjePriorityQueue(
+        self.queue = queue or queues.PriorityQueue(
             pq_id=scheduler_id,
             maxsize=ctx.config.pq_maxsize,
-            item_type=models.BoefjeTask,
+            item_type=self.ITEM_TYPE,
             allow_priority_updates=True,
             pq_store=ctx.datastores.pq_store,
         )
@@ -292,165 +296,6 @@ class BoefjeScheduler(Scheduler):
                         boefje_task,
                         self.push_tasks_for_new_boefjes.__name__,
                     )
-
-    @tracer.start_as_current_span("boefje_push_task")
-    def push_boefje_task(
-        self, boefje_task: models.BoefjeTask, caller: str = ""
-    ) -> None:
-        """Given a Boefje and OOI create a BoefjeTask and push it onto
-        the queue.
-
-        Args:
-            boefje: Boefje to run.
-            ooi: OOI to run Boefje on.
-            caller: The name of the function that called this function, used for logging.
-
-        """
-        if not self.has_boefje_task_permission_to_run(boefje_task):
-            self.logger.debug(
-                "Task is not allowed to run: %s",
-                boefje_task.hash,
-                boefje_task_hash=boefje_task.hash,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-                caller=caller,
-            )
-            return
-
-        try:
-            grace_period_passed = self.has_boefje_task_grace_period_passed(boefje_task)
-            if not grace_period_passed:
-                self.logger.debug(
-                    "Task has not passed grace period: %s",
-                    boefje_task.hash,
-                    boefje_task_hash=boefje_task.hash,
-                    organisation_id=self.organisation.id,
-                    scheduler_id=self.scheduler_id,
-                    caller=caller,
-                )
-                return
-        except Exception as exc_grace_period:
-            self.logger.warning(
-                "Could not check if grace period has passed: %s",
-                boefje_task.hash,
-                boefje_task_hash=boefje_task.hash,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-                caller=caller,
-                exc_info=exc_grace_period,
-            )
-            return
-
-        try:
-            is_stalled = self.has_boefje_task_stalled(boefje_task)
-            if is_stalled:
-                self.logger.debug(
-                    "Task is stalled: %s",
-                    boefje_task.hash,
-                    boefje_task_hash=boefje_task.hash,
-                    organisation_id=self.organisation.id,
-                    scheduler_id=self.scheduler_id,
-                    caller=caller,
-                )
-
-                # Update task in datastore to be failed
-                task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(
-                    boefje_task.hash
-                )
-                task_db.status = TaskStatus.FAILED
-                self.ctx.datastores.task_store.update_task(task_db)
-        except Exception as exc_stalled:
-            self.logger.warning(
-                "Could not check if task is stalled: %s",
-                boefje_task.hash,
-                boefje_task_hash=boefje_task.hash,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-                caller=caller,
-                exc_info=exc_stalled,
-            )
-            return
-
-        try:
-            is_running = self.has_boefje_task_started_running(boefje_task)
-            if is_running:
-                self.logger.debug(
-                    "Task is still running: %s",
-                    boefje_task.hash,
-                    boefje_task_hash=boefje_task.hash,
-                    organisation_id=self.organisation.id,
-                    scheduler_id=self.scheduler_id,
-                    caller=caller,
-                )
-                return
-        except Exception as exc_running:
-            self.logger.warning(
-                "Could not check if task is running: %s",
-                boefje_task.hash,
-                boefje_task_hash=boefje_task.hash,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-                caller=caller,
-                exc_info=exc_running,
-            )
-            return
-
-        if self.is_item_on_queue_by_hash(boefje_task.hash):
-            self.logger.debug(
-                "Task is already on queue: %s",
-                boefje_task.hash,
-                boefje_task_hash=boefje_task.hash,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-                caller=caller,
-                exc_info=True,
-            )
-            return
-
-        prior_tasks = self.ctx.datastores.task_store.get_tasks_by_hash(boefje_task.hash)
-        score = self.priority_ranker.rank(
-            SimpleNamespace(
-                prior_tasks=prior_tasks,
-                task=boefje_task,
-            )
-        )
-
-        # TODO: check the correct attributes, schedule
-        task = Task(
-            scheduler_id=self.scheduler_id,
-            priority=score,
-            hash=boefje_task.hash,
-            data=boefje_task.model_dump(),
-            # schedule_id=
-        )
-
-        try:
-            self.push_item_to_queue_with_timeout(
-                task,
-                self.max_tries,
-            )
-        except queues.QueueFullError:
-            self.logger.warning(
-                "Could not add task to queue, queue was full: %s",
-                boefje_task.hash,
-                boefje_task_hash=boefje_task.hash,
-                queue_qsize=self.queue.qsize(),
-                queue_maxsize=self.queue.maxsize,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-                caller=caller,
-            )
-            return
-
-        self.logger.info(
-            "Created boefje task",
-            task_id=task.id,
-            task_hash=task.hash,
-            boefje_id=boefje_task.boefje.id,
-            organisation_id=self.organisation.id,
-            scheduler_id=self.scheduler_id,
-            caller=caller,
-        )
 
     @tracer.start_as_current_span("boefje_push_tasks_for_rescheduling")
     def push_tasks_for_rescheduling(self):

@@ -949,7 +949,8 @@ class APISchemaEndpointTestCase(APITemplateTestCase):
         )
         self.assertEqual(400, response.status_code)
         self.assertEqual(
-            "min_deadline must be less than max_deadline", response.json().get("detail")
+            "min_deadline_at must be less than max_deadline_at",
+            response.json().get("detail"),
         )
 
     # TODO: hash, enabled, created_at, modified_at, pagination
@@ -966,12 +967,18 @@ class APISchemaEndpointTestCase(APITemplateTestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(False, response.json().get("enabled"))
 
-    def test_patch_schedule_validate_malformed_cron_expression(self):
+    def test_patch_schedule_validate_schedule(self):
         response = self.client.patch(
             f"/schedules/{str(self.first_schedule.id)}",
-            json={"cron_expression": "malformed"},
+            json={"schedule": "*/5 * * * *"},
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual("*/5 * * * *", response.json().get("schedule"))
+
+    def test_patch_schedule_validate_malformed_schedule(self):
+        response = self.client.patch(
+            f"/schedules/{str(self.first_schedule.id)}",
+            json={"schedule": "malformed"},
         )
         self.assertEqual(400, response.status_code)
-        self.assertTrue(
-            response.json().get("detail").startswith("Invalid cron expression")
-        )
+        self.assertIn("validation error", response.json().get("detail"))

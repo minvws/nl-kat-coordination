@@ -45,6 +45,7 @@ class SchedulerTestCase(unittest.TestCase):
             ctx=self.mock_ctx,
             scheduler_id=identifier,
             queue=queue,
+            create_schedule_for_tasks=True,
         )
 
     def tearDown(self):
@@ -101,7 +102,11 @@ class SchedulerTestCase(unittest.TestCase):
         schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
             task_db.schedule_id
         )
+        self.assertIsNotNone(schedule_db)
         self.assertEqual(schedule_db.id, task_db.schedule_id)
+
+    def test_post_push_without_schedule(self):
+        pass
 
     def test_post_pop(self):
         """When a task is popped from the queue, it should be removed from the database"""

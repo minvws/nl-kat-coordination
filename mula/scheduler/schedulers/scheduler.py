@@ -55,13 +55,16 @@ class Scheduler(abc.ABC):
             running tasks concurrently.
     """
 
+    ITEM_TYPE: Any = None
+
     def __init__(
         self,
         ctx: context.AppContext,
         scheduler_id: str,
-        queue: queues.PriorityQueue,
+        queue: queues.PriorityQueue | None = None,
         callback: Callable[..., None] | None = None,
         max_tries: int = -1,
+        create_schedule_for_tasks: bool = False,
     ):
         """Initialize the Scheduler.
 
@@ -82,14 +85,22 @@ class Scheduler(abc.ABC):
 
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
-        self.queue: queues.PriorityQueue = queue
         self.callback: Callable[[], Any] | None = callback
 
         # Properties
         self.scheduler_id: str = scheduler_id
         self.max_tries: int = max_tries
         self.enabled: bool = True
+        self.create_schedule_for_tasks: bool = create_schedule_for_tasks
         self._last_activity: datetime | None = None
+
+        # Queue
+        self.queue = queue or queues.PriorityQueue(
+            pq_id=scheduler_id,
+            maxsize=self.ctx.config.pq_maxsize,
+            item_type=self.ITEM_TYPE,
+            pq_store=self.ctx.datastores.pq_store,
+        )
 
         # Listeners
         self.listeners: dict[str, connectors.listeners.Listener] = {}
@@ -280,52 +291,51 @@ class Scheduler(abc.ABC):
         """
         self.last_activity = datetime.now(timezone.utc)
 
-        # TODO: check exception handling here
+        if self.create_schedule_for_tasks is False:
+            return
+
+        schedule_db = None
         try:
             # FIXME: task.schedule instead of get
             # TODO: test that there should only be one scheduler for a hash
-            schedule = self.ctx.datastores.schedule_store.get_schedule_by_hash(
+            schedule_db = self.ctx.datastores.schedule_store.get_schedule_by_hash(
                 item.hash
             )
-            if schedule is None:
-                # TODO: naive cron schedule determination, should be improved
-                # with a random jitter approach to avoid scheduling tasks
-                # during office hours
-                # TODO: data field in schedule, write test that checks
-                # if a new task gets created that is correct
-                now = datetime.now(timezone.utc)
-                cron_expression = self.evaluate_schedule(item)
-                schedule_db = self.ctx.datastores.schedule_store.create_schedule(
-                    models.Schedule(
-                        scheduler_id=self.scheduler_id,
-                        hash=item.hash,
-                        data=item.data,
-                        schedule=cron_expression,
-                        deadline_at=cron.next_run(cron_expression),
-                        created_at=now,
-                        modified_at=now,
-                    )
+            if schedule_db.enabled is False:
+                self.logger.debug(
+                    "Schedule %s is disabled, not creating new schedule",
+                    schedule_db.id,
+                    schedule_id=schedule_db.id,
+                    scheduler_id=self.scheduler_id,
                 )
-
-                item.schedule_id = schedule_db.id
-                self.ctx.datastores.task_store.update_task(item)
                 return
-
-            if schedule.enabled is False:
-                # TODO: logging
-                return
-
-            cron_expression = self.evaluate_schedule(item)
-            schedule.deadline_at = cron.next_run(cron_expression)
-            self.ctx.datastores.schedule_store.update_schedule(schedule)
-        except Exception as exc:
+        except storage.StorageError:
             self.logger.error(
-                "Error while updating schedule for task %s",
+                "Error while getting schedule for task %s",
                 item.id,
                 item_id=item.id,
                 queue_id=self.queue.pq_id,
                 scheduler_id=self.scheduler_id,
             )
+
+        if schedule_db is None:
+            cron_expression = self.evaluate_schedule(item)
+            schedule_db = self.ctx.datastores.schedule_store.create_schedule(
+                models.Schedule(
+                    scheduler_id=self.scheduler_id,
+                    hash=item.hash,
+                    schedule=cron_expression,
+                    deadline_at=cron.next_run(cron_expression),
+                    data=item.data,
+                )
+            )
+        else:
+            cron_expression = self.evaluate_schedule(item)
+            schedule_db.deadline_at = cron.next_run(cron_expression)
+            self.ctx.datastores.schedule_store.update_schedule(schedule_db)
+
+        item.schedule_id = schedule_db.id
+        self.ctx.datastores.task_store.update_task(item)
 
     # TODO: check when return None is significant
     def pop_item_from_queue(

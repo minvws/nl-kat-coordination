@@ -3,6 +3,7 @@ import uuid
 from typing import Any
 
 import fastapi
+import pydantic
 import structlog
 
 from scheduler import context, models, storage
@@ -134,8 +135,8 @@ class ScheduleAPI:
 
         return schedule
 
-    # TODO: replace Schedule model
-    def patch(self, schedule_id: uuid.UUID, schedule: models.Schedule) -> Any:
+    # TODO: replace Schedule model with a correct ScheduleIn model
+    def patch(self, schedule_id: uuid.UUID, schedule: serializers.Schedule) -> Any:
         try:
             schedule_db = self.ctx.datastores.schedule_store.get_schedule(schedule_id)
         except storage.errors.StorageError as exc:
@@ -159,11 +160,26 @@ class ScheduleAPI:
         patch_data = schedule.model_dump(exclude_unset=True)
         if len(patch_data) == 0:
             raise fastapi.HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
                 detail="no data to patch",
             )
 
-        updated_schedule = schedule_db.model_copy(update=patch_data)
+        try:
+            # Update schedule
+            updated_schedule = schedule_db.model_copy(update=patch_data)
+
+            # Validate schedule, model_copy() does not validate the model
+            models.Schedule(**updated_schedule.dict())
+        except pydantic.ValidationError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=f"invalid schedule [exception: {exc}]",
+            ) from exc
+        except Exception as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=f"failed to update schedule [exception: {exc}]",
+            ) from exc
 
         # Update schedule in database
         try:

@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from concurrent import futures
 from types import SimpleNamespace
+from typing import Any
 
 import structlog
 from opentelemetry import trace
@@ -33,6 +34,8 @@ class NormalizerScheduler(Scheduler):
         organisation: The organisation that this scheduler is for.
     """
 
+    ITEM_TYPE: Any = NormalizerTask
+
     def __init__(
         self,
         ctx: context.AppContext,
@@ -43,11 +46,12 @@ class NormalizerScheduler(Scheduler):
     ):
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.organisation: Organisation = organisation
+        self.create_schedule = False
 
-        self.queue = queue or queues.NormalizerPriorityQueue(
+        self.queue = queue or queues.PriorityQueue(
             pq_id=scheduler_id,
             maxsize=ctx.config.pq_maxsize,
-            item_type=NormalizerTask,
+            item_type=self.ITEM_TYPE,
             allow_priority_updates=True,
             pq_store=ctx.datastores.pq_store,
         )
