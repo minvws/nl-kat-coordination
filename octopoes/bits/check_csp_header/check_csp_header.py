@@ -156,7 +156,7 @@ def _create_kat_finding(header: Reference, kat_id: str, description: str) -> Ite
 def _source_valid(policy: list[str]) -> bool:
     for value in policy:
         if not (
-            re.search(r"\S+\.\S{2,3}([\s]+|$|;|:[\d]+)", value)
+            re.search(r"\S+\.\S{2,3}([\s]+|$|;|:\d+)", value)
             or value
             in [
                 "'none'",
