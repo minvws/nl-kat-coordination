@@ -228,11 +228,6 @@ class SetupScanGenerateReportView(
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.selected_report_types:
-            messages.error(self.request, _("Select at least one report type to proceed."))
-            return redirect(
-                reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(self.request)
-            )
         if not self.report_has_required_plugins() or self.plugins_enabled():
             report_ooi = self.save_report()
             return redirect(
