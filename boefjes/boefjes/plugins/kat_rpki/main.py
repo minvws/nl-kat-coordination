@@ -27,14 +27,12 @@ BGP_SOURCE_URL = "https://bgp.tools/table.jsonl"
 
 # Cache timeout and default hash function
 RPKI_CACHE_TIMEOUT = 1800  # in seconds
-HASHFUNC = getenv("HASHFUNC", "sha256")
-USER_AGENT = getenv("USERAGENT", default="OpenKAT")
 
 
 def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]
     ip = input_["address"]
-    hash_algorithm = HASHFUNC
+    hash_algorithm = getenv("HASHFUNC", "sha256")
 
     # if the address is private, we do not need a ROA
     if not ip_address(ip).is_global:
@@ -120,7 +118,7 @@ def refresh_cache(
     source_url: str, data_path: Path, meta_path: Path, algo: str, file_extension: str = "json"
 ) -> tuple[dict | list, dict]:
     """Refreshes the cache for either RPKI or BGP data. Handles both JSON and JSON Lines formats."""
-    headers = {"User-Agent": USER_AGENT}
+    headers = {"User-Agent": getenv("USERAGENT", default="OpenKAT")}
     response = requests.get(source_url, headers=headers, allow_redirects=True, timeout=30)
     response.raise_for_status()
 
