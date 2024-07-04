@@ -1,13 +1,14 @@
 ARG PYTHON_VERSION=3.11
 FROM python:$PYTHON_VERSION-bookworm AS dev
 
-EXPOSE 8000
-
 ARG USER_UID=1000
 ARG USER_GID=1000
+ARG PORT=8000
 
-RUN groupadd --gid $USER_GID keiko
-RUN adduser --disabled-password --gecos '' --uid $USER_UID --gid $USER_GID keiko
+EXPOSE $PORT
+
+RUN groupadd --gid "$USER_GID" keiko
+RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" keiko
 
 WORKDIR /app/keiko
 ENV PATH=/home/keiko/.local/bin:${PATH}
@@ -45,4 +46,4 @@ FROM dev
 
 COPY . .
 
-CMD ["uvicorn", "keiko.app:api", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "keiko.app:api", "--host", "0.0.0.0", "--port", $PORT]
