@@ -179,6 +179,15 @@ class NormalizerScheduler(Scheduler):
             raw_data: The raw data to create a task for.
             caller: The name of the function that called this function, used for logging.
         """
+        self.logger.debug(
+            "Pushing normalizer task",
+            task_id=normalizer_task.id,
+            normalizer_id=normalizer_task.normalizer.id,
+            organisation_id=self.organisation.id,
+            scheduler_id=self.scheduler_id,
+            caller=caller,
+        )
+
         if not self.has_normalizer_task_permission_to_run(normalizer_task):
             self.logger.debug(
                 "Task is not allowed to run: %s",

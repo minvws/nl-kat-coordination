@@ -110,19 +110,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
-        boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.parse_obj(plugin.dict()),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
-
-        # Mocks
-        self.mock_get_plugin.return_value = plugin
-        self.mock_get_object.return_value = ooi
-
         # Act
-        allowed_to_run = self.scheduler.has_boefje_task_permission_to_run(
-            boefje_task,
+        allowed_to_run = self.scheduler.has_boefje_permission_to_run(
+            plugin,
+            ooi,
         )
 
         # Assert
@@ -134,19 +125,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
-        boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.parse_obj(plugin.dict()),
-            input_ooi=None,
-            organization=self.organisation.id,
-        )
-
-        # Mocks
-        self.mock_get_plugin.return_value = plugin
-        self.mock_get_object.return_value = ooi
-
         # Act
-        allowed_to_run = self.scheduler.has_boefje_task_permission_to_run(
-            boefje_task,
+        allowed_to_run = self.scheduler.has_boefje_permission_to_run(
+            plugin,
+            ooi,
         )
 
         # Assert
@@ -158,20 +140,11 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         plugin = PluginFactory(scan_level=4, consumes=[ooi.object_type])
 
-        boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.parse_obj(plugin.dict()),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
-
-        # Mocks
-        self.mock_get_plugin.return_value = plugin
-        self.mock_get_object.return_value = ooi
-
         # Act
         with capture_logs() as cm:
-            allowed_to_run = self.scheduler.has_boefje_task_permission_to_run(
-                boefje_task,
+            allowed_to_run = self.scheduler.has_boefje_permission_to_run(
+                plugin,
+                ooi,
             )
 
         # Assert
@@ -642,9 +615,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertFalse(has_passed)
 
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_boefje_task_started_running")
-    @mock.patch(
-        "scheduler.schedulers.BoefjeScheduler.has_boefje_task_permission_to_run"
-    )
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.has_boefje_permission_to_run")
     @mock.patch(
         "scheduler.schedulers.BoefjeScheduler.has_boefje_task_grace_period_passed"
     )
@@ -655,7 +626,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         mock_get_tasks_by_hash,
         mock_is_item_on_queue_by_hash,
         mock_has_boefje_task_grace_period_passed,
-        mock_has_boefje_task_permission_to_run,
+        mock_has_boefje_permission_to_run,
         mock_has_boefje_task_started_running,
     ):
         """When the task queue is full, the task should not be pushed"""
@@ -674,7 +645,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.scheduler.max_tries = 1
 
         # Mocks
-        mock_has_boefje_task_permission_to_run.return_value = True
+        mock_has_boefje_permission_to_run.return_value = True
         mock_has_boefje_task_started_running.return_value = False
         mock_has_boefje_task_grace_period_passed.return_value = True
         mock_is_item_on_queue_by_hash.return_value = False
@@ -696,9 +667,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
 
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_boefje_task_stalled")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_boefje_task_started_running")
-    @mock.patch(
-        "scheduler.schedulers.BoefjeScheduler.has_boefje_task_permission_to_run"
-    )
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.has_boefje_permission_to_run")
     @mock.patch(
         "scheduler.schedulers.BoefjeScheduler.has_boefje_task_grace_period_passed"
     )
@@ -709,7 +678,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         mock_get_tasks_by_hash,
         mock_is_item_on_queue_by_hash,
         mock_has_boefje_task_grace_period_passed,
-        mock_has_boefje_task_permission_to_run,
+        mock_has_boefje_permission_to_run,
         mock_has_boefje_task_started_running,
         mock_has_boefje_task_stalled,
     ):
@@ -763,7 +732,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
 
         # Mocks
-        mock_has_boefje_task_permission_to_run.return_value = True
+        mock_has_boefje_permission_to_run.return_value = True
         mock_has_boefje_task_grace_period_passed.return_value = True
         mock_has_boefje_task_stalled.return_value = True
         mock_has_boefje_task_started_running.return_value = False
@@ -970,114 +939,64 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Stop the scheduler
         self.scheduler.stop()
 
-    def test_has_boefje_task_permission_to_run(self):
+    def test_has_boefje_permission_to_run(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
-        boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.parse_obj(plugin.dict()),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
-
-        # Mocks
-        self.mock_get_plugin.return_value = plugin
-        self.mock_get_object.return_value = ooi
-
         # Act
-        is_allowed = self.scheduler.has_boefje_task_permission_to_run(boefje_task)
+        is_allowed = self.scheduler.has_boefje_permission_to_run(plugin, ooi)
 
         # Assert
         self.assertTrue(is_allowed)
 
-    def test_has_boefje_task_permission_to_run_boefje_disabled(self):
+    def test_has_boefje_permission_to_run_boefje_disabled(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type], enabled=False)
 
-        boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.parse_obj(plugin.dict()),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
-
-        # Mocks
-        self.mock_get_plugin.return_value = plugin
-        self.mock_get_object.return_value = ooi
-
         # Act
-        is_allowed = self.scheduler.has_boefje_task_permission_to_run(boefje_task)
+        is_allowed = self.scheduler.has_boefje_permission_to_run(plugin, ooi)
 
         # Assert
         self.assertFalse(is_allowed)
 
-    def test_has_boefje_task_permission_to_run_scan_profile_is_none(self):
+    def test_has_boefje_permission_to_run_scan_profile_is_none(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
         ooi.scan_profile = None
 
-        boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.parse_obj(plugin.dict()),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
-
-        # Mocks
-        self.mock_get_plugin.return_value = plugin
-        self.mock_get_object.return_value = ooi
-
         # Act
-        is_allowed = self.scheduler.has_boefje_task_permission_to_run(boefje_task)
+        is_allowed = self.scheduler.has_boefje_permission_to_run(plugin, ooi)
 
         # Assert
         self.assertFalse(is_allowed)
 
-    def test_has_boefje_task_permission_to_run_ooi_scan_level_is_none(self):
+    def test_has_boefje_permission_to_run_ooi_scan_level_is_none(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
         ooi.scan_profile.level = None
 
-        boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.parse_obj(plugin.dict()),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
-
-        # Mocks
-        self.mock_get_plugin.return_value = plugin
-        self.mock_get_object.return_value = ooi
-
         # Act
-        is_allowed = self.scheduler.has_boefje_task_permission_to_run(boefje_task)
+        is_allowed = self.scheduler.has_boefje_permission_to_run(plugin, ooi)
 
         # Assert
         self.assertFalse(is_allowed)
 
-    def test_has_boefje_task_permission_to_run_boefje_scan_level_is_none(self):
+    def test_has_boefje_permission_to_run_boefje_scan_level_is_none(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         plugin = PluginFactory(scan_level=None, consumes=[ooi.object_type])
 
-        boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.parse_obj(plugin.dict()),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
-
-        # Mocks
-        self.mock_get_plugin.return_value = plugin
-        self.mock_get_object.return_value = ooi
-
         # Act
-        is_allowed = self.scheduler.has_boefje_task_permission_to_run(boefje_task)
+        is_allowed = self.scheduler.has_boefje_permission_to_run(plugin, ooi)
 
         # Assert
         self.assertFalse(is_allowed)
@@ -1092,8 +1011,8 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
             return_value=False,
         ).start()
 
-        self.mock_has_boefje_task_permission_to_run = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.has_boefje_task_permission_to_run",
+        self.mock_has_boefje_permission_to_run = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.has_boefje_permission_to_run",
             return_value=True,
         ).start()
 
@@ -1180,7 +1099,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
-        self.mock_has_boefje_task_permission_to_run.return_value = False
+        self.mock_has_boefje_permission_to_run.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
@@ -1318,8 +1237,8 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
             return_value=False,
         ).start()
 
-        self.mock_has_boefje_task_permission_to_run = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.has_boefje_task_permission_to_run",
+        self.mock_has_boefje_permission_to_run = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.has_boefje_permission_to_run",
             return_value=True,
         ).start()
 
@@ -1482,7 +1401,7 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_objects_by_object_types.return_value = [ooi]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
-        self.mock_has_boefje_task_permission_to_run.return_value = False
+        self.mock_has_boefje_permission_to_run.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_new_boefjes()

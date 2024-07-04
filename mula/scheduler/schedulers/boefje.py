@@ -205,6 +205,16 @@ class BoefjeScheduler(Scheduler):
             thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-mutations"
         ) as executor:
             for boefje in boefjes:
+                if not self.has_boefje_permission_to_run(boefje, ooi):
+                    self.logger.debug(
+                        "Boefje not allowed to run on ooi",
+                        boefje_id=boefje.id,
+                        ooi_primary_key=ooi.primary_key,
+                        organisation_id=self.organisation.id,
+                        scheduler_id=self.scheduler_id,
+                    )
+                    continue
+
                 boefje_task = BoefjeTask(
                     boefje=Boefje.parse_obj(boefje.dict()),
                     input_ooi=ooi.primary_key if ooi else None,
@@ -285,6 +295,16 @@ class BoefjeScheduler(Scheduler):
                 thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-new_boefjes"
             ) as executor:
                 for ooi in oois_by_object_type:
+                    if not self.has_boefje_permission_to_run(boefje, ooi):
+                        self.logger.debug(
+                            "Boefje not allowed to run on ooi",
+                            boefje_id=boefje.id,
+                            ooi_primary_key=ooi.primary_key,
+                            organisation_id=self.organisation.id,
+                            scheduler_id=self.scheduler_id,
+                        )
+                        continue
+
                     boefje_task = BoefjeTask(
                         boefje=Boefje.parse_obj(boefje.dict()),
                         input_ooi=ooi.primary_key,
@@ -430,7 +450,7 @@ class BoefjeScheduler(Scheduler):
                     # TODO: do we want to disable the schedule when a
                     # boefje is not allowed to scan an ooi?
                     # Boefje allowed to scan ooi?
-                    if not self.has_boefje_task_permission_to_run(boefje_task):
+                    if not self.has_boefje_permission_to_run(plugin, ooi):
                         self.logger.debug(
                             "Boefje not allowed to scan ooi, skipping",
                             boefje_id=boefje_task.boefje.id,
@@ -456,7 +476,9 @@ class BoefjeScheduler(Scheduler):
 
     @tracer.start_as_current_span("boefje_push_task")
     def push_boefje_task(
-        self, boefje_task: models.BoefjeTask, caller: str = ""
+        self,
+        boefje_task: BoefjeTask,
+        caller: str = "",
     ) -> None:
         """Given a Boefje and OOI create a BoefjeTask and push it onto
         the queue.
@@ -467,16 +489,13 @@ class BoefjeScheduler(Scheduler):
             caller: The name of the function that called this function, used for logging.
 
         """
-        if not self.has_boefje_task_permission_to_run(boefje_task):
-            self.logger.debug(
-                "Task is not allowed to run: %s",
-                boefje_task.hash,
-                boefje_task_hash=boefje_task.hash,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-                caller=caller,
-            )
-            return
+        self.logger.debug(
+            "Pushing boefje task",
+            boefje_id=boefje_task.boefje.id,
+            organisation_id=self.organisation.id,
+            scheduler_id=self.scheduler_id,
+            caller=caller,
+        )
 
         try:
             grace_period_passed = self.has_boefje_task_grace_period_passed(boefje_task)
@@ -613,8 +632,12 @@ class BoefjeScheduler(Scheduler):
             caller=caller,
         )
 
-    @tracer.start_as_current_span("boefje_has_boefje_task_permission_to_run")
-    def has_boefje_task_permission_to_run(self, boefje_task: models.BoefjeTask) -> bool:
+    @tracer.start_as_current_span("boefje_has_boefje_permission_to_run")
+    def has_boefje_permission_to_run(
+        self,
+        boefje: Plugin,
+        ooi: OOI,
+    ) -> bool:
         """Checks whether a boefje is allowed to run on an ooi.
 
         Args:
@@ -624,12 +647,6 @@ class BoefjeScheduler(Scheduler):
         Returns:
             True if the boefje is allowed to run on the ooi, False otherwise.
         """
-        # TODO: check if we can optimize this call
-        boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
-            boefje_task.boefje.id,
-            self.organisation.id,
-        )
-
         if boefje.enabled is False:
             self.logger.debug(
                 "Boefje: %s is disabled",
@@ -652,14 +669,8 @@ class BoefjeScheduler(Scheduler):
             return False
 
         # We allow boefjes without an ooi to run.
-        if boefje_task.input_ooi is None:
+        if ooi is None:
             return True
-
-        # TODO: check if we can optimize this call
-        ooi = self.ctx.services.octopoes.get_object(
-            self.organisation.id,
-            boefje_task.input_ooi,
-        )
 
         if ooi.scan_profile is None:
             self.logger.debug(

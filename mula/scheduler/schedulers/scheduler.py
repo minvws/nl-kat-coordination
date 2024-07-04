@@ -294,32 +294,9 @@ class Scheduler(abc.ABC):
         if self.create_schedule_for_tasks is False:
             return
 
-        schedule_db = None
-        try:
-            # FIXME: task.schedule instead of get
-            # TODO: test that there should only be one scheduler for a hash
-            schedule_db = self.ctx.datastores.schedule_store.get_schedule_by_hash(
-                item.hash
-            )
-            if schedule_db.enabled is False:
-                self.logger.debug(
-                    "Schedule %s is disabled, not creating new schedule",
-                    schedule_db.id,
-                    schedule_id=schedule_db.id,
-                    scheduler_id=self.scheduler_id,
-                )
-                return
-        except storage.StorageError:
-            self.logger.error(
-                "Error while getting schedule for task %s",
-                item.id,
-                item_id=item.id,
-                queue_id=self.queue.pq_id,
-                scheduler_id=self.scheduler_id,
-            )
+        cron_expression = self.evaluate_schedule(item)
 
-        if schedule_db is None:
-            cron_expression = self.evaluate_schedule(item)
+        if item.schedule_id is None:
             schedule_db = self.ctx.datastores.schedule_store.create_schedule(
                 models.Schedule(
                     scheduler_id=self.scheduler_id,
@@ -329,13 +306,18 @@ class Scheduler(abc.ABC):
                     data=item.data,
                 )
             )
-        else:
-            cron_expression = self.evaluate_schedule(item)
-            schedule_db.deadline_at = cron.next_run(cron_expression)
-            self.ctx.datastores.schedule_store.update_schedule(schedule_db)
 
-        item.schedule_id = schedule_db.id
-        self.ctx.datastores.task_store.update_task(item)
+            item.schedule_id = schedule_db.id
+            self.ctx.datastores.task_store.update_task(item)
+        else:
+            schedule_db = self.ctx.datastores.schedule_store.get_schedule(
+                item.schedule_id
+            )
+            if schedule_db.enabled is False:
+                return
+
+            schedule_db.schedule = cron_expression
+            self.ctx.datastores.schedule_store.update_schedule(schedule_db)
 
     # TODO: check when return None is significant
     def pop_item_from_queue(
