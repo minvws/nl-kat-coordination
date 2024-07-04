@@ -13,10 +13,10 @@ logger = logging.getLogger(__name__)
 class BitMetric:
     def __init__(self, data):
         date_format = "%Y-%m-%dT%H:%M:%SZ"
-        self.txTime: datetime = datetime.strptime(data["txTime"], date_format)
-        self.txId: int = int(data["txId"])
-        self.validTime: datetime = datetime.strptime(data["validTime"], date_format)
-        self.contentHash: str = data["contentHash"]
+        self.tx_time: datetime = datetime.strptime(data["txTime"], date_format)
+        self.tx_id: int = int(data["txId"])
+        self.valid_time: datetime = datetime.strptime(data["validTime"], date_format)
+        self.content_hash: str = data["contentHash"]
         self.yld: dict[str, str] = json.loads(data["doc"]["yield"])
         self.cfg: dict[str, str] = json.loads(data["doc"]["config"])
         self.src: dict[str, str] = json.loads(data["doc"]["source"])
@@ -28,10 +28,16 @@ class BitMetric:
         return len(self.yld) == 0
 
     def __eq__(self, val):
-        return all([getattr(self, op) == getattr(val, op) for op in ["src", "cfg", "yld", "name", "pms"]])
+        return (
+            self.src == val.src
+            and self.cfg == val.cfg
+            and self.yld == val.yld
+            and self.name == val.name
+            and self.pms == val.pms
+        )
 
     def __hash__(self):
-        return hash(str(hash(self.txTime)) + self.contentHash)
+        return hash(str(hash(self.tx_time)) + self.content_hash)
 
 
 @click.group(
@@ -83,18 +89,15 @@ def raw(ctx: click.Context):
 @cli.command(help="Returns the parsed metric")
 @click.pass_context
 def parse(ctx: click.Context):
+    bit_metrics = ctx.obj["bit_metrics"]
     metrics = {
-        "total": len(ctx.obj["bit_metrics"]),
-        "total_elapsed": sum([bm.elapsed for bm in ctx.obj["bit_metrics"]]),
-        "empty": len([bm for bm in ctx.obj["bit_metrics"] if bm.empty()]),
-        "empty_elapsed": sum([bm.elapsed for bm in ctx.obj["bit_metrics"] if bm.empty()]),
-        "useful": len([bm for bm in ctx.obj["bit_metrics"] if not bm.empty()]),
-        "useful_elapsed": sum([bm.elapsed for bm in ctx.obj["bit_metrics"] if not bm.empty()]),
-        "futile_runs": {
-            bm.name: ctx.obj["bit_metrics"].count(bm) - 1
-            for bm in ctx.obj["bit_metrics"]
-            if ctx.obj["bit_metrics"].count(bm) > 1
-        },
+        "total": len(bit_metrics),
+        "total_elapsed": sum([bm.elapsed for bm in bit_metrics]),
+        "empty": len([bm for bm in bit_metrics if bm.empty()]),
+        "empty_elapsed": sum([bm.elapsed for bm in bit_metrics if bm.empty()]),
+        "useful": len([bm for bm in bit_metrics if not bm.empty()]),
+        "useful_elapsed": sum([bm.elapsed for bm in bit_metrics if not bm.empty()]),
+        "futile_runs": {bm.name: bit_metrics.count(bm) - 1 for bm in bit_metrics if bit_metrics.count(bm) > 1},
     }
     click.echo(json.dumps(metrics))
 

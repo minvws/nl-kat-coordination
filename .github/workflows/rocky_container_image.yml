@@ -53,7 +53,7 @@ jobs:
           cp _version.py rocky/rocky/version.py
 
       - name: Build container image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           # We don't use git context because that doesn't process .dockerignore
           # https://github.com/docker/cli/issues/2827
