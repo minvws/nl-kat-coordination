@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 BUCKETPREFIX = env.get("S3_BUCKET_PREFIX", "OpenKAT-")
 BUCKET = env.get("S3_BUCKET", "OpenKAT")
+S3_REGION = env.get("S3_REGION", None)
 
 def create_raw_repository(settings: Settings) -> RawRepository:
     return FileRawRepository(
@@ -94,15 +95,18 @@ class S3RawRepository(RawRepository):
         self._s3resource = self._session.resource("s3")
         return self._s3resource
 
-    def get_or_create_bucket(self, organization: Str) -> :
+    def get_or_create_bucket(self, organization: Str):
         bucketname = S3_BUCKET
+        s3region = S3_REGION
         if self.bucket_per_orga:
             bucketname = f"{S3_BUCKET_PREFIX}{organization}"
             try:
-                self.s3resource.create_bucket(Bucket=bucketname)
+                bucket = self.s3resource.create_bucket(Bucket=bucketname, region=s3region)
+                bucket.wait_until_exists()
+                return bucket
             except self.s3resource.meta.client.exceptions.BucketAlreadyExists
                 pass # we might not be the only Bytes client trying to create this bucket
-        return self.s3resource.Bucket(name=bucketname)
+        return self.s3resource.Bucket(name=bucketname, region=s3region)
     
     def save_raw(self, raw_id: UUID, raw: RawData) -> None:
         file_name = self._raw_file_name(raw_id, raw.boefje_meta)
@@ -118,9 +122,11 @@ class S3RawRepository(RawRepository):
 
         try:
             contents = bucket.Object(file_name).get()['Body'].read()
-        except self.s3resource.meta.client.exceptions as error
-            logger.error(f"Could not get file from s3: {bucket}/{file_name} due to {error}")
-            raise BytesFileNotFoundException(error)
+        except self.s3resource.meta.client.exceptions as error:
+            if error.response['Error']['Code'] == "404":
+                raise BytesFileNotFoundException(error)
+            logger.error(f"Could not get file from s3: {bucket.name}/{file_name} due to {error}")
+            raise error
 
         return RawData(value=self.file_middleware.decode(contents), boefje_meta=boefje_meta)
 
