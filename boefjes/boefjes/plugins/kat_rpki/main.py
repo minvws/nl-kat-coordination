@@ -4,7 +4,7 @@ import hashlib
 import json
 import os
 import tempfile
-from datetime import datetime
+from datetime import datetime, timezone
 from ipaddress import ip_address
 from os import getenv
 from pathlib import Path
@@ -107,10 +107,14 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 
 def cache_out_of_date(meta_path: Path) -> bool:
     """Returns True if the cache file is older than the allowed cache_timeout"""
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     maxage = int(getenv("RPKI_CACHE_TIMEOUT", RPKI_CACHE_TIMEOUT))
     meta = load_json(meta_path)
-    cached_file_timestamp = datetime.strptime(meta["timestamp"], "%Y-%m-%dT%H:%M:%SZ")
+    try:
+        cached_file_timestamp = datetime.fromisoformat(meta["timestamp"])
+    # for old meta cache files that have the old timestamp format
+    except ValueError:
+        return True
     return (now - cached_file_timestamp).total_seconds() > maxage
 
 
@@ -138,7 +142,7 @@ def refresh_cache(
 
     # Creating metadata
     metadata = {
-        "timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "source": source_url,
         "hash": create_hash(response.content, algo),
         "hash_algorithm": algo,
