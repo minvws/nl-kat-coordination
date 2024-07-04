@@ -1,15 +1,16 @@
 ARG PYTHON_VERSION=3.11
 FROM python:$PYTHON_VERSION-bookworm AS dev
 
-EXPOSE 8000
-
 ARG USER_UID=1000
 ARG USER_GID=1000
+ARG PORT=8000
+
+EXPOSE $PORT
 
 ENTRYPOINT ["/app/scheduler/entrypoint.sh"]
 
-RUN groupadd --gid $USER_GID scheduler
-RUN adduser --disabled-password --gecos '' --uid $USER_UID --gid $USER_GID scheduler
+RUN groupadd --gid "$USER_GID" scheduler
+RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" scheduler
 
 WORKDIR /app/scheduler
 ENV PATH=/home/scheduler/.local/bin:${PATH}
