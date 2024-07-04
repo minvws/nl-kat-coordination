@@ -97,11 +97,11 @@ macro_string = Combine(ZeroOrMore(macro_expand | macro_literal))
 domain_spec = macro_string.setParseAction(_check_domain_end)
 
 ip4_network = Regex(
-    r"((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])"
+    r"((25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)"
 )
 
-ip6_cidr_length = CaselessLiteral("/") + Regex("(12[0-8]|1[01][0-9]|[1-9][0-9]|[0-9])")
-ip4_cidr_length = CaselessLiteral("/") + Regex("(3[0-2]|[12][0-9]|[0-9])")
+ip6_cidr_length = CaselessLiteral("/") + Regex("(12[0-8]|1[01]\d|[1-9]\d|\d)")
+ip4_cidr_length = CaselessLiteral("/") + Regex("(3[0-2]|[12]\d|\d)")
 dual_cidr_length = Optional(ip4_cidr_length) + Optional(CaselessLiteral("/") + ip6_cidr_length)
 
 unknown_modifier = Combine(name + CaselessLiteral("=") + macro_string)
@@ -139,9 +139,6 @@ record = version + Group(terms).setResultsName("terms") + ZeroOrMore(SP) + Strin
 
 def parse(spf_record):
     try:
-        parsed = record.parseString(spf_record)
-    except ParseException:
-        parsed = None
+        return record.parseString(spf_record)
     except Exception:
-        parsed = None
-    return parsed
+        return None
