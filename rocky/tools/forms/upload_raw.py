@@ -49,8 +49,8 @@ class UploadRawForm(BaseRockyForm):
         *args,
         **kwargs,
     ):
-        self.octopoes_connector = connector
         super().__init__(*args, **kwargs)
+        self.octopoes_connector = connector
         self.set_choices_for_widget("ooi_id", ooi_list)
 
     def clean_mime_types(self) -> set[str]:
