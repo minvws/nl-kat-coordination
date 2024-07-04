@@ -52,7 +52,7 @@ def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[
     # 3: second-level domain
     # 4: end with either a space, a ';', a :port or the end of the string
     #              {1}{ 2}{  3  }{         4       }
-    if re.search(r"\S+\*\.\S{2,3}([\s]+|$|;|:[\d]+)", csp_header):
+    if re.search(r"\S+\*\.\S{2,3}([\s]+|$|;|:\d+)", csp_header):
         findings.append("The wildcard * for the scheme and host part of any URL should never be used in CSP settings.")
 
     if "unsafe-inline" in csp_header or "unsafe-eval" in csp_header or "unsafe-hashes" in csp_header:
