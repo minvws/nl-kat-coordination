@@ -52,7 +52,7 @@ def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[
     # 3: second-level domain
     # 4: end with either a space, a ';', a :port or the end of the string
     #              {1}{ 2}{  3  }{         4       }
-    if re.search(r"\S+\*\.\S{2,3}([\s]+|$|;|:[0-9]+)", csp_header):
+    if re.search(r"\S+\*\.\S{2,3}([\s]+|$|;|:[\d]+)", csp_header):
         findings.append("The wildcard * for the scheme and host part of any URL should never be used in CSP settings.")
 
     if "unsafe-inline" in csp_header or "unsafe-eval" in csp_header or "unsafe-hashes" in csp_header:
@@ -156,7 +156,7 @@ def _create_kat_finding(header: Reference, kat_id: str, description: str) -> Ite
 def _source_valid(policy: list[str]) -> bool:
     for value in policy:
         if not (
-            re.search(r"\S+\.\S{2,3}([\s]+|$|;|:[0-9]+)", value)
+            re.search(r"\S+\.\S{2,3}([\s]+|$|;|:[\d]+)", value)
             or value
             in [
                 "'none'",
