@@ -1,0 +1,10 @@
+{
+  "id": "kat_cve_2024_6387_normalize",
+  "consumes": [
+    "boefje/CVE-2024-6387"
+  ],
+  "produces": [
+    "Finding",
+    "CVEFindingType"
+  ]
+}

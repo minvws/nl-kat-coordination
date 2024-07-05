@@ -1,0 +1,9 @@
+{
+  "id": "CVE-2024-6387",
+  "name": "CVE_2024_6387",
+  "description": "CVE-2024-6387-Checker is a tool designed to identify servers running vulnerable versions of OpenSSH, specifically targeting the recently discovered regreSSHion vulnerability (CVE-2024-6387)",
+  "consumes": [
+    "IPPort"
+  ],
+  "scan_level": 2
+}
