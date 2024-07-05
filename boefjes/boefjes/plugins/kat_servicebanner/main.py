@@ -16,6 +16,8 @@ def get_sock(ip, port, timeout):
 
 
 def get_banner(sock):
+    if not sock:
+        return [({"boefje/error"}, "Unable to connect to the service")]
     try:
         sock.settimeout(TIMEOUT)
         banner = sock.recv(1024)
