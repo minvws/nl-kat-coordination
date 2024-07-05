@@ -1,0 +1,9 @@
+{
+  "id": "servicebanner",
+  "name": "Servicebanner download",
+  "description": "Downloads service banners from the target hosts",
+  "consumes": [
+    "IPPort"
+  ],
+  "scan_level": 2
+}
