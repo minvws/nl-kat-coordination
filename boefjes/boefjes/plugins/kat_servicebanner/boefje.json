@@ -1,7 +1,7 @@
 {
   "id": "servicebanner",
-  "name": "SSH servicebanner download",
-  "description": "Downloads ssh service banners from the target hosts",
+  "name": "Servicebanner download",
+  "description": "Downloads service banners from the target hosts",
   "consumes": [
     "IPPort"
   ],

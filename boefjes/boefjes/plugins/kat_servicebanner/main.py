@@ -5,7 +5,7 @@ from boefjes.job_models import BoefjeMeta
 TIMEOUT = 1.0
 
 
-def get_ssh_sock(ip, port, timeout):
+def get_sock(ip, port, timeout):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(timeout)
     try:
@@ -15,7 +15,7 @@ def get_ssh_sock(ip, port, timeout):
         return None
 
 
-def get_ssh_banner(sock):
+def get_banner(sock):
     try:
         banner = sock.recv(1024)
         try:
@@ -25,7 +25,7 @@ def get_ssh_banner(sock):
         sock.close()
         return [({"openkat/servicebanner"}, banner)]
     except Exception as e:
-        return [({"boefje/error"}, f"Unable to get SSH banner. {str(e)}")]
+        return [({"boefje/error"}, f"Unable to get banner. {str(e)}")]
 
 
 def run(boefje_meta: BoefjeMeta) -> list[tuple[set, str | bytes]]:
@@ -33,6 +33,6 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, str | bytes]]:
     port = input_["port"]
     ip = input_["address"]["address"]
 
-    sshsock = get_ssh_sock(ip, port, TIMEOUT)
+    sock = get_sock(ip, port, TIMEOUT)
 
-    return get_ssh_banner(sshsock)
+    return get_banner(sock)
