@@ -57,15 +57,13 @@ class ADRFindingType(FindingType):
 class CVEFindingType(FindingType):
     object_type: Literal["CVEFindingType"] = "CVEFindingType"
 
-    id: constr(to_upper=True)
+    id: constr(strip_whitespace=True, to_upper=True)
 
 
 class CWEFindingType(FindingType):
     object_type: Literal["CWEFindingType"] = "CWEFindingType"
 
-    def __init__(self, *args, **kwargs):
-        kwargs['id'] = kwargs['id'].upper()
-        super().__init__(*args, **kwargs)
+    id: constr(strip_whitespace=True, to_upper=True)
 
 
 class CAPECFindingType(FindingType):
