@@ -23,9 +23,9 @@ def get_ssh_banner(sock):
         except UnicodeDecodeError:
             banner = banner.decode("latin1").strip()
         sock.close()
-        return banner
+        return [({"openkat/servicebanner"}, banner)]
     except Exception as e:
-        return str(e)
+        return [({"boefje/error"}, f"Unable to get SSH banner. {str(e)}")]
 
 
 def run(boefje_meta: BoefjeMeta) -> list[tuple[set, str | bytes]]:
@@ -35,6 +35,4 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, str | bytes]]:
 
     sshsock = get_ssh_sock(ip, port, TIMEOUT)
 
-    banner = get_ssh_banner(sshsock)
-
-    return [({"openkat/servicebanner"}, banner)]
+    return get_ssh_banner(sshsock)
