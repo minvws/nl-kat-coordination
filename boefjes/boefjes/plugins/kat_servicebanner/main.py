@@ -17,6 +17,7 @@ def get_sock(ip, port, timeout):
 
 def get_banner(sock):
     try:
+        sock.settimeout(TIMEOUT)
         banner = sock.recv(1024)
         try:
             banner = banner.decode().strip()
