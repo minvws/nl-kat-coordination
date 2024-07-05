@@ -492,7 +492,6 @@ class Server:
             stats = self.ctx.datastores.task_store.get_status_count_per_hour(scheduler_id)
         except Exception as exc:
             self.logger.exception(exc)
-            self.logger.exception(exc)
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="failed to get task stats",

@@ -11,11 +11,14 @@ buttons.forEach((button) => {
     .closest("tr")
     .getAttribute("data-task-id")
     .replace(/-/g, "");
+  const organization =
+    organization_code ||
+    button.closest("tr").getAttribute("data-organization-code");
   const json_url =
     "/" +
     language +
     "/" +
-    organization_code +
+    organization +
     "/tasks/normalizers/" +
     encodeURI(task_id);
 
@@ -79,7 +82,7 @@ buttons.forEach((button) => {
             "/" +
             language +
             "/" +
-            escapeHTMLEntities(encodeURIComponent(organization_code));
+            escapeHTMLEntities(encodeURIComponent(organization));
           let object_list = "";
           // set the observed at time a fews seconds into the future, as the job finish time is not the same as the ooi-creation time. Due to async reasons the object might be a bit slow.
           data["timestamp"] = Date.parse(data["valid_time"] + "Z");
