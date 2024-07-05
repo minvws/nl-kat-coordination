@@ -71,6 +71,7 @@ class CAPECFindingType(FindingType):
 
     id: constr(strip_whitespace=True, to_upper=True)
 
+
 class RetireJSFindingType(FindingType):
     object_type: Literal["RetireJSFindingType"] = "RetireJSFindingType"
 
@@ -79,6 +80,7 @@ class SnykFindingType(FindingType):
     object_type: Literal["SnykFindingType"] = "SnykFindingType"
 
     id: constr(strip_whitespace=True, to_upper=True)
+
 
 class KATFindingType(FindingType):
     object_type: Literal["KATFindingType"] = "KATFindingType"
