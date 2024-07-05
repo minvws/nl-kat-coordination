@@ -47,7 +47,11 @@ structlog.configure(
         structlog.dev.set_exc_info,
         structlog.stdlib.PositionalArgumentsFormatter(),
         structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S", utc=False),
-        structlog.dev.ConsoleRenderer(),
+        (
+            structlog.dev.ConsoleRenderer(pad_level=False)
+            if settings.logging_format == "text"
+            else structlog.processors.JSONRenderer()
+        ),
     ],
     context_class=dict,
     logger_factory=structlog.stdlib.LoggerFactory(),
@@ -58,14 +62,19 @@ app = FastAPI(title="Octopoes API")
 
 # Set up OpenTelemetry instrumentation
 if settings.span_export_grpc_endpoint is not None:
-    logger.info("Setting up instrumentation with span exporter endpoint [%s]", settings.span_export_grpc_endpoint)
+    logger.info(
+        "Setting up instrumentation with span exporter endpoint [%s]",
+        settings.span_export_grpc_endpoint,
+    )
 
     FastAPIInstrumentor.instrument_app(app)
     HTTPXClientInstrumentor().instrument()
 
     resource = Resource(attributes={SERVICE_NAME: "octopoes"})
     provider = TracerProvider(resource=resource)
-    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=str(settings.span_export_grpc_endpoint)))
+    processor = BatchSpanProcessor(
+        OTLPSpanExporter(endpoint=str(settings.span_export_grpc_endpoint))
+    )
     provider.add_span_processor(processor)
     trace.set_tracer_provider(provider)
 
@@ -122,7 +131,9 @@ def not_found_exception_handler(_: Request, exc: ObjectNotFoundException) -> Non
 @app.exception_handler(Exception)
 def uncaught_exception_handler(_: Request, exc: Exception) -> None:
     logger.error(exc)
-    raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"{exc.__class__.__name__}: {exc}")
+    raise HTTPException(
+        status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"{exc.__class__.__name__}: {exc}"
+    )
 
 
 @app.get("/health")
