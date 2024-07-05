@@ -2,7 +2,7 @@ from enum import Enum
 from functools import total_ordering
 from typing import Literal
 
-from pydantic import Field, AnyUrl
+from pydantic import constr, AnyUrl
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -57,7 +57,7 @@ class ADRFindingType(FindingType):
 class CVEFindingType(FindingType):
     object_type: Literal["CVEFindingType"] = "CVEFindingType"
 
-    id: str = Field(to_upper=True)
+    id: str = constr(to_upper=True)
 
 
 class CWEFindingType(FindingType):
