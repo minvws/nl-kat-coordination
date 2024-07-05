@@ -19,7 +19,11 @@ structlog.configure(
         structlog.dev.set_exc_info,
         structlog.stdlib.PositionalArgumentsFormatter(),
         structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S", utc=False),
-        structlog.dev.ConsoleRenderer(),
+        (
+            structlog.dev.ConsoleRenderer(pad_level=False)
+            if settings.logging_format == "text"
+            else structlog.processors.JSONRenderer()
+        ),
     ],
     context_class=dict,
     logger_factory=structlog.stdlib.LoggerFactory(),
@@ -31,7 +35,9 @@ logger = structlog.get_logger(__name__)
 
 
 @click.command()
-@click.argument("worker_type", type=click.Choice([q.value for q in WorkerManager.Queue]))
+@click.argument(
+    "worker_type", type=click.Choice([q.value for q in WorkerManager.Queue])
+)
 @click.option(
     "--log-level",
     type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"]),
