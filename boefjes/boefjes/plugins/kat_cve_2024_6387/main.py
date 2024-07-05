@@ -89,4 +89,4 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, str | bytes]]:
 
     status, banner = SSHChecker(ip, port, TIMEOUT).check_vulnerability()
 
-    return [(set(), json.dumps({"status": status, "banner": banner}))]
+    return [(set('openkat/servicebanner',), banner)]
