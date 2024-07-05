@@ -31,7 +31,7 @@ structlog.configure(
         structlog.processors.StackInfoRenderer(),
         structlog.dev.set_exc_info,
         structlog.stdlib.PositionalArgumentsFormatter(),
-        structlog.processors.TimeStamper("iso"),
+        structlog.processors.TimeStamper("iso", utc=False),
         (
             structlog.dev.ConsoleRenderer(pad_level=False)
             if settings.logging_format == "text"
