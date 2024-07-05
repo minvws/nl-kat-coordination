@@ -35,9 +35,7 @@ logger = structlog.get_logger(__name__)
 
 
 @click.command()
-@click.argument(
-    "worker_type", type=click.Choice([q.value for q in WorkerManager.Queue])
-)
+@click.argument("worker_type", type=click.Choice([q.value for q in WorkerManager.Queue]))
 @click.option(
     "--log-level",
     type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"]),

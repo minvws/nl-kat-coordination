@@ -72,9 +72,7 @@ if settings.span_export_grpc_endpoint is not None:
 
     resource = Resource(attributes={SERVICE_NAME: "octopoes"})
     provider = TracerProvider(resource=resource)
-    processor = BatchSpanProcessor(
-        OTLPSpanExporter(endpoint=str(settings.span_export_grpc_endpoint))
-    )
+    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=str(settings.span_export_grpc_endpoint)))
     provider.add_span_processor(processor)
     trace.set_tracer_provider(provider)
 
@@ -131,9 +129,7 @@ def not_found_exception_handler(_: Request, exc: ObjectNotFoundException) -> Non
 @app.exception_handler(Exception)
 def uncaught_exception_handler(_: Request, exc: Exception) -> None:
     logger.error(exc)
-    raise HTTPException(
-        status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"{exc.__class__.__name__}: {exc}"
-    )
+    raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"{exc.__class__.__name__}: {exc}")
 
 
 @app.get("/health")

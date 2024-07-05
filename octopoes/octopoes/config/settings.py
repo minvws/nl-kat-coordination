@@ -6,12 +6,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath
-from pydantic_settings import (
-    BaseSettings,
-    EnvSettingsSource,
-    PydanticBaseSettingsSource,
-    SettingsConfigDict,
-)
+from pydantic_settings import BaseSettings, EnvSettingsSource, PydanticBaseSettingsSource, SettingsConfigDict
 
 from octopoes.models import ScanLevel, ScanProfileType
 from octopoes.models.ooi.findings import RiskLevelSeverity
@@ -53,9 +48,7 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # Application settings
-    log_cfg: FilePath = Field(
-        BASE_DIR / "logging.yml", description="Path to the logging configuration file"
-    )
+    log_cfg: FilePath = Field(BASE_DIR / "logging.yml", description="Path to the logging configuration file")
 
     # External services settings
     queue_uri: AmqpDsn = Field(
@@ -82,9 +75,7 @@ class Settings(BaseSettings):
         60,
         description="Interval in seconds of the periodic task that recalculates scan levels",
     )
-    bits_enabled: set[str] = Field(
-        set(), examples=['["port-common"]'], description="Explicitly enabled bits"
-    )
+    bits_enabled: set[str] = Field(set(), examples=['["port-common"]'], description="Explicitly enabled bits")
     bits_disabled: set[str] = Field(
         set(),
         examples=['["port-classification-ip"]'],
@@ -97,9 +88,7 @@ class Settings(BaseSettings):
         validation_alias="SPAN_EXPORT_GRPC_ENDPOINT",
     )
 
-    logging_format: Literal["text", "json"] = Field(
-        "text", description="Logging format"
-    )
+    logging_format: Literal["text", "json"] = Field("text", description="Logging format")
 
     model_config = SettingsConfigDict(env_prefix="OCTOPOES_")
 
@@ -122,9 +111,7 @@ class Settings(BaseSettings):
 
 
 DEFAULT_SCAN_LEVEL_FILTER = {scan_level for scan_level in ScanLevel}
-DEFAULT_SCAN_PROFILE_TYPE_FILTER = {
-    scan_profile_type for scan_profile_type in ScanProfileType
-}
+DEFAULT_SCAN_PROFILE_TYPE_FILTER = {scan_profile_type for scan_profile_type in ScanProfileType}
 DEFAULT_SEVERITY_FILTER = {severity for severity in RiskLevelSeverity}
 DEFAULT_LIMIT = 50
 DEFAULT_OFFSET = 0

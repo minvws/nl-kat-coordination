@@ -88,9 +88,7 @@ REMOTE_USER_FALLBACK = env.bool("REMOTE_USER_FALLBACK", False)
 if REMOTE_USER_HEADER:
     # Optional list of default organizations to add remote users to,
     # format: space separated list of ORGANIZATION_CODE:GROUP_NAME, e.g. `test:admin test2:redteam`
-    REMOTE_USER_DEFAULT_ORGANIZATIONS = env.list(
-        "REMOTE_USER_DEFAULT_ORGANIZATIONS", default=[]
-    )
+    REMOTE_USER_DEFAULT_ORGANIZATIONS = env.list("REMOTE_USER_DEFAULT_ORGANIZATIONS", default=[])
     AUTHENTICATION_BACKENDS = [
         "rocky.auth.remote_user.RemoteUserBackend",
     ]
@@ -113,12 +111,8 @@ if SPAN_EXPORT_GRPC_ENDPOINT is not None:
 # -----------------------------
 # EMAIL CONFIGURATION for SMTP
 # -----------------------------
-EMAIL_BACKEND = env(
-    "EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend"
-)
-EMAIL_FILE_PATH = env.path(
-    "EMAIL_FILE_PATH", BASE_DIR / "rocky/email_logs"
-)  # directory to store output files
+EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
+EMAIL_FILE_PATH = env.path("EMAIL_FILE_PATH", BASE_DIR / "rocky/email_logs")  # directory to store output files
 EMAIL_HOST = env("EMAIL_HOST", default="localhost")  # localhost
 try:
     EMAIL_PORT = env.int("EMAIL_PORT", default=25)
@@ -405,9 +399,7 @@ if GITPOD_WORKSPACE_URL := env("GITPOD_WORKSPACE_URL", default=None):
     CSRF_TRUSTED_ORIGINS.append(GITPOD_WORKSPACE_URL.replace("//", "//8000-"))
 
 # Configuration for GitHub Codespaces
-if GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN := env(
-    "GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN", default=None
-):
+if GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN := env("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN", default=None):
     # example environment variable: GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN=preview.app.github.dev
     # public url on https://praseodym-organic-engine-9j6465vx3xgx6-8000.preview.app.github.dev/
     ALLOWED_HOSTS.append("." + GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN)
@@ -445,9 +437,7 @@ DEFAULT_RENDERER_CLASSES = ["rest_framework.renderers.JSONRenderer"]
 BROWSABLE_API = env.bool("BROWSABLE_API", DEBUG)
 
 if BROWSABLE_API:
-    DEFAULT_RENDERER_CLASSES = DEFAULT_RENDERER_CLASSES + [
-        "rest_framework.renderers.BrowsableAPIRenderer"
-    ]
+    DEFAULT_RENDERER_CLASSES = DEFAULT_RENDERER_CLASSES + ["rest_framework.renderers.BrowsableAPIRenderer"]
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
