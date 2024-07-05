@@ -57,7 +57,7 @@ class ADRFindingType(FindingType):
 class CVEFindingType(FindingType):
     object_type: Literal["CVEFindingType"] = "CVEFindingType"
 
-    id: str = constr(to_upper=True)
+    id: constr(to_upper=True)
 
 
 class CWEFindingType(FindingType):
