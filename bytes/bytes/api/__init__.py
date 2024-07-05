@@ -18,7 +18,9 @@ from bytes.api.root import validation_exception_handler
 from bytes.api.router import router
 from bytes.config import get_settings
 
-logging.config.fileConfig(get_settings().log_cfg, disable_existing_loggers=False)
+settings = get_settings()
+
+logging.config.fileConfig(settings.log_cfg, disable_existing_loggers=False)
 structlog.configure(
     processors=[
         structlog.contextvars.merge_contextvars,
@@ -27,7 +29,11 @@ structlog.configure(
         structlog.dev.set_exc_info,
         structlog.stdlib.PositionalArgumentsFormatter(),
         structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S", utc=False),
-        structlog.dev.ConsoleRenderer(),
+        (
+            structlog.dev.ConsoleRenderer(pad_level=False)
+            if settings.logging_format == "text"
+            else structlog.processors.JSONRenderer()
+        ),
     ],
     context_class=dict,
     logger_factory=structlog.stdlib.LoggerFactory(),
@@ -39,8 +45,11 @@ logger = structlog.get_logger(__name__)
 
 app = FastAPI(title="Bytes API")
 
-if get_settings().span_export_grpc_endpoint is not None:
-    logger.info("Setting up instrumentation with span exporter endpoint [%s]", get_settings().span_export_grpc_endpoint)
+if settings.span_export_grpc_endpoint is not None:
+    logger.info(
+        "Setting up instrumentation with span exporter endpoint [%s]",
+        get_settings().span_export_grpc_endpoint,
+    )
 
     FastAPIInstrumentor.instrument_app(app)
     Psycopg2Instrumentor().instrument()
@@ -48,7 +57,9 @@ if get_settings().span_export_grpc_endpoint is not None:
 
     resource = Resource(attributes={SERVICE_NAME: "bytes"})
     provider = TracerProvider(resource=resource)
-    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=str(get_settings().span_export_grpc_endpoint)))
+    processor = BatchSpanProcessor(
+        OTLPSpanExporter(endpoint=str(settings.span_export_grpc_endpoint))
+    )
     provider.add_span_processor(processor)
     trace.set_tracer_provider(provider)
 
