@@ -38,7 +38,7 @@ SEVERITY_LEAKSTAGE_MAPPING = {
 def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     results = json.loads(raw)
 
-    pk_ooi = Reference.from_str(input_ooi["primary_key"])
+    pk_ooi_reference = Reference.from_str(input_ooi["primary_key"])
     network_reference = Network(name="internet").reference
 
     for event in results:
@@ -48,7 +48,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         # TODO: ssh, ssl
 
         # reset loop
-        event_ooi_reference = pk_ooi
+        event_ooi_reference = pk_ooi_reference
 
         # Autonomous System
         as_ooi = None
@@ -198,6 +198,6 @@ def handle_tag(event, software_ooi_reference=None, ip_port_ooi_reference=None):
             if re.match(r"cve-\d{4}-\d{4,6}", tag):
                 ft = CVEFindingType(id=tag)
                 cve_ooi = software_ooi_reference if software_ooi_reference else ip_port_ooi_reference
-                f = Finding(finding_type=ft.reference, ooi=cve_ooi.reference)
+                f = Finding(finding_type=ft.reference, ooi=cve_ooi)
                 yield ft
                 yield f
