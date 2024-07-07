@@ -30,7 +30,7 @@ New Features
 * Improvements of several reports in terms of performance, styling, OOI selection and configuration.
 * Improved documentation about reports, the new OCI image functionality and architecture, IPv6 support in Docker and Octopoes models.
 * Added documentation on how to make a boefje, normalizer, model, bit and report with examples. Thanks to @Souf149 for contributing some of these improvements.
-* Frysk has been added to the selectable list of languages.
+* Frysk has been added to the selectable list of languages. Over 30% of OpenKAT has been translated due to the amazing and hard work of [Wim Benes](https://www.linkedin.com/in/wimbenes/). Tige tank!
 
 Bug fixes
 =========
