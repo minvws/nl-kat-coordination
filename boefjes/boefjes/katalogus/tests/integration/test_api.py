@@ -51,7 +51,7 @@ class TestAPI(TestCase):
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/")
         self.assertEqual(len(response.json()), 95)
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins?plugin_type=boefje")
-        self.assertEqual(len(response.json()), 41)
+        self.assertEqual(len(response.json()), 42)
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins?limit=10")
         self.assertEqual(len(response.json()), 10)
