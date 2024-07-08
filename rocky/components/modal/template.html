@@ -22,8 +22,9 @@
             </section>
             <section class="footer">
                 <div class="toolbar">
-                    <button>{% slot "cta_button" %}{% translate "Confirm" %}{% endslot %}</button>
-                    <button class="ghost close-modal-button">{% slot "secondary_button" %} {% translate "Cancel" %} {% endslot %}</button>
+                    {% slot "footer_buttons" %}
+                        <button class="ghost close-modal-button">{% slot "secondary_button" %} {% translate "Cancel" %} {% endslot %}</button>
+                    {% endslot %}
                 </div>
             </section>
         </div>

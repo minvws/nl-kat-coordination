@@ -12,5 +12,4 @@ class Modal(component.Component):
         }
 
     class Media:
-        js = "modal/script.js"
         css = "dist/components.css"
