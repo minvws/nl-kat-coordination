@@ -78,22 +78,6 @@ $grid-xxl: 215rem;
   --section-content-wrapper-padding-left: 0;
 }
 
-// main section {
-// 	div {
-
-// 		div,
-// 		section {
-// 			padding-top: var(--content-nested-padding-top);
-// 			padding-right: var(--content-nested-padding-right);
-// 			padding-bottom: var(--content-nested-padding-bottom);
-// 			padding-left: var(--content-nested-padding-left);
-// 			max-width: var(--content-nested-max-width);
-// 			gap: var(--content-nested-gap);
-// 			margin: 0;
-// 		}
-// 	}
-// }
-
 body {
   > header {
     @media screen and (min-width: $grid-m) {

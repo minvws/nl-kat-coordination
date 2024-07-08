@@ -53,7 +53,7 @@ class NameServerChecks:
 class NameServerSystemReport(Report):
     id = "name-server-report"
     name = _("Name Server Report")
-    description = _("Name server report checks name servers on basic security standards.")
+    description = _("Name Server Report checks name servers on basic security standards.")
     plugins = {
         "required": [
             "nmap",

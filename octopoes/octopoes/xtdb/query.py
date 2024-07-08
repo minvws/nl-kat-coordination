@@ -74,6 +74,7 @@ class Query:
     _find_clauses: list[str] = field(default_factory=list)
     _limit: int | None = None
     _offset: int | None = None
+    _order_by: tuple[Aliased, bool] | None = None
 
     def where(self, ooi_type: Ref, **kwargs) -> "Query":
         for field_name, value in kwargs.items():
@@ -146,10 +147,10 @@ class Query:
 
         return query
 
-    def pull(self, ooi_type: Ref) -> "Query":
+    def pull(self, ooi_type: Ref, *, fields: str = "[*]") -> "Query":
         """By default, we pull the target type. But when using find, count, etc., you have to pull explicitly."""
 
-        self._find_clauses.append(f"(pull {self._get_object_alias(ooi_type)} [*])")
+        self._find_clauses.append(f"(pull {self._get_object_alias(ooi_type)} {fields})")
 
         return self
 
@@ -175,6 +176,11 @@ class Query:
 
     def offset(self, offset: int) -> "Query":
         self._offset = offset
+
+        return self
+
+    def order_by(self, ref: Aliased, ascending: bool = True) -> "Query":
+        self._order_by = (ref, ascending)
 
         return self
 
@@ -213,6 +219,10 @@ class Query:
                 self._add_or_statement_for_abstract_types(ref, field_name, f'"{value}"')
                 return
 
+            if isinstance(value, bool):
+                self._add_or_statement_for_abstract_types(ref, field_name, str(value).lower())
+                return
+
             if not isinstance(value, type | Aliased):
                 raise InvalidField(f"value '{value}' for abstract class fields should be a string or an OOI Type")
 
@@ -228,6 +238,10 @@ class Query:
 
         if isinstance(value, str):
             self._add_where_statement(ref, field_name, f'"{value}"')
+            return
+
+        if isinstance(value, bool):
+            self._add_where_statement(ref, field_name, str(value).lower())
             return
 
         if not isinstance(value, type | Aliased):
@@ -340,6 +354,10 @@ class Query:
 
         find_clauses = self._compile_find_clauses()
         compiled = f"{{:query {{:find [{find_clauses}] :where [{where_clauses}]"
+
+        if self._order_by is not None:
+            asc_desc = ":asc" if self._order_by[1] else ":desc"
+            compiled += f" :order-by [[{self._get_object_alias(self._order_by[0])} {asc_desc}]]"
 
         if self._limit is not None:
             compiled += f" :limit {self._limit}"
