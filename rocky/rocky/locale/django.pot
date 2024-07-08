@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-24 12:02+0000\n"
+"POT-Creation-Date: 2024-07-08 14:12+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -722,6 +722,7 @@ msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/report_overview/report_history_table.html
 #: reports/templates/summary/ooi_selection.html
 #: rocky/templates/partials/task_history.html
 msgid "Object"
@@ -986,6 +987,7 @@ msgid "Actions"
 msgstr ""
 
 #: katalogus/templates/partials/plugins_navigation.html
+#: reports/templates/report_overview/report_overview_navigation.html
 msgid "Plugins Navigation"
 msgstr ""
 
@@ -1552,8 +1554,9 @@ msgstr ""
 msgid "Choose a report - Introduction"
 msgstr ""
 
-#: onboarding/templates/step_2a_choose_report_info.html reports/views/base.py
-#: rocky/templates/header.html
+#: onboarding/templates/step_2a_choose_report_info.html
+#: reports/templates/report_overview/report_overview_header.html
+#: reports/views/base.py rocky/templates/header.html
 msgid "Reports"
 msgstr ""
 
@@ -2102,7 +2105,7 @@ msgstr ""
 msgid "Filter by OOI types"
 msgstr ""
 
-#: reports/forms.py
+#: reports/forms.py reports/templates/report_overview/report_history_table.html
 msgid "Report types"
 msgstr ""
 
@@ -2128,6 +2131,8 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/plugin_overview_table.html
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
 #: reports/templates/summary/report_asset_overview.html
 msgid "Report type"
 msgstr ""
@@ -2587,6 +2592,10 @@ msgid ""
 "information systems (RIS). DICOM servers store and manage patient-specific "
 "medical images, like X-rays, CT scans, and MRIs, utilizing a standardized "
 "format."
+msgstr ""
+
+#: reports/report_types/concatenated_report/report.py
+msgid "Concatenated Report"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -3473,6 +3482,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/report_overview/report_history_table.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: tools/view_helpers.py rocky/templates/admin/delete_confirmation.html
 #: rocky/templates/admin/delete_selected_confirmation.html
@@ -3576,6 +3586,7 @@ msgid "Show more suggested plugins"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
+#: reports/templates/report_overview/report_overview_header.html
 #: reports/views/generate_report.py
 msgid "Generate report"
 msgstr ""
@@ -3643,6 +3654,136 @@ msgstr ""
 msgid "Toggle all report types"
 msgstr ""
 
+#: reports/templates/report_overview/report_history.html
+#: reports/views/report_overview.py
+msgid "Reports history"
+msgstr ""
+
+#: reports/templates/report_overview/report_history.html
+msgid "An overview of all your generated reports."
+msgstr ""
+
+#: reports/templates/report_overview/report_history.html
+#, python-format
+msgid "Showing %(length)s of %(total)s reports"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Reports:"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Report ID"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Input Objects"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Reference date"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Creation date"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Shows parent report details"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Close children report object details"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Subreports details:"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#, python-format
+msgid ""
+"\n"
+"                                    This report consist of %(counter)s "
+"subreport with the following report type and object.\n"
+"                                "
+msgid_plural ""
+"\n"
+"                                    This report consist of %(counter)s "
+"subreports with the following report types and objects.\n"
+"                                "
+msgstr[0] ""
+msgstr[1] ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_header.html
+#: reports/views/report_overview.py
+msgid "Subreports"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Shows subreport details"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "View all subreports"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_header.html
+msgid "Overview of reports"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Recent"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Presets"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Scheduled"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Folders"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "History"
+msgstr ""
+
+#: reports/templates/report_overview/subreports.html
+#, python-format
+msgid "Showing %(length)s of %(total)s subreports"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_header.html
+msgid "Back to Reports History"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_header.html
+msgid "An overview of all underlying reports of"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_header.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Shows report details"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_table.html
+msgid "Subreports:"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_table.html
+#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "Input Object"
+msgstr ""
+
 #: reports/templates/summary/report_asset_overview.html
 msgid ""
 "The objects listed in the table below were used to generate this report. For "
@@ -3699,8 +3840,7 @@ msgid "Select report types"
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
-#: reports/views/multi_report.py
-msgid "View report"
+msgid "Save report"
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
@@ -3709,13 +3849,13 @@ msgid "Select at least one OOI to proceed."
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
-msgid "Select at least one report type to proceed."
-msgstr ""
-
-#: reports/views/aggregate_report.py reports/views/generate_report.py
 msgid ""
 "No data could be found for %(report_types). Object(s) did not exist on "
 "%(date)s."
+msgstr ""
+
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+msgid "Select at least one report type to proceed."
 msgstr ""
 
 #: reports/views/base.py
@@ -3729,6 +3869,10 @@ msgstr ""
 
 #: reports/views/multi_report.py
 msgid "Select OOIs"
+msgstr ""
+
+#: reports/views/multi_report.py
+msgid "View report"
 msgstr ""
 
 #: reports/views/view_helpers.py
@@ -5808,11 +5952,6 @@ msgstr ""
 
 #: rocky/templates/tasks/boefjes.html
 msgid "List of tasks for boefjes"
-msgstr ""
-
-#: rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "Input Object"
 msgstr ""
 
 #: rocky/templates/tasks/normalizers.html

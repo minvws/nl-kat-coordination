@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-24 15:42+0000\n"
-"PO-Revision-Date: 2024-06-21 14:09+0000\n"
+"POT-Creation-Date: 2024-06-27 09:18+0000\n"
+"PO-Revision-Date: 2024-07-02 12:12+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
 "Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/nl-kat-"
 "coordination/fy/>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.6-rc\n"
+"X-Generator: Weblate 5.7-dev\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -794,6 +794,7 @@ msgstr "Selektearre objekten"
 
 #: katalogus/templates/change_clearance_level.html
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/report_overview/report_history_table.html
 #: reports/templates/summary/ooi_selection.html
 #: rocky/templates/partials/task_history.html
 msgid "Object"
@@ -899,7 +900,7 @@ msgstr "Dit is in oersjoch fan de lêste ynstellingen fan alle ynstekkers."
 
 #: katalogus/templates/katalogus_settings.html
 msgid "Latest plugin settings"
-msgstr ""
+msgstr "Lêste ynstekkerynstellingen"
 
 #: katalogus/templates/katalogus_settings.html
 #: rocky/templates/partials/task_history.html
@@ -1086,6 +1087,7 @@ msgid "Actions"
 msgstr "Aksjes"
 
 #: katalogus/templates/partials/plugins_navigation.html
+#: reports/templates/report_overview/report_overview_navigation.html
 msgid "Plugins Navigation"
 msgstr "Ynstekkersnavigaasje"
 
@@ -1202,7 +1204,7 @@ msgstr " Details"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Overview of settings"
-msgstr ""
+msgstr "Ynstellingenoersjoch"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Required"
@@ -1745,8 +1747,9 @@ msgstr "Onboarding oerslaan"
 msgid "Choose a report - Introduction"
 msgstr "Kies in rapport – Yntroduksje"
 
-#: onboarding/templates/step_2a_choose_report_info.html reports/views/base.py
-#: rocky/templates/header.html
+#: onboarding/templates/step_2a_choose_report_info.html
+#: reports/templates/report_overview/report_overview_header.html
+#: reports/views/base.py rocky/templates/header.html
 msgid "Reports"
 msgstr "Rapporten"
 
@@ -2051,6 +2054,9 @@ msgid ""
 "Meaning it requires at least a level 3 clearance level to be set on your "
 "object."
 msgstr ""
+"In foarbyld fan in agressivere scan. Dy hat in scanyntinsiteitsskoare fan 3. "
+"Dit betsjut dat der op syn minst ien frijwarringsnivo 3 fereaske is foar it "
+"objekt."
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid ""
@@ -2063,6 +2069,12 @@ msgid ""
 "aggressive scans.\n"
 "                "
 msgstr ""
+"\n"
+"                    OpenKAT hat in tastimmingssysteem dat behearders yn "
+"steat stelt om te konfigurearjen hokker brûkers in bepaald frijwarringsnivo "
+"yn stelle kinne. Dit soarget derfoar dat allinnich brûkers dy’t fertroud "
+"binne, de mear agressive scans starte kinne.\n"
+"                "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid "Acknowledge clearance level"
@@ -2164,11 +2176,11 @@ msgstr ""
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Setup scan - Enable plugins"
-msgstr ""
+msgstr "Scan opsette – Ynstekkers aktivearje"
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Plugins introduction"
-msgstr ""
+msgstr "Yntroduksje ynstekkers"
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
@@ -2176,6 +2188,9 @@ msgid ""
 "specific skillset that will help to generate your report. There are three "
 "types of plugins."
 msgstr ""
+"OpenKAT brûkt ynstekkers om te scannen, te kontrolearjen en te analysearjen. "
+"Elke ynstekker hat spesifike feardichheden dy’t helpe by it generearjen fan "
+"jo rapport. Der binne trije soarten ynstekkers."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Boefjes:"
@@ -2186,6 +2201,8 @@ msgid ""
 "Scan objects for data. Each boefje has a scan intensity score to prevent "
 "invasive scanning on objects where you don’t have the clearance to do so."
 msgstr ""
+"Objekten scanne foar gegevens. Elk Boefke hat in frijwarringsnivo om te "
+"soargjen dat objekten net te agressyf scand wurde."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Normalizers:"
@@ -2195,14 +2212,17 @@ msgstr "Normalizers:"
 msgid ""
 "Check the data for specific objects and add these object to your object list."
 msgstr ""
+"Kontrolearje de gegevens foar spesifike objekten en foegje dizze ta oan jo "
+"objektelist."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Bits:"
-msgstr ""
+msgstr "Bits:"
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Analyze the available data to come to insights and conclusions."
 msgstr ""
+"Bits binne de bedriuwsregels dy’t de objekten analysearje en konklúzjes lûke."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
@@ -2217,14 +2237,16 @@ msgstr ""
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Let’s setup your scan by enabling the plugins of your choice below."
 msgstr ""
+"Litte wy jo scan ynstelle troch de ynstekkers fan jo kar hjirûnder yn te "
+"skeakeljen."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Required and suggested plugins"
-msgstr ""
+msgstr "Fereaske en foarstelde ynstekkers"
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Enable and start scan"
-msgstr ""
+msgstr "Ynskeakelje en scan starte"
 
 #: onboarding/templates/step_4_report.html
 msgid "Report"
@@ -2232,7 +2254,7 @@ msgstr "Rapport"
 
 #: onboarding/templates/step_4_report.html
 msgid "Boefjes are scanning"
-msgstr ""
+msgstr "De Boefkes binne oan it scannen"
 
 #: onboarding/templates/step_4_report.html
 msgid ""
@@ -2247,6 +2269,7 @@ msgid ""
 "During this introduction we ask you to wait till the scan is ready. After "
 "which you can view the report."
 msgstr ""
+"Wylst de yntroduksje freegje wy jo om te wachtsjen oant de scan foltôge is."
 
 #: onboarding/templates/step_4_report.html
 msgid ""
@@ -2257,11 +2280,11 @@ msgstr ""
 
 #: onboarding/templates/step_4_report.html
 msgid "Open my DNS-report"
-msgstr ""
+msgstr "DNS-rapport iepenje"
 
 #: onboarding/view_helpers.py
 msgid "1: Introduction"
-msgstr ""
+msgstr "1: Yntroduksje"
 
 #: onboarding/view_helpers.py
 msgid "2: Choose a report"
@@ -2334,7 +2357,7 @@ msgstr ""
 msgid "Filter by OOI types"
 msgstr ""
 
-#: reports/forms.py
+#: reports/forms.py reports/templates/report_overview/report_history_table.html
 msgid "Report types"
 msgstr ""
 
@@ -2360,6 +2383,8 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/plugin_overview_table.html
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
 #: reports/templates/summary/report_asset_overview.html
 msgid "Report type"
 msgstr ""
@@ -2819,6 +2844,10 @@ msgid ""
 "information systems (RIS). DICOM servers store and manage patient-specific "
 "medical images, like X-rays, CT scans, and MRIs, utilizing a standardized "
 "format."
+msgstr ""
+
+#: reports/report_types/concatenated_report/report.py
+msgid "Concatenated Report"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -3703,6 +3732,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/report_overview/report_history_table.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: tools/view_helpers.py rocky/templates/admin/delete_confirmation.html
 #: rocky/templates/admin/delete_selected_confirmation.html
@@ -3806,6 +3836,7 @@ msgid "Show more suggested plugins"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
+#: reports/templates/report_overview/report_overview_header.html
 #: reports/views/generate_report.py
 msgid "Generate report"
 msgstr ""
@@ -3873,6 +3904,135 @@ msgstr ""
 msgid "Toggle all report types"
 msgstr ""
 
+#: reports/templates/report_overview/report_history.html
+#: reports/views/report_overview.py
+msgid "Reports history"
+msgstr ""
+
+#: reports/templates/report_overview/report_history.html
+msgid "An overview of all your generated reports."
+msgstr ""
+
+#: reports/templates/report_overview/report_history.html
+#, python-format
+msgid "Showing %(length)s of %(total)s reports"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Reports:"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Report ID"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Input Objects"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Reference date"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Creation date"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Shows parent report details"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Close children report object details"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Subreports details:"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#, python-format
+msgid ""
+"\n"
+"                                    This report consist of %(counter)s "
+"subreport with the following report type and object.\n"
+"                                "
+msgid_plural ""
+"\n"
+"                                    This report consist of %(counter)s "
+"subreports with the following report types and objects.\n"
+"                                "
+msgstr[0] ""
+msgstr[1] ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_header.html
+#: reports/views/report_overview.py
+msgid "Subreports"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Shows subreport details"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "View all subreports"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_header.html
+msgid "Overview of reports"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Recent"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Presets"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Scheduled"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Folders"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "History"
+msgstr ""
+
+#: reports/templates/report_overview/subreports.html
+#, python-format
+msgid "Showing %(length)s of %(total)s subreports"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_header.html
+msgid "Back to Reports History"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_header.html
+msgid "An overview of all underlying reports of"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_header.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Shows report details"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_table.html
+msgid "Subreports:"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_table.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+msgid "Input Object"
+msgstr ""
+
 #: reports/templates/summary/report_asset_overview.html
 msgid ""
 "The objects listed in the table below were used to generate this report. For "
@@ -3929,8 +4089,7 @@ msgid "Select report types"
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
-#: reports/views/multi_report.py
-msgid "View report"
+msgid "Save report"
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
@@ -3939,13 +4098,13 @@ msgid "Select at least one OOI to proceed."
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
-msgid "Select at least one report type to proceed."
-msgstr ""
-
-#: reports/views/aggregate_report.py reports/views/generate_report.py
 msgid ""
 "No data could be found for %(report_types). Object(s) did not exist on "
 "%(date)s."
+msgstr ""
+
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+msgid "Select at least one report type to proceed."
 msgstr ""
 
 #: reports/views/base.py
@@ -3959,6 +4118,10 @@ msgstr ""
 
 #: reports/views/multi_report.py
 msgid "Select OOIs"
+msgstr ""
+
+#: reports/views/multi_report.py
+msgid "View report"
 msgstr ""
 
 #: reports/views/view_helpers.py
@@ -6040,10 +6203,6 @@ msgstr ""
 
 #: rocky/templates/tasks/partials/boefje_task_history.html
 msgid "No scans found for this object."
-msgstr ""
-
-#: rocky/templates/tasks/partials/boefje_task_history.html
-msgid "Input Object"
 msgstr ""
 
 #: rocky/templates/tasks/partials/normalizer_task_history.html

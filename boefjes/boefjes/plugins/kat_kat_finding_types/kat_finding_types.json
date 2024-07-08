@@ -473,5 +473,12 @@
     "risk": "medium",
     "impact": "Disallowed domains are domains that are for example 'world writable', this opens up the possibility for an atacker to host malicious files on a csp whitelisted domain.",
     "recommendation": "Remove the offending hostname from the CSP header."
+  },
+  "KAT-NONSTANDARD-HEADERS": {
+    "description": "Headers are used that are nonstandard and should not be used anymore.",
+    "risk": "low",
+    "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers",
+    "impact": "Nonstandard headers may not be supported by all browsers and may not provide the security that is expected.",
+    "recommendation": "Remove the nonstandard headers from the response."
   }
 }

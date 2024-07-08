@@ -9,3 +9,7 @@ class MockListener(listeners.Listener):
 
     def stop(self) -> None:
         pass
+
+
+class MockRabbitMQ(listeners.RabbitMQ):
+    pass
