@@ -1531,6 +1531,7 @@ def paginated_task_list(task):
     )
 
 
+@pytest.fixture
 def reports_more_input_oois():
     return [
         (
