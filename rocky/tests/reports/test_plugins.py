@@ -27,7 +27,7 @@ def test_generate_report_setup_scan_wrong_plugin_id(
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("generate_report_setup_scan", kwargs=kwargs)
 
-    request = rf.get(
+    request = rf.post(
         url,
         {
             "observed_at": valid_time.strftime("%Y-%m-%d"),
