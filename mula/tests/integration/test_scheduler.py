@@ -45,7 +45,7 @@ class SchedulerTestCase(unittest.TestCase):
             ctx=self.mock_ctx,
             scheduler_id=identifier,
             queue=queue,
-            create_schedule_for_tasks=True,
+            create_schedule=True,
         )
 
     def tearDown(self):
@@ -128,8 +128,20 @@ class SchedulerTestCase(unittest.TestCase):
         )
         self.assertIsNotNone(schedule_db)
         self.assertEqual(schedule_db.id, task_db.schedule_id)
+        self.assertIsNotNone(schedule_db.deadline_at)
+        breakpoint()
+        self.assertIsNotNone(schedule_db.schedule)
 
     def test_post_push_without_schedule(self):
+        pass
+
+    def test_post_push_schedule_enabled(self):
+        pass
+
+    def test_post_push_schedule_disabled(self):
+        pass
+
+    def test_evaluate_schedule(self):
         pass
 
     def test_post_pop(self):

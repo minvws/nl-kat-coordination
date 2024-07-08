@@ -60,7 +60,6 @@ class BoefjeScheduler(Scheduler):
         """
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.organisation: Organisation = organisation
-        self.create_schedule = True
 
         self.queue = queue or queues.PriorityQueue(
             pq_id=scheduler_id,
@@ -75,6 +74,7 @@ class BoefjeScheduler(Scheduler):
             queue=self.queue,
             scheduler_id=scheduler_id,
             callback=callback,
+            create_schedule=True,
         )
 
         # Priority ranker

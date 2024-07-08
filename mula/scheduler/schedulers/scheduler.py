@@ -64,7 +64,7 @@ class Scheduler(abc.ABC):
         queue: queues.PriorityQueue | None = None,
         callback: Callable[..., None] | None = None,
         max_tries: int = -1,
-        create_schedule_for_tasks: bool = False,
+        create_schedule: bool = False,
     ):
         """Initialize the Scheduler.
 
@@ -91,7 +91,7 @@ class Scheduler(abc.ABC):
         self.scheduler_id: str = scheduler_id
         self.max_tries: int = max_tries
         self.enabled: bool = True
-        self.create_schedule_for_tasks: bool = create_schedule_for_tasks
+        self.create_schedule: bool = create_schedule
         self._last_activity: datetime | None = None
 
         # Queue
@@ -291,33 +291,40 @@ class Scheduler(abc.ABC):
         """
         self.last_activity = datetime.now(timezone.utc)
 
-        if self.create_schedule_for_tasks is False:
+        if self.create_schedule is False:
+            self.logger.debug(
+                "Not creating schedule for item %s",
+                item.id,
+                item_id=item.id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
             return
 
-        cron_expression = self.evaluate_schedule(item)
-
-        if item.schedule_id is None:
-            schedule_db = self.ctx.datastores.schedule_store.create_schedule(
-                models.Schedule(
-                    scheduler_id=self.scheduler_id,
-                    hash=item.hash,
-                    schedule=cron_expression,
-                    deadline_at=cron.next_run(cron_expression),
-                    data=item.data,
-                )
+        schedule_db = self.ctx.datastores.schedule_store.get_schedule(item.schedule_id)
+        if schedule_db is None:
+            cron_expression = self.evaluate_schedule(item)
+            schedule = models.Schedule(
+                scheduler_id=self.scheduler_id,
+                hash=item.hash,
+                schedule=cron_expression,
+                deadline_at=cron.next_run(cron_expression),
+                data=item.data,
             )
-
+            schedule_db = self.ctx.datastores.schedule_store.create_schedule(schedule)
             item.schedule_id = schedule_db.id
             self.ctx.datastores.task_store.update_task(item)
-        else:
-            schedule_db = self.ctx.datastores.schedule_store.get_schedule(
-                item.schedule_id
-            )
-            if schedule_db.enabled is False:
-                return
+            return
 
-            schedule_db.schedule = cron_expression
-            self.ctx.datastores.schedule_store.update_schedule(schedule_db)
+        if schedule_db.enabled is False:
+            return
+
+        # NOTE: here you can evaluate the schedule for the task
+        # and update the schedule with a new cron expression
+
+        # TODO: maybe method set_new_deadline
+        schedule_db.deadline_at = cron.next_run(schedule_db.schedule)
+        self.ctx.datastores.schedule_store.update_schedule(schedule_db)
 
     # TODO: check when return None is significant
     def pop_item_from_queue(
@@ -388,6 +395,7 @@ class Scheduler(abc.ABC):
         self.last_activity = datetime.now(timezone.utc)
 
     # TODO: test this
+    # TODO: rename to evaluate_schedule_for_task
     def evaluate_schedule(self, task: models.Task) -> str:
         """Evaluate the schedule for a task.
 
@@ -398,9 +406,6 @@ class Scheduler(abc.ABC):
             A cron expression for the task, or None if no schedule could be
 
         """
-        if hasattr(task, "schedule") and task.schedule is not None:
-            return task.schedule
-
         # We at least delay a job by the grace period
         minimum = self.ctx.config.pq_grace_period
         deadline = datetime.now(timezone.utc) + timedelta(seconds=minimum)

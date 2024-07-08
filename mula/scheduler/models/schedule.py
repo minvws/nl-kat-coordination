@@ -41,13 +41,14 @@ class Schedule(BaseModel):
 
     @field_validator("schedule")
     @classmethod
-    def validate_schedule(cls, value: str):
+    def validate_schedule(cls, value: str) -> str:
         """Validate the schedule cron expression."""
         if value is None:
-            return
+            return value
 
         try:
             cron.next_run(value)
+            return value
         except Exception as exc:
             raise ValueError(f"Invalid cron expression: {value}") from exc
 
