@@ -22,7 +22,7 @@
                                 {% if observation.boefje.id %}
                                     <a href="{% url 'boefje_detail' organization_code=organization.code plugin_id=observation.boefje.id %}">{{ observation.boefje.name }}</a>
                                 {% else %}
-                                    {% translate "The boefje has since been deleted / disabled." %}
+                                    {% translate "The boefje has since been deleted or disabled." %}
                                 {% endif %}
                             </td>
                             <td>
