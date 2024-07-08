@@ -157,10 +157,21 @@ class NormalizerScheduler(Scheduler):
             thread_name_prefix=f"NormalizerScheduler-TPE-{self.scheduler_id}-raw_data"
         ) as executor:
             for normalizer in normalizers.values():
+                if not self.has_normalizer_permission_to_run(normalizer):
+                    self.logger.debug(
+                        "Normalizer is not allowed to run: %s",
+                        normalizer.id,
+                        normalizer_id=normalizer.id,
+                        organisation_id=self.organisation.id,
+                        scheduler_id=self.scheduler_id,
+                    )
+                    continue
+
                 normalizer_task = NormalizerTask(
                     normalizer=Normalizer.parse_obj(normalizer.dict()),
                     raw_data=latest_raw_data.raw_data,
                 )
+
                 executor.submit(
                     self.push_normalizer_task,
                     normalizer_task,
@@ -188,7 +199,7 @@ class NormalizerScheduler(Scheduler):
             caller=caller,
         )
 
-        if not self.has_normalizer_task_permission_to_run(normalizer_task):
+        if not self.has_normalizer_permission_to_run(normalizer_task):
             self.logger.debug(
                 "Task is not allowed to run: %s",
                 normalizer_task.id,
@@ -276,9 +287,10 @@ class NormalizerScheduler(Scheduler):
             caller=caller,
         )
 
-    @tracer.start_as_current_span("normalizer_has_normalizer_task_permission_to_run")
-    def has_normalizer_task_permission_to_run(
-        self, normalizer_task: models.NormalizerTask
+    @tracer.start_as_current_span("normalizer_has_normalizer_permission_to_run")
+    def has_normalizer_permission_to_run(
+        self,
+        normalizer: Plugin,
     ) -> bool:
         """Check if the task is allowed to run.
 
@@ -288,12 +300,6 @@ class NormalizerScheduler(Scheduler):
         Returns:
             True if the task is allowed to run, False otherwise.
         """
-        # TODO: check if we can optimize this call
-        normalizer = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
-            normalizer_task.normalizer.id,
-            self.organisation.id,
-        )
-
         if not normalizer.enabled:
             self.logger.debug(
                 "Normalizer: %s is disabled",
