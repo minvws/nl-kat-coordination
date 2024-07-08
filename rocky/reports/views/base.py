@@ -180,7 +180,7 @@ class ReportTypeSelectionView(TemplateView):
         self.report_type_ids = [report_type for report_type in self.selected_report_types]
 
     def get_report_type_selection(self) -> list[str]:
-        return sorted(set(self.request.POST.getlist("report_type", [])))
+        return sorted(set(self.request.GET.getlist("report_type", [])))
 
     def get_report_types_from_choice(
         self,

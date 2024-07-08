@@ -25,18 +25,15 @@
                     Selected objects ({{ total_oois }})
                 {% endblocktranslate %}
             </h2>
-            {% if 'all' in selected_oois %}
-                <p>
-                    {% blocktranslate trimmed count counter=oois|length %}
-                        You have selected {{ total_oois }} object in previous step.
-                    {% plural %}
-                        You have selected {{ total_oois }} objects in previous step.
-                    {% endblocktranslate %}
-                </p>
-            {% else %}
-                {% include "summary/ooi_selection.html" %}
+            <p>
+                {% blocktranslate trimmed count counter=oois|length %}
+                    You have selected {{ total_oois }} object in previous step.
+                {% plural %}
+                    You have selected {{ total_oois }} objects in previous step.
+                {% endblocktranslate %}
+            </p>
+            {% include "summary/ooi_selection.html" %}
 
-            {% endif %}
             <form novalidate
                   method="post"
                   action="{{ previous }}"
