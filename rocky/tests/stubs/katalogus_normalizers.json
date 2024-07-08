@@ -1,14 +1,11 @@
 [
   {
     "id": "kat_adr_finding_types_normalize",
-    "repository_id": "LOCAL",
     "name": "Adr Finding Types Normalize",
     "version": null,
-    "authors": null,
     "created": null,
     "description": null,
     "environment_keys": [],
-    "related": null,
     "enabled": true,
     "type": "normalizer",
     "consumes": [
@@ -21,14 +18,11 @@
   },
   {
     "id": "adr-validator",
-    "repository_id": "LOCAL",
     "name": null,
     "version": null,
-    "authors": null,
     "created": null,
     "description": null,
     "environment_keys": [],
-    "related": null,
     "enabled": true,
     "type": "normalizer",
     "consumes": [
@@ -44,14 +38,11 @@
   },
   {
     "id": "kat_answer_parser",
-    "repository_id": "LOCAL",
     "name": null,
     "version": null,
-    "authors": null,
     "created": null,
     "description": null,
     "environment_keys": [],
-    "related": null,
     "enabled": true,
     "type": "normalizer",
     "consumes": [
@@ -64,14 +55,11 @@
   },
   {
     "id": "kat_binaryedge_containers",
-    "repository_id": "LOCAL",
     "name": null,
     "version": null,
-    "authors": null,
     "created": null,
     "description": null,
     "environment_keys": [],
-    "related": null,
     "enabled": true,
     "type": "normalizer",
     "consumes": [
@@ -91,14 +79,11 @@
   },
   {
     "id": "kat_binaryedge_databases",
-    "repository_id": "LOCAL",
     "name": null,
     "version": null,
-    "authors": null,
     "created": null,
     "description": null,
     "environment_keys": [],
-    "related": null,
     "enabled": true,
     "type": "normalizer",
     "consumes": [

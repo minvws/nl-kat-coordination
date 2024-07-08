@@ -12,7 +12,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     software_name = input_["name"]
     software_version = input_["version"]
 
-    result = {
+    result: dict[str, list[dict]] = {
         "table_versions": [],
         "table_vulnerabilities": [],
         "cve_vulnerabilities": [],
@@ -51,7 +51,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
                     cve_element = vuln_soup.select("[class='cve']")
                     cve_code = cve_element[0].text.split("\n")[0] if cve_element else ""
 
-                    if cve_code != " ":
+                    if cve_code.startswith("CVE-"):
                         result["cve_vulnerabilities"].append(
                             {
                                 "cve_code": cve_code,

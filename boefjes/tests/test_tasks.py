@@ -8,14 +8,8 @@ from uuid import UUID
 
 import pytest
 
-from boefjes.job_handler import BoefjeHandler, NormalizerHandler
-from boefjes.job_models import (
-    BoefjeMeta,
-    InvalidReturnValueNormalizer,
-    NormalizerMeta,
-    NormalizerPlainOOI,
-    UnsupportedReturnTypeNormalizer,
-)
+from boefjes.job_handler import BoefjeHandler
+from boefjes.job_models import BoefjeMeta, InvalidReturnValueNormalizer, NormalizerMeta
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.katalogus.models import Bit, Boefje, Normalizer, PluginType
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
@@ -28,25 +22,21 @@ class TaskTest(TestCase):
         self.boefjes = [
             Boefje(
                 id="test-boefje-1",
-                repository_id="",
                 consumes={"SomeOOI"},
                 produces=["test-boef-1", "test/text"],
             ),
             Boefje(
                 id="test-boefje-2",
-                repository_id="",
                 consumes={"SomeOOI"},
                 produces=["test-boef-2", "test/text"],
             ),
             Boefje(
                 id="test-boefje-3",
-                repository_id="",
                 consumes={"SomeOOI"},
                 produces=["test-boef-3", "test/plain"],
             ),
             Boefje(
                 id="test-boefje-4",
-                repository_id="",
                 consumes={"SomeOOI"},
                 produces=["test-boef-4", "test/and-simple"],
             ),
@@ -54,13 +44,11 @@ class TaskTest(TestCase):
         self.normalizers = [
             Normalizer(
                 id="test-normalizer-1",
-                repository_id="",
                 consumes=["test-boef-3", "test/text"],
                 produces=["SomeOOI", "OtherOOI"],
             ),
             Normalizer(
                 id="test-normalizer-2",
-                repository_id="",
                 consumes=["test/text"],
                 produces=["SomeOtherOOI"],
             ),
@@ -68,14 +56,12 @@ class TaskTest(TestCase):
         self.bits = [
             Bit(
                 id="test-bit-1",
-                repository_id="",
                 consumes="SomeOOI",
                 produces=["SomeOOI"],
                 parameters=[],
             ),
             Bit(
                 id="test-bit-2",
-                repository_id="",
                 consumes="SomeOOI",
                 produces=["SomeOOI", "SomeOtherOOI"],
                 parameters=[],
@@ -92,11 +78,6 @@ class TaskTest(TestCase):
             arguments={},
             organization="_dev",
         ).copy()
-
-    def test_parse_plain_ooi(self):
-        plain_ooi = NormalizerPlainOOI(object_type="Network", name="internet")
-
-        NormalizerHandler._parse_ooi(plain_ooi)
 
     def test_parse_normalizer_meta_to_json(self):
         meta = NormalizerMeta.model_validate_json(get_dummy_data("snyk-normalizer.json"))
@@ -143,7 +124,7 @@ class TaskTest(TestCase):
         local_repository = LocalPluginRepository(Path(__file__).parent / "modules")
         runner = LocalNormalizerJobRunner(local_repository)
 
-        with self.assertRaises(UnsupportedReturnTypeNormalizer):
+        with self.assertRaises(InvalidReturnValueNormalizer):
             runner.run(meta, b"123")
 
     def test_exception_raised_invalid_return_value(self):

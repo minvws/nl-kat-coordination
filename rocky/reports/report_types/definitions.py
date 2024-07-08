@@ -24,26 +24,12 @@ class BaseReport:
     name: str
     description: str
     template_path: str = "report.html"
+    plugins: ReportPlugins
+    input_ooi_types: set[type[OOI]]
     label_style = "1-light"  # default/fallback color
 
     def __init__(self, octopoes_api_connector: OctopoesAPIConnector):
         self.octopoes_api_connector = octopoes_api_connector
-
-
-BaseReportType = TypeVar("BaseReportType", bound="BaseReport")
-
-
-class Report(BaseReport):
-    plugins: ReportPlugins
-    input_ooi_types: set[type[OOI]]
-
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
-        raise NotImplementedError
-
-    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
-        """Generate data for multiple OOIs. Child classes can override this method to improve performance."""
-
-        return {input_ooi: self.generate_data(input_ooi, valid_time) for input_ooi in input_oois}
 
     @classmethod
     def class_attributes(cls) -> dict[str, Any]:
@@ -56,6 +42,19 @@ class Report(BaseReport):
             "template_path": cls.template_path,
             "label_style": cls.label_style,
         }
+
+
+BaseReportType = TypeVar("BaseReportType", bound="BaseReport")
+
+
+class Report(BaseReport):
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
+        raise NotImplementedError
+
+    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+        """Generate data for multiple OOIs. Child classes can override this method to improve performance."""
+
+        return {input_ooi: self.generate_data(input_ooi, valid_time) for input_ooi in input_oois}
 
     @staticmethod
     def group_by_source(
@@ -107,6 +106,25 @@ class Report(BaseReport):
 
         return hostnames_by_input_ooi
 
+    @staticmethod
+    def hostnames_to_human_readable(
+        hostnames_by_input_ooi: dict,
+    ) -> dict[str, str]:
+        """Converts input_oois to human readable hostname strings.
+
+        Turns a list of either Hostname and IPAddress references into a string
+        of shortest related hostname and indication on more hostnames present,
+        grouped by input ooi.
+        """
+        return {
+            input_ooi: (
+                f'({min([h.human_readable for h in hostnames], key=len)}{", ..." if len(hostnames) > 1 else ""})'
+                if hostnames
+                else ""
+            )
+            for input_ooi, hostnames in hostnames_by_input_ooi.items()
+        }
+
     def to_ips(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, list[Reference]]:
         """
         Turn a list of either Hostname and IPAddress reference strings into a list of related ips.
@@ -131,9 +149,6 @@ class Report(BaseReport):
 
 
 class MultiReport(BaseReport):
-    plugins: ReportPlugins
-    input_ooi_types: set[type[OOI]]
-
     def post_process_data(self, data: dict[str, Any]) -> dict[str, Any]:
         raise NotImplementedError
 

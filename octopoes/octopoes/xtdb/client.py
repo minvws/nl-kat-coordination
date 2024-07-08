@@ -123,7 +123,7 @@ class XTDBHTTPClient:
         res = self._session.post(
             f"{self.client_url()}/query",
             params={"valid-time": valid_time.isoformat()},
-            content=str(query),
+            content=" ".join(str(query).split()),
             headers={"Content-Type": "application/edn"},
         )
         self._verify_response(res)
@@ -163,7 +163,7 @@ class XTDBHTTPClient:
 
             raise XTDBException("Could not delete node") from e
 
-    def export_transactions(self) -> Any:
+    def export_transactions(self):
         res = self._session.get(f"{self.client_url()}/tx-log?with-ops?=true", headers={"Accept": "application/json"})
         self._verify_response(res)
         return res.json()

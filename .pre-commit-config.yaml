@@ -83,15 +83,16 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies:
-          - types-PyYAML
+          - types-pyyaml
           - types-cachetools
           - types-retry
           - pydantic
           - pynacl
           - httpx
+          - types-python-dateutil
+          - types-requests
         exclude: |
           (?x)(
-          ^boefjes/boefjes/plugins |
           ^boefjes/tools |
           ^keiko/templates |
           ^mula/whitelist\.py$ |

@@ -93,7 +93,7 @@ class WebChecks:
 class WebSystemReport(Report):
     id = "web-system-report"
     name = _("Web System Report")
-    description = _("Web system reports check web systems on basic security standards.")
+    description = _("Web System Reports check web systems on basic security standards.")
     plugins = {
         "required": [
             "nmap",
