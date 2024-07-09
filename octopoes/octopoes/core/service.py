@@ -2,7 +2,6 @@ import json
 from collections import Counter
 from collections.abc import Callable, ValuesView
 from datetime import datetime, timezone
-from itertools import chain
 from logging import getLogger
 from typing import overload
 
@@ -403,15 +402,10 @@ class OctopoesService:
             raise ValueError("Update event new_data should not be None")
 
         if isinstance(event.new_data, Config):
-            relevant_bits = [bit for bit in get_bit_definitions().values() if bit.config_ooi_relation_path is not None]
-            inference_origins = list(
-                {
-                    x.model_dump_json(): x
-                    for x in chain.from_iterable(
-                        map(lambda x: self.origin_repository.list_origins(event.valid_time, method=x.id), relevant_bits)
-                    )
-                }.values()
-            )
+            relevant_bit_ids = [
+                bit.id for bit in get_bit_definitions().values() if bit.config_ooi_relation_path is not None
+            ]
+            inference_origins = self.origin_repository.list_origins(event.valid_time, method=relevant_bit_ids)
         else:
             inference_origins = self.origin_repository.list_origins(event.valid_time, source=event.new_data.reference)
             inference_params = self.origin_parameter_repository.list_by_reference(
