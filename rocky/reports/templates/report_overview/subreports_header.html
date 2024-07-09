@@ -1,0 +1,17 @@
+{% load i18n %}
+
+<div>
+    <div class="horizontal-view">
+        <a class="button ghost"
+           href="{% url 'report_history' organization.code %}">
+            <span class="icon ti-chevron-left"></span>{% translate "Back to Reports History" %}
+        </a>
+    </div>
+    <div>
+        <h1>{% translate "Subreports" %}</h1>
+        <p class="emphasized">
+            {% translate "An overview of all underlying reports of" %} "<a href="{% url "view_report" organization.code %}?report_id={{ parent_report_id }}"
+   title="{% translate "Shows report details" %}">{{ parent_report_id }}</a>".
+        </p>
+    </div>
+</div>

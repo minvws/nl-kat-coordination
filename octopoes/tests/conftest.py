@@ -16,6 +16,7 @@ from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Referenc
 from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import IPAddressV6
+from octopoes.models.ooi.reports import Report
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import URL, HTTPHeader, SecurityTXT
 from octopoes.models.origin import Origin, OriginType
@@ -446,3 +447,33 @@ def seed_system(xtdb_ooi_repository: XTDBOOIRepository, xtdb_origin_repository: 
 
     xtdb_origin_repository.commit()
     xtdb_ooi_repository.commit()
+
+
+def seed_report(name: str, valid_time, ooi_repository, origin_repository, parent_report: type[Report] | None = None):
+    report = Report(
+        name=name,
+        date_generated=valid_time,
+        report_id=uuid.uuid4(),
+        organization_code="code",
+        organization_name="name",
+        organization_tags=["tag1", "tag2"],
+        data_raw_id="raw",
+        observed_at=valid_time,
+        parent_report=parent_report.reference if parent_report else None,
+        has_parent=parent_report is not None,
+        input_oois=["testooi"],
+        report_type="report_type",
+    )
+    report_origin = Origin(
+        origin_type=OriginType.DECLARATION,
+        method="manual",
+        source=report.reference,
+        result=[report.reference],
+        task_id=uuid.uuid4(),
+    )
+    ooi_repository.save(report, valid_time=valid_time)
+    origin_repository.save(report_origin, valid_time=valid_time)
+    origin_repository.commit()
+    ooi_repository.commit()
+
+    return report

@@ -13,156 +13,172 @@ main.sidemenu {
 
   position: relative;
   align-items: stretch;
+  padding-left: var(--sidemenu-nav-padding-left);
 
-  > nav {
-    /* Layout */
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    left: 0;
-    width: var(--sidemenu-nav-width);
-    padding-top: var(--sidemenu-nav-padding-top);
-    padding-right: var(--sidemenu-nav-padding-right);
-    padding-bottom: var(--sidemenu-nav-padding-bottom);
-    padding-left: var(--sidemenu-nav-padding-left);
-    box-sizing: border-box;
-    background-color: #ffffff;
-    border-right: 1px solid var(--sidemenu-nav-border-color);
-    height: 100%;
+  @media (width >= 42rem) {
+    padding-left: var(--sidemenu-nav-width);
+  }
+
+  /* Transition */
+  transition: padding-left 1s;
+
+  .sticky-container {
+    /* Behaviour */
+    position: sticky;
+    top: 0;
     z-index: 1;
 
-    /* Behaviour */
-    position: absolute;
+    > nav {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      left: 0;
+      width: var(--sidemenu-nav-width);
+      padding-top: var(--sidemenu-nav-padding-top);
+      padding-right: 0;
+      position: absolute;
+      padding-bottom: 0;
+      padding-left: var(--sidemenu-nav-padding-left);
+      box-sizing: border-box;
+      background-color: #ffffff;
+      border-right: 1px solid var(--sidemenu-nav-border-color);
+      height: 100%;
+      z-index: 1;
 
-    /* Transition */
-    transition: left 1s;
+      @media (width >= 42rem) {
+        left: calc(var(--sidemenu-nav-width) * -1);
+      }
 
-    @media (width >= 55rem) {
-      position: relative;
-      height: unset;
-      overflow: unset;
-    }
+      /* Transition */
+      transition: all 1s;
 
-    ol,
-    ul {
-      padding-left: 0;
-      list-style-position: inside;
+      /* Behaviour */
+      overflow: auto;
 
-      li {
-        --list-base-item-padding: 0.75rem 0;
+      ol,
+      ul {
+        padding-left: 0;
+        list-style-position: inside;
 
-        a,
-        a:visited,
-        a:focus,
-        a:active {
-          color: #000000;
-          text-decoration: none;
-        }
+        li {
+          --list-base-item-padding: 0.75rem 0;
 
-        &.object {
           a,
           a:visited,
           a:focus,
           a:active {
             color: #000000;
             text-decoration: none;
-            font-style: italic;
-            word-break: break-all;
+          }
+
+          &.object {
+            a,
+            a:visited,
+            a:focus,
+            a:active {
+              color: #000000;
+              text-decoration: none;
+              font-style: italic;
+              word-break: break-all;
+            }
           }
         }
       }
-    }
 
-    .sticky {
-      position: sticky;
-      top: 4.5rem;
-    }
+      /* Menu button */
+      .sidemenu-toggle {
+        --sidemenu-button-icon-font-family: var(--icon-font-family);
+        --sidemenu-expanded-button-icon: "\ec42";
+        --sidemenu-collapsed-button-icon: "\ec42";
 
-    /* Menu button */
-    .sidemenu-toggle {
-      --sidemenu-button-icon-font-family: var(--icon-font-family);
-      --sidemenu-expanded-button-icon: "\ec42";
-      --sidemenu-collapsed-button-icon: "\ec42";
+        /* Layout */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        min-width: var(--sidemenu-toggle-button-min-width);
+        min-height: var(--sidemenu-toggle-button-min-height);
+        margin-left: -1rem;
+        padding-top: 0;
+        padding-right: 0;
+        padding-bottom: 0;
+        padding-left: 0;
+        background-color: rgb(255 255 255 / 75%);
 
-      /* Layout */
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 0;
-      min-width: var(--sidemenu-toggle-button-min-width);
-      min-height: var(--sidemenu-toggle-button-min-height);
-      margin-left: 0;
-      padding-top: 0;
-      padding-right: 0;
-      padding-bottom: 0;
-      padding-left: 0;
+        /* Needed to keep the button to stick to the top */
+        z-index: 2;
 
-      /* Needed to keep the button to stick to the top */
-      z-index: 2;
+        /* Styling */
+        font-size: var(--sidemenu-toggle-button-font-size);
+        border: 0;
+        border-radius: 0;
+        color: #000000;
 
-      /* Styling */
-      font-size: var(--sidemenu-toggle-button-font-size);
-      border: 0;
-      border-radius: 0;
-      color: #000000;
-
-      /* Behaviour */
-      position: sticky;
-      top: 1rem;
-
-      /* Transition */
-      transition: margin-left 1s;
-
-      &::before {
-        @include icon.icon;
-
-        line-height: 1;
-        content: var(--sidemenu-expanded-button-icon);
-        font-family: var(--sidemenu-button-icon-font-family);
-        font-size: var(--sidemenu-button-icon-font-size);
-
-        /* Styling options for text input instead of icons */
-        font-weight: var(--sidemenu-button-icon-font-weight);
-        white-space: var(--sidemenu-button-icon-white-space);
-      }
-
-      &[aria-expanded="false"] {
-        margin-left: calc(var(--sidemenu-nav-width));
+        /* Transition */
         transition: margin-left 1s;
 
         &::before {
-          content: var(--sidemenu-collapsed-button-icon);
+          @include icon.icon;
+
+          line-height: 1;
+          content: var(--sidemenu-expanded-button-icon);
+          font-family: var(--sidemenu-button-icon-font-family);
+          font-size: var(--sidemenu-button-icon-font-size);
+
+          /* Styling options for text input instead of icons */
+          font-weight: var(--sidemenu-button-icon-font-weight);
+          white-space: var(--sidemenu-button-icon-white-space);
+        }
+
+        &[aria-expanded="false"] {
+          margin-left: calc(var(--sidemenu-nav-width) - 1rem);
+          transition: margin-left 1s;
+
+          &::before {
+            content: var(--sidemenu-collapsed-button-icon);
+          }
+        }
+
+        @media (width >= 55rem) {
+          position: static;
         }
       }
     }
   }
 
-  &.sidemenu-closed > nav {
-    position: absolute;
-    border-right: 1px solid #cccccc;
+  &.sidemenu-closed {
+    padding-left: 0;
 
-    /* Needed to show the button */
-    overflow: visible;
+    /* Transition */
+    transition: padding-left 1s;
 
-    /* Move outside of the screen according to the size of the menu */
-    left: calc(var(--sidemenu-nav-width) * -1);
+    .sticky-container > nav {
+      position: absolute;
+      border-right: 1px solid #cccccc;
 
-    @media (width >= 55rem) {
-      /* Layout */
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      height: 100%;
-      width: var(--sidemenu-nav-width);
-      padding-top: var(--sidemenu-nav-padding-top);
-      padding-right: var(--sidemenu-nav-padding-right);
-      padding-bottom: var(--sidemenu-nav-padding-bottom);
-      padding-left: var(--sidemenu-nav-padding-left);
-      box-sizing: border-box;
-    }
+      /* Needed to show the button */
+      overflow: visible;
 
-    > div {
-      overflow: hidden;
+      /* Move outside of the screen according to the size of the menu */
+      left: calc(var(--sidemenu-nav-width) * -1);
+
+      @media (width >= 55rem) {
+        /* Layout */
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        height: 100%;
+        width: var(--sidemenu-nav-width);
+        padding-top: var(--sidemenu-nav-padding-top);
+        padding-right: var(--sidemenu-nav-padding-right);
+        padding-bottom: 0;
+        padding-left: var(--sidemenu-nav-padding-left);
+        box-sizing: border-box;
+      }
+
+      > div {
+        overflow: hidden;
+      }
     }
   }
 }

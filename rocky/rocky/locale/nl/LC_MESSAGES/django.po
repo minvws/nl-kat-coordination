@@ -13,17 +13,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-23 15:00+0000\n"
-"PO-Revision-Date: 2024-06-14 12:09+0000\n"
-"Last-Translator: Madelon Dohmen <maddohmen@hotmail.com>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
-"nl-kat-coordination/nl/>\n"
+"POT-Creation-Date: 2024-06-27 09:18+0000\n"
+"PO-Revision-Date: 2024-06-26 12:09+0000\n"
+"Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
+"coordination/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.6-dev\n"
+"X-Generator: Weblate 5.6-rc\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -369,8 +369,6 @@ msgid "Member type"
 msgstr "Soort lid"
 
 #: account/templates/account_detail.html
-#: onboarding/templates/account/step_2a_organization_setup.html
-#: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 msgid "Organization"
 msgstr "Organisatie"
@@ -797,11 +795,14 @@ msgstr ""
 "voor deze objecten instelt."
 
 #: katalogus/templates/change_clearance_level.html
-msgid "Selected objects:"
-msgstr "Geselecteerde objecten:"
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/report_asset_overview.html
+msgid "Selected objects"
+msgstr "Geselecteerde objecten"
 
 #: katalogus/templates/change_clearance_level.html
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/report_overview/report_history_table.html
 #: reports/templates/summary/ooi_selection.html
 #: rocky/templates/partials/task_history.html
 msgid "Object"
@@ -906,8 +907,8 @@ msgid "This is an overview of the latest settings of all plugins."
 msgstr "Dit is een overzicht van de laatste instellingen van alle plug-ins."
 
 #: katalogus/templates/katalogus_settings.html
-msgid "Latest plugin settings:"
-msgstr "Laatste plug-ininstellingen:"
+msgid "Latest plugin settings"
+msgstr ""
 
 #: katalogus/templates/katalogus_settings.html
 #: rocky/templates/partials/task_history.html
@@ -992,6 +993,7 @@ msgstr "Tabelweergave"
 
 #: katalogus/templates/partials/objects_to_scan.html
 #: rocky/templates/findings/finding_list.html
+#: rocky/templates/forms/widgets/checkbox_group_table.html
 #: rocky/templates/oois/ooi_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid "Object list"
@@ -1094,6 +1096,7 @@ msgid "Actions"
 msgstr "Acties"
 
 #: katalogus/templates/partials/plugins_navigation.html
+#: reports/templates/report_overview/report_overview_navigation.html
 msgid "Plugins Navigation"
 msgstr "Plug-insnavigatie"
 
@@ -1102,7 +1105,7 @@ msgid "All"
 msgstr "Alle"
 
 #: katalogus/templates/partials/plugins_navigation.html
-#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/scan.html rocky/templates/tasks/boefjes.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Boefjes"
 msgstr "Boefjes"
@@ -1209,8 +1212,8 @@ msgid " Details"
 msgstr " Details"
 
 #: katalogus/templates/plugin_settings_list.html
-msgid "Overview of settings:"
-msgstr "Overzicht van instellingen:"
+msgid "Overview of settings"
+msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Required"
@@ -1449,6 +1452,7 @@ msgstr ""
 #: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/organizations/organization_add.html
 #: rocky/templates/organizations/organization_settings.html
+#: rocky/templates/partials/organization_properties_table.html
 msgid "Organization details"
 msgstr "Organisatiedetails"
 
@@ -1661,6 +1665,7 @@ msgid "OpenKAT introduction"
 msgstr "Introductie OpenKAT"
 
 #: onboarding/templates/dns_report.html
+#: onboarding/templates/step_2b_choose_report_type.html
 #: reports/report_types/dns_report/report.py
 msgid "DNS Report"
 msgstr "DNS-rapport"
@@ -1750,8 +1755,9 @@ msgstr "Onboarding overslaan"
 msgid "Choose a report - Introduction"
 msgstr "Kies een rapport – Introductie"
 
-#: onboarding/templates/step_2a_choose_report_info.html reports/views/base.py
-#: rocky/templates/header.html
+#: onboarding/templates/step_2a_choose_report_info.html
+#: reports/templates/report_overview/report_overview_header.html
+#: reports/views/base.py rocky/templates/header.html
 msgid "Reports"
 msgstr "Rapporten"
 
@@ -1847,17 +1853,13 @@ msgstr "Kies een rapport – Type"
 msgid ""
 "Within OpenKAT you can view reports for each of your current objects. For "
 "specific reports you can choose one of the available report types and "
-"generate a report. Such as a pen-test, a DNS-report or a mail report to give "
+"generate a report. Such as a pentest, a DNS-report or a Mail Report to give "
 "some examples."
 msgstr ""
-"Binnen OpenKAT kunt u rapporten bekijken voor elk van uw huidige objecten. "
-"Voor specifieke rapporten kunt u een van de beschikbare rapporttypes kiezen "
-"en een rapport genereren. Zoals een pentest, een DNS-rapport of een "
-"Mailrapport."
 
 #: onboarding/templates/step_2b_choose_report_type.html
-msgid "For this tutorial we suggest a DNS-report to get you started."
-msgstr "Deze uitleg maakt gebruik van het DNS-rapport."
+msgid "For this tutorial we will create a DNS-report to get you started."
+msgstr ""
 
 #: onboarding/templates/step_2b_choose_report_type.html
 msgid ""
@@ -1866,10 +1868,6 @@ msgid ""
 msgstr ""
 "Wanneer u begint met het genereren van dit rapport, zal OpenKAT u door de "
 "nodige stappen leiden."
-
-#: onboarding/templates/step_2b_choose_report_type.html
-msgid "DNS report"
-msgstr "DNS-rapport"
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
@@ -1898,15 +1896,10 @@ msgstr "Objecten begrijpen"
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid ""
 "A lot of things can be an object within the scope of OpenKAT. For example a "
-"mailserver, an ip-address, a URL, a DNS record, a hostname or a network to "
+"mailserver, an IP address, a URL, a DNS record, a hostname or a network to "
 "name a few.  While these objects can be related to each other they are all "
 "objects within OpenKAT that can be scanned to gain valuable insight."
 msgstr ""
-"Veel dingen kunnen een object zijn binnen het bereik van OpenKAT. "
-"Bijvoorbeeld een mailserver, een IP-adres, een URL, een DNS-record, een "
-"hostnaam of een netwerk om er maar een paar te noemen.  Hoewel deze objecten "
-"aan elkaar gerelateerd kunnen zijn, zijn het allemaal objecten binnen "
-"OpenKAT die gescand kunnen worden om waardevolle inzichten te verkrijgen."
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid "Creating, adding and editing objects"
@@ -1955,15 +1948,10 @@ msgstr "Afhankelijkheden"
 msgid ""
 "Most objects have dependencies on the existence of other objects. For "
 "example a URL needs to be connected to a network, hostname, fqdn (fully "
-"qualified domain name) and ip-address. OpenKAT collects these additional "
+"qualified domain name) and IP address. OpenKAT collects these additional "
 "object automatically when possible. By running plugins to collect or extract "
 "this data."
 msgstr ""
-"De meeste objecten zijn afhankelijk van het bestaan van andere objecten. Een "
-"URL moet bijvoorbeeld verbonden zijn met een netwerk, hostnaam, FQDN (Fully "
-"Qualified Domain Name) en IP-adres. OpenKAT verzamelt deze aanvullende "
-"objecten waar mogelijk automatisch, door plug-ins uit te voeren die deze "
-"gegevens verzamelen of extraheren."
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 msgid ""
@@ -2269,7 +2257,6 @@ msgstr ""
 "uw rapport. Er zijn drie soorten plug-ins."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: rocky/templates/scan.html
 msgid "Boefjes:"
 msgstr "Boefjes:"
 
@@ -2450,7 +2437,7 @@ msgstr "{name} met succes aangemaakt."
 msgid "Filter by OOI types"
 msgstr "Filter op OOI-types"
 
-#: reports/forms.py
+#: reports/forms.py reports/templates/report_overview/report_history_table.html
 msgid "Report types"
 msgstr "Rapporttypes"
 
@@ -2459,11 +2446,6 @@ msgstr "Rapporttypes"
 #: reports/templates/partials/report_sidemenu.html
 msgid "Appendix"
 msgstr "Appendix"
-
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_asset_overview.html
-msgid "Selected objects"
-msgstr "Geselecteerde objecten"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 msgid "Currently filtered on"
@@ -2476,7 +2458,13 @@ msgid "Selected Report Types"
 msgstr "Geselecteerde rapporttypes"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Selected report types"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/plugin_overview_table.html
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
 #: reports/templates/summary/report_asset_overview.html
 msgid "Report type"
 msgstr "Rapporttype"
@@ -2485,6 +2473,10 @@ msgstr "Rapporttype"
 #: reports/templates/partials/report_sidemenu.html
 msgid "Service Versions and Health"
 msgstr "Serviceversies en gezondheid"
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Service, version and health"
+msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/service_health.html rocky/templates/footer.html
@@ -2514,6 +2506,10 @@ msgstr "Ongezond"
 #: reports/report_types/aggregate_organisation_report/appendix.html
 msgid "Used Config objects"
 msgstr "Gebruikte configuratieobjecten"
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Used config objects"
+msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 msgid "Primary Key"
@@ -2845,12 +2841,14 @@ msgstr "Host:"
 #: reports/report_types/vulnerability_report/report.html
 #: reports/report_types/web_system_report/report.html
 #: reports/templates/partials/report_severity_totals_table.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/ooi_report_findings_block.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
 #: rocky/views/finding_list.py rocky/views/finding_type_add.py
 #: rocky/views/ooi_view.py
 msgid "Findings"
@@ -2995,6 +2993,10 @@ msgstr ""
 "(PACS) en radiologie-informatiesystemen (RIS). DICOM-servers slaan "
 "patiëntspecifieke medische beelden, zoals röntgenfoto’s, CT-scans en MRI’s "
 "op en beheren deze met behulp van een gestandaardiseerd formaat."
+
+#: reports/report_types/concatenated_report/report.py
+msgid "Concatenated Report"
+msgstr ""
 
 #: reports/report_types/dns_report/report.html
 msgid "Records found"
@@ -3145,18 +3147,12 @@ msgstr ""
 
 #: reports/report_types/findings_report/report.html
 msgid ""
-"The findings report provides an overview of the identified findings on the "
+"The Findings Report provides an overview of the identified findings on the "
 "scanned systems. For each finding it shows the risk level and the number of "
 "occurrences of the finding. Under the 'Details' section a description, "
 "impact, recommendation and location of the finding can be found. The risk "
 "level may be different for your specific environment."
 msgstr ""
-"Het Bevindingenrapport geeft een overzicht van de geïdentificeerde "
-"bevindingen op de gescande systemen. Voor elke bevinding wordt het "
-"risiconiveau en het aantal gebeurtenissen van de bevinding getoond. Onder de "
-"sectie ‘Details’ staat een beschrijving, impact, aanbeveling en locatie van "
-"de bevinding. Het risiconiveau is wellicht anders voor uw specifieke "
-"omgeving."
 
 #: reports/report_types/findings_report/report.html
 msgid "Impact"
@@ -3198,7 +3194,7 @@ msgstr ""
 "gevonden."
 
 #: reports/report_types/ipv6_report/report.html
-msgid "IPV6 overview"
+msgid "IPv6 overview"
 msgstr "IPv6-overzicht"
 
 #: reports/report_types/ipv6_report/report.html
@@ -3211,24 +3207,18 @@ msgid "IPv6 Report"
 msgstr "IPv6-rapport"
 
 #: reports/report_types/ipv6_report/report.py
-msgid "Check whether hostnames point to ipv6 addresses."
-msgstr "Controle of hostnamen naar IPv6-adressen verwijzen."
+msgid "Check whether hostnames point to IPv6 addresses."
+msgstr "Controleer of hostnamen naar IPv6-adressen verwijzen."
 
 #: reports/report_types/mail_report/report.html
 msgid ""
-"The mail report provides an overview of the compliance checks associated "
-"with e-mail servers. The current compliance check the presence of SPF, DKIM "
+"The Mail Report provides an overview of the compliance checks associated "
+"with e-mail servers. The current compliance checks the presence of SPF, DKIM "
 "and DMARC records. The table below shows for each of these checks how many "
 "of the identified mail servers are compliant, and if applicable a compliance "
 "issue description and risk level. The risk level may be different for your "
 "specific environment."
 msgstr ""
-"Het Mailrapport geeft een overzicht van de compliancecontroles geassocieerd "
-"met e-mailservers. De huidige compliancecontroles controleren de "
-"aanwezigheid van SPF-, DKIM- en DMARC-dossiers. De tabel hieronder toont "
-"hoeveel van de geïdentificeerde mailservers compliant zijn, en indien van "
-"toepassing, een beschrijving van het complianceprobleem en risiconiveau. Het "
-"risiconiveau kan verschillen voor uw specifieke omgeving."
 
 #: reports/report_types/mail_report/report.html
 msgid "Mailserver compliance"
@@ -3248,8 +3238,8 @@ msgstr "Mailrapport"
 
 #: reports/report_types/mail_report/report.py
 msgid ""
-"System specific mail report that focusses on IP addresses and hostnames."
-msgstr "Systeemspecifiek Mailrapport dat focust op IP-adressen en hostnames."
+"System specific Mail Report that focusses on IP addresses and hostnames."
+msgstr "Systeemspecifiek Mailrapport dat focust op IP-adressen en hostnamen."
 
 #: reports/report_types/multi_organization_report/asset_overview.html
 msgid "Overview of included assets"
@@ -3367,7 +3357,7 @@ msgid " systems have an IPv6 connection."
 msgstr " systemen een IPv6-verbinding."
 
 #: reports/report_types/multi_organization_report/ipv6.html
-msgid "Overview of ip version compliance"
+msgid "Overview of IP version compliance"
 msgstr "Overzicht van compliance met IP-versies"
 
 #: reports/report_types/multi_organization_report/open_ports.html
@@ -3389,8 +3379,8 @@ msgid "Open ports"
 msgstr "Open poorten"
 
 #: reports/report_types/multi_organization_report/open_ports.html
-msgid "Occurrences (IP addressees)"
-msgstr "Voorvallen (IP-adressen)"
+msgid "Occurrences (IP addresses)"
+msgstr "Aantal (IP-adressen)"
 
 #: reports/report_types/multi_organization_report/open_ports.html
 #: reports/templates/summary/service_health.html
@@ -3436,7 +3426,7 @@ msgstr "totaal"
 
 #: reports/report_types/name_server_report/report.html
 msgid ""
-"The name server report provides an overview of the compliance checks that "
+"The Name Server Report provides an overview of the compliance checks that "
 "were performed against the identified Domain Name Servers (DNS). The "
 "compliance checks verify the presence and validity of DNSSEC and whether no "
 "unnecessary ports were identified to be open. The table below gives an "
@@ -3445,14 +3435,6 @@ msgid ""
 "identified are shown too. The risk level may be different for your specific "
 "environment."
 msgstr ""
-"Het Name Server-rapport geeft een overzicht van de compliancecontroles die "
-"werden uitgevoerd tegen de geïdentificeerde Domain Name Servers (DNS). De "
-"compliancecontroles bevestigen de aanwezigheid en geldigheid van DNSSEC en "
-"of er geen onnodige openstaande poorten zijn geïdentificeerd. De tabel "
-"hieronder geeft een overzicht van de beschikbare controles inclusief of het "
-"systeem de uitgevoerde controles heeft doorstaan. Het risiconiveau en "
-"redenen waarom er een probleem is geïdentificeerd worden ook getoond. Het "
-"risiconiveau is misschien anders voor uw specifieke omgeving."
 
 #: reports/report_types/name_server_report/report.html
 msgid "Name server compliance"
@@ -3484,25 +3466,19 @@ msgid "Name Server Report"
 msgstr "Name Server-rapport"
 
 #: reports/report_types/name_server_report/report.py
-msgid "Name server report checks name servers on basic security standards."
+msgid "Name Server Report checks name servers on basic security standards."
 msgstr ""
-"Name Server-rapport controleert de basisbeveiligingsmaatregelen van "
+"Nameserver-rapport controleert de basisbeveiligingsmaatregelen van "
 "nameservers."
 
 #: reports/report_types/open_ports_report/report.html
 msgid ""
-"The open ports report provides an overview of the open ports identified on a "
+"The Open Ports Report provides an overview of the open ports identified on a "
 "system. The ports that are marked as <b>bold</b> were identified by direct "
 "scans performed by OpenKAT (such as nmap). Ports that are not marked in bold "
 "were identified through external services and/or scans (such as Shodan). "
 "Scans with the same hostnames, ports and IPs are merged."
 msgstr ""
-"Het Open Poorten-rapport geeft een overzicht van de open poorten die zijn "
-"geïdentificeerd op een systeem. De poorten die <b>vetgedrukt</b> zijn "
-"gemarkeerd werden geïdentificeerd door directe scans uitgevoerd door OpenKAT "
-"(zoals nmap). Poorten die niet zijn gemarkeerd, zijn geïdentificeerd door "
-"externe diensten en/of scans (zoals Shodan). Scans met dezelfde hostnamen, "
-"poorten en IP’s zijn samengevoegd."
 
 #: reports/report_types/open_ports_report/report.html
 msgid "Overview of open ports found for the scanned assets"
@@ -3531,11 +3507,11 @@ msgstr "Zoek open poorten van IP-adressen"
 
 #: reports/report_types/rpki_report/report.html
 msgid ""
-"The RPKI report shows if an RPKI route announcement was available for the "
+"The RPKI Report shows if an RPKI route announcement was available for the "
 "system and if this announcement is not expired."
 msgstr ""
-"Het RPKI-rapport toont aan dat een RPKI-route-announcement beschikbaar was "
-"voor het systeem en of deze aankondiging niet is verlopen."
+"Het RPKI-rapport toont of een RPKI-routeaankondiging beschikbaar was voor "
+"het systeem en of deze aankondiging niet is verlopen."
 
 #: reports/report_types/rpki_report/report.html
 msgid "RPKI compliance"
@@ -3568,11 +3544,11 @@ msgstr "RPKI-rapport"
 
 #: reports/report_types/rpki_report/report.py
 msgid ""
-"Shows whether the ip is covered by a valid RPKI ROA. For a hostname it shows "
-"the ip addresses and whether they are covered by a valid RPKI ROA."
+"Shows whether the IP is covered by a valid RPKI ROA. For a hostname it shows "
+"the IP addresses and whether they are covered by a valid RPKI ROA."
 msgstr ""
-"Toont of een IP valt onder een valide RPKI ROA. Toont voor een hostname de "
-"IP-adressen en of ze valt onder een valide RPKI ROA."
+"Toont of een IP valt onder een valide RPKI ROA. Toont voor een hostnaam de "
+"IP-adressen en of ze zijn gedekt door een valide RPKI ROA."
 
 #: reports/report_types/safe_connections_report/report.html
 msgid ""
@@ -3604,19 +3580,13 @@ msgstr "Toont of de IP-service veilige versleutelingen gebruikt."
 
 #: reports/report_types/systems_report/report.html
 msgid ""
-"The system report provides an overview of the system types (types of similar "
+"The System Report provides an overview of the system types (types of similar "
 "services) that were identified for each system. The following system types "
 "can be identified: DNS servers, Web servers, Mail servers and those "
 "classified as 'Other' servers. Each hostname and/or IP address is given one "
 "or more system types depending on the identified ports and services. The "
 "table below gives an overview of these results."
 msgstr ""
-"Het Systeemrapport geeft een overzicht van de systeemtypes die werden "
-"geïdentificeerd voor elk systeem. De volgende systemen kunnen worden "
-"geïdentificeerd: DNS-servers, webservers, mailservers en die geclassificeerd "
-"als ‘Overige’ servers. Elke hostname en/of IP-adres wordt een of meer "
-"systeemtypes gegeven, afhankelijk van de geïdentificeerde poorten en "
-"diensten. De tabel hieronder geeft een overzicht van deze resultaten."
 
 #: reports/report_types/systems_report/report.html
 msgid "Selected assets"
@@ -3636,11 +3606,11 @@ msgstr "Combineer IP-adressen, hostnamen en services in systemen."
 
 #: reports/report_types/tls_report/report.html
 msgid ""
-"The TLS report shows which TLS protocols and ciphers were identified on the "
+"The TLS Report shows which TLS protocols and ciphers were identified on the "
 "host for the provided port."
 msgstr ""
-"Het TLS-rapport toont welke TLS-protocollen en -versleutelingen werden "
-"geïdentificeerd op de gekozen host en poort."
+"Het TLS-rapport toont welke TLS-protocollen en -versleutelingen zijn "
+"geïdentificeerd op de host voor de opgegeven poort."
 
 #: reports/report_types/tls_report/report.html
 msgid ""
@@ -3718,23 +3688,19 @@ msgstr "TLS-rapport"
 
 #: reports/report_types/tls_report/report.py
 msgid ""
-"TLS reports assess the security of data encryption and transmission "
+"TLS Report assesses the security of data encryption and transmission "
 "protocols."
 msgstr ""
-"TLS-rapporten geven inzicht in de beveiliging van data-encryptie en "
-"transportprotocollen."
+"TLS-rapport beoordeelt de veiligheid van gegevensencryptie en "
+"transmissieprotocollen."
 
 #: reports/report_types/vulnerability_report/report.html
 msgid ""
-"The vulnerability report provides an overview of all identified CVE "
+"The Vulnerability Report provides an overview of all identified CVE "
 "vulnerabilities that were identified on the selected systems. For each CVE "
 "the table shows the CVE scoring, the number of occurrences, and the CVE "
 "details."
 msgstr ""
-"Het Kwetsbaarhedenrapport geeft een overzicht van alle geïdentificeerde CVE-"
-"kwetsbaarheden die werden geïdentificeerd op de geselecteerde systemen. Voor "
-"elke CVE wordt de CVE-score, het aantal gebeurtenissen en de CVE-details "
-"getoond."
 
 #: reports/report_types/vulnerability_report/report.html
 msgid "Advice"
@@ -3769,19 +3735,13 @@ msgstr "Bewijs"
 
 #: reports/report_types/web_system_report/report.html
 msgid ""
-"The web system report provides an overview of various web server checks that "
+"The Web System Report provides an overview of various web server checks that "
 "were performed against the scanned system(s). For each performed check the "
 "table below shows whether or not the server is compliant with the checks. A "
 "description of why this compliant check failed is also shown, including an "
 "general risk level. The risk level may be different for your specific "
 "environment."
 msgstr ""
-"Het Web System-rapport geeft een overzicht van verschillende "
-"webservercontroles die werden uitgevoerd op het gescande systeem. Voor elke "
-"uitgevoerde controle toont onderstaande tabel, of de server voldoet aan de "
-"controles. Een beschrijving van de falende controles wordt ook getoond, "
-"inclusief een algemeen risiconiveau. Het risiconiveau is misschien anders "
-"voor uw specifieke omgeving."
 
 #: reports/report_types/web_system_report/report.html
 msgid "Web system compliance"
@@ -3832,10 +3792,9 @@ msgid "Web System Report"
 msgstr "Web System-rapport"
 
 #: reports/report_types/web_system_report/report.py
-msgid "Web system reports check web systems on basic security standards."
+msgid "Web System Reports check web systems on basic security standards."
 msgstr ""
-"Web System-rapport controleert websystemen tegen "
-"basisbeveiligingsstandaarden."
+"Websysteemrapport controleert websystemen op basisbeveiligingsstandaarden."
 
 #: reports/templates/generate_report.html
 #: reports/templates/generate_report_pdf.html
@@ -3981,6 +3940,7 @@ msgstr[0] "Selecteer %(total_oois)s object"
 msgstr[1] "Selecteer alle %(total_oois)s objecten"
 
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/report_overview/report_history_table.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: tools/view_helpers.py rocky/templates/admin/delete_confirmation.html
 #: rocky/templates/admin/delete_selected_confirmation.html
@@ -4102,6 +4062,7 @@ msgid "Show more suggested plugins"
 msgstr "Meer voorgestelde plug-ins tonen"
 
 #: reports/templates/partials/report_setup_scan.html
+#: reports/templates/report_overview/report_overview_header.html
 #: reports/views/generate_report.py
 msgid "Generate report"
 msgstr "Rapport genereren"
@@ -4175,6 +4136,135 @@ msgstr "Alle rapporten die beschikbaar zijn voor uw selectie."
 msgid "Toggle all report types"
 msgstr "Selecteer alle rapporttypes"
 
+#: reports/templates/report_overview/report_history.html
+#: reports/views/report_overview.py
+msgid "Reports history"
+msgstr ""
+
+#: reports/templates/report_overview/report_history.html
+msgid "An overview of all your generated reports."
+msgstr ""
+
+#: reports/templates/report_overview/report_history.html
+#, python-format
+msgid "Showing %(length)s of %(total)s reports"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Reports:"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Report ID"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Input Objects"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Reference date"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Creation date"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Shows parent report details"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Close children report object details"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Subreports details:"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#, python-format
+msgid ""
+"\n"
+"                                    This report consist of %(counter)s "
+"subreport with the following report type and object.\n"
+"                                "
+msgid_plural ""
+"\n"
+"                                    This report consist of %(counter)s "
+"subreports with the following report types and objects.\n"
+"                                "
+msgstr[0] ""
+msgstr[1] ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_header.html
+#: reports/views/report_overview.py
+msgid "Subreports"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Shows subreport details"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "View all subreports"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_header.html
+msgid "Overview of reports"
+msgstr "Overzicht van rapporten"
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Recent"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Presets"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Scheduled"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Folders"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "History"
+msgstr ""
+
+#: reports/templates/report_overview/subreports.html
+#, python-format
+msgid "Showing %(length)s of %(total)s subreports"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_header.html
+msgid "Back to Reports History"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_header.html
+msgid "An overview of all underlying reports of"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_header.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Shows report details"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_table.html
+msgid "Subreports:"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_table.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+msgid "Input Object"
+msgstr "Inputobject"
+
 #: reports/templates/summary/report_asset_overview.html
 msgid ""
 "The objects listed in the table below were used to generate this report. For "
@@ -4202,6 +4292,10 @@ msgid ""
 msgstr ""
 "De tabel hieronder toont alle benodigde of optionele plug-ins voor de "
 "geselecteerde rapporten."
+
+#: reports/templates/summary/selected_plugins.html
+msgid "Required and optional plugins"
+msgstr ""
 
 #: reports/templates/summary/selected_plugins.html
 msgid "Plugin enabled"
@@ -4237,18 +4331,13 @@ msgid "Select report types"
 msgstr "Selecteer rapporttypes"
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
-#: reports/views/multi_report.py
-msgid "View report"
-msgstr "Toon rapport"
+msgid "Save report"
+msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 #: reports/views/multi_report.py
 msgid "Select at least one OOI to proceed."
 msgstr "Selecteer minstens één OOI om door te gaan."
-
-#: reports/views/aggregate_report.py reports/views/generate_report.py
-msgid "Select at least one report type to proceed."
-msgstr "Selecteer minstens één rapporttype om door te gaan."
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 msgid ""
@@ -4257,6 +4346,10 @@ msgid ""
 msgstr ""
 "Er zijn geen gegevens gevonden voor %(report_types). Object(en) bestaan niet "
 "op %(date)s."
+
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+msgid "Select at least one report type to proceed."
+msgstr "Selecteer minstens één rapporttype om door te gaan."
 
 #: reports/views/base.py
 #, python-format
@@ -4270,6 +4363,10 @@ msgstr "Multi-rapport"
 #: reports/views/multi_report.py
 msgid "Select OOIs"
 msgstr "Selecteer OOI’s"
+
+#: reports/views/multi_report.py
+msgid "View report"
+msgstr "Toon rapport"
 
 #: reports/views/view_helpers.py
 msgid "1: Select objects"
@@ -4955,6 +5052,12 @@ msgid " Finding Details"
 msgstr " Details bevindingen"
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Finding details"
+msgstr "Bevindingsdetails"
+
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/organizations/organization_list.html
 msgid "There were no organizations found for your user account"
 msgstr "Er zijn geen organisaties gevonden voor uw gebruikersaccount"
@@ -4995,8 +5098,8 @@ msgid "Welcome"
 msgstr "Welkom"
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-msgid "User overview:"
-msgstr "Gebruikersoverzicht:"
+msgid "User overview"
+msgstr ""
 
 #: rocky/templates/dashboard_redteam.html
 #: rocky/templates/partials/notifications_block.html
@@ -5064,6 +5167,11 @@ msgid "findings"
 msgstr "bevindingen"
 
 #: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "Findings table"
+msgstr "Bevindingentabel"
+
+#: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
@@ -5084,9 +5192,9 @@ msgid "Show details for %(finding)s"
 msgstr "Bekijk details van %(finding)s"
 
 #: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "Finding type:"
-msgstr "Bevindingstype:"
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+msgid "Finding type"
+msgstr "Bevindingstype"
 
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -5095,9 +5203,8 @@ msgid "Show details for %(finding_type)s"
 msgstr "Bekijk details van %(finding_type)s"
 
 #: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "OOI type:"
-msgstr "OOI-type:"
+msgid "OOI type"
+msgstr "OOI-type"
 
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -5106,9 +5213,8 @@ msgid "Show %(ooi_type)s objects"
 msgstr "%(ooi_type)s tonen"
 
 #: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "Source OOI:"
-msgstr "Bron OOI:"
+msgid "Source OOI"
+msgstr "Bron OOI"
 
 #: rocky/templates/findings/finding_list.html
 #, python-format
@@ -5116,8 +5222,8 @@ msgid "Show details for %(ooi)s"
 msgstr "Bekijk details van %(ooi)s"
 
 #: rocky/templates/findings/finding_list.html
-msgid "Risk score:"
-msgstr "Risicoscore:"
+msgid "Risk score"
+msgstr "Risicoscore"
 
 #: rocky/templates/findings/finding_list.html
 msgid "Mute findings"
@@ -5189,6 +5295,10 @@ msgstr "Taken"
 #: rocky/templates/health.html
 msgid "Health Checks"
 msgstr "Gezondheidscontroles"
+
+#: rocky/templates/health.html
+msgid "Health checks"
+msgstr ""
 
 #: rocky/templates/health.html
 msgid "Additional"
@@ -5357,6 +5467,10 @@ msgid "Here you can delete the %(display_type)s."
 msgstr "Hier kunt u de %(display_type)s verwijderen."
 
 #: rocky/templates/oois/ooi_delete.html
+msgid "To be deleted object(s)"
+msgstr ""
+
+#: rocky/templates/oois/ooi_delete.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 msgid "Key"
 msgstr "Sleutel"
@@ -5374,6 +5488,10 @@ msgstr "Verwijderen niet mogelijk voor types: KATFindingType en CVEFindingType"
 #: rocky/templates/oois/ooi_detail.html
 msgid "using boefjes"
 msgstr "met Boefjes"
+
+#: rocky/templates/oois/ooi_detail.html rocky/templates/scan.html
+msgid "Boefjes overview"
+msgstr ""
 
 #: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_origins_observations.html
@@ -5454,11 +5572,6 @@ msgstr "Overzicht van bevindingen voor"
 #: rocky/templates/oois/ooi_detail_findings_list.html
 msgid "Score"
 msgstr "Score"
-
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Finding details"
-msgstr "Bevindingsdetails"
 
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 msgid "Overview of the number of findings and their severity found on"
@@ -5700,6 +5813,18 @@ msgstr ""
 msgid "Top 10 most severe Findings"
 msgstr "Top 10 meest ernstige bevindingen"
 
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "Finding type:"
+msgstr "Bevindingstype:"
+
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "OOI type:"
+msgstr "OOI-type:"
+
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "Source OOI:"
+msgstr "Bron OOI:"
+
 #: rocky/templates/organizations/organization_edit.html
 msgid "Edit organization"
 msgstr "Organisatie bewerken"
@@ -5930,8 +6055,8 @@ msgid "graph"
 msgstr "grafiek"
 
 #: rocky/templates/partials/explanations.html
-msgid "Clearance level inheritance:"
-msgstr "Overerving op vrijwaringsniveau:"
+msgid "Clearance level inheritance"
+msgstr "Overerving op vrijwaringsniveau"
 
 #: rocky/templates/partials/explanations.html
 msgid "OOI"
@@ -6155,10 +6280,6 @@ msgid "Findings for %(type)s %(name)s on %(observed_at)s:"
 msgstr "Bevindingen voor %(type)s %(name)s op %(observed_at)s:"
 
 #: rocky/templates/partials/ooi_report_findings_block_table.html
-msgid "Finding type"
-msgstr "Bevindingstype"
-
-#: rocky/templates/partials/ooi_report_findings_block_table.html
 msgid "Open finding details"
 msgstr "Open bevindingsdetails"
 
@@ -6343,13 +6464,9 @@ msgstr "Opnieuw plannen"
 msgid "Download task data"
 msgstr "Taakgegevens downloaden"
 
-#: rocky/templates/scan.html
-msgid "Boefjes overview:"
-msgstr "Boefjes-overzicht:"
-
 #: rocky/templates/scan_profiles/scan_profile_detail.html
-msgid "Clearance level:"
-msgstr "Vrijwaringsniveau:"
+msgid "Current clearance level"
+msgstr "Actuele vrijwaringsniveau"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Declared:"
@@ -6417,10 +6534,6 @@ msgstr ""
 "                overeenkomstige scanniveaus.\n"
 "            "
 
-#: rocky/templates/scan_profiles/scan_profile_detail.html
-msgid "Set clearance level:"
-msgstr "Vrijwaringsniveau instellen:"
-
 #: rocky/templates/scan_profiles/scan_profile_reset.html
 msgid "Set clearance level for:"
 msgstr "Vrijwaringsniveau instellen voor:"
@@ -6471,10 +6584,6 @@ msgstr "Lijst van taken voor normalizers"
 #: rocky/templates/tasks/partials/boefje_task_history.html
 msgid "No scans found for this object."
 msgstr "Geen scans gevonden voor dit object."
-
-#: rocky/templates/tasks/partials/boefje_task_history.html
-msgid "Input Object"
-msgstr "Inputobject"
 
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Normalizer"
@@ -7192,6 +7301,237 @@ msgstr "Raw-bestand kan niet naar Bytes worden geüpload: %s"
 msgid "Raw file successfully added."
 msgstr "Raw-bestand met succes toegevoegd."
 
+#~ msgid "Selected objects:"
+#~ msgstr "Geselecteerde objecten:"
+
+#~ msgid "Latest plugin settings:"
+#~ msgstr "Laatste plug-ininstellingen:"
+
+#~ msgid "Overview of settings:"
+#~ msgstr "Overzicht van instellingen:"
+
+#~ msgid "For this tutorial we suggest a DNS-report to get you started."
+#~ msgstr "Deze uitleg maakt gebruik van het DNS-rapport."
+
+#~ msgid "DNS report"
+#~ msgstr "DNS-rapport"
+
+#~ msgid "User overview:"
+#~ msgstr "Gebruikersoverzicht:"
+
+#~ msgid "Boefjes overview:"
+#~ msgstr "Boefjes-overzicht:"
+
+#~ msgid ""
+#~ "Within OpenKAT you can view reports for each of your current objects. For "
+#~ "specific reports you can choose one of the available report types and "
+#~ "generate a report. Such as a pen-test, a DNS-report or a mail report to "
+#~ "give some examples."
+#~ msgstr ""
+#~ "Binnen OpenKAT kunt u rapporten bekijken voor elk van uw huidige "
+#~ "objecten. Voor specifieke rapporten kunt u een van de beschikbare "
+#~ "rapporttypes kiezen en een rapport genereren. Zoals een pentest, een DNS-"
+#~ "rapport of een Mailrapport."
+
+#~ msgid ""
+#~ "A lot of things can be an object within the scope of OpenKAT. For example "
+#~ "a mailserver, an ip-address, a URL, a DNS record, a hostname or a network "
+#~ "to name a few.  While these objects can be related to each other they are "
+#~ "all objects within OpenKAT that can be scanned to gain valuable insight."
+#~ msgstr ""
+#~ "Veel dingen kunnen een object zijn binnen het bereik van OpenKAT. "
+#~ "Bijvoorbeeld een mailserver, een IP-adres, een URL, een DNS-record, een "
+#~ "hostnaam of een netwerk om er maar een paar te noemen.  Hoewel deze "
+#~ "objecten aan elkaar gerelateerd kunnen zijn, zijn het allemaal objecten "
+#~ "binnen OpenKAT die gescand kunnen worden om waardevolle inzichten te "
+#~ "verkrijgen."
+
+#~ msgid ""
+#~ "Most objects have dependencies on the existence of other objects. For "
+#~ "example a URL needs to be connected to a network, hostname, fqdn (fully "
+#~ "qualified domain name) and ip-address. OpenKAT collects these additional "
+#~ "object automatically when possible. By running plugins to collect or "
+#~ "extract this data."
+#~ msgstr ""
+#~ "De meeste objecten zijn afhankelijk van het bestaan van andere objecten. "
+#~ "Een URL moet bijvoorbeeld verbonden zijn met een netwerk, hostnaam, FQDN "
+#~ "(Fully Qualified Domain Name) en IP-adres. OpenKAT verzamelt deze "
+#~ "aanvullende objecten waar mogelijk automatisch, door plug-ins uit te "
+#~ "voeren die deze gegevens verzamelen of extraheren."
+
+#~ msgid ""
+#~ "The findings report provides an overview of the identified findings on "
+#~ "the scanned systems. For each finding it shows the risk level and the "
+#~ "number of occurrences of the finding. Under the 'Details' section a "
+#~ "description, impact, recommendation and location of the finding can be "
+#~ "found. The risk level may be different for your specific environment."
+#~ msgstr ""
+#~ "Het Bevindingenrapport geeft een overzicht van de geïdentificeerde "
+#~ "bevindingen op de gescande systemen. Voor elke bevinding wordt het "
+#~ "risiconiveau en het aantal gebeurtenissen van de bevinding getoond. Onder "
+#~ "de sectie ‘Details’ staat een beschrijving, impact, aanbeveling en "
+#~ "locatie van de bevinding. Het risiconiveau is wellicht anders voor uw "
+#~ "specifieke omgeving."
+
+#~ msgid "IPV6 overview"
+#~ msgstr "IPv6-overzicht"
+
+#~ msgid "Check whether hostnames point to ipv6 addresses."
+#~ msgstr "Controle of hostnamen naar IPv6-adressen verwijzen."
+
+#~ msgid ""
+#~ "The mail report provides an overview of the compliance checks associated "
+#~ "with e-mail servers. The current compliance check the presence of SPF, "
+#~ "DKIM and DMARC records. The table below shows for each of these checks "
+#~ "how many of the identified mail servers are compliant, and if applicable "
+#~ "a compliance issue description and risk level. The risk level may be "
+#~ "different for your specific environment."
+#~ msgstr ""
+#~ "Het Mailrapport geeft een overzicht van de compliancecontroles "
+#~ "geassocieerd met e-mailservers. De huidige compliancecontroles "
+#~ "controleren de aanwezigheid van SPF-, DKIM- en DMARC-dossiers. De tabel "
+#~ "hieronder toont hoeveel van de geïdentificeerde mailservers compliant "
+#~ "zijn, en indien van toepassing, een beschrijving van het "
+#~ "complianceprobleem en risiconiveau. Het risiconiveau kan verschillen voor "
+#~ "uw specifieke omgeving."
+
+#~ msgid ""
+#~ "System specific mail report that focusses on IP addresses and hostnames."
+#~ msgstr ""
+#~ "Systeemspecifiek Mailrapport dat focust op IP-adressen en hostnames."
+
+#~ msgid "Overview of ip version compliance"
+#~ msgstr "Overzicht van compliance met IP-versies"
+
+#~ msgid "Occurrences (IP addressees)"
+#~ msgstr "Voorvallen (IP-adressen)"
+
+#~ msgid ""
+#~ "The name server report provides an overview of the compliance checks that "
+#~ "were performed against the identified Domain Name Servers (DNS). The "
+#~ "compliance checks verify the presence and validity of DNSSEC and whether "
+#~ "no unnecessary ports were identified to be open. The table below gives an "
+#~ "overview of the available checks including whether the system passed the "
+#~ "performed checks. The risk level and reasoning as to why an issue was "
+#~ "identified are shown too. The risk level may be different for your "
+#~ "specific environment."
+#~ msgstr ""
+#~ "Het Name Server-rapport geeft een overzicht van de compliancecontroles "
+#~ "die werden uitgevoerd tegen de geïdentificeerde Domain Name Servers "
+#~ "(DNS). De compliancecontroles bevestigen de aanwezigheid en geldigheid "
+#~ "van DNSSEC en of er geen onnodige openstaande poorten zijn "
+#~ "geïdentificeerd. De tabel hieronder geeft een overzicht van de "
+#~ "beschikbare controles inclusief of het systeem de uitgevoerde controles "
+#~ "heeft doorstaan. Het risiconiveau en redenen waarom er een probleem is "
+#~ "geïdentificeerd worden ook getoond. Het risiconiveau is misschien anders "
+#~ "voor uw specifieke omgeving."
+
+#~ msgid "Name server report checks name servers on basic security standards."
+#~ msgstr ""
+#~ "Name Server-rapport controleert de basisbeveiligingsmaatregelen van "
+#~ "nameservers."
+
+#~ msgid ""
+#~ "The open ports report provides an overview of the open ports identified "
+#~ "on a system. The ports that are marked as <b>bold</b> were identified by "
+#~ "direct scans performed by OpenKAT (such as nmap). Ports that are not "
+#~ "marked in bold were identified through external services and/or scans "
+#~ "(such as Shodan). Scans with the same hostnames, ports and IPs are merged."
+#~ msgstr ""
+#~ "Het Open Poorten-rapport geeft een overzicht van de open poorten die zijn "
+#~ "geïdentificeerd op een systeem. De poorten die <b>vetgedrukt</b> zijn "
+#~ "gemarkeerd werden geïdentificeerd door directe scans uitgevoerd door "
+#~ "OpenKAT (zoals nmap). Poorten die niet zijn gemarkeerd, zijn "
+#~ "geïdentificeerd door externe diensten en/of scans (zoals Shodan). Scans "
+#~ "met dezelfde hostnamen, poorten en IP’s zijn samengevoegd."
+
+#~ msgid ""
+#~ "The RPKI report shows if an RPKI route announcement was available for the "
+#~ "system and if this announcement is not expired."
+#~ msgstr ""
+#~ "Het RPKI-rapport toont aan dat een RPKI-route-announcement beschikbaar "
+#~ "was voor het systeem en of deze aankondiging niet is verlopen."
+
+#~ msgid ""
+#~ "Shows whether the ip is covered by a valid RPKI ROA. For a hostname it "
+#~ "shows the ip addresses and whether they are covered by a valid RPKI ROA."
+#~ msgstr ""
+#~ "Toont of een IP valt onder een valide RPKI ROA. Toont voor een hostname "
+#~ "de IP-adressen en of ze valt onder een valide RPKI ROA."
+
+#~ msgid ""
+#~ "The system report provides an overview of the system types (types of "
+#~ "similar services) that were identified for each system. The following "
+#~ "system types can be identified: DNS servers, Web servers, Mail servers "
+#~ "and those classified as 'Other' servers. Each hostname and/or IP address "
+#~ "is given one or more system types depending on the identified ports and "
+#~ "services. The table below gives an overview of these results."
+#~ msgstr ""
+#~ "Het Systeemrapport geeft een overzicht van de systeemtypes die werden "
+#~ "geïdentificeerd voor elk systeem. De volgende systemen kunnen worden "
+#~ "geïdentificeerd: DNS-servers, webservers, mailservers en die "
+#~ "geclassificeerd als ‘Overige’ servers. Elke hostname en/of IP-adres wordt "
+#~ "een of meer systeemtypes gegeven, afhankelijk van de geïdentificeerde "
+#~ "poorten en diensten. De tabel hieronder geeft een overzicht van deze "
+#~ "resultaten."
+
+#~ msgid ""
+#~ "The TLS report shows which TLS protocols and ciphers were identified on "
+#~ "the host for the provided port."
+#~ msgstr ""
+#~ "Het TLS-rapport toont welke TLS-protocollen en -versleutelingen werden "
+#~ "geïdentificeerd op de gekozen host en poort."
+
+#~ msgid ""
+#~ "TLS reports assess the security of data encryption and transmission "
+#~ "protocols."
+#~ msgstr ""
+#~ "TLS-rapporten geven inzicht in de beveiliging van data-encryptie en "
+#~ "transportprotocollen."
+
+#~ msgid ""
+#~ "The vulnerability report provides an overview of all identified CVE "
+#~ "vulnerabilities that were identified on the selected systems. For each "
+#~ "CVE the table shows the CVE scoring, the number of occurrences, and the "
+#~ "CVE details."
+#~ msgstr ""
+#~ "Het Kwetsbaarhedenrapport geeft een overzicht van alle geïdentificeerde "
+#~ "CVE-kwetsbaarheden die werden geïdentificeerd op de geselecteerde "
+#~ "systemen. Voor elke CVE wordt de CVE-score, het aantal gebeurtenissen en "
+#~ "de CVE-details getoond."
+
+#~ msgid ""
+#~ "The web system report provides an overview of various web server checks "
+#~ "that were performed against the scanned system(s). For each performed "
+#~ "check the table below shows whether or not the server is compliant with "
+#~ "the checks. A description of why this compliant check failed is also "
+#~ "shown, including an general risk level. The risk level may be different "
+#~ "for your specific environment."
+#~ msgstr ""
+#~ "Het Web System-rapport geeft een overzicht van verschillende "
+#~ "webservercontroles die werden uitgevoerd op het gescande systeem. Voor "
+#~ "elke uitgevoerde controle toont onderstaande tabel, of de server voldoet "
+#~ "aan de controles. Een beschrijving van de falende controles wordt ook "
+#~ "getoond, inclusief een algemeen risiconiveau. Het risiconiveau is "
+#~ "misschien anders voor uw specifieke omgeving."
+
+#~ msgid "Web system reports check web systems on basic security standards."
+#~ msgstr ""
+#~ "Web System-rapport controleert websystemen tegen "
+#~ "basisbeveiligingsstandaarden."
+
+#~ msgid "Risk score:"
+#~ msgstr "Risicoscore:"
+
+#~ msgid "Clearance level inheritance:"
+#~ msgstr "Overerving op vrijwaringsniveau:"
+
+#~ msgid "Clearance level:"
+#~ msgstr "Vrijwaringsniveau:"
+
+#~ msgid "Set clearance level:"
+#~ msgstr "Vrijwaringsniveau instellen:"
+
 #~ msgid "Select object"
 #~ msgid_plural "Select objects"
 #~ msgstr[0] "Selecteer object"
@@ -7330,9 +7670,6 @@ msgstr "Raw-bestand met succes toegevoegd."
 #~ msgid "Web system compliance:"
 #~ msgstr "Compliance websysteem:"
 
-#~ msgid "Overview of reports"
-#~ msgstr "Overzicht van rapporten"
-
 #~ msgid "Objects:"
 #~ msgstr "Objecten:"
 
@@ -7406,12 +7743,6 @@ msgstr "Raw-bestand met succes toegevoegd."
 
 #~ msgid "Overview of findings for "
 #~ msgstr "Overzicht van bevindingen voor "
-
-#~ msgid "OOI type"
-#~ msgstr "OOI-type"
-
-#~ msgid "Source OOI"
-#~ msgstr "Bron OOI"
 
 #~ msgid "Error"
 #~ msgstr "Foutmelding"
@@ -7518,9 +7849,6 @@ msgstr "Raw-bestand met succes toegevoegd."
 #~ msgstr ""
 #~ "Niet alle benodigde boefjes zijn geselecteerd. Selecteer alle benodigde "
 #~ "boefjes."
-
-#~ msgid "Clearance level inheritance"
-#~ msgstr "Overerving op vrijwaringsniveau"
 
 #, python-format
 #~ msgid ""

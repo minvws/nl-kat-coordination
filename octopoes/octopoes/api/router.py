@@ -26,6 +26,7 @@ from octopoes.models import OOI, Reference, ScanLevel, ScanProfile, ScanProfileB
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
+from octopoes.models.ooi.reports import Report
 from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Path as ObjectPath
@@ -458,6 +459,29 @@ def list_findings(
         offset,
         limit,
     )
+
+
+@router.get("/reports", tags=["Reports"])
+def list_reports(
+    offset=DEFAULT_OFFSET,
+    limit=DEFAULT_LIMIT,
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+) -> Paginated[tuple[Report, list[Report | None]]]:
+    res = octopoes.ooi_repository.list_reports(
+        valid_time,
+        offset,
+        limit,
+    )
+    return res
+
+
+@router.get("/reports/{report_id}", tags=["Reports"])
+def get_report(
+    report_id: str,
+    octopoes: OctopoesService = Depends(octopoes_service),
+):
+    return octopoes.ooi_repository.get_report(report_id)
 
 
 @router.get("/findings/count_by_severity", tags=["Findings"])
