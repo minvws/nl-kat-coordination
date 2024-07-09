@@ -255,9 +255,9 @@ django-admin-auto-tests @ git+https://github.com/dekkers/django-admin-auto-tests
 django-appconf==1.0.6 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:c3ae442fba1ff7ec830412c5184b17169a7a1e71cf0864a4c3f93cf4c98a1993 \
     --hash=sha256:cfe87ea827c4ee04b9a70fab90b86d704cb02f2981f89da8423cb0fabf88efbf
-django-components==0.80 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:a2ca8d7f308d5b54e83122331f137e2daa397b5f2e64d212f59334ca7af65dac \
-    --hash=sha256:c6067f24e6428c52f33727a2bf1b51a70d61ecae7286d4ff826ce85f6745f794
+django-components==0.82 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:8c84c0ae028c04675b32a2962b6f52a098871ce09b1286d66fbdc5c7038ddacc \
+    --hash=sha256:94e29eba63248f439291335a3093587827ebb1010e92526ede669b964884a3df
 django-compressor @ git+https://github.com/dekkers/django-compressor@620bc0ab86590f8981dd24456a70951c9bdbf91f ; python_version >= "3.10" and python_version < "4.0"
 django-csp==3.7 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:01443a07723f9a479d498bd7bb63571aaa771e690f64bde515db6cdb76e8041a \
