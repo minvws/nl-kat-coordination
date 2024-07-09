@@ -3,6 +3,7 @@
   "consumes": [
     "openkat/service-banner"
   ],
+  "description": "Checks service banner for CVE-2024-6387, enable service banner boefje to get the service banner",
   "produces": [
     "Finding",
     "CVEFindingType"
