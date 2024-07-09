@@ -227,7 +227,7 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
     assert result[0][1] == dns_ns_records[0]
 
 
-def test_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
+def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     network = Network(name="test")
     octopoes_api_connector.save_declaration(
         Declaration(
@@ -237,7 +237,7 @@ def test_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector, valid_
     )
 
     ip = IPAddressV4(network=network.reference, address="10.10.10.10")
-    ip_port = IPPort(
+    tcp_port = IPPort(
         address=ip.reference,
         protocol=Protocol.TCP,
         port=3306,
@@ -248,15 +248,16 @@ def test_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector, valid_
         Observation(
             method="kat_nmap_normalize",
             source=ip.reference,
-            source_method="nmap-tcp",
+            source_method="nmap",
             task_id=uuid.uuid4(),
             valid_time=valid_time,
-            result=[ip, ip_port],
+            result=[ip, tcp_port],
         )
     )
 
     octopoes_api_connector.save_many_scan_profiles(
-        [DeclaredScanProfile(reference=ooi.reference, level=ScanLevel.L2) for ooi in [ip, ip_port, network]], valid_time
+        [DeclaredScanProfile(reference=ooi.reference, level=ScanLevel.L2) for ooi in [ip, tcp_port, network]],
+        valid_time,
     )
 
     octopoes_api_connector.recalculate_bits()
@@ -266,11 +267,11 @@ def test_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector, valid_
         Finding(
             finding_type=KATFindingType(id="KAT-OPEN-DATABASE-PORT").reference,
             description="Port 3306/tcp is a database port and should not be open.",
-            ooi=ip_port.reference,
+            ooi=tcp_port.reference,
         )
     ]
 
-    ip_port = IPPort(
+    udp_port = IPPort(
         address=ip.reference,
         protocol=Protocol.UDP,
         port=53,
@@ -280,14 +281,20 @@ def test_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector, valid_
         Observation(
             method="kat_nmap_normalize",
             source=ip.reference,
-            source_method="nmap-tcp",
+            source_method="nmap-udp",
             task_id=uuid.uuid4(),
             valid_time=valid_time,
-            result=[ip, ip_port],
+            result=[ip, udp_port],
         )
     )
 
     octopoes_api_connector.recalculate_bits()
     findings = octopoes_api_connector.list_findings({severity for severity in RiskLevelSeverity}, valid_time)
 
-    assert findings.items == []
+    assert findings.items == [
+        Finding(
+            finding_type=KATFindingType(id="KAT-OPEN-DATABASE-PORT").reference,
+            description="Port 3306/tcp is a database port and should not be open.",
+            ooi=tcp_port.reference,
+        )
+    ]
