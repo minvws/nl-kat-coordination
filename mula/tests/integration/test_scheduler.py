@@ -1,5 +1,6 @@
 import unittest
 import uuid
+from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
@@ -101,7 +102,7 @@ class SchedulerTestCase(unittest.TestCase):
     def test_pop_item_from_queue_empty(self):
         pass
 
-    def test_post_push(self):
+    def test_post_push__(self):
         """When a task is added to the queue, it should be added to the database"""
         # Arrange
         item = functions.create_item(
@@ -112,30 +113,41 @@ class SchedulerTestCase(unittest.TestCase):
         # Act
         self.scheduler.push_item_to_queue(item)
 
-        # Task should be on priority queue
+        # Assert: Task should be on priority queue
         pq_item = self.scheduler.queue.peek(0)
         self.assertEqual(1, self.scheduler.queue.qsize())
         self.assertEqual(pq_item.id, item.id)
 
-        # Task should be in datastore, and queued
+        # Assert: Task should be in datastore, and queued
         task_db = self.mock_ctx.datastores.task_store.get_task(str(item.id))
         self.assertEqual(task_db.id, item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
-        # Schedule should be in datastore
+        # Assert: Schedule should be in datastore
         schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
             task_db.schedule_id
         )
         self.assertIsNotNone(schedule_db)
         self.assertEqual(schedule_db.id, task_db.schedule_id)
+
+        # Assert: schedule should have a deadline
         self.assertIsNotNone(schedule_db.deadline_at)
-        breakpoint()
         self.assertIsNotNone(schedule_db.schedule)
+
+        # Assert: deadline should be in the future, at least later than the
+        # grace period
+        self.assertGreater(
+            schedule_db.created_at
+            + timedelta(seconds=self.mock_ctx.config.pq_grace_period),
+            schedule_db.deadline_at,
+        )
 
     def test_post_push_without_schedule(self):
         pass
 
     def test_post_push_schedule_enabled(self):
+        # make sure that the deadline is set at least to the
+        # grace period
         pass
 
     def test_post_push_schedule_disabled(self):

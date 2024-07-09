@@ -53,7 +53,7 @@ def run(org_num: int = 1):
         boefjes = ("dns-records", "dns-sec", "dns-zone")
         for boefje_id in boefjes:
             resp_enable_boefje = httpx.patch(
-                url=f"{KATALOGUS_API}/v1/organisations/{org.get('id')}/repositories/LOCAL/plugins/{boefje_id}",
+                url=f"{KATALOGUS_API}/v1/organisations/{org.get('id')}/plugins/{boefje_id}",
                 json={"enabled": True},
                 timeout=30,
             )
@@ -99,7 +99,9 @@ def run(org_num: int = 1):
     for org in orgs:
         for declaration in declarations:
             resp_octopoes_decl = httpx.post(
-                f"{OCTOPOES_API}/{org.get('id')}/declarations", json=declaration, timeout=30
+                f"{OCTOPOES_API}/{org.get('id')}/declarations",
+                json=declaration,
+                timeout=30,
             )
 
             try:
@@ -116,7 +118,9 @@ def run(org_num: int = 1):
                 params={"valid_time": str(datetime.now(timezone.utc))},
                 json={
                     "scan_profile_type": "declared",
-                    "reference": declaration.get("ooi").get("scan_profile").get("reference"),
+                    "reference": declaration.get("ooi")
+                    .get("scan_profile")
+                    .get("reference"),
                     "level": declaration.get("ooi").get("scan_profile").get("level"),
                 },
                 timeout=30,
@@ -125,11 +129,17 @@ def run(org_num: int = 1):
             try:
                 resp_octopoes_scan_profile.raise_for_status()
             except httpx.HTTPError:
-                print("Error creating scan profile", declaration.get("ooi").get("scan_profile"))
+                print(
+                    "Error creating scan profile",
+                    declaration.get("ooi").get("scan_profile"),
+                )
                 print(resp_octopoes_scan_profile.text)
                 raise
 
-            print("Org {org.get('id')} created scan profile", declaration.get("ooi").get("scan_profile"))
+            print(
+                "Org {org.get('id')} created scan profile",
+                declaration.get("ooi").get("scan_profile"),
+            )
 
 
 if __name__ == "__main__":
@@ -137,7 +147,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Load test the scheduler")
 
     # Add arguments
-    parser.add_argument("--orgs", type=int, default=1, help="Number of organisations to create")
+    parser.add_argument(
+        "--orgs", type=int, default=1, help="Number of organisations to create"
+    )
 
     # Parse arguments
     args = parser.parse_args()

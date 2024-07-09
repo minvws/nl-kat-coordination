@@ -303,12 +303,14 @@ class Scheduler(abc.ABC):
 
         schedule_db = self.ctx.datastores.schedule_store.get_schedule(item.schedule_id)
         if schedule_db is None:
-            cron_expression = self.evaluate_schedule(item)
+            deadline_at = self.calculate_deadline(item)
+            cron_expression = f"{deadline_at.minute} {deadline_at.hour} * * *"
+
             schedule = models.Schedule(
                 scheduler_id=self.scheduler_id,
                 hash=item.hash,
                 schedule=cron_expression,
-                deadline_at=cron.next_run(cron_expression),
+                deadline_at=deadline_at,
                 data=item.data,
             )
             schedule_db = self.ctx.datastores.schedule_store.create_schedule(schedule)
@@ -396,16 +398,7 @@ class Scheduler(abc.ABC):
 
     # TODO: test this
     # TODO: rename to evaluate_schedule_for_task
-    def evaluate_schedule(self, task: models.Task) -> str:
-        """Evaluate the schedule for a task.
-
-        Args:
-            task: The task to evaluate the schedule for.
-
-        Returns:
-            A cron expression for the task, or None if no schedule could be
-
-        """
+    def calculate_deadline(self, task: models.Task) -> datetime:
         # We at least delay a job by the grace period
         minimum = self.ctx.config.pq_grace_period
         deadline = datetime.now(timezone.utc) + timedelta(seconds=minimum)
@@ -421,8 +414,7 @@ class Scheduler(abc.ABC):
         adjusted_time = deadline + jitter_offset
         adjusted_time = max(adjusted_time, deadline)
 
-        # TODO: check and test this
-        return f"{adjusted_time.minute} {adjusted_time.hour} * * *"
+        return adjusted_time
 
     def enable(self) -> None:
         """Enable the scheduler.
