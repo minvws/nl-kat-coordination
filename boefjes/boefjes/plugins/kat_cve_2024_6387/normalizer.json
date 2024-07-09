@@ -1,7 +1,7 @@
 {
   "id": "kat_cve_2024_6387_normalize",
   "consumes": [
-    "openkat/servicebanner"
+    "openkat/service-banner"
   ],
   "produces": [
     "Finding",

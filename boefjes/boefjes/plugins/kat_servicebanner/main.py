@@ -26,7 +26,7 @@ def get_banner(sock):
         except UnicodeDecodeError:
             banner = banner.decode("latin1").strip()
         sock.close()
-        return [({"openkat/servicebanner"}, banner)]
+        return [({"openkat/service-banner"}, banner)]
     except Exception as e:
         return [({"boefje/error"}, f"Unable to get banner. {str(e)}")]
 
