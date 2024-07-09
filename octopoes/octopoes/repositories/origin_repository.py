@@ -37,6 +37,7 @@ class OriginRepository(Repository):
         task_id: UUID | None = None,
         source: Reference | None = None,
         result: Reference | None = None,
+        method: str | None = None,
         origin_type: OriginType | None = None,
     ) -> list[Origin]:
         raise NotImplementedError
@@ -73,6 +74,7 @@ class XTDBOriginRepository(OriginRepository):
         task_id: UUID | None = None,
         source: Reference | None = None,
         result: Reference | None = None,
+        method: str | None = None,
         origin_type: OriginType | None = None,
     ) -> list[Origin]:
         where_parameters = {"type": Origin.__name__}
@@ -85,6 +87,9 @@ class XTDBOriginRepository(OriginRepository):
 
         if result:
             where_parameters["result"] = str(result)
+
+        if method:
+            where_parameters["method"] = method
 
         if origin_type:
             where_parameters["origin_type"] = origin_type.value
