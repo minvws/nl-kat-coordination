@@ -10,7 +10,18 @@ This outlines the basic usages and provides a code block example below, of how t
 
 ### Instantiate
 
-`{% component "modal" size="xx" dialogid="xx" %}` is enough to instantiate the dialog modal component, where `dialogid` should be a unique identifier to enable multiple dialogs on the same page, and size should contain the appropriate class name to achieve the correct sizing. This can be either `dialog-small`, `dialog-medium` or `dialog-large`.
+First you need to add `{% load component_tags %}` at the top of your template. Next you need to add the following code block at the bottom, to include the corresponding JS (if you haven't already you also need to add `{% load compress %}`).
+
+```
+{% block html_at_end_body %}
+    {{ block.super }}
+    {% compress js %}
+        <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
+    {% endcompress %}
+{% endblock html_at_end_body %}
+```
+
+After that, `{% component "modal" size="xx" dialogid="xx" %}` is enough to instantiate the dialog modal component, where `dialogid` should be a unique identifier to enable multiple dialogs on the same page, and size should contain the appropriate class name to achieve the correct sizing. This can be either `dialog-small`, `dialog-medium` or `dialog-large`.
 
 ### Slots and fills
 
