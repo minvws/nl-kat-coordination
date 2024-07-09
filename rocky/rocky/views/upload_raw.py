@@ -99,6 +99,5 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         ).items
 
         # generate options
-        options = [(o.primary_key, o.get_ooi_type()) for o in objects]
-
-        return options
+        for option in objects:
+            yield (option.primary_key, option.get_ooi_type()) 
