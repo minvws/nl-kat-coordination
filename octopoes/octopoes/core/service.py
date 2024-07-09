@@ -412,8 +412,6 @@ class OctopoesService:
                     )
                 }.values()
             )
-            for inference_origin in inference_origins:
-                self._run_inference(inference_origin, event.valid_time)
         else:
             inference_origins = self.origin_repository.list_origins(event.valid_time, source=event.new_data.reference)
             inference_params = self.origin_parameter_repository.list_by_reference(
@@ -423,8 +421,8 @@ class OctopoesService:
                 inference_origins.append(self.origin_repository.get(inference_param.origin_id, event.valid_time))
 
             inference_origins = [o for o in inference_origins if o.origin_type == OriginType.INFERENCE]
-            for inference_origin in inference_origins:
-                self._run_inference(inference_origin, event.valid_time)
+        for inference_origin in inference_origins:
+            self._run_inference(inference_origin, event.valid_time)
 
     def _on_delete_ooi(self, event: OOIDBEvent) -> None:
         if event.old_data is None:
