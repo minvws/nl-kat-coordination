@@ -6,8 +6,8 @@ EXPOSE 8000
 ARG USER_UID=1000
 ARG USER_GID=1000
 
-RUN groupadd --gid $USER_GID keiko
-RUN adduser --disabled-password --gecos '' --uid $USER_UID --gid $USER_GID keiko
+RUN groupadd --gid "$USER_GID" keiko
+RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" keiko
 
 WORKDIR /app/keiko
 ENV PATH=/home/keiko/.local/bin:${PATH}
