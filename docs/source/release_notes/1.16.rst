@@ -80,6 +80,25 @@ Then follow the steps above using the HTTP endpoints to delete the other entries
 After these steps, again the normal instructions for upgrading :ref:`Debian packages<Upgrading Debian>`
 or upgrading :ref:`containers <Upgrading_Containers>` should be followed.
 
+Running the Origin Migration
+================================
+Upon upgrading, one migration needs to be triggered manually.
+This is the `boefjes/tools/upgrade_v1_16_0.py` script, which you can run in your ``boefje`` environment using:
+
+.. code-block:: sh
+
+    python -m tools.upgrade_v1_16_0
+
+Or, using Docker:
+
+.. code-block:: sh
+
+    docker compose exec boefje python -m tools.upgrade_v1_16_0
+
+Please check the logs for any errors in the migration.
+The script can be run multiple times in case unexpected errors appear, although some warnings are to be expected.
+After running the script (ideally once), the next run should log that `total_processed=0` and `total_failed=0`.
+
 Full Changelog
 ==============
 

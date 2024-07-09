@@ -104,8 +104,8 @@ def migrate_org(bytes_client, connector, organisation_id, valid_time) -> tuple[i
                         origin.method,
                         origin.origin_type,
                     )
+                    failed += 1
 
-                failed += 1
                 continue
 
             processed += 1
