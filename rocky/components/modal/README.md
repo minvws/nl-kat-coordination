@@ -37,6 +37,8 @@ There's three slots to fill:
 
 Including `{% component_css_dependencies %}` is needed to inject the reference to the correct stylesheet needed to style the component into the HTML document. Configuring the location of said stylesheet is done in the components `.py` file.
 
+### Example implementation
+
 ```
 {% component "modal" size="dialog-small" dialogid="id1" %}
 	{% fill "header" %}
