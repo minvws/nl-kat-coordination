@@ -250,6 +250,17 @@ def delete_object(
     octopoes.commit()
 
 
+@router.delete("/origins", tags=["Origins"])
+def delete_origin(
+    origin_id: str,
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+) -> None:
+    origin = octopoes.origin_repository.get(origin_id, valid_time)
+    octopoes.origin_repository.delete(origin, valid_time)
+    octopoes.commit()
+
+
 @router.post("/objects/delete_many", tags=["Objects"])
 def delete_many(
     octopoes: OctopoesService = Depends(octopoes_service),
@@ -282,6 +293,8 @@ def get_tree(
 def list_origins(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
+    offset: int = 0,
+    limit: int | None = None,
     source: Reference | None = Query(None),
     result: Reference | None = Query(None),
     task_id: uuid.UUID | None = Query(None),
@@ -290,6 +303,8 @@ def list_origins(
     return octopoes.origin_repository.list_origins(
         valid_time,
         task_id=task_id,
+        offset=offset,
+        limit=limit,
         source=source,
         result=result,
         origin_type=origin_type,

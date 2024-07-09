@@ -132,6 +132,8 @@ class OctopoesAPIConnector:
     def list_origins(
         self,
         valid_time: datetime,
+        offset: int = DEFAULT_OFFSET,
+        limit: int = DEFAULT_LIMIT,
         source: Reference | None = None,
         result: Reference | None = None,
         task_id: UUID | None = None,
@@ -141,6 +143,8 @@ class OctopoesAPIConnector:
             "valid_time": str(valid_time),
             "source": source,
             "result": result,
+            "offset": offset,
+            "limit": limit,
             "task_id": str(task_id) if task_id else None,
             "origin_type": str(origin_type) if origin_type else None,
         }
@@ -151,6 +155,14 @@ class OctopoesAPIConnector:
         )
 
         return TypeAdapter(list[Origin]).validate_json(res.content)
+
+    def delete_origin(self, origin_id: str, valid_time: datetime) -> None:
+        params = {
+            "valid_time": str(valid_time),
+            "origin_id": origin_id,
+        }
+
+        self.session.delete(f"/{self.client}/origins", params=params)
 
     def save_observation(self, observation: Observation) -> None:
         self.session.post(

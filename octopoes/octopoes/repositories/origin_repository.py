@@ -35,6 +35,8 @@ class OriginRepository(Repository):
         valid_time: datetime,
         *,
         task_id: UUID | None = None,
+        offset: int = 0,
+        limit: int | None = None,
         source: Reference | None = None,
         result: Reference | None = None,
         origin_type: OriginType | None = None,
@@ -71,6 +73,8 @@ class XTDBOriginRepository(OriginRepository):
         valid_time: datetime,
         *,
         task_id: UUID | None = None,
+        offset: int = 0,
+        limit: int | None = None,
         source: Reference | None = None,
         result: Reference | None = None,
         origin_type: OriginType | None = None,
@@ -92,6 +96,8 @@ class XTDBOriginRepository(OriginRepository):
         query = generate_pull_query(
             FieldSet.ALL_FIELDS,
             where_parameters,
+            offset=offset,
+            limit=limit,
         )
 
         results = self.session.client.query(query, valid_time=valid_time)
