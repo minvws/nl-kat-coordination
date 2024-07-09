@@ -91,6 +91,10 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         if "ooi_class" in kwargs:
             del kwargs["ooi_class"]
 
+        observed_at = self.request.GET.get("observed_at")
+        if observed_at:
+            kwargs["observed_at"] = observed_at
+
         return kwargs
 
     def get_ooi_options(self) -> list[tuple[str, str]]:
@@ -98,6 +102,6 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
             set(OOI_TYPES.values()), valid_time=datetime.now(timezone.utc)
         ).items
 
-        # generate options
-        for option in objects:
-            yield (option.primary_key, option.get_ooi_type()) 
+        options = [(o.primary_key, o.get_ooi_type()) for o in objects]
+
+        return options

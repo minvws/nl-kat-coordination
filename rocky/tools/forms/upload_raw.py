@@ -32,13 +32,14 @@ class UploadRawForm(BaseRockyForm):
 
     ooi_id = forms.CharField(
         label="Input or Scan OOI",
-        widget=DataListInput(attrs={"placeholder": _("Click to select one of the available options, or type one yourself")}),
+        widget=DataListInput(
+            attrs={"placeholder": _("Click to select one of the available options, or type one yourself")}
+        ),
     )
 
     date = forms.DateTimeField(
         label=_("Date/Time (UTC)"),
         widget=DateTimeInput(format="%Y-%m-%dT%H:%M"),
-        initial=lambda: datetime.now(tz=timezone.utc),
         help_text=RAW_FILE_DATETIME_HELP_TEXT,
     )
 
@@ -49,9 +50,21 @@ class UploadRawForm(BaseRockyForm):
         *args,
         **kwargs,
     ):
+        observed_at = kwargs.pop("observed_at", None)
         super().__init__(*args, **kwargs)
         self.octopoes_connector = connector
         self.set_choices_for_widget("ooi_id", ooi_list)
+
+        if observed_at:
+            try:
+                parsed_date = (
+                    datetime.strptime(observed_at, "%Y-%m-%d").replace(tzinfo=timezone.utc).replace(hour=23, minute=59)
+                )
+                self.fields["date"].initial = parsed_date
+            except ValueError:
+                self.fields["date"].initial = datetime.now(tz=timezone.utc)
+        else:
+            self.fields["date"].initial = datetime.now(tz=timezone.utc)
 
     def clean_mime_types(self) -> set[str]:
         mime_types = self.cleaned_data["mime_types"]
