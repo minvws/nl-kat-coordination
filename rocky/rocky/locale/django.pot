@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-27 09:18+0000\n"
+"POT-Creation-Date: 2024-07-09 07:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5047,11 +5047,23 @@ msgid "Parameters"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
-msgid "Observed by"
+msgid "Last observed by"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 msgid "Task ID"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html
+msgid "When"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html
+msgid "The boefje has since been deleted / disabled."
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html
+msgid "No Raw file could be found, this might point to an error in OpenKAT"
 msgstr ""
 
 #: rocky/templates/oois/ooi_edit.html
