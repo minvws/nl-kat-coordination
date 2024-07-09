@@ -314,6 +314,7 @@ def save_observation(
         origin_type=OriginType.OBSERVATION,
         method=observation.method,
         source=observation.source,
+        source_method=observation.source_method,
         result=[ooi.reference for ooi in observation.result],
         task_id=observation.task_id,
     )
@@ -330,6 +331,7 @@ def save_declaration(
         origin_type=OriginType.DECLARATION,
         method=declaration.method if declaration.method else "manual",
         source=declaration.ooi.reference,
+        source_method=declaration.source_method,
         result=[declaration.ooi.reference],
         task_id=declaration.task_id if declaration.task_id else uuid.uuid4(),
     )
@@ -346,6 +348,7 @@ def save_affirmation(
         origin_type=OriginType.AFFIRMATION,
         method=affirmation.method if affirmation.method else "hydration",
         source=affirmation.ooi.reference,
+        source_method=affirmation.source_method,
         result=[affirmation.ooi.reference],
         task_id=affirmation.task_id if affirmation.task_id else uuid.uuid4(),
     )

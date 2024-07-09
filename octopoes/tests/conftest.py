@@ -421,8 +421,9 @@ def seed_system(xtdb_ooi_repository: XTDBOOIRepository, xtdb_origin_repository: 
 
     network_origin = Origin(
         origin_type=OriginType.DECLARATION,
-        method="manual",
+        method="kat_manual_csv",
         source=network.reference,
+        source_method="manual",
         result=[network.reference],
         task_id=uuid.uuid4(),
     )
@@ -433,6 +434,7 @@ def seed_system(xtdb_ooi_repository: XTDBOOIRepository, xtdb_origin_repository: 
         origin_type=OriginType.OBSERVATION,
         method="",
         source=network.reference,
+        source_method="manual",
         result=[ooi.reference for ooi in oois],
         task_id=uuid.uuid4(),
     )

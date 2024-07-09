@@ -10,8 +10,8 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
 from octopoes.models.ooi.dns.records import DNSAAAARecord, DNSARecord, DNSMXRecord, DNSNSRecord
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.findings import RiskLevelSeverity, Finding, KATFindingType
-from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol, PortState
+from octopoes.models.ooi.findings import Finding, KATFindingType, RiskLevelSeverity
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, PortState, Protocol
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.web import Website
 from octopoes.models.origin import OriginType
@@ -35,6 +35,7 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
         Observation(
             method="normalizer_id",
             source=network.reference,
+            source_method="manual",
             task_id=task_id,
             valid_time=valid_time,
             result=hostnames,
@@ -56,6 +57,7 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
         "method": "normalizer_id",
         "origin_type": OriginType.OBSERVATION,
         "source": network.reference,
+        "source_method": "manual",
         "result": [hostname.reference for hostname in hostnames],
         "task_id": task_id,
     }
@@ -154,6 +156,7 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
         Observation(
             method="normalizer_id",
             source=network.reference,
+            source_method="manual",
             task_id=uuid.uuid4(),
             valid_time=valid_time,
             result=all_new_oois,
@@ -245,6 +248,7 @@ def test_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector, valid_
         Observation(
             method="kat_nmap_normalize",
             source=ip.reference,
+            source_method="nmap-tcp",
             task_id=uuid.uuid4(),
             valid_time=valid_time,
             result=[ip, ip_port],
@@ -258,11 +262,13 @@ def test_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector, valid_
     octopoes_api_connector.recalculate_bits()
     findings = octopoes_api_connector.list_findings({severity for severity in RiskLevelSeverity}, valid_time)
 
-    assert findings.items == [Finding(
-        finding_type=KATFindingType(id="KAT-OPEN-DATABASE-PORT").reference,
-        description='Port 3306/tcp is a database port and should not be open.',
-        ooi=ip_port.reference,
-    )]
+    assert findings.items == [
+        Finding(
+            finding_type=KATFindingType(id="KAT-OPEN-DATABASE-PORT").reference,
+            description="Port 3306/tcp is a database port and should not be open.",
+            ooi=ip_port.reference,
+        )
+    ]
 
     ip_port = IPPort(
         address=ip.reference,
@@ -274,6 +280,7 @@ def test_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector, valid_
         Observation(
             method="kat_nmap_normalize",
             source=ip.reference,
+            source_method="nmap-tcp",
             task_id=uuid.uuid4(),
             valid_time=valid_time,
             result=[ip, ip_port],
