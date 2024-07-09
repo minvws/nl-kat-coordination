@@ -406,7 +406,7 @@ class OctopoesService:
             relevant_bits = [bit for bit in get_bit_definitions().values() if bit.config_ooi_relation_path is not None]
             inference_origins = list(
                 {
-                    id(x): x
+                    x.task_id: x
                     for x in chain.from_iterable(
                         map(lambda x: self.origin_repository.list_origins(event.valid_time, method=x.id), relevant_bits)
                     )
