@@ -10,8 +10,8 @@ WORKDIR /app/octopoes
 
 ENTRYPOINT ["/app/octopoes/entrypoint.sh"]
 
-RUN groupadd --gid $USER_GID octopoes
-RUN adduser --disabled-password --gecos '' --uid $USER_UID --gid $USER_GID octopoes
+RUN groupadd --gid "$USER_GID" octopoes
+RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" octopoes
 
 ENV PATH=/home/octopoes/.local/bin:${PATH}
 
