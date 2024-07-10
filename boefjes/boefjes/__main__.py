@@ -20,7 +20,7 @@ structlog.configure(
         structlog.stdlib.PositionalArgumentsFormatter(),
         structlog.processors.TimeStamper("iso", utc=False),
         (
-            structlog.dev.ConsoleRenderer(pad_level=False)
+            structlog.dev.ConsoleRenderer(colors=True, pad_level=False)
             if settings.logging_format == "text"
             else structlog.processors.JSONRenderer()
         ),
