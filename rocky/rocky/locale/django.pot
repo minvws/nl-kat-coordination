@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-03 14:31+0000\n"
+"POT-Creation-Date: 2024-07-10 15:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -566,6 +566,24 @@ msgid ""
 "We couldn't send a password reset link. Contact your system administrator."
 msgstr ""
 
+#: components/modal/template.html
+#: reports/templates/partials/export_report_settings.html
+msgid "Close modal"
+msgstr ""
+
+#: components/modal/template.html
+#: katalogus/templates/change_clearance_level.html
+#: katalogus/templates/confirmation_clone_settings.html
+#: katalogus/templates/plugin_settings_delete.html
+#: reports/templates/partials/export_report_settings.html
+#: rocky/templates/oois/ooi_delete.html
+#: rocky/templates/oois/ooi_mute_finding.html
+#: rocky/templates/organizations/organization_edit.html
+#: rocky/templates/organizations/organization_member_edit.html
+#: rocky/templates/two_factor/_wizard_actions.html
+msgid "Cancel"
+msgstr ""
+
 #: crisis_room/views.py
 msgid ""
 "Failed to get list of findings for organization {}, check server logs for "
@@ -745,18 +763,6 @@ msgstr ""
 #: katalogus/templates/change_clearance_level.html
 #: rocky/templates/oois/ooi_detail.html
 msgid "Scan"
-msgstr ""
-
-#: katalogus/templates/change_clearance_level.html
-#: katalogus/templates/confirmation_clone_settings.html
-#: katalogus/templates/plugin_settings_delete.html
-#: reports/templates/partials/export_report_settings.html
-#: rocky/templates/oois/ooi_delete.html
-#: rocky/templates/oois/ooi_mute_finding.html
-#: rocky/templates/organizations/organization_edit.html
-#: rocky/templates/organizations/organization_member_edit.html
-#: rocky/templates/two_factor/_wizard_actions.html
-msgid "Cancel"
 msgstr ""
 
 #: katalogus/templates/clone_settings.html
@@ -2599,7 +2605,6 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/concatenated_report/report.py
-#: reports/views/generate_report.py
 msgid "Concatenated Report"
 msgstr ""
 
@@ -3374,10 +3379,6 @@ msgid "Edit "
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-msgid "Close modal"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
 msgid ""
 "\n"
 "                                        Give your report a custom name and "
@@ -3938,7 +3939,22 @@ msgstr ""
 
 #: reports/views/generate_report.py
 #, python-brace-format
-msgid "Concatenated Report for {report_type}"
+msgid "Concatenated Report for {oois_count} objects"
+msgstr ""
+
+#: reports/views/generate_report.py
+#, python-brace-format
+msgid "Concatenated Report for {ooi}"
+msgstr ""
+
+#: reports/views/generate_report.py
+#, python-brace-format
+msgid "{report_type} for {oois_count} objects"
+msgstr ""
+
+#: reports/views/generate_report.py
+#, python-brace-format
+msgid "{report_type} for {ooi}"
 msgstr ""
 
 #: reports/views/multi_report.py
@@ -4515,6 +4531,14 @@ msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] ""
 msgstr[1] ""
+
+#: rocky/templates/admin/change_list.html
+msgid "Hide counts"
+msgstr ""
+
+#: rocky/templates/admin/change_list.html
+msgid "Show counts"
+msgstr ""
 
 #: rocky/templates/admin/change_list.html
 msgid "Clear all filters"

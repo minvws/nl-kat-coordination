@@ -6,8 +6,8 @@ ARG USER_GID=1000
 
 ENTRYPOINT ["/app/boefjes/entrypoint.sh"]
 
-RUN groupadd --gid $USER_GID nonroot
-RUN adduser --disabled-password --gecos '' --uid $USER_UID --gid $USER_GID nonroot
+RUN groupadd --gid "$USER_GID" nonroot
+RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" nonroot
 
 WORKDIR /app/boefjes
 ENV PATH=/home/nonroot/.local/bin:${PATH}

@@ -1,6 +1,6 @@
 from abc import ABC
 
-from boefjes.katalogus.models import Boefje, Normalizer, Organisation, PluginType
+from boefjes.models import Boefje, Normalizer, Organisation, PluginType
 
 
 class StorageError(Exception):
@@ -37,14 +37,23 @@ class PluginStateNotFound(NotFound):
         super().__init__(f"State for plugin with id '{plugin_id}' not found for organisation '{organisation_id}'")
 
 
-class ExistingPluginId(StorageError):
-    def __init__(self, plugin_id: str):
-        super().__init__(f"Plugin id '{plugin_id}' is already used")
-
-
-class SettingsNotFound(NotFound):
+class ConfigNotFound(NotFound):
     def __init__(self, organisation_id: str, plugin_id: str):
         super().__init__(f"Setting not found for organisation '{organisation_id}' and plugin '{plugin_id}'")
+
+
+class NotAllowed(StorageError):
+    """Generic exception for operations that are not allowed at a domain level"""
+
+
+class CannotUpdateStaticPlugin(NotAllowed):
+    def __init__(self, plugin_id: str):
+        super().__init__(f"Plugin with id '{plugin_id}' is static, so updating it is not allowed")
+
+
+class ExistingPluginId(NotAllowed):
+    def __init__(self, plugin_id: str):
+        super().__init__(f"Plugin id '{plugin_id}' is already used")
 
 
 class OrganisationStorage(ABC):
@@ -102,38 +111,26 @@ class PluginStorage(ABC):
         raise NotImplementedError
 
 
-class SettingsStorage(ABC):
+class ConfigStorage(ABC):
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type: type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
         pass
 
-    def get_all(self, organisation_id: str, plugin_id: str) -> dict[str, str]:
+    def get_all_settings(self, organisation_id: str, plugin_id: str) -> dict[str, str]:
         raise NotImplementedError
 
-    def upsert(self, values: dict, organisation_id: str, plugin_id: str) -> None:
+    def upsert(
+        self, organisation_id: str, plugin_id: str, settings: dict | None = None, enabled: bool | None = None
+    ) -> None:
         raise NotImplementedError
 
     def delete(self, organisation_id: str, plugin_id: str) -> None:
         raise NotImplementedError
 
-
-class PluginEnabledStorage(ABC):
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type: type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
-        pass
-
-    def get_by_id(self, plugin_id: str, organisation_id: str) -> bool:
+    def is_enabled_by_id(self, plugin_id: str, organisation_id: str) -> bool:
         raise NotImplementedError
 
-    def get_all_enabled(self, organisation_id: str) -> list[str]:
-        raise NotImplementedError
-
-    def create(self, plugin_id: str, enabled: bool, organisation_id: str) -> None:
-        raise NotImplementedError
-
-    def update_or_create_by_id(self, plugin_id: str, enabled: bool, organisation_id: str) -> None:
+    def get_enabled_boefjes(self, organisation_id: str) -> list[str]:
         raise NotImplementedError

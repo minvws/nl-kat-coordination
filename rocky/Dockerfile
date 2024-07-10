@@ -19,8 +19,8 @@ ARG USER_GID=1000
 
 ENTRYPOINT ["/app/rocky/entrypoint.sh"]
 
-RUN groupadd --gid $USER_GID rocky
-RUN adduser --disabled-password --gecos '' --uid $USER_UID --gid $USER_GID rocky
+RUN groupadd --gid "$USER_GID" rocky
+RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" rocky
 
 WORKDIR /app/rocky
 
