@@ -66,7 +66,9 @@ class Server:
 
             resource = Resource(attributes={SERVICE_NAME: "mula"})
             provider = TracerProvider(resource=resource)
-            processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=str(self.config.host_metrics)))
+            processor = BatchSpanProcessor(
+                OTLPSpanExporter(endpoint=str(self.config.host_metrics))
+            )
             provider.add_span_processor(processor)
             trace.set_tracer_provider(provider)
 
@@ -299,14 +301,17 @@ class Server:
         plugin_id: str | None = None,  # FIXME: deprecated
         filters: storage.filters.FilterRequest | None = None,
     ) -> Any:
-        if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
+        if (
+            min_created_at is not None and max_created_at is not None
+        ) and min_created_at > max_created_at:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
                 detail="min_date must be less than max_date",
             )
 
         # FIXME: deprecated; backwards compatibility for rocky that uses the
-        # input_ooi and plugin_id parameters.
+        # input_ooi and plugin_id parameters. These filter options should be
+        # defined in the filter request payload not as query parameters.
         f_req = filters or storage.filters.FilterRequest(filters={})
         if input_ooi is not None:
             if task_type == "boefje":
@@ -351,6 +356,9 @@ class Server:
 
             f_req.filters.update(f_ooi)  # type: ignore
 
+        # FIXME: deprecated; backwards compatibility for rocky that uses the
+        # input_ooi and plugin_id parameters. These filter options should be
+        # defined in the filter request payload not as query parameters.
         if plugin_id is not None:
             if task_type == "boefje":
                 f_plugin = {
@@ -364,12 +372,16 @@ class Server:
                     ]
                 }
             elif task_type == "normalizer":
-                f_plugin = storage.filters.Filter(
-                    column="p_item",
-                    field="data__normalizer__id",
-                    operator="eq",
-                    value=plugin_id,
-                )
+                f_plugin = {
+                    "and": [
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__normalizer__id",
+                            operator="eq",
+                            value=plugin_id,
+                        )
+                    ]
+                }
             else:
                 f_plugin = {
                     "or": [
@@ -487,9 +499,13 @@ class Server:
 
         return updated_task
 
-    def get_task_stats(self, scheduler_id: str | None = None) -> dict[str, dict[str, int]] | None:
+    def get_task_stats(
+        self, scheduler_id: str | None = None
+    ) -> dict[str, dict[str, int]] | None:
         try:
-            stats = self.ctx.datastores.task_store.get_status_count_per_hour(scheduler_id)
+            stats = self.ctx.datastores.task_store.get_status_count_per_hour(
+                scheduler_id
+            )
         except Exception as exc:
             self.logger.exception(exc)
             self.logger.exception(exc)
@@ -501,7 +517,10 @@ class Server:
         return stats
 
     def get_queues(self) -> Any:
-        return [models.Queue(**s.queue.dict(include_pq=False)) for s in self.schedulers.copy().values()]
+        return [
+            models.Queue(**s.queue.dict(include_pq=False))
+            for s in self.schedulers.copy().values()
+        ]
 
     def get_queue(self, queue_id: str) -> Any:
         s = self.schedulers.get(queue_id)
@@ -520,7 +539,9 @@ class Server:
 
         return models.Queue(**q.dict())
 
-    def pop_queue(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
+    def pop_queue(
+        self, queue_id: str, filters: storage.filters.FilterRequest | None = None
+    ) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(

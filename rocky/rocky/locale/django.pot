@@ -4496,6 +4496,14 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: rocky/templates/admin/change_list.html
+msgid "Hide counts"
+msgstr ""
+
+#: rocky/templates/admin/change_list.html
+msgid "Show counts"
+msgstr ""
+
+#: rocky/templates/admin/change_list.html
 msgid "Clear all filters"
 msgstr ""
 
