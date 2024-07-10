@@ -9,16 +9,14 @@ from django.utils.translation import gettext_lazy as _
 from httpx import HTTPError, HTTPStatusError
 from rest_framework.status import HTTP_404_NOT_FOUND
 
-from katalogus.client import Boefje as KATalogusBoefje
-from katalogus.client import KATalogusClientV1, get_katalogus
-from katalogus.client import Normalizer as KATalogusNormalizer
+from katalogus.client import KATalogusClientV1, Plugin, get_katalogus
 
 logger = getLogger(__name__)
 
 
 class SinglePluginView(OrganizationView):
     katalogus_client: KATalogusClientV1
-    plugin: KATalogusBoefje | KATalogusNormalizer
+    plugin: Plugin
 
     def setup(self, request, *args, plugin_id: str, **kwargs):
         """

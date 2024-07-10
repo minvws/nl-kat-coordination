@@ -10,7 +10,7 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
 
-from katalogus.client import Boefje, get_katalogus
+from katalogus.client import Boefje, Normalizer, get_katalogus
 from katalogus.views.plugin_settings_list import PluginSettingsListView
 from rocky.views.tasks import TaskListView
 
@@ -27,8 +27,6 @@ class PluginCoverImgView(OrganizationView):
 
 
 class PluginDetailView(TaskListView, PluginSettingsListView):
-    paginate_by = 10
-
     def post(self, request, *args, **kwargs):
         if self.action == self.SCAN_OOIS:
             selected_oois = request.POST.getlist("ooi", [])
@@ -92,11 +90,13 @@ class PluginDetailView(TaskListView, PluginSettingsListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["plugin"] = self.plugin.model_dump()
+        context["plugin_settings"] = self.get_plugin_settings()
         return context
 
 
 class NormalizerDetailView(PluginDetailView):
     template_name = "normalizer_detail.html"
+    plugin: Normalizer
     task_type = "normalizer"
 
     def get_context_data(self, **kwargs):
