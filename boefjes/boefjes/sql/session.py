@@ -3,7 +3,7 @@ import logging
 from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm import Session
 
-from boefjes.katalogus.storage.interfaces import StorageError
+from boefjes.storage.interfaces import StorageError
 
 logger = logging.getLogger(__name__)
 

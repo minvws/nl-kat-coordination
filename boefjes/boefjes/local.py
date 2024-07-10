@@ -13,7 +13,7 @@ from boefjes.job_models import (
     NormalizerResults,
     ObservationsWithoutInputOOI,
 )
-from boefjes.katalogus.local_repository import LocalPluginRepository
+from boefjes.local_repository import LocalPluginRepository
 from boefjes.runtime_interfaces import BoefjeJobRunner, JobRuntimeError, NormalizerJobRunner
 from octopoes.models import OOI, DeclaredScanProfile
 
