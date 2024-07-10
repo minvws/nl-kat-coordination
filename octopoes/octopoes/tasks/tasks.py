@@ -44,6 +44,8 @@ structlog.configure(
     wrapper_class=structlog.stdlib.BoundLogger,
     cache_logger_on_first_use=True,
 )
+
+
 @worker_process_shutdown.connect
 def shutdown_worker(**kwargs):
     close_rabbit_channel(str(settings.queue_uri))
