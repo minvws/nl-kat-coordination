@@ -160,11 +160,12 @@ class Scheduler(abc.ABC):
                 queues.errors.NotAllowedError,
                 queues.errors.QueueFullError,
                 queues.errors.InvalidItemError,
-            ):
+            ) as exc:
                 self.logger.debug(
-                    "Unable to push item %s to queue %s",
+                    "Unable to push item %s to queue %s (%s)",
                     item.id,
                     self.queue.pq_id,
+                    exc,
                     item_id=item.id,
                     queue_id=self.queue.pq_id,
                     scheduler_id=self.scheduler_id,
@@ -215,7 +216,7 @@ class Scheduler(abc.ABC):
 
         self.push_item_to_queue(item)
 
-    def push_item_to_queue(self, item: models.Task) -> None:
+    def push_item_to_queue(self, item: models.Task) -> models.Task:
         """Push a PrioritizedItem to the queue.
 
         Args:
@@ -260,7 +261,7 @@ class Scheduler(abc.ABC):
             raise exc
         except queues.errors.InvalidItemError as exc:
             self.logger.warning(
-                "Invalid prioritized item %s",
+                "Invalid item %s",
                 item.id,
                 item_id=item.id,
                 queue_id=self.queue.pq_id,
@@ -281,7 +282,7 @@ class Scheduler(abc.ABC):
 
         self.post_push(item)
 
-        # TODO: return item
+        return item
 
     def post_push(self, item: models.Task) -> None:
         """After an in item is pushed to the queue, we execute this function
@@ -321,10 +322,6 @@ class Scheduler(abc.ABC):
         if schedule_db.enabled is False:
             return
 
-        # NOTE: here you can evaluate the schedule for the task
-        # and update the schedule with a new cron expression
-
-        # TODO: maybe method set_new_deadline
         schedule_db.deadline_at = cron.next_run(schedule_db.schedule)
         self.ctx.datastores.schedule_store.update_schedule(schedule_db)
 
@@ -396,9 +393,18 @@ class Scheduler(abc.ABC):
 
         self.last_activity = datetime.now(timezone.utc)
 
-    # TODO: test this
-    # TODO: rename to evaluate_schedule_for_task
     def calculate_deadline(self, task: models.Task) -> datetime:
+        """Calculate the deadline for a task.
+
+        NOTE: This is a simple implementation, you can override this method
+        to implement a more complex logic.
+
+        Args:
+            task: The task to calculate the deadline for.
+
+        Returns:
+            The deadline for the task.
+        """
         # We at least delay a job by the grace period
         minimum = self.ctx.config.pq_grace_period
         deadline = datetime.now(timezone.utc) + timedelta(seconds=minimum)

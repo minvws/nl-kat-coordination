@@ -4,7 +4,10 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
+from structlog.testing import capture_logs
+
 from scheduler import config, models, queues, storage
+from tests.mocks import item as mock_item
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
 from tests.mocks import task as mock_task
@@ -37,7 +40,7 @@ class SchedulerTestCase(unittest.TestCase):
         queue = mock_queue.MockPriorityQueue(
             pq_id=identifier,
             maxsize=self.mock_ctx.config.pq_maxsize,
-            item_type=mock_task.MockTask,
+            item_type=mock_item.MockData,
             allow_priority_updates=True,
             pq_store=self.mock_ctx.datastores.pq_store,
         )
@@ -55,7 +58,37 @@ class SchedulerTestCase(unittest.TestCase):
         self.dbconn.engine.dispose()
 
     def test_push_items_to_queue(self):
-        pass
+        # Arrange
+        items = []
+        for i in range(10):
+            item = functions.create_item(
+                scheduler_id=self.scheduler.scheduler_id,
+                priority=i + 1,
+            )
+            items.append(item)
+
+        # Act
+        self.scheduler.push_items_to_queue(items)
+
+        # Assert
+        self.assertEqual(10, self.scheduler.queue.qsize())
+
+        for i, item in enumerate(items):
+            # Task should be on priority queue
+            pq_item = self.scheduler.queue.peek(i)
+            self.assertEqual(pq_item.id, item.id)
+
+            # Task should be in datastore, and queued
+            task_db = self.mock_ctx.datastores.task_store.get_task(str(item.id))
+            self.assertEqual(task_db.id, item.id)
+            self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+            # Schedule should be in datastore
+            schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
+                task_db.schedule_id
+            )
+            self.assertIsNotNone(schedule_db)
+            self.assertEqual(schedule_db.id, task_db.schedule_id)
 
     def test_push_item_to_queue(self):
         # Arrange
@@ -84,20 +117,53 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertIsNotNone(schedule_db)
         self.assertEqual(schedule_db.id, task_db.schedule_id)
 
-    def test_push_item_to_queue_with_timeout(self):
-        pass
-
     def test_push_item_to_queue_full(self):
-        pass
+        # Arrange
+        item = functions.create_item(
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+        )
+
+        self.scheduler.queue.maxsize = 1
+
+        # Act
+        self.scheduler.push_item_to_queue_with_timeout(item=item, max_tries=1)
+
+        # Assert
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+        with self.assertRaises(queues.errors.QueueFullError):
+            self.scheduler.push_item_to_queue_with_timeout(item=item, max_tries=1)
+
+        self.assertEqual(1, self.scheduler.queue.qsize())
 
     def test_push_item_to_queue_invalid(self):
-        pass
+        # Arrange
+        item = functions.create_item(
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+        )
+        item.data = {"invalid": "data"}
 
-    def test_push_item_to_queue_not_allowed(self):
-        pass
+        # Assert
+        with self.assertRaises(queues.errors.InvalidItemError):
+            self.scheduler.push_item_to_queue(item)
 
     def test_pop_item_from_queue(self):
-        pass
+        # Arrange
+        item = functions.create_item(
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+        )
+
+        self.scheduler.push_item_to_queue(item)
+
+        # Act
+        popped_item = self.scheduler.pop_item_from_queue()
+
+        # Assert
+        self.assertEqual(0, self.scheduler.queue.qsize())
+        self.assertEqual(item.id, popped_item.id)
 
     def test_pop_item_from_queue_empty(self):
         pass
@@ -137,24 +203,90 @@ class SchedulerTestCase(unittest.TestCase):
         # Assert: deadline should be in the future, at least later than the
         # grace period
         self.assertGreater(
-            schedule_db.created_at
-            + timedelta(seconds=self.mock_ctx.config.pq_grace_period),
             schedule_db.deadline_at,
+            datetime.now(timezone.utc),
         )
 
-    def test_post_push_without_schedule(self):
-        pass
-
     def test_post_push_schedule_enabled(self):
-        # make sure that the deadline is set at least to the
+        # Arrange
+        item = functions.create_item(
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+        )
+
+        # Act
+        self.scheduler.push_item_to_queue(item)
+
+        # Assert: Task should be on priority queue
+        pq_item = self.scheduler.queue.peek(0)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(pq_item.id, item.id)
+
+        # Assert: Task should be in datastore, and queued
+        task_db = self.mock_ctx.datastores.task_store.get_task(str(item.id))
+        self.assertEqual(task_db.id, item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Assert: Schedule should be in datastore
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
+            task_db.schedule_id
+        )
+        self.assertIsNotNone(schedule_db)
+        self.assertEqual(schedule_db.id, task_db.schedule_id)
+
+        # Assert: schedule should have a deadline
+        self.assertIsNotNone(schedule_db.deadline_at)
+        self.assertIsNotNone(schedule_db.schedule)
+
+        # Assert: deadline should be in the future, at least later than the
         # grace period
-        pass
+        self.assertGreater(
+            schedule_db.deadline_at,
+            datetime.now(timezone.utc),
+        )
 
     def test_post_push_schedule_disabled(self):
         pass
 
-    def test_evaluate_schedule(self):
-        pass
+    def test_post_push_schedule_update_schedule(self):
+        # Arrange
+        first_item = functions.create_item(
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+        )
+
+        # Act
+        first_item_db = self.scheduler.push_item_to_queue(first_item)
+
+        initial_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
+            first_item_db.schedule_id
+        )
+
+        # pop
+        self.scheduler.pop_item_from_queue()
+
+        # Act
+        second_item = first_item_db.copy()
+        second_item.id = uuid.uuid4()
+        second_item_db = self.scheduler.push_item_to_queue(second_item)
+
+        updated_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
+            second_item_db.schedule_id
+        )
+
+        # Assert
+        self.assertEqual(initial_schedule_db.id, updated_schedule_db.id)
+        self.assertNotEqual(
+            updated_schedule_db.deadline_at, initial_schedule_db.deadline_at
+        )
+
+        # There should be only one schedule
+        schedules, _ = self.mock_ctx.datastores.schedule_store.get_schedules(
+            self.scheduler.scheduler_id
+        )
+        breakpoint()
+
+        self.assertEqual(1, len(schedules))
 
     def test_post_pop(self):
         """When a task is popped from the queue, it should be removed from the database"""

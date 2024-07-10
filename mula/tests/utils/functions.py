@@ -17,7 +17,7 @@ class TestModel(pydantic.BaseModel):
     id: str
     name: str
     count: int = 0
-    categories: list[str] = None
+    categories: list[str] | None = None
     child: Any = None
 
     def __init__(self, **data: Any):

@@ -2,10 +2,13 @@ import time
 
 from scheduler import schedulers
 
+from ..utils import functions
 from . import listener
 
 
 class MockScheduler(schedulers.Scheduler):
+    ITEM_TYPE = functions.TestModel
+
     def run(self) -> None:
         # Listener
         self.listeners["mock-listener"] = listener.MockListener()

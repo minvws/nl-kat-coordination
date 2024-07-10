@@ -30,6 +30,7 @@ class ScheduleStore:
         filters: FilterRequest | None = None,
     ) -> tuple[list[models.Schedule], int]:
         with self.dbconn.session.begin() as session:
+            breakpoint()
             query = session.query(models.ScheduleDB)
 
             if enabled is not None:
