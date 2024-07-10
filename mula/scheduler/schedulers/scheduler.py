@@ -201,6 +201,7 @@ class Scheduler(abc.ABC):
                 scheduler_id=self.scheduler_id,
             )
             raise queues.errors.NotAllowedError("Scheduler is disabled")
+
         try:
             self.queue.push(p_item)
         except queues.errors.NotAllowedError as exc:
