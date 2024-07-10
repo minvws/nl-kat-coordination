@@ -20,7 +20,7 @@ from octopoes.tasks.app import app
 from octopoes.xtdb.client import XTDBSession
 
 settings = Settings()
-logger = getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 try:
     with Path(settings.log_cfg).open() as log_config:
