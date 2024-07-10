@@ -5,7 +5,6 @@ from typing import Any
 
 import structlog
 
-from boefjes.katalogus.models import PluginType
 from boefjes.models import PluginType
 from boefjes.plugins.models import (
     BOEFJE_DEFINITION_FILE,
