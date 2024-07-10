@@ -1,7 +1,7 @@
 import timeit
 import uuid
 from datetime import datetime, timezone
-from logging import config, getLogger
+from logging import config
 from pathlib import Path
 
 import structlog
