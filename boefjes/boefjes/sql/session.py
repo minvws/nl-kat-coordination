@@ -2,7 +2,7 @@ import structlog
 from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm import Session
 
-from boefjes.katalogus.storage.interfaces import StorageError
+from boefjes.storage.interfaces import StorageError
 
 logger = structlog.get_logger(__name__)
 

@@ -489,6 +489,8 @@ WEASYPRINT_BASEURL = env("WEASYPRINT_BASEURL", default="http://127.0.0.1:8000/")
 
 KNOX_TOKEN_MODEL = "account.AuthToken"
 
+FORMS_URLFIELD_ASSUME_HTTPS = True
+
 # Logging format ("text" or "json")
 LOGGING_FORMAT = env("LOGGING_FORMAT", default="text")
 
@@ -511,3 +513,4 @@ structlog.configure(
     wrapper_class=structlog.stdlib.BoundLogger,
     cache_logger_on_first_use=True,
 )
+
