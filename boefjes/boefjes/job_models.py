@@ -19,6 +19,7 @@ class Job(BaseModel):
     id: UUID
     started_at: AwareDatetime | None = Field(default=None)
     ended_at: AwareDatetime | None = Field(default=None)
+    remote: bool = Field(default=False)
 
     @property
     def runtime(self) -> timedelta | None:
@@ -33,6 +34,7 @@ class Boefje(BaseModel):
 
     id: Annotated[str, StringConstraints(min_length=1)]
     version: str | None = Field(default=None)
+    remote: bool = Field(default=False)
 
 
 class Normalizer(BaseModel):

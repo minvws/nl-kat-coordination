@@ -29,10 +29,13 @@
         "DNSSOARecord",
         "DNSCNAMERecord"
       ],
-      "dispatches": null
+      "dispatches": null,
+      "remote": false
     },
     "input_ooi": "Hostname|internet|test.test",
     "organization": "_dev",
-    "dispatches": []
-  }
+    "dispatches": [],
+    "remote": false
+  },
+  "remote": false
 }
