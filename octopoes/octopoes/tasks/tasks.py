@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from logging import config, getLogger
 from pathlib import Path
 
+import structlog
 import yaml
 from celery.signals import worker_process_init, worker_process_shutdown
 from celery.utils.log import get_task_logger
@@ -28,7 +29,21 @@ try:
 except FileNotFoundError:
     logger.warning("No log config found at: %s", settings.log_cfg)
 
-
+structlog.configure(
+    processors=[
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.add_log_level,
+        structlog.processors.StackInfoRenderer(),
+        structlog.dev.set_exc_info,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.TimeStamper("iso", utc=False),
+        structlog.dev.ConsoleRenderer(),
+    ],
+    context_class=dict,
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    wrapper_class=structlog.stdlib.BoundLogger,
+    cache_logger_on_first_use=True,
+)
 @worker_process_shutdown.connect
 def shutdown_worker(**kwargs):
     close_rabbit_channel(str(settings.queue_uri))
