@@ -172,16 +172,17 @@ class LazyTaskList:
 class SchedulerError(Exception):
     message: str = _("The Scheduler has an unexpected error. Check the Scheduler logs for further details.")
 
+    def __init__(self, *args: object, extra_message: str | None = None) -> None:
+        super().__init__(*args)
+        if extra_message is not None:
+            self.message = extra_message + self.message
+
     def __str__(self):
         return str(self.message)
 
 
 class SchedulerConnectError(SchedulerError):
-    def __init__(self, *args: object, extra_message: str | None = None) -> None:
-        super().__init__(*args)
-        self.message = _("Could not connect to Scheduler. Service is possibly down.")
-        if extra_message is not None:
-            self.message = extra_message + self.message
+    message = _("Could not connect to Scheduler. Service is possibly down.")
 
 
 class SchedulerValidationError(SchedulerError):
@@ -222,7 +223,7 @@ class SchedulerClient:
             res = self._client.get("/tasks", params=kwargs)
             return PaginatedTasksResponse.model_validate_json(res.content)
         except ValidationError:
-            raise SchedulerValidationError()
+            raise SchedulerValidationError(extra_message=_("Task list: "))
         except ConnectError:
             raise SchedulerConnectError(extra_message=_("Task list: "))
 
