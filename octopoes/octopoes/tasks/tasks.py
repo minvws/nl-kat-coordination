@@ -37,7 +37,7 @@ structlog.configure(
         structlog.dev.set_exc_info,
         structlog.stdlib.PositionalArgumentsFormatter(),
         structlog.processors.TimeStamper("iso", utc=False),
-        structlog.dev.ConsoleRenderer(),
+        structlog.dev.ConsoleRenderer(colors=True),
     ],
     context_class=dict,
     logger_factory=structlog.stdlib.LoggerFactory(),
