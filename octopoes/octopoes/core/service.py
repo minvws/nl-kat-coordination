@@ -30,6 +30,7 @@ from octopoes.models import (
 )
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
+from octopoes.models.ooi.config import Config
 from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import (
@@ -421,14 +422,20 @@ class OctopoesService:
         if event.new_data is None:
             raise ValueError("Update event new_data should not be None")
 
-        inference_origins = self.origin_repository.list_origins(event.valid_time, source=event.new_data.reference)
-        inference_params = self.origin_parameter_repository.list_by_reference(
-            event.new_data.reference, valid_time=event.valid_time
-        )
-        for inference_param in inference_params:
-            inference_origins.append(self.origin_repository.get(inference_param.origin_id, event.valid_time))
+        if isinstance(event.new_data, Config):
+            relevant_bit_ids = [
+                bit.id for bit in get_bit_definitions().values() if bit.config_ooi_relation_path is not None
+            ]
+            inference_origins = self.origin_repository.list_origins(event.valid_time, method=relevant_bit_ids)
+        else:
+            inference_origins = self.origin_repository.list_origins(event.valid_time, source=event.new_data.reference)
+            inference_params = self.origin_parameter_repository.list_by_reference(
+                event.new_data.reference, valid_time=event.valid_time
+            )
+            for inference_param in inference_params:
+                inference_origins.append(self.origin_repository.get(inference_param.origin_id, event.valid_time))
 
-        inference_origins = [o for o in inference_origins if o.origin_type == OriginType.INFERENCE]
+            inference_origins = [o for o in inference_origins if o.origin_type == OriginType.INFERENCE]
         for inference_origin in inference_origins:
             self._run_inference(inference_origin, event.valid_time)
 
