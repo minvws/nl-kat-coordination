@@ -101,10 +101,3 @@ class MultiReportStepsMixin(StepsMixin):
             },
         ]
         return steps
-
-
-def create_full_report_name(report_name, reference_date) -> str:
-    if reference_date:
-        return report_name + " (" + reference_date + ")"
-    else:
-        return report_name

@@ -24,7 +24,7 @@ from reports.views.base import (
     ReportTypeView,
     get_selection,
 )
-from reports.views.view_helpers import AggregateReportStepsMixin, create_full_report_name
+from reports.views.view_helpers import AggregateReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
 
 logger = logging.getLogger(__name__)
@@ -252,19 +252,10 @@ class ExportSetupAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggre
 
         return super().get(request, *args, **kwargs)
 
-    def post(self, *args, **kwargs) -> HttpResponse:
-        report_name = self.request.POST.get("report-name")
-        reference_date = str(self.request.POST.get("reference-date"))
-        return redirect(f"{self.get_current()}&report_name={report_name}&reference_date={reference_date}")
-
     def get_context_data(self, **kwargs):
-        report_name = self.request.GET.get("report_name", "") or _("Aggregate Report")
-        reference_date = self.request.GET.get("reference_date", "") or ""
-
         context = super().get_context_data(**kwargs)
         context["current_datetime"] = datetime.now(timezone.utc)
-        context["report_name"] = report_name
-        context["full_report_name"] = create_full_report_name(report_name, reference_date)
+        context["reports"] = [_("Aggregate Report")]
         return context
 
 
@@ -278,7 +269,7 @@ class SaveAggregateReportView(SaveAggregateReportMixin, BreadcrumbsAggregateRepo
     report_types: Sequence[type[Report]]
 
     def post(self, request, *args, **kwargs):
-        report_ooi = self.save_report(self.request.POST.get("full_report_name"))
+        report_ooi = self.save_report(self.request.POST.get("reports"))
 
         return redirect(
             reverse("view_report", kwargs={"organization_code": self.organization.code})

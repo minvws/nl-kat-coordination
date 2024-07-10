@@ -23,13 +23,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>{{ full_report_name }}</td>
-                            <td>
-                                <button class="icon ti-edit action-button modal-trigger"
-                                        data-target="{{ dialogid }}">Edit {{ dialogid }}</button>
-                            </td>
-                        </tr>
+                        {% for report in reports %}
+                            <tr>
+                                <td>{{ report }}</td>
+                                <td>
+                                    <button class="icon ti-edit action-button modal-trigger"
+                                            data-target="{{ dialogid }}">Edit {{ dialogid }}</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
                 <dialog class="modal {{ size }}"
@@ -38,7 +40,7 @@
                         id="{{ dialogid }}">
                     <div class="content-wrapper">
                         <section class="header">
-                            <h2>{% translate "Edit " %}{{ report_name }}</h2>
+                            <h2>{% translate "Edit " %}{{ old_report_name }}</h2>
                             <button class="icon-only ti-x close-modal-button"
                                     aria-label="{% translate "Close modal" %}"></button>
                         </section>
@@ -58,7 +60,7 @@
                                            name="report-name"
                                            type="text"
                                            autocomplete="on"
-                                           value="{{ report_name }}">
+                                           value="{{ old_report_name }}">
                                     <div>
                                         <label for="reference-date">{% translate "Add reference date" %}</label>
                                         <select id="reference-date" name="reference-date" required>
@@ -89,7 +91,7 @@
                 </dialog>
                 <form id="generate_report" class="inline" method="post" action="{{ next }}">
                     {% csrf_token %}
-                    <input type="hidden" name="full_report_name" value="{{ full_report_name }}">
+                    <input type="hidden" name="reports" value="{{ reports }}">
                     <button type="submit">
                         {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
                     </button>

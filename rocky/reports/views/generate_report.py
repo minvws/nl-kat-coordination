@@ -24,7 +24,7 @@ from reports.views.base import (
     ReportTypeView,
     get_selection,
 )
-from reports.views.view_helpers import GenerateReportStepsMixin, create_full_report_name
+from reports.views.view_helpers import GenerateReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -272,19 +272,11 @@ class ExportSetupGenerateReportView(
 
         return super().get(request, *args, **kwargs)
 
-    def post(self, *args, **kwargs) -> HttpResponse:
-        report_name = self.request.POST.get("report-name")
-        reference_date = str(self.request.POST.get("reference-date"))
-        return redirect(f"{self.get_current()}&report_name={report_name}&reference_date={reference_date}")
-
     def get_context_data(self, **kwargs):
-        report_name = self.request.GET.get("report_name", "") or create_report_name(self.oois_pk, self.report_types)
-        reference_date = self.request.GET.get("reference_date", "") or ""
-
+        reports = create_report_names(self.oois_pk, self.report_types)
         context = super().get_context_data(**kwargs)
         context["current_datetime"] = datetime.now(timezone.utc)
-        context["report_name"] = report_name
-        context["full_report_name"] = create_full_report_name(report_name, reference_date)
+        context["reports"] = reports
         return context
 
 
@@ -300,7 +292,7 @@ class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportV
     ooi_types = get_ooi_types_with_report()
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        report_ooi = self.save_report(request.POST.get("full_report_name"))
+        report_ooi = self.save_report(request.POST.get("reports"))
 
         return redirect(
             reverse("view_report", kwargs={"organization_code": self.organization.code})
@@ -309,11 +301,31 @@ class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportV
         )
 
 
-def create_report_name(oois_pk, report_types) -> str:
-    first_report_type = Reference.from_str(oois_pk[0]).human_readable
-    if len(report_types) > 1 and len(oois_pk) > 1:
-        return _("Concatenated Report")
-    elif len(report_types) > 1 and len(oois_pk) == 1:
-        return _("Concatenated Report for {report_type}").format(report_type=first_report_type)
-    else:
-        return report_types[0].name + " for " + first_report_type
+def create_report_names(oois_pk, report_types):
+    reports = {}
+    oois_count = len(oois_pk)
+    report_types_count = len(report_types)
+    ooi = Reference.from_str(oois_pk[0]).human_readable
+    report_type = report_types[0].name
+
+    # Create name for parent report
+    if not (report_types_count == 1 and oois_count == 1):
+        if report_types_count > 1 and oois_count > 1:
+            name = _("Concatenated Report for {oois_count} objects").format(
+                report_type=report_type, oois_count=oois_count
+            )
+        elif report_types_count > 1 and oois_count == 1:
+            name = _("Concatenated Report for {ooi}").format(ooi=ooi)
+        elif report_types_count == 1 and oois_count > 1:
+            name = _("{report_type} for {oois_count} objects").format(report_type=report_type, oois_count=oois_count)
+        reports[name] = ""
+
+    # Create name for subreports or single reports
+    for ooi in oois_pk:
+        for report_type in report_types:
+            name = _("{report_type} for {ooi}").format(
+                report_type=report_type.name, ooi=Reference.from_str(ooi).human_readable
+            )
+            reports[name] = ""
+
+    return reports
