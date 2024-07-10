@@ -6,7 +6,8 @@
     "id": "70da7d4f-f41f-4940-901b-d98a92e9014b",
     "boefje": {
       "id": "dns-records",
-      "version": null
+      "version": null,
+      "remote": false
     },
     "input_ooi": "",
     "organization": "_dev",
@@ -14,6 +15,8 @@
     "started_at": null,
     "runnable_hash": null,
     "environment": null,
-    "ended_at": null
-  }
+    "ended_at": null,
+    "remote": false
+  },
+  "remote": false
 }

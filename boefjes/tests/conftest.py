@@ -45,11 +45,12 @@ class MockSchedulerClient(SchedulerClientInterface):
         time.sleep(self.sleep_time)
         return TypeAdapter(list[Queue]).validate_json(self.queue_response)
 
-    def pop_item(self, queue: str) -> QueuePrioritizedItem | None:
+    def pop_non_remote_item(self, queue: str) -> QueuePrioritizedItem | None:
         time.sleep(self.sleep_time)
 
         try:
             if WorkerManager.Queue.BOEFJES.value in queue:
+                print(self.boefje_responses[0].decode())
                 p_item = TypeAdapter(QueuePrioritizedItem).validate_json(self.boefje_responses.pop(0))
                 self._popped_items[str(p_item.id)] = p_item
                 self._tasks[str(p_item.id)] = self._task_from_id(p_item.id)
@@ -86,6 +87,7 @@ class MockSchedulerClient(SchedulerClientInterface):
             status=TaskStatus.DISPATCHED,
             created_at=datetime.now(timezone.utc),
             modified_at=datetime.now(timezone.utc),
+            remote=False,
         )
 
     def push_item(self, queue_id: str, p_item: QueuePrioritizedItem) -> None:
