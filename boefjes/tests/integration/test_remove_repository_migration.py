@@ -6,10 +6,9 @@ from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 
 from boefjes.config import settings
-from boefjes.katalogus.models import Organisation
+from boefjes.models import Organisation
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
-from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
 
 
 @skipIf(os.environ.get("CI") != "1", "Needs a CI database.")
@@ -71,10 +70,8 @@ class TestRemoveRepositories(TestCase):
 
         alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "7c88b9cd96aa"])
 
-        with SQLPluginEnabledStorage(session, settings) as storage:
-            assert storage.get_by_id("test_plugin_id", "dev1")
-            assert storage.get_all_enabled("dev1") == ["test_plugin_id"]
-            assert storage.get_all_enabled("dev2") == []
+        all_plugin_states = [x[1:] for x in self.engine.execute(text("SELECT * FROM plugin_state")).fetchall()]
+        assert all_plugin_states == [("test_plugin_id", True, 1)]
 
         session.close()
 
@@ -85,18 +82,17 @@ class TestRemoveRepositories(TestCase):
         alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "7c88b9cd96aa"])
         alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "downgrade", "-1"])
 
-        # Same checks plus check if a repository exists
-        with SQLPluginEnabledStorage(session, settings) as storage:
-            assert storage.get_by_id("test_plugin_id", "dev1")
-            assert storage.get_all_enabled("dev1") == ["test_plugin_id"]
-            assert storage.get_all_enabled("dev2") == []
-            assert self.engine.execute(text("SELECT * from repository")).fetchall() == [
-                (1, "LOCAL", "Local Plugin Repository", "http://dev/null")
-            ]
+        all_plugin_states = [x[1:] for x in self.engine.execute(text("SELECT * FROM plugin_state")).fetchall()]
+        assert all_plugin_states == [("test_plugin_id", True, 1, 1)]
+        assert self.engine.execute(text("SELECT * from repository")).fetchall() == [
+            (1, "LOCAL", "Local Plugin Repository", "http://dev/null")
+        ]
 
         session.close()
 
     def tearDown(self) -> None:
+        self.engine.execute(text("DELETE FROM plugin_state"))  # Fix unique constraint fails
+
         alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"])
 
         session = sessionmaker(bind=get_engine())()
