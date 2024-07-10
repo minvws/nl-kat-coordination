@@ -489,6 +489,8 @@ WEASYPRINT_BASEURL = env("WEASYPRINT_BASEURL", default="http://127.0.0.1:8000/")
 
 KNOX_TOKEN_MODEL = "account.AuthToken"
 
+FORMS_URLFIELD_ASSUME_HTTPS = True
+
 structlog.configure(
     processors=[
         structlog.contextvars.merge_contextvars,
