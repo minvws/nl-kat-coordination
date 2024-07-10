@@ -1,6 +1,6 @@
-import structlog
 from collections.abc import Iterator
 
+import structlog
 from sqlalchemy.orm import Session
 
 from boefjes.config import Settings, settings

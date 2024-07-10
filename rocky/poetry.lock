@@ -3416,8 +3416,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-<<<<<<< HEAD
-content-hash = "373504453bc29c267708c5831f60f89c14d278ae8fcbea5e85bfa12d5db16cff"
-=======
-content-hash = "fd1f8a6cf8caf8216070cb5c9d8e0a2269de42f67011215e232431e262dc2153"
->>>>>>> refs/heads/main
+content-hash = "605a5548f2c3d78a4f3dcc46e5c649ffb7937763ad5f391579a33f582a49e551"
