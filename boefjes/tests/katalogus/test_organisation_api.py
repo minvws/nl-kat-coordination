@@ -3,10 +3,10 @@ from unittest import TestCase
 
 from fastapi.testclient import TestClient
 
-from boefjes.katalogus.api.root import app
-from boefjes.katalogus.dependencies.organisations import get_organisations_store
-from boefjes.katalogus.models import Organisation
-from boefjes.katalogus.storage.memory import OrganisationStorageMemory
+from boefjes.katalogus.root import app
+from boefjes.models import Organisation
+from boefjes.sql.organisation_storage import get_organisations_store
+from boefjes.storage.memory import OrganisationStorageMemory
 
 
 class TestOrganisations(TestCase):

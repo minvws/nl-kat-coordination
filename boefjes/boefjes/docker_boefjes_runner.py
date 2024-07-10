@@ -9,7 +9,7 @@ from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient, TaskStatus
 from boefjes.config import settings
 from boefjes.job_models import BoefjeMeta
-from boefjes.katalogus.models import Boefje
+from boefjes.models import Boefje
 
 logger = logging.getLogger(__name__)
 
