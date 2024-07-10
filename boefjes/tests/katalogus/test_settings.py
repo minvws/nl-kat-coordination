@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from nacl.public import PrivateKey
 
-from boefjes.katalogus.dependencies.encryption import NaclBoxMiddleware
+from boefjes.dependencies.encryption import NaclBoxMiddleware
 
 
 class TestSettingsEncryption(TestCase):
