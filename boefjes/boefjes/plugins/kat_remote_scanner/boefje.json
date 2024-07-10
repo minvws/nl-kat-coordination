@@ -9,6 +9,5 @@
   ],
   "environment_keys": [],
   "scan_level": 4,
-  "oci_image": "openkat/remote-scanner",
   "remote": true
 }
