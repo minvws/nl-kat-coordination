@@ -7,7 +7,7 @@ from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath, IPvAnyAddress, Postgr
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 from pydantic_settings.sources import EnvSettingsSource
 
-from boefjes.katalogus.models import EncryptionMiddleware
+from boefjes.models import EncryptionMiddleware
 
 BASE_DIR: Path = Path(__file__).parent.resolve()
 

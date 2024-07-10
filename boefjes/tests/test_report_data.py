@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 
 from boefjes.job_models import NormalizerDeclaration, NormalizerMeta
-from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.local import LocalNormalizerJobRunner
+from boefjes.local_repository import LocalPluginRepository
 from tests.loading import get_dummy_data
 
 

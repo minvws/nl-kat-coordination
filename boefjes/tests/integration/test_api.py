@@ -6,13 +6,12 @@ from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
 
 from boefjes.config import settings
-from boefjes.katalogus.api.root import app
-from boefjes.katalogus.dependencies.encryption import IdentityMiddleware
-from boefjes.katalogus.models import Boefje, Normalizer, Organisation
+from boefjes.dependencies.encryption import IdentityMiddleware
+from boefjes.katalogus.root import app
+from boefjes.models import Boefje, Normalizer, Organisation
+from boefjes.sql.config_storage import SQLConfigStorage
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
-from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
-from boefjes.sql.setting_storage import SQLSettingsStorage
 
 
 @skipIf(os.environ.get("CI") != "1", "Needs a CI database.")
@@ -22,8 +21,7 @@ class TestAPI(TestCase):
 
         session = sessionmaker(bind=get_engine())()
         self.organisation_storage = SQLOrganisationStorage(session, settings)
-        self.settings_storage = SQLSettingsStorage(session, IdentityMiddleware())
-        self.plugin_state_storage = SQLPluginEnabledStorage(session, settings)
+        self.settings_storage = SQLConfigStorage(session, IdentityMiddleware())
 
         self.org = Organisation(id="test", name="Test Organisation")
         self.client = TestClient(app)
@@ -59,12 +57,12 @@ class TestAPI(TestCase):
     def test_cannot_add_plugin_reserved_id(self):
         boefje = Boefje(id="dns-records", name="My test boefje", static=False)
         response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.json())
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {"message": "Plugin id 'dns-records' is already used"})
 
         normalizer = Normalizer(id="kat_nmap_normalize", name="My test normalizer", static=False)
         response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.json())
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {"message": "Plugin id 'kat_nmap_normalize' is already used"})
 
     def test_add_boefje(self):
@@ -143,6 +141,17 @@ class TestAPI(TestCase):
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/{normalizer.id}")
         self.assertEqual(response.json()["version"], "v1.2")
+
+    def test_cannot_update_static_plugins(self):
+        self.client.patch(f"/v1/organisations/{self.org.id}/plugins/dns-records", json={"enabled": True})
+        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/dns-records")
+        self.assertTrue(response.json()["enabled"])
+
+        response = self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/dns-records", json={"version": "v1.2"})
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/dns-records")
+        self.assertNotEqual(response.json()["version"], "v1.2")
 
     def test_basic_settings_api(self):
         plug = "dns-records"
