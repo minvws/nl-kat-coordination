@@ -15,7 +15,6 @@ from boefjes.docker_boefjes_runner import DockerBoefjesRunner
 from boefjes.job_models import BoefjeMeta, NormalizerMeta, SerializedOOI, SerializedOOIValue
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.plugins.models import _default_mime_types
-from boefjes.remote_boefjes_runner import RemoteBoefjesRunner
 from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
 from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -103,23 +102,9 @@ class BoefjeHandler(Handler):
 
     def handle(self, boefje_meta: BoefjeMeta) -> None:
         logger.info("Handling boefje %s[task_id=%s]", boefje_meta.boefje.id, str(boefje_meta.id))
-        boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)
-
-        env_keys = boefje_resource.environment_keys
-        boefje_meta.environment = get_environment_settings(boefje_meta, env_keys) if env_keys else {}
-
-        # Check if the user has provided the boefje with a `remote_url`, if so, use the `RemoteBoefjesRunner`
-        if boefje_meta.environment and boefje_meta.environment.get("REMOTE_URL", ""):
-            logger.info(
-                "Forwarding boefje %s[task_id=%s] to a remote container",
-                boefje_meta.boefje.id,
-                str(boefje_meta.id),
-            )
-            remote_runner = RemoteBoefjesRunner(boefje_resource, boefje_meta)
-
-            return remote_runner.run()
 
         # Check if this boefje is container-native, if so, continue using the Docker boefjes runner
+        boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)
         if boefje_resource.oci_image:
             logger.info(
                 "Delegating boefje %s[task_id=%s] to Docker runner with OCI image [%s]",
@@ -128,7 +113,7 @@ class BoefjeHandler(Handler):
                 boefje_resource.oci_image,
             )
             docker_runner = DockerBoefjesRunner(boefje_resource, boefje_meta)
-            return docker_runner.run()  # TODO: Make docker use the now-provided environment variables
+            return docker_runner.run()
 
         if boefje_meta.input_ooi:
             reference = Reference.from_str(boefje_meta.input_ooi)
@@ -141,7 +126,10 @@ class BoefjeHandler(Handler):
 
             boefje_meta.arguments["input"] = serialize_ooi(ooi)
 
+        env_keys = boefje_resource.environment_keys
+
         boefje_meta.runnable_hash = boefje_resource.runnable_hash
+        boefje_meta.environment = get_environment_settings(boefje_meta, env_keys) if env_keys else {}
 
         mime_types = _default_mime_types(boefje_meta.boefje)
 

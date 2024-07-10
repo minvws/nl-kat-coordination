@@ -241,7 +241,6 @@ class App:
         """
         # Start schedulers
         self.start_schedulers()
-        self.logger.info("SCHEDULERS HAVE STARTED")
 
         # Start monitors
         self.start_monitors()
@@ -252,7 +251,6 @@ class App:
 
         # API Server
         self.start_server()
-        self.logger.info("API SERVER STARTED")
 
         # Main thread
         while not self.stop_event.is_set():
@@ -313,7 +311,6 @@ class App:
         Args:
             scheduler_id: The id of the scheduler to remove.
         """
-        self.logger.info(f"SCHEDULER GOT REMOVED {scheduler_id}")  # noqa: G004
         with self.lock:
             if scheduler_id not in self.schedulers:
                 return

@@ -106,8 +106,6 @@ class Scheduler(abc.ABC):
             remote=p_item.remote,
         )
 
-        self.logger.info(task.model_dump_json())
-
         task_db = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
         if task_db is not None:
             self.ctx.datastores.task_store.update_task(task)
@@ -194,7 +192,6 @@ class Scheduler(abc.ABC):
         Args:
             p_item: The PrioritizedItem to push to the queue.
         """
-        self.logger.info("Checking enabled")
         if not self.is_enabled():
             self.logger.warning(
                 "Scheduler is disabled, not pushing item to queue %s",
@@ -204,13 +201,9 @@ class Scheduler(abc.ABC):
                 scheduler_id=self.scheduler_id,
             )
             raise queues.errors.NotAllowedError("Scheduler is disabled")
-        self.logger.info("Checking enabled went correct")
-        self.logger.info("Trying push")
         try:
             self.queue.push(p_item)
-            self.logger.info("Push went well!")
         except queues.errors.NotAllowedError as exc:
-            self.logger.info("NOT ALLOWED ERROR")
             self.logger.warning(
                 "Not allowed to push to queue %s",
                 self.queue.pq_id,
@@ -220,7 +213,6 @@ class Scheduler(abc.ABC):
             )
             raise exc
         except queues.errors.QueueFullError as exc:
-            self.logger.info("QUEUE FULL ERROR")
             self.logger.warning(
                 "Queue %s is full, not pushing new items",
                 self.queue.pq_id,
@@ -231,7 +223,6 @@ class Scheduler(abc.ABC):
             )
             raise exc
         except queues.errors.InvalidPrioritizedItemError as exc:
-            self.logger.info("INVALID p_ITEM")
             self.logger.warning(
                 "Invalid prioritized item %s",
                 p_item.id,
@@ -241,8 +232,7 @@ class Scheduler(abc.ABC):
                 scheduler_id=self.scheduler_id,
             )
             raise exc
-        except Exception as e:
-            self.logger.info(e)
+        # TODO: SOUF WHEN PULLING FROM TASKSTORE WITH INVALID MODEL EXCEPTION DOES NOT GET CAUGHT
 
         self.logger.debug(
             "Pushed item %s to queue %s with priority %s ",
@@ -310,7 +300,6 @@ class Scheduler(abc.ABC):
             QueueFullError: When the queue is full.
         """
         tries = 0
-
         while not self.is_space_on_queue() and (tries < max_tries or max_tries == -1):
             self.logger.debug(
                 "Queue %s is full, waiting for space",

@@ -1,4 +1,3 @@
-import logging
 from collections.abc import Callable
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
@@ -26,7 +25,6 @@ from scheduler.storage import filters
 from .scheduler import Scheduler
 
 tracer = trace.get_tracer(__name__)
-logger = logging.getLogger(__name__)
 
 
 class BoefjeScheduler(Scheduler):
@@ -694,8 +692,6 @@ class BoefjeScheduler(Scheduler):
             hash=task.hash,
             remote=boefje.remote,
         )
-        self.logger.info(boefje.model_dump_json())
-        self.logger.info(p_item.model_dump_json())
 
         try:
             self.push_item_to_queue_with_timeout(p_item, self.max_tries)

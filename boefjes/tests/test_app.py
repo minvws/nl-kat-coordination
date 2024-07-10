@@ -85,7 +85,9 @@ def test_two_processes_handler_exception(manager: SchedulerWorkerManager, item_h
     assert patched_tasks.count(("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed")) == 2
 
 
-def test_two_processes_cleanup_unfinished_tasks(manager, item_handler, tmp_path) -> None:
+def test_two_processes_cleanup_unfinished_tasks(
+    manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path
+) -> None:
     """
     Push 3 slow tasks to 2 workers,
     then crash (from popping from an empty queue),

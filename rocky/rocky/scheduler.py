@@ -229,7 +229,6 @@ class SchedulerClient:
     def get_task_details(self, organization_code: str, task_id: str) -> Task:
         res = self._client.get(f"/tasks/{task_id}")
         res.raise_for_status()
-
         task_details = Task.model_validate_json(res.content)
 
         if task_details.type == "normalizer":

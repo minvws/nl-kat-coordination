@@ -533,7 +533,6 @@ class Server:
                 status_code=fastapi.status.HTTP_404_NOT_FOUND,
                 detail="could not pop item from queue, check your filters",
             )
-        self.logger.info(p_item.model_dump())
 
         return models.PrioritizedItem(**p_item.model_dump())
 
@@ -555,6 +554,7 @@ class Server:
 
             p_item.priority = item.priority
             p_item.remote = item.data["remote"]
+
             if s.queue.item_type == models.BoefjeTask:
                 p_item.data = models.BoefjeTask(**item.data).dict()
                 p_item.id = p_item.data["id"]
