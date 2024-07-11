@@ -1,4 +1,3 @@
-import logging
 import typing
 import uuid
 from collections.abc import Callable, Set
@@ -6,12 +5,13 @@ from functools import wraps
 from typing import Any
 from uuid import UUID
 
+import structlog
 from httpx import Client, HTTPStatusError, HTTPTransport, Response
 
 from boefjes.job_models import BoefjeMeta, NormalizerMeta, RawDataMeta
 
 BYTES_API_CLIENT_VERSION = "0.3"
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 ClientSessionMethod = Callable[..., Any]
 

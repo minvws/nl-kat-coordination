@@ -1,6 +1,6 @@
-import logging
 from uuid import UUID
 
+import structlog
 from cachetools import TTLCache, cached
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import Response
@@ -16,7 +16,7 @@ from bytes.models import BoefjeMeta, MimeType, NormalizerMeta, RawData, RawDataM
 from bytes.rabbitmq import create_event_manager
 from bytes.repositories.meta_repository import BoefjeMetaFilter, MetaDataRepository, NormalizerMetaFilter, RawDataFilter
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 router = APIRouter(dependencies=[Depends(authenticate_token)])
 BOEFJE_META_TAG = "BoefjeMeta"
 NORMALIZER_META_TAG = "NormalizerMeta"

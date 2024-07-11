@@ -1,4 +1,3 @@
-import logging
 import os
 import traceback
 from collections.abc import Callable
@@ -7,6 +6,7 @@ from enum import Enum
 from typing import Any, cast
 
 import httpx
+import structlog
 from httpx import HTTPError
 
 from boefjes.clients.bytes_client import BytesAPIClient
@@ -23,7 +23,7 @@ from octopoes.models.exception import ObjectNotFoundException
 
 MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought to be reasonable
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 bytes_api_client = BytesAPIClient(
     str(settings.bytes_api),

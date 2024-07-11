@@ -1,10 +1,10 @@
 import json
-import logging
 import threading
 import uuid
 from collections.abc import Callable
 
 import pika
+import structlog
 from celery import Celery
 from pika.adapters.blocking_connection import BlockingChannel
 from pika.exceptions import StreamLostError
@@ -13,7 +13,7 @@ from pydantic import BaseModel
 from octopoes.events.events import DBEvent, OperationType, ScanProfileDBEvent
 from octopoes.models import ScanProfile, format_id_short
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class AbstractOOI(BaseModel):
