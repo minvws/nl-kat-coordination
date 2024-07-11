@@ -1,7 +1,7 @@
-import logging
 import uuid
 from collections.abc import Iterator
 
+import structlog
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
@@ -17,7 +17,7 @@ from bytes.repositories.raw_repository import RawRepository
 from bytes.timestamping.hashing import hash_data
 from bytes.timestamping.provider import create_hash_repository
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class SQLMetaDataRepository(MetaDataRepository):

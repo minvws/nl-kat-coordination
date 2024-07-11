@@ -50,6 +50,8 @@ opentelemetry-instrumentation-wsgi = "^0.45b0"
 opentelemetry-proto = "^1.24.0"
 opentelemetry-semantic-conventions = "^0.45b0"
 opentelemetry-util-http = "^0.45b0"
+structlog = "^24.2.0"
+django-structlog = "^8.1.0"
 
 
 [tool.poetry.group.dev.dependencies]

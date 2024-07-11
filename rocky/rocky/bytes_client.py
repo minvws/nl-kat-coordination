@@ -1,9 +1,9 @@
-import logging
 import uuid
 from collections.abc import Set
 from datetime import datetime, timezone
 
 import httpx
+import structlog
 from django.conf import settings
 from django.http import Http404
 
@@ -11,7 +11,7 @@ from octopoes.api.models import Declaration
 from rocky.health import ServiceHealth
 from rocky.scheduler import Boefje, BoefjeMeta, Normalizer, NormalizerMeta, RawData
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class BytesClient:
