@@ -4,13 +4,12 @@
 
 <div class="modal-wrapper">
     {% slot "trigger" %}
-        <button class="modal-trigger" data-target="{{ dialogid }}">Open modal {{ dialogid }}</button>
+        <button class="modal-trigger">Open modal</button>
     {% endslot %}
 
     <dialog class="modal {{ size }}"
             aria-modal="true"
-            role="dialog"
-            id="{{ dialogid }}">
+            role="dialog">
         <div class="content-wrapper">
             <section class="header">
                 <h2>{% slot "header" %}{% endslot %}</h2>

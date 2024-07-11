@@ -2,29 +2,27 @@ import { onDomReady } from "../js/imports/utils.js";
 
 onDomReady(initDialogs);
 
-export function initDialogs() {
-  let modal_components = document.querySelectorAll(".modal-wrapper");
+export function initDialogs(element) {
+  let root = element || document;
+  let modal_components = root.querySelectorAll(".modal-wrapper");
 
-  modal_components.forEach((modal) => {
-    modal
-      .querySelector("button.modal-trigger")
-      .addEventListener("click", (event) => {
-        let target =
-          "dialog#" +
-          modal.querySelector("button.modal-trigger").dataset.target;
-        modal.querySelector(target).showModal();
-      });
+  modal_components.forEach((modal) => initDialog(modal));
+}
 
-    let dialog_element = modal.querySelector("dialog");
+export function initDialog(modal) {
+  modal.querySelector(".modal-trigger").addEventListener("click", (event) => {
+    // Used ".closest" instead of ".parentNode" to make sure we stay flexible in terms of
+    // HTML-structure when implementing the trigger.
+    event.target.closest(".modal-wrapper").querySelector("dialog").showModal();
+  });
 
-    dialog_element.addEventListener("click", (event) => {
-      // event.target.nodeName === 'DIALOG' is needed to check if the ::backdrop is clicked.
-      if (
-        event.target.nodeName === "DIALOG" ||
-        event.target.classList.contains("close-modal-button")
-      ) {
-        dialog_element.close();
-      }
-    });
+  modal.querySelector("dialog").addEventListener("click", (event) => {
+    // event.target.nodeName === 'DIALOG' is needed to check if the ::backdrop is clicked.
+    if (
+      event.target.nodeName === "DIALOG" ||
+      event.target.classList.contains("close-modal-button")
+    ) {
+      event.target.closest(".modal-wrapper").querySelector("dialog").close();
+    }
   });
 }
