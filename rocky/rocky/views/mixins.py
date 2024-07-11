@@ -104,7 +104,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
         except Exception as e:
             logger.error(e)
             return results
-        
+
         try:
             bytes = get_bytes_client(organization.code)
             client.login()
@@ -117,16 +117,16 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
         for origin in origin_data:
             if origin.origin.origin_type != OriginType.OBSERVATION or not origin.origin.task_id:
                 if origin.origin.origin_type == OriginType.DECLARATION:
-                    results[0].append(origin)    
-                else if origin.origin.origin_type == OriginType.INFERENCE:
-                    results[2].append(origin) 
+                    results[0].append(origin)
+                elif origin.origin.origin_type == OriginType.INFERENCE:
+                    results[2].append(origin)
                 continue
 
             try:
                 normalizer_data = bytes.get_normalizer_meta(origin.origin.task_id)
             except HTTPError as e:
                 logger.error('Could not load Normalizer meta', e)
-            else:    
+            else:
                 boefje_id = normalizer_data["raw_data"]["boefje_meta"]["boefje"]["id"]
                 origin.normalizer = normalizer_data
                 try:
