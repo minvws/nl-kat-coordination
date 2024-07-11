@@ -12,6 +12,7 @@ from sqlalchemy.orm import sessionmaker
 
 from boefjes.local_repository import get_local_repository
 from boefjes.sql.plugin_storage import create_plugin_storage
+from boefjes.storage.interfaces import PluginNotFound
 
 # revision identifiers, used by Alembic.
 revision = "f9de6eb7824b"
@@ -70,6 +71,12 @@ def upgrade() -> None:
             if local_plugins[plugin_id].type != "boefje":
                 raise ValueError(f"Settings for normalizer or bit found: {plugin_id}. Remove these entries first.")
 
+            try:
+                storage.boefje_by_id(plugin_id)
+                continue  # The Boefje already exists
+            except PluginNotFound:
+                pass  # The raw query bypasses the session "cache", so this just checks for duplicates
+
             storage.create_boefje(local_plugins[plugin_id])  # type: ignore
 
         query = """
@@ -81,6 +88,12 @@ def upgrade() -> None:
             plugin_id = plugin_id_output[0]
             if plugin_id not in local_plugins:
                 raise ValueError(f"Invalid plugin id found: {plugin_id}")
+
+            try:
+                storage.boefje_by_id(plugin_id)
+                continue  # The Boefje already exists
+            except PluginNotFound:
+                pass  # The raw query bypasses the session "cache", so this just checks for duplicates
 
             if local_plugins[plugin_id].type == "boefje":
                 storage.create_boefje(local_plugins[plugin_id])  # type: ignore
@@ -94,6 +107,12 @@ def upgrade() -> None:
             plugin_id = plugin_id_output[0]
             if plugin_id not in local_plugins:
                 raise ValueError(f"Invalid plugin id found: {plugin_id}")
+
+            try:
+                storage.normalizer_by_id(plugin_id)
+                continue  # The Normalizer already exists
+            except PluginNotFound:
+                pass  # The raw query bypasses the session "cache", so this just checks for duplicates
 
             if local_plugins[plugin_id].type == "normalizer":
                 storage.create_normalizer(local_plugins[plugin_id])  # type: ignore

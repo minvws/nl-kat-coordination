@@ -37,6 +37,13 @@ class TestSettingsToBoefjeConfig(TestCase):
         ]
         query = f"INSERT INTO settings (id, values, plugin_id, organisation_pk) values {','.join(map(str, entries))}"  # noqa: S608
         self.engine.execute(text(query))
+
+        entries = [(1, "dns-records", True, 1)]
+        query = (
+            f"INSERT INTO plugin_state (id, plugin_id, enabled, organisation_pk) values {','.join(map(str, entries))}"
+        )
+        self.engine.execute(text(query))
+
         session.close()
 
     def test_fail_on_wrong_plugin_ids(self):
