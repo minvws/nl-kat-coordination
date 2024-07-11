@@ -642,8 +642,8 @@ def no_rpki_finding_type() -> KATFindingType:
 
 
 @pytest.fixture
-def expired_rpki_finding_type() -> KATFindingType:
-    return KATFindingType(id="KAT-EXPIRED-RPKI")
+def invalid_rpki_finding_type() -> KATFindingType:
+    return KATFindingType(id="KAT-INVALID-RPKI")
 
 
 @pytest.fixture
