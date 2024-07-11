@@ -166,7 +166,9 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(item.id, popped_item.id)
 
     def test_pop_item_from_queue_empty(self):
-        pass
+        self.assertEqual(0, self.scheduler.queue.qsize())
+        with self.assertRaises(queues.errors.QueueEmptyError):
+            self.scheduler.pop_item_from_queue()
 
     def test_post_push(self):
         """When a task is added to the queue, it should be added to the database"""
@@ -246,7 +248,37 @@ class SchedulerTestCase(unittest.TestCase):
         )
 
     def test_post_push_schedule_disabled(self):
-        pass
+        # Arrange
+        first_item = functions.create_item(
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+        )
+
+        # Act
+        first_item_db = self.scheduler.push_item_to_queue(first_item)
+
+        initial_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
+            first_item_db.schedule_id
+        )
+
+        # Pop
+        self.scheduler.pop_item_from_queue()
+
+        # Disable this schedule
+        initial_schedule_db.enabled = False
+        self.mock_ctx.datastores.schedule_store.update_schedule(
+            initial_schedule_db,
+        )
+
+        # Act
+        second_item = first_item_db.copy()
+        second_item.id = uuid.uuid4()
+        second_item_db = self.scheduler.push_item_to_queue(second_item)
+
+        with capture_logs() as cm:
+            self.scheduler.post_push(second_item_db)
+
+        self.assertIn("is disabled, not updating deadline", cm[-1].get("event"))
 
     def test_post_push_schedule_update_schedule(self):
         # Arrange
@@ -262,7 +294,7 @@ class SchedulerTestCase(unittest.TestCase):
             first_item_db.schedule_id
         )
 
-        # pop
+        # Pop
         self.scheduler.pop_item_from_queue()
 
         # Act
@@ -284,7 +316,6 @@ class SchedulerTestCase(unittest.TestCase):
         schedules, _ = self.mock_ctx.datastores.schedule_store.get_schedules(
             scheduler_id=self.scheduler.scheduler_id
         )
-        breakpoint()
 
         self.assertEqual(1, len(schedules))
 
@@ -426,52 +457,3 @@ class SchedulerTestCase(unittest.TestCase):
 
         # Stop the scheduler
         self.scheduler.stop()
-
-    @unittest.skip("refactor")
-    def test_signal_handler_task_not_finished(self):
-        # Arrange
-        item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-        )
-
-        self.scheduler.push_item_to_queue(item)
-
-        task_db = self.mock_ctx.datastores.task_store.get_task(str(item.id))
-
-        # Get schedule
-        initial_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
-            task_db.schedule_id
-        )
-        initial_timestamp = initial_schedule_db.deadline_at
-
-        self.scheduler.signal_handler_task(task_db)
-
-        # Assert: schedule should have same deadline
-        updated_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
-            task_db.schedule_id
-        )
-        updated_timestamp = updated_schedule_db.deadline_at
-        self.assertEqual(initial_timestamp, updated_timestamp)
-
-    @unittest.skip("refactor")
-    def test_signal_handler_malformed_cron_expression(self):
-        # Arrange
-        item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-        )
-
-        self.scheduler.push_item_to_queue(item)
-        self.scheduler.pop_item_from_queue()
-
-        task_db = self.mock_ctx.datastores.task_store.get_task(str(item.id))
-
-        # Get schedule
-        initial_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
-            task_db.schedule_id
-        )
-
-        # Set cron expression to malformed
-        with self.assertRaises(ValueError):
-            initial_schedule_db.schedule = ".&^%$#"

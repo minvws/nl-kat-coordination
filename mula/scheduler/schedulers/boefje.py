@@ -596,9 +596,10 @@ class BoefjeScheduler(Scheduler):
         )
 
         # Get schedule
-        schedule = self.ctx.datastores.schedule_store.get_schedule_id_by_hash(
+        schedule = self.ctx.datastores.schedule_store.get_schedule_by_hash(
             boefje_task.hash
         )
+        # TODO: what if you don't find one?
 
         # TODO: check the correct attributes, schedule
         # TODO: test schedule_id

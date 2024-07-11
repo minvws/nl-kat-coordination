@@ -320,6 +320,14 @@ class Scheduler(abc.ABC):
             return
 
         if schedule_db.enabled is False:
+            self.logger.debug(
+                "Schedule %s is disabled, not updating deadline",
+                schedule_db.id,
+                schedule_id=schedule_db.id,
+                item_id=item.id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
             return
 
         schedule_db.deadline_at = cron.next_run(schedule_db.schedule)
