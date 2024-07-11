@@ -1,7 +1,7 @@
-import logging
 from collections.abc import Iterable
 from typing import Any
 
+import structlog
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
@@ -12,7 +12,7 @@ from tools.view_helpers import BreadcrumbsMixin
 from octopoes.models.ooi.findings import RiskLevelSeverity
 from rocky.views.mixins import ConnectorFormMixin, FindingList, OctopoesView, SeveritiesMixin
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def sort_by_severity_desc(findings) -> list[dict[str, Any]]:
