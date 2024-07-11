@@ -40,7 +40,7 @@ class TestSettingsToBoefjeConfig(TestCase):
 
         entries = [(1, "dns-records", True, 1)]
         query = (
-            f"INSERT INTO plugin_state (id, plugin_id, enabled, organisation_pk) values {','.join(map(str, entries))}"
+            f"INSERT INTO plugin_state (id, plugin_id, enabled, organisation_pk) values {','.join(map(str, entries))}"  # noqa: S608
         )
         self.engine.execute(text(query))
 
