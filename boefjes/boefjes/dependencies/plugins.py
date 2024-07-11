@@ -1,9 +1,9 @@
 import contextlib
-import logging
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Literal
 
+import structlog
 from fastapi import Query
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
@@ -23,7 +23,7 @@ from boefjes.storage.interfaces import (
     SettingsNotConformingToSchema,
 )
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class PluginService:
