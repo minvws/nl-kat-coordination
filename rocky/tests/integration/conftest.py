@@ -170,7 +170,14 @@ def seed_system(
     )
 
     octopoes_api_connector.save_observation(
-        Observation(method="", source_method="test", source=network.reference, task_id=uuid.uuid4(), valid_time=valid_time, result=oois)
+        Observation(
+            method="",
+            source_method="test",
+            source=network.reference,
+            task_id=uuid.uuid4(),
+            valid_time=valid_time,
+            result=oois,
+        )
     )
     octopoes_api_connector.recalculate_bits()
 
