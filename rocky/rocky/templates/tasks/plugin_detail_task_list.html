@@ -27,7 +27,15 @@
                         </td>
                         <td>{{ task.created_at }}</td>
                         <td>
-                            <a href="{% ooi_url "ooi_detail" task.p_item.data.input_ooi organization.code observed_at=task.created_at|date:'c' %}">{{ task.p_item.data.input_ooi }}</a>
+                            {% if task.type == "boefje" %}
+                                {% with ooi=task.p_item.data.input_ooi %}
+                                    <a href="{% ooi_url "ooi_detail" ooi organization.code observed_at=task.created_at|date:'c' %}">{{ ooi }}</a>
+                                {% endwith %}
+                            {% elif task.type == "normalizer" %}
+                                {% with ooi=task.p_item.data.raw_data.boefje_meta.input_ooi %}
+                                    <a href="{% ooi_url "ooi_detail" ooi organization.code observed_at=task.created_at|date:'c' %}">{{ ooi }}</a>
+                                {% endwith %}
+                            {% endif %}
                         </td>
                         <td>
                             <button type="button"
