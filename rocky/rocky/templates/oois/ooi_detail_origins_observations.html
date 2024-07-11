@@ -21,7 +21,8 @@
                         <tr>
                             <td>
                                 {% if observation.boefje.id %}
-                                    <a href="{% url 'boefje_detail' organization_code=organization.code plugin_id=observation.boefje.id %}" title="{{ observation.boefje.id }}">{{ observation.boefje.name }}</a>
+                                    <a href="{% url 'boefje_detail' organization_code=organization.code plugin_id=observation.boefje.id %}"
+                                       title="{{ observation.boefje.id }}">{{ observation.boefje.name }}</a>
                                 {% else %}
                                     {% translate "The boefje has since been deleted or disabled." %}
                                 {% endif %}
@@ -36,7 +37,9 @@
                                     {% translate "No Raw file could be found, this might point to an error in OpenKAT" %}
                                 {% endif %}
                             </td>
-                            <td><span title="{{ observation.normalizer.raw_data.boefje_meta.ended_at }} UTC">{{ observation.normalizer.raw_data.boefje_meta.ended_at|naturaltime }}</span></td>
+                            <td>
+                                <span title="{{ observation.normalizer.raw_data.boefje_meta.ended_at }} UTC">{{ observation.normalizer.raw_data.boefje_meta.ended_at|naturaltime }}</span>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
