@@ -1,4 +1,3 @@
-import logging
 from typing import Any
 
 from django.contrib import messages
@@ -7,8 +6,6 @@ from httpx import HTTPError
 
 from katalogus.views.mixins import SinglePluginView
 from rocky.paginator import RockyPaginator
-
-logger = logging.getLogger(__name__)
 
 
 class PluginSettingsListView(SinglePluginView):

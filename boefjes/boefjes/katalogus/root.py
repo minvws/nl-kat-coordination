@@ -2,6 +2,7 @@ import json
 import logging.config
 from typing import Any
 
+import structlog
 from fastapi import APIRouter, FastAPI, Request, status
 from fastapi.responses import JSONResponse, RedirectResponse
 from opentelemetry import trace
@@ -23,7 +24,23 @@ from boefjes.storage.interfaces import NotAllowed, NotFound, StorageError
 with settings.log_cfg.open() as f:
     logging.config.dictConfig(json.load(f))
 
-logger = logging.getLogger(__name__)
+structlog.configure(
+    processors=[
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.add_log_level,
+        structlog.processors.StackInfoRenderer(),
+        structlog.dev.set_exc_info,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S", utc=False),
+        structlog.dev.ConsoleRenderer(),
+    ],
+    context_class=dict,
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    wrapper_class=structlog.stdlib.BoundLogger,
+    cache_logger_on_first_use=True,
+)
+
+logger = structlog.get_logger(__name__)
 
 app = FastAPI(title="KAT-alogus API", version=__version__)
 

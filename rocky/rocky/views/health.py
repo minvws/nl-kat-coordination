@@ -1,5 +1,4 @@
-import logging
-
+import structlog
 from account.mixins import OrganizationView
 from django.http import JsonResponse
 from django.urls.base import reverse
@@ -15,7 +14,7 @@ from rocky.keiko import keiko_client
 from rocky.scheduler import SchedulerError, scheduler_client
 from rocky.version import __version__
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class Health(OrganizationView, View):

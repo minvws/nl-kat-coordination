@@ -1,6 +1,6 @@
-import logging
 from collections.abc import Iterator
 
+import structlog
 from sqlalchemy.orm import Session
 
 from boefjes.config import Settings, settings
@@ -10,7 +10,7 @@ from boefjes.sql.db_models import BoefjeInDB, NormalizerInDB
 from boefjes.sql.session import SessionMixin
 from boefjes.storage.interfaces import NotAllowed, PluginNotFound, PluginStorage
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class SQLPluginStorage(SessionMixin, PluginStorage):

@@ -5115,11 +5115,23 @@ msgid "Parameters"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
-msgid "Observed by"
+msgid "Last observed by"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 msgid "Task ID"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html
+msgid "When"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html
+msgid "The boefje has since been deleted or disabled."
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html
+msgid "No Raw file could be found, this might point to an error in OpenKAT"
 msgstr ""
 
 #: rocky/templates/oois/ooi_edit.html

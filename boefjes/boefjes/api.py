@@ -1,10 +1,10 @@
 import base64
-import logging
 import multiprocessing
 from datetime import datetime, timezone
 from enum import Enum
 from uuid import UUID
 
+import structlog
 from fastapi import Depends, FastAPI, HTTPException, Response
 from httpx import HTTPError, HTTPStatusError
 from pydantic import BaseModel, ConfigDict, Field
@@ -21,7 +21,7 @@ from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
 
 app = FastAPI(title="Boefje API")
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class UvicornServer(multiprocessing.Process):
