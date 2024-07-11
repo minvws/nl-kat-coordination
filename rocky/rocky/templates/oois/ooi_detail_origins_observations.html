@@ -18,7 +18,7 @@
                 </thead>
                 <tbody>
                     {% for observation in observations %}
-                        <tr {% if observation.is_old %} class="warning" {% endif %}>
+                        <tr {% if observation.is_old %}class="warning"{% endif %}>
                             <td>
                                 {% if observation.boefje.id %}
                                     <a href="{% url 'boefje_detail' organization_code=organization.code plugin_id=observation.boefje.id %}"
