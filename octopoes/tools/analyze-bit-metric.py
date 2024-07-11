@@ -77,13 +77,17 @@ def cli(ctx: click.Context, url: str, node: str, timeout: int, verbosity: int):
     ctx.ensure_object(dict)
     ctx.obj["client"] = client
     ctx.obj["raw_bit_metrics"] = client.history("BIT_METRIC", False, True)
+    if not ctx.obj["raw_bit_metrics"]:
+        raise click.UsageError("No bit metrics found")
+    if "error" in ctx.obj["raw_bit_metrics"] and ctx.obj["raw_bit_metrics"]["error"] == "Node not found":
+        raise click.UsageError("Node node found")
     ctx.obj["bit_metrics"] = list(map(lambda x: BitMetric(x), ctx.obj["raw_bit_metrics"]))
 
 
 @cli.command(help="Returns the raw bit metric")
 @click.pass_context
 def raw(ctx: click.Context):
-    click.echo(ctx.obj["raw_bit_metrics"])
+    click.echo(json.dumps(ctx.obj["raw_bit_metrics"]))
 
 
 @cli.command(help="Returns the parsed metric")
