@@ -7,7 +7,7 @@ from tests.integration.conftest import seed_system
 
 
 @pytest.mark.slow
-def test_aggregate_report_benchmark(octopoes_api_connector, valid_time):
+def test_aggregate_report_benchmark(octopoes_api_connector, valid_time, organization):
     hostname_range = range(0, 20)
     for x in hostname_range:
         seed_system(
@@ -26,6 +26,7 @@ def test_aggregate_report_benchmark(octopoes_api_connector, valid_time):
         [Hostname(name=f"{x}.com", network=Network(name="test").reference) for x in hostname_range],
         reports,
         valid_time,
+        organization.code,
     )
 
     assert data["systems"]
