@@ -97,33 +97,44 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
         reference: Reference,
         organization: Organization,
     ) -> tuple[list[OriginData], list[OriginData], list[OriginData]]:
+        results = [], [], []
         try:
             origins = self.octopoes_api_connector.list_origins(self.observed_at, result=reference)
             origin_data = [OriginData(origin=origin) for origin in origins]
-
-            for origin in origin_data:
-                if origin.origin.origin_type != OriginType.OBSERVATION or not origin.origin.task_id:
-                    continue
-
-                try:
-                    client = get_bytes_client(organization.code)
-                    client.login()
-
-                    normalizer_data = client.get_normalizer_meta(origin.origin.task_id)
-                    boefje_id = normalizer_data["raw_data"]["boefje_meta"]["boefje"]["id"]
-                    origin.normalizer = normalizer_data
-                    origin.boefje = get_katalogus(organization.code).get_plugin(boefje_id)
-                except HTTPError as e:
-                    logger.error(e)
-
-            return (
-                [origin for origin in origin_data if origin.origin.origin_type == OriginType.DECLARATION],
-                [origin for origin in origin_data if origin.origin.origin_type == OriginType.OBSERVATION],
-                [origin for origin in origin_data if origin.origin.origin_type == OriginType.INFERENCE],
-            )
         except Exception as e:
             logger.error(e)
-            return [], [], []
+            return results
+        
+        try:
+            bytes = get_bytes_client(organization.code)
+            client.login()
+        except HTTPError as e:
+            logger.error(e)
+            return results
+
+        katalogus = get_katalogus(organization.code)
+
+        for origin in origin_data:
+            if origin.origin.origin_type != OriginType.OBSERVATION or not origin.origin.task_id:
+                if origin.origin.origin_type == OriginType.DECLARATION:
+                    results[0].append(origin)    
+                else if origin.origin.origin_type == OriginType.INFERENCE:
+                    results[2].append(origin) 
+                continue
+
+            try:
+                normalizer_data = bytes.get_normalizer_meta(origin.origin.task_id)
+            except HTTPError as e:
+                logger.error('Could not load Normalizer meta', e)
+            else:    
+                boefje_id = normalizer_data["raw_data"]["boefje_meta"]["boefje"]["id"]
+                origin.normalizer = normalizer_data
+                try:
+                    origin.boefje = katalogus.get_plugin(boefje_id)
+                except HTTPError as e:
+                    logger.error(e)
+            results[1].append(origin)
+        return results
 
     def handle_connector_exception(self, exception: Exception):
         if isinstance(exception, ObjectNotFoundException):
