@@ -168,7 +168,7 @@ class SchedulerTestCase(unittest.TestCase):
     def test_pop_item_from_queue_empty(self):
         pass
 
-    def test_post_push__(self):
+    def test_post_push(self):
         """When a task is added to the queue, it should be added to the database"""
         # Arrange
         item = functions.create_item(
@@ -282,7 +282,7 @@ class SchedulerTestCase(unittest.TestCase):
 
         # There should be only one schedule
         schedules, _ = self.mock_ctx.datastores.schedule_store.get_schedules(
-            self.scheduler.scheduler_id
+            scheduler_id=self.scheduler.scheduler_id
         )
         breakpoint()
 

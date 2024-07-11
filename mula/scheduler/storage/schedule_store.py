@@ -19,6 +19,7 @@ class ScheduleStore:
     @exception_handler
     def get_schedules(
         self,
+        scheduler_id: str | None = None,
         schedule_hash: str | None = None,
         enabled: bool | None = True,
         min_deadline_at: datetime | None = None,
@@ -30,8 +31,10 @@ class ScheduleStore:
         filters: FilterRequest | None = None,
     ) -> tuple[list[models.Schedule], int]:
         with self.dbconn.session.begin() as session:
-            breakpoint()
             query = session.query(models.ScheduleDB)
+
+            if scheduler_id is not None:
+                query = query.filter(models.ScheduleDB.scheduler_id == scheduler_id)
 
             if enabled is not None:
                 query = query.filter(models.ScheduleDB.enabled == enabled)
