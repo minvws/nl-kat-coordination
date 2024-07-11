@@ -1,9 +1,10 @@
 import timeit
 import uuid
 from datetime import datetime, timezone
-from logging import config, getLogger
+from logging import config
 from pathlib import Path
 
+import structlog
 import yaml
 from celery.signals import worker_process_init, worker_process_shutdown
 from celery.utils.log import get_task_logger
@@ -19,7 +20,7 @@ from octopoes.tasks.app import app
 from octopoes.xtdb.client import XTDBSession
 
 settings = Settings()
-logger = getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 try:
     with Path(settings.log_cfg).open() as log_config:
@@ -27,6 +28,22 @@ try:
         logger.info("Configured loggers with config: %s", settings.log_cfg)
 except FileNotFoundError:
     logger.warning("No log config found at: %s", settings.log_cfg)
+
+structlog.configure(
+    processors=[
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.add_log_level,
+        structlog.processors.StackInfoRenderer(),
+        structlog.dev.set_exc_info,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.TimeStamper("iso", utc=False),
+        structlog.dev.ConsoleRenderer(colors=True),
+    ],
+    context_class=dict,
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    wrapper_class=structlog.stdlib.BoundLogger,
+    cache_logger_on_first_use=True,
+)
 
 
 @worker_process_shutdown.connect
