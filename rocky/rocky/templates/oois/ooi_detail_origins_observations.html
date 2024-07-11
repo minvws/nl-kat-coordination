@@ -18,7 +18,7 @@
                 </thead>
                 <tbody>
                     {% for observation in observations %}
-                        <tr>
+                        <tr {% if observation.is_old %} class="warning" {% endif %]>
                             <td>
                                 {% if observation.boefje.id %}
                                     <a href="{% url 'boefje_detail' organization_code=organization.code plugin_id=observation.boefje.id %}"
@@ -37,7 +37,8 @@
                                     {% translate "No Raw file could be found, this might point to an error in OpenKAT" %}
                                 {% endif %}
                             </td>
-                            <td>
+                            <td  {% if observation.is_old %} aria-label="{% translate "Warning" %}" {% endif %} >
+                                {% if observation.is_old %}<span>{% translate "Warning" %}:</span>{% endif %}
                                 <span title="{{ observation.normalizer.raw_data.boefje_meta.ended_at }} UTC">{{ observation.normalizer.raw_data.boefje_meta.ended_at|naturaltime }}</span>
                             </td>
                         </tr>
