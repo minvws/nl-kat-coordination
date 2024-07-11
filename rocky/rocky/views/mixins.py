@@ -101,7 +101,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
         try:
             origins = self.octopoes_api_connector.list_origins(self.observed_at, result=reference)
         except Exception as e:
-            logger.error("Could not load origins for OOI: {!r} from octopoes: {!r}".format(reference, e)
+            logger.error("Could not load origins for OOI: {!r} from octopoes: {!r}".format(reference, e))
             return results
 
         try:
@@ -132,7 +132,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
                 try:
                     origin.boefje = katalogus.get_plugin(boefje_id)
                 except HTTPError as e:
-                    logger.error("Could not load boefje from katalogus: {}, error: {!r}".format(boefje_id, e))
+                    logger.error("Could not load boefje from katalogus: {!r}, error: {!r}".format(boefje_id, e))
             results[1].append(origin)
         return results
 
