@@ -48,16 +48,6 @@ class SchedulerAPI:
             description="Update a scheduler",
         )
 
-        # FIXME
-        # self.api.add_api_route(
-        #     path="/schedulers/{scheduler_id}/tasks",
-        #     endpoint=self.list_tasks,
-        #     methods=["GET"],
-        #     response_model=PaginatedResponse,
-        #     status_code=status.HTTP_200_OK,
-        #     description="List all tasks for a scheduler",
-        # )
-
     def list(self) -> Any:
         return [models.Scheduler(**s.dict()) for s in self.schedulers.values()]
 

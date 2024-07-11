@@ -55,6 +55,7 @@ class APITemplateTestCase(unittest.TestCase):
             ctx=self.mock_ctx,
             scheduler_id=self.organisation.id,
             queue=queue,
+            create_schedule=True,
         )
 
         # API server and Test Client
@@ -159,7 +160,7 @@ class APITestCase(APITemplateTestCase):
         response = self.client.get("/queues/123.123")
         self.assertEqual(response.status_code, 404)
 
-    def test_push_queue(self):
+    def test_push_queue__(self):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         item = create_task_in(1)
@@ -179,13 +180,12 @@ class APITestCase(APITemplateTestCase):
             response_post.json().get("id"), response_get_task.json().get("id")
         )
 
-        # TODO: uncomment when schema endpoint is implemented
-        # Schema should be created
-        # response_get_schedule = self.client.get(f"/schema?hash{response_post.json().get('hash')}")
-        # self.assertEqual(200, response_get_schedule.status_code)
-        # self.assertEqual(
-        #     response_post.json().get("hash"), response_get_schedule.json().get("results")[0].get("p_item").get("hash")
-        # )
+        # Schedule should be created, and schedule_id should be in the
+        # response of the post request
+        response_get_schedule = self.client.get(
+            f"/schedules/{response_post.json().get('schedule_id')}"
+        )
+        self.assertEqual(200, response_get_schedule.status_code)
 
     def test_push_incorrect_item_type(self):
         response = self.client.post(
@@ -624,13 +624,15 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         self.assertEqual(200, response_get_task.status_code)
         self.assertEqual(initial_item_id, response_get_task.json().get("id"))
 
-        # TODO: uncomment when schema endpoint is implemented
-        # Schema should be created
-        # response_get_schedule = self.client.get(f"/schema?hash{response_post.json().get('hash')}")
-        # self.assertEqual(200, response_get_schedule.status_code)
-        # self.assertEqual(
-        #     response_post.json().get("hash"), response_get_schedule.json().get("results")[0].get("p_item").get("hash")
-        # )
+        # Schedule should be created
+        response_get_schedule = self.client.get(
+            f"/schedule?hash{response_post.json().get('hash')}"
+        )
+        self.assertEqual(200, response_get_schedule.status_code)
+        self.assertEqual(
+            response_post.json().get("hash"),
+            response_get_schedule.json().get("results")[0].get("p_item").get("hash"),
+        )
 
     def test_get_tasks(self):
         response = self.client.get("/tasks")
@@ -845,9 +847,7 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         self.assertEqual(200, response.status_code)
 
 
-# TODO: implement api server schema endpoints
-# TODO: fix schedule references to schema
-class APISchemaEndpointTestCase(APITemplateTestCase):
+class APIScheduleEndpointTestCase(APITemplateTestCase):
     def setUp(self):
         super().setUp()
 

@@ -130,7 +130,7 @@ class QueueAPI:
             ) from exc
 
         try:
-            s.push_item_to_queue(new_item)
+            pushed_item = s.push_item_to_queue(new_item)
         except ValueError as exc_value:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
@@ -148,4 +148,4 @@ class QueueAPI:
                 detail=str(exc_not_allowed),
             ) from exc_not_allowed
 
-        return new_item
+        return pushed_item

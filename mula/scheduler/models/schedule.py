@@ -60,7 +60,7 @@ class ScheduleDB(Base):
 
     scheduler_id = Column(String, nullable=False)
 
-    hash = Column(String(32), nullable=True)  # TODO: unique=True
+    hash = Column(String(32), nullable=True, unique=True)
 
     data = Column(JSONB, nullable=False)
 
@@ -68,7 +68,6 @@ class ScheduleDB(Base):
 
     schedule = Column(String, nullable=True)
 
-    # TODO: cascade
     tasks = relationship("TaskDB", back_populates="schedule")
 
     deadline_at = Column(

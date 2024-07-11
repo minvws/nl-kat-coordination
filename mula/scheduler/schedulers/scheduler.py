@@ -280,11 +280,11 @@ class Scheduler(abc.ABC):
             scheduler_id=self.scheduler_id,
         )
 
-        self.post_push(item)
+        item = self.post_push(item)
 
         return item
 
-    def post_push(self, item: models.Task) -> None:
+    def post_push(self, item: models.Task) -> models.Task:
         """After an in item is pushed to the queue, we execute this function
 
         Args:
@@ -300,7 +300,7 @@ class Scheduler(abc.ABC):
                 queue_id=self.queue.pq_id,
                 scheduler_id=self.scheduler_id,
             )
-            return
+            return item
 
         schedule_db = self.ctx.datastores.schedule_store.get_schedule(item.schedule_id)
         if schedule_db is None:
@@ -317,7 +317,7 @@ class Scheduler(abc.ABC):
             schedule_db = self.ctx.datastores.schedule_store.create_schedule(schedule)
             item.schedule_id = schedule_db.id
             self.ctx.datastores.task_store.update_task(item)
-            return
+            return item
 
         if schedule_db.enabled is False:
             self.logger.debug(
@@ -328,10 +328,12 @@ class Scheduler(abc.ABC):
                 queue_id=self.queue.pq_id,
                 scheduler_id=self.scheduler_id,
             )
-            return
+            return item
 
         schedule_db.deadline_at = cron.next_run(schedule_db.schedule)
         self.ctx.datastores.schedule_store.update_schedule(schedule_db)
+
+        return item
 
     # TODO: check when return None is significant
     def pop_item_from_queue(

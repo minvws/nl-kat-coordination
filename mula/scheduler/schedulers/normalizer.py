@@ -251,13 +251,11 @@ class NormalizerScheduler(Scheduler):
             ),
         )
 
-        # TODO: check the correct attributes, schema
         task = Task(
             scheduler_id=self.scheduler_id,
             priority=score,
             hash=normalizer_task.hash,
             data=normalizer_task.model_dump(),
-            # schema_id=
         )
 
         try:

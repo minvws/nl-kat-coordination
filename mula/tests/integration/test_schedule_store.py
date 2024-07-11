@@ -189,8 +189,7 @@ class ScheduleStoreTestCase(unittest.TestCase):
         )
         self.assertEqual(is_schedule_deleted, None)
 
-    # TODO: review and fix this
-    def test_delete_schedule_cascade(self):
+    def test_delete_schedule_ondelete(self):
         """When a schedule is deleted, its tasks should NOT be deleted."""
         # Arrange
         scheduler_id = "test_scheduler_id"

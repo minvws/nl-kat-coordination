@@ -117,6 +117,30 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertIsNotNone(schedule_db)
         self.assertEqual(schedule_db.id, task_db.schedule_id)
 
+    def test_push_item_to_queue_create_schedule_false(self):
+        # Arrange
+        item = functions.create_item(
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+        )
+
+        # Act
+        self.scheduler.push_item_to_queue(item, create_schedule=False)
+
+        # Task should be on priority queue
+        pq_item = self.scheduler.queue.peek(0)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(pq_item.id, item.id)
+
+        # Task should be in datastore, and queued
+        task_db = self.mock_ctx.datastores.task_store.get_task(str(item.id))
+        self.assertEqual(task_db.id, item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Schedule should not be in datastore
+        with self.assertRaises(storage.errors.NotFoundError):
+            self.mock_ctx.datastores.schedule_store.get_schedule(task_db.schedule_id)
+
     def test_push_item_to_queue_full(self):
         # Arrange
         item = functions.create_item(

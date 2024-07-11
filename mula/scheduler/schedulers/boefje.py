@@ -595,20 +595,11 @@ class BoefjeScheduler(Scheduler):
             )
         )
 
-        # Get schedule
-        schedule = self.ctx.datastores.schedule_store.get_schedule_by_hash(
-            boefje_task.hash
-        )
-        # TODO: what if you don't find one?
-
-        # TODO: check the correct attributes, schedule
-        # TODO: test schedule_id
         task = Task(
             scheduler_id=self.scheduler_id,
             priority=score,
             hash=boefje_task.hash,
             data=boefje_task.model_dump(),
-            schedule_id=schedule.id if schedule else None,
         )
 
         try:
