@@ -16,7 +16,7 @@ def test_one_process(manager: SchedulerWorkerManager, item_handler: MockHandler)
         manager.run(WorkerManager.Queue.BOEFJES)
 
     items = item_handler.get_all()
-    assert len(items) == 2
+    assert len(items) == 3
     assert items[0].boefje.id == "dns-records"
     assert items[1].boefje.id == "dns-records"
 

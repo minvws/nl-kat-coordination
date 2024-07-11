@@ -1,0 +1,22 @@
+{
+  "id": "e6f8b2d0-f7ae-40f8-ba57-bebf885b4073",
+  "scheduler_id": "boefje-_dev",
+  "hash": "c407627d363e08439792fbe6f5dc1cd9",
+  "priority": 1,
+  "data": {
+    "id": "e6f8b2d0-f7ae-40f8-ba57-bebf885b4073",
+    "boefje": {
+      "id": "remote-scanner",
+      "name": "Remote scanner",
+      "remote": true,
+      "version": null
+    },
+    "remote": true,
+    "input_ooi": "IPAddressV4|internet|46.23.85.171",
+    "dispatches": [],
+    "organization": "_dev"
+  },
+  "created_at": "2024-07-03T14:13:11.764181Z",
+  "modified_at": "2024-07-03T14:13:11.764196Z",
+  "remote": true
+}

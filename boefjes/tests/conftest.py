@@ -118,10 +118,12 @@ def item_handler(tmp_path: Path):
 @pytest.fixture
 def manager(item_handler: MockHandler, tmp_path: Path) -> SchedulerWorkerManager:
     scheduler_client = MockSchedulerClient(
-        get_dummy_data("scheduler/queues_response.json"),
-        2 * [get_dummy_data("scheduler/pop_response_boefje.json")] + [get_dummy_data("scheduler/should_crash.json")],
-        [get_dummy_data("scheduler/pop_response_normalizer.json")],
-        tmp_path / "patch_task_log",
+        queue_response=get_dummy_data("scheduler/queues_response.json"),
+        boefje_responses=2 * [get_dummy_data("scheduler/pop_response_boefje.json")]
+        + [get_dummy_data("scheduler/should_crash.json")]
+        + [get_dummy_data("scheduler/pop_response_remote_boefje.json")],
+        normalizer_responses=[get_dummy_data("scheduler/pop_response_normalizer.json")],
+        log_path=tmp_path / "patch_task_log",
     )
 
     return SchedulerWorkerManager(item_handler, scheduler_client, Settings(pool_size=1, poll_interval=0.01), "DEBUG")
