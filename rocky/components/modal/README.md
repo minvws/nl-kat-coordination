@@ -20,7 +20,7 @@ First you need to add `{% load component_tags %}` at the top of your template. N
 {% endblock html_at_end_body %}
 ```
 
-After that, `{% component "modal" size="xx" dialogid="xx" %}` is enough to instantiate the dialog modal component, where `dialogid` should be a unique identifier to enable multiple dialogs on the same page, and size should contain the appropriate class name to achieve the correct sizing. This can be either `dialog-small`, `dialog-medium` or `dialog-large`.
+After that, `{% component "modal" size="xx" %}` is enough to instantiate the dialog modal component where size should contain the appropriate class name to achieve the correct sizing. This can be either `dialog-small`, `dialog-medium` or `dialog-large`.
 
 ### Slots and fills
 
@@ -28,7 +28,7 @@ Each named `fill` corresponds with a placeholder/target `slot` in the component 
 
 There's a total of four slots you can fill:
 
-1.  `trigger`: call to action `button` by default, with the caption "Open modal -dialog id-".
+1.  `trigger`: call to action `button` by default, with the caption "Open modal".
 2.  `header`: empty by default
 3.  `content`: empty by default
 4.  `footer_buttons`: cancel `button` by default. To have _no buttons_ show at all, it's needed to implement empty `fill` tags for this `slot`.
@@ -44,7 +44,7 @@ Including `{% component_css_dependencies %}` is needed to inject the reference t
 ### Example implementation
 
 ```
-{% component "modal" size="dialog-small" dialogid="id1" %}
+{% component "modal" size="dialog-small" %}
   {% fill "trigger" %}
 		<button class="modal-trigger">Click here to open the modal.</button>
 	{% endfill %}
