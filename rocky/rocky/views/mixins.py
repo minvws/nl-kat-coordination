@@ -101,7 +101,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
         try:
             origins = self.octopoes_api_connector.list_origins(self.observed_at, result=reference)
         except Exception as e:
-            logger.error("Could not load origins for OOI: {!r} from octopoes: {!r}".format(reference, e))
+            logger.error(f"Could not load origins for OOI: {reference!r} from octopoes: {e!r}")
             return results
 
         try:
@@ -125,14 +125,14 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
             try:
                 normalizer_data = bytesclient.get_normalizer_meta(origin.origin.task_id)
             except HTTPError as e:
-                logger.error("Could not load Normalizer meta for task_id: {!r}, error: {!r}".format(origin.origin.task_id, e))
+                logger.error(f"Could not load Normalizer meta for task_id: {origin.origin.task_id!r}, error: {e!r}")
             else:
                 boefje_id = normalizer_data["raw_data"]["boefje_meta"]["boefje"]["id"]
                 origin.normalizer = normalizer_data
                 try:
                     origin.boefje = katalogus.get_plugin(boefje_id)
                 except HTTPError as e:
-                    logger.error("Could not load boefje from katalogus: {!r}, error: {!r}".format(boefje_id, e))
+                    logger.error(f"Could not load boefje from katalogus: {boefje_id!r}, error: {e!r}")
             results[1].append(origin)
         return results
 
