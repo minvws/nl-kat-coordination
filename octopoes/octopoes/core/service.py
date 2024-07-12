@@ -3,10 +3,12 @@ from collections import Counter
 from collections.abc import Callable, ValuesView
 from datetime import datetime, timezone
 from logging import getLogger
+from time import perf_counter
 from typing import overload
 
 from bits.definitions import get_bit_definitions
 from bits.runner import BitRunner
+from pydantic import TypeAdapter
 
 from octopoes.config.settings import (
     DEFAULT_LIMIT,
@@ -43,6 +45,7 @@ from octopoes.repositories.ooi_repository import OOIRepository
 from octopoes.repositories.origin_parameter_repository import OriginParameterRepository
 from octopoes.repositories.origin_repository import OriginRepository
 from octopoes.repositories.scan_profile_repository import ScanProfileRepository
+from octopoes.xtdb.client import Operation, OperationType, XTDBSession
 
 logger = getLogger(__name__)
 settings = Settings()
@@ -67,11 +70,13 @@ class OctopoesService:
         origin_repository: OriginRepository,
         origin_parameter_repository: OriginParameterRepository,
         scan_profile_repository: ScanProfileRepository,
+        session: XTDBSession | None = None,
     ):
         self.ooi_repository = ooi_repository
         self.origin_repository = origin_repository
         self.origin_parameter_repository = origin_parameter_repository
         self.scan_profile_repository = scan_profile_repository
+        self.session = session
 
     @overload
     def _populate_scan_profiles(self, oois: ValuesView[OOI], valid_time: datetime) -> ValuesView[OOI]: ...
@@ -200,7 +205,23 @@ class OctopoesService:
                 config = configs[-1].config
 
         try:
-            resulting_oois = BitRunner(bit_definition).run(source, parameters, config=config)
+            if isinstance(self.session, XTDBSession):
+                start = perf_counter()
+                resulting_oois = BitRunner(bit_definition).run(source, parameters, config=config)
+                stop = perf_counter()
+                metrics: dict[str, str] = {
+                    "bit": bit_definition.id,
+                    "config": json.dumps(config),
+                    "elapsed": str(stop - start),
+                    "parameters": TypeAdapter(list[OOI]).dump_json(parameters).decode(),
+                    "source": source.model_dump_json(),
+                    "xt/id": "BIT_METRIC",
+                    "yield": TypeAdapter(list[OOI]).dump_json(resulting_oois).decode(),
+                }
+                ops: list[Operation] = [(OperationType.PUT, metrics, valid_time)]
+                self.session.client.submit_transaction(ops)
+            else:
+                resulting_oois = BitRunner(bit_definition).run(source, parameters, config=config)
             self.save_origin(origin, resulting_oois, valid_time)
         except Exception as e:
             logger.exception("Error running inference", exc_info=e)

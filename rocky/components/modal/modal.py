@@ -7,7 +7,6 @@ class Modal(component.Component):
 
     def get_context_data(self, **kwargs):
         return {
-            "dialogid": kwargs["dialogid"],
             "size": kwargs["size"],
         }
 

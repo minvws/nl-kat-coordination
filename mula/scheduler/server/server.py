@@ -306,7 +306,8 @@ class Server:
             )
 
         # FIXME: deprecated; backwards compatibility for rocky that uses the
-        # input_ooi and plugin_id parameters.
+        # input_ooi and plugin_id parameters. These filter options should be
+        # defined in the filter request payload not as query parameters.
         f_req = filters or storage.filters.FilterRequest(filters={})
         if input_ooi is not None:
             if task_type == "boefje":
@@ -351,6 +352,9 @@ class Server:
 
             f_req.filters.update(f_ooi)  # type: ignore
 
+        # FIXME: deprecated; backwards compatibility for rocky that uses the
+        # input_ooi and plugin_id parameters. These filter options should be
+        # defined in the filter request payload not as query parameters.
         if plugin_id is not None:
             if task_type == "boefje":
                 f_plugin = {
@@ -364,12 +368,16 @@ class Server:
                     ]
                 }
             elif task_type == "normalizer":
-                f_plugin = storage.filters.Filter(
-                    column="p_item",
-                    field="data__normalizer__id",
-                    operator="eq",
-                    value=plugin_id,
-                )
+                f_plugin = {
+                    "and": [
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__normalizer__id",
+                            operator="eq",
+                            value=plugin_id,
+                        )
+                    ]
+                }
             else:
                 f_plugin = {
                     "or": [

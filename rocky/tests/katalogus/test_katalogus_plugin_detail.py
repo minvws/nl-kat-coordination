@@ -22,7 +22,9 @@ def test_plugin_detail_view(
     )
 
     assertContains(response, "TestBoefje")
-    assertContains(response, "Completed")
+    assertContains(response, "Produces")
+    assertContains(response, "Tasks")
+    assertContains(response, "Object list")
     assertContains(response, "Consumes")
     assertContains(response, plugin_details.description)
 

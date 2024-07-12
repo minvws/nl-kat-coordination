@@ -1,7 +1,7 @@
-import logging
 from typing import Any
 
 import prometheus_client
+import structlog
 from fastapi import APIRouter, Depends, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.requests import Request
@@ -16,7 +16,7 @@ from bytes.repositories.meta_repository import MetaDataRepository
 from bytes.version import __version__
 
 router = APIRouter()
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class ServiceHealth(BaseModel):

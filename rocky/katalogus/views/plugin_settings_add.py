@@ -1,5 +1,3 @@
-import logging
-
 from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -10,8 +8,6 @@ from httpx import HTTPError
 
 from katalogus.forms import PluginSchemaForm
 from katalogus.views.mixins import SinglePluginView
-
-logger = logging.getLogger(__name__)
 
 
 class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginView, FormView):
