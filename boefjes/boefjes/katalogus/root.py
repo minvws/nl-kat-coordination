@@ -49,10 +49,7 @@ logger = structlog.get_logger(__name__)
 app = FastAPI(title="KAT-alogus API", version=__version__)
 
 if settings.span_export_grpc_endpoint is not None:
-    logger.info(
-        "Setting up instrumentation with span exporter endpoint [%s]",
-        settings.span_export_grpc_endpoint,
-    )
+    logger.info("Setting up instrumentation with span exporter endpoint [%s]", settings.span_export_grpc_endpoint)
 
     FastAPIInstrumentor.instrument_app(app)
     Psycopg2Instrumentor().instrument()
