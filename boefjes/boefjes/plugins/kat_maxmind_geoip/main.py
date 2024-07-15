@@ -12,7 +12,7 @@ import requests
 from boefjes.job_models import BoefjeMeta
 
 BASE_PATH = Path(getenv("OPENKAT_CACHE_PATH", Path(__file__).parent))
-GEOIP_PATH = BASE_PATH / "geoip.json"
+GEOIP_PATH = BASE_PATH / "GeoLite2-City_20240712/GeoLite2-City.mmdb"
 GEOIP_META_PATH = BASE_PATH / "geoip-meta.json"
 GEOIP_SOURCE_URL = "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz"
 GEOIP_CACHE_TIMEOUT = 7200  # in seconds
@@ -76,4 +76,6 @@ def refresh_geoip(algo: str) -> dict:
         "hash": create_hash(response.content, algo),
         "hash_algorithm": algo,
     }
+    with open(GEOIP_META_PATH, "w") as meta_file:
+        json.dump(metadata, meta_file)
     return metadata
