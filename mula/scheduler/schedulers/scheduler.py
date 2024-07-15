@@ -302,7 +302,7 @@ class Scheduler(abc.ABC):
             )
             return item
 
-        schedule_db = self.ctx.datastores.schedule_store.get_schedule(item.schedule_id)
+        schedule_db = self.ctx.datastores.schedule_store.get_schedule_by_hash(item.hash)
         if schedule_db is None:
             deadline_at = self.calculate_deadline(item)
             cron_expression = f"{deadline_at.minute} {deadline_at.hour} * * *"

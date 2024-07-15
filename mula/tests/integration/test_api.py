@@ -626,12 +626,12 @@ class APITasksEndpointTestCase(APITemplateTestCase):
 
         # Schedule should be created
         response_get_schedule = self.client.get(
-            f"/schedule?hash{response_post.json().get('hash')}"
+            f"/schedules?hash{response_post.json().get('hash')}"
         )
         self.assertEqual(200, response_get_schedule.status_code)
         self.assertEqual(
             response_post.json().get("hash"),
-            response_get_schedule.json().get("results")[0].get("p_item").get("hash"),
+            response_get_schedule.json().get("results")[0].get("hash"),
         )
 
     def test_get_tasks(self):
