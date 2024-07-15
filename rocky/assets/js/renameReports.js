@@ -1,18 +1,28 @@
-function editReportName() {
-  const old_name_id = document.getElementById("old-report-name").value;
-  const new_name = document.getElementById("new-report-name").value;
+import { onDomReady } from "../js/imports/utils.js";
 
-  const update_cell = document.getElementById(old_name_id);
-  update_cell.innerHTML = new_name;
+onDomReady(initConfirmButtons);
+
+export function initConfirmButtons(element) {
+  let root = element || document;
+  let confirm_buttons = root.querySelectorAll(".confirm-button");
+
+  confirm_buttons.forEach((button) => initClickHandlers(button));
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  confirm_id.addEventListener("click", function (event) {
-    const old_report_name = event.target
-      .closest("dialog")
-      .querySelector(".old-report-name").value;
-    const confirm_button = event.target
-      .closest("dialog")
-      .getElementById("confirm");
+function initClickHandlers(button) {
+  button.addEventListener("click", function (event) {
+    const target = event.target.closest("dialog");
+
+    editReportName(target);
   });
-});
+}
+
+function editReportName(target) {
+  const old_name_id = target.querySelector(".old-report-name").value;
+  const new_name = target.querySelector(".new-report-name").value;
+  const reference_date = target.querySelector(".reference-date").value;
+
+  const update_cell = document.getElementById(old_name_id);
+
+  update_cell.innerHTML = new_name + " - " + reference_date;
+}

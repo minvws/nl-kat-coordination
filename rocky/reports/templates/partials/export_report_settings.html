@@ -41,23 +41,23 @@
                                 {% csrf_token %}
                                 <p>
                                     {% blocktranslate %}
-                                                        Give your report a custom name and optionally add the reports' reference date
-                                                        to the name. To do so you can select a standard option or use a
-                                                        <a href="https://strftime.org/">Python strftime code</a> in the report name.
-                                                    {% endblocktranslate %}
+                                                                    Give your report a custom name and optionally add the reports' reference date
+                                                                    to the name. To do so you can select a standard option or use a
+                                                                    <a href="https://strftime.org/">Python strftime code</a> in the report name.
+                                                                {% endblocktranslate %}
                                 </p>
                                 <p>
                                     <input type="hidden"
                                            class="old-report-name"
                                            value="{{ report_name|slugify }}">
                                     <label for="report-name">{% translate "Report name" %}</label>
-                                    <input id="new-report-name"
+                                    <input class="new-report-name"
                                            name="report-name"
                                            type="text"
                                            value="{{ report_name }}">
                                     <div>
                                         <label for="reference-date">{% translate "Add reference date" %}</label>
-                                        <select id="reference-date" name="reference-date" required>
+                                        <select class="reference-date" name="reference-date" required>
                                             <option disabled selected value="">-- {% translate "Select option" %} --</option>
                                             <option value="">{% translate "No reference date" %}</option>
                                             <option value="{{ current_datetime|date:"N jS Y, H:i" }}">
@@ -76,7 +76,9 @@
                             </form>
                         {% endfill %}
                         {% fill "footer_buttons" %}
-                        <input id="confirm" type="button" class="close-modal-button" value="Confirm">
+                        <input type="button"
+                               class="confirm-button close-modal-button"
+                               value="Confirm">
                     {% endfill %}
                 {% endcomponent %}
                 {% component_css_dependencies %}
