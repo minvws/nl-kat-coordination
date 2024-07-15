@@ -1,15 +1,13 @@
 import hashlib
 import io
 import json
-import os
 import tarfile
-import tempfile
 from datetime import datetime
 from os import getenv
 from pathlib import Path
 
+import maxminddb
 import requests
-from netaddr import IPAddress, IPNetwork
 
 from boefjes.job_models import BoefjeMeta
 
@@ -23,32 +21,21 @@ HASHFUNC = "sha256"
 
 def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]
-    ip = input_["address"]
-    now = datetime.utcnow()
     hash_algorithm = getenv("HASHFUNC", HASHFUNC)
 
     if not GEOIP_PATH.exists() or cache_out_of_date():
-        geoip_json, geoip_meta = refresh_geoip(hash_algorithm)
+        geoip_meta = refresh_geoip(hash_algorithm)
     else:
-        with GEOIP_PATH.open() as json_file:
-            geoip_json = json.load(json_file)
         with GEOIP_META_PATH.open() as json_meta_file:
             geoip_meta = json.load(json_meta_file)
-    exists = False
-    notexpired = False
-    roas = []
-    for roa in geoip_json["roas"]:
-        if IPAddress(ip) in IPNetwork(roa["prefix"]):
-            exists = True
-            expires = datetime.fromtimestamp(roa["expires"])
-            roas.append({"prefix": roa["prefix"], "expires": expires.strftime("%Y-%m-%dT%H:%M"), "ta": roa["ta"]})
-            if expires > now:
-                notexpired = True
 
-    results = {"vrps_records": roas, "notexpired": notexpired, "exists": exists}
+    with maxminddb.open_database(
+        "boefjes/plugins/kat_maxmind_geoip/GeoLite2-City_20240712/GeoLite2-City.mmdb"
+    ) as reader:
+        results = reader.get(input_["address"])
 
     return [
-        (set(), json.dumps(results)),
+        ({"geoip/geo"}, json.dumps(results)),
         (
             {"geoip/cache-meta"},
             json.dumps(geoip_meta),
@@ -71,9 +58,11 @@ def cache_out_of_date() -> bool:
     return (now - cached_file_timestamp).total_seconds() > maxage
 
 
-def refresh_geoip(algo: str) -> tuple[dict, dict]:
+def refresh_geoip(algo: str) -> dict:
+    maxmind_username = getenv("MAXMIND_USERNAME", "")
+    maxmind_password = getenv("MAXMIND_PASSWORD", "")
     source_url = getenv("GEOIP_SOURCE_URL", GEOIP_SOURCE_URL)
-    response = requests.get(source_url, allow_redirects=True, timeout=30)
+    response = requests.get(source_url, allow_redirects=True, timeout=30, auth=(maxmind_username, maxmind_password))
     response.raise_for_status()
 
     file_like_object = io.BytesIO(response.content)
@@ -81,16 +70,10 @@ def refresh_geoip(algo: str) -> tuple[dict, dict]:
     with tarfile.open("r:gz", fileobj=file_like_object) as tf:
         tf.extract("GeoLite2-City_20240712/GeoLite2-City.mmdb", BASE_PATH)
 
-    with tempfile.NamedTemporaryFile(mode="wb", dir=GEOIP_PATH.parent, delete=False) as temp_geoip_file:
-        temp_geoip_file.write(response.content)
-        # atomic operation
-        os.rename(temp_geoip_file.name, GEOIP_PATH)
     metadata = {
         "timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": source_url,
         "hash": create_hash(response.content, algo),
         "hash_algorithm": algo,
     }
-    with open(GEOIP_META_PATH, "w") as meta_file:
-        json.dump(metadata, meta_file)
-    return (json.loads(response.content), metadata)
+    return metadata
