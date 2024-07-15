@@ -35,7 +35,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
         results = reader.get(input_["address"])
 
     return [
-        ({"geoip/geo"}, json.dumps(results)),
+        ({"geoip/geo_data"}, json.dumps(results)),
         (
             {"geoip/cache-meta"},
             json.dumps(geoip_meta),
