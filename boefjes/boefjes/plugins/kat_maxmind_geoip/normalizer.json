@@ -1,0 +1,9 @@
+{
+  "id": "kat_maxmind_geoip_normalize",
+  "consumes": [
+    "geoip/geo_data"
+  ],
+  "produces": [
+    "GeographicLocation"
+  ]
+}
