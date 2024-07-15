@@ -1,0 +1,25 @@
+{
+  "title": "Arguments",
+  "type": "object",
+  "properties": {
+    "MAXMIND_USER_ID": {
+      "title": "USER ID",
+      "type": "string",
+      "maxLength": 2048,
+      "description": "Username for maxmind"
+    },
+    "MAXMIND_LICENCE_KEY": {
+      "title": "MAXMIND_LICENCE_KEY",
+      "maxLength": 2048,
+      "type": "string",
+      "description": "Password for maxmind"
+    }
+  },
+  "required": [
+    "MAXMIND_USER_ID",
+    "MAXMIND_LICENCE_KEY"
+  ],
+  "secret": [
+    "MAXMIND_LICENCE_KEY"
+  ]
+}

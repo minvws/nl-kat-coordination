@@ -8,7 +8,7 @@
   ],
   "scan_level": 1,
   "environment_keys": [
-    "MAXMIND_USERNAME",
-    "MAXMIND_PASSWORD"
+    "MAXMIND_USER_ID",
+    "MAXMIND_LICENCE_KEY"
   ]
 }

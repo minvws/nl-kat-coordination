@@ -59,10 +59,10 @@ def cache_out_of_date() -> bool:
 
 
 def refresh_geoip(algo: str) -> dict:
-    maxmind_username = getenv("MAXMIND_USERNAME", "")
-    maxmind_password = getenv("MAXMIND_PASSWORD", "")
+    MAXMIND_USER_ID = getenv("MAXMIND_USER_ID", "")
+    MAXMIND_LICENCE_KEY = getenv("MAXMIND_LICENCE_KEY", "")
     source_url = getenv("GEOIP_SOURCE_URL", GEOIP_SOURCE_URL)
-    response = requests.get(source_url, allow_redirects=True, timeout=30, auth=(maxmind_username, maxmind_password))
+    response = requests.get(source_url, allow_redirects=True, timeout=30, auth=(MAXMIND_USER_ID, MAXMIND_LICENCE_KEY))
     response.raise_for_status()
 
     file_like_object = io.BytesIO(response.content)
