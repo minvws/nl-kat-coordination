@@ -27,11 +27,11 @@
                     <tbody>
                         {% for report_name in reports %}
                             <tr>
-                                <td>{{ report_name }}</td>
+                                <td id="{{ report_name|slugify }}">{{ report_name }}</td>
                                 <td>
                                     {% component "modal" size="dialog-medium" %}
                                     {% fill "trigger" %}
-                                    <button class="icon ti-edit action-button modal-trigger">Edit {{ report_name }}</button>
+                                    <button id="edit-name-icon" class="icon ti-edit action-button modal-trigger">Edit {{ report_name }}</button>
                                 {% endfill %}
                                 {% fill "header" %}
                                 <h2>{% translate "Edit " %}{{ report_name }}</h2>
@@ -47,12 +47,13 @@
                                                     {% endblocktranslate %}
                                 </p>
                                 <p>
-                                    <input type="hidden" name="old-report-name" value="{{ report_name }}">
+                                    <input type="hidden"
+                                           class="old-report-name"
+                                           value="{{ report_name|slugify }}">
                                     <label for="report-name">{% translate "Report name" %}</label>
                                     <input id="new-report-name"
                                            name="report-name"
                                            type="text"
-                                           autocomplete="on"
                                            value="{{ report_name }}">
                                     <div>
                                         <label for="reference-date">{% translate "Add reference date" %}</label>
@@ -75,7 +76,7 @@
                             </form>
                         {% endfill %}
                         {% fill "footer_buttons" %}
-                        <input type="submit"  form="content-form"  class="submit"  value="Confirm">
+                        <input id="confirm" type="button" class="close-modal-button" value="Confirm">
                     {% endfill %}
                 {% endcomponent %}
                 {% component_css_dependencies %}
