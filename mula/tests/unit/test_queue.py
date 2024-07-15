@@ -60,7 +60,7 @@ class PriorityQueueTestCase(unittest.TestCase):
 
         mock_push.return_value = None
 
-        with self.assertRaises(queues.errors.PrioritizedItemNotFoundError):
+        with self.assertRaises(queues.errors.ItemNotFoundError):
             self.pq.push(item)
 
         self.assertEqual(0, self.pq.qsize())
@@ -72,7 +72,10 @@ class PriorityQueueTestCase(unittest.TestCase):
         """When pushing an item that is not of the correct type, the item
         shouldn't be pushed.
         """
-        item = {"priority": 1, "data": functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex)}
+        item = {
+            "priority": 1,
+            "data": functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex),
+        }
 
         with self.assertRaises(queues.errors.InvalidItemError):
             self.pq.push(item)
@@ -371,6 +374,8 @@ class PriorityQueueTestCase(unittest.TestCase):
         popped_item = self.pq.pop()
         self.assertEqual(first_item.data, popped_item.data)
 
+        # TODO: determine if we want to update the task status to dispatch in
+        # the pq or (as is done now) in the post_push() method in the scheduler
         # The queue should now be empty
         self.assertEqual(0, self.pq.qsize())
 

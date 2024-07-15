@@ -386,20 +386,20 @@ class Scheduler(abc.ABC):
         Args:
             item: An item from the queue
         """
-        # Update task, set status to DISPATCHED
-        task = self.ctx.datastores.task_store.get_task(str(item.id))
-        if task is None:
-            self.logger.error(
-                "Task %s not found in datastore",
-                item.id,
-                item_id=item.id,
-                queue_id=self.queue.pq_id,
-                scheduler_id=self.scheduler_id,
-            )
-            return
-
-        task.status = models.TaskStatus.DISPATCHED
-        self.ctx.datastores.task_store.update_task(task)
+        # # Update task, set status to DISPATCHED
+        # task = self.ctx.datastores.task_store.get_task(str(item.id))
+        # if task is None:
+        #     self.logger.error(
+        #         "Task %s not found in datastore",
+        #         item.id,
+        #         item_id=item.id,
+        #         queue_id=self.queue.pq_id,
+        #         scheduler_id=self.scheduler_id,
+        #     )
+        #     return
+        #
+        # task.status = models.TaskStatus.DISPATCHED
+        # self.ctx.datastores.task_store.update_task(task)
 
         self.last_activity = datetime.now(timezone.utc)
 

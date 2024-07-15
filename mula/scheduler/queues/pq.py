@@ -125,6 +125,9 @@ class PriorityQueue(abc.ABC):
         if item is None:
             return None
 
+        item.status = models.TaskStatus.DISPATCHED
+        self.pq_store.update(self.pq_id, item)
+
         return item
 
     def push(self, task: models.Task) -> models.Task | None:

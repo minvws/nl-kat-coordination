@@ -8,7 +8,7 @@ from typing import Any
 import structlog
 from opentelemetry import trace
 
-from scheduler import context, models, queues, rankers
+from scheduler import context, models, queues, rankers, storage
 from scheduler.connectors import listeners
 from scheduler.connectors.errors import ExternalServiceError
 from scheduler.models import (
@@ -350,8 +350,7 @@ class BoefjeScheduler(Scheduler):
                     ]
                 )
             )
-        except Exception as exc_db:
-            # TODO: catch StorageError
+        except storage.errors.StorageError as exc_db:
             self.logger.error(
                 "Could not get schedules for rescheduling %s",
                 self.scheduler_id,
