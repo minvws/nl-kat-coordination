@@ -1,10 +1,14 @@
 {
-  "id": "rpki",
-  "name": "RPKI",
-  "description": "Check if an IPv4 or IPv6 address has a valid VRPS record.",
+  "id": "maxmind",
+  "name": "Maxmind",
+  "description": "Fetch geolocation information for an IP address from Maxmind",
   "consumes": [
     "IPAddressV4",
     "IPAddressV6"
   ],
-  "scan_level": 1
+  "scan_level": 1,
+  "environment_keys": [
+    "MAXMIND_USERNAME",
+    "MAXMIND_PASSWORD"
+  ]
 }
