@@ -1,9 +1,9 @@
-import logging
 import uuid
 from collections.abc import Set
 from datetime import datetime, timezone
 
 import httpx
+import structlog
 from django.conf import settings
 from django.http import Http404
 
@@ -11,7 +11,7 @@ from octopoes.api.models import Declaration
 from rocky.health import ServiceHealth
 from rocky.scheduler import Boefje, BoefjeMeta, Normalizer, NormalizerMeta, RawData
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class BytesClient:
@@ -70,7 +70,7 @@ class BytesClient:
             ),
         )
 
-    def upload_raw(self, raw: bytes, manual_mime_types: set[str], input_ooi: str | None = None):
+    def upload_raw(self, raw: bytes, manual_mime_types: set[str], input_ooi: str | None = None) -> str:
         self.login()
 
         boefje_meta = BoefjeMeta(
@@ -84,7 +84,8 @@ class BytesClient:
         )
 
         self._save_boefje_meta(boefje_meta)
-        self._save_raw(boefje_meta.id, raw, {"boefje/manual"}.union(manual_mime_types))
+        raw_id = self._save_raw(boefje_meta.id, raw, {"boefje/manual"}.union(manual_mime_types))
+        return raw_id
 
     def _save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
         response = self.session.post(
