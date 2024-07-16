@@ -126,7 +126,7 @@ def update_origin(connector: OctopoesAPIConnector, origin: Origin, valid_time) -
     """
     if origin.origin_type == OriginType.OBSERVATION:
         # Note that observations need OOITypes in its result, but origins only return a list of references
-        result = connector.load_objects_bulk(set(origin.result), valid_time)
+        result = connector.load_objects_bulk(set(origin.result), valid_time).values()
         connector.save_observation(
             Observation(**origin.model_dump(exclude={"origin_type", "result"}), result=result, valid_time=valid_time)
         )
