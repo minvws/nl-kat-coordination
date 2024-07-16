@@ -17,6 +17,7 @@ GEOIP_META_PATH = BASE_PATH / "geoip-meta.json"
 GEOIP_SOURCE_URL = "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz"
 GEOIP_CACHE_TIMEOUT = 7200  # in seconds
 HASHFUNC = "sha256"
+REQUEST_TIMEOUT = 30
 
 
 def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
@@ -51,18 +52,20 @@ def create_hash(data: bytes, algo: str) -> str:
 def cache_out_of_date() -> bool:
     """Returns True if the file is older than the allowed cache_timout"""
     now = datetime.utcnow()
-    maxage = int(getenv("GEOIP_CACHE_TIMEOUT", GEOIP_CACHE_TIMEOUT))
+    max_age = int(getenv("GEOIP_CACHE_TIMEOUT", GEOIP_CACHE_TIMEOUT))
     with GEOIP_META_PATH.open() as meta_file:
         meta = json.load(meta_file)
     cached_file_timestamp = datetime.strptime(meta["timestamp"], "%Y-%m-%dT%H:%M:%SZ")
-    return (now - cached_file_timestamp).total_seconds() > maxage
+    return (now - cached_file_timestamp).total_seconds() > max_age
 
 
 def refresh_geoip(algo: str) -> dict:
-    MAXMIND_USER_ID = getenv("MAXMIND_USER_ID", "")
-    MAXMIND_LICENCE_KEY = getenv("MAXMIND_LICENCE_KEY", "")
+    maxmind_user_id = getenv("MAXMIND_USER_ID", "")
+    maxmind_licence_key = getenv("MAXMIND_LICENCE_KEY", "")
     source_url = getenv("GEOIP_SOURCE_URL", GEOIP_SOURCE_URL)
-    response = requests.get(source_url, allow_redirects=True, timeout=30, auth=(MAXMIND_USER_ID, MAXMIND_LICENCE_KEY))
+    response = requests.get(
+        source_url, allow_redirects=True, timeout=REQUEST_TIMEOUT, auth=(maxmind_user_id, maxmind_licence_key)
+    )
     response.raise_for_status()
 
     file_like_object = io.BytesIO(response.content)
