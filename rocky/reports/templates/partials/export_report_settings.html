@@ -15,7 +15,7 @@
                     give a name to the parent report. Subreports cannot be given a name.
                 {% endblocktranslate %}
             </p>
-            <div class="modal-wrapper">
+            <form id="generate_report" class="inline" method="post" action="{{ next }}">
                 <table id="report-name-table">
                     <caption class="visually-hidden">{% translate "Report names:" %}</caption>
                     <thead>
@@ -27,11 +27,20 @@
                     <tbody>
                         {% for report_name in reports %}
                             <tr>
-                                <td id="{{ report_name|slugify }}">{{ report_name }}</td>
+                                <td>
+                                    <input id="{{ report_name|slugify }}"
+                                           type="text"
+                                           readonly
+                                           value="{{ report_name }}" />
+                                </td>
                                 <td>
                                     {% component "modal" size="dialog-medium" %}
                                     {% fill "trigger" %}
-                                    <button id="edit-name-icon" class="icon ti-edit action-button modal-trigger">Edit {{ report_name }}</button>
+                                    <button type="button"
+                                            id="edit-name-icon"
+                                            class="icon ti-edit action-button modal-trigger">
+                                        Edit {{ report_name }}
+                                    </button>
                                 {% endfill %}
                                 {% fill "header" %}
                                 <h2>{% translate "Edit " %}{{ report_name }}</h2>
@@ -57,7 +66,7 @@
                                            value="{{ report_name }}">
                                     <div>
                                         <label for="reference-date">{% translate "Add reference date" %}</label>
-                                        <select class="reference-date" name="reference-date" required>
+                                        <select class="reference-date" name="reference-date">
                                             <option disabled selected value="">-- {% translate "Select option" %} --</option>
                                             <option value="">{% translate "No reference date" %}</option>
                                             <option value="{{ current_datetime|date:"N jS Y, H:i" }}">
@@ -76,9 +85,7 @@
                             </form>
                         {% endfill %}
                         {% fill "footer_buttons" %}
-                        <input type="button"
-                               class="confirm-button close-modal-button"
-                               value="Confirm">
+                        <button type="button" class="confirm-button close-modal-button">{% translate "Confirm" %}</button>
                     {% endfill %}
                 {% endcomponent %}
                 {% component_css_dependencies %}
@@ -87,14 +94,12 @@
     {% endfor %}
 </tbody>
 </table>
-<form id="generate_report" class="inline" method="post" action="{{ next }}">
-    {% csrf_token %}
-    <input type="hidden" name="reports" value="{{ reports }}">
-    <button type="submit">
-        {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
-    </button>
+{% csrf_token %}
+<input type="hidden" name="reports" value="{{ reports }}">
+<button type="submit" form="generate_report">
+    {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
+</button>
 </form>
-</div>
 {% else %}
 <a class="button ghost" href="{{ previous }}">
     <span class="icon ti-chevron-left"></span>{% translate "Go back" %}

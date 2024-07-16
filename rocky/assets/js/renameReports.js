@@ -19,13 +19,13 @@ function initClickHandlers(button) {
 
 function editReportName(target) {
   const old_name_id = target.querySelector(".old-report-name").value;
-  const new_name = target.querySelector(".new-report-name").value;
   const reference_date = target.querySelector(".reference-date").value;
+  const update_target = document.getElementById(old_name_id);
 
-  const update_cell = document.getElementById(old_name_id);
+  let new_name = target.querySelector(".new-report-name").value;
 
-  update_cell.textContent = new_name;
   if (reference_date) {
-    update_cell.textContent += " (" + reference_date + ")";
+    new_name += " (" + reference_date + ")";
   }
+  update_target.setAttribute("value", new_name);
 }
