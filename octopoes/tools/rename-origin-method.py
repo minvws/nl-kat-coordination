@@ -2,6 +2,7 @@
 
 import json
 import logging
+from typing import Any
 
 import click
 from xtdb_client import XTDBClient
@@ -47,15 +48,30 @@ def cli(ctx: click.Context, url: str, node: str, timeout: int, verbosity: int):
     ctx.obj["client"] = client
 
 
+QY = '{:query {:find [(pull ?var [*])] :where [[?var :type "Origin"][?var :origin_type "observation"][?var :method]]}}'
+
+
+def method_query(method: str):
+    if method:
+        return f"""{{
+:query {{
+    :find [(pull ?var [*])] :where [
+            [?var :type "Origin"]
+            [?var :origin_type "observation"]
+            [?var :method "{method}"]
+        ]
+    }}
+}}
+"""
+    else:
+        return QY
+
+
 @cli.command(help="List observation origins based on method")
 @click.argument("method", required=False)
 @click.pass_context
-def list(ctx: click.Context, method: str):  # noqa: A001
-    if method:
-        query = f'{{:query {{:find [(pull ?var [*])] :where [[?var :type "Origin"][?var :origin_type "observation"][?var :method "{method}"]]}}}}'  # noqa: E501
-    else:
-        query = '{:query {:find [(pull ?var [*])] :where [[?var :type "Origin"][?var :origin_type "observation"][?var :method]]}}'  # noqa: E501
-    origins = ctx.obj["client"].query(query)
+def LIST(ctx: click.Context, method: str):
+    origins = ctx.obj["client"].query(method_query(method))
     if not origins:
         raise click.UsageError("No targets found")
     if "error" in origins:
@@ -63,32 +79,33 @@ def list(ctx: click.Context, method: str):  # noqa: A001
     click.echo(json.dumps(origins))
 
 
-def search_replace_in_dict(ds, s: str, r: str):
+def search_replace_method(ds: list[dict[str, Any]], s: str, r: str):
     for d in ds:
-        for k, v in d.items():
-            if s in v:
-                d[k] = v.replace(s, r)
+        for k in ["method", "xt/id"]:
+            if k in d and s in d[k]:
+                d[k] = d[k].replace(s, r)
 
 
 @cli.command(help="Rename an observation origin method")
-@click.option("--armed", is_flag=True)
+@click.option("--armed", is_flag=True, help="Arm the tool to overwrite the method name (confirmation)")
+@click.option("--evict", is_flag=True, help="Also remove the history of targeted origins")
 @click.argument("method")
 @click.argument("renamed")
 @click.pass_context
-def rename(ctx: click.Context, armed: bool, method: str, renamed: str):
-    query = f'{{:query {{:find [(pull ?var [*])] :where [[?var :type "Origin"][?var :origin_type "observation"][?var :method "{method}"]]}}}}'  # noqa: E501
-    origins = ctx.obj["client"].query(query)
+def rename(ctx: click.Context, armed: bool, evict: bool, method: str, renamed: str):
+    origins = ctx.obj["client"].query(method_query(method))
     if not origins:
         raise click.UsageError("No targets found")
     if "error" in origins:
         raise click.UsageError(origins["error"])
     if armed:
-        evict_txs = [f"[\"evict\", \"{o[0]["xt/id"]}\"]" for o in origins]
-        search_replace_in_dict([x[0] for x in origins], method, renamed)
+        operation = "evict" if evict else "delete"
+        evict_txs = [f'["{operation}", "{o[0]["xt/id"]}"]' for o in origins]
+        search_replace_method([o[0] for o in origins], method, renamed)
         put_txs = [f'["put", {json.dumps(o[0])}]' for o in origins]
-        click.echo(ctx.obj["client"].submit_tx(evict_txs + put_txs))
+        click.echo(json.dumps(ctx.obj["client"].submit_tx(evict_txs + put_txs)))
     else:
-        search_replace_in_dict([x[0] for x in origins], method, renamed)
+        search_replace_method([o[0] for o in origins], method, renamed)
         click.echo(json.dumps(origins))
 
 
