@@ -2,7 +2,7 @@ import hashlib
 import io
 import json
 import tarfile
-from datetime import datetime
+from datetime import datetime, timezone
 from os import getenv
 from pathlib import Path
 
@@ -51,11 +51,11 @@ def create_hash(data: bytes, algo: str) -> str:
 
 def cache_out_of_date() -> bool:
     """Returns True if the file is older than the allowed cache_timout"""
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     max_age = int(getenv("GEOIP_CACHE_TIMEOUT", GEOIP_CACHE_TIMEOUT))
     with GEOIP_META_PATH.open() as meta_file:
         meta = json.load(meta_file)
-    cached_file_timestamp = datetime.strptime(meta["timestamp"], "%Y-%m-%dT%H:%M:%SZ")
+    cached_file_timestamp = datetime.fromisoformat(meta["timestamp"])
     return (now - cached_file_timestamp).total_seconds() > max_age
 
 
@@ -74,7 +74,7 @@ def refresh_geoip(algo: str) -> dict:
         tf.extract("GeoLite2-City_20240712/GeoLite2-City.mmdb", BASE_PATH)
 
     metadata = {
-        "timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "source": source_url,
         "hash": create_hash(response.content, algo),
         "hash_algorithm": algo,
