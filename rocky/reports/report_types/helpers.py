@@ -5,6 +5,7 @@ from reports.report_types.definitions import AggregateReport, MultiReport, Repor
 from reports.report_types.dns_report.report import DNSReport
 from reports.report_types.findings_report.report import FindingsReport
 from reports.report_types.ipv6_report.report import IPv6Report
+from reports.report_types.location_report.report import LocationReport
 from reports.report_types.mail_report.report import MailReport
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport
 from reports.report_types.name_server_report.report import NameServerSystemReport
@@ -29,6 +30,7 @@ REPORTS = [
     NameServerSystemReport,
     RPKIReport,
     IPv6Report,
+    LocationReport,
 ]
 AGGREGATE_REPORTS = [AggregateOrganisationReport]
 
