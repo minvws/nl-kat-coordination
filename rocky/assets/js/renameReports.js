@@ -24,5 +24,8 @@ function editReportName(target) {
 
   const update_cell = document.getElementById(old_name_id);
 
-  update_cell.innerHTML = new_name + " - " + reference_date;
+  update_cell.textContent = new_name;
+  if (reference_date) {
+    update_cell.textContent += " (" + reference_date + ")";
+  }
 }
