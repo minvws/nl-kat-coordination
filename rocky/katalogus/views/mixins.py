@@ -14,6 +14,7 @@ from katalogus.client import Boefje as KATalogusBoefje
 from katalogus.client import KATalogusClientV1, get_katalogus
 from katalogus.client import Normalizer as KATalogusNormalizer
 from octopoes.models import OOI
+from octopoes.models.ooi.network import IPAddress
 from rocky.scheduler import Boefje, BoefjeTask, Normalizer, NormalizerTask, PrioritizedItem, RawData
 from rocky.views.mixins import OctopoesView
 
@@ -85,6 +86,9 @@ class BoefjeMixin(OctopoesView):
             input_ooi=ooi.reference if ooi else None,
             organization=self.organization.code,
         )
+
+        if isinstance(ooi, IPAddress):
+            boefje_task.network_scope = str(ooi.network)
 
         task = PrioritizedItem(priority=1, data=boefje_task)
         schedule_task(self.request, self.organization.code, task)

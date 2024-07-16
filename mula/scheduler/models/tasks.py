@@ -135,6 +135,10 @@ class BoefjeTask(BaseModel):
 
     dispatches: list[Normalizer] = Field(default_factory=list)
 
+    network_scope: str | None = Field(
+        default=None, description="The network this task should be run from. By default use the internet"
+    )
+
     @property
     def hash(self) -> str:
         """Make BoefjeTask hashable, so that we can de-duplicate it when used
