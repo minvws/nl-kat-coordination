@@ -38,6 +38,7 @@ opentelemetry-semantic-conventions = "^0.45b0"
 opentelemetry-util-http = "^0.45b0"
 pyjwt = "^2.8.0"
 fastapi-slim = "^0.111.0"
+structlog = "^24.2.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.0"
