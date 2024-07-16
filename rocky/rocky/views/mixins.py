@@ -77,7 +77,10 @@ class ObservedAtMixin:
 
                 return ret
             except ValueError:
-                messages.error(self.request, _("Can not parse date, falling back to show current date."))
+                messages.error(
+                    self.request,
+                    _("Can not parse date, falling back to show current date."),
+                )
                 return datetime.now(timezone.utc)
 
 
@@ -97,16 +100,24 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
         reference: Reference,
         organization: Organization,
     ) -> tuple[list[OriginData], list[OriginData], list[OriginData]]:
-        results = [], [], []  # type: tuple[list[OriginData], list[OriginData], list[OriginData]]
+        declarations: list[OriginData] = []
+        observations: list[OriginData] = []
+        inferences: list[OriginData] = []
+        results = declarations, observations, inferences
+
         try:
             origins = self.octopoes_api_connector.list_origins(self.observed_at, result=reference)
         except Exception as e:
-            logger.error("Could not load origins for OOI: %s from octopoes, error: %s", reference, e)
+            logger.error(
+                "Could not load origins for OOI: %s from octopoes, error: %s",
+                reference,
+                e,
+            )
             return results
 
         try:
-            bytesclient = get_bytes_client(organization.code)
-            bytesclient.login()
+            bytes_client = get_bytes_client(organization.code)
+            bytes_client.login()
         except HTTPError as e:
             logger.error(e)
             return results
@@ -117,23 +128,32 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
             origin = OriginData(origin=origin)
             if origin.origin.origin_type != OriginType.OBSERVATION or not origin.origin.task_id:
                 if origin.origin.origin_type == OriginType.DECLARATION:
-                    results[0].append(origin)
+                    declarations.append(origin)
                 elif origin.origin.origin_type == OriginType.INFERENCE:
-                    results[2].append(origin)
+                    inferences.append(origin)
                 continue
 
             try:
-                normalizer_data = bytesclient.get_normalizer_meta(origin.origin.task_id)
+                normalizer_data = bytes_client.get_normalizer_meta(origin.origin.task_id)
             except HTTPError as e:
-                logger.error("Could not load Normalizer meta for task_id: %s, error: %s", origin.origin.task_id, e)
+                logger.error(
+                    "Could not load Normalizer meta for task_id: %s, error: %s",
+                    origin.origin.task_id,
+                    e,
+                )
             else:
                 boefje_id = normalizer_data["raw_data"]["boefje_meta"]["boefje"]["id"]
                 origin.normalizer = normalizer_data
                 try:
                     origin.boefje = katalogus.get_plugin(boefje_id)
                 except HTTPError as e:
-                    logger.error("Could not load boefje: %s from katalogus, error: %s", boefje_id, e)
-            results[1].append(origin)
+                    logger.error(
+                        "Could not load boefje: %s from katalogus, error: %s",
+                        boefje_id,
+                        e,
+                    )
+            observations.append(origin)
+
         return results
 
     def handle_connector_exception(self, exception: Exception):
