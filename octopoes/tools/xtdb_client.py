@@ -119,7 +119,8 @@ class XTDBClient:
         return res.json()
 
     def submit_tx(self, transactions: list[str]) -> JsonValue:
-        data = f"{{\"tx-ops\": [{", ".join(transactions)}]}}"
+        joined_transactions = ", ".join(transactions)
+        data = f"{{\"tx-ops\": [{joined_transactions}]}}"
         res = self._client.post("/submit-tx", content=data, headers={"Content-Type": "application/json"})
 
         return res.json()
