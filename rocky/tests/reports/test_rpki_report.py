@@ -79,7 +79,7 @@ def test_rpki_hostname_with_two_ips_invalid(
     ipaddressv6,
     service,
     no_rpki_finding_type,
-    expired_rpki_finding_type,
+    invalid_rpki_finding_type,
 ):
     mock_octopoes_api_connector.oois = {
         hostname.reference: hostname,
@@ -90,8 +90,8 @@ def test_rpki_hostname_with_two_ips_invalid(
             hostname.reference: [ipaddressv4, ipaddressv6],
         },
         "IPAddress.<ooi[is Finding].finding_type": {
-            ipaddressv4.reference: [no_rpki_finding_type, expired_rpki_finding_type],
-            ipaddressv6.reference: [expired_rpki_finding_type],
+            ipaddressv4.reference: [no_rpki_finding_type, invalid_rpki_finding_type],
+            ipaddressv6.reference: [invalid_rpki_finding_type],
         },
     }
 
