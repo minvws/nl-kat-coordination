@@ -67,10 +67,10 @@ def method_query(method: str):
         return QY
 
 
-@cli.command(help="List observation origins based on method")
+@cli.command("list", help="List observation origins based on method")
 @click.argument("method", required=False)
 @click.pass_context
-def LIST(ctx: click.Context, method: str):
+def list_(ctx: click.Context, method: str):
     origins = ctx.obj["client"].query(method_query(method))
     if not origins:
         raise click.UsageError("No targets found")
