@@ -39,7 +39,7 @@
                             </td>
                             <td {% if observation.is_old %} aria-label="{% translate "Warning" %}" {% endif %}>
                                 {% if observation.is_old %}
-                                    <span>{% translate "Warning" %}:</span>
+                                    <span>{% translate "Warning:" %}</span>
                                 {% endif %}
                                 <span title="{{ observation.normalizer.raw_data.boefje_meta.ended_at }} UTC">{{ observation.normalizer.raw_data.boefje_meta.ended_at|naturaltime }}</span>
                             </td>

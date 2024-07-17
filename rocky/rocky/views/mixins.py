@@ -1,9 +1,8 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from functools import cached_property
 from operator import attrgetter
-from typing import Optional
 
 import structlog
 from account.mixins import OrganizationView
@@ -33,7 +32,8 @@ from rocky.bytes_client import get_bytes_client
 
 logger = structlog.get_logger(__name__)
 
-ORIGIN_MAX_AGE = 60*60*24 * 2 # 2 days in seconds
+ORIGIN_MAX_AGE = timedelta(days=2)
+
 
 @dataclass
 class HydratedFinding:
@@ -49,17 +49,16 @@ class OriginData(BaseModel):
     params: dict[str, str] | None = None
 
     @property
-    def is_old(self, maxage: Optional[int] = None) -> bool
-        if not maxage:
-            maxage = ORIGIN_MAX_AGE
+    def is_old(self) -> bool:
+        return self.is_older_than(ORIGIN_MAX_AGE)
+
+    def is_older_than(self, delta: timedelta):
         if not self.normalizer:
             return False
-            
-        observationdate = self.normalizer.get("raw_data", {}).get("boefje_meta", {}).get("ended_at", False)
-        old = datetime.datetime.utcnow() - datetime.timedelta(seconds=maxage)
-        if observationdate and observationdate < old:
-            return True
-        return False
+
+        observation_date = self.normalizer.get("raw_data", {}).get("boefje_meta", {}).get("ended_at")
+
+        return observation_date is not None and observation_date < datetime.now(timezone.utc) - delta
 
 
 class OOIAttributeError(AttributeError):
@@ -101,11 +100,11 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
         try:
             ref = Reference.from_str(pk)
             ooi = self.octopoes_api_connector.get(ref, valid_time=self.observed_at)
+
+            return ooi
         except Exception as e:
             # TODO: raise the exception but let the handling be done by  the method that implements "get_single_ooi"
             self.handle_connector_exception(e)
-
-        return ooi
 
     def get_origins(
         self,
