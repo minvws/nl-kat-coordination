@@ -26,9 +26,11 @@
                     </thead>
                     <tbody>
                         {% for report_name in reports %}
+                            <input type="hidden" name="old_report_name" value="{{ report_name }}" />
                             <tr>
                                 <td>
                                     <input id="{{ report_name|slugify }}"
+                                           name="report_name"
                                            type="text"
                                            readonly
                                            value="{{ report_name }}" />
@@ -50,18 +52,19 @@
                                 {% csrf_token %}
                                 <p>
                                     {% blocktranslate %}
-                                                                    Give your report a custom name and optionally add the reports' reference date
-                                                                    to the name. To do so you can select a standard option or use a
-                                                                    <a href="https://strftime.org/">Python strftime code</a> in the report name.
-                                                                {% endblocktranslate %}
+                                                        Give your report a custom name and optionally add the reports' reference date
+                                                        to the name. To do so you can select a standard option or use a
+                                                        <a href="https://strftime.org/">Python strftime code</a> in the report name.
+                                                    {% endblocktranslate %}
                                 </p>
                                 <p>
                                     <input type="hidden"
                                            class="old-report-name"
+                                           name="old-report-name"
                                            value="{{ report_name|slugify }}">
                                     <label for="report-name">{% translate "Report name" %}</label>
                                     <input class="new-report-name"
-                                           name="report-name"
+                                           name="new-report-name"
                                            type="text"
                                            value="{{ report_name }}">
                                     <div>
@@ -95,7 +98,6 @@
 </tbody>
 </table>
 {% csrf_token %}
-<input type="hidden" name="reports" value="{{ reports }}">
 <button type="submit" form="generate_report">
     {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
 </button>
