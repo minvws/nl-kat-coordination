@@ -415,19 +415,27 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 
 CSP_HEADER = env.bool("CSP_HEADER", True)
 
+MAPTILER_API_KEY = env.str("MAPTILER_API_KEY", "")
+
 if CSP_HEADER:
     MIDDLEWARE += ["csp.middleware.CSPMiddleware"]
     INSTALLED_APPS += ["csp"]
 
 CSP_DEFAULT_SRC = ["'none'"]
-CSP_IMG_SRC = ["'self'"]
+CSP_IMG_SRC = ["'self'", "data:"]
 CSP_FONT_SRC = ["'self'"]
-CSP_STYLE_SRC = ["'self'"]
+CSP_STYLE_SRC = ["'self'", "https://unpkg.com/maplibre-gl@4.5.0/dist/maplibre-gl.css"]
 CSP_FRAME_ANCESTORS = ["'none'"]
 CSP_BASE_URI = ["'none'"]
 CSP_FORM_ACTION = ["'self'"]
 CSP_INCLUDE_NONCE_IN = ["script-src"]
-CSP_CONNECT_SRC = ["'self'"]
+CSP_CONNECT_SRC = [
+    "'self'",
+    "https://maps.openkat.dev/data/openmaptiles/",
+    "https://openmaptiles.github.io/",
+    "https://api.maptiler.com/",
+]
+CSP_WORKER_SRC = ["blob:"]
 
 CSP_BLOCK_ALL_MIXED_CONTENT = True
 
