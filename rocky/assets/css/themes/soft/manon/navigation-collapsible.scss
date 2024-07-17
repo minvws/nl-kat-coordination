@@ -10,10 +10,10 @@ body > header nav.collapsible-menu .collapsing-menu {
   ul,
   ol {
     border: 1px solid var(--colors-grey-100);
-    background-color: var(-colors-white);
+    background-color: var(--colors-white);
 
     a[aria-current] {
-      background-color: var(-colors-white);
+      background-color: var(--colors-white);
       font-weight: bold;
 
       &::before {
@@ -28,7 +28,7 @@ body > header nav.collapsible-menu .collapsing-menu {
   }
 
   > div {
-    background-color: var(-colors-white);
+    background-color: var(--colors-white);
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -43,7 +43,7 @@ body > header nav.collapsible-menu .collapsing-menu {
       justify-content: stretch;
       align-items: center;
       min-height: 3rem;
-      background-color: var(-colors-white);
+      background-color: var(--colors-white);
       width: 100%;
       box-sizing: border-box;
       order: 1;

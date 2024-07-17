@@ -15,16 +15,16 @@
 
   /* Hover */
   --button-ghost-hover-background-color: transparent;
-  --button-ghost-hover-border-color: var(--button-ghost-border-color);
-  --button-ghost-hover-text-color: var(--button-ghost-text-color);
+  --button-ghost-hover-border-color: var(--colors-blue-600);
+  --button-ghost-hover-text-color: var(--colors-blue-700);
 
   /* Active */
   --button-ghost-active-background-color: transparent;
-  --button-ghost-active-border-color: var(--branding-color-1-darker);
-  --button-ghost-active-text-color: var(--button-ghost-text-color);
+  --button-ghost-active-border-color: var(--button-ghost-hover-border-color);
+  --button-ghost-active-text-color: var(--button-ghost-hover-text-color);
 
   /* Focus */
   --button-ghost-focus-background-color: transparent;
-  --button-ghost-focus-border-color: var(--branding-color-1-darker);
-  --button-ghost-focus-text-color: var(--button-ghost-text-color);
+  --button-ghost-focus-border-color: var(--button-ghost-hover-border-color);
+  --button-ghost-focus-text-color: var(--button-ghost-hover-text-color);
 }
