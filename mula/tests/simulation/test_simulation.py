@@ -1,9 +1,9 @@
+# NOTE: This file is DEPRECATED
 import unittest
 import uuid
 from unittest import mock
 
 from scheduler import config, models, queues, rankers, schedulers
-
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -69,9 +69,17 @@ class SimulationTestCase(unittest.TestCase):
     @mock.patch("scheduler.context.AppContext.services.scan_profile.get_latest_object")
     @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.create_tasks_for_oois")
-    def test_simulation_boefje_queue(self, mock_create_tasks_for_oois, mock_get_random_objects, mock_get_latest_object):
+    def test_simulation_boefje_queue(
+        self,
+        mock_create_tasks_for_oois,
+        mock_get_random_objects,
+        mock_get_latest_object,
+    ):
         iterations = 1000
-        oois = [OOIFactory(scan_profile=ScanProfileFactory(level=0)) for _ in range(iterations)]
+        oois = [
+            OOIFactory(scan_profile=ScanProfileFactory(level=0))
+            for _ in range(iterations)
+        ]
 
         mock_get_latest_object.side_effect = oois + [None]
 
@@ -101,13 +109,17 @@ class SimulationTestCase(unittest.TestCase):
     @profile_memory
     @mock.patch("scheduler.schedulers.NormalizerScheduler.create_tasks_for_raw_data")
     @mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")
-    def test_simulation_normalizer_queue(self, mock_get_latest_raw_data, mock_create_tasks_for_raw_data):
+    def test_simulation_normalizer_queue(
+        self, mock_get_latest_raw_data, mock_create_tasks_for_raw_data
+    ):
         iterations = 1000
         raw_data = [
             RawDataFactory(
                 boefje_meta=BoefjeMetaFactory(
                     boefje=PluginFactory(type="boefje", scan_level=0),
-                    input_ooi=OOIFactory(scan_profile=ScanProfileFactory(level=0)).primary_key,
+                    input_ooi=OOIFactory(
+                        scan_profile=ScanProfileFactory(level=0)
+                    ).primary_key,
                 )
             )
             for _ in range(iterations)
@@ -130,7 +142,9 @@ class SimulationTestCase(unittest.TestCase):
             for raw_file in raw_data
         ]
 
-        n_scheduler = self.create_normalizer_scheduler_for_organisation(self.organisation)
+        n_scheduler = self.create_normalizer_scheduler_for_organisation(
+            self.organisation
+        )
         n_scheduler.populate_queue()
 
         self.assertEqual(iterations, n_scheduler.queue.qsize())

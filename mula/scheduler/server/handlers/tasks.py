@@ -91,8 +91,8 @@ class TaskAPI:
                 f_ooi = {
                     "and": [
                         storage.filters.Filter(
-                            column="p_item",
-                            field="data__input_ooi",
+                            column="data",
+                            field="input_ooi",
                             operator="eq",
                             value=input_ooi,
                         )
@@ -102,8 +102,8 @@ class TaskAPI:
                 f_ooi = {
                     "and": [
                         storage.filters.Filter(
-                            column="p_item",
-                            field="data__raw_data__boefje_meta__input_ooi",
+                            column="data",
+                            field="raw_data__boefje_meta__input_ooi",
                             operator="eq",
                             value=input_ooi,
                         )
@@ -113,14 +113,14 @@ class TaskAPI:
                 f_ooi = {
                     "or": [
                         storage.filters.Filter(
-                            column="p_item",
-                            field="data__input_ooi",
+                            column="data",
+                            field="input_ooi",
                             operator="eq",
                             value=input_ooi,
                         ),
                         storage.filters.Filter(
-                            column="p_item",
-                            field="data__raw_data__boefje_meta__input_ooi",
+                            column="data",
+                            field="raw_data__boefje_meta__input_ooi",
                             operator="eq",
                             value=input_ooi,
                         ),
@@ -134,8 +134,8 @@ class TaskAPI:
                 f_plugin = {
                     "and": [
                         storage.filters.Filter(
-                            column="p_item",
-                            field="data__boefje__id",
+                            column="data",
+                            field="boefje__id",
                             operator="eq",
                             value=plugin_id,
                         )
@@ -143,8 +143,8 @@ class TaskAPI:
                 }
             elif task_type == "normalizer":
                 f_plugin = storage.filters.Filter(
-                    column="p_item",
-                    field="data__normalizer__id",
+                    column="data",
+                    field="normalizer__id",
                     operator="eq",
                     value=plugin_id,
                 )
@@ -152,14 +152,14 @@ class TaskAPI:
                 f_plugin = {
                     "or": [
                         storage.filters.Filter(
-                            column="p_item",
-                            field="data__boefje__id",
+                            column="data",
+                            field="boefje__id",
                             operator="eq",
                             value=plugin_id,
                         ),
                         storage.filters.Filter(
-                            column="p_item",
-                            field="data__normalizer__id",
+                            column="data",
+                            field="normalizer__id",
                             operator="eq",
                             value=plugin_id,
                         ),

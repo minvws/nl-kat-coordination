@@ -217,7 +217,7 @@ class Scheduler(abc.ABC):
         self.push_item_to_queue(item)
 
     def push_item_to_queue(self, item: models.Task) -> models.Task:
-        """Push a PrioritizedItem to the queue.
+        """Push a Task to the queue.
 
         Args:
             item: The item to push to the queue.
@@ -238,6 +238,8 @@ class Scheduler(abc.ABC):
             raise queues.errors.NotAllowedError("Scheduler is disabled")
 
         try:
+            if item.type is None:
+                item.type = self.ITEM_TYPE.type
             item.status = models.TaskStatus.QUEUED
             item = self.queue.push(item)
         except queues.errors.NotAllowedError as exc:
@@ -335,7 +337,6 @@ class Scheduler(abc.ABC):
 
         return item
 
-    # TODO: check when return None is significant
     def pop_item_from_queue(
         self, filters: storage.filters.FilterRequest | None = None
     ) -> models.Task | None:

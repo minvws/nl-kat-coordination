@@ -42,9 +42,12 @@ class Task(BaseModel):
 
     status: TaskStatus = TaskStatus.PENDING
 
+    type: str | None = None
+
     hash: str | None = None
 
     data: dict | None = None
 
     created_at: datetime | None = None
+
     modified_at: datetime | None = None

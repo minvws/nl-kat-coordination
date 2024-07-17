@@ -66,54 +66,61 @@ class NormalizerMeta(BaseModel):
 class NormalizerTask(BaseModel):
     """NormalizerTask represent data needed for a Normalizer to run."""
 
+    type: str = "normalizer"
+
     id: uuid.UUID | None = None
     normalizer: Normalizer
     raw_data: RawData
-    type: str = "normalizer"
 
 
 class BoefjeTask(BaseModel):
     """BoefjeTask represent data needed for a Boefje to run."""
 
+    type: str = "boefje"
+
     id: uuid.UUID | None = None
     boefje: Boefje
     input_ooi: str | None = None
     organization: str
-    type: str = "boefje"
-
-
-class PrioritizedItem(BaseModel):
-    """Representation of a queue.PrioritizedItem on the priority queue. Used
-    for unmarshalling of priority queue prioritized items to a JSON
-    representation.
-    """
-
-    id: uuid.UUID | None = None
-    hash: str | None = None
-    priority: int
-    data: SerializeAsAny[BoefjeTask | NormalizerTask]
 
 
 class TaskStatus(Enum):
-    """Status of a task."""
-
+    # Task has been created but not yet queued
     PENDING = "pending"
+
+    # Task has been pushed onto queue and is ready to be picked up
     QUEUED = "queued"
+
+    # Task has been picked up by a worker
     DISPATCHED = "dispatched"
+
+    # Task has been picked up by a worker, and the worker indicates that it is
+    # running.
     RUNNING = "running"
+
+    # Task has been completed
     COMPLETED = "completed"
+
+    # Task has failed
     FAILED = "failed"
+
+    # Task has been cancelled
+    CANCELLED = "cancelled"
 
 
 class Task(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: uuid.UUID | None = None
     scheduler_id: str
-    type: str
-    p_item: PrioritizedItem
-    status: TaskStatus
-    created_at: datetime.datetime
-    modified_at: datetime.datetime
-    model_config = ConfigDict(from_attributes=True)
+    schedule_id: str | None = None
+    priority: int
+    status: TaskStatus | None = TaskStatus.PENDING
+    type: str | None = None
+    hash: str | None = None
+    data: SerializeAsAny[BoefjeTask | NormalizerTask]
+    created_at: datetime.datetime | None = None
+    modified_at: datetime.datetime | None = None
 
 
 class PaginatedTasksResponse(BaseModel):
@@ -150,7 +157,10 @@ class LazyTaskList:
     def __getitem__(self, key) -> list[Task]:
         if isinstance(key, slice):
             offset = key.start or 0
-            limit = min(LazyTaskList.HARD_LIMIT, key.stop - offset or key.stop or LazyTaskList.HARD_LIMIT)
+            limit = min(
+                LazyTaskList.HARD_LIMIT,
+                key.stop - offset or key.stop or LazyTaskList.HARD_LIMIT,
+            )
 
         elif isinstance(key, int):
             offset = key
@@ -170,7 +180,9 @@ class LazyTaskList:
 
 
 class SchedulerError(Exception):
-    message: str = _("The Scheduler has an unexpected error. Check the Scheduler logs for further details.")
+    message: str = _(
+        "The Scheduler has an unexpected error. Check the Scheduler logs for further details."
+    )
 
     def __init__(self, *args: object, extra_message: str | None = None) -> None:
         super().__init__(*args)
@@ -194,7 +206,9 @@ class SchedulerTaskNotFound(SchedulerError):
 
 
 class SchedulerTooManyRequestError(SchedulerError):
-    message = _("Scheduler is receiving too many requests. Increase SCHEDULER_PQ_MAXSIZE or wait for task to finish.")
+    message = _(
+        "Scheduler is receiving too many requests. Increase SCHEDULER_PQ_MAXSIZE or wait for task to finish."
+    )
 
 
 class SchedulerBadRequestError(SchedulerError):
@@ -219,7 +233,9 @@ class SchedulerClient:
         **kwargs,
     ) -> PaginatedTasksResponse:
         try:
-            kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
+            kwargs = {
+                k: v for k, v in kwargs.items() if v is not None
+            }  # filter Nones from kwargs
             res = self._client.get("/tasks", params=kwargs)
             return PaginatedTasksResponse.model_validate_json(res.content)
         except ValidationError:
@@ -234,9 +250,9 @@ class SchedulerClient:
             task_details = Task.model_validate_json(res.content)
 
             if task_details.type == "normalizer":
-                organization = task_details.p_item.data.raw_data.boefje_meta.organization
+                organization = task_details.data.raw_data.boefje_meta.organization
             else:
-                organization = task_details.p_item.data.organization
+                organization = task_details.data.organization
 
             if organization != self.organization_code:
                 raise SchedulerTaskNotFound()
@@ -245,12 +261,13 @@ class SchedulerClient:
         except ConnectError:
             raise SchedulerConnectError()
 
-    def push_task(self, prioritized_item: PrioritizedItem) -> None:
+    def push_task(self, item: Task) -> None:
         try:
-            queue_name = f"{prioritized_item.data.type}-{self.organization_code}"
+            logger.info(f"Task data: {item}")
+            queue_name = f"{item.data.type}-{self.organization_code}"
             res = self._client.post(
                 f"/queues/{queue_name}/push",
-                content=prioritized_item.json(),
+                content=item.json(exclude_none=True),
                 headers={"Content-Type": "application/json"},
             )
             res.raise_for_status()

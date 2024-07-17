@@ -199,6 +199,10 @@ class NormalizerScheduler(Scheduler):
             caller=caller,
         )
 
+        self.logger.debug(normalizer_task)
+
+        self.logger.debug("HERE0")
+
         if not self.has_normalizer_permission_to_run(normalizer_task):
             self.logger.debug(
                 "Task is not allowed to run: %s",
@@ -209,6 +213,8 @@ class NormalizerScheduler(Scheduler):
                 caller=caller,
             )
             return
+
+        self.logger.debug("HERE1")
 
         try:
             if self.has_normalizer_task_started_running(normalizer_task):
@@ -233,6 +239,8 @@ class NormalizerScheduler(Scheduler):
             )
             return
 
+        self.logger.debug("HERE2")
+
         if self.is_item_on_queue_by_hash(normalizer_task.hash):
             self.logger.debug(
                 "Task is already on queue: %s",
@@ -244,19 +252,24 @@ class NormalizerScheduler(Scheduler):
             )
             return
 
+        self.logger.debug("HERE3")
+
         score = self.ranker.rank(
             SimpleNamespace(
                 raw_data=normalizer_task.raw_data,
                 task=normalizer_task,
             ),
         )
+        self.logger.debug("HERE4")
 
         task = Task(
             scheduler_id=self.scheduler_id,
+            type=self.ITEM_TYPE.type,
             priority=score,
             hash=normalizer_task.hash,
             data=normalizer_task.model_dump(),
         )
+        self.logger.debug("HERE5")
 
         try:
             self.push_item_to_queue_with_timeout(task, self.max_tries)
@@ -272,6 +285,8 @@ class NormalizerScheduler(Scheduler):
                 caller=caller,
             )
             return
+
+        self.logger.debug("HERE6")
 
         self.logger.info(
             "Created normalizer task: %s for raw data: %s",

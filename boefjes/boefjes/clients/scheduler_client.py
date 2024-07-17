@@ -13,18 +13,6 @@ class Queue(BaseModel):
     size: int
 
 
-class QueuePrioritizedItem(BaseModel):
-    """Representation of a queue.PrioritizedItem on the priority queue. Used
-    for unmarshalling of priority queue prioritized items to a JSON
-    representation.
-    """
-
-    id: uuid.UUID
-    priority: int
-    hash: str | None = None
-    data: BoefjeMeta | NormalizerMeta
-
-
 class TaskStatus(Enum):
     """Status of a task."""
 
@@ -34,14 +22,18 @@ class TaskStatus(Enum):
     RUNNING = "running"
     COMPLETED = "completed"
     FAILED = "failed"
+    CANCELLED = "cancelled"
 
 
 class Task(BaseModel):
     id: uuid.UUID
     scheduler_id: str
-    type: str
-    p_item: QueuePrioritizedItem
+    schedule_id: str | None
+    priority: int
     status: TaskStatus
+    type: str
+    hash: str | None = None
+    data: BoefjeMeta | NormalizerMeta
     created_at: datetime.datetime
     modified_at: datetime.datetime
 
@@ -50,7 +42,7 @@ class SchedulerClientInterface:
     def get_queues(self) -> list[Queue]:
         raise NotImplementedError()
 
-    def pop_item(self, queue: str) -> QueuePrioritizedItem | None:
+    def pop_item(self, queue: str) -> Task | None:
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
@@ -59,7 +51,7 @@ class SchedulerClientInterface:
     def get_task(self, task_id: uuid.UUID) -> Task:
         raise NotImplementedError()
 
-    def push_item(self, queue_id: str, p_item: QueuePrioritizedItem) -> None:
+    def push_item(self, queue_id: str, p_item: Task) -> None:
         raise NotImplementedError()
 
 
@@ -77,18 +69,20 @@ class SchedulerAPIClient(SchedulerClientInterface):
 
         return TypeAdapter(list[Queue]).validate_json(response.content)
 
-    def pop_item(self, queue: str) -> QueuePrioritizedItem | None:
+    def pop_item(self, queue: str) -> Task | None:
         response = self._session.post(f"/queues/{queue}/pop")
         self._verify_response(response)
 
-        return TypeAdapter(QueuePrioritizedItem | None).validate_json(response.content)
+        return TypeAdapter(Task | None).validate_json(response.content)
 
-    def push_item(self, queue_id: str, p_item: QueuePrioritizedItem) -> None:
+    def push_item(self, queue_id: str, p_item: Task) -> None:
         response = self._session.post(f"/queues/{queue_id}/push", content=p_item.json())
         self._verify_response(response)
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
-        response = self._session.patch(f"/tasks/{task_id}", json={"status": status.value})
+        response = self._session.patch(
+            f"/tasks/{task_id}", json={"status": status.value}
+        )
         self._verify_response(response)
 
     def get_task(self, task_id: uuid.UUID) -> Task:

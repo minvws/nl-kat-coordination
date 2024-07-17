@@ -36,14 +36,14 @@
                                 {% for task in task_list %}
                                     <tr data-task-id="{{ task.id }}">
                                         <td>
-                                            <a href="{% url "boefje_detail" organization.code task.p_item.data.boefje.id %}">{{ task.p_item.data.boefje.name }}</a>
+                                            <a href="{% url "boefje_detail" organization.code task.data.boefje.id %}">{{ task.data.boefje.name }}</a>
                                         </td>
                                         <td class="nowrap">
                                             <i class="icon {{ task.status.value }}"></i>&nbsp;{{ task.status.value|capfirst }}
                                         </td>
                                         <td>{{ task.created_at }}</td>
                                         <td>
-                                            <a href="{% ooi_url "ooi_detail" task.p_item.data.input_ooi organization.code observed_at=task.created_at|date:'c' %}">{{ task.p_item.data.input_ooi }}</a>
+                                            <a href="{% ooi_url "ooi_detail" task.data.input_ooi organization.code observed_at=task.created_at|date:'c' %}">{{ task.data.input_ooi }}</a>
                                         </td>
                                         <td>
                                             <button type="button"

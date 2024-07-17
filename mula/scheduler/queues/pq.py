@@ -149,13 +149,13 @@ class PriorityQueue(abc.ABC):
             ItemNotFoundError: If the item is not found on the queue.
         """
         if not isinstance(task, models.Task):
-            raise InvalidItemError("The item is not a PrioritizedItem")
+            raise InvalidItemError("The item is not of type Task")
 
         if not self._is_valid_item(task.data):
-            raise InvalidItemError(f"PrioritizedItem must be of type {self.item_type}")
+            raise InvalidItemError(f"Task must be of type {self.item_type}")
 
         if not task.priority:
-            raise InvalidItemError("PrioritizedItem must have a priority")
+            raise InvalidItemError("Task must have a priority")
 
         if self.full() and task.priority > 1:
             raise QueueFullError(f"Queue {self.pq_id} is full.")

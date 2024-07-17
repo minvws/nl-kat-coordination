@@ -448,6 +448,7 @@ class BoefjeScheduler(Scheduler):
 
                     # TODO: do we want to disable the schedule when a
                     # boefje is not allowed to scan an ooi?
+
                     # Boefje allowed to scan ooi?
                     if not self.has_boefje_permission_to_run(plugin, ooi):
                         self.logger.debug(
@@ -596,6 +597,7 @@ class BoefjeScheduler(Scheduler):
 
         task = Task(
             scheduler_id=self.scheduler_id,
+            type=self.ITEM_TYPE.type,
             priority=score,
             hash=boefje_task.hash,
             data=boefje_task.model_dump(),

@@ -135,7 +135,6 @@ class ScheduleAPI:
 
         return schedule
 
-    # TODO: replace Schedule model with a correct ScheduleIn model
     def patch(self, schedule_id: uuid.UUID, schedule: serializers.Schedule) -> Any:
         try:
             schedule_db = self.ctx.datastores.schedule_store.get_schedule(schedule_id)

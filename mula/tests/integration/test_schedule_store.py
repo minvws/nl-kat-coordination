@@ -46,7 +46,6 @@ class ScheduleStoreTestCase(unittest.TestCase):
         # Assert
         self.assertEqual(schedule, schedule_db)
 
-    # TODO: review and fix this
     def test_get_schedules(self):
         # Arrange
         scheduler_one = "test_scheduler_one"

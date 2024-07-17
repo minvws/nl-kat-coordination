@@ -57,6 +57,8 @@ class Task(BaseModel):
 
     status: TaskStatus = TaskStatus.PENDING
 
+    type: str | None = None
+
     hash: str | None = Field(None, max_length=32)
 
     data: dict | None = {}
@@ -76,6 +78,8 @@ class TaskDB(Base):
         GUID, ForeignKey("schedules.id", ondelete="SET NULL"), nullable=True
     )
     schedule = relationship("ScheduleDB", back_populates="tasks")
+
+    type = Column(String, nullable=False)
 
     hash = Column(String(32), index=True)
 

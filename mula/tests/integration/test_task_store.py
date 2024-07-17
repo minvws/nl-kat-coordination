@@ -24,7 +24,9 @@ class StoreTestCase(unittest.TestCase):
 
         self.mock_ctx.datastores = SimpleNamespace(
             **{
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(
+                    self.dbconn
+                ),
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
             }
         )
@@ -48,11 +50,15 @@ class StoreTestCase(unittest.TestCase):
             self.mock_ctx.datastores.task_store.create_task(task)
 
         # Act
-        tasks, count = self.mock_ctx.datastores.task_store.get_tasks(scheduler_id=self.organisation.id)
+        tasks, count = self.mock_ctx.datastores.task_store.get_tasks(
+            scheduler_id=self.organisation.id
+        )
 
         # Assert
         self.assertEqual(len(tasks), 5)
         self.assertEqual(count, 5)
+
+    # TODO: get tasks with filtersTestModel.type,
 
     def test_get_task(self):
         # Arrange
@@ -120,7 +126,9 @@ class StoreTestCase(unittest.TestCase):
         created_task = self.mock_ctx.datastores.task_store.create_task(task)
 
         # Act
-        self.mock_ctx.datastores.task_store.cancel_tasks(self.organisation.id, [created_task.id])
+        self.mock_ctx.datastores.task_store.cancel_tasks(
+            self.organisation.id, [created_task.id]
+        )
 
         # Assert
         updated_task = self.mock_ctx.datastores.task_store.get_task(created_task.id)
@@ -162,6 +170,7 @@ class StoreTestCase(unittest.TestCase):
                     scheduler_id=self.organisation.id,
                     priority=1,
                     status=status,
+                    type=functions.TestModel.type,
                     hash=data.hash,
                     data=data.model_dump(),
                     modified_at=modified_at,
@@ -213,6 +222,7 @@ class StoreTestCase(unittest.TestCase):
                     scheduler_id=self.organisation.id,
                     priority=1,
                     status=status,
+                    type=functions.TestModel.type,
                     hash=data.hash,
                     data=data.model_dump(),
                     modified_at=modified_at,

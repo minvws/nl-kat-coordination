@@ -122,7 +122,6 @@ class QueueAPI:
             if new_item.scheduler_id is None:
                 new_item.scheduler_id = s.scheduler_id
         except Exception as exc:
-            # TODO: better exception handling
             self.logger.exception(exc)
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -134,7 +133,7 @@ class QueueAPI:
         except ValueError as exc_value:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail="malformed item",
+                detail=f"malformed item: {exc_value}",
             ) from exc_value
         except queues.QueueFullError as exc_full:
             raise fastapi.HTTPException(
