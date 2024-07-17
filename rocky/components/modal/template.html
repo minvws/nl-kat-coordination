@@ -16,9 +16,11 @@
                 <button class="icon-only ti-x close-modal-button"
                         aria-label="{% translate "Close modal" %}"></button>
             </section>
+
             <section class="content">
               {% slot "content" %}{% endslot %}
             </section>
+
             <section class="footer">
                 <div class="toolbar">
                     {% slot "footer_buttons" %}
