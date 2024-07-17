@@ -1,15 +1,16 @@
-import logging
+from collections.abc import Iterator
 
+import structlog
 from sqlalchemy.orm import Session
 
 from boefjes.config import Settings, settings
-from boefjes.katalogus.models import Organisation
-from boefjes.katalogus.storage.interfaces import OrganisationNotFound, OrganisationStorage
-from boefjes.sql.db import ObjectNotFoundException
+from boefjes.models import Organisation
+from boefjes.sql.db import ObjectNotFoundException, session_managed_iterator
 from boefjes.sql.db_models import OrganisationInDB
 from boefjes.sql.session import SessionMixin
+from boefjes.storage.interfaces import OrganisationNotFound, OrganisationStorage
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class SQLOrganisationStorage(SessionMixin, OrganisationStorage):
@@ -66,3 +67,7 @@ class SQLOrganisationStorage(SessionMixin, OrganisationStorage):
 
 def create_organisation_storage(session) -> SQLOrganisationStorage:
     return SQLOrganisationStorage(session, settings)
+
+
+def get_organisations_store() -> Iterator[OrganisationStorage]:
+    yield from session_managed_iterator(create_organisation_storage)

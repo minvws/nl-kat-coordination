@@ -1,5 +1,4 @@
 import functools
-import logging
 from collections.abc import Callable
 from datetime import datetime, timezone
 from enum import Enum
@@ -7,6 +6,7 @@ from json import JSONDecodeError
 from typing import Any
 
 import httpx
+import structlog
 from httpx import HTTPError, HTTPStatusError, Response, codes
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
@@ -14,7 +14,7 @@ from octopoes.models.transaction import TransactionRecord
 from octopoes.xtdb.exceptions import NodeNotFound, XTDBException
 from octopoes.xtdb.query import Query
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class OperationType(Enum):

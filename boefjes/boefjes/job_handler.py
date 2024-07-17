@@ -1,4 +1,3 @@
-import logging
 import os
 import traceback
 from collections.abc import Callable
@@ -6,13 +5,14 @@ from datetime import datetime, timezone
 from typing import cast
 
 import httpx
+import structlog
 from httpx import HTTPError
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import settings
 from boefjes.docker_boefjes_runner import DockerBoefjesRunner
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
-from boefjes.katalogus.local_repository import LocalPluginRepository
+from boefjes.local_repository import LocalPluginRepository
 from boefjes.plugins.models import _default_mime_types
 from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
 from octopoes.api.models import Affirmation, Declaration, Observation
@@ -22,7 +22,7 @@ from octopoes.models.exception import ObjectNotFoundException
 
 MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought to be reasonable
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 bytes_api_client = BytesAPIClient(
     str(settings.bytes_api),
