@@ -48,23 +48,18 @@ def cli(ctx: click.Context, url: str, node: str, timeout: int, verbosity: int):
     ctx.obj["client"] = client
 
 
-QY = '{:query {:find [(pull ?var [*])] :where [[?var :type "Origin"][?var :origin_type "observation"][?var :method]]}}'
-
-
 def method_query(method: str):
-    if method:
-        return f"""{{
+    method = f'"{method}"' if method else ""
+    return f"""{{
 :query {{
     :find [(pull ?var [*])] :where [
             [?var :type "Origin"]
             [?var :origin_type "observation"]
-            [?var :method "{method}"]
+            [?var :method {method}]
         ]
     }}
 }}
 """
-    else:
-        return QY
 
 
 @cli.command("list", help="List observation origins based on method")
