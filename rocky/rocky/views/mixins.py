@@ -52,13 +52,13 @@ class OriginData(BaseModel):
     def is_old(self) -> bool:
         return self.is_older_than(ORIGIN_MAX_AGE)
 
-    def is_older_than(self, delta: timedelta):
+    def is_older_than(self, time_delta: timedelta) -> bool:
         if not self.normalizer:
             return False
 
         observation_date = self.normalizer.get("raw_data", {}).get("boefje_meta", {}).get("ended_at")
 
-        return observation_date is not None and observation_date < datetime.now(timezone.utc) - delta
+        return observation_date is not None and observation_date < datetime.now(timezone.utc) - time_delta
 
 
 class OOIAttributeError(AttributeError):
