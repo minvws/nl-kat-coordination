@@ -53,11 +53,11 @@ class RPKIReport(Report):
             for ip in ips:
                 finding_types = finding_types_by_source.get(ip, [])
                 exists = not any(finding_type for finding_type in finding_types if finding_type.id in ["KAT-NO-RPKI"])
-                expired = any(finding_type for finding_type in finding_types if finding_type.id in ["KAT-EXPIRED-RPKI"])
-                rpki_ips[ip] = {"exists": exists, "valid": not expired}
+                invalid = any(finding_type for finding_type in finding_types if finding_type.id in ["KAT-INVALID-RPKI"])
+                rpki_ips[ip] = {"exists": exists, "valid": not invalid}
                 number_of_available -= 1 if not exists else 0
-                number_of_valid -= 1 if expired else 0
-                number_of_compliant -= 1 if not (exists and not expired) else 0
+                number_of_valid -= 1 if invalid else 0
+                number_of_compliant -= 1 if not (exists and not invalid) else 0
 
             result[input_ooi] = {
                 "input_ooi": input_ooi,
