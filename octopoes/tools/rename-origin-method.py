@@ -79,11 +79,11 @@ def list_(ctx: click.Context, method: str):
     click.echo(json.dumps(origins))
 
 
-def search_replace_method(ds: list[dict[str, Any]], s: str, r: str):
-    for d in ds:
-        for k in ["method", "xt/id"]:
-            if k in d and s in d[k]:
-                d[k] = d[k].replace(s, r)
+def search_replace_method(data_list: list[dict[str, Any]], search_string: str, replace_string: str) -> None:
+    for data_dict in data_list:
+        for key in ["method", "xt/id"]:
+            if key in data_dict and search_string in data_dict[key]:
+                data_dict[key] = data_dict[key].replace(search_string, replace_string)
 
 
 @cli.command(help="Rename an observation origin method")
