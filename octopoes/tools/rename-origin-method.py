@@ -95,9 +95,9 @@ def rename(ctx: click.Context, armed: bool, evict: bool, method: str, renamed: s
         raise click.UsageError(origins["error"])
     if armed:
         operation = "evict" if evict else "delete"
-        evict_txs = [f'["{operation}", "{o[0]["xt/id"]}"]' for o in origins]
+        evict_txs = [[operation, o[0]["xt/id"]] for o in origins]
         search_replace_method([o[0] for o in origins], method, renamed)
-        put_txs = [f'["put", {json.dumps(o[0])}]' for o in origins]
+        put_txs = [["put", o[0]] for o in origins]
         click.echo(json.dumps(ctx.obj["client"].submit_tx(evict_txs + put_txs)))
     else:
         search_replace_method([o[0] for o in origins], method, renamed)
