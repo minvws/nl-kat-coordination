@@ -105,6 +105,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
         except Exception as e:
             # TODO: raise the exception but let the handling be done by  the method that implements "get_single_ooi"
             self.handle_connector_exception(e)
+            raise
 
     def get_origins(
         self,
