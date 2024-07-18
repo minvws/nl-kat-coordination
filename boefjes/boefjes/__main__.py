@@ -16,12 +16,17 @@ logger = logging.getLogger(__name__)
 @click.command()
 @click.argument("worker_type", type=click.Choice([q.value for q in WorkerManager.Queue]))
 @click.option(
+    "--scopes",
+    help="Scopes this worker manager can look for. Multiples can be given by ",
+    default="internet",
+)
+@click.option(
     "--log-level",
     type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"]),
     help="Log level",
     default="INFO",
 )
-def cli(worker_type: str, log_level: str):
+def cli(worker_type: str, scopes: str, log_level: str):
     logger.setLevel(log_level)
     logger.info("Starting runtime for %s", worker_type)
 
@@ -33,7 +38,7 @@ def cli(worker_type: str, log_level: str):
 
         boefjes.api.run()
 
-    runtime.run(queue)
+    runtime.run(queue, scopes.split("|"))
 
 
 if __name__ == "__main__":
