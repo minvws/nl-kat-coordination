@@ -37,6 +37,13 @@ class TestSettingsToBoefjeConfig(TestCase):
         ]
         query = f"INSERT INTO settings (id, values, plugin_id, organisation_pk) values {','.join(map(str, entries))}"  # noqa: S608
         self.engine.execute(text(query))
+
+        entries = [(1, "dns-records", True, 1), (2, "nmap-udp", True, 1)]
+        query = (
+            f"INSERT INTO plugin_state (id, plugin_id, enabled, organisation_pk) values {','.join(map(str, entries))}"  # noqa: S608
+        )
+        self.engine.execute(text(query))
+
         session.close()
 
     def test_fail_on_wrong_plugin_ids(self):
@@ -68,9 +75,13 @@ class TestSettingsToBoefjeConfig(TestCase):
 
         assert SQLPluginStorage(session, settings).boefje_by_id("dns-records").id == "dns-records"
 
-        settings_storage = SQLConfigStorage(session, encrypter)
-        assert settings_storage.get_all_settings("dev1", "dns-records") == {"key1": "val1"}
-        assert settings_storage.get_all_settings("dev2", "dns-records") == {"key1": "val1", "key2": "val2"}
+        config_storage = SQLConfigStorage(session, encrypter)
+        assert config_storage.get_all_settings("dev1", "dns-records") == {"key1": "val1"}
+        assert config_storage.get_all_settings("dev2", "dns-records") == {"key1": "val1", "key2": "val2"}
+        assert config_storage.get_all_settings("dev1", "nmap-udp") == {}
+
+        assert config_storage.is_enabled_by_id("dns-records", "dev1")
+        assert config_storage.is_enabled_by_id("nmap-udp", "dev1")
 
         session.close()
 
@@ -82,11 +93,12 @@ class TestSettingsToBoefjeConfig(TestCase):
         encrypter = create_encrypter()
         all_settings = list(self.engine.execute(text("select * from settings")).fetchall())
         self.assertSetEqual(
-            {(encrypter.decode(x[1]), x[2], x[3]) for x in all_settings},
+            {(encrypter.decode(x[1]) if x[1] != "{}" else "{}", x[2], x[3]) for x in all_settings},
             {
                 ('{"key1": "val1"}', "dns-records", 1),
                 ('{"key1": "val1", "key2": "val2"}', "dns-records", 2),
                 ('{"key2": "val2", "key3": "val3"}', "nmap", 1),
+                ("{}", "nmap-udp", 1),
             },
         )
 
