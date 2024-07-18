@@ -135,6 +135,8 @@ class NormalizerScheduler(Scheduler):
                 return
 
         # Get all normalizers for the mime types of the raw data
+        # TODO: should be Plugin instead of Normalizer, we'll miss
+        # the enabled field
         normalizers: dict[str, Normalizer] = {}
         for mime_type in latest_raw_data.raw_data.mime_types:
             normalizers_by_mime_type: list[Plugin] = self.get_normalizers_for_mime_type(
@@ -199,11 +201,11 @@ class NormalizerScheduler(Scheduler):
             caller=caller,
         )
 
-        self.logger.debug(normalizer_task)
-
-        self.logger.debug("HERE0")
-
-        if not self.has_normalizer_permission_to_run(normalizer_task):
+        plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+            normalizer_task.normalizer.id,
+            self.organisation.id,
+        )
+        if not self.has_normalizer_permission_to_run(plugin):
             self.logger.debug(
                 "Task is not allowed to run: %s",
                 normalizer_task.id,
@@ -213,8 +215,6 @@ class NormalizerScheduler(Scheduler):
                 caller=caller,
             )
             return
-
-        self.logger.debug("HERE1")
 
         try:
             if self.has_normalizer_task_started_running(normalizer_task):
@@ -239,8 +239,6 @@ class NormalizerScheduler(Scheduler):
             )
             return
 
-        self.logger.debug("HERE2")
-
         if self.is_item_on_queue_by_hash(normalizer_task.hash):
             self.logger.debug(
                 "Task is already on queue: %s",
@@ -252,15 +250,12 @@ class NormalizerScheduler(Scheduler):
             )
             return
 
-        self.logger.debug("HERE3")
-
         score = self.ranker.rank(
             SimpleNamespace(
                 raw_data=normalizer_task.raw_data,
                 task=normalizer_task,
             ),
         )
-        self.logger.debug("HERE4")
 
         task = Task(
             scheduler_id=self.scheduler_id,
@@ -269,7 +264,6 @@ class NormalizerScheduler(Scheduler):
             hash=normalizer_task.hash,
             data=normalizer_task.model_dump(),
         )
-        self.logger.debug("HERE5")
 
         try:
             self.push_item_to_queue_with_timeout(task, self.max_tries)
@@ -285,8 +279,6 @@ class NormalizerScheduler(Scheduler):
                 caller=caller,
             )
             return
-
-        self.logger.debug("HERE6")
 
         self.logger.info(
             "Created normalizer task: %s for raw data: %s",
@@ -313,7 +305,7 @@ class NormalizerScheduler(Scheduler):
         Returns:
             True if the task is allowed to run, False otherwise.
         """
-        if not normalizer.enabled:
+        if normalizer.enabled is False:
             self.logger.debug(
                 "Normalizer: %s is disabled",
                 normalizer.id,
@@ -366,6 +358,7 @@ class NormalizerScheduler(Scheduler):
 
         return False
 
+    # TODO: enabled is not present as field?
     def get_normalizers_for_mime_type(self, mime_type: str) -> list[Plugin]:
         """Get available normalizers for a given mime type.
 

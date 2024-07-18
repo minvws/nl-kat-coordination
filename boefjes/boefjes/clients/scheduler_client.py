@@ -71,6 +71,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
 
     def pop_item(self, queue: str) -> Task | None:
         response = self._session.post(f"/queues/{queue}/pop")
+        print(response.content)
         self._verify_response(response)
 
         return TypeAdapter(Task | None).validate_json(response.content)

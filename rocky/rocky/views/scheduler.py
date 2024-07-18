@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from typing import Any
 
@@ -112,9 +113,6 @@ class SchedulerView(OctopoesView):
             if hasattr(task, "id"):
                 delattr(task, "id")
 
-            # if hasattr(task.data, "id"):
-            #     delattr(task.data, "id")
-
             self.scheduler_client.push_task(task)
 
         except SchedulerError as error:
@@ -142,6 +140,11 @@ class SchedulerView(OctopoesView):
                 data=task.data,
             )
 
+            # Since we're re-using the task data, we need to issue a new id
+            # the task runner expects this to be generated before hand. Reusing
+            # the id from the old task will result in a conflict.
+            task.data.id = uuid.uuid4()
+
             self.schedule_task(new_task)
         except SchedulerError as error:
             messages.error(self.request, error.message)
@@ -159,7 +162,7 @@ class SchedulerView(OctopoesView):
 
             new_task = Task(priority=1, data=normalizer_task)
 
-            self.schedule_task(task)
+            self.schedule_task(new_task)
         except SchedulerError as error:
             messages.error(self.request, error.message)
 
