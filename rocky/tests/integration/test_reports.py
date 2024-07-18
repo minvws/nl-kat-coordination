@@ -93,14 +93,14 @@ def test_system_report(octopoes_api_connector: OctopoesAPIConnector, valid_time)
     }
 
 
-def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_time, hostname_oois):
+def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_time, hostname_oois, organization):
     seed_system(octopoes_api_connector, valid_time)
 
     reports: list[type[Report] | type[MultiReport]] = (
         AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
     )
     report_ids = [report_type.id for report_type in reports]
-    _, data, _, _ = aggregate_reports(octopoes_api_connector, hostname_oois, report_ids, valid_time)
+    _, data, _, _ = aggregate_reports(octopoes_api_connector, hostname_oois, report_ids, valid_time, organization.code)
 
     v4_test_hostnames = [
         "Hostname|test|a.example.com",
@@ -245,14 +245,19 @@ def test_multi_report(
     octopoes_api_connector_2: OctopoesAPIConnector,
     valid_time,
     hostname_oois,
+    organization,
 ):
     seed_system(octopoes_api_connector, valid_time)
     seed_system(octopoes_api_connector_2, valid_time)
 
     reports = AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
     report_ids = [report_type.id for report_type in reports]
-    _, data, report_data, _ = aggregate_reports(octopoes_api_connector, hostname_oois, report_ids, valid_time)
-    _, data_2, report_data_2, _ = aggregate_reports(octopoes_api_connector_2, hostname_oois, report_ids, valid_time)
+    _, data, report_data, _ = aggregate_reports(
+        octopoes_api_connector, hostname_oois, report_ids, valid_time, organization.code
+    )
+    _, data_2, report_data_2, _ = aggregate_reports(
+        octopoes_api_connector_2, hostname_oois, report_ids, valid_time, organization.code
+    )
 
     report_data_object = ReportData(
         organization_code=octopoes_api_connector.client,

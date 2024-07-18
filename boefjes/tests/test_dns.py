@@ -7,8 +7,8 @@ from pydantic import BaseModel
 
 from boefjes.job_handler import serialize_ooi
 from boefjes.job_models import Boefje, BoefjeMeta, Normalizer, NormalizerMeta, ObservationsWithoutInputOOI, RawDataMeta
-from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.local import LocalNormalizerJobRunner
+from boefjes.local_repository import LocalPluginRepository
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.records import (
     DNSAAAARecord,

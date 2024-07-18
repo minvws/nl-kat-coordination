@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import json
-import logging
 from collections import Counter
 from datetime import datetime
 from typing import Any, cast
 
+import structlog
 from bits.definitions import BitDefinition
 from httpx import HTTPStatusError, codes
 from pydantic import RootModel, TypeAdapter
@@ -36,7 +36,7 @@ from octopoes.xtdb.query import Aliased, Query
 from octopoes.xtdb.query_builder import generate_pull_query, str_val
 from octopoes.xtdb.related_field_generator import RelatedFieldNode
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def merge_ooi(ooi_new: OOI, ooi_old: OOI) -> tuple[OOI, bool]:
