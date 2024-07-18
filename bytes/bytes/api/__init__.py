@@ -48,7 +48,7 @@ app = FastAPI(title="Bytes API")
 if settings.span_export_grpc_endpoint is not None:
     logger.info(
         "Setting up instrumentation with span exporter endpoint [%s]",
-        get_settings().span_export_grpc_endpoint,
+        settings.span_export_grpc_endpoint,
     )
 
     FastAPIInstrumentor.instrument_app(app)
