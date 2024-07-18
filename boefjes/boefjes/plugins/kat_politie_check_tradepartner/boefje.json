@@ -1,6 +1,6 @@
 {
   "id": "politie_tradepartner_check",
-  "name": "politie_tradepartner_check",
+  "name": "Politie check tradepartner",
   "description": "Checks the Dutch politie.nl fraudulent tradepartners database",
   "consumes": [
     "Hostname"

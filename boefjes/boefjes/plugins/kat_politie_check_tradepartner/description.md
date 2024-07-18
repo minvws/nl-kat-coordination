@@ -11,3 +11,5 @@ url
 | OOI type   | Description                    |
 | ---------- | ------------------------------ |
 | KATFinding | Known Fraudulent trade partner |
+
+**Cat name**: Kitty

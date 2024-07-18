@@ -486,5 +486,12 @@
     "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers",
     "impact": "Nonstandard headers may not be supported by all browsers and may not provide the security that is expected.",
     "recommendation": "Remove the nonstandard headers from the response."
+  },
+  "KAT-FRAUDULENT-TRADER": {
+    "description": "The referenced object is known to be a fraudulent trade partner",
+    "risk": "medium",
+    "source": "https://www.politie.nl/aangifte-of-melding-doen/bekende-malafide-handelspartijen.html",
+    "impact": "The owners of this host can have negative intentions.",
+    "recommendation": "Check where the linked host is from and if something malicious is going on."
   }
 }
