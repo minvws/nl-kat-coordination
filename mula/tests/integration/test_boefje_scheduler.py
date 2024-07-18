@@ -624,6 +624,48 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Assert
         self.assertFalse(has_passed)
 
+    def test_push_task(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = BoefjeFactory()
+
+        boefje_task = models.BoefjeTask(
+            boefje=models.Boefje.parse_obj(boefje.dict()),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        # Mocks
+        self.mock_get_latest_task_by_hash.return_value = None
+        self.mock_get_last_run_boefje.return_value = None
+
+        # Act
+        self.scheduler.push_boefje_task(boefje_task)
+
+        # Assert
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+    def test_push_task_no_ooi(self):
+        # Arrange
+        boefje = BoefjeFactory()
+
+        boefje_task = models.BoefjeTask(
+            boefje=models.Boefje.parse_obj(boefje.dict()),
+            input_ooi=None,
+            organization=self.organisation.id,
+        )
+
+        # Mocks
+        self.mock_get_latest_task_by_hash.return_value = None
+        self.mock_get_last_run_boefje.return_value = None
+
+        # Act
+        self.scheduler.push_boefje_task(boefje_task)
+
+        # Assert
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_boefje_task_started_running")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_boefje_permission_to_run")
     @mock.patch(
