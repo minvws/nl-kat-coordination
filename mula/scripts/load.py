@@ -30,22 +30,28 @@ def run(org_num: int = 1):
 
         try:
             resp_katalogus.raise_for_status()
-        except httpx.HTTPError:
+        except httpx.HTTPStatusError:
             if resp_katalogus.status_code != 404:
-                print("Error creating organisation ", org)
-                raise
+                print("Error creating organisation in katalogus ", org)
 
             if resp_katalogus.status_code == 404:
-                print("Organisation already exists in katalogus", org)
+                print("Organisation already exists in katalogus ", org)
+
+        resp_octo = httpx.post(
+            url=f"{OCTOPOES_API}/{org.get('id')}/node",
+            timeout=30,
+        )
 
         try:
-            httpx.post(
-                url=f"{OCTOPOES_API}/{org.get('id')}/node/",
-                timeout=30,
-            )
-        except httpx.HTTPError:
-            print("Error creating organisation ", org)
-            raise
+            resp_octo.raise_for_status()
+        except httpx.HTTPStatusError:
+            if resp_octo.status_code != 404:
+                print("Error creating organisation in octopoes ", org)
+
+            if resp_octo.status_code == 404:
+                print("Organisation already exists in octopoes ", org)
+
+            print(resp_octo.content)
 
         print("Created organisation ", org)
 
@@ -83,6 +89,7 @@ def run(org_num: int = 1):
                     "primary_key": f"Hostname|internet|{name}",
                     "network": "Network|internet",
                     "name": f"{name}",
+                    "registered_domain": None,
                     "dns_zone": None,
                     "scan_profile": {
                         "scan_profile_type": "declared",
@@ -97,7 +104,7 @@ def run(org_num: int = 1):
             declarations.append(declaration)
 
     for org in orgs:
-        for declaration in declarations:
+        for declaration in declarations[:1]:
             resp_octopoes_decl = httpx.post(
                 f"{OCTOPOES_API}/{org.get('id')}/declarations",
                 json=declaration,
