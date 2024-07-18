@@ -517,7 +517,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                     report_data.setdefault(report.report_type, {})[ooi] = {
                         "data": self.get_report_data_from_bytes(report)["report_data"],
                         "template": report.template,
-                        "report_name": self.report_ooi.name,
+                        "report_name": report.name,
                     }
 
             input_oois = self.get_input_oois(children_reports)

@@ -20,12 +20,14 @@ function initClickHandlers(button) {
 function editReportName(target) {
   const old_name_id = target.querySelector(".old-report-name").value;
   const reference_date = target.querySelector(".reference-date").value;
-  const update_target = document.getElementById(old_name_id);
+  const update_target_input = document.getElementById(old_name_id);
+  const update_target_text = document.getElementById("text-" + old_name_id);
 
   let new_name = target.querySelector(".new-report-name").value;
 
   if (reference_date) {
     new_name += " (" + reference_date + ")";
   }
-  update_target.setAttribute("value", new_name);
+  update_target_input.setAttribute("value", new_name);
+  update_target_text.textContent = new_name;
 }

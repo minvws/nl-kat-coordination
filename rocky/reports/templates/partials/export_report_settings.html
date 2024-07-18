@@ -11,8 +11,7 @@
             <h2>{% translate "Report name" %}</h2>
             <p>
                 {% blocktranslate trimmed %}
-                    Give your report a name. Currently, it is only possible to
-                    give a name to the parent report. Subreports cannot be given a name.
+                    You can name individual reports.
                 {% endblocktranslate %}
             </p>
             <form id="generate_report" class="inline" method="post" action="{{ next }}">
@@ -28,10 +27,11 @@
                         {% for report_name in reports %}
                             <input type="hidden" name="old_report_name" value="{{ report_name }}" />
                             <tr>
+                                <td id="text-{{ report_name|slugify }}">{{ report_name }}</td>
                                 <td>
                                     <input id="{{ report_name|slugify }}"
                                            name="report_name"
-                                           type="text"
+                                           type="hidden"
                                            readonly
                                            value="{{ report_name }}" />
                                 </td>
