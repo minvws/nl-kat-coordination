@@ -9,8 +9,8 @@
 .pending,
 .unknown {
   --risk-level-critical: var(--colors-red-500);
-  --risk-level-high: var(--colors-yellow-300);
-  --risk-level-medium: var(--colors-yellow-150);
+  --risk-level-high: var(--colors-orange-300);
+  --risk-level-medium: var(--colors-ochre-150);
   --risk-level-low: var(--colors-green-150);
   --risk-level-informational: var(--colors-blue-150);
   --risk-level-pending: var(--colors-grey-400);
