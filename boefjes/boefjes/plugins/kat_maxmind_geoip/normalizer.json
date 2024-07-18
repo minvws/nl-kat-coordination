@@ -4,6 +4,6 @@
     "geoip/geo_data"
   ],
   "produces": [
-    "GeographicLocation"
+    "GeographicPoint"
   ]
 }
