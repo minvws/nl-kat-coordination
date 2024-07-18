@@ -17,3 +17,100 @@ services:
     image: docker.io/library/postgres:15
     env_file:
       - .ci/.env.test
+
+  migration_bench:
+    build:
+      context: ..
+      dockerfile: boefjes/Dockerfile
+      args:
+        - ENVIRONMENT=dev
+    command: python -m cProfile -o .ci/bench_$(date +%Y_%m_%d-%H:%M:%S).pstat -m pytest -v -m slow tests/integration
+    depends_on:
+      - ci_bytes
+      - ci_octopoes
+    env_file:
+      - .ci/.env.test
+    volumes:
+      - .:/app/boefjes
+
+  ci_bytes:
+    build:
+      context: ../bytes
+      args:
+        ENVIRONMENT: dev
+    command: uvicorn bytes.api:app --host 0.0.0.0
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      ci_bytes-db:
+        condition: service_started
+    volumes:
+      - .:/app/bytes
+    env_file:
+      - .ci/.env.test
+
+  ci_bytes-db:
+    image: docker.io/library/postgres:15
+    env_file:
+      - .ci/.env.test
+
+  ci_octopoes:
+    build:
+      context: ../octopoes
+    command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      xtdb:
+        condition: service_started
+      katalogus_mock:
+        condition: service_started
+      ci_octopoes_api_worker:
+        condition: service_started
+    env_file:
+      - .ci/.env.test
+    ports:
+      - "127.0.0.1:29000:80"
+
+  rabbitmq:
+    restart: on-failure
+    image: "docker.io/library/rabbitmq:3.12-management"
+    ports:
+      - "127.0.0.1:29003:15672"
+      - "127.0.0.1:29004:5672"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      retries: 4
+    env_file:
+      - .ci/.env.test
+
+  xtdb:
+    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.8"
+    ports:
+      - "127.0.0.1:29002:3000"
+
+  ci_octopoes_api_worker:
+    build:
+      context: ../octopoes
+    command: celery -A octopoes.tasks.tasks worker -E --loglevel=INFO
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      xtdb:
+        condition: service_started
+    env_file:
+      - .ci/.env.test
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+  katalogus_mock:
+    image: "docker.io/wiremock/wiremock:2.34.0"
+    volumes:
+      - .ci/wiremock:/home/wiremock
+    ports:
+      - "127.0.0.1:29001:8080"
+    env_file:
+      - .ci/.env.test
