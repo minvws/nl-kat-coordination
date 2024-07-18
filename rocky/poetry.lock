@@ -500,6 +500,20 @@ files = [
 django = "*"
 
 [[package]]
+name = "django-components"
+version = "0.80"
+description = "A way to create simple reusable template components in Django."
+optional = false
+python-versions = "<4.0,>=3.8"
+files = [
+    {file = "django_components-0.80-py3-none-any.whl", hash = "sha256:c6067f24e6428c52f33727a2bf1b51a70d61ecae7286d4ff826ce85f6745f794"},
+    {file = "django_components-0.80.tar.gz", hash = "sha256:a2ca8d7f308d5b54e83122331f137e2daa397b5f2e64d212f59334ca7af65dac"},
+]
+
+[package.dependencies]
+Django = ">=4.2"
+
+[[package]]
 name = "django_compressor"
 version = "4.4"
 description = "('Compresses linked and inline JavaScript or CSS into single cached files.',)"
@@ -3416,4 +3430,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "605a5548f2c3d78a4f3dcc46e5c649ffb7937763ad5f391579a33f582a49e551"
+content-hash = "20b560adc29a6680cfee2c5b0531359495d1cd516c1a97588c231ab478b08de0"

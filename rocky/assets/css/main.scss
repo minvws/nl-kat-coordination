@@ -9,17 +9,18 @@
 
 /* Vendors */
 @import "manon-components";
-@import "vendor_overrides/two-factor";
 @import "vendor_overrides/graph-override";
+@import "vendor_overrides/manon/button-icon-only";
 @import "vendor_overrides/manon/display-toggle";
 @import "vendor_overrides/manon/dl";
+@import "vendor_overrides/manon/form-fieldset-required";
+@import "vendor_overrides/manon/form-radio";
 @import "vendor_overrides/manon/layout-fifty-fifty";
 @import "vendor_overrides/manon/layout-form";
 @import "vendor_overrides/manon/nested-section";
-@import "vendor_overrides/manon/form-radio";
-@import "vendor_overrides/manon/form-fieldset-required";
 @import "vendor_overrides/manon/table";
 @import "vendor_overrides/manon/tile";
+@import "vendor_overrides/two-factor";
 
 /* Theme */
 @import "themes/soft/soft";
