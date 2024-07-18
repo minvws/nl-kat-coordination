@@ -124,9 +124,6 @@ class OOISelectionView(OOIFilterView):
             return len(self.oois_pk)
         return len(self.selected_oois)
 
-    def get_ooi_references(self) -> set[Reference]:
-        return {Reference.from_str(ooi) for ooi in self.selected_oois}
-
     def get_oois_pk(self) -> list[str]:
         oois_pk = self.selected_oois
         if "all" in self.selected_oois:
@@ -143,9 +140,7 @@ class OOISelectionView(OOIFilterView):
                 scan_profile_type=self.get_ooi_profile_types(),
             ).items
 
-        return self.octopoes_api_connector.load_objects_bulk(
-            references=self.get_ooi_references(), valid_time=self.observed_at
-        )
+        return [self.get_single_ooi(pk=ooi_pk) for ooi_pk in self.selected_oois]
 
     def get_ooi_filter_forms(self, ooi_types: Iterable[type[OOI]]) -> dict[str, Form]:
         return {

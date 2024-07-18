@@ -32,8 +32,10 @@
                     You have selected {{ total_oois }} objects in previous step.
                 {% endblocktranslate %}
             </p>
-            {% include "summary/ooi_selection.html" %}
+            {% if not "all" in selected_oois %}
+                {% include "summary/ooi_selection.html" %}
 
+            {% endif %}
             <form novalidate
                   method="post"
                   action="{{ previous }}"
