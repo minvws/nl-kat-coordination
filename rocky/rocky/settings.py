@@ -501,6 +501,9 @@ KNOX_TOKEN_MODEL = "account.AuthToken"
 
 FORMS_URLFIELD_ASSUME_HTTPS = True
 
+# Logging format ("text" or "json")
+LOGGING_FORMAT = env("LOGGING_FORMAT", default="text")
+
 structlog.configure(
     processors=[
         structlog.contextvars.merge_contextvars,
@@ -508,8 +511,12 @@ structlog.configure(
         structlog.processors.StackInfoRenderer(),
         structlog.dev.set_exc_info,
         structlog.stdlib.PositionalArgumentsFormatter(),
-        structlog.processors.TimeStamper("iso"),
-        structlog.dev.ConsoleRenderer(colors=True),
+        structlog.processors.TimeStamper("iso", utc=False),
+        (
+            structlog.processors.JSONRenderer()
+            if LOGGING_FORMAT == "json"
+            else structlog.dev.ConsoleRenderer(colors=True, pad_level=False)
+        ),
     ],
     context_class=dict,
     logger_factory=structlog.stdlib.LoggerFactory(),

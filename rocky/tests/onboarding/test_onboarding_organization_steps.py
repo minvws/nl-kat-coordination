@@ -15,7 +15,7 @@ from onboarding.views import (
     OnboardingSetupScanOOIInfoView,
     OnboardingSetupScanSelectPluginsView,
 )
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertNotContains
 
 from tests.conftest import setup_request
 
@@ -140,6 +140,8 @@ def test_onboarding_clearance_level_introduction(rf, redteam_member, mock_organi
     assertContains(response, "DNS-Zone")
     assertContains(response, "Skip onboarding")
     assertContains(response, "Continue")
+
+    assertNotContains(response, '<div class="action-buttons">', html=True)
 
 
 def test_onboarding_acknowledge_clearance_level(rf, redteam_member, mock_organization_view_octopoes, url):

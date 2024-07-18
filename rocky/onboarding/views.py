@@ -183,7 +183,7 @@ class OnboardingClearanceLevelIntroductionView(
             {
                 "id": "dns_zone",
                 "type": "boefje",
-                "scan_level": "l1",
+                "scan_level": "1",
                 "name": "DNS-Zone",
                 "description": _("Fetch the parent DNS zone of a hostname"),
                 "enabled": False,
@@ -191,7 +191,7 @@ class OnboardingClearanceLevelIntroductionView(
             {
                 "id": "fierce",
                 "type": "boefje",
-                "scan_level": "l3",
+                "scan_level": "3",
                 "name": "Fierce",
                 "description": _("Finds subdomains by brute force"),
                 "enabled": False,
