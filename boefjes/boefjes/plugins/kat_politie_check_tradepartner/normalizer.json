@@ -1,0 +1,10 @@
+{
+  "id": "kat_politie_tradepartner_check_normalizer",
+  "consumes": [
+    "boefje/politie_tradepartner_check"
+  ],
+  "produces": [
+    "Finding",
+    "KATFindingType"
+  ]
+}
