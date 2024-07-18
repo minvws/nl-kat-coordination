@@ -6,18 +6,24 @@ Create Date: 2024-05-31 10:45:16.474714
 
 """
 
+import logging
+
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.orm import sessionmaker
 
 from boefjes.local_repository import get_local_repository
 from boefjes.sql.plugin_storage import create_plugin_storage
+from boefjes.storage.interfaces import PluginNotFound
 
 # revision identifiers, used by Alembic.
 revision = "f9de6eb7824b"
 down_revision = "6f99834a4a5a"
 branch_labels = None
 depends_on = None
+
+
+logger = logging.getLogger(__name__)
 
 
 def upgrade() -> None:
@@ -70,6 +76,12 @@ def upgrade() -> None:
             if local_plugins[plugin_id].type != "boefje":
                 raise ValueError(f"Settings for normalizer or bit found: {plugin_id}. Remove these entries first.")
 
+            try:
+                storage.boefje_by_id(plugin_id)
+                continue  # The Boefje already exists
+            except PluginNotFound:
+                pass  # The raw query bypasses the session "cache", so this just checks for duplicates
+
             storage.create_boefje(local_plugins[plugin_id])  # type: ignore
 
         query = """
@@ -80,7 +92,14 @@ def upgrade() -> None:
         for plugin_id_output in op.get_bind().execute(query).fetchall():
             plugin_id = plugin_id_output[0]
             if plugin_id not in local_plugins:
-                raise ValueError(f"Invalid plugin id found: {plugin_id}")
+                logger.warning("Unknown plugin id found: %s. You might have to re-enable the plugin!", plugin_id)
+                continue
+
+            try:
+                storage.boefje_by_id(plugin_id)
+                continue  # The Boefje already exists
+            except PluginNotFound:
+                pass  # The raw query bypasses the session "cache", so this just checks for duplicates
 
             if local_plugins[plugin_id].type == "boefje":
                 storage.create_boefje(local_plugins[plugin_id])  # type: ignore
@@ -93,7 +112,14 @@ def upgrade() -> None:
         for plugin_id_output in op.get_bind().execute(query).fetchall():
             plugin_id = plugin_id_output[0]
             if plugin_id not in local_plugins:
-                raise ValueError(f"Invalid plugin id found: {plugin_id}")
+                logger.warning("Unknown plugin id found: %s. You might have to re-enable the plugin!", plugin_id)
+                continue
+
+            try:
+                storage.normalizer_by_id(plugin_id)
+                continue  # The Normalizer already exists
+            except PluginNotFound:
+                pass  # The raw query bypasses the session "cache", so this just checks for duplicates
 
             if local_plugins[plugin_id].type == "normalizer":
                 storage.create_normalizer(local_plugins[plugin_id])  # type: ignore
@@ -103,25 +129,25 @@ def upgrade() -> None:
             INSERT INTO boefje_config (settings, boefje_id, organisation_pk)
             SELECT s.values, b.id, s.organisation_pk from settings s
             join boefje b on s.plugin_id = b.plugin_id
-        """)
+        """)  # Add boefjes and set the settings for boefjes
 
     with connection.begin():
         connection.execute("""
-            INSERT INTO boefje_config (settings, boefje_id, organisation_pk)
+            INSERT INTO boefje_config (enabled, boefje_id, organisation_pk)
             SELECT p.enabled, b.id, p.organisation_pk FROM plugin_state p
             JOIN boefje b ON p.plugin_id = b.plugin_id
             LEFT JOIN boefje_config bc ON bc.boefje_id = b.id WHERE bc.boefje_id IS NULL
-        """)
+        """)  # Add boefjes and set the enabled field for boefjes that to not exist yet
         connection.execute("""
             UPDATE boefje_config bc SET enabled = p.enabled from plugin_state p
             JOIN boefje b ON p.plugin_id = b.plugin_id
             where b.id = bc.boefje_id and p.organisation_pk = bc.organisation_pk
-        """)
+        """)  # Set the enabled field for boefjes
         connection.execute("""
             UPDATE normalizer_config nc SET enabled = p.enabled from plugin_state p
             JOIN normalizer n ON p.plugin_id = n.plugin_id
             where n.id = nc.normalizer_id and p.organisation_pk = nc.organisation_pk
-        """)
+        """)  # Set the enabled field for normalizers
 
     op.drop_table("settings")
     op.drop_table("plugin_state")
