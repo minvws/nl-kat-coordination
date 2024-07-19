@@ -1,4 +1,3 @@
-import logging
 from collections.abc import Sequence
 from datetime import datetime, timezone
 from typing import Any
@@ -26,8 +25,6 @@ from reports.views.base import (
 )
 from reports.views.view_helpers import AggregateReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
-
-logger = logging.getLogger(__name__)
 
 
 class BreadcrumbsAggregateReportView(ReportBreadcrumbs):

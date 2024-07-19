@@ -96,7 +96,6 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = self.get_breadcrumbs()
         context["next"] = self.get_next()
-        context["current"] = self.get_current()
         context["previous"] = self.get_previous()
         return context
 
