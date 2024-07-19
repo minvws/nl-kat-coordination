@@ -564,6 +564,22 @@ msgid ""
 "We couldn't send a password reset link. Contact your system administrator."
 msgstr ""
 
+#: components/modal/template.html
+msgid "Close modal"
+msgstr ""
+
+#: components/modal/template.html
+#: katalogus/templates/change_clearance_level.html
+#: katalogus/templates/confirmation_clone_settings.html
+#: katalogus/templates/plugin_settings_delete.html
+#: rocky/templates/oois/ooi_delete.html
+#: rocky/templates/oois/ooi_mute_finding.html
+#: rocky/templates/organizations/organization_edit.html
+#: rocky/templates/organizations/organization_member_edit.html
+#: rocky/templates/two_factor/_wizard_actions.html
+msgid "Cancel"
+msgstr ""
+
 #: crisis_room/views.py
 msgid ""
 "Failed to get list of findings for organization {}, check server logs for "
@@ -742,17 +758,6 @@ msgstr ""
 #: katalogus/templates/change_clearance_level.html
 #: rocky/templates/oois/ooi_detail.html
 msgid "Scan"
-msgstr ""
-
-#: katalogus/templates/change_clearance_level.html
-#: katalogus/templates/confirmation_clone_settings.html
-#: katalogus/templates/plugin_settings_delete.html
-#: rocky/templates/oois/ooi_delete.html
-#: rocky/templates/oois/ooi_mute_finding.html
-#: rocky/templates/organizations/organization_edit.html
-#: rocky/templates/organizations/organization_member_edit.html
-#: rocky/templates/two_factor/_wizard_actions.html
-msgid "Cancel"
 msgstr ""
 
 #: katalogus/templates/clone_settings.html
