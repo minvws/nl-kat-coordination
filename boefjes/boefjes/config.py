@@ -131,6 +131,13 @@ class Settings(BaseSettings):
         None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
     )
 
+    network_scopes: list[str] = Field(
+        ["internet"],
+        description="List of networks the boefje ",
+        examples=[["internet", "dentist", "remote-location"], ["dentist"]],
+        validation_alias="NETWORK_SCOPES",
+    )
+
     model_config = SettingsConfigDict(env_prefix="BOEFJES_")
 
     @classmethod
