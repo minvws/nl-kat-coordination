@@ -95,6 +95,7 @@ class OOIRepository(Repository):
         limit: int = 20,
         scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+        search_string: str | None = None,
     ) -> Paginated[OOI]:
         raise NotImplementedError
 
@@ -292,8 +293,16 @@ class XTDBOOIRepository(OOIRepository):
         limit: int = 20,
         scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+        search_string: str | None = None,
     ) -> Paginated[OOI]:
         types = to_concrete(types)
+
+        search_statement = (
+            f"""[?e :xt/id ?id]
+                                [(clojure.string/includes? ?id \"{search_string}\")]"""
+            if search_string
+            else ""
+        )
 
         count_query = """
                 {{
@@ -304,7 +313,8 @@ class XTDBOOIRepository(OOIRepository):
                                 [?scan_profile :type "ScanProfile"]
                                 [?scan_profile :reference ?e]
                                 [?scan_profile :level _scan_level]
-                                [?scan_profile :scan_profile_type _scan_profile_type]]
+                                [?scan_profile :scan_profile_type _scan_profile_type]
+                                {search_statement}]
                     }}
                     :in-args [[{object_types}], [{scan_levels}], [{scan_profile_types}]]
                 }}
@@ -312,6 +322,7 @@ class XTDBOOIRepository(OOIRepository):
             object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)),
             scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]),
             scan_profile_types=" ".join([str_val(scan_profile_type.value) for scan_profile_type in scan_profile_types]),
+            search_statement=search_statement,
         )
 
         res_count = self.session.client.query(count_query, valid_time)
@@ -326,7 +337,8 @@ class XTDBOOIRepository(OOIRepository):
                                 [?scan_profile :type "ScanProfile"]
                                 [?scan_profile :reference ?e]
                                 [?scan_profile :level _scan_level]
-                                [?scan_profile :scan_profile_type _scan_profile_type]]
+                                [?scan_profile :scan_profile_type _scan_profile_type]
+                                {search_statement}]
                         :limit {limit}
                         :offset {offset}
                     }}
@@ -336,6 +348,7 @@ class XTDBOOIRepository(OOIRepository):
             object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)),
             scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]),
             scan_profile_types=" ".join([str_val(scan_profile_type.value) for scan_profile_type in scan_profile_types]),
+            search_statement=search_statement,
             limit=limit,
             offset=offset,
         )

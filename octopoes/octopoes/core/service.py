@@ -131,8 +131,11 @@ class OctopoesService:
         offset: int = DEFAULT_OFFSET,
         scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+        search_string: str | None = None,
     ) -> Paginated[OOI]:
-        paginated = self.ooi_repository.list_oois(types, valid_time, limit, offset, scan_levels, scan_profile_types)
+        paginated = self.ooi_repository.list_oois(
+            types, valid_time, limit, offset, scan_levels, scan_profile_types, search_string
+        )
         self._populate_scan_profiles(paginated.items, valid_time)
         return paginated
 
