@@ -98,8 +98,10 @@ class AppContext:
                     structlog.processors.StackInfoRenderer(),
                     structlog.dev.set_exc_info,
                     structlog.stdlib.PositionalArgumentsFormatter(),
-                    structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S", utc=False),
-                    structlog.dev.ConsoleRenderer(),
+                    structlog.processors.TimeStamper(
+                        fmt="%Y-%m-%d %H:%M:%S", utc=False
+                    ),
+                    structlog.dev.ConsoleRenderer(colors=False),
                 ],
                 context_class=dict,
                 # `logger_factory` is used to create wrapped loggers that are used
@@ -150,7 +152,10 @@ class AppContext:
         )
 
         # Datastores, SimpleNamespace allows us to use dot notation
-        dbconn = storage.DBConn(str(self.config.db_uri))
+        dbconn = storage.DBConn(
+            dsn=str(self.config.db_uri),
+            pool_size=self.config.db_connection_pool_size,
+        )
         self.datastores: SimpleNamespace = SimpleNamespace(
             **{
                 storage.ScheduleStore.name: storage.ScheduleStore(dbconn),
@@ -172,7 +177,9 @@ class AppContext:
                 "pq_grace_period": str(self.config.pq_grace_period),
                 "pq_max_random_objects": str(self.config.pq_max_random_objects),
                 "katalogus_cache_ttl": str(self.config.katalogus_cache_ttl),
-                "monitor_organisations_interval": str(self.config.monitor_organisations_interval),
+                "monitor_organisations_interval": str(
+                    self.config.monitor_organisations_interval
+                ),
             }
         )
 

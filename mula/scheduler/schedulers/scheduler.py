@@ -50,9 +50,6 @@ class Scheduler(abc.ABC):
         threads:
             A dict of ThreadRunner instances, used for running processes
             concurrently.
-        executor:
-            A concurrent.futures.ThreadPoolExecutor instance used for
-            running tasks concurrently.
     """
 
     ITEM_TYPE: Any = None
@@ -109,9 +106,6 @@ class Scheduler(abc.ABC):
         self.lock: threading.Lock = threading.Lock()
         self.stop_event_threads: threading.Event = threading.Event()
         self.threads: list[thread.ThreadRunner] = []
-        self.executor: futures.ThreadPoolExecutor = futures.ThreadPoolExecutor(
-            max_workers=10
-        )
 
     @abc.abstractmethod
     def run(self) -> None:
@@ -244,8 +238,9 @@ class Scheduler(abc.ABC):
             item = self.queue.push(item)
         except queues.errors.NotAllowedError as exc:
             self.logger.warning(
-                "Not allowed to push to queue %s",
+                "Not allowed to push to queue %s (%s)",
                 self.queue.pq_id,
+                exc,
                 item_id=item.id,
                 queue_id=self.queue.pq_id,
                 scheduler_id=self.scheduler_id,
@@ -253,8 +248,9 @@ class Scheduler(abc.ABC):
             raise exc
         except queues.errors.QueueFullError as exc:
             self.logger.warning(
-                "Queue %s is full, not pushing new items",
+                "Queue %s is full, not pushing new items (%s)",
                 self.queue.pq_id,
+                exc,
                 item_id=item.id,
                 queue_id=self.queue.pq_id,
                 queue_qsize=self.queue.qsize(),
@@ -278,6 +274,7 @@ class Scheduler(abc.ABC):
             self.queue.pq_id,
             item.priority,
             item_id=item.id,
+            item_hash=item.hash,
             queue_id=self.queue.pq_id,
             scheduler_id=self.scheduler_id,
         )
@@ -387,21 +384,6 @@ class Scheduler(abc.ABC):
         Args:
             item: An item from the queue
         """
-        # # Update task, set status to DISPATCHED
-        # task = self.ctx.datastores.task_store.get_task(str(item.id))
-        # if task is None:
-        #     self.logger.error(
-        #         "Task %s not found in datastore",
-        #         item.id,
-        #         item_id=item.id,
-        #         queue_id=self.queue.pq_id,
-        #         scheduler_id=self.scheduler_id,
-        #     )
-        #     return
-        #
-        # task.status = models.TaskStatus.DISPATCHED
-        # self.ctx.datastores.task_store.update_task(task)
-
         self.last_activity = datetime.now(timezone.utc)
 
     def calculate_deadline(self, task: models.Task) -> datetime:

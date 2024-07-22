@@ -281,10 +281,9 @@ class NormalizerScheduler(Scheduler):
             return
 
         self.logger.info(
-            "Created normalizer task: %s for raw data: %s",
-            task.id,
-            normalizer_task.raw_data.id,
+            "Created normalizer task",
             task_id=task.id,
+            task_hash=task.hash,
             normalizer_id=normalizer_task.normalizer.id,
             raw_data_id=normalizer_task.raw_data.id,
             organisation_id=self.organisation.id,

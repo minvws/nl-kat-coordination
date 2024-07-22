@@ -369,7 +369,9 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        with futures.ThreadPoolExecutor() as executor:
+        with futures.ThreadPoolExecutor(
+            thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-rescheduling"
+        ) as executor:
             for schedule in schedules:
                 boefje_task = BoefjeTask.parse_obj(schedule.data)
 
@@ -491,7 +493,9 @@ class BoefjeScheduler(Scheduler):
         """
         self.logger.debug(
             "Pushing boefje task",
+            task_hash=boefje_task.hash,
             boefje_id=boefje_task.boefje.id,
+            ooi_primary_key=boefje_task.input_ooi,
             organisation_id=self.organisation.id,
             scheduler_id=self.scheduler_id,
             caller=caller,
@@ -503,7 +507,7 @@ class BoefjeScheduler(Scheduler):
                 self.logger.debug(
                     "Task has not passed grace period: %s",
                     boefje_task.hash,
-                    boefje_task_hash=boefje_task.hash,
+                    task_hash=boefje_task.hash,
                     organisation_id=self.organisation.id,
                     scheduler_id=self.scheduler_id,
                     caller=caller,
@@ -513,7 +517,7 @@ class BoefjeScheduler(Scheduler):
             self.logger.warning(
                 "Could not check if grace period has passed: %s",
                 boefje_task.hash,
-                boefje_task_hash=boefje_task.hash,
+                task_hash=boefje_task.hash,
                 organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
@@ -527,7 +531,7 @@ class BoefjeScheduler(Scheduler):
                 self.logger.debug(
                     "Task is stalled: %s",
                     boefje_task.hash,
-                    boefje_task_hash=boefje_task.hash,
+                    task_hash=boefje_task.hash,
                     organisation_id=self.organisation.id,
                     scheduler_id=self.scheduler_id,
                     caller=caller,
@@ -557,7 +561,7 @@ class BoefjeScheduler(Scheduler):
                 self.logger.debug(
                     "Task is still running: %s",
                     boefje_task.hash,
-                    boefje_task_hash=boefje_task.hash,
+                    task_hash=boefje_task.hash,
                     organisation_id=self.organisation.id,
                     scheduler_id=self.scheduler_id,
                     caller=caller,
@@ -567,7 +571,7 @@ class BoefjeScheduler(Scheduler):
             self.logger.warning(
                 "Could not check if task is running: %s",
                 boefje_task.hash,
-                boefje_task_hash=boefje_task.hash,
+                task_hash=boefje_task.hash,
                 organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
@@ -579,7 +583,7 @@ class BoefjeScheduler(Scheduler):
             self.logger.debug(
                 "Task is already on queue: %s",
                 boefje_task.hash,
-                boefje_task_hash=boefje_task.hash,
+                task_hash=boefje_task.hash,
                 organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
@@ -612,7 +616,7 @@ class BoefjeScheduler(Scheduler):
             self.logger.warning(
                 "Could not add task to queue, queue was full: %s",
                 boefje_task.hash,
-                boefje_task_hash=boefje_task.hash,
+                task_hash=boefje_task.hash,
                 queue_qsize=self.queue.qsize(),
                 queue_maxsize=self.queue.maxsize,
                 organisation_id=self.organisation.id,
@@ -626,6 +630,7 @@ class BoefjeScheduler(Scheduler):
             task_id=task.id,
             task_hash=task.hash,
             boefje_id=boefje_task.boefje.id,
+            ooi_primary_key=boefje_task.input_ooi,
             organisation_id=self.organisation.id,
             scheduler_id=self.scheduler_id,
             caller=caller,
