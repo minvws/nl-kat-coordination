@@ -290,9 +290,7 @@ direction RL
     class PluginSettingsListView
 
     OrganizationView : organization
-    OrganizationView : octopoes_api_connector
     OrganizationView : organization_member
-    OrganizationView : indemnification_present
 
     SinglePluginView : katalogus_client
     SinglePluginView : plugin
