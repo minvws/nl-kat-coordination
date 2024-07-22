@@ -1,5 +1,7 @@
 {% load i18n %}
 {% load static %}
+{% load compress %}
+{% load component_tags %}
 
 <div role="group"
      class="plugin {% if plugin.enabled %} plugin-is-enabled {% else %} plugin-is-disabled {% endif %}"
@@ -45,13 +47,41 @@
                 {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
 
                 {% if plugin.type == "boefje" %}
-                    <a class="tile-detail-link"
-                       href="{% url "boefje_detail" organization_code=organization.code plugin_id=plugin.id %}">{% translate "See details" %}</a>
+                    {% component "modal" size="dialog-small" %}
+                    {% fill "trigger" %}
+                    <a class="tile-detail-link modal-trigger">{% translate "See details" %}</a>
+                {% endfill %}
+                {% fill "header" %}
+                {% translate "Boefje details" %}
+            {% endfill %}
+            {% fill "content" %}
+            <h3>{{ plugin.name }}</h3>
+            <span>
+                {% if plugin.enabled %}
+                    {% translate "enabled" %}
                 {% else %}
-                    <a class="tile-detail-link"
-                       href="{% url "normalizer_detail" organization_code=organization.code plugin_id=plugin.id %}">{% translate "See details" %}</a>
+                    {% translate "disabled" %}
                 {% endif %}
-            </div>
-        {% endif %}
-    {% endif %}
+            </span>
+            <p>{{ plugin.description }}</p>
+            <p>{{ plugin.scan_level }}</p>
+            {% for report_type in plugin_data.plugin_report_types %}<p>{{ report_type }}</p>{% endfor %}
+        {% endfill %}
+        {% fill "footer_buttons" %}
+        <input type="submit"  form="content-form"  class="submit"  value="Submit">
+    {% endfill %}
+{% endcomponent %}
+{% component_css_dependencies %}
+{% else %}
+<a class="tile-detail-link"
+   href="{% url "normalizer_detail" organization_code=organization.code plugin_id=plugin.id %}">{% translate "See details" %}</a>
+{% endif %}
 </div>
+{% endif %}
+{% endif %}
+</div>
+{% block html_at_end_body %}
+    {% compress js %}
+        <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
+    {% endcompress %}
+{% endblock html_at_end_body %}
