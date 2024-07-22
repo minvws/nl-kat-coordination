@@ -197,3 +197,7 @@ class OOITypeMultiCheckboxForm(BaseRockyForm):
         choices=OOI_TYPE_CHOICES,
         widget=forms.CheckboxSelectMultiple,
     )
+
+
+class OOISearchForm(BaseRockyForm):
+    search = forms.CharField(label=_("Search"), required=False, max_length=256)
