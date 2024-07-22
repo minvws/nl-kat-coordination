@@ -29,12 +29,12 @@ class ConfirmCloneSettingsView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["to_organization"] = user.organization_from_code(code=kwargs["to_organization"])
+        context["to_organization"] = user.organization(code=kwargs["to_organization"])
 
         return context
 
     def post(self, request, *args, **kwargs):
-        to_organization = user.organization_from_code(code=kwargs["to_organization"])
+        to_organization = user.organization(code=kwargs["to_organization"])
         self.organization.katalogus.clone_all_configuration_to_organization(to_organization.code)
         messages.add_message(
             self.request,
