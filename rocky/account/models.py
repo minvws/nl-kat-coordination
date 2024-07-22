@@ -120,6 +120,19 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
             return self.all_organizations
         return [m.organization for m in self.organization_members]
 
+    def organization(self, code=str) -> Organization:
+        """
+        Returns the current organization as present in the Route.
+        Returns a 404 if the user has no membership, same as when the organization does not exists.
+        
+        Superusers are considered to be members of all organizations.
+        """
+        if self.is_superuser:
+            return Organization.objects.get(code=code)
+            
+        #TODO, do we need to catch indexError here and return 404?
+        return Organization.objects.filter(code=code).filter(members__user=self.id)[0]
+
 
 class AuthToken(AbstractAuthToken):
     name = models.CharField(_("name"), max_length=150)
