@@ -201,6 +201,20 @@ class Organization(models.Model):
 
         return octopoes_client
 
+    @cached_property
+    def katalogus(self) -> KATalogusClientV1:
+        self.katalogus_client = get_katalogus(self.code)
+        return self.katalogus_client
+
+    @cached_property
+    def octopoes(self) -> OctopoesAPIConnector:
+        self.octopoes_client = OctopoesAPIConnector(settings.OCTOPOES_API, client=self.code)
+        return self.octopoes_client
+
+    @cached_property
+    def indemnified(self):
+        return Indemnification.objects.filter(organization=self.id).exists()
+
 
 pre_save.connect(Organization.pre_create, sender=Organization)
 post_save.connect(Organization.post_create, sender=Organization)
