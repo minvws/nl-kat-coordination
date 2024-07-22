@@ -37,7 +37,7 @@ class ChangeClearanceLevel(OrganizationPermissionRequiredMixin, SchedulerView, S
 
     def post(self, request, *args, **kwargs):
         """Start scanning oois at plugin detail page."""
-        if not self.indemnification_present:
+        if not self.organization.indemnified:
             return self.get(request, *args, **kwargs)
 
         self.run_boefje_for_oois(boefje=self.plugin, oois=self.oois)
