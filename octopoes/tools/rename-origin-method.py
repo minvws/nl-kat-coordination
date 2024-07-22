@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
     "-u",
     "--url",
     default="http://localhost:3000",
+    envvar="XTDB_URI",
     help="XTDB server base url",
 )
 @click.option(
@@ -33,7 +34,7 @@ logger = logging.getLogger(__name__)
 )
 @click.option("-v", "--verbosity", count=True, help="Increase the verbosity level")
 @click.pass_context
-def cli(ctx: click.Context, url: str, node: str, timeout: int, verbosity: int):
+def cli(ctx: click.Context, url: str, code: str, timeout: int, verbosity: int):
     verbosities = [logging.WARN, logging.INFO, logging.DEBUG]
     try:
         if verbosity:
@@ -41,8 +42,8 @@ def cli(ctx: click.Context, url: str, node: str, timeout: int, verbosity: int):
     except IndexError:
         raise click.UsageError("Invalid verbosity level (use -v, -vv, or -vvv)")
 
-    client = XTDBClient(url, node, timeout)
-    logger.info("Instantiated XTDB client with endpoint %s for node %s", url, node)
+    client = XTDBClient(url, code, timeout)
+    logger.info("Instantiated XTDB client with endpoint %s for node %s", url, code)
 
     ctx.ensure_object(dict)
     ctx.obj["client"] = client
@@ -83,22 +84,20 @@ def search_replace_method(data_list: list[dict[str, Any]], search_string: str, r
 
 @cli.command(help="Rename an observation origin method")
 @click.option("--armed", is_flag=True, help="Arm the tool to overwrite the method name (confirmation)")
-@click.option("--evict", is_flag=True, help="Also remove the history of targeted origins")
 @click.argument("method")
 @click.argument("renamed")
 @click.pass_context
-def rename(ctx: click.Context, armed: bool, evict: bool, method: str, renamed: str):
+def rename(ctx: click.Context, armed: bool, method: str, renamed: str):
     origins = ctx.obj["client"].query(method_query(method))
     if not origins:
         raise click.UsageError("No targets found")
     if "error" in origins:
         raise click.UsageError(origins["error"])
     if armed:
-        operation = "evict" if evict else "delete"
-        evict_txs = [[operation, o[0]["xt/id"]] for o in origins]
+        delete_txs = [["delete", o[0]["xt/id"]] for o in origins]
         search_replace_method([o[0] for o in origins], method, renamed)
         put_txs = [["put", o[0]] for o in origins]
-        click.echo(json.dumps(ctx.obj["client"].submit_tx(evict_txs + put_txs)))
+        click.echo(json.dumps(ctx.obj["client"].submit_tx(delete_txs + put_txs)))
     else:
         search_replace_method([o[0] for o in origins], method, renamed)
         click.echo(json.dumps(origins))
