@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
         "show_default": True,
     }
 )
-@click.option("-n", "--node", default="0", help="XTDB node")
+@click.option("-c", "--code", default="0", help="The organisation code")
 @click.option(
     "-u",
     "--url",
