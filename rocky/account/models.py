@@ -130,8 +130,10 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
         if self.is_superuser:
             return Organization.objects.get(code=code)
             
-        #TODO, do we need to catch indexError here and return 404?
-        return Organization.objects.filter(code=code).filter(members__user=self.id)[0]
+        try:
+            return Organization.objects.filter(code=code).filter(members__user=self.id)[0]
+        except IndexError:
+            raise Organization.DoesNotExist(code)
 
 
 class AuthToken(AbstractAuthToken):
