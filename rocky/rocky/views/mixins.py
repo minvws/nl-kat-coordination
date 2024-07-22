@@ -99,7 +99,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
         self,
         reference: Reference,
         organization: Organization,
-    ) -> Dict[str: list[OriginData]]:
+    ) -> Dict[str, list[OriginData]]:
         declarations: list[OriginData] = []
         observations: list[OriginData] = []
         inferences: list[OriginData] = []
