@@ -80,9 +80,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
         "dmarc_response": get_email_security_records(resolver, hostname, "_dmarc"),
         "dkim_response": get_email_security_records(resolver, hostname, "_domainkey"),
     }
-    if (not answers_formatted and 
-        results["dmarc_response"] == "Timeout" and 
-        results["dmarc_response"] == "Timeout"):
+    if not answers_formatted and results["dmarc_response"] == "Timeout" and results["dmarc_response"] == "Timeout":
         raise TimeoutException("No answers from DNS-Server due to timeouts.")
     return [(set(), json.dumps(results))]
 
