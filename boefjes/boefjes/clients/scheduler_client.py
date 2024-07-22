@@ -49,11 +49,22 @@ class Task(BaseModel):
     modified_at: datetime.datetime
 
 
+class Filter(BaseModel):
+    column: str
+    field: str
+    operator: str
+    value: list[str]
+
+
+class QueuePopRequest(BaseModel):
+    filters: list[Filter]
+
+
 class SchedulerClientInterface:
     def get_queues(self) -> list[Queue]:
         raise NotImplementedError()
 
-    def pop_item(self, queue: str) -> QueuePrioritizedItem | None:
+    def pop_item(self, queue: str, network_scopes: list[str]) -> QueuePrioritizedItem | None:
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
@@ -80,8 +91,20 @@ class SchedulerAPIClient(SchedulerClientInterface):
 
         return TypeAdapter(list[Queue]).validate_json(response.content)
 
-    def pop_item(self, queue: str) -> QueuePrioritizedItem | None:
-        response = self._session.post(f"/queues/{queue}/pop")
+    def pop_item(self, queue: str, network_scopes: list[str]) -> QueuePrioritizedItem | None:
+        response = self._session.post(
+            f"/queues/{queue}/pop",
+            data=QueuePopRequest(
+                filters=[
+                    Filter(
+                        column="data",
+                        field="network_scope",
+                        operator="in",
+                        value=network_scopes,
+                    )
+                ]
+            ).model_dump_json(),
+        )
         self._verify_response(response)
 
         return TypeAdapter(QueuePrioritizedItem | None).validate_json(response.content)

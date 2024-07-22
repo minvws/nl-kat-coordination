@@ -102,7 +102,7 @@ class SchedulerWorkerManager(WorkerManager):
             logger.debug("Popping from queue %s", queue_type.id)
 
             try:
-                p_item = self.scheduler_client.pop_item(queue_type.id)
+                p_item = self.scheduler_client.pop_item(queue_type.id, self.settings.network_scopes)
             except (HTTPError, ValidationError):
                 logger.exception("Popping task from scheduler failed, sleeping 10 seconds")
                 time.sleep(10)

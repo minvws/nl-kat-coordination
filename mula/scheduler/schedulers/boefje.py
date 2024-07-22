@@ -560,7 +560,7 @@ class BoefjeScheduler(Scheduler):
         """
 
         # TODO: see what types have a network attribute. How?
-        network_scope = "internet1"
+        network_scope = "internet"
         if ooi.object_type in ["IPAddressV4", "IPAddressV6"]:
             split = ooi.primary_key.split("|")
             if len(split) == 3:
