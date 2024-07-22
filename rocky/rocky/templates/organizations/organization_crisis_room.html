@@ -10,7 +10,7 @@
         <section>
             <div>
                 <h1>{% translate "Crisis room:" %} {{ organization.name }}</h1>
-                {% if not indemnification_present %}
+                {% if not organization.indemnified %}
                     <p class="warning"
                        role="group"
                        aria-label="{% translate "indemnification warning" %}">
