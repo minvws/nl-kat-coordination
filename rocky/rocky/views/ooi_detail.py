@@ -38,11 +38,10 @@ class OOIDetailView(
         return super().post(request, *args, **kwargs)
 
     def set_clearance_level(self) -> None:
-        if not self.indemnification_present:
+        if not self.organiszation.indemnified:
             return self.indemnification_error()
-        else:
-            clearance_level = int(self.request.POST.get("level"))
-            self.can_raise_clearance_level(self.ooi, clearance_level)  # returns appropriate messages
+        clearance_level = int(self.request.POST.get("level", 0))
+        self.can_raise_clearance_level(self.ooi, clearance_level)  # returns appropriate messages
 
     def answer_ooi_questions(self) -> None:
         if not isinstance(self.ooi, Question):
@@ -126,7 +125,6 @@ class OOIDetailView(
         context["severity_summary_totals"] = sum(context["count_findings_per_severity"].values())
 
         context["possible_boefjes_filter_form"] = filter_form
-        context["organization_indemnification"] = self.indemnification_present
 
         if self.request.GET.get("show_clearance_level_inheritance"):
             clearance_level_inheritance = self.get_scan_profile_inheritance(self.ooi)
