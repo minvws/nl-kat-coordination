@@ -5,7 +5,6 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, ListView, TemplateView
 
-from katalogus.client import get_katalogus
 from katalogus.forms import KATalogusFilter
 
 
@@ -14,7 +13,7 @@ class BaseKATalogusView(OrganizationView, ListView, FormView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.katalogus_client = get_katalogus(self.organization.code)
+        self.katalogus = self.organization.katalogus
 
     def get_initial(self) -> dict[str, Any]:
         initial = super().get_initial()
@@ -71,7 +70,7 @@ class KATalogusView(BaseKATalogusView):
     template_name = "katalogus.html"
 
     def get_queryset(self):
-        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_plugins())
+        queryset = self.sort_alphabetic_ascending(self.katalogus.get_plugins())
         return self.filter_katalogus(queryset)
 
 
@@ -81,7 +80,7 @@ class BoefjeListView(BaseKATalogusView):
     template_name = "boefjes.html"
 
     def get_queryset(self):
-        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_boefjes())
+        queryset = self.sort_alphabetic_ascending(self.katalogus.get_boefjes())
         return self.filter_katalogus(queryset)
 
 
@@ -91,7 +90,7 @@ class NormalizerListView(BaseKATalogusView):
     template_name = "normalizers.html"
 
     def get_queryset(self):
-        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_normalizers())
+        queryset = self.sort_alphabetic_ascending(self.katalogus.get_normalizers())
         return self.filter_katalogus(queryset)
 
 
