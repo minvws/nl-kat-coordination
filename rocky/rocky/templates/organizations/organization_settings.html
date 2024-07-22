@@ -16,7 +16,7 @@
             An overview of "{{ organization_name }}". This shows general information and its settings.
           {% endblocktranslate %}
                 </p>
-                {% if not indemnification_present %}
+                {% if not organization.indemnified %}
                     <p class="warning"
                        role="group"
                        aria-label="{% translate "indemnification warning" %}">
