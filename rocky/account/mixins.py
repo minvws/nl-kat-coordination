@@ -68,15 +68,16 @@ class OrganizationPermWrapper:
 class OrganizationView(View):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-
         organization_code = kwargs["organization_code"]
         try:
-            self.organization = Organization.objects.get(code=organization_code)
+            self.organization = self.request.user.organization(organization_code)
         except Organization.DoesNotExist:
             raise Http404()
 
-        self.indemnification_present = Indemnification.objects.filter(organization=self.organization).exists()
+        #TODO, since its a property, we dont need to pre-load it, let the template handle it at will
+        self.indemnification_present = self.organization.indemnified
 
+        #TODO move this to be on the organization that we just got *from* the membership instead.
         try:
             self.organization_member = OrganizationMember.objects.get(
                 user=self.request.user, organization=self.organization
