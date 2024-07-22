@@ -74,9 +74,6 @@ class OrganizationView(View):
         except Organization.DoesNotExist:
             raise Http404()
 
-        #TODO, since its a property, we dont need to pre-load it, let the template handle it at will
-        self.indemnification_present = self.organization.indemnified
-
         #TODO move this to be on the organization that we just got *from* the membership instead.
         try:
             self.organization_member = OrganizationMember.objects.get(
@@ -105,7 +102,6 @@ class OrganizationView(View):
         context["organization"] = self.organization
         context["organization_member"] = self.organization_member
         context["may_update_clearance_level"] = self.may_update_clearance_level
-        context["indemnification_present"] = self.indemnification_present
         context["perms"] = OrganizationPermWrapper(self.organization_member)
         return context
 
