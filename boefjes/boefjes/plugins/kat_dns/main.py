@@ -99,8 +99,8 @@ def get_email_security_records(resolver: dns.resolver.Resolver, hostname: str, r
     except dns.resolver.NoNameservers as error:
         # no servers responded happily, we'll check the response from the first
         if error.kwargs['errors'][0][3] == 'SERVFAIL':
-            return "SERVFAIL" # returned when DNSSEC tells us this query wont return data.
-        raise # Not dnssec related, unhandled, raise.
+            return "SERVFAIL"  # returned when DNSSEC tells us this query won't return data.
+        raise  # Not dnssec related, unhandled, raise.
     except dns.resolver.NXDOMAIN:
         return "NXDOMAIN"
     except dns.resolver.Timeout:
