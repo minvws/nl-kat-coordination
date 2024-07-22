@@ -148,9 +148,10 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.staticfiles",
     "django.contrib.humanize",
     "django.forms",
+    "django_components",
+    "django_components.safer_staticfiles",
     "django_otp",
     "django_otp.plugins.otp_static",
     "django_otp.plugins.otp_totp",
@@ -202,7 +203,6 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [BASE_DIR / "rocky/templates", BASE_DIR / "reports/report_types"],
-        "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -214,7 +214,17 @@ TEMPLATES = [
                 "tools.context_processors.organizations_including_blocked",
                 "tools.context_processors.rocky_version",
             ],
-            "builtins": ["tools.templatetags.ooi_extra"],
+            "builtins": ["django_components.templatetags.component_tags", "tools.templatetags.ooi_extra"],
+            "loaders": [
+                (
+                    "django.template.loaders.cached.Loader",
+                    [
+                        "django.template.loaders.filesystem.Loader",
+                        "django.template.loaders.app_directories.Loader",
+                        "django_components.template_loader.Loader",
+                    ],
+                )
+            ],
         },
     },
 ]
@@ -328,7 +338,7 @@ if env.bool("PIRATE", False):
 
 STATIC_URL = "/static/"
 STATIC_ROOT = env.path("STATIC_ROOT", BASE_DIR / "static")
-STATICFILES_DIRS = (BASE_DIR / "assets",)
+STATICFILES_DIRS = (BASE_DIR / "assets", BASE_DIR / "components")
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
@@ -492,6 +502,9 @@ KNOX_TOKEN_MODEL = "account.AuthToken"
 
 FORMS_URLFIELD_ASSUME_HTTPS = True
 
+# Logging format ("text" or "json")
+LOGGING_FORMAT = env("LOGGING_FORMAT", default="text")
+
 structlog.configure(
     processors=[
         structlog.contextvars.merge_contextvars,
@@ -499,8 +512,12 @@ structlog.configure(
         structlog.processors.StackInfoRenderer(),
         structlog.dev.set_exc_info,
         structlog.stdlib.PositionalArgumentsFormatter(),
-        structlog.processors.TimeStamper("iso"),
-        structlog.dev.ConsoleRenderer(colors=True),
+        structlog.processors.TimeStamper("iso", utc=False),
+        (
+            structlog.processors.JSONRenderer()
+            if LOGGING_FORMAT == "json"
+            else structlog.dev.ConsoleRenderer(colors=True, pad_level=False)
+        ),
     ],
     context_class=dict,
     logger_factory=structlog.stdlib.LoggerFactory(),

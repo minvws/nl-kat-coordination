@@ -91,7 +91,10 @@ class ObservedAtMixin:
 
                 return ret
             except ValueError:
-                messages.error(self.request, _("Can not parse date, falling back to show current date."))
+                messages.error(
+                    self.request,
+                    _("Can not parse date, falling back to show current date."),
+                )
                 return datetime.now(timezone.utc)
 
 
@@ -112,33 +115,61 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
         reference: Reference,
         organization: Organization,
     ) -> tuple[list[OriginData], list[OriginData], list[OriginData]]:
+        declarations: list[OriginData] = []
+        observations: list[OriginData] = []
+        inferences: list[OriginData] = []
+        results = declarations, observations, inferences
+
         try:
             origins = self.octopoes_api_connector.list_origins(self.observed_at, result=reference)
-            origin_data = [OriginData(origin=origin) for origin in origins]
-
-            for origin in origin_data:
-                if origin.origin.origin_type != OriginType.OBSERVATION or not origin.origin.task_id:
-                    continue
-
-                try:
-                    client = get_bytes_client(organization.code)
-                    client.login()
-
-                    normalizer_data = client.get_normalizer_meta(origin.origin.task_id)
-                    boefje_id = normalizer_data["raw_data"]["boefje_meta"]["boefje"]["id"]
-                    origin.normalizer = normalizer_data
-                    origin.boefje = get_katalogus(organization.code).get_plugin(boefje_id)
-                except HTTPError as e:
-                    logger.error(e)
-
-            return (
-                [origin for origin in origin_data if origin.origin.origin_type == OriginType.DECLARATION],
-                [origin for origin in origin_data if origin.origin.origin_type == OriginType.OBSERVATION],
-                [origin for origin in origin_data if origin.origin.origin_type == OriginType.INFERENCE],
-            )
         except Exception as e:
+            logger.error(
+                "Could not load origins for OOI: %s from octopoes, error: %s",
+                reference,
+                e,
+            )
+            return results
+
+        try:
+            bytes_client = get_bytes_client(organization.code)
+            bytes_client.login()
+        except HTTPError as e:
             logger.error(e)
-            return [], [], []
+            return results
+
+        katalogus = get_katalogus(organization.code)
+
+        for origin in origins:
+            origin = OriginData(origin=origin)
+            if origin.origin.origin_type != OriginType.OBSERVATION or not origin.origin.task_id:
+                if origin.origin.origin_type == OriginType.DECLARATION:
+                    declarations.append(origin)
+                elif origin.origin.origin_type == OriginType.INFERENCE:
+                    inferences.append(origin)
+                continue
+
+            try:
+                normalizer_data = bytes_client.get_normalizer_meta(origin.origin.task_id)
+            except HTTPError as e:
+                logger.error(
+                    "Could not load Normalizer meta for task_id: %s, error: %s",
+                    origin.origin.task_id,
+                    e,
+                )
+            else:
+                boefje_id = normalizer_data["raw_data"]["boefje_meta"]["boefje"]["id"]
+                origin.normalizer = normalizer_data
+                try:
+                    origin.boefje = katalogus.get_plugin(boefje_id)
+                except HTTPError as e:
+                    logger.error(
+                        "Could not load boefje: %s from katalogus, error: %s",
+                        boefje_id,
+                        e,
+                    )
+            observations.append(origin)
+
+        return results
 
     def handle_connector_exception(self, exception: Exception):
         if isinstance(exception, ObjectNotFoundException):
