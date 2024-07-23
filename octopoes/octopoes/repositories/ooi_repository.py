@@ -314,9 +314,7 @@ class XTDBOOIRepository(OOIRepository):
             else ""
         )
 
-        order_statement = (
-            f":order-by [[_{re.escape(order_by)} :{re.escape(asc_desc)}]]" if order_by and asc_desc else ""
-        )
+        order_statement = f":order-by [[_{re.escape(order_by)} :{re.escape(asc_desc)}]]"
 
         count_query = """
                 {{
