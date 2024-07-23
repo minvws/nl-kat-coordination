@@ -43,7 +43,7 @@ class AppContext:
             logging.config.dictConfig(json.load(f))
 
         # Check if we enabled structured logging in the configuration
-        if self.config.json_logging:
+        if self.config.logging_format == "json":
             structlog.configure(
                 processors=[
                     # If log level is too low, abort pipeline and throw away log entry.
@@ -55,7 +55,7 @@ class AppContext:
                     # Perform %-style formatting.
                     structlog.stdlib.PositionalArgumentsFormatter(),
                     # Add a timestamp in ISO 8601 format.
-                    structlog.processors.TimeStamper(fmt="iso"),
+                    structlog.processors.TimeStamper(fmt="iso", utc=False),
                     # If the "stack_info" key in the event dict is true, remove it
                     # and render the current stack trace in the "stack" key.
                     structlog.processors.StackInfoRenderer(),
@@ -98,10 +98,8 @@ class AppContext:
                     structlog.processors.StackInfoRenderer(),
                     structlog.dev.set_exc_info,
                     structlog.stdlib.PositionalArgumentsFormatter(),
-                    structlog.processors.TimeStamper(
-                        fmt="%Y-%m-%d %H:%M:%S", utc=False
-                    ),
-                    structlog.dev.ConsoleRenderer(colors=False),
+                    structlog.processors.TimeStamper("iso", utc=False),
+                    structlog.dev.ConsoleRenderer(),
                 ],
                 context_class=dict,
                 # `logger_factory` is used to create wrapped loggers that are used
