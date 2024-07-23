@@ -45,8 +45,10 @@ def upgrade():
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("hash"),
     )
+
     op.drop_index("ix_items_hash", table_name="items")
     op.drop_table("items")
+
     op.add_column(
         "tasks",
         sa.Column("schedule_id", scheduler.utils.datastore.GUID(), nullable=True),
@@ -57,13 +59,22 @@ def upgrade():
         "tasks",
         sa.Column("data", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
     )
+
+    # Migrate data from p_item to columns
+    op.execute("""UPDATE tasks SET data = p_item -> 'data'""")
+    op.execute("""UPDATE tasks SET priority = (p_item ->> 'priority')::integer""")
+    op.execute("""UPDATE tasks SET hash = p_item ->> 'hash'""")
+
     op.alter_column("tasks", "scheduler_id", existing_type=sa.VARCHAR(), nullable=False)
     op.alter_column("tasks", "type", existing_type=sa.VARCHAR(), nullable=False)
+
     op.drop_index("ix_tasks_p_item_hash", table_name="tasks")
+
     op.create_index(op.f("ix_tasks_hash"), "tasks", ["hash"], unique=False)
     op.create_foreign_key(
         None, "tasks", "schedules", ["schedule_id"], ["id"], ondelete="SET NULL"
     )
+
     op.drop_column("tasks", "p_item")
     # ### end Alembic commands ###
 
@@ -79,6 +90,28 @@ def downgrade():
             nullable=False,
         ),
     )
+
+    op.execute(
+        """
+        UPDATE tasks
+        SET p_item = jsonb_set(p_item, '{data}', data)
+    """
+    )
+
+    op.execute(
+        """
+        UPDATE tasks
+        SET p_item = jsonb_set(p_item, '{priority}', to_jsonb(priority))
+    """
+    )
+
+    op.execute(
+        """
+        UPDATE tasks
+        SET p_item = jsonb_set(p_item, '{hash}', to_jsonb(hash))
+    """
+    )
+
     op.drop_constraint(None, "tasks", type_="foreignkey")
     op.drop_index(op.f("ix_tasks_hash"), table_name="tasks")
     op.create_index(
