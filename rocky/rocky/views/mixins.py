@@ -5,7 +5,6 @@ from functools import cached_property
 from operator import attrgetter
 
 import structlog
-
 from account.mixins import OrganizationView
 from django.contrib import messages
 from django.http import Http404, HttpRequest
