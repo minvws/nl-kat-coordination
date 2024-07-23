@@ -408,7 +408,7 @@ class AggregateOrganisationReport(AggregateReport):
             "total_systems": total_ips,
             "total_hostnames": total_hostnames,
             "total_systems_basic_security": total_systems_basic_security,
-            "health": [health.dict() for health in flattened_health],
+            "health": [health.model_dump() for health in flattened_health],
             "config_oois": config_oois,
         }
 

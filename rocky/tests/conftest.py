@@ -39,6 +39,7 @@ from octopoes.models.pagination import Paginated
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
+from rocky.health import ServiceHealth
 from rocky.scheduler import PaginatedTasksResponse, Task
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
@@ -1664,3 +1665,42 @@ def onboarding_collect_data():
             "finding_types": [],
         }
     }
+
+
+@pytest.fixture
+def rocky_health():
+    ServiceHealth(
+        service="rocky",
+        healthy=True,
+        version="0.0.1.dev1",
+        additional=None,
+        results=[
+            ServiceHealth(
+                service="octopoes",
+                healthy=True,
+                version="0.0.1.dev1",
+                additional=None,
+                results=[
+                    ServiceHealth(
+                        service="xtdb",
+                        healthy=True,
+                        version="1.24.1",
+                        additional={
+                            "version": "1.24.1",
+                            "revision": "1164f9a3c7e36edbc026867945765fd4366c1731",
+                            "indexVersion": 22,
+                            "consumerState": None,
+                            "kvStore": "xtdb.rocksdb.RocksKv",
+                            "estimateNumKeys": 24552,
+                            "size": 24053091,
+                        },
+                        results=[],
+                    )
+                ],
+            ),
+            ServiceHealth(service="katalogus", healthy=True, version="0.0.1-development", additional=None, results=[]),
+            ServiceHealth(service="scheduler", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
+            ServiceHealth(service="bytes", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
+            ServiceHealth(service="keiko", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
+        ],
+    )
