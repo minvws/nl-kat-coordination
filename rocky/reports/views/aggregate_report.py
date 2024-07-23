@@ -142,7 +142,7 @@ class ReportTypesSelectionAggregateReportView(
 
 
 class SaveAggregateReportMixin(ReportPluginView):
-    def save_report(self, report_name) -> ReportOOI:
+    def save_report(self, report_name: list) -> ReportOOI:
         input_oois = self.get_oois()
 
         aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(

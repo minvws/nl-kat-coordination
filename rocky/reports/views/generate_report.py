@@ -127,7 +127,7 @@ class ReportTypesSelectionGenerateReportView(
 
 
 class SaveGenerateReportMixin(ReportPluginView):
-    def save_report(self, report_names) -> ReportOOI:
+    def save_report(self, report_names: list) -> ReportOOI:
         error_reports = []
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
         by_type: dict[str, list[str]] = {}
