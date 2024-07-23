@@ -19,8 +19,10 @@ from octopoes.models.ooi.service import IPService, Service
 from pydantic import TypeAdapter
 
 from boefjes.app import SchedulerWorkerManager
+from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import Queue, QueuePrioritizedItem, SchedulerClientInterface, Task, TaskStatus
 from boefjes.config import Settings, settings
+from boefjes.job_handler import bytes_api_client
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.runtime_interfaces import Handler, WorkerManager
 from tests.loading import get_dummy_data
@@ -150,6 +152,11 @@ def octopoes_api_connector(request) -> OctopoesAPIConnector:
     connector.create_node()
     yield connector
     connector.delete_node()
+
+
+@pytest.fixture
+def bytes_client(request) -> BytesAPIClient:
+    return bytes_api_client
 
 
 @pytest.fixture

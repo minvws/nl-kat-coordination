@@ -24,14 +24,17 @@ services:
       dockerfile: boefjes/Dockerfile
       args:
         - ENVIRONMENT=dev
-    command: python -m cProfile -o .ci/bench_$(date +%Y_%m_%d-%H:%M:%S).pstat -m pytest -v -m slow tests/integration
+    command: bash -c "python -m cProfile -o .ci/bench_$(date +%Y_%m_%d-%H:%M:%S).pstat -m pytest -v -m slow tests/integration"
     depends_on:
       - ci_bytes
       - ci_octopoes
+      - ci_katalogus-db
     env_file:
       - .ci/.env.test
     volumes:
       - .:/app/boefjes
+    environment:
+      - DATABASE_MIGRATION=1
 
   ci_bytes:
     build:
@@ -44,10 +47,10 @@ services:
         condition: service_healthy
       ci_bytes-db:
         condition: service_started
-    volumes:
-      - .:/app/bytes
     env_file:
       - .ci/.env.test
+    environment:
+      - DATABASE_MIGRATION=1
 
   ci_bytes-db:
     image: docker.io/library/postgres:15

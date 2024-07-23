@@ -147,7 +147,7 @@ class OctopoesAPIConnector:
             "offset": offset,
             "limit": limit,
             "task_id": str(task_id) if task_id else None,
-            "origin_type": str(origin_type) if origin_type else None,
+            "origin_type": str(origin_type.value) if origin_type else None,
         }
         params = {k: v for k, v in params.items() if v is not None}  # filter out None values
         res = self.session.get(
