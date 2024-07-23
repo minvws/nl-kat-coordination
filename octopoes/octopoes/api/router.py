@@ -124,8 +124,12 @@ def list_objects(
     offset: int = 0,
     limit: int = 20,
     search_string: str | None = None,
+    order_by: str | None = None,
+    asc_desc: str | None = None,
 ):
-    return octopoes.list_ooi(types, valid_time, offset, limit, scan_level, scan_profile_type, search_string)
+    return octopoes.list_ooi(
+        types, valid_time, offset, limit, scan_level, scan_profile_type, search_string, order_by, asc_desc
+    )
 
 
 @router.get("/query", tags=["Objects"])

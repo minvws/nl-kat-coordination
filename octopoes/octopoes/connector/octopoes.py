@@ -72,6 +72,8 @@ class OctopoesAPIConnector:
         scan_level: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_type: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
         search_string: str | None = None,
+        order_by: str | None = None,
+        asc_desc: str | None = None,
     ) -> Paginated[OOIType]:
         params: dict[str, str | int | list[str | int] | None] = {
             "types": [t.__name__ for t in types],
@@ -81,6 +83,8 @@ class OctopoesAPIConnector:
             "scan_level": [s.value for s in scan_level],
             "scan_profile_type": [s.value for s in scan_profile_type],
             "search_string": search_string,
+            "order_by": order_by,
+            "asc_desc": asc_desc,
         }
         res = self.session.get(f"/{self.client}/objects", params=params)
         return TypeAdapter(Paginated[OOIType]).validate_json(res.content)

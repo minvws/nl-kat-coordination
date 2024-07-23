@@ -146,6 +146,8 @@ class OOIList:
         scan_level: set[ScanLevel],
         scan_profile_type: set[ScanProfileType],
         search_string: str | None = None,
+        order_by: str | None = None,
+        asc_desc: str | None = None,
     ):
         self.octopoes_connector = octopoes_connector
         self.ooi_types = ooi_types
@@ -155,6 +157,8 @@ class OOIList:
         self.scan_level = scan_level
         self.scan_profile_type = scan_profile_type
         self.search_string = search_string
+        self.order_by = order_by
+        self.asc_desc = asc_desc
 
     @cached_property
     def count(self) -> int:
@@ -185,6 +189,8 @@ class OOIList:
                 scan_level=self.scan_level,
                 scan_profile_type=self.scan_profile_type,
                 search_string=self.search_string,
+                order_by=self.order_by,
+                asc_desc=self.asc_desc,
             ).items
 
         elif isinstance(key, int):
@@ -196,6 +202,8 @@ class OOIList:
                 scan_level=self.scan_level,
                 scan_profile_type=self.scan_profile_type,
                 search_string=self.search_string,
+                order_by=self.order_by,
+                asc_desc=self.asc_desc,
             ).items
 
 

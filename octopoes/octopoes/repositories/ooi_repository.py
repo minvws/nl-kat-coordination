@@ -97,6 +97,8 @@ class OOIRepository(Repository):
         scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
         search_string: str | None = None,
+        order_by: str | None = None,
+        asc_desc: str | None = None,
     ) -> Paginated[OOI]:
         raise NotImplementedError
 
@@ -295,6 +297,8 @@ class XTDBOOIRepository(OOIRepository):
         scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
         search_string: str | None = None,
+        order_by: str | None = None,
+        asc_desc: str | None = None,
     ) -> Paginated[OOI]:
         types = to_concrete(types)
 
@@ -303,6 +307,10 @@ class XTDBOOIRepository(OOIRepository):
                                 [(clojure.string/includes? ?id \"{re.escape(search_string)}\")]"""
             if search_string
             else ""
+        )
+
+        order_statement = (
+            f":order-by [[_{re.escape(order_by)} :{re.escape(asc_desc)}]]" if order_by and asc_desc else ""
         )
 
         count_query = """
@@ -332,7 +340,7 @@ class XTDBOOIRepository(OOIRepository):
         data_query = """
                 {{
                     :query {{
-                        :find [(pull ?e [*])]
+                        :find [(pull ?e [*]) _object_type _scan_level]
                         :in [[_object_type ...] [_scan_level ...]  [_scan_profile_type ...]]
                         :where [[?e :object_type _object_type]
                                 [?scan_profile :type "ScanProfile"]
@@ -340,6 +348,7 @@ class XTDBOOIRepository(OOIRepository):
                                 [?scan_profile :level _scan_level]
                                 [?scan_profile :scan_profile_type _scan_profile_type]
                                 {search_statement}]
+                        {order_statement}
                         :limit {limit}
                         :offset {offset}
                     }}
@@ -350,6 +359,7 @@ class XTDBOOIRepository(OOIRepository):
             scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]),
             scan_profile_types=" ".join([str_val(scan_profile_type.value) for scan_profile_type in scan_profile_types]),
             search_statement=search_statement,
+            order_statement=order_statement,
             limit=limit,
             offset=offset,
         )
