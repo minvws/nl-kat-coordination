@@ -142,7 +142,7 @@ class ReportTypesSelectionAggregateReportView(
 
 
 class SaveAggregateReportMixin(ReportPluginView):
-    def save_report(self, report_name: list) -> ReportOOI:
+    def save_report(self, report_names: list) -> ReportOOI:
         input_oois = self.get_oois()
 
         aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
@@ -198,7 +198,7 @@ class SaveAggregateReportMixin(ReportPluginView):
             parent=None,
             has_parent=False,
             observed_at=observed_at,
-            name=report_name[0][1],
+            name=report_names[0][1],
         )
 
         # Save the child reports to bytes

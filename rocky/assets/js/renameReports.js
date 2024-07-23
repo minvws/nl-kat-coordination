@@ -25,9 +25,11 @@ function editReportName(target) {
 
   let new_name = target.querySelector(".new-report-name").value;
 
-  if (reference_date) {
-    new_name += " (" + reference_date + ")";
+  if (new_name) {
+    if (reference_date) {
+      new_name += " (" + reference_date + ")";
+    }
+    update_target_input.setAttribute("value", new_name);
+    update_target_text.textContent = new_name;
   }
-  update_target_input.setAttribute("value", new_name);
-  update_target_text.textContent = new_name;
 }

@@ -22,7 +22,33 @@ export function initDialog(modal) {
       event.target.nodeName === "DIALOG" ||
       event.target.classList.contains("close-modal-button")
     ) {
-      event.target.closest(".modal-wrapper").querySelector("dialog").close();
+      let required_elements = modal.querySelectorAll("[required]");
+
+      if (required_elements) {
+        if (checkRequiredElements(required_elements)) {
+          event.target
+            .closest(".modal-wrapper")
+            .querySelector("dialog")
+            .close();
+        }
+      } else {
+        event.target.closest(".modal-wrapper").querySelector("dialog").close();
+      }
     }
   });
+}
+
+export function checkRequiredElements(elements) {
+  let valid = true;
+
+  elements.forEach((element) => {
+    if (!element.checkValidity()) {
+      valid = false;
+      element.style.border = "solid red 1px";
+    } else {
+      element.style.border = "";
+    }
+  });
+
+  return valid;
 }
