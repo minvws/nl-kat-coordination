@@ -56,9 +56,12 @@ class OriginData(BaseModel):
         if not self.normalizer:
             return False
 
-        observation_date = self.normalizer.get("raw_data", {}).get("boefje_meta", {}).get("ended_at")
+        if (observation_date := self.normalizer.get("raw_data", {}).get("boefje_meta", {}).get("ended_at")) is None:
+            raise ValueError("Observation date is missing in normalizer meta")
 
-        return observation_date is not None and observation_date < datetime.now(timezone.utc) - time_delta
+        observation_date = datetime.strptime(observation_date, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc)
+
+        return observation_date < datetime.now(timezone.utc) - time_delta
 
 
 class OOIAttributeError(AttributeError):
@@ -298,7 +301,9 @@ class FindingList:
                     continue
                 hydrated_findings.append(
                     HydratedFinding(
-                        finding=finding, finding_type=objects[finding.finding_type], ooi=objects[finding.ooi]
+                        finding=finding,
+                        finding_type=objects[finding.finding_type],
+                        ooi=objects[finding.ooi],
                     )
                 )
             return hydrated_findings
