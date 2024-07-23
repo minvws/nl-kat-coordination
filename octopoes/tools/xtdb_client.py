@@ -3,6 +3,26 @@ import datetime
 import httpx
 from pydantic import JsonValue
 
+PutTransaction = (
+    tuple[str, dict]
+    | tuple[str, dict, str | datetime.datetime]
+    | tuple[str, dict, str | datetime.datetime, str | datetime.datetime]
+)
+
+DeleteTransaction = (
+    tuple[str] | tuple[str, str | datetime.datetime] | tuple[str, str | datetime.datetime, str | datetime.datetime]
+)
+
+EvictTransaction = DeleteTransaction
+
+SimpleTransactions = list[PutTransaction | DeleteTransaction | EvictTransaction]
+
+MatchTransaction = (
+    tuple[str, str, dict, SimpleTransactions] | tuple[str, str, dict, str | datetime.datetime, SimpleTransactions]
+)
+
+TransactionType = PutTransaction | DeleteTransaction | EvictTransaction | MatchTransaction
+
 
 class XTDBClient:
     def __init__(self, base_url: str, node: str, timeout: int | None = None):
@@ -118,8 +138,9 @@ class XTDBClient:
 
         return res.json()
 
-    def submit_tx(self, transactions: list[str]) -> JsonValue:
-        res = self._client.post("/submit-tx", json={"tx-ops": transactions})
+    def submit_tx(self, transactions: list[TransactionType]) -> JsonValue:
+        data = {"tx-ops": transactions}
+        res = self._client.post("/submit-tx", json=data)
 
         return res.json()
 
