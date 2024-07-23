@@ -50,7 +50,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     requested_dns_name = dns.name.from_text(hostname)
     resolver = dns.resolver.Resolver()
     # https://dnspython.readthedocs.io/en/stable/_modules/dns/edns.html
-    # enable EDE to get the DNSSEC Bogus return values if the server supports it
+    # enable EDE to get the DNSSEC Bogus return values if the server supports it # codespell-ignore
     resolver.use_edns(options=[EDEOption(15)])
     nameserver = getenv("REMOTE_NS", "1.1.1.1")
     resolver.nameservers = [nameserver]
