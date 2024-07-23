@@ -205,6 +205,11 @@ for ooi_type_ in get_concrete_types():
 datamodel = Datamodel(entities=entities)
 
 
+def escape_string(string):
+    escaped_string = re.sub(r"([^a-zA-Z0-9.:/])", r"\\\1", string)
+    return escaped_string
+
+
 class XTDBOOIRepository(OOIRepository):
     pk_prefix = "xt/id"
 
@@ -304,7 +309,7 @@ class XTDBOOIRepository(OOIRepository):
 
         search_statement = (
             f"""[?e :xt/id ?id]
-                                [(clojure.string/includes? ?id \"{re.escape(search_string)}\")]"""
+                                [(clojure.string/includes? ?id \"{escape_string(search_string)}\")]"""
             if search_string
             else ""
         )
