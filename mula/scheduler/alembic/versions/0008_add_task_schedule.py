@@ -57,13 +57,15 @@ def upgrade():
     op.add_column("tasks", sa.Column("priority", sa.Integer(), nullable=True))
     op.add_column(
         "tasks",
-        sa.Column("data", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column("data", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
     )
 
     # Migrate data from p_item to columns
     op.execute("""UPDATE tasks SET data = p_item -> 'data'""")
     op.execute("""UPDATE tasks SET priority = (p_item ->> 'priority')::integer""")
     op.execute("""UPDATE tasks SET hash = p_item ->> 'hash'""")
+
+    op.alter_column("tasks", "data", nullable=False)
 
     op.alter_column("tasks", "scheduler_id", existing_type=sa.VARCHAR(), nullable=False)
     op.alter_column("tasks", "type", existing_type=sa.VARCHAR(), nullable=False)
@@ -76,6 +78,16 @@ def upgrade():
     )
 
     op.drop_column("tasks", "p_item")
+
+    # Create schedules from tasks
+    op.execute(
+        """
+        INSERT INTO schedules (id, scheduler_id, hash, data, enabled, created_at, modified_at)
+        SELECT DISTINCT ON (scheduler_id, hash) uuid_generate_v4(), scheduler_id, hash, data, true, now(), now()
+        FROM tasks ORDER BY scheduler_id, hash, created_at DESC
+    """
+    )
+
     # ### end Alembic commands ###
 
 
