@@ -188,9 +188,9 @@ class SaveGenerateReportMixin(ReportPluginView):
                 for ooi, data in ooi_data.items():
                     report_type_name = str(get_report_by_id(report_type).name)
                     ooi_name = Reference.from_str(ooi).human_readable
-                    for default_name, updatet_name in report_names:
+                    for default_name, updated_name in report_names:
                         if ooi_name in default_name and report_type_name in default_name:
-                            name = updatet_name
+                            name = updated_name
                             break
 
                     raw_id = self.save_report_raw(data={"report_data": data["data"]})
