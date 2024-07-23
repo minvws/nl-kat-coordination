@@ -6,8 +6,6 @@ from operator import attrgetter
 
 import structlog
 
-from typing import Dict
-
 from account.mixins import OrganizationView
 from django.contrib import messages
 from django.http import Http404, HttpRequest
@@ -102,7 +100,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
         self,
         reference: Reference,
         organization: Organization,
-    ) -> Dict[str, list[OriginData]]:
+    ) -> dict[str, list[OriginData]]:
         declarations: list[OriginData] = []
         observations: list[OriginData] = []
         inferences: list[OriginData] = []
