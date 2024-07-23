@@ -357,7 +357,7 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
         observed_at: datetime,
         name: str,
     ) -> ReportOOI:
-        if not name or name.isspace() or name is None:
+        if not name or name.isspace():
             name = report_type.name
         report_ooi = ReportOOI(
             name=name,
