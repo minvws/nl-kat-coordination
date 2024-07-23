@@ -135,9 +135,7 @@ class NormalizerScheduler(Scheduler):
                 return
 
         # Get all normalizers for the mime types of the raw data
-        # TODO: should be Plugin instead of Normalizer, we'll miss
-        # the enabled field
-        normalizers: dict[str, Normalizer] = {}
+        normalizers: dict[str, Plugin] = {}
         for mime_type in latest_raw_data.raw_data.mime_types:
             normalizers_by_mime_type: list[Plugin] = self.get_normalizers_for_mime_type(
                 mime_type.get("value")
@@ -357,7 +355,6 @@ class NormalizerScheduler(Scheduler):
 
         return False
 
-    # TODO: enabled is not present as field?
     def get_normalizers_for_mime_type(self, mime_type: str) -> list[Plugin]:
         """Get available normalizers for a given mime type.
 

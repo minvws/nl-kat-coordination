@@ -58,18 +58,20 @@ class StoreTestCase(unittest.TestCase):
         self.assertEqual(len(tasks), 5)
         self.assertEqual(count, 5)
 
-    # TODO: get tasks with filtersTestModel.type,
-
-    def test_get_task(self):
+    def get_tasks_by_type(self):
         # Arrange
-        task = functions.create_task(scheduler_id=self.organisation.id)
-        created_task = self.mock_ctx.datastores.task_store.create_task(task)
+        for i in range(5):
+            task = functions.create_task(scheduler_id=self.organisation.id)
+            self.mock_ctx.datastores.task_store.create_task(task)
 
         # Act
-        task = self.mock_ctx.datastores.task_store.get_task(created_task.id)
+        tasks, count = self.mock_ctx.datastores.task_store.get_tasks(
+            scheduler_id=self.organisation.id, task_type=functions.TestModel.type
+        )
 
         # Assert
-        self.assertIsNotNone(task)
+        self.assertEqual(len(tasks), 5)
+        self.assertEqual(count, 5)
 
     def test_get_tasks_by_hash(self):
         # Arrange
@@ -88,6 +90,17 @@ class StoreTestCase(unittest.TestCase):
 
         # Assert
         self.assertEqual(len(tasks), 5)
+
+    def test_get_task(self):
+        # Arrange
+        task = functions.create_task(scheduler_id=self.organisation.id)
+        created_task = self.mock_ctx.datastores.task_store.create_task(task)
+
+        # Act
+        task = self.mock_ctx.datastores.task_store.get_task(created_task.id)
+
+        # Assert
+        self.assertIsNotNone(task)
 
     def test_get_latest_task_by_hash(self):
         # Arrange

@@ -16,7 +16,7 @@ logger = structlog.getLogger(__name__)
 
 
 class DBConn:
-    def __init__(self, dsn: str, pool_size: int) -> None:
+    def __init__(self, dsn: str, pool_size: int = 25) -> None:
         super().__init__()
 
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)

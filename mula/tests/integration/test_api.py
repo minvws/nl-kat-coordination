@@ -953,7 +953,68 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
             response.json().get("detail"),
         )
 
-    # TODO: hash, enabled, created_at, modified_at, pagination
+    def test_list_schedules_hash(self):
+        response = self.client.get(f"/schedules?hash={self.first_schedule.hash}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()["count"])
+        self.assertEqual(1, len(response.json()["results"]))
+        self.assertEqual(
+            str(self.first_schedule.id), response.json()["results"][0]["id"]
+        )
+
+    def test_list_schedules_min_created_at(self):
+        response = self.client.get(
+            f"/schedules?min_created_at={quote(self.first_schedule.created_at.isoformat())}"
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, response.json()["count"])
+        self.assertEqual(2, len(response.json()["results"]))
+
+        response = self.client.get(
+            f"/schedules?min_created_at={quote(self.second_schedule.created_at.isoformat())}"
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()["count"])
+        self.assertEqual(1, len(response.json()["results"]))
+        self.assertEqual(
+            str(self.second_schedule.id), response.json()["results"][0]["id"]
+        )
+
+    def test_list_schedules_max_created_at(self):
+        response = self.client.get(
+            f"/schedules?max_created_at={quote(self.second_schedule.created_at.isoformat())}"
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, response.json()["count"])
+        self.assertEqual(2, len(response.json()["results"]))
+
+        response = self.client.get(
+            f"/schedules?max_created_at={quote(self.first_schedule.created_at.isoformat())}"
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()["count"])
+        self.assertEqual(1, len(response.json()["results"]))
+        self.assertEqual(
+            str(self.first_schedule.id), response.json()["results"][0]["id"]
+        )
+
+    def test_list_schedules_min_and_max_created_at(self):
+        response = self.client.get(
+            f"/schedules?min_created_at={quote(self.first_schedule.created_at.isoformat())}&max_created_at={quote(self.second_schedule.created_at.isoformat())}"
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, response.json()["count"])
+        self.assertEqual(2, len(response.json()["results"]))
+
+        response = self.client.get(
+            f"/schedules?min_created_at={quote(self.first_schedule.created_at.isoformat())}&max_created_at={quote(self.first_schedule.created_at.isoformat())}"
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()["count"])
+        self.assertEqual(1, len(response.json()["results"]))
+        self.assertEqual(
+            str(self.first_schedule.id), response.json()["results"][0]["id"]
+        )
 
     def test_get_schedule(self):
         response = self.client.get(f"/schedules/{str(self.first_schedule.id)}")

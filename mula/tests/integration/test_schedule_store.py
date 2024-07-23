@@ -240,7 +240,6 @@ class ScheduleStoreTestCase(unittest.TestCase):
         self.assertEqual(len(schedule_tasks), 1)
         self.assertEqual(schedule_tasks[0].id, task_db.id)
 
-    # TODO
     def test_get_tasks_filter_related(self):
         # Arrange
         scheduler_id = "test_scheduler_id"
@@ -271,39 +270,3 @@ class ScheduleStoreTestCase(unittest.TestCase):
         self.assertEqual(count, 1)
         self.assertEqual(len(tasks), 1)
         self.assertEqual(tasks[0].schedule_id, schedule_db.id)
-
-    # TODO
-    @unittest.skip("Not implemented")
-    def test_get_tasks_filter_related_and_nested(self):
-        # Arrange
-        scheduler_id = "test_scheduler_id"
-        task = functions.create_task(scheduler_id)
-        schedule = models.Schedule(
-            scheduler_id=scheduler_id,
-            hash=task.hash,
-            data=task.model_dump(),
-        )
-        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
-
-        task.schedule_id = schedule_db.id
-        created_task = self.mock_ctx.datastores.task_store.create_task(task)
-
-        f_req = filters.FilterRequest(
-            filters={
-                "and": [
-                    filters.Filter(
-                        column="tasks",
-                        field="data__id",
-                        operator="eq",
-                        value=created_task.data.get("id"),
-                    ),
-                ]
-            }
-        )
-
-        schedules, count = self.mock_ctx.datastores.schedule_store.get_schedules(
-            filters=f_req
-        )
-        self.assertEqual(count, 1)
-        self.assertEqual(len(schedules), 1)
-        self.assertEqual(schedules[0].id, schedule_db.id)
