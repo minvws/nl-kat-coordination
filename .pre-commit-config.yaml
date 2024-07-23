@@ -108,7 +108,7 @@ repos:
     hooks:
       - id: codespell
         additional_dependencies: ["tomli"]
-        args: [-L, lama, --ignore-regex="{1024}|.*codespell-ignore."]
+        args: ["-L", "lama", "--ignore-regex", "{1024}|.*codespell-ignore."]
         exclude: |
           (?x)(
           \.po$ |
