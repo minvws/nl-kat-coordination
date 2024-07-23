@@ -4,7 +4,7 @@ import json
 import re
 from collections import Counter
 from datetime import datetime
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 import structlog
 from bits.definitions import BitDefinition
@@ -97,8 +97,8 @@ class OOIRepository(Repository):
         scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
         search_string: str | None = None,
-        order_by: str | None = None,
-        asc_desc: str | None = None,
+        order_by: Literal["scan_level", "object_type"] = "object_type",
+        asc_desc: Literal["asc", "desc"] = "asc",
     ) -> Paginated[OOI]:
         raise NotImplementedError
 
@@ -297,8 +297,8 @@ class XTDBOOIRepository(OOIRepository):
         scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
         search_string: str | None = None,
-        order_by: str | None = None,
-        asc_desc: str | None = None,
+        order_by: Literal["scan_level", "object_type"] = "object_type",
+        asc_desc: Literal["asc", "desc"] = "asc",
     ) -> Paginated[OOI]:
         types = to_concrete(types)
 

@@ -4,7 +4,7 @@ from collections.abc import Callable, ValuesView
 from datetime import datetime, timezone
 from logging import getLogger
 from time import perf_counter
-from typing import overload
+from typing import Literal, overload
 
 from bits.definitions import get_bit_definitions
 from bits.runner import BitRunner
@@ -132,8 +132,8 @@ class OctopoesService:
         scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
         search_string: str | None = None,
-        order_by: str | None = None,
-        asc_desc: str | None = None,
+        order_by: Literal["scan_level", "object_type"] = "object_type",
+        asc_desc: Literal["asc", "desc"] = "asc",
     ) -> Paginated[OOI]:
         paginated = self.ooi_repository.list_oois(
             types,

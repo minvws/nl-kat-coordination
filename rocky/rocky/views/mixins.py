@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import cached_property
 from operator import attrgetter
+from typing import Literal
 
 import structlog
 from account.mixins import OrganizationView
@@ -146,8 +147,8 @@ class OOIList:
         scan_level: set[ScanLevel],
         scan_profile_type: set[ScanProfileType],
         search_string: str | None = None,
-        order_by: str | None = None,
-        asc_desc: str | None = None,
+        order_by: Literal["scan_level", "object_type"] = "object_type",
+        asc_desc: Literal["asc", "desc"] = "asc",
     ):
         self.octopoes_connector = octopoes_connector
         self.ooi_types = ooi_types

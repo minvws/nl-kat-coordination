@@ -1,6 +1,7 @@
 import json
 from collections.abc import Sequence, Set
 from datetime import datetime
+from typing import Literal
 from uuid import UUID
 
 import httpx
@@ -72,8 +73,8 @@ class OctopoesAPIConnector:
         scan_level: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_type: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
         search_string: str | None = None,
-        order_by: str | None = None,
-        asc_desc: str | None = None,
+        order_by: Literal["scan_level", "object_type"] = "object_type",
+        asc_desc: Literal["asc", "desc"] = "asc",
     ) -> Paginated[OOIType]:
         params: dict[str, str | int | list[str | int] | None] = {
             "types": [t.__name__ for t in types],
