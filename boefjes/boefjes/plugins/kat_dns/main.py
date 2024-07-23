@@ -8,7 +8,7 @@ from os import getenv
 import dns.resolver
 from dns.name import Name
 from dns.resolver import Answer
-from dns.edns import EDEOpton
+from dns.edns import EDEOption
 
 from boefjes.job_models import BoefjeMeta
 
