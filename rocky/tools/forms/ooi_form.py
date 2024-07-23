@@ -200,4 +200,4 @@ class OOITypeMultiCheckboxForm(BaseRockyForm):
 
 
 class OOISearchForm(BaseRockyForm):
-    search = forms.CharField(label=_("Search"), required=False, max_length=256)
+    search = forms.CharField(label=_("Search"), required=False, max_length=256  help_text="Object ID contains")
