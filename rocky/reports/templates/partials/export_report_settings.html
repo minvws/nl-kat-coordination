@@ -25,75 +25,77 @@
                     </thead>
                     <tbody>
                         {% for report_name in reports %}
-                            <input type="hidden" name="old_report_name" value="{{ report_name }}" />
-                            <tr>
-                                <td id="text-{{ report_name|slugify }}">{{ report_name }}</td>
-                                <td>
-                                    <input id="{{ report_name|slugify }}"
-                                           name="report_name"
-                                           type="hidden"
-                                           readonly
-                                           value="{{ report_name }}" />
-                                </td>
-                                <td>
-                                    {% component "modal" size="dialog-medium" %}
-                                    {% fill "trigger" %}
-                                    <button type="button"
-                                            id="edit-name-icon"
-                                            class="icon ti-edit action-button modal-trigger">
-                                        Edit {{ report_name }}
-                                    </button>
+                            {% with report_id=report_name|slugify %}
+                                <input type="hidden" name="old_report_name" value="{{ report_name }}" />
+                                <tr>
+                                    <td id="text-{{ report_id }}">{{ report_name }}</td>
+                                    <td>
+                                        <input id="{{ report_id }}"
+                                               name="report_name"
+                                               type="hidden"
+                                               readonly
+                                               value="{{ report_name }}" />
+                                    </td>
+                                    <td>
+                                        {% component "modal" size="dialog-medium" %}
+                                        {% fill "trigger" %}
+                                        <button type="button"
+                                                id="edit-name-icon"
+                                                class="icon ti-edit action-button modal-trigger">
+                                            Edit {{ report_name }}
+                                        </button>
+                                    {% endfill %}
+                                    {% fill "header" %}
+                                    <h2>{% translate "Edit " %}{{ report_name }}</h2>
                                 {% endfill %}
-                                {% fill "header" %}
-                                <h2>{% translate "Edit " %}{{ report_name }}</h2>
+                                {% fill "content" %}
+                                <form id="content-form"  class="inline"  action=""  method="">
+                                    {% csrf_token %}
+                                    <p>
+                                        {% blocktranslate %}
+                                                            Give your report a custom name and optionally add the reports' reference date
+                                                            to the name. To do so you can select a standard option or use a
+                                                            <a href="https://strftime.org/">Python strftime code</a> in the report name.
+                                                        {% endblocktranslate %}
+                                    </p>
+                                    <p>
+                                        <input type="hidden"
+                                               class="old-report-name"
+                                               name="old-report-name"
+                                               value="{{ report_id }}">
+                                        <label for="report-name">{% translate "Report name" %}</label>
+                                        <input class="new-report-name"
+                                               name="new-report-name"
+                                               type="text"
+                                               value="{{ report_name }}">
+                                        <div>
+                                            <label for="reference-date">{% translate "Add reference date" %}</label>
+                                            <select class="reference-date" name="reference-date">
+                                                <option disabled selected value="">-- {% translate "Select option" %} --</option>
+                                                <option value="">{% translate "No reference date" %}</option>
+                                                <option value="{{ current_datetime|date:"N jS Y, H:i" }}">
+                                                    {% translate "Day" %} ({{ current_datetime|date:"N jS Y, H:i" }})
+                                                </option>
+                                                <option value="{% translate "Week" %} {{ current_datetime|date:"W, Y" }}">
+                                                    {% translate "Week" %} ({% translate "Week" %} {{ current_datetime|date:"W, Y" }})
+                                                </option>
+                                                <option value="{{ current_datetime|date:"N, Y" }}">
+                                                    {% translate "Month" %} ({{ current_datetime|date:"N, Y" }})
+                                                </option>
+                                                <option value="{{ current_datetime|date:"Y" }}">{% translate "Year" %} ({{ current_datetime|date:"Y" }})</option>
+                                            </select>
+                                        </div>
+                                    </p>
+                                </form>
                             {% endfill %}
-                            {% fill "content" %}
-                            <form id="content-form"  class="inline"  action=""  method="">
-                                {% csrf_token %}
-                                <p>
-                                    {% blocktranslate %}
-                                                        Give your report a custom name and optionally add the reports' reference date
-                                                        to the name. To do so you can select a standard option or use a
-                                                        <a href="https://strftime.org/">Python strftime code</a> in the report name.
-                                                    {% endblocktranslate %}
-                                </p>
-                                <p>
-                                    <input type="hidden"
-                                           class="old-report-name"
-                                           name="old-report-name"
-                                           value="{{ report_name|slugify }}">
-                                    <label for="report-name">{% translate "Report name" %}</label>
-                                    <input class="new-report-name"
-                                           name="new-report-name"
-                                           type="text"
-                                           value="{{ report_name }}">
-                                    <div>
-                                        <label for="reference-date">{% translate "Add reference date" %}</label>
-                                        <select class="reference-date" name="reference-date">
-                                            <option disabled selected value="">-- {% translate "Select option" %} --</option>
-                                            <option value="">{% translate "No reference date" %}</option>
-                                            <option value="{{ current_datetime|date:"N jS Y, H:i" }}">
-                                                {% translate "Day" %} ({{ current_datetime|date:"N jS Y, H:i" }})
-                                            </option>
-                                            <option value="{% translate "Week" %} {{ current_datetime|date:"W, Y" }}">
-                                                {% translate "Week" %} ({% translate "Week" %} {{ current_datetime|date:"W, Y" }})
-                                            </option>
-                                            <option value="{{ current_datetime|date:"N, Y" }}">
-                                                {% translate "Month" %} ({{ current_datetime|date:"N, Y" }})
-                                            </option>
-                                            <option value="{{ current_datetime|date:"Y" }}">{% translate "Year" %} ({{ current_datetime|date:"Y" }})</option>
-                                        </select>
-                                    </div>
-                                </p>
-                            </form>
+                            {% fill "footer_buttons" %}
+                            <button type="button" class="confirm-button close-modal-button">{% translate "Confirm" %}</button>
                         {% endfill %}
-                        {% fill "footer_buttons" %}
-                        <button type="button" class="confirm-button close-modal-button">{% translate "Confirm" %}</button>
-                    {% endfill %}
-                {% endcomponent %}
-                {% component_css_dependencies %}
-            </td>
-        </tr>
+                    {% endcomponent %}
+                    {% component_css_dependencies %}
+                </td>
+            </tr>
+        {% endwith %}
     {% endfor %}
 </tbody>
 </table>
