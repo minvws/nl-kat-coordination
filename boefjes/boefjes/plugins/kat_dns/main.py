@@ -8,6 +8,7 @@ from os import getenv
 import dns.resolver
 from dns.name import Name
 from dns.resolver import Answer
+from dns.edns import EDEOpton
 
 from boefjes.job_models import BoefjeMeta
 
@@ -48,6 +49,9 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 
     requested_dns_name = dns.name.from_text(hostname)
     resolver = dns.resolver.Resolver()
+    # https://dnspython.readthedocs.io/en/stable/_modules/dns/edns.html
+    # enable EDE to get the DNSSEC Bogus return values if the server supports it
+    resolver.use_edns(options=[EDEOption(15)])
     nameserver = getenv("REMOTE_NS", "1.1.1.1")
     resolver.nameservers = [nameserver]
 
@@ -98,7 +102,9 @@ def get_email_security_records(resolver: dns.resolver.Resolver, hostname: str, r
         return answer.response.to_text()
     except dns.resolver.NoNameservers as error:
         # no servers responded happily, we'll check the response from the first
-        if error.kwargs["errors"][0][3] == "SERVFAIL":
+        # https://dnspython.readthedocs.io/en/latest/_modules/dns/rcode.html
+        # https://www.rfc-editor.org/rfc/rfc8914#name-extended-dns-error-code-6-d
+        if error.kwargs["errors"][0][3] == "SERVFAIL" and int(b.kwargs['errors'][0][4].options[0].code) == 6:
             return "SERVFAIL"  # returned when DNSSEC tells us this query won't return data.
         raise  # Not dnssec related, unhandled, raise.
     except dns.resolver.NXDOMAIN:
