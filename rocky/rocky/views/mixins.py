@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import cached_property
 from operator import attrgetter
+from typing import TypedDict
 
 import structlog
 from account.mixins import OrganizationView
@@ -18,7 +19,6 @@ from tools.forms.settings import DEPTH_DEFAULT, DEPTH_MAX
 from tools.models import Organization
 from tools.ooi_helpers import get_knowledge_base_data_for_ooi_store
 from tools.view_helpers import convert_date_to_datetime, get_ooi_url
-from typing import TypedDict
 
 from octopoes.connector import ObjectNotFoundException
 from octopoes.connector.octopoes import OctopoesAPIConnector
