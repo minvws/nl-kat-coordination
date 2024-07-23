@@ -68,7 +68,6 @@ class Katalogus(HTTPService):
             for org in orgs:
                 if org.id not in self.organisations_plugin_cache:
                     self.organisations_plugin_cache[org.id] = {}
-                    self.organisations_new_boefjes_cache[org.id] = {}
 
                 plugins = self.get_plugins_by_organisation(org.id)
                 self.organisations_plugin_cache[org.id] = {
@@ -247,32 +246,47 @@ class Katalogus(HTTPService):
                 )
 
     def get_new_boefjes_by_org_id(self, organisation_id: str) -> list[Plugin]:
-        # Get the enabled boefjes for the organisation from katalogus
-        plugins = self.get_plugins_by_organisation(organisation_id)
-        enabled_boefjes = {
-            plugin.id: plugin
-            for plugin in plugins
-            if plugin.enabled is True and plugin.type == "boefje" and plugin.consumes
-        }
+        with self.lock:
+            # Get the enabled boefjes for the organisation from katalogus
+            plugins = self.get_plugins_by_organisation(organisation_id)
+            enabled_boefjes = {
+                plugin.id: plugin
+                for plugin in plugins
+                if plugin.enabled is True
+                and plugin.type == "boefje"
+                and plugin.consumes
+            }
 
-        # Check if there are new boefjes
-        new_boefjes = []
-        for boefje_id, boefje in enabled_boefjes.items():
-            if boefje_id in self.organisations_new_boefjes_cache.get(
-                organisation_id, {}
-            ):
-                continue
+            self.logger.info(
+                "Enabled boefjes for organisation %s: %s",
+                organisation_id,
+                enabled_boefjes.keys(),
+            )
 
-            new_boefjes.append(boefje)
+            # Check if there are new boefjes
+            new_boefjes = []
+            for boefje_id, boefje in enabled_boefjes.items():
+                if boefje_id in self.organisations_new_boefjes_cache.get(
+                    organisation_id, {}
+                ):
+                    continue
 
-        self.organisations_new_boefjes_cache[organisation_id] = enabled_boefjes
+                new_boefjes.append(boefje)
 
-        self.logger.debug(
-            "%d new boefjes found for organisation %s",
-            len(new_boefjes),
-            organisation_id,
-            organisation_id=organisation_id,
-            boefjes=[boefje.name for boefje in new_boefjes],
-        )
+            self.logger.info(
+                "New boefjes for organisation %s: %s",
+                organisation_id,
+                new_boefjes,
+            )
 
-        return new_boefjes
+            self.organisations_new_boefjes_cache[organisation_id] = enabled_boefjes
+
+            self.logger.debug(
+                "%d new boefjes found for organisation %s",
+                len(new_boefjes),
+                organisation_id,
+                organisation_id=organisation_id,
+                boefjes=[boefje.name for boefje in new_boefjes],
+            )
+
+            return new_boefjes
