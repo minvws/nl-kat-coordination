@@ -104,7 +104,8 @@ def get_email_security_records(resolver: dns.resolver.Resolver, hostname: str, r
         # no servers responded happily, we'll check the response from the first
         # https://dnspython.readthedocs.io/en/latest/_modules/dns/rcode.html
         # https://www.rfc-editor.org/rfc/rfc8914#name-extended-dns-error-code-6-d
-        if error.kwargs["errors"][0][3] == "SERVFAIL" and int(error.kwargs['errors'][0][4].options[0].code) == 6:
+        firsterror = error.kwargs["errors"][0]
+        if firsterror[3] == "SERVFAIL" and int(firsterror[4].options[0].code) == 6:
             return "SERVFAIL"  # returned when DNSSEC tells us this query won't return data.
         raise  # Not dnssec related, unhandled, raise.
     except dns.resolver.NXDOMAIN:
