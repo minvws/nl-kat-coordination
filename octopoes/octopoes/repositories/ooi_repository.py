@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from collections import Counter
 from datetime import datetime
 from typing import Any, cast
@@ -299,7 +300,7 @@ class XTDBOOIRepository(OOIRepository):
 
         search_statement = (
             f"""[?e :xt/id ?id]
-                                [(clojure.string/includes? ?id \"{search_string}\")]"""
+                                [(clojure.string/includes? ?id \"{re.escape(search_string)}\")]"""
             if search_string
             else ""
         )
