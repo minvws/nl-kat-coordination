@@ -57,25 +57,25 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "structlog": {
+        "json_formatter": {
             "()": structlog.stdlib.ProcessorFormatter,
             "processor": structlog.processors.JSONRenderer(),
+        },
+        "plain_console": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.dev.ConsoleRenderer(),
         },
     },
     "handlers": {
         "console": {
-            "formatter": "structlog",
             "class": "logging.StreamHandler",
+            "formatter": "plain_console",
         },
     },
     "loggers": {
         "root": {
             "handlers": ["console"],
             "level": "INFO",
-        },
-        "django_structlog": {
-            "handlers": ["console"],
-            "level": "DEBUG",
         },
     },
 }
@@ -158,6 +158,7 @@ INSTALLED_APPS = [
     "account",
     "tools",
     "fmea",
+    "rocky",
     "crisis_room",
     "onboarding",
     "katalogus",
