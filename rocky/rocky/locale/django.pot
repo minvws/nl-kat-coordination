@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-18 16:28+0000\n"
+"POT-Creation-Date: 2024-07-24 12:28+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -575,6 +575,7 @@ msgstr ""
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/confirmation_clone_settings.html
 #: katalogus/templates/plugin_settings_delete.html
+#: reports/templates/partials/export_report_settings.html
 #: rocky/templates/oois/ooi_delete.html
 #: rocky/templates/oois/ooi_mute_finding.html
 #: rocky/templates/organizations/organization_edit.html
@@ -628,6 +629,7 @@ msgid "Sorting options"
 msgstr ""
 
 #: katalogus/forms/plugin_settings.py
+#: reports/templates/partials/export_report_settings.html
 msgid "This field is required."
 msgstr ""
 
@@ -841,6 +843,10 @@ msgid "%(plugin_name)s is able to process the following mime types:"
 msgstr ""
 
 #: katalogus/templates/partials/boefje_tile.html
+msgid "This object type is required"
+msgstr ""
+
+#: katalogus/templates/partials/boefje_tile.html
 msgid "Scan level:"
 msgstr ""
 
@@ -961,6 +967,7 @@ msgstr ""
 #: katalogus/templates/partials/plugin_settings_required.html
 #: katalogus/templates/plugin_settings_list.html
 #: rocky/templates/findings/finding_add.html
+#: rocky/templates/partials/ooi_detail_related_object.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Add"
 msgstr ""
@@ -3366,13 +3373,17 @@ msgstr ""
 #: reports/templates/partials/export_report_settings.html
 msgid ""
 "\n"
-"                                                        Give your report a "
-"custom name and optionally add the reports' reference date\n"
-"                                                        to the name. To do "
-"so you can select a standard option or use a\n"
-"                                                        <a href=\"https://"
-"strftime.org/\">Python strftime code</a> in the report name.\n"
-"                                                    "
+"                                            Give your report a custom name "
+"and optionally add the reports' reference date\n"
+"                                            to the name. To do so you can "
+"select a standard option or use a\n"
+"                                            <a href=\"https://strftime.org/"
+"\">Python strftime code</a> in the report name.\n"
+"                                        "
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Report name settings."
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
