@@ -28,16 +28,16 @@
   --language-selector-list-closed-button-icon: "\ea62";
 
   /* List */
-  --language-selector-list-border-color: #d4d4d4;
+  --language-selector-list-border-color: var(--colors-grey-200);
   --language-selector-list-border-radius: 0.25rem;
   --language-selector-list-margin-top: 0.25rem;
-  --language-selector-list-box-shadow: 0px 8px 16px 0px rgb(17 20 22 / 15%);
+  --language-selector-list-box-shadow: 0px 8px 16px 0px var(--colors-black-15);
   --language-selector-list-min-width: 8rem;
 
   /* List item */
   --language-selector-list-item-background-color: transparent;
   --language-selector-list-item-active-background-color: transparent;
-  --language-selector-list-item-hover-background-color: #ededed;
+  --language-selector-list-item-hover-background-color: var(--colors-grey-100);
 
   /* List item link */
   --language-selector-list-item-link-border-width: 0;
@@ -118,7 +118,7 @@ body > header nav {
 
             button {
               min-width: 0;
-              color: #006fb3;
+              color: var(--colors-blue-600);
               text-decoration: underline;
               text-transform: uppercase;
             }

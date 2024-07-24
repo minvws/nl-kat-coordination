@@ -1,7 +1,7 @@
 from datetime import datetime
-from logging import getLogger
 from typing import Any
 
+import structlog
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -20,7 +20,7 @@ from reports.report_types.vulnerability_report.report import VulnerabilityReport
 from reports.report_types.web_system_report.report import WebSystemReport
 from rocky.views.health import flatten_health, get_rocky_health
 
-logger = getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class AggregateOrganisationReport(AggregateReport):

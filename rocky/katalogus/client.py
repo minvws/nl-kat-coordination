@@ -1,7 +1,7 @@
 from io import BytesIO
-from logging import getLogger
 
 import httpx
+import structlog
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from jsonschema.exceptions import SchemaError
@@ -14,7 +14,7 @@ from octopoes.models.exception import TypeNotFound
 from octopoes.models.types import type_by_name
 from rocky.health import ServiceHealth
 
-logger = getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class Plugin(BaseModel):

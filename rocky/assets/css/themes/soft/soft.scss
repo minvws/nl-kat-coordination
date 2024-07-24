@@ -4,7 +4,8 @@
 @import "fonts/fonts";
 
 /* Styling sets. E.g color sets */
-@import "colors";
+@import "colors/colors";
+@import "colors/tag-colors";
 @import "manon/body-text-set";
 @import "manon/spot-large";
 @import "manon/headings-base-set";
@@ -54,6 +55,7 @@
 @import "manon/header-navigation-collapsible";
 @import "manon/header-navigation-link";
 @import "manon/header-navigation-link-active";
+@import "manon/notification-colors";
 @import "manon/notification-block";
 @import "manon/icon";
 @import "manon/layout-column-4";

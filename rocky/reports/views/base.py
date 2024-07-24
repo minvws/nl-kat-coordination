@@ -2,11 +2,11 @@ import json
 from collections import defaultdict
 from collections.abc import Iterable, Sequence
 from datetime import datetime, timezone
-from logging import getLogger
 from operator import attrgetter
 from typing import Any, Literal, cast
 from uuid import uuid4
 
+import structlog
 from account.mixins import OrganizationView
 from django.conf import settings
 from django.contrib import messages
@@ -45,7 +45,7 @@ def get_selection(request: HttpRequest, pre_selection: dict[str, str | Sequence[
     return "?" + urlencode(request.GET, True)
 
 
-logger = getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
