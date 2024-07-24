@@ -14,7 +14,9 @@
 
   /* Collapsing menu */
   --navigation-collapsible-menu-collapsing-menu-width: 100%;
-  --navigation-collapsible-menu-list-item-collapsed-hover-background-color: #14131a;
+  --navigation-collapsible-menu-list-item-collapsed-hover-background-color: var(
+    --colors-black
+  );
 
   /* Collapsing menu item */
 
