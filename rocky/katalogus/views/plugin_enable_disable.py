@@ -92,6 +92,5 @@ class PluginEnableDisableView(SinglePluginView):
                     self.plugin.scan_level.value,
                 ),
             )
-            
             url = request.build_absolute_uri(request.POST.get("current_url"))
             return HttpResponseRedirect(url)
