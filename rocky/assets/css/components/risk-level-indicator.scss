@@ -8,13 +8,13 @@
 .recommendation,
 .pending,
 .unknown {
-  --risk-level-critical: #f84638;
-  --risk-level-high: #ff9a4d;
-  --risk-level-medium: #fbe366;
-  --risk-level-low: #a6e5b7;
-  --risk-level-informational: #c6e6fa;
-  --risk-level-pending: #a4a4a4;
-  --risk-level-unkown: #a4a4a4;
+  --risk-level-critical: var(--colors-red-500);
+  --risk-level-high: var(--colors-orange-300);
+  --risk-level-medium: var(--colors-ochre-150);
+  --risk-level-low: var(--colors-green-150);
+  --risk-level-informational: var(--colors-blue-150);
+  --risk-level-pending: var(--colors-grey-400);
+  --risk-level-unkown: var(--colors-grey-400);
 
   display: flex;
   align-items: center;
