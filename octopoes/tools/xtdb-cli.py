@@ -1,219 +1,285 @@
 #!/usr/bin/env python
 
-import argparse
 import datetime
-import sys
-from pathlib import Path
+import json
+import logging
 
-import httpx
+import click
+from xtdb_client import XTDBClient
 
-
-class XTDB:
-    def __init__(self, host: str, port: int, node: str):
-        self.host = host
-        self.port = port
-        self.node = node
-
-    def _root(self, target: str = ""):
-        return f"http://{self.host}:{self.port}/_xtdb/{self.node}/{target}"
-
-    def status(self):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root("status"), headers=headers)
-        return req.text
-
-    def query(self, query: str = "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}"):
-        headers = {"Accept": "application/json", "Content-Type": "application/edn"}
-        req = httpx.post(self._root("query"), headers=headers, data=query)
-        return req.text
-
-    def entity(self, key: str):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root(f"entity?eid={key}"), headers=headers)
-        return req.text
-
-    def history(self, key: str):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root(f"entity?eid={key}&history=true&sortOrder=asc"), headers=headers)
-        return req.text
-
-    def entity_tx(self, key: str):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root(f"entity-tx?eid={key}"), headers=headers)
-        return req.text
-
-    def attribute_stats(self):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root("attribute-stats"), headers=headers)
-        return req.text
-
-    def sync(self, timeout: int = 500):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root(f"sync?timeout={timeout}"), headers=headers)
-        return req.text
-
-    def await_tx(self, txid: int):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root(f"await-tx?txId={txid}"), headers=headers)
-        return req.text
-
-    def await_tx_time(self, tm: str = datetime.datetime.now().isoformat()):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root(f"await-tx-time?tx-time={tm}"), headers=headers)
-        return req.text
-
-    def tx_log(self):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root("tx-log"), headers=headers)
-        return req.text
-
-    def tx_log_docs(self):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root("tx-log?with-ops?=true"), headers=headers)
-        return req.text
-
-    def submit_tx(self, txs):
-        headers = {"Accept": "application/json", "Content-Type": "application/json"}
-        data = '{{"tx-ops": {}}}'.format(" ".join(txs))
-        req = httpx.post(self._root("submit-tx"), headers=headers, data=data)
-        return req.text
-
-    def tx_committed(self, txid: int):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root(f"tx_commited?txId={txid}"), headers=headers)
-        return req.text
-
-    def latest_completed_tx(self):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root("latest-completed-tx"), headers=headers)
-        return req.text
-
-    def latest_submitted_tx(self):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root("latest-submitted-tx"), headers=headers)
-        return req.text
-
-    def active_queries(self):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root("active-queries"), headers=headers)
-        return req.text
-
-    def recent_queries(self):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root("recent-queries"), headers=headers)
-        return req.text
-
-    def slowest_queries(self):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root("recent-queries"), headers=headers)
-        return req.text
+logger = logging.getLogger(__name__)
 
 
-def dispatch(xtdb, instruction):
-    match instruction.pop(0):
-        case "list-keys":
-            return xtdb.query()
-        case "list-values":
-            return xtdb.query("{:query {:find [(pull ?var [*])] :where [[?var :xt/id]]}}")
-        case "submit-tx":
-            if instruction:
-                return xtdb.submit_tx(instruction)
-        case x:
-            call = getattr(xtdb, x.replace("-", "_"))
-            match call.__code__.co_argcount - 1:
-                case 1:
-                    return call(instruction[0])
-                case 0:
-                    return call()
-
-
-KEYWORDS = set(
-    [
-        keyword.replace("_", "-")
-        for keyword in dir(XTDB)
-        if callable(getattr(XTDB, keyword)) and not keyword.startswith("_")
-    ]
-    + ["list-keys", "list-values"]
+@click.group(
+    context_settings={
+        "help_option_names": ["-h", "--help"],
+        "max_content_width": 120,
+        "show_default": True,
+    }
 )
+@click.option("-n", "--node", default="0", help="XTDB node")
+@click.option(
+    "-u",
+    "--url",
+    default="http://localhost:3000",
+    help="XTDB server base url",
+)
+@click.option(
+    "-t",
+    "--timeout",
+    type=int,
+    default=5000,
+    help="XTDB request timeout (in ms)",
+)
+@click.option("-v", "--verbosity", count=True, help="Increase the verbosity level")
+@click.pass_context
+def cli(ctx: click.Context, url: str, node: str, timeout: int, verbosity: int):
+    """This help functionality explains how to query XTDB using the xtdb-cli tool.
+    The help functionality for all default XTDB commands was copied from the official
+    XTDB docs for the HTTP implementation. Not all optional parameters as available
+    on the HTTP docs may be implemented."""
+    verbosities = [logging.WARN, logging.INFO, logging.DEBUG]
+    try:
+        if verbosity:
+            logging.basicConfig(level=verbosities[verbosity - 1])
+    except IndexError:
+        raise click.UsageError("Invalid verbosity level (use -v, -vv, or -vvv)")
 
-EPILOG = """
-As instructions the following keywords with arguments are supported:
-  status
-  query [edn-query]
-  list-keys
-  list-values
-  entity [xt/id]
-  history [xt/id]
-  entity-tx [xt/id]
-  attribute-stats
-  sync [timeout in ms]
-  await-tx [transaction id]
-  await-tx-time [time]
-  tx-log
-  tx-log-docs
-  submit-tx [transaction list]
-  tx-committed [transaction id]
-  latest-completed-tx
-  latest-submitted-tx
-  active-queries
-  recent-queries
-  slowest-queries
+    client = XTDBClient(url, node, timeout)
+    logger.info("Instantiated XTDB client with endpoint %s for node %s", url, node)
 
-If no keyword is given in the initial instruction either use
-* a dash "-" to read stdin
-* otherwise all instructions are treated as filenames
-
-See https://v1-docs.xtdb.com/clients/http/ for more information.
-
-OpenKAT https://openkat.nl/.
-"""
-
-
-def iparse(instructions):
-    idxs = [idx for idx, key in enumerate(instructions) if key in KEYWORDS] + [len(instructions)]
-    return [instructions[i:j] for i, j in zip(idxs, idxs[1:] + idxs[:1]) if instructions[i:j]]
+    ctx.ensure_object(dict)
+    ctx.obj["client"] = client
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        prog="xtdb-cli",
-        description="A command-line interface for xtdb multinode as used in OpenKAT",
-        epilog=EPILOG,
-        add_help=True,
-        allow_abbrev=True,
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
-    parser.add_argument("--port", help="xtdb server port (default 3000)", type=int, default=3000)
-    parser.add_argument("--host", help="xtdb server hostname (default localhost)", type=str, default="localhost")
-    parser.add_argument("--node", help="xtdb node (default 0)", type=str, default="0")
-    parser.add_argument("instructions", type=str, nargs="*")
-    args = parser.parse_args()
-    xtdb = XTDB(args.host, args.port, args.node)
-    if args.instructions:
-        if args.instructions[0] in KEYWORDS:
-            for instruction in iparse(args.instructions):
-                result = dispatch(xtdb, instruction)
-                if result:
-                    sys.stdout.write(f"{result}\n")
-        elif args.instructions[0] == "-":
-            for line in sys.stdin:
-                if line.rstrip() == "exit" or line.rstrip() == "quit":
-                    break
-                for instruction in iparse(line.rstrip().split(" ")):
-                    result = dispatch(xtdb, instruction)
-                    if result:
-                        sys.stdout.write(f"{result}\n")
-        else:
-            for fname in args.instructions:
-                with Path(fname).open("r") as file:
-                    for line in file.readlines():
-                        if line.rstrip() == "exit" or line.rstrip() == "quit":
-                            break
-                        for instruction in iparse(line.rstrip().split(" ")):
-                            result = dispatch(xtdb, instruction)
-                            if result:
-                                sys.stdout.write(f"{result}\n")
+@cli.command(help="Returns the current status information of the node")
+@click.pass_context
+def status(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(json.dumps(client.status()))
+
+
+@cli.command(help='EDN Query (default: "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}")')
+@click.argument("edn", required=False)
+@click.pass_context
+def query(ctx: click.Context, edn: str):
+    client: XTDBClient = ctx.obj["client"]
+
+    if edn:
+        click.echo(json.dumps(client.query(edn)))
+    else:
+        click.echo(json.dumps(client.query()))
+
+
+@cli.command(help="List all keys in node")
+@click.pass_context
+def list_keys(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(json.dumps(client.query()))
+
+
+@cli.command(help="List all values in node")
+@click.pass_context
+def list_values(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(json.dumps(client.query("{:query {:find [(pull ?var [*])] :where [[?var :xt/id]]}}")))
+
+
+@cli.command(help="Returns the document map for a particular entity.")
+@click.option("--tx-id", type=int, help="Defaulting to latest transaction id (integer)")
+@click.option("--tx-time", type=click.DateTime(), help="Defaulting to latest transaction time (date)")
+@click.option("--valid-time", type=click.DateTime(), help="Defaulting to now (date)")
+@click.argument("key")
+@click.pass_context
+def entity(
+    ctx: click.Context,
+    key: str,
+    valid_time: datetime.datetime | None = None,
+    tx_time: datetime.datetime | None = None,
+    tx_id: int | None = None,
+):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(json.dumps(client.entity(key, valid_time, tx_time, tx_id)))
+
+
+@cli.command(help="Returns the history of a particular entity.")
+@click.option(
+    "--with-docs",
+    is_flag=True,
+    help="Includes the documents in the response sequence, under the doc key (boolean, default: false)",
+)
+@click.option(
+    "--with-corrections",
+    is_flag=True,
+    help="""Includes bitemporal corrections in the response, inline,
+    sorted by valid-time then tx-id (boolean, default: false)""",
+)
+@click.argument("key")
+@click.pass_context
+def history(ctx: click.Context, key: str, with_corrections: bool, with_docs: bool):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(json.dumps(client.history(key, with_corrections, with_docs)))
+
+
+@cli.command(help="Returns the transaction details for an entity - returns a map containing the tx-id and tx-time.")
+@click.option("--tx-id", type=int, help="Defaulting to the latest transaction id (integer)")
+@click.option("--tx-time", type=click.DateTime(), help="Defaulting to the latest transaction time (date)")
+@click.option("--valid-time", type=click.DateTime(), help="Defaulting to now (date)")
+@click.argument("key")
+@click.pass_context
+def entity_tx(
+    ctx: click.Context,
+    key: str,
+    valid_time: datetime.datetime | None = None,
+    tx_time: datetime.datetime | None = None,
+    tx_id: int | None = None,
+):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(json.dumps(client.entity_tx(key, valid_time, tx_time, tx_id)))
+
+
+@cli.command(help="Returns frequencies of indexed attributes")
+@click.pass_context
+def attribute_stats(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(json.dumps(client.attribute_stats()))
+
+
+@cli.command(
+    help="""Wait until the Kafka consumer’s lag is back to 0 (i.e. when it no longer has
+    pending transactions to write). Returns the transaction time of the most recent transaction."""
+)
+@click.option("--timeout", type=int, help="Specified in milliseconds (integer)")
+@click.pass_context
+def sync(ctx: click.Context, timeout: int | None):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(json.dumps(client.sync(timeout)))
+
+
+@cli.command(
+    help="""Waits until the node has indexed a transaction that is at or past the
+    supplied tx-id. Returns the most recent tx indexed by the node."""
+)
+@click.option("--timeout", type=int, help="Specified in milliseconds, defaulting to 10 seconds (integer)")
+@click.argument("tx-id", type=int)
+@click.pass_context
+def await_tx(ctx: click.Context, tx_id: int, timeout: int | None):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(json.dumps(client.await_tx(tx_id, timeout)))
+
+
+@cli.command(
+    help="""Blocks until the node has indexed a transaction that is past the supplied tx-time.
+    The returned date is the latest index time when this node has caught up as of this call."""
+)
+@click.option("--timeout", type=int, help="Specified in milliseconds, defaulting to 10 seconds (integer)")
+@click.argument("tx-time", type=click.DateTime())
+@click.pass_context
+def await_tx_time(
+    ctx: click.Context,
+    tx_time: datetime.datetime,
+    timeout: int | None,
+):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(json.dumps(client.await_tx_time(tx_time, timeout)))
+
+
+@cli.command(
+    help="Returns a list of all transactions, from oldest to newest transaction time - optionally including documents."
+)
+@click.option(
+    "--with-ops", is_flag=True, help="Should the operations with documents be included? (boolean, default: false)"
+)
+@click.option("--after-tx-id", type=int, help="Transaction id to start after (integer, default: unbounded)")
+@click.pass_context
+def tx_log(ctx: click.Context, after_tx_id: int | None, with_ops: bool):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(json.dumps(client.tx_log(after_tx_id, with_ops)))
+
+
+@cli.command(help="Show all document transactions")
+@click.pass_context
+def txs(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(json.dumps(client.tx_log(None, True)))
+
+
+@cli.command(
+    help="""Takes a space separated list of transactions (any combination of put, delete, match, evict and fn)
+    and executes them in order. This is the only 'write' endpoint."""
+)
+@click.argument("txs", nargs=-1)
+@click.pass_context
+def submit_tx(ctx: click.Context, txs):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(json.dumps(client.submit_tx(txs)))
+
+
+@cli.command(
+    help="""Checks if a submitted tx was successfully committed, returning a map with tx-committed and
+    either true or false (or a NodeOutOfSyncException exception response if the node has not yet indexed
+    the transaction)."""
+)
+@click.argument("tx-id", type=int)
+@click.pass_context
+def tx_committed(ctx: click.Context, tx_id: int) -> None:
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(json.dumps(client.tx_committed(tx_id)))
+
+
+@cli.command(help="Returns the latest transaction to have been indexed by this node.")
+@click.pass_context
+def latest_completed_tx(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(json.dumps(client.latest_completed_tx()))
+
+
+@cli.command(help="Returns the latest transaction to have been submitted to this cluster.")
+@click.pass_context
+def latest_submitted_tx(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(json.dumps(client.latest_submitted_tx()))
+
+
+@cli.command(help="Returns a list of currently running queries.")
+@click.pass_context
+def active_queries(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(json.dumps(client.active_queries()))
+
+
+@cli.command(help="Returns a list of recently completed/failed queries.")
+@click.pass_context
+def recent_queries(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(json.dumps(client.recent_queries()))
+
+
+@cli.command(help="Returns a list of slowest completed/failed queries ran on the node.")
+@click.pass_context
+def slowest_queries(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(json.dumps(client.slowest_queries()))
 
 
 if __name__ == "__main__":
-    main()
+    cli()

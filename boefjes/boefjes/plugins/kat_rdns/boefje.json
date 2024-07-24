@@ -1,7 +1,7 @@
 {
   "id": "rdns",
   "name": "Reverse DNS",
-  "description": "Resolve IP-addreses to a hostname",
+  "description": "Resolve IP addresses to a hostname",
   "consumes": [
     "IPAddressV4",
     "IPAddressV6"

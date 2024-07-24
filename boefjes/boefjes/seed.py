@@ -1,22 +1,3 @@
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import sessionmaker
+import structlog
 
-from boefjes.katalogus.models import RESERVED_LOCAL_ID
-from boefjes.sql.db import get_engine
-from boefjes.sql.db_models import RepositoryInDB
-
-
-def main():
-    session = sessionmaker(bind=get_engine())()
-
-    try:
-        session.add(RepositoryInDB(id=RESERVED_LOCAL_ID, name="Local Plugin Repository", base_url="http://dev/null"))
-        session.commit()
-    except IntegrityError:
-        session.rollback()
-
-    session.close()
-
-
-if __name__ == "__main__":
-    main()
+structlog.get_logger(__name__).warning("This module has been phased out in v1.16.0 and will be removed in v1.17.0")

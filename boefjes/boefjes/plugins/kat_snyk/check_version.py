@@ -79,13 +79,12 @@ def check_version_agains_versionlist(my_version: str, all_versions: list[str]):
 
     start_inequality = re.search(regex_ineq_lowerbound, lowerbound)
     start_version = re.search("^[0-9a-z*]", lowerbound)
-    end_bracket = False
+    end_bracket = None
 
     lowerbound_ok = False
-    lowerbound_versioncheck = None
 
     # Check if lowerbound is < or <=
-    if re.search("^[[(]", lowerbound):
+    if re.search(r"^[\[(]", lowerbound):
         # Example: "(1.1,1.4]"  # https://snyk.io/vuln/maven%3Aorg.apache.nifi%3Anifi-security-utils
         upperbound = all_versions.pop(0).strip()
         end_bracket = re.search("[])]$", upperbound)
@@ -137,7 +136,7 @@ def check_version_agains_versionlist(my_version: str, all_versions: list[str]):
         return False, None
 
     start_inequality = re.search(regex_ineq_upperbound, upperbound)
-    upperbound_versioncheck = None
+
     if end_bracket:
         # Example: "(1.2,1.4]"
         upperbound_versioncheck = VersionCheck.SMALLER if upperbound[-1] == ")" else VersionCheck.SMALLER_EQUAL

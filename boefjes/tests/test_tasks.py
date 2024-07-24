@@ -10,9 +10,9 @@ import pytest
 
 from boefjes.job_handler import BoefjeHandler
 from boefjes.job_models import BoefjeMeta, InvalidReturnValueNormalizer, NormalizerMeta
-from boefjes.katalogus.local_repository import LocalPluginRepository
-from boefjes.katalogus.models import Bit, Boefje, Normalizer, PluginType
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
+from boefjes.local_repository import LocalPluginRepository
+from boefjes.models import Bit, Boefje, Normalizer, PluginType
 from boefjes.runtime_interfaces import JobRuntimeError
 from tests.loading import get_dummy_data
 
@@ -22,25 +22,21 @@ class TaskTest(TestCase):
         self.boefjes = [
             Boefje(
                 id="test-boefje-1",
-                repository_id="",
                 consumes={"SomeOOI"},
                 produces=["test-boef-1", "test/text"],
             ),
             Boefje(
                 id="test-boefje-2",
-                repository_id="",
                 consumes={"SomeOOI"},
                 produces=["test-boef-2", "test/text"],
             ),
             Boefje(
                 id="test-boefje-3",
-                repository_id="",
                 consumes={"SomeOOI"},
                 produces=["test-boef-3", "test/plain"],
             ),
             Boefje(
                 id="test-boefje-4",
-                repository_id="",
                 consumes={"SomeOOI"},
                 produces=["test-boef-4", "test/and-simple"],
             ),
@@ -48,13 +44,11 @@ class TaskTest(TestCase):
         self.normalizers = [
             Normalizer(
                 id="test-normalizer-1",
-                repository_id="",
                 consumes=["test-boef-3", "test/text"],
                 produces=["SomeOOI", "OtherOOI"],
             ),
             Normalizer(
                 id="test-normalizer-2",
-                repository_id="",
                 consumes=["test/text"],
                 produces=["SomeOtherOOI"],
             ),
@@ -62,14 +56,12 @@ class TaskTest(TestCase):
         self.bits = [
             Bit(
                 id="test-bit-1",
-                repository_id="",
                 consumes="SomeOOI",
                 produces=["SomeOOI"],
                 parameters=[],
             ),
             Bit(
                 id="test-bit-2",
-                repository_id="",
                 consumes="SomeOOI",
                 produces=["SomeOOI", "SomeOtherOOI"],
                 parameters=[],

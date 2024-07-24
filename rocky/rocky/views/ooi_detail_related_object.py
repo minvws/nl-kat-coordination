@@ -3,7 +3,6 @@ from collections import Counter
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import TemplateView
 from tools.ooi_helpers import format_attr_name
 from tools.view_helpers import existing_ooi_type, get_mandatory_fields, url_with_querystring
 
@@ -59,7 +58,7 @@ class OOIFindingManager(SingleOOITreeMixin):
         return [(finding, self.tree.store[str(finding.finding_type)]) for finding in self.get_findings()]
 
 
-class OOIRelatedObjectAddView(OOIRelatedObjectManager, TemplateView):
+class OOIRelatedObjectAddView(OOIRelatedObjectManager):
     template_name = "oois/ooi_detail_add_related_object.html"
 
     def get(self, request, *args, **kwargs):

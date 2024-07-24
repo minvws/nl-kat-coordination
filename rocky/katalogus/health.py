@@ -1,11 +1,10 @@
-import logging
-
+import structlog
 from httpx import HTTPError
 
 from katalogus.client import get_katalogus
 from rocky.health import ServiceHealth
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def get_katalogus_health() -> ServiceHealth:
