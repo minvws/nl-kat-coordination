@@ -64,17 +64,7 @@ class SchedulerClientInterface:
     def get_queues(self) -> list[Queue]:
         raise NotImplementedError()
 
-    def pop_item(self, queue: str, network_scopes: list[str]) -> QueuePrioritizedItem | None:
-        """Pops item from `queue` with the corresponding `network_scopes`
-
-        Args:
-            queue (str): the name of the queue to pop from
-            network_scopes (list[str]): A list of all scopes that the queue must pop from
-
-
-        Returns:
-            QueuePrioritizedItem | None
-        """
+    def pop_item(self, queue: str) -> QueuePrioritizedItem | None:
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
@@ -88,8 +78,9 @@ class SchedulerClientInterface:
 
 
 class SchedulerAPIClient(SchedulerClientInterface):
-    def __init__(self, base_url: str):
+    def __init__(self, base_url: str, network_scopes: list[str] = []):
         self._session = Client(base_url=base_url, transport=HTTPTransport(retries=6))
+        self._network_scopes = network_scopes
 
     @staticmethod
     def _verify_response(response: Response) -> None:
@@ -101,7 +92,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
 
         return TypeAdapter(list[Queue]).validate_json(response.content)
 
-    def pop_item(self, queue: str, network_scopes: list[str]) -> QueuePrioritizedItem | None:
+    def pop_item(self, queue: str) -> QueuePrioritizedItem | None:
         response = self._session.post(
             f"/queues/{queue}/pop",
             data=QueuePopRequest(
@@ -110,7 +101,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
                         column="data",
                         field="network_scope",
                         operator="in",
-                        value=network_scopes,
+                        value=self._network_scopes,
                     )
                 ]
             ).model_dump_json(),

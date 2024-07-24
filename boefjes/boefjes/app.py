@@ -102,7 +102,7 @@ class SchedulerWorkerManager(WorkerManager):
             logger.debug("Popping from queue %s", queue_type.id)
 
             try:
-                p_item = self.scheduler_client.pop_item(queue_type.id, self.settings.network_scopes)
+                p_item = self.scheduler_client.pop_item(queue_type.id)
             except (HTTPError, ValidationError):
                 logger.exception("Popping task from scheduler failed, sleeping 10 seconds")
                 time.sleep(10)
@@ -271,7 +271,10 @@ def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_leve
 
     return SchedulerWorkerManager(
         item_handler,
-        SchedulerAPIClient(str(settings.scheduler_api)),  # Do not share a session between workers
+        SchedulerAPIClient(
+            base_url=str(settings.scheduler_api),
+            network_scopes=settings.network_scopes,
+        ),  # Do not share a session between workers
         settings,
         log_level,
     )
