@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from logging import getLogger
 from typing import Any
 
 from account.mixins import OrganizationView
@@ -13,8 +12,6 @@ from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
 from katalogus.client import Boefje, Normalizer, get_katalogus
 from katalogus.views.plugin_settings_list import PluginSettingsListView
 from rocky.views.tasks import TaskListView
-
-logger = getLogger(__name__)
 
 
 class PluginCoverImgView(OrganizationView):

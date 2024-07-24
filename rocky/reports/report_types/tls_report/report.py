@@ -1,5 +1,4 @@
 from datetime import datetime
-from logging import getLogger
 from typing import Any
 
 from django.utils.translation import gettext_lazy as _
@@ -8,8 +7,6 @@ from octopoes.models import Reference
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.service import IPService, TLSCipher
 from reports.report_types.definitions import Report
-
-logger = getLogger(__name__)
 
 CIPHER_FINDINGS = [
     "KAT-RECOMMENDATION-BAD-CIPHER",

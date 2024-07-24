@@ -368,9 +368,9 @@ snowballstemmer==2.2.0 ; python_version >= "3.10" and python_version < "4.0" \
 sphinx-rtd-theme==2.0.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:bd5d7b80622406762073a04ef8fadc5f9151261563d47027de09910ce03afe6b \
     --hash=sha256:ec93d0856dc280cf3aee9a4c9807c60e027c7f7b461b77aeffed682e68f0e586
-sphinx==7.4.6 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:116918d455c493fff3178edea12b4fe1c1e4894680fd81e7b7431ea21d47ca52 \
-    --hash=sha256:915760d6188288a1e30c2cd0d9fa31b1b009bc6e6019cc0c32d16c77d20e86d9
+sphinx==7.4.7 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:242f92a7ea7e6c5b406fdc2615413890ba9f699114a9c09192d7dfead2ee9cfe \
+    --hash=sha256:c2419e2135d11f1951cd994d6eb18a1835bd8fdd8429f9ca375dc1f3281bd239
 sphinxcontrib-applehelp==1.0.8 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:c40a4f96f3776c4393d933412053962fac2b84f4c99a7982ba42e09576a70619 \
     --hash=sha256:cb61eb0ec1b61f349e5cc36b2028e9e7ca765be05e49641c97241274753067b4
