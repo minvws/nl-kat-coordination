@@ -1,12 +1,9 @@
 import json
-import logging
 import time
 from functools import partial, wraps
 
-import pydantic
 import sqlalchemy
 import structlog
-from sqlalchemy.ext.declarative import declarative_base
 
 from scheduler.config import settings
 
@@ -27,9 +24,7 @@ class DBConn:
         self.connect(dsn, pool_size)
 
     def connect(self, dsn: str, pool_size: int) -> None:
-        db_uri_redacted = sqlalchemy.engine.make_url(
-            name_or_url=str(dsn)
-        ).render_as_string(hide_password=True)
+        db_uri_redacted = sqlalchemy.engine.make_url(name_or_url=str(dsn)).render_as_string(hide_password=True)
 
         pool_size = settings.Settings().db_connection_pool_size
 

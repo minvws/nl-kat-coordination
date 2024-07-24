@@ -1,6 +1,6 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 
-from sqlalchemy import exc, func
+from sqlalchemy import exc
 
 from scheduler import models
 
@@ -59,19 +59,11 @@ class ScheduleStore:
 
             try:
                 count = query.count()
-                schedules_orm = (
-                    query.order_by(models.ScheduleDB.created_at.desc())
-                    .offset(offset)
-                    .limit(limit)
-                    .all()
-                )
+                schedules_orm = query.order_by(models.ScheduleDB.created_at.desc()).offset(offset).limit(limit).all()
             except exc.ProgrammingError as e:
                 raise StorageError(f"Invalid filter: {e}") from e
 
-            schedules = [
-                models.Schedule.model_validate(schedule_orm)
-                for schedule_orm in schedules_orm
-            ]
+            schedules = [models.Schedule.model_validate(schedule_orm) for schedule_orm in schedules_orm]
 
             return schedules, count
 
@@ -79,11 +71,7 @@ class ScheduleStore:
     @exception_handler
     def get_schedule(self, schedule_id: str) -> models.Schedule:
         with self.dbconn.session.begin() as session:
-            schedule_orm = (
-                session.query(models.ScheduleDB)
-                .filter(models.ScheduleDB.id == schedule_id)
-                .one_or_none()
-            )
+            schedule_orm = session.query(models.ScheduleDB).filter(models.ScheduleDB.id == schedule_id).one_or_none()
 
             if schedule_orm is None:
                 return None
@@ -95,9 +83,7 @@ class ScheduleStore:
     def get_schedule_by_hash(self, schedule_hash: str) -> models.Schedule:
         with self.dbconn.session.begin() as session:
             schedule_orm = (
-                session.query(models.ScheduleDB)
-                .filter(models.ScheduleDB.hash == schedule_hash)
-                .one_or_none()
+                session.query(models.ScheduleDB).filter(models.ScheduleDB.hash == schedule_hash).one_or_none()
             )
 
             if schedule_orm is None:
@@ -130,6 +116,4 @@ class ScheduleStore:
     @exception_handler
     def delete_schedule(self, schedule_id: str) -> None:
         with self.dbconn.session.begin() as session:
-            session.query(models.ScheduleDB).filter(
-                models.ScheduleDB.id == schedule_id
-            ).delete()
+            session.query(models.ScheduleDB).filter(models.ScheduleDB.id == schedule_id).delete()

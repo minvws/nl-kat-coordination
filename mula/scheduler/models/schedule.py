@@ -1,20 +1,15 @@
 import uuid
 from datetime import datetime, timezone
-from typing import ClassVar
 
-import mmh3
 from pydantic import BaseModel, ConfigDict, Field, field_validator
-from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, String
+from sqlalchemy import Boolean, Column, DateTime, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
-from sqlalchemy.schema import Index
 from sqlalchemy.sql import func
-from sqlalchemy.sql.expression import text
 
 from scheduler.utils import GUID, cron
 
 from .base import Base
-from .errors import ValidationError
 from .task import Task
 
 

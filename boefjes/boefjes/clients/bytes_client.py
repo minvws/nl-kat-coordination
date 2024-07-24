@@ -73,17 +73,13 @@ class BytesAPIClient:
     @retry_with_login
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
         print(boefje_meta.json())
-        response = self._session.post(
-            "/bytes/boefje_meta", content=boefje_meta.json(), headers=self.headers
-        )
+        response = self._session.post("/bytes/boefje_meta", content=boefje_meta.json(), headers=self.headers)
 
         self._verify_response(response)
 
     @retry_with_login
     def get_boefje_meta(self, boefje_meta_id: str) -> BoefjeMeta:
-        response = self._session.get(
-            f"/bytes/boefje_meta/{boefje_meta_id}", headers=self.headers
-        )
+        response = self._session.get(f"/bytes/boefje_meta/{boefje_meta_id}", headers=self.headers)
         self._verify_response(response)
 
         return BoefjeMeta.model_validate_json(response.content)
@@ -99,9 +95,7 @@ class BytesAPIClient:
         self._verify_response(response)
 
     @retry_with_login
-    def save_raw(
-        self, boefje_meta_id: str, raw: str | bytes, mime_types: Set[str] = frozenset()
-    ) -> UUID:
+    def save_raw(self, boefje_meta_id: str, raw: str | bytes, mime_types: Set[str] = frozenset()) -> UUID:
         headers = {"content-type": "application/octet-stream"}
         headers.update(self.headers)
         response = self._session.post(
@@ -123,9 +117,7 @@ class BytesAPIClient:
 
     @retry_with_login
     def get_raw_meta(self, raw_data_id: str) -> RawDataMeta:
-        response = self._session.get(
-            f"/bytes/raw/{raw_data_id}/meta", headers=self.headers
-        )
+        response = self._session.get(f"/bytes/raw/{raw_data_id}/meta", headers=self.headers)
         self._verify_response(response)
 
         return RawDataMeta.model_validate_json(response.content)

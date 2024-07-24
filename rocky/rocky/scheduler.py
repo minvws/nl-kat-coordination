@@ -180,9 +180,7 @@ class LazyTaskList:
 
 
 class SchedulerError(Exception):
-    message: str = _(
-        "The Scheduler has an unexpected error. Check the Scheduler logs for further details."
-    )
+    message: str = _("The Scheduler has an unexpected error. Check the Scheduler logs for further details.")
 
     def __init__(self, *args: object, extra_message: str | None = None) -> None:
         super().__init__(*args)
@@ -206,9 +204,7 @@ class SchedulerTaskNotFound(SchedulerError):
 
 
 class SchedulerTooManyRequestError(SchedulerError):
-    message = _(
-        "Scheduler is receiving too many requests. Increase SCHEDULER_PQ_MAXSIZE or wait for task to finish."
-    )
+    message = _("Scheduler is receiving too many requests. Increase SCHEDULER_PQ_MAXSIZE or wait for task to finish.")
 
 
 class SchedulerBadRequestError(SchedulerError):
@@ -233,9 +229,7 @@ class SchedulerClient:
         **kwargs,
     ) -> PaginatedTasksResponse:
         try:
-            kwargs = {
-                k: v for k, v in kwargs.items() if v is not None
-            }  # filter Nones from kwargs
+            kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
             res = self._client.get("/tasks", params=kwargs)
             return PaginatedTasksResponse.model_validate_json(res.content)
         except ValidationError:

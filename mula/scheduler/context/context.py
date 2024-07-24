@@ -175,9 +175,7 @@ class AppContext:
                 "pq_grace_period": str(self.config.pq_grace_period),
                 "pq_max_random_objects": str(self.config.pq_max_random_objects),
                 "katalogus_cache_ttl": str(self.config.katalogus_cache_ttl),
-                "monitor_organisations_interval": str(
-                    self.config.monitor_organisations_interval
-                ),
+                "monitor_organisations_interval": str(self.config.monitor_organisations_interval),
             }
         )
 

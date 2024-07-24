@@ -104,7 +104,7 @@ def run(org_num: int = 1):
             declarations.append(declaration)
 
     for org in orgs:
-        for declaration in declarations[:1]:
+        for declaration in declarations[:10]:
             resp_octopoes_decl = httpx.post(
                 f"{OCTOPOES_API}/{org.get('id')}/declarations",
                 json=declaration,
@@ -125,9 +125,7 @@ def run(org_num: int = 1):
                 params={"valid_time": str(datetime.now(timezone.utc))},
                 json={
                     "scan_profile_type": "declared",
-                    "reference": declaration.get("ooi")
-                    .get("scan_profile")
-                    .get("reference"),
+                    "reference": declaration.get("ooi").get("scan_profile").get("reference"),
                     "level": declaration.get("ooi").get("scan_profile").get("level"),
                 },
                 timeout=30,
@@ -154,9 +152,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Load test the scheduler")
 
     # Add arguments
-    parser.add_argument(
-        "--orgs", type=int, default=1, help="Number of organisations to create"
-    )
+    parser.add_argument("--orgs", type=int, default=1, help="Number of organisations to create")
 
     # Parse arguments
     args = parser.parse_args()

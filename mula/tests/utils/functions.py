@@ -4,11 +4,10 @@ from typing import Any, ClassVar
 
 import mmh3
 import pydantic
+from scheduler import models
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Query
 
-from scheduler import models
-from scheduler.server import serializers
 from tests import factories
 
 
@@ -53,9 +52,7 @@ def create_task_in(priority: int, data: TestModel | None = None) -> str:
     )
 
 
-def create_item(
-    scheduler_id: str, priority: int, task: models.Task | None = None
-) -> models.Task:
+def create_item(scheduler_id: str, priority: int, task: models.Task | None = None) -> models.Task:
     if task is None:
         task = create_task(scheduler_id)
 
@@ -100,8 +97,4 @@ def create_boefje() -> models.Boefje:
 
 
 def compile_query(query: Query) -> str:
-    return str(
-        query.statement.compile(
-            dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}
-        )
-    )
+    return str(query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))

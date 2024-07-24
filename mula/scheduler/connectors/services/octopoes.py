@@ -68,9 +68,7 @@ class Octopoes(HTTPService):
         return oois
 
     @exception_handler
-    def get_random_objects(
-        self, organisation_id: str, n: int, scan_level: list[int]
-    ) -> list[OOI]:
+    def get_random_objects(self, organisation_id: str, n: int, scan_level: list[int]) -> list[OOI]:
         """Get `n` random oois from octopoes"""
         if scan_level is None:
             scan_level = []

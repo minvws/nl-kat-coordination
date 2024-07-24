@@ -1,17 +1,6 @@
-import enum
-import uuid
-from datetime import datetime, timezone
+from pydantic import BaseModel
 
-from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
-
-from scheduler.utils import GUID
-
-from .base import Base
-from .task import Task, TaskStatus
+from .task import Task
 
 
 class Queue(BaseModel):

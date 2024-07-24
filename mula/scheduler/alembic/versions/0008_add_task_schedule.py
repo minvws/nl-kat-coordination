@@ -81,12 +81,11 @@ def upgrade():
 
     op.drop_column("tasks", "p_item")
 
-    # TODO: set cron
     # Create schedules from tasks
     op.execute(
         """
         INSERT INTO schedules (id, scheduler_id, hash, data, enabled, schedule, deadline_at, created_at, modified_at)
-        SELECT DISTINCT ON (scheduler_id, hash) uuid_generate_v4(), scheduler_id, hash, data, true, '0 0 * * *', 
+        SELECT DISTINCT ON (scheduler_id, hash) uuid_generate_v4(), scheduler_id, hash, data, true, '0 0 * * *',
                now() + INTERVAL '1 day' * random(), now(), now()
         FROM tasks ORDER BY scheduler_id, hash, created_at DESC
     """
