@@ -20,7 +20,7 @@ export function initDialog(modal) {
     // event.target.nodeName === 'DIALOG' is needed to check if the ::backdrop is clicked.
     if (
       event.target.nodeName === "DIALOG" ||
-      event.target.classList.contains("close-modal-button")
+      event.target.classList.contains("confirm-modal-button")
     ) {
       let required_elements = modal.querySelectorAll("[required]");
 
@@ -34,8 +34,18 @@ export function initDialog(modal) {
       } else {
         event.target.closest(".modal-wrapper").querySelector("dialog").close();
       }
+    } else {
+      if (event.target.classList.contains("close-modal-button")) {
+        event.target.closest(".modal-wrapper").querySelector("dialog").close();
+      }
     }
   });
+}
+
+export function getInitialValuesOfInputs(form) {
+  let formInputs = form.querySelectorAll("input");
+
+  formInputs.forEach((input) => {});
 }
 
 export function checkRequiredElements(elements) {
@@ -44,9 +54,9 @@ export function checkRequiredElements(elements) {
   elements.forEach((element) => {
     if (!element.checkValidity()) {
       valid = false;
-      element.style.border = "solid red 1px";
+      element.classList.add("error");
     } else {
-      element.style.border = "";
+      element.classList.remove("error");
     }
   });
 
