@@ -7,6 +7,7 @@ import uuid
 from unittest import mock
 
 from scheduler import config, models, queues, storage
+
 from tests.mocks import queue as mock_queue
 from tests.utils import functions
 
@@ -374,8 +375,6 @@ class PriorityQueueTestCase(unittest.TestCase):
         popped_item = self.pq.pop()
         self.assertEqual(first_item.data, popped_item.data)
 
-        # TODO: determine if we want to update the task status to dispatch in
-        # the pq or (as is done now) in the post_push() method in the scheduler
         # The queue should now be empty
         self.assertEqual(0, self.pq.qsize())
 

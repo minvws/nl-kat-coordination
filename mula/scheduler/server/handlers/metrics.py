@@ -13,7 +13,7 @@ from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
-from scheduler import context, models, queues, schedulers, storage, version
+from scheduler import context
 
 
 class MetricsAPI:
@@ -35,9 +35,7 @@ class MetricsAPI:
 
             resource = Resource(attributes={SERVICE_NAME: "mula"})
             provider = TracerProvider(resource=resource)
-            processor = BatchSpanProcessor(
-                OTLPSpanExporter(endpoint=str(self.ctx.config.host_metrics))
-            )
+            processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=str(self.ctx.config.host_metrics)))
             provider.add_span_processor(processor)
             trace.set_tracer_provider(provider)
 

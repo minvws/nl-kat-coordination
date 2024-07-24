@@ -4,6 +4,7 @@ from unittest import mock
 
 from scheduler import config, models, storage
 from scheduler.storage import filters
+
 from tests.utils import functions
 
 
@@ -68,34 +69,30 @@ class ScheduleStoreTestCase(unittest.TestCase):
             )
             self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
-        schedules_scheduler_one, schedules_scheduler_one_count = (
-            self.mock_ctx.datastores.schedule_store.get_schedules(
-                filters=storage.filters.FilterRequest(
-                    filters={
-                        "and": [
-                            storage.filters.Filter(
-                                column="scheduler_id",
-                                operator="eq",
-                                value=scheduler_one,
-                            )
-                        ]
-                    }
-                )
+        schedules_scheduler_one, schedules_scheduler_one_count = self.mock_ctx.datastores.schedule_store.get_schedules(
+            filters=storage.filters.FilterRequest(
+                filters={
+                    "and": [
+                        storage.filters.Filter(
+                            column="scheduler_id",
+                            operator="eq",
+                            value=scheduler_one,
+                        )
+                    ]
+                }
             )
         )
-        schedules_scheduler_two, schedules_scheduler_two_count = (
-            self.mock_ctx.datastores.schedule_store.get_schedules(
-                filters=storage.filters.FilterRequest(
-                    filters={
-                        "and": [
-                            storage.filters.Filter(
-                                column="scheduler_id",
-                                operator="eq",
-                                value=scheduler_two,
-                            )
-                        ]
-                    }
-                )
+        schedules_scheduler_two, schedules_scheduler_two_count = self.mock_ctx.datastores.schedule_store.get_schedules(
+            filters=storage.filters.FilterRequest(
+                filters={
+                    "and": [
+                        storage.filters.Filter(
+                            column="scheduler_id",
+                            operator="eq",
+                            value=scheduler_two,
+                        )
+                    ]
+                }
             )
         )
 
@@ -117,9 +114,7 @@ class ScheduleStoreTestCase(unittest.TestCase):
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         # Act
-        schedule_by_id = self.mock_ctx.datastores.schedule_store.get_schedule(
-            schedule_db.id
-        )
+        schedule_by_id = self.mock_ctx.datastores.schedule_store.get_schedule(schedule_db.id)
 
         # Assert
         self.assertEqual(schedule_by_id.id, schedule_db.id)
@@ -136,9 +131,7 @@ class ScheduleStoreTestCase(unittest.TestCase):
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         # Act
-        schedule_by_hash = self.mock_ctx.datastores.schedule_store.get_schedule_by_hash(
-            schedule_db.hash
-        )
+        schedule_by_hash = self.mock_ctx.datastores.schedule_store.get_schedule_by_hash(schedule_db.hash)
 
         # Assert
         self.assertEqual(schedule_by_hash.id, schedule_db.id)
@@ -164,9 +157,7 @@ class ScheduleStoreTestCase(unittest.TestCase):
         self.mock_ctx.datastores.schedule_store.update_schedule(schedule_db)
 
         # Assert
-        schedule_db_updated = self.mock_ctx.datastores.schedule_store.get_schedule(
-            schedule_db.id
-        )
+        schedule_db_updated = self.mock_ctx.datastores.schedule_store.get_schedule(schedule_db.id)
         self.assertEqual(schedule_db_updated.enabled, False)
 
     def test_delete_schedule(self):
@@ -184,9 +175,7 @@ class ScheduleStoreTestCase(unittest.TestCase):
         self.mock_ctx.datastores.schedule_store.delete_schedule(schedule_db.id)
 
         # Assert
-        is_schedule_deleted = self.mock_ctx.datastores.schedule_store.get_schedule(
-            schedule_db.id
-        )
+        is_schedule_deleted = self.mock_ctx.datastores.schedule_store.get_schedule(schedule_db.id)
         self.assertEqual(is_schedule_deleted, None)
 
     def test_delete_schedule_ondelete(self):
@@ -208,9 +197,7 @@ class ScheduleStoreTestCase(unittest.TestCase):
         self.mock_ctx.datastores.schedule_store.delete_schedule(schedule_db.id)
 
         # Assert
-        is_schedule_deleted = self.mock_ctx.datastores.schedule_store.get_schedule(
-            schedule_db.id
-        )
+        is_schedule_deleted = self.mock_ctx.datastores.schedule_store.get_schedule(schedule_db.id)
         self.assertEqual(is_schedule_deleted, None)
 
         is_task_deleted = self.mock_ctx.datastores.task_store.get_task(task_db.id)
@@ -232,15 +219,12 @@ class ScheduleStoreTestCase(unittest.TestCase):
         task_db = self.mock_ctx.datastores.task_store.create_task(task)
 
         # Act
-        schedule_tasks = self.mock_ctx.datastores.schedule_store.get_schedule(
-            schedule_db.id
-        ).tasks
+        schedule_tasks = self.mock_ctx.datastores.schedule_store.get_schedule(schedule_db.id).tasks
 
         # Assert
         self.assertEqual(len(schedule_tasks), 1)
         self.assertEqual(schedule_tasks[0].id, task_db.id)
 
-    # TODO
     def test_get_tasks_filter_related(self):
         # Arrange
         scheduler_id = "test_scheduler_id"
@@ -271,39 +255,3 @@ class ScheduleStoreTestCase(unittest.TestCase):
         self.assertEqual(count, 1)
         self.assertEqual(len(tasks), 1)
         self.assertEqual(tasks[0].schedule_id, schedule_db.id)
-
-    # TODO
-    @unittest.skip("Not implemented")
-    def test_get_tasks_filter_related_and_nested(self):
-        # Arrange
-        scheduler_id = "test_scheduler_id"
-        task = functions.create_task(scheduler_id)
-        schedule = models.Schedule(
-            scheduler_id=scheduler_id,
-            hash=task.hash,
-            data=task.model_dump(),
-        )
-        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
-
-        task.schedule_id = schedule_db.id
-        created_task = self.mock_ctx.datastores.task_store.create_task(task)
-
-        f_req = filters.FilterRequest(
-            filters={
-                "and": [
-                    filters.Filter(
-                        column="tasks",
-                        field="data__id",
-                        operator="eq",
-                        value=created_task.data.get("id"),
-                    ),
-                ]
-            }
-        )
-
-        schedules, count = self.mock_ctx.datastores.schedule_store.get_schedules(
-            filters=f_req
-        )
-        self.assertEqual(count, 1)
-        self.assertEqual(len(schedules), 1)
-        self.assertEqual(schedules[0].id, schedule_db.id)

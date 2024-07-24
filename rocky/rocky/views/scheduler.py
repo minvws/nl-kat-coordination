@@ -5,21 +5,14 @@ from typing import Any
 from django.contrib import messages
 from django.http import JsonResponse
 from django.utils.translation import gettext_lazy as _
-from octopoes.models import OOI
-
 from katalogus.client import Boefje, Normalizer
-from rocky.scheduler import Boefje as SchedulerBoefje
-from rocky.scheduler import BoefjeTask, LazyTaskList
-from rocky.scheduler import Normalizer as SchedulerNormalizer
-from rocky.scheduler import (
-    NormalizerTask,
-    RawData,
-    SchedulerError,
-    Task,
-    scheduler_client,
-)
-from rocky.views.mixins import OctopoesView
 from tools.forms.scheduler import TaskFilterForm
+
+from octopoes.models import OOI
+from rocky.scheduler import Boefje as SchedulerBoefje
+from rocky.scheduler import BoefjeTask, LazyTaskList, NormalizerTask, RawData, SchedulerError, Task, scheduler_client
+from rocky.scheduler import Normalizer as SchedulerNormalizer
+from rocky.views.mixins import OctopoesView
 
 
 def get_date_time(date: str | None) -> datetime | None:
@@ -91,9 +84,7 @@ class SchedulerView(OctopoesView):
                 return JsonResponse(
                     {
                         "oois": self.get_output_oois(task),
-                        "valid_time": task.data.raw_data.boefje_meta.ended_at.strftime(
-                            "%Y-%m-%dT%H:%M:%S"
-                        ),
+                        "valid_time": task.data.raw_data.boefje_meta.ended_at.strftime("%Y-%m-%dT%H:%M:%S"),
                     },
                     safe=False,
                 )
@@ -149,14 +140,10 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             messages.error(self.request, error.message)
 
-    def run_normalizer(
-        self, katalogus_normalizer: Normalizer, raw_data: RawData
-    ) -> None:
+    def run_normalizer(self, katalogus_normalizer: Normalizer, raw_data: RawData) -> None:
         try:
             normalizer_task = NormalizerTask(
-                normalizer=SchedulerNormalizer.model_validate(
-                    katalogus_normalizer.model_dump()
-                ),
+                normalizer=SchedulerNormalizer.model_validate(katalogus_normalizer.model_dump()),
                 raw_data=raw_data,
             )
 

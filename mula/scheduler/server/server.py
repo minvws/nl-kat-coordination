@@ -1,7 +1,6 @@
 import fastapi
 import structlog
 import uvicorn
-from fastapi import status
 
 from scheduler import context, schedulers
 

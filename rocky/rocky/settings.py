@@ -88,9 +88,7 @@ REMOTE_USER_FALLBACK = env.bool("REMOTE_USER_FALLBACK", False)
 if REMOTE_USER_HEADER:
     # Optional list of default organizations to add remote users to,
     # format: space separated list of ORGANIZATION_CODE:GROUP_NAME, e.g. `test:admin test2:redteam`
-    REMOTE_USER_DEFAULT_ORGANIZATIONS = env.list(
-        "REMOTE_USER_DEFAULT_ORGANIZATIONS", default=[]
-    )
+    REMOTE_USER_DEFAULT_ORGANIZATIONS = env.list("REMOTE_USER_DEFAULT_ORGANIZATIONS", default=[])
     AUTHENTICATION_BACKENDS = [
         "rocky.auth.remote_user.RemoteUserBackend",
     ]
@@ -113,12 +111,8 @@ if SPAN_EXPORT_GRPC_ENDPOINT is not None:
 # -----------------------------
 # EMAIL CONFIGURATION for SMTP
 # -----------------------------
-EMAIL_BACKEND = env(
-    "EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend"
-)
-EMAIL_FILE_PATH = env.path(
-    "EMAIL_FILE_PATH", BASE_DIR / "rocky/email_logs"
-)  # directory to store output files
+EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
+EMAIL_FILE_PATH = env.path("EMAIL_FILE_PATH", BASE_DIR / "rocky/email_logs")  # directory to store output files
 EMAIL_HOST = env("EMAIL_HOST", default="localhost")  # localhost
 try:
     EMAIL_PORT = env.int("EMAIL_PORT", default=25)
@@ -154,8 +148,9 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.staticfiles",
     "django.forms",
+    "django_components",
+    "django_components.safer_staticfiles",
     "django_otp",
     "django_otp.plugins.otp_static",
     "django_otp.plugins.otp_totp",
@@ -207,7 +202,6 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [BASE_DIR / "rocky/templates", BASE_DIR / "reports/report_types"],
-        "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -219,7 +213,20 @@ TEMPLATES = [
                 "tools.context_processors.organizations_including_blocked",
                 "tools.context_processors.rocky_version",
             ],
-            "builtins": ["tools.templatetags.ooi_extra"],
+            "builtins": [
+                "django_components.templatetags.component_tags",
+                "tools.templatetags.ooi_extra",
+            ],
+            "loaders": [
+                (
+                    "django.template.loaders.cached.Loader",
+                    [
+                        "django.template.loaders.filesystem.Loader",
+                        "django.template.loaders.app_directories.Loader",
+                        "django_components.template_loader.Loader",
+                    ],
+                )
+            ],
         },
     },
 ]
@@ -333,7 +340,7 @@ if env.bool("PIRATE", False):
 
 STATIC_URL = "/static/"
 STATIC_ROOT = env.path("STATIC_ROOT", BASE_DIR / "static")
-STATICFILES_DIRS = (BASE_DIR / "assets",)
+STATICFILES_DIRS = (BASE_DIR / "assets", BASE_DIR / "components")
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
@@ -405,9 +412,7 @@ if GITPOD_WORKSPACE_URL := env("GITPOD_WORKSPACE_URL", default=None):
     CSRF_TRUSTED_ORIGINS.append(GITPOD_WORKSPACE_URL.replace("//", "//8000-"))
 
 # Configuration for GitHub Codespaces
-if GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN := env(
-    "GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN", default=None
-):
+if GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN := env("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN", default=None):
     # example environment variable: GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN=preview.app.github.dev
     # public url on https://praseodym-organic-engine-9j6465vx3xgx6-8000.preview.app.github.dev/
     ALLOWED_HOSTS.append("." + GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN)
@@ -445,9 +450,7 @@ DEFAULT_RENDERER_CLASSES = ["rest_framework.renderers.JSONRenderer"]
 BROWSABLE_API = env.bool("BROWSABLE_API", DEBUG)
 
 if BROWSABLE_API:
-    DEFAULT_RENDERER_CLASSES = DEFAULT_RENDERER_CLASSES + [
-        "rest_framework.renderers.BrowsableAPIRenderer"
-    ]
+    DEFAULT_RENDERER_CLASSES = DEFAULT_RENDERER_CLASSES + ["rest_framework.renderers.BrowsableAPIRenderer"]
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
@@ -501,6 +504,9 @@ KNOX_TOKEN_MODEL = "account.AuthToken"
 
 FORMS_URLFIELD_ASSUME_HTTPS = True
 
+# Logging format ("text" or "json")
+LOGGING_FORMAT = env("LOGGING_FORMAT", default="text")
+
 structlog.configure(
     processors=[
         structlog.contextvars.merge_contextvars,
@@ -508,8 +514,12 @@ structlog.configure(
         structlog.processors.StackInfoRenderer(),
         structlog.dev.set_exc_info,
         structlog.stdlib.PositionalArgumentsFormatter(),
-        structlog.processors.TimeStamper("iso"),
-        structlog.dev.ConsoleRenderer(colors=False),
+        structlog.processors.TimeStamper("iso", utc=False),
+        (
+            structlog.processors.JSONRenderer()
+            if LOGGING_FORMAT == "json"
+            else structlog.dev.ConsoleRenderer(colors=True, pad_level=False)
+        ),
     ],
     context_class=dict,
     logger_factory=structlog.stdlib.LoggerFactory(),

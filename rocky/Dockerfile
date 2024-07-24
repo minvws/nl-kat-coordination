@@ -6,6 +6,7 @@ WORKDIR /app
 
 COPY rocky/package.json rocky/yarn.lock .
 COPY rocky/assets assets
+COPY rocky/components components
 
 RUN yarn --ignore-engines && yarn build
 

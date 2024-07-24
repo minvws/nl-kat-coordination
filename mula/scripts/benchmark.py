@@ -86,7 +86,14 @@ def parse_logs(path: str) -> None:
 def collect_cpu(container_id: str) -> str:
     return (
         subprocess.run(
-            ["docker", "stats", "--no-stream", "--format", "{{.CPUPerc}}", container_id],
+            [
+                "docker",
+                "stats",
+                "--no-stream",
+                "--format",
+                "{{.CPUPerc}}",
+                container_id,
+            ],
             capture_output=True,
             check=True,
         )
@@ -98,7 +105,14 @@ def collect_cpu(container_id: str) -> str:
 def collect_memory(container_id: str) -> str:
     return (
         subprocess.run(
-            ["docker", "stats", "--no-stream", "--format", "{{.MemUsage}}", container_id],
+            [
+                "docker",
+                "stats",
+                "--no-stream",
+                "--format",
+                "{{.MemUsage}}",
+                container_id,
+            ],
             capture_output=True,
             check=True,
         )

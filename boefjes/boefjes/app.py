@@ -9,11 +9,7 @@ import structlog
 from httpx import HTTPError
 from pydantic import ValidationError
 
-from boefjes.clients.scheduler_client import (
-    SchedulerAPIClient,
-    SchedulerClientInterface,
-    TaskStatus,
-)
+from boefjes.clients.scheduler_client import SchedulerAPIClient, SchedulerClientInterface, TaskStatus
 from boefjes.config import Settings
 from boefjes.job_handler import BoefjeHandler, NormalizerHandler, bytes_api_client
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
@@ -37,9 +33,7 @@ class SchedulerWorkerManager(WorkerManager):
 
         manager = mp.Manager()
 
-        self.task_queue = (
-            manager.Queue()
-        )  # multiprocessing.Queue() will not work on macOS, see mp.Queue.qsize()
+        self.task_queue = manager.Queue()  # multiprocessing.Queue() will not work on macOS, see mp.Queue.qsize()
         self.handling_tasks = manager.dict()
         self.workers: list[mp.Process] = []
 
@@ -51,8 +45,7 @@ class SchedulerWorkerManager(WorkerManager):
         logger.info("Created worker pool for queue '%s'", queue_type.value)
 
         self.workers = [
-            mp.Process(target=_start_working, args=self._worker_args())
-            for _ in range(self.settings.pool_size)
+            mp.Process(target=_start_working, args=self._worker_args()) for _ in range(self.settings.pool_size)
         ]
         for worker in self.workers:
             worker.start()
@@ -106,9 +99,7 @@ class SchedulerWorkerManager(WorkerManager):
             try:
                 p_item = self.scheduler_client.pop_item(queue_type.id)
             except (HTTPError, ValidationError):
-                logger.exception(
-                    "Popping task from scheduler failed, sleeping 10 seconds"
-                )
+                logger.exception("Popping task from scheduler failed, sleeping 10 seconds")
                 time.sleep(10)
                 continue
 
@@ -139,16 +130,12 @@ class SchedulerWorkerManager(WorkerManager):
                         p_item.data.id,
                     )
                 except HTTPError:
-                    logger.exception(
-                        "Could not patch scheduler task to %s", TaskStatus.FAILED.value
-                    )
+                    logger.exception("Could not patch scheduler task to %s", TaskStatus.FAILED.value)
 
                 raise
 
         if all_queues_empty:
-            logger.debug(
-                "All queues empty, sleeping %f seconds", self.settings.poll_interval
-            )
+            logger.debug("All queues empty, sleeping %f seconds", self.settings.poll_interval)
             time.sleep(self.settings.poll_interval)
 
     def _check_workers(self) -> None:
@@ -170,9 +157,7 @@ class SchedulerWorkerManager(WorkerManager):
                 _format_exit_code(worker.exitcode),
             )
 
-            if (
-                not closed
-            ):  # Closed workers do not have a pid, so cleaning up would fail
+            if not closed:  # Closed workers do not have a pid, so cleaning up would fail
                 self._cleanup_pending_worker_task(worker)
                 worker.close()
 
@@ -222,9 +207,7 @@ class SchedulerWorkerManager(WorkerManager):
                 logger.info("Received %s, exiting", signal.Signals(signum).name)
 
             if not self.task_queue.empty():
-                items: list[Task] = [
-                    self.task_queue.get() for _ in range(self.task_queue.qsize())
-                ]
+                items: list[Task] = [self.task_queue.get() for _ in range(self.task_queue.qsize())]
 
                 for p_item in items:
                     try:
@@ -234,9 +217,7 @@ class SchedulerWorkerManager(WorkerManager):
 
             killed_workers = []
 
-            for (
-                worker
-            ) in self.workers:  # Send all signals before joining, speeding up shutdowns
+            for worker in self.workers:  # Send all signals before joining, speeding up shutdowns
                 try:
                     if worker.is_alive():
                         worker.kill()
@@ -281,9 +262,7 @@ def _start_working(
             handler.handle(p_item.data)
             status = TaskStatus.COMPLETED
         except Exception:  # noqa
-            logger.exception(
-                "An error occurred handling scheduler item[id=%s]", p_item.data.id
-            )
+            logger.exception("An error occurred handling scheduler item[id=%s]", p_item.data.id)
         except:  # noqa
             logger.exception(
                 "An unhandled error occurred handling scheduler item[id=%s]",
@@ -292,9 +271,7 @@ def _start_working(
             raise
         finally:
             try:
-                scheduler_client.patch_task(
-                    p_item.id, status
-                )  # Note: implicitly, we have p_item.id == task_id
+                scheduler_client.patch_task(p_item.id, status)  # Note: implicitly, we have p_item.id == task_id
                 logger.info(
                     "Set status to %s in the scheduler for task[id=%s]",
                     status,
@@ -304,15 +281,11 @@ def _start_working(
                 logger.exception("Could not patch scheduler task to %s", status.value)
 
 
-def get_runtime_manager(
-    settings: Settings, queue: WorkerManager.Queue, log_level: str
-) -> WorkerManager:
+def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_level: str) -> WorkerManager:
     local_repository = get_local_repository()
     item_handler: Handler
     if queue is WorkerManager.Queue.BOEFJES:
-        item_handler = BoefjeHandler(
-            LocalBoefjeJobRunner(local_repository), local_repository, bytes_api_client
-        )
+        item_handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository, bytes_api_client)
     else:
         item_handler = NormalizerHandler(
             LocalNormalizerJobRunner(local_repository),
@@ -322,9 +295,7 @@ def get_runtime_manager(
 
     return SchedulerWorkerManager(
         item_handler,
-        SchedulerAPIClient(
-            str(settings.scheduler_api)
-        ),  # Do not share a session between workers
+        SchedulerAPIClient(str(settings.scheduler_api)),  # Do not share a session between workers
         settings,
         log_level,
     )

@@ -1,11 +1,10 @@
 from typing import Any
 
 import fastapi
-import prometheus_client
 import structlog
 from fastapi import status
 
-from scheduler import context, models, queues, schedulers, storage, version
+from scheduler import context, models, version
 
 
 class HealthAPI:
