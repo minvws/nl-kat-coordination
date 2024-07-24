@@ -104,6 +104,7 @@ def test_get_scan_profiles(httpx_mock, patch_pika, valid_time):
             "level": 0,
             "reference": "Hostname|internet|mispo.es",
             "scan_profile_type": "empty",
+            "user": None,
         }
     ]
 

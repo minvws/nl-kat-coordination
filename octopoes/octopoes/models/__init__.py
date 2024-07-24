@@ -77,6 +77,7 @@ class ScanProfileBase(BaseModel):
     scan_profile_type: str
     reference: Reference
     level: ScanLevel
+    user: str | None = None
 
     def __eq__(self, other):
         if isinstance(other, ScanProfileBase) and self.__class__ == other.__class__:
