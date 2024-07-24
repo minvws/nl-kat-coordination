@@ -348,6 +348,7 @@ def test_enable_disable_plugin_has_clearance(rf, redteam_member, mocker):
     request = setup_request(
         rf.post(
             "plugin_enable_disable",
+            {"current_url": "test"}
         ),
         redteam_member.user,
     )
@@ -376,6 +377,7 @@ def test_enable_disable_normalizer(rf, redteam_member, mocker):
     request = setup_request(
         rf.post(
             "plugin_enable_disable",
+            {"current_url": "test"}
         ),
         redteam_member.user,
     )
