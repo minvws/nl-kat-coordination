@@ -10,10 +10,6 @@ repos:
       - id: check-case-conflict
       - id: check-yaml
       - id: check-json
-        exclude: |
-          (?x)(
-          ^boefjes/boefjes/plugins/.*/tests/.*/*.json
-          )
       - id: check-toml
       - id: debug-statements
         exclude: |
@@ -26,15 +22,10 @@ repos:
           (?x)(
           \.svcg$ |
           ^boefjes/tests/examples/rdns-nxdomain.txt$ |
-          ^boefjes/tests/examples/raw/ |
-          ^boefjes/boefjes/plugins/.*/tests/.*/*.json
+          ^boefjes/tests/examples/raw/
           )
       - id: fix-byte-order-marker
       - id: pretty-format-json
-        exclude: |
-          (?x)(
-          ^boefjes/boefjes/plugins/.*/tests/.*/*.json
-          )
         args: ["--autofix", "--no-ensure-ascii", "--no-sort-keys"]
 
   - repo: https://github.com/abravalheri/validate-pyproject
@@ -128,7 +119,6 @@ repos:
           retirejs.json$ |
           ^boefjes/boefjes/plugins/kat_fierce/lists |
           ^boefjes/tests/examples/inputs/cve-result-without-cvss.json |
-          ^boefjes/boefjes/plugins/.*/tests/.*/*.json |
           ^boefjes/tests/examples |
           ^keiko/glossaries |
           ^keiko/templates/.*/template.tex$ |
