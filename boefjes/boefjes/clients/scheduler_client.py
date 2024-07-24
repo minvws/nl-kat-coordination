@@ -65,6 +65,16 @@ class SchedulerClientInterface:
         raise NotImplementedError()
 
     def pop_item(self, queue: str, network_scopes: list[str]) -> QueuePrioritizedItem | None:
+        """Pops item from `queue` with the corresponding `network_scopes`
+
+        Args:
+            queue (str): the name of the queue to pop from
+            network_scopes (list[str]): A list of all scopes that the queue must pop from
+
+
+        Returns:
+            QueuePrioritizedItem | None
+        """
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:

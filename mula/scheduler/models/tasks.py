@@ -104,18 +104,12 @@ class TaskDB(Base):
     )
 
 
-class PluginTask(BaseModel):
-    id: uuid.UUID | None = Field(default_factory=uuid.uuid4)
-    network_scope: str | None = Field(
-        default=None, description="The network this task should be run from. By default use the internet"
-    )
-
-
-class NormalizerTask(PluginTask):
+class NormalizerTask(BaseModel):
     """NormalizerTask represent data needed for a Normalizer to run."""
 
     type: ClassVar[str] = "normalizer"
 
+    id: uuid.UUID | None = Field(default_factory=uuid.uuid4)
     normalizer: Normalizer
     raw_data: RawData
 
@@ -133,7 +127,7 @@ class NormalizerTask(PluginTask):
         ).hex()
 
 
-class BoefjeTask(PluginTask):
+class BoefjeTask(BaseModel):
     """BoefjeTask represent data needed for a Boefje to run."""
 
     type: ClassVar[str] = "boefje"
@@ -144,6 +138,10 @@ class BoefjeTask(PluginTask):
     organization: str
 
     dispatches: list[Normalizer] = Field(default_factory=list)
+
+    network_scope: str = (
+        "internet"  # TODO SOUF: maybe make a network scope for the openkat instance where the normalizers get run on
+    )
 
     @property
     def hash(self) -> str:

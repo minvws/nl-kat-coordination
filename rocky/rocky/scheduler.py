@@ -80,11 +80,6 @@ class BoefjeTask(BaseModel):
     organization: str
     type: str = "boefje"
 
-    # traits
-    network_scope: str = Field(
-        default="Network|internet", description="The network this task should be run from. By default use the internet"
-    )
-
 
 class PrioritizedItem(BaseModel):
     """Representation of a queue.PrioritizedItem on the priority queue. Used
