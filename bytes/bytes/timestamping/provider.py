@@ -16,6 +16,6 @@ def create_hash_repository(settings: Settings) -> HashRepository:
     if settings.ext_hash_repository == HashingRepositoryReference.RFC3161:
         assert settings.rfc3161_cert_file and settings.rfc3161_provider, "RFC3161 service needs a url and a certificate"
 
-        return RFC3161HashRepository(settings.rfc3161_cert_file.read_bytes(), settings.rfc3161_provider)
+        return RFC3161HashRepository(settings.rfc3161_cert_file.read_bytes(), str(settings.rfc3161_provider))
 
     return InMemoryHashRepository()
