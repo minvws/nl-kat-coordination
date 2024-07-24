@@ -486,5 +486,12 @@
     "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers",
     "impact": "Nonstandard headers may not be supported by all browsers and may not provide the security that is expected.",
     "recommendation": "Remove the nonstandard headers from the response."
+  },
+  "KAT-DOMAIN-OWNERSHIP-PENDING": {
+    "description": "The domain requires Ownership verification. An email hasbeen send to the registered owner by the registrar. The domain is currently offline.",
+    "risk": "high",
+    "source": "",
+    "impact": "Domain points to placeholder DNS-Servers, and is offline for regular use.",
+    "recommendation": "Verify ownership by following the emailed link."
   }
 }
