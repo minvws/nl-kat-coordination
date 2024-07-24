@@ -4,13 +4,15 @@
 {% spaceless %}
     {% if observations %}
         <div class="horizontal-scroll">
-            <h2>{% translate "Observed by" %}</h2>
+            <h2>{% translate "Last observed by" %}</h2>
             <table>
+                <caption class="visually-hidden">{% translate "Last observed by" %}</caption>
                 <thead>
                     <tr>
                         <th>{% translate "Boefje" %}</th>
                         <th>{% translate "Source" %}</th>
                         <th>{% translate "Task ID" %}</th>
+                        <th>{% translate "When" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -19,6 +21,8 @@
                             <td>
                                 {% if observation.boefje.id %}
                                     <a href="{% url 'boefje_detail' organization_code=organization.code plugin_id=observation.boefje.id %}">{{ observation.boefje.name }}</a>
+                                {% else %}
+                                    {% translate "The boefje has since been deleted or disabled." %}
                                 {% endif %}
                             </td>
                             <td>
@@ -27,8 +31,11 @@
                             <td>
                                 {% if observation.normalizer.raw_data.boefje_meta.id %}
                                     <a href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=observation.normalizer.raw_data.boefje_meta.id %}">{{ observation.normalizer.raw_data.boefje_meta.id }}</a>
+                                {% else %}
+                                    {% translate "No Raw file could be found, this might point to an error in OpenKAT" %}
                                 {% endif %}
                             </td>
+                            <td>{{ observation.normalizer.raw_data.boefje_meta.ended_at }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

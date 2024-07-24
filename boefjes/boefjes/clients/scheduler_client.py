@@ -1,5 +1,4 @@
 import datetime
-import logging
 import uuid
 from enum import Enum
 
@@ -7,8 +6,6 @@ from httpx import Client, HTTPTransport, Response
 from pydantic import BaseModel, TypeAdapter
 
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
-
-logger = logging.getLogger(__name__)
 
 
 class Queue(BaseModel):

@@ -1,4 +1,5 @@
 import datetime
+import uuid
 from typing import Any
 
 import fastapi
@@ -18,6 +19,7 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from scheduler import context, models, queues, schedulers, storage, version
 from scheduler.config import settings
 
+from . import serializers
 from .pagination import PaginatedResponse, paginate
 
 
@@ -49,11 +51,14 @@ class Server:
         self.schedulers: dict[str, schedulers.Scheduler] = s
         self.config: settings.Settings = settings.Settings()
 
-        self.api = fastapi.FastAPI()
+        self.api = fastapi.FastAPI(title="Scheduler (Mula) API")
 
         # Set up OpenTelemetry instrumentation
         if self.config.host_metrics is not None:
-            self.logger.info("Setting up instrumentation with span exporter endpoint [%s]", self.config.host_metrics)
+            self.logger.info(
+                "Setting up instrumentation with span exporter endpoint [%s]",
+                self.config.host_metrics,
+            )
 
             FastAPIInstrumentor.instrument_app(self.api)
             Psycopg2Instrumentor().instrument()
@@ -167,6 +172,7 @@ class Server:
             endpoint=self.patch_task,
             methods=["PATCH"],
             response_model=models.Task,
+            response_model_exclude_unset=True,
             status_code=status.HTTP_200_OK,
             description="Update a task",
         )
@@ -300,7 +306,8 @@ class Server:
             )
 
         # FIXME: deprecated; backwards compatibility for rocky that uses the
-        # input_ooi and plugin_id parameters.
+        # input_ooi and plugin_id parameters. These filter options should be
+        # defined in the filter request payload not as query parameters.
         f_req = filters or storage.filters.FilterRequest(filters={})
         if input_ooi is not None:
             if task_type == "boefje":
@@ -345,6 +352,9 @@ class Server:
 
             f_req.filters.update(f_ooi)  # type: ignore
 
+        # FIXME: deprecated; backwards compatibility for rocky that uses the
+        # input_ooi and plugin_id parameters. These filter options should be
+        # defined in the filter request payload not as query parameters.
         if plugin_id is not None:
             if task_type == "boefje":
                 f_plugin = {
@@ -358,12 +368,16 @@ class Server:
                     ]
                 }
             elif task_type == "normalizer":
-                f_plugin = storage.filters.Filter(
-                    column="p_item",
-                    field="data__normalizer__id",
-                    operator="eq",
-                    value=plugin_id,
-                )
+                f_plugin = {
+                    "and": [
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__normalizer__id",
+                            operator="eq",
+                            value=plugin_id,
+                        )
+                    ]
+                }
             else:
                 f_plugin = {
                     "or": [
@@ -398,12 +412,12 @@ class Server:
         except storage.filters.errors.FilterError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail=str(exc),
+                detail=f"invalid filter(s) [exception: {exc}]",
             ) from exc
-        except ValueError as exc:
+        except storage.errors.StorageError as exc:
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail=str(exc),
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"error occurred while accessing the database [exception: {exc}]",
             ) from exc
         except Exception as exc:
             self.logger.exception(exc)
@@ -414,59 +428,68 @@ class Server:
 
         return paginate(request, results, count=count, offset=offset, limit=limit)
 
-    def get_task(self, task_id: str) -> Any:
+    def get_task(self, task_id: uuid.UUID) -> Any:
         try:
             task = self.ctx.datastores.task_store.get_task_by_id(task_id)
-        except ValueError as exc:
+        except storage.errors.StorageError as exc:
             raise fastapi.HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=str(exc),
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"error occurred while accessing the database [exception: {exc}]",
             ) from exc
         except Exception as exc:
             self.logger.exception(exc)
             raise fastapi.HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="failed to get task",
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"failed to get task [exception: {exc}]",
             ) from exc
 
         if task is None:
             raise fastapi.HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
+                status_code=fastapi.status.HTTP_404_NOT_FOUND,
                 detail="task not found",
             )
 
         return models.Task(**task.model_dump())
 
-    def patch_task(self, task_id: str, item: dict) -> Any:
-        if len(item) == 0:
-            raise fastapi.HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="no data to patch",
-            )
-
+    # NOTE: serializers.Task instead of models.Task is needed for patch
+    # endpoints # to allow for partial updates.
+    def patch_task(self, task_id: uuid.UUID, item: serializers.Task) -> Any:
         try:
             task_db = self.ctx.datastores.task_store.get_task_by_id(task_id)
-        except Exception as exc:
+        except storage.errors.StorageError as exc:
             raise fastapi.HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"error occurred while accessing the database [exception: {exc}]",
+            ) from exc
+        except Exception as exc:
+            self.logger.exception(exc)
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"failed to get task [exception: {exc}]",
             ) from exc
 
         if task_db is None:
             raise fastapi.HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
+                status_code=fastapi.status.HTTP_404_NOT_FOUND,
                 detail="task not found",
             )
 
-        updated_task = task_db.model_copy(update=item)
+        patch_data = item.model_dump(exclude_unset=True)
+        if len(patch_data) == 0:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="no data to patch",
+            )
+
+        updated_task = task_db.model_copy(update=patch_data)
 
         # Update task in database
         try:
             self.ctx.datastores.task_store.update_task(updated_task)
         except Exception as exc:
-            self.logger.error(exc)
+            self.logger.exception(exc)
             raise fastapi.HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="failed to update task",
             ) from exc
 
@@ -477,8 +500,9 @@ class Server:
             stats = self.ctx.datastores.task_store.get_status_count_per_hour(scheduler_id)
         except Exception as exc:
             self.logger.exception(exc)
+            self.logger.exception(exc)
             raise fastapi.HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="failed to get task stats",
             ) from exc
 
@@ -491,14 +515,14 @@ class Server:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
+                status_code=fastapi.status.HTTP_404_NOT_FOUND,
                 detail="scheduler not found, by queue_id",
             )
 
         q = s.queue
         if q is None:
             raise fastapi.HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
+                status_code=fastapi.status.HTTP_404_NOT_FOUND,
                 detail="queue not found",
             )
 
@@ -508,7 +532,7 @@ class Server:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
+                status_code=fastapi.status.HTTP_404_NOT_FOUND,
                 detail="queue not found",
             )
 
@@ -519,17 +543,17 @@ class Server:
 
         if p_item is None:
             raise fastapi.HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
+                status_code=fastapi.status.HTTP_404_NOT_FOUND,
                 detail="could not pop item from queue, check your filters",
             )
 
         return models.PrioritizedItem(**p_item.model_dump())
 
-    def push_queue(self, queue_id: str, item: models.PrioritizedItemRequest) -> Any:
+    def push_queue(self, queue_id: str, item: serializers.PrioritizedItem) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
+                status_code=fastapi.status.HTTP_404_NOT_FOUND,
                 detail="queue not found",
             )
 
@@ -554,7 +578,7 @@ class Server:
         except Exception as exc:
             self.logger.exception(exc)
             raise fastapi.HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=str(exc),
             ) from exc
 
@@ -562,18 +586,18 @@ class Server:
             s.push_item_to_queue(p_item)
         except ValueError as exc_value:
             raise fastapi.HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
                 detail="malformed item",
             ) from exc_value
         except queues.QueueFullError as exc_full:
             raise fastapi.HTTPException(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                status_code=fastapi.status.HTTP_429_TOO_MANY_REQUESTS,
                 detail="queue is full",
             ) from exc_full
         except queues.errors.NotAllowedError as exc_not_allowed:
             raise fastapi.HTTPException(
                 headers={"Retry-After": "60"},
-                status_code=status.HTTP_409_CONFLICT,
+                status_code=fastapi.status.HTTP_409_CONFLICT,
                 detail=str(exc_not_allowed),
             ) from exc_not_allowed
 

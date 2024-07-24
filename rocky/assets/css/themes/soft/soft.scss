@@ -17,14 +17,6 @@
 /* Base - Top level styling */
 @import "manon/application-base";
 
-/* Styling on the highest level */
-
-/* Helpers */
-
-/* @import "manon/center-only-child.scss"; */
-
-/* Can be added after v10.1.1 */
-
 /* Layout */
 @import "manon/layout-set";
 @import "manon/main";
@@ -65,6 +57,7 @@
 @import "manon/notification-block";
 @import "manon/icon";
 @import "manon/layout-column-4";
+@import "manon/layout-form";
 @import "manon/max-line-length";
 @import "manon/description-list";
 @import "manon/form-fieldset";

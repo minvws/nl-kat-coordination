@@ -8,7 +8,7 @@
             <p>{% translate "Settings" %}</p>
             <div class="horizontal-scroll">
                 <table>
-                    <caption>{% translate "Overview of settings:" %}</caption>
+                    <caption class="visually-hidden">{% translate "Overview of settings" %}</caption>
                     <thead>
                         <tr>
                             <th scope="col">{% translate "Name" %}</th>
@@ -57,8 +57,6 @@
                     {% csrf_token %}
                     <button type="submit">{% translate "Delete" %}</button>
                 </form>
-                {% include "partials/pagination.html" %}
-
             </div>
         </div>
     </section>

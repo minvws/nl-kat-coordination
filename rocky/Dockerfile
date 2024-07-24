@@ -6,6 +6,7 @@ WORKDIR /app
 
 COPY rocky/package.json rocky/yarn.lock .
 COPY rocky/assets assets
+COPY rocky/components components
 
 RUN yarn --ignore-engines && yarn build
 
@@ -19,8 +20,8 @@ ARG USER_GID=1000
 
 ENTRYPOINT ["/app/rocky/entrypoint.sh"]
 
-RUN groupadd --gid $USER_GID rocky
-RUN adduser --disabled-password --gecos '' --uid $USER_UID --gid $USER_GID rocky
+RUN groupadd --gid "$USER_GID" rocky
+RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" rocky
 
 WORKDIR /app/rocky
 
@@ -68,8 +69,5 @@ RUN export SECRET_KEY="secret" BYTES_API="http://bytes:8000" BYTES_PASSWORD="pas
     && python manage.py collectstatic -l && python manage.py compress && python manage.py compilemessages
 
 USER rocky
-
-# Workaround for https://github.com/emmett-framework/granian/issues/287
-ENV GRANIAN_HTTP=1
 
 CMD ["granian", "--interface", "wsgi", "rocky.wsgi:application", "--host", "0.0.0.0"]

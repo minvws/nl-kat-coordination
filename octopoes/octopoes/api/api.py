@@ -3,6 +3,7 @@ import socket
 from logging import config
 from pathlib import Path
 
+import structlog
 import yaml
 from fastapi import FastAPI, HTTPException, status
 from fastapi.exceptions import RequestValidationError
@@ -38,8 +39,26 @@ try:
 except FileNotFoundError:
     logger.warning("No log config found at: %s", settings.log_cfg)
 
-
-app = FastAPI()
+structlog.configure(
+    processors=[
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.add_log_level,
+        structlog.processors.StackInfoRenderer(),
+        structlog.dev.set_exc_info,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.TimeStamper("iso", utc=False),
+        (
+            structlog.dev.ConsoleRenderer(colors=True, pad_level=False)
+            if settings.logging_format == "text"
+            else structlog.processors.JSONRenderer()
+        ),
+    ],
+    context_class=dict,
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    wrapper_class=structlog.stdlib.BoundLogger,
+    cache_logger_on_first_use=True,
+)
+app = FastAPI(title="Octopoes API")
 
 # Set up OpenTelemetry instrumentation
 if settings.span_export_grpc_endpoint is not None:

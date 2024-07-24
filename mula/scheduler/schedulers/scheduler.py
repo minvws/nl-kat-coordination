@@ -366,7 +366,11 @@ class Scheduler(abc.ABC):
         tasks that were on the queue will be set to CANCELLED.
         """
         if not self.is_enabled():
-            self.logger.warning("Scheduler already disabled: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
+            self.logger.warning(
+                "Scheduler already disabled: %s",
+                self.scheduler_id,
+                scheduler_id=self.scheduler_id,
+            )
             return
 
         self.logger.info("Disabling scheduler: %s", self.scheduler_id)

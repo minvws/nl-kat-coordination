@@ -76,22 +76,23 @@ repos:
     rev: 1.16.0
     hooks:
       - id: django-upgrade
-        args: [--target-version, "4.2"]
+        args: [--target-version, "5.0"]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.9.0
     hooks:
       - id: mypy
         additional_dependencies:
-          - types-PyYAML
+          - types-pyyaml
           - types-cachetools
           - types-retry
           - pydantic
           - pynacl
           - httpx
+          - types-python-dateutil
+          - types-requests
         exclude: |
           (?x)(
-          ^boefjes/boefjes/plugins |
           ^boefjes/tools |
           ^keiko/templates |
           ^mula/whitelist\.py$ |

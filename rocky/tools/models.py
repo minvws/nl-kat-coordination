@@ -1,10 +1,10 @@
 import datetime
-import logging
 from collections.abc import Iterable
 from enum import Enum
 from functools import cached_property
 from typing import cast
 
+import structlog
 import tagulous.models
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission
@@ -30,7 +30,7 @@ GROUP_ADMIN = "admin"
 GROUP_REDTEAM = "redteam"
 GROUP_CLIENT = "clients"
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 ORGANIZATION_CODE_LENGTH = 32
 DENY_ORGANIZATION_CODES = [

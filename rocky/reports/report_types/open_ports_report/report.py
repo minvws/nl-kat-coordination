@@ -59,7 +59,7 @@ class OpenPortsReport(Report):
                     services[port.port] = [service.name for service in services_by_port.get(port.reference, [])]
 
                 sorted_port_numbers = dict(sorted(port_numbers.items()))
-                by_ip[ip] = {
+                by_ip[ip.tokenized.address] = {
                     "ports": sorted_port_numbers,
                     "hostnames": hostnames,
                     "services": services,

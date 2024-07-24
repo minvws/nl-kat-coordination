@@ -1,10 +1,10 @@
 import base64
-import logging
 import multiprocessing
 from datetime import datetime, timezone
 from enum import Enum
 from uuid import UUID
 
+import structlog
 from fastapi import Depends, FastAPI, HTTPException, Response
 from httpx import HTTPError, HTTPStatusError
 from pydantic import BaseModel, ConfigDict, Field
@@ -15,13 +15,13 @@ from boefjes.clients.scheduler_client import SchedulerAPIClient, TaskStatus
 from boefjes.config import settings
 from boefjes.job_handler import get_environment_settings, get_octopoes_api_connector, serialize_ooi
 from boefjes.job_models import BoefjeMeta
-from boefjes.katalogus.local_repository import LocalPluginRepository, get_local_repository
+from boefjes.local_repository import LocalPluginRepository, get_local_repository
 from boefjes.plugins.models import _default_mime_types
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
 
 app = FastAPI(title="Boefje API")
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class UvicornServer(multiprocessing.Process):

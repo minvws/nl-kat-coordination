@@ -1,4 +1,3 @@
-import logging
 import multiprocessing as mp
 import os
 import signal
@@ -6,6 +5,7 @@ import sys
 import time
 from queue import Queue
 
+import structlog
 from httpx import HTTPError
 from pydantic import ValidationError
 
@@ -17,11 +17,11 @@ from boefjes.clients.scheduler_client import (
 )
 from boefjes.config import Settings
 from boefjes.job_handler import BoefjeHandler, NormalizerHandler, bytes_api_client
-from boefjes.katalogus.local_repository import get_local_repository
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
+from boefjes.local_repository import get_local_repository
 from boefjes.runtime_interfaces import Handler, WorkerManager
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class SchedulerWorkerManager(WorkerManager):
@@ -261,10 +261,11 @@ def _start_working(
 
 def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_level: str) -> WorkerManager:
     local_repository = get_local_repository()
+    item_handler: Handler
     if queue is WorkerManager.Queue.BOEFJES:
         item_handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository, bytes_api_client)
     else:
-        item_handler = NormalizerHandler(  # type: ignore
+        item_handler = NormalizerHandler(
             LocalNormalizerJobRunner(local_repository), bytes_api_client, settings.scan_profile_whitelist
         )
 

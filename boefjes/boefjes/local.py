@@ -1,6 +1,7 @@
-import logging
 import os
 from collections.abc import Iterable
+
+import structlog
 
 from boefjes.job_models import (
     BoefjeMeta,
@@ -13,11 +14,11 @@ from boefjes.job_models import (
     NormalizerResults,
     ObservationsWithoutInputOOI,
 )
-from boefjes.katalogus.local_repository import LocalPluginRepository
+from boefjes.local_repository import LocalPluginRepository
 from boefjes.runtime_interfaces import BoefjeJobRunner, JobRuntimeError, NormalizerJobRunner
 from octopoes.models import OOI, DeclaredScanProfile
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class TemporaryEnvironment:
@@ -45,8 +46,11 @@ class LocalBoefjeJobRunner(BoefjeJobRunner):
         boefjes = self.local_repository.resolve_boefjes()
         boefje_resource = boefjes[boefje_meta.boefje.id]
 
-        if not boefje_resource.module and boefje_resource.boefje.oci_image:
-            raise JobRuntimeError("Trying to run OCI image boefje locally")
+        if not boefje_resource.module:
+            if boefje_resource.boefje.oci_image:
+                raise JobRuntimeError("Trying to run OCI image boefje locally")
+            else:
+                raise JobRuntimeError("Boefje doesn't have OCI image or main.py")
 
         with TemporaryEnvironment() as temporary_environment:
             temporary_environment.update(environment)
