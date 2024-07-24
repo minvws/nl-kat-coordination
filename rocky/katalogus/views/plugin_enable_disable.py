@@ -24,7 +24,8 @@ class PluginEnableDisableView(SinglePluginView):
                 messages.WARNING,
                 _("{} '{}' disabled.").format(self.plugin.type.title(), self.plugin.name),
             )
-            return HttpResponseRedirect(request.POST.get("current_url"))
+            url = request.build_absolute_uri(request.POST.get("current_url"))
+            return HttpResponseRedirect(url)
 
         try:
             plugin_settings = self.katalogus_client.get_plugin_settings(self.plugin.id)
@@ -91,5 +92,6 @@ class PluginEnableDisableView(SinglePluginView):
                     self.plugin.scan_level.value,
                 ),
             )
-
-        return HttpResponseRedirect(request.POST.get("current_url"))
+            
+            url = request.build_absolute_uri(request.POST.get("current_url"))
+            return HttpResponseRedirect(url)
