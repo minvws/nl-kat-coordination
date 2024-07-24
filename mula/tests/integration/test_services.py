@@ -230,15 +230,25 @@ class KatalogusTestCase(unittest.TestCase):
     def test_get_new_boefjes_by_org_id(self, mock_get_plugins_by_organisation):
         # Mock
         mock_get_plugins_by_organisation.side_effect = [
+            # First call
             [
                 PluginFactory(
-                    id="plugin-1", type="boefje", enabled=True, consumes=["Hostname"]
+                    id="plugin-1",
+                    type="boefje",
+                    enabled=True,
+                    consumes=["Hostname"],
                 ),
                 PluginFactory(
-                    id="plugin-2", type="boefje", enabled=True, consumes=["Hostname"]
+                    id="plugin-2",
+                    type="boefje",
+                    enabled=True,
+                    consumes=["Hostname"],
                 ),
                 PluginFactory(
-                    id="plugin-3", type="boefje", enabled=False, consumes=["Hostname"]
+                    id="plugin-3",
+                    type="boefje",
+                    enabled=False,
+                    consumes=["Hostname"],
                 ),
                 PluginFactory(
                     id="plugin-4",
@@ -247,12 +257,19 @@ class KatalogusTestCase(unittest.TestCase):
                     consumes=["Hostname"],
                 ),
             ],
+            # Second call
             [
                 PluginFactory(
-                    id="plugin-1", type="boefje", enabled=True, consumes=["Hostname"]
+                    id="plugin-1",
+                    type="boefje",
+                    enabled=True,
+                    consumes=["Hostname"],
                 ),
                 PluginFactory(
-                    id="plugin-3", type="boefje", enabled=False, consumes=["Hostname"]
+                    id="plugin-3",
+                    type="boefje",
+                    enabled=False,
+                    consumes=["Hostname"],
                 ),
                 PluginFactory(
                     id="plugin-4",
@@ -261,19 +278,26 @@ class KatalogusTestCase(unittest.TestCase):
                     consumes=["Hostname"],
                 ),
                 PluginFactory(
-                    id="plugin-5", type="boefje", enabled=True, consumes=["Hostname"]
+                    id="plugin-5",
+                    type="boefje",
+                    enabled=True,
+                    consumes=["Hostname"],
                 ),
             ],
         ]
 
-        # Act
+        # Act: First call we would expect 2 new boefjes
         new_boefjes = self.service_katalogus.get_new_boefjes_by_org_id("org-1")
 
         # Assert
-        self.assertEqual(len(self.service_katalogus.organisations_new_boefjes_cache), 2)
+        breakpoint()
+        # Should have 1 organisation in cache
+        self.assertEqual(len(self.service_katalogus.organisations_new_boefjes_cache), 1)
         self.assertIsNotNone(
             self.service_katalogus.organisations_new_boefjes_cache.get("org-1")
         )
+
+        # Should have 2 new boefjes in cache
         self.assertEqual(
             len(self.service_katalogus.organisations_new_boefjes_cache.get("org-1")), 2
         )
@@ -291,20 +315,29 @@ class KatalogusTestCase(unittest.TestCase):
         self.assertEqual(new_boefjes[0].id, "plugin-1")
         self.assertEqual(new_boefjes[1].id, "plugin-2")
 
-        # Act
+        # Act: Second call we would expect 1 new boefje, and 1 removed boefje
         new_boefjes = self.service_katalogus.get_new_boefjes_by_org_id("org-1")
 
         # Assert
-        self.assertEqual(len(self.service_katalogus.organisations_new_boefjes_cache), 2)
+
+        # Should have 1 organisation in cache
+        self.assertEqual(len(self.service_katalogus.organisations_new_boefjes_cache), 1)
         self.assertIsNotNone(
             self.service_katalogus.organisations_new_boefjes_cache.get("org-1")
         )
+
+        # Should have 2 new boefjes in cache
         self.assertEqual(
             len(self.service_katalogus.organisations_new_boefjes_cache.get("org-1")), 2
         )
         self.assertIsNotNone(
             self.service_katalogus.organisations_new_boefjes_cache.get("org-1").get(
-                "plugin-5"
+                "plugin-1"
+            )
+        )
+        self.assertIsNone(
+            self.service_katalogus.organisations_new_boefjes_cache.get("org-1").get(
+                "plugin-2"
             )
         )
         self.assertIsNotNone(
@@ -312,5 +345,6 @@ class KatalogusTestCase(unittest.TestCase):
                 "plugin-5"
             )
         )
+
         self.assertEqual(len(new_boefjes), 1)
         self.assertEqual(new_boefjes[0].id, "plugin-5")

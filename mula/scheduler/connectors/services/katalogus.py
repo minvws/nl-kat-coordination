@@ -279,6 +279,7 @@ class Katalogus(HTTPService):
                 new_boefjes,
             )
 
+            # Update the cache
             self.organisations_new_boefjes_cache[organisation_id] = enabled_boefjes
 
             self.logger.debug(
