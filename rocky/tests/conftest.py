@@ -17,7 +17,8 @@ from django.utils.translation import activate, deactivate
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from httpx import Response
-from katalogus.client import parse_plugin
+from katalogus.client import Boefje, parse_plugin
+from tools.enums import SCAN_LEVEL
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 
 from octopoes.config.settings import (
@@ -1703,4 +1704,25 @@ def rocky_health():
             ServiceHealth(service="bytes", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
             ServiceHealth(service="keiko", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
         ],
+    )
+
+
+@pytest.fixture
+def boefje_dns_records():
+    return Boefje(
+        id="dns-records",
+        name="DnsRecords",
+        version=None,
+        authors=None,
+        created=None,
+        description="Fetch the DNS record(s) of a hostname",
+        environment_keys=None,
+        related=[],
+        enabled=True,
+        type="boefje",
+        scan_level=SCAN_LEVEL.L1,
+        consumes={Hostname},
+        options=None,
+        runnable_hash=None,
+        produces={"boefje/dns-records"},
     )

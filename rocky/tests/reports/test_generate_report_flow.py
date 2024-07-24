@@ -187,10 +187,18 @@ def test_report_types_selection(
     valid_time,
     mock_organization_view_octopoes,
     listed_hostnames,
+    mocker,
+    boefje_dns_records,
+    mock_bytes_client,
 ):
     """
     Will send the selected report types to the configuration page (set plugins).
     """
+
+    katalogus_mocker = mocker.patch("reports.views.base.get_katalogus")()
+    katalogus_mocker.get_plugins.return_value = [boefje_dns_records]
+
+    mock_bytes_client().upload_raw.return_value = "Report|e821aaeb-a6bd-427f-b064-e46837911a5d"
 
     mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
         count=len(listed_hostnames), items=listed_hostnames
@@ -199,14 +207,15 @@ def test_report_types_selection(
     request = setup_request(
         rf.post(
             "generate_report_setup_scan",
-            {"observed_at": valid_time.strftime("%Y-%m-%d"), "report_type": "dns-report"},
+            {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": "all", "report_type": "dns-report"},
         ),
         client_member.user,
     )
 
     response = SetupScanGenerateReportView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 200
+    assert response.status_code == 302  # plugin is enabled so redirect to generate report view
+    assert "report_id=Report" in response.url
 
 
 def test_save_generate_report_view(
@@ -215,10 +224,18 @@ def test_save_generate_report_view(
     valid_time,
     mock_organization_view_octopoes,
     listed_hostnames,
+    mocker,
+    boefje_dns_records,
+    mock_bytes_client,
 ):
     """
     Will send data through post to generate report.
     """
+
+    katalogus_mocker = mocker.patch("reports.views.base.get_katalogus")()
+    katalogus_mocker.get_plugins.return_value = [boefje_dns_records]
+
+    mock_bytes_client().upload_raw.return_value = "Report|e821aaeb-a6bd-427f-b064-e46837911a5d"
 
     mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
         count=len(listed_hostnames), items=listed_hostnames
