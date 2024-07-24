@@ -1,27 +1,42 @@
 import json
-import logging
 import time
 from functools import partial, wraps
 
 import sqlalchemy
+import structlog
 
 from scheduler.config import settings
 
-logger = logging.getLogger(__name__)
+from .errors import StorageError
+
+logger = structlog.getLogger(__name__)
 
 
 class DBConn:
-    def __init__(self, dsn: str) -> None:
+    def __init__(self, dsn: str, pool_size: int = 25) -> None:
         super().__init__()
 
+        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
+
         self.engine = None
+        self.session = None
 
-        serializer = partial(json.dumps, default=str)
+        self.connect(dsn, pool_size)
 
+    def connect(self, dsn: str, pool_size: int) -> None:
         db_uri_redacted = sqlalchemy.engine.make_url(name_or_url=str(dsn)).render_as_string(hide_password=True)
+
         pool_size = settings.Settings().db_connection_pool_size
 
-        logger.info("Connecting to database %s with pool size %s...", db_uri_redacted, pool_size)
+        self.logger.debug(
+            "Connecting to database %s with pool size %s...",
+            dsn,
+            pool_size,
+            dsn=db_uri_redacted,
+            pool_size=pool_size,
+        )
+
+        serializer = partial(json.dumps, default=str)
         self.engine = sqlalchemy.create_engine(
             dsn,
             pool_pre_ping=True,
@@ -29,10 +44,14 @@ class DBConn:
             pool_recycle=300,
             json_serializer=serializer,
         )
-        logger.info("Connected to database %s.", db_uri_redacted)
+        self.logger.debug(
+            "Connected to database %s.",
+            db_uri_redacted,
+            dsn=db_uri_redacted,
+        )
 
         if self.engine is None:
-            raise Exception("Invalid datastore type")
+            raise StorageError("Invalid datastore type")
 
         self.session = sqlalchemy.orm.sessionmaker(
             bind=self.engine,
