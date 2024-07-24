@@ -1,6 +1,5 @@
 import sys
 from datetime import datetime, timezone
-from logging import getLogger
 from pathlib import Path
 from typing import Any
 
@@ -16,7 +15,6 @@ from rocky.views.mixins import FindingList
 from tools.models import Organization
 
 User = get_user_model()
-logger = getLogger(__name__)
 
 
 class Command(BaseCommand):

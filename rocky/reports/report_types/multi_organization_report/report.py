@@ -1,5 +1,4 @@
 from datetime import datetime
-from logging import getLogger
 from typing import Any, TypedDict
 
 from django.utils.translation import gettext_lazy as _
@@ -8,8 +7,6 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.reports import ReportData
 from reports.report_types.definitions import MultiReport, ReportPlugins
-
-logger = getLogger(__name__)
 
 
 class OpenPortsDict(TypedDict):

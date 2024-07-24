@@ -1,5 +1,4 @@
-from logging import getLogger
-
+import structlog
 from account.mixins import OrganizationView
 from django.contrib import messages
 from django.http import Http404
@@ -11,7 +10,7 @@ from rest_framework.status import HTTP_404_NOT_FOUND
 
 from katalogus.client import KATalogusClientV1, Plugin, get_katalogus
 
-logger = getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class SinglePluginView(OrganizationView):
