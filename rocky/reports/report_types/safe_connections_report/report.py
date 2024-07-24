@@ -1,6 +1,5 @@
 from collections.abc import Iterable
 from datetime import datetime
-from logging import getLogger
 from typing import Any
 
 from django.utils.translation import gettext_lazy as _
@@ -14,8 +13,6 @@ CIPHER_FINDINGS = [
     "KAT-MEDIUM-BAD-CIPHER",
     "KAT-CRITICAL-BAD-CIPHER",
 ]
-
-logger = getLogger(__name__)
 
 
 class SafeConnectionsReport(Report):
