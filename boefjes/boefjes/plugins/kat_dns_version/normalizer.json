@@ -1,0 +1,12 @@
+{
+  "id": "kat_DNS-bind-version_normalize",
+  "consumes": [
+    "boefje/dns-bind-version"
+  ],
+  "produces": [
+    "Software",
+    "SoftwareInstance",
+    "CVEFindingType",
+    "Finding"
+  ]
+}
