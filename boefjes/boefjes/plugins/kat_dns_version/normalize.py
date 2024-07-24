@@ -48,21 +48,21 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
             software_instance = SoftwareInstance(ooi=input_ooi_reference, software=software.reference)
             yield from [software, software_instance]
 
-        # TODO move this to a generic boefje that enriches SoftwareOOIs
-        if name == "bind" and is_vulnerable(versionnumber.lower()):
-            for cveid, description in cves.items():
-                # Create instances of CVEFindingType and Finding classes
-                cve_finding_type = CVEFindingType(id=cveid)
-                yield cve_finding_type
+            # TODO move this to a generic boefje that enriches SoftwareOOIs
+            if name == "bind" and is_vulnerable(versionnumber.lower()):
+                for cveid, description in cves.items():
+                    # Create instances of CVEFindingType and Finding classes
+                    cve_finding_type = CVEFindingType(id=cveid)
+                    yield cve_finding_type
 
-                finding = Finding(
-                    finding_type=cve_finding_type.reference,
-                    ooi=input_ooi_reference,
-                    proof=None,
-                    description=description,
-                    reproduce=f"dig -t TXT -c chaos VERSION.BIND @{input_ip} -p {input_port}",
-                )
-                yield finding
+                    finding = Finding(
+                        finding_type=cve_finding_type.reference,
+                        ooi=input_ooi_reference,
+                        proof=None,
+                        description=description,
+                        reproduce=f"dig -t TXT -c chaos VERSION.BIND @{input_ip} -p {input_port}",
+                    )
+                    yield finding
 
 
 def is_vulnerable(versionnumber: str) -> bool:
