@@ -71,7 +71,7 @@ table td .icon {
   &.incomplete {
     &::before {
       content: "\ea6a"; // $ti-icon-circle-x
-      color: var(--colors-grey-11);
+      color: var(--colors-grey-900);
     }
   }
 
