@@ -36,16 +36,13 @@ export function initDialog(modal) {
       }
     } else {
       if (event.target.classList.contains("close-modal-button")) {
+        if (modal.querySelector("form")) {
+          modal.querySelector("form").reset();
+        }
         event.target.closest(".modal-wrapper").querySelector("dialog").close();
       }
     }
   });
-}
-
-export function getInitialValuesOfInputs(form) {
-  let formInputs = form.querySelectorAll("input");
-
-  formInputs.forEach((input) => {});
 }
 
 export function checkRequiredElements(elements) {

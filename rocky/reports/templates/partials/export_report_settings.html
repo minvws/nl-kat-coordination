@@ -65,6 +65,7 @@
                                                name="old-report-name"
                                                value="{{ report_id }}">
                                         <label for="report-name">{% translate "Report name" %}</label>
+                                        <br>
                                         <span class="nota-bene">{% translate "This field is required." %}</span>
                                         <div>
                                             <input id="report-name"
@@ -73,9 +74,6 @@
                                                    type="text"
                                                    value="{{ report_name }}"
                                                    required>
-                                            <p class="error" id="input-error-message">
-                                                <span>{% translate "Error" %}:</span> {% translate "You should put something in this input field you knobhead!!!" %}
-                                            </p>
                                         </div>
                                         <div>
                                             <label for="reference-date">{% translate "Add reference date" %}</label>
