@@ -290,7 +290,7 @@ class KatalogusTestCase(unittest.TestCase):
         new_boefjes = self.service_katalogus.get_new_boefjes_by_org_id("org-1")
 
         # Assert
-        breakpoint()
+
         # Should have 1 organisation in cache
         self.assertEqual(len(self.service_katalogus.organisations_new_boefjes_cache), 1)
         self.assertIsNotNone(
