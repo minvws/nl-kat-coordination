@@ -110,7 +110,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
         declarations: list[OriginData] = []
         observations: list[OriginData] = []
         inferences: list[OriginData] = []
-        results = Origins({"declarations": declarations, "observations": observations, "inferences": inferences})
+        results = {"declarations": declarations, "observations": observations, "inferences": inferences}
 
         try:
             origins = self.octopoes_api_connector.list_origins(self.observed_at, result=reference)
