@@ -29,28 +29,28 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
         if version.startswith("bind"):
             name = "bind"
-            versionnumber = version.split("-")[1]
+            version_number = version.split("-")[1]
         if version.startswith("9."):
             name = "bind"
-            versionnumber = version
+            version_number = version
         elif version.startswith("Microsoft DNS"):
             name = "Microsoft DNS"
-            versionnumber = version.replace("Microsoft DNS ", "").split(" ")[0]
+            version_number = version.replace("Microsoft DNS ", "").split(" ")[0]
         elif version.startswith("dnsmasq"):
             name = "dnsmasq"
-            versionnumber = version.split("-")[1]
+            version_number = version.split("-")[1]
         elif version.startswith("PowerDNS"):
             name = "PowerDNS"
-            versionnumber = version.replace("PowerDNS Authoritative Server ", "").split(" ")[0]
+            version_number = version.replace("PowerDNS Authoritative Server ", "").split(" ")[0]
 
         if name and versionnumber:
-            software = Software(name=name, version=versionnumber)
+            software = Software(name=name, version=version_number)
             software_instance = SoftwareInstance(ooi=input_ooi_reference, software=software.reference)
             yield from [software, software_instance]
 
             # TODO move this to a generic boefje that enriches SoftwareOOIs
-            if name == "bind" and is_vulnerable(versionnumber.lower()):
-                for cveid, description in cves.items():
+            if name == "bind" and is_vulnerable(version_number.lower()):
+                for cveid, description in CVES[name].items():
                     # Create instances of CVEFindingType and Finding classes
                     cve_finding_type = CVEFindingType(id=cveid)
                     yield cve_finding_type
@@ -65,7 +65,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
                     yield finding
 
 
-def is_vulnerable(versionnumber: str) -> bool:
+def is_vulnerable(version_number: str) -> bool:
     """Attempts to parse the version string and match against known broken versions
 
     # examples
@@ -84,23 +84,23 @@ def is_vulnerable(versionnumber: str) -> bool:
     broken = "9.18.27"
 
     # simple match if not annotated by vendor
-    if len(versionnumber) == 7 and Version(versionnumber) >= Version(broken):
+    if len(version_number) == 7 and Version(version_number) >= Version(broken):
         return False
 
-    if "redhat" in versionnumber:
-        version, security_update = versionnumber.split("-redhat-")
+    if "redhat" in version_number:
+        version, security_update = version_number.split("-redhat-")
         security_update = security_update.split(".el")[0].replace(version + "-", "")
 
         if Version(security_update) >= Version("1.1"):
             return False
 
-    if "ubuntu" in versionnumber:
-        version, security_update, _ = versionnumber.split("-")
+    if "ubuntu" in version_number:
+        version, security_update, _ = version_number.split("-")
         if Version(security_update) >= Version("1"):
             return False
 
-    if "debian" in versionnumber:
-        version, security_update = versionnumber.split("deb10u")
+    if "debian" in version_number:
+        version, security_update = version_number.split("deb10u")
         security_update = security_update.split("-")[0]
         if Version(security_update) >= Version("1"):
             return False
