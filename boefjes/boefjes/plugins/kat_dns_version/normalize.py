@@ -43,7 +43,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
             name = "PowerDNS"
             version_number = version.replace("PowerDNS Authoritative Server ", "").split(" ")[0]
 
-        if name and versionnumber:
+        if name and version_number:
             software = Software(name=name, version=version_number)
             software_instance = SoftwareInstance(ooi=input_ooi_reference, software=software.reference)
             yield from [software, software_instance]
