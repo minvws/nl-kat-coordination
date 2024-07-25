@@ -81,6 +81,7 @@ bench:  ## Run the report benchmark.
 	$(ci-docker-compose) build
 	$(ci-docker-compose) down --remove-orphans
 	$(ci-docker-compose) run --rm migration_bench
+	$(ci-docker-compose) stop
 
 debian12:
 	docker run --rm \

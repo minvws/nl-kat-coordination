@@ -46,7 +46,7 @@ def test_migration(octopoes_api_connector: OctopoesAPIConnector, bytes_client: B
 
         bytes_client.save_normalizer_meta(normalizer_meta)
 
-    total_processed, total_failed = upgrade()
+    total_processed, total_failed = upgrade(valid_time)
 
     assert total_processed == 0
     assert total_failed == 0

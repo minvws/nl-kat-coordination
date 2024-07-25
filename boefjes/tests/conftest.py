@@ -224,7 +224,7 @@ def seed_system(
         Observation(
             method="",
             source_method="test",
-            source=network.reference,
+            source=hostnames[0].reference,
             task_id=uuid.uuid4(),
             valid_time=valid_time,
             result=oois,

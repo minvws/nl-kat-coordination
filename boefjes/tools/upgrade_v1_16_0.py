@@ -30,14 +30,16 @@ with settings.log_cfg.open() as f:
 logger = logging.getLogger(__name__)
 
 
-def upgrade() -> tuple[int, int]:
+def upgrade(valid_time: datetime | None = None) -> tuple[int, int]:
     """
     Perform the migration for all organisations in the database. The happy flow in this script is idempotent,
     meaning that it can be rerun until there are no, or only expected, exceptions.
     """
 
     organisations = create_organisation_storage(sessionmaker(bind=get_engine())()).get_all()
-    valid_time = datetime.now(timezone.utc)
+
+    if valid_time is None:
+        valid_time = datetime.now(timezone.utc)
 
     bytes_client = get_bytes_client()
     bytes_client.login()
@@ -59,6 +61,7 @@ def upgrade() -> tuple[int, int]:
     logger.info("Finished migration [total_processed=%s, total_failed=%s]", total_processed, total_failed)
 
     return total_processed, total_failed
+
 
 def migrate_org(bytes_client, connector, organisation_id, valid_time) -> tuple[int, int]:
     """

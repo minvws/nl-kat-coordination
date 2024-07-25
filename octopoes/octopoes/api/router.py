@@ -512,7 +512,12 @@ def delete_node(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> None:
 
 @router.post("/bits/recalculate", tags=["Bits"])
 def recalculate_bits(octopoes: OctopoesService = Depends(octopoes_service)) -> int:
-    inference_count = octopoes.recalculate_bits()
+    try:
+        inference_count = octopoes.recalculate_bits()
+    except ObjectNotFoundException:
+        logger.exception("Failed to recalculate bits")
+        raise
+
     octopoes.commit()
 
     return inference_count
