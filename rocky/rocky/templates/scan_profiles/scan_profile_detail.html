@@ -12,7 +12,7 @@
                 {% include "partials/ooi_head.html" with ooi=ooi view="scan_profile_detail" %}
 
                 <h2 rf-selector="clearance-header">{% translate "Current clearance level" %}</h2>
-                <p>{{ ooi.scan_profile.human_readable }}, {{ ooi.scan_profile.scan_profile_type }}</p>
+                <p>{{ ooi.scan_profile.human_readable }}, {{ ooi.scan_profile.scan_profile_type }} (by user "{{ username }}")</p>
                 {% if ooi.scan_profile.scan_profile_type == "declared" %}
                     <p class="explanation">
                         <span>{% translate "Declared:" %}</span>{% blocktranslate with scan_level=ooi.scan_profile.human_readable %}

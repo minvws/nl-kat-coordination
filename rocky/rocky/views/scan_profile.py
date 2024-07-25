@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
@@ -19,6 +20,7 @@ class ScanProfileDetailView(FormView, OOIDetailView):
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["mandatory_fields"] = get_mandatory_fields(self.request)
+        context["username"] = get_user_model().objects.get(id=self.ooi.scan_profile.user)
         return context
 
     def get_initial(self):
