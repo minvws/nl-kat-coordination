@@ -5,7 +5,6 @@ import json
 import uuid
 from enum import Enum
 from functools import cached_property
-from logging import getLogger
 from typing import Any
 
 import httpx
@@ -15,8 +14,6 @@ from httpx import ConnectError, HTTPError, HTTPStatusError, RequestError, codes
 from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny, ValidationError
 
 from rocky.health import ServiceHealth
-
-logger = getLogger(__name__)
 
 
 class Boefje(BaseModel):
