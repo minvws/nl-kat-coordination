@@ -13,8 +13,8 @@
   --footer-gap: 2rem;
 
   /* Visual styling */
-  --footer-background-color: #ffffff;
-  --footer-text-color: #6a6a6a;
+  --footer-background-color: var(--colors-white);
+  --footer-text-color: var(--colors-grey-600);
 
   /* Links */
   --footer-link-text-color: var(--link-text-color);

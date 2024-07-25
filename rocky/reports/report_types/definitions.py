@@ -1,6 +1,5 @@
 from collections.abc import Callable, Iterable
 from datetime import datetime
-from logging import getLogger
 from pathlib import Path
 from typing import Any, TypedDict, TypeVar
 
@@ -11,7 +10,6 @@ from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from octopoes.models.types import OOIType
 
 REPORTS_DIR = Path(__file__).parent
-logger = getLogger(__name__)
 
 
 class ReportPlugins(TypedDict):

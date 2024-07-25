@@ -1,5 +1,3 @@
-from logging import getLogger
-
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
@@ -8,8 +6,6 @@ from django.utils.translation import gettext_lazy as _
 from httpx import HTTPError
 
 from katalogus.views.mixins import SinglePluginView
-
-logger = getLogger(__name__)
 
 
 class PluginEnableDisableView(SinglePluginView):
