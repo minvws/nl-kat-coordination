@@ -12,7 +12,7 @@
                 {% include "partials/ooi_head.html" with ooi=ooi view="scan_profile_detail" %}
 
                 <h2 rf-selector="clearance-header">{% translate "Current clearance level" %}</h2>
-                {% if username %}
+                {% if scan_profile_user %}
                     <p>
                         {{ ooi.scan_profile.human_readable }}, {{ ooi.scan_profile.scan_profile_type }} (by user "
                         {% if not scan_profile_user.is_active %}
