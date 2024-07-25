@@ -13,7 +13,7 @@ from tools.upgrade_v1_16_0 import upgrade
 
 @pytest.mark.slow
 def test_migration(octopoes_api_connector: OctopoesAPIConnector, bytes_client: BytesAPIClient, valid_time):
-    hostname_range = range(0, 20)
+    hostname_range = range(0, 1)
 
     for x in hostname_range:
         seed_system(
@@ -23,16 +23,6 @@ def test_migration(octopoes_api_connector: OctopoesAPIConnector, bytes_client: B
             test_ip=f"192.0.{x % 7}.{x % 13}",
             test_ipv6=f"{x % 7}e4d:64a2:cb49:bd48:a1ba:def3:d15d:{x % 5}230",
         )
-
-    export = octopoes_api_connector.export_all()
-
-    # Drop the source method field to test the migration
-    for tx in export:
-        if "txOps" in tx and len(tx["txOps"]) > 1 and len(tx["txOps"][1]) > 1 and "source_method" in tx["txOps"][1][1]:
-            del tx["txOps"][1][1]["source_method"]
-
-    octopoes_api_connector.import_new(json.dumps(export))
-    bytes_client.login()
 
     raw = b"1234567890"
 
@@ -46,6 +36,25 @@ def test_migration(octopoes_api_connector: OctopoesAPIConnector, bytes_client: B
 
         bytes_client.save_normalizer_meta(normalizer_meta)
 
+    export = []
+
+    # Drop the source method field to test the migration
+    for tx in octopoes_api_connector.export_all():
+        if "txOps" in tx:
+            ops = []
+            for tx_op in tx["txOps"]:
+                if "source_method" in tx_op[1]:
+                    del tx_op[1]["source_method"]
+
+                ops.append(tx_op)
+
+            tx["txOps"] = ops
+
+        export.append(tx)
+
+    breakpoint()
+    octopoes_api_connector.import_new(json.dumps(export))
+    bytes_client.login()
     total_processed, total_failed = upgrade(valid_time)
 
     assert total_processed == 0

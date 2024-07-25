@@ -1,6 +1,7 @@
 import multiprocessing
 import uuid
 from ipaddress import ip_address
+from typing import Iterator
 
 import time
 from datetime import datetime, timezone
@@ -17,6 +18,7 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPPort, IPAddressV6, Network
 from octopoes.models.ooi.service import IPService, Service
 from pydantic import TypeAdapter
+from sqlalchemy.orm import sessionmaker
 
 from boefjes.app import SchedulerWorkerManager
 from boefjes.clients.bytes_client import BytesAPIClient
@@ -24,7 +26,10 @@ from boefjes.clients.scheduler_client import Queue, QueuePrioritizedItem, Schedu
 from boefjes.config import Settings, settings
 from boefjes.job_handler import bytes_api_client
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
+from boefjes.models import Organisation
 from boefjes.runtime_interfaces import Handler, WorkerManager
+from boefjes.sql.db import get_engine, SQL_BASE
+from boefjes.sql.organisation_storage import SQLOrganisationStorage
 from tests.loading import get_dummy_data
 
 
@@ -145,10 +150,30 @@ def api(tmp_path):
 
 
 @pytest.fixture
-def octopoes_api_connector(request) -> OctopoesAPIConnector:
-    test_node = f"test-{request.node.originalname}"
+def organisation_repository():
+    engine = get_engine()
+    session = sessionmaker(bind=engine)()
 
-    connector = OctopoesAPIConnector(str(settings.octopoes_api), test_node)
+    yield SQLOrganisationStorage(session, settings)
+
+    sessionmaker(bind=engine, autocommit=True)().execute(
+        ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables])
+    )
+
+
+@pytest.fixture
+def organisation(organisation_repository) -> Organisation:
+    organisation = Organisation(id="test", name="Test org")
+
+    with organisation_repository as repo:
+        repo.create(organisation)
+
+    return organisation
+
+
+@pytest.fixture
+def octopoes_api_connector(organisation) -> OctopoesAPIConnector:
+    connector = OctopoesAPIConnector(str(settings.octopoes_api), organisation.id)
     connector.create_node()
     yield connector
     connector.delete_node()
@@ -212,18 +237,8 @@ def seed_system(
 
     octopoes_api_connector.save_observation(
         Observation(
-            method="",
-            source_method="test",
-            source=network.reference,
-            task_id=uuid.uuid4(),
-            valid_time=valid_time,
-            result=oois,
-        )
-    )
-    octopoes_api_connector.save_observation(
-        Observation(
-            method="",
-            source_method="test",
+            method="test-normalizer",
+            source_method="test-boefje",
             source=hostnames[0].reference,
             task_id=uuid.uuid4(),
             valid_time=valid_time,

@@ -73,8 +73,10 @@ def migrate_org(bytes_client, connector, organisation_id, valid_time) -> tuple[i
     processed = 0
 
     offset = 0
+    page_size = 200
+
     while True:
-        origins = connector.list_origins(valid_time, offset=offset, limit=200)
+        origins = connector.list_origins(valid_time, offset=offset, limit=page_size)
         logger.info("Processing %s origins", len(origins))
 
         for origin in origins:
@@ -118,7 +120,7 @@ def migrate_org(bytes_client, connector, organisation_id, valid_time) -> tuple[i
             logger.info("Processed all origins [organization_id=%s]", organisation_id)
             break
 
-        offset += 1
+        offset += page_size
 
     return failed, processed
 
