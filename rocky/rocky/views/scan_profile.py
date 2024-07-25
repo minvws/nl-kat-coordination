@@ -26,7 +26,7 @@ class ScanProfileDetailView(FormView, OOIDetailView):
                 context["username"] = str(kat_user)
             else:
                 name = str(kat_user)
-                context["username"] = ''.join([c + '\u0336' if i < len(name) - 1 else c for i, c in enumerate(name)])
+                context["username"] = "".join([c + "\u0336" if i < len(name) - 1 else c for i, c in enumerate(name)])
         except get_user_model().DoesNotExist:
             context["username"] = ""
         return context
