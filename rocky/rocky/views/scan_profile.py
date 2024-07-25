@@ -20,7 +20,15 @@ class ScanProfileDetailView(FormView, OOIDetailView):
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["mandatory_fields"] = get_mandatory_fields(self.request)
-        context["username"] = get_user_model().objects.get(id=self.ooi.scan_profile.user)
+        try:
+            kat_user = get_user_model().objects.get(id=self.ooi.scan_profile.user)
+            if kat_user.is_active:
+                context["username"] = str(kat_user)
+            else:
+                name = str(kat_user)
+                context["username"] = ''.join([c + '\u0336' if i < len(name) - 1 else c for i, c in enumerate(name)])
+        except get_user_model().DoesNotExist:
+            context["username"] = "unknown"
         return context
 
     def get_initial(self):
