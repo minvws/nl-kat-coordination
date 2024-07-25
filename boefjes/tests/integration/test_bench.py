@@ -52,7 +52,6 @@ def test_migration(octopoes_api_connector: OctopoesAPIConnector, bytes_client: B
 
         export.append(tx)
 
-    breakpoint()
     octopoes_api_connector.import_new(json.dumps(export))
     bytes_client.login()
     total_processed, total_failed = upgrade(valid_time)
