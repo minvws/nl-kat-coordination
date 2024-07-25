@@ -7,7 +7,7 @@ from octopoes.models.ooi.findings import CVEFindingType, Finding
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from packaging.version import Version
 
-cves = {
+CVES = {
     "bind": {
         "CVE-2024-0760": "A flood of DNS messages over TCP may make the server unstable https://kb.isc.org/docs/cve-2024-0760",
         "CVE-2024-1737": "BIND's database will be slow if a very large number of RRs exist at the same name https://kb.isc.org/docs/cve-2024-1737",
