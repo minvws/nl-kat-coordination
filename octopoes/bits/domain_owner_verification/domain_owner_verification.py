@@ -28,5 +28,5 @@ def run(nameserver: DNSNSRecord, additional_oois: list[Hostname], config: dict[s
             yield Finding(
                 finding_type=finding_type.reference,
                 ooi=hostname.reference,
-                description="This domain requires Ownership verification and is currently pending.",
+                description="This domain requires ownership verification and is currently pending.",
             )
