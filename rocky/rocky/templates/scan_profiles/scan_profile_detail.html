@@ -13,7 +13,15 @@
 
                 <h2 rf-selector="clearance-header">{% translate "Current clearance level" %}</h2>
                 {% if username %}
-                    <p>{{ ooi.scan_profile.human_readable }}, {{ ooi.scan_profile.scan_profile_type }} (by user "{% if not scan_profile_user.is_active %}<s title="{% translate "Inactive" %}">{{ scan_profile_user }}</s>{% else %} {{ scan_profile_user }}{% endif %}")</p>
+                    <p>
+                        {{ ooi.scan_profile.human_readable }}, {{ ooi.scan_profile.scan_profile_type }} (by user "
+                        {% if not scan_profile_user.is_active %}
+                            <s title="{% translate "Inactive" %}">{{ scan_profile_user }}</s>
+                        {% else %}
+                            {{ scan_profile_user }}
+                        {% endif %}
+                        ")
+                    </p>
                 {% else %}
                     <p>{{ ooi.scan_profile.human_readable }}, {{ ooi.scan_profile.scan_profile_type }}</p>
                 {% endif %}
