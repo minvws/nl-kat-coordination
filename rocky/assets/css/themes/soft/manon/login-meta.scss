@@ -1,6 +1,6 @@
 /* Login meta - Variables */
 
 :root {
-  --login-meta-background-color: #eaeaea;
-  --login-meta-color: #000000;
+  --login-meta-background-color: var(--colors-grey-100);
+  --login-meta-color: var(--colors-black);
 }
