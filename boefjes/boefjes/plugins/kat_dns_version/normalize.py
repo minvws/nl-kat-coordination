@@ -25,7 +25,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     results = json.loads(raw)
     for version in results:
         name = None
-        versionnumber = None
+        version_number = None
 
         if version.startswith("bind"):
             name = "bind"
