@@ -22,7 +22,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, str | bytes]]:
     port = ip_port["port"]
     protocol = ip_port["protocol"]
 
-    timeout = getenv("TIMEOUT", 30)
+    timeout = float(getenv("TIMEOUT", 30))
 
     method = dns.query.tcp
     if protocol == "udp":
