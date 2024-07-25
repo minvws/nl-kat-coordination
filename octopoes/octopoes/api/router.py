@@ -298,6 +298,7 @@ def list_origins(
     limit: int | None = None,
     source: Reference | None = Query(None),
     result: Reference | None = Query(None),
+    method: str | list[str] | None = Query(None),
     task_id: uuid.UUID | None = Query(None),
     origin_type: OriginType | None = Query(None),
 ) -> list[Origin]:
@@ -308,6 +309,7 @@ def list_origins(
         limit=limit,
         source=source,
         result=result,
+        method=method,
         origin_type=origin_type,
     )
 

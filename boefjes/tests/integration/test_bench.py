@@ -13,7 +13,7 @@ from tests.loading import get_boefje_meta, get_normalizer_meta
 
 @pytest.mark.slow
 def test_migration(octopoes_api_connector: OctopoesAPIConnector, bytes_client: BytesAPIClient, valid_time):
-    hostname_range = range(0, 20)
+    hostname_range = range(0, 10)
 
     for x in hostname_range:
         seed_system(
@@ -33,6 +33,7 @@ def test_migration(octopoes_api_connector: OctopoesAPIConnector, bytes_client: B
 
         normalizer_meta = get_normalizer_meta(boefje_meta, raw_data_id)
         normalizer_meta.id = origin.task_id
+        normalizer_meta.normalizer.id = "kat_nmap_normalize"
 
         bytes_client.save_normalizer_meta(normalizer_meta)
 

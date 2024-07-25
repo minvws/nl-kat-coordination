@@ -14,12 +14,17 @@ from sqlalchemy.orm import sessionmaker
 
 from boefjes.api import get_bytes_client
 from boefjes.config import settings
+from boefjes.dependencies.plugins import get_plugin_service, PluginService
 from boefjes.job_handler import get_octopoes_api_connector
+from boefjes.local_repository import get_local_repository
+from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.db import get_engine
 from boefjes.sql.organisation_storage import create_organisation_storage
 from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.origin import Origin, OriginType
+
+from boefjes.sql.plugin_storage import create_plugin_storage
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -75,12 +80,36 @@ def migrate_org(bytes_client, connector, organisation_id, valid_time) -> tuple[i
     offset = 0
     page_size = 200
 
+    session = sessionmaker(bind=get_engine())()
+
+    all_plugins = PluginService(
+        create_plugin_storage(session),
+        create_config_storage(session),
+        get_local_repository(),
+    )._get_all_without_enabled()
+
+    normalizers = {}
+
+    for normalizer in [x for x in all_plugins.values() if x.type == "normalizer"]:
+        boefjes = []
+
+        for plugin in all_plugins.values():
+            if plugin.type == "boefje" and f"boefje/{plugin.id}" in normalizer.consumes:
+                boefjes.append(plugin)
+
+        normalizers[normalizer.id] = boefjes
+
     while True:
-        origins = connector.list_origins(valid_time, offset=offset, limit=page_size)
+        origins = connector.list_origins(valid_time, method=normalizers.keys(), offset=offset, limit=page_size)
         logger.info("Processing %s origins", len(origins))
 
         for origin in origins:
             if origin.source_method is not None or origin.origin_type == OriginType.INFERENCE:
+                continue
+
+            if origin.method in normalizers and len(normalizers[origin.method]) == 1:
+                origin.source_method = normalizers[origin.method][0].id
+                update_origin(connector, origin, valid_time)
                 continue
 
             try:
@@ -121,7 +150,8 @@ def migrate_org(bytes_client, connector, organisation_id, valid_time) -> tuple[i
             break
 
         offset += page_size
-
+        
+    session.close()
     return failed, processed
 
 
