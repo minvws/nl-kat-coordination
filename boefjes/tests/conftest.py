@@ -1,22 +1,14 @@
 import multiprocessing
-import uuid
-from ipaddress import ip_address
-from typing import Iterator
-
 import time
+import uuid
 from datetime import datetime, timezone
+from ipaddress import ip_address
 from multiprocessing import Manager
 from pathlib import Path
 from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
-from octopoes.api.models import Observation, Declaration
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI
-from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import IPAddressV4, IPPort, IPAddressV6, Network
-from octopoes.models.ooi.service import IPService, Service
 from pydantic import TypeAdapter
 from sqlalchemy.orm import sessionmaker
 
@@ -28,8 +20,14 @@ from boefjes.job_handler import bytes_api_client
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.models import Organisation
 from boefjes.runtime_interfaces import Handler, WorkerManager
-from boefjes.sql.db import get_engine, SQL_BASE
+from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
+from octopoes.api.models import Declaration, Observation
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import OOI
+from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network
+from octopoes.models.ooi.service import IPService, Service
 from tests.loading import get_dummy_data
 
 
@@ -227,18 +225,12 @@ def seed_system(
         IPService(ip_port=ports[3].reference, service=services[2].reference),
     ]
 
-    oois = (
-        hostnames
-        + addresses
-        + ports
-        + services
-        + ip_services
-    )
+    oois = hostnames + addresses + ports + services + ip_services
 
     octopoes_api_connector.save_observation(
         Observation(
-            method="test-normalizer",
-            source_method="test-boefje",
+            method="kat_test.main",
+            source_method=None,
             source=hostnames[0].reference,
             task_id=uuid.uuid4(),
             valid_time=valid_time,

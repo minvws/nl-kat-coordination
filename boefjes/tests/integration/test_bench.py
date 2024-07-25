@@ -2,18 +2,18 @@ import json
 import uuid
 
 import pytest
+from tools.upgrade_v1_16_0 import upgrade
+
+from boefjes.clients.bytes_client import BytesAPIClient
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.origin import OriginType
 from tests.conftest import seed_system
-
-from boefjes.clients.bytes_client import BytesAPIClient
-from tests.loading import get_dummy_data, get_boefje_meta, get_raw_data_meta, get_normalizer_meta
-from tools.upgrade_v1_16_0 import upgrade
+from tests.loading import get_boefje_meta, get_normalizer_meta
 
 
 @pytest.mark.slow
 def test_migration(octopoes_api_connector: OctopoesAPIConnector, bytes_client: BytesAPIClient, valid_time):
-    hostname_range = range(0, 1)
+    hostname_range = range(0, 20)
 
     for x in hostname_range:
         seed_system(
@@ -27,7 +27,7 @@ def test_migration(octopoes_api_connector: OctopoesAPIConnector, bytes_client: B
     raw = b"1234567890"
 
     for origin in octopoes_api_connector.list_origins(valid_time, origin_type=OriginType.OBSERVATION):
-        boefje_meta = get_boefje_meta(uuid.uuid4())
+        boefje_meta = get_boefje_meta(uuid.uuid4(), boefje_id="bench_boefje")
         bytes_client.save_boefje_meta(boefje_meta)
         raw_data_id = bytes_client.save_raw(boefje_meta.id, raw)
 
@@ -56,5 +56,10 @@ def test_migration(octopoes_api_connector: OctopoesAPIConnector, bytes_client: B
     bytes_client.login()
     total_processed, total_failed = upgrade(valid_time)
 
-    assert total_processed == 0
+    assert total_processed == len(hostname_range)
     assert total_failed == 0
+
+    observation = octopoes_api_connector.list_origins(valid_time, origin_type=OriginType.OBSERVATION)[0]
+
+    assert observation.method == normalizer_meta.normalizer.id
+    assert observation.source_method == boefje_meta.boefje.id
