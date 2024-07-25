@@ -100,7 +100,7 @@ span {
   &.label {
     display: inline-flex;
     max-width: 18.75rem;
-    border: 1px solid #ffffff;
+    border: 1px solid var(--colors-white);
     border-radius: var(--spacing-grid-050);
     padding: var(--spacing-grid-050) var(--spacing-grid-100);
     font-size: var(--tile-font-size);
@@ -109,8 +109,8 @@ span {
       var(--spacing-grid-050) 0;
 
     &.tags-color-grey-2 {
-      color: var(--colors-grey-10);
-      background-color: var(--colors-grey-2);
+      color: var(--colors-grey-800);
+      background-color: var(--colors-grey-100);
     }
   }
 }
