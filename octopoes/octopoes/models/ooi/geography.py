@@ -1,5 +1,5 @@
 from typing import Literal
-
+from pydantic import confloat
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
 
