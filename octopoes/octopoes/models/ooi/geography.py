@@ -9,8 +9,8 @@ class GeographicPoint(OOI):
 
     ooi: Reference = ReferenceField(OOI)
 
-    longitude: float
-    latitude: float
+    longitude: confloat(ge=-180.0, le=180.0)
+    latitude: confloat(ge=-90.0, le=90.0)
 
     @property
     def natural_key(self) -> str:
