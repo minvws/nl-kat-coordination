@@ -139,9 +139,7 @@ class BoefjeTask(BaseModel):
 
     dispatches: list[Normalizer] = Field(default_factory=list)
 
-    network_scope: str = (
-        "internet"  # TODO SOUF: maybe make a network scope for the openkat instance where the normalizers get run on
-    )
+    network_scope: str = "internet"
 
     @property
     def hash(self) -> str:

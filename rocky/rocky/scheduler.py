@@ -69,6 +69,7 @@ class NormalizerTask(BaseModel):
     normalizer: Normalizer
     raw_data: RawData
     type: str = "normalizer"
+    network_scope: str = "internet"
 
 
 class BoefjeTask(BaseModel):
@@ -79,6 +80,7 @@ class BoefjeTask(BaseModel):
     input_ooi: str | None = None
     organization: str
     type: str = "boefje"
+    network_scope: str = "internet"
 
 
 class PrioritizedItem(BaseModel):
