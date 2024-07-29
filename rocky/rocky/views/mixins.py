@@ -7,6 +7,7 @@ from operator import attrgetter
 import structlog
 from account.mixins import OrganizationView
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.http import Http404, HttpRequest
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -480,6 +481,13 @@ class SingleOOIMixin(OctopoesView):
 
         props.pop("scan_profile")
         props.pop("primary_key")
+        if props["user"]:
+            user = get_user_model().objects.get(id=props["user"])
+            if user.is_active:
+                props["user"] = str(user)
+            else:
+                name = str(user)
+                props["user"] = ''.join([c + '\u0336' if i < len(name) - 1 else c for i, c in enumerate(name)])
 
         return props
 

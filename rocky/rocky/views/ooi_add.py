@@ -70,10 +70,17 @@ class OOIAddView(BaseOOIFormView):
         except KeyError:
             raise Http404("OOI not found")
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["uid"] = self.request.user.id
+
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         context["type"] = self.ooi_class.get_ooi_type()
+        context["user"] = str(self.request.user)
         context["breadcrumbs"] = [
             {
                 "url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}),

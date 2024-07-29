@@ -20,9 +20,12 @@
                             <label for="ooi_type">Type</label>
                             <input id="ooi_type" type="text" name="ooi_type" value="{{ type }}" readonly>
                         </div>
+                        <div>
+                            <label for="user">User</label>
+                            <input id="user" type="text" name="user" value="{{ user }}" readonly>
+                        </div>
                         {% for field in form %}
                             {% include "partials/form/field_input_wrapper.html" %}
-
                         {% endfor %}
                     </fieldset>
                     <button type="submit">{% blocktranslate %}Add {{ display_type }}{% endblocktranslate %}</button>
