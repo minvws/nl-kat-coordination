@@ -96,6 +96,7 @@ repos:
           ^boefjes/tools |
           ^keiko/templates |
           ^mula/whitelist\.py$ |
+          ^mula/scripts/ |
           ^octopoes/tools |
           ^rocky/whitelist\.py$ |
           /tests/ |
@@ -108,7 +109,7 @@ repos:
     hooks:
       - id: codespell
         additional_dependencies: ["tomli"]
-        args: [-L, lama]
+        args: [-L, llama]
         exclude: |
           (?x)(
           \.po$ |
