@@ -3,9 +3,9 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import config, connectors, models, schedulers, storage
 from structlog.testing import capture_logs
 
+from scheduler import config, connectors, models, schedulers, storage
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -53,6 +53,7 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
 
         # Database
         self.dbconn = storage.DBConn(str(self.mock_ctx.config.db_uri))
+        self.dbconn.connect()
         models.Base.metadata.drop_all(self.dbconn.engine)
         models.Base.metadata.create_all(self.dbconn.engine)
 
@@ -60,7 +61,9 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
             **{
                 storage.ScheduleStore.name: storage.ScheduleStore(self.dbconn),
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(
+                    self.dbconn
+                ),
             }
         )
 
@@ -94,7 +97,9 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             "scheduler.context.AppContext.services.katalogus.get_plugin_by_id_and_org_id",
         ).start()
 
-        self.mock_get_object = mock.patch("scheduler.context.AppContext.services.octopoes.get_object").start()
+        self.mock_get_object = mock.patch(
+            "scheduler.context.AppContext.services.octopoes.get_object"
+        ).start()
 
     def tearDown(self):
         mock.patch.stopall()
@@ -268,7 +273,9 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         # Mock
-        self.mock_get_latest_task_by_hash.side_effect = Exception("Something went wrong")
+        self.mock_get_latest_task_by_hash.side_effect = Exception(
+            "Something went wrong"
+        )
         self.mock_get_last_run_boefje.return_value = None
 
         # Act
@@ -396,7 +403,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=boefje_task.hash,
             data=boefje_task.model_dump(),
             created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc) - timedelta(seconds=self.mock_ctx.config.pq_grace_period),
+            modified_at=datetime.now(timezone.utc)
+            - timedelta(seconds=self.mock_ctx.config.pq_grace_period),
         )
 
         # Mock
@@ -461,7 +469,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=boefje_task.hash,
             data=boefje_task.model_dump(),
             created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc) - timedelta(seconds=self.mock_ctx.config.pq_grace_period),
+            modified_at=datetime.now(timezone.utc)
+            - timedelta(seconds=self.mock_ctx.config.pq_grace_period),
         )
 
         # Mock
@@ -490,7 +499,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=boefje_task.hash,
             data=boefje_task.model_dump(),
             created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc) - timedelta(seconds=self.mock_ctx.config.pq_grace_period),
+            modified_at=datetime.now(timezone.utc)
+            - timedelta(seconds=self.mock_ctx.config.pq_grace_period),
         )
 
         # Mock
@@ -554,13 +564,15 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=boefje_task.hash,
             data=boefje_task.model_dump(),
             created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc) - timedelta(seconds=self.mock_ctx.config.pq_grace_period),
+            modified_at=datetime.now(timezone.utc)
+            - timedelta(seconds=self.mock_ctx.config.pq_grace_period),
         )
 
         last_run_boefje = BoefjeMetaFactory(
             boefje=boefje,
             input_ooi=ooi.primary_key,
-            ended_at=datetime.now(timezone.utc) - timedelta(seconds=self.mock_ctx.config.pq_grace_period),
+            ended_at=datetime.now(timezone.utc)
+            - timedelta(seconds=self.mock_ctx.config.pq_grace_period),
         )
 
         # Mock
@@ -592,7 +604,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=boefje_task.hash,
             data=boefje_task.model_dump(),
             created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc) - timedelta(seconds=self.mock_ctx.config.pq_grace_period),
+            modified_at=datetime.now(timezone.utc)
+            - timedelta(seconds=self.mock_ctx.config.pq_grace_period),
         )
 
         last_run_boefje = BoefjeMetaFactory(
@@ -655,7 +668,9 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
 
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_boefje_task_started_running")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_boefje_permission_to_run")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.has_boefje_task_grace_period_passed")
+    @mock.patch(
+        "scheduler.schedulers.BoefjeScheduler.has_boefje_task_grace_period_passed"
+    )
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_item_on_queue_by_hash")
     @mock.patch("scheduler.context.AppContext.datastores.task_store.get_tasks_by_hash")
     def test_push_task_queue_full(
@@ -697,13 +712,17 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         with capture_logs() as cm:
             self.scheduler.push_boefje_task(boefje_task)
 
-        self.assertIn("Could not add task to queue, queue was full", cm[-1].get("event"))
+        self.assertIn(
+            "Could not add task to queue, queue was full", cm[-1].get("event")
+        )
         self.assertEqual(1, self.scheduler.queue.qsize())
 
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_boefje_task_stalled")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_boefje_task_started_running")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_boefje_permission_to_run")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.has_boefje_task_grace_period_passed")
+    @mock.patch(
+        "scheduler.schedulers.BoefjeScheduler.has_boefje_task_grace_period_passed"
+    )
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_item_on_queue_by_hash")
     @mock.patch("scheduler.context.AppContext.datastores.task_store.get_tasks_by_hash")
     def test_push_task_stalled(
@@ -931,7 +950,9 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         # All tasks on queue should be set to CANCELLED
-        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(self.scheduler.scheduler_id)
+        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(
+            self.scheduler.scheduler_id
+        )
         for task in tasks:
             self.assertEqual(task.status, models.TaskStatus.CANCELLED)
 
@@ -1093,7 +1114,9 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
     def test_push_tasks_for_scan_profile_mutations_value_empty(self):
         """When the value of a mutation is empty it should not push any tasks"""
         # Arrange
-        mutation = models.ScanProfileMutation(operation="create", primary_key="123", value=None).model_dump_json()
+        mutation = models.ScanProfileMutation(
+            operation="create", primary_key="123", value=None
+        ).model_dump_json()
 
         # Act
         self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
@@ -1323,8 +1346,12 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_objects_by_object_types.side_effect = [
-            connectors.errors.ExternalServiceError("External service is not available."),
-            connectors.errors.ExternalServiceError("External service is not available."),
+            connectors.errors.ExternalServiceError(
+                "External service is not available."
+            ),
+            connectors.errors.ExternalServiceError(
+                "External service is not available."
+            ),
         ]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
@@ -1404,8 +1431,12 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_objects_by_object_types.side_effect = [
-            connectors.errors.ExternalServiceError("External service is not available."),
-            connectors.errors.ExternalServiceError("External service is not available."),
+            connectors.errors.ExternalServiceError(
+                "External service is not available."
+            ),
+            connectors.errors.ExternalServiceError(
+                "External service is not available."
+            ),
         ]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
@@ -1640,7 +1671,9 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         # Assert: schedule should be disabled
-        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule(schedule.id)
+        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule(
+            schedule.id
+        )
         self.assertFalse(schedule_db_disabled.enabled)
 
     def test_push_tasks_for_rescheduling_boefje_not_found(self):
@@ -1676,7 +1709,9 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         # Assert: schedule should be disabled
-        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule(schedule.id)
+        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule(
+            schedule.id
+        )
         self.assertFalse(schedule_db_disabled.enabled)
 
     def test_push_tasks_for_rescheduling_boefje_disabled(self):
@@ -1712,7 +1747,9 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         # Assert: schedule should be disabled
-        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule(schedule.id)
+        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule(
+            schedule.id
+        )
         self.assertFalse(schedule_db_disabled.enabled)
 
     def test_push_tasks_for_rescheduling_boefje_doesnt_consume_ooi(self):
@@ -1748,7 +1785,9 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         # Assert: schedule should be disabled
-        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule(schedule.id)
+        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule(
+            schedule.id
+        )
         self.assertFalse(schedule_db_disabled.enabled)
 
     def test_push_tasks_for_rescheduling_boefje_cannot_scan_ooi(self):
@@ -1784,5 +1823,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         # Assert: schedule should be disabled
-        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule(schedule.id)
+        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule(
+            schedule.id
+        )
         self.assertFalse(schedule_db_disabled.enabled)

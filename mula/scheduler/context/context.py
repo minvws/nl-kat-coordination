@@ -113,6 +113,8 @@ class AppContext:
                 cache_logger_on_first_use=True,
             )
 
+        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
+
         # Services
         katalogus_service = services.Katalogus(
             host=remove_trailing_slash(str(self.config.host_katalogus)),
@@ -149,6 +151,17 @@ class AppContext:
             }
         )
 
+        # Database connection
+        try:
+            dbconn = storage.DBConn(str(self.config.db_uri))
+            dbconn.connect()
+        except storage.errors.StorageError as e:
+            self.logger.error("Failed to connect to database", exc_info=e)
+            raise
+        except Exception as e:
+            self.logger.error("Failed to connect to database", exc_info=e)
+            raise
+
         # Datastores, SimpleNamespace allows us to use dot notation
         dbconn = storage.DBConn(
             dsn=str(self.config.db_uri),
@@ -175,7 +188,9 @@ class AppContext:
                 "pq_grace_period": str(self.config.pq_grace_period),
                 "pq_max_random_objects": str(self.config.pq_max_random_objects),
                 "katalogus_cache_ttl": str(self.config.katalogus_cache_ttl),
-                "monitor_organisations_interval": str(self.config.monitor_organisations_interval),
+                "monitor_organisations_interval": str(
+                    self.config.monitor_organisations_interval
+                ),
             }
         )
 

@@ -4,7 +4,6 @@ from types import SimpleNamespace
 from unittest import mock
 
 from scheduler import config, models, storage
-
 from tests.factories import OrganisationFactory
 from tests.utils import functions
 
@@ -17,12 +16,15 @@ class PriorityQueueStoreTestCase(unittest.TestCase):
 
         # Database
         self.dbconn = storage.DBConn(str(self.mock_ctx.config.db_uri))
+        self.dbconn.connect()
         models.Base.metadata.drop_all(self.dbconn.engine)
         models.Base.metadata.create_all(self.dbconn.engine)
 
         self.mock_ctx.datastores = SimpleNamespace(
             **{
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(
+                    self.dbconn
+                ),
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
             }
         )
@@ -40,7 +42,9 @@ class PriorityQueueStoreTestCase(unittest.TestCase):
         item.status = models.TaskStatus.QUEUED
         created_item = self.mock_ctx.datastores.pq_store.push(item)
 
-        item_db = self.mock_ctx.datastores.pq_store.get(scheduler_id=item.scheduler_id, item_id=item.id)
+        item_db = self.mock_ctx.datastores.pq_store.get(
+            scheduler_id=item.scheduler_id, item_id=item.id
+        )
 
         # Assert
         self.assertIsNotNone(created_item)
@@ -52,7 +56,9 @@ class PriorityQueueStoreTestCase(unittest.TestCase):
         item.status = models.TaskStatus.PENDING
         created_item = self.mock_ctx.datastores.pq_store.push(item)
 
-        item_db = self.mock_ctx.datastores.pq_store.get(scheduler_id=item.scheduler_id, item_id=item.id)
+        item_db = self.mock_ctx.datastores.pq_store.get(
+            scheduler_id=item.scheduler_id, item_id=item.id
+        )
 
         # Assert
         self.assertIsNotNone(created_item)

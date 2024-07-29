@@ -7,7 +7,6 @@ import uuid
 from unittest import mock
 
 from scheduler import config, models, queues, storage
-
 from tests.mocks import queue as mock_queue
 from tests.utils import functions
 
@@ -18,6 +17,7 @@ class PriorityQueueTestCase(unittest.TestCase):
 
         # Database
         self.dbconn = storage.DBConn(str(cfg.db_uri))
+        self.dbconn.connect()
         models.Base.metadata.drop_all(self.dbconn.engine)
         models.Base.metadata.create_all(self.dbconn.engine)
 
