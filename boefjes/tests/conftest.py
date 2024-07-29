@@ -194,6 +194,7 @@ def seed_system(
     test_hostname: str = "example.com",
     test_ip: str = "192.0.2.3",
     test_ipv6: str = "3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
+    method: str = "kat_nmap_normalize",
 ) -> dict[str, list[OOI]]:
     network = Network(name="test")
     octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
@@ -230,7 +231,7 @@ def seed_system(
 
     octopoes_api_connector.save_observation(
         Observation(
-            method="kat_nmap_normalize",
+            method=method,
             source_method=None,
             source=hostnames[0].reference,
             task_id=uuid.uuid4(),
