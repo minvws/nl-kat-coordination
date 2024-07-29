@@ -57,7 +57,6 @@ def AuthRequiredMiddleware(get_response):
         # When 2fa is enabled, check if user is verified, otherwise redirect to 2fa setup page
         if (
             settings.TWOFACTOR_ENABLED
-            and not request.user.is_verified()
             and not (
                 # check if path is not in excluded list
                 request.path in excluded
@@ -65,6 +64,8 @@ def AuthRequiredMiddleware(get_response):
                 # check if path starts with anything in excluded_prefix
                 or any([request.path.startswith(prefix) for prefix in excluded_prefix])
             )
+            # This check should be after excluding /api because API users won't have `is_verified`
+            and not request.user.is_verified()
         ):
             return redirect(two_factor_setup_path)
 

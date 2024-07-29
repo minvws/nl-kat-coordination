@@ -1,6 +1,5 @@
 from collections.abc import Iterable
 from datetime import datetime
-from logging import getLogger
 from typing import Any, TypedDict
 
 from django.utils.translation import gettext_lazy as _
@@ -9,8 +8,6 @@ from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
-
-logger = getLogger(__name__)
 
 
 class RPKIData(TypedDict):
