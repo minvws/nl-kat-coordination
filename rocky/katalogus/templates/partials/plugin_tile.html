@@ -126,8 +126,7 @@
             </section>
         {% endfill %}
         {% fill "footer_buttons" %}
-        <a class="tile-detail-link"
-           href="{% url "boefje_detail" organization_code=organization.code plugin_id=plugin.id %}">
+        <a href="{% url "boefje_detail" organization_code=organization.code plugin_id=plugin.id %}">
             <button type="button" class="ghost">{% translate "Go to boefje detail page" %}</button>
         </a>
     {% endfill %}
