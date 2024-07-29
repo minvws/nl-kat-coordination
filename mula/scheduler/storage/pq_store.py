@@ -4,7 +4,8 @@ from scheduler import models
 
 from .errors import exception_handler
 from .filters import FilterRequest, apply_filter
-from .storage import DBConn, retry
+from .storage import DBConn
+from .utils import retry
 
 
 class PriorityQueueStore:
