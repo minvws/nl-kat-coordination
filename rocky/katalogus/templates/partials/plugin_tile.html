@@ -47,7 +47,7 @@
                 {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
 
                 {% if plugin.type == "boefje" %}
-                    {% component "modal" size="dialog-small" %}
+                    {% component "modal" size="dialog-medium" %}
                     {% fill "trigger" %}
                     <a class="tile-detail-link modal-trigger">{% translate "See details" %}</a>
                 {% endfill %}
@@ -55,20 +55,81 @@
                 {% translate "Boefje details" %}
             {% endfill %}
             {% fill "content" %}
-            <h3>{{ plugin.name }}</h3>
-            <span>
-                {% if plugin.enabled %}
-                    {% translate "enabled" %}
+            <section>
+                <span>
+                    <h3>{{ plugin.name }}</h3>
+                    {% if plugin.enabled %}
+                        {% translate "enabled" %}
+                    {% else %}
+                        {% translate "disabled" %}
+                    {% endif %}
+                </span>
+                <p>{{ plugin.description }}</p>
+            </section>
+            <section class="fifty-fifty">
+                <div>
+                    <h3>{% translate "Scan level" %}</h3>
+                    {% if plugin.type == "boefje" %}
+                        <div class="horizontal-view scan-intensity">
+                            <ul class="level-indicator l{{ plugin.scan_level }}">
+                                {% for i in "1234"|make_list %}<li></li>{% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+                <div>
+                    <h3>{% translate "Matching objects" %}</h3>
+                </div>
+            </section>
+            <section>
+                <h3>{% translate "Report types" %}</h3>
+                <p>{% translate "This boefje is required by the following report types." %}</p>
+                <p>
+                    {% for report_type in plugin_data.plugin_report_types %}
+                        {{ report_type }}
+                        {% if not forloop.last %}-{% endif %}
+                    {% endfor %}
+                </p>
+            </section>
+            <section>
+                {% if plugin.consumes %}
+                    <h3>{% translate "Consumes" %}</h3>
+                    <p>
+                        {% blocktranslate trimmed with plugin_name=plugin.name %}
+                            {{ plugin_name }} is able to scan the following object types:
+                        {% endblocktranslate %}
+                    </p>
+                    <p>
+                        {{ plugin.consumes }}
+                        {% comment %} {% for ooi_type in plugin.consumes %}
+                        {{ ooi_type }}
+                        {% if not forloop.last %}-{% endif %}
+                        {% endfor %} {% endcomment %}
+                    </p>
                 {% else %}
-                    {% translate "disabled" %}
+                    {% blocktranslate trimmed with plugin_name=plugin.name %}
+                        {{ plugin_name }} does not need any input objects.
+                    {% endblocktranslate %}
                 {% endif %}
-            </span>
-            <p>{{ plugin.description }}</p>
-            <p>{{ plugin.scan_level }}</p>
-            {% for report_type in plugin_data.plugin_report_types %}<p>{{ report_type }}</p>{% endfor %}
+                <h3>{% translate "Produces" %}</h3>
+                <p>
+                    {% blocktranslate trimmed with plugin_name=plugin.name %}
+                        {{ plugin_name }} can produce the following output:
+                    {% endblocktranslate %}
+                </p>
+                <p>
+                    {{ plugin.produce }}
+                    <ul>
+                        {% for mime_type in plugin.produces %}<li>{{ mime_type }}</li>{% endfor %}
+                    </ul>
+                </p>
+            </section>
         {% endfill %}
         {% fill "footer_buttons" %}
-        <input type="submit"  form="content-form"  class="submit"  value="Submit">
+        <a class="tile-detail-link"
+           href="{% url "boefje_detail" organization_code=organization.code plugin_id=plugin.id %}">
+            <button type="button" class="ghost">{% translate "Go to boefje detail page" %}</button>
+        </a>
     {% endfill %}
 {% endcomponent %}
 {% component_css_dependencies %}
