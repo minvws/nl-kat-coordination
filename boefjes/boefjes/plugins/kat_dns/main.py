@@ -113,8 +113,8 @@ def get_email_security_records(resolver: dns.resolver.Resolver, hostname: str, r
         firsterror = error.kwargs["errors"][0]
         if firsterror[3] == "SERVFAIL":
             edeerror = int(firsterror[4].options[0].code)
-            if edeerror in (6, 12):  # not all resolvers return the same error code for the same issue.
-                return "SERVFAIL"  # returned when DNSSEC tells us this query won't return data.
+            if edeerror in (1, 2, 5, 6, 7, 8, 9, 10, 11, 12):  # DNSSEC error codes defined in RFC 8914
+                return "DNSSECFAIL"  # returned when the resolver indicates a DNSSEC failure.
         raise  # Not dnssec related, unhandled, raise.
     except dns.resolver.NXDOMAIN:
         return "NXDOMAIN"
