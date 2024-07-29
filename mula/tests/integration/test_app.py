@@ -5,6 +5,7 @@ from unittest import mock
 
 import scheduler
 from scheduler import config, models, server, storage
+
 from tests.factories import OrganisationFactory
 from tests.mocks import MockKatalogusService
 
@@ -25,9 +26,7 @@ class AppTestCase(unittest.TestCase):
         self.mock_ctx.datastores = SimpleNamespace(
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(
-                    self.dbconn
-                ),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
             }
         )
 

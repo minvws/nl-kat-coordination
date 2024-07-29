@@ -4,6 +4,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 from scheduler import config, models, queues, storage
+
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
 from tests.mocks import task as mock_task
@@ -25,9 +26,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.mock_ctx.datastores = SimpleNamespace(
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(
-                    self.dbconn
-                ),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
             }
         )
 
@@ -143,9 +142,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         # All tasks on queue should be set to CANCELLED
-        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(
-            self.scheduler.scheduler_id
-        )
+        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(self.scheduler.scheduler_id)
         for task in tasks:
             self.assertEqual(task.status, models.TaskStatus.CANCELLED)
 
@@ -185,9 +182,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         # All tasks on queue should be set to CANCELLED
-        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(
-            self.scheduler.scheduler_id
-        )
+        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(self.scheduler.scheduler_id)
         for task in tasks:
             self.assertEqual(task.status, models.TaskStatus.CANCELLED)
 
