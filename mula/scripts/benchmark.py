@@ -159,9 +159,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Benchmark the scheduler.")
 
     # Add arguments
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Set to enable verbose logging."
-    )
+    parser.add_argument("--verbose", "-v", action="store_true", help="Set to enable verbose logging.")
 
     parser.add_argument(
         "--container-id",

@@ -55,5 +55,6 @@ omit = [
     "scheduler/context/*",
     "scheduler/models/*",
     "scheduler/utils/*",
+    "scheduler/scripts/*",
     "scheduler/__main__.py",
 ]
