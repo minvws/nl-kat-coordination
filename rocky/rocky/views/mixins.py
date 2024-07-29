@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import cached_property
 from operator import attrgetter
+from typing import TypedDict
 
 import structlog
 from account.mixins import OrganizationView
@@ -45,6 +46,12 @@ class OriginData(BaseModel):
     normalizer: dict | None = None
     boefje: Boefje | None = None
     params: dict[str, str] | None = None
+
+
+class Origins(TypedDict):
+    declarations: list[OriginData]
+    observations: list[OriginData]
+    inferences: list[OriginData]
 
 
 class OOIAttributeError(AttributeError):
@@ -99,11 +106,11 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
         self,
         reference: Reference,
         organization: Organization,
-    ) -> tuple[list[OriginData], list[OriginData], list[OriginData]]:
+    ) -> Origins:
         declarations: list[OriginData] = []
         observations: list[OriginData] = []
         inferences: list[OriginData] = []
-        results = declarations, observations, inferences
+        results: Origins = {"declarations": declarations, "observations": observations, "inferences": inferences}
 
         try:
             origins = self.octopoes_api_connector.list_origins(self.observed_at, result=reference)
