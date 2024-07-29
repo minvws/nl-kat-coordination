@@ -5,8 +5,7 @@ import structlog
 from fastapi import status
 
 from scheduler import context, models, queues, schedulers, storage
-
-from .. import serializers
+from scheduler.server import serializers
 
 
 class QueueAPI:
