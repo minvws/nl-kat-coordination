@@ -254,7 +254,6 @@ class SchedulerClient:
 
     def push_task(self, item: Task) -> None:
         try:
-            logger.info(f"Task data: {item}")
             queue_name = f"{item.data.type}-{self.organization_code}"
             res = self._client.post(
                 f"/queues/{queue_name}/push",

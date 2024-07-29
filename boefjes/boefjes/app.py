@@ -9,7 +9,7 @@ import structlog
 from httpx import HTTPError
 from pydantic import ValidationError
 
-from boefjes.clients.scheduler_client import SchedulerAPIClient, SchedulerClientInterface, TaskStatus
+from boefjes.clients.scheduler_client import SchedulerAPIClient, SchedulerClientInterface, Task, TaskStatus
 from boefjes.config import Settings
 from boefjes.job_handler import BoefjeHandler, NormalizerHandler, bytes_api_client
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner

@@ -122,7 +122,7 @@ class PriorityQueue(abc.ABC):
 
         return item
 
-    def push(self, task: models.Task) -> models.Task | None:
+    def push(self, task: models.Task) -> models.Task:
         """Push an item onto the queue.
 
         Args:

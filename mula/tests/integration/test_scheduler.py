@@ -351,7 +351,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
         # Act
-        popped_item = self.scheduler.pop_item_from_queue()
+        self.scheduler.pop_item_from_queue()
 
         # Assert: task should be in datastore, and dispatched
         self.assertEqual(0, self.scheduler.queue.qsize())

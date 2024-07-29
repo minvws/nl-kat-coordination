@@ -1529,14 +1529,6 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        task = models.Task(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-            type=models.BoefjeTask.type,
-            data=boefje_task.model_dump(),
-            hash=boefje_task.hash,
-        )
-
         schedule = models.Schedule(
             scheduler_id=self.scheduler.scheduler_id,
             hash=boefje_task.hash,

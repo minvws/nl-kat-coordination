@@ -71,7 +71,6 @@ class SchedulerAPIClient(SchedulerClientInterface):
 
     def pop_item(self, queue: str) -> Task | None:
         response = self._session.post(f"/queues/{queue}/pop")
-        print(response.content)
         self._verify_response(response)
 
         return TypeAdapter(Task | None).validate_json(response.content)
@@ -81,7 +80,9 @@ class SchedulerAPIClient(SchedulerClientInterface):
         self._verify_response(response)
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
-        response = self._session.patch(f"/tasks/{task_id}", json={"status": status.value})
+        response = self._session.patch(
+            f"/tasks/{task_id}", json={"status": status.value}
+        )
         self._verify_response(response)
 
     def get_task(self, task_id: uuid.UUID) -> Task:

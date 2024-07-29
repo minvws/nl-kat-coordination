@@ -118,17 +118,6 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
 
     def test_is_allowed_to_run(self):
         # Arrange
-        ooi = OOIFactory(scan_profile=ScanProfileFactory(level=0))
-        boefje = BoefjeFactory()
-        boefje_meta = BoefjeMetaFactory(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-        )
-        raw_data = RawDataFactory(
-            boefje_meta=boefje_meta,
-            mime_types=[{"value": "text/plain"}],
-        )
-
         plugin = PluginFactory(type="normalizer", consumes=["text/plain"])
 
         # Mocks
@@ -142,17 +131,6 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
 
     def test_is_not_allowed_to_run(self):
         # Arrange
-        ooi = OOIFactory(scan_profile=ScanProfileFactory(level=0))
-        boefje = BoefjeFactory()
-        boefje_meta = BoefjeMetaFactory(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-        )
-        raw_data = RawDataFactory(
-            boefje_meta=boefje_meta,
-            mime_types=[{"value": "text/plain"}],
-        )
-
         plugin = PluginFactory(type="normalizer", consumes=["text/plain"])
         plugin.enabled = False
 

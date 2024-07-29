@@ -70,7 +70,7 @@ class ScheduleStore:
 
     @retry()
     @exception_handler
-    def get_schedule(self, schedule_id: str) -> models.Schedule:
+    def get_schedule(self, schedule_id: str) -> models.Schedule | None:
         with self.dbconn.session.begin() as session:
             schedule_orm = session.query(models.ScheduleDB).filter(models.ScheduleDB.id == schedule_id).one_or_none()
 
@@ -81,7 +81,7 @@ class ScheduleStore:
 
     @retry()
     @exception_handler
-    def get_schedule_by_hash(self, schedule_hash: str) -> models.Schedule:
+    def get_schedule_by_hash(self, schedule_hash: str) -> models.Schedule | None:
         with self.dbconn.session.begin() as session:
             schedule_orm = (
                 session.query(models.ScheduleDB).filter(models.ScheduleDB.hash == schedule_hash).one_or_none()
