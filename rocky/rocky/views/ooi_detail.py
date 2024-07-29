@@ -93,10 +93,10 @@ class OOIDetailView(
         context["boefjes"] = [boefje for boefje in boefjes if boefje.scan_level.value <= max_level]
         context["ooi"] = self.ooi
 
-        declarations, observations, inferences = self.get_origins(self.ooi.reference, self.organization)
+        context.update(self.get_origins(self.ooi.reference, self.organization))
 
         inference_params = self.octopoes_api_connector.list_origin_parameters(
-            {inference.origin.id for inference in inferences},
+            {inference.origin.id for inference in context["inferences"]},
             self.observed_at,
         )
         inference_params_per_inference = defaultdict(list)
@@ -104,13 +104,9 @@ class OOIDetailView(
             inference_params_per_inference[inference_param.origin_id].append(inference_param)
 
         inference_origin_params: list[tuple] = []
-        for inference in inferences:
+        for inference in context["inferences"]:
             inference_origin_params.append((inference, inference_params_per_inference[inference.origin.id]))
 
-        context["declarations"] = declarations
-
-        context["observations"] = observations
-        context["inferences"] = inferences
         context["inference_origin_params"] = inference_origin_params
         context["member"] = self.organization_member
 

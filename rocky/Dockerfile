@@ -6,6 +6,7 @@ WORKDIR /app
 
 COPY rocky/package.json rocky/yarn.lock .
 COPY rocky/assets assets
+COPY rocky/components components
 
 RUN yarn --ignore-engines && yarn build
 
@@ -38,15 +39,19 @@ ARG ENVIRONMENT
 # requirements separately
 COPY rocky/requirements*.txt .
 RUN --mount=type=cache,target=/root/.cache \
-    pip install --upgrade pip \
+    # Workaround for https://github.com/pypa/setuptools/issues/4519 \
+    echo "setuptools<72" > /tmp/constraints.txt \
+    && export PIP_CONSTRAINT=/tmp/constraints.txt \
+    && pip install --upgrade pip \
     && if [ "$ENVIRONMENT" = "dev" ]; \
     then \
-    grep -v git+https:// requirements-dev.txt | pip install -r /dev/stdin ; \
+    grep -v git+https:// requirements-dev.txt | pip install -r /dev/stdin && \
     grep git+https:// requirements-dev.txt | pip install -r /dev/stdin ; \
     else \
-    grep -v git+https:// requirements.txt | pip install -r /dev/stdin ;\
+    grep -v git+https:// requirements.txt | pip install -r /dev/stdin && \
     grep git+https:// requirements.txt | pip install -r /dev/stdin ; \
-    fi
+    fi \
+    && rm /tmp/constraints.txt
 
 FROM dev
 

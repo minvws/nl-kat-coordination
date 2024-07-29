@@ -40,7 +40,7 @@ main.sidemenu {
       padding-bottom: 0;
       padding-left: var(--sidemenu-nav-padding-left);
       box-sizing: border-box;
-      background-color: #ffffff;
+      background-color: var(--colors-white);
       border-right: 1px solid var(--sidemenu-nav-border-color);
       height: 100%;
       z-index: 1;
@@ -67,7 +67,7 @@ main.sidemenu {
           a:visited,
           a:focus,
           a:active {
-            color: #000000;
+            color: var(--colors-black);
             text-decoration: none;
           }
 
@@ -76,7 +76,7 @@ main.sidemenu {
             a:visited,
             a:focus,
             a:active {
-              color: #000000;
+              color: var(--colors-black);
               text-decoration: none;
               font-style: italic;
               word-break: break-all;
@@ -112,7 +112,7 @@ main.sidemenu {
         font-size: var(--sidemenu-toggle-button-font-size);
         border: 0;
         border-radius: 0;
-        color: #000000;
+        color: var(--colors-black);
 
         /* Transition */
         transition: margin-left 1s;
@@ -154,7 +154,7 @@ main.sidemenu {
 
     .sticky-container > nav {
       position: absolute;
-      border-right: 1px solid #cccccc;
+      border-right: 1px solid var(--colors-grey-200);
 
       /* Needed to show the button */
       overflow: visible;
