@@ -102,7 +102,7 @@ def migrate_org(bytes_client, connector, organisation_id, valid_time) -> tuple[i
     session.close()
 
     while True:
-        origins = connector.list_origins(valid_time, method=normalizers.keys(), offset=offset, limit=page_size)
+        origins = connector.list_origins(valid_time, method=[x for x in normalizers.keys()], offset=offset, limit=page_size)
         logger.info("Processing %s origins", len(origins))
 
         for origin in origins:
@@ -192,7 +192,7 @@ def update_origin(connector: OctopoesAPIConnector, origin: Origin, valid_time) -
             )
         )
 
-    origin.source_method = None  # This assures the origin.id takes on the old value so we can delete the old entity
+    origin.source_method = None  # This assures the origin.id takes on the old value, so we can delete the old entity
     connector.delete_origin(origin.id, valid_time)
 
 
