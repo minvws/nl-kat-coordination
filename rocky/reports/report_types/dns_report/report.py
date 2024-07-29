@@ -1,7 +1,7 @@
 from datetime import datetime
-from logging import getLogger
 from typing import Any
 
+import structlog
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import Reference
@@ -11,7 +11,7 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding
 from reports.report_types.definitions import Report
 
-logger = getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class DNSReport(Report):
