@@ -56,79 +56,94 @@
             {% endfill %}
             {% fill "content" %}
             <section>
-                <span>
-                    <h3>{{ plugin.name }}</h3>
-                    {% if plugin.enabled %}
-                        {% translate "enabled" %}
-                    {% else %}
-                        {% translate "disabled" %}
-                    {% endif %}
-                </span>
-                <p>{{ plugin.description }}</p>
-            </section>
-            <section class="fifty-fifty">
                 <div>
-                    <h3>{% translate "Scan level" %}</h3>
-                    {% if plugin.type == "boefje" %}
-                        <div class="horizontal-view scan-intensity">
-                            <ul class="level-indicator l{{ plugin.scan_level }}">
-                                {% for i in "1234"|make_list %}<li></li>{% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
+                    <!-- Introduction -->
+                    <div class="horizontal-view">
+                        <h3 class="heading-small">{{ plugin.name }}</h3>
+                        {% if plugin.enabled %}
+                            <span class="state-tag enabled">{% translate "Enabled" %}</span>
+                        {% else %}
+                            <span class="state-tag disabled">{% translate "Disabled" %}</span>
+                        {% endif %}
+                    </div>
+                    <p>{{ plugin.description }}</p>
                 </div>
-                <div>
-                    <h3>{% translate "Matching objects" %}</h3>
+                <div class="fifty-fifty">
+                    <!-- General information -->
+                    <div>
+                        <!-- Scan level -->
+                        <h3 class="heading-small">{% translate "Scan level" %}</h3>
+                        {% if plugin.type == "boefje" %}
+                            <div class="horizontal-view scan-intensity">
+                                <ul class="level-indicator l{{ plugin.scan_level }}">
+                                    {% for i in "1234"|make_list %}<li></li>{% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <!-- Matching objects -->
+                        <h3 class="heading-small">{% translate "Matching objects" %}</h3>
+                    </div>
                 </div>
             </section>
             <section>
-                <h3>{% translate "Report types" %}</h3>
-                <p>{% translate "This boefje is required by the following report types." %}</p>
-                <p>
-                    {% for report_type in plugin_data.plugin_report_types %}
-                        {{ report_type }}
+                <div>
+                    <!-- Report types-->
+                    <h3 class="heading-small">{% translate "Report types" %}</h3>
+                    <p>{% translate "This boefje is required by the following report types." %}</p>
+                    <p>
+                        {% for report_type in plugin_data.plugin_report_types %}
+                            {{ report_type }}
+                            {% if not forloop.last %}-{% endif %}
+                        {% endfor %}
+                    </p>
+                </div>
+            </section>
+            <section>
+                <div>
+                    <!-- Consumes -->
+                    {% if plugin.consumes %}
+                        <h3 class="heading-small">{% translate "Consumes" %}</h3>
+                        <p>
+                            {% blocktranslate trimmed with plugin_name=plugin.name %}
+                                {{ plugin_name }} is able to scan the following object types:
+                            {% endblocktranslate %}
+                        </p>
+                        <p>
+                            {{ plugin.consumes }}
+                            {% comment %} {% for ooi_type in plugin.consumes %}
+                        {{ ooi_type }}
                         {% if not forloop.last %}-{% endif %}
-                    {% endfor %}
-                </p>
-            </section>
-            <section>
-                {% if plugin.consumes %}
-                    <h3>{% translate "Consumes" %}</h3>
+                            {% endfor %} {% endcomment %}
+                        </p>
+                    {% else %}
+                        {% blocktranslate trimmed with plugin_name=plugin.name %}
+                            {{ plugin_name }} does not need any input objects.
+                        {% endblocktranslate %}
+                    {% endif %}
+                </div>
+                <div>
+                    <!-- Produces -->
+                    <h3 class="heading-small">{% translate "Produces" %}</h3>
                     <p>
                         {% blocktranslate trimmed with plugin_name=plugin.name %}
-                            {{ plugin_name }} is able to scan the following object types:
+                            {{ plugin_name }} can produce the following output:
                         {% endblocktranslate %}
                     </p>
                     <p>
-                        {{ plugin.consumes }}
-                        {% comment %} {% for ooi_type in plugin.consumes %}
-                        {{ ooi_type }}
-                        {% if not forloop.last %}-{% endif %}
-                        {% endfor %} {% endcomment %}
+                        {{ plugin.produce }}
+                        <ul>
+                            {% for mime_type in plugin.produces %}<li>{{ mime_type }}</li>{% endfor %}
+                        </ul>
                     </p>
-                {% else %}
-                    {% blocktranslate trimmed with plugin_name=plugin.name %}
-                        {{ plugin_name }} does not need any input objects.
-                    {% endblocktranslate %}
-                {% endif %}
-                <h3>{% translate "Produces" %}</h3>
-                <p>
-                    {% blocktranslate trimmed with plugin_name=plugin.name %}
-                        {{ plugin_name }} can produce the following output:
-                    {% endblocktranslate %}
-                </p>
-                <p>
-                    {{ plugin.produce }}
-                    <ul>
-                        {% for mime_type in plugin.produces %}<li>{{ mime_type }}</li>{% endfor %}
-                    </ul>
-                </p>
+                </div>
             </section>
         {% endfill %}
         {% fill "footer_buttons" %}
-        <a class="tile-detail-link"
+        <a class="tile-detail-link button ghost"
            href="{% url "boefje_detail" organization_code=organization.code plugin_id=plugin.id %}">
-            <button type="button" class="ghost">{% translate "Go to boefje detail page" %}</button>
+            {% translate "Go to boefje detail page" %}
         </a>
     {% endfill %}
 {% endcomponent %}
