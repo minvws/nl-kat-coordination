@@ -154,9 +154,10 @@ def organisation_repository():
 
     yield SQLOrganisationStorage(session, settings)
 
-    sessionmaker(bind=engine, autocommit=True)().execute(
+    session.execute(
         ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables])
     )
+    session.close()
 
 
 @pytest.fixture

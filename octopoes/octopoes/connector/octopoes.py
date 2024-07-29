@@ -137,6 +137,7 @@ class OctopoesAPIConnector:
         limit: int = DEFAULT_LIMIT,
         source: Reference | None = None,
         result: Reference | None = None,
+        method: str | list[str] | None = None,
         task_id: UUID | None = None,
         origin_type: OriginType | None = None,
     ) -> list[Origin]:
@@ -146,6 +147,7 @@ class OctopoesAPIConnector:
             "result": result,
             "offset": offset,
             "limit": limit,
+            "method": method,
             "task_id": str(task_id) if task_id else None,
             "origin_type": str(origin_type.value) if origin_type else None,
         }

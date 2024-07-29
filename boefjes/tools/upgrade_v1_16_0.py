@@ -25,6 +25,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.origin import Origin, OriginType
 
 from boefjes.sql.plugin_storage import create_plugin_storage
+from boefjes.storage.interfaces import OrganisationStorage
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -35,14 +36,11 @@ with settings.log_cfg.open() as f:
 logger = logging.getLogger(__name__)
 
 
-def upgrade(valid_time: datetime | None = None) -> tuple[int, int]:
+def upgrade(organisation_repository: OrganisationStorage, valid_time: datetime | None = None) -> tuple[int, int]:
     """
     Perform the migration for all organisations in the database. The happy flow in this script is idempotent,
     meaning that it can be rerun until there are no, or only expected, exceptions.
     """
-
-    organisations = create_organisation_storage(sessionmaker(bind=get_engine())()).get_all()
-
     if valid_time is None:
         valid_time = datetime.now(timezone.utc)
 
@@ -51,6 +49,8 @@ def upgrade(valid_time: datetime | None = None) -> tuple[int, int]:
 
     total_failed = 0
     total_processed = 0
+
+    organisations = organisation_repository.get_all()
     logger.info("Processing %s organisations in total", len(organisations))
 
     for organisation_id in organisations:
@@ -98,6 +98,8 @@ def migrate_org(bytes_client, connector, organisation_id, valid_time) -> tuple[i
                 boefjes.append(plugin)
 
         normalizers[normalizer.id] = boefjes
+
+    session.close()
 
     while True:
         origins = connector.list_origins(valid_time, method=normalizers.keys(), offset=offset, limit=page_size)
@@ -150,8 +152,7 @@ def migrate_org(bytes_client, connector, organisation_id, valid_time) -> tuple[i
             break
 
         offset += page_size
-        
-    session.close()
+
     return failed, processed
 
 
@@ -197,7 +198,12 @@ def update_origin(connector: OctopoesAPIConnector, origin: Origin, valid_time) -
 
 @click.command()
 def main():
-    upgrade()
+    session = sessionmaker(bind=get_engine())()
+    organisations = create_organisation_storage(session)
+
+    upgrade(organisations)
+
+    session.close()
 
 
 if __name__ == "__main__":

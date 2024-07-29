@@ -2,6 +2,8 @@ import json
 import uuid
 
 import pytest
+
+from boefjes.sql.organisation_storage import SQLOrganisationStorage
 from tools.upgrade_v1_16_0 import upgrade
 
 from boefjes.clients.bytes_client import BytesAPIClient
@@ -12,8 +14,8 @@ from tests.loading import get_boefje_meta, get_normalizer_meta
 
 
 @pytest.mark.slow
-def test_migration(octopoes_api_connector: OctopoesAPIConnector, bytes_client: BytesAPIClient, valid_time):
-    hostname_range = range(0, 10)
+def test_migration(octopoes_api_connector: OctopoesAPIConnector, bytes_client: BytesAPIClient, organisation_repository: SQLOrganisationStorage, valid_time):
+    hostname_range = range(0, 30)
 
     for x in hostname_range:
         seed_system(
@@ -55,7 +57,7 @@ def test_migration(octopoes_api_connector: OctopoesAPIConnector, bytes_client: B
 
     octopoes_api_connector.import_new(json.dumps(export))
     bytes_client.login()
-    total_processed, total_failed = upgrade(valid_time)
+    total_processed, total_failed = upgrade(organisation_repository, valid_time)
 
     assert total_processed == len(hostname_range)
     assert total_failed == 0
