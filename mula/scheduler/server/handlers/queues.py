@@ -5,8 +5,7 @@ import structlog
 from fastapi import status
 
 from scheduler import context, models, queues, schedulers, storage
-
-from .. import serializers
+from scheduler.server import serializers
 
 
 class QueueAPI:
@@ -59,7 +58,10 @@ class QueueAPI:
         )
 
     def list(self) -> Any:
-        return [models.Queue(**s.queue.dict(include_pq=False)) for s in self.schedulers.copy().values()]
+        return [
+            models.Queue(**s.queue.dict(include_pq=False))
+            for s in self.schedulers.copy().values()
+        ]
 
     def get(self, queue_id: str) -> Any:
         s = self.schedulers.get(queue_id)
@@ -78,7 +80,9 @@ class QueueAPI:
 
         return models.Queue(**q.dict())
 
-    def pop(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
+    def pop(
+        self, queue_id: str, filters: storage.filters.FilterRequest | None = None
+    ) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
