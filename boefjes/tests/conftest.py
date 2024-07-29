@@ -230,7 +230,7 @@ def seed_system(
 
     octopoes_api_connector.save_observation(
         Observation(
-            method="kat_test.main",
+            method="kat_nmap_normalize",
             source_method=None,
             source=hostnames[0].reference,
             task_id=uuid.uuid4(),
