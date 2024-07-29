@@ -227,12 +227,6 @@ class Katalogus(HTTPService):
                 if plugin.enabled is True and plugin.type == "boefje" and plugin.consumes
             }
 
-            self.logger.info(
-                "Enabled boefjes for organisation %s: %s",
-                organisation_id,
-                enabled_boefjes.keys(),
-            )
-
             # Check if there are new boefjes
             new_boefjes = []
             for boefje_id, boefje in enabled_boefjes.items():
@@ -240,12 +234,6 @@ class Katalogus(HTTPService):
                     continue
 
                 new_boefjes.append(boefje)
-
-            self.logger.info(
-                "New boefjes for organisation %s: %s",
-                organisation_id,
-                new_boefjes,
-            )
 
             # Update the cache
             self.new_boefjes_cache[organisation_id] = enabled_boefjes
