@@ -141,10 +141,8 @@
             </section>
         {% endfill %}
         {% fill "footer_buttons" %}
-        <a class="tile-detail-link button ghost"
-           href="{% url "boefje_detail" organization_code=organization.code plugin_id=plugin.id %}">
-            {% translate "Go to boefje detail page" %}
-        </a>
+        <a href="{% url "boefje_detail" organization_code=organization.code plugin_id=plugin.id %}"
+           class="button ghost">{% translate "Go to boefje detail page" %}</a>
     {% endfill %}
 {% endcomponent %}
 {% component_css_dependencies %}
