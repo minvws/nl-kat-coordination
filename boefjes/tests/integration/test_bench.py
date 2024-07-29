@@ -40,6 +40,7 @@ def test_migration(
                 test_hostname=f"{x}.com",
                 test_ip=f"192.0.{x % 7}.{x % 13}",
                 test_ipv6=f"{x % 7}e4d:64a2:cb49:bd48:a1ba:def3:d15d:{x % 5}230",
+                method="kat_nmap_normalize" if x % 3 == 0 else "kat_dns_normalize"  # 30% of the origins need Bytes
             )
 
         export = []
