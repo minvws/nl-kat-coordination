@@ -80,38 +80,12 @@ def migrate_org(bytes_client, connector, organisation_id, valid_time) -> tuple[i
     offset = 0
     page_size = 200
 
-    session = sessionmaker(bind=get_engine())()
-
-    all_plugins = PluginService(
-        create_plugin_storage(session),
-        create_config_storage(session),
-        get_local_repository(),
-    )._get_all_without_enabled()
-
-    normalizers = {}
-
-    for normalizer in [x for x in all_plugins.values() if x.type == "normalizer"]:
-        boefjes = []
-
-        for plugin in all_plugins.values():
-            if plugin.type == "boefje" and f"boefje/{plugin.id}" in normalizer.consumes:
-                boefjes.append(plugin)
-
-        normalizers[normalizer.id] = boefjes
-
-    session.close()
-
     while True:
-        origins = connector.list_origins(valid_time, method=normalizers.keys(), offset=offset, limit=page_size)
+        origins = connector.list_origins(valid_time, offset=offset, limit=page_size)
         logger.info("Processing %s origins", len(origins))
 
         for origin in origins:
             if origin.source_method is not None or origin.origin_type == OriginType.INFERENCE:
-                continue
-
-            if origin.method in normalizers and len(normalizers[origin.method]) == 1:
-                origin.source_method = normalizers[origin.method][0].id
-                update_origin(connector, origin, valid_time)
                 continue
 
             try:
