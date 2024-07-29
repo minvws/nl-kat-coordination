@@ -87,7 +87,7 @@ def test_migration(
 
     total_processed, total_failed = upgrade(organisation_repository, valid_time)
 
-    assert total_processed == len(hostname_range)
+    assert total_processed == len(hostname_range) // 3
     assert total_failed == 0
 
     observation = octopoes_api_connector.list_origins(
@@ -100,7 +100,7 @@ def test_migration(
         valid_time, source=Reference.from_str("Hostname|test|1.com"), origin_type=OriginType.OBSERVATION
     )[0]
     assert observation.method == "kat_dns_normalize"
-    assert observation.source_method == "boefje_kat_dns_normalize"
+    assert observation.source_method == "dns-records"  # the logic has found the right boefje id
 
     observation = octopoes_api_connector.list_origins(
         valid_time, source=Reference.from_str("Hostname|test|3.com"), origin_type=OriginType.OBSERVATION
