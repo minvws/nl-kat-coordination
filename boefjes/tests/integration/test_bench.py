@@ -27,13 +27,12 @@ def test_migration(
 
     iterations = 30
     cache_path = Path(BASE_DIR.parent / ".ci" / f".cache_{iterations}.json")
+    hostname_range = range(0, iterations)
 
     if cache_path.exists():
         export = json.load(cache_path.open())
         exported = json.dumps(export)
     else:
-        hostname_range = range(0, iterations)
-
         for x in hostname_range:
             seed_system(
                 octopoes_api_connector,
