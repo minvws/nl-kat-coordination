@@ -42,19 +42,6 @@ def test_migration(
                 test_ipv6=f"{x % 7}e4d:64a2:cb49:bd48:a1ba:def3:d15d:{x % 5}230",
             )
 
-        raw = b"1234567890"
-
-        for origin in octopoes_api_connector.list_origins(valid_time, origin_type=OriginType.OBSERVATION):
-            boefje_meta = get_boefje_meta(uuid.uuid4(), boefje_id="bench_boefje")
-            bytes_client.save_boefje_meta(boefje_meta)
-            raw_data_id = bytes_client.save_raw(boefje_meta.id, raw)
-
-            normalizer_meta = get_normalizer_meta(boefje_meta, raw_data_id)
-            normalizer_meta.id = origin.task_id
-            normalizer_meta.normalizer.id = "kat_nmap_normalize"
-
-            bytes_client.save_normalizer_meta(normalizer_meta)
-
         export = []
 
         # Drop the source method field to test the migration
@@ -75,7 +62,21 @@ def test_migration(
         cache_path.write_text(exported)
 
     octopoes_api_connector.import_new(exported)
+
+    raw = b"1234567890"
     bytes_client.login()
+
+    for origin in octopoes_api_connector.list_origins(valid_time, origin_type=OriginType.OBSERVATION):
+        boefje_meta = get_boefje_meta(uuid.uuid4(), boefje_id="bench_boefje")
+        bytes_client.save_boefje_meta(boefje_meta)
+        raw_data_id = bytes_client.save_raw(boefje_meta.id, raw)
+
+        normalizer_meta = get_normalizer_meta(boefje_meta, raw_data_id)
+        normalizer_meta.id = origin.task_id
+        normalizer_meta.normalizer.id = "kat_nmap_normalize"
+
+        bytes_client.save_normalizer_meta(normalizer_meta)
+
     total_processed, total_failed = upgrade(organisation_repository, valid_time)
 
     assert total_processed == len(hostname_range)
