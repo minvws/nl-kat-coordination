@@ -113,6 +113,8 @@ class AppContext:
                 cache_logger_on_first_use=True,
             )
 
+        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
+
         # Services
         katalogus_service = services.Katalogus(
             host=remove_trailing_slash(str(self.config.host_katalogus)),
@@ -149,8 +151,18 @@ class AppContext:
             }
         )
 
+        # Database connection
+        try:
+            dbconn = storage.DBConn(str(self.config.db_uri))
+            dbconn.connect()
+        except storage.errors.StorageError as e:
+            self.logger.error("Failed to connect to database", exc_info=e)
+            raise
+        except Exception as e:
+            self.logger.error("Failed to connect to database", exc_info=e)
+            raise
+
         # Datastores, SimpleNamespace allows us to use dot notation
-        dbconn = storage.DBConn(str(self.config.db_uri))
         self.datastores: SimpleNamespace = SimpleNamespace(
             **{
                 storage.TaskStore.name: storage.TaskStore(dbconn),

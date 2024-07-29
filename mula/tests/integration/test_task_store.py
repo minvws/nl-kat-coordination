@@ -7,7 +7,6 @@ from unittest import mock
 
 from scheduler import config, models, storage
 from scheduler.storage import filters
-
 from tests.factories import OrganisationFactory
 from tests.utils import functions
 
@@ -20,13 +19,16 @@ class TaskStoreTestCase(unittest.TestCase):
 
         # Database
         self.dbconn = storage.DBConn(str(self.mock_ctx.config.db_uri))
+        self.dbconn.connect()
         models.Base.metadata.drop_all(self.dbconn.engine)
         models.Base.metadata.create_all(self.dbconn.engine)
 
         self.mock_ctx.datastores = SimpleNamespace(
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(
+                    self.dbconn
+                ),
             }
         )
 

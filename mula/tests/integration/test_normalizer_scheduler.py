@@ -3,9 +3,9 @@ import unittest
 from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import config, connectors, models, schedulers, storage
 from structlog.testing import capture_logs
 
+from scheduler import config, connectors, models, schedulers, storage
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -27,13 +27,16 @@ class NormalizerSchedulerBaseTestCase(unittest.TestCase):
 
         # Database
         self.dbconn = storage.DBConn(str(self.mock_ctx.config.db_uri))
+        self.dbconn.connect()
         models.Base.metadata.drop_all(self.dbconn.engine)
         models.Base.metadata.create_all(self.dbconn.engine)
 
         self.mock_ctx.datastores = SimpleNamespace(
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(
+                    self.dbconn
+                ),
             }
         )
 
@@ -73,7 +76,9 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         # All tasks on queue should be set to CANCELLED
-        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(self.scheduler.scheduler_id)
+        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(
+            self.scheduler.scheduler_id
+        )
         for task in tasks:
             self.assertEqual(task.status, models.TaskStatus.CANCELLED)
 
@@ -94,7 +99,9 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         # All tasks on queue should be set to CANCELLED
-        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(self.scheduler.scheduler_id)
+        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(
+            self.scheduler.scheduler_id
+        )
         for task in tasks:
             self.assertEqual(task.status, models.TaskStatus.CANCELLED)
 
@@ -131,8 +138,12 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         # Assert
         self.assertFalse(result)
 
-    @mock.patch("scheduler.context.AppContext.services.katalogus.get_normalizers_by_org_id_and_type")
-    def test_get_normalizers_for_mime_type(self, mock_get_normalizers_by_org_id_and_type):
+    @mock.patch(
+        "scheduler.context.AppContext.services.katalogus.get_normalizers_by_org_id_and_type"
+    )
+    def test_get_normalizers_for_mime_type(
+        self, mock_get_normalizers_by_org_id_and_type
+    ):
         # Arrange
         normalizer = NormalizerFactory()
 
@@ -146,12 +157,20 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0], normalizer)
 
-    @mock.patch("scheduler.context.AppContext.services.katalogus.get_normalizers_by_org_id_and_type")
-    def test_get_normalizers_for_mime_type_request_exception(self, mock_get_normalizers_by_org_id_and_type):
+    @mock.patch(
+        "scheduler.context.AppContext.services.katalogus.get_normalizers_by_org_id_and_type"
+    )
+    def test_get_normalizers_for_mime_type_request_exception(
+        self, mock_get_normalizers_by_org_id_and_type
+    ):
         # Mocks
         mock_get_normalizers_by_org_id_and_type.side_effect = [
-            connectors.errors.ExternalServiceError("External service is not available."),
-            connectors.errors.ExternalServiceError("External service is not available."),
+            connectors.errors.ExternalServiceError(
+                "External service is not available."
+            ),
+            connectors.errors.ExternalServiceError(
+                "External service is not available."
+            ),
         ]
 
         # Act
@@ -160,8 +179,12 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         # Assert
         self.assertEqual(len(result), 0)
 
-    @mock.patch("scheduler.context.AppContext.services.katalogus.get_normalizers_by_org_id_and_type")
-    def test_get_normalizers_for_mime_type_response_is_none(self, mock_get_normalizers_by_org_id_and_type):
+    @mock.patch(
+        "scheduler.context.AppContext.services.katalogus.get_normalizers_by_org_id_and_type"
+    )
+    def test_get_normalizers_for_mime_type_response_is_none(
+        self, mock_get_normalizers_by_org_id_and_type
+    ):
         # Mocks
         mock_get_normalizers_by_org_id_and_type.return_value = None
 
@@ -201,7 +224,9 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
+        p_item = functions.create_p_item(
+            scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task
+        )
         task = functions.create_task(p_item)
         self.mock_ctx.datastores.task_store.create_task(task)
 
@@ -248,7 +273,9 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
+        p_item = functions.create_p_item(
+            scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task
+        )
         task = functions.create_task(p_item)
         self.mock_ctx.datastores.task_store.create_task(task)
 
@@ -287,7 +314,9 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
+        p_item = functions.create_p_item(
+            scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task
+        )
         task = functions.create_task(p_item)
         self.mock_ctx.datastores.task_store.create_task(task)
 
@@ -329,7 +358,9 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
+        p_item = functions.create_p_item(
+            scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task
+        )
         task = functions.create_task(p_item)
         self.mock_ctx.datastores.task_store.create_task(task)
 
@@ -372,7 +403,9 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
+        p_item = functions.create_p_item(
+            scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task
+        )
         task = functions.create_task(p_item)
         self.mock_ctx.datastores.task_store.create_task(task)
 
@@ -415,7 +448,9 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
+        p_item = functions.create_p_item(
+            scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task
+        )
         task = functions.create_task(p_item)
         self.mock_ctx.datastores.task_store.create_task(task)
 
@@ -472,7 +507,9 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
+        p_item = functions.create_p_item(
+            scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task
+        )
         task = functions.create_task(p_item)
         self.mock_ctx.datastores.task_store.create_task(task)
 
@@ -510,7 +547,9 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
                 organization=self.organisation.id,
             )
 
-            p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
+            p_item = functions.create_p_item(
+                scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task
+            )
             task = functions.create_task(p_item)
             self.mock_ctx.datastores.task_store.create_task(task)
 
@@ -548,5 +587,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         with capture_logs() as cm:
             self.scheduler.push_tasks_for_received_raw_data(events[1])
 
-        self.assertIn("Could not add task to queue, queue was full", cm[-1].get("event"))
+        self.assertIn(
+            "Could not add task to queue, queue was full", cm[-1].get("event")
+        )
         self.assertEqual(1, self.scheduler.queue.qsize())
