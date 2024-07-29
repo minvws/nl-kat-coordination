@@ -75,9 +75,7 @@ def upgrade():
     op.drop_index("ix_tasks_p_item_hash", table_name="tasks")
 
     op.create_index(op.f("ix_tasks_hash"), "tasks", ["hash"], unique=False)
-    op.create_foreign_key(
-        None, "tasks", "schedules", ["schedule_id"], ["id"], ondelete="SET NULL"
-    )
+    op.create_foreign_key(None, "tasks", "schedules", ["schedule_id"], ["id"], ondelete="SET NULL")
 
     op.drop_column("tasks", "p_item")
 
