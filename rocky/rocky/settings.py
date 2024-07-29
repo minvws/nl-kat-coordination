@@ -151,6 +151,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "django.contrib.humanize",
     "django.forms",
     "django_components",
     "django_components.safer_staticfiles",
