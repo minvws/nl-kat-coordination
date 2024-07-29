@@ -3,6 +3,7 @@ import uuid
 from pathlib import Path
 
 import pytest
+from octopoes.models import Reference
 
 from boefjes.config import BASE_DIR
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
@@ -67,23 +68,42 @@ def test_migration(
     raw = b"1234567890"
     bytes_client.login()
 
-    for origin in octopoes_api_connector.list_origins(valid_time, origin_type=OriginType.OBSERVATION):
-        boefje_meta = get_boefje_meta(uuid.uuid4(), boefje_id="bench_boefje")
-        bytes_client.save_boefje_meta(boefje_meta)
-        raw_data_id = bytes_client.save_raw(boefje_meta.id, raw)
+    for method in ["kat_nmap_normalize", "kat_dns_normalize"]:
+        for origin in octopoes_api_connector.list_origins(valid_time, method=method, origin_type=OriginType.OBSERVATION):
+            boefje_id = "boefje_" + method
 
-        normalizer_meta = get_normalizer_meta(boefje_meta, raw_data_id)
-        normalizer_meta.id = origin.task_id
-        normalizer_meta.normalizer.id = "kat_nmap_normalize"
+            if "3.com" in origin.source:  # create one udp scan
+                boefje_id = "boefje_udp"
 
-        bytes_client.save_normalizer_meta(normalizer_meta)
+            boefje_meta = get_boefje_meta(uuid.uuid4(), boefje_id=boefje_id)
+            bytes_client.save_boefje_meta(boefje_meta)
+            raw_data_id = bytes_client.save_raw(boefje_meta.id, raw)
+
+            normalizer_meta = get_normalizer_meta(boefje_meta, raw_data_id)
+            normalizer_meta.id = origin.task_id
+            normalizer_meta.normalizer.id = method
+
+            bytes_client.save_normalizer_meta(normalizer_meta)
 
     total_processed, total_failed = upgrade(organisation_repository, valid_time)
 
     assert total_processed == len(hostname_range)
     assert total_failed == 0
 
-    observation = octopoes_api_connector.list_origins(valid_time, origin_type=OriginType.OBSERVATION)[0]
+    observation = octopoes_api_connector.list_origins(
+        valid_time, source=Reference.from_str("Hostname|test|0.com"), origin_type=OriginType.OBSERVATION
+    )[0]
+    assert observation.method == "kat_nmap_normalize"
+    assert observation.source_method == "boefje_kat_nmap_normalize"
 
-    assert observation.method == normalizer_meta.normalizer.id
-    assert observation.source_method == boefje_meta.boefje.id
+    observation = octopoes_api_connector.list_origins(
+        valid_time, source=Reference.from_str("Hostname|test|1.com"), origin_type=OriginType.OBSERVATION
+    )[0]
+    assert observation.method == "kat_dns_normalize"
+    assert observation.source_method == "boefje_kat_dns_normalize"
+
+    observation = octopoes_api_connector.list_origins(
+        valid_time, source=Reference.from_str("Hostname|test|3.com"), origin_type=OriginType.OBSERVATION
+    )[0]
+    assert observation.method == "kat_nmap_normalize"
+    assert observation.source_method == "boefje_udp"
