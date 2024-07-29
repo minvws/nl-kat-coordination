@@ -74,9 +74,7 @@ class TaskAPI:
         plugin_id: str | None = None,  # FIXME: deprecated
         filters: storage.filters.FilterRequest | None = None,
     ) -> Any:
-        if (
-            min_created_at is not None and max_created_at is not None
-        ) and min_created_at > max_created_at:
+        if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
                 detail="min_date must be less than max_date",
@@ -269,13 +267,9 @@ class TaskAPI:
 
         return updated_task
 
-    def stats(
-        self, scheduler_id: str | None = None
-    ) -> dict[str, dict[str, int]] | None:
+    def stats(self, scheduler_id: str | None = None) -> dict[str, dict[str, int]] | None:
         try:
-            stats = self.ctx.datastores.task_store.get_status_count_per_hour(
-                scheduler_id
-            )
+            stats = self.ctx.datastores.task_store.get_status_count_per_hour(scheduler_id)
         except Exception as exc:
             self.logger.exception(exc)
             self.logger.exception(exc)
