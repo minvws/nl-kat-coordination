@@ -16,9 +16,7 @@ class PriorityQueueStore:
 
     @retry()
     @exception_handler
-    def pop(
-        self, scheduler_id: str, filters: FilterRequest | None = None
-    ) -> models.Task | None:
+    def pop(self, scheduler_id: str, filters: FilterRequest | None = None) -> models.Task | None:
         with self.dbconn.session.begin() as session:
             query = (
                 session.query(models.TaskDB)

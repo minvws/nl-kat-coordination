@@ -4,9 +4,9 @@ from datetime import datetime, timezone
 from types import SimpleNamespace
 from unittest import mock
 
+from scheduler import config, models, queues, storage
 from structlog.testing import capture_logs
 
-from scheduler import config, models, queues, storage
 from tests.mocks import item as mock_item
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
@@ -28,9 +28,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.mock_ctx.datastores = SimpleNamespace(
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(
-                    self.dbconn
-                ),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
                 storage.ScheduleStore.name: storage.ScheduleStore(self.dbconn),
             }
         )
@@ -84,9 +82,7 @@ class SchedulerTestCase(unittest.TestCase):
             self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
             # Schedule should be in datastore
-            schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
-                task_db.schedule_id
-            )
+            schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(task_db.schedule_id)
             self.assertIsNotNone(schedule_db)
             self.assertEqual(schedule_db.id, task_db.schedule_id)
 
@@ -111,9 +107,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
         # Schedule should be in datastore
-        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
-            task_db.schedule_id
-        )
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(task_db.schedule_id)
         self.assertIsNotNone(schedule_db)
         self.assertEqual(schedule_db.id, task_db.schedule_id)
 
@@ -221,9 +215,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
         # Assert: Schedule should be in datastore
-        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
-            task_db.schedule_id
-        )
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(task_db.schedule_id)
         self.assertIsNotNone(schedule_db)
         self.assertEqual(schedule_db.id, task_db.schedule_id)
 
@@ -259,9 +251,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
         # Assert: Schedule should be in datastore
-        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
-            task_db.schedule_id
-        )
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(task_db.schedule_id)
         self.assertIsNotNone(schedule_db)
         self.assertEqual(schedule_db.id, task_db.schedule_id)
 
@@ -286,9 +276,7 @@ class SchedulerTestCase(unittest.TestCase):
         # Act
         first_item_db = self.scheduler.push_item_to_queue(first_item)
 
-        initial_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
-            first_item_db.schedule_id
-        )
+        initial_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(first_item_db.schedule_id)
 
         # Pop
         self.scheduler.pop_item_from_queue()
@@ -319,9 +307,7 @@ class SchedulerTestCase(unittest.TestCase):
         # Act
         first_item_db = self.scheduler.push_item_to_queue(first_item)
 
-        initial_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
-            first_item_db.schedule_id
-        )
+        initial_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(first_item_db.schedule_id)
 
         # Pop
         self.scheduler.pop_item_from_queue()
@@ -331,20 +317,14 @@ class SchedulerTestCase(unittest.TestCase):
         second_item.id = uuid.uuid4()
         second_item_db = self.scheduler.push_item_to_queue(second_item)
 
-        updated_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
-            second_item_db.schedule_id
-        )
+        updated_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(second_item_db.schedule_id)
 
         # Assert
         self.assertEqual(initial_schedule_db.id, updated_schedule_db.id)
-        self.assertNotEqual(
-            updated_schedule_db.deadline_at, initial_schedule_db.deadline_at
-        )
+        self.assertNotEqual(updated_schedule_db.deadline_at, initial_schedule_db.deadline_at)
 
         # There should be only one schedule
-        schedules, _ = self.mock_ctx.datastores.schedule_store.get_schedules(
-            scheduler_id=self.scheduler.scheduler_id
-        )
+        schedules, _ = self.mock_ctx.datastores.schedule_store.get_schedules(scheduler_id=self.scheduler.scheduler_id)
 
         self.assertEqual(1, len(schedules))
 
@@ -419,9 +399,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         # All tasks on queue should be set to CANCELLED
-        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(
-            self.scheduler.scheduler_id
-        )
+        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(self.scheduler.scheduler_id)
         for task in tasks:
             self.assertEqual(task.status, models.TaskStatus.CANCELLED)
 
@@ -461,9 +439,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         # All tasks on queue should be set to CANCELLED
-        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(
-            self.scheduler.scheduler_id
-        )
+        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(self.scheduler.scheduler_id)
         for task in tasks:
             self.assertEqual(task.status, models.TaskStatus.CANCELLED)
 
