@@ -338,3 +338,11 @@ class OctopoesAPIConnector:
 
     def import_new(self, content):
         return self.session.post(f"/{self.client}/io/import/new", content=content).json()
+
+    def _bulk_migrate_origins(self, origins: list[Origin], valid_time: datetime) -> None:
+        """Single-purpose method that should not be used outside the migration, hence private"""
+
+        params = {"valid_time": str(valid_time)}
+        self.session.post(
+            f"/{self.client}/origins/migrate", params=params, json=[json.loads(x.model_dump_json()) for x in origins]
+        )

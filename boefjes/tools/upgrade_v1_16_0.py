@@ -14,18 +14,16 @@ from sqlalchemy.orm import sessionmaker
 
 from boefjes.api import get_bytes_client
 from boefjes.config import settings
-from boefjes.dependencies.plugins import get_plugin_service, PluginService
+from boefjes.dependencies.plugins import PluginService
 from boefjes.job_handler import get_octopoes_api_connector
 from boefjes.local_repository import get_local_repository
+from boefjes.models import Boefje
 from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.db import get_engine
 from boefjes.sql.organisation_storage import create_organisation_storage
-from octopoes.api.models import Affirmation, Declaration, Observation
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models.origin import Origin, OriginType
-
 from boefjes.sql.plugin_storage import create_plugin_storage
 from boefjes.storage.interfaces import OrganisationStorage
+from octopoes.models.origin import OriginType
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -57,7 +55,7 @@ def upgrade(organisation_repository: OrganisationStorage, valid_time: datetime |
         connector = get_octopoes_api_connector(organisation_id)
         logger.info("Processing organisation [organization_id=%s]", organisation_id)
 
-        failed, processed = migrate_org(bytes_client, connector, organisation_id, valid_time)
+        failed, processed = migrate_organisation(bytes_client, connector, organisation_id, valid_time)
         total_failed += failed
         total_processed += processed
 
@@ -68,7 +66,7 @@ def upgrade(organisation_repository: OrganisationStorage, valid_time: datetime |
     return total_processed, total_failed
 
 
-def migrate_org(bytes_client, connector, organisation_id, valid_time) -> tuple[int, int]:
+def migrate_organisation(bytes_client, connector, organisation_id, valid_time) -> tuple[int, int]:
     """
     For each organisation, we paginate through the origin API, find the matching normalizer meta in Bytes,
     and set the source_method to the boefje id. Then update the origin, i.e. save it and delete the old one.
@@ -80,6 +78,70 @@ def migrate_org(bytes_client, connector, organisation_id, valid_time) -> tuple[i
     offset = 0
     page_size = 200
 
+    boefjes_for_normalizer = collect_boefjes_per_normalizer()
+    bulk_updated_origins = []
+
+    while True:
+        # We loop through the paginated API until we reach the end
+
+        origins = connector.list_origins(
+            valid_time, method=[x for x in boefjes_for_normalizer], offset=offset, limit=page_size
+        )
+        logger.info("Processing %s origins", len(origins))
+
+        for origin in origins:
+            if origin.source_method is not None or origin.origin_type == OriginType.INFERENCE:
+                continue
+
+            if origin.method in boefjes_for_normalizer and len(boefjes_for_normalizer[origin.method]) == 1:
+                origin.source_method = boefjes_for_normalizer[origin.method][0].id
+                bulk_updated_origins.append(origin)
+                continue
+
+            try:
+                normalizer_meta = bytes_client.get_normalizer_meta(origin.task_id)
+                origin.source_method = normalizer_meta.raw_data.boefje_meta.boefje.id
+                bulk_updated_origins.append(origin)
+            except HTTPStatusError as error:
+                # We expect to find Declaration/Affirmations without a normalizer meta
+                if error.response.status_code == 404 and origin.method != "manual":
+                    logger.warning(
+                        "Could not find normalizer_meta [task_id=%s, method=%s, origin_type=%s]",
+                        origin.task_id,
+                        origin.method,
+                        origin.origin_type,
+                    )
+                elif error.response.status_code == 404:
+                    logger.info(
+                        "Could not find normalizer_meta [task_id=%s, method=%s, origin_type=%s]",
+                        origin.task_id,
+                        origin.method,
+                        origin.origin_type,
+                    )
+                else:
+                    logger.exception(
+                        "Could not find normalizer_meta [task_id=%s, method=%s, origin_type=%s]",
+                        origin.task_id,
+                        origin.method,
+                        origin.origin_type,
+                    )
+                    failed += 1
+
+                continue
+
+        if len(origins) < 200:
+            logger.info("Processed all origins [organization_id=%s]", organisation_id)
+            break
+
+        offset += page_size
+
+    connector._bulk_migrate_origins(bulk_updated_origins, valid_time)
+    processed += len(bulk_updated_origins)
+
+    return failed, processed
+
+
+def collect_boefjes_per_normalizer() -> dict[str, list[Boefje]]:
     session = sessionmaker(bind=get_engine())()
 
     all_plugins = PluginService(
@@ -101,99 +163,7 @@ def migrate_org(bytes_client, connector, organisation_id, valid_time) -> tuple[i
 
     session.close()
 
-    while True:
-        origins = connector.list_origins(valid_time, method=[x for x in normalizers.keys()], offset=offset, limit=page_size)
-        logger.info("Processing %s origins", len(origins))
-
-        for origin in origins:
-            if origin.source_method is not None or origin.origin_type == OriginType.INFERENCE:
-                continue
-
-            if origin.method in normalizers and len(normalizers[origin.method]) == 1:
-                origin.source_method = normalizers[origin.method][0].id
-                update_origin(connector, origin, valid_time)
-                continue
-
-            try:
-                normalizer_meta = bytes_client.get_normalizer_meta(origin.task_id)
-                origin.source_method = normalizer_meta.raw_data.boefje_meta.boefje.id
-                update_origin(connector, origin, valid_time)
-            except HTTPStatusError as error:
-                # We expect to find Declaration/Affirmations without a normalizer meta
-                if error.response.status_code == 404 and origin.method != "manual":
-                    logger.warning(
-                        "Could not find normalizer_meta [task_id=%s, method=%s, origin_type=%s]",
-                        origin.task_id,
-                        origin.method,
-                        origin.origin_type,
-                    )
-                elif error.response.status_code == 404:
-                    logger.info(
-                        "Could not find normalizer_meta [task_id=%s, method=%s, origin_type=%s]",
-                        origin.task_id,
-                        origin.method,
-                        origin.origin_type,
-                    )
-                else:
-                    logger.exception(
-                        "Could not update origin [task_id=%s, method=%s, origin_type=%s]",
-                        origin.task_id,
-                        origin.method,
-                        origin.origin_type,
-                    )
-                    failed += 1
-
-                continue
-
-            processed += 1
-
-        if len(origins) < 200:
-            logger.info("Processed all origins [organization_id=%s]", organisation_id)
-            break
-
-        offset += page_size
-
-    return failed, processed
-
-
-def update_origin(connector: OctopoesAPIConnector, origin: Origin, valid_time) -> None:
-    """
-    Save the origin as either an observation, declaration or affirmation - depending on the type - and delete the
-    old origin.
-    """
-    if origin.origin_type == OriginType.OBSERVATION:
-        # Note that observations need OOITypes in its result, but origins only return a list of references
-        result = connector.load_objects_bulk(set(origin.result), valid_time).values()
-        connector.save_observation(
-            Observation(**origin.model_dump(exclude={"origin_type", "result"}), result=result, valid_time=valid_time)
-        )
-
-    if origin.origin_type == OriginType.DECLARATION:
-        # Same OOIType vs. Reference issue here
-        ooi = connector.get(origin.source, valid_time)
-        connector.save_declaration(
-            Declaration(
-                **origin.model_dump(exclude={"origin_type", "source", "results"}),
-                ooi=ooi,
-                results=[ooi],
-                valid_time=valid_time,
-            )
-        )
-
-    if origin.origin_type == OriginType.AFFIRMATION:
-        # Same OOIType vs. Reference issue here
-        ooi = connector.get(origin.source, valid_time)
-        connector.save_affirmation(
-            Affirmation(
-                **origin.model_dump(exclude={"origin_type", "source", "results"}),
-                ooi=ooi,
-                results=[ooi],
-                valid_time=valid_time,
-            )
-        )
-
-    origin.source_method = None  # This assures the origin.id takes on the old value, so we can delete the old entity
-    connector.delete_origin(origin.id, valid_time)
+    return normalizers
 
 
 @click.command()

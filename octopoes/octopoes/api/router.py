@@ -33,6 +33,7 @@ from octopoes.models.path import Path as ObjectPath
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
+from octopoes.repositories.origin_repository import XTDBOriginRepository
 from octopoes.version import __version__
 from octopoes.xtdb.client import Operation, OperationType, XTDBSession
 from octopoes.xtdb.exceptions import XTDBException
@@ -582,3 +583,23 @@ async def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xt
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
     return importer(data, xtdb_session_, True)
+
+
+@router.post("/origins/migrate", tags=["Origins"])
+async def migrate_origins(
+    origins: list[Origin],
+    session: XTDBSession = Depends(xtdb_session),
+    valid_time: datetime = Depends(extract_valid_time),
+) -> None:
+    for origin in origins:
+        if origin.source_method is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Only origins with a new source method can be migrated"
+            )
+
+        session.add((OperationType.PUT, XTDBOriginRepository.serialize(origin), valid_time))
+
+        origin.source_method = None  # To ensure the id property has the original pk value that we want to delete
+        session.add((OperationType.DELETE, origin.id, valid_time))
+
+    session.commit()  # The save-delete order is important to avoid garbage collection of the results

@@ -3,14 +3,13 @@ import uuid
 from pathlib import Path
 
 import pytest
-from octopoes.models import Reference
-
-from boefjes.config import BASE_DIR
-from boefjes.sql.organisation_storage import SQLOrganisationStorage
 from tools.upgrade_v1_16_0 import upgrade
 
 from boefjes.clients.bytes_client import BytesAPIClient
+from boefjes.config import BASE_DIR
+from boefjes.sql.organisation_storage import SQLOrganisationStorage
 from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import Reference
 from octopoes.models.origin import OriginType
 from tests.conftest import seed_system
 from tests.loading import get_boefje_meta, get_normalizer_meta
@@ -21,7 +20,7 @@ def test_migration(
     octopoes_api_connector: OctopoesAPIConnector,
     bytes_client: BytesAPIClient,
     organisation_repository: SQLOrganisationStorage,
-    valid_time
+    valid_time,
 ):
     octopoes_api_connector.session._timeout.connect = 60
     octopoes_api_connector.session._timeout.read = 60
@@ -41,7 +40,7 @@ def test_migration(
                 test_hostname=f"{x}.com",
                 test_ip=f"192.0.{x % 7}.{x % 13}",
                 test_ipv6=f"{x % 7}e4d:64a2:cb49:bd48:a1ba:def3:d15d:{x % 5}230",
-                method="kat_nmap_normalize" if x % 3 == 0 else "kat_dns_normalize"  # 30% of the origins need Bytes
+                method="kat_nmap_normalize" if x % 3 == 0 else "kat_dns_normalize",  # 30% of the origins need Bytes
             )
 
         export = []
@@ -69,7 +68,9 @@ def test_migration(
     bytes_client.login()
 
     for method in ["kat_nmap_normalize", "kat_dns_normalize"]:
-        for origin in octopoes_api_connector.list_origins(valid_time, method=method, origin_type=OriginType.OBSERVATION):
+        for origin in octopoes_api_connector.list_origins(
+            valid_time, method=method, origin_type=OriginType.OBSERVATION
+        ):
             boefje_id = "boefje_" + method
 
             if "3.com" in origin.source:  # create one udp scan
@@ -87,7 +88,7 @@ def test_migration(
 
     total_processed, total_failed = upgrade(organisation_repository, valid_time)
 
-    assert total_processed == len(hostname_range) // 3
+    assert total_processed == len(hostname_range)
     assert total_failed == 0
 
     observation = octopoes_api_connector.list_origins(

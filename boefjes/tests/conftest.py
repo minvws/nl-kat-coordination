@@ -154,9 +154,7 @@ def organisation_repository():
 
     yield SQLOrganisationStorage(session, settings)
 
-    session.execute(
-        ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables])
-    )
+    session.execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables]))
     session.close()
 
 
