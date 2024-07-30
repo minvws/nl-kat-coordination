@@ -26,6 +26,7 @@
                         </div>
                         {% for field in form %}
                             {% include "partials/form/field_input_wrapper.html" %}
+
                         {% endfor %}
                     </fieldset>
                     <button type="submit">{% blocktranslate %}Add {{ display_type }}{% endblocktranslate %}</button>

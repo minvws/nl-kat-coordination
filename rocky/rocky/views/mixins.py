@@ -517,7 +517,7 @@ class SingleOOIMixin(OctopoesView):
                 props["user"] = str(user)
             else:
                 name = str(user)
-                props["user"] = ''.join([c + '\u0336' if i < len(name) - 1 else c for i, c in enumerate(name)])
+                props["user"] = "".join([c + "\u0336" if i < len(name) - 1 else c for i, c in enumerate(name)])
         else:
             props.pop("user")
 
