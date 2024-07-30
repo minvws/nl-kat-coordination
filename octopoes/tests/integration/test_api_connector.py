@@ -289,7 +289,7 @@ def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector, val
     )
 
     octopoes_api_connector.recalculate_bits()
-    findings = octopoes_api_connector.list_findings({severity for severity in RiskLevelSeverity}, valid_time)
+    findings = octopoes_api_connector.list_findings({severity for severity in RiskLevelSeverity}, datetime.now(timezone.utc))
 
     assert findings.items == [
         Finding(
