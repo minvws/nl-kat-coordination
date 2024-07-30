@@ -511,15 +511,15 @@ class SingleOOIMixin(OctopoesView):
 
         props.pop("scan_profile")
         props.pop("primary_key")
-        if "user" in props and props["user"]:
-            user = get_user_model().objects.get(id=props["user"])
+        if "user_id" in props and props["user_id"]:
+            user = get_user_model().objects.get(id=props["user_id"])
             if user.is_active:
-                props["user"] = str(user)
+                props["user_id"] = str(user)
             else:
                 name = str(user)
-                props["user"] = "".join([c + "\u0336" if i < len(name) - 1 else c for i, c in enumerate(name)])
+                props["user_id"] = "".join([c + "\u0336" if i < len(name) - 1 else c for i, c in enumerate(name)])
         else:
-            props.pop("user")
+            props.pop("user_id")
 
         return props
 

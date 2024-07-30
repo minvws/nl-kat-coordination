@@ -20,7 +20,7 @@ from tools.models import SCAN_LEVEL
 
 class OOIForm(BaseRockyForm):
     def __init__(self, ooi_class: type[OOI], connector: OctopoesAPIConnector, *args, **kwargs):
-        self.uid = kwargs.pop("uid", None)
+        self.user_id = kwargs.pop("user_id", None)
         super().__init__(*args, **kwargs)
         self.ooi_class = ooi_class
         self.api_connector = connector
@@ -50,8 +50,8 @@ class OOIForm(BaseRockyForm):
             if name == "primary_key":
                 continue
 
-            if name == "user":
-                fields[name] = forms.CharField(widget=forms.HiddenInput(), initial=str(self.uid))
+            if name == "user_id":
+                fields[name] = forms.CharField(widget=forms.HiddenInput(), initial=str(self.user_id))
                 continue
 
             # skip literals

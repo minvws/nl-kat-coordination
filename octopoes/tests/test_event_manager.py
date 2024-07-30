@@ -32,7 +32,7 @@ def test_event_manager_create_ooi(mocker, network):
                     "scan_profile": None,
                     "primary_key": "Network|internet",
                     "name": "internet",
-                    "user": None,
+                    "user_id": None,
                 },
             },
         ),

@@ -112,7 +112,7 @@ class OOI(BaseModel):
     object_type: str
 
     scan_profile: ScanProfile | None = None
-    user: int | None = None
+    user_id: int | None = None
 
     _natural_key_attrs: ClassVar[list[str]] = []
     _reverse_relation_names: ClassVar[dict[str, str]] = {}
