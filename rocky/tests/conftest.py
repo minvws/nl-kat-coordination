@@ -508,6 +508,7 @@ def url(network) -> URL:
             reference=Reference("URL|testnetwork|http://example.com/"),
             level=ScanLevel.L1,
         ),
+        user_id=None,
         primary_key="URL|testnetwork|http://example.com/",
         network=network.reference,
         raw="http://example.com",
