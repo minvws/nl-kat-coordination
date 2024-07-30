@@ -138,9 +138,14 @@ class KATalogusClientV1:
         response = self.session.put(f"{self.organization_uri}/{plugin_id}/settings", json=values)
         response.raise_for_status()
 
+        logger.info("Upsert plugin settings", plugin_id=plugin_id)
+
     def delete_plugin_settings(self, plugin_id: str):
         response = self.session.delete(f"{self.organization_uri}/{plugin_id}/settings")
         response.raise_for_status()
+
+        logger.info("Delete plugin settings", plugin_id=plugin_id)
+
         return response
 
     def clone_all_configuration_to_organization(self, to_organization: str):
@@ -177,6 +182,8 @@ class KATalogusClientV1:
         return [plugin for plugin in self.get_normalizers() if plugin.enabled]
 
     def _patch_boefje_state(self, boefje_id: str, enabled: bool) -> None:
+        logger.info("Toggle plugin state", plugin_id=boefje_id, enabled=enabled)
+
         response = self.session.patch(
             f"{self.organization_uri}/plugins/{boefje_id}",
             json={"enabled": enabled},
