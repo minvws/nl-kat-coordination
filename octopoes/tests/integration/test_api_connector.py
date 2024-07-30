@@ -227,7 +227,9 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
     assert result[0][1] == dns_ns_records[0]
 
 
-def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
+def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector):
+    valid_time = datetime.now(timezone.utc)
+
     network = Network(name="test")
     octopoes_api_connector.save_declaration(
         Declaration(
@@ -261,6 +263,8 @@ def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector, val
     )
 
     octopoes_api_connector.recalculate_bits()
+
+    valid_time = datetime.now(timezone.utc)
     findings = octopoes_api_connector.list_findings({severity for severity in RiskLevelSeverity}, valid_time)
 
     assert findings.items == [
@@ -277,6 +281,7 @@ def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector, val
         port=53,
         state=PortState.OPEN,
     )
+
     octopoes_api_connector.save_observation(
         Observation(
             method="kat_nmap_normalize",
@@ -288,10 +293,20 @@ def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector, val
         )
     )
 
-    octopoes_api_connector.recalculate_bits()
-    findings = octopoes_api_connector.list_findings(
-        {severity for severity in RiskLevelSeverity}, datetime.now(timezone.utc)
+    octopoes_api_connector.save_scan_profile(
+        DeclaredScanProfile(reference=udp_port.reference, level=ScanLevel.L2),
+        valid_time,
     )
+    assert octopoes_api_connector.get(udp_port.reference, valid_time)
+
+    octopoes_api_connector.recalculate_bits()
+
+    valid_time = datetime.now(timezone.utc)
+
+    assert octopoes_api_connector.get(udp_port.reference, valid_time)
+    assert octopoes_api_connector.get(tcp_port.reference, valid_time)
+
+    findings = octopoes_api_connector.list_findings({severity for severity in RiskLevelSeverity}, valid_time)
 
     assert findings.items == [
         Finding(
