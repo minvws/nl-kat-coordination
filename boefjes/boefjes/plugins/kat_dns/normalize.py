@@ -6,6 +6,7 @@ from ipaddress import IPv4Address, IPv6Address
 from dns.message import Message, from_text
 from dns.rdtypes.ANY.CAA import CAA
 from dns.rdtypes.ANY.CNAME import CNAME
+from dns.rdtypes.ANY.LOC import LOC
 from dns.rdtypes.ANY.MX import MX
 from dns.rdtypes.ANY.NS import NS
 from dns.rdtypes.ANY.SOA import SOA
@@ -26,9 +27,11 @@ from octopoes.models.ooi.dns.records import (
     DNSRecord,
     DNSSOARecord,
     DNSTXTRecord,
+    DNSLOCRecord,
 )
 from octopoes.models.ooi.dns.zone import DNSZone, Hostname
 from octopoes.models.ooi.email_security import DKIMExists, DMARCTXTRecord
+from octopoes.models.ooi.geography import GeographicPoint
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 
 
@@ -159,6 +162,12 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
                     default_args["value"] = record_value[2]
                     register_record(DNSCAARecord(**default_args))
 
+                if isinstance(rr, LOC):
+                    locrecord = register_record(DNSLOCRecord(**default_args))
+                    lat = rr.float_lontitude()
+                    lon = rr.float_longtitude()
+                    register_record(GeographicPoint(ooi=locrecord.reference, latitude=lat, longitude=lon))
+    
     # link the hostnames to their discovered zones
     for hostname_, zone in zone_links.items():
         hostname_store[hostname_].dns_zone = zone.reference
