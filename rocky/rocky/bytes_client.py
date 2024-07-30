@@ -11,7 +11,7 @@ from octopoes.api.models import Declaration
 from rocky.health import ServiceHealth
 from rocky.scheduler import Boefje, BoefjeMeta, Normalizer, NormalizerMeta, RawData
 
-logger = structlog.get_logger(__name__)
+logger = structlog.get_logger("bytes_client")
 
 
 class BytesClient:
@@ -85,6 +85,9 @@ class BytesClient:
 
         self._save_boefje_meta(boefje_meta)
         raw_id = self._save_raw(boefje_meta.id, raw, {"boefje/manual"}.union(manual_mime_types))
+
+        logger.info("Uploaded raw data", raw_id=raw_id, organization=self.organization)
+
         return raw_id
 
     def _save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
