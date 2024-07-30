@@ -136,7 +136,7 @@ class OrganizationView(View):
     def raise_clearance_level(self, ooi_reference: Reference, level: int) -> bool:
         self.verify_raise_clearance_level(level)
         self.octopoes_api_connector.save_scan_profile(
-            DeclaredScanProfile(reference=ooi_reference, level=ScanLevel(level), user=self.request.user.id),
+            DeclaredScanProfile(reference=ooi_reference, level=ScanLevel(level), user_id=self.request.user.id),
             datetime.now(timezone.utc),
         )
 
@@ -146,7 +146,7 @@ class OrganizationView(View):
         self.verify_raise_clearance_level(level)
         self.octopoes_api_connector.save_many_scan_profiles(
             [
-                DeclaredScanProfile(reference=reference, level=ScanLevel(level), user=self.request.user.id)
+                DeclaredScanProfile(reference=reference, level=ScanLevel(level), user_id=self.request.user.id)
                 for reference in ooi_references
             ],
             datetime.now(timezone.utc),
