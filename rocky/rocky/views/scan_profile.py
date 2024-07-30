@@ -20,9 +20,9 @@ class ScanProfileDetailView(FormView, OOIDetailView):
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["mandatory_fields"] = get_mandatory_fields(self.request)
-        if self.ooi.scan_profile and self.ooi.scan_profile.userid:
+        if self.ooi.scan_profile and self.ooi.scan_profile.user_id:
             try:
-                context["scan_profile_user"] = get_user_model().objects.get(id=self.ooi.scan_profile.userid)
+                context["scan_profile_user"] = get_user_model().objects.get(id=self.ooi.scan_profile.user_id)
             except get_user_model().DoesNotExist:
                 pass
         return context
