@@ -86,6 +86,7 @@ def test_migration(
 
             bytes_client.save_normalizer_meta(normalizer_meta)
 
+    total_oois = octopoes_api_connector.list_objects(set(), valid_time).count
     total_processed, total_failed = upgrade(organisation_repository, valid_time)
 
     assert total_processed == len(hostname_range)
@@ -108,3 +109,5 @@ def test_migration(
     )[0]
     assert observation.method == "kat_nmap_normalize"
     assert observation.source_method == "boefje_udp"
+
+    assert octopoes_api_connector.list_objects(set(), valid_time).count == total_oois
