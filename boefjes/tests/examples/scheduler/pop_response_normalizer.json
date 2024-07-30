@@ -18,7 +18,9 @@
           "description": "Fetch the DNS record(s) of a hostname",
           "version": null,
           "scan_level": 1,
-          "consumes": ["Hostname"],
+          "consumes": [
+            "Hostname"
+          ],
           "produces": [
             "DNSAAAARecord",
             "IPAddressV6",
