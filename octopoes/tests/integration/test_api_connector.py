@@ -238,7 +238,6 @@ def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector):
             valid_time=first_valid_time,
         )
     )
-    time.sleep(2)
 
     ip = IPAddressV4(network=network.reference, address="10.10.10.10")
     tcp_port = IPPort(
@@ -315,11 +314,7 @@ def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector):
 
     assert octopoes_api_connector.get(udp_port.reference, third_valid_time)
 
-    time.sleep(3)
-
     findings = octopoes_api_connector.list_findings({severity for severity in RiskLevelSeverity}, third_valid_time)
-    time.sleep(2)
-
     assert octopoes_api_connector.get(tcp_port.reference, third_valid_time)
 
     assert findings.items == [
