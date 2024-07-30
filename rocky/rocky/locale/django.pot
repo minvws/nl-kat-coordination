@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-24 12:28+0000\n"
+"POT-Creation-Date: 2024-07-17 11:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4737,6 +4737,7 @@ msgid "warning"
 msgstr ""
 
 #: rocky/templates/dashboard_redteam.html
+#: rocky/templates/oois/ooi_detail_origins_observations.html
 #: rocky/templates/partials/notifications_block.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Warning:"
@@ -5224,6 +5225,10 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 msgid "No Raw file could be found, this might point to an error in OpenKAT"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html
+msgid "Warning"
 msgstr ""
 
 #: rocky/templates/oois/ooi_edit.html
