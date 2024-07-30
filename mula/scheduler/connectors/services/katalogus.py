@@ -62,8 +62,7 @@ class Katalogus(HTTPService):
 
             orgs = self.get_organisations()
             for org in orgs:
-                if org.id not in self.plugin_cache:
-                    self.plugin_cache[org.id] = {}
+                plugin_cache.setdefault(org.id, {})
 
                 plugins = self.get_plugins_by_organisation(org.id)
                 self.plugin_cache[org.id] = {plugin.id: plugin for plugin in plugins if plugin.enabled}
