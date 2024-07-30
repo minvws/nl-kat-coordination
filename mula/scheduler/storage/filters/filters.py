@@ -48,19 +48,7 @@ class Filter(BaseModel):
         "@?",
         "@@",
     ]
-    value: (
-        str
-        | int
-        | float
-        | bool
-        | datetime.datetime
-        | None
-        | list[str]
-        | list[int]
-        | list[float]
-        | list[bool]
-        | list[None]
-    )
+    value: str | int | float | bool | None | list[str] | list[int] | list[float] | list[bool] | list[None]
 
 
 class FilterRequest(BaseModel):
