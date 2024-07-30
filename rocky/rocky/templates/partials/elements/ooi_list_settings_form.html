@@ -1,6 +1,7 @@
 {% load i18n %}
 
-<form action="{% if organization.code %}{% url request.resolver_match.url_name organization.code %}{% else %}{% url request.resolver_match.url_name %}{% endif %}"
+<form id="ooi_list_settings"
+      action="{% if organization.code %}{% url request.resolver_match.url_name organization.code %}{% else %}{% url request.resolver_match.url_name %}{% endif %}"
       method="get"
       class="help">
     {% if ooi_id %}<input type="hidden" name="ooi_id" value="{{ ooi_id }}" />{% endif %}
@@ -16,6 +17,9 @@
     {% include "partials/form/fieldset.html" with fields=clearance_level_filter_form %}
     {% include "partials/form/fieldset.html" with fields=ooi_search_form %}
 
+    <input type="hidden"
+           name="sorting_order"
+           value="{% if "desc" == request.GET.sorting_order %}asc{% else %}desc{% endif %}">
     <div class="button-container">
         <input type="submit"
                value="{% if submit_text %}{{ submit_text }}{% else %}{% translate "Set filters" %}{% endif %}" />

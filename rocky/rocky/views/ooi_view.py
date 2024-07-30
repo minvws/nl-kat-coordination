@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from time import sleep
+from typing import Literal
 
 from django import forms
 from django.http import Http404
@@ -38,6 +39,8 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
         self.clearance_levels = request.GET.getlist("clearance_level", [])
         self.clearance_types = request.GET.getlist("clearance_type", [])
         self.search_string = request.GET.get("search", "")
+        self.order_by = self.request.GET.get("order_by", "")
+        self.sorting_order = self.request.GET.get("sorting_order", "")
 
     def get_active_filters(self) -> dict[str, str]:
         active_filters = {}
@@ -48,6 +51,12 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
             active_filters[_("Clearance level: ")] = ", ".join(clearance_level)
         if self.clearance_types:
             active_filters[_("Clearance type: ")] = ", ".join(self.clearance_types)
+        if self.search_string:
+            active_filters[_("Searching for: ")] = self.search_string
+        if self.order_by:
+            active_filters[_("Order by: ")] = _("Clearance level") if self.order_by == "scan_level" else _("Type")
+        if self.sorting_order:
+            active_filters[_("Sorting order: ")] = _("Descending") if self.sorting_order == "desc" else _("Ascending")
         return active_filters
 
     def get_ooi_scan_levels(self) -> set[ScanLevel]:
@@ -65,6 +74,25 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
             return self.ooi_types
         return {type_by_name(t) for t in self.filtered_ooi_types if t not in _EXCLUDED_OOI_TYPES}
 
+    def get_order_by(self) -> Literal["object_type", "scan_level"]:
+        """This ordering is limited for object type and scan level"""
+
+        return "scan_level" if self.order_by == "scan_level" else "object_type"
+
+    def get_sorting_order(self) -> Literal["asc", "desc"]:
+        return "desc" if self.sorting_order == "desc" else "asc"
+
+    def get_queryset_filters(self):
+        return {
+            "valid_time": self.observed_at,
+            "ooi_types": self.get_ooi_types(),
+            "scan_level": self.get_ooi_scan_levels(),
+            "scan_profile_type": self.get_ooi_profile_types(),
+            "search_string": self.search_string,
+            "order_by": self.get_order_by(),
+            "asc_desc": self.get_sorting_order(),
+        }
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["observed_at"] = self.observed_at
@@ -78,6 +106,7 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
         context["clearance_types_selection"] = self.clearance_types
 
         context["active_filters"] = self.get_active_filters()
+
         return context
 
 
@@ -87,18 +116,12 @@ class BaseOOIListView(OOIFilterView, ListView):
     paginator = RockyPaginator
 
     def get_queryset(self) -> OOIList:
-        return OOIList(
-            self.octopoes_api_connector,
-            ooi_types=self.get_ooi_types(),
-            valid_time=self.observed_at,
-            scan_level=self.get_ooi_scan_levels(),
-            scan_profile_type=self.get_ooi_profile_types(),
-            search_string=self.search_string,
-        )
+        return OOIList(self.octopoes_api_connector, **self.get_queryset_filters())
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["mandatory_fields"] = get_mandatory_fields(self.request)
+        context["observed_at"] = self.observed_at
         context["total_oois"] = len(self.object_list)
         return context
 
