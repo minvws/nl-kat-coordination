@@ -14,7 +14,7 @@ from octopoes.models.exception import TypeNotFound
 from octopoes.models.types import type_by_name
 from rocky.health import ServiceHealth
 
-logger = structlog.get_logger(__name__)
+logger = structlog.get_logger("katalogus_client")
 
 
 class Plugin(BaseModel):
@@ -94,9 +94,13 @@ class KATalogusClientV1:
         response = self.session.post("/v1/organisations/", json={"id": self.organization, "name": name})
         response.raise_for_status()
 
+        logger.info("Created organization", code=self.organization, name=name)
+
     def delete_organization(self):
         response = self.session.delete(self.organization_uri)
         response.raise_for_status()
+
+        logger.info("Deleted organization", code=self.organization)
 
     def get_plugins(self, **params):
         try:
