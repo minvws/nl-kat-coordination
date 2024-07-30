@@ -20,7 +20,9 @@ class ExpiringDict:
     return an ExpiredError.
     """
 
-    def __init__(self, lifetime: int = 300, start_time: datetime = datetime.now(timezone.utc)) -> None:
+    def __init__(
+        self, lifetime: int = 300, start_time: datetime = datetime.now(timezone.utc)
+    ) -> None:
         self.lifetime: timedelta = timedelta(seconds=lifetime)
         self.start_time = start_time
         self.expiration_time: datetime = start_time + self.lifetime
@@ -95,3 +97,7 @@ class ExpiringDict:
     def __iter__(self) -> Iterator[str]:
         with self.lock:
             return iter(self.cache)
+
+    def setdefault(self, key: str, default: Any) -> Any:
+        with self.lock:
+            return self.cache.setdefault(key, default)
