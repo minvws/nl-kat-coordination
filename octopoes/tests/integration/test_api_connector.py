@@ -229,6 +229,7 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
 
 def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector):
     first_valid_time = datetime.now(timezone.utc)
+    import time
 
     network = Network(name="test")
     octopoes_api_connector.save_declaration(
@@ -237,6 +238,7 @@ def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector):
             valid_time=first_valid_time,
         )
     )
+    time.sleep(2)
 
     ip = IPAddressV4(network=network.reference, address="10.10.10.10")
     tcp_port = IPPort(
@@ -261,10 +263,14 @@ def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector):
         [DeclaredScanProfile(reference=ooi.reference, level=ScanLevel.L2) for ooi in [ip, tcp_port, network]],
         first_valid_time,
     )
-
-    octopoes_api_connector.recalculate_bits()
+    time.sleep(2)
 
     second_valid_time = datetime.now(timezone.utc)
+    time.sleep(2)
+
+    octopoes_api_connector.recalculate_bits()
+    time.sleep(2)
+
     findings = octopoes_api_connector.list_findings({severity for severity in RiskLevelSeverity}, second_valid_time)
 
     assert findings.items == [
@@ -292,21 +298,29 @@ def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector):
             result=[ip, udp_port],
         )
     )
+    time.sleep(2)
 
     octopoes_api_connector.save_scan_profile(
         DeclaredScanProfile(reference=udp_port.reference, level=ScanLevel.L2),
         second_valid_time,
     )
+    time.sleep(2)
+
     assert octopoes_api_connector.get(udp_port.reference, second_valid_time)
 
     octopoes_api_connector.recalculate_bits()
+    time.sleep(2)
 
     third_valid_time = datetime.now(timezone.utc)
 
     assert octopoes_api_connector.get(udp_port.reference, third_valid_time)
-    assert octopoes_api_connector.get(tcp_port.reference, third_valid_time)
+
+    time.sleep(3)
 
     findings = octopoes_api_connector.list_findings({severity for severity in RiskLevelSeverity}, third_valid_time)
+    time.sleep(2)
+
+    assert octopoes_api_connector.get(tcp_port.reference, third_valid_time)
 
     assert findings.items == [
         Finding(
