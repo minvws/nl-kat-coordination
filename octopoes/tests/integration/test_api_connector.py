@@ -262,11 +262,8 @@ def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector):
         [DeclaredScanProfile(reference=ooi.reference, level=ScanLevel.L2) for ooi in [ip, tcp_port, network]],
         first_valid_time,
     )
-    time.sleep(2)
 
     second_valid_time = datetime.now(timezone.utc)
-    time.sleep(2)
-
     octopoes_api_connector.recalculate_bits()
     time.sleep(2)
 
@@ -303,7 +300,6 @@ def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector):
         DeclaredScanProfile(reference=udp_port.reference, level=ScanLevel.L2),
         second_valid_time,
     )
-    time.sleep(2)
 
     assert octopoes_api_connector.get(udp_port.reference, second_valid_time)
 
