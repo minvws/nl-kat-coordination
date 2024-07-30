@@ -25,6 +25,7 @@ DEFAULT_RECORD_TYPES = {
     "CNAME",
     "DNAME",
     "SOA",
+    "LOC",
 }
 
 
