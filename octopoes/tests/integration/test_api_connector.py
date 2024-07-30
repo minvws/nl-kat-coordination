@@ -228,13 +228,13 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
 
 
 def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector):
-    valid_time = datetime.now(timezone.utc)
+    first_valid_time = datetime.now(timezone.utc)
 
     network = Network(name="test")
     octopoes_api_connector.save_declaration(
         Declaration(
             ooi=network,
-            valid_time=valid_time,
+            valid_time=first_valid_time,
         )
     )
 
@@ -252,20 +252,20 @@ def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector):
             source=ip.reference,
             source_method="nmap",
             task_id=uuid.uuid4(),
-            valid_time=valid_time,
+            valid_time=first_valid_time,
             result=[ip, tcp_port],
         )
     )
 
     octopoes_api_connector.save_many_scan_profiles(
         [DeclaredScanProfile(reference=ooi.reference, level=ScanLevel.L2) for ooi in [ip, tcp_port, network]],
-        valid_time,
+        first_valid_time,
     )
 
     octopoes_api_connector.recalculate_bits()
 
-    valid_time = datetime.now(timezone.utc)
-    findings = octopoes_api_connector.list_findings({severity for severity in RiskLevelSeverity}, valid_time)
+    second_valid_time = datetime.now(timezone.utc)
+    findings = octopoes_api_connector.list_findings({severity for severity in RiskLevelSeverity}, second_valid_time)
 
     assert findings.items == [
         Finding(
@@ -288,25 +288,25 @@ def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector):
             source=ip.reference,
             source_method="nmap-udp",
             task_id=uuid.uuid4(),
-            valid_time=valid_time,
+            valid_time=second_valid_time,
             result=[ip, udp_port],
         )
     )
 
     octopoes_api_connector.save_scan_profile(
         DeclaredScanProfile(reference=udp_port.reference, level=ScanLevel.L2),
-        valid_time,
+        second_valid_time,
     )
-    assert octopoes_api_connector.get(udp_port.reference, valid_time)
+    assert octopoes_api_connector.get(udp_port.reference, second_valid_time)
 
     octopoes_api_connector.recalculate_bits()
 
-    valid_time = datetime.now(timezone.utc)
+    third_valid_time = datetime.now(timezone.utc)
 
-    assert octopoes_api_connector.get(udp_port.reference, valid_time)
-    assert octopoes_api_connector.get(tcp_port.reference, valid_time)
+    assert octopoes_api_connector.get(udp_port.reference, third_valid_time)
+    assert octopoes_api_connector.get(tcp_port.reference, third_valid_time)
 
-    findings = octopoes_api_connector.list_findings({severity for severity in RiskLevelSeverity}, valid_time)
+    findings = octopoes_api_connector.list_findings({severity for severity in RiskLevelSeverity}, third_valid_time)
 
     assert findings.items == [
         Finding(
