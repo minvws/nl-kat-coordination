@@ -7,18 +7,22 @@ from uuid import UUID
 import structlog
 from fastapi import Depends, FastAPI, HTTPException, Response
 from httpx import HTTPError, HTTPStatusError
+from octopoes.models import Reference
+from octopoes.models.exception import ObjectNotFoundException
 from pydantic import BaseModel, ConfigDict, Field
 from uvicorn import Config, Server
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient, TaskStatus
 from boefjes.config import settings
-from boefjes.job_handler import get_environment_settings, get_octopoes_api_connector, serialize_ooi
+from boefjes.job_handler import (
+    get_environment_settings,
+    get_octopoes_api_connector,
+    serialize_ooi,
+)
 from boefjes.job_models import BoefjeMeta
 from boefjes.local_repository import LocalPluginRepository, get_local_repository
 from boefjes.plugins.models import _default_mime_types
-from octopoes.models import Reference
-from octopoes.models.exception import ObjectNotFoundException
 
 app = FastAPI(title="Boefje API")
 logger = structlog.get_logger(__name__)
@@ -122,7 +126,7 @@ async def boefje_output(
     bytes_client.save_boefje_meta(boefje_meta)
 
     if boefje_output.files:
-        mime_types = _default_mime_types(task.p_item.data.boefje)
+        mime_types = _default_mime_types(task.data.boefje)
         for file in boefje_output.files:
             raw = base64.b64decode(file.content)
             # when supported, also save file.name to Bytes
@@ -149,21 +153,25 @@ def get_task(task_id, scheduler_client):
 
 
 def create_boefje_meta(task, local_repository):
-    boefje = task.p_item.data.boefje
+    boefje = task.data.boefje
     boefje_resource = local_repository.by_id(boefje.id)
     env_keys = boefje_resource.environment_keys
-    environment = get_environment_settings(task.p_item.data, env_keys) if env_keys else {}
+    environment = get_environment_settings(task.data, env_keys) if env_keys else {}
 
-    organization = task.p_item.data.organization
-    input_ooi = task.p_item.data.input_ooi
+    organization = task.data.organization
+    input_ooi = task.data.input_ooi
     arguments = {"oci_arguments": boefje_resource.oci_arguments}
 
     if input_ooi:
         reference = Reference.from_str(input_ooi)
         try:
-            ooi = get_octopoes_api_connector(organization).get(reference, valid_time=datetime.now(timezone.utc))
+            ooi = get_octopoes_api_connector(organization).get(
+                reference, valid_time=datetime.now(timezone.utc)
+            )
         except ObjectNotFoundException as e:
-            raise ObjectNotFoundException(f"Object {reference} not found in Octopoes") from e
+            raise ObjectNotFoundException(
+                f"Object {reference} not found in Octopoes"
+            ) from e
 
         arguments["input"] = serialize_ooi(ooi)
 

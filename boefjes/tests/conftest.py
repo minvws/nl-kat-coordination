@@ -10,7 +10,12 @@ from fastapi.testclient import TestClient
 from pydantic import TypeAdapter
 
 from boefjes.app import SchedulerWorkerManager
-from boefjes.clients.scheduler_client import Queue, SchedulerClientInterface, Task, TaskStatus
+from boefjes.clients.scheduler_client import (
+    Queue,
+    SchedulerClientInterface,
+    Task,
+    TaskStatus,
+)
 from boefjes.config import Settings
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.runtime_interfaces import Handler, WorkerManager
@@ -39,7 +44,9 @@ class MockSchedulerClient(SchedulerClientInterface):
         self._iterations = 0
         self._tasks: dict[str, Task] = multiprocessing.Manager().dict()
         self._popped_items: dict[str, Task] = multiprocessing.Manager().dict()
-        self._pushed_items: dict[str, tuple[str, Task]] = multiprocessing.Manager().dict()
+        self._pushed_items: dict[str, tuple[str, Task]] = (
+            multiprocessing.Manager().dict()
+        )
 
     def get_queues(self) -> list[Queue]:
         time.sleep(self.sleep_time)
@@ -56,7 +63,9 @@ class MockSchedulerClient(SchedulerClientInterface):
                 return p_item
 
             if WorkerManager.Queue.NORMALIZERS.value in queue:
-                p_item = TypeAdapter(Task).validate_json(self.normalizer_responses.pop(0))
+                p_item = TypeAdapter(Task).validate_json(
+                    self.normalizer_responses.pop(0)
+                )
                 self._popped_items[str(p_item.id)] = p_item
                 return p_item
         except IndexError:
@@ -66,7 +75,11 @@ class MockSchedulerClient(SchedulerClientInterface):
         with self.log_path.open("a") as f:
             f.write(f"{task_id},{status.value}\n")
 
-        task = self._task_from_id(task_id) if str(task_id) not in self._tasks else self._tasks[str(task_id)]
+        task = (
+            self._task_from_id(task_id)
+            if str(task_id) not in self._tasks
+            else self._tasks[str(task_id)]
+        )
         task.status = status
         self._tasks[str(task_id)] = task
 
@@ -75,18 +88,14 @@ class MockSchedulerClient(SchedulerClientInterface):
             return [tuple(x.strip().split(",")) for x in f]
 
     def get_task(self, task_id: UUID) -> Task:
-        return self._task_from_id(task_id) if str(task_id) not in self._tasks else self._tasks[str(task_id)]
+        return (
+            self._task_from_id(task_id)
+            if str(task_id) not in self._tasks
+            else self._tasks[str(task_id)]
+        )
 
     def _task_from_id(self, task_id: UUID):
-        return Task(
-            id=task_id,
-            scheduler_id="test",
-            type="test",
-            p_item=self._popped_items[str(task_id)],
-            status=TaskStatus.DISPATCHED,
-            created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc),
-        )
+        return self._popped_items[str(task_id)]
 
     def push_item(self, queue_id: str, p_item: Task) -> None:
         self._pushed_items[str(p_item.id)] = (queue_id, p_item)
@@ -118,7 +127,8 @@ def item_handler(tmp_path: Path):
 def manager(item_handler: MockHandler, tmp_path: Path) -> SchedulerWorkerManager:
     scheduler_client = MockSchedulerClient(
         get_dummy_data("scheduler/queues_response.json"),
-        2 * [get_dummy_data("scheduler/pop_response_boefje.json")] + [get_dummy_data("scheduler/should_crash.json")],
+        2 * [get_dummy_data("scheduler/pop_response_boefje.json")]
+        + [get_dummy_data("scheduler/should_crash.json")],
         [get_dummy_data("scheduler/pop_response_normalizer.json")],
         tmp_path / "patch_task_log",
     )
