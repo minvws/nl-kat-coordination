@@ -113,7 +113,7 @@ class AppContext:
                 cache_logger_on_first_use=True,
             )
 
-        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
+        self.logger: structlog.BoundLogger = structlog.get_logger(__name__)
 
         # Services
         katalogus_service = services.Katalogus(
