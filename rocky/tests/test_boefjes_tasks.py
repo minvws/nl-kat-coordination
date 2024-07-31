@@ -24,9 +24,13 @@ def test_boefjes_tasks(rf, client_member, mock_scheduler):
     assert response.status_code == 200
 
 
-def test_tasks_view_simple(rf, client_member, mock_scheduler, mock_scheduler_client_task_list):
+def test_tasks_view_simple(
+    rf, client_member, mock_scheduler, mock_scheduler_client_task_list
+):
     request = setup_request(rf.get("boefjes_task_list"), client_member.user)
-    response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
+    response = BoefjesTaskListView.as_view()(
+        request, organization_code=client_member.organization.code
+    )
 
     assertContains(response, "Completed")
 
@@ -40,7 +44,9 @@ def test_reschedule_task(rf, client_member, mock_scheduler, task):
         ),
         client_member.user,
     )
-    response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
+    response = BoefjesTaskListView.as_view()(
+        request, organization_code=client_member.organization.code
+    )
 
     assert response.status_code == 200
     assert list(request._messages)[0].message == (
@@ -50,7 +56,9 @@ def test_reschedule_task(rf, client_member, mock_scheduler, task):
     )
 
 
-def test_reschedule_task_already_queued(rf, client_member, mock_scheduler, mocker, task):
+def test_reschedule_task_already_queued(
+    rf, client_member, mock_scheduler, mocker, task
+):
     mock_scheduler.get_task_details.return_value = task
     mock_scheduler.push_task.side_effect = SchedulerTooManyRequestError
 
@@ -74,7 +82,9 @@ def test_reschedule_task_already_queued(rf, client_member, mock_scheduler, mocke
     )
 
 
-def test_reschedule_task_from_other_org(rf, client_member, client_member_b, mock_scheduler, task):
+def test_reschedule_task_from_other_org(
+    rf, client_member, client_member_b, mock_scheduler, task
+):
     mock_scheduler.get_task_details.return_value = task
 
     request = setup_request(
@@ -85,7 +95,9 @@ def test_reschedule_task_from_other_org(rf, client_member, client_member_b, mock
         client_member_b.user,
     )
     with pytest.raises(Http404):
-        BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
+        BoefjesTaskListView.as_view()(
+            request, organization_code=client_member.organization.code
+        )
 
 
 def test_download_task_other_org_from_other_org_url(
@@ -99,7 +111,9 @@ def test_download_task_other_org_from_other_org_url(
         )
 
 
-def test_download_task_same_org(rf, client_member, mock_bytes_client, bytes_raw_metas, bytes_get_raw):
+def test_download_task_same_org(
+    rf, client_member, mock_bytes_client, bytes_raw_metas, bytes_get_raw
+):
     mock_bytes_client().get_raw.return_value = bytes_get_raw
     mock_bytes_client().get_raw_metas.return_value = bytes_raw_metas
 
