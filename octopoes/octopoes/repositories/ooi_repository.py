@@ -214,7 +214,7 @@ class XTDBOOIRepository(OOIRepository):
     @classmethod
     def serialize(cls, ooi: OOI) -> dict[str, Any]:
         # export model with pydantic serializers
-        export = json.loads(ooi.json())
+        export = json.loads(ooi.model_dump_json())
 
         # prefix fields, but not object_type
         export.pop("object_type")
