@@ -26,6 +26,7 @@ DEFAULT_RECORD_TYPES = {
     "DNAME",
     "SOA",
     "LOC",
+    "GPOS",
 }
 
 
