@@ -234,7 +234,7 @@ class XTDBOOIRepository(OOIRepository):
 
         # pop global attributes
         object_cls = type_by_name(data.pop("object_type"))
-        user_id = data.pop("user_id")
+        user_id = data.pop("user_id", None)
         data.pop(cls.pk_prefix)
 
         # remove type prefixes
