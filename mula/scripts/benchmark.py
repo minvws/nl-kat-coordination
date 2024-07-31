@@ -10,12 +10,13 @@ import httpx
 SCHEDULER_API = "http://localhost:8004"
 TIMEOUT_FOR_LOG_CAPTURE = 5
 
-logger = logging.getLogger(__name__)
+logger = logging.get_logger(__name__)
+client = httpx.Client(base_url=SCHEDULER_API)
 
 
 def are_tasks_done() -> bool:
-    response = httpx.get(
-        url=f"{SCHEDULER_API}/tasks/stats",
+    response = client.get(
+        url="/tasks/stats",
         timeout=30,
     )
 
@@ -31,8 +32,8 @@ def are_tasks_done() -> bool:
 
 
 def parse_stats() -> None:
-    resp_tasks_stats = httpx.get(
-        url=f"{SCHEDULER_API}/tasks/stats",
+    resp_tasks_stats = client.get(
+        url="/tasks/stats",
         timeout=30,
     )
 
@@ -177,7 +178,7 @@ if __name__ == "__main__":
     # if -v was not given it defaults to printing level warning and higher.
     level = logging.INFO
     if args.verbose:
-        default_loglevel = logging.DEBUG
+        level = logging.DEBUG
 
     logging.basicConfig(
         level=level,
