@@ -516,15 +516,11 @@ class SingleOOIMixin(OctopoesView):
             try:
                 user = get_user_model().objects.get(id=props["user_id"])
             except KATUser.DoesNotExist:
-                user = None
-            if user is None:
                 props["user_id"] = "<user not found>"
             else:
-                if user.is_active:
-                    props["user_id"] = str(user)
-                else:
-                    name = str(user)
-                    props["user_id"] = "".join([c + "\u0336" if i < len(name) - 1 else c for i, c in enumerate(name)])
+                props["user_id"] = str(user)
+                if not user.is_active:
+                    props["zombie"] = True
             props = {"owner" if key == "user_id" else key: value for key, value in props.items()}
         else:
             props.pop("user_id")

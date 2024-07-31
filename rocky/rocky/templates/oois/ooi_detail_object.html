@@ -7,7 +7,11 @@
             <div>
                 <dt>{{ key }}</dt>
                 <dd>
-                    {{ value }}
+                    {% if key == "owner" and zombie %}
+                        <s title="{% translate "Inactive" %}">{{ value }}</s>
+                    {% else %}
+                        {{ value }}
+                    {% endif %}
                 </dd>
             </div>
         {% endfor %}
