@@ -1,0 +1,13 @@
+{
+  "id": "nikto",
+  "name": "Nikto",
+  "description": "Uses Nikto",
+  "consumes": [
+    "IPAddressV4",
+    "IPAddressV6"
+  ],
+  "environment_keys": [],
+  "scan_level": 3,
+  "oci_image": "openkat/nikto",
+  "oci_arguments": []
+}
