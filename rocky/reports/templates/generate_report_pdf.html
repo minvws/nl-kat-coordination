@@ -23,7 +23,7 @@
                 {% for report_type,data in report.items %}
                     <section>
                         <div>
-                            <h2>{{ report_type }} {% translate "for" %} {{ ooi }}</h2>
+                            <h2>{{ data.report_name }}</h2>
                             {% include data.template with data=data.data %}
 
                         </div>
