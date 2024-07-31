@@ -17,33 +17,19 @@ from django.utils.translation import activate, deactivate
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from httpx import Response
+from katalogus.client import parse_plugin
+from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
+
 from octopoes.config.settings import (
     DEFAULT_LIMIT,
     DEFAULT_OFFSET,
     DEFAULT_SCAN_LEVEL_FILTER,
     DEFAULT_SCAN_PROFILE_TYPE_FILTER,
 )
-from octopoes.models import (
-    OOI,
-    DeclaredScanProfile,
-    Reference,
-    ScanLevel,
-    ScanProfileType,
-)
+from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel, ScanProfileType
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.findings import (
-    CVEFindingType,
-    Finding,
-    KATFindingType,
-    RiskLevelSeverity,
-)
-from octopoes.models.ooi.network import (
-    IPAddressV4,
-    IPAddressV6,
-    IPPort,
-    Network,
-    Protocol,
-)
+from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
 from octopoes.models.ooi.reports import Report
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software
@@ -53,17 +39,7 @@ from octopoes.models.pagination import Paginated
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
-
-from katalogus.client import parse_plugin
 from rocky.scheduler import PaginatedTasksResponse, Task
-from tools.models import (
-    GROUP_ADMIN,
-    GROUP_CLIENT,
-    GROUP_REDTEAM,
-    Indemnification,
-    Organization,
-    OrganizationMember,
-)
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
 
@@ -247,9 +223,7 @@ def admin_member(adminuser, organization):
 @pytest.fixture
 def admin_member_b(adminuser_b, organization_b):
     member = create_member(adminuser_b, organization_b)
-    adminuser_b.user_permissions.add(
-        Permission.objects.get(codename="view_organization")
-    )
+    adminuser_b.user_permissions.add(Permission.objects.get(codename="view_organization"))
     add_admin_group_permissions(member)
     return member
 
@@ -482,9 +456,7 @@ def bytes_raw_metas():
             },
             "mime_types": [
                 {"value": "boefje/dns-sec"},
-                {
-                    "value": "boefje/dns-sec-c90404f60aeacf9b254abbd250bd3214e3b1a65b5a883dcbc"
-                },
+                {"value": "boefje/dns-sec-c90404f60aeacf9b254abbd250bd3214e3b1a65b5a883dcbc"},
                 {"value": "dns-sec"},
             ],
             "secure_hash": "sha512:23e40f3e0c4381b89a296a5708a3c7a2dff369dc272b5cbce584d0fd7e17b1a5ebb1a947"
@@ -521,9 +493,7 @@ def lazy_task_list_with_boefje(task) -> MagicMock:
 def network() -> Network:
     return Network(
         name="testnetwork",
-        scan_profile=DeclaredScanProfile(
-            reference=Reference.from_str("Network|testnetwork"), level=ScanLevel.L1
-        ),
+        scan_profile=DeclaredScanProfile(reference=Reference.from_str("Network|testnetwork"), level=ScanLevel.L1),
     )
 
 
@@ -577,9 +547,7 @@ def website(ip_service: IPService, hostname: Hostname):
 
 @pytest.fixture
 def security_txt(website: Website, url: URL):
-    return SecurityTXT(
-        website=website.reference, url=url.reference, security_txt="example"
-    )
+    return SecurityTXT(website=website.reference, url=url.reference, security_txt="example")
 
 
 @pytest.fixture
@@ -1596,9 +1564,7 @@ def reports_more_input_oois():
                     organization_tags=[],
                     data_raw_id="acbd2250-85f4-471a-ab70-ba1750280192",
                     observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
-                    parent_report=Reference(
-                        "Report|e821aaeb-a6bd-427f-b064-e46837911a5d"
-                    ),
+                    parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
                     has_parent=True,
                 ),
                 Report(
@@ -1619,9 +1585,7 @@ def reports_more_input_oois():
                     organization_tags=[],
                     data_raw_id="acbd2250-85f4-471a-ab70-ba1750280194",
                     observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
-                    parent_report=Reference(
-                        "Report|e821aaeb-a6bd-427f-b064-e46837911a5d"
-                    ),
+                    parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
                     has_parent=True,
                 ),
                 Report(
@@ -1642,9 +1606,7 @@ def reports_more_input_oois():
                     organization_tags=[],
                     data_raw_id="ba2d86b8-aca8-4009-adc0-e3d59ea34906",
                     observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
-                    parent_report=Reference(
-                        "Report|e821aaeb-a6bd-427f-b064-e46837911a5d"
-                    ),
+                    parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
                     has_parent=True,
                 ),
                 Report(
@@ -1665,9 +1627,7 @@ def reports_more_input_oois():
                     organization_tags=[],
                     data_raw_id="ba2d86b8-aca8-4009-adc0-e3d59ea34904",
                     observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
-                    parent_report=Reference(
-                        "Report|e821aaeb-a6bd-427f-b064-e46837911a5d"
-                    ),
+                    parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
                     has_parent=True,
                 ),
             ],
