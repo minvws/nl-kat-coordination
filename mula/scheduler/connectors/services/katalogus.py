@@ -25,19 +25,19 @@ class Katalogus(HTTPService):
         # For every organisation we cache its plugins, it references the
         # plugin-id as key and the plugin as value.
         self.plugin_cache_lock = threading.Lock()
-        self.plugin_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(lifetime=cache_ttl)
+        self.plugin_cache = dict_utils.ExpiringDict(lifetime=cache_ttl)
 
         # For every organisation we cache on which type of object (consumes)
         # the boefjes consume, it references the object type (consumes)
         # as the key and a dict of boefjes as value.
         self.boefje_cache_lock = threading.Lock()
-        self.boefje_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(lifetime=cache_ttl)
+        self.boefje_cache = dict_utils.ExpiringDict(lifetime=cache_ttl)
 
         # For every organisation we cache on which type of object (consumes)
         # the normalizers consume, it references the object type (consumes)
         # as the key and a dict of normalizers as value.
         self.normalizer_cache_lock = threading.Lock()
-        self.normalizer_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(lifetime=cache_ttl)
+        self.normalizer_cache = dict_utils.ExpiringDict(lifetime=cache_ttl)
 
         # For every organisation we cache which new boefjes for an organisation
         # have been enabled.
@@ -62,8 +62,7 @@ class Katalogus(HTTPService):
 
             orgs = self.get_organisations()
             for org in orgs:
-                if org.id not in self.plugin_cache:
-                    self.plugin_cache[org.id] = {}
+                self.plugin_cache.setdefault(org.id, {})
 
                 plugins = self.get_plugins_by_organisation(org.id)
                 self.plugin_cache[org.id] = {plugin.id: plugin for plugin in plugins if plugin.enabled}
@@ -85,8 +84,7 @@ class Katalogus(HTTPService):
             for org in orgs:
                 self.boefje_cache[org.id] = {}
 
-                plugins = self.get_plugins_by_organisation(org.id)
-                for plugin in plugins:
+                for plugin in self.get_plugins_by_organisation(org.id):
                     if plugin.type != "boefje":
                         continue
 
@@ -122,8 +120,7 @@ class Katalogus(HTTPService):
             for org in orgs:
                 self.normalizer_cache[org.id] = {}
 
-                plugins = self.get_plugins_by_organisation(org.id)
-                for plugin in plugins:
+                for plugin in self.get_plugins_by_organisation(org.id):
                     if plugin.type != "normalizer":
                         continue
 
@@ -227,25 +224,11 @@ class Katalogus(HTTPService):
                 if plugin.enabled is True and plugin.type == "boefje" and plugin.consumes
             }
 
-            self.logger.info(
-                "Enabled boefjes for organisation %s: %s",
-                organisation_id,
-                enabled_boefjes.keys(),
-            )
-
             # Check if there are new boefjes
             new_boefjes = []
             for boefje_id, boefje in enabled_boefjes.items():
-                if boefje_id in self.new_boefjes_cache.get(organisation_id, {}):
-                    continue
-
-                new_boefjes.append(boefje)
-
-            self.logger.info(
-                "New boefjes for organisation %s: %s",
-                organisation_id,
-                new_boefjes,
-            )
+                if boefje_id not in self.new_boefjes_cache.get(organisation_id, {}):
+                    new_boefjes.append(boefje)
 
             # Update the cache
             self.new_boefjes_cache[organisation_id] = enabled_boefjes
