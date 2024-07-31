@@ -6,6 +6,7 @@ from ipaddress import IPv4Address, IPv6Address
 from dns.message import Message, from_text
 from dns.rdtypes.ANY.CAA import CAA
 from dns.rdtypes.ANY.CNAME import CNAME
+from dns.rdtypes.ANY.GPOS import GPOS
 from dns.rdtypes.ANY.LOC import LOC
 from dns.rdtypes.ANY.MX import MX
 from dns.rdtypes.ANY.NS import NS
@@ -28,6 +29,7 @@ from octopoes.models.ooi.dns.records import (
     DNSSOARecord,
     DNSTXTRecord,
     DNSLOCRecord,
+    DNSGPOSRecord,
 )
 from octopoes.models.ooi.dns.zone import DNSZone, Hostname
 from octopoes.models.ooi.email_security import DKIMExists, DMARCTXTRecord
@@ -162,21 +164,32 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
                     default_args["value"] = record_value[2]
                     register_record(DNSCAARecord(**default_args))
 
-                if isinstance(rr, LOC):
-                    locrecord = register_record(DNSLOCRecord(**default_args))
+                if isinstance(rr, LOC) or isinstance(rr, GPOS):
                     default_args.update({
                         "value": rr.to_text(),
-                        "ooi": locrecord.reference,
                         "latitude": rr.float_lontitude(),
                         "longitude": rr.float_longtitude(),
                         "altitude": rr.float_altitude(),
-                        "horizontal_precision": rr.horizontal_precision(),
-                        "horizontal_precision": rr.vertical_precision(),
-                        "size": rr.size(),
                     })
-                        
-                    register_record(GeographicPoint(**default_args))
-    
+                    if isinstance(rr, LOC):
+                        default_args.update({
+                            "horizontal_precision": rr.horizontal_precision(),
+                            "horizontal_precision": rr.vertical_precision(),
+                            "size": rr.size(),
+                        })
+                        locrecord = register_record(DNSLOCRecord(**default_args))
+                    else: 
+                        locrecord = register_record(DNSGPOSRecord(**default_args))
+                    
+                    geopoint = {
+                        "ooi": locrecord.reference,
+                        "latitude": rr.float_lontitude(),
+                        "longitude": rr.float_longtitude(),
+                    }
+                    register_record(GeographicPoint(**geopoint))
+
+                
+        
     # link the hostnames to their discovered zones
     for hostname_, zone in zone_links.items():
         hostname_store[hostname_].dns_zone = zone.reference
