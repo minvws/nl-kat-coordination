@@ -218,13 +218,11 @@ class XTDBOOIRepository(OOIRepository):
 
         # prefix fields, but not object_type
         export.pop("object_type")
-        export = {
-            key if key == "user_id" else f"{ooi.__class__.__name__}/{key}": value
-            for key, value in export.items()
-            if value is not None
-        }
+        user_id = export.pop("user_id", None)
+        export = {f"{ooi.__class__.__name__}/{key}": value for key, value in export.items() if value is not None}
 
         export["object_type"] = ooi.__class__.__name__
+        export["user_id"] = user_id
         export[cls.pk_prefix] = ooi.primary_key
 
         return export
@@ -237,9 +235,11 @@ class XTDBOOIRepository(OOIRepository):
         # pop global attributes
         object_cls = type_by_name(data.pop("object_type"))
         data.pop(cls.pk_prefix)
+        user_id = data.pop("user_id", None)
 
         # remove type prefixes
-        stripped = {key if key == "user_id" else key.split("/")[1]: value for key, value in data.items()}
+        stripped = {key.split("/")[1]: value for key, value in data.items()}
+        stripped["user_id"] = user_id
         return object_cls.model_validate(stripped)
 
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
