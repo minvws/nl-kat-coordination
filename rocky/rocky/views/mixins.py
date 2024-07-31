@@ -514,13 +514,9 @@ class SingleOOIMixin(OctopoesView):
         props.pop("primary_key")
         if "user_id" in props and props["user_id"]:
             try:
-                user = get_user_model().objects.get(id=props["user_id"])
+                props["user_id"] = get_user_model().objects.get(id=props["user_id"])
             except KATUser.DoesNotExist:
-                props["user_id"] = "<user not found>"
-            else:
-                props["user_id"] = str(user)
-                if not user.is_active:
-                    props["inactive"] = True
+                props["user_id"] = None
             props = {"owner" if key == "user_id" else key: value for key, value in props.items()}
         else:
             props.pop("user_id")

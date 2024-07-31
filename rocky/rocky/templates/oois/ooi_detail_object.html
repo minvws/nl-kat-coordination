@@ -7,7 +7,7 @@
             <div>
                 <dt>{{ key }}</dt>
                 <dd>
-                    {% if key == "owner" and inactive %}
+                    {% if key == "owner" and value.is_inactive %}
                         <s title="{% translate "Inactive" %}">{{ value }}</s>
                     {% else %}
                         {{ value }}

@@ -80,7 +80,6 @@ class OOIAddView(BaseOOIFormView):
         context = super().get_context_data(**kwargs)
 
         context["type"] = self.ooi_class.get_ooi_type()
-        context["user"] = str(self.request.user)
         context["breadcrumbs"] = [
             {
                 "url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}),
