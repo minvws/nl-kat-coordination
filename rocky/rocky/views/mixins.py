@@ -520,7 +520,7 @@ class SingleOOIMixin(OctopoesView):
             else:
                 props["user_id"] = str(user)
                 if not user.is_active:
-                    props["zombie"] = True
+                    props["inactive"] = True
             props = {"owner" if key == "user_id" else key: value for key, value in props.items()}
         else:
             props.pop("user_id")

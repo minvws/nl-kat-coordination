@@ -112,7 +112,7 @@ class OOIDetailView(
 
         # TODO: generic solution to render ooi fields properly: https://github.com/minvws/nl-kat-coordination/issues/145
         context["object_details"] = format_display(self.get_ooi_properties(self.ooi), ignore=["json_schema"])
-        context["zombie"] = context["object_details"].pop("zombie", False)
+        context["inactive"] = context["object_details"].pop("inactive", False)
         context["ooi_types"] = self.get_ooi_types_input_values(self.ooi)
 
         context["is_question"] = isinstance(self.ooi, Question)
