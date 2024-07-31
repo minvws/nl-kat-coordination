@@ -53,11 +53,19 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
             active_filters[_("Clearance type: ")] = ", ".join(self.clearance_types)
         if self.search_string:
             active_filters[_("Searching for: ")] = self.search_string
-        if self.order_by:
-            active_filters[_("Order by: ")] = _("Clearance level") if self.order_by == "scan_level" else _("Type")
-        if self.sorting_order:
-            active_filters[_("Sorting order: ")] = _("Descending") if self.sorting_order == "desc" else _("Ascending")
         return active_filters
+
+    def get_queryset_ordering(self):
+        active_ordering_sorting = {}
+        if self.order_by:
+            active_ordering_sorting[_("Order by: ")] = (
+                _("Clearance level") if self.order_by == "scan_level" else _("Type")
+            )
+        if self.sorting_order:
+            active_ordering_sorting[_("Sorting order: ")] = (
+                _("Descending") if self.sorting_order == "desc" else _("Ascending")
+            )
+        return active_ordering_sorting
 
     def get_ooi_scan_levels(self) -> set[ScanLevel]:
         if not self.clearance_levels:
@@ -82,7 +90,7 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
     def get_sorting_order(self) -> Literal["asc", "desc"]:
         return "desc" if self.sorting_order == "desc" else "asc"
 
-    def get_queryset_filters(self):
+    def get_queryset_params(self):
         return {
             "valid_time": self.observed_at,
             "ooi_types": self.get_ooi_types(),
@@ -106,17 +114,18 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
         context["clearance_types_selection"] = self.clearance_types
 
         context["active_filters"] = self.get_active_filters()
+        context["queryset_ordering"] = self.get_queryset_ordering()
 
         return context
 
 
 class BaseOOIListView(OOIFilterView, ListView):
-    paginate_by = 150
+    paginate_by = 25
     context_object_name = "ooi_list"
     paginator = RockyPaginator
 
     def get_queryset(self) -> OOIList:
-        return OOIList(self.octopoes_api_connector, **self.get_queryset_filters())
+        return OOIList(self.octopoes_api_connector, **self.get_queryset_params())
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
