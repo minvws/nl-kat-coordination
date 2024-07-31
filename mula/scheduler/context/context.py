@@ -113,7 +113,7 @@ class AppContext:
                 cache_logger_on_first_use=True,
             )
 
-        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
+        self.logger: structlog.BoundLogger = structlog.get_logger(__name__)
 
         # Services
         katalogus_service = services.Katalogus(
@@ -158,11 +158,11 @@ class AppContext:
                 pool_size=self.config.db_connection_pool_size,
             )
             dbconn.connect()
-        except storage.errors.StorageError as e:
-            self.logger.error("Failed to connect to database", exc_info=e)
+        except storage.errors.StorageError:
+            self.logger.exception("Failed to connect to database")
             raise
-        except Exception as e:
-            self.logger.error("Failed to connect to database", exc_info=e)
+        except Exception:
+            self.logger.exception("Failed to connect to database")
             raise
 
         # Datastores, SimpleNamespace allows us to use dot notation
