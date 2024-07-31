@@ -164,9 +164,18 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
                 if isinstance(rr, LOC):
                     locrecord = register_record(DNSLOCRecord(**default_args))
-                    lat = rr.float_lontitude()
-                    lon = rr.float_longtitude()
-                    register_record(GeographicPoint(ooi=locrecord.reference, latitude=lat, longitude=lon))
+                    default_args.update({
+                        "value": rr.to_text(),
+                        "ooi": locrecord.reference,
+                        "latitude": rr.float_lontitude(),
+                        "longitude": rr.float_longtitude(),
+                        "altitude": rr.float_altitude(),
+                        "horizontal_precision": rr.horizontal_precision(),
+                        "horizontal_precision": rr.vertical_precision(),
+                        "size": rr.size(),
+                    })
+                        
+                    register_record(GeographicPoint(**default_args))
     
     # link the hostnames to their discovered zones
     for hostname_, zone in zone_links.items():
