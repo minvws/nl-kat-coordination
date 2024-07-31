@@ -156,7 +156,7 @@ class AppContext:
             dbconn = storage.DBConn(str(self.config.db_uri))
             dbconn.connect()
         except storage.errors.StorageError as e:
-            self.logger.error("Failed to connect to database", exc_info=e)
+            self.logger.exception("Failed to connect to database")
             raise
         except Exception as e:
             self.logger.error("Failed to connect to database", exc_info=e)
