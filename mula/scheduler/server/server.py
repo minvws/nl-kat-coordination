@@ -200,7 +200,7 @@ class Server:
             path="/queues/{queue_id}/pop",
             endpoint=self.pop_queue,
             methods=["POST"],
-            response_model=models.PrioritizedItem | None,
+            response_model=list[models.PrioritizedItem],
             status_code=status.HTTP_200_OK,
             description="Pop an item from a queue",
         )
@@ -528,7 +528,12 @@ class Server:
 
         return models.Queue(**q.dict())
 
-    def pop_queue(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
+    def pop_queue(
+        self,
+        queue_id: str,
+        many: bool = False,
+        filters: storage.filters.FilterRequest | None = None,
+    ) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
@@ -537,17 +542,17 @@ class Server:
             )
 
         try:
-            p_item = s.pop_item_from_queue(filters)
+            p_items = s.pop_items_from_queue(many, filters)
         except queues.QueueEmptyError:
             return None
 
-        if p_item is None:
+        if p_items is None:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_404_NOT_FOUND,
                 detail="could not pop item from queue, check your filters",
             )
 
-        return models.PrioritizedItem(**p_item.model_dump())
+        return [models.PrioritizedItem(**p_item.dict()) for p_item in p_items]
 
     def push_queue(self, queue_id: str, item: serializers.PrioritizedItem) -> Any:
         s = self.schedulers.get(queue_id)
