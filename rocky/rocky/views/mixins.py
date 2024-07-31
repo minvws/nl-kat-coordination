@@ -7,6 +7,7 @@ from typing import TypedDict
 
 import structlog
 from account.mixins import OrganizationView
+from account.models import KATUser
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.http import Http404, HttpRequest
@@ -512,12 +513,18 @@ class SingleOOIMixin(OctopoesView):
         props.pop("scan_profile")
         props.pop("primary_key")
         if "user_id" in props and props["user_id"]:
-            user = get_user_model().objects.get(id=props["user_id"])
-            if user.is_active:
-                props["user_id"] = str(user)
+            try:
+                user = get_user_model().objects.get(id=props["user_id"])
+            except KATUser.DoesNotExist:
+                user = None
+            if user is None:
+                props["user_id"] = "<user not found>"
             else:
-                name = str(user)
-                props["user_id"] = "".join([c + "\u0336" if i < len(name) - 1 else c for i, c in enumerate(name)])
+                if user.is_active:
+                    props["user_id"] = str(user)
+                else:
+                    name = str(user)
+                    props["user_id"] = "".join([c + "\u0336" if i < len(name) - 1 else c for i, c in enumerate(name)])
             props = {"owner" if key == "user_id" else key: value for key, value in props.items()}
         else:
             props.pop("user_id")

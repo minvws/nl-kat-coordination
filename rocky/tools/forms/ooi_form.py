@@ -31,6 +31,7 @@ class OOIForm(BaseRockyForm):
             self.fields[name] = field
 
     def clean(self):
+        super().clean()["user_id"] = self.user_id
         return {key: value for key, value in super().clean().items() if value}
 
     def get_fields(self) -> dict[str, forms.fields.Field]:
@@ -51,7 +52,6 @@ class OOIForm(BaseRockyForm):
                 continue
 
             if name == "user_id":
-                fields[name] = forms.CharField(widget=forms.HiddenInput(), initial=str(self.user_id))
                 continue
 
             # skip literals
