@@ -10,7 +10,7 @@ from octopoes.models.persistence import ReferenceField
 
 class DNSRecord(OOI):
     hostname: Reference = ReferenceField(Hostname, max_issue_scan_level=0, max_inherit_scan_level=2)
-    dns_record_type: Literal["A", "AAAA", "CAA", "CNAME", "MX", "NS", "PTR", "SOA", "SRV", "TXT", "LOC"]
+    dns_record_type: Literal["A", "AAAA", "CAA", "CNAME", "MX", "NS", "PTR", "SOA", "SRV", "TXT", "LOC", "GPOS"]
     value: str
     ttl: int | None = None  # todo: validation
 
@@ -187,17 +187,14 @@ class DNSCAARecord(DNSRecord):
     _natural_key_attrs = ["hostname", "flags", "tag", "value"]
 
 
-class DNSLOCRecord(DNSRecord):
-    # RFC 1876
-    object_type: Literal["DNSLOCRecord"] = "DNSLOCRecord"
-    dns_record_type: Literal["LOC"] = "LOC"
+class DNSGPOSRecord(DNSRecord):
+    # RFC 1712
+    object_type: Literal["DNSGPOSRecord"] = "DNSGPOSRecord"
+    dns_record_type: Literal["GPOS"] = "GPOS"
 
     latitude: str | None = None
     longitude: str | None = None    
     altitude: str | None = None
-    horizontal_precision: int | None = None
-    vertical_precision: int | None = None
-    size: int | None = None
     
     @property
     def natural_key(self) -> str:
@@ -205,4 +202,15 @@ class DNSLOCRecord(DNSRecord):
         key = super().natural_key
         return key.replace(self.value, sha)
 
+    _reverse_relation_names = {"hostname": "dns_gpos_records"}
+
+class DNSLOCRecord(DNSGPOSRecord):
+    # RFC 1876
+    object_type: Literal["DNSLOCRecord"] = "DNSLOCRecord"
+    dns_record_type: Literal["LOC"] = "LOC"
+
+    horizontal_precision: int | None = None
+    vertical_precision: int | None = None
+    size: int | None = None
+    
     _reverse_relation_names = {"hostname": "dns_loc_records"}
