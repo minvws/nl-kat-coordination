@@ -155,11 +155,11 @@ class AppContext:
         try:
             dbconn = storage.DBConn(str(self.config.db_uri))
             dbconn.connect()
-        except storage.errors.StorageError as e:
+        except storage.errors.StorageError:
             self.logger.exception("Failed to connect to database")
             raise
-        except Exception as e:
-            self.logger.error("Failed to connect to database", exc_info=e)
+        except Exception:
+            self.logger.exception("Failed to connect to database")
             raise
 
         # Datastores, SimpleNamespace allows us to use dot notation

@@ -10,11 +10,11 @@ from .errors import StorageError
 
 
 class DBConn:
-    def __init__(self, dsn: str, pool_size: int = 25) -> None:
+    def __init__(self, dsn: str, pool_size: int = 25):
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
 
-        self.dsn: str = dsn
-        self.pool_size: int = pool_size
+        self.dsn = dsn
+        self.pool_size = pool_size
 
     def connect(self) -> None:
         db_uri_redacted = sqlalchemy.engine.make_url(
