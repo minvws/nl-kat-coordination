@@ -72,9 +72,9 @@ coverage[toml]==7.6.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:ed8d1d1821ba5fc88d4a4f45387b65de52382fa3ef1f0115a4f7a20cdfab0e94 \
     --hash=sha256:f2501d60d7497fd55e391f423f965bbe9e650e9ffc3c627d5f0ac516026000b8 \
     --hash=sha256:f7db0b6ae1f96ae41afe626095149ecd1b212b424626175a6633c2999eaad45b
-croniter==2.0.7 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:1041b912b4b1e03751a0993531becf77851ae6e8b334c9c76ffeffb8f055f53f \
-    --hash=sha256:f15e80828d23920c4bb7f4d9340b932c9dcabecafc7775703c8b36d1253ed526
+croniter==3.0.3 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:34117ec1741f10a7bd0ec3ad7d8f0eb8fa457a2feb9be32e6a2250e158957668 \
+    --hash=sha256:b3bd11f270dc54ccd1f2397b813436015a86d30ffc5a7a9438eec1ed916f2101
 decorator==5.1.1 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:637996211036b6385ef91435e4fae22989472f9d571faba8927ba8253acbc330 \
     --hash=sha256:b8c3f85900b9dc423225913c5aace94729fe1fa9763b38939a95226f02d37186
