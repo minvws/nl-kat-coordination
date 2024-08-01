@@ -333,7 +333,9 @@ class Scheduler(abc.ABC):
 
         return item
 
-    def pop_item_from_queue(self, filters: storage.filters.FilterRequest | None = None) -> models.Task | None:
+    def pop_item_from_queue(
+        self, filters: storage.filters.FilterRequest | None = None
+    ) -> models.Task | None:
         """Pop an item from the queue.
 
         Args:
@@ -401,7 +403,9 @@ class Scheduler(abc.ABC):
 
         # We want to delay the job by a random amount of time, in a range of 5 hours
         jitter_range_seconds = 5 * 60 * 60
-        jitter_offset = timedelta(seconds=random.uniform(-jitter_range_seconds, jitter_range_seconds))
+        jitter_offset = timedelta(
+            seconds=random.uniform(-jitter_range_seconds, jitter_range_seconds)
+        )  # nosec
 
         # Check if the adjusted time is earlier than the minimum, and
         # ensure that the adjusted time is not earlier than the deadline
@@ -461,7 +465,9 @@ class Scheduler(abc.ABC):
             status=models.TaskStatus.QUEUED,
         )
         task_ids = [task.id for task in tasks]
-        self.ctx.datastores.task_store.cancel_tasks(scheduler_id=self.scheduler_id, task_ids=task_ids)
+        self.ctx.datastores.task_store.cancel_tasks(
+            scheduler_id=self.scheduler_id, task_ids=task_ids
+        )
 
         self.logger.info(
             "Disabled scheduler: %s",
