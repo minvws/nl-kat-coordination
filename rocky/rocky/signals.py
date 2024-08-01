@@ -7,7 +7,7 @@ logger = structlog.get_logger(__name__)
 def log_save(sender, instance, created, **kwargs) -> None:
     if isinstance(instance, LogEntry):
         # Django admin will automatically create a LogEntry for each admin
-        # action, but we shouldn't send log messages about thosee.
+        # action, but we shouldn't send log messages about these.
         return
 
     if created:
