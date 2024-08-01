@@ -458,6 +458,7 @@ if BROWSABLE_API:
     DEFAULT_RENDERER_CLASSES = DEFAULT_RENDERER_CLASSES + ["rest_framework.renderers.BrowsableAPIRenderer"]
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": ("knox.auth.TokenAuthentication",),
     "DEFAULT_PERMISSION_CLASSES": [
         # For now this will provide a safe default, but non-admin users will
         # need to be able to use the API in the future..
