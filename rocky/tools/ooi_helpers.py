@@ -237,7 +237,11 @@ OOI_TYPES_WITHOUT_FINDINGS = [name for name, cls_ in OOI_TYPES.items() if cls_ n
 
 
 def get_or_create_ooi(
-    api_connector: OctopoesAPIConnector, bytes_client: BytesClient, ooi: OOI, observed_at: datetime
+    api_connector: OctopoesAPIConnector,
+    bytes_client: BytesClient,
+    ooi: OOI,
+    observed_at: datetime,
+    timeout: datetime | None = None,
 ) -> tuple[OOI, bool]:
     try:
         return api_connector.get(ooi.reference, observed_at), False
