@@ -60,3 +60,8 @@ omit = [
     "scheduler/utils/*",
     "scheduler/__main__.py",
 ]
+
+[tool.ruff]
+per-file-ignores = {
+    "scheduler/schedulers/scheduler.py": ["S311"]
+}

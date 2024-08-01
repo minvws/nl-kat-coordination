@@ -64,17 +64,13 @@ class ScheduleAPI:
         min_created_at: datetime.datetime | None = None,
         max_created_at: datetime.datetime | None = None,
     ) -> Any:
-        if (
-            min_created_at is not None and max_created_at is not None
-        ) and min_created_at > max_created_at:
+        if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
                 detail="min_created_at must be less than max_created_at",
             )
 
-        if (
-            min_deadline_at is not None and max_deadline_at is not None
-        ) and min_deadline_at > max_deadline_at:
+        if (min_deadline_at is not None and max_deadline_at is not None) and min_deadline_at > max_deadline_at:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
                 detail="min_deadline_at must be less than max_deadline_at",
