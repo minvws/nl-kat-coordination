@@ -9,7 +9,15 @@ from opentelemetry import trace
 from scheduler import context, models, queues, rankers
 from scheduler.connectors import listeners
 from scheduler.connectors.errors import ExternalServiceError
-from scheduler.models import Normalizer, NormalizerTask, Organisation, Plugin, RawDataReceivedEvent, Task, TaskStatus
+from scheduler.models import (
+    Normalizer,
+    NormalizerTask,
+    Organisation,
+    Plugin,
+    RawDataReceivedEvent,
+    Task,
+    TaskStatus,
+)
 
 from .scheduler import Scheduler
 
@@ -128,7 +136,9 @@ class NormalizerScheduler(Scheduler):
         # Get all normalizers for the mime types of the raw data
         normalizers: dict[str, Plugin] = {}
         for mime_type in latest_raw_data.raw_data.mime_types:
-            normalizers_by_mime_type: list[Plugin] = self.get_normalizers_for_mime_type(mime_type.get("value"))
+            normalizers_by_mime_type: list[Plugin] = self.get_normalizers_for_mime_type(
+                mime_type.get("value")
+            )
 
             for normalizer in normalizers_by_mime_type:
                 normalizers[normalizer.id] = normalizer
@@ -168,7 +178,9 @@ class NormalizerScheduler(Scheduler):
                 )
 
     @tracer.start_as_current_span("normalizer_push_task")
-    def push_normalizer_task(self, normalizer_task: models.NormalizerTask, caller: str = "") -> None:
+    def push_normalizer_task(
+        self, normalizer_task: models.NormalizerTask, caller: str = ""
+    ) -> None:
         """Given a normalizer and raw data, create a task and push it to the
         queue.
 
@@ -243,6 +255,7 @@ class NormalizerScheduler(Scheduler):
         )
 
         task = Task(
+            id=normalizer_task.id,
             scheduler_id=self.scheduler_id,
             type=self.ITEM_TYPE.type,
             priority=score,
@@ -352,9 +365,11 @@ class NormalizerScheduler(Scheduler):
             A list of Plugins of type normalizer for the given mime type.
         """
         try:
-            normalizers = self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(
-                self.organisation.id,
-                mime_type,
+            normalizers = (
+                self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(
+                    self.organisation.id,
+                    mime_type,
+                )
             )
         except ExternalServiceError:
             self.logger.warning(
