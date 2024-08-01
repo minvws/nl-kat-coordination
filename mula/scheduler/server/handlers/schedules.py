@@ -55,7 +55,7 @@ class ScheduleAPI:
     def list(
         self,
         request: fastapi.Request,
-        hash: str | None = None,
+        schedule_hash: str | None = None,
         enabled: bool | None = True,
         offset: int = 0,
         limit: int = 10,
@@ -64,13 +64,17 @@ class ScheduleAPI:
         min_created_at: datetime.datetime | None = None,
         max_created_at: datetime.datetime | None = None,
     ) -> Any:
-        if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
+        if (
+            min_created_at is not None and max_created_at is not None
+        ) and min_created_at > max_created_at:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
                 detail="min_created_at must be less than max_created_at",
             )
 
-        if (min_deadline_at is not None and max_deadline_at is not None) and min_deadline_at > max_deadline_at:
+        if (
+            min_deadline_at is not None and max_deadline_at is not None
+        ) and min_deadline_at > max_deadline_at:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
                 detail="min_deadline_at must be less than max_deadline_at",
@@ -78,7 +82,7 @@ class ScheduleAPI:
 
         try:
             results, count = self.ctx.datastores.schedule_store.get_schedules(
-                schedule_hash=hash,
+                schedule_hash=schedule_hash,
                 enabled=enabled,
                 min_deadline_at=min_deadline_at,
                 max_deadline_at=max_deadline_at,
