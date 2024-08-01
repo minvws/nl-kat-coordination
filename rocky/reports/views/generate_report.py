@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from datetime import datetime, timezone
 from typing import Any
 
 from django.contrib import messages
@@ -39,7 +40,7 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
             },
             {
                 "url": reverse("generate_report_select_oois", kwargs=kwargs) + selection,
-                "text": _("Select Objects"),
+                "text": _("Select objects"),
             },
             {
                 "url": reverse("generate_report_select_report_types", kwargs=kwargs) + selection,
@@ -48,6 +49,10 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
             {
                 "url": reverse("generate_report_setup_scan", kwargs=kwargs) + selection,
                 "text": _("Configuration"),
+            },
+            {
+                "url": reverse("generate_report_export_setup", kwargs=kwargs) + selection,
+                "text": _("Export setup"),
             },
             {
                 "url": reverse("generate_report_view", kwargs=kwargs) + selection,
@@ -122,7 +127,7 @@ class ReportTypesSelectionGenerateReportView(
 
 
 class SaveGenerateReportMixin(ReportPluginView):
-    def save_report(self) -> ReportOOI:
+    def save_report(self, report_names: list) -> ReportOOI:
         error_reports = []
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
         by_type: dict[str, list[str]] = {}
@@ -177,9 +182,17 @@ class SaveGenerateReportMixin(ReportPluginView):
                 parent=None,
                 has_parent=False,
                 observed_at=observed_at,
+                name=report_names[0][1],
             )
             for report_type, ooi_data in report_data.items():
                 for ooi, data in ooi_data.items():
+                    report_type_name = str(get_report_by_id(report_type).name)
+                    ooi_name = Reference.from_str(ooi).human_readable
+                    for default_name, updated_name in report_names:
+                        if ooi_name in default_name and report_type_name in default_name:
+                            name = updated_name
+                            break
+
                     raw_id = self.save_report_raw(data={"report_data": data["data"]})
                     self.save_report_ooi(
                         report_data_raw_id=raw_id,
@@ -188,6 +201,7 @@ class SaveGenerateReportMixin(ReportPluginView):
                         parent=report_ooi.reference,
                         has_parent=True,
                         observed_at=observed_at,
+                        name=name,
                     )
         # if its a single report we can just save it as complete
         else:
@@ -204,6 +218,7 @@ class SaveGenerateReportMixin(ReportPluginView):
                 parent=None,
                 has_parent=False,
                 observed_at=observed_at,
+                name=report_names[0][1],
             )
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if error_reports:
@@ -240,15 +255,36 @@ class SetupScanGenerateReportView(
                 reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(self.request)
             )
         if not self.report_has_required_plugins() or self.plugins_enabled():
-            report_ooi = self.save_report()
-            return redirect(
-                reverse("view_report", kwargs={"organization_code": self.organization.code})
-                + "?"
-                + urlencode({"report_id": report_ooi.reference})
-            )
+            return redirect(self.get_next())
         if not self.plugins:
             return redirect(self.get_previous())
         return super().get(request, *args, **kwargs)
+
+
+class ExportSetupGenerateReportView(
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportPluginView, TemplateView
+):
+    """
+    Shows the export setup page where users can set their export preferences.
+    """
+
+    template_name = "generate_report/export_setup.html"
+    breadcrumbs_step = 6
+    current_step = 4
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.selected_report_types:
+            messages.error(request, _("Select at least one report type to proceed."))
+            return redirect(self.get_previous())
+
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        reports = create_report_names(self.oois_pk, self.report_types)
+        context = super().get_context_data(**kwargs)
+        context["current_datetime"] = datetime.now(timezone.utc)
+        context["reports"] = reports
+        return context
 
 
 class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportView, ReportPluginView, TemplateView):
@@ -263,10 +299,43 @@ class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportV
     ooi_types = get_ooi_types_with_report()
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        report_ooi = self.save_report()
+        old_report_names = request.POST.getlist("old_report_name")
+        new_report_names = request.POST.getlist("report_name")
+        report_names = list(zip(old_report_names, new_report_names))
+        report_ooi = self.save_report(report_names)
 
         return redirect(
             reverse("view_report", kwargs={"organization_code": self.organization.code})
             + "?"
             + urlencode({"report_id": report_ooi.reference})
         )
+
+
+def create_report_names(oois_pk, report_types):
+    reports = {}
+    oois_count = len(oois_pk)
+    report_types_count = len(report_types)
+    ooi = Reference.from_str(oois_pk[0]).human_readable
+    report_type = report_types[0].name
+
+    # Create name for parent report
+    if not (report_types_count == 1 and oois_count == 1):
+        if report_types_count > 1 and oois_count > 1:
+            name = _("Concatenated Report for {oois_count} objects").format(
+                report_type=report_type, oois_count=oois_count
+            )
+        elif report_types_count > 1 and oois_count == 1:
+            name = _("Concatenated Report for {ooi}").format(ooi=ooi)
+        elif report_types_count == 1 and oois_count > 1:
+            name = _("{report_type} for {oois_count} objects").format(report_type=report_type, oois_count=oois_count)
+        reports[name] = ""
+
+    # Create name for subreports or single reports
+    for ooi in oois_pk:
+        for report_type in report_types:
+            name = _("{report_type} for {ooi}").format(
+                report_type=report_type.name, ooi=Reference.from_str(ooi).human_readable
+            )
+            reports[name] = ""
+
+    return reports
