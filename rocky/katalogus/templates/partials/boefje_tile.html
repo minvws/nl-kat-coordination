@@ -4,7 +4,9 @@
 <div class="{% if item.required %}required{% endif %} {{ item|get_type_name|lower }}"
      role="group"
      aria-labelledby="{{ item.id }}">
-    {% if item.required %}<span class="nota-bene" id="boefje_{{ item.id }}">This object type is required</span>{% endif %}
+    {% if item.required %}
+        <span class="nota-bene" id="boefje_{{ item.id }}">{% translate "This object type is required" %}</span>
+    {% endif %}
     {% if widget %}
         {% include "forms/widgets/checkbox_option.html" %}
 
