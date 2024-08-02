@@ -43,7 +43,4 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, str | bytes]]:
         except IndexError:
             pass
 
-    if not results:
-        raise StopIteration
-
     return [(set(), json.dumps(results))]
