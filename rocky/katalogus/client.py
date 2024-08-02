@@ -84,6 +84,7 @@ class KATalogusClientV1:
         self.session = httpx.Client(base_url=base_uri)
         self.organization = organization
         self.organization_uri = f"/v1/organisations/{organization}"
+        self.logger = logger.bind(organization_code=organization)
 
     def organization_exists(self) -> bool:
         response = self.session.get(self.organization_uri)
@@ -94,13 +95,13 @@ class KATalogusClientV1:
         response = self.session.post("/v1/organisations/", json={"id": self.organization, "name": name})
         response.raise_for_status()
 
-        logger.info("Created organization", organization_code=self.organization, name=name)
+        self.logger.info("Created organization", name=name)
 
     def delete_organization(self):
         response = self.session.delete(self.organization_uri)
         response.raise_for_status()
 
-        logger.info("Deleted organization", organization_code=self.organization)
+        self.logger.info("Deleted organization", organization_code=self.organization)
 
     def get_plugins(self, **params):
         try:
@@ -127,7 +128,7 @@ class KATalogusClientV1:
         try:
             Draft202012Validator.check_schema(schema)
         except SchemaError as error:
-            logger.warning("Invalid schema found for plugin %s, %s", plugin_id, error)
+            self.logger.warning("Invalid schema found for plugin %s, %s", plugin_id, error)
         else:
             return schema
 
@@ -142,13 +143,13 @@ class KATalogusClientV1:
         response = self.session.put(f"{self.organization_uri}/{plugin_id}/settings", json=values)
         response.raise_for_status()
 
-        logger.info("Upsert plugin settings", plugin_id=plugin_id)
+        self.logger.info("Upsert plugin settings", plugin_id=plugin_id)
 
     def delete_plugin_settings(self, plugin_id: str):
         response = self.session.delete(f"{self.organization_uri}/{plugin_id}/settings")
         response.raise_for_status()
 
-        logger.info("Delete plugin settings", plugin_id=plugin_id)
+        self.logger.info("Delete plugin settings", plugin_id=plugin_id)
 
         return response
 
@@ -186,7 +187,7 @@ class KATalogusClientV1:
         return [plugin for plugin in self.get_normalizers() if plugin.enabled]
 
     def _patch_boefje_state(self, boefje_id: str, enabled: bool) -> None:
-        logger.info("Toggle plugin state", plugin_id=boefje_id, enabled=enabled)
+        self.logger.info("Toggle plugin state", plugin_id=boefje_id, enabled=enabled)
 
         response = self.session.patch(
             f"{self.organization_uri}/plugins/{boefje_id}",
