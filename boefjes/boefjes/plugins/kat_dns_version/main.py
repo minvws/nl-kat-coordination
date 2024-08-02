@@ -15,8 +15,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, str | bytes]]:
     input_ = boefje_meta.arguments["input"]  # input is IPService
     ip_port = input_["ip_port"]
     if input_["service"]["name"] != "dns":
-        logging.info("Not a DNS service")
-        return
+        return [({"boefje/error"}, "Not a DNS service")]
 
     ip = ip_port["address"]["address"]
     port = ip_port["port"]
