@@ -3,12 +3,14 @@
 
 <section>
     <div>
-        <h1>{% translate "Configuration" %}</h1>
+        <h2>{% translate "Configuration" %}</h2>
         <p class="emphasized">{% translate "Set up the required plugins for this report." %}</p>
         {% if selected_oois and selected_report_types %}
             <a href="{{ previous }}" class="button ghost">
                 <span class="icon ti-chevron-left"></span>{% translate "Change selection" %}
             </a>
+            {% include "partials/plugin_overview_table.html" %}
+
             <h2>{% translate "Plugins" %}</h2>
             <p>
                 <strong>{% translate "KAT will be able to generate a full report when all the required and suggested boefjes are enabled." %}</strong>
@@ -36,8 +38,6 @@
                     Enabling them just before report generation will likely result in inaccurate reports, as plugins have not finished collecting data.
                 {% endblocktranslate %}
             </p>
-            {% include "partials/plugin_overview_table.html" %}
-
             <h3>{% translate "Required plugins" %}</h3>
             <p>{% translate "This report type requires the following plugins to be enabled:" %}</p>
             {% if all_plugins_enabled.required %}
@@ -54,7 +54,7 @@
                     </div>
                     <div class="column-4 tiles plugins images-cover">
                         {% for required_plugin in plugins.required|dictsort:"enabled" %}
-                            {% include "partials/plugin_tile.html" with plugin=required_plugin show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types %}
+                            {% include "partials/plugin_tile.html" with plugin=required_plugin plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types %}
 
                         {% endfor %}
                     </div>
@@ -92,14 +92,17 @@
                     </div>
                 </div>
             {% endif %}
-            <form id="generate_report" class="inline" method="get" action="{{ next }}">
+            <form id="continue-to-configuration"
+                  class="inline"
+                  method="get"
+                  action="{{ next }}">
                 {% include "forms/report_form_fields.html" %}
 
                 {% for report_type in selected_report_types %}
-                    <input type="hidden" name="report_type" value={{ report_type }}>
+                    <input type="hidden" name="report_type" value="{{ report_type }}">
                 {% endfor %}
                 <button type="submit">
-                    {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
+                    {% translate "Continue" %}<span class="icon ti-chevron-right"></span>
                 </button>
             </form>
         {% else %}

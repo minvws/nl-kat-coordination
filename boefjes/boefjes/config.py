@@ -1,13 +1,13 @@
 import logging
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath, IPvAnyAddress, PostgresDsn, conint
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 from pydantic_settings.sources import EnvSettingsSource
 
-from boefjes.katalogus.models import EncryptionMiddleware
+from boefjes.models import EncryptionMiddleware
 
 BASE_DIR: Path = Path(__file__).parent.resolve()
 
@@ -130,6 +130,8 @@ class Settings(BaseSettings):
     span_export_grpc_endpoint: AnyHttpUrl | None = Field(
         None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
     )
+
+    logging_format: Literal["text", "json"] = Field("text", description="Logging format")
 
     model_config = SettingsConfigDict(env_prefix="BOEFJES_")
 

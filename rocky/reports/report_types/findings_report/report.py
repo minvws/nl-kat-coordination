@@ -1,5 +1,4 @@
 from datetime import datetime
-from logging import getLogger
 from typing import Any
 
 from django.utils.translation import gettext_lazy as _
@@ -8,8 +7,6 @@ from octopoes.models import Reference
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.types import ALL_TYPES
 from reports.report_types.definitions import Report, ReportPlugins
-
-logger = getLogger(__name__)
 
 TREE_DEPTH = 9
 SEVERITY_OPTIONS = [severity.value for severity in RiskLevelSeverity]

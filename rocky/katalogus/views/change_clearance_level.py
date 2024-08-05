@@ -5,10 +5,11 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
-from katalogus.views.mixins import BoefjeMixin, SinglePluginView
+from katalogus.views.mixins import SinglePluginView
+from rocky.views.scheduler import SchedulerView
 
 
-class ChangeClearanceLevel(OrganizationPermissionRequiredMixin, BoefjeMixin, SinglePluginView, TemplateView):
+class ChangeClearanceLevel(OrganizationPermissionRequiredMixin, SchedulerView, SinglePluginView, TemplateView):
     template_name = "change_clearance_level.html"
     permission_required = "tools.can_set_clearance_level"
 

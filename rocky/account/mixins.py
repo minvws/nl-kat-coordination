@@ -108,6 +108,12 @@ class OrganizationView(View):
         context["perms"] = OrganizationPermWrapper(self.organization_member)
         return context
 
+    def indemnification_error(self):
+        return messages.error(
+            self.request,
+            f"Indemnification not present at organization {self.organization}.",
+        )
+
     @property
     def may_update_clearance_level(self) -> bool:
         if not self.indemnification_present:
@@ -130,7 +136,7 @@ class OrganizationView(View):
     def raise_clearance_level(self, ooi_reference: Reference, level: int) -> bool:
         self.verify_raise_clearance_level(level)
         self.octopoes_api_connector.save_scan_profile(
-            DeclaredScanProfile(reference=ooi_reference, level=ScanLevel(level)),
+            DeclaredScanProfile(reference=ooi_reference, level=ScanLevel(level), user_id=self.request.user.id),
             datetime.now(timezone.utc),
         )
 
@@ -139,7 +145,10 @@ class OrganizationView(View):
     def raise_clearance_levels(self, ooi_references: list[Reference], level: int) -> bool:
         self.verify_raise_clearance_level(level)
         self.octopoes_api_connector.save_many_scan_profiles(
-            [DeclaredScanProfile(reference=reference, level=ScanLevel(level)) for reference in ooi_references],
+            [
+                DeclaredScanProfile(reference=reference, level=ScanLevel(level), user_id=self.request.user.id)
+                for reference in ooi_references
+            ],
             datetime.now(timezone.utc),
         )
 

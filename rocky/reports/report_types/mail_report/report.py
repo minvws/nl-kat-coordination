@@ -1,6 +1,5 @@
 from collections.abc import Iterable
 from datetime import datetime
-from logging import getLogger
 from typing import Any
 
 from django.utils.translation import gettext_lazy as _
@@ -9,15 +8,13 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
 
-logger = getLogger(__name__)
-
 MAIL_FINDING_TYPES = ["KAT-NO-SPF", "KAT-NO-DMARC", "KAT-NO-DKIM"]
 
 
 class MailReport(Report):
     id = "mail-report"
     name = _("Mail Report")
-    description = _("System specific mail report that focusses on IP addresses and hostnames.")
+    description = _("System specific Mail Report that focusses on IP addresses and hostnames.")
     plugins = {"required": ["dns-records"], "optional": []}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "mail_report/report.html"

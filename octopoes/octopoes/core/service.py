@@ -3,10 +3,12 @@ from collections import Counter
 from collections.abc import Callable, ValuesView
 from datetime import datetime, timezone
 from logging import getLogger
+from time import perf_counter
 from typing import overload
 
 from bits.definitions import get_bit_definitions
 from bits.runner import BitRunner
+from pydantic import TypeAdapter
 
 from octopoes.config.settings import (
     DEFAULT_LIMIT,
@@ -28,6 +30,7 @@ from octopoes.models import (
 )
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
+from octopoes.models.ooi.config import Config
 from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import (
@@ -42,6 +45,7 @@ from octopoes.repositories.ooi_repository import OOIRepository
 from octopoes.repositories.origin_parameter_repository import OriginParameterRepository
 from octopoes.repositories.origin_repository import OriginRepository
 from octopoes.repositories.scan_profile_repository import ScanProfileRepository
+from octopoes.xtdb.client import Operation, OperationType, XTDBSession
 
 logger = getLogger(__name__)
 settings = Settings()
@@ -66,11 +70,13 @@ class OctopoesService:
         origin_repository: OriginRepository,
         origin_parameter_repository: OriginParameterRepository,
         scan_profile_repository: ScanProfileRepository,
+        session: XTDBSession | None = None,
     ):
         self.ooi_repository = ooi_repository
         self.origin_repository = origin_repository
         self.origin_parameter_repository = origin_parameter_repository
         self.scan_profile_repository = scan_profile_repository
+        self.session = session
 
     @overload
     def _populate_scan_profiles(self, oois: ValuesView[OOI], valid_time: datetime) -> ValuesView[OOI]: ...
@@ -190,7 +196,7 @@ class OctopoesService:
         source = self.ooi_repository.get(origin.source, valid_time)
 
         parameters_references = self.origin_parameter_repository.list_by_origin({origin.id}, valid_time)
-        parameters = self.ooi_repository.load_bulk({x.reference for x in parameters_references}, valid_time)
+        parameters = self.ooi_repository.load_bulk_as_list({x.reference for x in parameters_references}, valid_time)
 
         config = {}
         if bit_definition.config_ooi_relation_path is not None:
@@ -199,12 +205,26 @@ class OctopoesService:
                 config = configs[-1].config
 
         try:
-            resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()), config=config)
+            if isinstance(self.session, XTDBSession):
+                start = perf_counter()
+                resulting_oois = BitRunner(bit_definition).run(source, parameters, config=config)
+                stop = perf_counter()
+                metrics: dict[str, str] = {
+                    "bit": bit_definition.id,
+                    "config": json.dumps(config),
+                    "elapsed": str(stop - start),
+                    "parameters": TypeAdapter(list[OOI]).dump_json(parameters).decode(),
+                    "source": source.model_dump_json(),
+                    "xt/id": "BIT_METRIC",
+                    "yield": TypeAdapter(list[OOI]).dump_json(resulting_oois).decode(),
+                }
+                ops: list[Operation] = [(OperationType.PUT, metrics, valid_time)]
+                self.session.client.submit_transaction(ops)
+            else:
+                resulting_oois = BitRunner(bit_definition).run(source, parameters, config=config)
+            self.save_origin(origin, resulting_oois, valid_time)
         except Exception as e:
             logger.exception("Error running inference", exc_info=e)
-            return
-
-        self.save_origin(origin, resulting_oois, valid_time)
 
     @staticmethod
     def check_path_level(path_level: int | None, current_level: int):
@@ -402,14 +422,20 @@ class OctopoesService:
         if event.new_data is None:
             raise ValueError("Update event new_data should not be None")
 
-        inference_origins = self.origin_repository.list_origins(event.valid_time, source=event.new_data.reference)
-        inference_params = self.origin_parameter_repository.list_by_reference(
-            event.new_data.reference, valid_time=event.valid_time
-        )
-        for inference_param in inference_params:
-            inference_origins.append(self.origin_repository.get(inference_param.origin_id, event.valid_time))
+        if isinstance(event.new_data, Config):
+            relevant_bit_ids = [
+                bit.id for bit in get_bit_definitions().values() if bit.config_ooi_relation_path is not None
+            ]
+            inference_origins = self.origin_repository.list_origins(event.valid_time, method=relevant_bit_ids)
+        else:
+            inference_origins = self.origin_repository.list_origins(event.valid_time, source=event.new_data.reference)
+            inference_params = self.origin_parameter_repository.list_by_reference(
+                event.new_data.reference, valid_time=event.valid_time
+            )
+            for inference_param in inference_params:
+                inference_origins.append(self.origin_repository.get(inference_param.origin_id, event.valid_time))
 
-        inference_origins = [o for o in inference_origins if o.origin_type == OriginType.INFERENCE]
+            inference_origins = [o for o in inference_origins if o.origin_type == OriginType.INFERENCE]
         for inference_origin in inference_origins:
             self._run_inference(inference_origin, event.valid_time)
 
@@ -584,11 +610,13 @@ class OctopoesService:
         bit_definitions = get_bit_definitions()
         for bit_id, bit_definition in bit_definitions.items():
             # loop over all oois that are consumed by the bit
-            for ooi in self.ooi_repository.list_oois(
-                {bit_definition.consumes}, limit=20000, valid_time=valid_time
-            ).items:
+            for ooi in self.ooi_repository.list_oois_by_object_types(
+                {bit_definition.consumes},
+                valid_time=valid_time,
+            ):
                 if not isinstance(ooi, bit_definition.consumes):
-                    logger.exception("Wut?")
+                    logger.exception("Requested OOI type not met")
+                    raise ObjectNotFoundException("Requested OOI type not met")
 
                 # insert, if not exists
                 bit_instance = Origin(

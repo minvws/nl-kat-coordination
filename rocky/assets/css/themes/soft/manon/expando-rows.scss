@@ -1,8 +1,8 @@
 /* Expando rows - Variables */
 
 :root {
-  --expando-rows-table-cell-background-color: #ffffff;
-  --expando-rows-row-background-color: #eeecf8;
+  --expando-rows-table-cell-background-color: var(--colors-white);
+  --expando-rows-row-background-color: var(--colors-purrple-100);
   --expando-rows-row-striping-background-color: var(
     --expando-rows-row-background-color
   );

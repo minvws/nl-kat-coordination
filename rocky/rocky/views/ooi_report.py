@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from account.mixins import OrganizationView
@@ -6,8 +6,8 @@ from django.contrib import messages
 from django.http import FileResponse, HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView
 from katalogus.client import get_katalogus
 from tools.forms.ooi import OOIReportSettingsForm
 from tools.models import Organization
@@ -37,7 +37,7 @@ from rocky.views.mixins import FindingList, OctopoesView, SeveritiesMixin, Singl
 from rocky.views.ooi_view import BaseOOIDetailView
 
 
-class OOIReportView(BaseOOIDetailView):
+class OOIReportView(BaseOOIDetailView, TemplateView):
     template_name = "oois/ooi_report.html"
     connector_form_class = OOIReportSettingsForm
 
@@ -84,10 +84,16 @@ class OOIReportPDFView(SingleOOITreeMixin):
                 ),
             )
         except GeneratingReportFailed:
-            messages.error(self.request, _("Generating report failed. See Keiko logs for more information."))
+            messages.error(
+                self.request,
+                _("Generating report failed. See Keiko logs for more information."),
+            )
             return redirect(get_ooi_url("ooi_report", ooi.primary_key, self.organization.code))
         except ReportNotFoundException:
-            messages.error(self.request, _("Timeout reached generating report. See Keiko logs for more information."))
+            messages.error(
+                self.request,
+                _("Timeout reached generating report. See Keiko logs for more information."),
+            )
             return redirect(get_ooi_url("ooi_report", ooi.primary_key, self.organization.code))
 
         return FileResponse(
@@ -136,10 +142,16 @@ class FindingReportPDFView(SeveritiesMixin, OctopoesView):
                 ),
             )
         except GeneratingReportFailed:
-            messages.error(request, _("Generating report failed. See Keiko logs for more information."))
+            messages.error(
+                request,
+                _("Generating report failed. See Keiko logs for more information."),
+            )
             return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))
         except ReportNotFoundException:
-            messages.error(request, _("Timeout reached generating report. See Keiko logs for more information."))
+            messages.error(
+                request,
+                _("Timeout reached generating report. See Keiko logs for more information."),
+            )
             return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))
 
         return FileResponse(

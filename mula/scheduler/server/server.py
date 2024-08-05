@@ -19,6 +19,7 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from scheduler import context, models, queues, schedulers, storage, version
 from scheduler.config import settings
 
+from . import serializers
 from .pagination import PaginatedResponse, paginate
 
 
@@ -50,7 +51,7 @@ class Server:
         self.schedulers: dict[str, schedulers.Scheduler] = s
         self.config: settings.Settings = settings.Settings()
 
-        self.api = fastapi.FastAPI()
+        self.api = fastapi.FastAPI(title="Scheduler (Mula) API")
 
         # Set up OpenTelemetry instrumentation
         if self.config.host_metrics is not None:
@@ -171,6 +172,7 @@ class Server:
             endpoint=self.patch_task,
             methods=["PATCH"],
             response_model=models.Task,
+            response_model_exclude_unset=True,
             status_code=status.HTTP_200_OK,
             description="Update a task",
         )
@@ -304,7 +306,8 @@ class Server:
             )
 
         # FIXME: deprecated; backwards compatibility for rocky that uses the
-        # input_ooi and plugin_id parameters.
+        # input_ooi and plugin_id parameters. These filter options should be
+        # defined in the filter request payload not as query parameters.
         f_req = filters or storage.filters.FilterRequest(filters={})
         if input_ooi is not None:
             if task_type == "boefje":
@@ -349,6 +352,9 @@ class Server:
 
             f_req.filters.update(f_ooi)  # type: ignore
 
+        # FIXME: deprecated; backwards compatibility for rocky that uses the
+        # input_ooi and plugin_id parameters. These filter options should be
+        # defined in the filter request payload not as query parameters.
         if plugin_id is not None:
             if task_type == "boefje":
                 f_plugin = {
@@ -362,12 +368,16 @@ class Server:
                     ]
                 }
             elif task_type == "normalizer":
-                f_plugin = storage.filters.Filter(
-                    column="p_item",
-                    field="data__normalizer__id",
-                    operator="eq",
-                    value=plugin_id,
-                )
+                f_plugin = {
+                    "and": [
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__normalizer__id",
+                            operator="eq",
+                            value=plugin_id,
+                        )
+                    ]
+                }
             else:
                 f_plugin = {
                     "or": [
@@ -441,13 +451,9 @@ class Server:
 
         return models.Task(**task.model_dump())
 
-    def patch_task(self, task_id: uuid.UUID, item: dict) -> Any:
-        if len(item) == 0:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail="no data to patch",
-            )
-
+    # NOTE: serializers.Task instead of models.Task is needed for patch
+    # endpoints # to allow for partial updates.
+    def patch_task(self, task_id: uuid.UUID, item: serializers.Task) -> Any:
         try:
             task_db = self.ctx.datastores.task_store.get_task_by_id(task_id)
         except storage.errors.StorageError as exc:
@@ -468,7 +474,14 @@ class Server:
                 detail="task not found",
             )
 
-        updated_task = task_db.model_copy(update=item)
+        patch_data = item.model_dump(exclude_unset=True)
+        if len(patch_data) == 0:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="no data to patch",
+            )
+
+        updated_task = task_db.model_copy(update=patch_data)
 
         # Update task in database
         try:
@@ -536,7 +549,7 @@ class Server:
 
         return models.PrioritizedItem(**p_item.model_dump())
 
-    def push_queue(self, queue_id: str, item: models.PrioritizedItemRequest) -> Any:
+    def push_queue(self, queue_id: str, item: serializers.PrioritizedItem) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(

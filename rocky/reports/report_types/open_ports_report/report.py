@@ -1,6 +1,5 @@
 from collections.abc import Iterable
 from datetime import datetime
-from logging import getLogger
 from typing import Any
 
 from django.utils.translation import gettext_lazy as _
@@ -8,8 +7,6 @@ from django.utils.translation import gettext_lazy as _
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
-
-logger = getLogger(__name__)
 
 
 class OpenPortsReport(Report):
@@ -59,7 +56,7 @@ class OpenPortsReport(Report):
                     services[port.port] = [service.name for service in services_by_port.get(port.reference, [])]
 
                 sorted_port_numbers = dict(sorted(port_numbers.items()))
-                by_ip[ip] = {
+                by_ip[ip.tokenized.address] = {
                     "ports": sorted_port_numbers,
                     "hostnames": hostnames,
                     "services": services,

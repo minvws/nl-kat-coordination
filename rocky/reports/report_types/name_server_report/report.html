@@ -1,10 +1,11 @@
 {% load i18n %}
+{% load report_extra %}
 
 {% if data.name_server_checks|length > 0 %}
     {% if generate_report %}
         <p>
             {% blocktranslate trimmed %}
-                The name server report provides an overview of the compliance checks that
+                The Name Server Report provides an overview of the compliance checks that
                 were performed against the identified Domain Name Servers (DNS). The compliance
                 checks verify the presence and validity of DNSSEC and whether no unnecessary
                 ports were identified to be open. The table below gives an overview of the
@@ -27,34 +28,34 @@
                 <tr>
                     <td>{% translate "DNSSEC Present" %}</td>
                     <td>
-                        {% if data.name_server_checks.has_dnssec != data.name_server_checks|length %}
+                        {% if data.name_server_checks.checks|sum_attribute:"has_dnssec" != data.name_server_checks.checks|length %}
                             <span class="icon incomplete"></span>
                         {% else %}
                             <span class="icon positive"></span>
                         {% endif %}
-                        {{ data.name_server_checks.has_dnssec }}/{{ data.name_server_checks|length }} {% translate "name servers compliant" %}
+                        {{ data.name_server_checks.checks|sum_attribute:"has_dnssec" }}/{{ data.name_server_checks.checks|length }} {% translate "name servers compliant" %}
                     </td>
                 </tr>
                 <tr>
                     <td>{% translate "Valid DNSSEC" %}</td>
                     <td>
-                        {% if data.name_server_checks.has_valid_dnssec != data.name_server_checks|length %}
+                        {% if data.name_server_checks.checks|sum_attribute:"has_valid_dnssec" != data.name_server_checks.checks|length %}
                             <span class="icon incomplete"></span>
                         {% else %}
                             <span class="icon positive"></span>
                         {% endif %}
-                        {{ data.name_server_checks.has_valid_dnssec }}/{{ data.name_server_checks|length }} {% translate "name servers compliant" %}
+                        {{ data.name_server_checks.checks|sum_attribute:"has_valid_dnssec" }}/{{ data.name_server_checks.checks|length }} {% translate "name servers compliant" %}
                     </td>
                 </tr>
                 <tr>
                     <td>{% translate "No unnecessary ports open" %}</td>
                     <td>
-                        {% if data.name_server_checks.no_uncommon_ports != data.name_server_checks|length %}
+                        {% if data.name_server_checks.checks|sum_attribute:"no_uncommon_ports" != data.name_server_checks.checks|length %}
                             <span class="icon incomplete"></span>
                         {% else %}
                             <span class="icon positive"></span>
                         {% endif %}
-                        {{ data.name_server_checks.no_uncommon_ports }}/{{ data.name_server_checks|length }} {% translate "name servers compliant" %}
+                        {{ data.name_server_checks.checks|sum_attribute:"no_uncommon_ports" }}/{{ data.name_server_checks.checks|length }} {% translate "name servers compliant" %}
                     </td>
                 </tr>
             </tbody>

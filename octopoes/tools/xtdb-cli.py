@@ -217,7 +217,7 @@ def txs(ctx: click.Context):
 
 
 @cli.command(
-    help="""Takes a vector of transactions (any combination of put, delete, match, evict and fn)
+    help="""Takes a space separated list of transactions (any combination of put, delete, match, evict and fn)
     and executes them in order. This is the only 'write' endpoint."""
 )
 @click.argument("txs", nargs=-1)

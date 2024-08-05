@@ -1,6 +1,6 @@
-import logging
 from dataclasses import dataclass
 
+import structlog
 from account.models import KATUser
 from django.conf import settings
 from django.contrib import messages
@@ -17,7 +17,7 @@ from octopoes.models.ooi.findings import RiskLevelSeverity
 from rocky.views.mixins import ObservedAtMixin
 from rocky.views.ooi_view import ConnectorFormMixin
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 # dataclass to store finding type counts
