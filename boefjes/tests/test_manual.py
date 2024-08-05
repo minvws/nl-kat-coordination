@@ -14,8 +14,10 @@ from tests.loading import get_dummy_data
 class ManualTest(TestCase):
     TEST_DECLARATIONS_DATA = (
         b"["
-        b'{"ooi": {"object_type": "Network", "scan_profile": null, "primary_key": "Network|net1", "name": "net1"}},'
-        b'{"ooi": {"object_type": "Network", "scan_profile": null, "primary_key": "Network|net2", "name": "net2"}}'
+        b'{"ooi": {"object_type": "Network", "scan_profile": null, "user_id": null\
+        , "primary_key": "Network|net1", "name": "net1"}},'
+        b'{"ooi": {"object_type": "Network", "scan_profile": null, "user_id": null\
+        , "primary_key": "Network|net2", "name": "net2"}}'
         b"]"
     )
     CSV_EXAMPLES = [
@@ -51,11 +53,23 @@ darknet,https://openkat.nl/""",
         self.assertEqual(0, len(output.observations))
 
         self.assertEqual(
-            {"name": "net1", "object_type": "Network", "primary_key": "Network|net1", "scan_profile": None},
+            {
+                "name": "net1",
+                "object_type": "Network",
+                "primary_key": "Network|net1",
+                "scan_profile": None,
+                "user_id": None,
+            },
             output.declarations[0].ooi.dict(),
         )
         self.assertEqual(
-            {"name": "net2", "object_type": "Network", "primary_key": "Network|net2", "scan_profile": None},
+            {
+                "name": "net2",
+                "object_type": "Network",
+                "primary_key": "Network|net2",
+                "scan_profile": None,
+                "user_id": None,
+            },
             output.declarations[1].ooi.dict(),
         )
 
@@ -72,6 +86,7 @@ darknet,https://openkat.nl/""",
                 "primary_key": "Hostname|internet|example.com",
                 "registered_domain": None,
                 "scan_profile": None,
+                "user_id": None,
             },
             output.declarations[1].ooi.dict(),
         )
@@ -88,6 +103,7 @@ darknet,https://openkat.nl/""",
                 "primary_key": "Hostname|internet|example.net",
                 "registered_domain": None,
                 "scan_profile": None,
+                "user_id": None,
             },
             output.declarations[1].ooi.dict(),
         )
@@ -103,6 +119,7 @@ darknet,https://openkat.nl/""",
                 "object_type": "IPAddressV4",
                 "primary_key": "IPAddressV4|internet|1.1.1.1",
                 "scan_profile": None,
+                "user_id": None,
             },
             output.declarations[1].ooi.dict(),
         )
@@ -116,6 +133,7 @@ darknet,https://openkat.nl/""",
                 "object_type": "IPAddressV6",
                 "primary_key": "IPAddressV6|internet|fe80:cd00:0:cde:1257:0:211e:729c",
                 "scan_profile": None,
+                "user_id": None,
             },
             output.declarations[1].ooi.dict(),
         )
@@ -133,6 +151,7 @@ darknet,https://openkat.nl/""",
                     "https://example.com/",
                 ),
                 "scan_profile": None,
+                "user_id": None,
                 "web_url": None,
             },
             output.declarations[1].ooi.model_dump(),
@@ -149,6 +168,7 @@ darknet,https://openkat.nl/""",
                     "https://example.com/",
                 ),
                 "scan_profile": None,
+                "user_id": None,
                 "web_url": None,
             },
             output.declarations[1].ooi.dict(),
@@ -162,7 +182,13 @@ darknet,https://openkat.nl/""",
 
         self.assertEqual(0, len(output.observations))
         self.assertEqual(
-            {"name": "internet", "object_type": "Network", "primary_key": "Network|internet", "scan_profile": None},
+            {
+                "name": "internet",
+                "object_type": "Network",
+                "primary_key": "Network|internet",
+                "scan_profile": None,
+                "user_id": None,
+            },
             output.declarations[0].ooi.dict(),
         )
         return meta, output, runner
