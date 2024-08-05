@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-31 08:44+0000\n"
+"POT-Creation-Date: 2024-08-05 06:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1769,6 +1769,10 @@ msgid "Type"
 msgstr ""
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
+msgid "Owner"
+msgstr ""
+
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "Path"
 msgstr ""
 
@@ -3373,13 +3377,11 @@ msgstr ""
 #: reports/templates/partials/export_report_settings.html
 msgid ""
 "\n"
-"                                            Give your report a custom name "
-"and optionally add the reports' reference date\n"
-"                                            to the name. To do so you can "
-"select a standard option or use a\n"
-"                                            <a href=\"https://strftime.org/"
-"\">Python strftime code</a> in the report name.\n"
-"                                        "
+"                                                            Give your report "
+"a custom name and optionally add the reports' reference date\n"
+"                                                            to the name. To "
+"do so you can select an option below.\n"
+"                                                        "
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
