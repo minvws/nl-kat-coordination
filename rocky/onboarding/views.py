@@ -365,15 +365,16 @@ class OnboardingReportView(
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         ooi = self.get_ooi(self.request.GET.get("ooi", ""))
-        self.oois = Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network)
-        self.selected_oois = [self.oois.primary_key]
+        self.oois = [Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network)]
+        self.selected_oois = [self.oois[0].primary_key]
 
     def get_report_type_selection(self) -> list[str]:
         return [self.request.GET.get("report_type", "")]
 
     def post(self, request, *args, **kwargs):
-        report_ooi = self.save_report()
         self.set_member_onboarded()
+
+        report_ooi = self.save_report([("Onboarding Report", "Onboarding Report")])
 
         return redirect(
             reverse("view_report", kwargs={"organization_code": self.organization.code})

@@ -1293,6 +1293,27 @@ subreports = [
     ),
 ]
 
+dns_report = [
+    Report(
+        object_type="Report",
+        scan_profile=None,
+        primary_key="Report|e821aaeb-a6bd-427f-b064-e46837913b4d",
+        name="DNS Report",
+        report_type="dns-report",
+        template="dns_report/report.html",
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_oois=[],
+        report_id=UUID("e821aaeb-a6bd-427f-b064-e46837911a5d"),
+        organization_code="test_organization",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="a5ccf97b-d4e9-442d-85bf-84e739b63da9s",
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        parent_report=None,
+        has_parent=False,
+    ),
+]
+
 
 @pytest.fixture
 def report_list_one_subreport():

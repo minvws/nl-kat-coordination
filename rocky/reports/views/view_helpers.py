@@ -29,6 +29,13 @@ class GenerateReportStepsMixin(StepsMixin):
                 "url": reverse_lazy("generate_report_setup_scan", kwargs={"organization_code": self.organization.code})
                 + selection,
             },
+            {
+                "text": _("4: Export setup"),
+                "url": reverse_lazy(
+                    "generate_report_export_setup", kwargs={"organization_code": self.organization.code}
+                )
+                + selection,
+            },
         ]
         return steps
 
@@ -58,6 +65,13 @@ class AggregateReportStepsMixin(StepsMixin):
                 "url": reverse_lazy("aggregate_report_setup_scan", kwargs={"organization_code": self.organization.code})
                 + selection,
             },
+            {
+                "text": _("4: Export setup"),
+                "url": reverse_lazy(
+                    "aggregate_report_export_setup", kwargs={"organization_code": self.organization.code}
+                )
+                + selection,
+            },
         ]
         return steps
 
@@ -78,6 +92,11 @@ class MultiReportStepsMixin(StepsMixin):
                 "url": reverse_lazy(
                     "multi_report_select_report_types", kwargs={"organization_code": self.organization.code}
                 )
+                + selection,
+            },
+            {
+                "text": _("3: Export setup"),
+                "url": reverse_lazy("multi_report_export_setup", kwargs={"organization_code": self.organization.code})
                 + selection,
             },
         ]

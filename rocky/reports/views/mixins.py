@@ -13,7 +13,7 @@ from reports.views.base import ReportPluginView
 
 
 class SaveGenerateReportMixin(ReportPluginView):
-    def save_report(self) -> ReportOOI:
+    def save_report(self, report_names: list) -> ReportOOI:
         error_reports = []
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
         by_type: dict[str, list[str]] = {}
@@ -68,9 +68,17 @@ class SaveGenerateReportMixin(ReportPluginView):
                 parent=None,
                 has_parent=False,
                 observed_at=observed_at,
+                name=report_names[0][1],
             )
             for report_type, ooi_data in report_data.items():
                 for ooi, data in ooi_data.items():
+                    report_type_name = str(get_report_by_id(report_type).name)
+                    ooi_name = Reference.from_str(ooi).human_readable
+                    for default_name, updated_name in report_names:
+                        if ooi_name in default_name and report_type_name in default_name:
+                            name = updated_name
+                            break
+
                     raw_id = self.save_report_raw(data={"report_data": data["data"]})
                     self.save_report_ooi(
                         report_data_raw_id=raw_id,
@@ -79,6 +87,7 @@ class SaveGenerateReportMixin(ReportPluginView):
                         parent=report_ooi.reference,
                         has_parent=True,
                         observed_at=observed_at,
+                        name=name,
                     )
         # if its a single report we can just save it as complete
         else:
@@ -95,6 +104,7 @@ class SaveGenerateReportMixin(ReportPluginView):
                 parent=None,
                 has_parent=False,
                 observed_at=observed_at,
+                name=report_names[0][1],
             )
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if error_reports:
@@ -110,7 +120,7 @@ class SaveGenerateReportMixin(ReportPluginView):
 
 
 class SaveAggregateReportMixin(ReportPluginView):
-    def save_report(self) -> ReportOOI:
+    def save_report(self, report_names: list) -> ReportOOI:
         input_oois = self.get_oois()
 
         aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
@@ -166,6 +176,7 @@ class SaveAggregateReportMixin(ReportPluginView):
             parent=None,
             has_parent=False,
             observed_at=observed_at,
+            name=report_names[0][1],
         )
 
         # Save the child reports to bytes
