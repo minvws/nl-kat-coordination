@@ -181,7 +181,7 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
     def form_valid(self, form):
         # Transform into OOI
         try:
-            new_ooi = self.ooi_class.parse_obj(form.cleaned_data)
+            new_ooi = self.ooi_class.model_validate(form.cleaned_data)
             create_ooi(
                 self.octopoes_api_connector,
                 self.bytes_client,

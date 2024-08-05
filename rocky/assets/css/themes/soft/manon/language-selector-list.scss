@@ -8,6 +8,15 @@
   --language-selector-list-label-gap: 0;
 
   /* Button */
+  --language-selector-list-button-line-height: var(--button-base-line-height);
+  --language-selector-list-button-padding-top: var(--button-base-padding-top);
+  --language-selector-list-button-padding-right: var(
+    --button-base-padding-right
+  );
+  --language-selector-list-button-padding-bottom: var(
+    --button-base-padding-bottom
+  );
+  --language-selector-list-button-padding-left: var(--button-base-padding-left);
 
   /* --language-selector-list-button-font-size: var(--header-navigation-button-font-size); */
   --language-selector-list-button-border-color: var(
@@ -61,6 +70,10 @@ body > header nav {
 
       &::after {
         color: var(--language-selector-list-button-text-color);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        max-height: 1.25rem; /* Set to same height as button line-height to prevent icons from increasing line-height */
       }
     }
 
