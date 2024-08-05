@@ -11,7 +11,7 @@ from django.views.generic import ListView
 from django.views.generic.edit import FormView
 from pydantic import ValidationError
 from tools.forms.base import BaseRockyForm, ObservedAtForm
-from tools.forms.ooi_form import _EXCLUDED_OOI_TYPES, ClearanceFilterForm, OOIForm
+from tools.forms.ooi_form import _EXCLUDED_OOI_TYPES, ClearanceFilterForm, OOIForm, OrderByObjectTypeForm
 from tools.ooi_helpers import create_ooi
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_mandatory_fields, get_ooi_url
 
@@ -55,18 +55,6 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
             active_filters[_("Searching for: ")] = self.search_string
         return active_filters
 
-    def get_queryset_ordering(self):
-        active_ordering_sorting = {}
-        if self.order_by:
-            active_ordering_sorting[_("Order by: ")] = (
-                _("Clearance level") if self.order_by == "scan_level" else _("Type")
-            )
-        if self.sorting_order:
-            active_ordering_sorting[_("Sorting order: ")] = (
-                _("Descending") if self.sorting_order == "desc" else _("Ascending")
-            )
-        return active_ordering_sorting
-
     def get_ooi_scan_levels(self) -> set[ScanLevel]:
         if not self.clearance_levels:
             return self.scan_levels
@@ -105,6 +93,11 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
         context = super().get_context_data(**kwargs)
         context["observed_at"] = self.observed_at
         context["observed_at_form"] = self.get_connector_form()
+        context["order_by"] = self.get_order_by()
+        context["order_by_form"] = OrderByObjectTypeForm(self.request.GET)
+
+        context["sorting_order"] = self.get_sorting_order()
+        context["sorting_order_class"] = "ascending" if self.get_sorting_order() == "asc" else "descending"
 
         context["ooi_types_selection"] = self.filtered_ooi_types
 
@@ -114,7 +107,6 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
         context["clearance_types_selection"] = self.clearance_types
 
         context["active_filters"] = self.get_active_filters()
-        context["queryset_ordering"] = self.get_queryset_ordering()
 
         return context
 

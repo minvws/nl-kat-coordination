@@ -34,12 +34,6 @@
                     {% endif %}
                 </p>
                 <p class="de-emphasized">
-                    {% if queryset_ordering %}
-                        <strong>{% translate "Table ordering: " %}</strong>
-                        {% for ordering, value in queryset_ordering.items %}<strong>{{ ordering }}</strong>{{ value|title }}&nbsp;{% endfor %}
-                    {% endif %}
-                </p>
-                <p class="de-emphasized">
                     {% blocktranslate with length=ooi_list|length total=total_oois %}Showing {{ length }} of {{ total }} objects{% endblocktranslate %}
                 </p>
                 <form method="post"
@@ -56,26 +50,26 @@
                                 <th>{% translate "Object" %}</th>
                                 <th scope="col"
                                     class="sortable"
-                                    {% if "object_type" == request.GET.order_by and "asc" == request.GET.sorting_order %}aria-sort="ascending"{% elif "object_type" == request.GET.order_by and "desc" == request.GET.sorting_order %}aria-sort="descending"{% endif %}>
-                                    <button name="order_by"
+                                    {% if order_by == "object_type" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
+                                    <button form="ooi_list_settings"
+                                            name="order_by"
                                             value="object_type"
-                                            form="ooi_list_settings"
                                             class="sort">
                                         {% translate "Type" %}
                                         <span aria-hidden="true"
-                                              class="icon ti-{% if "object_type" == request.GET.order_by and "asc" == request.GET.sorting_order %}chevron-up{% elif "object_type" == request.GET.order_by and "desc" == request.GET.sorting_order %}chevron-down {% else %}direction{% endif %}"></span>
+                                              class="icon ti-{% if order_by == "object_type" and sorting_order == "asc" %}chevron-up{% elif order_by == "object_type" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
                                     </button>
                                 </th>
                                 <th scope="col"
                                     class="sortable"
-                                    {% if "scan_level" == request.GET.order_by and "asc" == request.GET.sorting_order %}aria-sort="ascending"{% elif "scan_level" == request.GET.order_by and "desc" == request.GET.sorting_order %}aria-sort="descending"{% endif %}>
-                                    <button name="order_by"
+                                    {% if order_by == "scan_level" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
+                                    <button form="ooi_list_settings"
+                                            name="order_by"
                                             value="scan_level"
-                                            form="ooi_list_settings"
-                                            class="sort">
+                                            lass="sort">
                                         {% translate "Clearance level" %}
                                         <span aria-hidden="true"
-                                              class="icon ti-{% if "scan_level" == request.GET.order_by and "asc" == request.GET.sorting_order %}chevron-up{% elif "scan_level" == request.GET.order_by and "desc" == request.GET.sorting_order %}chevron-down {% else %}direction{% endif %}"></span>
+                                              class="icon ti-{% if order_by == "scan_level" and sorting_order == "asc" %}chevron-up{% elif order_by == "scan_level" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
                                     </button>
                                 </th>
                                 <th>{% translate "Clearance type" %}</th>
