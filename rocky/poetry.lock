@@ -501,13 +501,13 @@ django = "*"
 
 [[package]]
 name = "django-components"
-version = "0.80"
+version = "0.82"
 description = "A way to create simple reusable template components in Django."
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "django_components-0.80-py3-none-any.whl", hash = "sha256:c6067f24e6428c52f33727a2bf1b51a70d61ecae7286d4ff826ce85f6745f794"},
-    {file = "django_components-0.80.tar.gz", hash = "sha256:a2ca8d7f308d5b54e83122331f137e2daa397b5f2e64d212f59334ca7af65dac"},
+    {file = "django_components-0.82-py3-none-any.whl", hash = "sha256:8c84c0ae028c04675b32a2962b6f52a098871ce09b1286d66fbdc5c7038ddacc"},
+    {file = "django_components-0.82.tar.gz", hash = "sha256:94e29eba63248f439291335a3093587827ebb1010e92526ede669b964884a3df"},
 ]
 
 [package.dependencies]
