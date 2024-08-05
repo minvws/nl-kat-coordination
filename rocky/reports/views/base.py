@@ -161,8 +161,7 @@ class OOISelectionView(OOIFilterView):
 
 class ReportTypeSelectionView(TemplateView):
     """
-    Shows report types based on the OOIs selections.
-    Handles all request for report types selections.
+    Shows report types and handles selections and requests.
     """
 
     NONE_REPORT_TYPE_SELECTION_MESSAGE = _("Select at least one report type to proceed.")
@@ -176,7 +175,7 @@ class ReportTypeSelectionView(TemplateView):
         self.report_type_ids = [report_type for report_type in self.selected_report_types]
 
     def get_report_type_selection(self) -> list[str]:
-        return sorted(set(self.request.GET.getlist("report_type", [])))
+        return sorted(set(self.request.POST.getlist("report_type", [])))
 
     def get_report_types_from_choice(
         self,
@@ -202,6 +201,11 @@ class ReportTypeSelectionView(TemplateView):
             }
             for report_type in reports
         ]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["selected_report_types"] = self.selected_report_types
+        return context
 
 
 class ReportPluginView(OOISelectionView, ReportTypeSelectionView):
@@ -376,12 +380,9 @@ class ReportPluginView(OOISelectionView, ReportTypeSelectionView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["created_at"] = datetime.now()
-        context["selected_oois"] = self.selected_oois
-        context["selected_report_types"] = self.selected_report_types
         context["plugins"] = self.plugins
         context["all_plugins_enabled"] = self.all_plugins_enabled
         context["plugin_data"] = self.get_plugin_data()
-        context["oois"] = self.get_oois()
         return context
 
 

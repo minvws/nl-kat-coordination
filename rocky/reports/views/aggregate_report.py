@@ -8,9 +8,7 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 
-from octopoes.models import ScanProfileType
-from octopoes.models.ooi.reports import Report as ReportOOI
-from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
+from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.definitions import AggregateReport, MultiReport, Report
 from reports.report_types.helpers import get_ooi_types_from_aggregate_report, get_report_types_from_aggregate_report
 from reports.views.base import (
@@ -21,6 +19,7 @@ from reports.views.base import (
     ReportTypeSelectionView,
     get_selection,
 )
+from reports.views.mixins import SaveAggregateReportMixin
 from reports.views.view_helpers import AggregateReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
 
@@ -140,74 +139,6 @@ class ReportTypesSelectionAggregateReportView(
         return context
 
 
-class SaveAggregateReportMixin(ReportPluginView):
-    def save_report(self, report_names: list) -> ReportOOI:
-        input_oois = self.get_oois()
-
-        aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
-            self.octopoes_api_connector,
-            input_oois,
-            self.selected_report_types,
-            self.observed_at,
-            self.organization.code,
-        )
-
-        # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
-        if report_errors:
-            report_types = ", ".join(set(report_errors))
-            date = self.observed_at.date()
-            error_message = _("No data could be found for %(report_types). Object(s) did not exist on %(date)s.") % {
-                "report_types": report_types,
-                "date": date,
-            }
-            messages.add_message(self.request, messages.ERROR, error_message)
-
-        observed_at = self.get_observed_at()
-
-        post_processed_data["plugins"] = self.get_plugin_data_for_saving()
-        post_processed_data["oois"] = []
-        for input_ooi in input_oois:
-            post_processed_data["oois"].append(
-                {
-                    "name": input_ooi.human_readable,
-                    "type": input_ooi.object_type,
-                    "scan_profile_level": input_ooi.scan_profile.level.value if input_ooi.scan_profile else 0,
-                    "scan_profile_type": (
-                        input_ooi.scan_profile.scan_profile_type if input_ooi.scan_profile else ScanProfileType.EMPTY
-                    ),
-                }
-            )
-
-        post_processed_data["report_types"] = []
-        for report_type in self.report_types:
-            post_processed_data["report_types"].append(
-                {
-                    "name": str(report_type.name),
-                    "description": str(report_type.description),
-                    "label_style": report_type.label_style,
-                }
-            )
-
-        # Create the report
-        report_data_raw_id = self.save_report_raw(data=post_processed_data)
-        report_ooi = self.save_report_ooi(
-            report_data_raw_id=report_data_raw_id,
-            report_type=type(aggregate_report),
-            input_oois=[ooi.primary_key for ooi in input_oois],
-            parent=None,
-            has_parent=False,
-            observed_at=observed_at,
-            name=report_names[0][1],
-        )
-
-        # Save the child reports to bytes
-        for ooi, types in report_data.items():
-            for report_type, data in types.items():
-                self.save_report_raw(data=data)
-
-        return report_ooi
-
-
 class SetupScanAggregateReportView(
     SaveAggregateReportMixin, AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportPluginView
 ):
@@ -219,18 +150,11 @@ class SetupScanAggregateReportView(
     breadcrumbs_step = 5
     current_step = 3
 
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+    def post(self, request, *args, **kwargs):
         if not self.selected_report_types:
-            messages.error(self.request, _("Select at least one report type to proceed."))
-            return redirect(
-                reverse("aggregate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(self.request)
-            )
-        if not self.report_has_required_plugins() or self.plugins_enabled():
-            return redirect(self.get_next())
-        if not self.plugins:
+            messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
             return redirect(self.get_previous())
-
-        return super().get(request, *args, **kwargs)
+        return self.get(request, *args, **kwargs)
 
 
 class ExportSetupAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportPluginView):
@@ -242,11 +166,7 @@ class ExportSetupAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggre
     breadcrumbs_step = 6
     current_step = 4
 
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.selected_report_types:
-            messages.error(request, _("Select at least one report type to proceed."))
-            return redirect(self.get_previous())
-
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -261,6 +181,8 @@ class SaveAggregateReportView(SaveAggregateReportMixin, BreadcrumbsAggregateRepo
     Save the report and redirect to the saved report
     """
 
+    template_name = "aggregate_report.html"
+    breadcrumbs_step = 6
     current_step = 6
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
     report_types: list[type[Report] | type[MultiReport] | type[AggregateReport]]

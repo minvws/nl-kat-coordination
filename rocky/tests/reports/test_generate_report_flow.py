@@ -1,5 +1,10 @@
 from pytest_django.asserts import assertContains
-from reports.views.generate_report import OOISelectionGenerateReportView, ReportTypesSelectionGenerateReportView
+from reports.views.generate_report import (
+    OOISelectionGenerateReportView,
+    ReportTypesSelectionGenerateReportView,
+    SaveGenerateReportView,
+    SetupScanGenerateReportView,
+)
 
 from octopoes.models.pagination import Paginated
 from octopoes.models.types import OOIType
@@ -145,3 +150,114 @@ def test_change_ooi_selection_with_ooi_selection(
     oois_fetched_from_post = response.context_data["selected_oois"]
 
     assert len(oois_fetched_from_post) == 2
+
+
+def test_report_types_selection_nothing_selected(
+    rf,
+    client_member,
+    valid_time,
+    mock_organization_view_octopoes,
+    listed_hostnames,
+):
+    """
+    Will send the selected report types to the configuration page (set plugins).
+    """
+
+    mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
+        count=len(listed_hostnames), items=listed_hostnames
+    )
+
+    request = setup_request(
+        rf.post(
+            "generate_report_setup_scan",
+            {"observed_at": valid_time.strftime("%Y-%m-%d")},
+        ),
+        client_member.user,
+    )
+
+    response = SetupScanGenerateReportView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 302
+    assert list(request._messages)[0].message == "Select at least one report type to proceed."
+
+
+def test_report_types_selection(
+    rf,
+    client_member,
+    valid_time,
+    mock_organization_view_octopoes,
+    listed_hostnames,
+    mocker,
+    boefje_dns_records,
+    mock_bytes_client,
+):
+    """
+    Will send the selected report types to the configuration page (set plugins).
+    """
+
+    katalogus_mocker = mocker.patch("reports.views.base.get_katalogus")()
+    katalogus_mocker.get_plugins.return_value = [boefje_dns_records]
+
+    mock_bytes_client().upload_raw.return_value = "Report|e821aaeb-a6bd-427f-b064-e46837911a5d"
+
+    mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
+        count=len(listed_hostnames), items=listed_hostnames
+    )
+
+    request = setup_request(
+        rf.post(
+            "generate_report_setup_scan",
+            {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": "all", "report_type": "dns-report"},
+        ),
+        client_member.user,
+    )
+
+    response = SetupScanGenerateReportView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 200
+    assertContains(response, '<input type="hidden" name="report_type" value="dns-report">', html=True)
+
+
+def test_save_generate_report_view(
+    rf,
+    client_member,
+    valid_time,
+    mock_organization_view_octopoes,
+    listed_hostnames,
+    mocker,
+    boefje_dns_records,
+    mock_bytes_client,
+):
+    """
+    Will send data through post to generate report.
+    """
+
+    katalogus_mocker = mocker.patch("reports.views.base.get_katalogus")()
+    katalogus_mocker.get_plugins.return_value = [boefje_dns_records]
+
+    mock_bytes_client().upload_raw.return_value = "Report|e821aaeb-a6bd-427f-b064-e46837911a5d"
+
+    mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
+        count=len(listed_hostnames), items=listed_hostnames
+    )
+
+    old_report_names = [f"DNS report for {ooi.name}" for ooi in listed_hostnames]
+
+    request = setup_request(
+        rf.post(
+            "generate_report_view",
+            {
+                "observed_at": valid_time.strftime("%Y-%m-%d"),
+                "ooi": "all",
+                "report_type": "dns-report",
+                "old_report_name": old_report_names,
+                "report_name": [f"DNS report for {len(listed_hostnames)} objects"],
+            },
+        ),
+        client_member.user,
+    )
+
+    response = SaveGenerateReportView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 302  # after post follows redirect, this to first create report ID
+    assert "report_id=Report" in response.url

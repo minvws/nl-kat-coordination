@@ -58,7 +58,7 @@
             <form novalidate
                   method="post"
                   action="{{ next }}"
-                  class="inline layout-wide">
+                  class="inline layout-wide checkboxes_required">
                 {% csrf_token %}
                 {% if "all" in selected_oois %}
                     {% include "forms/report_form_fields.html" %}
