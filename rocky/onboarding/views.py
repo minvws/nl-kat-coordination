@@ -374,7 +374,7 @@ class OnboardingReportView(
     def post(self, request, *args, **kwargs):
         self.set_member_onboarded()
 
-        report_ooi = self.save_report()
+        report_ooi = self.save_report([("Onboarding Report", "Onboarding Report")])
 
         return redirect(
             reverse("view_report", kwargs={"organization_code": self.organization.code})
