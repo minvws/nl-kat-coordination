@@ -14,7 +14,7 @@
                 {% for ooi,data in report.items %}
                     {% if data.data %}
                         <li>
-                            <a href="#{{ report_type }}-{{ ooi }}">{{ data.report_name }} {% translate "for" %} {{ ooi|human_readable }}</a>
+                            <a href="#{{ report_type }}-{{ ooi }}">{{ data.report_name }}</a>
                         </li>
                     {% endif %}
                 {% endfor %}
