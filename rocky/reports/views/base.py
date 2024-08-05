@@ -109,9 +109,9 @@ class OOISelectionView(OOIFilterView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.selected_oois = self.get_ooi_selection()
-        self.oois = self.get_oois()
-        self.oois_pk = self.get_oois_pk()
+        self.selected_oois: list[str] = self.get_ooi_selection()
+        self.oois: list[OOI] = self.get_oois()
+        self.oois_pk: list[str] = self.get_oois_pk()
 
     def get_ooi_selection(self) -> list[str]:
         selected_oois = self.request.GET.getlist("ooi", [])
@@ -341,9 +341,12 @@ class ReportPluginView(OOISelectionView, ReportTypeSelectionView):
         parent: Reference | None,
         has_parent: bool,
         observed_at: datetime,
+        name: str,
     ) -> ReportOOI:
+        if not name or name.isspace():
+            name = report_type.name
         report_ooi = ReportOOI(
-            name=str(report_type.name),
+            name=name,
             report_type=str(report_type.id),
             template=report_type.template_path,
             report_id=uuid4(),
@@ -499,7 +502,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                     report_data.setdefault(report.report_type, {})[ooi] = {
                         "data": self.get_report_data_from_bytes(report)["report_data"],
                         "template": report.template,
-                        "report_name": get_report_by_id(report.report_type).name,
+                        "report_name": report.name,
                     }
 
             input_oois = self.get_input_oois(children_reports)
@@ -518,13 +521,14 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                 report_data[self.report_ooi.report_type][ooi] = {
                     "data": context["data"]["report_data"],
                     "template": self.report_ooi.template,
-                    "report_name": get_report_by_id(self.report_ooi.report_type).name,
+                    "report_name": self.report_ooi.name,
                 }
 
             input_oois = self.get_input_oois([self.report_ooi])
             report_types = self.get_report_types([self.report_ooi])
 
         context["report_data"] = report_data
+        context["report_name"] = self.report_ooi.name
         context["report_types"] = [
             report_type for x in REPORTS for report_type in report_types if report_type["id"] == x.id
         ]
