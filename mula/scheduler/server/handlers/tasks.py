@@ -88,8 +88,8 @@ class TaskAPI:
                 f_ooi = {
                     "and": [
                         storage.filters.Filter(
-                            column="data",
-                            field="input_ooi",
+                            column="p_item",
+                            field="data__input_ooi",
                             operator="eq",
                             value=input_ooi,
                         )
@@ -99,8 +99,8 @@ class TaskAPI:
                 f_ooi = {
                     "and": [
                         storage.filters.Filter(
-                            column="data",
-                            field="raw_data__boefje_meta__input_ooi",
+                            column="p_item",
+                            field="data__raw_data__boefje_meta__input_ooi",
                             operator="eq",
                             value=input_ooi,
                         )
@@ -110,14 +110,14 @@ class TaskAPI:
                 f_ooi = {
                     "or": [
                         storage.filters.Filter(
-                            column="data",
-                            field="input_ooi",
+                            column="p_item",
+                            field="data__input_ooi",
                             operator="eq",
                             value=input_ooi,
                         ),
                         storage.filters.Filter(
-                            column="data",
-                            field="raw_data__boefje_meta__input_ooi",
+                            column="p_item",
+                            field="data__raw_data__boefje_meta__input_ooi",
                             operator="eq",
                             value=input_ooi,
                         ),
@@ -131,8 +131,8 @@ class TaskAPI:
                 f_plugin = {
                     "and": [
                         storage.filters.Filter(
-                            column="data",
-                            field="boefje__id",
+                            column="p_item",
+                            field="data__boefje__id",
                             operator="eq",
                             value=plugin_id,
                         )
@@ -140,8 +140,8 @@ class TaskAPI:
                 }
             elif task_type == "normalizer":
                 f_plugin = storage.filters.Filter(
-                    column="data",
-                    field="normalizer__id",
+                    column="p_item",
+                    field="data_normalizer__id",
                     operator="eq",
                     value=plugin_id,
                 )
@@ -149,14 +149,14 @@ class TaskAPI:
                 f_plugin = {
                     "or": [
                         storage.filters.Filter(
-                            column="data",
-                            field="boefje__id",
+                            column="p_item",
+                            field="data_boefje__id",
                             operator="eq",
                             value=plugin_id,
                         ),
                         storage.filters.Filter(
-                            column="data",
-                            field="normalizer__id",
+                            column="p_item",
+                            field="data_normalizer__id",
                             operator="eq",
                             value=plugin_id,
                         ),
@@ -197,7 +197,7 @@ class TaskAPI:
 
     def get(self, task_id: uuid.UUID) -> Any:
         try:
-            task = self.ctx.datastores.task_store.get_task_by_id(task_id)
+            task = self.ctx.datastores.task_store.get_task(task_id)
         except storage.errors.StorageError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -222,7 +222,7 @@ class TaskAPI:
     # endpoints # to allow for partial updates.
     def patch(self, task_id: uuid.UUID, item: serializers.Task) -> Any:
         try:
-            task_db = self.ctx.datastores.task_store.get_task_by_id(task_id)
+            task_db = self.ctx.datastores.task_store.get_task(task_id)
         except storage.errors.StorageError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
