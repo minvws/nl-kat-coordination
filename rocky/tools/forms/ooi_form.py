@@ -100,6 +100,17 @@ class OOIForm(BaseRockyForm):
             else:
                 fields[name] = forms.CharField(max_length=256, **default_attrs)
 
+        # ruff: noqa: ERA001
+        #  We are not exactly ready to activate this yet
+        #  ```
+        #  fields["end_valid_time"] = forms.DateTimeField(
+        #      label="Expires by",
+        #      widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
+        #      input_formats=["%Y-%m-%dT%H:%M:%S"],
+        #      required=False,
+        #  )
+        #  ```
+
         return fields
 
 
