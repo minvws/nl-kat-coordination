@@ -78,8 +78,12 @@ class SaveGenerateReportMixin(ReportPluginView):
                         if ooi_name in default_name and report_type_name in default_name:
                             name = updated_name
                             break
+                        else:
+                            name = default_name
+                            break
 
                     raw_id = self.save_report_raw(data={"report_data": data["data"]})
+
                     self.save_report_ooi(
                         report_data_raw_id=raw_id,
                         report_type=get_report_by_id(report_type),

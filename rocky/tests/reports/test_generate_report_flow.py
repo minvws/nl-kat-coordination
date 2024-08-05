@@ -214,8 +214,8 @@ def test_report_types_selection(
 
     response = SetupScanGenerateReportView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 302  # plugin is enabled so redirect to generate report view
-    assert "report_id=Report" in response.url
+    assert response.status_code == 200
+    assertContains(response, '<input type="hidden" name="report_type" value="dns-report">', html=True)
 
 
 def test_save_generate_report_view(
@@ -241,10 +241,18 @@ def test_save_generate_report_view(
         count=len(listed_hostnames), items=listed_hostnames
     )
 
+    old_report_names = [f"DNS report for {ooi.name}" for ooi in listed_hostnames]
+
     request = setup_request(
         rf.post(
             "generate_report_view",
-            {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": "all", "report_type": "dns-report"},
+            {
+                "observed_at": valid_time.strftime("%Y-%m-%d"),
+                "ooi": "all",
+                "report_type": "dns-report",
+                "old_report_name": old_report_names,
+                "report_name": [f"DNS report for {len(listed_hostnames)} objects"],
+            },
         ),
         client_member.user,
     )

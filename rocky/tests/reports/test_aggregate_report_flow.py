@@ -218,8 +218,9 @@ def test_report_types_selection(
 
     response = SetupScanAggregateReportView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 302  # if all plugins are enabled the view will auto redirect to generate report
-    assert "report_id=Report" in response.url
+    assert response.status_code == 200  # if all plugins are enabled the view will auto redirect to generate report
+
+    assertContains(response, '<input type="hidden" name="report_type" value="dns-report">', html=True)
 
 
 def test_save_aggregate_report_view(
@@ -256,6 +257,8 @@ def test_save_aggregate_report_view(
                 "observed_at": valid_time.strftime("%Y-%m-%d"),
                 "ooi": "all",
                 "report_type": ["systems-report", "dns-report"],
+                "old_report_name": ["Aggregate Report"],
+                "report_name": ["Testing a new name for Aggregate Report"],
             },
         ),
         client_member.user,

@@ -150,14 +150,6 @@ class SetupScanAggregateReportView(
     breadcrumbs_step = 5
     current_step = 3
 
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.report_has_required_plugins() or self.plugins_enabled():
-            return redirect(self.get_next())
-        if not self.plugins:
-            return redirect(self.get_previous())
-
-        return super().get(request, *args, **kwargs)
-
     def post(self, request, *args, **kwargs):
         if not self.selected_report_types:
             messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
