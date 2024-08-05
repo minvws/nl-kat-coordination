@@ -40,6 +40,7 @@ class Declaration(BaseModel):
 
     ooi: OOIType
     valid_time: datetime
+    end_valid_time: datetime | None = None
     method: str | None = None
     task_id: uuid.UUID | None = None
 
@@ -75,6 +76,7 @@ class ValidatedDeclaration(BaseModel):
 
     ooi: ValidatedOOIType
     valid_time: AwareDatetime
+    end_valid_time: AwareDatetime | None = None
     method: str | None = "manual"
     task_id: uuid.UUID | None = Field(default_factory=uuid.uuid4)
 

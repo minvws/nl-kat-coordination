@@ -58,14 +58,14 @@ class XTDBOriginRepository(OriginRepository):
 
     @classmethod
     def serialize(cls, origin: Origin) -> dict[str, Any]:
-        data = origin.dict()
+        data = origin.model_dump()
         data[cls.pk_prefix] = origin.id
         data["type"] = origin.__class__.__name__
         return data
 
     @classmethod
     def deserialize(cls, data: dict[str, Any]) -> Origin:
-        return Origin.parse_obj(data)
+        return Origin.model_validate(data)
 
     def list_origins(
         self,

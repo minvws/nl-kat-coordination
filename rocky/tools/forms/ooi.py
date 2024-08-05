@@ -117,3 +117,9 @@ class MuteFindingForm(forms.Form):
     finding = forms.CharField(widget=forms.HiddenInput(), required=False)
     ooi_type = forms.CharField(widget=forms.HiddenInput(), required=False)
     reason = forms.CharField(widget=forms.Textarea(attrs={"name": "reason", "rows": "3", "cols": "5"}), required=False)
+    end_valid_time = forms.DateTimeField(
+        label="Expires by",
+        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
+        input_formats=["%Y-%m-%dT%H:%M:%S"],
+        required=False,
+    )

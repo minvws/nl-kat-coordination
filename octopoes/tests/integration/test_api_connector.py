@@ -51,7 +51,7 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
     assert len(octopoes_api_connector.list_origins(task_id=uuid.uuid4(), valid_time=valid_time)) == 0
     origins = octopoes_api_connector.list_origins(task_id=task_id, valid_time=valid_time)
     assert len(origins) == 1
-    assert origins[0].dict() == {
+    assert origins[0].model_dump() == {
         "method": "normalizer_id",
         "origin_type": OriginType.OBSERVATION,
         "source": network.reference,
