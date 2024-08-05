@@ -52,6 +52,7 @@ class KatalogusTestCase(unittest.TestCase):
     def setUp(self) -> None:
         self.config = config.settings.Settings()
         self.dbconn = storage.DBConn(str(self.config.db_uri))
+        self.dbconn.connect()
 
         self.service_katalogus = services.Katalogus(
             host=remove_trailing_slash(str(self.config.host_katalogus)),
@@ -78,7 +79,10 @@ class KatalogusTestCase(unittest.TestCase):
         self.service_katalogus.flush_organisations_plugin_cache()
 
         # Assert
-        self.assertCountEqual(self.service_katalogus.organisations_plugin_cache.cache.keys(), ("org-1", "org-2"))
+        self.assertCountEqual(
+            self.service_katalogus.organisations_plugin_cache.cache.keys(),
+            ("org-1", "org-2"),
+        )
 
     @mock.patch("scheduler.connectors.services.Katalogus.get_organisations")
     def test_flush_organisations_plugin_cache_empty(self, mock_get_organisations):
@@ -114,10 +118,16 @@ class KatalogusTestCase(unittest.TestCase):
         self.assertEqual(len(self.service_katalogus.organisations_boefje_type_cache), 2)
         self.assertIsNotNone(self.service_katalogus.organisations_boefje_type_cache.get("org-1"))
         self.assertIsNotNone(self.service_katalogus.organisations_boefje_type_cache.get("org-1").get("Hostname"))
-        self.assertEqual(len(self.service_katalogus.organisations_boefje_type_cache.get("org-1").get("Hostname")), 2)
+        self.assertEqual(
+            len(self.service_katalogus.organisations_boefje_type_cache.get("org-1").get("Hostname")),
+            2,
+        )
         self.assertIsNotNone(self.service_katalogus.organisations_boefje_type_cache.get("org-2"))
         self.assertIsNotNone(self.service_katalogus.organisations_boefje_type_cache.get("org-2").get("Hostname"))
-        self.assertEqual(len(self.service_katalogus.organisations_boefje_type_cache.get("org-2").get("Hostname")), 2)
+        self.assertEqual(
+            len(self.service_katalogus.organisations_boefje_type_cache.get("org-2").get("Hostname")),
+            2,
+        )
 
     @mock.patch("scheduler.connectors.services.Katalogus.get_plugins_by_organisation")
     @mock.patch("scheduler.connectors.services.Katalogus.get_organisations")
@@ -143,12 +153,14 @@ class KatalogusTestCase(unittest.TestCase):
         self.assertIsNotNone(self.service_katalogus.organisations_normalizer_type_cache.get("org-1"))
         self.assertIsNotNone(self.service_katalogus.organisations_normalizer_type_cache.get("org-1").get("Hostname"))
         self.assertEqual(
-            len(self.service_katalogus.organisations_normalizer_type_cache.get("org-1").get("Hostname")), 2
+            len(self.service_katalogus.organisations_normalizer_type_cache.get("org-1").get("Hostname")),
+            2,
         )
         self.assertIsNotNone(self.service_katalogus.organisations_normalizer_type_cache.get("org-2"))
         self.assertIsNotNone(self.service_katalogus.organisations_normalizer_type_cache.get("org-2").get("Hostname"))
         self.assertEqual(
-            len(self.service_katalogus.organisations_normalizer_type_cache.get("org-2").get("Hostname")), 2
+            len(self.service_katalogus.organisations_normalizer_type_cache.get("org-2").get("Hostname")),
+            2,
         )
 
     @mock.patch("scheduler.connectors.services.Katalogus.get_plugins_by_organisation")
@@ -159,12 +171,22 @@ class KatalogusTestCase(unittest.TestCase):
                 PluginFactory(id="plugin-1", type="boefje", enabled=True, consumes=["Hostname"]),
                 PluginFactory(id="plugin-2", type="boefje", enabled=True, consumes=["Hostname"]),
                 PluginFactory(id="plugin-3", type="boefje", enabled=False, consumes=["Hostname"]),
-                PluginFactory(id="plugin-4", type="normalizer", enabled=True, consumes=["Hostname"]),
+                PluginFactory(
+                    id="plugin-4",
+                    type="normalizer",
+                    enabled=True,
+                    consumes=["Hostname"],
+                ),
             ],
             [
                 PluginFactory(id="plugin-1", type="boefje", enabled=True, consumes=["Hostname"]),
                 PluginFactory(id="plugin-3", type="boefje", enabled=False, consumes=["Hostname"]),
-                PluginFactory(id="plugin-4", type="normalizer", enabled=True, consumes=["Hostname"]),
+                PluginFactory(
+                    id="plugin-4",
+                    type="normalizer",
+                    enabled=True,
+                    consumes=["Hostname"],
+                ),
                 PluginFactory(id="plugin-5", type="boefje", enabled=True, consumes=["Hostname"]),
             ],
         ]
