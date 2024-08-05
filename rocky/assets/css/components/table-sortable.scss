@@ -1,0 +1,28 @@
+/* Sortable table element */
+
+table thead th.sortable {
+  padding: 0;
+
+  button {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    border: 0;
+    padding: var(--table-head-cell-padding);
+    display: flex;
+    justify-content: flex-start;
+
+    .icon::before {
+      color: var(--colors-grey-6);
+    }
+
+    .icon.ti-direction::before {
+      font-size: 1.75rem;
+    }
+  }
+
+  &[aria-sort] {
+    background-color: var(--colors-purrple-2);
+    border-radius: 0.25rem 0.25rem 0 0;
+  }
+}
