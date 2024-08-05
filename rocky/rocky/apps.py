@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from django.db.models.signals import post_delete, post_save
 
 
 class RockyConfig(AppConfig):
@@ -6,4 +7,5 @@ class RockyConfig(AppConfig):
 
     def ready(self):
         # import the signals module to ensure that the signal handlers are connected
+        # and to avoid "apps aren't loaded yet" error from Django
         from . import signals  # noqa: F401
