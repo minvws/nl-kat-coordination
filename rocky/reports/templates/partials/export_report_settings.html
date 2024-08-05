@@ -106,6 +106,8 @@
 </table>
 {% csrf_token %}
 <button type="submit" form="generate_report">
+    {% include "forms/report_form_fields.html" %}
+
     {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
 </button>
 </form>

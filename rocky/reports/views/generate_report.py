@@ -131,13 +131,6 @@ class SetupScanGenerateReportView(
     breadcrumbs_step = 5
     current_step = 3
 
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.report_has_required_plugins() or self.plugins_enabled():
-            return redirect(self.get_next())
-        if not self.plugins:
-            return redirect(self.get_previous())
-        return super().get(request, *args, **kwargs)
-
     def post(self, request, *args, **kwargs):
         if not self.selected_report_types:
             messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
@@ -153,19 +146,16 @@ class ExportSetupGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenerat
     template_name = "generate_report/export_setup.html"
     breadcrumbs_step = 6
     current_step = 4
+    reports: dict[str, str] = {}
 
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.selected_report_types:
-            messages.error(request, _("Select at least one report type to proceed."))
-            return redirect(self.get_previous())
-
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.reports = create_report_names(self.oois_pk, self.report_types)
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        reports = create_report_names(self.oois_pk, self.report_types)
         context = super().get_context_data(**kwargs)
+        context["reports"] = self.reports
         context["current_datetime"] = datetime.now(timezone.utc)
-        context["reports"] = reports
         return context
 
 
@@ -191,7 +181,7 @@ class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportV
         )
 
 
-def create_report_names(oois_pk, report_types):
+def create_report_names(oois_pk, report_types) -> dict[str, str]:
     reports = {}
     oois_count = len(oois_pk)
     report_types_count = len(report_types)

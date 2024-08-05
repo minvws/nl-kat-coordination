@@ -96,6 +96,7 @@
                   class="inline"
                   method="post"
                   action="{{ next }}">
+                {% csrf_token %}
                 {% include "forms/report_form_fields.html" %}
 
                 <button type="submit">
