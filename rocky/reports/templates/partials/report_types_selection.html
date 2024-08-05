@@ -14,9 +14,8 @@
             {% endblocktranslate %}
         </p>
         {% if not selected_oois %}
-            <a class="button ghost" href="{{ previous }}">
-                <span class="icon ti-chevron-left"></span>{% translate "Go back" %}
-            </a>
+            {% include "partials/return_button.html" with btn_text="Go back" %}
+
         {% else %}
             <h2>
                 {% blocktranslate trimmed count counter=oois|length %}
