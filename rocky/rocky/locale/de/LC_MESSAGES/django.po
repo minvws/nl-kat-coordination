@@ -1,28 +1,31 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# jan klopper <jan@underdark.nl>, 2023.
+# alster <alsternerd@users.noreply.hosted.weblate.org>, 2024.
+# LibreTranslate <noreply-mt-libretranslate@weblate.org>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-29 14:05+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
-"Language: fr\n"
+"PO-Revision-Date: 2024-07-17 09:09+0000\n"
+"Last-Translator: LibreTranslate <noreply-mt-libretranslate@weblate.org>\n"
+"Language-Team: German <https://hosted.weblate.org/projects/openkat/nl-kat-"
+"coordination/de/>\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.7-dev\n"
 
 #: account/admin.py
 msgid "Permissions"
-msgstr ""
+msgstr "Berechtigungen"
 
 #: account/admin.py
 msgid "Important dates"
-msgstr ""
+msgstr "Wichtige Daten"
 
 #: account/forms/account_setup.py katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
@@ -35,68 +38,68 @@ msgstr ""
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/templates/partials/ooi_detail_related_object.html
 msgid "Name"
-msgstr ""
+msgstr "Name"
 
 #: account/forms/account_setup.py
 msgid "The name that will be used in order to communicate."
-msgstr ""
+msgstr "Der Name, der in der Kommunikation genutzt werden wird."
 
 #: account/forms/account_setup.py
 msgid "Please provide username"
-msgstr ""
+msgstr "Bitte gib einen Benutzernamen an"
 
 #: account/forms/account_setup.py
 msgid "Email"
-msgstr ""
+msgstr "E-Mail"
 
 #: account/forms/account_setup.py
 msgid "Enter an email address."
-msgstr ""
+msgstr "Gib eine E-Mail-Adresse ein."
 
 #: account/forms/account_setup.py
 msgid "Password"
-msgstr ""
+msgstr "Passwort"
 
 #: account/forms/account_setup.py
 msgid "Choose a super secret password"
-msgstr ""
+msgstr "Wähle ein super geheimes Passwort"
 
 #: account/forms/account_setup.py
 msgid "Choose another email."
-msgstr ""
+msgstr "Wähle eine andere E-Mail-Adresse."
 
 #: account/forms/account_setup.py tools/forms/settings.py
 msgid "--- Please select one of the available options ----"
-msgstr ""
+msgstr "--- Bitte wähle eine der vorgegebenen Optionen ---"
 
 #: account/forms/account_setup.py
 msgid "Account Type"
-msgstr ""
+msgstr "Accounttyp"
 
 #: account/forms/account_setup.py
 msgid "Every member of OpenKAT must be part of an account type."
-msgstr ""
+msgstr "Jedes Mitglied von OpenKAT muss Teil eines Accounttyps sein."
 
 #: account/forms/account_setup.py
 msgid "Please select an account type to proceed."
-msgstr ""
+msgstr "Bitte wähle einen Account zum Fortfahren."
 
 #: account/forms/account_setup.py
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid "Trusted clearance level"
-msgstr ""
+msgstr "Vertrauenswürdige Freigabestufe"
 
 #: account/forms/account_setup.py
 msgid "Select a clearance level you trust this member with."
-msgstr ""
+msgstr "Wählen Sie eine Freigabestufe, die Sie diesem Mitglied anvertrauen."
 
 #: account/forms/account_setup.py onboarding/forms.py tools/forms/ooi.py
 msgid "Please select a clearance level to proceed."
-msgstr ""
+msgstr "Bitte wählen Sie eine Freigabestufe, um fortzufahren."
 
 #: account/forms/account_setup.py
 msgid "The name of the organization."
-msgstr ""
+msgstr "Der Name der Ogranisation."
 
 #: account/forms/account_setup.py
 msgid "explanation-organization-name"
@@ -105,7 +108,7 @@ msgstr ""
 #: account/forms/account_setup.py
 #, python-brace-format
 msgid "A unique code of {code_length} characters."
-msgstr ""
+msgstr "Ein eindeutiger Code von {code_length} Zeichen."
 
 #: account/forms/account_setup.py
 msgid "explanation-organization-code"
@@ -113,19 +116,19 @@ msgstr ""
 
 #: account/forms/account_setup.py
 msgid "Organization name is required to proceed."
-msgstr ""
+msgstr "Zum Fortfahren wird der Name der Organisation benötigt."
 
 #: account/forms/account_setup.py
 msgid "Choose another organization."
-msgstr ""
+msgstr "Wähle eine andere Organisation."
 
 #: account/forms/account_setup.py
 msgid "Organization code is required to proceed."
-msgstr ""
+msgstr "Der Organisationscode ist erforderlich, um fortzufahren."
 
 #: account/forms/account_setup.py
 msgid "Choose another code for your organization."
-msgstr ""
+msgstr "Wählen Sie einen anderen Code für Ihre Organisation."
 
 #: account/forms/account_setup.py
 msgid ""
@@ -133,6 +136,10 @@ msgid ""
 "have permission to scan these assets. I am aware of the implications a scan "
 "with a higher scan level brings on my systems."
 msgstr ""
+"Ich erkläre, dass OpenKAT die Assets meiner Organisation scannen darf und "
+"dass ich die Erlaubnis habe, diese Assets zu scannen. Ich bin mir der "
+"Auswirkungen bewusst, die ein Scan mit einer höheren Scanebene auf meine "
+"Systeme hat."
 
 #: account/forms/account_setup.py
 msgid ""
@@ -140,116 +147,128 @@ msgid ""
 "organization. I have the experience and knowledge to know what the "
 "consequences might be and can be held responsible for them."
 msgstr ""
+"Ich erkläre, dass ich befugt bin, diese Haftungsfreistellung innerhalb "
+"meiner Organisation abzugeben. Ich verfüge über die Erfahrung und das "
+"Wissen, um die möglichen Folgen zu kennen, und kann für diese verantwortlich "
+"gemacht werden."
 
 #: account/forms/account_setup.py
 msgid "Trusted to change Clearance Levels."
-msgstr ""
+msgstr "Vertraut, um Freigabestufen zu ändern."
 
 #: account/forms/account_setup.py
 msgid "Acknowledged to change Clearance Levels."
-msgstr ""
+msgstr "Bestätigt zum Ändern der Freigabestufen."
 
 #: account/forms/account_setup.py
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/views/organization_member_list.py
 msgid "Blocked"
-msgstr ""
+msgstr "Blockiert"
 
 #: account/forms/account_setup.py
 msgid ""
 "Set the members status to blocked, so they don't have access to the "
 "organization anymore."
 msgstr ""
+"Setzen Sie die Mitglieder auf den Status \"gesperrt\", so dass sie keinen "
+"Zugriff mehr auf die Organisation haben."
 
 #: account/forms/account_setup.py
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Accepted clearance level"
-msgstr ""
+msgstr "Akzeptierte Freigabestufe"
 
 #: account/forms/account_setup.py
 msgid "Enter tags separated by comma."
-msgstr ""
+msgstr "Geben Sie Tags durch Komma getrennt ein."
 
 #: account/forms/account_setup.py
 msgid "The two password fields didn’t match."
-msgstr ""
+msgstr "Die beiden Passwortfelder stimmten nicht überein."
 
 #: account/forms/account_setup.py
 msgid "New password"
-msgstr ""
+msgstr "Neues Passwort"
 
 #: account/forms/account_setup.py
 msgid "Enter a new password"
-msgstr ""
+msgstr "Geben Sie ein neues Passwort ein"
 
 #: account/forms/account_setup.py
 msgid "New password confirmation"
-msgstr ""
+msgstr "Neues Passwort wiederholen"
 
 #: account/forms/account_setup.py
 msgid "Repeat the new password"
-msgstr ""
+msgstr "Wiederhole das neue Passwort"
 
 #: account/forms/account_setup.py
 msgid "Confirm the new password"
-msgstr ""
+msgstr "Bestätige das neue Passwort"
 
 #: account/forms/login.py
 msgid "Please enter a correct email address and password."
 msgstr ""
+"Bitte geben Sie die richtige E-Mail-Adresse und das richtige Passwort ein."
 
 #: account/forms/login.py
 msgid "This account is inactive."
-msgstr ""
+msgstr "Diese Account ist nicht aktiv."
 
 #: account/forms/login.py
 msgid "Insert the email you registered with or got at OpenKAT installation."
 msgstr ""
+"Geben Sie die E-Mail ein, mit der Sie sich registriert haben oder die Sie "
+"bei der Installation von OpenKAT erhalten haben."
 
 #: account/forms/organization.py
 msgid "Organization is required."
-msgstr ""
+msgstr "Organisation wird benötigt."
 
 #: account/forms/organization.py tools/view_helpers.py
 #: rocky/templates/dashboard_redteam.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/views/organization_add.py
 msgid "Organizations"
-msgstr ""
+msgstr "Organisationen"
 
 #: account/forms/organization.py
 msgid "The organization from which to clone settings."
-msgstr ""
+msgstr "Die Organisation, von der Einstellungen geklont werden sollen."
 
 #: account/forms/password_reset.py
 msgid "Email address"
-msgstr ""
+msgstr "E-Mail-Adresse"
 
 #: account/forms/password_reset.py
 msgid "A reset link will be sent to this email"
-msgstr ""
+msgstr "Ein Link zum Zurücksetzen wird an diese E-Mail gesendet"
 
 #: account/forms/password_reset.py
 msgid "The email address connected to your OpenKAT-account"
-msgstr ""
+msgstr "Die mit Ihrem OpenKAT-Konto verbundene E-Mail-Adresse"
 
 #: account/forms/token.py
 msgid ""
 "Insert the token generated by the authenticator app to setup the two factor "
 "authentication."
 msgstr ""
+"Geben Sie das von der Authenticator-App generierte Token ein, um die Zwei-"
+"Faktor-Authentifizierung einzurichten."
 
 #: account/forms/token.py
 msgid "Insert the token generated by your token authenticator app."
 msgstr ""
+"Geben Sie das von Ihrer Token-Authentifizierungs-App generierte Token ein."
 
 #: account/forms/token.py
 msgid "Backup token"
-msgstr ""
+msgstr "Backup Token"
 
 #: account/mixins.py
 msgid "Clearance level has been set"
-msgstr ""
+msgstr "Die Freigabestufe wurde festgelegt"
 
 #: account/mixins.py
 #, python-format
@@ -257,6 +276,8 @@ msgid ""
 "Could not raise clearance level of %s to L%s. Indemnification not present at "
 "organization %s."
 msgstr ""
+"Konnte die Freigabestufe von %s nicht auf L%s erhöhen. Entschädigung nicht "
+"vorhanden bei Organisation %s."
 
 #: account/mixins.py
 #, python-format
@@ -264,6 +285,9 @@ msgid ""
 "Could not raise clearance level of %s to L%s. You were trusted a clearance "
 "level of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
+"Konnte die Freigabestufe von %s nicht auf F%s erhöhen. Es wurde Ihnen eine "
+"Freigabestufe von F%s anvertraut. Wenden Sie sich an Ihren Administrator, um "
+"eine höhere Freigabestufe zu erhalten."
 
 #: account/mixins.py
 #, python-format
@@ -272,86 +296,92 @@ msgid ""
 "level of L%s. Please accept the clearance level first on your profile page "
 "to proceed."
 msgstr ""
+"Konnte die Freigabestufe von %s nicht auf F%s erhöhen. Sie haben eine "
+"Freigabestufe von F%s bestätigt. Bitte akzeptieren Sie die Freigabestufe "
+"zuerst auf Ihrer Profilseite, um fortzufahren."
 
 #: account/models.py
 msgid "The Email must be set"
-msgstr ""
+msgstr "Die E-Mail muss eingestellt werden"
 
 #: account/models.py
 msgid "Superuser must have is_staff=True."
-msgstr ""
+msgstr "Superuser muss is_staff=True haben."
 
 #: account/models.py
 msgid "Superuser must have is_superuser=True."
-msgstr ""
+msgstr "Superuser muss is_superuser=True haben."
 
 #: account/models.py
 msgid "full name"
-msgstr ""
+msgstr "Vor- und Nachname"
 
 #: account/models.py
 msgid "email"
-msgstr ""
+msgstr "E-Mail"
 
 #: account/models.py
 msgid "staff status"
-msgstr ""
+msgstr "Personalstatus"
 
 #: account/models.py
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
+"Gibt an, ob sich der Benutzer bei dieser Verwaltungsseite anmelden kann."
 
 #: account/models.py tools/models.py
 msgid "active"
-msgstr ""
+msgstr "Aktiv"
 
 #: account/models.py
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
+"Gibt an, ob dieser Benutzer als aktiv behandelt werden soll. Deaktivieren "
+"Sie diese Option, anstatt Konten zu löschen."
 
 #: account/models.py
 msgid "date joined"
-msgstr ""
+msgstr "Beitrittsdatum"
 
 #: account/models.py
 msgid "name"
-msgstr ""
+msgstr "Name"
 
 #: account/templates/account_detail.html account/views/account.py
 msgid "Account details"
-msgstr ""
+msgstr "Accountdetails"
 
 #: account/templates/account_detail.html account/templates/password_reset.html
 #: account/views/password_reset.py
 msgid "Reset password"
-msgstr ""
+msgstr "Passwort zurücksetzen"
 
 #: account/templates/account_detail.html
 msgid "Full name"
-msgstr ""
+msgstr "Vor - und Nachname"
 
 #: account/templates/account_detail.html
 msgid "E-mail address"
-msgstr ""
+msgstr "E-Mail-Adresse"
 
 #: account/templates/account_detail.html
 msgid "Member type"
-msgstr ""
+msgstr "Mitgliedstyp"
 
 #: account/templates/account_detail.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 msgid "Organization"
-msgstr ""
+msgstr "Organisation"
 
 #: account/templates/account_detail.html
 msgid "Permission to set OOI clearance levels"
-msgstr ""
+msgstr "Erlaubnis zur Festlegung von OOI-Freigabestufen"
 
 #: account/templates/account_detail.html
 msgid "OOI clearance"
-msgstr ""
+msgstr "OOI Freigabe"
 
 #: account/templates/account_detail.html
 msgid ""
@@ -362,20 +392,28 @@ msgid ""
 "necessary clearance level.\n"
 "                        "
 msgstr ""
+"\n"
+"                            Sie haben keine Berechtigung zum Scannen von "
+"Objekten.<br>\n"
+"                            Setzen Sie sich mit dem Administrator in "
+"Verbindung, damit er Ihnen die erforderliche Freigabestufe erteilt.\n"
+"                        "
 
 #: account/templates/account_detail.html
 msgid "You have currently accepted clearance up to level"
-msgstr ""
+msgstr "Sie haben derzeit eine Freigabe bis zur Stufe"
 
 #: account/templates/account_detail.html
 msgid "Explanation OOI Clearance"
-msgstr ""
+msgstr "Erläuterung OOI-Freigabe"
 
 #: account/templates/account_detail.html
 msgid ""
 "You can withdraw this at anytime you like, but know that you won't be able "
 "to change clearance levels anymore when you do."
 msgstr ""
+"Sie können diese jederzeit zurückziehen, sollten aber wissen, dass Sie dann "
+"die Freigabestufen nicht mehr ändern können."
 
 #: account/templates/account_detail.html
 #, python-format
@@ -384,10 +422,13 @@ msgid ""
 "                            Withdraw L%(acl)s clearance and responsibility\n"
 "                    "
 msgstr ""
+"\n"
+"                            F%(acl)s Freigabe und Verantwortung entziehen\n"
+"                    "
 
 #: account/templates/account_detail.html
 msgid "Explanation OOI clearance"
-msgstr ""
+msgstr "Erläuterung OOI-Freigabe"
 
 #: account/templates/account_detail.html
 #, python-format
@@ -397,6 +438,10 @@ msgid ""
 "permission. Remember: <strong>with great power comes great responsibility.</"
 "strong>"
 msgstr ""
+"You are granted clearance for level F%(tcl)s by your admin. Before you can "
+"change OOI clearance levels up to this level, you need to accept this "
+"permission. Remember: <strong>with great power comes great responsibility.</"
+"strong>"
 
 #: account/templates/account_detail.html
 #, python-format
@@ -405,32 +450,39 @@ msgid ""
 "                        Accept level L%(tcl)s clearance and responsibility\n"
 "                    "
 msgstr ""
+"\n"
+"                        Freigabe und Verantwortung der Ebene F%(tcl)s "
+"akzeptieren\n"
+"                    "
 
 #: account/templates/password_reset.html
 msgid "Use the form below to reset your password."
 msgstr ""
+"Verwenden Sie das untenstehende Formular, um Ihr Passwort zurückzusetzen."
 
 #: account/templates/password_reset.html
 #: account/templates/password_reset_confirm.html
 msgid "Send"
-msgstr ""
+msgstr "Absenden"
 
 #: account/templates/password_reset.html
 #: account/templates/password_reset_confirm.html
 msgid "Back"
-msgstr ""
+msgstr "Zurück"
 
 #: account/templates/password_reset_confirm.html
 msgid "Confirm reset password"
-msgstr ""
+msgstr "Bestätigen Sie das zurückgesetzte Passwort"
 
 #: account/templates/password_reset_confirm.html
 msgid "Use the form below to confirm resetting your password"
 msgstr ""
+"Verwenden Sie das nachstehende Formular, um das Zurücksetzen Ihres Passworts "
+"zu bestätigen"
 
 #: account/templates/password_reset_confirm.html
 msgid "Confirm password"
-msgstr ""
+msgstr "Passwort bestätigen"
 
 #: account/templates/password_reset_confirm.html
 msgid "The link is invalid"
@@ -899,15 +951,15 @@ msgstr ""
 #: rocky/templates/header.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Settings"
-msgstr ""
+msgstr "Einstellungen"
 
 #: katalogus/templates/partials/katalogus_toolbar.html
 msgid "Gridview"
-msgstr ""
+msgstr "Rasteransicht"
 
 #: katalogus/templates/partials/katalogus_toolbar.html
 msgid "Tableview"
-msgstr ""
+msgstr "Tabellenansicht"
 
 #: katalogus/templates/partials/objects_to_scan.html
 #: rocky/templates/findings/finding_list.html
@@ -915,7 +967,7 @@ msgstr ""
 #: rocky/templates/oois/ooi_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid "Object list"
-msgstr ""
+msgstr "Objektliste"
 
 #: katalogus/templates/partials/objects_to_scan.html
 #, python-format
@@ -953,14 +1005,17 @@ msgid ""
 "You currently don't have scannable objects for %(name)s. Add objects to use "
 "this Boefje. This Boefje is able to scan objects of the following types:"
 msgstr ""
+"Sie haben derzeit keine durchsuchbaren Objekte für %(name)s. Füge Objekte "
+"hinzu, um dieses Boefje zu verwenden. Dieses Boefje kann Objekte der "
+"folgenden Typen scannen:"
 
 #: katalogus/templates/partials/plugin_settings_required.html
 msgid "The form could not be initialized."
-msgstr ""
+msgstr "Das Formular konnte nicht initialisiert werden."
 
 #: katalogus/templates/partials/plugin_settings_required.html
 msgid "Required settings"
-msgstr ""
+msgstr "Erforderliche Einstellungen"
 
 #: katalogus/templates/partials/plugin_settings_required.html
 #: katalogus/templates/plugin_settings_list.html
@@ -968,57 +1023,57 @@ msgstr ""
 #: rocky/templates/partials/ooi_detail_related_object.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Add"
-msgstr ""
+msgstr "Hinzufügen"
 
 #: katalogus/templates/partials/plugin_tile.html
 msgid "Required for:"
-msgstr ""
+msgstr "Erforderlich für:"
 
 #: katalogus/templates/partials/plugins.html
 msgid "Plugins overview:"
-msgstr ""
+msgstr "Plugins Übersicht:"
 
 #: katalogus/templates/partials/plugins.html
 #: reports/templates/summary/selected_plugins.html
 msgid "Plugin name"
-msgstr ""
+msgstr "Pluginname"
 
 #: katalogus/templates/partials/plugins.html
 #: reports/templates/summary/selected_plugins.html
 msgid "Plugin type"
-msgstr ""
+msgstr "Plugintyp"
 
 #: katalogus/templates/partials/plugins.html
 #: reports/templates/summary/selected_plugins.html
 msgid "Plugin description"
-msgstr ""
+msgstr "Pluginbeschreibung"
 
 #: katalogus/templates/partials/plugins.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Actions"
-msgstr ""
+msgstr "Aktionen"
 
 #: katalogus/templates/partials/plugins_navigation.html
 #: reports/templates/report_overview/report_overview_navigation.html
 msgid "Plugins Navigation"
-msgstr ""
+msgstr "Plugins-Navigation"
 
 #: katalogus/templates/partials/plugins_navigation.html
 #: tools/forms/scheduler.py
 msgid "All"
-msgstr ""
+msgstr "Alle"
 
 #: katalogus/templates/partials/plugins_navigation.html
 #: rocky/templates/scan.html rocky/templates/tasks/boefjes.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Boefjes"
-msgstr ""
+msgstr "Boefjes"
 
 #: katalogus/templates/partials/plugins_navigation.html
 #: rocky/templates/tasks/normalizers.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Normalizers"
-msgstr ""
+msgstr "Normalisierer"
 
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
@@ -1030,7 +1085,13 @@ msgid_plural ""
 "            Add settings\n"
 "          "
 msgstr[0] ""
+"\n"
+"            Einstellung hinzufügen\n"
+"          "
 msgstr[1] ""
+"\n"
+"            Einstellungen hinzufügen\n"
+"          "
 
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
@@ -1042,7 +1103,13 @@ msgid_plural ""
 "            Settings\n"
 "          "
 msgstr[0] ""
+"\n"
+"            Einstellung\n"
+"          "
 msgstr[1] ""
+"\n"
+"            Einstellungen\n"
+"          "
 
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
@@ -1054,7 +1121,13 @@ msgid_plural ""
 "                  Add settings and enable boefje\n"
 "                "
 msgstr[0] ""
+"\n"
+"                  Einstellung hinzufügen und Boefje aktivieren\n"
+"                "
 msgstr[1] ""
+"\n"
+"                  Einstellungen hinzufügen und Boefje aktivieren\n"
+"                "
 
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
@@ -1066,89 +1139,102 @@ msgid_plural ""
 "                Add settings\n"
 "              "
 msgstr[0] ""
+"\n"
+"                Einstellung hinzufügen\n"
+"              "
 msgstr[1] ""
+"\n"
+"                Einstellungen hinzufügen\n"
+"              "
 
 #: katalogus/templates/plugin_settings_delete.html
 msgid "Delete settings"
-msgstr ""
+msgstr "Einstellungen löschen"
 
 #: katalogus/templates/plugin_settings_delete.html
 #, python-format
 msgid ""
 "Are you sure you want to delete all settings for the plugin %(plugin_name)s?"
 msgstr ""
+"Sind Sie sicher, dass Sie alle Einstellungen für das Plugin %(plugin_name)s "
+"löschen wollen?"
 
 #: katalogus/templates/plugin_settings_delete.html
 #: katalogus/templates/plugin_settings_list.html
 #: katalogus/views/plugin_settings_delete.py
 #: rocky/templates/admin/delete_confirmation.html rocky/views/ooi_delete.py
 msgid "Delete"
-msgstr ""
+msgstr "Löschen"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid " Details"
-msgstr ""
+msgstr " Details"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Overview of settings"
-msgstr ""
+msgstr "Übersicht der Einstellungen"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Required"
-msgstr ""
+msgstr "Erforderlich"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Action"
-msgstr ""
+msgstr "Aktion"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Unset"
-msgstr ""
+msgstr "Nicht gesetzt"
 
 #: katalogus/templates/plugin_settings_list.html
 #: reports/report_types/dns_report/report.html
 msgid "Yes"
-msgstr ""
+msgstr "Ja"
 
 #: katalogus/templates/plugin_settings_list.html
 #: reports/report_types/dns_report/report.html
 msgid "No"
-msgstr ""
+msgstr "Nein"
 
 #: katalogus/templates/plugin_settings_list.html
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/views/ooi_edit.py rocky/views/organization_edit.py
 msgid "Edit"
-msgstr ""
+msgstr "Bearbeiten"
 
 #: katalogus/views/change_clearance_level.py
 msgid "Session has terminated, please select objects again."
-msgstr ""
+msgstr "Die Sitzung wurde beendet, bitte wählen Sie erneut Objekte aus."
 
 #: katalogus/views/change_clearance_level.py
 msgid "Change clearance level"
-msgstr ""
+msgstr "Freigabestufe ändern"
 
 #: katalogus/views/katalogus_settings.py
 msgid "Settings from {} to {} successfully cloned."
-msgstr ""
+msgstr "Einstellungen von {} nach {} erfolgreich geklont."
 
 #: katalogus/views/katalogus_settings.py
 #: katalogus/views/plugin_settings_list.py
 msgid "Failed getting settings for boefje {}"
-msgstr ""
+msgstr "Einstellungen für boefje konnten nicht abgerufen werden {}"
 
 #: katalogus/views/mixins.py
 msgid ""
 "Getting information for plugin {} failed. Please check the KATalogus logs."
 msgstr ""
+"Das Abrufen von Informationen für das Plugin {} ist fehlgeschlagen. Bitte "
+"prüfen Sie die KATalogus-Logs."
 
 #: katalogus/views/plugin_detail.py
 msgid ""
 "Some selected OOIs needs an increase of clearance level to perform scans. "
 "You do not have the permission to change clearance level."
 msgstr ""
+"Für einige ausgewählte OOIs ist eine Erhöhung der Freigabestufe "
+"erforderlich, um Scans durchzuführen. Sie haben nicht die Berechtigung, die "
+"Freigabestufe zu ändern."
 
 #: katalogus/views/plugin_enable_disable.py
 msgid "{} '{}' disabled."
@@ -1349,11 +1435,11 @@ msgstr ""
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Accounts"
-msgstr ""
+msgstr "Accounts"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Organization setup with separate accounts:"
-msgstr ""
+msgstr "Einrichtung einer Organisation mit separaten Konten:"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid ""
@@ -1363,10 +1449,16 @@ msgid ""
 "can choose to create the separate accounts during this introduction or when "
 "you’re ready from the OpenKAT users page."
 msgstr ""
+"Innerhalb von OpenKAT ist es möglich, separate Benutzerkonten mit den "
+"spezifischen Rollen zu erstellen. Jeder mit seinen eigenen Funktionen und "
+"Berechtigungen. Dies ist nützlich, wenn mehrere Personen mit demselben "
+"OpenKAT-Setup arbeiten werden. Sie können die separaten Konten während "
+"dieser Einführung oder zu einem späteren Zeitpunkt auf der OpenKAT-"
+"Benutzerseite erstellen."
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Single account setup:"
-msgstr ""
+msgstr "Einrichtung eines Einzelkontos:"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid ""
@@ -1376,29 +1468,36 @@ msgid ""
 "account. You can always add additional user accounts If you’re team expands "
 "in the future."
 msgstr ""
+"Alternativ ist es auch möglich, OpenKAT von einem einzigen Benutzerkonto aus "
+"zu starten. Dies ist nützlich, wenn Sie der einzige Benutzer des Kontos "
+"sind. Sie können dann von Ihrem Konto aus auf die Funktionen der "
+"verschiedenen Rollen zugreifen. Sie können jederzeit weitere Benutzerkonten "
+"hinzufügen, wenn sich Ihr Team in Zukunft erweitert."
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Create separate accounts"
-msgstr ""
+msgstr "Getrennte Konten erstellen"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Continue with this account, onboard me!"
-msgstr ""
+msgstr "Fahren Sie mit diesem Konto fort, nehmen Sie mich an Bord!"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "Users"
-msgstr ""
+msgstr "Benutzer*Innen"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid ""
 "Within OpenKAT there are three types of user accounts. Each has its own "
 "functions."
 msgstr ""
+"In OpenKAT gibt es drei Arten von Benutzerkonten. Jedes hat seine eigenen "
+"Funktionen."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_4_account_setup_admin.html
 msgid "Admin"
-msgstr ""
+msgstr "Admin"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_4_account_setup_admin.html
@@ -1406,25 +1505,27 @@ msgid ""
 "Each organization must have an admin. The admin can create and manage user "
 "accounts as well as organization details."
 msgstr ""
+"Jede Organisation muss einen Administrator haben. Der Administrator kann "
+"Benutzerkonten erstellen und verwalten sowie Details zur Organisation."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Red teamer"
-msgstr ""
+msgstr "Redteamer"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "A red teamer account can run scans and generate reports."
-msgstr ""
+msgstr "Ein Red-Teamer-Konto kann Scans durchführen und Berichte erstellen."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Client account"
-msgstr ""
+msgstr "Kundenkonto"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "A client account can access reports."
-msgstr ""
+msgstr "Ein Kundenkonto kann auf Berichte zugreifen."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid ""
@@ -1432,55 +1533,61 @@ msgid ""
 "function. This introduction will guide you through the setup of both. After "
 "that you can choose to add a client account as well."
 msgstr ""
+"Jede Organisation benötigt mindestens ein Admin- und ein Red-Teamer-Konto, "
+"um zu funktionieren. Diese Einführung wird Sie durch die Einrichtung beider "
+"Konten führen. Danach können Sie sich entscheiden, auch ein Kundenkonto "
+"hinzuzufügen."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "Let's add accounts"
-msgstr ""
+msgstr "Wir wollen Konten hinzufügen"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 msgid "Admin account setup"
-msgstr ""
+msgstr "Admin-Konto einrichten"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 msgid "Admin details"
-msgstr ""
+msgstr "Admin-Details"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Skip this step"
-msgstr ""
+msgstr "Diesen Schritt überspringen"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Go back to previous step"
-msgstr ""
+msgstr "Zum vorherigen Schritt zurückkehren"
 
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Red teamer account setup"
-msgstr ""
+msgstr "Einrichtung eines Red-Teamers-Kontos"
 
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Red teamer details"
-msgstr ""
+msgstr "Red-Teamer-Details"
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Client account setup (optional)"
-msgstr ""
+msgstr "Einrichtung eines Kundenkontos (optional)"
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid ""
 "A client account can access reports. Adding a client account to the "
 "organization is optional."
 msgstr ""
+"Ein Kundenkonto kann auf Berichte zugreifen. Das Hinzufügen eines "
+"Kundenkontos zur Organisation ist optional."
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "User details"
-msgstr ""
+msgstr "Benutzerdetails"
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Finish organization setup"
-msgstr ""
+msgstr "Einrichtung der Organisation abschließen"
 
 #: onboarding/templates/dns_report.html
 #: onboarding/templates/step_2a_choose_report_info.html
@@ -1490,13 +1597,13 @@ msgstr ""
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 #: onboarding/templates/step_4_report.html onboarding/view_helpers.py
 msgid "OpenKAT introduction"
-msgstr ""
+msgstr "OpenKAT Einführung"
 
 #: onboarding/templates/dns_report.html
 #: onboarding/templates/step_2b_choose_report_type.html
 #: reports/report_types/dns_report/report.py
 msgid "DNS Report"
-msgstr ""
+msgstr "DNS Report"
 
 #: onboarding/templates/dns_report.html
 #, python-format
@@ -1505,15 +1612,18 @@ msgid ""
 "finding for more detailed information about the issue, its origin, severity "
 "and possible solutions."
 msgstr ""
+"Dies sind die Ergebnisse einer OpenKAT-Analyse (%(observed_at)s). Klicken "
+"Sie auf ein Ergebnis, um nähere Informationen über das Problem, seinen "
+"Ursprung, seinen Schweregrad und mögliche Lösungen zu erhalten."
 
 #: onboarding/templates/dns_report.html
 msgid "DNS Tree"
-msgstr ""
+msgstr "DNS Baum"
 
 #: onboarding/templates/step_1_introduction.html
 #: rocky/templates/landing_page.html
 msgid "Welcome to OpenKAT"
-msgstr ""
+msgstr "Willkommen bei OpenKAT"
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
@@ -1521,12 +1631,19 @@ msgid ""
 "Tool). An Open-Source-project developed by the Ministry of Health, Welfare "
 "and Sport to make your and our world a safer place."
 msgstr ""
+"OpenKAT ist das \"Kwetsbaarheden Analyse Tool\" (Werkzeug zur Analyse von "
+"Schwachstellen). Ein Open-Source-Projekt, das vom Ministerium für "
+"Gesundheit, Wohlfahrt und Sport entwickelt wurde, um Ihre und unsere Welt "
+"sicherer zu machen."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
 "OpenKAT is able to give insight into security risks on your online objects. "
 "For example, your websites, mailservers or online data."
 msgstr ""
+"OpenKAT ist in der Lage, einen Einblick in die Sicherheitsrisiken auf Ihren "
+"Online-Objekten zu geben. Zum Beispiel Ihre Websites, Mailserver oder Online-"
+"Daten."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
@@ -1536,18 +1653,28 @@ msgid ""
 "you would like to monitor or scan and which insight you would like to "
 "receive."
 msgstr ""
+"OpenKAT verwendet Plugins, um die möglicherweise gefährdeten Bereiche zu "
+"finden und zu bewerten, und meldet diese an Sie zurück. Jedes Plugin hat "
+"seine eigenen Fähigkeiten, die im Scannen, Normalisieren oder Analysieren "
+"von Daten bestehen können. Als Nutzer entscheiden Sie, welche Bereiche Sie "
+"überwachen oder scannen möchten und welche Erkenntnisse Sie erhalten möchten."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
 "Within OpenKAT you can view the insights as well as all the data OpenKAT has "
 "found. You can choose to browse through the data or view reports."
 msgstr ""
+"Innerhalb von OpenKAT können Sie die Erkenntnisse sowie alle Daten, die "
+"OpenKAT gefunden hat, einsehen. Sie können wählen, ob Sie die Daten "
+"durchsuchen oder Berichte anzeigen möchten."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
 "During this introduction you will be guided through the steps to create a "
 "report."
 msgstr ""
+"Während dieser Einführung werden Sie durch die Schritte zur Erstellung eines "
+"Berichts geführt."
 
 #: onboarding/templates/step_1_introduction.html
 #: onboarding/templates/step_2a_choose_report_info.html
@@ -1561,17 +1688,17 @@ msgstr ""
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 #: rocky/templates/partials/form/boefje_tiles_form.html
 msgid "Skip onboarding"
-msgstr ""
+msgstr "Onboarding überspringen"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Choose a report - Introduction"
-msgstr ""
+msgstr "Wählen Sie einen Bericht - Einleitung"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 #: reports/templates/report_overview/report_overview_header.html
 #: reports/views/base.py rocky/templates/header.html
 msgid "Reports"
-msgstr ""
+msgstr "Berichte"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -1580,11 +1707,16 @@ msgid ""
 "vulnerable to. Each report gives a high overview of the state of the object "
 "as well as detailed information on what OpenKAT found and possible solutions."
 msgstr ""
+"Die Berichte in OpenKAT enthalten einen Überblick über die gescannten "
+"Objekte, die darin gefundenen Probleme und die bekannten Sicherheitsrisiken, "
+"für die das Objekt anfällig sein könnte. Jeder Bericht gibt einen "
+"umfassenden Überblick über den Zustand des Objekts sowie detaillierte "
+"Informationen darüber, was OpenKAT gefunden hat, und mögliche Lösungen."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 #: reports/report_types/dns_report/report.html
 msgid "Data"
-msgstr ""
+msgstr "Daten"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -1593,10 +1725,15 @@ msgid ""
 "manage the plugins within your account which let's OpenKAT know which "
 "plugins to run and on which objects or areas."
 msgstr ""
+"OpenKAT kann mit Hilfe von Plugins scannen und analysieren. Jedes Plugin hat "
+"seine eigenen Fähigkeiten und sammelt spezifische Daten oder gibt "
+"spezifische Einblicke. Sie verwalten die Plugins in Ihrem Konto, damit "
+"OpenKAT weiß, welche Plugins für welche Objekte oder Bereiche ausgeführt "
+"werden sollen."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Generating a report"
-msgstr ""
+msgstr "Report generieren"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -1605,6 +1742,11 @@ msgid ""
 "needs, as well as asks for permission to run plugins that you haven’t "
 "enabled yet but are needed to collect or analyze the data."
 msgstr ""
+"Wenn Sie einen Berichtstyp auswählen, wird OpenKAT Sie durch die Einrichtung "
+"führen. OpenKAT stellt die notwendigen Fragen auf der Grundlage der "
+"Eingaben, die der Bericht benötigt, und bittet um die Erlaubnis, Plugins "
+"auszuführen, die Sie noch nicht aktiviert haben, die aber für die Erfassung "
+"oder Analyse der Daten erforderlich sind."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -1612,10 +1754,13 @@ msgid ""
 "own report by selecting and running plugins on objects of your choice. "
 "OpenKAT will present the results."
 msgstr ""
+"Sie können sich die gesammelten Daten auch direkt ansehen oder Ihren eigenen "
+"Bericht erstellen, indem Sie Plugins für Objekte Ihrer Wahl auswählen und "
+"ausführen. OpenKAT wird die Ergebnisse präsentieren."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Permission"
-msgstr ""
+msgstr "Erlaubnis"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -1623,20 +1768,25 @@ msgid ""
 "community. Before a plugin can run, you need to give it permission by "
 "enabling it."
 msgstr ""
+"Plugins können von OpenKAT zur Verfügung gestellt werden, aber sie können "
+"auch von der Gemeinschaft kommen. Bevor ein Plugin ausgeführt werden kann, "
+"müssen Sie ihm die Erlaubnis erteilen, indem Sie es aktivieren."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
 "When you generate a report. OpenKAT will let you know which plugins it "
 "requires or suggests so you can choose to enable them."
 msgstr ""
+"Wenn Sie einen Bericht erstellen. OpenKAT teilt Ihnen mit, welche Plugins es "
+"benötigt oder vorschlägt, damit Sie diese aktivieren können."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Let's choose a report"
-msgstr ""
+msgstr "Lassen Sie uns einen Bericht auswählen"
 
 #: onboarding/templates/step_2b_choose_report_type.html
 msgid "Choose a report - Type"
-msgstr ""
+msgstr "Wählen Sie einen Bericht - Typ"
 
 #: onboarding/templates/step_2b_choose_report_type.html
 msgid ""
@@ -1645,26 +1795,34 @@ msgid ""
 "generate a report. Such as a pentest, a DNS-report or a Mail Report to give "
 "some examples."
 msgstr ""
+"In OpenKAT können Sie Berichte für jedes Ihrer aktuellen Objekte anzeigen. "
+"Für spezifische Berichte können Sie einen der verfügbaren Berichtstypen "
+"auswählen und einen Bericht erstellen. Ein Pentest, ein DNS-Bericht oder ein "
+"Mail-Bericht sind nur einige Beispiele."
 
 #: onboarding/templates/step_2b_choose_report_type.html
 msgid "For this tutorial we will create a DNS-report to get you started."
 msgstr ""
+"In diesem Tutorial werden wir einen DNS-Bericht erstellen, um Ihnen den "
+"Einstieg zu erleichtern."
 
 #: onboarding/templates/step_2b_choose_report_type.html
 msgid ""
 "When you start to generate this report. OpenKAT will guide you through the "
 "necessary steps."
 msgstr ""
+"Wenn Sie beginnen, diesen Bericht zu erstellen. OpenKAT wird Sie durch die "
+"notwendigen Schritte führen."
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "Setup scan"
-msgstr ""
+msgstr "Scan einrichten"
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid "Let OpenKAT know what object to scan"
-msgstr ""
+msgstr "Lassen Sie OpenKAT wissen, welches Objekt gescannt werden soll"
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid ""
@@ -1672,10 +1830,13 @@ msgid ""
 "would like to scan and analyze for the DNS-report. So it can tell you which "
 "plugins are available for the chosen object."
 msgstr ""
+"Plugins scannen und analysieren Objekte. OpenKAT muss wissen, welche(s) "
+"Objekt(e) Sie für den DNS-Bericht scannen und analysieren möchten. So kann "
+"es Ihnen sagen, welche Plugins für das gewählte Objekt verfügbar sind."
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid "Understanding objects"
-msgstr ""
+msgstr "Objekte verstehen"
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid ""
@@ -1684,45 +1845,58 @@ msgid ""
 "name a few.  While these objects can be related to each other they are all "
 "objects within OpenKAT that can be scanned to gain valuable insight."
 msgstr ""
+"Viele Dinge können ein Objekt im Rahmen von OpenKAT sein. Zum Beispiel ein "
+"Mailserver, eine IP-Adresse, eine URL, ein DNS-Eintrag, ein Hostname oder "
+"ein Netzwerk, um nur einige zu nennen.  Obwohl diese Objekte miteinander in "
+"Beziehung stehen können, sind sie alle Objekte innerhalb von OpenKAT, die "
+"gescannt werden können, um wertvolle Erkenntnisse zu gewinnen."
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid "Creating, adding and editing objects"
-msgstr ""
+msgstr "Erstellen, Hinzufügen und Bearbeiten von Objekten"
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid ""
 "Within OpenKAT you can view, add and edit objects from the organization’s "
 "object page."
 msgstr ""
+"In OpenKAT können Sie Objekte auf der Objektseite der Organisation anzeigen, "
+"hinzufügen und bearbeiten."
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid ""
 "Let’s add an object to scan for the DNS-Report. For this introduction we "
 "suggest adding a URL."
 msgstr ""
+"Fügen wir ein Objekt hinzu, um nach dem DNS-Bericht zu suchen. Für diese "
+"Einführung schlagen wir vor, eine URL hinzuzufügen."
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid "Add URL"
-msgstr ""
+msgstr "URL hinzufügen"
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html onboarding/views.py
 msgid "Creating an object"
-msgstr ""
+msgstr "Objekt erstellen"
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 msgid "Create your first object, a URL by filling out the form below."
 msgstr ""
+"Erstellen Sie Ihr erstes Objekt, eine URL, indem Sie das untenstehende "
+"Formular ausfüllen."
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 msgid ""
 "Additional details and examples can be found by pressing on the help button "
 "next to the input field."
 msgstr ""
+"Weitere Details und Beispiele finden Sie, wenn Sie auf die Schaltfläche "
+"\"Hilfe\" neben dem Eingabefeld klicken."
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 msgid "Dependencies"
-msgstr ""
+msgstr "Abhängigkeiten"
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 msgid ""
@@ -1732,6 +1906,11 @@ msgid ""
 "object automatically when possible. By running plugins to collect or extract "
 "this data."
 msgstr ""
+"Die meisten Objekte sind von der Existenz anderer Objekte abhängig. Zum "
+"Beispiel muss eine URL mit einem Netzwerk verbunden sein, Hostname, FQDN "
+"(Fully Qualified Domain Name) und IP-Adresse. OpenKAT sammelt diese "
+"zusätzlichen Objekte automatisch, wenn möglich. Durch die Ausführung von "
+"Plugins zum Sammeln oder Extrahieren dieser Daten."
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 msgid ""
@@ -1739,21 +1918,27 @@ msgid ""
 "list as separate objects. If OpenKAT can’t add them automatically it will "
 "guide you through the process of creating them manually."
 msgstr ""
+"Die zusätzlichen Objekte, die OpenKAT erstellt hat, werden als separate "
+"Objekte zu Ihrer Objektliste hinzugefügt. Wenn OpenKAT sie nicht automatisch "
+"hinzufügen kann, wird es Sie durch den Prozess der manuellen Erstellung "
+"leiten."
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 #: reports/templates/partials/report_ooi_list.html
 msgid "Create object"
-msgstr ""
+msgstr "Objekt erstellen"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid ""
 "Based on the url you provided OpenKAT added the necessary additional objects "
 "to create a url object."
 msgstr ""
+"Basierend auf der von Ihnen angegebenen URL hat OpenKAT die notwendigen "
+"zusätzlichen Objekte hinzugefügt, um ein URL-Objekt zu erstellen."
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 #: reports/report_types/dns_report/report.html
@@ -1764,7 +1949,7 @@ msgstr ""
 #: rocky/templates/partials/ooi_detail_related_object.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Type"
-msgstr ""
+msgstr "Typ"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "Path"
@@ -2186,27 +2371,27 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 msgid "Used Config objects"
-msgstr ""
+msgstr "Gebrauchte Config Objekte"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 msgid "Used config objects"
-msgstr ""
+msgstr "Gebrauchte Konfigurationsobjekte"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 msgid "Primary Key"
-msgstr ""
+msgstr "Primärschlüssel"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 msgid "Bit ID"
-msgstr ""
+msgstr "Bit ID"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 msgid "Config"
-msgstr ""
+msgstr "Konfiguration"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 msgid "No config objects found."
-msgstr ""
+msgstr "Keine Konfigurationsobjekte gefunden."
 
 #: reports/report_types/aggregate_organisation_report/asset_overview.html
 #: reports/report_types/multi_organization_report/asset_overview.html
@@ -2214,7 +2399,7 @@ msgstr ""
 #: reports/templates/partials/report_sidemenu.html
 #: reports/templates/summary/report_asset_overview.html
 msgid "Asset overview"
-msgstr ""
+msgstr "Assetübersicht"
 
 #: reports/report_types/aggregate_organisation_report/asset_overview.html
 #: reports/report_types/multi_organization_report/asset_overview.html
@@ -6707,3 +6892,6 @@ msgstr ""
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr ""
+
+#~ msgid "Please select an OOI to start scan."
+#~ msgstr "Bitte wählen Sie einen OOI, um den Scan zu starten."

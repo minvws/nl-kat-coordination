@@ -27,6 +27,7 @@ class NormalizerSchedulerBaseTestCase(unittest.TestCase):
 
         # Database
         self.dbconn = storage.DBConn(str(self.mock_ctx.config.db_uri))
+        self.dbconn.connect()
         models.Base.metadata.drop_all(self.dbconn.engine)
         models.Base.metadata.create_all(self.dbconn.engine)
 
@@ -233,7 +234,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Task should be in datastore
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(task_pq.id)
         self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
@@ -457,7 +458,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Task should be in datastore
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(task_pq.id)
         self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
