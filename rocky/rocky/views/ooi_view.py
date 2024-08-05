@@ -112,7 +112,7 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
 
 
 class BaseOOIListView(OOIFilterView, ListView):
-    paginate_by = 25
+    paginate_by = 150
     context_object_name = "ooi_list"
     paginator = RockyPaginator
 
