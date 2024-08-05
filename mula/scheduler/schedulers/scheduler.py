@@ -105,7 +105,7 @@ class Scheduler(abc.ABC):
             modified_at=datetime.now(timezone.utc),
         )
 
-        task_db = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
+        task_db = self.ctx.datastores.task_store.get_task(str(p_item.id))
         if task_db is not None:
             self.ctx.datastores.task_store.update_task(task)
             return
@@ -123,7 +123,7 @@ class Scheduler(abc.ABC):
         """
         # NOTE: we set the id of the task the same as the p_item, for easier
         # lookup.
-        task = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
+        task = self.ctx.datastores.task_store.get_task(str(p_item.id))
         if task is None:
             self.logger.warning(
                 "PrioritizedItem %s popped from %s, task %s not found in datastore, could not update task status",
