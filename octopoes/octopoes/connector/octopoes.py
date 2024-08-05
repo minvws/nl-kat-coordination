@@ -4,6 +4,7 @@ from datetime import datetime
 from uuid import UUID
 
 import httpx
+import structlog
 from httpx import HTTPError, Response
 from pydantic import TypeAdapter
 
@@ -38,8 +39,8 @@ class OctopoesAPIConnector:
     def __init__(self, base_uri: str, client: str):
         self.base_uri = base_uri
         self.client = client
-
         self.session = httpx.Client(base_url=base_uri, timeout=30, event_hooks={"response": [self._verify_response]})
+        self.logger = structlog.get_logger("octopoes-connector", client=client)
 
     @staticmethod
     def _verify_response(response: Response) -> None:
@@ -160,6 +161,8 @@ class OctopoesAPIConnector:
             content=observation.model_dump_json(),
         )
 
+        self.logger.info("Saved observation", observation=observation)
+
     def save_declaration(self, declaration: Declaration) -> None:
         self.session.post(
             f"/{self.client}/declarations",
@@ -167,12 +170,16 @@ class OctopoesAPIConnector:
             content=declaration.model_dump_json(),
         )
 
+        self.logger.info("Saved declaration", declaration=declaration)
+
     def save_affirmation(self, affirmation: Affirmation) -> None:
         self.session.post(
             f"/{self.client}/affirmations",
             headers={"Content-Type": "application/json"},
             content=affirmation.model_dump_json(),
         )
+
+        self.logger.info("Saved affirmation", affirmation=affirmation)
 
     def save_scan_profile(self, scan_profile: ScanProfile, valid_time: datetime):
         params = {"valid_time": str(valid_time)}
@@ -195,9 +202,13 @@ class OctopoesAPIConnector:
         params = {"reference": str(reference), "valid_time": str(valid_time)}
         self.session.delete(f"/{self.client}/", params=params)
 
+        self.logger.info("Deleted object", reference=reference, valid_time=valid_time)
+
     def delete_many(self, references: list[Reference], valid_time: datetime) -> None:
         params = {"valid_time": str(valid_time)}
         self.session.post(f"/{self.client}/objects/delete_many", params=params, json=[str(ref) for ref in references])
+
+        self.logger.info("Deleted objects", references=references, valid_time=valid_time)
 
     def list_origin_parameters(self, origin_id: set[str], valid_time: datetime) -> list[OriginParameter]:
         params = {"origin_id": list(origin_id), "valid_time": str(valid_time)}
@@ -207,8 +218,12 @@ class OctopoesAPIConnector:
     def create_node(self):
         self.session.post(f"/{self.client}/node")
 
+        self.logger.info("Created node")
+
     def delete_node(self):
         self.session.delete(f"/{self.client}/node")
+
+        self.logger.info("Deleted node")
 
     def get_scan_profile_inheritance(self, reference: Reference, valid_time: datetime) -> list[InheritanceSection]:
         params = {"reference": str(reference), "valid_time": str(valid_time)}
