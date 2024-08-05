@@ -1769,6 +1769,10 @@ msgid "Type"
 msgstr ""
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
+msgid "Owner"
+msgstr ""
+
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "Path"
 msgstr ""
 
@@ -5188,6 +5192,11 @@ msgstr ""
 msgid "Total findings:"
 msgstr ""
 
+#: rocky/templates/oois/ooi_detail_object.html
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Inactive"
+msgstr ""
+
 #: rocky/templates/oois/ooi_detail_origins_declarations.html
 msgid "Declarations"
 msgstr ""
@@ -5954,10 +5963,6 @@ msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Current clearance level"
-msgstr ""
-
-#: rocky/templates/scan_profiles/scan_profile_detail.html
-msgid "Inactive"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
