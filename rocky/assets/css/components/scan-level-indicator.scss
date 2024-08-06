@@ -37,23 +37,19 @@ Markup:
   }
 
   &.l1 li:first-child::before {
-    content: "\f689";
-    color: var(--colors-purrple-8);
+    color: var(--colors-purrple-500);
   }
 
   &.l2 li:nth-child(-n + 2)::before {
-    content: "\f689";
-    color: var(--colors-purrple-9);
+    color: var(--colors-purrple-600);
   }
 
   &.l3 li:nth-child(-n + 3)::before {
-    content: "\f689";
-    color: var(--colors-purrple-10);
+    color: var(--colors-purrple-700);
   }
 
   &.l4 li:nth-child(-n + 4)::before {
-    content: "\f689";
-    color: var(--colors-purrple-11);
+    color: var(--colors-purrple-800);
   }
 
   &-form {

@@ -19,6 +19,7 @@ class SchedulerTestCase(unittest.TestCase):
 
         # Database
         self.dbconn = storage.DBConn(str(cfg.db_uri))
+        self.dbconn.connect()
         models.Base.metadata.drop_all(self.dbconn.engine)
         models.Base.metadata.create_all(self.dbconn.engine)
 
@@ -67,7 +68,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(pq_p_item.id, p_item.id)
 
         # Task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
@@ -88,7 +89,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(pq_p_item.id, p_item.id)
 
         # Assert: task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
@@ -97,7 +98,7 @@ class SchedulerTestCase(unittest.TestCase):
 
         # Assert: task should be in datastore, and dispatched
         self.assertEqual(0, self.scheduler.queue.qsize())
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
 
@@ -118,7 +119,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(pq_p_item.id, p_item.id)
 
         # Assert: task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 

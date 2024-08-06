@@ -53,29 +53,32 @@ FEATURE_REPORTS = env.bool("FEATURE_REPORTS", False)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", False)
 
+# Logging format ("text" or "json")
+LOGGING_FORMAT = env("LOGGING_FORMAT", default="text")
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "structlog": {
+        "json_formatter": {
             "()": structlog.stdlib.ProcessorFormatter,
             "processor": structlog.processors.JSONRenderer(),
+        },
+        "plain_console": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.dev.ConsoleRenderer(colors=True, pad_level=False),
         },
     },
     "handlers": {
         "console": {
-            "formatter": "structlog",
             "class": "logging.StreamHandler",
+            "formatter": "json_formatter" if LOGGING_FORMAT == "json" else "plain_console",
         },
     },
     "loggers": {
         "root": {
             "handlers": ["console"],
             "level": "INFO",
-        },
-        "django_structlog": {
-            "handlers": ["console"],
-            "level": "DEBUG",
         },
     },
 }
@@ -148,6 +151,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "django.contrib.humanize",
     "django.forms",
     "django_components",
     "django_components.safer_staticfiles",
@@ -158,6 +162,7 @@ INSTALLED_APPS = [
     "account",
     "tools",
     "fmea",
+    "rocky",
     "crisis_room",
     "onboarding",
     "katalogus",
@@ -179,6 +184,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "rocky.middleware.auth_token.AuthTokenMiddleware",
     "django_structlog.middlewares.RequestMiddleware",
 ]
 
@@ -213,7 +219,10 @@ TEMPLATES = [
                 "tools.context_processors.organizations_including_blocked",
                 "tools.context_processors.rocky_version",
             ],
-            "builtins": ["django_components.templatetags.component_tags", "tools.templatetags.ooi_extra"],
+            "builtins": [
+                "django_components.templatetags.component_tags",
+                "tools.templatetags.ooi_extra",
+            ],
             "loaders": [
                 (
                     "django.template.loaders.cached.Loader",
@@ -441,15 +450,24 @@ CSP_CONNECT_SRC = ["'self'"]
 
 CSP_BLOCK_ALL_MIXED_CONTENT = True
 
-DEFAULT_RENDERER_CLASSES = ["rest_framework.renderers.JSONRenderer"]
-
 # Turn on the browsable API by default if DEBUG is True, but disable by default in production
 BROWSABLE_API = env.bool("BROWSABLE_API", DEBUG)
 
 if BROWSABLE_API:
-    DEFAULT_RENDERER_CLASSES = DEFAULT_RENDERER_CLASSES + ["rest_framework.renderers.BrowsableAPIRenderer"]
+    DEFAULT_AUTHENTICATION_CLASSES = [
+        "knox.auth.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ]
+    DEFAULT_RENDERER_CLASSES = [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ]
+else:
+    DEFAULT_AUTHENTICATION_CLASSES = ["knox.auth.TokenAuthentication"]
+    DEFAULT_RENDERER_CLASSES = ["rest_framework.renderers.JSONRenderer"]
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": DEFAULT_AUTHENTICATION_CLASSES,
     "DEFAULT_PERMISSION_CLASSES": [
         # For now this will provide a safe default, but non-admin users will
         # need to be able to use the API in the future..
@@ -500,9 +518,6 @@ WEASYPRINT_BASEURL = env("WEASYPRINT_BASEURL", default="http://127.0.0.1:8000/")
 KNOX_TOKEN_MODEL = "account.AuthToken"
 
 FORMS_URLFIELD_ASSUME_HTTPS = True
-
-# Logging format ("text" or "json")
-LOGGING_FORMAT = env("LOGGING_FORMAT", default="text")
 
 structlog.configure(
     processors=[

@@ -139,7 +139,7 @@ class OnboardingSetupScanOOIAddView(
 
     def get_or_create_url_object(self, url: str) -> OOI:
         network = Network(name="internet")
-        url = URL(network=network.reference, raw=url)
+        url = URL(network=network.reference, raw=url, user_id=self.request.user.id)
         observed_at = datetime.now(timezone.utc)
         url_ooi, _ = get_or_create_ooi(self.octopoes_api_connector, self.bytes_client, url, observed_at)
         return url_ooi
@@ -374,7 +374,7 @@ class OnboardingReportView(
     def post(self, request, *args, **kwargs):
         self.set_member_onboarded()
 
-        report_ooi = self.save_report()
+        report_ooi = self.save_report([("Onboarding Report", "Onboarding Report")])
 
         return redirect(
             reverse("view_report", kwargs={"organization_code": self.organization.code})
