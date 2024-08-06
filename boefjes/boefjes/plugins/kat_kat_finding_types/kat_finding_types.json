@@ -490,7 +490,7 @@
   "KAT-DOMAIN-OWNERSHIP-PENDING": {
     "description": "The domain requires Ownership verification. An email hasbeen send to the registered owner by the registrar. The domain is currently offline.",
     "risk": "high",
-    "source": "https://support.dnsimple.com/articles/icann-domain-validation/",
+    "source": "https://www.icann.org/resources/pages/contact-verification-2013-05-03-en",
     "impact": "Domain points to placeholder DNS-Servers, and is offline for regular use.",
     "recommendation": "Verify ownership by following the emailed link."
   }
