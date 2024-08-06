@@ -3,7 +3,10 @@
 <div class="filter">
     <div>
         <button aria-expanded="false"
-                data-hide-filters-label='{% translate "Hide filters" %}'>{% translate "Show filters" %}</button>
+                data-hide-filters-label='{% translate "Hide filters" %}'>
+            {% translate "Show filters" %}
+            {% if count_active_filters > 0 %}({{ count_active_filters }}){% endif %}
+        </button>
     </div>
     <form novalidate method="get">
         {% include "partials/form/fieldset.html" with fields=task_filter_form %}
