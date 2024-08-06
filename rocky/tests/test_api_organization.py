@@ -222,10 +222,15 @@ class TestOrganizationViewSet(ViewSetTest):
             async_=False,
         )
 
-        def test_it_deletes_organization(self, initial_ids, organization):
+        def test_it_deletes_organization(self, initial_ids, organization, log_output):
             expected = initial_ids - {organization.id}
             actual = set(Organization.objects.values_list("id", flat=True))
             assert actual == expected
+
+            organization_created_log = log_output.entries[-2]
+            assert organization_created_log["event"] == "%s %s deleted"
+            assert organization_created_log["object"] == "Test Organization 1"
+            assert organization_created_log["object_type"] == "Organization"
 
     class TestDestroyKatalogusError(
         UsesDeleteMethod,
