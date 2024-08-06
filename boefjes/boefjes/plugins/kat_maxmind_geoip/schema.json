@@ -13,6 +13,21 @@
       "maxLength": 48,
       "type": "string",
       "description": "Licence key for MaxMind"
+    },
+    "GEOIP_CACHE_TIMEOUT": {
+      "title": "Cache Timeout",
+      "type": "integer",
+      "description": "Cache timeout in seconds"
+    },
+    "GEOIP_SOURCE_URL": {
+      "title": "Source URL",
+      "type": "string",
+      "description": "URL to download the GeoIP database from"
+    },
+    "REQUEST_TIMEOUT": {
+      "title": "Request Timeout",
+      "type": "integer",
+      "description": "Request timeout in seconds"
     }
   },
   "required": [

@@ -63,11 +63,12 @@ def cache_out_of_date() -> bool:
 
 
 def refresh_geoip(algo: str) -> dict:
-    maxmind_user_id = getenv("MAXMIND_USER_ID", "")
+    maxmind_user_id = str(getenv("MAXMIND_USER_ID", ""))
     maxmind_licence_key = getenv("MAXMIND_LICENCE_KEY", "")
     source_url = getenv("GEOIP_SOURCE_URL", GEOIP_SOURCE_URL)
+    request_timeout = getenv("REQUEST_TIMEOUT", REQUEST_TIMEOUT)
     response = requests.get(
-        source_url, allow_redirects=True, timeout=REQUEST_TIMEOUT, auth=(maxmind_user_id, maxmind_licence_key)
+        source_url, allow_redirects=True, timeout=request_timeout, auth=(maxmind_user_id, maxmind_licence_key)
     )
     response.raise_for_status()
 
