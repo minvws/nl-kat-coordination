@@ -33,8 +33,8 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[OOI]:
             if hostname.endswith(DNS_PTR_STR):
                 yield DNSPTRRecord(hostname=hostname_ooi.reference, value=hostname, address=input_ooi_reference)
 
-        for port in result["ports"]:
-            yield IPPort(address=input_ooi_reference, port=int(port), state=PortState("open"))
+        #for port in result["ports"]:
+        #    yield IPPort(address=input_ooi_reference, port=int(port), state=PortState("open"))
 
         for cve in result["vulns"]:
             finding_type = CVEFindingType(id=cve)
