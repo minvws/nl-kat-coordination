@@ -430,7 +430,7 @@ class Server:
 
     def get_task(self, task_id: uuid.UUID) -> Any:
         try:
-            task = self.ctx.datastores.task_store.get_task_by_id(task_id)
+            task = self.ctx.datastores.task_store.get_task(task_id)
         except storage.errors.StorageError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -455,7 +455,7 @@ class Server:
     # endpoints # to allow for partial updates.
     def patch_task(self, task_id: uuid.UUID, item: serializers.Task) -> Any:
         try:
-            task_db = self.ctx.datastores.task_store.get_task_by_id(task_id)
+            task_db = self.ctx.datastores.task_store.get_task(task_id)
         except storage.errors.StorageError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,

@@ -33,6 +33,7 @@ def test_io(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     transactions = list(map(itemgetter("txOps"), txops))
     data = {
         "object_type": "Network",
+        "user_id": None,
         "Network/primary_key": "Network|internet",
         "Network/name": "internet",
         "xt/id": "Network|internet",
@@ -60,6 +61,7 @@ def test_io(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
             "put",
             {{
               "object_type": "Network",
+              "user_id": null,
               "Network/primary_key": "Network|😸",
               "Network/name": "😸",
               "xt/id": "Network|😸"
