@@ -25,6 +25,7 @@ def user_login_failed_callback(sender, credentials, request, **kwargs):
     logger.info("User login failed", credentials=credentials)
 
 
+# Signal sent when a model is saved
 @receiver(post_save, dispatch_uid="log_save")
 def log_save(sender, instance, created, **kwargs) -> None:
     if isinstance(instance, LogEntry):
@@ -50,6 +51,7 @@ def log_save(sender, instance, created, **kwargs) -> None:
         )
 
 
+# Signal sent when a model is deleted
 @receiver(post_delete, dispatch_uid="log_delete")
 def log_delete(sender, instance, **kwargs) -> None:
     logger.info(
