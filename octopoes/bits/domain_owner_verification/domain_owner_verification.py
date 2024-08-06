@@ -6,11 +6,6 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, KATFindingType
 
 INDICATORS = [
-    "DNS1.NAME-SERVICES.COM",
-    "DNS2.NAME-SERVICES.COM",
-    "DNS3.NAME-SERVICES.COM",
-    "DNS4.NAME-SERVICES.COM",
-    "DNS5.NAME-SERVICES.COM",
     "NS1.REGISTRANT-VERIFICATION.ISPAPI.NET",
     "NS2.REGISTRANT-VERIFICATION.ISPAPI.NET",
     "NS3.REGISTRANT-VERIFICATION.ISPAPI.NET",
