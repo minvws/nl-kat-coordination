@@ -33,21 +33,30 @@ def log_save(sender, instance, created, **kwargs) -> None:
         # action, but we shouldn't send log messages about these.
         return
 
+    context = {}
+    event_codes = getattr(instance, "EVENT_CODES", None)
+
     if created:
+        if event_codes and "created" in event_codes:
+            context["event_code"] = event_codes["created"]
         logger.info(
             "%s %s created",
             instance._meta.object_name,
             instance,
             object_type=instance._meta.object_name,
             object=str(instance),
+            **context,
         )
     else:
+        if event_codes and "updated" in event_codes:
+            context["event_code"] = event_codes["updated"]
         logger.info(
             "%s %s updated",
             instance._meta.object_name,
             instance,
             object_type=instance._meta.object_name,
             object=str(instance),
+            **context,
         )
 
 
