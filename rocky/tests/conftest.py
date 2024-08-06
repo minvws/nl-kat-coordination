@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch
 from uuid import UUID
 
 import pytest
+import structlog
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission
 from django.contrib.messages.middleware import MessageMiddleware
@@ -45,6 +46,17 @@ LANG_LIST = [code for code, _ in settings.LANGUAGES]
 
 # Quiet faker locale messages down in tests.
 logging.getLogger("faker").setLevel(logging.INFO)
+
+
+# Copied from https://www.structlog.org/en/stable/testing.html
+@pytest.fixture
+def log_output():
+    return structlog.testing.LogCapture()
+
+
+@pytest.fixture(autouse=True)
+def fixture_configure_structlog(log_output):
+    structlog.configure(processors=[log_output])
 
 
 @pytest.fixture
