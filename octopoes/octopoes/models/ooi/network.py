@@ -81,7 +81,7 @@ class IPPort(OOI):
     object_type: Literal["IPPort"] = "IPPort"
 
     address: Reference = ReferenceField(IPAddress, max_issue_scan_level=0, max_inherit_scan_level=4)
-    protocol: Protocol | None = None
+    protocol: Protocol
     port: Annotated[int, Field(gt=0, lt=2**16)]
     state: PortState | None = None
 
