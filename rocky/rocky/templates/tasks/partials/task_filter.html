@@ -5,7 +5,9 @@
         <button aria-expanded="false"
                 data-hide-filters-label='{% translate "Hide filters" %}'>
             {% translate "Show filters" %}
-            {% if count_active_filters > 0 %}({{ count_active_filters }}){% endif %}
+            {% if count_active_filters > 0 %}
+                ({{ count_active_filters }} {% translate "applied" %})
+            {% endif %}
         </button>
     </div>
     <form novalidate method="get">
