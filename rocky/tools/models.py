@@ -93,7 +93,6 @@ class Organization(models.Model):
 
     EVENT_CODES = {"created": 900201, "updated": 900202, "deleted": 900203}
 
-
     def __str__(self):
         return str(self.name)
 
@@ -274,12 +273,13 @@ class Indemnification(models.Model):
     EVENT_CODES = {"created": 900211, "updated": 900212, "deleted": 900213}
 
 
-
 class OOIInformation(models.Model):
     id = models.CharField(max_length=256, primary_key=True)
     last_updated = models.DateTimeField(auto_now=True)
     data = models.JSONField(null=True)
     consult_api = models.BooleanField(default=False)
+
+    EVENT_CODES = {"created": 900221, "updated": 900222, "deleted": 900223}
 
     def save(self, *args, **kwargs):
         if self.data is None:
