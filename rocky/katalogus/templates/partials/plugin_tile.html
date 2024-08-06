@@ -93,9 +93,12 @@
                     <h3 class="heading-small">{% translate "Report types" %}</h3>
                     <p>{% translate "This boefje is required by the following report types." %}</p>
                     <p>
-                        {% for report_type in plugin_data.plugin_report_types %}
-                            {{ report_type }}
-                            {% if not forloop.last %}-{% endif %}
+                        {% for plugin_id, report_types in plugin_report_types.items %}
+                            {% if plugin_id == plugin.id %}
+                                {% for report_type in report_types %}
+                                    <span class="label tags-color-{{ report_type.label_style }}">{{ report_type.name }}</span>
+                                {% endfor %}
+                            {% endif %}
                         {% endfor %}
                     </p>
                 </div>
@@ -110,13 +113,7 @@
                                 {{ plugin_name }} is able to scan the following object types:
                             {% endblocktranslate %}
                         </p>
-                        <p>
-                            {{ plugin.consumes }}
-                            {% comment %} {% for ooi_type in plugin.consumes %}
-                        {{ ooi_type }}
-                        {% if not forloop.last %}-{% endif %}
-                            {% endfor %} {% endcomment %}
-                        </p>
+                        <p>{{ plugin.consumes }}</p>
                     {% else %}
                         {% blocktranslate trimmed with plugin_name=plugin.name %}
                             {{ plugin_name }} does not need any input objects.
@@ -132,7 +129,6 @@
                         {% endblocktranslate %}
                     </p>
                     <p>
-                        {{ plugin.produce }}
                         <ul>
                             {% for mime_type in plugin.produces %}<li>{{ mime_type }}</li>{% endfor %}
                         </ul>
