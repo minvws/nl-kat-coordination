@@ -63,10 +63,15 @@ def log_save(sender, instance, created, **kwargs) -> None:
 # Signal sent when a model is deleted
 @receiver(post_delete, dispatch_uid="log_delete")
 def log_delete(sender, instance, **kwargs) -> None:
+    context = {}
+    event_codes = getattr(instance, "EVENT_CODES", None)
+    if event_codes and "deleted" in event_codes:
+        context["event_code"] = event_codes["deleted"]
     logger.info(
         "%s %s deleted",
         instance._meta.object_name,
         instance,
         object_type=instance._meta.object_name,
         object=str(instance),
+        **context,
     )
