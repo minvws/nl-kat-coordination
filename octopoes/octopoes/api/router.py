@@ -586,7 +586,7 @@ async def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xt
 
 
 @router.post("/origins/migrate", tags=["Origins"])
-async def migrate_origins(
+def migrate_origins(
     origins: list[Origin],
     session: XTDBSession = Depends(xtdb_session),
     valid_time: datetime = Depends(extract_valid_time),

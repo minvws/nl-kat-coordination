@@ -43,7 +43,7 @@ services:
         ENVIRONMENT: dev
     command: uvicorn bytes.api:app --host 0.0.0.0
     depends_on:
-      rabbitmq:
+      ci_rabbitmq:
         condition: service_healthy
       ci_bytes-db:
         condition: service_started
@@ -62,25 +62,20 @@ services:
       context: ../octopoes
     command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80
     depends_on:
-      rabbitmq:
+      ci_rabbitmq:
         condition: service_healthy
-      xtdb:
+      ci_xtdb:
         condition: service_started
-      katalogus_mock:
+      ci_katalogus:
         condition: service_started
       ci_octopoes_api_worker:
         condition: service_started
     env_file:
       - .ci/.env.test
-    ports:
-      - "127.0.0.1:29000:80"
 
-  rabbitmq:
+  ci_rabbitmq:
     restart: on-failure
     image: "docker.io/library/rabbitmq:3.12-management"
-    ports:
-      - "127.0.0.1:29003:15672"
-      - "127.0.0.1:29004:5672"
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"]
       interval: 5s
@@ -88,19 +83,17 @@ services:
     env_file:
       - .ci/.env.test
 
-  xtdb:
+  ci_xtdb:
     image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.8"
-    ports:
-      - "127.0.0.1:29002:3000"
 
   ci_octopoes_api_worker:
     build:
       context: ../octopoes
     command: celery -A octopoes.tasks.tasks worker -E --loglevel=INFO
     depends_on:
-      rabbitmq:
+      ci_rabbitmq:
         condition: service_healthy
-      xtdb:
+      ci_xtdb:
         condition: service_started
     env_file:
       - .ci/.env.test
@@ -109,11 +102,9 @@ services:
         soft: 262144
         hard: 262144
 
-  katalogus_mock:
+  ci_katalogus:
     image: "docker.io/wiremock/wiremock:2.34.0"
     volumes:
       - .ci/wiremock:/home/wiremock
-    ports:
-      - "127.0.0.1:29001:8080"
     env_file:
       - .ci/.env.test

@@ -52,11 +52,16 @@ def upgrade(organisation_repository: OrganisationStorage, valid_time: datetime |
     organisations = organisation_repository.get_all()
     logger.info("Processing %s organisations in total", len(organisations))
 
+    boefjes_per_normalizer = collect_boefjes_per_normalizer()
+    logger.info("Found %s normalizers", len(boefjes_per_normalizer))
+
     for organisation_id in organisations:
         connector = get_octopoes_api_connector(organisation_id)
         logger.info("Processing organisation [organization_id=%s]", organisation_id)
 
-        failed, processed = migrate_organisation(bytes_client, connector, organisation_id, valid_time)
+        failed, processed = migrate_organisation(
+            bytes_client, connector, organisation_id, boefjes_per_normalizer, valid_time
+        )
         total_failed += failed
         total_processed += processed
 
@@ -67,7 +72,9 @@ def upgrade(organisation_repository: OrganisationStorage, valid_time: datetime |
     return total_processed, total_failed
 
 
-def migrate_organisation(bytes_client, connector, organisation_id, valid_time) -> tuple[int, int]:
+def migrate_organisation(
+    bytes_client, connector, organisation_id, boefjes_per_normalizer, valid_time
+) -> tuple[int, int]:
     """
     For each organisation, we paginate through the origin API, find the matching normalizer meta in Bytes,
     and set the source_method to the boefje id. Then update the origin, i.e. save it and delete the old one.
@@ -79,14 +86,13 @@ def migrate_organisation(bytes_client, connector, organisation_id, valid_time) -
     offset = 0
     page_size = 200
 
-    boefjes_for_normalizer = collect_boefjes_per_normalizer()
     bulk_updated_origins = []
 
     while True:
         # We loop through the paginated API until we reach the end
 
         origins = connector.list_origins(
-            valid_time, method=[x for x in boefjes_for_normalizer], offset=offset, limit=page_size
+            valid_time, method=[x for x in boefjes_per_normalizer], offset=offset, limit=page_size
         )
         logger.info("Processing %s origins", len(origins))
 
@@ -94,8 +100,8 @@ def migrate_organisation(bytes_client, connector, organisation_id, valid_time) -
             if origin.source_method is not None or origin.origin_type == OriginType.INFERENCE:
                 continue
 
-            if origin.method in boefjes_for_normalizer and len(boefjes_for_normalizer[origin.method]) == 1:
-                origin.source_method = boefjes_for_normalizer[origin.method][0].id
+            if origin.method in boefjes_per_normalizer and len(boefjes_per_normalizer[origin.method]) == 1:
+                origin.source_method = boefjes_per_normalizer[origin.method][0].id
                 bulk_updated_origins.append(origin)
                 continue
 
