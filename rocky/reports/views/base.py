@@ -2,11 +2,11 @@ import json
 from collections import defaultdict
 from collections.abc import Iterable, Sequence
 from datetime import datetime, timezone
-from logging import getLogger
 from operator import attrgetter
 from typing import Any, Literal, cast
 from uuid import uuid4
 
+import structlog
 from account.mixins import OrganizationView
 from django.conf import settings
 from django.contrib import messages
@@ -45,7 +45,7 @@ def get_selection(request: HttpRequest, pre_selection: dict[str, str | Sequence[
     return "?" + urlencode(request.GET, True)
 
 
-logger = getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
@@ -190,7 +190,6 @@ class ReportTypeView(BaseSelectionView):
         self.report_types: Sequence[type[Report] | type[MultiReport] | type[AggregateReport]] = (
             self.get_report_types_from_choice()
         )
-
         self.report_ids = [report.id for report in self.report_types]
 
     def get_report_types_from_choice(
@@ -356,9 +355,12 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
         parent: Reference | None,
         has_parent: bool,
         observed_at: datetime,
+        name: str,
     ) -> ReportOOI:
+        if not name or name.isspace():
+            name = report_type.name
         report_ooi = ReportOOI(
-            name=str(report_type.name),
+            name=name,
             report_type=str(report_type.id),
             template=report_type.template_path,
             report_id=uuid4(),
@@ -514,7 +516,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                     report_data.setdefault(report.report_type, {})[ooi] = {
                         "data": self.get_report_data_from_bytes(report)["report_data"],
                         "template": report.template,
-                        "report_name": get_report_by_id(report.report_type).name,
+                        "report_name": report.name,
                     }
 
             input_oois = self.get_input_oois(children_reports)
@@ -533,13 +535,14 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                 report_data[self.report_ooi.report_type][ooi] = {
                     "data": context["data"]["report_data"],
                     "template": self.report_ooi.template,
-                    "report_name": get_report_by_id(self.report_ooi.report_type).name,
+                    "report_name": self.report_ooi.name,
                 }
 
             input_oois = self.get_input_oois([self.report_ooi])
             report_types = self.get_report_types([self.report_ooi])
 
         context["report_data"] = report_data
+        context["report_name"] = self.report_ooi.name
         context["report_types"] = [
             report_type for x in REPORTS for report_type in report_types if report_type["id"] == x.id
         ]

@@ -53,6 +53,7 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
 
         # Database
         self.dbconn = storage.DBConn(str(self.mock_ctx.config.db_uri))
+        self.dbconn.connect()
         models.Base.metadata.drop_all(self.dbconn.engine)
         models.Base.metadata.create_all(self.dbconn.engine)
 
@@ -1526,14 +1527,6 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             boefje=models.Boefje.parse_obj(plugin.model_dump()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
-        )
-
-        task = models.Task(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-            type=models.BoefjeTask.type,
-            data=boefje_task.model_dump(),
-            hash=boefje_task.hash,
         )
 
         schedule = models.Schedule(

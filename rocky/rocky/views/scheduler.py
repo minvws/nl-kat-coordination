@@ -96,16 +96,7 @@ class SchedulerView(OctopoesView):
         if not self.indemnification_present:
             return self.indemnification_error()
         try:
-            # Remove id attribute of both task and task.data, since the
-            # scheduler will create a new task with new id's. However, pydantic
-            # requires an id attribute to be present in its definition and the
-            # default set to None when the attribute is optional, otherwise it
-            # will not serialize the id if it is not present in the definition.
-            if hasattr(task, "id"):
-                delattr(task, "id")
-
             self.scheduler_client.push_task(task)
-
         except SchedulerError as error:
             messages.error(self.request, error.message)
         else:
@@ -125,16 +116,15 @@ class SchedulerView(OctopoesView):
         try:
             task = self.scheduler_client.get_task_details(task_id)
 
+            new_id = uuid.uuid4()
+            task.data.id = new_id
+
             new_task = Task(
+                id=new_id,
                 scheduler_id=task.scheduler_id,
                 priority=1,
                 data=task.data,
             )
-
-            # Since we're re-using the task data, we need to issue a new id
-            # the task runner expects this to be generated before hand. Reusing
-            # the id from the old task will result in a conflict.
-            task.data.id = uuid.uuid4()
 
             self.schedule_task(new_task)
         except SchedulerError as error:
@@ -147,7 +137,11 @@ class SchedulerView(OctopoesView):
                 raw_data=raw_data,
             )
 
-            new_task = Task(priority=1, data=normalizer_task)
+            new_task = Task(
+                priority=1,
+                data=normalizer_task,
+                scheduler_id=f"normalizer-{self.organization.code}",
+            )
 
             self.schedule_task(new_task)
         except SchedulerError as error:
@@ -161,7 +155,11 @@ class SchedulerView(OctopoesView):
                 organization=self.organization.code,
             )
 
-            new_task = Task(priority=1, data=boefje_task)
+            new_task = Task(
+                priority=1,
+                data=boefje_task,
+                scheduler_id=f"boefje-{self.organization.code}",
+            )
 
             self.schedule_task(new_task)
 

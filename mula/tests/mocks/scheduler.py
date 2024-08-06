@@ -2,7 +2,8 @@ import time
 
 from scheduler import schedulers
 
-from ..utils import functions
+from tests.utils import functions
+
 from . import listener
 
 

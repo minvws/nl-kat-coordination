@@ -1,6 +1,5 @@
 import multiprocessing
 import time
-from datetime import datetime, timezone
 from multiprocessing import Manager
 from pathlib import Path
 from uuid import UUID
@@ -78,15 +77,7 @@ class MockSchedulerClient(SchedulerClientInterface):
         return self._task_from_id(task_id) if str(task_id) not in self._tasks else self._tasks[str(task_id)]
 
     def _task_from_id(self, task_id: UUID):
-        return Task(
-            id=task_id,
-            scheduler_id="test",
-            type="test",
-            p_item=self._popped_items[str(task_id)],
-            status=TaskStatus.DISPATCHED,
-            created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc),
-        )
+        return self._popped_items[str(task_id)]
 
     def push_item(self, queue_id: str, p_item: Task) -> None:
         self._pushed_items[str(p_item.id)] = (queue_id, p_item)
@@ -117,10 +108,12 @@ def item_handler(tmp_path: Path):
 @pytest.fixture
 def manager(item_handler: MockHandler, tmp_path: Path) -> SchedulerWorkerManager:
     scheduler_client = MockSchedulerClient(
-        get_dummy_data("scheduler/queues_response.json"),
-        2 * [get_dummy_data("scheduler/pop_response_boefje.json")] + [get_dummy_data("scheduler/should_crash.json")],
-        [get_dummy_data("scheduler/pop_response_normalizer.json")],
-        tmp_path / "patch_task_log",
+        queue_response=get_dummy_data("scheduler/queues_response.json"),
+        boefje_responses=(
+            2 * [get_dummy_data("scheduler/pop_response_boefje.json")] + [get_dummy_data("scheduler/should_crash.json")]
+        ),
+        normalizer_responses=[get_dummy_data("scheduler/pop_response_normalizer.json")],
+        log_path=tmp_path / "patch_task_log",
     )
 
     return SchedulerWorkerManager(

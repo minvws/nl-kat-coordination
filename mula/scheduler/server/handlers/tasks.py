@@ -7,8 +7,7 @@ import structlog
 from fastapi import status
 
 from scheduler import context, models, storage
-
-from .. import serializers, utils
+from scheduler.server import serializers, utils
 
 
 class TaskAPI:

@@ -2,8 +2,10 @@ from uuid import UUID
 
 from scheduler import models
 
+from .errors import exception_handler
 from .filters import FilterRequest, apply_filter
-from .storage import DBConn, retry
+from .storage import DBConn
+from .utils import retry
 
 
 class PriorityQueueStore:
@@ -13,6 +15,7 @@ class PriorityQueueStore:
         self.dbconn = dbconn
 
     @retry()
+    @exception_handler
     def pop(self, scheduler_id: str, filters: FilterRequest | None = None) -> models.Task | None:
         with self.dbconn.session.begin() as session:
             query = (
@@ -34,6 +37,7 @@ class PriorityQueueStore:
             return models.Task.model_validate(item_orm)
 
     @retry()
+    @exception_handler
     def push(self, item: models.Task) -> models.Task | None:
         with self.dbconn.session.begin() as session:
             item_orm = models.TaskDB(**item.model_dump())
@@ -42,6 +46,7 @@ class PriorityQueueStore:
             return models.Task.model_validate(item_orm)
 
     @retry()
+    @exception_handler
     def peek(self, scheduler_id: str, index: int) -> models.Task | None:
         with self.dbconn.session.begin() as session:
             item_orm = (
@@ -60,6 +65,7 @@ class PriorityQueueStore:
             return models.Task.model_validate(item_orm)
 
     @retry()
+    @exception_handler
     def update(self, scheduler_id: str, item: models.Task) -> None:
         with self.dbconn.session.begin() as session:
             (
@@ -71,6 +77,7 @@ class PriorityQueueStore:
             )
 
     @retry()
+    @exception_handler
     def remove(self, scheduler_id: str, item_id: UUID) -> None:
         with self.dbconn.session.begin() as session:
             (
@@ -82,6 +89,7 @@ class PriorityQueueStore:
             )
 
     @retry()
+    @exception_handler
     def get(self, scheduler_id, item_id: UUID) -> models.Task | None:
         with self.dbconn.session.begin() as session:
             item_orm = (
@@ -98,6 +106,7 @@ class PriorityQueueStore:
             return models.Task.model_validate(item_orm)
 
     @retry()
+    @exception_handler
     def empty(self, scheduler_id: str) -> bool:
         with self.dbconn.session.begin() as session:
             count = (
@@ -109,6 +118,7 @@ class PriorityQueueStore:
             return count == 0
 
     @retry()
+    @exception_handler
     def qsize(self, scheduler_id: str) -> int:
         with self.dbconn.session.begin() as session:
             count = (
@@ -121,6 +131,7 @@ class PriorityQueueStore:
             return count
 
     @retry()
+    @exception_handler
     def get_items(
         self,
         scheduler_id: str,
@@ -145,6 +156,7 @@ class PriorityQueueStore:
             )
 
     @retry()
+    @exception_handler
     def get_item_by_hash(self, scheduler_id: str, item_hash: str) -> models.Task | None:
         with self.dbconn.session.begin() as session:
             item_orm = (
@@ -162,6 +174,7 @@ class PriorityQueueStore:
             return models.Task.model_validate(item_orm)
 
     @retry()
+    @exception_handler
     def get_items_by_scheduler_id(self, scheduler_id: str) -> list[models.Task]:
         with self.dbconn.session.begin() as session:
             items_orm = (
@@ -174,6 +187,7 @@ class PriorityQueueStore:
             return [models.Task.model_validate(item_orm) for item_orm in items_orm]
 
     @retry()
+    @exception_handler
     def clear(self, scheduler_id: str) -> None:
         with self.dbconn.session.begin() as session:
             (

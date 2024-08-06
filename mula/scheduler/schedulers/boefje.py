@@ -1,3 +1,4 @@
+import uuid
 from collections.abc import Callable
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
@@ -589,6 +590,7 @@ class BoefjeScheduler(Scheduler):
         )
 
         task = Task(
+            id=boefje_task.id,
             scheduler_id=self.scheduler_id,
             type=self.ITEM_TYPE.type,
             priority=score,
@@ -624,6 +626,21 @@ class BoefjeScheduler(Scheduler):
             scheduler_id=self.scheduler_id,
             caller=caller,
         )
+
+    def push_item_to_queue(self, item: Task) -> Task:
+        """Some boefje scheduler specific logic before pushing the item to the
+        queue."""
+        boefje_task = BoefjeTask.parse_obj(item.data)
+
+        # Check if id's are unique and correctly set. Same id's are necessary
+        # for the task runner.
+        if item.id != boefje_task.id or self.ctx.datastores.task_store.get_task(item.id):
+            new_id = uuid.uuid4()
+            boefje_task.id = new_id
+            item.id = new_id
+            item.data = boefje_task.model_dump()
+
+        return super().push_item_to_queue(item)
 
     @tracer.start_as_current_span("boefje_has_boefje_permission_to_run")
     def has_boefje_permission_to_run(

@@ -300,24 +300,33 @@ class Scheduler(abc.ABC):
             )
             return item
 
-        schedule_db = self.ctx.datastores.schedule_store.get_schedule_by_hash(item.hash)
-        if schedule_db is None:
-            deadline_at = self.calculate_deadline(item)
-            cron_expression = f"{deadline_at.minute} {deadline_at.hour} * * *"
+        schedule_db = None
+        if item.schedule_id is None:
+            schedule_db = self.ctx.datastores.schedule_store.get_schedule_by_hash(item.hash)
+            if schedule_db is None:
+                deadline_at = self.calculate_deadline(item)
+                cron_expression = f"{deadline_at.minute} {deadline_at.hour} * * *"
 
-            schedule = models.Schedule(
-                scheduler_id=self.scheduler_id,
-                hash=item.hash,
-                schedule=cron_expression,
-                deadline_at=deadline_at,
-                data=item.data,
-            )
-            schedule_db = self.ctx.datastores.schedule_store.create_schedule(schedule)
+                schedule = models.Schedule(
+                    scheduler_id=self.scheduler_id,
+                    hash=item.hash,
+                    schedule=cron_expression,
+                    deadline_at=deadline_at,
+                    data=item.data,
+                )
+                schedule_db = self.ctx.datastores.schedule_store.create_schedule(schedule)
+                item.schedule_id = schedule_db.id
+                self.ctx.datastores.task_store.update_task(item)
+                return item
+
             item.schedule_id = schedule_db.id
             self.ctx.datastores.task_store.update_task(item)
-            return item
+        else:
+            schedule_db = self.ctx.datastores.schedule_store.get_schedule(item.schedule_id)
+            if schedule_db is None:
+                raise ValueError(f"Schedule with id {item.schedule_id} not found for item {item.id}")
 
-        if schedule_db.enabled is False:
+        if not schedule_db.enabled:
             self.logger.debug(
                 "Schedule %s is disabled, not updating deadline",
                 schedule_db.id,
@@ -401,7 +410,9 @@ class Scheduler(abc.ABC):
 
         # We want to delay the job by a random amount of time, in a range of 5 hours
         jitter_range_seconds = 5 * 60 * 60
-        jitter_offset = timedelta(seconds=random.uniform(-jitter_range_seconds, jitter_range_seconds))
+        jitter_offset = timedelta(
+            seconds=random.uniform(-jitter_range_seconds, jitter_range_seconds)  # noqa
+        )
 
         # Check if the adjusted time is earlier than the minimum, and
         # ensure that the adjusted time is not earlier than the deadline

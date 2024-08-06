@@ -59,6 +59,7 @@ class Filter(BaseModel):
         | list[int]
         | list[float]
         | list[bool]
+        | list[datetime.datetime]
         | list[None]
     )
 

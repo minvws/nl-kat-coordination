@@ -5,8 +5,7 @@ import structlog
 from fastapi import status
 
 from scheduler import context, models, queues, schedulers, storage
-
-from .. import serializers
+from scheduler.server import serializers
 
 
 class QueueAPI:
@@ -141,5 +140,11 @@ class QueueAPI:
                 status_code=fastapi.status.HTTP_409_CONFLICT,
                 detail=str(exc_not_allowed),
             ) from exc_not_allowed
+        except Exception as exc:
+            self.logger.exception(exc)
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=str(exc),
+            ) from exc
 
         return pushed_item

@@ -24,6 +24,7 @@ class APITemplateTestCase(unittest.TestCase):
 
         # Database
         self.dbconn = storage.DBConn(str(self.mock_ctx.config.db_uri))
+        self.dbconn.connect()
         models.Base.metadata.drop_all(self.dbconn.engine)
         models.Base.metadata.create_all(self.dbconn.engine)
 
@@ -892,7 +893,7 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
         )
 
     def test_list_schedules_hash(self):
-        response = self.client.get(f"/schedules?hash={self.first_schedule.hash}")
+        response = self.client.get(f"/schedules?schedule_hash={self.first_schedule.hash}")
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()["count"])
         self.assertEqual(1, len(response.json()["results"]))
