@@ -10,7 +10,9 @@ import httpx
 SCHEDULER_API = "http://localhost:8004"
 TIMEOUT_FOR_LOG_CAPTURE = 5
 
-logger = logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
 client = httpx.Client(base_url=SCHEDULER_API)
 
 
@@ -160,7 +162,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Benchmark the scheduler.")
 
     # Add arguments
-    parser.add_argument("--verbose", "-v", action="store_true", help="Set to enable verbose logging.")
+    parser.add_argument(
+        "--verbose", "-v", action="store_true", help="Set to enable verbose logging."
+    )
 
     parser.add_argument(
         "--container-id",
