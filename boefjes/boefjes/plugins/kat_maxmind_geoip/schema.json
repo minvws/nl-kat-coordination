@@ -10,7 +10,7 @@
     },
     "MAXMIND_LICENCE_KEY": {
       "title": "Licence Key",
-      "maxLength": 2048,
+      "maxLength": 48,
       "type": "string",
       "description": "Licence key for MaxMind"
     }
