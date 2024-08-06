@@ -3,8 +3,8 @@ from typing import Literal
 from octopoes.models import OOI, Reference
 
 
-class Scan(OOI):
-    object_type: Literal["Scan"] = "Scan"
+class ExternalScan(OOI):
+    object_type: Literal["ExternalScan"] = "ExternalScan"
 
     name: str
 
