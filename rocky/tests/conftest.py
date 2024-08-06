@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch
 from uuid import UUID
 
 import pytest
+import structlog
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission
 from django.contrib.messages.middleware import MessageMiddleware
@@ -45,6 +46,17 @@ LANG_LIST = [code for code, _ in settings.LANGUAGES]
 
 # Quiet faker locale messages down in tests.
 logging.getLogger("faker").setLevel(logging.INFO)
+
+
+# Copied from https://www.structlog.org/en/stable/testing.html
+@pytest.fixture
+def log_output():
+    return structlog.testing.LogCapture()
+
+
+@pytest.fixture(autouse=True)
+def fixture_configure_structlog(log_output):
+    structlog.configure(processors=[log_output])
 
 
 @pytest.fixture
@@ -505,6 +517,7 @@ def url(network) -> URL:
             reference=Reference("URL|testnetwork|http://example.com/"),
             level=ScanLevel.L1,
         ),
+        user_id=None,
         primary_key="URL|testnetwork|http://example.com/",
         network=network.reference,
         raw="http://example.com",
@@ -1142,6 +1155,7 @@ parent_report = [
     Report(
         object_type="Report",
         scan_profile=None,
+        user_id=None,
         primary_key="Report|e821aaeb-a6bd-427f-b064-e46837911a5d",
         name="Test Parent Report",
         report_type="concatenated-report",
@@ -1163,6 +1177,7 @@ subreports = [
     Report(
         object_type="Report",
         scan_profile=None,
+        user_id=None,
         primary_key="Report|1730b72f-b115-412e-ad44-dae6ab3edff9",
         name="RPKI Report",
         report_type="rpki-report",
@@ -1181,6 +1196,7 @@ subreports = [
     Report(
         object_type="Report",
         scan_profile=None,
+        user_id=None,
         primary_key="Report|463c7f72-fef9-42ef-baf9-f10fcfb91abe",
         name="Safe Connections Report",
         report_type="safe-connections-report",
@@ -1199,6 +1215,7 @@ subreports = [
     Report(
         object_type="Report",
         scan_profile=None,
+        user_id=None,
         primary_key="Report|47a28977-04c6-43b6-9705-3c5f0c955833",
         name="System Report",
         report_type="systems-report",
@@ -1217,6 +1234,7 @@ subreports = [
     Report(
         object_type="Report",
         scan_profile=None,
+        user_id=None,
         primary_key="Report|57c8f1b9-da3e-48ca-acb1-554e6966b4aa",
         name="Mail Report",
         report_type="mail-report",
@@ -1235,6 +1253,7 @@ subreports = [
     Report(
         object_type="Report",
         scan_profile=None,
+        user_id=None,
         primary_key="Report|8075a64c-1acb-44b8-8376-b68d4ee972e5",
         name="IPv6 Report",
         report_type="ipv6-report",
@@ -1253,6 +1272,7 @@ subreports = [
     Report(
         object_type="Report",
         scan_profile=None,
+        user_id=None,
         primary_key="Report|8f3c6b75-b237-4c9a-8d9b-7745f3708d4a",
         name="Web System Report",
         report_type="web-system-report",
@@ -1271,6 +1291,7 @@ subreports = [
     Report(
         object_type="Report",
         scan_profile=None,
+        user_id=None,
         primary_key="Report|8f3c6b75-b237-4c9a-8d9b-7745f3708d4a",
         name="Web System Report",
         report_type="web-system-report",

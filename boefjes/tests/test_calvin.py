@@ -40,6 +40,7 @@ class CalvinTest(TestCase):
                 "primary_key": 'Incident|organisation/env/app|{"client_environment_app":"organisation/env/app",'
                 '"log_user_user_id":1234}-1655979300000',
                 "scan_profile": None,
+                "user_id": None,
                 "severity": "MEDIUM",
             },
             output.declarations[1].ooi.dict(),
@@ -68,6 +69,7 @@ class CalvinTest(TestCase):
                 "primary_key": 'Incident|organisation/env/app|{"client_environment_app":"organisation/env/app",'
                 '"log_user_user_id":1234}-1658825100000',
                 "scan_profile": None,
+                "user_id": None,
                 "severity": "MEDIUM",
             },
             output.declarations[-1].ooi.dict(),
@@ -106,6 +108,7 @@ class CalvinTest(TestCase):
                 "primary_key": 'Incident|organisation/env/app|{"client_environment_app":"organisation/env/app",'
                 '"log_user_user_id":1234}-1659618600000',
                 "scan_profile": None,
+                "user_id": None,
                 "severity": "MEDIUM",
             },
             output.declarations[1].ooi.dict(),
@@ -145,6 +148,7 @@ class CalvinTest(TestCase):
                 "primary_key": 'Incident|organisation/env/app|{"client_environment_app":"organisation/env/app",'
                 '"log_user_user_id":1234}-1658998200000',
                 "scan_profile": None,
+                "user_id": None,
                 "severity": "MEDIUM",
             },
             output.declarations[1].ooi.dict(),
