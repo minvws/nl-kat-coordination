@@ -68,7 +68,7 @@ def refresh_geoip(algo: str) -> dict:
     source_url = getenv("GEOIP_SOURCE_URL", GEOIP_SOURCE_URL)
     request_timeout = getenv("REQUEST_TIMEOUT", REQUEST_TIMEOUT)
     response = requests.get(
-        source_url, allow_redirects=True, timeout=request_timeout, auth=(maxmind_user_id, maxmind_licence_key)
+        source_url, allow_redirects=True, timeout=float(request_timeout), auth=(maxmind_user_id, maxmind_licence_key)
     )
     response.raise_for_status()
 
