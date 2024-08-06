@@ -77,6 +77,7 @@ class ScanProfileBase(BaseModel):
     scan_profile_type: str
     reference: Reference
     level: ScanLevel
+    user_id: int | None = None
 
     def __eq__(self, other):
         if isinstance(other, ScanProfileBase) and self.__class__ == other.__class__:
@@ -111,6 +112,7 @@ class OOI(BaseModel):
     object_type: str
 
     scan_profile: ScanProfile | None = None
+    user_id: int | None = None
 
     _natural_key_attrs: ClassVar[list[str]] = []
     _reverse_relation_names: ClassVar[dict[str, str]] = {}

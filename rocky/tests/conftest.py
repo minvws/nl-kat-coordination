@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch
 from uuid import UUID
 
 import pytest
+import structlog
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission
 from django.contrib.messages.middleware import MessageMiddleware
@@ -17,7 +18,8 @@ from django.utils.translation import activate, deactivate
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from httpx import Response
-from katalogus.client import parse_plugin
+from katalogus.client import Boefje, parse_plugin
+from tools.enums import SCAN_LEVEL
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 
 from octopoes.config.settings import (
@@ -39,12 +41,24 @@ from octopoes.models.pagination import Paginated
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
+from rocky.health import ServiceHealth
 from rocky.scheduler import PaginatedTasksResponse, Task
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
 
 # Quiet faker locale messages down in tests.
 logging.getLogger("faker").setLevel(logging.INFO)
+
+
+# Copied from https://www.structlog.org/en/stable/testing.html
+@pytest.fixture
+def log_output():
+    return structlog.testing.LogCapture()
+
+
+@pytest.fixture(autouse=True)
+def fixture_configure_structlog(log_output):
+    structlog.configure(processors=[log_output])
 
 
 @pytest.fixture
@@ -508,6 +522,7 @@ def url(network) -> URL:
             reference=Reference("URL|testnetwork|http://example.com/"),
             level=ScanLevel.L1,
         ),
+        user_id=None,
         primary_key="URL|testnetwork|http://example.com/",
         network=network.reference,
         raw="http://example.com",
@@ -1145,6 +1160,7 @@ parent_report = [
     Report(
         object_type="Report",
         scan_profile=None,
+        user_id=None,
         primary_key="Report|e821aaeb-a6bd-427f-b064-e46837911a5d",
         name="Test Parent Report",
         report_type="concatenated-report",
@@ -1166,6 +1182,7 @@ subreports = [
     Report(
         object_type="Report",
         scan_profile=None,
+        user_id=None,
         primary_key="Report|1730b72f-b115-412e-ad44-dae6ab3edff9",
         name="RPKI Report",
         report_type="rpki-report",
@@ -1184,6 +1201,7 @@ subreports = [
     Report(
         object_type="Report",
         scan_profile=None,
+        user_id=None,
         primary_key="Report|463c7f72-fef9-42ef-baf9-f10fcfb91abe",
         name="Safe Connections Report",
         report_type="safe-connections-report",
@@ -1202,6 +1220,7 @@ subreports = [
     Report(
         object_type="Report",
         scan_profile=None,
+        user_id=None,
         primary_key="Report|47a28977-04c6-43b6-9705-3c5f0c955833",
         name="System Report",
         report_type="systems-report",
@@ -1220,6 +1239,7 @@ subreports = [
     Report(
         object_type="Report",
         scan_profile=None,
+        user_id=None,
         primary_key="Report|57c8f1b9-da3e-48ca-acb1-554e6966b4aa",
         name="Mail Report",
         report_type="mail-report",
@@ -1238,6 +1258,7 @@ subreports = [
     Report(
         object_type="Report",
         scan_profile=None,
+        user_id=None,
         primary_key="Report|8075a64c-1acb-44b8-8376-b68d4ee972e5",
         name="IPv6 Report",
         report_type="ipv6-report",
@@ -1256,6 +1277,7 @@ subreports = [
     Report(
         object_type="Report",
         scan_profile=None,
+        user_id=None,
         primary_key="Report|8f3c6b75-b237-4c9a-8d9b-7745f3708d4a",
         name="Web System Report",
         report_type="web-system-report",
@@ -1274,6 +1296,7 @@ subreports = [
     Report(
         object_type="Report",
         scan_profile=None,
+        user_id=None,
         primary_key="Report|8f3c6b75-b237-4c9a-8d9b-7745f3708d4a",
         name="Web System Report",
         report_type="web-system-report",
@@ -1288,6 +1311,27 @@ subreports = [
         observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
         parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
         has_parent=True,
+    ),
+]
+
+dns_report = [
+    Report(
+        object_type="Report",
+        scan_profile=None,
+        primary_key="Report|e821aaeb-a6bd-427f-b064-e46837913b4d",
+        name="DNS Report",
+        report_type="dns-report",
+        template="dns_report/report.html",
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_oois=[],
+        report_id=UUID("e821aaeb-a6bd-427f-b064-e46837911a5d"),
+        organization_code="test_organization",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="a5ccf97b-d4e9-442d-85bf-84e739b63da9s",
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        parent_report=None,
+        has_parent=False,
     ),
 ]
 
@@ -1664,3 +1708,63 @@ def onboarding_collect_data():
             "finding_types": [],
         }
     }
+
+
+@pytest.fixture
+def rocky_health():
+    ServiceHealth(
+        service="rocky",
+        healthy=True,
+        version="0.0.1.dev1",
+        additional=None,
+        results=[
+            ServiceHealth(
+                service="octopoes",
+                healthy=True,
+                version="0.0.1.dev1",
+                additional=None,
+                results=[
+                    ServiceHealth(
+                        service="xtdb",
+                        healthy=True,
+                        version="1.24.1",
+                        additional={
+                            "version": "1.24.1",
+                            "revision": "1164f9a3c7e36edbc026867945765fd4366c1731",
+                            "indexVersion": 22,
+                            "consumerState": None,
+                            "kvStore": "xtdb.rocksdb.RocksKv",
+                            "estimateNumKeys": 24552,
+                            "size": 24053091,
+                        },
+                        results=[],
+                    )
+                ],
+            ),
+            ServiceHealth(service="katalogus", healthy=True, version="0.0.1-development", additional=None, results=[]),
+            ServiceHealth(service="scheduler", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
+            ServiceHealth(service="bytes", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
+            ServiceHealth(service="keiko", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
+        ],
+    )
+
+
+@pytest.fixture
+def boefje_dns_records():
+    return Boefje(
+        id="dns-records",
+        name="DnsRecords",
+        version=None,
+        authors=None,
+        created=None,
+        description="Fetch the DNS record(s) of a hostname",
+        environment_keys=None,
+        related=[],
+        enabled=True,
+        type="boefje",
+        scan_level=SCAN_LEVEL.L1,
+        consumes={Hostname},
+        options=None,
+        runnable_hash=None,
+        produces={"boefje/dns-records"},
+    )

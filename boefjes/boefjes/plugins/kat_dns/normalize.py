@@ -170,7 +170,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
     # DKIM
     dkim_results = results["dkim_response"]
-    if dkim_results not in ["NXDOMAIN", "Timeout"] and dkim_results.split("\n")[2] == "rcode NOERROR":
+    if dkim_results not in ["NXDOMAIN", "Timeout", "DNSSECFAIL"] and dkim_results.split("\n")[2] == "rcode NOERROR":
         yield DKIMExists(
             hostname=input_hostname.reference,
         )
