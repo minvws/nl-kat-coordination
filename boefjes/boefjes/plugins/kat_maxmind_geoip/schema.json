@@ -4,9 +4,9 @@
   "properties": {
     "MAXMIND_USER_ID": {
       "title": "User ID",
-      "type": "string",
+      "type": "integer",
       "maxLength": 48,
-      "description": "User id for MaxMind"
+      "description": "Numeric user id for MaxMind"
     },
     "MAXMIND_LICENCE_KEY": {
       "title": "Licence Key",
