@@ -3,22 +3,10 @@ import json
 from collections.abc import Iterable
 
 from boefjes.job_models import NormalizerOutput
+from boefjes.plugins.helpers import cpe_to_name_version
 from octopoes.models import Reference
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, PortState, Protocol
 from octopoes.models.ooi.software import Software, SoftwareInstance
-
-
-def get_name_from_cpe(cpe: str) -> str:
-    split = []
-    if cpe[0:5] == "cpe:/":
-        split = cpe[5:].split(":")
-    elif cpe[0:8] == "cpe:2.3:":
-        split = cpe[8:].split(":")
-
-    if len(split) > 3:
-        return split[2]
-    else:
-        return cpe
 
 
 def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
@@ -87,7 +75,8 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
                 yield software_ooi
                 yield SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
             for cpe in scan.get("result", {}).get("data", {}).get("cpe", []):
-                software_ooi = Software(name=get_name_from_cpe(cpe), cpe=cpe)
+                name, version = cpe_to_name_version(cpe=cpe)
+                software_ooi = Software(name=name, version=version, cpe=cpe)
                 yield software_ooi
                 yield SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
 
