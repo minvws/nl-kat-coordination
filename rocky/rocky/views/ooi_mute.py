@@ -44,10 +44,9 @@ class MuteFindingsBulkView(OrganizationPermissionRequiredMixin, SingleOOIMixin):
         reason = request.POST.get("reason", None)
         end_valid_time = request.POST.get("end_valid_time", None)
         if end_valid_time:
-            try:
-                end_valid_time = datetime.strptime(end_valid_time, "%Y-%m-%dT%H:%M").astimezone(timezone.utc)
-            except ValueError:
-                end_valid_time = None
+            end_valid_time = datetime.strptime(end_valid_time, "%Y-%m-%dT%H:%M").astimezone(timezone.utc)
+        else:
+            end_valid_time = None
 
         if not selected_findings:
             messages.add_message(self.request, messages.WARNING, _("Please select at least one finding."))
