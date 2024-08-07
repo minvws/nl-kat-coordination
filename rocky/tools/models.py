@@ -270,7 +270,7 @@ class Indemnification(models.Model):
     user = models.ForeignKey("account.KATUser", on_delete=models.SET_NULL, null=True)
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
 
-    EVENT_CODES = {"created": 900211, "updated": 900212, "deleted": 900213}
+    EVENT_CODES = {"created": 900221, "updated": 900222, "deleted": 900223}
 
 
 class OOIInformation(models.Model):
@@ -279,7 +279,7 @@ class OOIInformation(models.Model):
     data = models.JSONField(null=True)
     consult_api = models.BooleanField(default=False)
 
-    EVENT_CODES = {"created": 900221, "updated": 900222, "deleted": 900223}
+    EVENT_CODES = {"created": 900231, "updated": 900232, "deleted": 900233}
 
     def save(self, *args, **kwargs):
         if self.data is None:
