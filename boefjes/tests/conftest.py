@@ -116,12 +116,7 @@ def manager(item_handler: MockHandler, tmp_path: Path) -> SchedulerWorkerManager
         log_path=tmp_path / "patch_task_log",
     )
 
-    return SchedulerWorkerManager(
-        item_handler,
-        scheduler_client,
-        Settings(pool_size=1, poll_interval=0.01),
-        "DEBUG",
-    )
+    return SchedulerWorkerManager(item_handler, scheduler_client, Settings(pool_size=1, poll_interval=0.01), "DEBUG")
 
 
 @pytest.fixture

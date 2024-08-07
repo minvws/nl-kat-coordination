@@ -85,11 +85,7 @@ class BytesAPIClient:
 
     @retry_with_login
     def save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
-        response = self._session.post(
-            "/bytes/normalizer_meta",
-            content=normalizer_meta.json(),
-            headers=self.headers,
-        )
+        response = self._session.post("/bytes/normalizer_meta", content=normalizer_meta.json(), headers=self.headers)
 
         self._verify_response(response)
 
