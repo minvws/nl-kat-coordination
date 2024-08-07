@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-07 08:16+0000\n"
+"POT-Creation-Date: 2024-08-07 08:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -811,9 +811,6 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/katalogus_settings.html
-#: reports/templates/partials/export_report_settings.html
-#: reports/templates/partials/report_setup_scan.html
-#: reports/templates/partials/report_types_selection.html
 #: rocky/templates/two_factor/core/otp_required.html
 msgid "Go back"
 msgstr ""
@@ -3585,11 +3582,6 @@ msgid "Set up the required plugins for this report."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-#: reports/templates/partials/report_types_selection.html
-msgid "Change selection"
-msgstr ""
-
-#: reports/templates/partials/report_setup_scan.html
 msgid "Plugins"
 msgstr ""
 
@@ -3708,6 +3700,10 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: reports/templates/partials/report_types_selection.html
+msgid "Change selection"
+msgstr ""
+
+#: reports/templates/partials/report_types_selection.html
 msgid "Available report types"
 msgstr ""
 
@@ -3717,6 +3713,11 @@ msgstr ""
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Toggle all report types"
+msgstr ""
+
+#: reports/templates/partials/return_button.html
+#, python-format
+msgid "%(btn_text)s"
 msgstr ""
 
 #: reports/templates/report_overview/report_history.html
@@ -3913,19 +3914,11 @@ msgstr ""
 msgid "Save report"
 msgstr ""
 
-#: reports/views/aggregate_report.py reports/views/generate_report.py
-#: reports/views/multi_report.py
+#: reports/views/base.py
 msgid "Select at least one OOI to proceed."
 msgstr ""
 
-#: reports/views/aggregate_report.py reports/views/generate_report.py
-msgid ""
-"No data could be found for %(report_types). Object(s) did not exist on "
-"%(date)s."
-msgstr ""
-
-#: reports/views/aggregate_report.py reports/views/generate_report.py
-#: reports/views/multi_report.py
+#: reports/views/base.py reports/views/multi_report.py
 msgid "Select at least one report type to proceed."
 msgstr ""
 
@@ -3952,6 +3945,12 @@ msgstr ""
 #: reports/views/generate_report.py
 #, python-brace-format
 msgid "{report_type} for {ooi}"
+msgstr ""
+
+#: reports/views/mixins.py
+msgid ""
+"No data could be found for %(report_types). Object(s) did not exist on "
+"%(date)s."
 msgstr ""
 
 #: reports/views/multi_report.py
