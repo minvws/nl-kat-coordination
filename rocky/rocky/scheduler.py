@@ -340,11 +340,11 @@ class SchedulerClient:
     def get_schedules(
         self,
         **kwargs,
-    ) -> PaginatedTasksResponse:
+    ) -> PaginatedSchedulesResponse:
         try:
             kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
             res = self._client.get("/schedules", params=kwargs)
-            return PaginatedTasksResponse.model_validate_json(res.content)
+            return PaginatedSchedulesResponse.model_validate_json(res.content)
         except ValidationError:
             raise SchedulerValidationError(extra_message=_("Schedules: "))
         except ConnectError:

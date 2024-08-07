@@ -5,11 +5,11 @@
     {% ooi_url 'ooi_detail' ooi.primary_key organization.code query=mandatory_fields as this_url %}
     {% if not task_list %}
         <p class="emphasized">{% translate "There are no tasks for" %} {{ ooi }}</p>
-        {% include "tasks/partials/task_filter.html" with clear_filter_url=this_url %}
+        {% include "tasks/partials/task_filter.html" with clear_filter_url=this_url filter_form=task_filter_form %}
 
     {% else %}
         <p class="emphasized">{% translate "List of tasks for" %} {{ ooi }}</p>
-        {% include "tasks/partials/task_filter.html" with clear_filter_url=this_url %}
+        {% include "tasks/partials/task_filter.html" with clear_filter_url=this_url filter_form=task_filter_form %}
 
         <table rf-selector="table-scan-history">
             <thead>

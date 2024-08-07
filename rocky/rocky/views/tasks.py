@@ -62,3 +62,28 @@ class BoefjesTaskListView(TaskListView):
 class NormalizersTaskListView(TaskListView):
     template_name = "tasks/normalizers.html"
     task_type = "normalizer"
+
+
+class TaskSchedulesListView(SchedulerView, SchedulerListView):
+    paginator_class = RockyPaginator
+    paginate_by = 20
+    context_object_name = "task_schedules"
+    template_name = "tasks/schedules.html"
+
+    def get_queryset(self):
+        return self.get_task_schedules()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["task_schedules_filter_form"] = self.get_schedule_filter_form()
+        context["breadcrumbs"] = [
+            {
+                "url": reverse("task_list", kwargs={"organization_code": self.organization.code}),
+                "text": _("Tasks"),
+            },
+            {
+                "url": reverse("task_schedules", kwargs={"organization_code": self.organization.code}),
+                "text": _("Schedules"),
+            },
+        ]
+        return context

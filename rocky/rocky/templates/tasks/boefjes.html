@@ -15,11 +15,11 @@
                 <h1>{% translate "Boefjes" %}</h1>
                 {% if not task_list %}
                     <p class="emphasized">{% translate "There are no tasks for boefjes" %}</p>
-                    {% include "tasks/partials/task_filter.html" %}
+                    {% include "tasks/partials/task_filter.html" with filter_form=task_filter_form %}
 
                 {% else %}
                     <p class="emphasized">{% translate "List of tasks for boefjes" %}</p>
-                    {% include "tasks/partials/task_filter.html" %}
+                    {% include "tasks/partials/task_filter.html" with filter_form=task_filter_form %}
 
                     <div class="horizontal-scroll">
                         <table rf-selector="table-scan-history">

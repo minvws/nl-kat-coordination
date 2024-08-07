@@ -8,5 +8,8 @@
         <li {% if view == "normalizers_tasks" %}aria-current="page"{% endif %}>
             <a href="{% url 'normalizers_task_list' organization.code %}">{% translate "Normalizers" %}</a>
         </li>
+        <li {% if view == "task_schedules" %}aria-current="page"{% endif %}>
+            <a href="{% url 'task_schedules' organization.code %}">{% translate "Schedules" %}</a>
+        </li>
     </ul>
 </nav>

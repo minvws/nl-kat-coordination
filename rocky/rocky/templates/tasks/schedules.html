@@ -1,0 +1,46 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+{% load ooi_extra %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div>
+                {% include "tasks/partials/tab_navigation.html" with view="task_schedules" %}
+
+                <h1>{% translate "Schedules" %}</h1>
+                {% if not task_schedules %}
+                    <p class="emphasized">{% translate "There are no schedules for tasks" %}</p>
+                    {% include "tasks/partials/task_filter.html" with filter_form=task_schedules_filter_form %}
+
+                {% else %}
+                    <p class="emphasized">{% translate "List of schedules for tasks" %}</p>
+                    {% include "tasks/partials/task_filter.html" with filter_form=task_schedules_filter_form %}
+
+                    <div class="horizontal-scroll">
+                        <table rf-selector="table-scan-history">
+                            <thead>
+                                <tr>
+                                    <th scope="col">{% translate "Boefje" %}</th>
+                                    <th scope="col">{% translate "Status" %}</th>
+                                    <th scope="col">{% translate "Created date" %}</th>
+                                    <th scope="col">{% translate "Input Object" %}</th>
+                                    <th scope="col" class="visually-hidden">{% translate "Details" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for schedule in task_schedules %}{{ schedule }}{% endfor %}
+                            </tbody>
+                        </table>
+                        {% include "partials/list_paginator.html" %}
+
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+{% endblock content %}

@@ -40,7 +40,7 @@ from rocky.views.privacy_statement import PrivacyStatementView
 from rocky.views.scan_profile import ScanProfileDetailView, ScanProfileResetView
 from rocky.views.scans import ScanListView
 from rocky.views.task_detail import BoefjeTaskDetailView, DownloadTaskDetail, NormalizerTaskJSONView
-from rocky.views.tasks import BoefjesTaskListView, NormalizersTaskListView
+from rocky.views.tasks import BoefjesTaskListView, NormalizersTaskListView, TaskSchedulesListView
 from rocky.views.upload_csv import UploadCSV
 from rocky.views.upload_raw import UploadRaw
 
@@ -173,6 +173,7 @@ urlpatterns += i18n_patterns(
     path("<organization_code>/objects/upload/raw/<mime_type>", UploadRaw.as_view(), name="upload_raw_typed"),
     path("<organization_code>/tasks/", BoefjesTaskListView.as_view(), name="task_list"),
     path("<organization_code>/tasks/boefjes", BoefjesTaskListView.as_view(), name="boefjes_task_list"),
+    path("<organization_code>/tasks/schedules", TaskSchedulesListView.as_view(), name="task_schedules"),
     path(
         "<organization_code>/tasks/boefjes/<task_id>",
         BoefjeTaskDetailView.as_view(),
