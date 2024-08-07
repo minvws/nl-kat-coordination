@@ -19,4 +19,36 @@
 .filter form {
   background-color: transparent;
   padding: 1.5rem 2rem 2rem;
+  border-bottom: 1px solid var(--colors-grey-200);
+}
+
+/* Temporary fix, can be removed after upgrading to the Manon release after v16.2.0 */
+.filter > div button {
+  &::before,
+  &::after {
+    font-family: var(--filter-button-icon-font-family, inherit);
+    line-height: var(--filter-button-icon-line-height);
+    font-size: var(--filter-button-icon-font-size, inherit);
+    font-weight: var(--filter-button-icon-font-weight, inherit);
+  }
+
+  &[aria-expanded="true"] {
+    &::before {
+      content: var(--filter-button-icon-before-close-content);
+    }
+
+    &::after {
+      content: var(--filter-button-icon-after-close-content);
+    }
+  }
+
+  &[aria-expanded="false"] {
+    &::before {
+      content: var(--filter-button-icon-before-open-content);
+    }
+
+    &::after {
+      content: var(--filter-button-icon-after-open-content);
+    }
+  }
 }
