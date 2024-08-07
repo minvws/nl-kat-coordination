@@ -488,7 +488,7 @@
     "recommendation": "Remove the nonstandard headers from the response."
   },
   "KAT-DOMAIN-OWNERSHIP-PENDING": {
-    "description": "The domain requires Ownership verification. An email hasbeen send to the registered owner by the registrar. The domain is currently offline.",
+    "description": "The domain requires Ownership verification. An email has been sent to the registered owner by the registrar. The domain is currently offline.",
     "risk": "high",
     "source": "https://www.icann.org/resources/pages/contact-verification-2013-05-03-en",
     "impact": "Domain points to placeholder DNS-Servers, and is offline for regular use.",
