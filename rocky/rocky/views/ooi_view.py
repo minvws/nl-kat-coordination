@@ -182,7 +182,7 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
         # Transform into OOI
         try:
             end_valid_time = form.cleaned_data.pop("end_valid_time", None)
-            if end_valid_time:
+            if end_valid_time is not None:
                 end_valid_time.astimezone(timezone.utc)
             new_ooi = self.ooi_class.model_validate(form.cleaned_data)
             create_ooi(
