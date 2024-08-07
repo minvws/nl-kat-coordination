@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 from typing import Any
 
 from django import forms
@@ -120,20 +119,6 @@ class MuteFindingForm(forms.Form):
     reason = forms.CharField(widget=forms.Textarea(attrs={"name": "reason", "rows": "3", "cols": "5"}), required=False)
     end_valid_time = forms.DateTimeField(
         label="Expires by",
-        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
-        input_formats=["%Y-%m-%dT%H:%M:%S"],
+        widget=forms.DateTimeInput(attrs={"name": "end_valid_time", "type": "datetime-local"}),
         required=False,
     )
-
-    # TODO: do we need this?
-    def clean(self):
-        cleaned_data = super().clean()
-
-        if cleaned_data["end_valid_time"]:
-            try:
-                cleaned_data["end_valid_time"] = datetime.strptime(
-                    cleaned_data["end_valid_time"], "%Y-%m-%dT%H:%M"
-                ).astimezone(timezone.utc)
-            except ValueError:
-                cleaned_data["end_valid_time"] = None
-        return cleaned_data

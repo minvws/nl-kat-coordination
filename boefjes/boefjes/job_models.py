@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Annotated, Literal, TypeAlias
 from uuid import UUID
 
@@ -85,6 +85,7 @@ class NormalizerObservation(BaseModel):
 class NormalizerDeclaration(BaseModel):
     type: Literal["declaration"] = "declaration"
     ooi: OOIType
+    end_valid_time: datetime | None = None
 
 
 class NormalizerAffirmation(BaseModel):

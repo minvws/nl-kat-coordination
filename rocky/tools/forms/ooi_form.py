@@ -101,15 +101,16 @@ class OOIForm(BaseRockyForm):
                 fields[name] = forms.CharField(max_length=256, **default_attrs)
 
         # ruff: noqa: ERA001
-        #  We are not exactly ready to activate this yet
-        #  ```
-        #  fields["end_valid_time"] = forms.DateTimeField(
-        #      label="Expires by",
-        #      widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
-        #      input_formats=["%Y-%m-%dT%H:%M:%S"],
-        #      required=False,
-        #  )
-        #  ```
+        # Currently we are not ready to use the following line as the
+        # event manager is not aware of the deletion of a generic OOI
+        # it does work for 'end-point'-OOIs like MutedFinding and the
+        # field is hidden for now
+        # fields["end_valid_time"] = forms.DateTimeField(
+        #     label="Expires by",
+        #     widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
+        #     required=False,
+        # )
+        fields["end_valid_time"] = forms.DateTimeField(widget=forms.HiddenInput())
 
         return fields
 
