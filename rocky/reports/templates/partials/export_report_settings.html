@@ -9,6 +9,8 @@
     <div>
         {% if selected_oois and selected_report_types %}
             <h2>{% translate "Report name" %}</h2>
+            {% include "partials/return_button.html" with btn_text="Change selection" %}
+
             <p>
                 {% blocktranslate trimmed %}
                     You can name individual reports.
@@ -106,13 +108,14 @@
 </table>
 {% csrf_token %}
 <button type="submit" form="generate_report">
+    {% include "forms/report_form_fields.html" %}
+
     {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
 </button>
 </form>
 {% else %}
-<a class="button ghost" href="{{ previous }}">
-    <span class="icon ti-chevron-left"></span>{% translate "Go back" %}
-</a>
+{% include "partials/return_button.html" with btn_text="Go back" %}
+
 {% endif %}
 </div>
 </section>
