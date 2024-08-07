@@ -110,7 +110,7 @@ class OOIForm(BaseRockyForm):
         #     widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
         #     required=False,
         # )
-        fields["end_valid_time"] = forms.DateTimeField(widget=forms.HiddenInput())
+        fields["end_valid_time"] = forms.DateTimeField(widget=forms.HiddenInput(), required=False)
 
         return fields
 
