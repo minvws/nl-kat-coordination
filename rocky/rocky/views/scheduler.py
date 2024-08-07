@@ -6,11 +6,20 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import Boefje, Normalizer
-from tools.forms.scheduler import TaskFilterForm
+from tools.forms.scheduler import ScheduleFilterForm, TaskFilterForm
 
 from octopoes.models import OOI
 from rocky.scheduler import Boefje as SchedulerBoefje
-from rocky.scheduler import BoefjeTask, LazyTaskList, NormalizerTask, RawData, SchedulerError, Task, scheduler_client
+from rocky.scheduler import (
+    BoefjeTask,
+    LazyScheduleList,
+    LazyTaskList,
+    NormalizerTask,
+    RawData,
+    SchedulerError,
+    Task,
+    scheduler_client,
+)
 from rocky.scheduler import Normalizer as SchedulerNormalizer
 from rocky.views.mixins import OctopoesView
 
@@ -24,6 +33,7 @@ def get_date_time(date: str | None) -> datetime | None:
 class SchedulerView(OctopoesView):
     task_type: str
     task_filter_form = TaskFilterForm
+    schedule_filter_form = ScheduleFilterForm
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -34,10 +44,10 @@ class SchedulerView(OctopoesView):
             "scheduler_id": f"{self.task_type}-{self.organization.code}",
             "task_type": self.task_type,
             "plugin_id": None,  # plugin_id present and set at plugin detail
-            **self.get_form_data(),
+            **self.get_task_filter_form_data(),
         }
 
-    def get_form_data(self) -> dict[str, Any]:
+    def get_task_filter_form_data(self) -> dict[str, Any]:
         form_data = self.get_task_filter_form().data.dict()
         return {k: v for k, v in form_data.items() if v}
 
@@ -47,6 +57,23 @@ class SchedulerView(OctopoesView):
     def get_task_list(self) -> LazyTaskList | list[Any]:
         try:
             return LazyTaskList(self.scheduler_client, **self.get_task_filters())
+        except SchedulerError as error:
+            messages.error(self.request, error.message)
+        return []
+
+    def get_schedule_filter_form(self) -> ScheduleFilterForm:
+        return self.schedule_filter_form(self.request.GET)
+
+    def get_schedule_filter_form_data(self):
+        form_data = self.get_schedule_filter_form().data.dict()
+        return {k: v for k, v in form_data.items() if v}
+
+    def get_schedules_params(self):
+        return {"schedule_hash": None, **self.get_schedule_filter_form_data()}
+
+    def get_task_schedules(self):
+        try:
+            return LazyScheduleList(self.scheduler_client, **self.get_schedules_params())
         except SchedulerError as error:
             messages.error(self.request, error.message)
         return []

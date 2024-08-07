@@ -134,6 +134,19 @@ class Schedule(BaseModel):
     modified_at: datetime.datetime
 
 
+class ScheduleList(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    schedule_hash: str | None = None
+    enabled: bool | None = True
+    offset: int = 0
+    limit: int = 10
+    min_deadline_at: datetime.datetime | None = None
+    max_deadline_at: datetime.datetime | None = None
+    min_created_at: datetime.datetime | None = None
+    max_created_at: datetime.datetime | None = None
+
+
 class PaginatedTasksResponse(BaseModel):
     count: int
     next: str | None = None
@@ -197,6 +210,55 @@ class LazyTaskList:
         return res.results
 
 
+class LazyScheduleList:
+    HARD_LIMIT = 500
+
+    def __init__(
+        self,
+        scheduler_client: SchedulerClient,
+        **kwargs,
+    ):
+        self.scheduler_client = scheduler_client
+        self.kwargs = kwargs
+        self._count: int | None = None
+
+    @cached_property
+    def count(self) -> int:
+        if self._count is None:
+            self._count = self.scheduler_client.get_schedules(
+                limit=0,
+                **self.kwargs,
+            ).count
+        return self._count
+
+    def __len__(self):
+        return self.count
+
+    def __getitem__(self, key) -> list[Schedule]:
+        if isinstance(key, slice):
+            offset = key.start or 0
+            limit = min(
+                LazyScheduleList.HARD_LIMIT,
+                key.stop - offset or key.stop or LazyScheduleList.HARD_LIMIT,
+            )
+
+        elif isinstance(key, int):
+            offset = key
+            limit = 1
+        else:
+            raise TypeError("Invalid slice argument type.")
+
+        res = self.scheduler_client.get_schedules(
+            limit=limit,
+            offset=offset,
+            **self.kwargs,
+        )
+
+        self._count = res.count
+
+        return res.results
+
+
 class SchedulerError(Exception):
     message: str = _("The Scheduler has an unexpected error. Check the Scheduler logs for further details.")
 
@@ -242,20 +304,6 @@ class SchedulerClient:
         self._client = httpx.Client(base_url=base_uri)
         self.organization_code = organization_code
 
-    # TODO
-    def list_schedules(self, **kwargs) -> PaginatedSchedulesResponse:
-        try:
-            kwargs = {
-                k: v for k, v in kwargs.items() if v is not None
-            }  # filter Nones from kwargs
-            res = self._client.get("/schedules", params=kwargs)
-            res.raise_for_status()
-            return PaginatedSchedulesResponse.model_validate_json(res.content)
-        except ValidationError:
-            raise SchedulerValidationError(extra_message=_("Schedule list: "))
-        except ConnectError:
-            raise SchedulerConnectError(extra_message=_("Schedule list: "))
-
     def get_schedule_details(self, schedule_id: str) -> Schedule:
         try:
             res = self._client.get(f"/schedules/{schedule_id}")
@@ -265,7 +313,7 @@ class SchedulerClient:
             raise SchedulerConnectError()
 
     # TODO: arguments, a Schedule model, a dict?
-    def patch_schedule(self, schedule_id: str, enabled: bool, schedule: string) -> None:
+    def patch_schedule(self, schedule_id: str, enabled: bool, schedule: str) -> None:
         # FIXME: this is just an example
         try:
             res = self._client.patch(
@@ -288,6 +336,19 @@ class SchedulerClient:
             raise SchedulerValidationError(extra_message=_("Task list: "))
         except ConnectError:
             raise SchedulerConnectError(extra_message=_("Task list: "))
+
+    def get_schedules(
+        self,
+        **kwargs,
+    ) -> PaginatedTasksResponse:
+        try:
+            kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
+            res = self._client.get("/schedules", params=kwargs)
+            return PaginatedTasksResponse.model_validate_json(res.content)
+        except ValidationError:
+            raise SchedulerValidationError(extra_message=_("Schedules: "))
+        except ConnectError:
+            raise SchedulerConnectError()
 
     def get_task_details(self, task_id: str) -> Task:
         try:
