@@ -44,7 +44,7 @@ class MuteFindingsBulkView(OrganizationPermissionRequiredMixin, SingleOOIMixin):
         reason = request.POST.get("reason", None)
         end_valid_time = request.POST.get("end_valid_time", None)
         if end_valid_time:
-            end_valid_time = datetime.strptime(end_valid_time, "%Y-%m-%dT%H:%M").astimezone(timezone.utc)
+            end_valid_time = datetime.strptime(end_valid_time, "%Y-%m-%dT%H:%M").replace(tzinfo=timezone.utc)
         else:
             end_valid_time = None
 
