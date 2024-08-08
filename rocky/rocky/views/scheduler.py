@@ -49,6 +49,9 @@ class SchedulerView(OctopoesView):
         form_data = self.get_task_filter_form().data.dict()
         return {k: v for k, v in form_data.items() if v}
 
+    def count_active_filters(self):
+        return len(self.get_form_data())
+
     def get_task_filter_form(self) -> TaskFilterForm:
         return self.task_filter_form(self.request.GET)
 
