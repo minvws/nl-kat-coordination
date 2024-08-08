@@ -19,10 +19,19 @@ class ScheduleAPI:
         self.api.add_api_route(
             path="/schedules",
             endpoint=self.list,
-            methods=["GET", "POST"],
+            methods=["GET"],
             response_model=utils.PaginatedResponse,
             status_code=200,
             description="List all schedules",
+        )
+
+        self.api.add_api_route(
+            path="/schedules",
+            endpoint=self.create,
+            methods=["POST"],
+            response_model=models.Schedule,
+            status_code=201,
+            description="Create a schedule",
         )
 
         self.api.add_api_route(
@@ -98,6 +107,36 @@ class ScheduleAPI:
 
         return utils.paginate(request, results, count, offset, limit)
 
+    def create(self, schedule: serializers.ScheduleCreate) -> Any:
+        try:
+            new_schedule = models.Schedule(**schedule.dict())
+        except pydantic.ValidationError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=f"invalid schedule [exception: {exc}]",
+            ) from exc
+        except Exception as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=f"failed to create schedule [exception: {exc}]",
+            ) from exc
+
+        try:
+            self.ctx.datastores.schedule_store.create_schedule(new_schedule)
+        except storage.errors.StorageError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"error occurred while accessing the database [exception: {exc}]",
+            ) from exc
+        except Exception as exc:
+            self.logger.exception(exc)
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"failed to create schedule [exception: {exc}]",
+            ) from exc
+
+        return new_schedule
+
     def get(self, schedule_id: uuid.UUID) -> Any:
         try:
             schedule = self.ctx.datastores.schedule_store.get_schedule(schedule_id)
@@ -121,7 +160,7 @@ class ScheduleAPI:
 
         return schedule
 
-    def patch(self, schedule_id: uuid.UUID, schedule: serializers.Schedule) -> Any:
+    def patch(self, schedule_id: uuid.UUID, schedule: serializers.SchedulePatch) -> Any:
         try:
             schedule_db = self.ctx.datastores.schedule_store.get_schedule(schedule_id)
         except storage.errors.StorageError as exc:
