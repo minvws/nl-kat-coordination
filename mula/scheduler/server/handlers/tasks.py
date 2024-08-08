@@ -218,8 +218,6 @@ class TaskAPI:
 
         return task
 
-    # NOTE: serializers.Task instead of models.Task is needed for patch
-    # endpoints # to allow for partial updates.
     def patch(self, task_id: uuid.UUID, item: serializers.Task) -> Any:
         try:
             task_db = self.ctx.datastores.task_store.get_task(task_id)
@@ -248,9 +246,9 @@ class TaskAPI:
                 detail="no data to patch",
             )
 
+        # Update task
         updated_task = task_db.model_copy(update=patch_data)
 
-        # Update task in database
         try:
             self.ctx.datastores.task_store.update_task(updated_task)
         except storage.errors.StorageError as exc:

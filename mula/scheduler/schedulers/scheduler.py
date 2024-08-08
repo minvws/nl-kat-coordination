@@ -410,14 +410,11 @@ class Scheduler(abc.ABC):
 
         # We want to delay the job by a random amount of time, in a range of 5 hours
         jitter_range_seconds = 5 * 60 * 60
-        jitter_offset = timedelta(
-            seconds=random.uniform(-jitter_range_seconds, jitter_range_seconds)  # noqa
-        )
+        jitter = timedelta(seconds=random.uniform(0, jitter_range_seconds))  # noqa
 
         # Check if the adjusted time is earlier than the minimum, and
         # ensure that the adjusted time is not earlier than the deadline
-        adjusted_time = deadline + jitter_offset
-        adjusted_time = max(adjusted_time, deadline)
+        adjusted_time = deadline + jitter
 
         return adjusted_time
 

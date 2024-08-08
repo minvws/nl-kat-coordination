@@ -22,7 +22,7 @@ class Schedule(BaseModel):
 
     hash: str | None = Field(None, max_length=32)
 
-    data: dict | None = {}
+    data: dict | None = None
 
     enabled: bool = True
 

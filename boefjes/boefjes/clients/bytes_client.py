@@ -1,4 +1,5 @@
 import typing
+import uuid
 from collections.abc import Callable, Set
 from functools import wraps
 from typing import Any
@@ -85,13 +86,16 @@ class BytesAPIClient:
 
     @retry_with_login
     def save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
-        response = self._session.post(
-            "/bytes/normalizer_meta",
-            content=normalizer_meta.json(),
-            headers=self.headers,
-        )
+        response = self._session.post("/bytes/normalizer_meta", content=normalizer_meta.json(), headers=self.headers)
 
         self._verify_response(response)
+
+    @retry_with_login
+    def get_normalizer_meta(self, normalizer_meta_id: uuid.UUID) -> NormalizerMeta:
+        response = self._session.get(f"/bytes/normalizer_meta/{normalizer_meta_id}", headers=self.headers)
+        self._verify_response(response)
+
+        return NormalizerMeta.model_validate_json(response.content)
 
     @retry_with_login
     def save_raw(self, boefje_meta_id: str, raw: str | bytes, mime_types: Set[str] = frozenset()) -> UUID:

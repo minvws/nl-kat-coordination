@@ -108,9 +108,7 @@ class QueueAPI:
 
         try:
             # Load default values
-            default_item = models.Task()
-            patch_data = item_in.model_dump(exclude_unset=True)
-            new_item = default_item.model_copy(update=patch_data)
+            new_item = models.Task(**item_in.model_dump(exclude_unset=True))
 
             # Set values
             if new_item.scheduler_id is None:

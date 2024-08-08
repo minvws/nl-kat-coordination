@@ -3,14 +3,15 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field
 
 
+# NOTE: model added for support of partial updates
 class Schedule(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     hash: str | None = Field(None, max_length=32)
 
-    data: dict | None = {}
+    data: dict | None = None
 
-    enabled: bool | None = True
+    enabled: bool | None = None
 
     schedule: str | None = None
 
