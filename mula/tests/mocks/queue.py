@@ -3,5 +3,5 @@ from scheduler.utils import dict_utils
 
 
 class MockPriorityQueue(queues.PriorityQueue):
-    def create_hash(self, p_item: models.PrioritizedItem) -> str:
+    def create_hash(self, p_item: models.Task) -> str:
         return dict_utils.deep_get(p_item.model_dump(), ["data", "id"])

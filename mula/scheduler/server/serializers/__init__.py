@@ -1,2 +1,2 @@
-from .p_item import PrioritizedItem
+from .schedule import Schedule
 from .task import Task, TaskStatus

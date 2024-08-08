@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from typing import Any
 
@@ -9,16 +10,7 @@ from tools.forms.scheduler import TaskFilterForm
 
 from octopoes.models import OOI
 from rocky.scheduler import Boefje as SchedulerBoefje
-from rocky.scheduler import (
-    BoefjeTask,
-    LazyTaskList,
-    NormalizerTask,
-    PrioritizedItem,
-    RawData,
-    SchedulerError,
-    Task,
-    scheduler_client,
-)
+from rocky.scheduler import BoefjeTask, LazyTaskList, NormalizerTask, RawData, SchedulerError, Task, scheduler_client
 from rocky.scheduler import Normalizer as SchedulerNormalizer
 from rocky.views.mixins import OctopoesView
 
@@ -76,7 +68,7 @@ class SchedulerView(OctopoesView):
     def get_output_oois(self, task):
         try:
             return self.octopoes_api_connector.list_origins(
-                valid_time=task.p_item.data.raw_data.boefje_meta.ended_at,
+                valid_time=task.data.raw_data.boefje_meta.ended_at,
                 task_id=task.id,
             )[0].result
         except IndexError:
@@ -92,7 +84,7 @@ class SchedulerView(OctopoesView):
                 return JsonResponse(
                     {
                         "oois": self.get_output_oois(task),
-                        "valid_time": task.p_item.data.raw_data.boefje_meta.ended_at.strftime("%Y-%m-%dT%H:%M:%S"),
+                        "valid_time": task.data.raw_data.boefje_meta.ended_at.strftime("%Y-%m-%dT%H:%M:%S"),
                     },
                     safe=False,
                 )
@@ -100,23 +92,11 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
-    def schedule_task(self, p_item: PrioritizedItem) -> None:
+    def schedule_task(self, task: Task) -> None:
         if not self.indemnification_present:
             return self.indemnification_error()
         try:
-            # Remove id attribute of both p_item and p_item.data, since the
-            # scheduler will create a new task with new id's. However, pydantic
-            # requires an id attribute to be present in its definition and the
-            # default set to None when the attribute is optional, otherwise it
-            # will not serialize the id if it is not present in the definition.
-            if hasattr(p_item, "id"):
-                delattr(p_item, "id")
-
-            if hasattr(p_item.data, "id"):
-                delattr(p_item.data, "id")
-
-            self.scheduler_client.push_task(p_item)
-
+            self.scheduler_client.push_task(task)
         except SchedulerError as error:
             messages.error(self.request, error.message)
         else:
@@ -136,12 +116,17 @@ class SchedulerView(OctopoesView):
         try:
             task = self.scheduler_client.get_task_details(task_id)
 
-            new_p_item = PrioritizedItem(
-                data=task.p_item.data,
+            new_id = uuid.uuid4()
+            task.data.id = new_id
+
+            new_task = Task(
+                id=new_id,
+                scheduler_id=task.scheduler_id,
                 priority=1,
+                data=task.data,
             )
 
-            self.schedule_task(new_p_item)
+            self.schedule_task(new_task)
         except SchedulerError as error:
             messages.error(self.request, error.message)
 
@@ -152,9 +137,13 @@ class SchedulerView(OctopoesView):
                 raw_data=raw_data,
             )
 
-            p_item = PrioritizedItem(priority=1, data=normalizer_task)
+            new_task = Task(
+                priority=1,
+                data=normalizer_task,
+                scheduler_id=f"normalizer-{self.organization.code}",
+            )
 
-            self.schedule_task(p_item)
+            self.schedule_task(new_task)
         except SchedulerError as error:
             messages.error(self.request, error.message)
 
@@ -166,9 +155,13 @@ class SchedulerView(OctopoesView):
                 organization=self.organization.code,
             )
 
-            p_item = PrioritizedItem(priority=1, data=boefje_task)
+            new_task = Task(
+                priority=1,
+                data=boefje_task,
+                scheduler_id=f"boefje-{self.organization.code}",
+            )
 
-            self.schedule_task(p_item)
+            self.schedule_task(new_task)
 
         except SchedulerError as error:
             messages.error(self.request, error.message)

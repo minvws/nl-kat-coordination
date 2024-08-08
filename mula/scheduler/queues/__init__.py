@@ -1,4 +1,2 @@
-from .boefje import BoefjePriorityQueue
-from .errors import InvalidPrioritizedItemError, NotAllowedError, QueueEmptyError, QueueFullError
-from .normalizer import NormalizerPriorityQueue
+from .errors import InvalidItemError, ItemNotFoundError, NotAllowedError, QueueEmptyError, QueueFullError
 from .pq import PriorityQueue
