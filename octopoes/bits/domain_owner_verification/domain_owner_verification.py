@@ -12,11 +12,11 @@ INDICATORS = [
 ]
 
 
-def run(nameserver: DNSNSRecord, additional_oois: list[Hostname], config: dict[str, str]) -> Iterator[OOI]:
+def run(nameserver_record: DNSNSRecord, additional_oois: list[Hostname], config: dict[str, str]) -> Iterator[OOI]:
     """Checks to see if a domain has a specific set of dns servers which would indicate domain registrant verification.
     https://support.dnsimple.com/articles/icann-domain-validation/
     """
-    if DNSNSRecord.name_server_hostname.rstrip(".").upper() in INDICATORS:
+    if nameserver_record.name_server_hostname.rstrip(".").upper() in INDICATORS:
         for hostname in additional_oois:
             finding_type = KATFindingType(id="KAT-DOMAIN-OWNERSHIP-PENDING")
             yield finding_type
