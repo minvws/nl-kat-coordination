@@ -1,35 +1,68 @@
 import { onDomReady } from "../js/imports/utils.js";
 
-onDomReady(initConfirmButtons);
+onDomReady(initResetButtons);
 
-export function initConfirmButtons(element) {
-  let root = element || document;
-  let confirm_buttons = root.querySelectorAll(".confirm-button");
+function initResetButtons() {
+  const resetButtons = document.querySelectorAll(".reset-button");
 
-  confirm_buttons.forEach((button) => initClickHandlers(button));
+  resetButtons.forEach((button) => {
+    button.classList.add("visually-hidden");
+
+    let input = button.closest("tr").querySelector(".name-input");
+
+    input.defaultvalue = input.value;
+
+    button.addEventListener("click", function (event) {
+      input.value = input.defaultvalue;
+    });
+  });
+
+  watchInputChanges();
 }
 
-function initClickHandlers(button) {
-  button.addEventListener("click", function (event) {
-    const target = event.target.closest("dialog");
+function watchInputChanges() {
+  const nameInputs = document.querySelectorAll(".name-input");
 
-    editReportName(target);
+  nameInputs.forEach((input) => {
+    input.addEventListener("change", function (event) {
+      input
+        .closest("tr")
+        .querySelector(".reset-button")
+        .classList.remove("visually-hidden");
+    });
   });
 }
 
-function editReportName(target) {
-  const old_name_id = target.querySelector(".old-report-name").value;
-  const reference_date = target.querySelector(".reference-date").value;
-  const update_target_input = document.getElementById(old_name_id);
-  const update_target_text = document.getElementById("text-" + old_name_id);
+// onDomReady(initConfirmButtons);
 
-  let new_name = target.querySelector(".new-report-name").value;
+// export function initConfirmButtons(element) {
+//   let root = element || document;
+//   let confirm_buttons = root.querySelectorAll(".confirm-button");
 
-  if (new_name) {
-    if (reference_date) {
-      new_name += " (" + reference_date + ")";
-    }
-    update_target_input.setAttribute("value", new_name);
-    update_target_text.textContent = new_name;
-  }
-}
+//   confirm_buttons.forEach((button) => initClickHandlers(button));
+// }
+
+// function initClickHandlers(button) {
+//   button.addEventListener("click", function (event) {
+//     const target = event.target.closest("dialog");
+
+//     editReportName(target);
+//   });
+// }
+
+// function editReportName(target) {
+//   const old_name_id = target.querySelector(".old-report-name").value;
+//   const reference_date = target.querySelector(".reference-date").value;
+//   const update_target_input = document.getElementById(old_name_id);
+//   const update_target_text = document.getElementById("text-" + old_name_id);
+
+//   let new_name = target.querySelector(".new-report-name").value;
+
+//   if (new_name) {
+//     if (reference_date) {
+//       new_name += " (" + reference_date + ")";
+//     }
+//     update_target_input.setAttribute("value", new_name);
+//     update_target_text.textContent = new_name;
+//   }
+// }
