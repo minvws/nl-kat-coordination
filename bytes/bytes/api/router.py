@@ -105,8 +105,10 @@ def get_normalizer_meta_by_id(
     normalizer_meta_id: UUID,
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
 ) -> NormalizerMeta:
-    with meta_repository:
+    try:
         return meta_repository.get_normalizer_meta_by_id(normalizer_meta_id)
+    except ObjectNotFoundException as error:
+        raise HTTPException(status_code=404, detail="Normalizer meta not found") from error
 
 
 @router.get("/normalizer_meta", response_model=list[NormalizerMeta], tags=[NORMALIZER_META_TAG])

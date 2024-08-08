@@ -22,6 +22,7 @@ ServiceHealth.model_rebuild()
 class _BaseObservation(BaseModel):
     method: str
     source: Reference
+    source_method: str | None
     result: list[OOIType]
     valid_time: AwareDatetime
     task_id: uuid.UUID
@@ -42,6 +43,7 @@ class Declaration(BaseModel):
     valid_time: datetime
     end_valid_time: datetime | None = None
     method: str | None = None
+    source_method: str | None = None
     task_id: uuid.UUID | None = None
 
 
@@ -51,6 +53,7 @@ class Affirmation(BaseModel):
     ooi: OOIType
     valid_time: datetime
     method: str | None = None
+    source_method: str | None = None
     task_id: uuid.UUID | None = None
 
 
@@ -69,6 +72,7 @@ class ValidatedObservation(_BaseObservation):
 
     result: list[ValidatedOOIType]
     valid_time: AwareDatetime
+    source_method: str | None = None
 
 
 class ValidatedDeclaration(BaseModel):
@@ -78,6 +82,7 @@ class ValidatedDeclaration(BaseModel):
     valid_time: AwareDatetime
     end_valid_time: AwareDatetime | None = None
     method: str | None = "manual"
+    source_method: str | None = None
     task_id: uuid.UUID | None = Field(default_factory=uuid.uuid4)
 
 
@@ -87,4 +92,5 @@ class ValidatedAffirmation(BaseModel):
     ooi: ValidatedOOIType
     valid_time: AwareDatetime
     method: str | None = "hydration"
+    source_method: str | None = None
     task_id: uuid.UUID | None = Field(default_factory=uuid.uuid4)

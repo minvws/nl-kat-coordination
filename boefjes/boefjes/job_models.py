@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import AwareDatetime, BaseModel, Field, StringConstraints
 
-from octopoes.models import DeclaredScanProfile, PrimaryKeyToken
+from octopoes.models import DeclaredScanProfile
 from octopoes.models.types import OOIType
 
 
@@ -101,5 +101,3 @@ class NormalizerResults(BaseModel):
 
 
 NormalizerOutput: TypeAlias = OOIType | NormalizerDeclaration | NormalizerAffirmation | DeclaredScanProfile
-SerializedOOIValue: TypeAlias = None | str | int | float | dict[str, str | PrimaryKeyToken] | list["SerializedOOIValue"]
-SerializedOOI: TypeAlias = dict[str, SerializedOOIValue]

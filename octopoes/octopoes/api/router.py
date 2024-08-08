@@ -33,6 +33,7 @@ from octopoes.models.path import Path as ObjectPath
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
+from octopoes.repositories.origin_repository import XTDBOriginRepository
 from octopoes.version import __version__
 from octopoes.xtdb.client import Operation, OperationType, XTDBSession
 from octopoes.xtdb.exceptions import XTDBException
@@ -251,6 +252,17 @@ def delete_object(
     octopoes.commit()
 
 
+@router.delete("/origins", tags=["Origins"])
+def delete_origin(
+    origin_id: str,
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+) -> None:
+    origin = octopoes.origin_repository.get(origin_id, valid_time)
+    octopoes.origin_repository.delete(origin, valid_time)
+    octopoes.commit()
+
+
 @router.post("/objects/delete_many", tags=["Objects"])
 def delete_many(
     octopoes: OctopoesService = Depends(octopoes_service),
@@ -283,16 +295,22 @@ def get_tree(
 def list_origins(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
+    offset: int = 0,
+    limit: int | None = None,
     source: Reference | None = Query(None),
     result: Reference | None = Query(None),
+    method: str | list[str] | None = Query(None),
     task_id: uuid.UUID | None = Query(None),
     origin_type: OriginType | None = Query(None),
 ) -> list[Origin]:
     return octopoes.origin_repository.list_origins(
         valid_time,
         task_id=task_id,
+        offset=offset,
+        limit=limit,
         source=source,
         result=result,
+        method=method,
         origin_type=origin_type,
     )
 
@@ -315,6 +333,7 @@ def save_observation(
         origin_type=OriginType.OBSERVATION,
         method=observation.method,
         source=observation.source,
+        source_method=observation.source_method,
         result=[ooi.reference for ooi in observation.result],
         task_id=observation.task_id,
     )
@@ -331,6 +350,7 @@ def save_declaration(
         origin_type=OriginType.DECLARATION,
         method=declaration.method if declaration.method else "manual",
         source=declaration.ooi.reference,
+        source_method=declaration.source_method,
         result=[declaration.ooi.reference],
         task_id=declaration.task_id if declaration.task_id else uuid.uuid4(),
     )
@@ -347,6 +367,7 @@ def save_affirmation(
         origin_type=OriginType.AFFIRMATION,
         method=affirmation.method if affirmation.method else "hydration",
         source=affirmation.ooi.reference,
+        source_method=affirmation.source_method,
         result=[affirmation.ooi.reference],
         task_id=affirmation.task_id if affirmation.task_id else uuid.uuid4(),
     )
@@ -494,7 +515,12 @@ def delete_node(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> None:
 
 @router.post("/bits/recalculate", tags=["Bits"])
 def recalculate_bits(octopoes: OctopoesService = Depends(octopoes_service)) -> int:
-    inference_count = octopoes.recalculate_bits()
+    try:
+        inference_count = octopoes.recalculate_bits()
+    except ObjectNotFoundException:
+        logger.exception("Failed to recalculate bits")
+        raise
+
     octopoes.commit()
 
     return inference_count
@@ -557,3 +583,23 @@ async def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xt
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
     return importer(data, xtdb_session_, True)
+
+
+@router.post("/origins/migrate", tags=["Origins"])
+def migrate_origins(
+    origins: list[Origin],
+    session: XTDBSession = Depends(xtdb_session),
+    valid_time: datetime = Depends(extract_valid_time),
+) -> None:
+    for origin in origins:
+        if origin.source_method is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Only origins with a new source method can be migrated"
+            )
+
+        session.add((OperationType.PUT, XTDBOriginRepository.serialize(origin), valid_time))
+
+        origin.source_method = None  # To ensure the id property has the original pk value that we want to delete
+        session.add((OperationType.DELETE, origin.id, valid_time))
+
+    session.commit()  # The save-delete order is important to avoid garbage collection of the results

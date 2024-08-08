@@ -4094,11 +4094,11 @@ msgstr ""
 msgid "Please explain how to reproduce your finding"
 msgstr ""
 
-#: tools/forms/finding_type.py
+#: tools/forms/finding_type.py tools/forms/upload_raw.py
 msgid "Date/Time (UTC)"
 msgstr ""
 
-#: tools/forms/finding_type.py
+#: tools/forms/finding_type.py tools/forms/upload_raw.py
 msgid "Doc! I'm from the future, I'm here to take you back!"
 msgstr ""
 
@@ -4261,6 +4261,10 @@ msgid "Add the date and time of your finding (UTC)"
 msgstr ""
 
 #: tools/forms/settings.py
+msgid "Add the date and time of when the raw file was generated (UTC)"
+msgstr ""
+
+#: tools/forms/settings.py
 msgid ""
 "OpenKAT stores a time indication with every observation, so it is possible "
 "to see the status of your network through time. Select a datetime to change "
@@ -4331,6 +4335,14 @@ msgstr ""
 #: tools/forms/upload_raw.py rocky/templates/partials/ooi_list_toolbar.html
 #: rocky/templates/upload_raw.html
 msgid "Upload raw file"
+msgstr ""
+
+#: tools/forms/upload_raw.py
+msgid "Click to select one of the available options, or type one yourself"
+msgstr ""
+
+#: tools/forms/upload_raw.py
+msgid "OOI doesn't exist, try another valid time"
 msgstr ""
 
 #: tools/models.py
@@ -6363,6 +6375,15 @@ msgstr ""
 
 #: rocky/templates/upload_raw.html
 msgid "Automate the creation of multiple objects by uploading a raw file."
+msgstr ""
+
+#: rocky/templates/upload_raw.html
+msgid ""
+"An input OOI can be selected for the normalizer to attach newly yielded OOIs "
+"to. If no input OOI was used for the raw file, a placeholder ExternalScan "
+"OOI can be used. ExternalScan OOIs can be created from the objects page. "
+"When a new version of the raw file is generated, the same ExternalScan OOI "
+"should be chosen to ensure that old results are overwritten."
 msgstr ""
 
 #: rocky/templates/upload_raw.html rocky/views/upload_raw.py
