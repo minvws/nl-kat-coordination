@@ -46,6 +46,7 @@ from octopoes.models.ooi.findings import (
     RetireJSFindingType,
     SnykFindingType,
 )
+from octopoes.models.ooi.geography import GeographicPoint
 from octopoes.models.ooi.monitoring import Application, Incident
 from octopoes.models.ooi.network import (
     AutonomousSystem,
@@ -161,6 +162,7 @@ ConcreteOOIType = (
     | ReportsType
     | ScanType
     | Report
+    | GeographicPoint
 )
 
 OOIType = ConcreteOOIType | NetworkType | FindingTypeType
