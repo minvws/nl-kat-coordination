@@ -9,7 +9,7 @@
     <main id="main-content">
         <section>
             <div>
-                <h1>"{{ task.p_item.data.boefje.id }}" @ {{ task.p_item.data.input_ooi }}</h1>
+                <h1>"{{ task.data.boefje.id }}" @ {{ task.data.input_ooi }}</h1>
                 <h2>{{ task.created_at }}</h2>
                 <p>
                     {% blocktranslate trimmed %}
@@ -28,7 +28,7 @@
             <div>
                 <h2>{% translate "Input object" %}</h2>
                 <p>
-                    <a href="{% ooi_url 'ooi_detail' task.p_item.data.input_ooi organization.code %}">{{ task.p_item.data.input_ooi }}</a>
+                    <a href="{% ooi_url 'ooi_detail' task.data.input_ooi organization.code %}">{{ task.data.input_ooi }}</a>
                 </p>
             </div>
         </section>

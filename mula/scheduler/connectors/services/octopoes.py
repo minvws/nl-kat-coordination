@@ -88,7 +88,7 @@ class Octopoes(HTTPService):
     @exception_handler
     def get_object(self, organisation_id: str, reference: str) -> OOI:
         """Get an ooi from octopoes"""
-        url = f"{self.host}/{organisation_id}"
+        url = f"{self.host}/{organisation_id}/object"
         response = self.get(
             url,
             params={"reference": reference, "valid_time": datetime.now(timezone.utc)},

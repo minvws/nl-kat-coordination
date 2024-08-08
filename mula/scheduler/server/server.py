@@ -41,6 +41,7 @@ class Server:
         # Set up API endpoints
         handlers.SchedulerAPI(self.api, self.ctx, s)
         handlers.QueueAPI(self.api, self.ctx, s)
+        handlers.ScheduleAPI(self.api, self.ctx)
         handlers.TaskAPI(self.api, self.ctx)
         handlers.MetricsAPI(self.api, self.ctx)
         handlers.HealthAPI(self.api, self.ctx)

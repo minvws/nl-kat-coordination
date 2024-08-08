@@ -28,11 +28,11 @@
                         <td>{{ task.created_at }}</td>
                         <td>
                             {% if task.type == "boefje" %}
-                                {% with ooi=task.p_item.data.input_ooi %}
+                                {% with ooi=task.data.input_ooi %}
                                     <a href="{% ooi_url "ooi_detail" ooi organization.code observed_at=task.created_at|date:'c' %}">{{ ooi }}</a>
                                 {% endwith %}
                             {% elif task.type == "normalizer" %}
-                                {% with ooi=task.p_item.data.raw_data.boefje_meta.input_ooi %}
+                                {% with ooi=task.data.raw_data.boefje_meta.input_ooi %}
                                     <a href="{% ooi_url "ooi_detail" ooi organization.code observed_at=task.created_at|date:'c' %}">{{ ooi }}</a>
                                 {% endwith %}
                             {% endif %}

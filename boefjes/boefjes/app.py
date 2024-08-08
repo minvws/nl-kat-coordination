@@ -9,12 +9,7 @@ import structlog
 from httpx import HTTPError
 from pydantic import ValidationError
 
-from boefjes.clients.scheduler_client import (
-    QueuePrioritizedItem,
-    SchedulerAPIClient,
-    SchedulerClientInterface,
-    TaskStatus,
-)
+from boefjes.clients.scheduler_client import SchedulerAPIClient, SchedulerClientInterface, Task, TaskStatus
 from boefjes.config import Settings
 from boefjes.job_handler import BoefjeHandler, NormalizerHandler, bytes_api_client
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
@@ -192,7 +187,7 @@ class SchedulerWorkerManager(WorkerManager):
                 logger.info("Received %s, exiting", signal.Signals(signum).name)
 
             if not self.task_queue.empty():
-                items: list[QueuePrioritizedItem] = [self.task_queue.get() for _ in range(self.task_queue.qsize())]
+                items: list[Task] = [self.task_queue.get() for _ in range(self.task_queue.qsize())]
 
                 for p_item in items:
                     try:

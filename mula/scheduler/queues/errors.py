@@ -9,7 +9,7 @@ class NotAllowedError(Exception):
     pass
 
 
-class InvalidPrioritizedItemError(ValueError):
+class InvalidItemError(ValueError):
     pass
 
 
@@ -17,5 +17,5 @@ class QueueFullError(Full):
     pass
 
 
-class PrioritizedItemNotFoundError(Exception):
+class ItemNotFoundError(Exception):
     pass

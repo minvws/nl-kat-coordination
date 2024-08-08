@@ -43,7 +43,7 @@ class QueueAPI:
             path="/queues/{queue_id}/pop",
             endpoint=self.pop,
             methods=["POST"],
-            response_model=models.PrioritizedItem | None,
+            response_model=models.Task | None,
             status_code=status.HTTP_200_OK,
             description="Pop an item from a queue",
         )
@@ -52,7 +52,7 @@ class QueueAPI:
             path="/queues/{queue_id}/push",
             endpoint=self.push,
             methods=["POST"],
-            response_model=models.PrioritizedItem | None,
+            response_model=models.Task | None,
             status_code=status.HTTP_201_CREATED,
             description="Push an item to a queue",
         )
@@ -96,9 +96,9 @@ class QueueAPI:
                 detail="could not pop item from queue, check your filters",
             )
 
-        return models.PrioritizedItem(**p_item.model_dump())
+        return models.Task(**p_item.model_dump())
 
-    def push(self, queue_id: str, item: serializers.PrioritizedItem) -> Any:
+    def push(self, queue_id: str, item_in: serializers.Task) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
@@ -108,22 +108,11 @@ class QueueAPI:
 
         try:
             # Load default values
-            p_item = models.PrioritizedItem()
+            new_item = models.Task(**item_in.model_dump(exclude_unset=True))
 
             # Set values
-            if p_item.scheduler_id is None:
-                p_item.scheduler_id = s.scheduler_id
-
-            p_item.priority = item.priority
-
-            if s.queue.item_type == models.BoefjeTask:
-                p_item.data = models.BoefjeTask(**item.data).dict()
-                p_item.id = p_item.data["id"]
-            elif s.queue.item_type == models.NormalizerTask:
-                p_item.data = models.NormalizerTask(**item.data).dict()
-                p_item.id = p_item.data["id"]
-            else:
-                p_item.data = item.data
+            if new_item.scheduler_id is None:
+                new_item.scheduler_id = s.scheduler_id
         except Exception as exc:
             self.logger.exception(exc)
             raise fastapi.HTTPException(
@@ -132,11 +121,11 @@ class QueueAPI:
             ) from exc
 
         try:
-            s.push_item_to_queue(p_item)
+            pushed_item = s.push_item_to_queue(new_item)
         except ValueError as exc_value:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail="malformed item",
+                detail=f"malformed item: {exc_value}",
             ) from exc_value
         except queues.QueueFullError as exc_full:
             raise fastapi.HTTPException(
@@ -149,5 +138,11 @@ class QueueAPI:
                 status_code=fastapi.status.HTTP_409_CONFLICT,
                 detail=str(exc_not_allowed),
             ) from exc_not_allowed
+        except Exception as exc:
+            self.logger.exception(exc)
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=str(exc),
+            ) from exc
 
-        return p_item
+        return pushed_item

@@ -1,15 +1,16 @@
 import abc
+import random
 import threading
 import time
 from collections.abc import Callable
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import structlog
 from opentelemetry import trace
 
 from scheduler import connectors, context, models, queues, storage, utils
-from scheduler.utils import thread
+from scheduler.utils import cron, thread
 
 tracer = trace.get_tracer(__name__)
 
@@ -24,29 +25,42 @@ class Scheduler(abc.ABC):
         ctx:
             Application context of shared data (e.g. configuration, external
             services connections).
-        enabled:
-            Whether the scheduler is enabled or not.
-        scheduler_id:
-            The id of the scheduler.
         queue:
             A queues.PriorityQueue instance
-        threads:
-            A dict of ThreadRunner instances, used for running processes
-            concurrently.
-        stop_event: A threading.Event object used for communicating a stop
-            event across threads.
+        callback:
+            A callback function to call when the scheduler is stopped.
+        scheduler_id:
+             The id of the scheduler.
+        max_tries:
+            The maximum number of retries for an item to be pushed to
+            the queue.
+        enabled:
+            Whether the scheduler is enabled or not.
+        _last_activity:
+            The last activity of the scheduler.
         listeners:
             A dict of connector.Listener instances, used for listening to
             external events.
+        lock:
+            A threading.Lock instance used for locking
+        stop_event_threads:
+            A threading.Event object used for communicating a stop
+            event across threads.
+        threads:
+            A dict of ThreadRunner instances, used for running processes
+            concurrently.
     """
+
+    ITEM_TYPE: Any = None
 
     def __init__(
         self,
         ctx: context.AppContext,
         scheduler_id: str,
-        queue: queues.PriorityQueue,
+        queue: queues.PriorityQueue | None = None,
         callback: Callable[..., None] | None = None,
         max_tries: int = -1,
+        create_schedule: bool = False,
     ):
         """Initialize the Scheduler.
 
@@ -58,21 +72,31 @@ class Scheduler(abc.ABC):
                 The id of the scheduler.
             queue:
                 A queues.PriorityQueue instance
-            ranker:
-                A rankers.Ranker instance.
+            callback:
+                A callback function to call when the scheduler is stopped.
             max_tries:
-                The maximum number of retries for a task to be pushed to
+                The maximum number of retries for an item to be pushed to
                 the queue.
         """
 
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
-        self.enabled: bool = True
-        self.scheduler_id: str = scheduler_id
-        self.queue: queues.PriorityQueue = queue
-        self.max_tries: int = max_tries
         self.callback: Callable[[], Any] | None = callback
+
+        # Properties
+        self.scheduler_id: str = scheduler_id
+        self.max_tries: int = max_tries
+        self.enabled: bool = True
+        self.create_schedule: bool = create_schedule
         self._last_activity: datetime | None = None
+
+        # Queue
+        self.queue = queue or queues.PriorityQueue(
+            pq_id=scheduler_id,
+            maxsize=self.ctx.config.pq_maxsize,
+            item_type=self.ITEM_TYPE,
+            pq_store=self.ctx.datastores.pq_store,
+        )
 
         # Listeners
         self.listeners: dict[str, connectors.listeners.Listener] = {}
@@ -85,234 +109,6 @@ class Scheduler(abc.ABC):
     @abc.abstractmethod
     def run(self) -> None:
         raise NotImplementedError
-
-    def post_push(self, p_item: models.PrioritizedItem) -> None:
-        """When a boefje task is being added to the queue. We
-        persist a task to the datastore with the status QUEUED.
-
-        Args:
-            p_item: The prioritized item from the priority queue.
-        """
-        # NOTE: we set the id of the task the same as the p_item, for easier
-        # lookup.
-        task = models.Task(
-            id=p_item.id,
-            scheduler_id=self.scheduler_id,
-            type=self.queue.item_type.type,
-            p_item=p_item,
-            status=models.TaskStatus.QUEUED,
-            created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc),
-        )
-
-        task_db = self.ctx.datastores.task_store.get_task(str(p_item.id))
-        if task_db is not None:
-            self.ctx.datastores.task_store.update_task(task)
-            return
-
-        self.ctx.datastores.task_store.create_task(task)
-
-        self.last_activity = datetime.now(timezone.utc)
-
-    def post_pop(self, p_item: models.PrioritizedItem) -> None:
-        """When a boefje task is being removed from the queue. We
-        persist a task to the datastore with the status RUNNING
-
-        Args:
-            p_item: The prioritized item from the priority queue.
-        """
-        # NOTE: we set the id of the task the same as the p_item, for easier
-        # lookup.
-        task = self.ctx.datastores.task_store.get_task(str(p_item.id))
-        if task is None:
-            self.logger.warning(
-                "PrioritizedItem %s popped from %s, task %s not found in datastore, could not update task status",
-                p_item.id,
-                self.queue.pq_id,
-                p_item.data.get("id"),
-                p_item_id=p_item.id,
-                task_id=p_item.data.get("id"),
-                queue_id=self.queue.pq_id,
-                scheduler_id=self.scheduler_id,
-            )
-            return
-
-        task.status = models.TaskStatus.DISPATCHED
-        self.ctx.datastores.task_store.update_task(task)
-
-        self.last_activity = datetime.now(timezone.utc)
-
-    @tracer.start_as_current_span("scheduler_pop_item_from_queue")
-    def pop_item_from_queue(
-        self, filters: storage.filters.FilterRequest | None = None
-    ) -> models.PrioritizedItem | None:
-        """Pop an item from the queue.
-
-        Args:
-            filters: A FilterRequest instance to filter the
-            prioritized items from the queue.
-
-        Returns:
-            A PrioritizedItem instance.
-        """
-        if not self.is_enabled():
-            self.logger.warning(
-                "Scheduler is disabled, not popping item from queue",
-                queue_id=self.queue.pq_id,
-                queue_qsize=self.queue.qsize(),
-                scheduler_id=self.scheduler_id,
-            )
-            raise queues.errors.NotAllowedError("Scheduler is disabled")
-
-        try:
-            p_item = self.queue.pop(filters)
-        except queues.QueueEmptyError as exc:
-            raise exc
-
-        if p_item is not None:
-            self.logger.debug(
-                "Popped item %s from queue %s with priority %s",
-                p_item.id,
-                self.queue.pq_id,
-                p_item.priority,
-                p_item_id=p_item.id,
-                queue_id=self.queue.pq_id,
-                scheduler_id=self.scheduler_id,
-            )
-
-            self.post_pop(p_item)
-
-        return p_item
-
-    @tracer.start_as_current_span("scheduler_push_item_to_queue")
-    def push_item_to_queue(self, p_item: models.PrioritizedItem) -> None:
-        """Push a PrioritizedItem to the queue.
-
-        Args:
-            p_item: The PrioritizedItem to push to the queue.
-        """
-        if not self.is_enabled():
-            self.logger.warning(
-                "Scheduler is disabled, not pushing item to queue %s",
-                self.queue.pq_id,
-                p_item_id=p_item.id,
-                queue_id=self.queue.pq_id,
-                scheduler_id=self.scheduler_id,
-            )
-            raise queues.errors.NotAllowedError("Scheduler is disabled")
-
-        try:
-            self.queue.push(p_item)
-        except queues.errors.NotAllowedError as exc:
-            self.logger.warning(
-                "Not allowed to push to queue %s",
-                self.queue.pq_id,
-                p_item_id=p_item.id,
-                queue_id=self.queue.pq_id,
-                scheduler_id=self.scheduler_id,
-            )
-            raise exc
-        except queues.errors.QueueFullError as exc:
-            self.logger.warning(
-                "Queue %s is full, not pushing new items",
-                self.queue.pq_id,
-                p_item_id=p_item.id,
-                queue_id=self.queue.pq_id,
-                queue_qsize=self.queue.qsize(),
-                scheduler_id=self.scheduler_id,
-            )
-            raise exc
-        except queues.errors.InvalidPrioritizedItemError as exc:
-            self.logger.warning(
-                "Invalid prioritized item %s",
-                p_item.id,
-                p_item_id=p_item.id,
-                queue_id=self.queue.pq_id,
-                queue_qsize=self.queue.qsize(),
-                scheduler_id=self.scheduler_id,
-            )
-            raise exc
-
-        self.logger.debug(
-            "Pushed item %s to queue %s with priority %s ",
-            p_item.id,
-            self.queue.pq_id,
-            p_item.priority,
-            p_item_id=p_item.id,
-            queue_id=self.queue.pq_id,
-            scheduler_id=self.scheduler_id,
-        )
-
-        self.post_push(p_item)
-
-    def push_items_to_queue(self, p_items: list[models.PrioritizedItem]) -> None:
-        """Push multiple PrioritizedItems to the queue.
-
-        Args:
-            p_items: The list PrioritzedItem to add to the queue.
-        """
-        count = 0
-        for p_item in p_items:
-            try:
-                self.push_item_to_queue(p_item)
-            except (
-                queues.errors.NotAllowedError,
-                queues.errors.QueueFullError,
-                queues.errors.InvalidPrioritizedItemError,
-            ):
-                self.logger.debug(
-                    "Unable to push item %s to queue %s",
-                    p_item.id,
-                    self.queue.pq_id,
-                    p_item_id=p_item.id,
-                    queue_id=self.queue.pq_id,
-                    scheduler_id=self.scheduler_id,
-                )
-                continue
-            except Exception as exc:
-                self.logger.error(
-                    "Unable to push item %s to queue %s",
-                    p_item.id,
-                    self.queue.pq_id,
-                    p_item_id=p_item.id,
-                    queue_id=self.queue.pq_id,
-                    scheduler_id=self.scheduler_id,
-                )
-                raise exc
-
-            count += 1
-
-    def push_item_to_queue_with_timeout(
-        self,
-        p_item: models.PrioritizedItem,
-        max_tries: int = 5,
-        timeout: int = 1,
-    ) -> None:
-        """Push an item to the queue, with a timeout.
-
-        Args:
-            p_item: The item to push to the queue.
-            timeout: The timeout in seconds.
-            max_tries: The maximum number of tries. Set to -1 for infinite tries.
-
-        Raises:
-            QueueFullError: When the queue is full.
-        """
-        tries = 0
-        while not self.is_space_on_queue() and (tries < max_tries or max_tries == -1):
-            self.logger.debug(
-                "Queue %s is full, waiting for space",
-                queue_id=self.queue.pq_id,
-                queue_qsize=self.queue.qsize(),
-                scheduler_id=self.scheduler_id,
-            )
-            time.sleep(timeout)
-            tries += 1
-
-        if tries >= max_tries and max_tries != -1:
-            raise queues.errors.QueueFullError()
-
-        self.push_item_to_queue(p_item)
 
     def run_in_thread(
         self,
@@ -343,21 +139,308 @@ class Scheduler(abc.ABC):
 
         self.threads.append(t)
 
-    def is_space_on_queue(self) -> bool:
-        """Check if there is space on the queue.
+    def push_items_to_queue(self, items: list[models.Task]) -> None:
+        """Push multiple items to the queue.
 
-        NOTE: maxsize 0 means unlimited
+        Args:
+            items: A list of items to push to the queue.
+        """
+        count = 0
+        for item in items:
+            try:
+                self.push_item_to_queue(item)
+            except (
+                queues.errors.NotAllowedError,
+                queues.errors.QueueFullError,
+                queues.errors.InvalidItemError,
+            ) as exc:
+                self.logger.debug(
+                    "Unable to push item %s to queue %s (%s)",
+                    item.id,
+                    self.queue.pq_id,
+                    exc,
+                    item_id=item.id,
+                    queue_id=self.queue.pq_id,
+                    scheduler_id=self.scheduler_id,
+                )
+                continue
+            except Exception as exc:
+                self.logger.error(
+                    "Unable to push item %s to queue %s",
+                    item.id,
+                    self.queue.pq_id,
+                    item_id=item.id,
+                    queue_id=self.queue.pq_id,
+                    scheduler_id=self.scheduler_id,
+                )
+                raise exc
+
+            count += 1
+
+    def push_item_to_queue_with_timeout(
+        self,
+        item: models.Task,
+        max_tries: int = 5,
+        timeout: int = 1,
+    ) -> None:
+        """Push an item to the queue, with a timeout.
+
+        Args:
+            item: The item to push to the queue.
+            timeout: The timeout in seconds.
+            max_tries: The maximum number of tries. Set to -1 for infinite tries.
+
+        Raises:
+            QueueFullError: When the queue is full.
+        """
+        tries = 0
+        while not self.is_space_on_queue() and (tries < max_tries or max_tries == -1):
+            self.logger.debug(
+                "Queue %s is full, waiting for space",
+                queue_id=self.queue.pq_id,
+                queue_qsize=self.queue.qsize(),
+                scheduler_id=self.scheduler_id,
+            )
+            time.sleep(timeout)
+            tries += 1
+
+        if tries >= max_tries and max_tries != -1:
+            raise queues.errors.QueueFullError()
+
+        self.push_item_to_queue(item)
+
+    def push_item_to_queue(self, item: models.Task) -> models.Task:
+        """Push a Task to the queue.
+
+        Args:
+            item: The item to push to the queue.
+
+        Raises:
+            NotAllowedError: When the scheduler is disabled.
+            QueueFullError: When the queue is full.
+            InvalidItemError: When the item is invalid.
+        """
+        if not self.is_enabled():
+            self.logger.warning(
+                "Scheduler is disabled, not pushing item to queue %s",
+                self.queue.pq_id,
+                item_id=item.id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
+            raise queues.errors.NotAllowedError("Scheduler is disabled")
+
+        try:
+            if item.type is None:
+                item.type = self.ITEM_TYPE.type
+            item.status = models.TaskStatus.QUEUED
+            item = self.queue.push(item)
+        except queues.errors.NotAllowedError as exc:
+            self.logger.warning(
+                "Not allowed to push to queue %s (%s)",
+                self.queue.pq_id,
+                exc,
+                item_id=item.id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
+            raise exc
+        except queues.errors.QueueFullError as exc:
+            self.logger.warning(
+                "Queue %s is full, not pushing new items (%s)",
+                self.queue.pq_id,
+                exc,
+                item_id=item.id,
+                queue_id=self.queue.pq_id,
+                queue_qsize=self.queue.qsize(),
+                scheduler_id=self.scheduler_id,
+            )
+            raise exc
+        except queues.errors.InvalidItemError as exc:
+            self.logger.warning(
+                "Invalid item %s",
+                item.id,
+                item_id=item.id,
+                queue_id=self.queue.pq_id,
+                queue_qsize=self.queue.qsize(),
+                scheduler_id=self.scheduler_id,
+            )
+            raise exc
+
+        self.logger.debug(
+            "Pushed item %s to queue %s with priority %s ",
+            item.id,
+            self.queue.pq_id,
+            item.priority,
+            item_id=item.id,
+            item_hash=item.hash,
+            queue_id=self.queue.pq_id,
+            scheduler_id=self.scheduler_id,
+        )
+
+        item = self.post_push(item)
+
+        return item
+
+    def post_push(self, item: models.Task) -> models.Task:
+        """After an in item is pushed to the queue, we execute this function
+
+        Args:
+            item: The item from the priority queue.
+        """
+        self.last_activity = datetime.now(timezone.utc)
+
+        if self.create_schedule is False:
+            self.logger.debug(
+                "Not creating schedule for item %s",
+                item.id,
+                item_id=item.id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
+            return item
+
+        schedule_db = None
+        if item.schedule_id is None:
+            schedule_db = self.ctx.datastores.schedule_store.get_schedule_by_hash(item.hash)
+            if schedule_db is None:
+                deadline_at = self.calculate_deadline(item)
+                cron_expression = f"{deadline_at.minute} {deadline_at.hour} * * *"
+
+                schedule = models.Schedule(
+                    scheduler_id=self.scheduler_id,
+                    hash=item.hash,
+                    schedule=cron_expression,
+                    deadline_at=deadline_at,
+                    data=item.data,
+                )
+                schedule_db = self.ctx.datastores.schedule_store.create_schedule(schedule)
+                item.schedule_id = schedule_db.id
+                self.ctx.datastores.task_store.update_task(item)
+                return item
+
+            item.schedule_id = schedule_db.id
+            self.ctx.datastores.task_store.update_task(item)
+        else:
+            schedule_db = self.ctx.datastores.schedule_store.get_schedule(item.schedule_id)
+            if schedule_db is None:
+                raise ValueError(f"Schedule with id {item.schedule_id} not found for item {item.id}")
+
+        if not schedule_db.enabled:
+            self.logger.debug(
+                "Schedule %s is disabled, not updating deadline",
+                schedule_db.id,
+                schedule_id=schedule_db.id,
+                item_id=item.id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
+            return item
+
+        schedule_db.deadline_at = cron.next_run(schedule_db.schedule)
+        self.ctx.datastores.schedule_store.update_schedule(schedule_db)
+
+        return item
+
+    def pop_item_from_queue(self, filters: storage.filters.FilterRequest | None = None) -> models.Task | None:
+        """Pop an item from the queue.
+
+        Args:
+            filters: Optional filters to apply when popping an item.
 
         Returns:
-            True if there is space on the queue, False otherwise.
+            An item from the queue
+
+        Raises:
+            NotAllowedError: When the scheduler is disabled.
+            QueueEmptyError: When the queue is empty.
         """
-        if (self.queue.maxsize - self.queue.qsize()) <= 0 and self.queue.maxsize != 0:
-            return False
+        if not self.is_enabled():
+            self.logger.warning(
+                "Scheduler is disabled, not popping item from queue",
+                queue_id=self.queue.pq_id,
+                queue_qsize=self.queue.qsize(),
+                scheduler_id=self.scheduler_id,
+            )
+            raise queues.errors.NotAllowedError("Scheduler is disabled")
 
-        return True
+        try:
+            item = self.queue.pop(filters)
+        except queues.QueueEmptyError as exc:
+            raise exc
 
-    def is_item_on_queue_by_hash(self, item_hash: str) -> bool:
-        return self.queue.is_item_on_queue_by_hash(item_hash)
+        if item is not None:
+            self.logger.debug(
+                "Popped item %s from queue %s with priority %s",
+                item.id,
+                self.queue.pq_id,
+                item.priority,
+                item_id=item.id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
+
+            self.post_pop(item)
+
+        return item
+
+    def post_pop(self, item: models.Task) -> None:
+        """After an item is popped from the queue, we execute this function
+
+        Args:
+            item: An item from the queue
+        """
+        self.last_activity = datetime.now(timezone.utc)
+
+    def calculate_deadline(self, task: models.Task) -> datetime:
+        """Calculate the deadline for a task.
+
+        NOTE: This is a simple implementation, you can override this method
+        to implement a more complex logic.
+
+        Args:
+            task: The task to calculate the deadline for.
+
+        Returns:
+            The deadline for the task.
+        """
+        # We at least delay a job by the grace period
+        minimum = self.ctx.config.pq_grace_period
+        deadline = datetime.now(timezone.utc) + timedelta(seconds=minimum)
+
+        # We want to delay the job by a random amount of time, in a range of 5 hours
+        jitter_range_seconds = 5 * 60 * 60
+        jitter = timedelta(seconds=random.uniform(0, jitter_range_seconds))  # noqa
+
+        # Check if the adjusted time is earlier than the minimum, and
+        # ensure that the adjusted time is not earlier than the deadline
+        adjusted_time = deadline + jitter
+
+        return adjusted_time
+
+    def enable(self) -> None:
+        """Enable the scheduler.
+
+        This will start the scheduler, and start all listeners and threads.
+        """
+        if self.is_enabled():
+            self.logger.debug("Scheduler is already enabled")
+            return
+
+        self.logger.info(
+            "Enabling scheduler: %s",
+            self.scheduler_id,
+            scheduler_id=self.scheduler_id,
+        )
+        self.enabled = True
+        self.stop_event_threads.clear()
+        self.run()
+
+        self.logger.info(
+            "Enabled scheduler: %s",
+            self.scheduler_id,
+            scheduler_id=self.scheduler_id,
+        )
 
     def disable(self) -> None:
         """Disable the scheduler.
@@ -378,7 +461,6 @@ class Scheduler(abc.ABC):
 
         self.stop_listeners()
         self.stop_threads()
-
         self.queue.clear()
 
         # Get all tasks that were on the queue and set them to CANCELLED
@@ -389,33 +471,11 @@ class Scheduler(abc.ABC):
         task_ids = [task.id for task in tasks]
         self.ctx.datastores.task_store.cancel_tasks(scheduler_id=self.scheduler_id, task_ids=task_ids)
 
-        self.logger.info("Disabled scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
-
-    def enable(self) -> None:
-        """Enable the scheduler.
-
-        This will start the scheduler, and start all listeners and threads.
-        """
-        if self.is_enabled():
-            self.logger.debug("Scheduler is already enabled")
-            return
-
-        self.logger.info("Enabling scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
-        self.enabled = True
-
-        self.stop_event_threads.clear()
-
-        self.run()
-
-        self.logger.info("Enabled scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
-
-    def is_enabled(self) -> bool:
-        """Check if the scheduler is enabled.
-
-        Returns:
-            True if the scheduler is enabled, False otherwise.
-        """
-        return self.enabled
+        self.logger.info(
+            "Disabled scheduler: %s",
+            self.scheduler_id,
+            scheduler_id=self.scheduler_id,
+        )
 
     def stop(self, callback: bool = True) -> None:
         """Stop the scheduler.
@@ -423,7 +483,11 @@ class Scheduler(abc.ABC):
         Args:
             callback: Whether to call the callback function.
         """
-        self.logger.info("Stopping scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
+        self.logger.info(
+            "Stopping scheduler: %s",
+            self.scheduler_id,
+            scheduler_id=self.scheduler_id,
+        )
 
         # First, stop the listeners, when those are running in a thread and
         # they're using rabbitmq, they will block. Setting the stop event
@@ -434,7 +498,11 @@ class Scheduler(abc.ABC):
         if self.callback and callback:
             self.callback(self.scheduler_id)  # type: ignore [call-arg]
 
-        self.logger.info("Stopped scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
+        self.logger.info(
+            "Stopped scheduler: %s",
+            self.scheduler_id,
+            scheduler_id=self.scheduler_id,
+        )
 
     def stop_listeners(self) -> None:
         """Stop the listeners."""
@@ -449,6 +517,30 @@ class Scheduler(abc.ABC):
             t.join(5)
 
         self.threads = []
+
+    def is_enabled(self) -> bool:
+        """Check if the scheduler is enabled.
+
+        Returns:
+            True if the scheduler is enabled, False otherwise.
+        """
+        return self.enabled
+
+    def is_space_on_queue(self) -> bool:
+        """Check if there is space on the queue.
+
+        NOTE: maxsize 0 means unlimited
+
+        Returns:
+            True if there is space on the queue, False otherwise.
+        """
+        if (self.queue.maxsize - self.queue.qsize()) <= 0 and self.queue.maxsize != 0:
+            return False
+
+        return True
+
+    def is_item_on_queue_by_hash(self, item_hash: str) -> bool:
+        return self.queue.is_item_on_queue_by_hash(item_hash)
 
     @property
     def last_activity(self) -> datetime | None:
