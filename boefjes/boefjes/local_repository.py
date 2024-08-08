@@ -11,10 +11,10 @@ from boefjes.plugins.models import (
     BOEFJES_DIR,
     ENTRYPOINT_NORMALIZERS,
     NORMALIZER_DEFINITION_FILE,
+    SCHEMA_FILE,
     BoefjeResource,
     ModuleException,
     NormalizerResource,
-    SCHEMA_FILE,
 )
 
 logger = structlog.get_logger(__name__)
