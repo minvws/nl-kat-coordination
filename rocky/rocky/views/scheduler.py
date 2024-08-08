@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import Boefje, Normalizer
+from reports.forms import ReportScheduleForm
 from tools.forms.scheduler import TaskFilterForm
 
 from octopoes.models import OOI
@@ -24,6 +25,7 @@ def get_date_time(date: str | None) -> datetime | None:
 class SchedulerView(OctopoesView):
     task_type: str
     task_filter_form = TaskFilterForm
+    schedule_report_form = ReportScheduleForm
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -50,6 +52,13 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             messages.error(self.request, error.message)
         return []
+
+    def get_schedule_filter_form(self) -> ReportScheduleForm:
+        return self.schedule_report_form(self.request.POST)
+
+    def get_schedule_filter_form_data(self):
+        form_data = self.get_schedule_filter_form().data.dict()
+        return {k: v for k, v in form_data.items() if v}
 
     def get_task_details(self, task_id: str) -> Task | None:
         try:
@@ -181,3 +190,26 @@ class SchedulerView(OctopoesView):
                 self.run_boefje(boefje, ooi)
         except SchedulerError as error:
             messages.error(self.request, error.message)
+
+    def convert_recurrence_to_cron_expressions(self, start_date: str, recurrence: str) -> str:
+        """
+        Because there is no time defined for the start date, we use midnight 00:00 for all expressions.
+        """
+        date: datetime = datetime.strptime(start_date, "%Y-%m-%d")
+
+        day = date.day
+        month = date.month
+        year = date.year
+
+        weekday = date.strftime("%a").upper()  # ex. THU
+        month_3L = date.strftime("%b").upper()  # ex. AUG
+
+        cron_expr = {
+            "no_repeat": f"0 0 0 {day} {month} ? {year}",  # Run once on this date
+            "daily": "0 0 0 ? * * *",  # Recurres every day at 00:00
+            "weekly": f"0 0 0 ? * {weekday} *",  # Recurres on every {weekday} at 00:00
+            "monthly": f"0 0 0 {day} * ? *",  # Recurres on the {day} of the month at 00:00
+            "yearly": f"0 0 0 {day} {month_3L} ? *",  # Recurres every year on the {day} of the {month} at 00:00
+        }
+
+        return cron_expr.get(recurrence, "")

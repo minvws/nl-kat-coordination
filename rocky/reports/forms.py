@@ -35,13 +35,17 @@ class ReportTypeMultiselectForm(BaseRockyForm):
 class ReportScheduleForm(BaseRockyForm):
     start_date = forms.DateField(
         label=_("Start date"),
-        widget=DateInput(format="%Y-%m-%d"),
+        widget=DateInput(format="%Y-%m-%d", attrs={"form": "generate_report"}),
         initial=lambda: datetime.now(tz=timezone.utc).date(),
         required=False,
     )
 
     recurrence = forms.ChoiceField(
-        widget=forms.Select,
+        label=_("Recurrence"),
+        required=False,
+        widget=forms.Select(
+            attrs={"form": "generate_report"},
+        ),
         choices=[
             ("no_repeat", _("Does not repeat")),
             ("daily", _("Daily")),
@@ -64,24 +68,6 @@ class ReportScheduleForm(BaseRockyForm):
                 self.add_error("start_date", _("Warning: Recurrence will skip months that does not have 31 days."))
                 return False
         return True
-
-    def convert_recurrence_to_cron_expressions(self, start_date: date, recurrence: str) -> str:
-        """
-        Because there is no time defined for the start date, we use midnight 00:00 for all expressions.
-        """
-
-        day = start_date.day
-        weekday = start_date.strftime("%a").upper()  # ex. THU
-        month = start_date.strftime("%b").upper()  # ex. AUG
-
-        cron_expr = {
-            "daily": "0 0 0 ? * * *",  # Recurres every day at 00:00
-            "weekly": f"0 0 0 ? * {weekday} *",  # Recurres on every {weekday} at 00:00
-            "monthly": f"0 0 0 {day} * ? *",  # Recurres on the {day} of the month at 00:00
-            "yearly": f"0 0 0 {day} {month} ? *",  # Recurres every year on the {day} of the {month} at 00:00
-        }
-
-        return cron_expr[recurrence]
 
     def clean(self):
         cleaned_data = super().clean()

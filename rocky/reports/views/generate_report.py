@@ -13,6 +13,7 @@ from django.views.generic import TemplateView
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
 from octopoes.models.ooi.reports import Report as ReportOOI
+from reports.forms import ReportScheduleForm
 from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import Report
 from reports.report_types.helpers import REPORTS, get_ooi_types_with_report, get_report_by_id, get_report_types_for_oois
@@ -26,6 +27,7 @@ from reports.views.base import (
 )
 from reports.views.view_helpers import GenerateReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
+from rocky.views.scheduler import SchedulerView
 
 
 class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
@@ -284,10 +286,11 @@ class ExportSetupGenerateReportView(
         context = super().get_context_data(**kwargs)
         context["current_datetime"] = datetime.now(timezone.utc)
         context["reports"] = reports
+        context["schedule_report_form"] = ReportScheduleForm(self.request.POST)
         return context
 
 
-class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportView, ReportPluginView, TemplateView):
+class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportView, ReportPluginView, SchedulerView):
     """
     Save the report generated.
     """
@@ -299,6 +302,12 @@ class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportV
     ooi_types = get_ooi_types_with_report()
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        form_data = self.get_schedule_filter_form_data()
+        if "start_date" in form_data and "recurrence" in form_data:
+            self.convert_recurrence_to_cron_expressions(form_data["start_date"], form_data["recurrence"])
+
+            # TODO: send cron expression to the scheduler to schedule report
+
         old_report_names = request.POST.getlist("old_report_name")
         new_report_names = request.POST.getlist("report_name")
         report_names = list(zip(old_report_names, new_report_names))
