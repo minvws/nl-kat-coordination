@@ -1721,13 +1721,7 @@ def onboarding_collect_data():
                     "content": "ns1.domaindiscount24.net. tech.key-systems.net. 2023012324 10800 3600 604800 3600",
                 },
             ],
-            "security": {
-                "spf": False,
-                "dkim": False,
-                "dmarc": False,
-                "dnssec": False,
-                "caa": False,
-            },
+            "security": {"spf": False, "dkim": False, "dmarc": False, "dnssec": False, "caa": False},
             "finding_types": [],
         }
     }

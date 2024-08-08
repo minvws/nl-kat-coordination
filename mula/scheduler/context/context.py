@@ -99,7 +99,7 @@ class AppContext:
                     structlog.dev.set_exc_info,
                     structlog.stdlib.PositionalArgumentsFormatter(),
                     structlog.processors.TimeStamper("iso", utc=False),
-                    structlog.dev.ConsoleRenderer(colors=False),
+                    structlog.dev.ConsoleRenderer(),
                 ],
                 context_class=dict,
                 # `logger_factory` is used to create wrapped loggers that are used
