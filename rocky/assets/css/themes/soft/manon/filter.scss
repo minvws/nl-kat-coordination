@@ -22,7 +22,7 @@
   border-bottom: 1px solid var(--colors-grey-200);
 }
 
-/* Temporary fix, can be removed after upgrading to the Manon release after v16.2.0 */
+/* Temporary fix, this needs to be updated after this issue has been solved in Manon */
 .filter > div button {
   &::before,
   &::after {
