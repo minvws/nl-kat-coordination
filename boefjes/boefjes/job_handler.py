@@ -180,6 +180,7 @@ class NormalizerHandler(Handler):
                     Observation(
                         method=normalizer_meta.normalizer.id,
                         source=reference,
+                        source_method=normalizer_meta.raw_data.boefje_meta.boefje.id,
                         task_id=normalizer_meta.id,
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
                         result=[ooi for ooi in observation.results if ooi.primary_key != observation.input_ooi],
@@ -190,6 +191,7 @@ class NormalizerHandler(Handler):
                 connector.save_declaration(
                     Declaration(
                         method=normalizer_meta.normalizer.id,
+                        source_method=normalizer_meta.raw_data.boefje_meta.boefje.id,
                         ooi=declaration.ooi,
                         task_id=normalizer_meta.id,
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
@@ -200,6 +202,7 @@ class NormalizerHandler(Handler):
                 connector.save_affirmation(
                     Affirmation(
                         method=normalizer_meta.normalizer.id,
+                        source_method=normalizer_meta.raw_data.boefje_meta.boefje.id,
                         ooi=affirmation.ooi,
                         task_id=normalizer_meta.id,
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
