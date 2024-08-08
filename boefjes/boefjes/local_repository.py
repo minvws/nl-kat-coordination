@@ -14,6 +14,7 @@ from boefjes.plugins.models import (
     BoefjeResource,
     ModuleException,
     NormalizerResource,
+    SCHEMA_FILE,
 )
 
 logger = structlog.get_logger(__name__)
@@ -52,7 +53,7 @@ class LocalPluginRepository:
         if id_ not in boefjes:
             return None
 
-        path = boefjes[id_].path / "schema.json"
+        path = boefjes[id_].path / SCHEMA_FILE
 
         if not path.exists():
             logger.debug("Did not find schema for boefje %s", boefjes[id_])
