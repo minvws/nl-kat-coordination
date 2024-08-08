@@ -31,7 +31,8 @@ def test_add_ooi(rf, client_member, mock_organization_view_octopoes, mock_bytes_
 
 def test_add_bad_schema(rf, client_member):
     request = setup_request(
-        rf.post("ooi_add", {"ooi_type": "Network", "testnamewrong": "testnetwork"}), client_member.user
+        rf.post("ooi_add", {"ooi_type": "Network", "testnamewrong": "testnetwork"}),
+        client_member.user,
     )
 
     response = OOIAddView.as_view()(request, organization_code=client_member.organization.code, ooi_type="Network")

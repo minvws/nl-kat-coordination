@@ -237,18 +237,28 @@ OOI_TYPES_WITHOUT_FINDINGS = [name for name, cls_ in OOI_TYPES.items() if cls_ n
 
 
 def get_or_create_ooi(
-    api_connector: OctopoesAPIConnector, bytes_client: BytesClient, ooi: OOI, observed_at: datetime
+    api_connector: OctopoesAPIConnector,
+    bytes_client: BytesClient,
+    ooi: OOI,
+    observed_at: datetime,
+    end_valid_time: datetime | None = None,
 ) -> tuple[OOI, bool]:
     try:
         return api_connector.get(ooi.reference, observed_at), False
     except ObjectNotFoundException:
-        create_ooi(api_connector, bytes_client, ooi, observed_at)
+        create_ooi(api_connector, bytes_client, ooi, observed_at, end_valid_time)
         return ooi, True
 
 
-def create_ooi(api_connector: OctopoesAPIConnector, bytes_client: BytesClient, ooi: OOI, observed_at: datetime) -> None:
+def create_ooi(
+    api_connector: OctopoesAPIConnector,
+    bytes_client: BytesClient,
+    ooi: OOI,
+    observed_at: datetime,
+    end_valid_time: datetime | None = None,
+) -> None:
     task_id = uuid4()
-    declaration = Declaration(ooi=ooi, valid_time=observed_at, task_id=str(task_id))
+    declaration = Declaration(ooi=ooi, valid_time=observed_at, task_id=task_id, end_valid_time=end_valid_time)
     bytes_client.add_manual_proof(task_id, BytesClient.raw_from_declarations([declaration]))
 
     api_connector.save_declaration(declaration)

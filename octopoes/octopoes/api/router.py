@@ -354,7 +354,7 @@ def save_declaration(
         result=[declaration.ooi.reference],
         task_id=declaration.task_id if declaration.task_id else uuid.uuid4(),
     )
-    octopoes.save_origin(origin, [declaration.ooi], declaration.valid_time)
+    octopoes.save_origin(origin, [declaration.ooi], declaration.valid_time, declaration.end_valid_time)
     octopoes.commit()
 
 
