@@ -10,7 +10,9 @@ import httpx
 SCHEDULER_API = "http://localhost:8004"
 TIMEOUT_FOR_LOG_CAPTURE = 5
 
-logger = logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
 client = httpx.Client(base_url=SCHEDULER_API)
 
 

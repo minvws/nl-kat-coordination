@@ -67,10 +67,6 @@ cov: ## Generate a test coverage report
 		--cov-report term-missing:skip-covered \
 		--cov=scheduler tests/
 
-shell: ## Start a shell in the scheduler container.
-	docker compose run --rm scheduler \
-		python -i -c 'import scheduler; app = scheduler.App(scheduler.context.AppContext())'
-
 ##
 ##+------------------------------------------------------------------------+
 ##| Migrations                                                             |

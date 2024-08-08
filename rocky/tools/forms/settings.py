@@ -50,6 +50,8 @@ FINDING_TYPE_IDS_HELP_TEXT = _("Add one finding type ID per line.")
 
 FINDING_DATETIME_HELP_TEXT = _("Add the date and time of your finding (UTC)")
 
+RAW_FILE_DATETIME_HELP_TEXT = _("Add the date and time of when the raw file was generated (UTC)")
+
 OBSERVED_AT_HELP_TEXT = _(
     "OpenKAT stores a time indication with every observation, "
     "so it is possible to see the status of your network through time. "

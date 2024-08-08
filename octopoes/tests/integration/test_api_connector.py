@@ -10,7 +10,8 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
 from octopoes.models.ooi.dns.records import DNSAAAARecord, DNSARecord, DNSMXRecord, DNSNSRecord
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network
+from octopoes.models.ooi.findings import Finding, KATFindingType, RiskLevelSeverity
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, PortState, Protocol
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.web import Website
 from octopoes.models.origin import OriginType
@@ -34,6 +35,7 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
         Observation(
             method="normalizer_id",
             source=network.reference,
+            source_method="manual",
             task_id=task_id,
             valid_time=valid_time,
             result=hostnames,
@@ -55,6 +57,7 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
         "method": "normalizer_id",
         "origin_type": OriginType.OBSERVATION,
         "source": network.reference,
+        "source_method": "manual",
         "result": [hostname.reference for hostname in hostnames],
         "task_id": task_id,
     }
@@ -153,6 +156,7 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
         Observation(
             method="normalizer_id",
             source=network.reference,
+            source_method="manual",
             task_id=uuid.uuid4(),
             valid_time=valid_time,
             result=all_new_oois,
@@ -221,3 +225,98 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
     assert len(result) == 3
     assert result[0][0] == hostnames[0].reference
     assert result[0][1] == dns_ns_records[0]
+
+
+def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector):
+    first_valid_time = datetime.now(timezone.utc)
+    import time
+
+    network = Network(name="test")
+    octopoes_api_connector.save_declaration(
+        Declaration(
+            ooi=network,
+            valid_time=first_valid_time,
+        )
+    )
+
+    ip = IPAddressV4(network=network.reference, address="10.10.10.10")
+    tcp_port = IPPort(
+        address=ip.reference,
+        protocol=Protocol.TCP,
+        port=3306,
+        state=PortState.OPEN,
+    )
+
+    octopoes_api_connector.save_observation(
+        Observation(
+            method="kat_nmap_normalize",
+            source=ip.reference,
+            source_method="nmap",
+            task_id=uuid.uuid4(),
+            valid_time=first_valid_time,
+            result=[ip, tcp_port],
+        )
+    )
+
+    octopoes_api_connector.save_many_scan_profiles(
+        [DeclaredScanProfile(reference=ooi.reference, level=ScanLevel.L2) for ooi in [ip, tcp_port, network]],
+        first_valid_time,
+    )
+    second_valid_time = datetime.now(timezone.utc)
+
+    time.sleep(2)
+    octopoes_api_connector.recalculate_bits()
+    time.sleep(2)
+
+    findings = octopoes_api_connector.list_findings({severity for severity in RiskLevelSeverity}, second_valid_time)
+
+    assert findings.items == [
+        Finding(
+            finding_type=KATFindingType(id="KAT-OPEN-DATABASE-PORT").reference,
+            description="Port 3306/tcp is a database port and should not be open.",
+            ooi=tcp_port.reference,
+        )
+    ]
+
+    udp_port = IPPort(
+        address=ip.reference,
+        protocol=Protocol.UDP,
+        port=53,
+        state=PortState.OPEN,
+    )
+
+    octopoes_api_connector.save_observation(
+        Observation(
+            method="kat_nmap_normalize",
+            source=ip.reference,
+            source_method="nmap-udp",
+            task_id=uuid.uuid4(),
+            valid_time=second_valid_time,
+            result=[ip, udp_port],
+        )
+    )
+
+    octopoes_api_connector.save_scan_profile(
+        DeclaredScanProfile(reference=udp_port.reference, level=ScanLevel.L2),
+        second_valid_time,
+    )
+
+    assert octopoes_api_connector.get(udp_port.reference, second_valid_time)
+
+    octopoes_api_connector.recalculate_bits()
+    time.sleep(2)
+
+    third_valid_time = datetime.now(timezone.utc)
+
+    assert octopoes_api_connector.get(udp_port.reference, third_valid_time)
+
+    findings = octopoes_api_connector.list_findings({severity for severity in RiskLevelSeverity}, third_valid_time)
+    assert octopoes_api_connector.get(tcp_port.reference, third_valid_time)
+
+    assert findings.items == [
+        Finding(
+            finding_type=KATFindingType(id="KAT-OPEN-DATABASE-PORT").reference,
+            description="Port 3306/tcp is a database port and should not be open.",
+            ooi=tcp_port.reference,
+        )
+    ]

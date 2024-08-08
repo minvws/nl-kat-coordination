@@ -19,14 +19,6 @@ class ScheduleAPI:
         self.api.add_api_route(
             path="/schedules",
             endpoint=self.list,
-            methods=["GET"],
-            response_model=utils.PaginatedResponse,
-            status_code=200,
-            description="List all schedules",
-        )
-        self.api.add_api_route(
-            path="/schedules",
-            endpoint=self.list,
             methods=["GET", "POST"],
             response_model=utils.PaginatedResponse,
             status_code=200,
@@ -157,11 +149,11 @@ class ScheduleAPI:
                 detail="no data to patch",
             )
 
-        try:
-            # Update schedule
-            updated_schedule = schedule_db.model_copy(update=patch_data)
+        # Update schedule
+        updated_schedule = schedule_db.model_copy(update=patch_data)
 
-            # Validate schedule, model_copy() does not validate the model
+        # Validate schedule, model_copy() does not validate the model
+        try:
             models.Schedule(**updated_schedule.dict())
         except pydantic.ValidationError as exc:
             raise fastapi.HTTPException(
