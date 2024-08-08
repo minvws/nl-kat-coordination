@@ -134,8 +134,11 @@ class OctopoesAPIConnector:
     def list_origins(
         self,
         valid_time: datetime,
+        offset: int = DEFAULT_OFFSET,
+        limit: int = DEFAULT_LIMIT,
         source: Reference | None = None,
         result: Reference | None = None,
+        method: str | list[str] | None = None,
         task_id: UUID | None = None,
         origin_type: OriginType | None = None,
     ) -> list[Origin]:
@@ -143,8 +146,11 @@ class OctopoesAPIConnector:
             "valid_time": str(valid_time),
             "source": source,
             "result": result,
+            "offset": offset,
+            "limit": limit,
+            "method": method,
             "task_id": str(task_id) if task_id else None,
-            "origin_type": str(origin_type) if origin_type else None,
+            "origin_type": str(origin_type.value) if origin_type else None,
         }
         params = {k: v for k, v in params.items() if v is not None}  # filter out None values
         res = self.session.get(
@@ -153,6 +159,14 @@ class OctopoesAPIConnector:
         )
 
         return TypeAdapter(list[Origin]).validate_json(res.content)
+
+    def delete_origin(self, origin_id: str, valid_time: datetime) -> None:
+        params = {
+            "valid_time": str(valid_time),
+            "origin_id": origin_id,
+        }
+
+        self.session.delete(f"/{self.client}/origins", params=params)
 
     def save_observation(self, observation: Observation) -> None:
         self.session.post(
@@ -339,3 +353,11 @@ class OctopoesAPIConnector:
 
     def import_new(self, content):
         return self.session.post(f"/{self.client}/io/import/new", content=content).json()
+
+    def _bulk_migrate_origins(self, origins: list[Origin], valid_time: datetime) -> None:
+        """Single-purpose method that should not be used outside the migration, hence private"""
+
+        params = {"valid_time": str(valid_time)}
+        self.session.post(
+            f"/{self.client}/origins/migrate", params=params, json=[json.loads(x.model_dump_json()) for x in origins]
+        )
