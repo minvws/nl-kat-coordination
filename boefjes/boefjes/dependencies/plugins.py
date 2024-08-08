@@ -150,12 +150,7 @@ class PluginService:
     def delete_settings(self, organisation_id: str, plugin_id: str):
         self.config_storage.delete(organisation_id, plugin_id)
 
-        try:
-            self._assert_settings_match_schema({}, organisation_id, plugin_id)
-        except SettingsNotConformingToSchema:
-            logger.warning("Making sure %s is disabled for %s because settings are deleted", plugin_id, organisation_id)
-
-            self.set_enabled_by_id(plugin_id, organisation_id, False)
+        # We don't check the schema anymore because we can provide entries through the global environment as well
 
     def schema(self, plugin_id: str) -> dict | None:
         return self.local_repo.schema(plugin_id)
@@ -179,9 +174,7 @@ class PluginService:
             return ""
 
     def set_enabled_by_id(self, plugin_id: str, organisation_id: str, enabled: bool):
-        if enabled:
-            all_settings = self.get_all_settings(organisation_id, plugin_id)
-            self._assert_settings_match_schema(all_settings, organisation_id, plugin_id)
+        # We don't check the schema anymore because we can provide entries through the global environment as well
 
         try:
             self._put_boefje(plugin_id)
