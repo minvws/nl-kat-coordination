@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from urllib.parse import unquote
 
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
@@ -10,6 +11,7 @@ from django.views.generic.edit import FormView
 from httpx import HTTPError, HTTPStatusError
 from tools.forms.upload_raw import UploadRawForm
 
+from octopoes.models.types import OOI_TYPES
 from rocky.bytes_client import get_bytes_client
 
 
@@ -59,9 +61,17 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
     def process_raw(self, form):
         raw_file = form.cleaned_data["raw_file"]
         mime_types = form.cleaned_data["mime_types"]
+        input_ooi = form.cleaned_data["ooi"]
+        valid_time = form.cleaned_data["date"]
 
         try:
-            get_bytes_client(self.organization.code).upload_raw(raw_file.read(), mime_types)
+            get_bytes_client(self.organization.code).upload_raw(
+                raw_file.read(),
+                mime_types,
+                input_ooi=input_ooi.primary_key,
+                input_dict=input_ooi.serialize(),
+                valid_time=valid_time,
+            )
         except HTTPStatusError as exc:
             return self.add_error_notification(
                 _("Raw file could not be uploaded to Bytes: status code %d") % exc.response.status_code
@@ -70,3 +80,28 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
             return self.add_error_notification(_("Raw file could not be uploaded to Bytes: %s") % str(exc))
         else:
             self.add_success_notification(_("Raw file successfully added."))
+
+    def get_form_kwargs(self):
+        kwargs = {
+            "connector": self.octopoes_api_connector,
+            "ooi_list": self.get_ooi_options(),
+        }
+        kwargs.update(super().get_form_kwargs())
+
+        if "ooi_class" in kwargs:
+            del kwargs["ooi_class"]
+
+        observed_at = self.request.GET.get("observed_at")
+        if observed_at:
+            kwargs["observed_at"] = observed_at
+
+        return kwargs
+
+    def get_ooi_options(self) -> list[tuple[str, str]]:
+        objects = self.octopoes_api_connector.list_objects(
+            set(OOI_TYPES.values()), valid_time=datetime.now(timezone.utc)
+        ).items
+
+        options = [(o.primary_key, o.get_ooi_type()) for o in objects]
+
+        return options

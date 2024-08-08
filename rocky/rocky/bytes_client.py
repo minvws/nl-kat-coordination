@@ -70,17 +70,24 @@ class BytesClient:
             ),
         )
 
-    def upload_raw(self, raw: bytes, manual_mime_types: set[str], input_ooi: str | None = None) -> str:
+    def upload_raw(
+        self,
+        raw: bytes,
+        manual_mime_types: set[str],
+        input_ooi: str | None = None,
+        input_dict: dict | None = None,
+        valid_time: datetime | None = None,
+    ) -> str:
         self.login()
 
         boefje_meta = BoefjeMeta(
             id=uuid.uuid4(),
             boefje=Boefje(id="manual"),
             input_ooi=input_ooi,
-            arguments={},
+            arguments={"input": input_dict} if input_dict else {},
             organization=self.organization,
-            started_at=datetime.now(timezone.utc),
-            ended_at=datetime.now(timezone.utc),
+            started_at=valid_time or datetime.now(timezone.utc),
+            ended_at=valid_time or datetime.now(timezone.utc),
         )
 
         self._save_boefje_meta(boefje_meta)
