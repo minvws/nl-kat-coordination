@@ -1,6 +1,8 @@
+from datetime import date, datetime, timezone
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from tools.forms.base import BaseRockyForm
+from tools.forms.base import BaseRockyForm, DateInput
 
 from reports.report_types.definitions import Report
 
@@ -28,3 +30,111 @@ class ReportTypeMultiselectForm(BaseRockyForm):
         super().__init__(*args, **kwargs)
         report_types_choices = ((report_type.id, report_type.name) for report_type in report_types)
         self.fields["report_type"].choices = report_types_choices
+
+
+class ReportScheduleForm(BaseRockyForm):
+    start_date = forms.DateField(
+        label=_("Start date"),
+        widget=DateInput(format="%Y-%m-%d"),
+        initial=lambda: datetime.now(tz=timezone.utc).date(),
+        required=False,
+    )
+
+    recurrence = forms.ChoiceField(
+        widget=forms.Select,
+        choices=[
+            ("no_repeat", _("Does not repeat")),
+            ("daily", _("Daily")),
+            ("weekly", _("Weekly")),
+            ("monthly", _("Monthly")),
+            ("yearly", _("Yearly")),
+        ],
+    )
+
+    def is_valid_day_for_monthly_recurrence(self, start_date: date, recurrence: str) -> bool:
+        day = start_date.day
+        if recurrence == "monthly":
+            if day == 29:
+                self.add_error("start_date", _("Warning: Recurrence is set in February only for leap years."))
+                return False
+            if day == 30:
+                self.add_error("start_date", _("Warning: Recurrence is not set for February."))
+                return False
+            if day == 31:
+                self.add_error("start_date", _("Warning: Recurrence will skip months that does not have 31 days."))
+                return False
+        return True
+
+    def convert_recurrence_to_cron_expressions(self, start_date: date, recurrence: str) -> str:
+        """
+        Because there is no time defined for the start date, we use midnight 00:00 for all expressions.
+        """
+
+        day = start_date.day
+        weekday = start_date.strftime("%a").upper()  # ex. THU
+        month = start_date.strftime("%b").upper()  # ex. AUG
+
+        cron_expr = {
+            "daily": "0 0 0 ? * * *",  # Recurres every day at 00:00
+            "weekly": f"0 0 0 ? * {weekday} *",  # Recurres on every {weekday} at 00:00
+            "monthly": f"0 0 0 {day} * ? *",  # Recurres on the {day} of the month at 00:00
+            "yearly": f"0 0 0 {day} {month} ? *",  # Recurres every year on the {day} of the {month} at 00:00
+        }
+
+        return cron_expr[recurrence]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get("start_date")
+        recurrence = cleaned_data.get("recurrence")
+
+        if start_date and recurrence:
+            self.is_valid_day_for_monthly_recurrence(start_date, recurrence)
+
+        return cleaned_data
+
+
+class CustomReportScheduleForm(BaseRockyForm):
+    start_date = forms.DateField(
+        label=_("Start date"),
+        widget=DateInput(format="%Y-%m-%d"),
+        initial=lambda: datetime.now(tz=timezone.utc).date(),
+        required=False,
+    )
+    repeating_number = forms.IntegerField(initial=1, required=False, min_value=1, max_value=100)
+    repeating_term = forms.ChoiceField(
+        widget=forms.Select,
+        choices=[
+            ("day", _("day")),
+            ("week", _("week")),
+            ("month", _("month")),
+            ("year", _("year")),
+        ],
+    )
+    on_weekdays = forms.ChoiceField(
+        widget=forms.RadioSelect,
+        choices=[
+            ("monday", "M"),
+            ("tuesday", "T"),
+            ("wednesday", "W"),
+            ("thursday", "T"),
+            ("friday", "F"),
+            ("saturday", "S"),
+            ("sunday", "S"),
+        ],
+    )
+    recurrence_ends = forms.ChoiceField(
+        widget=forms.RadioSelect,
+        choices=[
+            ("never", _("Never")),
+            ("on", _("On")),  # user choses a specific date
+            ("after", _("After")),  # after how many occurrences? Shows drop down with occurrences
+        ],
+    )
+
+    end_date = forms.DateField(
+        label=_(""),
+        widget=forms.HiddenInput(),
+        initial=lambda: datetime.now(tz=timezone.utc).date(),
+        required=False,
+    )
