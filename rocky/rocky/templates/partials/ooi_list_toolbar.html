@@ -10,23 +10,16 @@
             <div id="export-add" aria-expanded="false" class="dropdown-list">
                 <ul>
                     <li>
-                        <a href="{% url 'ooi_add_type_select' organization.code %}">
-                            <div>
-                                <span class="icon ti-plus"></span>{% translate "Add object" %}
-                            </div>
-                            <span class="nota-bene">Lorem ipsum</span>
-                        </a>
+                        <a href="{% url 'ooi_add_type_select' organization.code %}"><span class="icon ti-plus"></span>{% translate "Add object" %}</a>
                     </li>
                     <li>
-                        <a href="{% url 'scan_list' organization.code %}"><span class="icon ti-eye-plus"></span>{% translate "Scan for objects" %}</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li>
-                        <a href="{% url 'upload_raw' organization.code %}"><span class="icon ti-file"></span>{% translate "Upload raw file" %}</a>
+                        <a href="{% url 'scan_list' organization.code %}"><span class="icon ti-eye-plus" aria-hidden="true"></span>{% translate "Scan for objects" %}</a>
                     </li>
                     <li>
-                        <a href="{% url 'upload_csv' organization.code %}"><span class="icon ti-file-type-csv"></span>{% translate "Upload CSV" %}</a>
+                        <a href="{% url 'upload_raw' organization.code %}"><span class="icon ti-file" aria-hidden="true"></span>{% translate "Upload raw file" %}</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'upload_csv' organization.code %}"><span class="icon ti-file-type-csv" aria-hidden="true"></span>{% translate "Upload CSV" %}</a>
                     </li>
                 </ul>
             </div>
