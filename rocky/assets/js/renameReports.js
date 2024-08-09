@@ -6,7 +6,7 @@ function initResetButtons() {
   const resetButtons = document.querySelectorAll(".reset-button");
 
   resetButtons.forEach((button) => {
-    button.classList.add("visually-hidden");
+    button.classList.add("hidden");
 
     let input = button.closest("tr").querySelector(".name-input");
 
@@ -14,6 +14,7 @@ function initResetButtons() {
 
     button.addEventListener("click", function (event) {
       input.value = input.defaultvalue;
+      button.classList.add("hidden");
     });
   });
 
@@ -25,10 +26,13 @@ function watchInputChanges() {
 
   nameInputs.forEach((input) => {
     input.addEventListener("change", function (event) {
-      input
-        .closest("tr")
-        .querySelector(".reset-button")
-        .classList.remove("visually-hidden");
+      let button = input.closest("tr").querySelector(".reset-button");
+
+      if (input.defaultvalue == input.value) {
+        button.classList.add("hidden");
+      } else {
+        button.classList.remove("hidden");
+      }
     });
   });
 }
