@@ -10,17 +10,19 @@
             {% endif %}
             <span class="icon ti-chevron-down"></span>
         </button>
-        <ul class="dropdown-list">
-            <li>
-                <a href="{% url "crisis_room" %}">{% translate "All organizations" %}</a>
-            </li>
-            {% for org in organizations_including_blocked %}
-                {% if organization.code != org.code %}
-                    <li>
-                        <a href="{% url "organization_crisis_room" org.code %}">{{ org.name }}</a>
-                    </li>
-                {% endif %}
-            {% endfor %}
-        </ul>
+        <div class="dropdown-list">
+            <ul>
+                <li>
+                    <a href="{% url "crisis_room" %}">{% translate "All organizations" %}</a>
+                </li>
+                {% for org in organizations_including_blocked %}
+                    {% if organization.code != org.code %}
+                        <li>
+                            <a href="{% url "organization_crisis_room" org.code %}">{{ org.name }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 {% endif %}
