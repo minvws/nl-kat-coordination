@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+import structlog.contextvars
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -70,6 +71,9 @@ class OrganizationView(View):
         super().setup(request, *args, **kwargs)
 
         organization_code = kwargs["organization_code"]
+        # bind organization_code to log context
+        structlog.contextvars.bind_contextvars(organization_code=organization_code)
+
         try:
             self.organization = Organization.objects.get(code=organization_code)
         except Organization.DoesNotExist:
