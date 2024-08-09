@@ -1,14 +1,11 @@
 """Boefje script for getting namserver version"""
 
 import json
-import logging
 from os import getenv
 
 import dns
 
 from boefjes.job_models import BoefjeMeta
-
-logger = logging.getLogger(__name__)
 
 
 def run(boefje_meta: BoefjeMeta) -> list[tuple[set, str | bytes]]:
@@ -23,9 +20,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, str | bytes]]:
 
     timeout = float(getenv("TIMEOUT", 30))
 
-    method = dns.query.tcp
-    if protocol == "udp":
-        method = dns.query.udp
+    method = dns.query.udp if protocol == "udp" else dns.query.tcp
 
     queries = [
         dns.message.make_query("VERSION.BIND", dns.rdatatype.TXT, dns.rdataclass.CHAOS),
