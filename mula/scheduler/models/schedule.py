@@ -43,8 +43,8 @@ class Schedule(BaseModel):
         if "deadline_at" in data:
             self._deadline_at = data["deadline_at"]
 
-    @computed_field
     @property
+    @computed_field
     def deadline_at(self) -> datetime | None:
         """Two ways to calculate the deadline_at:
         1. If the deadline_at is set, return it.

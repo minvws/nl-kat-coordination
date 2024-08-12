@@ -6,9 +6,9 @@ from unittest import mock
 from urllib.parse import quote
 
 from fastapi.testclient import TestClient
-
 from scheduler import config, models, server, storage, utils
 from scheduler.server import serializers
+
 from tests.factories import OrganisationFactory
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
