@@ -113,7 +113,10 @@
                                 {{ plugin_name }} is able to scan the following object types:
                             {% endblocktranslate %}
                         </p>
-                        <p>{{ plugin.consumes }}</p>
+                        {% for consumes in plugin.consumes_human_readable %}
+                            {{ consumes }}
+                            {% if not forloop.last %}-{% endif %}
+                        {% endfor %}
                     {% else %}
                         {% blocktranslate trimmed with plugin_name=plugin.name %}
                             {{ plugin_name }} does not need any input objects.
