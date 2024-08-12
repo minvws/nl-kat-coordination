@@ -7,6 +7,7 @@ from logging import getLogger
 from operator import itemgetter
 from typing import Any
 
+from asgiref.sync import sync_to_async
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
 from httpx import HTTPError
 from pydantic import AwareDatetime
@@ -531,6 +532,7 @@ def exporter(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> Any:
     return xtdb_session_.client.export_transactions()
 
 
+@sync_to_async
 def importer(data: bytes, xtdb_session_: XTDBSession, reset: bool = False) -> dict[str, int]:
     try:
         ops: list[dict[str, Any]] = list(map(itemgetter("txOps"), json.loads(data)))
@@ -568,21 +570,21 @@ def importer(data: bytes, xtdb_session_: XTDBSession, reset: bool = False) -> di
 
 
 @router.post("/io/import/add", tags=["io"])
-def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
+async def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
     try:
-        data = request.body()
+        data = await request.body()
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
-    return importer(data, xtdb_session_)
+    return await importer(data, xtdb_session_)
 
 
 @router.post("/io/import/new", tags=["io"])
-def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
+async def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
     try:
-        data = request.body()
+        data = await request.body()
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
-    return importer(data, xtdb_session_, True)
+    return await importer(data, xtdb_session_, True)
 
 
 @router.post("/origins/migrate", tags=["Origins"])
