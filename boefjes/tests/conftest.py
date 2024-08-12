@@ -1,6 +1,8 @@
 import multiprocessing
 import time
+import uuid
 from datetime import datetime, timezone
+from ipaddress import ip_address
 from multiprocessing import Manager
 from pathlib import Path
 from uuid import UUID
@@ -8,12 +10,24 @@ from uuid import UUID
 import pytest
 from fastapi.testclient import TestClient
 from pydantic import TypeAdapter
+from sqlalchemy.orm import sessionmaker
 
 from boefjes.app import SchedulerWorkerManager
+from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import Queue, QueuePrioritizedItem, SchedulerClientInterface, Task, TaskStatus
-from boefjes.config import Settings
+from boefjes.config import Settings, settings
+from boefjes.job_handler import bytes_api_client
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
+from boefjes.models import Organisation
 from boefjes.runtime_interfaces import Handler, WorkerManager
+from boefjes.sql.db import SQL_BASE, get_engine
+from boefjes.sql.organisation_storage import SQLOrganisationStorage
+from octopoes.api.models import Declaration, Observation
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import OOI
+from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network
+from octopoes.models.ooi.service import IPService, Service
 from tests.loading import get_dummy_data
 
 
@@ -131,3 +145,104 @@ def api(tmp_path):
     from boefjes.api import app
 
     return TestClient(app)
+
+
+@pytest.fixture
+def organisation_repository():
+    engine = get_engine()
+    session = sessionmaker(bind=engine)()
+
+    yield SQLOrganisationStorage(session, settings)
+
+    session.execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables]))
+    session.close()
+
+
+@pytest.fixture
+def organisation(organisation_repository) -> Organisation:
+    organisation = Organisation(id="test", name="Test org")
+
+    with organisation_repository as repo:
+        repo.create(organisation)
+
+    return organisation
+
+
+@pytest.fixture
+def octopoes_api_connector(organisation) -> OctopoesAPIConnector:
+    connector = OctopoesAPIConnector(str(settings.octopoes_api), organisation.id)
+    connector.create_node()
+    yield connector
+    connector.delete_node()
+
+
+@pytest.fixture
+def bytes_client(request) -> BytesAPIClient:
+    return bytes_api_client
+
+
+@pytest.fixture
+def valid_time():
+    return datetime.now(timezone.utc)
+
+
+def seed_system(
+    octopoes_api_connector: OctopoesAPIConnector,
+    valid_time: datetime,
+    test_hostname: str = "example.com",
+    test_ip: str = "192.0.2.3",
+    test_ipv6: str = "3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
+    method: str = "kat_nmap_normalize",
+) -> dict[str, list[OOI]]:
+    network = Network(name="test")
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
+
+    hostnames = [
+        Hostname(network=network.reference, name=test_hostname),
+        Hostname(network=network.reference, name=f"a.{test_hostname}"),
+        Hostname(network=network.reference, name=f"b.{test_hostname}"),
+        Hostname(network=network.reference, name=f"c.{test_hostname}"),
+        Hostname(network=network.reference, name=f"d.{test_hostname}"),
+        Hostname(network=network.reference, name=f"e.{test_hostname}"),
+        Hostname(network=network.reference, name=f"f.{test_hostname}"),
+    ]
+
+    addresses = [
+        IPAddressV4(network=network.reference, address=ip_address(test_ip)),
+        IPAddressV6(network=network.reference, address=ip_address(test_ipv6)),
+    ]
+    ports = [
+        IPPort(address=addresses[0].reference, protocol="tcp", port=25),
+        IPPort(address=addresses[0].reference, protocol="tcp", port=443),
+        IPPort(address=addresses[0].reference, protocol="tcp", port=22),
+        IPPort(address=addresses[1].reference, protocol="tcp", port=80),
+    ]
+    services = [Service(name="smtp"), Service(name="https"), Service(name="http"), Service(name="ssh")]
+    ip_services = [
+        IPService(ip_port=ports[0].reference, service=services[0].reference),
+        IPService(ip_port=ports[1].reference, service=services[1].reference),
+        IPService(ip_port=ports[2].reference, service=services[3].reference),
+        IPService(ip_port=ports[3].reference, service=services[2].reference),
+    ]
+
+    oois = hostnames + addresses + ports + services + ip_services
+
+    octopoes_api_connector.save_observation(
+        Observation(
+            method=method,
+            source_method=None,
+            source=hostnames[0].reference,
+            task_id=uuid.uuid4(),
+            valid_time=valid_time,
+            result=oois,
+        )
+    )
+    octopoes_api_connector.recalculate_bits()
+
+    return {
+        "hostnames": hostnames,
+        "addresses": addresses,
+        "ports": ports,
+        "services": services,
+        "ip_services": ip_services,
+    }
