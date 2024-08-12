@@ -164,23 +164,24 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
                     default_args["value"] = record_value[2]
                     register_record(DNSCAARecord(**default_args))
 
-                if isinstance(rr, LOC) or isinstance(rr, GPOS):
+                if isinstance(rr, (LOC, GPOS)):
                     default_args.update({
                         "value": rr.to_text(),
                         "latitude": rr.float_lontitude(),
                         "longitude": rr.float_longtitude(),
                         "altitude": rr.float_altitude(),
                     })
+
                     if isinstance(rr, LOC):
                         default_args.update({
                             "horizontal_precision": rr.horizontal_precision(),
-                            "horizontal_precision": rr.vertical_precision(),
+                            "vertical_precision": rr.vertical_precision(),
                             "size": rr.size(),
                         })
                         locrecord = register_record(DNSLOCRecord(**default_args))
-                    else: 
+                    else:
                         locrecord = register_record(DNSGPOSRecord(**default_args))
-                    
+
                     geopoint = {
                         "ooi": locrecord.reference,
                         "latitude": rr.float_lontitude(),
@@ -188,8 +189,8 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
                     }
                     register_record(GeographicPoint(**geopoint))
 
-                
-        
+
+
     # link the hostnames to their discovered zones
     for hostname_, zone in zone_links.items():
         hostname_store[hostname_].dns_zone = zone.reference
