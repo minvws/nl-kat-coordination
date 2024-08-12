@@ -204,6 +204,7 @@ class DNSGPOSRecord(DNSRecord):
 
     _reverse_relation_names = {"hostname": "dns_gpos_records"}
 
+
 class DNSLOCRecord(DNSRecord):
     # RFC 1876
     object_type: Literal["DNSLOCRecord"] = "DNSLOCRecord"
@@ -216,7 +217,6 @@ class DNSLOCRecord(DNSRecord):
     horizontal_precision: int | None = None
     vertical_precision: int | None = None
     size: int | None = None
-
 
     @property
     def natural_key(self) -> str:
