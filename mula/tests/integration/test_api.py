@@ -7,7 +7,7 @@ from urllib.parse import quote
 
 from fastapi.testclient import TestClient
 
-from scheduler import config, models, server, storage
+from scheduler import config, models, server, storage, utils
 from scheduler.server import serializers
 from tests.factories import OrganisationFactory
 from tests.mocks import queue as mock_queue
@@ -953,6 +953,26 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
         self.assertEqual(201, response.status_code)
         self.assertEqual(item.hash, response.json().get("hash"))
         self.assertEqual(item.data, response.json().get("data"))
+
+        # Deadline should be set to the next run of the schedule
+        self.assertEqual(
+            utils.cron.next_run("*/5 * * * *"),
+            datetime.fromisoformat(response.json().get("deadline_at")),
+        )
+
+    def test_post_schedule_invalid_schedule(self):
+        item = functions.create_item(self.scheduler.scheduler_id, 1)
+        response = self.client.post(
+            "/schedules",
+            json={
+                "scheduler_id": item.scheduler_id,
+                "schedule": "invalid",
+                "hash": item.hash,
+                "data": item.data,
+            },
+        )
+        self.assertEqual(400, response.status_code)
+        self.assertIn("validation error", response.json().get("detail"))
 
     def test_get_schedule(self):
         response = self.client.get(f"/schedules/{str(self.first_schedule.id)}")

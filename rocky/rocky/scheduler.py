@@ -242,9 +242,7 @@ class SchedulerClient:
     # TODO
     def list_schedules(self, **kwargs) -> PaginatedSchedulesResponse:
         try:
-            kwargs = {
-                k: v for k, v in kwargs.items() if v is not None
-            }  # filter Nones from kwargs
+            kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
             res = self._client.get("/schedules", params=kwargs)
             res.raise_for_status()
             return PaginatedSchedulesResponse.model_validate_json(res.content)
