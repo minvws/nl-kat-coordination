@@ -40,8 +40,9 @@ def upgrade() -> None:
                     instance = storage._db_boefje_instance_by_id(plugin.id)
                     instance.schema = schema
                     storage.session.add(instance)
+                    logger.info("Updated database entry for plugin %s", plugin.id)
                 except PluginNotFound:
-                    logger.exception("Could not set schema for plugin %s", plugin.id)
+                    logger.info("No database entry for plugin %s", plugin.id)
                     continue
 
     session.close()
