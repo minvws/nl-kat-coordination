@@ -193,9 +193,9 @@ class DNSGPOSRecord(DNSRecord):
     dns_record_type: Literal["GPOS"] = "GPOS"
 
     latitude: str | None = None
-    longitude: str | None = None    
+    longitude: str | None = None
     altitude: str | None = None
-    
+
     @property
     def natural_key(self) -> str:
         sha = hashlib.sha1(self.value.encode("UTF-8")).hexdigest()
@@ -204,13 +204,24 @@ class DNSGPOSRecord(DNSRecord):
 
     _reverse_relation_names = {"hostname": "dns_gpos_records"}
 
-class DNSLOCRecord(DNSGPOSRecord):
+class DNSLOCRecord(DNSRecord):
     # RFC 1876
     object_type: Literal["DNSLOCRecord"] = "DNSLOCRecord"
     dns_record_type: Literal["LOC"] = "LOC"
 
+    latitude: str | None = None
+    longitude: str | None = None
+    altitude: str | None = None
+
     horizontal_precision: int | None = None
     vertical_precision: int | None = None
     size: int | None = None
-    
+
+
+    @property
+    def natural_key(self) -> str:
+        sha = hashlib.sha1(self.value.encode("UTF-8")).hexdigest()
+        key = super().natural_key
+        return key.replace(self.value, sha)
+
     _reverse_relation_names = {"hostname": "dns_loc_records"}
