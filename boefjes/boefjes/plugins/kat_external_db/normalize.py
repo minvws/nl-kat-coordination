@@ -31,16 +31,16 @@ def follow_path_in_dict(path, path_dict):
     return path_dict
 
 
-def get_indemnification_level(path_dict, path=INDEMNIFICATION_ITEM_PATH, default=DEFAULT_INDEMNIFICATION_LEVEL):
+def get_indemnification_level(path_dict):
     """Return indemnification level from metadata or default."""
     try:
-        indemnification_level = int(follow_path_in_dict(path=path, path_dict=path_dict))
+        indemnification_level = int(follow_path_in_dict(path=INDEMNIFICATION_ITEM_PATH, path_dict=path_dict))
         if 0 < indemnification_level < 5:
             return indemnification_level
         raise ValueError(f"Invalid indemnificationlevel {indemnification_level}, aborting.")
     except KeyError:
         logging.info("No integer indemnification level found, using default.")
-        return default
+        return DEFAULT_INDEMNIFICATION_LEVEL
 
 
 def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
