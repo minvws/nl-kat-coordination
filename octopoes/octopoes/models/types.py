@@ -29,6 +29,8 @@ from octopoes.models.ooi.email_security import (
     DKIMKey,
     DKIMSelector,
     DMARCTXTRecord,
+    DNSGPOSRecord,
+    DNSLOCRecord,
     DNSSPFMechanismHostname,
     DNSSPFMechanismIP,
     DNSSPFMechanismNetBlock,
@@ -93,6 +95,8 @@ DnsRecordType = (
     | DNSSOARecord
     | DNSCNAMERecord
     | DNSCAARecord
+    | DNSLOCRecord
+    | DNSGPOSRecord
     | ResolvedHostname
     | NXDOMAIN
 )
