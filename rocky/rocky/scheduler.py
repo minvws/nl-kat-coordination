@@ -81,6 +81,14 @@ class BoefjeTask(BaseModel):
     organization: str
 
 
+class ReportTask(BaseModel):
+    type: str = "report"
+
+    organization: str
+
+    # TODO: add more fields
+
+
 class TaskStatus(Enum):
     # Task has been created but not yet queued
     PENDING = "pending"
@@ -120,7 +128,17 @@ class Task(BaseModel):
     modified_at: datetime.datetime | None = None
 
 
-class Schedule(BaseModel):
+class ScheduleRequest(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    scheduler_id: str
+    hash: str
+    data: dict
+    schedule: str
+    deadline_at: datetime.datetime | None = None
+
+
+class ScheduleResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
@@ -145,7 +163,7 @@ class PaginatedSchedulesResponse(BaseModel):
     count: int
     next: str | None = None
     previous: str | None = None
-    results: list[Schedule]
+    results: list[ScheduleResponse]
 
 
 class LazyTaskList:
@@ -239,7 +257,7 @@ class SchedulerClient:
         self._client = httpx.Client(base_url=base_uri)
         self.organization_code = organization_code
 
-    # TODO
+    # TODO: review the kwargs
     def list_schedules(self, **kwargs) -> PaginatedSchedulesResponse:
         try:
             kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
@@ -251,16 +269,29 @@ class SchedulerClient:
         except ConnectError:
             raise SchedulerConnectError(extra_message=_("Schedule list: "))
 
-    def get_schedule_details(self, schedule_id: str) -> Schedule:
+    def get_schedule_details(self, schedule_id: str) -> ScheduleResponse:
         try:
             res = self._client.get(f"/schedules/{schedule_id}")
             res.raise_for_status()
-            return Schedule.model_validate_json(res.content)
+            return ScheduleResponse.model_validate_json(res.content)
+        except ConnectError:
+            raise SchedulerConnectError()
+
+    def post_schedule(self, schedule: ScheduleRequest) -> ScheduleResponse:
+        try:
+            res = self._client.post(
+                "/schedules",
+                json=schedule.dict(exclude_none=True),
+            )
+            res.raise_for_status()
+            return ScheduleResponse.model_validate_json(res.content)
+        except ValidationError:
+            raise SchedulerValidationError()
         except ConnectError:
             raise SchedulerConnectError()
 
     # TODO: arguments, a Schedule model, a dict?
-    def patch_schedule(self, schedule_id: str, enabled: bool, schedule: string) -> None:
+    def patch_schedule(self, schedule_id: str, enabled: bool, schedule: str) -> None:
         # FIXME: this is just an example
         try:
             res = self._client.patch(
