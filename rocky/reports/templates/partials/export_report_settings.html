@@ -41,8 +41,7 @@
                                                 class="icon ti-arrow-back-up action-button reset-button"></button>
                                     </td>
                                     <td>
-                                        <select class="reference-date" name="reference-date">
-                                            <option disabled selected value="">-- {% translate "Select option" %} --</option>
+                                        <select class="reference-date" name="reference_date">
                                             <option value="">{% translate "No reference date" %}</option>
                                             <option value="{{ current_datetime|date:"N jS Y, H:i" }}">
                                                 {% translate "Day" %} ({{ current_datetime|date:"N jS Y, H:i" }})

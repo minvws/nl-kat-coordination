@@ -168,11 +168,29 @@ class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportV
     breadcrumbs_step = 6
     current_step = 4
 
+    @staticmethod
+    def finalise_report_names(report_names: list[str], reference_dates: list[str]) -> list[str]:
+        final_report_names = []
+
+        if len(report_names) == len(reference_dates):
+            for index, report_name in enumerate(report_names):
+                if reference_dates[index]:
+                    final_report_name = f"{report_name} {reference_dates[index]}"
+                else:
+                    final_report_name = report_name
+                final_report_names.append(final_report_name)
+        if not final_report_names:
+            return report_names
+        return final_report_names
+
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         old_report_names = request.POST.getlist("old_report_name")
-        new_report_names = request.POST.getlist("report_name")
-        report_names = list(zip(old_report_names, new_report_names))
-        report_ooi = self.save_report(report_names)
+        report_names = request.POST.getlist("report_name")
+        reference_dates = request.POST.getlist("reference_date")
+
+        final_report_names = list(zip(old_report_names, self.finalise_report_names(report_names, reference_dates)))
+
+        report_ooi = self.save_report(final_report_names)
 
         return redirect(
             reverse("view_report", kwargs={"organization_code": self.organization.code})
