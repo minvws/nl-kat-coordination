@@ -30,7 +30,7 @@ class Boefje(Plugin):
     scan_level: int = 1
     consumes: set[str] = Field(default_factory=set)
     produces: set[str] = Field(default_factory=set)
-    schema: dict = Field(default_factory=dict)
+    schema: dict | None = None
     runnable_hash: str | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
@@ -38,10 +38,9 @@ class Boefje(Plugin):
     @field_validator("schema")
     @classmethod
     def json_schema_valid(cls, schema: dict) -> dict:
-        val = Draft202012Validator({})
-        val.check_schema(schema)
-
-        return schema
+        if schema is not None:
+            Draft202012Validator.check_schema(schema)
+            return schema
 
     class Config:
         validate_assignment = True
