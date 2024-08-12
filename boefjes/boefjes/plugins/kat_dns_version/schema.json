@@ -5,7 +5,7 @@
     "TIMEOUT": {
       "title": "TIMEOUT",
       "type": "integer",
-      "description": "Timeout for requests to the dns serverst",
+      "description": "Timeout for requests to the targeted dns servers",
       "default": 30,
       "minimum": 0
     }
