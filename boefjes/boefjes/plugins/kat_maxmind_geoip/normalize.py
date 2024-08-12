@@ -7,7 +7,7 @@ from octopoes.models.ooi.geography import GeographicPoint
 
 
 def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
-    """Yields hostnames, IPv4/6 addresses or netblocks."""
+    """Yields GeographicPoints."""
     results = json.loads(raw)
     if not results:
         return

@@ -18,7 +18,7 @@ BASE_PATH = Path(getenv("OPENKAT_CACHE_PATH", Path(__file__).parent))
 GEOIP_PATH_PATTERN = r"GeoLite2-City_\d+/GeoLite2-City.mmdb"
 GEOIP_META_PATH = BASE_PATH / "geoip-meta.json"
 GEOIP_SOURCE_URL = "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz"
-GEOIP_CACHE_TIMEOUT = 7200  # in seconds
+GEOIP_CACHE_TIMEOUT = 86400  # in seconds
 HASHFUNC = "sha256"
 REQUEST_TIMEOUT = 30
 
@@ -63,11 +63,12 @@ def cache_out_of_date() -> bool:
 
 
 def refresh_geoip(algo: str) -> dict:
-    maxmind_user_id = getenv("MAXMIND_USER_ID", "")
+    maxmind_user_id = str(getenv("MAXMIND_USER_ID", ""))
     maxmind_licence_key = getenv("MAXMIND_LICENCE_KEY", "")
     source_url = getenv("GEOIP_SOURCE_URL", GEOIP_SOURCE_URL)
+    request_timeout = getenv("REQUEST_TIMEOUT", REQUEST_TIMEOUT)
     response = requests.get(
-        source_url, allow_redirects=True, timeout=REQUEST_TIMEOUT, auth=(maxmind_user_id, maxmind_licence_key)
+        source_url, allow_redirects=True, timeout=float(request_timeout), auth=(maxmind_user_id, maxmind_licence_key)
     )
     response.raise_for_status()
 
