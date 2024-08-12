@@ -146,7 +146,7 @@ def get_normalizer_meta(
 
 
 @router.post("/raw", tags=[RAW_TAG])
-async def create_raw(
+def create_raw(
     request: Request,
     boefje_meta_id: UUID,
     mime_types: list[str] | None = Query(None),
@@ -161,7 +161,7 @@ async def create_raw(
         if meta_repository.has_raw(meta, parsed_mime_types):
             return RawResponse(status="success", message="Raw data already present")
 
-        data = await request.body()
+        data = request.body()
 
         raw_data = RawData(value=data, boefje_meta=meta, mime_types=parsed_mime_types)
         with meta_repository:

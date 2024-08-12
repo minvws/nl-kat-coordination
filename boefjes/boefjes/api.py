@@ -85,7 +85,7 @@ async def root():
 
 
 @app.get("/api/v0/tasks/{task_id}", response_model=BoefjeInput)
-async def boefje_input(
+def boefje_input(
     task_id: UUID,
     scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),
     local_repository: LocalPluginRepository = Depends(get_local_repository),
@@ -102,7 +102,7 @@ async def boefje_input(
 
 
 @app.post("/api/v0/tasks/{task_id}")
-async def boefje_output(
+def boefje_output(
     task_id: UUID,
     boefje_output: BoefjeOutput,
     scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),

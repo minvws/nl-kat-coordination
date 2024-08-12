@@ -568,18 +568,18 @@ def importer(data: bytes, xtdb_session_: XTDBSession, reset: bool = False) -> di
 
 
 @router.post("/io/import/add", tags=["io"])
-async def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
+def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
     try:
-        data = await request.body()
+        data = request.body()
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
     return importer(data, xtdb_session_)
 
 
 @router.post("/io/import/new", tags=["io"])
-async def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
+def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
     try:
-        data = await request.body()
+        data = request.body()
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
     return importer(data, xtdb_session_, True)
