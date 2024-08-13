@@ -4,7 +4,8 @@
   "description": "Uses Nikto",
   "consumes": [
     "IPAddressV4",
-    "IPAddressV6"
+    "IPAddressV6",
+    "Hostname"
   ],
   "environment_keys": [],
   "scan_level": 3,
