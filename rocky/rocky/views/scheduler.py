@@ -34,15 +34,20 @@ class SchedulerView(OctopoesView):
             "scheduler_id": f"{self.task_type}-{self.organization.code}",
             "task_type": self.task_type,
             "plugin_id": None,  # plugin_id present and set at plugin detail
-            **self.get_form_data(),
+            **self.get_task_filter_form_data(),
         }
 
-    def get_form_data(self) -> dict[str, Any]:
+    def get_task_filter_form_data(self) -> dict[str, Any]:
         form_data = self.get_task_filter_form().data.dict()
         return {k: v for k, v in form_data.items() if v}
 
-    def count_active_filters(self):
-        return len(self.get_form_data())
+    def count_active_task_filters(self):
+        form_data = self.get_task_filter_form_data()
+
+        for task_filter in form_data.copy():
+            if task_filter == "observed_at" or task_filter == "ooi_id":
+                form_data.pop(task_filter)
+        return len(form_data)
 
     def get_task_filter_form(self) -> TaskFilterForm:
         return self.task_filter_form(self.request.GET)
