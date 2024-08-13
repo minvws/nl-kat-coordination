@@ -2,7 +2,6 @@ from unittest import TestCase
 
 from pydantic import parse_obj_as
 
-from boefjes.job_handler import serialize_ooi
 from boefjes.plugins.kat_leakix.normalize import run
 from octopoes.models.types import OOIType
 from tests.loading import get_dummy_data
@@ -22,7 +21,7 @@ class LeakIxNormalizerTest(TestCase):
             },
         )
 
-        output = [x for x in run(serialize_ooi(input_ooi), get_dummy_data("raw/leakix-example.com.json"))]
+        output = [x for x in run(input_ooi.serialize(), get_dummy_data("raw/leakix-example.com.json"))]
 
         self.assertEqual(170, len(output))
         self.assertEqual(get_dummy_data("raw/leakix-example.com-output.txt").decode().strip(), str(output))
