@@ -38,16 +38,16 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
         self.clearance_levels = request.GET.getlist("clearance_level", [])
         self.clearance_types = request.GET.getlist("clearance_type", [])
 
-    def get_active_filters(self) -> dict[str, str]:
-        active_filters = {}
-        if self.filtered_ooi_types:
-            active_filters[_("OOI types: ")] = ", ".join(self.filtered_ooi_types)
-        if self.clearance_levels:
-            clearance_level = ["L" + str(cl) for cl in self.clearance_levels]
-            active_filters[_("Clearance level: ")] = ", ".join(clearance_level)
-        if self.clearance_types:
-            active_filters[_("Clearance type: ")] = ", ".join(self.clearance_types)
-        return active_filters
+    def count_observed_at_filter(self) -> int:
+        return 1 if datetime.now(timezone.utc).date() != self.observed_at.date() else 0
+
+    def count_active_filters(self):
+        return (
+            len(self.filtered_ooi_types)
+            + len(self.clearance_levels)
+            + len(self.clearance_types)
+            + self.count_observed_at_filter()
+        )
 
     def get_ooi_scan_levels(self) -> set[ScanLevel]:
         if not self.clearance_levels:
@@ -68,15 +68,11 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
         context = super().get_context_data(**kwargs)
         context["observed_at"] = self.observed_at
         context["observed_at_form"] = self.get_connector_form()
-
         context["ooi_types_selection"] = self.filtered_ooi_types
-
         context["clearance_levels_selection"] = self.clearance_levels
         context["clearance_level_filter_form"] = ClearanceFilterForm(self.request.GET)
-
         context["clearance_types_selection"] = self.clearance_types
-
-        context["active_filters"] = self.get_active_filters()
+        context["active_filters_counter"] = self.count_active_filters()
         return context
 
 

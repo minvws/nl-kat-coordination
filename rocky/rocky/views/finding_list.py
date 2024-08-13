@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+from datetime import datetime, timezone
 from typing import Any
 
 import structlog
@@ -60,6 +61,12 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         self.exclude_muted = self.muted_findings == "non-muted"
         self.only_muted = self.muted_findings == "muted"
 
+    def count_observed_at_filter(self) -> int:
+        return 1 if datetime.now(timezone.utc).date() != self.observed_at.date() else 0
+
+    def count_active_filters(self):
+        return len(self.severities) + 1 if self.muted_findings else 0 + self.count_observed_at_filter()
+
     def get_queryset(self) -> FindingList:
         return FindingList(
             octopoes_connector=self.octopoes_api_connector,
@@ -76,6 +83,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         context["severity_filter"] = FindingSeverityMultiSelectForm({"severity": list(self.severities)})
         context["muted_findings_filter"] = MutedFindingSelectionForm({"muted_findings": self.muted_findings})
         context["only_muted"] = self.only_muted
+        context["active_filters_counter"] = self.count_active_filters()
         return context
 
 
