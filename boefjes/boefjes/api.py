@@ -85,7 +85,7 @@ async def root():
 
 
 @app.get("/api/v0/tasks/{task_id}", response_model=BoefjeInput)
-async def boefje_input(
+def boefje_input(
     task_id: UUID,
     scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),
     local_repository: LocalPluginRepository = Depends(get_local_repository),
@@ -102,7 +102,7 @@ async def boefje_input(
 
 
 @app.post("/api/v0/tasks/{task_id}")
-async def boefje_output(
+def boefje_output(
     task_id: UUID,
     boefje_output: BoefjeOutput,
     scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),
@@ -122,7 +122,7 @@ async def boefje_output(
     bytes_client.save_boefje_meta(boefje_meta)
 
     if boefje_output.files:
-        mime_types = _default_mime_types(task.p_item.data.boefje)
+        mime_types = _default_mime_types(task.data.boefje)
         for file in boefje_output.files:
             raw = base64.b64decode(file.content)
             # when supported, also save file.name to Bytes
@@ -149,13 +149,13 @@ def get_task(task_id, scheduler_client):
 
 
 def create_boefje_meta(task, local_repository):
-    boefje = task.p_item.data.boefje
+    boefje = task.data.boefje
     boefje_resource = local_repository.by_id(boefje.id)
     env_keys = boefje_resource.environment_keys
-    environment = get_environment_settings(task.p_item.data, env_keys) if env_keys else {}
+    environment = get_environment_settings(task.data, env_keys) if env_keys else {}
 
-    organization = task.p_item.data.organization
-    input_ooi = task.p_item.data.input_ooi
+    organization = task.data.organization
+    input_ooi = task.data.input_ooi
     arguments = {"oci_arguments": boefje_resource.oci_arguments}
 
     if input_ooi:
