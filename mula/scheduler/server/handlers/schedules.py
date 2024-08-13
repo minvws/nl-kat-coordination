@@ -5,16 +5,23 @@ from typing import Any
 import fastapi
 import pydantic
 import structlog
+from fastapi import status
 
-from scheduler import context, models, storage
+from scheduler import context, models, schedulers, storage
 from scheduler.server import serializers, utils
 
 
 class ScheduleAPI:
-    def __init__(self, api: fastapi.FastAPI, ctx: context.AppContext) -> None:
+    def __init__(
+        self,
+        api: fastapi.FastAPI,
+        ctx: context.AppContext,
+        s: dict[str, schedulers.Scheduler],
+    ) -> None:
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.api = api
         self.ctx = ctx
+        self.schedulers: dict[str, schedulers.Scheduler] = s
 
         self.api.add_api_route(
             path="/schedules",
@@ -120,6 +127,16 @@ class ScheduleAPI:
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
                 detail=f"failed to create schedule [exception: {exc}]",
             ) from exc
+
+        s = self.schedulers.get(new_schedule.scheduler_id)
+        if s is None:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="scheduler not found",
+            )
+
+        # TODO: validate data with task type
+        # TODO: create hash for schedule with task type
 
         try:
             self.ctx.datastores.schedule_store.create_schedule(new_schedule)
