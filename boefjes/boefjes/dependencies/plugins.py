@@ -153,7 +153,12 @@ class PluginService:
         # We don't check the schema anymore because we can provide entries through the global environment as well
 
     def schema(self, plugin_id: str) -> dict | None:
-        return self.local_repo.schema(plugin_id)
+        try:
+            boefje = self.plugin_storage.boefje_by_id(plugin_id)
+
+            return boefje.schema
+        except PluginNotFound:
+            return self.local_repo.schema(plugin_id)
 
     def cover(self, plugin_id: str) -> Path:
         try:

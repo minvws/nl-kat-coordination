@@ -11,6 +11,7 @@ from boefjes.plugins.models import (
     BOEFJES_DIR,
     ENTRYPOINT_NORMALIZERS,
     NORMALIZER_DEFINITION_FILE,
+    SCHEMA_FILE,
     BoefjeResource,
     ModuleException,
     NormalizerResource,
@@ -52,7 +53,7 @@ class LocalPluginRepository:
         if id_ not in boefjes:
             return None
 
-        path = boefjes[id_].path / "schema.json"
+        path = boefjes[id_].path / SCHEMA_FILE
 
         if not path.exists():
             logger.debug("Did not find schema for boefje %s", boefjes[id_])
