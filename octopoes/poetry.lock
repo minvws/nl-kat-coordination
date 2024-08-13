@@ -1551,6 +1551,7 @@ optional = false
 python-versions = "*"
 files = [
     {file = "requests-file-2.0.0.tar.gz", hash = "sha256:20c5931629c558fda566cacc10cfe2cd502433e628f568c34c80d96a0cc95972"},
+    {file = "requests_file-2.0.0-py2.py3-none-any.whl", hash = "sha256:3e493d390adb44aa102ebea827a48717336d5268968c370eaf19abaf5cae13bf"},
 ]
 
 [package.dependencies]
@@ -2121,4 +2122,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "a22b57bde55a27cb04df0496afa697c7a5c93a494f929a1a502fc121f092a5fe"
+content-hash = "b0e8830f05dab4fe189273276c62f1a8a2b49536f9e9b0c023417d0b2e6d0219"
