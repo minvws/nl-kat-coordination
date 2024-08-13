@@ -957,7 +957,9 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
         # Deadline should be set to the next run of the schedule
         self.assertEqual(
             utils.cron.next_run("*/5 * * * *"),
-            datetime.fromisoformat(response.json().get("deadline_at")),
+            # NOTE: Remove Z from the end of the string. Until 3.11
+            # datetime.fromisoformat does not accept Z at the end of the string
+            datetime.fromisoformat(response.json().get("deadline_at")[:-1]).astimezone(timezone.utc),
         )
 
     def test_post_schedule_invalid_schedule(self):
