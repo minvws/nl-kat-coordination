@@ -1,26 +1,13 @@
-import uuid
 from collections.abc import Callable
 from concurrent import futures
-from datetime import datetime, timedelta, timezone
-from types import SimpleNamespace
+from datetime import datetime, timezone
 from typing import Any
 
 import structlog
 from opentelemetry import trace
 
-from scheduler import context, queues, rankers, storage
-from scheduler.connectors import listeners
-from scheduler.connectors.errors import ExternalServiceError
-from scheduler.models import (
-    OOI,
-    MutationOperationType,
-    Organisation,
-    Plugin,
-    ReportTask,
-    ScanProfileMutation,
-    Task,
-    TaskStatus,
-)
+from scheduler import context, queues, storage
+from scheduler.models import Organisation, ReportTask, Task
 from scheduler.storage import filters
 
 from .scheduler import Scheduler

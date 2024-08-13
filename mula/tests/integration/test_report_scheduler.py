@@ -3,6 +3,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 from scheduler import config, models, schedulers, storage
+
 from tests.factories import OrganisationFactory
 
 
@@ -21,9 +22,7 @@ class ReportSchedulerBaseTestCase(unittest.TestCase):
         self.mock_ctx.datastores = SimpleNamespace(
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(
-                    self.dbconn
-                ),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
                 storage.ScheduleStore.name: storage.ScheduleStore(self.dbconn),
             }
         )
