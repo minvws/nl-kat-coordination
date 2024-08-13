@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-05 13:42+0000\n"
+"POT-Creation-Date: 2024-08-13 13:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3511,7 +3511,6 @@ msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
 #: rocky/templates/admin/change_list.html rocky/templates/oois/ooi_list.html
-#: rocky/templates/tasks/partials/task_filter.html
 msgid "Filter"
 msgstr ""
 
@@ -6120,6 +6119,10 @@ msgstr ""
 
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Show filters"
+msgstr ""
+
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "applied"
 msgstr ""
 
 #: rocky/templates/two_factor/_wizard_actions.html
