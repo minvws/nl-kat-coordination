@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
 from sqlalchemy import Boolean, Column, DateTime, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
@@ -30,14 +30,42 @@ class Schedule(BaseModel):
 
     tasks: list[Task] = []
 
-    deadline_at: datetime | None = None
+    _deadline_at: datetime | None = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    def __init__(self, **data):
+        super().__init__(**data)
+
+        if self.schedule is not None:
+            self._deadline_at = cron.next_run(self.schedule)
+
+        if "deadline_at" in data:
+            self._deadline_at = data["deadline_at"]
+
+    @computed_field  # type: ignore
+    @property
+    def deadline_at(self) -> datetime | None:
+        """Two ways to calculate the deadline_at:
+        1. If the deadline_at is set, return it.
+        2. If the schedule is set, calculate the next run and return it.
+        """
+        if self._deadline_at is not None:
+            return self._deadline_at
+
+        if self.schedule is not None:
+            return cron.next_run(self.schedule)
+
+        return None
+
+    @deadline_at.setter
+    def deadline_at(self, value: datetime | None):
+        self._deadline_at = value
 
     @field_validator("schedule")
     @classmethod
     def validate_schedule(cls, value: str) -> str:
-        """Validate the schedule cron expression."""
+        """Custom validation for the schedule cron expression."""
         if value is None:
             return value
 
@@ -46,6 +74,15 @@ class Schedule(BaseModel):
             return value
         except Exception as exc:
             raise ValueError(f"Invalid cron expression: {value}") from exc
+
+    @classmethod
+    def model_validate(cls, data):
+        """By default model_validate() will not set the deadline_at from_attributes
+        on computed_fields. This is a workaround to set the deadline_at from_attributes"""
+        instance = super().model_validate(data)
+        if hasattr(data, "deadline_at"):
+            instance.deadline_at = getattr(data, "deadline_at")
+        return instance
 
 
 class ScheduleDB(Base):
