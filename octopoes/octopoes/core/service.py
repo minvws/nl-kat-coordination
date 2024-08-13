@@ -152,7 +152,9 @@ class OctopoesService:
         if not referencing_origins:
             self.ooi_repository.delete(reference, valid_time)
 
-    def save_origin(self, origin: Origin, oois: list[OOI], valid_time: datetime) -> None:
+    def save_origin(
+        self, origin: Origin, oois: list[OOI], valid_time: datetime, end_valid_time: datetime | None = None
+    ) -> None:
         origin.result = [ooi.reference for ooi in oois]
 
         # When an Origin is saved while the source OOI does not exist, reject saving the results
@@ -166,7 +168,7 @@ class OctopoesService:
                 raise ValueError("Origin source of observation does not exist")
 
         for ooi in oois:
-            self.ooi_repository.save(ooi, valid_time=valid_time)
+            self.ooi_repository.save(ooi, valid_time=valid_time, end_valid_time=end_valid_time)
         self.origin_repository.save(origin, valid_time=valid_time)
 
     def _run_inference(self, origin: Origin, valid_time: datetime) -> None:

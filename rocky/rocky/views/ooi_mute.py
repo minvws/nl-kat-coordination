@@ -42,6 +42,11 @@ class MuteFindingsBulkView(OrganizationPermissionRequiredMixin, SingleOOIMixin):
         unmute = request.POST.get("unmute", None)
         selected_findings = request.POST.getlist("finding", None)
         reason = request.POST.get("reason", None)
+        end_valid_time = request.POST.get("end_valid_time", None)
+        if end_valid_time:
+            end_valid_time = datetime.strptime(end_valid_time, "%Y-%m-%dT%H:%M").replace(tzinfo=timezone.utc)
+        else:
+            end_valid_time = None
 
         if not selected_findings:
             messages.add_message(self.request, messages.WARNING, _("Please select at least one finding."))
@@ -54,8 +59,10 @@ class MuteFindingsBulkView(OrganizationPermissionRequiredMixin, SingleOOIMixin):
             return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))
         else:
             for finding in selected_findings:
-                ooi = self.ooi_class.parse_obj({"finding": finding, "reason": reason})
-                create_ooi(self.octopoes_api_connector, self.bytes_client, ooi, datetime.now(timezone.utc))
+                ooi = self.ooi_class.model_validate({"finding": finding, "reason": reason})
+                create_ooi(
+                    self.octopoes_api_connector, self.bytes_client, ooi, datetime.now(timezone.utc), end_valid_time
+                )
 
             messages.add_message(self.request, messages.SUCCESS, _("Finding(s) successfully muted."))
             return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))
