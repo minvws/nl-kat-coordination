@@ -64,7 +64,7 @@ class ScheduleAPI:
         self,
         request: fastapi.Request,
         schedule_hash: str | None = None,
-        enabled: bool | None = True,
+        enabled: bool | None = None,
         offset: int = 0,
         limit: int = 10,
         min_deadline_at: datetime.datetime | None = None,
@@ -153,11 +153,25 @@ class ScheduleAPI:
                 detail=f"failed to create hash for schedule [exception: {exc}]",
             ) from exc
 
+        # Check if schedule with the same hash already exists
+        try:
+            schedule = self.ctx.datastores.schedule_store.get_schedule_by_hash(new_schedule.hash)
+            if schedule is not None:
+                raise fastapi.HTTPException(
+                    status_code=fastapi.status.HTTP_409_CONFLICT,
+                    detail="schedule with the same hash already exists",
+                )
+        except storage.errors.StorageError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"error occurred while accessing the database [exception: {exc}]",
+            ) from exc
+
         try:
             self.ctx.datastores.schedule_store.create_schedule(new_schedule)
         except storage.errors.StorageError as exc:
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
                 detail=f"error occurred while accessing the database [exception: {exc}]",
             ) from exc
         except Exception as exc:
