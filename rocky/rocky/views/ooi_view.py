@@ -44,7 +44,7 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
     def get_active_filters(self) -> dict[str, str]:
         active_filters = {}
         if self.count_observed_at_filter() > 0:
-            active_filters[_("Observed_at: ")] = self.observed_at
+            active_filters[_("Observed_at: ")] = self.observed_at.strftime("%Y-%m-%d")
         if self.filtered_ooi_types:
             active_filters[_("OOI types: ")] = ", ".join(self.filtered_ooi_types)
         if self.clearance_levels:
