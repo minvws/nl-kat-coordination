@@ -7,7 +7,9 @@ from typing import Literal, TypedDict
 
 import structlog
 from account.mixins import OrganizationView
+from account.models import KATUser
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.http import Http404, HttpRequest
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -523,6 +525,14 @@ class SingleOOIMixin(OctopoesView):
 
         props.pop("scan_profile")
         props.pop("primary_key")
+        if "user_id" in props and props["user_id"]:
+            try:
+                props["user_id"] = get_user_model().objects.get(id=props["user_id"])
+            except KATUser.DoesNotExist:
+                props["user_id"] = None
+            props = {"owner" if key == "user_id" else key: value for key, value in props.items()}
+        else:
+            props.pop("user_id")
 
         return props
 

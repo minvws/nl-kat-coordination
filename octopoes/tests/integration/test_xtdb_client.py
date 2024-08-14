@@ -72,6 +72,7 @@ def test_query_simple_filter(xtdb_session: XTDBSession, valid_time: datetime):
                 "Network/primary_key": "Network|testnetwork",
                 "Network/name": "testnetwork",
                 "object_type": "Network",
+                "user_id": None,
                 "xt/id": "Network|testnetwork",
             }
         ]
@@ -101,6 +102,7 @@ def test_query_not_empty_on_reference_filter_for_hostname(xtdb_session: XTDBSess
                 "Network/primary_key": "Network|testnetwork",
                 "Network/name": "testnetwork",
                 "object_type": "Network",
+                "user_id": None,
                 "xt/id": "Network|testnetwork",
             }
         ]
@@ -114,6 +116,7 @@ def test_query_not_empty_on_reference_filter_for_hostname(xtdb_session: XTDBSess
                 "Network/primary_key": "Network|testnetwork",
                 "Network/name": "testnetwork",
                 "object_type": "Network",
+                "user_id": None,
                 "xt/id": "Network|testnetwork",
             }
         ]
@@ -138,6 +141,7 @@ def test_query_empty_on_reference_filter_for_wrong_hostname(xtdb_session: XTDBSe
                 "Network/primary_key": "Network|testnetwork",
                 "Network/name": "testnetwork",
                 "object_type": "Network",
+                "user_id": None,
                 "xt/id": "Network|testnetwork",
             }
         ]
@@ -389,6 +393,7 @@ def test_query_subclass_fields_and_returning_only_fields(
         [
             {
                 "object_type": "Network",
+                "user_id": None,
                 "Network/primary_key": "Network|test",
                 "Network/name": "test",
                 "xt/id": "Network|test",
@@ -413,6 +418,7 @@ def test_query_subclass_fields_and_returning_only_fields(
             {
                 "Hostname/primary_key": "Hostname|test|example.com",
                 "object_type": "Hostname",
+                "user_id": None,
                 "Hostname/network": "Network|test",
                 "Hostname/name": "example.com",
                 "xt/id": "Hostname|test|example.com",

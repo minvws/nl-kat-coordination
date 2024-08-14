@@ -16,7 +16,7 @@ def test_add_ooi(rf, client_member, mock_organization_view_octopoes, mock_bytes_
     assert response.url == "/en/test/objects/detail/?ooi_id=Network%7Ctestnetwork"
 
     data_without_valid_time = (
-        b'[{"ooi":{"object_type":"Network","scan_profile":null,'
+        b'[{"ooi":{"object_type":"Network","scan_profile":null,"user_id":225,'
         b'"primary_key":"Network|testnetwork","name":"testnetwork"}'
     )
     mock_bytes_client().add_manual_proof.assert_called_once()
@@ -31,7 +31,8 @@ def test_add_ooi(rf, client_member, mock_organization_view_octopoes, mock_bytes_
 
 def test_add_bad_schema(rf, client_member):
     request = setup_request(
-        rf.post("ooi_add", {"ooi_type": "Network", "testnamewrong": "testnetwork"}), client_member.user
+        rf.post("ooi_add", {"ooi_type": "Network", "testnamewrong": "testnetwork"}),
+        client_member.user,
     )
 
     response = OOIAddView.as_view()(request, organization_code=client_member.organization.code, ooi_type="Network")
