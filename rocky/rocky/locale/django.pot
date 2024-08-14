@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-07 13:24+0000\n"
+"POT-Creation-Date: 2024-08-14 11:43+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4164,6 +4164,10 @@ msgstr ""
 msgid "Filter by clearance type"
 msgstr ""
 
+#: tools/forms/ooi_form.py tools/forms/scheduler.py
+msgid "Search"
+msgstr ""
+
 #: tools/forms/scheduler.py
 msgid "From"
 msgstr ""
@@ -4198,10 +4202,6 @@ msgstr ""
 
 #: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
 msgid "Running"
-msgstr ""
-
-#: tools/forms/scheduler.py
-msgid "Search"
 msgstr ""
 
 #: tools/forms/scheduler.py
