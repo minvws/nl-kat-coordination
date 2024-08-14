@@ -46,12 +46,17 @@
             <div class="action-buttons">
                 {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
 
-                {% if plugin.type == "boefje" %}
+                {% if show_report_types %}
                     {% include "partials/plugin_tile_modal.html" with plugin=plugin %}
 
                 {% else %}
-                    <a class="tile-detail-link"
-                       href="{% url "normalizer_detail" organization_code=organization.code plugin_id=plugin.id %}">{% translate "See details" %}</a>
+                    {% if plugin.type == "boefje" %}
+                        <a class="tile-detail-link"
+                           href="{% url "boefje_detail" organization_code=organization.code plugin_id=plugin.id %}">{% translate "See details" %}</a>
+                    {% else %}
+                        <a class="tile-detail-link"
+                           href="{% url "normalizer_detail" organization_code=organization.code plugin_id=plugin.id %}">{% translate "See details" %}</a>
+                    {% endif %}
                 {% endif %}
             </div>
         {% endif %}
