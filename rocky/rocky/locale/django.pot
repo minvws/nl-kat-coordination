@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-07 13:24+0000\n"
+"POT-Creation-Date: 2024-08-14 09:29+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -745,13 +745,14 @@ msgstr ""
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/summary/ooi_selection.html
+#: rocky/templates/oois/ooi_list.html
 msgid "Object"
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html onboarding/forms.py
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
-#: rocky/templates/oois/ooi_page_tabs.html
+#: rocky/templates/oois/ooi_list.html rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/explanations.html
 msgid "Clearance level"
 msgstr ""
@@ -1758,6 +1759,7 @@ msgstr ""
 #: reports/report_types/dns_report/report.html
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
+#: rocky/templates/oois/ooi_list.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/explanations.html
 #: rocky/templates/partials/ooi_detail_related_object.html
@@ -3556,13 +3558,15 @@ msgstr[1] ""
 #: rocky/templates/admin/delete_selected_confirmation.html
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html rocky/templates/indemnification_present.html
-#: rocky/views/ooi_add.py rocky/views/ooi_list.py rocky/views/ooi_view.py
-#: rocky/views/upload_csv.py rocky/views/upload_raw.py
+#: rocky/templates/oois/ooi_list.html rocky/views/ooi_add.py
+#: rocky/views/ooi_list.py rocky/views/ooi_view.py rocky/views/upload_csv.py
+#: rocky/views/upload_raw.py
 msgid "Objects"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html
+#: rocky/templates/oois/ooi_list.html
 msgid "Clearance type"
 msgstr ""
 
@@ -4164,6 +4168,10 @@ msgstr ""
 msgid "Filter by clearance type"
 msgstr ""
 
+#: tools/forms/ooi_form.py tools/forms/scheduler.py
+msgid "Search"
+msgstr ""
+
 #: tools/forms/scheduler.py
 msgid "From"
 msgstr ""
@@ -4198,10 +4206,6 @@ msgstr ""
 
 #: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
 msgid "Running"
-msgstr ""
-
-#: tools/forms/scheduler.py
-msgid "Search"
 msgstr ""
 
 #: tools/forms/scheduler.py
@@ -6557,6 +6561,10 @@ msgstr ""
 
 #: rocky/views/ooi_view.py
 msgid "Clearance type: "
+msgstr ""
+
+#: rocky/views/ooi_view.py
+msgid "Searching for: "
 msgstr ""
 
 #: rocky/views/organization_add.py
