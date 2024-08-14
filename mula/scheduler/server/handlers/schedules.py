@@ -135,8 +135,23 @@ class ScheduleAPI:
                 detail="scheduler not found",
             )
 
-        # TODO: validate data with task type
-        # TODO: create hash for schedule with task type
+        # Validate data with task type of the scheduler
+        try:
+            instance = s.ITEM_TYPE.parse_obj(new_schedule.data)
+        except pydantic.ValidationError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=f"invalid task data [exception: {exc}]",
+            ) from exc
+
+        # Create hash for schedule with task type
+        try:
+            new_schedule.hash = instance.hash
+        except Exception as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=f"failed to create hash for schedule [exception: {exc}]",
+            ) from exc
 
         try:
             self.ctx.datastores.schedule_store.create_schedule(new_schedule)
