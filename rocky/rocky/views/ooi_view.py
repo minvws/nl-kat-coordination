@@ -122,7 +122,6 @@ class BaseOOIListView(OOIFilterView, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["mandatory_fields"] = get_mandatory_fields(self.request)
-        context["observed_at"] = self.observed_at
         context["total_oois"] = len(self.object_list)
         return context
 
