@@ -47,112 +47,15 @@
                 {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
 
                 {% if plugin.type == "boefje" %}
-                    {% component "modal" size="dialog-medium" %}
-                    {% fill "trigger" %}
-                    <a class="tile-detail-link modal-trigger">{% translate "See details" %}</a>
-                {% endfill %}
-                {% fill "header" %}
-                {% translate "Boefje details" %}
-            {% endfill %}
-            {% fill "content" %}
-            <section>
-                <div>
-                    <!-- Introduction -->
-                    <div class="horizontal-view">
-                        <h3 class="heading-small">{{ plugin.name }}</h3>
-                        {% if plugin.enabled %}
-                            <span class="state-tag enabled">{% translate "Enabled" %}</span>
-                        {% else %}
-                            <span class="state-tag disabled">{% translate "Disabled" %}</span>
-                        {% endif %}
-                    </div>
-                    <p>{{ plugin.description }}</p>
-                </div>
-                <div class="fifty-fifty">
-                    <!-- General information -->
-                    <div>
-                        <!-- Scan level -->
-                        <h3 class="heading-small">{% translate "Scan level" %}</h3>
-                        {% if plugin.type == "boefje" %}
-                            <div class="horizontal-view scan-intensity">
-                                <ul class="level-indicator l{{ plugin.scan_level }}">
-                                    {% for i in "1234"|make_list %}<li></li>{% endfor %}
-                                </ul>
-                            </div>
-                        {% endif %}
-                    </div>
-                    {% comment %} TODO: {% endcomment %}
-                    {% comment %} <div>
-                        <!-- Matching objects -->
-                        <h3 class="heading-small">{% translate "Matching objects" %}</h3>
-                    </div> {% endcomment %}
-                </div>
-            </section>
-            <section>
-                <div>
-                    <!-- Report types-->
-                    <h3 class="heading-small">{% translate "Report types" %}</h3>
-                    <p>{% translate "This boefje is required by the following report types." %}</p>
-                    <p>
-                        {% for plugin_id, report_types in plugin_report_types.items %}
-                            {% if plugin_id == plugin.id %}
-                                {% for report_type in report_types %}
-                                    <span class="label tags-color-{{ report_type.label_style }}">{{ report_type.name }}</span>
-                                {% endfor %}
-                            {% endif %}
-                        {% endfor %}
-                    </p>
-                </div>
-            </section>
-            <section>
-                <div>
-                    <!-- Consumes -->
-                    {% if plugin.consumes %}
-                        <h3 class="heading-small">{% translate "Consumes" %}</h3>
-                        <p>
-                            {% blocktranslate trimmed with plugin_name=plugin.name %}
-                                {{ plugin_name }} is able to scan the following object types:
-                            {% endblocktranslate %}
-                        </p>
-                        {% for consumes in plugin.consumes_human_readable %}
-                            {{ consumes }}
-                            {% if not forloop.last %}-{% endif %}
-                        {% endfor %}
-                    {% else %}
-                        {% blocktranslate trimmed with plugin_name=plugin.name %}
-                            {{ plugin_name }} does not need any input objects.
-                        {% endblocktranslate %}
-                    {% endif %}
-                </div>
-                <div>
-                    <!-- Produces -->
-                    <h3 class="heading-small">{% translate "Produces" %}</h3>
-                    <p>
-                        {% blocktranslate trimmed with plugin_name=plugin.name %}
-                            {{ plugin_name }} can produce the following output:
-                        {% endblocktranslate %}
-                    </p>
-                    <p>
-                        <ul>
-                            {% for mime_type in plugin.produces %}<li>{{ mime_type }}</li>{% endfor %}
-                        </ul>
-                    </p>
-                </div>
-            </section>
-        {% endfill %}
-        {% fill "footer_buttons" %}
-        <a href="{% url "boefje_detail" organization_code=organization.code plugin_id=plugin.id %}"
-           class="button ghost">{% translate "Go to boefje detail page" %}</a>
-    {% endfill %}
-{% endcomponent %}
-{% component_css_dependencies %}
-{% else %}
-<a class="tile-detail-link"
-   href="{% url "normalizer_detail" organization_code=organization.code plugin_id=plugin.id %}">{% translate "See details" %}</a>
-{% endif %}
-</div>
-{% endif %}
-{% endif %}
+                    {% include "partials/plugin_tile_modal.html" with plugin=plugin %}
+
+                {% else %}
+                    <a class="tile-detail-link"
+                       href="{% url "normalizer_detail" organization_code=organization.code plugin_id=plugin.id %}">{% translate "See details" %}</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endif %}
 </div>
 {% block html_at_end_body %}
     {% compress js %}
