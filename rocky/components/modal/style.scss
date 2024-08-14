@@ -1,5 +1,5 @@
 dialog {
-  border: 1px solid var(--colors-grey-4);
+  border: 1px solid var(--colors-grey-200);
   border-radius: 8px;
   max-height: calc(100vh - 3rem);
   padding: 0;
@@ -44,7 +44,7 @@ dialog {
       display: flex;
       justify-content: space-between;
       flex-direction: row;
-      border-bottom: 1px solid var(--colors-grey-4);
+      border-bottom: 1px solid var(--colors-grey-200);
       position: sticky;
       background-color: white;
       top: 0;
@@ -78,7 +78,7 @@ dialog {
 
     .footer {
       padding: var(--spacing-grid-300);
-      border-top: 1px solid var(--colors-grey-4);
+      border-top: 1px solid var(--colors-grey-200);
       position: sticky;
       background-color: white;
       bottom: 0;
