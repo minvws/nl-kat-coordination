@@ -2,6 +2,19 @@
 
 table thead th.sortable {
   padding: 0;
+  border-radius: 0.25rem 0.25rem 0 0;
+
+  &:hover {
+    background-color: var(--colors-black-05);
+  }
+
+  &[aria-sort] {
+    background-color: var(--colors-purrple-100);
+
+    &:hover {
+      background-color: var(--colors-purrple-200);
+    }
+  }
 
   button {
     width: 100%;
@@ -13,16 +26,11 @@ table thead th.sortable {
     justify-content: flex-start;
 
     .icon::before {
-      color: var(--colors-grey-6);
+      color: var(--colors-grey-500);
     }
 
     .icon.ti-direction::before {
       font-size: 1.75rem;
     }
-  }
-
-  &[aria-sort] {
-    background-color: var(--colors-purrple-2);
-    border-radius: 0.25rem 0.25rem 0 0;
   }
 }
