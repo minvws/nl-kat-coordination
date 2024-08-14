@@ -16,9 +16,9 @@ def test_add_ooi(rf, client_member, mock_organization_view_octopoes, mock_bytes_
     assert response.url == "/en/test/objects/detail/?ooi_id=Network%7Ctestnetwork"
 
     data_without_valid_time = (
-        b'[{"ooi":{"object_type":"Network","scan_profile":null,"user_id":225,'
-        b'"primary_key":"Network|testnetwork","name":"testnetwork"}'
-    )
+        f'[{{"ooi":{{"object_type":"Network","scan_profile":null,"user_id":{client_member.user.id},'
+        f'"primary_key":"Network|testnetwork","name":"testnetwork"}}'
+    ).encode()
     mock_bytes_client().add_manual_proof.assert_called_once()
     call_args = mock_bytes_client().add_manual_proof.call_args[0]
 

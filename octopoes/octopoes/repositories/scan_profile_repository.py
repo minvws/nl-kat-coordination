@@ -4,7 +4,7 @@ from logging import getLogger
 from typing import Any
 
 from httpx import HTTPStatusError
-from pydantic import parse_obj_as
+from pydantic import TypeAdapter
 
 from octopoes.events.events import OperationType, ScanProfileDBEvent
 from octopoes.events.manager import EventManager
@@ -58,14 +58,14 @@ class XTDBScanProfileRepository(ScanProfileRepository):
 
     @classmethod
     def serialize(cls, scan_profile: ScanProfile) -> dict[str, Any]:
-        data = scan_profile.dict()
+        data = scan_profile.model_dump()
         data[cls.pk_prefix] = cls.format_id(scan_profile.reference)
         data["type"] = cls.object_type
         return data
 
     @classmethod
     def deserialize(cls, data: dict[str, Any]) -> ScanProfileBase:
-        return parse_obj_as(ScanProfile, data)
+        return TypeAdapter(ScanProfile).validate_python(data)
 
     def list_scan_profiles(self, scan_profile_type: str | None, valid_time: datetime) -> list[ScanProfileBase]:
         where = {"type": self.object_type}
