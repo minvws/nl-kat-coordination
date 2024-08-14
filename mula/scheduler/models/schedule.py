@@ -37,17 +37,16 @@ class Schedule(BaseModel):
     def __init__(self, **data):
         super().__init__(**data)
 
-        if self.schedule is not None:
-            self._deadline_at = cron.next_run(self.schedule)
-
         if "deadline_at" in data:
-            self._deadline_at = data["deadline_at"]
+            self.deadline_at = data["deadline_at"]
+        elif "deadline_at" not in data and self.schedule is not None:
+            self.deadline_at = cron.next_run(self.schedule)
 
     @computed_field  # type: ignore
     @property
     def deadline_at(self) -> datetime | None:
         """Two ways to calculate the deadline_at:
-        1. If the deadline_at is set, return it.
+        1. If the self._deadline_at is already set, return it.
         2. If the schedule is set, calculate the next run and return it.
         """
         if self._deadline_at is not None:
@@ -77,8 +76,9 @@ class Schedule(BaseModel):
 
     @classmethod
     def model_validate(cls, data):
-        """By default model_validate() will not set the deadline_at from_attributes
-        on computed_fields. This is a workaround to set the deadline_at from_attributes"""
+        """By default when creating an instance with model_validate() will not
+        set the deadline_at when using computed_fields. This method will set
+        the deadline_at if it is passed in the data."""
         instance = super().model_validate(data)
         if hasattr(data, "deadline_at"):
             instance.deadline_at = getattr(data, "deadline_at")
