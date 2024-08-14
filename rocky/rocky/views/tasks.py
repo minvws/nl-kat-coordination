@@ -44,7 +44,7 @@ class TaskListView(SchedulerView, SchedulerListView, PageActionsView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["task_filter_form"] = self.get_task_filter_form()
-        context["active_filters_counter"] = self.count_active_filters()
+        context["active_filters_counter"] = self.count_active_task_filters()
         context["stats"] = self.get_task_statistics()
         context["breadcrumbs"] = [
             {
