@@ -1,0 +1,31 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <article>
+            <div class="layout-form">
+                <h1>{% translate "Boefje setup" %}</h1>
+                <p>
+                    {% blocktranslate %}
+                        You can create a new Boefje. If you want more information on this,
+                        you can check out the documentation.
+                    {% endblocktranslate%}
+                </p>
+                <form action="{% url "finding_add" organization.code %}"
+                      method="post"
+                      class="horizontal-view help">
+                    {% csrf_token %}
+                    {% translate "Finding" as fieldset_legend %}
+                    {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
+
+                    <button type="submit">{% translate "Add" %} {% translate "Finding" %}</button>
+                </form>
+            </div>
+        </article>
+    </main>
+{% endblock content %}

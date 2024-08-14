@@ -1,5 +1,6 @@
 from django.urls import path
 
+from katalogus.views.boefje_setup import BoefjeSetupView
 from katalogus.views.change_clearance_level import ChangeClearanceLevel
 from katalogus.views.katalogus import AboutPluginsView, BoefjeListView, KATalogusView, NormalizerListView
 from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
@@ -75,5 +76,10 @@ urlpatterns = [
         "plugins/<plugin_type>/<plugin_id>/settings/delete/",
         PluginSettingsDeleteView.as_view(),
         name="plugin_settings_delete",
+    ),
+    path(
+        "plugins/boefjes/settings/add",
+        BoefjeSetupView.as_view(),
+        name="boefje_setup",
     ),
 ]
