@@ -1,10 +1,10 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Annotated, Literal, TypeAlias
 from uuid import UUID
 
 from pydantic import AwareDatetime, BaseModel, Field, StringConstraints
 
-from octopoes.models import DeclaredScanProfile, PrimaryKeyToken
+from octopoes.models import DeclaredScanProfile
 from octopoes.models.types import OOIType
 
 
@@ -85,6 +85,7 @@ class NormalizerObservation(BaseModel):
 class NormalizerDeclaration(BaseModel):
     type: Literal["declaration"] = "declaration"
     ooi: OOIType
+    end_valid_time: datetime | None = None
 
 
 class NormalizerAffirmation(BaseModel):
@@ -100,5 +101,3 @@ class NormalizerResults(BaseModel):
 
 
 NormalizerOutput: TypeAlias = OOIType | NormalizerDeclaration | NormalizerAffirmation | DeclaredScanProfile
-SerializedOOIValue: TypeAlias = None | str | int | float | dict[str, str | PrimaryKeyToken] | list["SerializedOOIValue"]
-SerializedOOI: TypeAlias = dict[str, SerializedOOIValue]
