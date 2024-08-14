@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-13 13:11+0000\n"
+"POT-Creation-Date: 2024-08-14 09:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4922,7 +4922,9 @@ msgstr ""
 msgid "OpenKAT logo, go to the homepage of OpenKAT"
 msgstr ""
 
-#: rocky/templates/header.html rocky/views/finding_list.py
+#: rocky/templates/header.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/views/finding_list.py
 msgid "Crisis room"
 msgstr ""
 
@@ -5391,10 +5393,6 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_tree.html
 msgid "Object tree"
-msgstr ""
-
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "Crisis room:"
 msgstr ""
 
 #: rocky/templates/organizations/organization_crisis_room.html
