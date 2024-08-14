@@ -40,7 +40,6 @@ class Plugin(BaseModel):
 class Boefje(Plugin):
     scan_level: SCAN_LEVEL
     consumes: set[type[OOI]]
-    consumes_human_readable: set[str]
     options: list[str] | None = None
     runnable_hash: str | None = None
     produces: set[str]
@@ -215,7 +214,6 @@ def parse_boefje(boefje: dict) -> Boefje:
         type=boefje["type"],
         scan_level=scan_level,
         consumes=consumes,
-        consumes_human_readable=set(boefje["consumes"]),
         produces=boefje["produces"],
     )
 
