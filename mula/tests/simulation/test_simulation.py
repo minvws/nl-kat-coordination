@@ -1,3 +1,4 @@
+# NOTE: This file is DEPRECATED
 import unittest
 import uuid
 from unittest import mock
@@ -69,7 +70,12 @@ class SimulationTestCase(unittest.TestCase):
     @mock.patch("scheduler.context.AppContext.services.scan_profile.get_latest_object")
     @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.create_tasks_for_oois")
-    def test_simulation_boefje_queue(self, mock_create_tasks_for_oois, mock_get_random_objects, mock_get_latest_object):
+    def test_simulation_boefje_queue(
+        self,
+        mock_create_tasks_for_oois,
+        mock_get_random_objects,
+        mock_get_latest_object,
+    ):
         iterations = 1000
         oois = [OOIFactory(scan_profile=ScanProfileFactory(level=0)) for _ in range(iterations)]
 

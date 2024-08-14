@@ -18,7 +18,8 @@ from django.utils.translation import activate, deactivate
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from httpx import Response
-from katalogus.client import parse_plugin
+from katalogus.client import Boefje, parse_plugin
+from tools.enums import SCAN_LEVEL
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 
 from octopoes.config.settings import (
@@ -40,6 +41,7 @@ from octopoes.models.pagination import Paginated
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
+from rocky.health import ServiceHealth
 from rocky.scheduler import PaginatedTasksResponse, Task
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
@@ -412,39 +414,36 @@ def task() -> Task:
             "id": "1b20f85f-63d5-4baa-be9e-f3f19d6e3fae",
             "hash": "19ed51514b37d42f79c5e95469956b05",
             "scheduler_id": "boefje-test",
+            "schedule_id": None,
             "type": "boefje",
-            "p_item": {
-                "id": "1b20f85f-63d5-4baa-be9e-f3f19d6e3fae",
-                "hash": "19ed51514b37d42f79c5e95469956b05",
-                "priority": 1,
-                "data": {
-                    "id": "1b20f85f63d54baabe9ef3f19d6e3fae",
-                    "boefje": {
-                        "id": "test-boefje",
-                        "name": "TestBoefje",
-                        "description": "Fetch the DNS record(s) of a hostname",
-                        "version": None,
-                        "scan_level": 1,
-                        "consumes": ["Hostname"],
-                        "produces": [
-                            "DNSNSRecord",
-                            "DNSARecord",
-                            "DNSCNAMERecord",
-                            "DNSMXRecord",
-                            "DNSZone",
-                            "Hostname",
-                            "DNSAAAARecord",
-                            "IPAddressV4",
-                            "DNSSOARecord",
-                            "DNSTXTRecord",
-                            "IPAddressV6",
-                            "Network",
-                            "NXDOMAIN",
-                        ],
-                    },
-                    "input_ooi": "Hostname|internet|mispo.es",
-                    "organization": "test",
+            "priority": 1,
+            "data": {
+                "id": "1b20f85f63d54baabe9ef3f19d6e3fae",
+                "boefje": {
+                    "id": "test-boefje",
+                    "name": "TestBoefje",
+                    "description": "Fetch the DNS record(s) of a hostname",
+                    "version": None,
+                    "scan_level": 1,
+                    "consumes": ["Hostname"],
+                    "produces": [
+                        "DNSNSRecord",
+                        "DNSARecord",
+                        "DNSCNAMERecord",
+                        "DNSMXRecord",
+                        "DNSZone",
+                        "Hostname",
+                        "DNSAAAARecord",
+                        "IPAddressV4",
+                        "DNSSOARecord",
+                        "DNSTXTRecord",
+                        "IPAddressV6",
+                        "Network",
+                        "NXDOMAIN",
+                    ],
                 },
+                "input_ooi": "Hostname|internet|mispo.es",
+                "organization": "test",
             },
             "status": "completed",
             "created_at": "2022-08-09 11:53:41.378292",
@@ -1437,22 +1436,17 @@ def mock_scheduler_client_task_list(mock_scheduler):
                     "results": [
                         {
                             "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
+                            "hash": "416aa907e0b2a16c1b324f7d3261c5a4",
                             "scheduler_id": "boefje-test",
+                            "schedule_id": None,
                             "type": "boefje",
-                            "p_item": {
-                                "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
-                                "scheduler_id": "boefje-test",
-                                "hash": "416aa907e0b2a16c1b324f7d3261c5a4",
-                                "priority": 631,
-                                "data": {
-                                    "id": "2e757dd366c746b899877cd18252cc6d",
-                                    "boefje": {"id": "test-plugin", "version": None},
-                                    "input_ooi": "Hostname|internet|example.com",
-                                    "organization": "test",
-                                    "dispatches": [],
-                                },
-                                "created_at": "2023-05-09T09:37:20.899668+00:00",
-                                "modified_at": "2023-05-09T09:37:20.899675+00:00",
+                            "priority": 631,
+                            "data": {
+                                "id": "2e757dd366c746b899877cd18252cc6d",
+                                "boefje": {"id": "test-plugin", "version": None},
+                                "input_ooi": "Hostname|internet|example.com",
+                                "organization": "test",
+                                "dispatches": [],
                             },
                             "status": "completed",
                             "created_at": "2023-05-09T09:37:20.909069+00:00",
@@ -1690,11 +1684,36 @@ def onboarding_collect_data():
         "Hostname|internet|mispo.es": {
             "input_ooi": "Hostname|internet|mispo.es",
             "records": [
-                {"type": "A", "ttl": 480, "name": "mispo.es", "content": "134.209.85.72"},
-                {"type": "MX", "ttl": 480, "name": "mispo.es", "content": "10 mx.wijmailenveilig.nl."},
-                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns1.domaindiscount24.net."},
-                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns2.domaindiscount24.net."},
-                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns3.domaindiscount24.net."},
+                {
+                    "type": "A",
+                    "ttl": 480,
+                    "name": "mispo.es",
+                    "content": "134.209.85.72",
+                },
+                {
+                    "type": "MX",
+                    "ttl": 480,
+                    "name": "mispo.es",
+                    "content": "10 mx.wijmailenveilig.nl.",
+                },
+                {
+                    "type": "NS",
+                    "ttl": 480,
+                    "name": "mispo.es",
+                    "content": "ns1.domaindiscount24.net.",
+                },
+                {
+                    "type": "NS",
+                    "ttl": 480,
+                    "name": "mispo.es",
+                    "content": "ns2.domaindiscount24.net.",
+                },
+                {
+                    "type": "NS",
+                    "ttl": 480,
+                    "name": "mispo.es",
+                    "content": "ns3.domaindiscount24.net.",
+                },
                 {
                     "type": "SOA",
                     "ttl": 480,
@@ -1706,3 +1725,63 @@ def onboarding_collect_data():
             "finding_types": [],
         }
     }
+
+
+@pytest.fixture
+def rocky_health():
+    ServiceHealth(
+        service="rocky",
+        healthy=True,
+        version="0.0.1.dev1",
+        additional=None,
+        results=[
+            ServiceHealth(
+                service="octopoes",
+                healthy=True,
+                version="0.0.1.dev1",
+                additional=None,
+                results=[
+                    ServiceHealth(
+                        service="xtdb",
+                        healthy=True,
+                        version="1.24.1",
+                        additional={
+                            "version": "1.24.1",
+                            "revision": "1164f9a3c7e36edbc026867945765fd4366c1731",
+                            "indexVersion": 22,
+                            "consumerState": None,
+                            "kvStore": "xtdb.rocksdb.RocksKv",
+                            "estimateNumKeys": 24552,
+                            "size": 24053091,
+                        },
+                        results=[],
+                    )
+                ],
+            ),
+            ServiceHealth(service="katalogus", healthy=True, version="0.0.1-development", additional=None, results=[]),
+            ServiceHealth(service="scheduler", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
+            ServiceHealth(service="bytes", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
+            ServiceHealth(service="keiko", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
+        ],
+    )
+
+
+@pytest.fixture
+def boefje_dns_records():
+    return Boefje(
+        id="dns-records",
+        name="DnsRecords",
+        version=None,
+        authors=None,
+        created=None,
+        description="Fetch the DNS record(s) of a hostname",
+        environment_keys=None,
+        related=[],
+        enabled=True,
+        type="boefje",
+        scan_level=SCAN_LEVEL.L1,
+        consumes={Hostname},
+        options=None,
+        runnable_hash=None,
+        produces={"boefje/dns-records"},
+    )

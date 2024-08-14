@@ -52,7 +52,7 @@ class PluginService:
 
         return [self._set_plugin_enabled(plugin, organisation_id) for plugin in all_plugins.values()]
 
-    def _get_all_without_enabled(self):
+    def _get_all_without_enabled(self) -> dict[str, PluginType]:
         all_plugins = {plugin.id: plugin for plugin in self.local_repo.get_all()}
 
         for plugin in self.plugin_storage.get_all():
