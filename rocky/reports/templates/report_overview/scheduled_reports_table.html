@@ -15,25 +15,28 @@
             </tr>
         </thead>
         <tbody>
-            {% for report in reports %}
-                <tr>
-                    <td>
-                        <a href="{% url "view_report" organization.code %}?report_id={{ report.parent_report.reference }}&observed_at={{ report.parent_report.observed_at|date:"Y-m-d H:i:s:u" }}"
-                           title="{% translate "Shows report details" %}">{{ report.parent_report.name }}</a>
-                    </td>
-                    <td>
-                        <span class="label tags-color-{{ report.parent_report.report_type|get_report_type_label_style }}">{{ report.parent_report.report_type|get_report_type_name }}</span>
-                    </td>
-                    <td class="nowrap">scheduled_for_date</td>
-                    <td>
-                        <button type="button"
-                                class="expando-button icon ti-chevron-down"
-                                data-icon-open-class="icon ti-chevron-down"
-                                data-icon-close-class="icon ti-chevron-up"
-                                data-close-label="{% translate "Close children report object details" %}"
-                                aria-expanded="false"></button>
-                    </td>
-                </tr>
+            {% for schedule in report_schedules %}
+                {% with report=schedule.data %}
+                    <tr>
+                        <td>
+                            <a href="{% url "view_report" organization.code %}?report_id={{ report.reference }}&observed_at={{ report.observed_at|date:"Y-m-d H:i:s:u" }}"
+                               title="{% translate "Show report details" %}">{{ report.name }}</a>
+                        </td>
+                        <td>
+                            <span class="label tags-color-{{ report.report_type|get_report_type_label_style }}">{{ report.report_type|get_report_type_name }}</span>
+                        </td>
+                        <td>{{ schedule.deadline_at }} scheduled_for_date</td>
+                        <td class="nowrap">recurrence</td>
+                        <td>
+                            <button type="button"
+                                    class="expando-button icon ti-chevron-down"
+                                    data-icon-open-class="icon ti-chevron-down"
+                                    data-icon-close-class="icon ti-chevron-up"
+                                    data-close-label="{% translate "Close children report object details" %}"
+                                    aria-expanded="false"></button>
+                        </td>
+                    </tr>
+                {% endwith %}
                 <tr class="expando-row">
                     <td colspan="6">
                         <table>
@@ -47,12 +50,18 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>creation_date</td>
-                                    <td>reference_date</td>
-                                    <td>status</td>
-                                    <td>actions</td>
-                                </tr>
+                                {% for task in schedule.tasks %}
+                                    <tr>
+                                        <td>{{ task.created_at }} created_at</td>
+                                        <td>reference_date</td>
+                                        <td class="nowrap">
+                                            <span class="icon {{ task.status.value }}"></span>{{ task.status.value|capfirst }}
+                                        </td>
+                                        <td>
+                                            <a href=""><span class="icon ti-dots-vertical"></span></a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                         <div class="button-container">

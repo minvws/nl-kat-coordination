@@ -25,29 +25,6 @@ class BreadcrumbsReportOverviewView(ReportBreadcrumbs):
         return breadcrumbs
 
 
-class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
-    """
-    Shows all the reports that have ever been generated for the organization.
-    """
-
-    paginate_by = 20
-    breadcrumbs_step = 2
-    context_object_name = "reports"
-    paginator = RockyPaginator
-    template_name = "report_overview/report_history.html"
-
-    def get_queryset(self) -> ReportList:
-        return ReportList(
-            self.octopoes_api_connector,
-            valid_time=self.observed_at,
-        )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["total_oois"] = len(self.object_list)
-        return context
-
-
 class ScheduledReportsView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     """
     Shows all the reports that have ever been generated for the organization.
@@ -58,6 +35,26 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, OctopoesView, ListView
     context_object_name = "reports"
     paginator = RockyPaginator
     template_name = "report_overview/scheduled_reports.html"
+
+    def get_queryset(self):
+        # This should return a list with all the report schedules
+        return []
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
+    """
+    Shows all the reports that have ever been generated for the organization.
+    """
+
+    paginate_by = 20
+    breadcrumbs_step = 2
+    context_object_name = "reports"
+    paginator = RockyPaginator
+    template_name = "report_overview/report_history.html"
 
     def get_queryset(self) -> ReportList:
         return ReportList(
