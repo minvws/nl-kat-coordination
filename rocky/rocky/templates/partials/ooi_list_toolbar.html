@@ -10,7 +10,7 @@
             <div id="export-add" aria-expanded="false" class="dropdown-list">
                 <ul>
                     <li>
-                        <a href="{% url 'ooi_add_type_select' organization.code %}"><span class="icon ti-plus"></span>{% translate "Add object" %}</a>
+                        <a href="{% url 'ooi_add_type_select' organization.code %}"><span class="icon ti-plus" aria-hidden="true"></span>{% translate "Add object" %}</a>
                     </li>
                     <li>
                         <a href="{% url 'scan_list' organization.code %}"><span class="icon ti-eye-plus" aria-hidden="true"></span>{% translate "Scan for objects" %}</a>
