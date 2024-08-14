@@ -46,7 +46,6 @@
                                     <th scope="col">{% translate "Creation date" %}</th>
                                     <th scope="col">{% translate "Reference date" %}</th>
                                     <th scope="col">{% translate "Status" %}</th>
-                                    <th scope="col">{% translate "Actions" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -57,16 +56,10 @@
                                         <td class="nowrap">
                                             <span class="icon {{ task.status.value }}"></span>{{ task.status.value|capfirst }}
                                         </td>
-                                        <td>
-                                            <a href=""><span class="icon ti-dots-vertical"></span></a>
-                                        </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
-                        <div class="button-container">
-                            <a class="button ghost" href=""><span class="icon ti-calendar-event"></span>{% translate "Change schedule" %}</a>
-                        </div>
                     </td>
                 </tr>
             {% endfor %}
