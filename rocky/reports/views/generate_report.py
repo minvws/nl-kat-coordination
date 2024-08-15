@@ -105,6 +105,9 @@ class ReportTypesSelectionGenerateReportView(
     current_step = 2
 
     def post(self, request, *args, **kwargs):
+        if not hasattr(ReportTypesSelectionGenerateReportView, "selected_oois"):
+            self.setup(request, *args, **kwargs)
+
         if not self.selected_oois:
             messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
             return redirect(self.get_previous())
@@ -132,6 +135,15 @@ class SetupScanGenerateReportView(
     current_step = 3
 
     def post(self, request, *args, **kwargs):
+        _, are_plugins_enabled = self.get_all_plugins()
+        all_plugins_enabled = are_plugins_enabled.get("required") and are_plugins_enabled.get("optional")
+
+        if "return" in self.request.POST and all_plugins_enabled:
+            return ReportTypesSelectionGenerateReportView().post(request, *args, **kwargs)
+
+        if are_plugins_enabled.get("required") and are_plugins_enabled.get("optional"):
+            return ExportSetupGenerateReportView().post(request, *args, **kwargs)
+
         if not self.selected_report_types:
             messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
             return redirect(self.get_previous())
@@ -149,6 +161,10 @@ class ExportSetupGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenerat
     reports: dict[str, str] = {}
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not hasattr(ExportSetupGenerateReportView, "oois_pk") and not hasattr(
+            ExportSetupGenerateReportView, "report_types"
+        ):
+            self.setup(request, *args, **kwargs)
         self.reports = create_report_names(self.oois_pk, self.report_types)
         return super().get(request, *args, **kwargs)
 
