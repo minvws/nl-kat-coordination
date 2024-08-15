@@ -7,34 +7,38 @@
             <button aria-controls="export-add" class="dropdown-button ghost">
                 {% translate "Add" %}<span aria-hidden="true" class="icon ti-chevron-down"></span>
             </button>
-            <ul id="export-add" aria-expanded="false" class="dropdown-list">
-                <li>
-                    <a href="{% url 'ooi_add_type_select' organization.code %}">{% translate "Add object" %}</a>
-                </li>
-                <li>
-                    <a href="{% url 'scan_list' organization.code %}">{% translate "Scan for objects" %}</a>
-                </li>
-                <li>
-                    <a href="{% url 'upload_raw' organization.code %}">{% translate "Upload raw file" %}</a>
-                </li>
-                <li>
-                    <a href="{% url 'upload_csv' organization.code %}">{% translate "Upload CSV" %}</a>
-                </li>
-            </ul>
+            <div id="export-add" aria-expanded="false" class="dropdown-list">
+                <ul>
+                    <li>
+                        <a href="{% url 'ooi_add_type_select' organization.code %}"><span class="icon ti-plus" aria-hidden="true"></span>{% translate "Add object" %}</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'scan_list' organization.code %}"><span class="icon ti-eye-plus" aria-hidden="true"></span>{% translate "Scan for objects" %}</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'upload_raw' organization.code %}"><span class="icon ti-file" aria-hidden="true"></span>{% translate "Upload raw file" %}</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'upload_csv' organization.code %}"><span class="icon ti-file-type-csv" aria-hidden="true"></span>{% translate "Upload CSV" %}</a>
+                    </li>
+                </ul>
+            </div>
         </div>
         <div class="dropdown">
             <button aria-controls="export-dropdown" class="dropdown-button ghost">
                 {% translate "Export" %}
                 <span aria-hidden="true" class="icon ti-chevron-down"></span>
             </button>
-            <ul id="export-dropdown" aria-expanded="false" class="dropdown-list">
-                <li>
-                    <a href="{% url 'ooi_list_export' organization.code %}?{% url_replace 'file_type' 'json' %}">{% translate "Download as JSON" %}</a>
-                </li>
-                <li>
-                    <a href="{% url 'ooi_list_export' organization.code %}?{% url_replace 'file_type' 'csv' %}">{% translate "Download as CSV" %}</a>
-                </li>
-            </ul>
+            <div id="export-dropdown" aria-expanded="false" class="dropdown-list">
+                <ul>
+                    <li>
+                        <a href="{% url 'ooi_list_export' organization.code %}?{% url_replace 'file_type' 'json' %}"><span class="icon ti-json"></span>{% translate "Download as JSON" %}</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'ooi_list_export' organization.code %}?{% url_replace 'file_type' 'csv' %}"><span class="icon ti-file-type-csv"></span>{% translate "Download as CSV" %}</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 {% endspaceless %}
