@@ -146,7 +146,7 @@ class Katalogus(HTTPService):
             response = self.get(url)
             return [Boefje(**boefje) for boefje in response.json()]
         except httpx.HTTPStatusError as e:
-            if e.response.status_code == 404:
+            if e.response.status_code == httpx.codes.NOT_FOUND
                 return []
             raise
 
@@ -157,7 +157,7 @@ class Katalogus(HTTPService):
             response = self.get(url)
             return Boefje(**response.json())
         except httpx.HTTPStatusError as e:
-            if e.response.status_code == 404:
+            if e.response.status_code == httpx.codes.NOT_FOUND:
                 return None
             raise
 
@@ -168,7 +168,7 @@ class Katalogus(HTTPService):
             response = self.get(url)
             return Organisation(**response.json())
         except httpx.HTTPStatusError as e:
-            if e.response.status_code == 404:
+            if e.response.status_code == httpx.codes.NOT_FOUND:
                 return None
             raise
 
@@ -179,7 +179,7 @@ class Katalogus(HTTPService):
             response = self.get(url)
             return [Organisation(**organisation) for organisation in response.json().values()]
         except httpx.HTTPStatusError as e:
-            if e.response.status_code == 404:
+            if e.response.status_code == httpx.codes.NOT_FOUND:
                 return []
             raise
 
@@ -190,7 +190,7 @@ class Katalogus(HTTPService):
             response = self.get(url)
             return [Plugin(**plugin) for plugin in response.json()]
         except httpx.HTTPStatusError as e:
-            if e.response.status_code == 404:
+            if e.response.status_code == httpx.codes.NOT_FOUND:
                 return []
             raise
 

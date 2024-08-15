@@ -93,7 +93,7 @@ class Octopoes(HTTPService):
             response = self.get(url, params=params)
             return [OOI(**ooi) for ooi in response.json()]
         except httpx.HTTPStatusError as e:
-            if e.response.status_code == 404:
+            if e.response.status_code == httpx.codes.NOT_FOUND:
                 return []
             raise
 
@@ -109,7 +109,7 @@ class Octopoes(HTTPService):
             )
             return OOI(**response.json())
         except httpx.HTTPStatusError as e:
-            if e.response.status_code == 404:
+            if e.response.status_code == httpx.codes.NOT_FOUND:
                 return None
             raise
 

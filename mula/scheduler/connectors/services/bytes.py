@@ -99,7 +99,7 @@ class Bytes(HTTPService):
             )
             return BoefjeMeta(**response.json()[0])
         except httpx.HTTPStatusError as exc:
-            if exc.response.status_code == 404:
+            if exc.response.status_code == httpx.codes.NOT_FOUND:
                 return None
             raise
 
@@ -118,6 +118,6 @@ class Bytes(HTTPService):
             )
             return BoefjeMeta(**response.json()[0])
         except httpx.HTTPStatusError as exc:
-            if exc.response.status_code == 404:
+            if exc.response.status_code == httpx.codes.NOT_FOUND:
                 return None
             raise
