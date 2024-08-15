@@ -110,6 +110,8 @@ class HTTPService(Connector):
             url=url,
         )
 
+        self._verify_response(response)
+
         return response
 
     def post(
