@@ -101,8 +101,7 @@ class Bytes(HTTPService):
         except httpx.HTTPStatusError as exc:
             if exc.response.status_code == 404:
                 return None
-
-        return None
+            raise
 
     @retry_with_login
     @exception_handler
@@ -121,5 +120,4 @@ class Bytes(HTTPService):
         except httpx.HTTPStatusError as exc:
             if exc.response.status_code == 404:
                 return None
-
-        return None
+            raise

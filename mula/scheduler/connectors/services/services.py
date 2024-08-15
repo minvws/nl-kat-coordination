@@ -208,11 +208,12 @@ class HTTPService(Connector):
         try:
             response.raise_for_status()
         except HTTPError as e:
-            self.logger.error(
+            self.logger.warning(
                 "Received bad response from %s.",
                 response.url,
                 name=self.name,
                 url=response.url,
+                status_code=response.status_code,
                 response=str(response.content),
             )
             raise e

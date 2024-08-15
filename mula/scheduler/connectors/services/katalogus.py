@@ -148,8 +148,7 @@ class Katalogus(HTTPService):
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 404:
                 return []
-
-        return []
+            raise
 
     @exception_handler
     def get_boefje(self, boefje_id: str) -> Boefje | None:
@@ -160,8 +159,7 @@ class Katalogus(HTTPService):
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 404:
                 return None
-
-        return None
+            raise
 
     @exception_handler
     def get_organisation(self, organisation_id) -> Organisation | None:
@@ -172,8 +170,7 @@ class Katalogus(HTTPService):
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 404:
                 return None
-
-        return None
+            raise
 
     @exception_handler
     def get_organisations(self) -> list[Organisation]:
@@ -184,8 +181,7 @@ class Katalogus(HTTPService):
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 404:
                 return []
-
-        return []
+            raise
 
     @exception_handler
     def get_plugins_by_organisation(self, organisation_id: str) -> list[Plugin]:
@@ -196,8 +192,7 @@ class Katalogus(HTTPService):
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 404:
                 return []
-
-        return []
+            raise
 
     def get_plugins_by_org_id(self, organisation_id: str) -> list[Plugin]:
         def _get_from_cache() -> list[Plugin]:

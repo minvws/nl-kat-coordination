@@ -68,6 +68,7 @@ class Octopoes(HTTPService):
             except httpx.HTTPStatusError as e:
                 if e.response.status_code == 404:
                     break
+                raise
 
             list_objects = ListObjectsResponse(**response.json())
             oois.extend([ooi for ooi in list_objects.items])
@@ -94,8 +95,7 @@ class Octopoes(HTTPService):
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 404:
                 return []
-
-        return []
+            raise
 
     @exception_handler
     def get_object(self, organisation_id: str, reference: str) -> OOI | None:
@@ -111,8 +111,7 @@ class Octopoes(HTTPService):
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 404:
                 return None
-
-        return None
+            raise
 
     def is_healthy(self) -> bool:
         healthy = True
