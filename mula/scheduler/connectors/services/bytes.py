@@ -97,7 +97,10 @@ class Bytes(HTTPService):
                     "descending": "true",
                 },
             )
-            return BoefjeMeta(**response.json()[0])
+            if len(response.json()) > 0:
+                return BoefjeMeta(**response.json()[0])
+
+            return None
         except httpx.HTTPStatusError as exc:
             if exc.response.status_code == httpx.codes.NOT_FOUND:
                 return None
