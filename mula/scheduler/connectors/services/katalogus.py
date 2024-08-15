@@ -146,7 +146,7 @@ class Katalogus(HTTPService):
             response = self.get(url)
             return [Boefje(**boefje) for boefje in response.json()]
         except httpx.HTTPStatusError as e:
-            if e.response.status_code == httpx.codes.NOT_FOUND
+            if e.response.status_code == httpx.codes.NOT_FOUND:
                 return []
             raise
 
