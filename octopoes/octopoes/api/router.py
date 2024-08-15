@@ -7,6 +7,7 @@ from logging import getLogger
 from operator import itemgetter
 from typing import Any
 
+from asgiref.sync import sync_to_async
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
 from httpx import HTTPError
 from pydantic import AwareDatetime
@@ -354,7 +355,7 @@ def save_declaration(
         result=[declaration.ooi.reference],
         task_id=declaration.task_id if declaration.task_id else uuid.uuid4(),
     )
-    octopoes.save_origin(origin, [declaration.ooi], declaration.valid_time)
+    octopoes.save_origin(origin, [declaration.ooi], declaration.valid_time, declaration.end_valid_time)
     octopoes.commit()
 
 
@@ -531,6 +532,7 @@ def exporter(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> Any:
     return xtdb_session_.client.export_transactions()
 
 
+@sync_to_async
 def importer(data: bytes, xtdb_session_: XTDBSession, reset: bool = False) -> dict[str, int]:
     try:
         ops: list[dict[str, Any]] = list(map(itemgetter("txOps"), json.loads(data)))
@@ -573,7 +575,7 @@ async def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xt
         data = await request.body()
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
-    return importer(data, xtdb_session_)
+    return await importer(data, xtdb_session_)
 
 
 @router.post("/io/import/new", tags=["io"])
@@ -582,7 +584,7 @@ async def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xt
         data = await request.body()
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
-    return importer(data, xtdb_session_, True)
+    return await importer(data, xtdb_session_, True)
 
 
 @router.post("/origins/migrate", tags=["Origins"])

@@ -5,18 +5,16 @@ from typing import ClassVar
 
 import mmh3
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Column, DateTime, Enum, String
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.schema import Index
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from sqlalchemy.sql.expression import text
 
 from scheduler.utils import GUID
 
 from .base import Base
 from .boefje import Boefje
 from .normalizer import Normalizer
-from .queue import PrioritizedItem
 from .raw_data import RawData
 
 
@@ -47,22 +45,24 @@ class TaskStatus(str, enum.Enum):
 class Task(BaseModel):
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
-    id: uuid.UUID
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
 
-    scheduler_id: str
+    scheduler_id: str | None = None
 
-    type: str
+    schedule_id: uuid.UUID | None = None
 
-    p_item: PrioritizedItem
+    priority: int | None = 0
 
-    status: TaskStatus
+    status: TaskStatus = TaskStatus.PENDING
+
+    type: str | None = None
+
+    hash: str | None = Field(None, max_length=32)
+
+    data: dict | None = None
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-    def __repr__(self):
-        return f"Task(id={self.id}, scheduler_id={self.scheduler_id}, type={self.type}, status={self.status})"
 
 
 class TaskDB(Base):
@@ -70,11 +70,18 @@ class TaskDB(Base):
 
     id = Column(GUID, primary_key=True)
 
-    scheduler_id = Column(String)
+    scheduler_id = Column(String, nullable=False)
 
-    type = Column(String)
+    schedule_id = Column(GUID, ForeignKey("schedules.id", ondelete="SET NULL"), nullable=True)
+    schedule = relationship("ScheduleDB", back_populates="tasks")
 
-    p_item = Column(JSONB, nullable=False)
+    type = Column(String, nullable=False)
+
+    hash = Column(String(32), index=True)
+
+    priority = Column(Integer)
+
+    data = Column(JSONB, nullable=False)
 
     status = Column(
         Enum(TaskStatus),
@@ -93,14 +100,6 @@ class TaskDB(Base):
         nullable=False,
         server_default=func.now(),
         onupdate=func.now(),
-    )
-
-    __table_args__ = (
-        Index(
-            "ix_p_item_hash",
-            text("(p_item->>'hash')"),
-            created_at.desc(),
-        ),
     )
 
 
@@ -130,7 +129,7 @@ class BoefjeTask(BaseModel):
 
     id: uuid.UUID | None = Field(default_factory=uuid.uuid4)
     boefje: Boefje
-    input_ooi: str | None
+    input_ooi: str | None = None
     organization: str
 
     dispatches: list[Normalizer] = Field(default_factory=list)
