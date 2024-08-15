@@ -58,25 +58,12 @@
     </div>
 </section>
 <section>
-    <div>
+    {% comment %} TODO: Implement consumable object types {% endcomment %}
+    {% comment %} <div>
         <!-- Consumes -->
         {% if plugin.consumes %}
             <h3 class="heading-small">{% translate "Consumes" %}</h3>
-            <p>
-                {% blocktranslate trimmed with plugin_name=plugin.name %}
-                    {{ plugin_name }} is able to scan the following object types:
-                {% endblocktranslate %}
-            </p>
-            {% for consumes in plugin.consumes_human_readable %}
-                {{ consumes }}
-                {% if not forloop.last %}-{% endif %}
-            {% endfor %}
-        {% else %}
-            {% blocktranslate trimmed with plugin_name=plugin.name %}
-                {{ plugin_name }} does not need any input objects.
-            {% endblocktranslate %}
-        {% endif %}
-    </div>
+    </div> {% endcomment %}
     <div>
         <!-- Produces -->
         <h3 class="heading-small">{% translate "Produces" %}</h3>
