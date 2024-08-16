@@ -174,10 +174,14 @@ class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportV
 
         if len(report_names) == len(reference_dates):
             for index, report_name in enumerate(report_names):
-                if reference_dates[index]:
-                    final_report_name = f"{report_name} {reference_dates[index]}"
-                else:
-                    final_report_name = report_name
+                date_format = ""
+                if reference_dates[index] and reference_dates[index] != "":
+                    date_format = " - "
+                    if reference_dates[index] == "week":
+                        date_format += _("Week %W, %Y")
+                    else:
+                        date_format += reference_dates[index]
+                final_report_name = f"{report_name} {date_format}".strip()
                 final_report_names.append(final_report_name)
         if not final_report_names:
             return report_names

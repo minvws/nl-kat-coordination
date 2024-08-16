@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 
 from django.contrib import messages
@@ -57,6 +58,7 @@ class SaveGenerateReportMixin(ReportPluginView):
                 number_of_reports += 1
 
         observed_at = self.get_observed_at()
+        now = datetime.utcnow()
 
         # if its not a single report, we need a parent
         if number_of_reports > 1:
@@ -68,7 +70,7 @@ class SaveGenerateReportMixin(ReportPluginView):
                 parent=None,
                 has_parent=False,
                 observed_at=observed_at,
-                name=report_names[0][1],
+                name=now.strftime(report_names[0][1]),
             )
             for report_type, ooi_data in report_data.items():
                 for ooi, data in ooi_data.items():
@@ -105,7 +107,7 @@ class SaveGenerateReportMixin(ReportPluginView):
                 parent=None,
                 has_parent=False,
                 observed_at=observed_at,
-                name=report_names[0][1],
+                name=datetime.strftime(now, report_names[0][1]),
             )
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if error_reports:

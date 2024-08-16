@@ -43,16 +43,10 @@
                                     <td>
                                         <select class="reference-date" name="reference_date">
                                             <option value="">{% translate "No reference date" %}</option>
-                                            <option value="{{ current_datetime|date:"N jS Y, H:i" }}">
-                                                {% translate "Day" %} ({{ current_datetime|date:"N jS Y, H:i" }})
-                                            </option>
-                                            <option value="{% translate "Week" %} {{ current_datetime|date:"W, Y" }}">
-                                                {% translate "Week" %} ({% translate "Week" %} {{ current_datetime|date:"W, Y" }})
-                                            </option>
-                                            <option value="{{ current_datetime|date:"N, Y" }}">
-                                                {% translate "Month" %} ({{ current_datetime|date:"N, Y" }})
-                                            </option>
-                                            <option value="{{ current_datetime|date:"Y" }}">{% translate "Year" %} ({{ current_datetime|date:"Y" }})</option>
+                                            <option value="%b %d %Y, %H:%M">{% translate "Day" %} ({{ current_datetime|date:"N jS Y, H:i" }})</option>
+                                            <option value="week">{% translate "Week" %} ({% translate "Week" %} {{ current_datetime|date:"W, Y" }})</option>
+                                            <option value="%b, %Y">{% translate "Month" %} ({{ current_datetime|date:"N, Y" }})</option>
+                                            <option value="%Y">{% translate "Year" %} ({{ current_datetime|date:"Y" }})</option>
                                         </select>
                                     </td>
                                 </tr>
