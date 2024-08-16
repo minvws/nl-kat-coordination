@@ -16,7 +16,7 @@ from octopoes.models.ooi.web import URL, HostnameHTTPURL, HTTPHeader, HTTPResour
 
 
 def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
-    parser = minidom.parse(raw)
+    parser = minidom.parseString(raw.decode("UTF-8"))
 
     # assume that input ooi is none or a HostnameHTTPURL
     if input_ooi:
