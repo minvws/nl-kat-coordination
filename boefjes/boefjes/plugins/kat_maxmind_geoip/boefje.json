@@ -1,0 +1,14 @@
+{
+  "id": "maxmind",
+  "name": "Maxmind",
+  "description": "Fetch geolocation information for an IP address from Maxmind",
+  "consumes": [
+    "IPAddressV4",
+    "IPAddressV6"
+  ],
+  "scan_level": 1,
+  "environment_keys": [
+    "MAXMIND_USER_ID",
+    "MAXMIND_LICENCE_KEY"
+  ]
+}
