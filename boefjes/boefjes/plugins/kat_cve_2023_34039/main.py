@@ -51,14 +51,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, str | bytes]]:
                 coutput = os.system(" ".join(ssh_command))  # noqa: S605
                 if coutput not in (0, 32512):  # 0 = it worked, 32512 = `exit` does not exists but we did connect
                     continue
-                return [
-                    (
-                        set(),
-                        "\n".join(
-                            (str(coutput), f"{key_file} is allowed access to vRealize Network Insight on {ip}:{port}")
-                        ),
-                    )
-                ]
+                return [({"cve/id"}, "CVE-2023-34039")]
 
             except Exception:  # noqa: S112
                 continue
