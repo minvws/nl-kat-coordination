@@ -28,7 +28,7 @@ services:
       - ci_rabbitmq
 
   ci_postgres:
-    image: postgres:15
+    image: docker.io/library/postgres:15
     command:
       ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]
     healthcheck:
