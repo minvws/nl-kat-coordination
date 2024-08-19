@@ -473,7 +473,7 @@ class BoefjeScheduler(Scheduler):
 
                     # Boefje allowed to scan ooi?
                     if not self.has_boefje_permission_to_run(plugin, ooi):
-                        self.logger.debug(
+                        self.logger.info(
                             "Boefje not allowed to scan ooi, skipping and disabling schedule",
                             boefje_id=boefje_task.boefje.id,
                             ooi_primary_key=ooi.primary_key,
