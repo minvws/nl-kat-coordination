@@ -4,7 +4,7 @@ from typing import Any
 
 import httpx
 import structlog
-from httpx import HTTPError, HTTPTransport, Limits
+from httpx import HTTPTransport, Limits
 
 from ..connector import Connector  # noqa: TID252
 
