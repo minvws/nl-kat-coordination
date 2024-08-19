@@ -110,7 +110,7 @@ class HTTPService(Connector):
             url=url,
         )
 
-        self._verify_response(response)
+        response.raise_for_status()
 
         return response
 
@@ -146,7 +146,7 @@ class HTTPService(Connector):
             payload=payload,
         )
 
-        self._verify_response(response)
+        response.raise_for_status()
 
         return response
 
@@ -198,22 +198,3 @@ class HTTPService(Connector):
             return False
 
         return self.is_host_healthy(self.host, self.health_endpoint)
-
-    def _verify_response(self, response: httpx.Response) -> None:
-        """Verify the received response from a request.
-
-        Raises:
-            Exception
-        """
-        try:
-            response.raise_for_status()
-        except HTTPError as e:
-            self.logger.warning(
-                "Received bad response from %s.",
-                response.url,
-                name=self.name,
-                url=response.url,
-                status_code=response.status_code,
-                response=str(response.content),
-            )
-            raise e
