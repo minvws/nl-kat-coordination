@@ -5,16 +5,23 @@ from typing import Any
 import fastapi
 import pydantic
 import structlog
+from fastapi import status
 
-from scheduler import context, models, storage
+from scheduler import context, models, schedulers, storage
 from scheduler.server import serializers, utils
 
 
 class ScheduleAPI:
-    def __init__(self, api: fastapi.FastAPI, ctx: context.AppContext) -> None:
+    def __init__(
+        self,
+        api: fastapi.FastAPI,
+        ctx: context.AppContext,
+        s: dict[str, schedulers.Scheduler],
+    ) -> None:
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.api = api
         self.ctx = ctx
+        self.schedulers: dict[str, schedulers.Scheduler] = s
 
         self.api.add_api_route(
             path="/schedules",
@@ -57,7 +64,7 @@ class ScheduleAPI:
         self,
         request: fastapi.Request,
         schedule_hash: str | None = None,
-        enabled: bool | None = True,
+        enabled: bool | None = None,
         offset: int = 0,
         limit: int = 10,
         min_deadline_at: datetime.datetime | None = None,
@@ -109,7 +116,7 @@ class ScheduleAPI:
 
     def create(self, schedule: serializers.ScheduleCreate) -> Any:
         try:
-            new_schedule = models.Schedule(**schedule.dict())
+            new_schedule = models.Schedule(**schedule.model_dump())
         except pydantic.ValidationError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
@@ -121,21 +128,44 @@ class ScheduleAPI:
                 detail=f"failed to create schedule [exception: {exc}]",
             ) from exc
 
+        s = self.schedulers.get(new_schedule.scheduler_id)
+        if s is None:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="scheduler not found",
+            )
+
+        # Validate data with task type of the scheduler
         try:
-            self.ctx.datastores.schedule_store.create_schedule(new_schedule)
+            instance = s.ITEM_TYPE.parse_obj(new_schedule.data)
+        except pydantic.ValidationError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=f"invalid task data [exception: {exc}]",
+            ) from exc
+
+        # Create hash for schedule with task type
+        try:
+            new_schedule.hash = instance.hash
+        except Exception as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=f"failed to create hash for schedule [exception: {exc}]",
+            ) from exc
+
+        # Check if schedule with the same hash already exists
+        try:
+            schedule = self.ctx.datastores.schedule_store.get_schedule_by_hash(new_schedule.hash)
+            if schedule is not None:
+                raise fastapi.HTTPException(
+                    status_code=fastapi.status.HTTP_409_CONFLICT,
+                    detail="schedule with the same hash already exists",
+                )
         except storage.errors.StorageError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"error occurred while accessing the database [exception: {exc}]",
             ) from exc
-        except Exception as exc:
-            self.logger.exception(exc)
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"failed to create schedule [exception: {exc}]",
-            ) from exc
-
-        return new_schedule
 
     def get(self, schedule_id: uuid.UUID) -> Any:
         try:

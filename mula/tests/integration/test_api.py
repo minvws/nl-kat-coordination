@@ -976,6 +976,67 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
         self.assertEqual(400, response.status_code)
         self.assertIn("validation error", response.json().get("detail"))
 
+    def test_post_schedule_invalid_scheduler_id(self):
+        item = functions.create_item(self.scheduler.scheduler_id, 1)
+        response = self.client.post(
+            "/schedules",
+            json={
+                "scheduler_id": "invalid",
+                "schedule": "*/5 * * * *",
+                "data": item.data,
+            },
+        )
+        self.assertEqual(404, response.status_code)
+        self.assertIn("scheduler not found", response.json().get("detail"))
+
+    def test_post_schedule_invalid_data(self):
+        item = functions.create_item(self.scheduler.scheduler_id, 1)
+        response = self.client.post(
+            "/schedules",
+            json={
+                "scheduler_id": item.scheduler_id,
+                "schedule": "*/5 * * * *",
+                "data": "invalid",
+            },
+        )
+        self.assertEqual(422, response.status_code)
+
+    def test_post_schedule_invalid_data_type(self):
+        item = functions.create_item(self.scheduler.scheduler_id, 1)
+        response = self.client.post(
+            "/schedules",
+            json={
+                "scheduler_id": item.scheduler_id,
+                "schedule": "*/5 * * * *",
+                "data": {"invalid": "invalid"},
+            },
+        )
+        self.assertEqual(400, response.status_code)
+        self.assertIn("validation error", response.json().get("detail"))
+
+    def test_post_schedule_hash_already_exists(self):
+        item = functions.create_item(self.scheduler.scheduler_id, 1)
+        response = self.client.post(
+            "/schedules",
+            json={
+                "scheduler_id": item.scheduler_id,
+                "schedule": "*/5 * * * *",
+                "data": item.data,
+            },
+        )
+        self.assertEqual(201, response.status_code)
+
+        response = self.client.post(
+            "/schedules",
+            json={
+                "scheduler_id": item.scheduler_id,
+                "schedule": "*/5 * * * *",
+                "data": item.data,
+            },
+        )
+        self.assertEqual(409, response.status_code)
+        self.assertIn("schedule with the same hash already exists", response.json().get("detail"))
+
     def test_get_schedule(self):
         response = self.client.get(f"/schedules/{str(self.first_schedule.id)}")
         self.assertEqual(200, response.status_code)
