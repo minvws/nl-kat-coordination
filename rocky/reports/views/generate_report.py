@@ -165,6 +165,9 @@ class ExportSetupGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenerat
             ExportSetupGenerateReportView, "report_types"
         ):
             self.setup(request, *args, **kwargs)
+        if not self.selected_report_types:
+            messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
+            return redirect(self.get_previous())
         self.reports = create_report_names(self.oois_pk, self.report_types)
         return super().get(request, *args, **kwargs)
 
