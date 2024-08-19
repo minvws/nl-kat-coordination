@@ -90,7 +90,7 @@ class SaveGenerateReportMixin(ReportPluginView):
                         parent=report_ooi.reference,
                         has_parent=True,
                         observed_at=observed_at,
-                        name=name,
+                        name=now.strftime(name),
                     )
         # if its a single report we can just save it as complete
         else:
@@ -107,7 +107,7 @@ class SaveGenerateReportMixin(ReportPluginView):
                 parent=None,
                 has_parent=False,
                 observed_at=observed_at,
-                name=datetime.strftime(now, report_names[0][1]),
+                name=now.strftime(report_names[0][1]),
             )
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if error_reports:
@@ -170,6 +170,8 @@ class SaveAggregateReportMixin(ReportPluginView):
                 }
             )
 
+        now = datetime.utcnow()
+
         # Create the report
         report_data_raw_id = self.save_report_raw(data=post_processed_data)
         report_ooi = self.save_report_ooi(
@@ -179,7 +181,7 @@ class SaveAggregateReportMixin(ReportPluginView):
             parent=None,
             has_parent=False,
             observed_at=observed_at,
-            name=report_names[0][1],
+            name=now.strftime(report_names[0][1]),
         )
 
         # Save the child reports to bytes
