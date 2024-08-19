@@ -9,7 +9,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import ec, rsa
 from dateutil.parser import parse
 
-from boefjes.job_models import NormalizerOutput
+from boefjes.job_models import NormalizerAffirmation, NormalizerOutput
 from octopoes.models import Reference
 from octopoes.models.ooi.certificate import (
     AlgorithmType,
@@ -73,7 +73,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         )
 
         # update website
-        yield website
+        yield NormalizerAffirmation(ooi=website)
 
     # chain certificates together
     last_certificate = None
