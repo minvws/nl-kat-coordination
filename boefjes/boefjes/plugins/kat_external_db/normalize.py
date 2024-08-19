@@ -35,7 +35,7 @@ def get_indemnification_level(path_dict):
     """Return indemnification level from metadata or default."""
     try:
         indemnification_level = int(follow_path_in_dict(path=INDEMNIFICATION_ITEM_PATH, path_dict=path_dict))
-        if 0 < indemnification_level < 5:
+        if 0 <= indemnification_level < 5:
             return indemnification_level
         raise ValueError(f"Invalid indemnificationlevel {indemnification_level}, aborting.")
     except KeyError:
