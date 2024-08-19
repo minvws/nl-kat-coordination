@@ -48,9 +48,12 @@ class BoefjeTaskDetailView(TaskDetailView):
             {
                 "url": reverse(
                     "boefje_task_view",
-                    kwargs={"organization_code": self.organization.code, "task_id": context["task_id"]},
+                    kwargs={
+                        "organization_code": self.organization.code,
+                        "task_id": context["task_id"],
+                    },
                 ),
-                "text": context["task"].p_item.data.boefje.id,
+                "text": context["task"].data.boefje.id,
             },
         ]
 
