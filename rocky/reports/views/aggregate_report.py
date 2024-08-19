@@ -154,12 +154,10 @@ class SetupScanAggregateReportView(
     current_step = 3
 
     def post(self, request, *args, **kwargs):
-        _, are_plugins_enabled = self.get_all_plugins()
-        all_plugins_enabled = are_plugins_enabled.get("required") and are_plugins_enabled.get("optional")
         # If the user wants to change selection, but all plugins are enabled, it needs to go even further back
-        if "return" in self.request.POST and all_plugins_enabled:
+        if "return" in self.request.POST and self.plugins_enabled():
             return ReportTypesSelectionAggregateReportView().post(request, *args, **kwargs)
-        if all_plugins_enabled:
+        if self.plugins_enabled():
             return ExportSetupAggregateReportView().post(request, *args, **kwargs)
         if not self.selected_report_types:
             messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)

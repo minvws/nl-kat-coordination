@@ -135,13 +135,10 @@ class SetupScanGenerateReportView(
     current_step = 3
 
     def post(self, request, *args, **kwargs):
-        _, are_plugins_enabled = self.get_all_plugins()
-        all_plugins_enabled = are_plugins_enabled.get("required") and are_plugins_enabled.get("optional")
-
-        if "return" in self.request.POST and all_plugins_enabled:
+        if "return" in self.request.POST and self.plugins_enabled():
             return ReportTypesSelectionGenerateReportView().post(request, *args, **kwargs)
 
-        if are_plugins_enabled.get("required") and are_plugins_enabled.get("optional"):
+        if self.plugins_enabled():
             return ExportSetupGenerateReportView().post(request, *args, **kwargs)
 
         if not self.selected_report_types:
