@@ -377,7 +377,7 @@ class BoefjeScheduler(Scheduler):
                         self.organisation.id,
                     )
                     if not plugin:
-                        self.logger.debug(
+                        self.logger.info(
                             "Boefje does not exist anymore, skipping and disabling schedule",
                             boefje_id=boefje_task.boefje.id,
                             schedule_id=schedule.id,
