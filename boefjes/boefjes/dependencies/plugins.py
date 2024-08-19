@@ -98,7 +98,7 @@ class PluginService:
             self.set_enabled_by_id(plugin_id, to_organisation, enabled=True)
 
     def upsert_settings(self, settings: dict, organisation_id: str, plugin_id: str):
-        self._assert_settings_match_schema(settings, organisation_id, plugin_id)
+        self._assert_settings_match_schema(settings, plugin_id)
         self._put_boefje(plugin_id)
 
         return self.config_storage.upsert(organisation_id, plugin_id, settings=settings)
@@ -188,14 +188,14 @@ class PluginService:
 
         self.config_storage.upsert(organisation_id, plugin_id, enabled=enabled)
 
-    def _assert_settings_match_schema(self, all_settings: dict, organisation_id: str, plugin_id: str):
+    def _assert_settings_match_schema(self, all_settings: dict, plugin_id: str):
         schema = self.schema(plugin_id)
 
         if schema:  # No schema means that there is nothing to assert
             try:
                 validate(instance=all_settings, schema=schema)
             except ValidationError as e:
-                raise SettingsNotConformingToSchema(organisation_id, plugin_id, e.message) from e
+                raise SettingsNotConformingToSchema(plugin_id, e.message) from e
 
     def _set_plugin_enabled(self, plugin: PluginType, organisation_id: str) -> PluginType:
         with contextlib.suppress(KeyError, NotFound):

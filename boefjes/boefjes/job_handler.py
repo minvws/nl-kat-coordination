@@ -35,7 +35,7 @@ def get_octopoes_api_connector(org_code: str) -> OctopoesAPIConnector:
     return OctopoesAPIConnector(str(settings.octopoes_api), org_code)
 
 
-def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: list[str]) -> dict[str, str]:
+def get_environment_settings(boefje_meta: BoefjeMeta) -> dict[str, str]:
     try:
         katalogus_api = str(settings.katalogus_api).rstrip("/")
         response = httpx.get(
@@ -43,21 +43,22 @@ def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: list[str
             timeout=30,
         )
         response.raise_for_status()
-        environment = response.json()
-
-        # Add prefixed BOEFJE_* global environment variables
-        for key, value in os.environ.items():
-            if key.startswith("BOEFJE_"):
-                katalogus_key = key.split("BOEFJE_", 1)[1]
-                # Only pass the environment variable if it is not explicitly set through the katalogus,
-                # if and only if they are defined in boefje.json
-                if katalogus_key in environment_keys and katalogus_key not in environment:
-                    environment[katalogus_key] = value
-
-        return {k: str(v) for k, v in environment.items() if k in environment_keys}
     except HTTPError:
         logger.exception("Error getting environment settings")
         raise
+
+    settings_from_katalogus = response.json()
+    new_env = {}
+
+    for key, value in os.environ.items():
+        if key.startswith("BOEFJE_"):
+            env_key = key.split("BOEFJE_", 1)[1]
+            new_env[env_key] = value
+
+    for key, value in settings_from_katalogus.items:
+        new_env[key] = value
+
+    return new_env
 
 
 class BoefjeHandler(Handler):
@@ -97,10 +98,8 @@ class BoefjeHandler(Handler):
 
             boefje_meta.arguments["input"] = ooi.serialize()
 
-        env_keys = boefje_resource.environment_keys
-
         boefje_meta.runnable_hash = boefje_resource.runnable_hash
-        boefje_meta.environment = get_environment_settings(boefje_meta, env_keys) if env_keys else {}
+        boefje_meta.environment = get_environment_settings(boefje_meta)
 
         mime_types = _default_mime_types(boefje_meta.boefje)
 
