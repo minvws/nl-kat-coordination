@@ -286,9 +286,9 @@ class SchedulerClient:
             res.raise_for_status()
             return ScheduleResponse.model_validate_json(res.content)
         except ValidationError:
-            raise SchedulerValidationError()
+            raise SchedulerValidationError(extra_message="Report schedule failed: ")
         except ConnectError:
-            raise SchedulerConnectError()
+            raise SchedulerConnectError(extra_message="Report schedule failed: ")
 
     # TODO: arguments, a Schedule model, a dict?
     def patch_schedule(self, schedule_id: str, enabled: bool, schedule: str) -> None:

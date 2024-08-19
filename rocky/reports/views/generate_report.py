@@ -173,16 +173,17 @@ class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportV
     task_type = "report"
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        form_data = self.get_schedule_filter_form_data()
-        if "start_date" in form_data and "recurrence" in form_data:
-            self.create_schedule()
-
-            # TODO: send cron expression to the scheduler to schedule report
-
         old_report_names = request.POST.getlist("old_report_name")
         new_report_names = request.POST.getlist("report_name")
         report_names = list(zip(old_report_names, new_report_names))
         report_ooi = self.save_report(report_names)
+
+        form_data = self.get_schedule_filter_form_data()
+        # A schedule must be set or skip.
+        if "start_date" in form_data and "recurrence" in form_data:
+            start_date = form_data.get("start_date", "")
+            recurrence = form_data.get("recurrence", "")
+            self.create_report_schedule(report_ooi, start_date, recurrence)
 
         return redirect(
             reverse("view_report", kwargs={"organization_code": self.organization.code})

@@ -77,20 +77,14 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
-    def get_schedule_params(self) -> dict[str, str | None]:
-        return {
-            "scheduler_id": self.scheduler_id,
-            "hash": "",
-            "data": "",
-            "schedule": self.convert_recurrence_to_cron_expressions(
-                self.request.POST.get("start_date", ""), self.request.POST.get("recurrence", "")
-            ),
-            "deadline_at": None,
-        }
-
-    def create_schedule(self) -> ScheduleResponse | None:
+    def create_report_schedule(self, report_ooi, start_date: str, recurrence: str) -> ScheduleResponse | None:
         try:
-            return self.scheduler_client.post_schedule(schedule=ScheduleRequest(**self.get_schedule_params()))
+            self.bytes_client.get_raw(report_ooi.data_raw_id)
+            schedule = self.convert_recurrence_to_cron_expressions(start_date, recurrence)
+            schedule_request = ScheduleRequest(
+                scheduler_id=self.scheduler_id, hash="", data={}, schedule=schedule, deadline_at=None
+            )
+            return self.scheduler_client.post_schedule(schedule=schedule_request)
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
