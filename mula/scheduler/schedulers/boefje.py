@@ -433,7 +433,7 @@ class BoefjeScheduler(Scheduler):
                     try:
                         ooi = self.ctx.services.octopoes.get_object(boefje_task.organization, boefje_task.input_ooi)
                         if not ooi:
-                            self.logger.debug(
+                            self.logger.info(
                                 "OOI does not exist anymore, skipping and disabling schedule",
                                 ooi_primary_key=boefje_task.input_ooi,
                                 schedule_id=schedule.id,
