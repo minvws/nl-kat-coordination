@@ -11,7 +11,17 @@ from tools.forms.scheduler import TaskFilterForm
 
 from octopoes.models import OOI
 from rocky.scheduler import Boefje as SchedulerBoefje
-from rocky.scheduler import BoefjeTask, LazyTaskList, NormalizerTask, RawData, SchedulerError, Task, scheduler_client
+from rocky.scheduler import (
+    BoefjeTask,
+    LazyTaskList,
+    NormalizerTask,
+    RawData,
+    ScheduleRequest,
+    SchedulerError,
+    ScheduleResponse,
+    Task,
+    scheduler_client,
+)
 from rocky.scheduler import Normalizer as SchedulerNormalizer
 from rocky.views.mixins import OctopoesView
 
@@ -30,10 +40,11 @@ class SchedulerView(OctopoesView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.scheduler_client = scheduler_client(self.organization.code)
+        self.scheduler_id = f"{self.task_type}-{self.organization.code}"
 
     def get_task_filters(self) -> dict[str, Any]:
         return {
-            "scheduler_id": f"{self.task_type}-{self.organization.code}",
+            "scheduler_id": self.scheduler_id,
             "task_type": self.task_type,
             "plugin_id": None,  # plugin_id present and set at plugin detail
             **self.get_form_data(),
@@ -63,6 +74,23 @@ class SchedulerView(OctopoesView):
     def get_task_details(self, task_id: str) -> Task | None:
         try:
             return self.scheduler_client.get_task_details(task_id)
+        except SchedulerError as error:
+            return messages.error(self.request, error.message)
+
+    def get_schedule_params(self) -> dict[str, str | None]:
+        return {
+            "scheduler_id": self.scheduler_id,
+            "hash": "",
+            "data": "",
+            "schedule": self.convert_recurrence_to_cron_expressions(
+                self.request.POST.get("start_date", ""), self.request.POST.get("recurrence", "")
+            ),
+            "deadline_at": None,
+        }
+
+    def create_schedule(self) -> ScheduleResponse | None:
+        try:
+            return self.scheduler_client.post_schedule(schedule=ScheduleRequest(**self.get_schedule_params()))
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 

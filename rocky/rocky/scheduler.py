@@ -281,7 +281,7 @@ class SchedulerClient:
         try:
             res = self._client.post(
                 "/schedules",
-                json=schedule.dict(exclude_none=True),
+                json=schedule.model_dump(exclude_none=True),
             )
             res.raise_for_status()
             return ScheduleResponse.model_validate_json(res.content)

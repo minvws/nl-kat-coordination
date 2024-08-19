@@ -170,11 +170,12 @@ class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportV
     template_name = "generate_report.html"
     breadcrumbs_step = 6
     current_step = 4
+    task_type = "report"
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         form_data = self.get_schedule_filter_form_data()
         if "start_date" in form_data and "recurrence" in form_data:
-            self.convert_recurrence_to_cron_expressions(form_data["start_date"], form_data["recurrence"])
+            self.create_schedule()
 
             # TODO: send cron expression to the scheduler to schedule report
 
