@@ -71,6 +71,8 @@ opentelemetry-semantic-conventions = "^0.47b0"
 opentelemetry-util-http = "^0.47b0"
 fastapi-slim = "^0.111.0"
 structlog = "^24.2.0"
+# required by kat_maxmind_geoip
+maxminddb = "^2.6.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.0"
@@ -85,14 +87,15 @@ line-length = 120
 transform-concats = true
 
 [tool.pytest.ini_options]
+addopts = "-m 'not slow'"
 env = [
-    "KATALOGUS_DB_URI=postgresql://postgres:postgres@ci_katalogus-db:5432/ci_katalogus",
-    "QUEUE_URI=amqp://placeholder",
-    "BOEFJE_API=http://placeholder:8006",
-    "KATALOGUS_API=http://placeholder:8000",
-    "OCTOPOES_API=http://placeholder:8001",
-    "SCHEDULER_API=http://placeholder:8002",
-    "BYTES_API=http://placeholder:8003",
-    "BYTES_USERNAME=placeholder",
-    "BYTES_PASSWORD=placeholder",
+    "D:KATALOGUS_DB_URI=postgresql://postgres:postgres@ci_katalogus-db:5432/ci_katalogus",
+    "D:QUEUE_URI=amqp://placeholder",
+    "D:BOEFJE_API=http://placeholder:8006",
+    "D:KATALOGUS_API=http://placeholder:8000",
+    "D:OCTOPOES_API=http://placeholder:8001",
+    "D:SCHEDULER_API=http://placeholder:8002",
+    "D:BYTES_API=http://placeholder:8003",
+    "D:BYTES_USERNAME=placeholder",
+    "D:BYTES_PASSWORD=placeholder",
 ]
