@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-05 13:42+0000\n"
+"POT-Creation-Date: 2024-08-19 13:46+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -575,7 +575,6 @@ msgstr ""
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/confirmation_clone_settings.html
 #: katalogus/templates/plugin_settings_delete.html
-#: reports/templates/partials/export_report_settings.html
 #: rocky/templates/oois/ooi_delete.html
 #: rocky/templates/oois/ooi_mute_finding.html
 #: rocky/templates/organizations/organization_edit.html
@@ -629,7 +628,6 @@ msgid "Sorting options"
 msgstr ""
 
 #: katalogus/forms/plugin_settings.py
-#: reports/templates/partials/export_report_settings.html
 msgid "This field is required."
 msgstr ""
 
@@ -3368,29 +3366,7 @@ msgid "Report names:"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-msgid "Edit "
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid ""
-"\n"
-"                                                            Give your report "
-"a custom name and optionally add the reports' reference date\n"
-"                                                            to the name. To "
-"do so you can select an option below.\n"
-"                                                        "
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Report name settings."
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
 msgid "Add reference date"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Select option"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -3411,10 +3387,6 @@ msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
 msgid "Year"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Confirm"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -3925,6 +3897,10 @@ msgstr ""
 #: reports/views/base.py
 #, python-format
 msgid "Report type '%s' does not exist."
+msgstr ""
+
+#: reports/views/base.py
+msgid "Week %W, %Y"
 msgstr ""
 
 #: reports/views/generate_report.py
