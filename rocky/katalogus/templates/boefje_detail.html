@@ -61,6 +61,10 @@
                         {{ plugin_name }} does not need any input objects.
                     {% endblocktranslate %}
                 {% endif %}
+            </div>
+        </section>
+        <section>
+            <div>
                 <h2>{% translate "Produces" %}</h2>
                 <p>
                     {% blocktranslate trimmed with plugin_name=plugin.name %}
@@ -73,11 +77,11 @@
                         {% for mime_type in plugin.produces %}<li>{{ mime_type }}</li>{% endfor %}
                     </ul>
                 </p>
-                <p>
-                    {% include "tasks/plugin_detail_task_list.html" %}
-
-                </p>
             </div>
+        </section>
+        <section>
+            {% include "tasks/plugin_detail_task_list.html" %}
+
         </section>
         {% if perms.tools.can_scan_organization %}
             {% include "partials/objects_to_scan.html" with plugin=plugin %}
