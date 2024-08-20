@@ -27,7 +27,7 @@ from octopoes.models import OOI, Reference
 from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.concatenated_report.report import ConcatenatedReport
-from reports.report_types.definitions import AggregateReport, BaseReportType, MultiReport, Report
+from reports.report_types.definitions import AggregateReport, BaseReport, BaseReportType, MultiReport, Report
 from reports.report_types.helpers import REPORTS, get_plugins_for_report_ids, get_report_by_id
 from reports.utils import JSONEncoder, debug_json_keys
 from rocky.views.mixins import ObservedAtMixin, OOIList
@@ -100,6 +100,53 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
         return context
 
 
+class ReportRecipe:
+    input_oois: set[OOI] = set()
+    report_types: set[type[BaseReport]] = set()
+    plugins: dict[str, set[type[Plugin]]] = {}
+
+
+class BaseSelectionView(OOIFilterView):
+    def get_report_recipe(self):
+        input_oois = self.get_oois(self.get_ooi_selection())
+        report_types = self.get_report_types(self.get_report_type_selection())
+        return input_oois, report_types
+
+    def get_ooi_selection(self) -> list[str]:
+        selected_oois = self.request.GET.getlist("ooi", [])
+        if "all" in selected_oois:
+            return selected_oois
+        return sorted(set(self.request.POST.getlist("ooi", [])))
+
+    def get_report_type_selection(self) -> list[str]:
+        return sorted(set(self.request.POST.getlist("report_type", [])))
+
+    def get_oois(self, ooi_selection: list[str]) -> set[OOI]:
+        if "all" in ooi_selection:
+            return set(
+                self.octopoes_api_connector.list_objects(
+                    self.get_ooi_types(),
+                    valid_time=self.observed_at,
+                    limit=OOIList.HARD_LIMIT,
+                    scan_level=self.get_ooi_scan_levels(),
+                    scan_profile_type=self.get_ooi_profile_types(),
+                ).items
+            )
+
+        return {self.get_single_ooi(pk=ooi_pk) for ooi_pk in ooi_selection}
+
+    def get_report_types(self, report_type_selection: list[str]) -> set[type[BaseReport]]:
+        report_types = set()
+        for report_type_id in report_type_selection:
+            try:
+                report = get_report_by_id(report_type_id)
+                report_types.add(report)
+            except ValueError:
+                error_message = _("Report type '%s' does not exist.") % report_type_id
+                messages.error(self.request, error_message)
+        return report_types
+
+
 class OOISelectionView(OOIFilterView):
     """
     Shows a list of OOIs to select from and handles OOIs selection requests.
@@ -113,12 +160,6 @@ class OOISelectionView(OOIFilterView):
         self.oois: list[OOI] = self.get_oois()
         self.oois_pk: list[str] = self.get_oois_pk()
 
-    def get_ooi_selection(self) -> list[str]:
-        selected_oois = self.request.GET.getlist("ooi", [])
-        if "all" in selected_oois:
-            return selected_oois
-        return sorted(set(self.request.POST.getlist("ooi", [])))
-
     def get_total_objects(self) -> int:
         if "all" in self.selected_oois:
             return len(self.oois_pk)
@@ -129,18 +170,6 @@ class OOISelectionView(OOIFilterView):
         if "all" in self.selected_oois:
             oois_pk = [ooi.primary_key for ooi in self.oois]
         return oois_pk
-
-    def get_oois(self) -> list[OOI]:
-        if "all" in self.selected_oois:
-            return self.octopoes_api_connector.list_objects(
-                self.get_ooi_types(),
-                valid_time=self.observed_at,
-                limit=OOIList.HARD_LIMIT,
-                scan_level=self.get_ooi_scan_levels(),
-                scan_profile_type=self.get_ooi_profile_types(),
-            ).items
-
-        return [self.get_single_ooi(pk=ooi_pk) for ooi_pk in self.selected_oois]
 
     def get_ooi_filter_forms(self, ooi_types: Iterable[type[OOI]]) -> dict[str, Form]:
         return {
@@ -173,22 +202,6 @@ class ReportTypeSelectionView(TemplateView):
             self.get_report_types_from_choice()
         )
         self.report_type_ids = [report_type for report_type in self.selected_report_types]
-
-    def get_report_type_selection(self) -> list[str]:
-        return sorted(set(self.request.POST.getlist("report_type", [])))
-
-    def get_report_types_from_choice(
-        self,
-    ) -> list[type[Report] | type[MultiReport] | type[AggregateReport]]:
-        report_types = []
-        for report_type in self.selected_report_types:
-            try:
-                report = get_report_by_id(report_type)
-                report_types.append(report)
-            except ValueError:
-                error_message = _("Report type '%s' does not exist.") % report_type
-                messages.error(self.request, error_message)
-        return report_types
 
     @staticmethod
     def get_report_types(reports: set[type[BaseReportType]]) -> list[dict[str, str]]:
