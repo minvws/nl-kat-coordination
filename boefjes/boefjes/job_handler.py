@@ -7,6 +7,8 @@ from typing import cast
 import httpx
 import structlog
 from httpx import HTTPError
+from jsonschema.exceptions import ValidationError
+from jsonschema.validators import validate
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import settings
@@ -15,6 +17,7 @@ from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.local_repository import LocalPluginRepository
 from boefjes.plugins.models import _default_mime_types
 from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
+from boefjes.storage.interfaces import SettingsNotConformingToSchema
 from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference, ScanLevel
@@ -35,7 +38,7 @@ def get_octopoes_api_connector(org_code: str) -> OctopoesAPIConnector:
     return OctopoesAPIConnector(str(settings.octopoes_api), org_code)
 
 
-def get_environment_settings(boefje_meta: BoefjeMeta) -> dict[str, str]:
+def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None) -> dict[str, str]:
     try:
         katalogus_api = str(settings.katalogus_api).rstrip("/")
         response = httpx.get(
@@ -57,6 +60,12 @@ def get_environment_settings(boefje_meta: BoefjeMeta) -> dict[str, str]:
 
     for key, value in settings_from_katalogus.items:
         new_env[key] = value
+
+    if schema is not None:
+        try:
+            validate(instance=new_env, schema=schema)
+        except ValidationError as e:
+            raise SettingsNotConformingToSchema(boefje_meta.boefje.id, e.message) from e
 
     return new_env
 
@@ -99,7 +108,7 @@ class BoefjeHandler(Handler):
             boefje_meta.arguments["input"] = ooi.serialize()
 
         boefje_meta.runnable_hash = boefje_resource.runnable_hash
-        boefje_meta.environment = get_environment_settings(boefje_meta)
+        boefje_meta.environment = get_environment_settings(boefje_meta, boefje_resource.schema)
 
         mime_types = _default_mime_types(boefje_meta.boefje)
 

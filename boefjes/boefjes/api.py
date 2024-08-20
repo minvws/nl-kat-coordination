@@ -151,7 +151,7 @@ def get_task(task_id, scheduler_client):
 def create_boefje_meta(task, local_repository):
     boefje = task.data.boefje
     boefje_resource = local_repository.by_id(boefje.id)
-    environment = get_environment_settings(task.data)
+    environment = get_environment_settings(task.data, boefje_resource.schema)
 
     organization = task.data.organization
     input_ooi = task.data.input_ooi
