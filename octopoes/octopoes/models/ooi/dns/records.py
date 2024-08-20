@@ -188,9 +188,9 @@ class DNSCAARecord(DNSRecord):
 
 
 class DNSLocation(DNSRecord):
-    latitude: str | None = None
-    longitude: str | None = None
-    altitude: str | None = None
+    latitude: float | None = None
+    longitude: float | None = None
+    altitude: float | None = None
 
     @property
     def natural_key(self) -> str:
