@@ -11,11 +11,14 @@ SCHEDULER_API = "http://localhost:8004"
 TIMEOUT_FOR_LOG_CAPTURE = 5
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
+client = httpx.Client(base_url=SCHEDULER_API)
 
 
 def are_tasks_done() -> bool:
-    response = httpx.get(
-        url=f"{SCHEDULER_API}/tasks/stats",
+    response = client.get(
+        url="/tasks/stats",
         timeout=30,
     )
 
@@ -31,8 +34,8 @@ def are_tasks_done() -> bool:
 
 
 def parse_stats() -> None:
-    resp_tasks_stats = httpx.get(
-        url=f"{SCHEDULER_API}/tasks/stats",
+    resp_tasks_stats = client.get(
+        url="/tasks/stats",
         timeout=30,
     )
 
@@ -86,7 +89,14 @@ def parse_logs(path: str) -> None:
 def collect_cpu(container_id: str) -> str:
     return (
         subprocess.run(
-            ["docker", "stats", "--no-stream", "--format", "{{.CPUPerc}}", container_id],
+            [
+                "docker",
+                "stats",
+                "--no-stream",
+                "--format",
+                "{{.CPUPerc}}",
+                container_id,
+            ],
             capture_output=True,
             check=True,
         )
@@ -98,7 +108,14 @@ def collect_cpu(container_id: str) -> str:
 def collect_memory(container_id: str) -> str:
     return (
         subprocess.run(
-            ["docker", "stats", "--no-stream", "--format", "{{.MemUsage}}", container_id],
+            [
+                "docker",
+                "stats",
+                "--no-stream",
+                "--format",
+                "{{.MemUsage}}",
+                container_id,
+            ],
             capture_output=True,
             check=True,
         )
@@ -163,7 +180,7 @@ if __name__ == "__main__":
     # if -v was not given it defaults to printing level warning and higher.
     level = logging.INFO
     if args.verbose:
-        default_loglevel = logging.DEBUG
+        level = logging.DEBUG
 
     logging.basicConfig(
         level=level,

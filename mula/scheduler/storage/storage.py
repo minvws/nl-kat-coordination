@@ -39,6 +39,7 @@ class DBConn:
                 pool_size=pool_size,
                 pool_recycle=300,
                 json_serializer=serializer,
+                connect_args={"options": "-c timezone=utc"},
             )
         except sqlalchemy.exc.SQLAlchemyError as e:
             self.logger.error(

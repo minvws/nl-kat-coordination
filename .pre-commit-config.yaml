@@ -91,11 +91,13 @@ repos:
           - httpx
           - types-python-dateutil
           - types-requests
+          - types-croniter
         exclude: |
           (?x)(
           ^boefjes/tools |
           ^keiko/templates |
           ^mula/whitelist\.py$ |
+          ^mula/scripts |
           ^octopoes/tools |
           ^rocky/whitelist\.py$ |
           /tests/ |

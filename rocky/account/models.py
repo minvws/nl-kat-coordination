@@ -84,6 +84,8 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
 
     objects = KATUserManager()
 
+    EVENT_CODES = {"created": 900101, "updated": 900102, "deleted": 900103}
+
     def get_full_name(self):
         return self.full_name
 
@@ -128,6 +130,8 @@ class AuthToken(AbstractAuthToken):
         constraints = [
             models.UniqueConstraint("user", Lower("name"), name="unique name"),
         ]
+
+    EVENT_CODES = {"created": 900111, "updated": 900122, "deleted": 900123}
 
     def __str__(self):
         return f"{self.name} ({self.user})"
