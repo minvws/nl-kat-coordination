@@ -56,7 +56,7 @@ class LocalPluginRepository:
         path = boefjes[id_].path / SCHEMA_FILE
 
         if not path.exists():
-            logger.debug("Did not find schema for boefje %s", boefjes[id_])
+            logger.debug("Did not find schema for boefje %s", id_)
             return None
 
         return json.loads(path.read_text())
