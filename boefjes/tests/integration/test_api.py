@@ -25,7 +25,7 @@ class TestAPI(TestCase):
 
         self.org = Organisation(id="test", name="Test Organisation")
         self.client = TestClient(app)
-        response = self.client.post("/v1/organisations/", content=self.org.json())
+        response = self.client.post("/v1/organisations/", content=self.org.model_dump_json())
         self.assertEqual(response.status_code, 201)
 
     def tearDown(self) -> None:
@@ -47,7 +47,7 @@ class TestAPI(TestCase):
 
     def test_filter_plugins(self):
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/")
-        self.assertEqual(len(response.json()), 97)
+        self.assertEqual(len(response.json()), 99)
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins?plugin_type=boefje")
         self.assertEqual(len(response.json()), 43)
 
@@ -56,27 +56,27 @@ class TestAPI(TestCase):
 
     def test_cannot_add_plugin_reserved_id(self):
         boefje = Boefje(id="dns-records", name="My test boefje", static=False)
-        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.json())
+        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.model_dump_json())
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {"message": "Plugin id 'dns-records' is already used"})
 
         normalizer = Normalizer(id="kat_nmap_normalize", name="My test normalizer", static=False)
-        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.json())
+        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.model_dump_json())
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {"message": "Plugin id 'kat_nmap_normalize' is already used"})
 
     def test_add_boefje(self):
         boefje = Boefje(id="test_plugin", name="My test boefje", static=False)
-        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.json())
+        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.model_dump_json())
         self.assertEqual(response.status_code, 201)
 
         response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", json={"a": "b"})
         self.assertEqual(response.status_code, 422)
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/?plugin_type=boefje")
-        self.assertEqual(len(response.json()), 44)
+        self.assertEqual(len(response.json()), 45)
 
-        boefje_dict = boefje.dict()
+        boefje_dict = boefje.model_dump()
         boefje_dict["consumes"] = list(boefje_dict["consumes"])
         boefje_dict["produces"] = list(boefje_dict["produces"])
 
@@ -85,7 +85,7 @@ class TestAPI(TestCase):
 
     def test_delete_boefje(self):
         boefje = Boefje(id="test_plugin", name="My test boefje", static=False)
-        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.json())
+        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.model_dump_json())
         self.assertEqual(response.status_code, 201)
 
         response = self.client.delete(f"/v1/organisations/{self.org.id}/boefjes/test_plugin")
@@ -95,18 +95,18 @@ class TestAPI(TestCase):
 
     def test_add_normalizer(self):
         normalizer = Normalizer(id="test_normalizer", name="My test normalizer", static=False)
-        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.json())
+        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.model_dump_json())
         self.assertEqual(response.status_code, 201)
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/?plugin_type=normalizer")
-        self.assertEqual(len(response.json()), 55)
+        self.assertEqual(len(response.json()), 56)
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/test_normalizer")
-        self.assertEqual(response.json(), normalizer.dict())
+        self.assertEqual(response.json(), normalizer.model_dump())
 
     def test_delete_normalizer(self):
         normalizer = Normalizer(id="test_normalizer", name="My test normalizer", static=False)
-        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.json())
+        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.model_dump_json())
         self.assertEqual(response.status_code, 201)
 
         response = self.client.delete(f"/v1/organisations/{self.org.id}/normalizers/test_normalizer")
@@ -118,7 +118,7 @@ class TestAPI(TestCase):
         normalizer = Normalizer(id="norm_id", name="My test normalizer", static=False)
         boefje = Boefje(id="test_plugin", name="My test boefje", description="123", static=False)
 
-        self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.json())
+        self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.model_dump_json())
         self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/{boefje.id}", json={"description": "4"})
         self.client.patch(f"/v1/organisations/{self.org.id}/plugins/{boefje.id}", json={"enabled": True})
 
@@ -136,7 +136,7 @@ class TestAPI(TestCase):
         self.assertIsNone(response.json()["version"])
         self.assertEqual(response.json()["id"], "dns-records")
 
-        self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.json())
+        self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.model_dump_json())
         self.client.patch(f"/v1/organisations/{self.org.id}/normalizers/{normalizer.id}", json={"version": "v1.2"})
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/{normalizer.id}")
@@ -187,7 +187,7 @@ class TestAPI(TestCase):
         # Add the second organisation
         new_org_id = "org2"
         org2 = Organisation(id=new_org_id, name="Second test Organisation")
-        self.client.post("/v1/organisations/", content=org2.json())
+        self.client.post("/v1/organisations/", content=org2.model_dump_json())
         self.client.put(f"/v1/organisations/{new_org_id}/{plug}/settings", json={"test_key": "second value"})
 
         # Show that the second organisation has no settings and dns-records is not enabled
