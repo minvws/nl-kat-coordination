@@ -12,17 +12,12 @@
             <div class="two-thirds-one-third">
                 <div>
                     <h1>{{ plugin.name }}</h1>
+                    {% if plugin.description %}<p class="emphasized">{{ plugin.description }}</p>{% endif %}
                     <div class="horizontal-view scan-intensity">
                         <span class="de-emphasized">{% translate "Scan level" %}</span>
                         {% include "partials/scan_level_indicator.html" with value=plugin.scan_level %}
 
                     </div>
-                    {% if plugin.description %}
-                        <p>
-                            <strong>{% translate "Description" %}</strong>
-                        </p>
-                        <p>{{ plugin.description }}</p>
-                    {% endif %}
                     <div class="horizontal-view">
                         {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
 
@@ -36,10 +31,14 @@
                 </div>
             </div>
         </section>
-        {% if perms.tools.can_view_katalogus_settings %}
-            {% include "plugin_settings_list.html" with object_list=plugin_settings plugin=plugin %}
+        <section>
+            <div>
+                {% if perms.tools.can_view_katalogus_settings %}
+                    {% include "plugin_settings_list.html" with object_list=plugin_settings plugin=plugin %}
 
-        {% endif %}
+                {% endif %}
+            </div>
+        </section>
         <section>
             <div>
                 <h2>{% translate "Consumes" %}</h2>
