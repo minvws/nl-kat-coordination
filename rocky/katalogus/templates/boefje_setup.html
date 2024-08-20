@@ -16,13 +16,14 @@
                         you can check out the <a href="https://nmap.org/book/man-examples.html">documentation</a>.
                     {% endblocktranslate%}
                 </p>
-                <form action="" method="post" class="horizontal-view help">
+                <form action="" method="post" class="help">
                     {% csrf_token %}
-                    <fieldset>
-                        {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
+                    {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
 
-                    </fieldset>
-                    <button type="submit">{% translate "Add" %} {% translate "Boefje" %}</button>
+                    <div class="button-container">
+                        <button type="submit">{% translate "Create variant" %}</button>
+                        <button type="button" class="ghost">{% translate "Discard variant" %}</button>
+                    </div>
                 </form>
             </div>
         </section>
