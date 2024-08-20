@@ -59,7 +59,7 @@ class Task(BaseModel):
 
     hash: str | None = Field(None, max_length=32)
 
-    data: dict | None = {}
+    data: dict = Field(default_factory=dict)
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
