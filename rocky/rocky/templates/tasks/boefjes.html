@@ -25,9 +25,13 @@
                         <table rf-selector="table-scan-history">
                             <thead>
                                 <tr>
+                                    {% if not organization.code %}
+                                        <th scope="col">{% translate "Organization Code" %}</th>
+                                    {% endif %}
                                     <th scope="col">{% translate "Boefje" %}</th>
                                     <th scope="col">{% translate "Status" %}</th>
                                     <th scope="col">{% translate "Created date" %}</th>
+                                    <th scope="col">{% translate "Modified date" %}</th>
                                     <th scope="col">{% translate "Input Object" %}</th>
                                     <th scope="col" class="visually-hidden">{% translate "Details" %}</th>
                                 </tr>
@@ -35,15 +39,21 @@
                             <tbody>
                                 {% for task in task_list %}
                                     <tr data-task-id="{{ task.id }}">
+                                        {% if not organization.code %}
+                                            <td>
+                                                <a href="{% url "organization_crisis_room" task.data.organization %}">{{ task.data.organization }}</a>
+                                            </td>
+                                        {% endif %}
                                         <td>
-                                            <a href="{% url "boefje_detail" organization.code task.data.boefje.id %}">{{ task.data.boefje.name }}</a>
+                                            <a href="{% url "boefje_detail" task.data.organization task.data.boefje.id %}">{{ task.data.boefje.name }}</a>
                                         </td>
                                         <td class="nowrap">
                                             <i class="icon {{ task.status.value }}"></i>&nbsp;{{ task.status.value|capfirst }}
                                         </td>
                                         <td>{{ task.created_at }}</td>
+                                        <td>{{ task.modified_at }}</td>
                                         <td>
-                                            <a href="{% ooi_url "ooi_detail" task.data.input_ooi organization.code observed_at=task.created_at|date:'c' %}">{{ task.data.input_ooi }}</a>
+                                            <a href="{% ooi_url "ooi_detail" task.data.input_ooi task.data.organization observed_at=task.created_at|date:'c' %}">{{ task.data.input_ooi }}</a>
                                         </td>
                                         <td>
                                             <button type="button"

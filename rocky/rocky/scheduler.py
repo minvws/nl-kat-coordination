@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import collections
 import datetime
-import json
 import logging
 import uuid
 from enum import Enum
@@ -274,7 +273,7 @@ class SchedulerClient:
 
     def _get_task_stats(self, scheduler_id: str) -> dict:
         """Return task stats for specific scheduler."""
-        return self._get(f"/tasks/stats/{scheduler_id}")
+        return self._get(f"/tasks/stats/{scheduler_id}")  # type: ignore
 
     def get_task_stats(self, task_type: str) -> dict:
         """Return task stats for specific task type."""
@@ -295,7 +294,7 @@ class SchedulerClient:
             dicts=[self._get_task_stats(scheduler_id=scheduler_id) for scheduler_id in scheduler_ids]
         )
 
-    def _get(self, path: str, return_type: str = "json") -> dict:
+    def _get(self, path: str, return_type: str = "json") -> dict | bytes:
         """Helper to do a get request and raise warning for path."""
         try:
             res = self._client.get(path)

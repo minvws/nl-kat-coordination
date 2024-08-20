@@ -2,6 +2,11 @@
     {% csrf_token %}
     <input type="hidden" name="action" value="{{ action }}">
     {% if key %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}
+    {% if organization_code %}
+        <input type="hidden"
+               name="organization_code"
+               value="{{ organization_code }}">
+    {% endif %}
     <button type="submit"
             class="{{ btn_class }}"
             {% if btn_disabled %}disabled{% endif %}>
