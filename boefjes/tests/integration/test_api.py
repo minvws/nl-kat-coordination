@@ -47,9 +47,12 @@ class TestAPI(TestCase):
 
     def test_filter_plugins(self):
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/")
-        self.assertEqual(len(response.json()), 99)
+        total = len(response.json())
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins?plugin_type=boefje")
-        self.assertEqual(len(response.json()), 44)
+        boefjes = len(response.json())
+        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins?plugin_type=normalizer")
+        normalizers = len(response.json())
+        self.assertEqual(total, boefjes + normalizers)
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins?limit=10")
         self.assertEqual(len(response.json()), 10)
@@ -66,6 +69,8 @@ class TestAPI(TestCase):
         self.assertEqual(response.json(), {"message": "Plugin id 'kat_nmap_normalize' is already used"})
 
     def test_add_boefje(self):
+        total_boefjes = len(self.client.get(f"/v1/organisations/{self.org.id}/plugins/?plugin_type=boefje").json())
+
         boefje = Boefje(id="test_plugin", name="My test boefje", static=False)
         response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.model_dump_json())
         self.assertEqual(response.status_code, 201)
@@ -74,7 +79,7 @@ class TestAPI(TestCase):
         self.assertEqual(response.status_code, 422)
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/?plugin_type=boefje")
-        self.assertEqual(len(response.json()), 45)
+        self.assertEqual(len(response.json()), total_boefjes + 1)
 
         boefje_dict = boefje.model_dump()
         boefje_dict["consumes"] = list(boefje_dict["consumes"])
@@ -94,12 +99,16 @@ class TestAPI(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_add_normalizer(self):
+        total_normalizers = len(
+            self.client.get(f"/v1/organisations/{self.org.id}/plugins/?plugin_type=normalizer").json()
+        )
+
         normalizer = Normalizer(id="test_normalizer", name="My test normalizer", static=False)
         response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.model_dump_json())
         self.assertEqual(response.status_code, 201)
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/?plugin_type=normalizer")
-        self.assertEqual(len(response.json()), 56)
+        self.assertEqual(len(response.json()), total_normalizers + 1)
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/test_normalizer")
         self.assertEqual(response.json(), normalizer.model_dump())
