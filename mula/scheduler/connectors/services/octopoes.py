@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+import httpx
 from pydantic import BaseModel
 
 from scheduler.connectors.errors import exception_handler
@@ -61,7 +62,14 @@ class Octopoes(HTTPService):
         oois = []
         for offset in range(0, count, limit):
             params["offset"] = offset
-            response = self.get(url, params=params)
+
+            try:
+                response = self.get(url, params=params)
+            except httpx.HTTPStatusError as e:
+                if e.response.status_code == 404:
+                    break
+                raise
+
             list_objects = ListObjectsResponse(**response.json())
             oois.extend([ooi for ooi in list_objects.items])
 
@@ -81,19 +89,29 @@ class Octopoes(HTTPService):
             "valid_time": datetime.now(timezone.utc),
         }
 
-        response = self.get(url, params=params)
-
-        return [OOI(**ooi) for ooi in response.json()]
+        try:
+            response = self.get(url, params=params)
+            return [OOI(**ooi) for ooi in response.json()]
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == httpx.codes.NOT_FOUND:
+                return []
+            raise
 
     @exception_handler
-    def get_object(self, organisation_id: str, reference: str) -> OOI:
+    def get_object(self, organisation_id: str, reference: str) -> OOI | None:
         """Get an ooi from octopoes"""
         url = f"{self.host}/{organisation_id}/object"
-        response = self.get(
-            url,
-            params={"reference": reference, "valid_time": datetime.now(timezone.utc)},
-        )
-        return OOI(**response.json())
+
+        try:
+            response = self.get(
+                url,
+                params={"reference": reference, "valid_time": datetime.now(timezone.utc)},
+            )
+            return OOI(**response.json())
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == httpx.codes.NOT_FOUND:
+                return None
+            raise
 
     def is_healthy(self) -> bool:
         healthy = True
