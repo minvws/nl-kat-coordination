@@ -140,7 +140,7 @@ class ReportScheduler(Scheduler):
             )
         except queues.QueueFullError:
             self.logger.warning(
-                "Could not add task to queue, queue was full: %s",
+                "Could not add task %s to queue, queue was full",
                 report_task.hash,
                 task_hash=report_task.hash,
                 queue_qsize=self.queue.qsize(),
