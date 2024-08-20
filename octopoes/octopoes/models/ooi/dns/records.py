@@ -194,7 +194,7 @@ class DNSLocation(DNSRecord):
 
     @property
     def natural_key(self) -> str:
-        sha = hashlib.sha1(self.value.encode("UTF-8")).hexdigest()
+        sha = hashlib.sha1(self.value.encode()).hexdigest()
         key = super().natural_key
         return key.replace(self.value, sha)
 
