@@ -26,7 +26,7 @@ class ReportScheduler(Scheduler):
         queue: queues.PriorityQueue | None = None,
         callback: Callable[..., None] | None = None,
     ):
-        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
+        self.logger: structlog.BoundLogger = structlog.get_logger(__name__)
         self.organisation: Organisation = organisation
         self.create_schedule = False
 
