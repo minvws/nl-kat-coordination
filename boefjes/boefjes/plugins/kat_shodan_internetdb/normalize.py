@@ -7,7 +7,7 @@ from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.records import DNSPTRRecord
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding
-from octopoes.models.ooi.network import IPPort, Network, PortState
+from octopoes.models.ooi.network import Network
 from octopoes.models.ooi.software import Software, SoftwareInstance
 
 DNS_PTR_STR = ".in-addr.arpa"
@@ -33,8 +33,9 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[OOI]:
             if hostname.endswith(DNS_PTR_STR):
                 yield DNSPTRRecord(hostname=hostname_ooi.reference, value=hostname, address=input_ooi_reference)
 
-        #for port in result["ports"]:
-        #    yield IPPort(address=input_ooi_reference, port=int(port), state=PortState("open"))
+        # ruff: noqa: ERA001
+        # for port in result["ports"]:
+        #     yield IPPort(address=input_ooi_reference, port=int(port), state=PortState("open"))
 
         for cve in result["vulns"]:
             finding_type = CVEFindingType(id=cve)
