@@ -99,7 +99,6 @@ An example:
             "IPPort",
             "CVEFindingType"
         ],
-        "environment_keys": ["SHODAN_API"],
         "scan_level": 1
     }
 
@@ -111,7 +110,7 @@ Using the template as a base, you can create a boefje.json for your own boefje. 
 
 NOTE: If your boefje needs object-types that do not exist, you will need to create those. This will be described later in the document.
 
-The boefje also uses variables from the web interface, like the Shodan the API key. There are more possibilities, you can be creative with this and let the end user bring settings from the web interface. Use *environment_keys* for this. The schema.json file defines the metadata for these fields.
+The boefje also uses variables from the web interface, like the Shodan the API key. There are more possibilities, you can be creative with this and let the end user bring settings from the web interface. Use environment variables or KATalogus settings for this. The schema.json file defines the metadata for these fields.
 
 
 schema.json

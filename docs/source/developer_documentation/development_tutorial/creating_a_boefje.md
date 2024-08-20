@@ -28,7 +28,6 @@ This file contains information about our boefje. For example, this file contains
   "name": "Hello Katty",
   "description": "A simple boefje that can say hello",
   "consumes": ["IPAddressV4", "IPAddressV6"],
-  "environment_keys": ["MESSAGE", "NUMBER"],
   "scan_level": 0,
   "oci_image": "openkat/hello-katty"
 }
@@ -38,7 +37,6 @@ This file contains information about our boefje. For example, this file contains
 - **`name`**: A name to display in the KAT-alogus.
 - **`description`**: A description in the KAT-alogus.
 - **`consumes`**: A list of OOI types that trigger the boefje to run. Whenever one of these OOIs gets added, this boefje will run with that OOI. In our case, we will run our boefje whenever a new IPAddressV4 or IPAddressV6 gets added.
-- **`environment_keys`**: A list of inputs provided by the user. More information about these inputs can be found in `schema.json`. OpenKAT also provides some environment variables.
 - **`scan_level`**: A scan level that decides how intrusively this boefje will scan the provided OOIs. Since we will not make any external requests our boefje will have a scan level of 0.
 - **`oci_image`**: The name of the docker image that is provided inside `boefjes/Makefile`
 

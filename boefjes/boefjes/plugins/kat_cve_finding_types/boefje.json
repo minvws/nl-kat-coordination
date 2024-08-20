@@ -5,9 +5,6 @@
   "consumes": [
     "CVEFindingType"
   ],
-  "environment_keys": [
-    "CVEAPI_URL"
-  ],
   "scan_level": 0,
   "enabled": true
 }

@@ -7,8 +7,5 @@
     "IPAddressV6",
     "Hostname"
   ],
-  "environment_keys": [
-    "LEAKIX_API"
-  ],
   "scan_level": 1
 }
