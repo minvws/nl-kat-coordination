@@ -3,6 +3,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 from scheduler import config, models, schedulers, storage
+
 from tests.factories import OrganisationFactory
 
 
@@ -86,7 +87,6 @@ class ReportSchedulerTestCase(ReportSchedulerBaseTestCase):
         # Scheduler should be disabled
         self.assertFalse(self.scheduler.is_enabled())
 
-    @unittest.skip("TODO")
     def test_push_tasks_for_rescheduling(self):
         """When the deadline of schedules have passed, the resulting task should be added to the queue"""
         # Arrange
@@ -103,9 +103,58 @@ class ReportSchedulerTestCase(ReportSchedulerBaseTestCase):
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         # Mocks
-        self.mock_get_schedules.return_value = [schedule_db]
+        self.mock_get_schedules.return_value = ([schedule_db], 1)
 
         # Act
         self.scheduler.push_tasks_for_rescheduling()
 
-        # Assert
+        # Assert: new item should be on queue
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+        # Assert: new item is created with a similar task
+        peek = self.scheduler.queue.peek(0)
+        self.assertEqual(schedule.hash, peek.hash)
+
+        # Assert: task should be created, and should be the one that is queued
+        task_db = self.mock_ctx.datastores.task_store.get_task(peek.id)
+        self.assertIsNotNone(task_db)
+        self.assertEqual(peek.id, task_db.id)
+
+    def test_push_tasks_for_rescheduling_item_on_queue(self):
+        """When the deadline of schedules have passed, the resulting task should be added to the queue"""
+        # Arrange
+        report_task = models.ReportTask(
+            organisation_id=self.organisation.id,
+        )
+
+        schedule = models.Schedule(
+            scheduler_id=self.scheduler.scheduler_id,
+            hash=report_task.hash,
+            data=report_task.dict(),
+        )
+
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
+
+        # Mocks
+        self.mock_get_schedules.return_value = ([schedule_db], 1)
+
+        # Act
+        self.scheduler.push_tasks_for_rescheduling()
+
+        # Assert: new item should be on queue
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+        # Assert: new item is created with a similar task
+        peek = self.scheduler.queue.peek(0)
+        self.assertEqual(schedule.hash, peek.hash)
+
+        # Assert: task should be created, and should be the one that is queued
+        task_db = self.mock_ctx.datastores.task_store.get_task(peek.id)
+        self.assertIsNotNone(task_db)
+        self.assertEqual(peek.id, task_db.id)
+
+        # Act: push again
+        self.scheduler.push_tasks_for_rescheduling()
+
+        # Should only be one task on queue
+        self.assertEqual(1, self.scheduler.queue.qsize())

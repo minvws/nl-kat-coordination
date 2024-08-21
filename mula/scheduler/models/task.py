@@ -150,11 +150,12 @@ class ReportTask(BaseModel):
 
     id: uuid.UUID | None = Field(default_factory=uuid.uuid4)
 
-    organization: str
+    organisation_id: str
 
     # TODO: implement the necessary fields
 
-    # TODO: update this to make a unique hash
+    # TODO: update this to make a unique hash, for this task to find
+    # duplicates in the queue
     @property
     def hash(self) -> str:
-        return mmh3.hash_bytes(f"{self.organization}").hex()
+        return mmh3.hash_bytes(f"{self.organisation_id}").hex()

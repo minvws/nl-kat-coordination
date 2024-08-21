@@ -3,9 +3,9 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
+from scheduler import config, connectors, models, schedulers, storage
 from structlog.testing import capture_logs
 
-from scheduler import config, connectors, models, schedulers, storage
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,

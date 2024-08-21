@@ -53,6 +53,7 @@ class ReportScheduler(Scheduler):
             interval=60.0,
         )
 
+    @tracer.start_as_current_span(name="report_push_tasks_for_rescheduling")
     def push_tasks_for_rescheduling(self):
         if self.queue.full():
             self.logger.warning(
@@ -99,7 +100,7 @@ class ReportScheduler(Scheduler):
             thread_name_prefix=f"ReportScheduler-TPE-{self.scheduler_id}-rescheduling"
         ) as executor:
             for schedule in schedules:
-                report_task = ReportTask.parse_obj(schedule.data)
+                report_task = ReportTask.model_validate(schedule.data)
                 executor.submit(
                     self.push_report_task,
                     report_task,
@@ -128,9 +129,9 @@ class ReportScheduler(Scheduler):
         task = Task(
             scheduler_id=self.scheduler_id,
             priority=int(datetime.now().timestamp()),
-            type=self.ITEM_TYPE,
+            type=self.ITEM_TYPE.type,
             hash=report_task.hash,
-            data=report_task,
+            data=report_task.model_dump(),
         )
 
         try:
