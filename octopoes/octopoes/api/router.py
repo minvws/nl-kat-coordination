@@ -531,13 +531,13 @@ async def recalculate_bits_launcher(octopoes: OctopoesService, session_id: uuid.
 
 
 @router.post("/bits/recalculate", tags=["Bits"])
-async def recalculate_bits(octopoes: OctopoesService = Depends(octopoes_service)) -> str:
+async def recalculate_bits(octopoes: OctopoesService = Depends(octopoes_service)) -> Any:
     session_id = uuid.uuid4()
     RECALCULATE_BITS_SESSIONS[session_id] = -1
 
     asyncio.create_task(recalculate_bits_launcher(octopoes, session_id))
 
-    return str(session_id)
+    return {"session_id": session_id}
 
 
 @router.post("/bits/recalculate/status", tags=["Bits"])
