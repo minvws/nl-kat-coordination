@@ -34,7 +34,7 @@ class Schedule(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    def model_post_init(self, __context) -> None:
+    def model_post_init(self, context) -> None:
         """Post init method to set the deadline_at if it is not set."""
         if self.deadline_at is None and self.schedule:
             self.deadline_at = cron.next_run(self.schedule)
