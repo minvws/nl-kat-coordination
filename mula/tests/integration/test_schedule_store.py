@@ -5,6 +5,7 @@ from unittest import mock
 
 from scheduler import config, models, storage
 from scheduler.storage import filters
+
 from tests.utils import functions
 
 
