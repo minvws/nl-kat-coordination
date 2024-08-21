@@ -7,9 +7,10 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView
 
 from octopoes.models import Reference
-from reports.report_types.helpers import get_ooi_types_with_report, get_report_types_for_oois
+from reports.report_types.helpers import get_ooi_types_with_report
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
     OOISelectionView,
@@ -82,7 +83,7 @@ class OOISelectionGenerateReportView(
     ooi_types = get_ooi_types_with_report()
 
     def post(self, request, *args, **kwargs):
-        if not self.selected_oois:
+        if not self.get_ooi_selection():
             messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
         return self.get(request, *args, **kwargs)
 
@@ -93,7 +94,7 @@ class OOISelectionGenerateReportView(
 
 
 class ReportTypesSelectionGenerateReportView(
-    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, OOISelectionView, ReportTypeSelectionView
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, OOISelectionView, ReportTypeSelectionView, TemplateView
 ):
     """
     Shows all possible report types from a list of OOIs.
@@ -105,23 +106,20 @@ class ReportTypesSelectionGenerateReportView(
     current_step = 2
 
     def post(self, request, *args, **kwargs):
-        if not self.selected_oois:
+        if not self.get_ooi_selection():
             messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
             return redirect(self.get_previous())
         return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["available_report_types"] = self.get_report_types(get_report_types_for_oois(self.get_oois_pk()))
-        context["total_oois"] = self.get_total_objects()
+
+        context["total_oois"] = len(self.report_recipe.input_oois)
         return context
 
 
 class SetupScanGenerateReportView(
-    SaveGenerateReportMixin,
-    GenerateReportStepsMixin,
-    BreadcrumbsGenerateReportView,
-    ReportPluginView,
+    SaveGenerateReportMixin, GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportPluginView, TemplateView
 ):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
@@ -132,13 +130,15 @@ class SetupScanGenerateReportView(
     current_step = 3
 
     def post(self, request, *args, **kwargs):
-        if not self.selected_report_types:
+        if not self.report_recipe.report_types:
             messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
             return redirect(self.get_previous())
         return self.get(request, *args, **kwargs)
 
 
-class ExportSetupGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportPluginView):
+class ExportSetupGenerateReportView(
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportPluginView, TemplateView
+):
     """
     Shows the export setup page where users can set their export preferences.
     """

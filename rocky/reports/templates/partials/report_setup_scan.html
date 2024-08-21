@@ -36,6 +36,7 @@
                     Enabling them just before report generation will likely result in inaccurate reports, as plugins have not finished collecting data.
                 {% endblocktranslate %}
             </p>
+            {{ report_recipe.plugins }}
             <h3>{% translate "Required plugins" %}</h3>
             <p>{% translate "This report type requires the following plugins to be enabled:" %}</p>
             {% if all_plugins_enabled.required %}

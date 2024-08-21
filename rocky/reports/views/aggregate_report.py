@@ -7,10 +7,11 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.definitions import AggregateReport, MultiReport, Report
-from reports.report_types.helpers import get_ooi_types_from_aggregate_report, get_report_types_from_aggregate_report
+from reports.report_types.helpers import get_ooi_types_from_aggregate_report
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
     OOISelectionView,
@@ -83,7 +84,7 @@ class OOISelectionAggregateReportView(
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
     def post(self, request, *args, **kwargs):
-        if not self.selected_oois:
+        if not self.report_recipe.input_oois:
             messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
         return self.get(request, *args, **kwargs)
 
@@ -94,10 +95,7 @@ class OOISelectionAggregateReportView(
 
 
 class ReportTypesSelectionAggregateReportView(
-    AggregateReportStepsMixin,
-    BreadcrumbsAggregateReportView,
-    OOISelectionView,
-    ReportTypeSelectionView,
+    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, OOISelectionView, ReportTypeSelectionView, TemplateView
 ):
     """
     Shows all possible report types from a list of Objects.
@@ -109,38 +107,15 @@ class ReportTypesSelectionAggregateReportView(
     current_step = 2
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.available_report_types = self.get_report_types_for_aggregate_report(
-            get_report_types_from_aggregate_report(AggregateOrganisationReport)
-        )
-
     def post(self, request, *args, **kwargs):
-        if not self.selected_oois:
+        if not self.report_recipe.input_oois:
             messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
             return redirect(self.get_previous())
         return self.get(request, *args, **kwargs)
 
-    def get_report_types_for_aggregate_report(
-        self, reports_dict: dict[str, set[type[Report]]]
-    ) -> dict[str, list[dict[str, str]]]:
-        report_types = {}
-        for option, reports in reports_dict.items():
-            report_types[option] = self.get_report_types(reports)
-        return report_types
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["available_report_types_aggregate"] = self.available_report_types
-        context["count_available_report_types_aggregate"] = len(self.available_report_types["required"]) + len(
-            self.available_report_types["optional"]
-        )
-        context["total_oois"] = self.get_total_objects()
-        return context
-
 
 class SetupScanAggregateReportView(
-    SaveAggregateReportMixin, AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportPluginView
+    SaveAggregateReportMixin, AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportPluginView, TemplateView
 ):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
@@ -151,13 +126,15 @@ class SetupScanAggregateReportView(
     current_step = 3
 
     def post(self, request, *args, **kwargs):
-        if not self.selected_report_types:
+        if not self.report_recipe.report_types:
             messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
             return redirect(self.get_previous())
         return self.get(request, *args, **kwargs)
 
 
-class ExportSetupAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportPluginView):
+class ExportSetupAggregateReportView(
+    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportPluginView, TemplateView
+):
     """
     Shows the export setup page where users can set their export preferences.
     """
