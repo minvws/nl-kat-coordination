@@ -527,8 +527,6 @@ async def recalculate_bits_launcher(octopoes: OctopoesService, session_id: uuid.
 
     octopoes.commit()
 
-    await asyncio.sleep(60)
-
     RECALCULATE_BITS_SESSIONS[session_id] = inference_count
 
 
