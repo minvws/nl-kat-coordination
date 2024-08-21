@@ -546,8 +546,8 @@ async def recalculate_bits_status(request: Request) -> Any:
         data = await request.body()
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
-    session_id = uuid.UUID(data.decode())
-    if session_id:
+    if data:
+        session_id = uuid.UUID(data.decode())
         if session_id in RECALCULATE_BITS_SESSIONS:
             retval = RECALCULATE_BITS_SESSIONS[session_id]
             if retval > 0:
@@ -558,7 +558,7 @@ async def recalculate_bits_status(request: Request) -> Any:
         else:
             return {"status": "unavailable"}
     else:
-        return RECALCULATE_BITS_SESSIONS
+        return {"sessions": list(RECALCULATE_BITS_SESSIONS.keys())}
 
 
 @router.get("/io/export", tags=["io"])
