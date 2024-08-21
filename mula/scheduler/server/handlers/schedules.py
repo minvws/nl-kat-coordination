@@ -137,7 +137,7 @@ class ScheduleAPI:
 
         # Validate data with task type of the scheduler
         try:
-            instance = s.ITEM_TYPE.parse_obj(new_schedule.data)
+            instance = s.ITEM_TYPE.model_validate(new_schedule.data)
         except pydantic.ValidationError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
