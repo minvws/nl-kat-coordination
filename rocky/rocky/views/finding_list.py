@@ -81,7 +81,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
 
 class FindingListView(BreadcrumbsMixin, FindingListFilter):
     template_name = "findings/finding_list.html"
-    paginate_by = 20
+    paginate_by = 150
 
     def build_breadcrumbs(self):
         return [

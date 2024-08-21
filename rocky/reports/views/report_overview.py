@@ -30,7 +30,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     Shows all the reports that have ever been generated for the organization.
     """
 
-    paginate_by = 20
+    paginate_by = 150
     breadcrumbs_step = 2
     context_object_name = "reports"
     paginator = RockyPaginator
@@ -53,7 +53,7 @@ class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     Shows all the subreports that belong to the selected parent report.
     """
 
-    paginate_by = 20
+    paginate_by = 150
     breadcrumbs_step = 3
     context_object_name = "subreports"
     paginator = RockyPaginator
