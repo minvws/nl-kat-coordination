@@ -1,10 +1,10 @@
 import unittest
+from datetime import datetime, timezone
 from types import SimpleNamespace
 from unittest import mock
 
 from scheduler import config, models, storage
 from scheduler.storage import filters
-
 from tests.utils import functions
 
 
@@ -30,6 +30,48 @@ class ScheduleStoreTestCase(unittest.TestCase):
     def tearDown(self):
         models.Base.metadata.drop_all(self.dbconn.engine)
         self.dbconn.engine.dispose()
+
+    def test_create_schedule_calculate_deadline_at(self):
+        """When a schedule is created, the deadline_at should be calculated."""
+        schedule = models.Schedule(
+            scheduler_id="test_scheduler_id",
+            schedule="* * * * *",
+            data={},
+        )
+
+        self.assertIsNotNone(schedule.deadline_at)
+
+    def test_create_schedule_explicit_deadline_at(self):
+        """When a schedule is created, the deadline_at should be set if it is provided."""
+        now = datetime.now(timezone.utc)
+        schedule = models.Schedule(
+            scheduler_id="test_scheduler_id",
+            data={},
+            deadline_at=now,
+        )
+
+        self.assertEqual(schedule.deadline_at, now)
+
+    def test_create_schedule_deadline_at_takes_precedence(self):
+        """When a schedule is created, the deadline_at should be set if it is provided."""
+        now = datetime.now(timezone.utc)
+        schedule = models.Schedule(
+            scheduler_id="test_scheduler_id",
+            schedule="* * * * *",
+            data={},
+            deadline_at=now,
+        )
+
+        self.assertEqual(schedule.deadline_at, now)
+
+    def test_create_schedule_not_provided_schedule(self):
+        """When a schedule is created, the deadline_at should be None if schedule is not provided."""
+        schedule = models.Schedule(
+            scheduler_id="test_scheduler_id",
+            data={},
+        )
+
+        self.assertIsNone(schedule.deadline_at)
 
     def test_create_schedule(self):
         # Arrange
