@@ -1,3 +1,4 @@
+import asyncio
 import json
 import uuid
 from collections import Counter
@@ -514,8 +515,10 @@ def delete_node(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> None:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Deleting node failed") from e
 
 
-@router.post("/bits/recalculate", tags=["Bits"])
-def recalculate_bits(octopoes: OctopoesService = Depends(octopoes_service)) -> int:
+RECALCULATE_BITS_SESSIONS: dict[uuid.UUID, int] = {}
+
+
+async def recalculate_bits_launcher(octopoes: OctopoesService, session_id: uuid.UUID) -> None:
     try:
         inference_count = octopoes.recalculate_bits()
     except ObjectNotFoundException:
@@ -524,7 +527,35 @@ def recalculate_bits(octopoes: OctopoesService = Depends(octopoes_service)) -> i
 
     octopoes.commit()
 
-    return inference_count
+    RECALCULATE_BITS_SESSIONS[session_id] = inference_count
+
+
+@router.post("/bits/recalculate", tags=["Bits"])
+async def recalculate_bits(octopoes: OctopoesService = Depends(octopoes_service)) -> str:
+    session_id = uuid.uuid4()
+    RECALCULATE_BITS_SESSIONS[session_id] = -1
+
+    asyncio.create_task(recalculate_bits_launcher(octopoes, session_id))
+
+    return str(session_id)
+
+
+@router.post("/bits/recalculate/status", tags=["Bits"])
+async def recalculate_bits_status(request: Request) -> Any:
+    try:
+        data = await request.body()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
+    session_id = uuid.UUID(data.decode())
+    if session_id in RECALCULATE_BITS_SESSIONS:
+        retval = RECALCULATE_BITS_SESSIONS[session_id]
+        if retval > 0:
+            RECALCULATE_BITS_SESSIONS.pop(session_id)
+            return {"status": retval}
+        else:
+            return {"status": "awaiting"}
+    else:
+        return {"status": "unavailable"}
 
 
 @router.get("/io/export", tags=["io"])
