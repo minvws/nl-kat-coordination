@@ -10,6 +10,7 @@ from typing import Any
 
 from asgiref.sync import sync_to_async
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
+from fastapi.responses import JSONResponse
 from httpx import HTTPError
 from pydantic import AwareDatetime
 
@@ -556,7 +557,7 @@ async def recalculate_bits_status(request: Request) -> Any:
             else:
                 return {"status": "awaiting"}
         else:
-            return {"status": "unavailable"}
+            return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"status": "session not found"})
     else:
         return {"sessions": list(RECALCULATE_BITS_SESSIONS.keys())}
 
