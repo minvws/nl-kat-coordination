@@ -150,9 +150,11 @@ class ReportTask(BaseModel):
 
     id: uuid.UUID | None = Field(default_factory=uuid.uuid4)
 
+    organization: str
+
     # TODO: implement the necessary fields
 
     # TODO: update this to make a unique hash
     @property
     def hash(self) -> str:
-        return mmh3.hash_bytes(f"{self.id}").hex()
+        return mmh3.hash_bytes(f"{self.organization}").hex()

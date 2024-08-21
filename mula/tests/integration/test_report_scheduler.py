@@ -3,7 +3,6 @@ from types import SimpleNamespace
 from unittest import mock
 
 from scheduler import config, models, schedulers, storage
-
 from tests.factories import OrganisationFactory
 
 
@@ -29,7 +28,7 @@ class ReportSchedulerBaseTestCase(unittest.TestCase):
 
         # Scheduler
         self.organisation = OrganisationFactory()
-        self.scheduler = schedulers.NormalizerScheduler(
+        self.scheduler = schedulers.ReportScheduler(
             ctx=self.mock_ctx,
             scheduler_id=self.organisation.id,
             organisation=self.organisation,
@@ -45,10 +44,68 @@ class ReportSchedulerTestCase(ReportSchedulerBaseTestCase):
     def setUp(self):
         super().setUp()
 
-        self.mock_latest_task_by_hash = mock.patch(
-            "scheduler.context.AppContext.datastores.task_store.get_latest_task_by_hash"
+        self.mock_get_schedules = mock.patch(
+            "scheduler.context.AppContext.datastores.schedule_store.get_schedules",
         ).start()
 
-        self.mock_get_plugin = mock.patch(
-            "scheduler.context.AppContext.services.katalogus.get_plugin_by_id_and_org_id",
-        ).start()
+    def tearDown(self):
+        mock.patch.stopall()
+
+    def test_enable_scheduler(self):
+        # Disable scheduler first
+        self.scheduler.disable()
+
+        # Threads should be stopped
+        self.assertEqual(0, len(self.scheduler.threads))
+
+        # Queue should be empty
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+        # Re-enable scheduler
+        self.scheduler.enable()
+
+        # Threads should be started
+        self.assertGreater(len(self.scheduler.threads), 0)
+
+        # Scheduler should be enabled
+        self.assertTrue(self.scheduler.is_enabled())
+
+        # Stop the scheduler
+        self.scheduler.stop()
+
+    def test_disable_scheduler(self):
+        # Disable scheduler
+        self.scheduler.disable()
+
+        # Threads should be stopped
+        self.assertEqual(0, len(self.scheduler.threads))
+
+        # Queue should be empty
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+        # Scheduler should be disabled
+        self.assertFalse(self.scheduler.is_enabled())
+
+    @unittest.skip("TODO")
+    def test_push_tasks_for_rescheduling(self):
+        """When the deadline of schedules have passed, the resulting task should be added to the queue"""
+        # Arrange
+        report_task = models.ReportTask(
+            organisation_id=self.organisation.id,
+        )
+
+        schedule = models.Schedule(
+            scheduler_id=self.scheduler.scheduler_id,
+            hash=report_task.hash,
+            data=report_task.dict(),
+        )
+
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
+
+        # Mocks
+        self.mock_get_schedules.return_value = [schedule_db]
+
+        # Act
+        self.scheduler.push_tasks_for_rescheduling()
+
+        # Assert
