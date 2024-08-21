@@ -527,6 +527,8 @@ async def recalculate_bits_launcher(octopoes: OctopoesService, session_id: uuid.
 
     octopoes.commit()
 
+    await asyncio.sleep(60)
+
     RECALCULATE_BITS_SESSIONS[session_id] = inference_count
 
 
@@ -547,15 +549,18 @@ async def recalculate_bits_status(request: Request) -> Any:
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
     session_id = uuid.UUID(data.decode())
-    if session_id in RECALCULATE_BITS_SESSIONS:
-        retval = RECALCULATE_BITS_SESSIONS[session_id]
-        if retval > 0:
-            RECALCULATE_BITS_SESSIONS.pop(session_id)
-            return {"status": retval}
+    if session_id:
+        if session_id in RECALCULATE_BITS_SESSIONS:
+            retval = RECALCULATE_BITS_SESSIONS[session_id]
+            if retval > 0:
+                RECALCULATE_BITS_SESSIONS.pop(session_id)
+                return {"status": retval}
+            else:
+                return {"status": "awaiting"}
         else:
-            return {"status": "awaiting"}
+            return {"status": "unavailable"}
     else:
-        return {"status": "unavailable"}
+        return RECALCULATE_BITS_SESSIONS
 
 
 @router.get("/io/export", tags=["io"])
