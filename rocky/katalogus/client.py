@@ -122,7 +122,7 @@ def validate_organization_code(func):
 class KATalogusClientV1:
     def __init__(self, base_uri: str, organization: str):
         self.session = httpx.Client(base_url=base_uri)
-        self.organization = valid_organization_code(organization)
+        self.organization = valid_organization_code(organization) if organization else organization
         self.organization_uri = f"/v1/organisations/{organization}"
 
     def organization_exists(self) -> bool:
