@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from tools.enums import SCAN_LEVEL
@@ -56,6 +57,32 @@ OBSERVED_AT_HELP_TEXT = _(
     "OpenKAT stores a time indication with every observation, "
     "so it is possible to see the status of your network through time. "
     "Select a datetime to change the view to represent that moment in time."
+)
+
+BOEFJE_SCHEMA_HELP_TEXT = mark_safe(
+    _(
+        "If any other settings are needed for your Boefje, add these as a JSON Schema. "
+        "More information about how to do this can be found here: "
+        "<a href='https://json-schema.org/learn/getting-started-step-by-step'>JSON Schema</a> "
+    )
+)
+BOEFJE_CONSUMES_HELP_TEXT = _("Select the object type that your Boefje consumes.")
+
+BOEFJE_PRODUCES_HELP_TEXT = mark_safe(
+    _(
+        "<p>Add a set of mime types, separated by commas, for example:</p><p><i>'text/html, image/jpeg'</i> or "
+        "<i>'boefje/dns-records'</i>.</p><p>Mime types are used to match the correct normalizer to a raw file. "
+        "When the mime type 'boefje/dns-records' is added, the normalizer expects the raw file to contain dns "
+        "scan information.</p>"
+    )
+)
+BOEFJE_SCAN_LEVEL_HELP_TEXT = mark_safe(
+    _(
+        "Select a clearance level for your Boefje. For more information about the different "
+        "clearance levels please check the documentation: "
+        "<a href='https://docs.openkat.nl/manual/usermanual.html#scan-levels-clearance-indemnities'> "
+        "OpenKAT User Manual</a> "
+    )
 )
 
 DEPTH_DEFAULT = 9

@@ -4,66 +4,57 @@ from django.utils.translation import gettext_lazy as _
 from octopoes.models.types import ALL_TYPES
 from tools.enums import SCAN_LEVEL
 from tools.forms.base import BaseRockyForm
-from tools.forms.settings import FINDING_DATETIME_HELP_TEXT
+from tools.forms.settings import (
+    BOEFJE_CONSUMES_HELP_TEXT,
+    BOEFJE_PRODUCES_HELP_TEXT,
+    BOEFJE_SCAN_LEVEL_HELP_TEXT,
+    BOEFJE_SCHEMA_HELP_TEXT,
+)
 
-OOI_TYPE_CHOICES = ((ooi_type.get_object_type(), ooi_type.get_object_type()) for ooi_type in ALL_TYPES)
-
-JSON_SCHEMA = {
-    "id": "string",
-    "name": "string",
-    "version": "string",
-    "created": "2024-08-19T15:13:27.352Z",
-    "description": "string",
-    "environment_keys": ["string"],
-    "enabled": "boolean",
-    "static": "boolean",
-    "type": "boefje",
-    "scan_level": 1,
-    "consumes": ["string"],
-    "produces": ["string"],
-    "runnable_hash": "string",
-    "oci_image": "string",
-    "oci_arguments": ["string"],
-}
+OOI_TYPE_CHOICES = sorted((ooi_type.get_object_type(), ooi_type.get_object_type()) for ooi_type in ALL_TYPES)
 
 
 class BoefjeAddForm(BaseRockyForm):
-    container_image = forms.CharField(
-        required=False,
+    oci_image = forms.CharField(
+        required=True,
         label=_("Container image"),
-        widget=forms.TextInput(attrs={"rows": 1}),
+        widget=forms.TextInput(attrs={"description": "For example: ghcr.io/minvws/openkat/nmap"}),
     )
     name = forms.CharField(
-        required=False,
+        required=True,
         label=_("Name"),
-        widget=forms.TextInput(attrs={"rows": 1}),
     )
     description = forms.CharField(
         required=False,
         label=_("Description"),
-        widget=forms.Textarea(attrs={"placeholder": _("Placeholder"), "rows": 3}),
-    )
-    arguments = forms.CharField(
-        required=False,
-        label=_("Arguments"),
         widget=forms.Textarea(attrs={"rows": 3}),
     )
-    json_schema = forms.JSONField(
-        required=True,
-        label=_("Json schema"),
-        widget=forms.Textarea(attrs={"rows": 10, "cols": 40}),
-        initial=JSON_SCHEMA,
-    )
-    object_type = forms.CharField(
+    oci_arguments = forms.CharField(
         required=False,
-        label=_("Object type"),
-        widget=forms.Select(choices=OOI_TYPE_CHOICES),
+        label=_("Arguments"),
+        widget=forms.TextInput(attrs={"description": "For example: -sTU --top-ports 1000"}),
     )
-    clearance_level = forms.CharField(
+    schema = forms.JSONField(
+        required=False,
+        label=_("JSON Schema"),
+        help_text=BOEFJE_SCHEMA_HELP_TEXT,
+    )
+    consumes = forms.CharField(
+        required=False,
+        label=_("Input object type"),
+        widget=forms.Select(choices=OOI_TYPE_CHOICES),
+        help_text=BOEFJE_CONSUMES_HELP_TEXT,
+    )
+    produces = forms.CharField(
+        required=False,
+        label=_("Output mimetypes"),
+        help_text=BOEFJE_PRODUCES_HELP_TEXT,
+    )
+    scan_level = forms.CharField(
         required=False,
         label=_("Clearance level"),
         widget=forms.Select(choices=SCAN_LEVEL.choices),
-        help_text=FINDING_DATETIME_HELP_TEXT,
+        help_text=BOEFJE_SCAN_LEVEL_HELP_TEXT,
     )
 
     def __init__(self, *args, **kwargs):
