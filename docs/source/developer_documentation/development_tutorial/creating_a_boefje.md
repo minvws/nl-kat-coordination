@@ -126,7 +126,7 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
 
 The most important part is the return value we send back. This is what will be used by our normalizer to create our new OOIs.
 
-For ease of development, we added a generic CVE normalizer. When we just want to create a CVE finding on the input OOI, we can return the CVE ID as a string with `cve/id` as mime-type.
+For ease of development, we added a generic finding normalizer. When we just want to create a CVE or other type of finding on the input OOI, we can return the CVE ID, CWE ID or KAT ID as a string with `openkat/finding` as mime-type.
 
 ---
 
