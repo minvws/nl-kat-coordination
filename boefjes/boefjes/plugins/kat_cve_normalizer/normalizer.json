@@ -1,5 +1,5 @@
 {
-  "id": "kat_generic_cve_normalize",
+  "id": "kat_generic_finding_normalize",
   "consumes": [
     "openkat/finding"
   ],
