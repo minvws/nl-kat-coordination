@@ -72,7 +72,7 @@
                                         </td>
                                     </tr>
                                     <tr class="expando-row">
-                                        <td colspan="8">
+                                        <td colspan="{% if not organization.code %}8{% else %}7{% endif %}">
                                             {% include "tasks/partials/task_actions.html" %}
 
                                         </td>
