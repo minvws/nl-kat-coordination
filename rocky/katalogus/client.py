@@ -96,7 +96,7 @@ class KATalogusHTTPStatusError(KATalogusError):
 
 
 def validate_plugin_id(func):
-    @functools.wraps
+    @functools.wraps(func)
     def wrapper(self, plugin_id, *args, **kwargs):
         plugin_id = valid_plugin_id(plugin_id)
         return func(self, plugin_id, *args, **kwargs)
@@ -105,7 +105,7 @@ def validate_plugin_id(func):
 
 
 def validate_organization_code(func):
-    @functools.wraps
+    @functools.wraps(func)
     def wrapper(self, organization_code):
         try:
             validate_unicode_slug(organization_code)
