@@ -27,6 +27,8 @@ class TestRemoveRepositories(TestCase):
             storage.create(Organisation(id="dev1", name="Test 1 "))
             storage.create(Organisation(id="dev2", name="Test 2 "))
 
+        session.close()
+
         entries = [(1, "LOCAL", "Repository Local", "https://local.com/")]
         query = f"INSERT INTO repository (pk, id, name, base_url) values {','.join(map(str, entries))}"  # noqa: S608
         self.engine.execute(text(query))
@@ -44,7 +46,6 @@ class TestRemoveRepositories(TestCase):
             f"INSERT INTO organisation_repository (repository_pk, organisation_pk) values {','.join(map(str, entries))}"  # noqa: S608
         )
         self.engine.execute(text(query))
-        session.close()
 
     def test_fail_on_non_unique(self):
         session = sessionmaker(bind=self.engine)()
@@ -76,8 +77,6 @@ class TestRemoveRepositories(TestCase):
         session.close()
 
     def test_downgrade(self):
-        session = sessionmaker(bind=self.engine)()
-
         self.engine.execute(text("DELETE FROM plugin_state WHERE id = 2"))  # Fix unique constraint fails
         alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "7c88b9cd96aa"])
         alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "downgrade", "-1"])
@@ -87,8 +86,6 @@ class TestRemoveRepositories(TestCase):
         assert self.engine.execute(text("SELECT * from repository")).fetchall() == [
             (1, "LOCAL", "Local Plugin Repository", "http://dev/null")
         ]
-
-        session.close()
 
     def tearDown(self) -> None:
         self.engine.execute(text("DELETE FROM plugin_state"))  # Fix unique constraint fails
