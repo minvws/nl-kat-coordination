@@ -1,6 +1,7 @@
 from io import BytesIO
 
 import httpx
+import re
 import structlog
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -92,7 +93,7 @@ class KATalogusClientV1:
         try:
             validate_unicode_slug(organization)
             return organization
-        except ValidationError as error: 
+        except ValidationError as error:
             raise KATalogusError(error)
 
     @staticmethod
@@ -102,7 +103,7 @@ class KATalogusClientV1:
         if matches:
             return matches[0]
         raise KATalogusError("Invalid Plugin")
-        
+
     def organization_exists(self) -> bool:
         response = self.session.get(self.organization_uri)
 
