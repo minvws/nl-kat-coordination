@@ -2,7 +2,8 @@ import { execSync } from "node:child_process";
 import run from "./main.js";
 
 /**
- * @param {string} inp The string input to base64 encode
+ * @param {string} inp The string input to base64
+ * @returns {string}
  */
 function b64encode(inp) {
   console.log(`Encoding: ${inp}`);
@@ -30,12 +31,10 @@ async function main() {
   console.log("RAWS: " + JSON.stringify(raws));
   return {
     status: "COMPLETED",
-    files: raws.map((x) => {
-      return {
-        content: b64encode(x[1]),
-        tags: x[0],
-      };
-    }),
+    files: raws.map((x) => ({
+      content: b64encode(x[1]),
+      tags: x[0],
+    })),
   };
 }
 
@@ -56,7 +55,7 @@ main()
   })
   .finally(async () => {
     console.log("Finishing with: " + out);
-    if (out == undefined) return console.error("Somehow `out` was not set.");
+    if (out == undefined) return console.error("`out` is undefined.");
 
     try {
       console.log("SENDING OUT WITH: " + JSON.stringify(out));
