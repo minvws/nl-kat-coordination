@@ -1,0 +1,10 @@
+{
+  "id": "kat_nikto_normalize",
+  "consumes": [
+    "boefje/nikto"
+  ],
+  "produces": [
+    "Software",
+    "SoftwareInstance"
+  ]
+}
