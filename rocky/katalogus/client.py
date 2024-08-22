@@ -42,11 +42,14 @@ class Boefje(Plugin):
     consumes: set[type[OOI]]
     options: list[str] | None = None
     runnable_hash: str | None = None
-    produces: set[str]
+    type: str = "boefje"
+    schema: dict | None = None
+    oci_image: str | None = None
+    oci_arguments: list[str] = Field(default_factory=list)
 
     # use a custom field_serializer for `consumes`
     @field_serializer("consumes")
-    def serialize_consumes(self, consumes: set[type[OOI]]):
+    def serialize_consumes(self, consumes):
         return {ooi_class.get_ooi_type() for ooi_class in consumes}
 
     def can_scan(self, member) -> bool:
@@ -204,6 +207,13 @@ class KATalogusClientV1:
         response = self.session.get(f"{self.organization_uri}/plugins/{boefje_id}/cover.jpg")
         response.raise_for_status()
         return BytesIO(response.content)
+
+    def create_plugin(self, plugin: Plugin) -> None:
+        response = self.session.post(
+            f"{self.organization_uri}/plugins", headers={"Content-Type": "application/json"}, content=plugin
+        )
+        logger.info("Created new plugin %s", plugin.name)
+        response.raise_for_status()
 
 
 def parse_boefje(boefje: dict) -> Boefje:
