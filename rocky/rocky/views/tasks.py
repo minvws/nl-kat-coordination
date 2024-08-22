@@ -86,9 +86,12 @@ class AllTaskListView(SchedulerListView, PageActionsView):
                 **kwargs,
             )
 
-        except HTTPError:
-            error_message = _("Fetching tasks failed: no connection with scheduler")
+        except HTTPError as error:
+            error_message = _(f"Fetching tasks failed: no connection with scheduler: {error}")
             messages.add_message(self.request, messages.ERROR, error_message)
+            return []
+        except SchedulerError as error:
+            messages.add_message(self.request, messages.ERROR, str(error))
             return []
 
     def get_context_data(self, **kwargs):
