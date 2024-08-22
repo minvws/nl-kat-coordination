@@ -91,6 +91,7 @@ repos:
           - httpx
           - types-python-dateutil
           - types-requests
+          - types-croniter
         exclude: |
           (?x)(
           ^boefjes/tools |
