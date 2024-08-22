@@ -3,6 +3,8 @@ from io import BytesIO
 import httpx
 import structlog
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_unicode_slug
 from django.utils.translation import gettext_lazy as _
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
@@ -18,8 +20,8 @@ logger = structlog.get_logger("katalogus_client")
 
 
 class Plugin(BaseModel):
-    id: str
-    name: str
+    id: str = Field(pattern=r"^[\w.-]+")
+    name: str = Field(pattern=r"^[\w.- ]+")
     version: str | None = None
     authors: str | None = None
     created: str | None = None
@@ -82,15 +84,32 @@ class KATalogusHTTPStatusError(KATalogusError):
 class KATalogusClientV1:
     def __init__(self, base_uri: str, organization: str):
         self.session = httpx.Client(base_url=base_uri)
-        self.organization = organization
+        self.organization = self.__validate_organisation_code__(organization)
         self.organization_uri = f"/v1/organisations/{organization}"
 
+    @staticmethod
+    def __validate_organisation_code__(organization: str):
+        try:
+            validate_unicode_slug(organization)
+            return organization
+        except ValidationError as error: 
+            raise KATalogusError(error)
+
+    @staticmethod
+    def __clean_plugin_string__(plugin: str):
+        pattern = r"^[\w.-]+"
+        matches = re.match(pattern, plugin)
+        if matches:
+            return matches[0]
+        raise KATalogusError("Invalid Plugin")
+        
     def organization_exists(self) -> bool:
         response = self.session.get(self.organization_uri)
 
         return response.status_code != 404
 
     def create_organization(self, name: str):
+        name = self.__validate_organisation_code__(name)
         response = self.session.post("/v1/organisations/", json={"id": self.organization, "name": name})
         response.raise_for_status()
 
@@ -111,12 +130,14 @@ class KATalogusClientV1:
         return [parse_plugin(plugin) for plugin in response.json()]
 
     def get_plugin(self, plugin_id: str) -> Plugin:
+        plugin_id = self.__clean_plugin_string__(plugin_id)
         response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}")
         response.raise_for_status()
 
         return parse_plugin(response.json())
 
     def get_plugin_schema(self, plugin_id) -> dict | None:
+        plugin_id = self.__clean_plugin_string__(plugin_id)
         response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}/schema.json")
         response.raise_for_status()
 
@@ -134,17 +155,20 @@ class KATalogusClientV1:
         return None
 
     def get_plugin_settings(self, plugin_id: str) -> dict:
+        plugin_id = self.__clean_plugin_string__(plugin_id)
         response = self.session.get(f"{self.organization_uri}/{plugin_id}/settings")
         response.raise_for_status()
         return response.json()
 
     def upsert_plugin_settings(self, plugin_id: str, values: dict) -> None:
+        plugin_id = self.__clean_plugin_string__(plugin_id)
         response = self.session.put(f"{self.organization_uri}/{plugin_id}/settings", json=values)
         response.raise_for_status()
 
         logger.info("Upsert plugin settings", plugin_id=plugin_id)
 
     def delete_plugin_settings(self, plugin_id: str):
+        plugin_id = self.__clean_plugin_string__(plugin_id)
         response = self.session.delete(f"{self.organization_uri}/{plugin_id}/settings")
         response.raise_for_status()
 
@@ -153,6 +177,7 @@ class KATalogusClientV1:
         return response
 
     def clone_all_configuration_to_organization(self, to_organization: str):
+        to_organization = self.__validate_organisation_code__(to_organization)
         response = self.session.post(f"{self.organization_uri}/settings/clone/{to_organization}")
         response.raise_for_status()
 
@@ -195,12 +220,14 @@ class KATalogusClientV1:
         response.raise_for_status()
 
     def get_description(self, boefje_id: str) -> str:
+        boefje_id = self.__clean_plugin_string__(boefje_id)
         response = self.session.get(f"{self.organization_uri}/plugins/{boefje_id}/description.md")
         response.raise_for_status()
 
         return response.content.decode("utf-8")
 
     def get_cover(self, boefje_id: str) -> BytesIO:
+        boefje_id = self.__clean_plugin_string__(boefje_id)
         response = self.session.get(f"{self.organization_uri}/plugins/{boefje_id}/cover.jpg")
         response.raise_for_status()
         return BytesIO(response.content)
