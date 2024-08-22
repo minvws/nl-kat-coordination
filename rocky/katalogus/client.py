@@ -1,7 +1,8 @@
+import functools
 from io import BytesIO
+from typing import Annotated
 
 import httpx
-import re
 import structlog
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -9,8 +10,9 @@ from django.core.validators import validate_unicode_slug
 from django.utils.translation import gettext_lazy as _
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
-from pydantic import BaseModel, Field, field_serializer
+from pydantic import AfterValidator, BaseModel, Field, field_serializer
 from tools.enums import SCAN_LEVEL
+from tools.models import OrganizationMember
 
 from octopoes.models import OOI
 from octopoes.models.exception import TypeNotFound
@@ -20,9 +22,25 @@ from rocky.health import ServiceHealth
 logger = structlog.get_logger("katalogus_client")
 
 
+def valid_plugin_id(plugin_id: str) -> str:
+    # plugin IDs should be valid Python identifiers but may contain dots and dashes
+    if not plugin_id.replace("-", "").replace(".", "").isidentifier():
+        raise ValueError("Plugin ID is not valid")
+
+    return plugin_id
+
+
+def valid_organization_code(organization_code: str) -> str:
+    try:
+        validate_unicode_slug(organization_code)
+        return organization_code
+    except ValidationError:
+        raise ValueError("Organization code is not valid")
+
+
 class Plugin(BaseModel):
-    id: str = Field(pattern=r"^[\w.-]+")
-    name: str = Field(pattern=r"^[\w.- ]+")
+    id: Annotated[str, AfterValidator(valid_plugin_id)]
+    name: str
     version: str | None = None
     authors: str | None = None
     created: str | None = None
@@ -32,11 +50,7 @@ class Plugin(BaseModel):
     enabled: bool
     type: str
 
-    # def dict(self, *args, **kwargs):
-    #     """Pydantic does not stringify the OOI classes, but then templates can't render them"""
-    #     # todo: use field_serializer instead
-
-    def can_scan(self, member) -> bool:
+    def can_scan(self, member: OrganizationMember) -> bool:
         return member.has_perm("tools.can_scan_organization")
 
 
@@ -82,27 +96,35 @@ class KATalogusHTTPStatusError(KATalogusError):
         self.message = status_message + _("A HTTP error occurred. Check logs for more info.")
 
 
+def validate_plugin_id(func):
+    @functools.wraps
+    def wrapper(self, plugin_id, *args, **kwargs):
+        plugin_id = valid_plugin_id(plugin_id)
+        return func(self, plugin_id, *args, **kwargs)
+
+    return wrapper
+
+
+def validate_organization_code(func):
+    @functools.wraps
+    def wrapper(self, organization_code):
+        try:
+            validate_unicode_slug(organization_code)
+        except ValidationError as error:
+            raise KATalogusError(error)
+        return func(
+            self,
+            organization_code,
+        )
+
+    return wrapper
+
+
 class KATalogusClientV1:
     def __init__(self, base_uri: str, organization: str):
         self.session = httpx.Client(base_url=base_uri)
-        self.organization = self.__validate_organisation_code__(organization)
+        self.organization = valid_organization_code(organization)
         self.organization_uri = f"/v1/organisations/{organization}"
-
-    @staticmethod
-    def __validate_organisation_code__(organization: str):
-        try:
-            validate_unicode_slug(organization)
-            return organization
-        except ValidationError as error:
-            raise KATalogusError(error)
-
-    @staticmethod
-    def __clean_plugin_string__(plugin: str):
-        pattern = r"^[\w.-]+"
-        matches = re.match(pattern, plugin)
-        if matches:
-            return matches[0]
-        raise KATalogusError("Invalid Plugin")
 
     def organization_exists(self) -> bool:
         response = self.session.get(self.organization_uri)
@@ -110,7 +132,6 @@ class KATalogusClientV1:
         return response.status_code != 404
 
     def create_organization(self, name: str):
-        name = self.__validate_organisation_code__(name)
         response = self.session.post("/v1/organisations/", json={"id": self.organization, "name": name})
         response.raise_for_status()
 
@@ -130,15 +151,15 @@ class KATalogusClientV1:
             raise KATalogusHTTPStatusError(status_code=str(error.response.status_code))
         return [parse_plugin(plugin) for plugin in response.json()]
 
+    @validate_plugin_id
     def get_plugin(self, plugin_id: str) -> Plugin:
-        plugin_id = self.__clean_plugin_string__(plugin_id)
         response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}")
         response.raise_for_status()
 
         return parse_plugin(response.json())
 
-    def get_plugin_schema(self, plugin_id) -> dict | None:
-        plugin_id = self.__clean_plugin_string__(plugin_id)
+    @validate_plugin_id
+    def get_plugin_schema(self, plugin_id: str) -> dict | None:
         response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}/schema.json")
         response.raise_for_status()
 
@@ -155,21 +176,21 @@ class KATalogusClientV1:
 
         return None
 
+    @validate_plugin_id
     def get_plugin_settings(self, plugin_id: str) -> dict:
-        plugin_id = self.__clean_plugin_string__(plugin_id)
         response = self.session.get(f"{self.organization_uri}/{plugin_id}/settings")
         response.raise_for_status()
         return response.json()
 
+    @validate_plugin_id
     def upsert_plugin_settings(self, plugin_id: str, values: dict) -> None:
-        plugin_id = self.__clean_plugin_string__(plugin_id)
         response = self.session.put(f"{self.organization_uri}/{plugin_id}/settings", json=values)
         response.raise_for_status()
 
         logger.info("Upsert plugin settings", plugin_id=plugin_id)
 
+    @validate_plugin_id
     def delete_plugin_settings(self, plugin_id: str):
-        plugin_id = self.__clean_plugin_string__(plugin_id)
         response = self.session.delete(f"{self.organization_uri}/{plugin_id}/settings")
         response.raise_for_status()
 
@@ -177,8 +198,8 @@ class KATalogusClientV1:
 
         return response
 
+    @validate_organization_code
     def clone_all_configuration_to_organization(self, to_organization: str):
-        to_organization = self.__validate_organisation_code__(to_organization)
         response = self.session.post(f"{self.organization_uri}/settings/clone/{to_organization}")
         response.raise_for_status()
 
@@ -220,16 +241,16 @@ class KATalogusClientV1:
         )
         response.raise_for_status()
 
-    def get_description(self, boefje_id: str) -> str:
-        boefje_id = self.__clean_plugin_string__(boefje_id)
-        response = self.session.get(f"{self.organization_uri}/plugins/{boefje_id}/description.md")
+    @validate_plugin_id
+    def get_description(self, plugin_id: str) -> str:
+        response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}/description.md")
         response.raise_for_status()
 
         return response.content.decode("utf-8")
 
-    def get_cover(self, boefje_id: str) -> BytesIO:
-        boefje_id = self.__clean_plugin_string__(boefje_id)
-        response = self.session.get(f"{self.organization_uri}/plugins/{boefje_id}/cover.jpg")
+    @validate_plugin_id
+    def get_cover(self, plugin_id: str) -> BytesIO:
+        response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}/cover.jpg")
         response.raise_for_status()
         return BytesIO(response.content)
 
