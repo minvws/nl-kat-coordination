@@ -17,7 +17,9 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": { "$ref": "#/components/schemas/Scheduler" },
+                  "items": {
+                    "$ref": "#/components/schemas/Scheduler"
+                  },
                   "type": "array",
                   "title": "Response List Schedulers Get"
                 }
@@ -37,7 +39,10 @@
             "name": "scheduler_id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string", "title": "Scheduler Id" }
+            "schema": {
+              "type": "string",
+              "title": "Scheduler Id"
+            }
           }
         ],
         "responses": {
@@ -45,7 +50,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Scheduler" }
+                "schema": {
+                  "$ref": "#/components/schemas/Scheduler"
+                }
               }
             }
           },
@@ -53,7 +60,9 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -68,14 +77,19 @@
             "name": "scheduler_id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string", "title": "Scheduler Id" }
+            "schema": {
+              "type": "string",
+              "title": "Scheduler Id"
+            }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/Scheduler" }
+              "schema": {
+                "$ref": "#/components/schemas/Scheduler"
+              }
             }
           }
         },
@@ -84,7 +98,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Scheduler" }
+                "schema": {
+                  "$ref": "#/components/schemas/Scheduler"
+                }
               }
             }
           },
@@ -92,7 +108,9 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -110,7 +128,9 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": { "$ref": "#/components/schemas/Queue" },
+                  "items": {
+                    "$ref": "#/components/schemas/Queue"
+                  },
                   "type": "array",
                   "title": "Response List Queues Get"
                 }
@@ -130,7 +150,10 @@
             "name": "queue_id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string", "title": "Queue Id" }
+            "schema": {
+              "type": "string",
+              "title": "Queue Id"
+            }
           }
         ],
         "responses": {
@@ -138,7 +161,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Queue" }
+                "schema": {
+                  "$ref": "#/components/schemas/Queue"
+                }
               }
             }
           },
@@ -146,7 +171,9 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -163,7 +190,10 @@
             "name": "queue_id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string", "title": "Queue Id" }
+            "schema": {
+              "type": "string",
+              "title": "Queue Id"
+            }
           }
         ],
         "requestBody": {
@@ -171,8 +201,12 @@
             "application/json": {
               "schema": {
                 "anyOf": [
-                  { "$ref": "#/components/schemas/FilterRequest" },
-                  { "type": "null" }
+                  {
+                    "$ref": "#/components/schemas/FilterRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ],
                 "title": "Filters"
               }
@@ -186,8 +220,12 @@
               "application/json": {
                 "schema": {
                   "anyOf": [
-                    { "$ref": "#/components/schemas/Task-Output" },
-                    { "type": "null" }
+                    {
+                      "$ref": "#/components/schemas/Task-Output"
+                    },
+                    {
+                      "type": "null"
+                    }
                   ],
                   "title": "Response Pop Queues  Queue Id  Pop Post"
                 }
@@ -198,7 +236,9 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -215,14 +255,19 @@
             "name": "queue_id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string", "title": "Queue Id" }
+            "schema": {
+              "type": "string",
+              "title": "Queue Id"
+            }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/Task-Input" }
+              "schema": {
+                "$ref": "#/components/schemas/Task-Input"
+              }
             }
           }
         },
@@ -233,8 +278,12 @@
               "application/json": {
                 "schema": {
                   "anyOf": [
-                    { "$ref": "#/components/schemas/Task-Output" },
-                    { "type": "null" }
+                    {
+                      "$ref": "#/components/schemas/Task-Output"
+                    },
+                    {
+                      "type": "null"
+                    }
                   ],
                   "title": "Response Push Queues  Queue Id  Push Post"
                 }
@@ -245,7 +294,9 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -263,7 +314,14 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Schedule Hash"
             }
           },
@@ -272,7 +330,14 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [{ "type": "boolean" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Enabled"
             }
           },
@@ -280,13 +345,21 @@
             "name": "offset",
             "in": "query",
             "required": false,
-            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
           },
           {
             "name": "limit",
             "in": "query",
             "required": false,
-            "schema": { "type": "integer", "default": 10, "title": "Limit" }
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "title": "Limit"
+            }
           },
           {
             "name": "min_deadline_at",
@@ -294,8 +367,13 @@
             "required": false,
             "schema": {
               "anyOf": [
-                { "type": "string", "format": "date-time" },
-                { "type": "null" }
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
               ],
               "title": "Min Deadline At"
             }
@@ -306,8 +384,13 @@
             "required": false,
             "schema": {
               "anyOf": [
-                { "type": "string", "format": "date-time" },
-                { "type": "null" }
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
               ],
               "title": "Max Deadline At"
             }
@@ -318,8 +401,13 @@
             "required": false,
             "schema": {
               "anyOf": [
-                { "type": "string", "format": "date-time" },
-                { "type": "null" }
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
               ],
               "title": "Min Created At"
             }
@@ -330,8 +418,13 @@
             "required": false,
             "schema": {
               "anyOf": [
-                { "type": "string", "format": "date-time" },
-                { "type": "null" }
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
               ],
               "title": "Max Created At"
             }
@@ -342,7 +435,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PaginatedResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse"
+                }
               }
             }
           },
@@ -350,7 +445,9 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -364,7 +461,9 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/ScheduleCreate" }
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleCreate"
+              }
             }
           }
         },
@@ -373,7 +472,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Schedule" }
+                "schema": {
+                  "$ref": "#/components/schemas/Schedule"
+                }
               }
             }
           },
@@ -381,7 +482,9 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -410,7 +513,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Schedule" }
+                "schema": {
+                  "$ref": "#/components/schemas/Schedule"
+                }
               }
             }
           },
@@ -418,7 +523,9 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -444,7 +551,9 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/SchedulePatch" }
+              "schema": {
+                "$ref": "#/components/schemas/SchedulePatch"
+              }
             }
           }
         },
@@ -453,7 +562,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Schedule" }
+                "schema": {
+                  "$ref": "#/components/schemas/Schedule"
+                }
               }
             }
           },
@@ -461,7 +572,9 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -479,7 +592,14 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Scheduler Id"
             }
           },
@@ -488,7 +608,14 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Task Type"
             }
           },
@@ -497,7 +624,14 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Status"
             }
           },
@@ -505,13 +639,21 @@
             "name": "offset",
             "in": "query",
             "required": false,
-            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
           },
           {
             "name": "limit",
             "in": "query",
             "required": false,
-            "schema": { "type": "integer", "default": 10, "title": "Limit" }
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "title": "Limit"
+            }
           },
           {
             "name": "min_created_at",
@@ -519,8 +661,13 @@
             "required": false,
             "schema": {
               "anyOf": [
-                { "type": "string", "format": "date-time" },
-                { "type": "null" }
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
               ],
               "title": "Min Created At"
             }
@@ -531,8 +678,13 @@
             "required": false,
             "schema": {
               "anyOf": [
-                { "type": "string", "format": "date-time" },
-                { "type": "null" }
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
               ],
               "title": "Max Created At"
             }
@@ -542,7 +694,14 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Input Ooi"
             }
           },
@@ -551,7 +710,14 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Plugin Id"
             }
           }
@@ -561,8 +727,12 @@
             "application/json": {
               "schema": {
                 "anyOf": [
-                  { "$ref": "#/components/schemas/FilterRequest" },
-                  { "type": "null" }
+                  {
+                    "$ref": "#/components/schemas/FilterRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ],
                 "title": "Filters"
               }
@@ -574,7 +744,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PaginatedResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse"
+                }
               }
             }
           },
@@ -582,7 +754,9 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -598,7 +772,14 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Scheduler Id"
             }
           },
@@ -607,7 +788,14 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Task Type"
             }
           },
@@ -616,7 +804,14 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Status"
             }
           },
@@ -624,13 +819,21 @@
             "name": "offset",
             "in": "query",
             "required": false,
-            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
           },
           {
             "name": "limit",
             "in": "query",
             "required": false,
-            "schema": { "type": "integer", "default": 10, "title": "Limit" }
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "title": "Limit"
+            }
           },
           {
             "name": "min_created_at",
@@ -638,8 +841,13 @@
             "required": false,
             "schema": {
               "anyOf": [
-                { "type": "string", "format": "date-time" },
-                { "type": "null" }
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
               ],
               "title": "Min Created At"
             }
@@ -650,8 +858,13 @@
             "required": false,
             "schema": {
               "anyOf": [
-                { "type": "string", "format": "date-time" },
-                { "type": "null" }
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
               ],
               "title": "Max Created At"
             }
@@ -661,7 +874,14 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Input Ooi"
             }
           },
@@ -670,7 +890,14 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Plugin Id"
             }
           }
@@ -680,8 +907,12 @@
             "application/json": {
               "schema": {
                 "anyOf": [
-                  { "$ref": "#/components/schemas/FilterRequest" },
-                  { "type": "null" }
+                  {
+                    "$ref": "#/components/schemas/FilterRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ],
                 "title": "Filters"
               }
@@ -693,7 +924,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PaginatedResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse"
+                }
               }
             }
           },
@@ -701,7 +934,9 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -719,7 +954,14 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Scheduler Id"
             }
           }
@@ -735,10 +977,14 @@
                       "type": "object",
                       "additionalProperties": {
                         "type": "object",
-                        "additionalProperties": { "type": "integer" }
+                        "additionalProperties": {
+                          "type": "integer"
+                        }
                       }
                     },
-                    { "type": "null" }
+                    {
+                      "type": "null"
+                    }
                   ],
                   "title": "Response Stats Tasks Stats Get"
                 }
@@ -749,7 +995,9 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -767,7 +1015,14 @@
             "in": "path",
             "required": true,
             "schema": {
-              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Scheduler Id"
             }
           }
@@ -783,10 +1038,14 @@
                       "type": "object",
                       "additionalProperties": {
                         "type": "object",
-                        "additionalProperties": { "type": "integer" }
+                        "additionalProperties": {
+                          "type": "integer"
+                        }
                       }
                     },
-                    { "type": "null" }
+                    {
+                      "type": "null"
+                    }
                   ],
                   "title": "Response Stats Tasks Stats  Scheduler Id  Get"
                 }
@@ -797,7 +1056,9 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -814,7 +1075,11 @@
             "name": "task_id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string", "format": "uuid", "title": "Task Id" }
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Task Id"
+            }
           }
         ],
         "responses": {
@@ -822,7 +1087,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Task-Output" }
+                "schema": {
+                  "$ref": "#/components/schemas/Task-Output"
+                }
               }
             }
           },
@@ -830,7 +1097,9 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -845,14 +1114,20 @@
             "name": "task_id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string", "format": "uuid", "title": "Task Id" }
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Task Id"
+            }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/Task-Input" }
+              "schema": {
+                "$ref": "#/components/schemas/Task-Input"
+              }
             }
           }
         },
@@ -861,7 +1136,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Task-Output" }
+                "schema": {
+                  "$ref": "#/components/schemas/Task-Output"
+                }
               }
             }
           },
@@ -869,7 +1146,9 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -886,7 +1165,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "title": "Response Metrics Metrics Get" }
+                "schema": {
+                  "title": "Response Metrics Metrics Get"
+                }
               }
             }
           }
@@ -915,7 +1196,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ServiceHealth" }
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceHealth"
+                }
               }
             }
           },
@@ -923,7 +1206,9 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -940,7 +1225,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "title": "Response Root  Get" }
+                "schema": {
+                  "title": "Response Root  Get"
+                }
               }
             }
           }
@@ -952,9 +1239,19 @@
     "schemas": {
       "Filter": {
         "properties": {
-          "column": { "type": "string", "title": "Column" },
+          "column": {
+            "type": "string",
+            "title": "Column"
+          },
           "field": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Field"
           },
           "operator": {
@@ -995,27 +1292,72 @@
           },
           "value": {
             "anyOf": [
-              { "type": "string" },
-              { "type": "integer" },
-              { "type": "number" },
-              { "type": "boolean" },
-              { "type": "string", "format": "date-time" },
-              { "items": { "type": "string" }, "type": "array" },
-              { "items": { "type": "integer" }, "type": "array" },
-              { "items": { "type": "number" }, "type": "array" },
-              { "items": { "type": "boolean" }, "type": "array" },
               {
-                "items": { "type": "string", "format": "date-time" },
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
                 "type": "array"
               },
-              { "items": { "type": "null" }, "type": "array" },
-              { "type": "null" }
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "items": {
+                  "type": "boolean"
+                },
+                "type": "array"
+              },
+              {
+                "items": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "type": "array"
+              },
+              {
+                "items": {
+                  "type": "null"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
             ],
             "title": "Value"
           }
         },
         "type": "object",
-        "required": ["column", "operator", "value"],
+        "required": [
+          "column",
+          "operator",
+          "value"
+        ],
         "title": "Filter",
         "description": "Represents a filter condition.\n\nAttributes:\n    column: The name of the column to filter on.\n    field: An optional field name for nested filtering.\n    operator: The comparison operator for the filter.\n    value: The value to compare against."
       },
@@ -1024,12 +1366,16 @@
           "filters": {
             "anyOf": [
               {
-                "items": { "$ref": "#/components/schemas/Filter" },
+                "items": {
+                  "$ref": "#/components/schemas/Filter"
+                },
                 "type": "array"
               },
               {
                 "additionalProperties": {
-                  "items": { "$ref": "#/components/schemas/Filter" },
+                  "items": {
+                    "$ref": "#/components/schemas/Filter"
+                  },
                   "type": "array"
                 },
                 "type": "object"
@@ -1039,14 +1385,18 @@
           }
         },
         "type": "object",
-        "required": ["filters"],
+        "required": [
+          "filters"
+        ],
         "title": "FilterRequest",
         "description": "Represents a filter request.\n\nArgs:\n    filters: The filter criteria, which can be a list of Filter objects or\n    a dictionary of lists."
       },
       "HTTPValidationError": {
         "properties": {
           "detail": {
-            "items": { "$ref": "#/components/schemas/ValidationError" },
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
             "type": "array",
             "title": "Detail"
           }
@@ -1056,29 +1406,73 @@
       },
       "PaginatedResponse": {
         "properties": {
-          "count": { "type": "integer", "title": "Count" },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
           "next": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Next"
           },
           "previous": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Previous"
           },
-          "results": { "items": {}, "type": "array", "title": "Results" }
+          "results": {
+            "items": {},
+            "type": "array",
+            "title": "Results"
+          }
         },
         "type": "object",
-        "required": ["count", "next", "previous", "results"],
+        "required": [
+          "count",
+          "next",
+          "previous",
+          "results"
+        ],
         "title": "PaginatedResponse"
       },
       "Queue": {
         "properties": {
-          "id": { "type": "string", "title": "Id" },
-          "size": { "type": "integer", "title": "Size" },
-          "maxsize": { "type": "integer", "title": "Maxsize" },
-          "item_type": { "type": "string", "title": "Item Type" },
-          "allow_replace": { "type": "boolean", "title": "Allow Replace" },
-          "allow_updates": { "type": "boolean", "title": "Allow Updates" },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "size": {
+            "type": "integer",
+            "title": "Size"
+          },
+          "maxsize": {
+            "type": "integer",
+            "title": "Maxsize"
+          },
+          "item_type": {
+            "type": "string",
+            "title": "Item Type"
+          },
+          "allow_replace": {
+            "type": "boolean",
+            "title": "Allow Replace"
+          },
+          "allow_updates": {
+            "type": "boolean",
+            "title": "Allow Updates"
+          },
           "allow_priority_updates": {
             "type": "boolean",
             "title": "Allow Priority Updates"
@@ -1086,10 +1480,14 @@
           "pq": {
             "anyOf": [
               {
-                "items": { "$ref": "#/components/schemas/Task-Output" },
+                "items": {
+                  "$ref": "#/components/schemas/Task-Output"
+                },
                 "type": "array"
               },
-              { "type": "null" }
+              {
+                "type": "null"
+              }
             ],
             "title": "Pq"
           }
@@ -1108,34 +1506,71 @@
       },
       "Schedule": {
         "properties": {
-          "id": { "type": "string", "format": "uuid", "title": "Id" },
-          "scheduler_id": { "type": "string", "title": "Scheduler Id" },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "scheduler_id": {
+            "type": "string",
+            "title": "Scheduler Id"
+          },
           "hash": {
             "anyOf": [
-              { "type": "string", "maxLength": 32 },
-              { "type": "null" }
+              {
+                "type": "string",
+                "maxLength": 32
+              },
+              {
+                "type": "null"
+              }
             ],
             "title": "Hash"
           },
           "data": {
-            "anyOf": [{ "type": "object" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Data"
           },
-          "enabled": { "type": "boolean", "title": "Enabled", "default": true },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": true
+          },
           "schedule": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Schedule"
           },
           "tasks": {
-            "items": { "$ref": "#/components/schemas/Task-Output" },
+            "items": {
+              "$ref": "#/components/schemas/Task-Output"
+            },
             "type": "array",
             "title": "Tasks",
             "default": []
           },
           "deadline_at": {
             "anyOf": [
-              { "type": "string", "format": "date-time" },
-              { "type": "null" }
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
             ],
             "title": "Deadline At"
           },
@@ -1151,44 +1586,90 @@
           }
         },
         "type": "object",
-        "required": ["scheduler_id"],
+        "required": [
+          "scheduler_id"
+        ],
         "title": "Schedule"
       },
       "ScheduleCreate": {
         "properties": {
-          "scheduler_id": { "type": "string", "title": "Scheduler Id" },
-          "data": { "type": "object", "title": "Data" },
-          "schedule": { "type": "string", "title": "Schedule" }
+          "scheduler_id": {
+            "type": "string",
+            "title": "Scheduler Id"
+          },
+          "data": {
+            "type": "object",
+            "title": "Data"
+          },
+          "schedule": {
+            "type": "string",
+            "title": "Schedule"
+          }
         },
         "type": "object",
-        "required": ["scheduler_id", "data", "schedule"],
+        "required": [
+          "scheduler_id",
+          "data",
+          "schedule"
+        ],
         "title": "ScheduleCreate"
       },
       "SchedulePatch": {
         "properties": {
           "hash": {
             "anyOf": [
-              { "type": "string", "maxLength": 32 },
-              { "type": "null" }
+              {
+                "type": "string",
+                "maxLength": 32
+              },
+              {
+                "type": "null"
+              }
             ],
             "title": "Hash"
           },
           "data": {
-            "anyOf": [{ "type": "object" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Data"
           },
           "enabled": {
-            "anyOf": [{ "type": "boolean" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Enabled"
           },
           "schedule": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Schedule"
           },
           "deadline_at": {
             "anyOf": [
-              { "type": "string", "format": "date-time" },
-              { "type": "null" }
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
             ],
             "title": "Deadline At"
           }
@@ -1199,21 +1680,47 @@
       "Scheduler": {
         "properties": {
           "id": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Id"
           },
           "enabled": {
-            "anyOf": [{ "type": "boolean" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Enabled"
           },
           "priority_queue": {
-            "anyOf": [{ "type": "object" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Priority Queue"
           },
           "last_activity": {
             "anyOf": [
-              { "type": "string", "format": "date-time" },
-              { "type": "null" }
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
             ],
             "title": "Last Activity"
           }
@@ -1224,31 +1731,49 @@
       },
       "ServiceHealth": {
         "properties": {
-          "service": { "type": "string", "title": "Service" },
+          "service": {
+            "type": "string",
+            "title": "Service"
+          },
           "healthy": {
             "type": "boolean",
             "title": "Healthy",
             "default": false
           },
           "version": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Version"
           },
-          "additional": { "title": "Additional" },
+          "additional": {
+            "title": "Additional"
+          },
           "results": {
-            "items": { "$ref": "#/components/schemas/ServiceHealth" },
+            "items": {
+              "$ref": "#/components/schemas/ServiceHealth"
+            },
             "type": "array",
             "title": "Results"
           },
           "externals": {
-            "additionalProperties": { "type": "boolean" },
+            "additionalProperties": {
+              "type": "boolean"
+            },
             "type": "object",
             "title": "Externals",
             "default": {}
           }
         },
         "type": "object",
-        "required": ["service"],
+        "required": [
+          "service"
+        ],
         "title": "ServiceHealth",
         "description": "ServiceHealth is used as response model for health check in the\nserver.Server for the health endpoint."
       },
@@ -1256,55 +1781,114 @@
         "properties": {
           "id": {
             "anyOf": [
-              { "type": "string", "format": "uuid" },
-              { "type": "null" }
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
             ],
             "title": "Id"
           },
           "scheduler_id": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Scheduler Id"
           },
           "schedule_id": {
             "anyOf": [
-              { "type": "string", "format": "uuid" },
-              { "type": "null" }
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
             ],
             "title": "Schedule Id"
           },
           "priority": {
-            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Priority"
           },
           "status": {
             "anyOf": [
-              { "$ref": "#/components/schemas/TaskStatus" },
-              { "type": "null" }
+              {
+                "$ref": "#/components/schemas/TaskStatus"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "type": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Type"
           },
           "hash": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Hash"
           },
           "data": {
-            "anyOf": [{ "type": "object" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Data"
           },
           "created_at": {
             "anyOf": [
-              { "type": "string", "format": "date-time" },
-              { "type": "null" }
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
             ],
             "title": "Created At"
           },
           "modified_at": {
             "anyOf": [
-              { "type": "string", "format": "date-time" },
-              { "type": "null" }
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
             ],
             "title": "Modified At"
           }
@@ -1314,40 +1898,86 @@
       },
       "Task-Output": {
         "properties": {
-          "id": { "type": "string", "format": "uuid", "title": "Id" },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
           "scheduler_id": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Scheduler Id"
           },
           "schedule_id": {
             "anyOf": [
-              { "type": "string", "format": "uuid" },
-              { "type": "null" }
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
             ],
             "title": "Schedule Id"
           },
           "priority": {
-            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Priority",
             "default": 0
           },
           "status": {
-            "allOf": [{ "$ref": "#/components/schemas/TaskStatus" }],
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TaskStatus"
+              }
+            ],
             "default": "pending"
           },
           "type": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Type"
           },
           "hash": {
             "anyOf": [
-              { "type": "string", "maxLength": 32 },
-              { "type": "null" }
+              {
+                "type": "string",
+                "maxLength": 32
+              },
+              {
+                "type": "null"
+              }
             ],
             "title": "Hash"
           },
           "data": {
-            "anyOf": [{ "type": "object" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Data"
           },
           "created_at": {
@@ -1380,15 +2010,34 @@
       "ValidationError": {
         "properties": {
           "loc": {
-            "items": { "anyOf": [{ "type": "string" }, { "type": "integer" }] },
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
             "type": "array",
             "title": "Location"
           },
-          "msg": { "type": "string", "title": "Message" },
-          "type": { "type": "string", "title": "Error Type" }
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
         },
         "type": "object",
-        "required": ["loc", "msg", "type"],
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
         "title": "ValidationError"
       }
     }
