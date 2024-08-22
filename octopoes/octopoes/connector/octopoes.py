@@ -88,6 +88,7 @@ class OctopoesAPIConnector:
             "order_by": order_by,
             "asc_desc": asc_desc,
         }
+        params = {k: v for k, v in params.items() if v is not None}  # filter out None values
         res = self.session.get(f"/{self.client}/objects", params=params)
         return TypeAdapter(Paginated[OOIType]).validate_json(res.content)
 
