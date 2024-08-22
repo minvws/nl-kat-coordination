@@ -206,7 +206,7 @@ datamodel = Datamodel(entities=entities)
 
 
 def escape_string(string):
-    escaped_string = re.sub(r"([^a-zA-Z0-9.:/])", r"\\\1", string)
+    escaped_string = re.sub(r'(["\\])', r"\\\1", string)
     return escaped_string
 
 
