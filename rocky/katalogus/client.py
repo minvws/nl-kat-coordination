@@ -12,7 +12,6 @@ from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import AfterValidator, BaseModel, Field, field_serializer
 from tools.enums import SCAN_LEVEL
-from tools.models import OrganizationMember
 
 from octopoes.models import OOI
 from octopoes.models.exception import TypeNotFound
@@ -50,7 +49,7 @@ class Plugin(BaseModel):
     enabled: bool
     type: str
 
-    def can_scan(self, member: OrganizationMember) -> bool:
+    def can_scan(self, member) -> bool:
         return member.has_perm("tools.can_scan_organization")
 
 
