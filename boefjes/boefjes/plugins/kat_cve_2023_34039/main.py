@@ -58,7 +58,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, str | bytes]]:
                             (str(coutput), f"{key_file} is allowed access to vRealize Network Insight on {ip}:{port}")
                         ),
                     ),
-                    ({"cve/id"}, "CVE-2023-34039"),
+                    ({"openkat/finding"}, "CVE-2023-34039"),
                 ]
 
             except Exception:  # noqa: S112
