@@ -318,7 +318,7 @@ class XTDBOOIRepository(OOIRepository):
             else ""
         )
 
-        order_statement = f":order-by [[_{re.escape(order_by)} :{re.escape(asc_desc)}]]"
+        order_statement = f":order-by [[_{order_by} :{asc_desc}]]"
 
         count_query = """
                 {{
