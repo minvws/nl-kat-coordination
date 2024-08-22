@@ -603,11 +603,13 @@ msgid "Show all"
 msgstr ""
 
 #: katalogus/forms/katalogus_filter.py
+#: katalogus/templates/partials/plugin_tile_modal.html
 #: reports/report_types/dns_report/report.html
 msgid "Enabled"
 msgstr ""
 
 #: katalogus/forms/katalogus_filter.py
+#: katalogus/templates/partials/plugin_tile_modal.html
 msgid "Disabled"
 msgstr ""
 
@@ -662,6 +664,7 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/boefje_detail.html
+#: katalogus/templates/partials/plugin_tile_modal.html
 msgid "Scan level"
 msgstr ""
 
@@ -695,11 +698,13 @@ msgstr ""
 
 #: katalogus/templates/boefje_detail.html
 #: katalogus/templates/normalizer_detail.html
+#: katalogus/templates/partials/plugin_tile_modal.html
 msgid "Produces"
 msgstr ""
 
 #: katalogus/templates/boefje_detail.html
 #: katalogus/templates/normalizer_detail.html
+#: katalogus/templates/partials/plugin_tile_modal.html
 #, python-format
 msgid "%(plugin_name)s can produce the following output:"
 msgstr ""
@@ -851,6 +856,7 @@ msgstr ""
 
 #: katalogus/templates/partials/boefje_tile.html
 #: katalogus/templates/partials/plugin_tile.html
+#: katalogus/templates/partials/plugin_tile_modal.html
 #: katalogus/templates/partials/plugins.html
 msgid "See details"
 msgstr ""
@@ -969,6 +975,23 @@ msgstr ""
 
 #: katalogus/templates/partials/plugin_tile.html
 msgid "Required for:"
+msgstr ""
+
+#: katalogus/templates/partials/plugin_tile_modal.html
+msgid "Boefje details"
+msgstr ""
+
+#: katalogus/templates/partials/plugin_tile_modal.html reports/forms.py
+#: reports/templates/report_overview/report_history_table.html
+msgid "Report types"
+msgstr ""
+
+#: katalogus/templates/partials/plugin_tile_modal.html
+msgid "This boefje is required by the following report types."
+msgstr ""
+
+#: katalogus/templates/partials/plugin_tile_modal.html
+msgid "Go to boefje detail page"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
@@ -2117,10 +2140,6 @@ msgstr ""
 
 #: reports/forms.py tools/forms/ooi_form.py
 msgid "Filter by OOI types"
-msgstr ""
-
-#: reports/forms.py reports/templates/report_overview/report_history_table.html
-msgid "Report types"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
