@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from httpx import HTTPError
 from tools.enums import CUSTOM_SCAN_LEVEL
 from tools.forms.ooi import SelectOOIForm
-from tools.forms.ooi_form import OOITypeMultiCheckboxForm
+from tools.forms.ooi_form import OOISearchForm, OOITypeMultiCheckboxForm
 from tools.models import Indemnification
 from tools.view_helpers import get_mandatory_fields
 
@@ -40,6 +40,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
         context = super().get_context_data(**kwargs)
 
         context["ooi_type_form"] = OOITypeMultiCheckboxForm(self.request.GET)
+        context["ooi_search_form"] = OOISearchForm(self.request.GET)
         context["mandatory_fields"] = get_mandatory_fields(self.request, params=["observed_at"])
         context["select_oois_form"] = SelectOOIForm(
             context.get("ooi_list", []),
