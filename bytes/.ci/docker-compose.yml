@@ -20,6 +20,8 @@ services:
       dockerfile: Dockerfile
       args:
         ENVIRONMENT: dev
+        USER_UID: 1001
+        USER_GID: 1001
     command: pytest -vv tests/integration
     depends_on:
       - ci_bytes
