@@ -18,10 +18,10 @@ jobs:
   # uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@feature/sonar-cloud
   # bytes-tests:
   # uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@feature/sonar-cloud
-  # mula-tests:
-  #   uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@feature/sonar-cloud
-  rocky-tests:
-    uses: minvws/nl-kat-coordination/.github/workflows/rocky-tests.yml@feature/sonar-cloud
+  mula-tests:
+    uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@feature/sonar-cloud
+  # rocky-tests:
+  #   uses: minvws/nl-kat-coordination/.github/workflows/rocky-tests.yml@feature/sonar-cloud
 
     # todo: bytes, rocky, mula, keiko, boefjes
 
