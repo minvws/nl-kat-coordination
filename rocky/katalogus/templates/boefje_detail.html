@@ -31,12 +31,12 @@
                 </div>
             </div>
         </section>
-        <section>
-            {% if perms.tools.can_view_katalogus_settings %}
+        {% if perms.tools.can_view_katalogus_settings and object_list %}
+            <section>
                 {% include "plugin_settings_list.html" with object_list=plugin_settings plugin=plugin %}
 
-            {% endif %}
-        </section>
+            </section>
+        {% endif %}
         <section>
             {% include "plugin_container_image.html" %}
 
