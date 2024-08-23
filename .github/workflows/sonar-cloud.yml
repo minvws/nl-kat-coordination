@@ -65,6 +65,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          sparse-checkout: .github/scripts/coverage_file_fixer.py
 
       - name: Download artifacts
         uses: actions/download-artifact@v4
@@ -83,6 +84,10 @@ jobs:
         uses: Mudlet/xmlstarlet-action@master
         with:
           args: edit --inplace --update "coverage/sources" --value "/github/workspace/${{ matrix.module['name'] }}/" "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
+      
+      - name: Print again
+        run: cat "${{ github.workspace }}/${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
+
 
       # todo: find a way to fix the filename attribute in the coverage, these should be relative to the base dir and not the coverage source!
       # - name: test mula
