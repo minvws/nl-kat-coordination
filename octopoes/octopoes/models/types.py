@@ -60,7 +60,7 @@ from octopoes.models.ooi.network import (
 from octopoes.models.ooi.question import Question
 from octopoes.models.ooi.reports import Report, ReportData
 from octopoes.models.ooi.service import IPService, Service, TLSCipher
-from octopoes.models.ooi.software import Software, SoftwareInstance
+from octopoes.models.ooi.software import OutdatedSoftwareInstance, Software, SoftwareInstance
 from octopoes.models.ooi.web import (
     RESTAPI,
     URL,
@@ -107,7 +107,7 @@ FindingTypeType = FindingType | ConcreteFindingTypeType
 ConcreteNetworkType = Network | IPAddressV4 | IPAddressV6 | AutonomousSystem | IPV4NetBlock | IPV6NetBlock | IPPort
 NetworkType = ConcreteNetworkType | IPAddress
 ServiceType = Service | IPService | TLSCipher
-SoftwareType = Software | SoftwareInstance
+SoftwareType = Software | SoftwareInstance | OutdatedSoftwareInstance
 WebType = (
     Website
     | URL
