@@ -39,7 +39,8 @@ class Plugin(BaseModel):
 
 class Boefje(Plugin):
     scan_level: SCAN_LEVEL
-    consumes: set[type[OOI]]
+    consumes: set[type[OOI]] = Field(default_factory=set)
+    produces: set[str] = Field(default_factory=set)
     options: list[str] | None = None
     runnable_hash: str | None = None
     type: str = "boefje"

@@ -44,6 +44,7 @@ class BoefjeSetupView(OrganizationView, FormView):
         form_data = form.cleaned_data
         input_object = type_by_name(form_data["consumes"])
         arguments = form_data["oci_arguments"].split()
+        produces = form_data["produces"].replace(" ", "").split(",")
         boefje_id = str(uuid.uuid4())
 
         boefje = Boefje(
@@ -54,6 +55,7 @@ class BoefjeSetupView(OrganizationView, FormView):
             enabled=False,
             scan_level=form_data["scan_level"],
             consumes={input_object},
+            produces=produces,
             schema=form_data["schema"],
             oci_image=form_data["oci_image"],
             oci_arguments=arguments,
