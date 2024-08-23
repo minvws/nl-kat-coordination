@@ -38,7 +38,7 @@ jobs:
       matrix:
         module: # todo: octopoes
           - name: octopoes
-            prefix_path: "/"
+            prefix_path: "."
           # - name: mula
           #   prefix_path: "mula/scheduler/"
           # - name: bytes
