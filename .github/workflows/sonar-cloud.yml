@@ -16,32 +16,14 @@ jobs:
 
   # octopoes-tests:
   # uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@feature/sonar-cloud
-  # bytes-tests:
-  # uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@feature/sonar-cloud
+  bytes-tests:
+    uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@feature/sonar-cloud
   mula-tests:
     uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@feature/sonar-cloud
-  # rocky-tests:
-  #   uses: minvws/nl-kat-coordination/.github/workflows/rocky-tests.yml@feature/sonar-cloud
+  rocky-tests:
+    uses: minvws/nl-kat-coordination/.github/workflows/rocky-tests.yml@feature/sonar-cloud
 
-  # todo: bytes, rocky, mula, keiko, boefjes
-
-  # find-coverage-reports:
-  #   runs-on: ubuntu-latest
-
-  #   needs: mula-tests
-
-  #   steps:
-  #     - name: Download artifacts
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         pattern: "*-coverage-unit"
-
-  # - name: Get coverage files
-  #   run: find . -name coverage.xml -exec dirname {} \; | xargs basename | xargs  | jq -R -c 'split(" ")'
-
-  # - name: Fix coverage reports
-  #   run: |
-  #     sed -i 's|<source></source>|<source>/github/workspace/mula</source>|g' mula-coverage-unit/coverage.xml
+  # todo: octopoes, boefjes
 
   fix-coverage-reports:
     runs-on: ubuntu-latest
@@ -50,44 +32,36 @@ jobs:
     needs:
       # - octopoes-tests
       - mula-tests
-      # - bytes-tests
-      # - rocky-tests
+      - bytes-tests
+      - rocky-tests
 
     strategy:
       matrix:
-        # module: ["octopoes", "mula", "rocky", "bytes"]
-        module:
+        module: # todo: octopoes
           - name: mula
             prefix_path: "mula/scheduler/"
+          - name: bytes
+            prefix_path: "bytes/"
+          - name: rocky
+            prefix_path: "rocky/"
 
     steps:
-      - name: Checkout repository
+      - name: Checkout coverage file fix script
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           sparse-checkout: .github/scripts/coverage_file_fixer.py
 
-      - name: Download artifacts
+      - name: Download coverage file for ${{ matrix.module['name'] }}
         uses: actions/download-artifact@v4
         with:
           name: ${{ matrix.module['name'] }}-coverage-unit
           path: ${{ matrix.module['name'] }}-coverage-unit
 
-      - run: tree .
-
-      # - name: Print
-      #   run: cat "${{ github.workspace }}/${{ matrix.module }}-coverage-unit/coverage.xml"
-      - name: Print
-        run: cat "${{ github.workspace }}/${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
-
-      - name: Fix coverage report
+      - name: Fix coverage report sources
         uses: Mudlet/xmlstarlet-action@master
         with:
           args: edit --inplace --update "coverage/sources" --value "/github/workspace/${{ matrix.module['name'] }}/" "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
-      
-      - name: Print again
-        run: cat "${{ github.workspace }}/${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
-
 
       # todo: find a way to fix the filename attribute in the coverage, these should be relative to the base dir and not the coverage source!
       # - name: test mula
@@ -153,10 +127,10 @@ jobs:
       - name: Fix via external script
         run: python "${{ github.workspace }}/.github/scripts/coverage_file_fixer.py" "${{ matrix.module['name'] }}-coverage-unit/coverage.xml" "${{ matrix.module['prefix_path'] }}"
 
-      - name: Print
-        run: cat "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
+      # - name: Print
+      #   run: cat "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
 
-      - name: Upload coverage as artifact
+      - name: Upload fixed coverage file for ${{ matrix.module['name'] }}
         uses: actions/upload-artifact@v4
         with:
           name: "${{ matrix.module['name'] }}-coverage-unit-fixed"
@@ -196,7 +170,7 @@ jobs:
 
       - run: pwd && tree .
 
-      - run: cat *-coverage-unit-fixed/coverage.xml
+      # - run: cat *-coverage-unit-fixed/coverage.xml
 
       - name: SonarCloud
         uses: SonarSource/sonarcloud-github-action@v2.2.0
