@@ -38,7 +38,7 @@ jobs:
       matrix:
         module: # todo: octopoes
           - name: octopoes
-            prefix_path: "octopoes/"
+            prefix_path: "/"
           # - name: mula
           #   prefix_path: "mula/scheduler/"
           # - name: bytes
@@ -53,7 +53,7 @@ jobs:
           fetch-depth: 0
           sparse-checkout: .github/scripts/coverage_file_fixer.py
 
-      - name: Download coverage file for ${{ matrix.module['name'] }}
+      - name: Download coverage file
         uses: actions/download-artifact@v4
         with:
           name: ${{ matrix.module['name'] }}-coverage-unit
@@ -64,74 +64,10 @@ jobs:
         with:
           args: edit --inplace --update "coverage/sources" --value "/github/workspace/${{ matrix.module['name'] }}/" "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
 
-      # todo: find a way to fix the filename attribute in the coverage, these should be relative to the base dir and not the coverage source!
-      # - name: test mula
-      #   id: test_mula
-      #   if: ${{ matrix.module == 'mula' }}
-      #   uses: Mudlet/xmlstarlet-action@master
-      #   with:
-      #     # args: edit --inplace --update "coverage/sources" --value "/github/workspace/${{ matrix.module }}/scheduler/" "${{ matrix.module }}-coverage-unit/coverage.xml"
-      #     # args: edit --inplace --update "coverage/sources" --value "${{ matrix.module }}/scheduler/" "${{ matrix.module }}-coverage-unit/coverage.xml"
-      #     args: edit --inplace --update "//class/@filename" --expr "concat('mula/scheduler/', .)" "${{ matrix.module }}-coverage-unit/coverage.xml"
-
-      # - name: fix via script
-      #   if: ${{ matrix.module == 'mula' }}
-      #   shell: python
-      #   run: |
-      #     #!/usr/bin/env python
-      #     import xml.etree.ElementTree as etree
-      #     from pathlib import Path
-
-      #     def path_prefixer(file: Path, prefix: Path) -> None:
-      #         xml = file.read_text()
-      #         root = etree.fromstring(xml)
-      #         for element in root.findall(".//*[@filename]"):
-      #             element.set("filename", prefix.joinpath(element.get("filename")).as_posix())
-      #         file.write_text(etree.tostring(root).decode())
-
-      #     path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("mula/scheduler/"))
-
-      # - name: fix via script
-      #   if: ${{ matrix.module == 'bytes' }}
-      #   shell: python
-      #   run: |
-      #     #!/usr/bin/env python
-      #     import xml.etree.ElementTree as etree
-      #     from pathlib import Path
-
-      #     def path_prefixer(file: Path, prefix: Path) -> None:
-      #         xml = file.read_text()
-      #         root = etree.fromstring(xml)
-      #         for element in root.findall(".//*[@filename]"):
-      #             element.set("filename", prefix.joinpath(element.get("filename")).as_posix())
-      #         file.write_text(etree.tostring(root).decode())
-
-      #     path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("bytes/"))
-
-      # - name: fix via script
-      #   if: ${{ matrix.module == 'rocky' }}
-      #   shell: python
-      #   run: |
-      #     #!/usr/bin/env python
-      #     import xml.etree.ElementTree as etree
-      #     from pathlib import Path
-
-      #     def path_prefixer(file: Path, prefix: Path) -> None:
-      #         xml = file.read_text()
-      #         root = etree.fromstring(xml)
-      #         for element in root.findall(".//*[@filename]"):
-      #             element.set("filename", prefix.joinpath(element.get("filename")).as_posix())
-      #         file.write_text(etree.tostring(root).decode())
-
-      #     path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("rocky/"))
-
-      - name: Fix via external script
+      - name: Fix coverage file
         run: python "${{ github.workspace }}/.github/scripts/coverage_file_fixer.py" "${{ matrix.module['name'] }}-coverage-unit/coverage.xml" "${{ matrix.module['prefix_path'] }}"
 
-      # - name: Print
-      #   run: cat "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
-
-      - name: Upload fixed coverage file for ${{ matrix.module['name'] }}
+      - name: Upload fixed coverage file
         uses: actions/upload-artifact@v4
         with:
           name: "${{ matrix.module['name'] }}-coverage-unit-fixed"
@@ -139,11 +75,8 @@ jobs:
 
   sonar-cloud:
     runs-on: ubuntu-latest
-    # needs: pre-commit-run
+
     needs:
-      # - octopoes-tests
-      # - bytes-tests
-      # - mula-tests
       - fix-coverage-reports
 
     steps:
@@ -156,22 +89,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: "*-coverage-unit-fixed"
-
-      # workaround for https://sonarsource.atlassian.net/browse/SONARPY-1203
-      # and https://community.sonarsource.com/t/sonar-on-github-actions-with-python-coverage-source-issue/36057
-      # - name: Override coverage Source Path for Sonar
-      #   run: sed -i 's/home\/runner\/work\/nl-kat-coordination\/nl-kat-coordination/github\/workspace/' *-coverage-unit/coverage.xml
-
-      # - name: test
-      #   run: sed -i 's|<source></source>|<source>/github/workspace/mula</source>|g' mula-coverage-unit/coverage.xml
-
-      # todo: create a job matrix for fixing all the coverage.xml file sources
-      # todo: https://github.com/Mudlet/xmlstarlet-action
-      # todo: cat coverage.xml | xml ed --inplace --update "coverage/sources" --value "test" | head
-
-      - run: pwd && tree .
-
-      # - run: cat *-coverage-unit-fixed/coverage.xml
 
       - name: SonarCloud
         uses: SonarSource/sonarcloud-github-action@v2.2.0
