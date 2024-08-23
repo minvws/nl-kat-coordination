@@ -1,12 +1,15 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from functools import cached_property
 from operator import attrgetter
+from typing import TypedDict
 
 import structlog
 from account.mixins import OrganizationView
+from account.models import KATUser
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.http import Http404, HttpRequest
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -32,6 +35,8 @@ from rocky.bytes_client import get_bytes_client
 
 logger = structlog.get_logger(__name__)
 
+ORIGIN_MAX_AGE = timedelta(days=2)
+
 
 @dataclass
 class HydratedFinding:
@@ -45,6 +50,27 @@ class OriginData(BaseModel):
     normalizer: dict | None = None
     boefje: Boefje | None = None
     params: dict[str, str] | None = None
+
+    @property
+    def is_old(self) -> bool:
+        return self.is_older_than(ORIGIN_MAX_AGE)
+
+    def is_older_than(self, time_delta: timedelta) -> bool:
+        if not self.normalizer:
+            return False
+
+        if (observation_date := self.normalizer.get("raw_data", {}).get("boefje_meta", {}).get("ended_at")) is None:
+            raise ValueError("Observation date is missing in normalizer meta")
+
+        observation_date = observation_date.replace(tzinfo=timezone.utc)
+
+        return observation_date < datetime.now(timezone.utc) - time_delta
+
+
+class Origins(TypedDict):
+    declarations: list[OriginData]
+    observations: list[OriginData]
+    inferences: list[OriginData]
 
 
 class OOIAttributeError(AttributeError):
@@ -89,21 +115,22 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
         try:
             ref = Reference.from_str(pk)
             ooi = self.octopoes_api_connector.get(ref, valid_time=self.observed_at)
+
+            return ooi
         except Exception as e:
             # TODO: raise the exception but let the handling be done by  the method that implements "get_single_ooi"
             self.handle_connector_exception(e)
-
-        return ooi
+            raise
 
     def get_origins(
         self,
         reference: Reference,
         organization: Organization,
-    ) -> tuple[list[OriginData], list[OriginData], list[OriginData]]:
+    ) -> Origins:
         declarations: list[OriginData] = []
         observations: list[OriginData] = []
         inferences: list[OriginData] = []
-        results = declarations, observations, inferences
+        results: Origins = {"declarations": declarations, "observations": observations, "inferences": inferences}
 
         try:
             origins = self.octopoes_api_connector.list_origins(self.observed_at, result=reference)
@@ -142,7 +169,10 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
                     e,
                 )
             else:
-                boefje_id = normalizer_data["raw_data"]["boefje_meta"]["boefje"]["id"]
+                boefje_meta = normalizer_data["raw_data"]["boefje_meta"]
+                boefje_id = boefje_meta["boefje"]["id"]
+                if boefje_meta.get("ended_at"):
+                    boefje_meta["ended_at"] = datetime.strptime(boefje_meta["ended_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
                 origin.normalizer = normalizer_data
                 try:
                     origin.boefje = katalogus.get_plugin(boefje_id)
@@ -283,7 +313,9 @@ class FindingList:
                     continue
                 hydrated_findings.append(
                     HydratedFinding(
-                        finding=finding, finding_type=objects[finding.finding_type], ooi=objects[finding.ooi]
+                        finding=finding,
+                        finding_type=objects[finding.finding_type],
+                        ooi=objects[finding.ooi],
                     )
                 )
             return hydrated_findings
@@ -480,6 +512,14 @@ class SingleOOIMixin(OctopoesView):
 
         props.pop("scan_profile")
         props.pop("primary_key")
+        if "user_id" in props and props["user_id"]:
+            try:
+                props["user_id"] = get_user_model().objects.get(id=props["user_id"])
+            except KATUser.DoesNotExist:
+                props["user_id"] = None
+            props = {"owner" if key == "user_id" else key: value for key, value in props.items()}
+        else:
+            props.pop("user_id")
 
         return props
 

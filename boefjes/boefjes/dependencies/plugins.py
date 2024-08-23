@@ -52,7 +52,7 @@ class PluginService:
 
         return [self._set_plugin_enabled(plugin, organisation_id) for plugin in all_plugins.values()]
 
-    def _get_all_without_enabled(self):
+    def _get_all_without_enabled(self) -> dict[str, PluginType]:
         all_plugins = {plugin.id: plugin for plugin in self.local_repo.get_all()}
 
         for plugin in self.plugin_storage.get_all():
@@ -158,7 +158,12 @@ class PluginService:
             self.set_enabled_by_id(plugin_id, organisation_id, False)
 
     def schema(self, plugin_id: str) -> dict | None:
-        return self.local_repo.schema(plugin_id)
+        try:
+            boefje = self.plugin_storage.boefje_by_id(plugin_id)
+
+            return boefje.schema
+        except PluginNotFound:
+            return self.local_repo.schema(plugin_id)
 
     def cover(self, plugin_id: str) -> Path:
         try:

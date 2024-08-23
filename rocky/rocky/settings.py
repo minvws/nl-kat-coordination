@@ -151,6 +151,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "django.contrib.humanize",
     "django.forms",
     "django_components",
     "django_components.safer_staticfiles",
@@ -183,6 +184,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "rocky.middleware.auth_token.AuthTokenMiddleware",
     "django_structlog.middlewares.RequestMiddleware",
 ]
 
@@ -448,15 +450,24 @@ CSP_CONNECT_SRC = ["'self'"]
 
 CSP_BLOCK_ALL_MIXED_CONTENT = True
 
-DEFAULT_RENDERER_CLASSES = ["rest_framework.renderers.JSONRenderer"]
-
 # Turn on the browsable API by default if DEBUG is True, but disable by default in production
 BROWSABLE_API = env.bool("BROWSABLE_API", DEBUG)
 
 if BROWSABLE_API:
-    DEFAULT_RENDERER_CLASSES = DEFAULT_RENDERER_CLASSES + ["rest_framework.renderers.BrowsableAPIRenderer"]
+    DEFAULT_AUTHENTICATION_CLASSES = [
+        "knox.auth.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ]
+    DEFAULT_RENDERER_CLASSES = [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ]
+else:
+    DEFAULT_AUTHENTICATION_CLASSES = ["knox.auth.TokenAuthentication"]
+    DEFAULT_RENDERER_CLASSES = ["rest_framework.renderers.JSONRenderer"]
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": DEFAULT_AUTHENTICATION_CLASSES,
     "DEFAULT_PERMISSION_CLASSES": [
         # For now this will provide a safe default, but non-admin users will
         # need to be able to use the API in the future..

@@ -2,8 +2,7 @@ import os
 import traceback
 from collections.abc import Callable
 from datetime import datetime, timezone
-from enum import Enum
-from typing import Any, cast
+from typing import cast
 
 import httpx
 import structlog
@@ -12,13 +11,13 @@ from httpx import HTTPError
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import settings
 from boefjes.docker_boefjes_runner import DockerBoefjesRunner
-from boefjes.job_models import BoefjeMeta, NormalizerMeta, SerializedOOI, SerializedOOIValue
+from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.local_repository import LocalPluginRepository
 from boefjes.plugins.models import _default_mime_types
 from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
 from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI, Reference, ScanLevel
+from octopoes.models import Reference, ScanLevel
 from octopoes.models.exception import ObjectNotFoundException
 
 MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought to be reasonable
@@ -30,34 +29,6 @@ bytes_api_client = BytesAPIClient(
     username=settings.bytes_username,
     password=settings.bytes_password,
 )
-
-
-def _serialize_value(value: Any, required: bool) -> SerializedOOIValue:
-    if isinstance(value, list):
-        return [_serialize_value(item, required) for item in value]
-    if isinstance(value, Reference):
-        try:
-            return value.tokenized.root
-        except AttributeError:
-            if required:
-                raise
-
-            return None
-    if isinstance(value, Enum):
-        return value.value
-    if isinstance(value, int | float):
-        return value
-    else:
-        return str(value)
-
-
-def serialize_ooi(ooi: OOI) -> SerializedOOI:
-    serialized_oois = {}
-    for key, value in ooi:
-        if key not in ooi.model_fields:
-            continue
-        serialized_oois[key] = _serialize_value(value, ooi.model_fields[key].is_required())
-    return serialized_oois
 
 
 def get_octopoes_api_connector(org_code: str) -> OctopoesAPIConnector:
@@ -124,7 +95,7 @@ class BoefjeHandler(Handler):
             except ObjectNotFoundException as e:
                 raise ObjectNotFoundException(f"Object {reference} not found in Octopoes") from e
 
-            boefje_meta.arguments["input"] = serialize_ooi(ooi)
+            boefje_meta.arguments["input"] = ooi.serialize()
 
         env_keys = boefje_resource.environment_keys
 
@@ -209,6 +180,7 @@ class NormalizerHandler(Handler):
                     Observation(
                         method=normalizer_meta.normalizer.id,
                         source=reference,
+                        source_method=normalizer_meta.raw_data.boefje_meta.boefje.id,
                         task_id=normalizer_meta.id,
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
                         result=[ooi for ooi in observation.results if ooi.primary_key != observation.input_ooi],
@@ -219,6 +191,7 @@ class NormalizerHandler(Handler):
                 connector.save_declaration(
                     Declaration(
                         method=normalizer_meta.normalizer.id,
+                        source_method=normalizer_meta.raw_data.boefje_meta.boefje.id,
                         ooi=declaration.ooi,
                         task_id=normalizer_meta.id,
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
@@ -229,6 +202,7 @@ class NormalizerHandler(Handler):
                 connector.save_affirmation(
                     Affirmation(
                         method=normalizer_meta.normalizer.id,
+                        source_method=normalizer_meta.raw_data.boefje_meta.boefje.id,
                         ooi=affirmation.ooi,
                         task_id=normalizer_meta.id,
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,

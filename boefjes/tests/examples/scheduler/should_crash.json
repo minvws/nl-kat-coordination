@@ -2,6 +2,9 @@
   "id": "9071c9fd-2b9f-440f-a524-ef1ca4824fd4",
   "priority": 1,
   "scheduler_id": "boefje-_dev",
+  "schedule_id": null,
+  "status": "dispatched",
+  "type": "boefje",
   "hash": "7e698c377cfd85015c0d7086b76b76b4",
   "data": {
     "id": "9071c9fd-2b9f-440f-a524-ef1ca4824fd4",
@@ -34,5 +37,7 @@
     "input_ooi": "Hostname|internet|test.test",
     "organization": "_dev",
     "dispatches": []
-  }
+  },
+  "created_at": "2021-06-29T14:00:00",
+  "modified_at": "2021-06-29T14:00:00"
 }
