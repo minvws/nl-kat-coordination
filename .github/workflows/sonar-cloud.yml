@@ -57,8 +57,8 @@ jobs:
       matrix:
         # module: ["octopoes", "mula", "rocky", "bytes"]
         module:
-          - name: rocky
-            prefix_path: "rocky/"
+          - name: mula
+            prefix_path: "mula/scheduler/"
 
 
     steps:
@@ -78,7 +78,7 @@ jobs:
       - name: Fix coverage report
         uses: Mudlet/xmlstarlet-action@master
         with:
-          args: edit --inplace --update "coverage/sources" --value "/github/workspace/${{ matrix.module }}/" "${{ matrix.module }}-coverage-unit/coverage.xml"
+          args: edit --inplace --update "coverage/sources" --value "/github/workspace/${{ matrix.module['name'] }}/" "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
 
       # todo: find a way to fix the filename attribute in the coverage, these should be relative to the base dir and not the coverage source!
       # - name: test mula
