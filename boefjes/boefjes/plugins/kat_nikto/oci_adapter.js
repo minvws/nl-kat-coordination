@@ -50,7 +50,7 @@ function main() {
   // Example command
   /*
     curl --request POST \
-      --url http://boefje/api/v0/tasks/7342e8dd-b945-4185-aaec-787205b7b664 \
+      --url http://boefje:8000/api/v0/tasks/7342e8dd-b945-4185-aaec-787205b7b664 \
       --header 'Content-Type: application/json' \
       --data '{"status":"COMPLETED","files":[{"content":"BASE_64_ENCODED_CONTENT","tags":[]}]}'
   */
