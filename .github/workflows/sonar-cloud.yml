@@ -56,19 +56,24 @@ jobs:
     strategy:
       matrix:
         # module: ["octopoes", "mula", "rocky", "bytes"]
-        module: [ "rocky" ]
+        module:
+          - name: rocky
+            prefix_path: "rocky/"
+
 
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.module }}-coverage-unit
-          path: ${{ matrix.module }}-coverage-unit
+          name: ${{ matrix.module['name'] }}-coverage-unit
+          path: ${{ matrix.module['name'] }}-coverage-unit
 
       - run: tree .
 
+      # - name: Print
+      #   run: cat "${{ github.workspace }}/${{ matrix.module }}-coverage-unit/coverage.xml"
       - name: Print
-        run: cat "${{ github.workspace }}/${{ matrix.module }}-coverage-unit/coverage.xml"
+        run: cat "${{ github.workspace }}/${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
 
       - name: Fix coverage report
         uses: Mudlet/xmlstarlet-action@master
@@ -85,68 +90,68 @@ jobs:
       #     # args: edit --inplace --update "coverage/sources" --value "${{ matrix.module }}/scheduler/" "${{ matrix.module }}-coverage-unit/coverage.xml"
       #     args: edit --inplace --update "//class/@filename" --expr "concat('mula/scheduler/', .)" "${{ matrix.module }}-coverage-unit/coverage.xml"
 
+      # - name: fix via script
+      #   if: ${{ matrix.module == 'mula' }}
+      #   shell: python
+      #   run: |
+      #     #!/usr/bin/env python
+      #     import xml.etree.ElementTree as etree
+      #     from pathlib import Path
 
-      - name: fix via script
-        if: ${{ matrix.module == 'mula' }}
-        shell: python
-        run: |
-          #!/usr/bin/env python
-          import xml.etree.ElementTree as etree
-          from pathlib import Path
+      #     def path_prefixer(file: Path, prefix: Path) -> None:
+      #         xml = file.read_text()
+      #         root = etree.fromstring(xml)
+      #         for element in root.findall(".//*[@filename]"):
+      #             element.set("filename", prefix.joinpath(element.get("filename")).as_posix())
+      #         file.write_text(etree.tostring(root).decode())
 
-          def path_prefixer(file: Path, prefix: Path) -> None:
-              xml = file.read_text()
-              root = etree.fromstring(xml)
-              for element in root.findall(".//*[@filename]"):
-                  element.set("filename", prefix.joinpath(element.get("filename")).as_posix())
-              file.write_text(etree.tostring(root).decode())
+      #     path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("mula/scheduler/"))
 
-          path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("mula/scheduler/"))
+      # - name: fix via script
+      #   if: ${{ matrix.module == 'bytes' }}
+      #   shell: python
+      #   run: |
+      #     #!/usr/bin/env python
+      #     import xml.etree.ElementTree as etree
+      #     from pathlib import Path
 
+      #     def path_prefixer(file: Path, prefix: Path) -> None:
+      #         xml = file.read_text()
+      #         root = etree.fromstring(xml)
+      #         for element in root.findall(".//*[@filename]"):
+      #             element.set("filename", prefix.joinpath(element.get("filename")).as_posix())
+      #         file.write_text(etree.tostring(root).decode())
 
-      - name: fix via script
-        if: ${{ matrix.module == 'bytes' }}
-        shell: python
-        run: |
-          #!/usr/bin/env python
-          import xml.etree.ElementTree as etree
-          from pathlib import Path
+      #     path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("bytes/"))
 
-          def path_prefixer(file: Path, prefix: Path) -> None:
-              xml = file.read_text()
-              root = etree.fromstring(xml)
-              for element in root.findall(".//*[@filename]"):
-                  element.set("filename", prefix.joinpath(element.get("filename")).as_posix())
-              file.write_text(etree.tostring(root).decode())
+      # - name: fix via script
+      #   if: ${{ matrix.module == 'rocky' }}
+      #   shell: python
+      #   run: |
+      #     #!/usr/bin/env python
+      #     import xml.etree.ElementTree as etree
+      #     from pathlib import Path
 
-          path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("bytes/"))
+      #     def path_prefixer(file: Path, prefix: Path) -> None:
+      #         xml = file.read_text()
+      #         root = etree.fromstring(xml)
+      #         for element in root.findall(".//*[@filename]"):
+      #             element.set("filename", prefix.joinpath(element.get("filename")).as_posix())
+      #         file.write_text(etree.tostring(root).decode())
 
-      - name: fix via script
-        if: ${{ matrix.module == 'rocky' }}
-        shell: python
-        run: |
-          #!/usr/bin/env python
-          import xml.etree.ElementTree as etree
-          from pathlib import Path
+      #     path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("rocky/"))
 
-          def path_prefixer(file: Path, prefix: Path) -> None:
-              xml = file.read_text()
-              root = etree.fromstring(xml)
-              for element in root.findall(".//*[@filename]"):
-                  element.set("filename", prefix.joinpath(element.get("filename")).as_posix())
-              file.write_text(etree.tostring(root).decode())
-
-          path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("rocky/"))
-
+      - name: Fix via external script
+        run: python .github/scripts/fix_coverage.py "${{ matrix.module['name'] }}-coverage-unit/coverage.xml" "${{ matrix.module['prefix_path'] }}"
 
       - name: Print
-        run: cat "${{ matrix.module }}-coverage-unit/coverage.xml"
+        run: cat "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
 
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: "${{ matrix.module }}-coverage-unit-fixed"
-          path: "${{ matrix.module }}-coverage-unit/coverage.xml"
+          name: "${{ matrix.module['name'] }}-coverage-unit-fixed"
+          path: "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
 
   sonar-cloud:
     runs-on: ubuntu-latest
