@@ -49,9 +49,9 @@ jobs:
     # needs: find-coverage-reports
     needs:
       # - octopoes-tests
-      # - mula-tests
+      - mula-tests
       # - bytes-tests
-      - rocky-tests
+      # - rocky-tests
 
     strategy:
       matrix:
