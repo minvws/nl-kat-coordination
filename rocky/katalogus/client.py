@@ -210,7 +210,9 @@ class KATalogusClientV1:
 
     def create_plugin(self, plugin: Plugin) -> None:
         response = self.session.post(
-            f"{self.organization_uri}/plugins", headers={"Content-Type": "application/json"}, content=plugin
+            f"{self.organization_uri}/plugins",
+            headers={"Content-Type": "application/json"},
+            content=plugin.model_dump_json(exclude_none=True),
         )
         logger.info("Created new plugin %s", plugin.name)
         response.raise_for_status()
@@ -236,6 +238,9 @@ def parse_boefje(boefje: dict) -> Boefje:
         scan_level=scan_level,
         consumes=consumes,
         produces=boefje["produces"],
+        schema=boefje["schema"],
+        oci_image=boefje["oci_image"],
+        oci_arguments=boefje["oci_arguments"],
     )
 
 

@@ -4,7 +4,7 @@
 <div>
     <h2>{% translate "Container image" %}</h2>
     <p>
-        {% translate "The container image for this Boefje is:" %} <a href="">{{ container_image }}</a>
+        {% translate "The container image for this Boefje is:" %} <a href="{{ plugin.oci_image }}">{{ plugin.oci_image }}</a>
     </p>
     <div class="fifty-fifty">
         <div>

@@ -1,6 +1,5 @@
 import uuid
 from datetime import datetime
-from urllib.parse import urlencode
 
 from account.mixins import OrganizationView
 from django.shortcuts import redirect
@@ -63,7 +62,5 @@ class BoefjeSetupView(OrganizationView, FormView):
         get_katalogus(self.organization.code).create_plugin(boefje)
 
         return redirect(
-            reverse("boefje_detail", kwargs={"organization_code": self.organization.code})
-            + "?"
-            + urlencode({"plugin_id": id})
+            reverse("boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": boefje_id})
         )
