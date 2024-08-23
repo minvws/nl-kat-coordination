@@ -142,7 +142,7 @@ jobs:
       #     path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("rocky/"))
 
       - name: Fix via external script
-        run: python .github/scripts/fix_coverage.py "${{ matrix.module['name'] }}-coverage-unit/coverage.xml" "${{ matrix.module['prefix_path'] }}"
+        run: python .github/scripts/coverage_file_fixer.py "${{ matrix.module['name'] }}-coverage-unit/coverage.xml" "${{ matrix.module['prefix_path'] }}"
 
       - name: Print
         run: cat "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
