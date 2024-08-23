@@ -1,6 +1,5 @@
 from collections.abc import Callable, Iterable
 from datetime import datetime
-from logging import getLogger
 from pathlib import Path
 from typing import Any, TypedDict, TypeVar
 
@@ -11,7 +10,6 @@ from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from octopoes.models.types import OOIType
 
 REPORTS_DIR = Path(__file__).parent
-logger = getLogger(__name__)
 
 
 class ReportPlugins(TypedDict):
@@ -24,26 +22,12 @@ class BaseReport:
     name: str
     description: str
     template_path: str = "report.html"
+    plugins: ReportPlugins
+    input_ooi_types: set[type[OOI]]
     label_style = "1-light"  # default/fallback color
 
     def __init__(self, octopoes_api_connector: OctopoesAPIConnector):
         self.octopoes_api_connector = octopoes_api_connector
-
-
-BaseReportType = TypeVar("BaseReportType", bound="BaseReport")
-
-
-class Report(BaseReport):
-    plugins: ReportPlugins
-    input_ooi_types: set[type[OOI]]
-
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
-        raise NotImplementedError
-
-    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
-        """Generate data for multiple OOIs. Child classes can override this method to improve performance."""
-
-        return {input_ooi: self.generate_data(input_ooi, valid_time) for input_ooi in input_oois}
 
     @classmethod
     def class_attributes(cls) -> dict[str, Any]:
@@ -56,6 +40,19 @@ class Report(BaseReport):
             "template_path": cls.template_path,
             "label_style": cls.label_style,
         }
+
+
+BaseReportType = TypeVar("BaseReportType", bound="BaseReport")
+
+
+class Report(BaseReport):
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
+        raise NotImplementedError
+
+    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+        """Generate data for multiple OOIs. Child classes can override this method to improve performance."""
+
+        return {input_ooi: self.generate_data(input_ooi, valid_time) for input_ooi in input_oois}
 
     @staticmethod
     def group_by_source(
@@ -150,9 +147,6 @@ class Report(BaseReport):
 
 
 class MultiReport(BaseReport):
-    plugins: ReportPlugins
-    input_ooi_types: set[type[OOI]]
-
     def post_process_data(self, data: dict[str, Any]) -> dict[str, Any]:
         raise NotImplementedError
 
@@ -165,7 +159,7 @@ class AggregateReportSubReports(TypedDict):
 class AggregateReport(BaseReport):
     reports: AggregateReportSubReports
 
-    def post_process_data(self, data: dict[str, Any], valid_time: datetime) -> dict[str, Any]:
+    def post_process_data(self, data: dict[str, Any], valid_time: datetime, organization_code: str) -> dict[str, Any]:
         raise NotImplementedError
 
 

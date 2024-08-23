@@ -1,15 +1,16 @@
-import logging
 from collections.abc import Callable, Iterator
 from functools import cache
+from types import UnionType
 from typing import Any
 
+import structlog
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine, make_url
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
 from boefjes.config import settings
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 SQL_BASE = declarative_base()
 
@@ -21,7 +22,12 @@ def get_engine() -> Engine:
     db_uri_redacted = db_uri.render_as_string(hide_password=True)
     logger.info("Connecting to database %s with pool size %s...", db_uri_redacted, settings.db_connection_pool_size)
 
-    engine = create_engine(url=db_uri, pool_pre_ping=True, pool_size=settings.db_connection_pool_size)
+    engine = create_engine(
+        url=db_uri,
+        pool_pre_ping=True,
+        pool_size=settings.db_connection_pool_size,
+        connect_args={"options": "-c timezone=utc"},
+    )
 
     logger.info("Connected to database %s", db_uri_redacted)
 
@@ -46,5 +52,5 @@ def session_managed_iterator(service_factory: Callable[[Session], Any]) -> Itera
 
 
 class ObjectNotFoundException(Exception):
-    def __init__(self, cls: type[SQL_BASE], **kwargs):  # type: ignore
+    def __init__(self, cls: type | UnionType, **kwargs):  # type: ignore
         super().__init__(f"The object of type {cls} was not found for query parameters {kwargs}")

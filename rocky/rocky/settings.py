@@ -14,6 +14,7 @@ import re
 from pathlib import Path
 
 import environ
+import structlog
 from django.conf import locale
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
@@ -52,17 +53,33 @@ FEATURE_REPORTS = env.bool("FEATURE_REPORTS", False)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", False)
 
+# Logging format ("text" or "json")
+LOGGING_FORMAT = env("LOGGING_FORMAT", default="text")
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {
+        "json_formatter": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.JSONRenderer(),
+        },
+        "plain_console": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.dev.ConsoleRenderer(colors=True, pad_level=False),
+        },
+    },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
+            "formatter": "json_formatter" if LOGGING_FORMAT == "json" else "plain_console",
         },
     },
-    "root": {
-        "handlers": ["console"],
-        "level": "WARNING",
+    "loggers": {
+        "root": {
+            "handlers": ["console"],
+            "level": "INFO",
+        },
     },
 }
 
@@ -134,8 +151,10 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.staticfiles",
+    "django.contrib.humanize",
     "django.forms",
+    "django_components",
+    "django_components.safer_staticfiles",
     "django_otp",
     "django_otp.plugins.otp_static",
     "django_otp.plugins.otp_totp",
@@ -143,6 +162,7 @@ INSTALLED_APPS = [
     "account",
     "tools",
     "fmea",
+    "rocky",
     "crisis_room",
     "onboarding",
     "katalogus",
@@ -164,6 +184,8 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "rocky.middleware.auth_token.AuthTokenMiddleware",
+    "django_structlog.middlewares.RequestMiddleware",
 ]
 
 if REMOTE_USER_HEADER:
@@ -186,7 +208,6 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [BASE_DIR / "rocky/templates", BASE_DIR / "reports/report_types"],
-        "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -198,7 +219,20 @@ TEMPLATES = [
                 "tools.context_processors.organizations_including_blocked",
                 "tools.context_processors.rocky_version",
             ],
-            "builtins": ["tools.templatetags.ooi_extra"],
+            "builtins": [
+                "django_components.templatetags.component_tags",
+                "tools.templatetags.ooi_extra",
+            ],
+            "loaders": [
+                (
+                    "django.template.loaders.cached.Loader",
+                    [
+                        "django.template.loaders.filesystem.Loader",
+                        "django.template.loaders.app_directories.Loader",
+                        "django_components.template_loader.Loader",
+                    ],
+                )
+            ],
         },
     },
 ]
@@ -276,8 +310,18 @@ LOCALE_PATHS = (BASE_DIR / "rocky/locale",)
 
 # Add custom languages not provided by Django
 EXTRA_LANG_INFO = {
-    "pap": {"bidi": False, "code": "pap", "name": "Papiamentu", "name_local": "Papiamentu"},
-    "en@pirate": {"bidi": False, "code": "en@pirate", "name": "English (Pirate)", "name_local": "English (Pirate)"},
+    "pap": {
+        "bidi": False,
+        "code": "pap",
+        "name": "Papiamentu",
+        "name_local": "Papiamentu",
+    },
+    "en@pirate": {
+        "bidi": False,
+        "code": "en@pirate",
+        "name": "English (Pirate)",
+        "name_local": "English (Pirate)",
+    },
 }
 LANG_INFO = locale.LANG_INFO.copy()
 LANG_INFO.update(EXTRA_LANG_INFO)
@@ -302,7 +346,7 @@ if env.bool("PIRATE", False):
 
 STATIC_URL = "/static/"
 STATIC_ROOT = env.path("STATIC_ROOT", BASE_DIR / "static")
-STATICFILES_DIRS = (BASE_DIR / "assets",)
+STATICFILES_DIRS = (BASE_DIR / "assets", BASE_DIR / "components")
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
@@ -406,15 +450,24 @@ CSP_CONNECT_SRC = ["'self'"]
 
 CSP_BLOCK_ALL_MIXED_CONTENT = True
 
-DEFAULT_RENDERER_CLASSES = ["rest_framework.renderers.JSONRenderer"]
-
 # Turn on the browsable API by default if DEBUG is True, but disable by default in production
 BROWSABLE_API = env.bool("BROWSABLE_API", DEBUG)
 
 if BROWSABLE_API:
-    DEFAULT_RENDERER_CLASSES = DEFAULT_RENDERER_CLASSES + ["rest_framework.renderers.BrowsableAPIRenderer"]
+    DEFAULT_AUTHENTICATION_CLASSES = [
+        "knox.auth.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ]
+    DEFAULT_RENDERER_CLASSES = [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ]
+else:
+    DEFAULT_AUTHENTICATION_CLASSES = ["knox.auth.TokenAuthentication"]
+    DEFAULT_RENDERER_CLASSES = ["rest_framework.renderers.JSONRenderer"]
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": DEFAULT_AUTHENTICATION_CLASSES,
     "DEFAULT_PERMISSION_CLASSES": [
         # For now this will provide a safe default, but non-admin users will
         # need to be able to use the API in the future..
@@ -463,3 +516,25 @@ TAG_BORDER_TYPES = [
 WEASYPRINT_BASEURL = env("WEASYPRINT_BASEURL", default="http://127.0.0.1:8000/")
 
 KNOX_TOKEN_MODEL = "account.AuthToken"
+
+FORMS_URLFIELD_ASSUME_HTTPS = True
+
+structlog.configure(
+    processors=[
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.add_log_level,
+        structlog.processors.StackInfoRenderer(),
+        structlog.dev.set_exc_info,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.TimeStamper("iso", utc=False),
+        (
+            structlog.processors.JSONRenderer()
+            if LOGGING_FORMAT == "json"
+            else structlog.dev.ConsoleRenderer(colors=True, pad_level=False)
+        ),
+    ],
+    context_class=dict,
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    wrapper_class=structlog.stdlib.BoundLogger,
+    cache_logger_on_first_use=True,
+)

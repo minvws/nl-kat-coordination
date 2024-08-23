@@ -1,5 +1,3 @@
-import logging
-
 from account.mixins import OrganizationView
 from django.http import Http404
 from django.shortcuts import redirect
@@ -12,8 +10,6 @@ from tools.view_helpers import existing_ooi_type
 from octopoes.models import OOI
 from octopoes.models.types import type_by_name
 from rocky.views.ooi_view import BaseOOIFormView
-
-logger = logging.getLogger(__name__)
 
 
 def ooi_type_input_choices():
@@ -30,7 +26,10 @@ class OOIAddTypeSelectView(OrganizationView, TemplateView):
             return redirect(
                 reverse(
                     "ooi_add",
-                    kwargs={"organization_code": self.organization.code, "ooi_type": request.GET["add_ooi_type"]},
+                    kwargs={
+                        "organization_code": self.organization.code,
+                        "ooi_type": request.GET["add_ooi_type"],
+                    },
                 )
             )
 
@@ -41,9 +40,15 @@ class OOIAddTypeSelectView(OrganizationView, TemplateView):
 
         context["ooi_types"] = ooi_type_input_choices()
         context["breadcrumbs"] = [
-            {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": _("Objects")},
             {
-                "url": reverse("ooi_add_type_select", kwargs={"organization_code": self.organization.code}),
+                "url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}),
+                "text": _("Objects"),
+            },
+            {
+                "url": reverse(
+                    "ooi_add_type_select",
+                    kwargs={"organization_code": self.organization.code},
+                ),
                 "text": _("Add object"),
             },
         ]
@@ -65,20 +70,35 @@ class OOIAddView(BaseOOIFormView):
         except KeyError:
             raise Http404("OOI not found")
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user_id"] = self.request.user.id
+
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         context["type"] = self.ooi_class.get_ooi_type()
         context["breadcrumbs"] = [
-            {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": _("Objects")},
             {
-                "url": reverse("ooi_add_type_select", kwargs={"organization_code": self.organization.code}),
+                "url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}),
+                "text": _("Objects"),
+            },
+            {
+                "url": reverse(
+                    "ooi_add_type_select",
+                    kwargs={"organization_code": self.organization.code},
+                ),
                 "text": _("Type select"),
             },
             {
                 "url": reverse(
                     "ooi_add",
-                    kwargs={"organization_code": self.organization.code, "ooi_type": self.ooi_class.get_ooi_type()},
+                    kwargs={
+                        "organization_code": self.organization.code,
+                        "ooi_type": self.ooi_class.get_ooi_type(),
+                    },
                 ),
                 "text": _("Add %(ooi_type)s") % {"ooi_type": self.ooi_class.get_ooi_type()},
             },

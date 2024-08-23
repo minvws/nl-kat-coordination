@@ -5,10 +5,9 @@ from unittest import TestCase
 
 from pydantic import BaseModel
 
-from boefjes.job_handler import serialize_ooi
 from boefjes.job_models import Boefje, BoefjeMeta, Normalizer, NormalizerMeta, ObservationsWithoutInputOOI, RawDataMeta
-from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.local import LocalNormalizerJobRunner
+from boefjes.local_repository import LocalPluginRepository
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.records import (
     DNSAAAARecord,
@@ -447,14 +446,12 @@ class DnsTest(TestCase):
             minimum=86400,
         )
 
-        input_ = serialize_ooi(
-            DNSZone(
-                hostname=Hostname(
-                    network=Reference.from_str("Network|internet"),
-                    name="sub.example.nl",
-                ).reference
-            )
-        )
+        input_ = DNSZone(
+            hostname=Hostname(
+                network=Reference.from_str("Network|internet"),
+                name="sub.example.nl",
+            ).reference
+        ).serialize()
 
         meta = NormalizerMeta(
             id=uuid.UUID("ee8374bb-e79f-4083-9ce9-add4f96006f2"),

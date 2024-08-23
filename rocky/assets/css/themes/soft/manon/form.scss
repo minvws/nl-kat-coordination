@@ -5,10 +5,10 @@
   --form-accent-color-color: var(--branding-color-2);
 
   /* Input */
-  --form-base-input-text-color: #000000;
+  --form-base-input-text-color: var(--colors-black);
   --form-input-border-width: 1px;
   --form-input-border-style: solid;
-  --form-input-border-color: #cccccc;
+  --form-input-border-color: var(--colors-grey-200);
   --form-inline-gap: 1rem;
 
   /* Help */
@@ -17,7 +17,7 @@
 
   /* Textarea */
   --form-textarea-text-color: var(--form-base-input-text-color);
-  --form-textarea-border-color: #cccccc;
+  --form-textarea-border-color: var(--colors-grey-200);
 
   /* Fieldset */
   --form-fieldset-legend-font-weight: 600;

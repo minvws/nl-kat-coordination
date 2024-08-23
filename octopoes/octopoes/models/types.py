@@ -46,6 +46,7 @@ from octopoes.models.ooi.findings import (
     RetireJSFindingType,
     SnykFindingType,
 )
+from octopoes.models.ooi.geography import GeographicPoint
 from octopoes.models.ooi.monitoring import Application, Incident
 from octopoes.models.ooi.network import (
     AutonomousSystem,
@@ -58,7 +59,8 @@ from octopoes.models.ooi.network import (
     Network,
 )
 from octopoes.models.ooi.question import Question
-from octopoes.models.ooi.reports import ReportData
+from octopoes.models.ooi.reports import Report, ReportData
+from octopoes.models.ooi.scans import ExternalScan
 from octopoes.models.ooi.service import IPService, Service, TLSCipher
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import (
@@ -136,6 +138,7 @@ EmailSecurityType = (
 MonitoringType = Application | Incident
 ConfigType = Config
 ReportsType = ReportData
+ScanType = ExternalScan
 
 ConcreteOOIType = (
     CertificateType
@@ -157,6 +160,9 @@ ConcreteOOIType = (
     | ConfigType
     | Question
     | ReportsType
+    | ScanType
+    | Report
+    | GeographicPoint
 )
 
 OOIType = ConcreteOOIType | NetworkType | FindingTypeType

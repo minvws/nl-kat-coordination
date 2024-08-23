@@ -1,6 +1,7 @@
-import logging
 from uuid import UUID
 
+import structlog
+from asgiref.sync import async_to_sync
 from cachetools import TTLCache, cached
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import Response
@@ -16,7 +17,7 @@ from bytes.models import BoefjeMeta, MimeType, NormalizerMeta, RawData, RawDataM
 from bytes.rabbitmq import create_event_manager
 from bytes.repositories.meta_repository import BoefjeMetaFilter, MetaDataRepository, NormalizerMetaFilter, RawDataFilter
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 router = APIRouter(dependencies=[Depends(authenticate_token)])
 BOEFJE_META_TAG = "BoefjeMeta"
 NORMALIZER_META_TAG = "NormalizerMeta"
@@ -105,8 +106,10 @@ def get_normalizer_meta_by_id(
     normalizer_meta_id: UUID,
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
 ) -> NormalizerMeta:
-    with meta_repository:
+    try:
         return meta_repository.get_normalizer_meta_by_id(normalizer_meta_id)
+    except ObjectNotFoundException as error:
+        raise HTTPException(status_code=404, detail="Normalizer meta not found") from error
 
 
 @router.get("/normalizer_meta", response_model=list[NormalizerMeta], tags=[NORMALIZER_META_TAG])
@@ -144,7 +147,7 @@ def get_normalizer_meta(
 
 
 @router.post("/raw", tags=[RAW_TAG])
-async def create_raw(
+def create_raw(
     request: Request,
     boefje_meta_id: UUID,
     mime_types: list[str] | None = Query(None),
@@ -159,7 +162,9 @@ async def create_raw(
         if meta_repository.has_raw(meta, parsed_mime_types):
             return RawResponse(status="success", message="Raw data already present")
 
-        data = await request.body()
+        # FastAPI/starlette only has async versions of the Request methods, but
+        # all our code is sync, so we wrap it in async_to_sync.
+        data = async_to_sync(request.body)()
 
         raw_data = RawData(value=data, boefje_meta=meta, mime_types=parsed_mime_types)
         with meta_repository:

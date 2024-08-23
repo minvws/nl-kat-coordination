@@ -14,18 +14,64 @@
                 {% include "tasks/partials/tab_navigation.html" with view="normalizers_tasks" %}
 
                 <h1>{% translate "Normalizers" %}</h1>
-                {% include "tasks/partials/task_filter.html" %}
-
-                {% if not object_list %}
+                {% if not task_list %}
                     <p class="emphasized">{% translate "There are no tasks for normalizers" %}</p>
+                    {% include "tasks/partials/task_filter.html" %}
+
                 {% else %}
                     <p class="emphasized">{% translate "List of tasks for normalizers" %}</p>
+                    {% include "tasks/partials/task_filter.html" %}
+
                     <div class="horizontal-scroll">
-                        {% include "tasks/partials/normalizer_task_history.html" with task_history=object_list %}
+                        <table rf-selector="table-scan-history">
+                            <thead>
+                                <tr>
+                                    <th scope="col">{% translate "Normalizer" %}</th>
+                                    <th scope="col">{% translate "Status" %}</th>
+                                    <th scope="col">{% translate "Created date" %}</th>
+                                    <th scope="col">{% translate "Boefje" %}</th>
+                                    <th scope="col">{% translate "Boefje input OOI" %}</th>
+                                    <th scope="col" class="visually-hidden">{% translate "Details" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in task_list %}
+                                    <tr data-task-id="{{ task.id }}">
+                                        <td>
+                                            <a href="{% url "normalizer_detail" organization.code task.data.normalizer.id %}">{{ task.data.normalizer.id }}</a>
+                                        </td>
+                                        <td class="nowrap">
+                                            <i class="icon {{ task.status.value }}"></i>&nbsp;{{ task.status.value|capfirst }}
+                                        </td>
+                                        <td>{{ task.created_at }}</td>
+                                        <td>
+                                            <a href="{% url "boefje_detail" organization.code task.data.raw_data.boefje_meta.boefje.id %}">{{ task.data.raw_data.boefje_meta.boefje.id }}</a>
+                                        </td>
+                                        <td>
+                                            <a href="{% ooi_url "ooi_detail" task.data.raw_data.boefje_meta.input_ooi organization.code observed_at=task.created_at|date:'c' %}">{{ task.data.raw_data.boefje_meta.input_ooi }}</a>
+                                        </td>
+                                        <td>
+                                            <button type="button"
+                                                    class="expando-button normalizer-list-table-row"
+                                                    data-icon-open-class="icon ti-chevron-down"
+                                                    data-icon-close-class="icon ti-chevron-up"
+                                                    data-close-label="{% translate "Close details" %}">
+                                                {% translate "Open details" %}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="expando-row">
+                                        <td colspan="7">
+                                            {% include "tasks/partials/task_actions.html" %}
+
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% include "partials/list_paginator.html" %}
 
                     </div>
-                    {% include "partials/list_paginator.html" %}
-
                 {% endif %}
             </div>
         </section>

@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load compress %}
 
-<footer>
+<footer id="page-footer">
     <span>Kwetsbaarheden Analyse Tool</span>
     {% if request.user.is_authenticated %}<span>{{ rocky_version }}</span>{% endif %}
     <nav aria-labelledby="footer-nav-1">

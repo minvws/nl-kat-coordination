@@ -133,7 +133,7 @@ def test_admin_edits_client_different_orgs(rf, admin_member, client_member_b):
         )
 
 
-def test_admin_edits_redteamer(rf, admin_member, redteam_member):
+def test_admin_edits_redteamer(rf, admin_member, redteam_member, log_output):
     request = setup_request(
         rf.post(
             "organization_member_edit",
@@ -148,6 +148,11 @@ def test_admin_edits_redteamer(rf, admin_member, redteam_member):
     redteam_member.refresh_from_db()
     assert redteam_member.status == "active"
     assert redteam_member.trusted_clearance_level == 4
+
+    organization_member_updated_log = log_output.entries[-1]
+    assert organization_member_updated_log["event"] == "%s %s updated"
+    assert organization_member_updated_log["object"] == "redteamer@openkat.nl"
+    assert organization_member_updated_log["object_type"] == "OrganizationMember"
 
 
 def test_admin_edits_redteamer_to_block(rf, admin_member, redteam_member):

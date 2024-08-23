@@ -1,10 +1,15 @@
-import logging
+from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from functools import cached_property
+from operator import attrgetter
+from typing import Literal, TypedDict
 
+import structlog
 from account.mixins import OrganizationView
+from account.models import KATUser
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.http import Http404, HttpRequest
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -22,12 +27,15 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
+from octopoes.models.ooi.reports import Report
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import get_relations
 from rocky.bytes_client import get_bytes_client
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
+
+ORIGIN_MAX_AGE = timedelta(days=2)
 
 
 @dataclass
@@ -42,6 +50,27 @@ class OriginData(BaseModel):
     normalizer: dict | None = None
     boefje: Boefje | None = None
     params: dict[str, str] | None = None
+
+    @property
+    def is_old(self) -> bool:
+        return self.is_older_than(ORIGIN_MAX_AGE)
+
+    def is_older_than(self, time_delta: timedelta) -> bool:
+        if not self.normalizer:
+            return False
+
+        if (observation_date := self.normalizer.get("raw_data", {}).get("boefje_meta", {}).get("ended_at")) is None:
+            raise ValueError("Observation date is missing in normalizer meta")
+
+        observation_date = observation_date.replace(tzinfo=timezone.utc)
+
+        return observation_date < datetime.now(timezone.utc) - time_delta
+
+
+class Origins(TypedDict):
+    declarations: list[OriginData]
+    observations: list[OriginData]
+    inferences: list[OriginData]
 
 
 class OOIAttributeError(AttributeError):
@@ -74,7 +103,10 @@ class ObservedAtMixin:
 
                 return ret
             except ValueError:
-                messages.error(self.request, _("Can not parse date, falling back to show current date."))
+                messages.error(
+                    self.request,
+                    _("Can not parse date, falling back to show current date."),
+                )
                 return datetime.now(timezone.utc)
 
 
@@ -83,44 +115,76 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
         try:
             ref = Reference.from_str(pk)
             ooi = self.octopoes_api_connector.get(ref, valid_time=self.observed_at)
+
+            return ooi
         except Exception as e:
             # TODO: raise the exception but let the handling be done by  the method that implements "get_single_ooi"
             self.handle_connector_exception(e)
-
-        return ooi
+            raise
 
     def get_origins(
         self,
         reference: Reference,
         organization: Organization,
-    ) -> tuple[list[OriginData], list[OriginData], list[OriginData]]:
+    ) -> Origins:
+        declarations: list[OriginData] = []
+        observations: list[OriginData] = []
+        inferences: list[OriginData] = []
+        results: Origins = {"declarations": declarations, "observations": observations, "inferences": inferences}
+
         try:
             origins = self.octopoes_api_connector.list_origins(self.observed_at, result=reference)
-            origin_data = [OriginData(origin=origin) for origin in origins]
-
-            for origin in origin_data:
-                if origin.origin.origin_type != OriginType.OBSERVATION or not origin.origin.task_id:
-                    continue
-
-                try:
-                    client = get_bytes_client(organization.code)
-                    client.login()
-
-                    normalizer_data = client.get_normalizer_meta(origin.origin.task_id)
-                    boefje_id = normalizer_data["raw_data"]["boefje_meta"]["boefje"]["id"]
-                    origin.normalizer = normalizer_data
-                    origin.boefje = get_katalogus(organization.code).get_plugin(boefje_id)
-                except HTTPError as e:
-                    logger.error(e)
-
-            return (
-                [origin for origin in origin_data if origin.origin.origin_type == OriginType.DECLARATION],
-                [origin for origin in origin_data if origin.origin.origin_type == OriginType.OBSERVATION],
-                [origin for origin in origin_data if origin.origin.origin_type == OriginType.INFERENCE],
-            )
         except Exception as e:
+            logger.error(
+                "Could not load origins for OOI: %s from octopoes, error: %s",
+                reference,
+                e,
+            )
+            return results
+
+        try:
+            bytes_client = get_bytes_client(organization.code)
+            bytes_client.login()
+        except HTTPError as e:
             logger.error(e)
-            return [], [], []
+            return results
+
+        katalogus = get_katalogus(organization.code)
+
+        for origin in origins:
+            origin = OriginData(origin=origin)
+            if origin.origin.origin_type != OriginType.OBSERVATION or not origin.origin.task_id:
+                if origin.origin.origin_type == OriginType.DECLARATION:
+                    declarations.append(origin)
+                elif origin.origin.origin_type == OriginType.INFERENCE:
+                    inferences.append(origin)
+                continue
+
+            try:
+                normalizer_data = bytes_client.get_normalizer_meta(origin.origin.task_id)
+            except HTTPError as e:
+                logger.error(
+                    "Could not load Normalizer meta for task_id: %s, error: %s",
+                    origin.origin.task_id,
+                    e,
+                )
+            else:
+                boefje_meta = normalizer_data["raw_data"]["boefje_meta"]
+                boefje_id = boefje_meta["boefje"]["id"]
+                if boefje_meta.get("ended_at"):
+                    boefje_meta["ended_at"] = datetime.strptime(boefje_meta["ended_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
+                origin.normalizer = normalizer_data
+                try:
+                    origin.boefje = katalogus.get_plugin(boefje_id)
+                except HTTPError as e:
+                    logger.error(
+                        "Could not load boefje: %s from katalogus, error: %s",
+                        boefje_id,
+                        e,
+                    )
+            observations.append(origin)
+
+        return results
 
     def handle_connector_exception(self, exception: Exception):
         if isinstance(exception, ObjectNotFoundException):
@@ -142,6 +206,9 @@ class OOIList:
         valid_time: datetime,
         scan_level: set[ScanLevel],
         scan_profile_type: set[ScanProfileType],
+        search_string: str | None = None,
+        order_by: Literal["scan_level", "object_type"] = "object_type",
+        asc_desc: Literal["asc", "desc"] = "asc",
     ):
         self.octopoes_connector = octopoes_connector
         self.ooi_types = ooi_types
@@ -150,6 +217,9 @@ class OOIList:
         self._count = 0
         self.scan_level = scan_level
         self.scan_profile_type = scan_profile_type
+        self.search_string = search_string
+        self.order_by = order_by
+        self.asc_desc = asc_desc
 
     @cached_property
     def count(self) -> int:
@@ -159,6 +229,7 @@ class OOIList:
             limit=0,
             scan_level=self.scan_level,
             scan_profile_type=self.scan_profile_type,
+            search_string=self.search_string,
         ).count
 
     def __len__(self):
@@ -178,6 +249,9 @@ class OOIList:
                 limit=limit,
                 scan_level=self.scan_level,
                 scan_profile_type=self.scan_profile_type,
+                search_string=self.search_string,
+                order_by=self.order_by,
+                asc_desc=self.asc_desc,
             ).items
 
         elif isinstance(key, int):
@@ -188,6 +262,9 @@ class OOIList:
                 limit=1,
                 scan_level=self.scan_level,
                 scan_profile_type=self.scan_profile_type,
+                search_string=self.search_string,
+                order_by=self.order_by,
+                asc_desc=self.asc_desc,
             ).items
 
 
@@ -249,12 +326,144 @@ class FindingList:
                     continue
                 hydrated_findings.append(
                     HydratedFinding(
-                        finding=finding, finding_type=objects[finding.finding_type], ooi=objects[finding.ooi]
+                        finding=finding,
+                        finding_type=objects[finding.finding_type],
+                        ooi=objects[finding.ooi],
                     )
                 )
             return hydrated_findings
 
         raise NotImplementedError("FindingList only supports slicing")
+
+
+class HydratedReport:
+    parent_report: Report
+    children_reports: list[Report] | None
+    total_children_reports: int
+    total_objects: int
+    report_type_summary: dict[str, int]
+
+
+class ReportList:
+    HARD_LIMIT = 99_999_999
+
+    def __init__(
+        self,
+        octopoes_connector: OctopoesAPIConnector,
+        valid_time: datetime,
+        parent_report_id: str | None = None,
+    ):
+        self.octopoes_connector = octopoes_connector
+        self.valid_time = valid_time
+        self.ordered = True
+        self._count = None
+        self.parent_report_id = parent_report_id
+
+        self.subreports = None
+        if self.parent_report_id and self.parent_report_id is not None:
+            self.subreports = self.get_subreports(self.parent_report_id)
+
+    @cached_property
+    def count(self) -> int:
+        if self.subreports is not None:
+            return len(self.subreports)
+        return self.octopoes_connector.list_reports(
+            valid_time=self.valid_time,
+            limit=0,
+        ).count
+
+    def __len__(self):
+        return self.count
+
+    def __getitem__(self, key: int | slice) -> Sequence[HydratedReport | tuple[str, Report]]:
+        if isinstance(key, slice):
+            offset = key.start or 0
+            limit = self.HARD_LIMIT
+            if key.stop:
+                limit = key.stop - offset
+
+            if self.subreports is not None:
+                return self.subreports[offset : offset + limit]
+
+            reports = self.octopoes_connector.list_reports(
+                valid_time=self.valid_time,
+                offset=offset,
+                limit=limit,
+            ).items
+
+            return self.hydrate_report_list(reports)
+
+        raise NotImplementedError("ReportList only supports slicing")
+
+    def get_subreports(self, report_id: str) -> list[tuple[str, Report]]:
+        """
+        Get child reports with parent id.
+        """
+        # TODO: is better to use query over query_many as we use one parent id.
+        # query will only return 50 items as we do not have pagination (offset and limit)
+        # yet implemented for query requests. We use query_many to get more then 50 items at once.
+
+        subreports = self.octopoes_connector.query_many(
+            "Report.<parent_report [is Report]",
+            self.valid_time,
+            [report_id],
+        )
+
+        subreports = sorted(subreports, key=lambda x: (x[1].report_type, x[1].input_oois))
+
+        return subreports
+
+    def hydrate_report_list(self, reports: list[Report]) -> list[HydratedReport]:
+        hydrated_reports: list[HydratedReport] = []
+
+        for report in reports:
+            hydrated_report: HydratedReport = HydratedReport()
+
+            parent_report, children_reports = report
+
+            hydrated_report.total_children_reports = len(children_reports)
+
+            if len(parent_report.input_oois) > 0:
+                hydrated_report.total_objects = len(parent_report.input_oois)
+            else:
+                hydrated_report.total_objects = len(self.get_children_input_oois(children_reports))
+
+            hydrated_report.report_type_summary = self.report_type_summary(children_reports)
+
+            if not parent_report.has_parent:
+                hydrated_children_reports: list[Report] = []
+                for child_report in children_reports:
+                    if str(child_report.parent_report) == str(parent_report):
+                        hydrated_children_reports.append(child_report)
+                    if len(hydrated_children_reports) >= 5:  # We want to show only 5 children reports
+                        break
+
+                hydrated_report.children_reports = sorted(hydrated_children_reports, key=attrgetter("name"))
+
+            hydrated_report.parent_report = parent_report
+            hydrated_reports.append(hydrated_report)
+
+        return hydrated_reports
+
+    @staticmethod
+    def get_children_input_oois(children_reports: list[Report]) -> set[str]:
+        return {input_ooi for child_report in children_reports for input_ooi in child_report.input_oois}
+
+    @staticmethod
+    def report_type_summary(reports: list[Report]) -> dict[str, int]:
+        """
+        Calculates per report type how many objects it consumed.
+        """
+
+        summary: dict[str, int] = {}
+        report_types: set[str] = {report.report_type for report in reports}
+
+        for report_type in sorted(report_types):
+            summary[report_type] = sum(
+                [len(report.input_oois) for report in reports if report_type == report.report_type]
+            )
+
+        return summary
 
 
 class ConnectorFormMixin:
@@ -316,6 +525,14 @@ class SingleOOIMixin(OctopoesView):
 
         props.pop("scan_profile")
         props.pop("primary_key")
+        if "user_id" in props and props["user_id"]:
+            try:
+                props["user_id"] = get_user_model().objects.get(id=props["user_id"])
+            except KATUser.DoesNotExist:
+                props["user_id"] = None
+            props = {"owner" if key == "user_id" else key: value for key, value in props.items()}
+        else:
+            props.pop("user_id")
 
         return props
 

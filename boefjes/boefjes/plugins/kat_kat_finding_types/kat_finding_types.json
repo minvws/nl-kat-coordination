@@ -461,6 +461,12 @@
     "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
     "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired."
   },
+  "KAT-INVALID-RPKI": {
+    "description": "A route announcement that is matched by the published Route Policy and Authorization (RPKI) is invalid",
+    "risk": "medium",
+    "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
+    "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired."
+  },
   "KAT-NO-CAA": {
     "description": "This zone does not carry at least one CAA record.",
     "source": "https://letsencrypt.org/docs/caa/",
@@ -473,5 +479,12 @@
     "risk": "medium",
     "impact": "Disallowed domains are domains that are for example 'world writable', this opens up the possibility for an atacker to host malicious files on a csp whitelisted domain.",
     "recommendation": "Remove the offending hostname from the CSP header."
+  },
+  "KAT-NONSTANDARD-HEADERS": {
+    "description": "Headers are used that are nonstandard and should not be used anymore.",
+    "risk": "low",
+    "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers",
+    "impact": "Nonstandard headers may not be supported by all browsers and may not provide the security that is expected.",
+    "recommendation": "Remove the nonstandard headers from the response."
   }
 }

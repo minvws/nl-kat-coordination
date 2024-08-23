@@ -1,5 +1,6 @@
 import pytest
 from django.core.exceptions import PermissionDenied
+from django.urls import reverse
 from onboarding.view_helpers import DNS_REPORT_LEAST_CLEARANCE_LEVEL
 from onboarding.views import (
     OnboardingAcknowledgeClearanceLevelView,
@@ -14,7 +15,7 @@ from onboarding.views import (
     OnboardingSetupScanOOIInfoView,
     OnboardingSetupScanSelectPluginsView,
 )
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertNotContains
 
 from tests.conftest import setup_request
 
@@ -139,6 +140,8 @@ def test_onboarding_clearance_level_introduction(rf, redteam_member, mock_organi
     assertContains(response, "DNS-Zone")
     assertContains(response, "Skip onboarding")
     assertContains(response, "Continue")
+
+    assertNotContains(response, '<div class="action-buttons">', html=True)
 
 
 def test_onboarding_acknowledge_clearance_level(rf, redteam_member, mock_organization_view_octopoes, url):
@@ -314,19 +317,23 @@ def test_onboarding_ooi_detail_scan(request, member, rf, mock_organization_view_
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
-def test_onboarding_scanning_boefjes(request, member, rf, mock_organization_view_octopoes, url, hostname, valid_time):
+def test_onboarding_scanning_boefjes(
+    request, member, rf, mock_organization_view_octopoes, url, mocker, mock_bytes_client
+):
     member = request.getfixturevalue(member)
+
+    mocker.patch("reports.views.base.get_katalogus")
+    mock_organization_view_octopoes().get.return_value = url
+    mock_bytes_client().upload_raw.return_value = "raw_id"
+
+    request_url = (
+        reverse("step_report", kwargs={"organization_code": member.organization.code})
+        + f"?report_type=dns-report&ooi={url.primary_key}"
+    )
 
     response = OnboardingReportView.as_view()(
         setup_request(
-            rf.post(
-                "step_report",
-                {
-                    "observed_at": valid_time.strftime("%Y-%m-%d"),
-                    "ooi": url.primary_key,
-                    "report_type": "dns-report",
-                },
-            ),
+            rf.post(request_url),
             member.user,
         ),
         organization_code=member.organization.code,

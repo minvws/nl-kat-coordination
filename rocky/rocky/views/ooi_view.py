@@ -1,12 +1,12 @@
 from datetime import datetime, timezone
 from time import sleep
-from typing import Any
 
-from django import forms, http
+from django import forms
+from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import ListView, TemplateView
+from django.views.generic import ListView
 from django.views.generic.edit import FormView
 from pydantic import ValidationError
 from tools.forms.base import BaseRockyForm, ObservedAtForm
@@ -37,6 +37,7 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
         self.filtered_ooi_types = request.GET.getlist("ooi_type", [])
         self.clearance_levels = request.GET.getlist("clearance_level", [])
         self.clearance_types = request.GET.getlist("clearance_type", [])
+        self.search_string = request.GET.get("search", "")
 
     def get_active_filters(self) -> dict[str, str]:
         active_filters = {}
@@ -92,6 +93,7 @@ class BaseOOIListView(OOIFilterView, ListView):
             valid_time=self.observed_at,
             scan_level=self.get_ooi_scan_levels(),
             scan_profile_type=self.get_ooi_profile_types(),
+            search_string=self.search_string,
         )
 
     def get_context_data(self, **kwargs):
@@ -101,17 +103,33 @@ class BaseOOIListView(OOIFilterView, ListView):
         return context
 
 
-class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin, TemplateView):
-    def get(self, request: http.HttpRequest, *args: Any, **kwargs: Any) -> http.HttpResponse:
+class BaseOOIDetailView(BreadcrumbsMixin, SingleOOITreeMixin, ConnectorFormMixin):
+    connector_form_class = ObservedAtForm
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
         self.ooi = self.get_ooi()
-        return super().get(request, *args, **kwargs)
+
+    def get_current_ooi(self) -> OOI | None:
+        """
+        Some OOIs have an old valid time, this will fetch the latest OOI for today.
+        """
+        now = datetime.now(timezone.utc)
+        if self.observed_at.date() == now.date():
+            return self.ooi
+        try:
+            return self.get_ooi(pk=self.get_ooi_id(), observed_at=now)
+        except Http404:
+            return None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         context["ooi"] = self.ooi
+        context["ooi_current"] = self.get_current_ooi()
         context["mandatory_fields"] = get_mandatory_fields(self.request)
         context["observed_at"] = self.observed_at
+        context["observed_at_form"] = self.get_connector_form()
 
         return context
 
@@ -165,8 +183,17 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
     def form_valid(self, form):
         # Transform into OOI
         try:
+            end_valid_time = form.cleaned_data.pop("end_valid_time", None)
+            if end_valid_time is not None:
+                end_valid_time = end_valid_time.replace(tzinfo=timezone.utc)
             new_ooi = self.ooi_class.model_validate(form.cleaned_data)
-            create_ooi(self.octopoes_api_connector, self.bytes_client, new_ooi, datetime.now(timezone.utc))
+            create_ooi(
+                self.octopoes_api_connector,
+                self.bytes_client,
+                new_ooi,
+                datetime.now(timezone.utc),
+                end_valid_time,
+            )
             sleep(1)
             return redirect(self.get_ooi_success_url(new_ooi))
         except ValidationError as exception:
