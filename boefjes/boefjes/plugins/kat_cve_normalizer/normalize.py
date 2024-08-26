@@ -5,7 +5,7 @@ from boefjes.job_models import NormalizerOutput
 from octopoes.models import Reference
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RetireJSFindingType, SnykFindingType
 
-CVE_PATTERN = re.compile(r"CVE-\d{4}-\d{4,7}")
+CVE_PATTERN = re.compile(r"CVE-\d{4}-\d{4,}")
 
 
 def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
