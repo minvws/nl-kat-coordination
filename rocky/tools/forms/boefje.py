@@ -18,7 +18,9 @@ class BoefjeAddForm(BaseRockyForm):
     oci_image = forms.CharField(
         required=True,
         label=_("Container image"),
-        widget=forms.TextInput(attrs={"description": "For example: ghcr.io/minvws/openkat/nmap"}),
+        widget=forms.TextInput(
+            attrs={"description": "For example: ghcr.io/minvws/openkat/nmap", "aria-describedby": "input-description"}
+        ),
     )
     name = forms.CharField(
         required=True,
@@ -32,7 +34,9 @@ class BoefjeAddForm(BaseRockyForm):
     oci_arguments = forms.CharField(
         required=False,
         label=_("Arguments"),
-        widget=forms.TextInput(attrs={"description": "For example: -sTU --top-ports 1000"}),
+        widget=forms.TextInput(
+            attrs={"description": "For example: -sTU --top-ports 1000", "aria-describedby": "input-description"}
+        ),
     )
     schema = forms.JSONField(
         required=False,

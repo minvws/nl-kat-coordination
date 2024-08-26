@@ -2,7 +2,7 @@
 
 <div {% if field.field.required %}class="required"{% endif %}>
     <p class="de-emphasized">{{ field.label_tag }}</p>
-    <p class="nota-bene">{{ field.field.widget.attrs.description }}</p>
+    <p id="input-description" class="nota-bene">{{ field.field.widget.attrs.description }}</p>
     {% if form_view != "vertical" %}
         <div>
             {% if field.field.required %}
