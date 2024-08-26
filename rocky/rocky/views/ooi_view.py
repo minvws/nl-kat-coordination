@@ -37,6 +37,7 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
         self.filtered_ooi_types = request.GET.getlist("ooi_type", [])
         self.clearance_levels = request.GET.getlist("clearance_level", [])
         self.clearance_types = request.GET.getlist("clearance_type", [])
+        self.search_string = request.GET.get("search", "")
 
     def count_observed_at_filter(self) -> int:
         return 1 if datetime.now(timezone.utc).date() != self.observed_at.date() else 0
@@ -101,6 +102,7 @@ class BaseOOIListView(OOIFilterView, ListView):
             valid_time=self.observed_at,
             scan_level=self.get_ooi_scan_levels(),
             scan_profile_type=self.get_ooi_profile_types(),
+            search_string=self.search_string,
         )
 
     def get_context_data(self, **kwargs):

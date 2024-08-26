@@ -10,7 +10,6 @@ from boefjes.models import Organisation
 from boefjes.sql.config_storage import SQLConfigStorage, create_encrypter
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
-from boefjes.sql.plugin_storage import SQLPluginStorage
 
 
 @skipIf(os.environ.get("CI") != "1", "Needs a CI database.")
@@ -29,6 +28,8 @@ class TestSettingsToBoefjeConfig(TestCase):
             storage.create(Organisation(id="dev1", name="Test 1 "))
             storage.create(Organisation(id="dev2", name="Test 2 "))
 
+        session.close()
+
         encrypter = create_encrypter()
         entries = [
             (1, encrypter.encode('{"key1": "val1"}'), "dns-records", 1),
@@ -43,8 +44,6 @@ class TestSettingsToBoefjeConfig(TestCase):
             f"INSERT INTO plugin_state (id, plugin_id, enabled, organisation_pk) values {','.join(map(str, entries))}"  # noqa: S608
         )
         self.engine.execute(text(query))
-
-        session.close()
 
     def test_fail_on_wrong_plugin_ids(self):
         session = sessionmaker(bind=self.engine)()
@@ -73,16 +72,17 @@ class TestSettingsToBoefjeConfig(TestCase):
 
         alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "f9de6eb7824b"])
 
-        assert SQLPluginStorage(session, settings).boefje_by_id("dns-records").id == "dns-records"
+        assert self.engine.execute(text("SELECT id FROM boefje WHERE plugin_id = 'dns-records'")).fetchall() == [(2,)]
 
         config_storage = SQLConfigStorage(session, encrypter)
         assert config_storage.get_all_settings("dev1", "dns-records") == {"key1": "val1"}
-        assert config_storage.get_all_settings("dev2", "dns-records") == {"key1": "val1", "key2": "val2"}
         assert config_storage.get_all_settings("dev1", "nmap-udp") == {}
+        assert config_storage.get_all_settings("dev2", "dns-records") == {"key1": "val1", "key2": "val2"}
 
         assert config_storage.is_enabled_by_id("dns-records", "dev1")
         assert config_storage.is_enabled_by_id("nmap-udp", "dev1")
 
+        session.commit()
         session.close()
 
     def test_downgrade(self):

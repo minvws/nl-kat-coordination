@@ -371,19 +371,32 @@ class BoefjeScheduler(Scheduler):
                 boefje_task = BoefjeTask.parse_obj(schedule.data)
 
                 # Plugin still exists?
-                plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
-                    boefje_task.boefje.id,
-                    self.organisation.id,
-                )
-                if not plugin:
-                    self.logger.debug(
-                        "Boefje does not exist anymore, skipping",
+                try:
+                    plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+                        boefje_task.boefje.id,
+                        self.organisation.id,
+                    )
+                    if not plugin:
+                        self.logger.info(
+                            "Boefje does not exist anymore, skipping and disabling schedule",
+                            boefje_id=boefje_task.boefje.id,
+                            schedule_id=schedule.id,
+                            organisation_id=self.organisation.id,
+                            scheduler_id=self.scheduler_id,
+                        )
+                        schedule.enabled = False
+                        self.ctx.datastores.schedule_store.update_schedule(schedule)
+                        continue
+                except ExternalServiceError as exc_plugin:
+                    self.logger.error(
+                        "Could not get plugin %s from katalogus",
+                        boefje_task.boefje.id,
                         boefje_id=boefje_task.boefje.id,
+                        schedule_id=schedule.id,
                         organisation_id=self.organisation.id,
                         scheduler_id=self.scheduler_id,
+                        exc_info=exc_plugin,
                     )
-                    schedule.enabled = False
-                    self.ctx.datastores.schedule_store.update_schedule(schedule)
                     continue
 
                 # Plugin still enabled?
@@ -391,6 +404,7 @@ class BoefjeScheduler(Scheduler):
                     self.logger.debug(
                         "Boefje is disabled, skipping",
                         boefje_id=boefje_task.boefje.id,
+                        schedule_id=schedule.id,
                         organisation_id=self.organisation.id,
                         scheduler_id=self.scheduler_id,
                     )
@@ -405,6 +419,7 @@ class BoefjeScheduler(Scheduler):
                     self.logger.warning(
                         "Plugin is not a boefje, skipping",
                         plugin_id=plugin.id,
+                        schedule_id=schedule.id,
                         organisation_id=self.organisation.id,
                         scheduler_id=self.scheduler_id,
                     )
@@ -415,16 +430,29 @@ class BoefjeScheduler(Scheduler):
                 ooi = None
                 if boefje_task.input_ooi:
                     # OOI still exists?
-                    ooi = self.ctx.services.octopoes.get_object(boefje_task.organization, boefje_task.input_ooi)
-                    if not ooi:
-                        self.logger.debug(
-                            "OOI does not exist anymore, skipping",
+                    try:
+                        ooi = self.ctx.services.octopoes.get_object(boefje_task.organization, boefje_task.input_ooi)
+                        if not ooi:
+                            self.logger.info(
+                                "OOI does not exist anymore, skipping and disabling schedule",
+                                ooi_primary_key=boefje_task.input_ooi,
+                                schedule_id=schedule.id,
+                                organisation_id=self.organisation.id,
+                                scheduler_id=self.scheduler_id,
+                            )
+                            schedule.enabled = False
+                            self.ctx.datastores.schedule_store.update_schedule(schedule)
+                            continue
+                    except ExternalServiceError as exc_ooi:
+                        self.logger.error(
+                            "Could not get ooi %s from octopoes",
+                            boefje_task.input_ooi,
                             ooi_primary_key=boefje_task.input_ooi,
+                            schedule_id=schedule.id,
                             organisation_id=self.organisation.id,
                             scheduler_id=self.scheduler_id,
+                            exc_info=exc_ooi,
                         )
-                        schedule.enabled = False
-                        self.ctx.datastores.schedule_store.update_schedule(schedule)
                         continue
 
                     # Boefje still consuming ooi type?
@@ -445,10 +473,11 @@ class BoefjeScheduler(Scheduler):
 
                     # Boefje allowed to scan ooi?
                     if not self.has_boefje_permission_to_run(plugin, ooi):
-                        self.logger.debug(
-                            "Boefje not allowed to scan ooi, skipping",
+                        self.logger.info(
+                            "Boefje not allowed to scan ooi, skipping and disabling schedule",
                             boefje_id=boefje_task.boefje.id,
                             ooi_primary_key=ooi.primary_key,
+                            schedule_id=schedule.id,
                             organisation_id=self.organisation.id,
                             scheduler_id=self.scheduler_id,
                         )

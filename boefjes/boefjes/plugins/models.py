@@ -1,15 +1,20 @@
 import hashlib
+import json
 from enum import Enum
 from importlib import import_module
 from inspect import isfunction, signature
+from json import JSONDecodeError
 from pathlib import Path
 from typing import Protocol
+
+from jsonschema.exceptions import SchemaError
 
 from boefjes.models import Boefje, Normalizer
 
 BOEFJES_DIR = Path(__file__).parent
 
 BOEFJE_DEFINITION_FILE = "boefje.json"
+SCHEMA_FILE = "schema.json"
 NORMALIZER_DEFINITION_FILE = "normalizer.json"
 ENTRYPOINT_BOEFJES = "main.py"
 ENTRYPOINT_NORMALIZERS = "normalize.py"
@@ -61,6 +66,14 @@ class BoefjeResource:
 
         if (path / ENTRYPOINT_BOEFJES).exists():
             self.module = get_runnable_module_from_package(package, ENTRYPOINT_BOEFJES, parameter_count=1)
+
+        if (path / SCHEMA_FILE).exists():
+            try:
+                self.boefje.schema = json.load((path / SCHEMA_FILE).open())
+            except JSONDecodeError as e:
+                raise ModuleException("Invalid schema file") from e
+            except SchemaError as e:
+                raise ModuleException("Invalid schema") from e
 
 
 class NormalizerResource:
