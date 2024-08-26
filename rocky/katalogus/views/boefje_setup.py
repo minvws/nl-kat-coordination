@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from account.mixins import OrganizationView
+from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic.edit import FormView
@@ -11,11 +11,12 @@ from katalogus.client import Boefje, get_katalogus
 from octopoes.models.types import type_by_name
 
 
-class BoefjeSetupView(OrganizationView, FormView):
+class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
     """View where the user can create a new boefje"""
 
     template_name = "boefje_setup.html"
     form_class = BoefjeAddForm
+    permission_required = "tools.can_set_katalogus_settings"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
