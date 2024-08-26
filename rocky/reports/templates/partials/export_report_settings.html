@@ -46,7 +46,8 @@
                                     </td>
                                     <td>
                                         <button type="button"
-                                                class="icon ti-arrow-back-up action-button reset-button" aria-label="{% translate "Reset" %}"></button>
+                                                class="icon ti-arrow-back-up action-button reset-button"
+                                                aria-label="{% translate "Reset" %}"></button>
                                     </td>
                                     <td>
                                         <select class="reference-date" name="reference_date">
@@ -66,7 +67,7 @@
                 <button type="submit" form="generate_report">
                     {% include "forms/report_form_fields.html" %}
 
-                    {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
+                    {% translate "Generate report" %}<span class="icon ti-chevron-right" aria-hidden="true"></span>
                 </button>
             </form>
         {% else %}
