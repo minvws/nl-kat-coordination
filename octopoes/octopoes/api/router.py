@@ -5,7 +5,7 @@ from collections.abc import Generator
 from datetime import datetime
 from logging import getLogger
 from operator import itemgetter
-from typing import Any
+from typing import Any, Literal
 
 from asgiref.sync import sync_to_async
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
@@ -125,8 +125,13 @@ def list_objects(
     scan_profile_type: set[ScanProfileType] = Query(DEFAULT_SCAN_PROFILE_TYPE_FILTER),
     offset: int = 0,
     limit: int = 20,
+    search_string: str | None = None,
+    order_by: Literal["scan_level", "object_type"] = "object_type",
+    asc_desc: Literal["asc", "desc"] = "asc",
 ):
-    return octopoes.list_ooi(types, valid_time, offset, limit, scan_level, scan_profile_type)
+    return octopoes.list_ooi(
+        types, valid_time, offset, limit, scan_level, scan_profile_type, search_string, order_by, asc_desc
+    )
 
 
 @router.get("/query", tags=["Objects"])
