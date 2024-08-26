@@ -22,6 +22,8 @@ def test_plugin_detail_view(
     )
 
     assertContains(response, "TestBoefje")
+    assertContains(response, "Container image")
+    assertContains(response, "Variants")
     assertContains(response, "Produces")
     assertContains(response, "Tasks")
     assertContains(response, "Object list")
