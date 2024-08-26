@@ -9,6 +9,7 @@ from tools.models import Indemnification
 
 from octopoes.models import ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 from octopoes.models.pagination import Paginated
 from octopoes.models.types import OOIType
@@ -70,6 +71,33 @@ def test_ooi_list_with_clearance_type_filter_and_clearance_level_filter(
 
     assertContains(response, "testnetwork")
     assertContains(response, "Showing 150 of 200 objects")
+
+
+def test_ooi_list_search(rf, client_member, mock_organization_view_octopoes):
+    kwargs = {"organization_code": client_member.organization.code}
+    url = reverse("ooi_list", kwargs=kwargs)
+    request = rf.get(
+        url,
+        {"search": "testnetwork"},
+    )
+    request.resolver_match = resolve(url)
+
+    setup_request(request, client_member.user)
+
+    network = Network(name="testnetwork")
+
+    mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
+        count=2, items=[network, Hostname(name="example.com", network=network.reference)]
+    )
+
+    response = OOIListView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 200
+
+    list_call_1 = mock_organization_view_octopoes().list_objects.call_args_list[0]
+    assert list_call_1.kwargs["search_string"] == "testnetwork"
+
+    assertContains(response, "Showing 2 of 2 objects")
 
 
 def test_ooi_list_delete_multiple(rf, client_member, mock_organization_view_octopoes):
