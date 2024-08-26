@@ -8,7 +8,8 @@ function initResetButtons() {
   resetButtons.forEach((button) => {
     button.classList.add("hidden");
 
-    let input = button.closest("tr").querySelector(".name-input");
+    let input = button.closest("tr")?.querySelector(".name-input");
+    if (!input) return;
 
     input.defaultvalue = input.value;
 
