@@ -236,6 +236,8 @@ class SchedulerClient:
             raise SchedulerConnectError(extra_message=_("Task list: "))
 
     def get_task_details(self, task_id: str) -> Task:
+        if self.organization_code is None:
+            raise SchedulerTaskNotFound("No organization defined in client.")
         task_details = Task.model_validate_json(self._get(f"/tasks/{task_id}", "content"))
 
         if task_details.type == "normalizer":
