@@ -9,7 +9,8 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
-from octopoes.models import Reference
+from octopoes.models import OOI
+from reports.report_types.definitions import Report
 from reports.report_types.helpers import get_ooi_types_with_report
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
@@ -111,12 +112,6 @@ class ReportTypesSelectionGenerateReportView(
             return redirect(self.get_previous())
         return self.get(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context["total_oois"] = len(self.report_recipe.input_oois)
-        return context
-
 
 class SetupScanGenerateReportView(
     SaveGenerateReportMixin, GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportPluginView, TemplateView
@@ -149,7 +144,10 @@ class ExportSetupGenerateReportView(
     reports: dict[str, str] = {}
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        self.reports = create_report_names(self.oois_pk, self.report_types)
+        oois = list(self.get_oois())
+        report_types = list(self.get_report_types())
+
+        self.reports = create_report_names(oois, report_types)
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -181,11 +179,11 @@ class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportV
         )
 
 
-def create_report_names(oois_pk, report_types) -> dict[str, str]:
+def create_report_names(oois: list[type[OOI]], report_types: list[type[Report]]) -> dict[str, str]:
     reports = {}
-    oois_count = len(oois_pk)
+    oois_count = len(oois)
     report_types_count = len(report_types)
-    ooi = Reference.from_str(oois_pk[0]).human_readable
+    ooi = oois[0].human_readable
     report_type = report_types[0].name
 
     # Create name for parent report
@@ -201,11 +199,9 @@ def create_report_names(oois_pk, report_types) -> dict[str, str]:
         reports[name] = ""
 
     # Create name for subreports or single reports
-    for ooi in oois_pk:
+    for ooi in oois:
         for report_type in report_types:
-            name = _("{report_type} for {ooi}").format(
-                report_type=report_type.name, ooi=Reference.from_str(ooi).human_readable
-            )
+            name = _("{report_type} for {ooi}").format(report_type=report_type.name, ooi=ooi.human_readable)
             reports[name] = ""
 
     return reports

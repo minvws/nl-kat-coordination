@@ -57,7 +57,7 @@
                   method="post"
                   action="{{ next }}">
                 {% csrf_token %}
-                {% include "forms/report_form_fields.html" %}
+                {% include "forms/report_form_fields.html" with disable_report_type_fields=True %}
 
                 <div class="column-4 tiles">
                     {% if available_report_types_aggregate %}

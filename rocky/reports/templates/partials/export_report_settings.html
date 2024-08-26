@@ -7,7 +7,7 @@
 
 <section>
     <div>
-        {% if selected_oois and selected_report_types %}
+        {% if report_recipe.input_oois and report_recipe.report_types %}
             <h2>{% translate "Report name" %}</h2>
             {% include "partials/return_button.html" with btn_text="Change selection" %}
 

@@ -2,6 +2,7 @@ import json
 from collections import defaultdict
 from collections.abc import Iterable, Sequence
 from datetime import datetime, timezone
+from operator import attrgetter
 from typing import Any, Literal, cast
 from uuid import uuid4
 
@@ -17,7 +18,7 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
-from katalogus.client import Boefje, Plugin
+from katalogus.client import Boefje, KATalogusError, Plugin, get_katalogus
 from pydantic import RootModel, TypeAdapter
 from tools.ooi_helpers import create_ooi
 from tools.view_helpers import BreadcrumbsMixin, url_with_querystring
@@ -26,7 +27,7 @@ from octopoes.models import OOI, Reference
 from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.concatenated_report.report import ConcatenatedReport
-from reports.report_types.definitions import AggregateReport, BaseReport, BaseReportType, MultiReport, Report
+from reports.report_types.definitions import AggregateReport, Report
 from reports.report_types.helpers import REPORTS, get_report_by_id, get_report_types_for_oois
 from reports.utils import JSONEncoder, debug_json_keys
 from rocky.views.mixins import ObservedAtMixin, OOIList
@@ -102,52 +103,51 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
 class ReportRecipe:
     def __init__(
         self,
-        input_oois: set[OOI] = set(),
-        report_types: set[BaseReport] = set(),
-        plugins: dict[str, set[Plugin]] = {},
+        input_oois: list[str] = [],
+        report_types: list[str] = [],
+        plugins: dict[str, list[str]] = {},
     ):
         self.input_oois = input_oois
         self.report_types = report_types
         self.plugins = plugins
 
+    def as_json(self):
+        return json.dumps(self.__dict__)
+
 
 class ReportRecipeView(OOIFilterView):
+    """
+    A recipe is here defined as: all data collected from user selections to create a report.
+    The user selects assets (oois) together with the report types and the resulted plugins.
+    """
+
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.report_recipe = self.get_report_recipe()
 
-    def get_report_recipe(self):
-        """
-        A recipe is here defined as: all necessary data to create reports based on user selections.
-        The selected reports are defined in the selected report types with its set of plugins.
-        """
-        input_oois: set[OOI] = self.get_oois(self.get_ooi_selection())
-        report_types: set[type[Report]] = self.get_report_types(self.get_report_type_selection())
-        plugins: dict[str, set[Plugin]] = self.get_plugins_from_report_types(report_types)
-
-        return ReportRecipe(input_oois, report_types, plugins)
+    def get_report_recipe(self) -> ReportRecipe:
+        return ReportRecipe(
+            self.get_ooi_pks(),
+            self.get_report_type_ids(),
+            self.get_plugin_ids(),
+        )
 
     def get_ooi_selection(self) -> list[str]:
-        """
-        OOIs selections from the ooi list table.
-        """
         selected_oois = self.request.GET.getlist("ooi", [])
         if "all" in selected_oois:
             return selected_oois
         return sorted(set(self.request.POST.getlist("ooi", [])))
 
-    def get_report_type_selection(self) -> list[str]:
-        """
-        Report types selections.
-        """
-        return sorted(set(self.request.POST.getlist("report_type", [])))
+    def get_ooi_pks(self) -> list[str]:
+        selected_oois = self.get_ooi_selection()
+        if "all" in selected_oois:
+            return sorted([ooi.primary_key for ooi in self.get_oois()])
+        return selected_oois
 
-    def get_oois(self, ooi_selections: list[str]) -> set[OOI]:
-        """
-        Returns OOI objects from oois selections.
-        """
+    def get_oois(self) -> set[type[OOI]]:
+        selected_oois = self.get_ooi_selection()
         oois = set()
-        if "all" in ooi_selections:
+        if "all" in selected_oois:
             oois = set(
                 self.octopoes_api_connector.list_objects(
                     self.get_ooi_types(),
@@ -158,36 +158,54 @@ class ReportRecipeView(OOIFilterView):
                 ).items
             )
         else:
-            oois = {self.get_single_ooi(pk=ooi_pk) for ooi_pk in ooi_selections}
+            oois = {self.get_single_ooi(pk=ooi_pk) for ooi_pk in selected_oois}
         return oois
 
-    def get_report_types(self, report_type_selection: list[str]) -> set[type[Report]]:
-        """
-        Returns the report type objects from a list of selected report type ids.
-        """
-        report_types = set()
-        for report_type_id in report_type_selection:
-            try:
-                report = get_report_by_id(report_type_id)
-                report_types.add(report)
-            except ValueError:
-                error_message = _("Report type '%s' does not exist.") % report_type_id
-                messages.error(self.request, error_message)
-        return report_types
+    def get_report_type_ids(self) -> list[str]:
+        return sorted(set(self.request.POST.getlist("report_type", [])))
 
-    def get_plugins_from_report_types(self, report_types: set[type[Report]]) -> dict[str, set[Plugin]]:
+    def get_report_types(self) -> set[type[Report]]:
+        return {get_report_by_id(report_type_id) for report_type_id in self.get_report_type_ids()}
+
+    def get_plugins_from_report_type(self) -> dict[str, list[Plugin]]:
         """
-        Returns all plugins from KAT-alogus from the selected report types.
+        Returns plugins from KAT-alogus from the selected report types.
         """
 
+        report_types = self.get_report_types()
         plugins: dict[str, Any] = {"required": [], "optional": []}
 
         for report_type in report_types:
             for required_optional, report_type_plugin_ids in report_type.plugins.items():
                 plugins[required_optional] += report_type_plugin_ids
+
+        # remove duplicate plugins
         plugins = {required_optional: set(plugin_ids) for required_optional, plugin_ids in plugins.items()}
 
-        return plugins
+        # remove optional plugins that is also in the set of required plugins
+        for plugin_id in plugins["required"]:
+            if plugin_id in plugins["optional"]:
+                plugins["optional"].remove(plugin_id)
+
+        # Finally we can get the plugins from KAT-alogus with the set of plugin ids and sort them by name and ascending.
+        try:
+            return {
+                required_optional: sorted(
+                    get_katalogus(self.organization.code).get_plugins(ids=list(plugin_ids)), key=attrgetter("name")
+                )
+                for required_optional, plugin_ids in plugins.items()
+                if plugin_ids
+            }
+        except KATalogusError as error:
+            messages.error(self.request, error.message)
+            return {}
+
+    def get_plugin_ids(self) -> dict[str, list[str]]:
+        report_type_plugins = self.get_plugins_from_report_type()
+        plugin_ids: dict[str, list[str]] = {"required": [], "optional": []}
+        for required_optional, plugins in report_type_plugins.items():
+            plugin_ids[required_optional] = [plugin.id for plugin in plugins]
+        return plugin_ids
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -226,46 +244,116 @@ class ReportTypeSelectionView(ReportRecipeView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.selected_report_types = self.get_report_type_selection()
+        self.show_report_types = get_report_types_for_oois(self.get_ooi_pks())
 
-    @staticmethod
-    def get_available_report_types(reports: set[type[BaseReportType]]) -> list[dict[str, str]]:
-        return [
+    def get_report_types_from_ooi_selelection(self) -> list[dict[str, str]]:
+        """
+        The report types are fetched from which ooi is selected. Shows all report types for the oois.
+        """
+
+        report_types = [
             {
                 "id": report_type.id,
                 "name": report_type.name,
                 "description": report_type.description,
                 "label_style": report_type.label_style,
             }
-            for report_type in reports
+            for report_type in self.show_report_types
         ]
+        return report_types
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["selected_oois"] = self.get_ooi_selection()
-        context["selected_report_types"] = self.selected_report_types
-        context["available_report_types"] = self.get_available_report_types(
-            get_report_types_for_oois(self.report_recipe.input_oois)
-        )
+        context["total_oois"] = len(self.report_recipe.input_oois)
+        context["oois"] = self.get_oois()
+        context["available_report_types"] = self.get_report_types_from_ooi_selelection()
         return context
 
 
-class ReportPluginView(OOISelectionView, ReportTypeSelectionView):
+class ReportPluginView(ReportRecipeView):
     """
-    This view shows the required and optional plugins.
-    Needs ReportTypeView to know which report type is selected to get their plugins.
-    The plugin ids will be collected and fetched form KAT-alogus.
-    The user is able to activate plugins they need for the scans.
-    The oois selection is also remembered by ReportOOIView.
+    This view shows the required and optional plugins together with the summary per report type.
     """
 
-    def are_all_plugins_enabled(self) -> bool:
-        return all([plugin.enabled for _, plugins in self.report_recipe.plugins.items() for plugin in plugins])
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.plugins = self.get_plugins_from_report_type()
 
+    def enabled_plugins(self) -> dict[str, bool]:
+        enabled_plugins_data: dict[str, bool] = {"required": False, "optional": False}
+        enabled_plugins = []
+
+        for required_optional, plugins in self.plugins.items():
+            for plugin in plugins:
+                enabled_plugins.append(plugin.enabled)
+            enabled_plugins_data[required_optional] = all(enabled_plugins)
+        return enabled_plugins_data
+
+    def get_plugin_data(self):
+        report_types: dict[str, Any] = {}
+        plugin_report_types: dict[str, list] = {}
+        total_enabled_plugins = {"required": 0, "optional": 0}
+        total_available_plugins = {"required": 0, "optional": 0}
+
+        if self.plugins:
+            for report_type in self.get_report_types():
+                for plugin_type in ["required", "optional"]:
+                    # Mypy doesn't infer this automatically https://github.com/python/mypy/issues/9168
+                    plugin_type = cast(Literal["required", "optional"], plugin_type)
+                    number_of_enabled = sum(
+                        (1 if plugin.enabled and plugin.id in report_type.plugins[plugin_type] else 0)
+                        for plugin in self.plugins[plugin_type]
+                    )
+                    report_plugins = report_type.plugins[plugin_type]
+
+                    for plugin in report_plugins:
+                        if plugin not in plugin_report_types:
+                            plugin_report_types[plugin] = [
+                                {
+                                    "name": report_type.name,
+                                    "label_style": report_type.label_style,
+                                }
+                            ]
+                        else:
+                            plugin_report_types[plugin].append(
+                                {
+                                    "name": report_type.name,
+                                    "label_style": report_type.label_style,
+                                }
+                            )
+
+                    total_enabled_plugins[plugin_type] += number_of_enabled
+                    total_available_plugins[plugin_type] += len(report_plugins)
+
+                    if report_type.name not in report_types:
+                        report_types[report_type.name] = {}
+
+                    report_types[report_type.name][f"number_of_enabled_{plugin_type}"] = number_of_enabled
+                    report_types[report_type.name][f"number_of_available_{plugin_type}"] = len(report_plugins)
+
+        plugin_data = {
+            "total_enabled_plugins": total_enabled_plugins,
+            "total_available_plugins": total_available_plugins,
+            "report_types": report_types,
+            "plugin_report_types": plugin_report_types,
+        }
+
+        return plugin_data
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["created_at"] = datetime.now()
+        context["enabled_plugins"] = self.enabled_plugins()
+        context["plugin_data"] = self.get_plugin_data()
+        context["plugins"] = self.plugins
+        return context
+
+
+class ReportFinalSettingsView(ReportRecipeView):
     def get_plugin_data_for_saving(self) -> list[dict]:
         plugin_data = []
-
-        for required_optional, plugins in self.report_recipe.plugins.items():
+        report_type_plugins = self.get_plugins_from_report_type()
+        for required_optional, plugins in report_type_plugins.items():
             for plugin in plugins:
                 plugin_data.append(
                     {
@@ -280,56 +368,6 @@ class ReportPluginView(OOISelectionView, ReportTypeSelectionView):
 
         return plugin_data
 
-    def get_plugin_data(self):
-        report_types: dict[str, Any] = {}
-        plugin_report_types: dict[str, list] = {}
-        total_enabled_plugins = {"required": 0, "optional": 0}
-        total_available_plugins = {"required": 0, "optional": 0}
-
-        for report_type in self.report_recipe.report_types:
-            for plugin_type in ["required", "optional"]:
-                # Mypy doesn't infer this automatically https://github.com/python/mypy/issues/9168
-                plugin_type = cast(Literal["required", "optional"], plugin_type)
-                number_of_enabled = sum(
-                    (1 if plugin.enabled and plugin.id in report_type.plugins[plugin_type] else 0)
-                    for plugin in self.report_recipe.plugins[plugin_type]
-                )
-                report_plugins = report_type.plugins[plugin_type]
-
-                for plugin in report_plugins:
-                    if plugin not in plugin_report_types:
-                        plugin_report_types[plugin] = [
-                            {
-                                "name": report_type.name,
-                                "label_style": report_type.label_style,
-                            }
-                        ]
-                    else:
-                        plugin_report_types[plugin].append(
-                            {
-                                "name": report_type.name,
-                                "label_style": report_type.label_style,
-                            }
-                        )
-
-                total_enabled_plugins[plugin_type] += number_of_enabled
-                total_available_plugins[plugin_type] += len(report_plugins)
-
-                if report_type.name not in report_types:
-                    report_types[report_type.name] = {}
-
-                report_types[report_type.name][f"number_of_enabled_{plugin_type}"] = number_of_enabled
-                report_types[report_type.name][f"number_of_available_{plugin_type}"] = len(report_plugins)
-
-        plugin_data = {
-            "total_enabled_plugins": total_enabled_plugins,
-            "total_available_plugins": total_available_plugins,
-            "report_types": report_types,
-            "plugin_report_types": plugin_report_types,
-        }
-
-        return plugin_data
-
     def save_report_raw(self, data: dict) -> str:
         report_data_raw_id = self.bytes_client.upload_raw(
             raw=ReportDataDict(data).model_dump_json().encode(),
@@ -341,7 +379,7 @@ class ReportPluginView(OOISelectionView, ReportTypeSelectionView):
     def save_report_ooi(
         self,
         report_data_raw_id: str,
-        report_type: type[Report] | type[MultiReport] | type[AggregateReport],
+        report_type: type[Report],
         input_oois: list[str],
         parent: Reference | None,
         has_parent: bool,
@@ -381,8 +419,6 @@ class ReportPluginView(OOISelectionView, ReportTypeSelectionView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["created_at"] = datetime.now()
-        context["all_plugins_enabled"] = self.are_all_plugins_enabled()
-        context["plugin_data"] = self.get_plugin_data()
         return context
 
 

@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
-from reports.report_types.definitions import AggregateReport, MultiReport, Report
+from reports.report_types.definitions import Report
 from reports.report_types.helpers import get_ooi_types_from_aggregate_report
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
@@ -84,7 +84,8 @@ class OOISelectionAggregateReportView(
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
     def post(self, request, *args, **kwargs):
-        if not self.report_recipe.input_oois:
+        report_recipe = self.get_report_recipe()
+        if not report_recipe.input_oois:
             messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
         return self.get(request, *args, **kwargs)
 
@@ -108,7 +109,8 @@ class ReportTypesSelectionAggregateReportView(
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
     def post(self, request, *args, **kwargs):
-        if not self.report_recipe.input_oois:
+        report_recipe = self.get_report_recipe()
+        if not report_recipe.input_oois:
             messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
             return redirect(self.get_previous())
         return self.get(request, *args, **kwargs)
@@ -162,7 +164,7 @@ class SaveAggregateReportView(SaveAggregateReportMixin, BreadcrumbsAggregateRepo
     breadcrumbs_step = 6
     current_step = 6
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
-    report_types: list[type[Report] | type[MultiReport] | type[AggregateReport]]
+    report_types: list[type[Report]]
 
     def post(self, request, *args, **kwargs):
         old_report_names = request.POST.getlist("old_report_name")

@@ -55,19 +55,19 @@ def get_report_types_for_ooi(ooi_pk: str) -> list[type[Report]]:
     return [report for report in REPORTS if ooi_type in report.input_ooi_types]
 
 
-def get_report_types_for_oois(oois: set[OOI]) -> set[type[Report]]:
+def get_report_types_for_oois(oois: list[str]) -> set[type[Report]]:
     """
     Get all report types that can be generated for a given list of OOIs
     """
-    ooi_pks = [ooi.primary_key for ooi in oois]
-    return {report for ooi_pk in ooi_pks for report in get_report_types_for_ooi(ooi_pk)}
+
+    return {report for ooi_pk in oois for report in get_report_types_for_ooi(ooi_pk)}
 
 
-def get_report_by_id(report_id: str) -> type[Report] | type[MultiReport] | type[AggregateReport]:
+def get_report_by_id(report_id: str) -> type[Report]:
     """
     Get report type by id
     """
-    if report_id is None:
+    if not report_id:
         return ConcatenatedReport
     for report in ALL_REPORT_TYPES:
         if report.id == report_id:
