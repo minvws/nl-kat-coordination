@@ -26,7 +26,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
         if prefix in finding_type_mapping:
             if prefix == "CVE" and not CVE_PATTERN.match(finding_id):
-                continue  # skip incorrect cves
+                raise ValueError(f"{finding_id} is not a valid CVE ID")
 
             finding_type = finding_type_mapping[prefix](id=finding_id)
             finding = Finding(
