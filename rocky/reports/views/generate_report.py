@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from django.contrib import messages
+from django.core.exceptions import SuspiciousOperation
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -172,16 +173,17 @@ class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportV
         old_report_names = request.POST.getlist("old_report_name")
         report_names = request.POST.getlist("report_name")
         reference_dates = request.POST.getlist("reference_date")
-
         final_report_names = list(zip(old_report_names, self.finalise_report_names(report_names, reference_dates)))
-
         report_ooi = self.save_report(final_report_names)
 
-        return redirect(
-            reverse("view_report", kwargs={"organization_code": self.organization.code})
-            + "?"
-            + urlencode({"report_id": report_ooi.reference})
-        )
+        if "" in report_names:
+            raise SuspiciousOperation(_("Empty name should not be possible."))
+        else:
+            return redirect(
+                reverse("view_report", kwargs={"organization_code": self.organization.code})
+                + "?"
+                + urlencode({"report_id": report_ooi.reference})
+            )
 
 
 def create_report_names(oois_pk, report_types) -> dict[str, str]:

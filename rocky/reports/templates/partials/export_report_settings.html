@@ -22,7 +22,9 @@
                     <caption class="visually-hidden">{% translate "Report names:" %}</caption>
                     <thead>
                         <tr>
-                            <th scope="col" colspan="2">{% translate "Name" %}</th>
+                            <th scope="col" colspan="2">
+                                {% translate "Name" %} <span class="nota-bene" aria-hidden>{% translate "(Required)" %}</span>
+                            </th>
                             <th scope="col">{% translate "Add reference date" %}</th>
                         </tr>
                     </thead>
@@ -32,11 +34,15 @@
                                 <input type="hidden" name="old_report_name" value="{{ report_name }}" />
                                 <tr>
                                     <td>
-                                        <input id="{{ report_id }}"
-                                               class="name-input"
-                                               name="report_name"
-                                               type="text"
-                                               value="{{ report_name }}" />
+                                        <div>
+                                            <input id="{{ report_id }}"
+                                                   class="name-input"
+                                                   name="report_name"
+                                                   type="text"
+                                                   value="{{ report_name }}"
+                                                   required
+                                                   minlength="3" />
+                                        </div>
                                     </td>
                                     <td>
                                         <button type="button"

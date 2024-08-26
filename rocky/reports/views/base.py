@@ -369,7 +369,7 @@ class ReportPluginView(OOISelectionView, ReportTypeSelectionView):
         if not name or name.isspace():
             name = report_type.name
         report_ooi = ReportOOI(
-            name=name,
+            name=str(name),
             report_type=str(report_type.id),
             template=report_type.template_path,
             report_id=uuid4(),

@@ -72,13 +72,17 @@ class SaveGenerateReportMixin(ReportPluginView):
                 observed_at=observed_at,
                 name=now.strftime(report_names[0][1]),
             )
+
             for report_type, ooi_data in report_data.items():
                 for ooi, data in ooi_data.items():
+                    name_to_save = ""
+
                     report_type_name = str(get_report_by_id(report_type).name)
                     ooi_name = Reference.from_str(ooi).human_readable
                     for default_name, updated_name in report_names:
+                        name_to_save = default_name
                         if ooi_name in default_name and report_type_name in default_name:
-                            name = updated_name
+                            name_to_save = updated_name
                             break
 
                     raw_id = self.save_report_raw(data={"report_data": data["data"]})
@@ -90,7 +94,7 @@ class SaveGenerateReportMixin(ReportPluginView):
                         parent=report_ooi.reference,
                         has_parent=True,
                         observed_at=observed_at,
-                        name=now.strftime(name),
+                        name=now.strftime(name_to_save),
                     )
         # if its a single report we can just save it as complete
         else:
