@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-23 09:49+0000\n"
+"POT-Creation-Date: 2024-08-26 09:50+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1099,8 +1099,7 @@ msgid "Add variant"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
-#: katalogus/templates/plugin_settings_list.html
-msgid "Overview of settings"
+msgid "Overview of variants"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
@@ -1227,6 +1226,10 @@ msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Edit Settings"
+msgstr ""
+
+#: katalogus/templates/plugin_settings_list.html
+msgid "Overview of settings"
 msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
@@ -4375,9 +4378,10 @@ msgstr ""
 #: tools/forms/settings.py
 msgid ""
 "If any other settings are needed for your Boefje, add these as a JSON "
-"Schema. More information about how to do this can be found here: <a "
-"href='https://json-schema.org/learn/getting-started-step-by-step'>JSON "
-"Schema</a> "
+"Schema, otherwise, leave the field empty or 'null'. More information about "
+"how to do this can be found here: <a href='https://json-schema.org/learn/"
+"getting-started-step-by-step'>JSON Schema</a> For inspiration, check the "
+"'schema.json' files of other Boefjes in the repo. "
 msgstr ""
 
 #: tools/forms/settings.py

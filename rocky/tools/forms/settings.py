@@ -61,9 +61,11 @@ OBSERVED_AT_HELP_TEXT = _(
 
 BOEFJE_SCHEMA_HELP_TEXT = mark_safe(
     _(
-        "If any other settings are needed for your Boefje, add these as a JSON Schema. "
+        "If any other settings are needed for your Boefje, add these as a JSON Schema, "
+        "otherwise, leave the field empty or 'null'. "
         "More information about how to do this can be found here: "
         "<a href='https://json-schema.org/learn/getting-started-step-by-step'>JSON Schema</a> "
+        "For inspiration, check the 'schema.json' files of other Boefjes in the repo. "
     )
 )
 BOEFJE_CONSUMES_HELP_TEXT = _("Select the object type that your Boefje consumes.")
