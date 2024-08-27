@@ -80,7 +80,7 @@ class SaveGenerateReportMixin(ReportPluginView):
                     report_type_name = str(get_report_by_id(report_type).name)
                     ooi_name = Reference.from_str(ooi).human_readable
                     for default_name, updated_name in report_names:
-                        name_to_save = default_name
+                        # Use default_name to check if we're on the right index in the list to update the name to save.
                         if ooi_name in default_name and report_type_name in default_name:
                             name_to_save = updated_name
                             break
