@@ -22,7 +22,7 @@ def scan_outdated_software(data: dict, ooi_ref):
                 yield software
                 yield software_instance
 
-                finding_type = KATFindingType(id="KAT-VERIFIED-VULNERABILITY")
+                finding_type = KATFindingType(id="KAT-OUTDATED-SOFTWARE")
                 yield finding_type
                 yield Finding(
                     finding_type=finding_type.reference,

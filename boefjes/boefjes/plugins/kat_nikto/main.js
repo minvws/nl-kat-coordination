@@ -28,16 +28,30 @@ export default function (boefje_meta) {
     );
   }
 
+  const raws = [];
+
   // Reading the file created by nikto
   try {
     var file_contents = fs.readFileSync("./output.json").toString();
+    raws.push([["boefje/nikto-output"], file_contents]);
   } catch (e) {
-    console.error(e);
+    console.error(e.message);
     throw new Error(
       "Something went wrong reading the file from the nikto command.\n" +
         e.message,
     );
   }
+
+  // Looking if outdated software has been found
+  try {
+    const data = JSON.parse(file_contents);
+    for (const vulnerability of data["vulnerabilities"])
+      if (vulnerability["id"].startsWith("6"))
+        raws.push([["openkat/finding"], "KAT-OUTDATED-SOFTWARE"]);
+  } catch (e) {
+    console.error(e.message);
+  }
+
   console.log("File contents: " + file_contents);
-  return [[[], file_contents]];
+  return raws;
 }

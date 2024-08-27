@@ -1,7 +1,7 @@
 {
   "id": "kat_nikto_normalize",
   "consumes": [
-    "boefje/nikto"
+    "boefje/nikto-output"
   ],
   "produces": [
     "Software",
