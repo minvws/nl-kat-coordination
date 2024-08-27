@@ -266,8 +266,8 @@ class OctopoesAPIConnector:
         offset: int = DEFAULT_OFFSET,
         limit: int = DEFAULT_LIMIT,
         search_string: str | None = None,
-        order_by: Literal["severity"] = "severity",
-        asc_desc: Literal["asc", "desc"] = "asc",
+        order_by: Literal["score"] = "score",
+        asc_desc: Literal["asc", "desc"] = "desc",
     ) -> Paginated[Finding]:
         params: dict[str, str | int | list[str] | None] = {
             "valid_time": str(valid_time),

@@ -730,8 +730,8 @@ class XTDBOOIRepository(OOIRepository):
         offset=DEFAULT_OFFSET,
         limit=DEFAULT_LIMIT,
         search_string: str | None = None,
-        order_by: Literal["severity"] = "severity",
-        asc_desc: Literal["asc", "desc"] = "asc",
+        order_by: Literal["score"] = "score",
+        asc_desc: Literal["asc", "desc"] = "desc",
     ) -> Paginated[Finding]:
         # clause to find risk_severity
         concrete_finding_types = to_concrete({FindingType})
@@ -760,6 +760,8 @@ class XTDBOOIRepository(OOIRepository):
             if search_string
             else ""
         )
+
+        order_statement = f":order-by [[?{order_by} :{asc_desc}]]"
 
         severity_values = ", ".join([str_val(severity.value) for severity in severities])
 
@@ -798,7 +800,7 @@ class XTDBOOIRepository(OOIRepository):
                             {search_statement}]
                     :limit {limit}
                     :offset {offset}
-                    :order-by [[?score :desc]]
+                    {order_statement}
                 }}
                :in-args [[{severity_values}]]
             }}

@@ -279,8 +279,8 @@ class FindingList:
         exclude_muted: bool = True,
         only_muted: bool = False,
         search_string: str | None = None,
-        order_by: Literal["severity"] = "severity",
-        asc_desc: Literal["asc", "desc"] = "asc",
+        order_by: Literal["score"] = "score",
+        asc_desc: Literal["asc", "desc"] = "desc",
     ):
         self.octopoes_connector = octopoes_connector
         self.valid_time = valid_time
