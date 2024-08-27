@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-27 14:08+0000\n"
+"POT-Creation-Date: 2024-08-27 14:33+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3577,9 +3577,8 @@ msgstr[1] ""
 #: rocky/templates/admin/delete_selected_confirmation.html
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html rocky/templates/indemnification_present.html
-#: rocky/templates/oois/ooi_list.html rocky/views/ooi_add.py
-#: rocky/views/ooi_list.py rocky/views/ooi_view.py rocky/views/upload_csv.py
-#: rocky/views/upload_raw.py
+#: rocky/views/ooi_add.py rocky/views/ooi_list.py rocky/views/ooi_view.py
+#: rocky/views/upload_csv.py rocky/views/upload_raw.py
 msgid "Objects"
 msgstr ""
 
@@ -5300,6 +5299,10 @@ msgid ""
 "An overview of objects found for organization <strong>%(organization_name)s</"
 "strong>. Objects can be added manually or by running Boefjes. Click an "
 "object for additional information."
+msgstr ""
+
+#: rocky/templates/oois/ooi_list.html
+msgid "Objects "
 msgstr ""
 
 #: rocky/templates/oois/ooi_list.html
