@@ -276,6 +276,16 @@ class BoefjeScheduler(Scheduler):
 
             oois_by_object_type: list[OOI] = []
             try:
+                if boefje.scan_level is None:
+                    self.logger.warning(
+                        "No scan level found for boefje: %s",
+                        boefje.name,
+                        boefje_id=boefje.id,
+                        organisation_id=self.organisation.id,
+                        scheduler_id=self.scheduler_id,
+                    )
+                    continue
+
                 oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
                     self.organisation.id,
                     boefje.consumes,
