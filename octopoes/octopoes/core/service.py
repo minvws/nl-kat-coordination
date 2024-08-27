@@ -8,6 +8,7 @@ from typing import Literal, overload
 
 from bits.definitions import get_bit_definitions
 from bits.runner import BitRunner
+from nibbles.runner import NibblesRunner
 from pydantic import TypeAdapter
 
 from octopoes.config.settings import (
@@ -77,6 +78,7 @@ class OctopoesService:
         self.origin_parameter_repository = origin_parameter_repository
         self.scan_profile_repository = scan_profile_repository
         self.session = session
+        self.nibbles = NibblesRunner(ooi_repository)
 
     @overload
     def _populate_scan_profiles(self, oois: ValuesView[OOI], valid_time: datetime) -> ValuesView[OOI]: ...
@@ -185,6 +187,7 @@ class OctopoesService:
         self.origin_repository.save(origin, valid_time=valid_time)
 
     def _run_inference(self, origin: Origin, valid_time: datetime) -> None:
+        # The bit part of inferring
         bit_definition = get_bit_definitions().get(origin.method, None)
 
         if bit_definition is None:
@@ -219,6 +222,7 @@ class OctopoesService:
             if len(configs) != 0:
                 config = configs[-1].config
 
+        resulting_oois = []
         try:
             if isinstance(self.session, XTDBSession):
                 start = perf_counter()
@@ -237,9 +241,12 @@ class OctopoesService:
                 self.session.client.submit_transaction(ops)
             else:
                 resulting_oois = BitRunner(bit_definition).run(source, parameters, config=config)
-            self.save_origin(origin, resulting_oois, valid_time)
         except Exception as e:
             logger.exception("Error running inference", exc_info=e)
+
+        # Adding the nibble part of inferring
+        resulting_oois += self.nibbles.infer([self.ooi_repository.get(origin.source, datetime.now())])
+        self.save_origin(origin, resulting_oois, valid_time)
 
     @staticmethod
     def check_path_level(path_level: int | None, current_level: int):
