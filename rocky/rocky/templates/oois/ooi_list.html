@@ -42,7 +42,12 @@
                     {% csrf_token %}
                     <div class="horizontal-scroll">
                         <table class="nowrap">
-                            <caption class="visually-hidden">{% translate "Objects" %}</caption>
+                            <caption class="visually-hidden">
+                              {% translate "Objects" %}
+                              <span class="visually-hidden">
+                                , {% translate "column headers with buttons are sortable" %}
+                              </span>
+                            </caption>
                             <thead>
                                 <th>
                                     <input class="toggle-all" data-toggle-target="ooi" type="checkbox">
