@@ -43,19 +43,3 @@ class SoftwareInstance(OOI):
         ooi_reference = Reference.from_str("|".join(parts[0:-4]))
         software_reference = Reference.from_str("|".join(parts[-4:]))
         return f"{software_reference.human_readable} @ {ooi_reference.human_readable}"
-
-
-class OutdatedSoftwareInstance(OOI):
-    object_type: Literal["OutdatedSoftwareInstance"] = "OutdatedSoftwareInstance"
-
-    _natural_key_attrs = ["ooi", "software", "newest_version"]
-
-    ooi: Reference = ReferenceField(OOI, max_issue_scan_level=0, max_inherit_scan_level=1)
-    software_instance: Reference = ReferenceField(SoftwareInstance, max_issue_scan_level=1, max_inherit_scan_level=0)
-    newest_version: str | None = None
-
-    @classmethod
-    def format_reference_human_readable(cls, reference: Reference) -> str:
-        return reference.human_readable
-
-    # TODO: create `format_reference_human_readable` to include `newest_version`
