@@ -45,6 +45,7 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
             created=str(datetime.now()),
             description=form_data["description"],
             enabled=False,
+            type="boefje",
             scan_level=form_data["scan_level"],
             consumes={input_object},
             produces=produces,
