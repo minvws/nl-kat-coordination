@@ -8,7 +8,7 @@ from typing import Any
 import structlog
 from opentelemetry import trace
 
-from scheduler import context, queues, rankers, storage
+from scheduler import context, queues, rankers, storage, utils
 from scheduler.connectors import listeners
 from scheduler.connectors.errors import ExternalServiceError
 from scheduler.models import (
@@ -112,7 +112,7 @@ class BoefjeScheduler(Scheduler):
         # New Boefjes
         self.run_in_thread(
             name=f"BoefjeScheduler-{self.scheduler_id}-new_boefjes",
-            target=self.push_tasks_for_new_boefjes,
+            target=self.check_new_boefjes,
             interval=60.0,
         )
 
@@ -130,6 +130,38 @@ class BoefjeScheduler(Scheduler):
             scheduler_id=self.scheduler_id,
             item_type=self.queue.item_type.__name__,
         )
+
+    def check_new_boefjes(self) -> None:
+        new_boefjes = None
+        try:
+            new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(self.organisation.id)
+        except ExternalServiceError:
+            self.logger.error(
+                "Failed to get new boefjes for organisation: %s from katalogus",
+                self.organisation.name,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+            )
+            return
+
+        if new_boefjes is None:
+            self.logger.debug(
+                "No new boefjes for organisation: %s",
+                self.organisation.name,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+            )
+            return
+
+        self.logger.debug(
+            "Received new boefjes",
+            boefjes=[boefje.name for boefje in new_boefjes],
+            organisation_id=self.organisation.id,
+            scheduler_id=self.scheduler_id,
+        )
+
+        self.push_tasks_for_new_boefjes(new_boefjes)
+        self.create_schedule_for_new_boefjes(new_boefjes)
 
     @tracer.start_as_current_span("boefje_push_tasks_for_scan_profile_mutations")
     def push_tasks_for_scan_profile_mutations(self, body: bytes) -> None:
@@ -227,37 +259,9 @@ class BoefjeScheduler(Scheduler):
                 )
 
     @tracer.start_as_current_span("boefje_push_tasks_for_new_boefjes")
-    def push_tasks_for_new_boefjes(self) -> None:
+    def push_tasks_for_new_boefjes(self, new_boefjes: list[Plugin]) -> None:
         """When new boefjes are added or enabled we find the ooi's that
         boefjes can run on, and create tasks for it."""
-        new_boefjes = None
-        try:
-            new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(self.organisation.id)
-        except ExternalServiceError:
-            self.logger.error(
-                "Failed to get new boefjes for organisation: %s from katalogus",
-                self.organisation.name,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-            )
-            return
-
-        if new_boefjes is None or not new_boefjes:
-            self.logger.debug(
-                "No new boefjes for organisation: %s",
-                self.organisation.name,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-            )
-            return
-
-        self.logger.debug(
-            "Received new boefjes",
-            boefjes=[boefje.name for boefje in new_boefjes],
-            organisation_id=self.organisation.id,
-            scheduler_id=self.scheduler_id,
-        )
-
         for boefje in new_boefjes:
             if not boefje.consumes:
                 self.logger.debug(
@@ -311,6 +315,54 @@ class BoefjeScheduler(Scheduler):
                         boefje_task,
                         self.push_tasks_for_new_boefjes.__name__,
                     )
+
+    def create_schedule_for_new_boefjes(self) -> None:
+        """When new boefjes are added or enabled we create schedules for them."""
+
+        for boefje in new_boefjes:
+            # TODO: check if boefje has a interval specified
+            interval = True  # FIXME
+            if not interval:
+                continue
+
+            # TODO:: parse interval and create cron expression
+            cron_expression = "0 0 * * *"  # FIXME
+            deadline_at = utils.cron.next_run(cron_expression)
+
+            boefje_task = BoefjeTask(
+                boefje=Boefje.parse_obj(boefje.dict()),
+                input_ooi=None,
+                organization=self.organisation.id,
+            )
+
+            schedule = Schedule(
+                scheduler_id=self.scheduler_id,
+                hash=boefje_task.hash,
+                schedule=cron_expression,
+                deadline_at=deadline_at,
+                data=boefje_task.model_dump(),
+            )
+
+            try:
+                self.ctx.datastores.schedule_store.create_schedule(schedule)
+            except storage.errors.StorageError as exc_db:
+                self.logger.error(
+                    "Could not create schedule for boefje %s",
+                    boefje.id,
+                    boefje_id=boefje.id,
+                    organisation_id=self.organisation.id,
+                    scheduler_id=self.scheduler_id,
+                    exc_info=exc_db,
+                )
+                continue
+
+            self.logger.info(
+                "Created schedule for boefje",
+                boefje_id=boefje.id,
+                schedule_id=schedule.id,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+            )
 
     @tracer.start_as_current_span("boefje_push_tasks_for_rescheduling")
     def push_tasks_for_rescheduling(self):
