@@ -60,6 +60,3 @@ class BoefjeAddForm(BaseRockyForm):
         widget=forms.Select(choices=SCAN_LEVEL.choices),
         help_text=BOEFJE_SCAN_LEVEL_HELP_TEXT,
     )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)

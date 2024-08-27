@@ -210,12 +210,7 @@ class KATalogusClientV1:
         return BytesIO(response.content)
 
     def create_plugin(self, plugin: Plugin) -> None:
-        response = self.session.post(
-            f"{self.organization_uri}/plugins",
-            headers={"Content-Type": "application/json"},
-            content=plugin.model_dump_json(exclude_none=True),
-        )
-        logger.info("Created new plugin %s", plugin.name)
+        response = self.session.post(f"{self.organization_uri}/plugins", json=plugin.model_dump(exclude_none=True))
         response.raise_for_status()
 
 

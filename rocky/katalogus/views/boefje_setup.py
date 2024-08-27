@@ -18,9 +18,6 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
     form_class = BoefjeAddForm
     permission_required = "tools.can_set_katalogus_settings"
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -33,12 +30,6 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
         ]
 
         return context
-
-    def get_form(self, form_class=None) -> BoefjeAddForm:
-        if form_class is None:
-            form_class = self.get_form_class()
-
-        return form_class(**self.get_form_kwargs())
 
     def form_valid(self, form):
         """If the form is valid, redirect to the supplied URL."""
