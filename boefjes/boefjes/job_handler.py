@@ -61,6 +61,9 @@ def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None
     for key, value in settings_from_katalogus.items:
         new_env[key] = value
 
+    # The schema, besides dictating that a boefje cannot run if it is not matched, also provides an extra safeguard:
+    # it is possible to inject code if arguments are passed that "escape" the call to a tool. Hence, we should enforce
+    # the schema somewhere and make the schema as strict as possible.
     if schema is not None:
         try:
             validate(instance=new_env, schema=schema)
