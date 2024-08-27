@@ -206,7 +206,7 @@ datamodel = Datamodel(entities=entities)
 
 
 def escape_string(string):
-    escaped_string = re.sub(r"([^a-zA-Z0-9.:/])", r"\\\1", string)
+    escaped_string = re.sub(r'(["\\])', r"\\\1", string)
     return escaped_string
 
 
@@ -318,7 +318,7 @@ class XTDBOOIRepository(OOIRepository):
             else ""
         )
 
-        order_statement = f":order-by [[_{re.escape(order_by)} :{re.escape(asc_desc)}]]"
+        order_statement = f":order-by [[_{order_by} :{asc_desc}]]"
 
         count_query = """
                 {{
@@ -840,9 +840,11 @@ class XTDBOOIRepository(OOIRepository):
         results = [
             (
                 self.simplify_keys(x[0]),
-                [self.simplify_keys(y) for y in x[0]["Report/_parent_report"]]
-                if "Report/_parent_report" in x[0]
-                else [],
+                (
+                    [self.simplify_keys(y) for y in x[0]["Report/_parent_report"]]
+                    if "Report/_parent_report" in x[0]
+                    else []
+                ),
             )
             for x in self.session.client.query(query)
         ]
