@@ -3,9 +3,9 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
+from scheduler import config, connectors, models, schedulers, storage
 from structlog.testing import capture_logs
 
-from scheduler import config, connectors, models, schedulers, storage
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -1490,6 +1490,20 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Act
+        self.scheduler.create_schedule_for_new_boefjes([boefje])
+
+        # Assert
+        schedules, _ = self.mock_ctx.datastores.schedule_store.get_schedules(self.scheduler.scheduler_id)
+        self.assertEqual(1, len(schedules))
+
+    def test_create_schedule_for_new_boefje_schedule_exists(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        # Act
+        self.scheduler.create_schedule_for_new_boefjes([boefje])
         self.scheduler.create_schedule_for_new_boefjes([boefje])
 
         # Assert
