@@ -146,6 +146,9 @@ class OOIRepository(Repository):
         only_muted,
         offset,
         limit,
+        search_string,
+        order_by,
+        asc_desc,
     ) -> Paginated[Finding]:
         raise NotImplementedError
 
