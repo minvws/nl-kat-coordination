@@ -460,7 +460,7 @@ def list_findings(
     valid_time: datetime = Depends(extract_valid_time),
     severities: set[RiskLevelSeverity] = Query(DEFAULT_SEVERITY_FILTER),
     search_string: str | None = None,
-    order_by: Literal["score"] = "score",
+    order_by: Literal["score", "finding_type"] = "score",
     asc_desc: Literal["asc", "desc"] = "desc",
 ) -> Paginated[Finding]:
     return octopoes.ooi_repository.list_findings(

@@ -730,7 +730,7 @@ class XTDBOOIRepository(OOIRepository):
         offset=DEFAULT_OFFSET,
         limit=DEFAULT_LIMIT,
         search_string: str | None = None,
-        order_by: Literal["score"] = "score",
+        order_by: Literal["score", "finding_type"] = "score",
         asc_desc: Literal["asc", "desc"] = "desc",
     ) -> Paginated[Finding]:
         # clause to find risk_severity
@@ -789,7 +789,7 @@ class XTDBOOIRepository(OOIRepository):
         finding_query = f"""
             {{
                 :query {{
-                    :find [(pull ?finding [*]) ?score]
+                    :find [(pull ?finding [*]) ?score ?finding_type]
                     :in [[severities_ ...]]
                     :where [[?finding :object_type "Finding"]
                             [?finding :Finding/finding_type ?finding_type]

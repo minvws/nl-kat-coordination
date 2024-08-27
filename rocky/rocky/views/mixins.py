@@ -279,7 +279,7 @@ class FindingList:
         exclude_muted: bool = True,
         only_muted: bool = False,
         search_string: str | None = None,
-        order_by: Literal["score"] = "score",
+        order_by: Literal["score", "finding_type"] = "score",
         asc_desc: Literal["asc", "desc"] = "desc",
     ):
         self.octopoes_connector = octopoes_connector
