@@ -3,8 +3,18 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field
 
 
+class ScheduleCreate(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    scheduler_id: str
+
+    data: dict
+
+    schedule: str
+
+
 # NOTE: model added for support of partial updates
-class Schedule(BaseModel):
+class SchedulePatch(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     hash: str | None = Field(None, max_length=32)
