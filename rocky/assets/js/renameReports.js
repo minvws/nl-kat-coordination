@@ -1,6 +1,36 @@
 import { onDomReady } from "../js/imports/utils.js";
 
-onDomReady(initResetButtons);
+onDomReady(initRenameReports);
+
+function initRenameReports() {
+  initResetButtons();
+
+  const table = document.getElementById("report-name-table");
+  if (!table) return;
+
+  table.addEventListener("click", function (event) {
+    if (!event.target.matches(".reset-button")) return;
+    event.stopPropagation();
+    const button = event.target;
+    const input = button.closest("tr")?.querySelector(".name-input");
+    if (!input) return;
+    input.value = input.defaultvalue;
+    button.classList.add("hidden");
+  });
+
+  table.addEventListener("change", function (event) {
+    if (!event.target.matches(".name-input")) return;
+    event.stopPropagation();
+    const input = event.target;
+    const button = input.closest("tr")?.querySelector(".reset-button");
+    if (!button) return;
+    if (input.defaultValue === input.value) {
+      button.classList.add("hidden");
+    } else {
+      button.classList.remove("hidden");
+    }
+  });
+}
 
 function initResetButtons() {
   const resetButtons = document.querySelectorAll(".reset-button");
@@ -12,28 +42,5 @@ function initResetButtons() {
     if (!input) return;
 
     input.defaultvalue = input.value;
-
-    button.addEventListener("click", function (event) {
-      input.value = input.defaultvalue;
-      button.classList.add("hidden");
-    });
-  });
-
-  watchInputChanges();
-}
-
-function watchInputChanges() {
-  const nameInputs = document.querySelectorAll(".name-input");
-
-  nameInputs.forEach((input) => {
-    input.addEventListener("change", function (event) {
-      let button = input.closest("tr").querySelector(".reset-button");
-
-      if (input.defaultvalue === input.value) {
-        button.classList.add("hidden");
-      } else {
-        button.classList.remove("hidden");
-      }
-    });
   });
 }
