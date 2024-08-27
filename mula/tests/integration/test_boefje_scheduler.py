@@ -1483,6 +1483,19 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
         self.assertEqual(1, self.scheduler.queue.qsize())
 
+    def test_create_schedule_for_new_boefjes(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        # Act
+        self.scheduler.create_schedule_for_new_boefjes([boefje])
+
+        # Assert
+        schedules, _ = self.mock_ctx.datastores.schedule_store.get_schedules(self.scheduler.scheduler_id)
+        self.assertEqual(1, len(schedules))
+
 
 class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
     def setUp(self):

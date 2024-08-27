@@ -19,6 +19,7 @@ from scheduler.models import (
     Organisation,
     Plugin,
     ScanProfileMutation,
+    Schedule,
     Task,
     TaskStatus,
 )
@@ -316,7 +317,7 @@ class BoefjeScheduler(Scheduler):
                         self.push_tasks_for_new_boefjes.__name__,
                     )
 
-    def create_schedule_for_new_boefjes(self) -> None:
+    def create_schedule_for_new_boefjes(self, new_boefjes: list[Plugin]) -> None:
         """When new boefjes are added or enabled we create schedules for them."""
 
         for boefje in new_boefjes:
