@@ -3,8 +3,6 @@ import { onDomReady } from "../js/imports/utils.js";
 onDomReady(initRenameReports);
 
 function initRenameReports() {
-  initResetButtons();
-
   const table = document.getElementById("report-name-table");
   if (!table) return;
 
@@ -14,7 +12,7 @@ function initRenameReports() {
     const button = event.target;
     const input = button.closest("tr")?.querySelector(".name-input");
     if (!input) return;
-    input.value = input.defaultvalue;
+    input.value = input.defaultValue;
     button.classList.add("hidden");
   });
 
@@ -29,18 +27,5 @@ function initRenameReports() {
     } else {
       button.classList.remove("hidden");
     }
-  });
-}
-
-function initResetButtons() {
-  const resetButtons = document.querySelectorAll(".reset-button");
-
-  resetButtons.forEach((button) => {
-    button.classList.add("hidden");
-
-    let input = button.closest("tr")?.querySelector(".name-input");
-    if (!input) return;
-
-    input.defaultvalue = input.value;
   });
 }
