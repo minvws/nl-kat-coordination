@@ -459,6 +459,9 @@ def list_findings(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     severities: set[RiskLevelSeverity] = Query(DEFAULT_SEVERITY_FILTER),
+    search_string: str | None = None,
+    order_by: Literal["severity"] = "severity",
+    asc_desc: Literal["asc", "desc"] = "asc",
 ) -> Paginated[Finding]:
     return octopoes.ooi_repository.list_findings(
         severities,
@@ -467,6 +470,9 @@ def list_findings(
         only_muted,
         offset,
         limit,
+        search_string,
+        order_by,
+        asc_desc,
     )
 
 

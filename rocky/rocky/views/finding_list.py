@@ -6,7 +6,7 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 from tools.forms.base import ObservedAtForm
-from tools.forms.findings import FindingSeverityMultiSelectForm, MutedFindingSelectionForm
+from tools.forms.findings import FindingSearchForm, FindingSeverityMultiSelectForm, MutedFindingSelectionForm
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models.ooi.findings import RiskLevelSeverity
@@ -60,6 +60,8 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         self.exclude_muted = self.muted_findings == "non-muted"
         self.only_muted = self.muted_findings == "muted"
 
+        self.search_string = request.GET.get("search", "")
+
     def get_queryset(self) -> FindingList:
         return FindingList(
             octopoes_connector=self.octopoes_api_connector,
@@ -67,6 +69,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
             severities=self.severities,
             exclude_muted=self.exclude_muted,
             only_muted=self.only_muted,
+            search_string=self.search_string,
         )
 
     def get_context_data(self, **kwargs):
@@ -75,6 +78,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         context["valid_time"] = self.observed_at
         context["severity_filter"] = FindingSeverityMultiSelectForm({"severity": list(self.severities)})
         context["muted_findings_filter"] = MutedFindingSelectionForm({"muted_findings": self.muted_findings})
+        context["finding_search_form"] = FindingSearchForm(self.request.GET)
         context["only_muted"] = self.only_muted
         return context
 

@@ -265,15 +265,23 @@ class OctopoesAPIConnector:
         only_muted: bool = False,
         offset: int = DEFAULT_OFFSET,
         limit: int = DEFAULT_LIMIT,
+        search_string: str | None = None,
+        order_by: Literal["severity"] = "severity",
+        asc_desc: Literal["asc", "desc"] = "asc",
     ) -> Paginated[Finding]:
-        params: dict[str, str | int | list[str]] = {
+        params: dict[str, str | int | list[str] | None] = {
             "valid_time": str(valid_time),
             "offset": offset,
             "limit": limit,
             "severities": [s.value for s in severities],
             "exclude_muted": exclude_muted,
             "only_muted": only_muted,
+            "search_string": search_string,
+            "order_by": order_by,
+            "asc_desc": asc_desc,
         }
+
+        params = {k: v for k, v in params.items() if v is not None}  # filter out None values
         res = self.session.get(f"/{self.client}/findings", params=params)
         return TypeAdapter(Paginated[Finding]).validate_json(res.content)
 
