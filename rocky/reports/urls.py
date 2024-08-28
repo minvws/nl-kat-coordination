@@ -1,6 +1,7 @@
 from django.urls import path
 
 from reports.views.aggregate_report import (
+    ExportSetupAggregateReportView,
     LandingAggregateReportView,
     OOISelectionAggregateReportView,
     ReportTypesSelectionAggregateReportView,
@@ -9,6 +10,7 @@ from reports.views.aggregate_report import (
 )
 from reports.views.base import ReportsLandingView, ViewReportPDFView, ViewReportView
 from reports.views.generate_report import (
+    ExportSetupGenerateReportView,
     LandingGenerateReportView,
     LocationReportView,
     OOISelectionGenerateReportView,
@@ -17,6 +19,7 @@ from reports.views.generate_report import (
     SetupScanGenerateReportView,
 )
 from reports.views.multi_report import (
+    ExportSetupMultiReportView,
     LandingMultiReportView,
     MultiReportPDFView,
     MultiReportView,
@@ -50,6 +53,7 @@ urlpatterns += [
         name="generate_report_select_report_types",
     ),
     path("generate-report/setup-scan/", SetupScanGenerateReportView.as_view(), name="generate_report_setup_scan"),
+    path("generate-report/export-setup/", ExportSetupGenerateReportView.as_view(), name="generate_report_export_setup"),
     path("generate-report/view/", SaveGenerateReportView.as_view(), name="generate_report_view"),
 ]
 
@@ -65,6 +69,9 @@ urlpatterns += [
         name="aggregate_report_select_report_types",
     ),
     path("aggregate-report/setup-scan/", SetupScanAggregateReportView.as_view(), name="aggregate_report_setup_scan"),
+    path(
+        "aggregate-report/export-setup/", ExportSetupAggregateReportView.as_view(), name="aggregate_report_export_setup"
+    ),
     path("aggregate-report/view/", SaveAggregateReportView.as_view(), name="aggregate_report_save"),
 ]
 
@@ -78,6 +85,7 @@ urlpatterns += [
         name="multi_report_select_report_types",
     ),
     path("multi-report/setup-scan/", SetupScanMultiReportView.as_view(), name="multi_report_setup_scan"),
+    path("multi-report/export-setup/", ExportSetupMultiReportView.as_view(), name="multi_report_export_setup"),
     path("multi-report/view/", MultiReportView.as_view(), name="multi_report_view"),
     path("multi-report/view/pdf/", MultiReportPDFView.as_view(), name="multi_report_pdf"),
 ]

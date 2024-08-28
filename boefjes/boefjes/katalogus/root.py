@@ -5,6 +5,7 @@ from typing import Any
 import structlog
 from fastapi import APIRouter, FastAPI, Request, status
 from fastapi.responses import JSONResponse, RedirectResponse
+from jsonschema.exceptions import SchemaError
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
@@ -31,8 +32,12 @@ structlog.configure(
         structlog.processors.StackInfoRenderer(),
         structlog.dev.set_exc_info,
         structlog.stdlib.PositionalArgumentsFormatter(),
-        structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S", utc=False),
-        structlog.dev.ConsoleRenderer(),
+        structlog.processors.TimeStamper("iso", utc=False),
+        (
+            structlog.dev.ConsoleRenderer(pad_level=False)
+            if settings.logging_format == "text"
+            else structlog.processors.JSONRenderer()
+        ),
     ],
     context_class=dict,
     logger_factory=structlog.stdlib.LoggerFactory(),
@@ -89,6 +94,14 @@ def storage_error_handler(request: Request, exc: StorageError):
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={"message": exc.message},
+    )
+
+
+@app.exception_handler(SchemaError)
+def schema_error_handler(request: Request, exc: StorageError):
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={"message": "Invalid jsonschema provided"},
     )
 
 

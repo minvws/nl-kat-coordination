@@ -91,11 +91,13 @@ repos:
           - httpx
           - types-python-dateutil
           - types-requests
+          - types-croniter
         exclude: |
           (?x)(
           ^boefjes/tools |
           ^keiko/templates |
           ^mula/whitelist\.py$ |
+          ^mula/scripts |
           ^octopoes/tools |
           ^rocky/whitelist\.py$ |
           /tests/ |
@@ -108,7 +110,7 @@ repos:
     hooks:
       - id: codespell
         additional_dependencies: ["tomli"]
-        args: [-L, lama]
+        args: ["-L", "lama", "--ignore-regex", ".{1024}|.*codespell-ignore.*"]
         exclude: |
           (?x)(
           \.po$ |

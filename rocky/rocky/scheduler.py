@@ -5,7 +5,6 @@ import json
 import uuid
 from enum import Enum
 from functools import cached_property
-from logging import getLogger
 from typing import Any
 
 import httpx
@@ -15,8 +14,6 @@ from httpx import ConnectError, HTTPError, HTTPStatusError, RequestError, codes
 from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny, ValidationError
 
 from rocky.health import ServiceHealth
-
-logger = getLogger(__name__)
 
 
 class Boefje(BaseModel):
@@ -66,54 +63,61 @@ class NormalizerMeta(BaseModel):
 class NormalizerTask(BaseModel):
     """NormalizerTask represent data needed for a Normalizer to run."""
 
+    type: str = "normalizer"
+
     id: uuid.UUID | None = None
     normalizer: Normalizer
     raw_data: RawData
-    type: str = "normalizer"
 
 
 class BoefjeTask(BaseModel):
     """BoefjeTask represent data needed for a Boefje to run."""
 
+    type: str = "boefje"
+
     id: uuid.UUID | None = None
     boefje: Boefje
     input_ooi: str | None = None
     organization: str
-    type: str = "boefje"
-
-
-class PrioritizedItem(BaseModel):
-    """Representation of a queue.PrioritizedItem on the priority queue. Used
-    for unmarshalling of priority queue prioritized items to a JSON
-    representation.
-    """
-
-    id: uuid.UUID | None = None
-    hash: str | None = None
-    priority: int
-    data: SerializeAsAny[BoefjeTask | NormalizerTask]
 
 
 class TaskStatus(Enum):
-    """Status of a task."""
-
+    # Task has been created but not yet queued
     PENDING = "pending"
+
+    # Task has been pushed onto queue and is ready to be picked up
     QUEUED = "queued"
+
+    # Task has been picked up by a worker
     DISPATCHED = "dispatched"
+
+    # Task has been picked up by a worker, and the worker indicates that it is
+    # running.
     RUNNING = "running"
+
+    # Task has been completed
     COMPLETED = "completed"
+
+    # Task has failed
     FAILED = "failed"
+
+    # Task has been cancelled
+    CANCELLED = "cancelled"
 
 
 class Task(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: uuid.UUID | None = None
     scheduler_id: str
-    type: str
-    p_item: PrioritizedItem
-    status: TaskStatus
-    created_at: datetime.datetime
-    modified_at: datetime.datetime
-    model_config = ConfigDict(from_attributes=True)
+    schedule_id: str | None = None
+    priority: int
+    status: TaskStatus | None = TaskStatus.PENDING
+    type: str | None = None
+    hash: str | None = None
+    data: SerializeAsAny[BoefjeTask | NormalizerTask]
+    created_at: datetime.datetime | None = None
+    modified_at: datetime.datetime | None = None
 
 
 class PaginatedTasksResponse(BaseModel):
@@ -234,9 +238,9 @@ class SchedulerClient:
             task_details = Task.model_validate_json(res.content)
 
             if task_details.type == "normalizer":
-                organization = task_details.p_item.data.raw_data.boefje_meta.organization
+                organization = task_details.data.raw_data.boefje_meta.organization
             else:
-                organization = task_details.p_item.data.organization
+                organization = task_details.data.organization
 
             if organization != self.organization_code:
                 raise SchedulerTaskNotFound()
@@ -245,12 +249,12 @@ class SchedulerClient:
         except ConnectError:
             raise SchedulerConnectError()
 
-    def push_task(self, prioritized_item: PrioritizedItem) -> None:
+    def push_task(self, item: Task) -> None:
         try:
-            queue_name = f"{prioritized_item.data.type}-{self.organization_code}"
+            queue_name = f"{item.data.type}-{self.organization_code}"
             res = self._client.post(
                 f"/queues/{queue_name}/push",
-                content=prioritized_item.json(),
+                content=item.json(exclude_none=True),
                 headers={"Content-Type": "application/json"},
             )
             res.raise_for_status()

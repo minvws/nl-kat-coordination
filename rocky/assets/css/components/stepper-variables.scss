@@ -48,7 +48,7 @@
     --list-item-completed-opacity
   );
   --list-item-completed-above-breakpoint-border-top: 2px solid
-    var(--colors-purrple-8);
+    var(--colors-purrple-500);
   --list-item-completed-above-breakpoint-margin-top: -2px; /* Compensating for the active top border */
 
   /* Icon between stepper items */
@@ -64,7 +64,7 @@
   --stepper-item-current-icon-font-family: tabler-icons;
   --stepper-item-current-icon-display: block;
   --stepper-item-current-icon-font-weight: 400;
-  --stepper-item-current-icon-color: var(--colors-purrple-8);
+  --stepper-item-current-icon-color: var(--colors-purrple-500);
   --stepper-item-current-icon-position: absolute;
   --stepper-item-current-icon-top: -0.875rem; /* Half the size of the icon */
   --stepper-item-current-icon-bottom: auto;

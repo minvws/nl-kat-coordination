@@ -1,72 +1,16 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "FastAPI",
+    "title": "Scheduler",
+    "description": "Scheduler API",
     "version": "0.1.0"
   },
   "paths": {
-    "/": {
-      "get": {
-        "summary": "Root",
-        "description": "Root endpoint",
-        "operationId": "root__get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "title": "Response Root  Get"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/health": {
-      "get": {
-        "summary": "Health",
-        "description": "Health check endpoint",
-        "operationId": "health_health_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceHealth"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/metrics": {
-      "get": {
-        "summary": "Metrics",
-        "description": "OpenMetrics compliant metrics endpoint",
-        "operationId": "metrics_metrics_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "title": "Response Metrics Metrics Get"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/schedulers": {
       "get": {
-        "summary": "Get Schedulers",
+        "summary": "List",
         "description": "List all schedulers",
-        "operationId": "get_schedulers_schedulers_get",
+        "operationId": "list_schedulers_get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -74,10 +18,10 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/Scheduler-Output"
+                    "$ref": "#/components/schemas/Scheduler"
                   },
                   "type": "array",
-                  "title": "Response Get Schedulers Schedulers Get"
+                  "title": "Response List Schedulers Get"
                 }
               }
             }
@@ -87,9 +31,9 @@
     },
     "/schedulers/{scheduler_id}": {
       "get": {
-        "summary": "Get Scheduler",
+        "summary": "Get",
         "description": "Get a scheduler",
-        "operationId": "get_scheduler_schedulers__scheduler_id__get",
+        "operationId": "get_schedulers__scheduler_id__get",
         "parameters": [
           {
             "name": "scheduler_id",
@@ -107,7 +51,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Scheduler-Output"
+                  "$ref": "#/components/schemas/Scheduler"
                 }
               }
             }
@@ -125,9 +69,9 @@
         }
       },
       "patch": {
-        "summary": "Patch Scheduler",
+        "summary": "Patch",
         "description": "Update a scheduler",
-        "operationId": "patch_scheduler_schedulers__scheduler_id__patch",
+        "operationId": "patch_schedulers__scheduler_id__patch",
         "parameters": [
           {
             "name": "scheduler_id",
@@ -144,7 +88,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Scheduler-Input"
+                "$ref": "#/components/schemas/Scheduler"
               }
             }
           }
@@ -155,7 +99,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Scheduler-Output"
+                  "$ref": "#/components/schemas/Scheduler"
                 }
               }
             }
@@ -173,30 +117,200 @@
         }
       }
     },
-    "/schedulers/{scheduler_id}/tasks": {
+    "/queues": {
       "get": {
-        "summary": "List Tasks",
-        "description": "List all tasks for a scheduler",
-        "operationId": "list_tasks_schedulers__scheduler_id__tasks_get",
+        "summary": "List",
+        "description": "List all queues",
+        "operationId": "list_queues_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Queue"
+                  },
+                  "type": "array",
+                  "title": "Response List Queues Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/queues/{queue_id}": {
+      "get": {
+        "summary": "Get",
+        "description": "Get a queue",
+        "operationId": "get_queues__queue_id__get",
         "parameters": [
           {
-            "name": "scheduler_id",
+            "name": "queue_id",
             "in": "path",
             "required": true,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
+              "type": "string",
+              "title": "Queue Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Queue"
                 }
-              ],
-              "title": "Scheduler Id"
+              }
             }
           },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/queues/{queue_id}/pop": {
+      "post": {
+        "summary": "Pop",
+        "description": "Pop an item from a queue",
+        "operationId": "pop_queues__queue_id__pop_post",
+        "parameters": [
           {
-            "name": "task_type",
+            "name": "queue_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Queue Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/FilterRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Filters"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Task-Output"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Pop Queues  Queue Id  Pop Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/queues/{queue_id}/push": {
+      "post": {
+        "summary": "Push",
+        "description": "Push an item to a queue",
+        "operationId": "push_queues__queue_id__push_post",
+        "parameters": [
+          {
+            "name": "queue_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Queue Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Task-Input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Task-Output"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Push Queues  Queue Id  Push Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/schedules": {
+      "get": {
+        "summary": "List",
+        "description": "List all schedules",
+        "operationId": "list_schedules_get",
+        "parameters": [
+          {
+            "name": "schedule_hash",
             "in": "query",
             "required": false,
             "schema": {
@@ -208,23 +322,23 @@
                   "type": "null"
                 }
               ],
-              "title": "Task Type"
+              "title": "Schedule Hash"
             }
           },
           {
-            "name": "status",
+            "name": "enabled",
             "in": "query",
             "required": false,
             "schema": {
               "anyOf": [
                 {
-                  "type": "string"
+                  "type": "boolean"
                 },
                 {
                   "type": "null"
                 }
               ],
-              "title": "Status"
+              "title": "Enabled"
             }
           },
           {
@@ -245,6 +359,40 @@
               "type": "integer",
               "default": 10,
               "title": "Limit"
+            }
+          },
+          {
+            "name": "min_deadline_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Min Deadline At"
+            }
+          },
+          {
+            "name": "max_deadline_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Max Deadline At"
             }
           },
           {
@@ -280,53 +428,131 @@
               ],
               "title": "Max Created At"
             }
-          },
-          {
-            "name": "input_ooi",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse"
                 }
-              ],
-              "title": "Input Ooi"
+              }
             }
           },
-          {
-            "name": "plugin_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
-              ],
-              "title": "Plugin Id"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create",
+        "description": "Create a schedule",
+        "operationId": "create_schedules_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Schedule"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/schedules/{schedule_id}": {
+      "get": {
+        "summary": "Get",
+        "description": "Get a schedule",
+        "operationId": "get_schedules__schedule_id__get",
+        "parameters": [
+          {
+            "name": "schedule_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Schedule Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Schedule"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Patch",
+        "description": "Update a schedule",
+        "operationId": "patch_schedules__schedule_id__patch",
+        "parameters": [
+          {
+            "name": "schedule_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Schedule Id"
             }
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "anyOf": [
-                  {
-                    "$ref": "#/components/schemas/FilterRequest"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "title": "Filters"
+                "$ref": "#/components/schemas/SchedulePatch"
               }
             }
           }
@@ -337,7 +563,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedResponse"
+                  "$ref": "#/components/schemas/Schedule"
                 }
               }
             }
@@ -357,9 +583,9 @@
     },
     "/tasks": {
       "post": {
-        "summary": "List Tasks",
+        "summary": "List",
         "description": "List all tasks",
-        "operationId": "list_tasks_tasks_post",
+        "operationId": "list_tasks_post",
         "parameters": [
           {
             "name": "scheduler_id",
@@ -537,9 +763,9 @@
         }
       },
       "get": {
-        "summary": "List Tasks",
+        "summary": "List",
         "description": "List all tasks",
-        "operationId": "list_tasks_tasks_post",
+        "operationId": "list_tasks_post",
         "parameters": [
           {
             "name": "scheduler_id",
@@ -719,9 +945,9 @@
     },
     "/tasks/stats": {
       "get": {
-        "summary": "Get Task Stats",
+        "summary": "Stats",
         "description": "Get task status counts for all schedulers in last 24 hours",
-        "operationId": "get_task_stats_tasks_stats_get",
+        "operationId": "stats_tasks_stats_get",
         "parameters": [
           {
             "name": "scheduler_id",
@@ -760,7 +986,7 @@
                       "type": "null"
                     }
                   ],
-                  "title": "Response Get Task Stats Tasks Stats Get"
+                  "title": "Response Stats Tasks Stats Get"
                 }
               }
             }
@@ -780,9 +1006,9 @@
     },
     "/tasks/stats/{scheduler_id}": {
       "get": {
-        "summary": "Get Task Stats",
+        "summary": "Stats",
         "description": "Get task status counts for a scheduler in last 24 hours",
-        "operationId": "get_task_stats_tasks_stats__scheduler_id__get",
+        "operationId": "stats_tasks_stats__scheduler_id__get",
         "parameters": [
           {
             "name": "scheduler_id",
@@ -821,7 +1047,7 @@
                       "type": "null"
                     }
                   ],
-                  "title": "Response Get Task Stats Tasks Stats  Scheduler Id  Get"
+                  "title": "Response Stats Tasks Stats  Scheduler Id  Get"
                 }
               }
             }
@@ -841,9 +1067,9 @@
     },
     "/tasks/{task_id}": {
       "get": {
-        "summary": "Get Task",
+        "summary": "Get",
         "description": "Get a task",
-        "operationId": "get_task_tasks__task_id__get",
+        "operationId": "get_tasks__task_id__get",
         "parameters": [
           {
             "name": "task_id",
@@ -851,6 +1077,7 @@
             "required": true,
             "schema": {
               "type": "string",
+              "format": "uuid",
               "title": "Task Id"
             }
           }
@@ -861,7 +1088,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Task"
+                  "$ref": "#/components/schemas/Task-Output"
                 }
               }
             }
@@ -879,9 +1106,9 @@
         }
       },
       "patch": {
-        "summary": "Patch Task",
+        "summary": "Patch",
         "description": "Update a task",
-        "operationId": "patch_task_tasks__task_id__patch",
+        "operationId": "patch_tasks__task_id__patch",
         "parameters": [
           {
             "name": "task_id",
@@ -889,6 +1116,7 @@
             "required": true,
             "schema": {
               "type": "string",
+              "format": "uuid",
               "title": "Task Id"
             }
           }
@@ -898,8 +1126,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "title": "Item"
+                "$ref": "#/components/schemas/Task-Input"
               }
             }
           }
@@ -910,7 +1137,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Task"
+                  "$ref": "#/components/schemas/Task-Output"
                 }
               }
             }
@@ -928,22 +1155,18 @@
         }
       }
     },
-    "/queues": {
+    "/metrics": {
       "get": {
-        "summary": "Get Queues",
-        "description": "List all queues",
-        "operationId": "get_queues_queues_get",
+        "summary": "Metrics",
+        "description": "OpenMetrics compliant metrics endpoint",
+        "operationId": "metrics_metrics_get",
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/Queue"
-                  },
-                  "type": "array",
-                  "title": "Response Get Queues Queues Get"
+                  "title": "Response Metrics Metrics Get"
                 }
               }
             }
@@ -951,19 +1174,20 @@
         }
       }
     },
-    "/queues/{queue_id}": {
+    "/health": {
       "get": {
-        "summary": "Get Queue",
-        "description": "Get a queue",
-        "operationId": "get_queue_queues__queue_id__get",
+        "summary": "Health",
+        "description": "Health check endpoint",
+        "operationId": "health_health_get",
         "parameters": [
           {
-            "name": "queue_id",
-            "in": "path",
-            "required": true,
+            "name": "externals",
+            "in": "query",
+            "required": false,
             "schema": {
-              "type": "string",
-              "title": "Queue Id"
+              "type": "boolean",
+              "default": false,
+              "title": "Externals"
             }
           }
         ],
@@ -973,7 +1197,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Queue"
+                  "$ref": "#/components/schemas/ServiceHealth"
                 }
               }
             }
@@ -991,114 +1215,18 @@
         }
       }
     },
-    "/queues/{queue_id}/pop": {
-      "post": {
-        "summary": "Pop Queue",
-        "description": "Pop an item from a queue",
-        "operationId": "pop_queue_queues__queue_id__pop_post",
-        "parameters": [
-          {
-            "name": "queue_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Queue Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "anyOf": [
-                  {
-                    "$ref": "#/components/schemas/FilterRequest"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "title": "Filters"
-              }
-            }
-          }
-        },
+    "/": {
+      "get": {
+        "summary": "Root",
+        "description": "Root endpoint",
+        "operationId": "root__get",
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/PrioritizedItem-Output"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "Response Pop Queue Queues  Queue Id  Pop Post"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/queues/{queue_id}/push": {
-      "post": {
-        "summary": "Push Queue",
-        "description": "Push an item to a queue",
-        "operationId": "push_queue_queues__queue_id__push_post",
-        "parameters": [
-          {
-            "name": "queue_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Queue Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PrioritizedItem-Input"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "title": "Response Push Queue Queues  Queue Id  Push Post"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "title": "Response Root  Get"
                 }
               }
             }
@@ -1177,6 +1305,10 @@
                 "type": "boolean"
               },
               {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
                 "items": {
                   "type": "string"
                 },
@@ -1197,6 +1329,13 @@
               {
                 "items": {
                   "type": "boolean"
+                },
+                "type": "array"
+              },
+              {
+                "items": {
+                  "type": "string",
+                  "format": "date-time"
                 },
                 "type": "array"
               },
@@ -1308,139 +1447,6 @@
         ],
         "title": "PaginatedResponse"
       },
-      "PrioritizedItem-Input": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "scheduler_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Scheduler Id"
-          },
-          "hash": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 32
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Hash"
-          },
-          "priority": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Priority"
-          },
-          "data": {
-            "type": "object",
-            "title": "Data"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Created At"
-          },
-          "modified_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Modified At"
-          }
-        },
-        "type": "object",
-        "required": [
-          "priority",
-          "data"
-        ],
-        "title": "PrioritizedItem",
-        "description": "Representation of an queue.PrioritizedItem on the priority queue. Used\nfor unmarshalling of priority queue prioritized items to a JSON\nrepresentation."
-      },
-      "PrioritizedItem-Output": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "scheduler_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Scheduler Id"
-          },
-          "hash": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 32
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Hash"
-          },
-          "priority": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Priority"
-          },
-          "data": {
-            "type": "object",
-            "title": "Data"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Created At"
-          },
-          "modified_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Modified At"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "scheduler_id",
-          "hash",
-          "priority",
-          "data",
-          "created_at",
-          "modified_at"
-        ],
-        "title": "PrioritizedItem",
-        "description": "Representation of an queue.PrioritizedItem on the priority queue. Used\nfor unmarshalling of priority queue prioritized items to a JSON\nrepresentation."
-      },
       "Queue": {
         "properties": {
           "id": {
@@ -1475,7 +1481,7 @@
             "anyOf": [
               {
                 "items": {
-                  "$ref": "#/components/schemas/PrioritizedItem-Output"
+                  "$ref": "#/components/schemas/Task-Output"
                 },
                 "type": "array"
               },
@@ -1494,36 +1500,34 @@
           "item_type",
           "allow_replace",
           "allow_updates",
-          "allow_priority_updates",
-          "pq"
+          "allow_priority_updates"
         ],
         "title": "Queue"
       },
-      "Scheduler-Input": {
+      "Schedule": {
         "properties": {
           "id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "type": "string",
+            "format": "uuid",
             "title": "Id"
           },
-          "enabled": {
+          "scheduler_id": {
+            "type": "string",
+            "title": "Scheduler Id"
+          },
+          "hash": {
             "anyOf": [
               {
-                "type": "boolean"
+                "type": "string",
+                "maxLength": 32
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Enabled"
+            "title": "Hash"
           },
-          "priority_queue": {
+          "data": {
             "anyOf": [
               {
                 "type": "object"
@@ -1532,16 +1536,14 @@
                 "type": "null"
               }
             ],
-            "title": "Priority Queue"
-          }
-        },
-        "type": "object",
-        "title": "Scheduler",
-        "description": "Representation of a schedulers.Scheduler instance. Used for\nunmarshalling of schedulers to a JSON representation."
-      },
-      "Scheduler-Output": {
-        "properties": {
-          "id": {
+            "title": "Data"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": true
+          },
+          "schedule": {
             "anyOf": [
               {
                 "type": "string"
@@ -1550,37 +1552,180 @@
                 "type": "null"
               }
             ],
-            "title": "Id"
+            "title": "Schedule"
           },
-          "enabled": {
+          "tasks": {
+            "items": {
+              "$ref": "#/components/schemas/Task-Output"
+            },
+            "type": "array",
+            "title": "Tasks",
+            "default": []
+          },
+          "deadline_at": {
             "anyOf": [
               {
-                "type": "boolean"
+                "type": "string",
+                "format": "date-time"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Enabled"
+            "title": "Deadline At"
           },
-          "priority_queue": {
-            "anyOf": [
-              {
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Priority Queue"
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "modified_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Modified At"
           }
         },
         "type": "object",
         "required": [
-          "id",
-          "enabled",
-          "priority_queue"
+          "scheduler_id"
         ],
+        "title": "Schedule"
+      },
+      "ScheduleCreate": {
+        "properties": {
+          "scheduler_id": {
+            "type": "string",
+            "title": "Scheduler Id"
+          },
+          "data": {
+            "type": "object",
+            "title": "Data"
+          },
+          "schedule": {
+            "type": "string",
+            "title": "Schedule"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scheduler_id",
+          "data",
+          "schedule"
+        ],
+        "title": "ScheduleCreate"
+      },
+      "SchedulePatch": {
+        "properties": {
+          "hash": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 32
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hash"
+          },
+          "data": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
+          },
+          "enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enabled"
+          },
+          "schedule": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schedule"
+          },
+          "deadline_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline At"
+          }
+        },
+        "type": "object",
+        "title": "SchedulePatch"
+      },
+      "Scheduler": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enabled"
+          },
+          "priority_queue": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Priority Queue"
+          },
+          "last_activity": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Activity"
+          }
+        },
+        "type": "object",
         "title": "Scheduler",
         "description": "Representation of a schedulers.Scheduler instance. Used for\nunmarshalling of schedulers to a JSON representation."
       },
@@ -1614,8 +1759,7 @@
               "$ref": "#/components/schemas/ServiceHealth"
             },
             "type": "array",
-            "title": "Results",
-            "default": []
+            "title": "Results"
           },
           "externals": {
             "additionalProperties": {
@@ -1628,17 +1772,131 @@
         },
         "type": "object",
         "required": [
-          "service",
-          "healthy",
-          "version",
-          "additional",
-          "results",
-          "externals"
+          "service"
         ],
         "title": "ServiceHealth",
         "description": "ServiceHealth is used as response model for health check in the\nserver.Server for the health endpoint."
       },
-      "Task": {
+      "Task-Input": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "scheduler_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scheduler Id"
+          },
+          "schedule_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schedule Id"
+          },
+          "priority": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Priority"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TaskStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type"
+          },
+          "hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hash"
+          },
+          "data": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "modified_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Modified At"
+          }
+        },
+        "type": "object",
+        "title": "Task"
+      },
+      "Task-Output": {
         "properties": {
           "id": {
             "type": "string",
@@ -1646,18 +1904,81 @@
             "title": "Id"
           },
           "scheduler_id": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Scheduler Id"
           },
-          "type": {
-            "type": "string",
-            "title": "Type"
+          "schedule_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schedule Id"
           },
-          "p_item": {
-            "$ref": "#/components/schemas/PrioritizedItem-Output"
+          "priority": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Priority",
+            "default": 0
           },
           "status": {
-            "$ref": "#/components/schemas/TaskStatus"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TaskStatus"
+              }
+            ],
+            "default": "pending"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type"
+          },
+          "hash": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 32
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hash"
+          },
+          "data": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
           },
           "created_at": {
             "type": "string",
@@ -1671,15 +1992,6 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "scheduler_id",
-          "type",
-          "p_item",
-          "status",
-          "created_at",
-          "modified_at"
-        ],
         "title": "Task"
       },
       "TaskStatus": {

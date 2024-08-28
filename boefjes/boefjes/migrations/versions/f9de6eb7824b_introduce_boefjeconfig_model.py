@@ -10,11 +10,12 @@ import logging
 
 import sqlalchemy as sa
 from alembic import op
-from sqlalchemy.orm import sessionmaker
+from psycopg2._json import Json
+from psycopg2.extensions import register_adapter
+from psycopg2.extras import execute_values
 
 from boefjes.local_repository import get_local_repository
-from boefjes.sql.plugin_storage import create_plugin_storage
-from boefjes.storage.interfaces import PluginNotFound
+from boefjes.models import Boefje, Normalizer
 
 # revision identifiers, used by Alembic.
 revision = "f9de6eb7824b"
@@ -57,72 +58,136 @@ def upgrade() -> None:
     op.add_column("boefje", sa.Column("static", sa.Boolean(), server_default="false", nullable=False))
     op.add_column("normalizer", sa.Column("static", sa.Boolean(), server_default="false", nullable=False))
 
+    register_adapter(dict, Json)
+
     local_plugins = {plugin.id: plugin for plugin in get_local_repository().get_all()}
     connection = op.get_bind()
-    session = sessionmaker(bind=connection)()
 
-    with create_plugin_storage(session) as storage:
-        # Get unique plugin_ids from the settings table for boefjes that do not exist yet in the database
-        query = """
-        SELECT DISTINCT s.plugin_id FROM settings s left join boefje b on b.plugin_id = s.plugin_id
-            where b.plugin_id IS NULL
-        """
-        for plugin_id_output in op.get_bind().execute(query).fetchall():
-            plugin_id = plugin_id_output[0]
-            if plugin_id not in local_plugins:
-                raise ValueError(f"Invalid plugin id found: {plugin_id}")
+    # Get unique plugin_ids from the settings table for boefjes that do not exist yet in the database
+    query = """
+    SELECT DISTINCT s.plugin_id FROM settings s left join boefje b on b.plugin_id = s.plugin_id
+        where b.plugin_id IS NULL
+    """  # noqa: S608
 
-            # Since settings are boefje-only at this moment
-            if local_plugins[plugin_id].type != "boefje":
-                raise ValueError(f"Settings for normalizer or bit found: {plugin_id}. Remove these entries first.")
+    to_insert: list[Boefje] = []
 
-            try:
-                storage.boefje_by_id(plugin_id)
-                continue  # The Boefje already exists
-            except PluginNotFound:
-                pass  # The raw query bypasses the session "cache", so this just checks for duplicates
+    for plugin_id_output in connection.execute(query).fetchall():
+        plugin_id = plugin_id_output[0]
+        if plugin_id not in local_plugins:
+            raise ValueError(f"Invalid plugin id found: {plugin_id}")
 
-            storage.create_boefje(local_plugins[plugin_id])  # type: ignore
+        # Since settings are boefje-only at this moment
+        if local_plugins[plugin_id].type != "boefje":
+            raise ValueError(f"Settings for normalizer or bit found: {plugin_id}. Remove these entries first.")
 
-        query = """
-        SELECT DISTINCT p.plugin_id FROM plugin_state p left join boefje b on b.plugin_id = p.plugin_id
-            where b.plugin_id IS NULL
-        """
+        res = connection.execute(f"SELECT id FROM boefje where plugin_id = '{plugin_id}'")  # noqa: S608
+        if res.fetchone() is not None:
+            continue  # The Boefje already exists
 
-        for plugin_id_output in op.get_bind().execute(query).fetchall():
-            plugin_id = plugin_id_output[0]
-            if plugin_id not in local_plugins:
-                logger.warning("Unknown plugin id found: %s. You might have to re-enable the plugin!", plugin_id)
-                continue
+        if local_plugins[plugin_id].type == "boefje":
+            to_insert.append(local_plugins[plugin_id])
 
-            try:
-                storage.boefje_by_id(plugin_id)
-                continue  # The Boefje already exists
-            except PluginNotFound:
-                pass  # The raw query bypasses the session "cache", so this just checks for duplicates
+    entries = [
+        (
+            boefje.id,
+            boefje.name,
+            boefje.description,
+            str(boefje.scan_level),
+            list(boefje.consumes),
+            list(boefje.produces),
+            boefje.environment_keys,
+            boefje.oci_image,
+            boefje.oci_arguments,
+            boefje.version,
+        )
+        for boefje in to_insert
+    ]
+    query = """INSERT INTO boefje (plugin_id, name, description, scan_level, consumes, produces, environment_keys,
+        oci_image, oci_arguments, version) values %s"""
 
-            if local_plugins[plugin_id].type == "boefje":
-                storage.create_boefje(local_plugins[plugin_id])  # type: ignore
+    with connection.begin():
+        cursor = connection.connection.cursor()
+        execute_values(cursor, query, entries)
 
-        query = """
-        SELECT DISTINCT p.plugin_id FROM plugin_state p left join normalizer n on n.plugin_id = p.plugin_id
-            where n.plugin_id IS NULL
-        """
+    to_insert = []
 
-        for plugin_id_output in op.get_bind().execute(query).fetchall():
-            plugin_id = plugin_id_output[0]
-            if plugin_id not in local_plugins:
-                logger.warning("Unknown plugin id found: %s. You might have to re-enable the plugin!", plugin_id)
-                continue
+    query = """
+    SELECT DISTINCT p.plugin_id FROM plugin_state p left join boefje b on b.plugin_id = p.plugin_id
+        where b.plugin_id IS NULL
+    """
 
-            try:
-                storage.normalizer_by_id(plugin_id)
-                continue  # The Normalizer already exists
-            except PluginNotFound:
-                pass  # The raw query bypasses the session "cache", so this just checks for duplicates
+    for plugin_id_output in connection.execute(query).fetchall():
+        plugin_id = plugin_id_output[0]
+        if plugin_id not in local_plugins:
+            logger.warning("Unknown plugin id found: %s. You might have to re-enable the plugin!", plugin_id)
+            continue
 
-            if local_plugins[plugin_id].type == "normalizer":
-                storage.create_normalizer(local_plugins[plugin_id])  # type: ignore
+        res = connection.execute(f"SELECT id FROM boefje where plugin_id = '{plugin_id}'")  # noqa: S608
+        if res.fetchone() is not None:
+            continue  # The Boefje already exists
+
+        if local_plugins[plugin_id].type == "boefje":
+            to_insert.append(local_plugins[plugin_id])
+
+    entries = [
+        (
+            boefje.id,
+            boefje.name,
+            boefje.description,
+            str(boefje.scan_level),
+            list(boefje.consumes),
+            list(boefje.produces),
+            boefje.environment_keys,
+            boefje.oci_image,
+            boefje.oci_arguments,
+            boefje.version,
+        )
+        for boefje in to_insert
+    ]
+    query = """INSERT INTO boefje (plugin_id, name, description, scan_level, consumes, produces, environment_keys,
+        oci_image, oci_arguments, version) values %s"""  # noqa: S608
+
+    with connection.begin():
+        cursor = connection.connection.cursor()
+        execute_values(cursor, query, entries)
+
+    normalizers_to_insert: list[Normalizer] = []
+    query = """
+    SELECT DISTINCT p.plugin_id FROM plugin_state p left join normalizer n on n.plugin_id = p.plugin_id
+        where n.plugin_id IS NULL
+    """  # noqa: S608
+
+    for plugin_id_output in connection.execute(query).fetchall():
+        plugin_id = plugin_id_output[0]
+        if plugin_id not in local_plugins:
+            logger.warning("Unknown plugin id found: %s. You might have to re-enable the plugin!", plugin_id)
+            continue
+
+        res = connection.execute(f"SELECT id FROM normalizer where plugin_id = '{plugin_id}'")  # noqa: S608
+        if res.fetchone() is not None:
+            continue  # The Normalizer already exists
+
+        if local_plugins[plugin_id].type == "normalizer":
+            normalizers_to_insert.append(local_plugins[plugin_id])
+
+    normalizer_entries = [
+        (
+            normalizer.id,
+            normalizer.name,
+            normalizer.description,
+            normalizer.consumes,
+            normalizer.produces,
+            normalizer.environment_keys,
+            normalizer.version,
+        )
+        for normalizer in normalizers_to_insert
+    ]
+    query = """INSERT INTO normalizer (plugin_id, name, description, consumes, produces, environment_keys, version)
+        values %s"""  # noqa: S608
+
+    with connection.begin():
+        cursor = connection.connection.cursor()
+        execute_values(cursor, query, normalizer_entries)
 
     with connection.begin():
         connection.execute("""

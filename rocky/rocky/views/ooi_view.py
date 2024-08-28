@@ -37,6 +37,7 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
         self.filtered_ooi_types = request.GET.getlist("ooi_type", [])
         self.clearance_levels = request.GET.getlist("clearance_level", [])
         self.clearance_types = request.GET.getlist("clearance_type", [])
+        self.search_string = request.GET.get("search", "")
 
     def get_active_filters(self) -> dict[str, str]:
         active_filters = {}
@@ -92,6 +93,7 @@ class BaseOOIListView(OOIFilterView, ListView):
             valid_time=self.observed_at,
             scan_level=self.get_ooi_scan_levels(),
             scan_profile_type=self.get_ooi_profile_types(),
+            search_string=self.search_string,
         )
 
     def get_context_data(self, **kwargs):
@@ -181,12 +183,16 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
     def form_valid(self, form):
         # Transform into OOI
         try:
-            new_ooi = self.ooi_class.parse_obj(form.cleaned_data)
+            end_valid_time = form.cleaned_data.pop("end_valid_time", None)
+            if end_valid_time is not None:
+                end_valid_time = end_valid_time.replace(tzinfo=timezone.utc)
+            new_ooi = self.ooi_class.model_validate(form.cleaned_data)
             create_ooi(
                 self.octopoes_api_connector,
                 self.bytes_client,
                 new_ooi,
                 datetime.now(timezone.utc),
+                end_valid_time,
             )
             sleep(1)
             return redirect(self.get_ooi_success_url(new_ooi))
