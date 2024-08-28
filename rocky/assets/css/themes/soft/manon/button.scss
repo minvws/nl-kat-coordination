@@ -27,18 +27,18 @@
 
   /* Hover */
   --button-base-hover-background-color: var(--colors-yellow-300);
-  --button-base-hover-text-color: var(--colors-black);
+  --button-base-hover-text-color: var(--colors-grey-900);
 
   /* Active */
   --button-base-active-background-color: var(--colors-yellow-300);
-  --button-base-active-text-color: var(--colors-black);
+  --button-base-active-text-color: var(--colors-grey-900);
   --button-base-active-border-style: var(--button-base-border-style);
   --button-base-active-border-color: var(--button-base-active-background-color);
   --button-base-active-border-width: var(--button-base-border-width);
 
   /* Focus */
   --button-base-focus-background-color: var(--colors-yellow-300);
-  --button-base-focus-text-color: var(--colors-black);
+  --button-base-focus-text-color: var(--colors-grey-900);
   --button-base-focus-border-style: var(--button-base-border-style);
   --button-base-focus-border-color: var(--button-base-focus-background-color);
   --button-base-focus-border-width: var(--button-base-border-width);

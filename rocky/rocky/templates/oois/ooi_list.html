@@ -37,13 +37,67 @@
                     {% blocktranslate with length=ooi_list|length total=total_oois %}Showing {{ length }} of {{ total }} objects{% endblocktranslate %}
                 </p>
                 <form method="post"
-                      class="inline layout-wide checkboxes_required"
-                      action="#bulk_clearance_level_submit">
+                      id="ooi_list_form"
+                      class="inline layout-wide checkboxes_required">
                     {% csrf_token %}
                     <div class="horizontal-scroll">
-                        {% include "partials/form/form_errors.html" with form=select_oois_form %}
+                        <table class="nowrap">
+                            <caption class="visually-hidden">
+                                {% translate "Objects " %}
+                                <span class="visually-hidden">, {% translate "column headers with buttons are sortable" %}</span>
+                            </caption>
+                            <thead>
+                                <th>
+                                    <input class="toggle-all" data-toggle-target="ooi" type="checkbox">
+                                </th>
+                                <th>{% translate "Object" %}</th>
+                                <th scope="col"
+                                    class="sortable"
+                                    {% if order_by == "object_type" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
+                                    <button form="ooi_list_settings"
+                                            name="order_by"
+                                            value="object_type"
+                                            class="sort">
+                                        {% translate "Type" %}
+                                        <span aria-hidden="true"
+                                              class="icon ti-{% if order_by == "object_type" and sorting_order == "asc" %}chevron-up{% elif order_by == "object_type" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
+                                    </button>
+                                </th>
+                                <th scope="col"
+                                    class="sortable"
+                                    {% if order_by == "scan_level" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
+                                    <button form="ooi_list_settings"
+                                            name="order_by"
+                                            value="scan_level"
+                                            lass="sort">
+                                        {% translate "Clearance level" %}
+                                        <span aria-hidden="true"
+                                              class="icon ti-{% if order_by == "scan_level" and sorting_order == "asc" %}chevron-up{% elif order_by == "scan_level" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
+                                    </button>
+                                </th>
+                                <th>{% translate "Clearance type" %}</th>
+                            </thead>
+                            <tbody>
+                                {% for object in ooi_list %}
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="ooi" value="{{ object.primary_key }}">
+                                        </td>
+                                        <td>
+                                            <a href="{% ooi_url "ooi_detail" object.primary_key organization.code observed_at=observed_at %}">{{ object.human_readable }}</a>
+                                        </td>
+                                        <td>
+                                            <a href="{{ request.path }}?observed_at={{ observed_at|date:"Y-m-d" }}&ooi_type={{ object.ooi_type }}">{{ object.ooi_type }}</a>
+                                        </td>
+                                        <td>
+                                            {% include "partials/scan_level_indicator.html" with value=object.scan_profile.level.value %}
 
-                        {% for field in select_oois_form %}{{ field }}{% endfor %}
+                                        </td>
+                                        <td>{{ object.scan_profile.scan_profile_type|title }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                     {% if ooi_list %}
                         <fieldset>
@@ -56,9 +110,7 @@
                                             class="dropdown-button"
                                             name="action"
                                             value="update-scan-profile"
-                                            id="bulk_clearance_level_submit">
-                                        {% translate "Set clearance level" %}
-                                    </button>
+                                            form="ooi_list_form">{% translate "Set clearance level" %}</button>
                                 {% endif %}
                                 {% if perms.tools.can_delete_oois %}
                                     <button type="submit" class="dropdown-button" name="action" value="delete">{% translate "Delete object(s)" %}</button>

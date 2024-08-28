@@ -840,9 +840,11 @@ class XTDBOOIRepository(OOIRepository):
         results = [
             (
                 self.simplify_keys(x[0]),
-                [self.simplify_keys(y) for y in x[0]["Report/_parent_report"]]
-                if "Report/_parent_report" in x[0]
-                else [],
+                (
+                    [self.simplify_keys(y) for y in x[0]["Report/_parent_report"]]
+                    if "Report/_parent_report" in x[0]
+                    else []
+                ),
             )
             for x in self.session.client.query(query)
         ]
