@@ -14,10 +14,22 @@ NIBBLE_ATTR_NAME = "NIBBLE"
 logger = getLogger(__name__)
 
 
-# TODO: Support paths (signature with a forced adjacency)
+class NibbleParameterDefinition(BaseModel):
+    ooi_type: type[OOI]
+    relation_path: str | None = None
+
+    def __eq__(self, other):
+        if isinstance(other, NibbleParameterDefinition):
+            return vars(self) == vars(other)
+        elif isinstance(other, type):
+            return self.ooi_type == other
+        else:
+            return False
+
+
 class NibbleDefinition(BaseModel):
     id: str
-    signature: list[type[OOI]]
+    signature: list[NibbleParameterDefinition]
     min_scan_level: int = 1
     default_enabled: bool = True
     config_ooi_relation_path: str | None = None

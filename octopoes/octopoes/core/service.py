@@ -222,7 +222,7 @@ class OctopoesService:
             if len(configs) != 0:
                 config = configs[-1].config
 
-        resulting_oois = []
+        resulting_oois: list[OOI] = []
         try:
             if isinstance(self.session, XTDBSession):
                 start = perf_counter()
@@ -245,7 +245,10 @@ class OctopoesService:
             logger.exception("Error running inference", exc_info=e)
 
         # Adding the nibble part of inferring
-        resulting_oois += self.nibbles.infer([self.ooi_repository.get(origin.source, datetime.now())])
+        # FIXME: save origins and origins of origins etc.
+        resulting_nibble_oois = self.nibbles.infer([source], valid_time)
+        resulting_oois += list(set.union(*resulting_nibble_oois[source].values()))
+
         self.save_origin(origin, resulting_oois, valid_time)
 
     @staticmethod
