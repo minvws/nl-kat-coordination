@@ -52,10 +52,18 @@ class BaseKATalogusView(OrganizationView, ListView, FormView):
     def sort_alphabetic_ascending(self, queryset):
         return sorted(queryset, key=lambda item: item.name.lower())
 
+    def count_active_filters(self):
+        filter_options = self.request.GET.get("filter_options")
+        sortin_options = self.request.GET.get("sorting_options")
+        count_filter_options = 1 if filter_options and filter_options != "all" else 0
+        count_sorting_options = 1 if sortin_options and sortin_options != "a-z" else 0
+        return count_filter_options + count_sorting_options
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["view_type"] = self.kwargs.get("view_type", "grid")
         context["url_name"] = self.request.resolver_match.url_name
+        context["active_filters_counter"] = self.count_active_filters()
         context["breadcrumbs"] = [
             {
                 "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
