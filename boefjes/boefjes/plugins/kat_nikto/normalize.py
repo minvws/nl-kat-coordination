@@ -1,5 +1,4 @@
 import json
-import logging
 from collections.abc import Iterable
 
 from boefjes.job_models import NormalizerOutput
@@ -8,7 +7,7 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.software import Software, SoftwareInstance
 
 
-def scan_outdated_software(data: dict, ooi_ref):
+def scan_outdated_software(data: dict, ooi_ref: Reference) -> Iterable[NormalizerOutput]:
     for scan in data:
         for vulnerability in scan["vulnerabilities"]:
             # If the scanned vulnerability has to do with outdated software
@@ -32,7 +31,6 @@ def scan_outdated_software(data: dict, ooi_ref):
 
 
 def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
-    logging.info(input_ooi)
     data = json.loads(raw)
 
     ooi_ref = Reference.from_str(input_ooi["primary_key"])

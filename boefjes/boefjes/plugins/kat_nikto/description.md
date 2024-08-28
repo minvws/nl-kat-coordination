@@ -10,14 +10,6 @@ Nikto expects an IpAddress or a Hostname OOI.
 
 ### Output OOIs
 
-Nikto outputs the following OOIs:
-
-| OOI type | Description |
-| -------- | ----------- |
-|          |             |
-|          |             |
-|          |             |
-|          |             |
-|          |             |
+Nikto outputs the following the found outdated software and a finding explaining that the software is outdated.
 
 **Cat name**: Kitty

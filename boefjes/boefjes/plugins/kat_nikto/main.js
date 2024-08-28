@@ -14,8 +14,6 @@ export default function (boefje_meta) {
   else if (object_type == "Hostname") ooi = boefje_meta.arguments.input.name;
   else throw new Error("Unexpected boefje_meta");
 
-  console.log(`Found boefje input with ooi: ${ooi}`);
-
   // Running nikto and outputting to a file
   try {
     execSync(`./nikto/program/nikto.pl -h ${ooi} -o ./output.json`, {
@@ -52,6 +50,5 @@ export default function (boefje_meta) {
     console.error(e.message);
   }
 
-  console.log("File contents: " + file_contents);
   return raws;
 }

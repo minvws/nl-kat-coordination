@@ -6,7 +6,6 @@ import run from "./main.js";
  * @returns {string}
  */
 function b64encode(inp) {
-  console.log(`Encoding: ${inp}`);
   return Buffer.from(inp).toString("base64");
 }
 
@@ -20,7 +19,7 @@ function main() {
     );
   } catch (error) {
     console.error(`Getting boefje input went wrong with URL: ${input_url}`);
-    throw new Error(error);
+    throw new Error(error.message);
   }
 
   let out = undefined;
