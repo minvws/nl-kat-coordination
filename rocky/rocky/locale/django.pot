@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-22 09:47+0000\n"
+"POT-Creation-Date: 2024-08-27 13:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1026,11 +1026,6 @@ msgid "Plugins Navigation"
 msgstr ""
 
 #: katalogus/templates/partials/plugins_navigation.html
-#: tools/forms/scheduler.py
-msgid "All"
-msgstr ""
-
-#: katalogus/templates/partials/plugins_navigation.html
 #: rocky/templates/scan.html rocky/templates/tasks/boefjes.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Boefjes"
@@ -1040,6 +1035,11 @@ msgstr ""
 #: rocky/templates/tasks/normalizers.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Normalizers"
+msgstr ""
+
+#: katalogus/templates/partials/plugins_navigation.html
+#: tools/forms/scheduler.py
+msgid "All"
 msgstr ""
 
 #: katalogus/templates/plugin_settings_add.html
