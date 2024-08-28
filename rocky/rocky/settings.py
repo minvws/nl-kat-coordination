@@ -78,7 +78,7 @@ LOGGING = {
     "loggers": {
         "root": {
             "handlers": ["console"],
-            "level": "INFO",
+            "level": env("LOG_LEVEL", default="INFO").upper(),
         },
     },
 }

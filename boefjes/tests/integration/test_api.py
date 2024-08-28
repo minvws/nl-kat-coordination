@@ -60,7 +60,7 @@ class TestAPI(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {"message": "Plugin id 'dns-records' is already used"})
 
-        normalizer = Normalizer(id="kat_nmap_normalize", name="My test normalizer", static=False)
+        normalizer = Normalizer(id="kat_nmap_normalize", name="My test normalizer")
         response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.json())
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {"message": "Plugin id 'kat_nmap_normalize' is already used"})
@@ -115,8 +115,8 @@ class TestAPI(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_update_plugins(self):
-        normalizer = Normalizer(id="norm_id", name="My test normalizer", static=False)
-        boefje = Boefje(id="test_plugin", name="My test boefje", description="123", static=False)
+        normalizer = Normalizer(id="norm_id", name="My test normalizer")
+        boefje = Boefje(id="test_plugin", name="My test boefje", description="123")
 
         self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.json())
         self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/{boefje.id}", json={"description": "4"})
@@ -126,6 +126,50 @@ class TestAPI(TestCase):
         self.assertEqual(response.json()["description"], "4")
         self.assertTrue(response.json()["enabled"])
 
+        self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.json())
+        self.client.patch(f"/v1/organisations/{self.org.id}/normalizers/{normalizer.id}", json={"version": "v1.2"})
+
+        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/{normalizer.id}")
+        self.assertEqual(response.json()["version"], "v1.2")
+
+    def test_cannot_create_boefje_with_invalid_schema(self):
+        boefje = Boefje(id="test_plugin", name="My test boefje", description="123").model_dump(mode="json")
+        boefje["schema"] = {"$schema": 3}
+
+        r = self.client.post(f"/v1/organisations/{self.org.id}/plugins", json=boefje)
+        self.assertEqual(r.status_code, 400)
+
+    def test_update_boefje_schema(self):
+        boefje = Boefje(id="test_plugin", name="My test boefje", description="123")
+        self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.json())
+
+        r = self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/{boefje.id}", json={"schema": {"$schema": 3}})
+        self.assertEqual(r.status_code, 400)
+
+        valid_schema = {
+            "title": "Arguments",
+            "type": "object",
+            "properties": {
+                "MY_KEY": {
+                    "title": "MY_KEY",
+                    "type": "integer",
+                }
+            },
+            "required": [],
+        }
+        r = self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/{boefje.id}", json={"schema": valid_schema})
+        self.assertEqual(r.status_code, 204)
+
+        schema = self.client.get(f"/v1/organisations/{self.org.id}/plugins/{boefje.id}/schema.json").json()
+        assert schema == valid_schema
+
+        api_boefje = self.client.get(f"/v1/organisations/{self.org.id}/plugins/{boefje.id}").json()
+        assert api_boefje["schema"] == valid_schema
+
+        r = self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/dns-records", json={"schema": valid_schema})
+        self.assertEqual(r.status_code, 404)
+
+    def test_cannot_update_static_plugins(self):
         r = self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/dns-records", json={"id": "4", "version": "s"})
         self.assertEqual(r.status_code, 404)
         r = self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/dns-records", json={"name": "Overwrite name"})
@@ -136,13 +180,6 @@ class TestAPI(TestCase):
         self.assertIsNone(response.json()["version"])
         self.assertEqual(response.json()["id"], "dns-records")
 
-        self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.json())
-        self.client.patch(f"/v1/organisations/{self.org.id}/normalizers/{normalizer.id}", json={"version": "v1.2"})
-
-        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/{normalizer.id}")
-        self.assertEqual(response.json()["version"], "v1.2")
-
-    def test_cannot_update_static_plugins(self):
         self.client.patch(f"/v1/organisations/{self.org.id}/plugins/dns-records", json={"enabled": True})
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/dns-records")
         self.assertTrue(response.json()["enabled"])

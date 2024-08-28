@@ -187,14 +187,25 @@ class NormalizerScheduler(Scheduler):
             caller=caller,
         )
 
-        plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
-            normalizer_task.normalizer.id,
-            self.organisation.id,
-        )
-        if not self.has_normalizer_permission_to_run(plugin):
-            self.logger.debug(
-                "Task is not allowed to run: %s",
-                normalizer_task.id,
+        try:
+            plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+                normalizer_task.normalizer.id,
+                self.organisation.id,
+            )
+            if not self.has_normalizer_permission_to_run(plugin):
+                self.logger.debug(
+                    "Task is not allowed to run: %s",
+                    normalizer_task.id,
+                    task_id=normalizer_task.id,
+                    organisation_id=self.organisation.id,
+                    scheduler_id=self.scheduler_id,
+                    caller=caller,
+                )
+                return
+        except ExternalServiceError:
+            self.logger.warning(
+                "Could not get plugin by id: %s",
+                normalizer_task.normalizer.id,
                 task_id=normalizer_task.id,
                 organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
