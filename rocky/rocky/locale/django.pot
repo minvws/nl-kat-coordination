@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-26 09:50+0000\n"
+"POT-Creation-Date: 2024-08-28 10:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -575,7 +575,6 @@ msgstr ""
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/confirmation_clone_settings.html
 #: katalogus/templates/plugin_settings_delete.html
-#: reports/templates/partials/export_report_settings.html
 #: rocky/templates/oois/ooi_delete.html
 #: rocky/templates/oois/ooi_mute_finding.html
 #: rocky/templates/organizations/organization_edit.html
@@ -631,7 +630,6 @@ msgid "Sorting options"
 msgstr ""
 
 #: katalogus/forms/plugin_settings.py
-#: reports/templates/partials/export_report_settings.html
 msgid "This field is required."
 msgstr ""
 
@@ -699,6 +697,11 @@ msgstr ""
 #: katalogus/templates/partials/plugin_tile_modal.html
 #, python-format
 msgid "%(plugin_name)s can produce the following output:"
+msgstr ""
+
+#: katalogus/templates/boefje_detail.html
+#, python-format
+msgid "%(plugin_name)s doesn't produce any output mimetypes."
 msgstr ""
 
 #: katalogus/templates/boefje_setup.html
@@ -904,6 +907,30 @@ msgid "You don't have permission to enable"
 msgstr ""
 
 #: katalogus/templates/partials/katalogus_filter.html
+#: rocky/templates/findings/findings_filter.html
+#: rocky/templates/partials/ooi_list_filters.html
+#: rocky/templates/partials/organization_member_list_filters.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Hide filters"
+msgstr ""
+
+#: katalogus/templates/partials/katalogus_filter.html
+#: rocky/templates/findings/findings_filter.html
+#: rocky/templates/partials/ooi_list_filters.html
+#: rocky/templates/partials/organization_member_list_filters.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Show filters"
+msgstr ""
+
+#: katalogus/templates/partials/katalogus_filter.html
+#: rocky/templates/findings/findings_filter.html
+#: rocky/templates/partials/ooi_list_filters.html
+#: rocky/templates/partials/organization_member_list_filters.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "applied"
+msgstr ""
+
+#: katalogus/templates/partials/katalogus_filter.html
 msgid "Filter plugins"
 msgstr ""
 
@@ -1052,11 +1079,6 @@ msgid "Plugins Navigation"
 msgstr ""
 
 #: katalogus/templates/partials/plugins_navigation.html
-#: tools/forms/scheduler.py
-msgid "All"
-msgstr ""
-
-#: katalogus/templates/partials/plugins_navigation.html
 #: rocky/templates/scan.html rocky/templates/tasks/boefjes.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Boefjes"
@@ -1069,7 +1091,8 @@ msgid "Normalizers"
 msgstr ""
 
 #: katalogus/templates/partials/plugins_navigation.html
-msgid "Awaiting approval"
+#: tools/forms/scheduler.py
+msgid "All"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html tools/forms/boefje.py
@@ -3452,7 +3475,11 @@ msgid "Report name"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-msgid "You can name individual reports."
+msgid ""
+"Give your report a custom name and optionally add the reports' reference "
+"date to the name. To do so you can select a standard option or use a <a "
+"href=\"https://strftime.org/\" target=\"_blank\">Python strftime code</a> in "
+"the report name."
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -3460,21 +3487,7 @@ msgid "Report names:"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-msgid "Edit "
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid ""
-"\n"
-"                                                            Give your report "
-"a custom name and optionally add the reports' reference date\n"
-"                                                            to the name. To "
-"do so you can select an option below.\n"
-"                                                        "
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Report name settings."
+msgid "(Required)"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -3482,7 +3495,8 @@ msgid "Add reference date"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-msgid "Select option"
+#: rocky/views/scan_profile.py
+msgid "Reset"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -3503,10 +3517,6 @@ msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
 msgid "Year"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Confirm"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -3599,17 +3609,6 @@ msgstr[1] ""
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "Select which objects you want to include in your report."
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
-#: rocky/templates/admin/change_list.html rocky/templates/oois/ooi_list.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Filter"
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
-#: rocky/templates/oois/ooi_list.html
-msgid "Currently filtered on:"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
@@ -4017,6 +4016,14 @@ msgstr ""
 #: reports/views/base.py
 #, python-format
 msgid "Report type '%s' does not exist."
+msgstr ""
+
+#: reports/views/base.py
+msgid "Week %W, %Y"
+msgstr ""
+
+#: reports/views/generate_report.py
+msgid "Empty name should not be possible."
 msgstr ""
 
 #: reports/views/generate_report.py
@@ -4502,7 +4509,6 @@ msgstr ""
 #: tools/view_helpers.py rocky/templates/header.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/partials/organization_member_list_filters.html
 #: rocky/views/organization_member_edit.py
 msgid "Members"
 msgstr ""
@@ -4734,6 +4740,10 @@ msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] ""
 msgstr[1] ""
+
+#: rocky/templates/admin/change_list.html
+msgid "Filter"
+msgstr ""
 
 #: rocky/templates/admin/change_list.html
 msgid "Hide counts"
@@ -5057,7 +5067,9 @@ msgstr ""
 msgid "OpenKAT logo, go to the homepage of OpenKAT"
 msgstr ""
 
-#: rocky/templates/header.html rocky/views/finding_list.py
+#: rocky/templates/header.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/views/finding_list.py
 msgid "Crisis room"
 msgstr ""
 
@@ -5522,14 +5534,6 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_summary.html
 msgid "shows the same objects."
-msgstr ""
-
-#: rocky/templates/oois/ooi_tree.html
-msgid "Object tree"
-msgstr ""
-
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "Crisis room:"
 msgstr ""
 
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -6270,14 +6274,6 @@ msgstr ""
 msgid "Download task data"
 msgstr ""
 
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Hide filters"
-msgstr ""
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Show filters"
-msgstr ""
-
 #: rocky/templates/two_factor/_wizard_actions.html
 msgid "Log in"
 msgstr ""
@@ -6688,6 +6684,10 @@ msgid "Graph Visualisation"
 msgstr ""
 
 #: rocky/views/ooi_view.py
+msgid "Observed_at: "
+msgstr ""
+
+#: rocky/views/ooi_view.py
 msgid "OOI types: "
 msgstr ""
 
@@ -6817,10 +6817,6 @@ msgstr ""
 #: rocky/views/scan_profile.py
 #, python-brace-format
 msgid "Can not reset scan level. Scan level of {ooi_name} not declared"
-msgstr ""
-
-#: rocky/views/scan_profile.py
-msgid "Reset"
 msgstr ""
 
 #: rocky/views/scheduler.py

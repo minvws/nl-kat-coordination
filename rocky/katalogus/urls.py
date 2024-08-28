@@ -10,7 +10,7 @@ from katalogus.views.plugin_settings_add import PluginSettingsAddView
 from katalogus.views.plugin_settings_delete import PluginSettingsDeleteView
 
 urlpatterns = [
-    path("", KATalogusView.as_view(), name="katalogus"),
+    path("", BoefjeListView.as_view(), name="katalogus"),
     path("view/<view_type>/", KATalogusView.as_view(), name="katalogus"),
     path(
         "settings/",
