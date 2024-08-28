@@ -90,6 +90,8 @@ class Organization(models.Model):
         ),
     )
     tags = tagulous.models.TagField(to=OrganizationTag, blank=True)
+    indemnification = models.BooleanField(default=False)
+    indemnification_by = models.ForeignKey("account.KATUser", on_delete=models.PROTECT)
 
     EVENT_CODES = {"created": 900201, "updated": 900202, "deleted": 900203}
 
@@ -264,13 +266,6 @@ class OrganizationMember(models.Model):
 
     def __str__(self):
         return str(self.user)
-
-
-class Indemnification(models.Model):
-    user = models.ForeignKey("account.KATUser", on_delete=models.SET_NULL, null=True)
-    organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
-
-    EVENT_CODES = {"created": 900221, "updated": 900222, "deleted": 900223}
 
 
 class OOIInformation(models.Model):
