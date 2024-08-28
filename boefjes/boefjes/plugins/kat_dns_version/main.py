@@ -4,6 +4,8 @@ import json
 from os import getenv
 
 import dns
+import dns.message
+import dns.query
 
 from boefjes.job_models import BoefjeMeta
 
@@ -15,7 +17,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, str | bytes]]:
         return [({"boefje/error"}, "Not a DNS service")]
 
     ip = ip_port["address"]["address"]
-    port = ip_port["port"]
+    port = int(ip_port["port"])
     protocol = ip_port["protocol"]
 
     timeout = float(getenv("TIMEOUT", 30))
