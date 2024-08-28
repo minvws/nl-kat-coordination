@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-28 08:22+0000\n"
+"POT-Creation-Date: 2024-08-28 08:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -872,6 +872,30 @@ msgstr ""
 
 #: katalogus/templates/partials/enable_disable_plugin.html
 msgid "You don't have permission to enable"
+msgstr ""
+
+#: katalogus/templates/partials/katalogus_filter.html
+#: rocky/templates/findings/findings_filter.html
+#: rocky/templates/partials/ooi_list_filters.html
+#: rocky/templates/partials/organization_member_list_filters.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Hide filters"
+msgstr ""
+
+#: katalogus/templates/partials/katalogus_filter.html
+#: rocky/templates/findings/findings_filter.html
+#: rocky/templates/partials/ooi_list_filters.html
+#: rocky/templates/partials/organization_member_list_filters.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Show filters"
+msgstr ""
+
+#: katalogus/templates/partials/katalogus_filter.html
+#: rocky/templates/findings/findings_filter.html
+#: rocky/templates/partials/ooi_list_filters.html
+#: rocky/templates/partials/organization_member_list_filters.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "applied"
 msgstr ""
 
 #: katalogus/templates/partials/katalogus_filter.html
@@ -3514,17 +3538,6 @@ msgid "Select which objects you want to include in your report."
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-#: rocky/templates/admin/change_list.html rocky/templates/oois/ooi_list.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Filter"
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
-#: rocky/templates/oois/ooi_list.html
-msgid "Currently filtered on:"
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
 msgid "No objects found."
 msgstr ""
 
@@ -4380,7 +4393,6 @@ msgstr ""
 #: tools/view_helpers.py rocky/templates/header.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/partials/organization_member_list_filters.html
 #: rocky/views/organization_member_edit.py
 msgid "Members"
 msgstr ""
@@ -4442,10 +4454,6 @@ msgstr ""
 
 #: rocky/scheduler.py
 msgid "Task list: "
-msgstr ""
-
-#: rocky/scheduler.py
-msgid "Task statistics: "
 msgstr ""
 
 #: rocky/settings.py
@@ -4612,6 +4620,10 @@ msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] ""
 msgstr[1] ""
+
+#: rocky/templates/admin/change_list.html
+msgid "Filter"
+msgstr ""
 
 #: rocky/templates/admin/change_list.html
 msgid "Hide counts"
@@ -4935,7 +4947,9 @@ msgstr ""
 msgid "OpenKAT logo, go to the homepage of OpenKAT"
 msgstr ""
 
-#: rocky/templates/header.html rocky/views/finding_list.py
+#: rocky/templates/header.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/views/finding_list.py
 msgid "Crisis room"
 msgstr ""
 
@@ -5400,14 +5414,6 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_summary.html
 msgid "shows the same objects."
-msgstr ""
-
-#: rocky/templates/oois/ooi_tree.html
-msgid "Object tree"
-msgstr ""
-
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "Crisis room:"
 msgstr ""
 
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -6079,9 +6085,17 @@ msgid "List of tasks for boefjes"
 msgstr ""
 
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+msgid "Organization Code"
+msgstr ""
+
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 #: rocky/templates/tasks/ooi_detail_task_list.html
 #: rocky/templates/tasks/plugin_detail_task_list.html
 msgid "Created date"
+msgstr ""
+
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+msgid "Modified date"
 msgstr ""
 
 #: rocky/templates/tasks/normalizers.html
@@ -6140,14 +6154,6 @@ msgstr ""
 
 #: rocky/templates/tasks/partials/task_actions.html
 msgid "Download task data"
-msgstr ""
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Hide filters"
-msgstr ""
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Show filters"
 msgstr ""
 
 #: rocky/templates/two_factor/_wizard_actions.html
@@ -6560,6 +6566,10 @@ msgid "Graph Visualisation"
 msgstr ""
 
 #: rocky/views/ooi_view.py
+msgid "Observed_at: "
+msgstr ""
+
+#: rocky/views/ooi_view.py
 msgid "OOI types: "
 msgstr ""
 
@@ -6696,6 +6706,15 @@ msgid ""
 "Your task is scheduled and will soon be started in the background. Results "
 "will be added to the object list when they are in. It may take some time, a "
 "refresh of the page may be needed to show the results."
+msgstr ""
+
+#: rocky/views/tasks.py
+#, python-brace-format
+msgid "Fetching tasks failed: no connection with scheduler: {error}"
+msgstr ""
+
+#: rocky/views/tasks.py
+msgid "All Tasks"
 msgstr ""
 
 #: rocky/views/upload_csv.py
