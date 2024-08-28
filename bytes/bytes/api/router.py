@@ -1,9 +1,8 @@
 from uuid import UUID
 
 import structlog
-from asgiref.sync import async_to_sync
 from cachetools import TTLCache, cached
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile
 from fastapi.responses import Response
 from starlette.responses import JSONResponse
 
@@ -148,42 +147,42 @@ def get_normalizer_meta(
 
 @router.post("/raw", tags=[RAW_TAG])
 def create_raw(
-    request: Request,
     boefje_meta_id: UUID,
-    mime_types: list[str] | None = Query(None),
+    raws: list[UploadFile],
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
     event_manager: EventManager = Depends(create_event_manager),
 ) -> RawResponse:
-    parsed_mime_types = [] if mime_types is None else [MimeType(value=mime_type) for mime_type in mime_types]
+    raw_ids = []
+    for raw in raws:
+        parsed_mime_types = [] if raw.content_type is None else [MimeType(value=x) for x in raw.content_type.split(",")]
 
-    try:
-        meta = meta_repository.get_boefje_meta_by_id(boefje_meta_id)
+        try:
+            meta = meta_repository.get_boefje_meta_by_id(boefje_meta_id)
 
-        if meta_repository.has_raw(meta, parsed_mime_types):
-            return RawResponse(status="success", message="Raw data already present")
+            if meta_repository.has_raw(meta, parsed_mime_types):
 
-        # FastAPI/starlette only has async versions of the Request methods, but
-        # all our code is sync, so we wrap it in async_to_sync.
-        data = async_to_sync(request.body)()
+                return RawResponse(status="success", message="Raw data already present")
 
-        raw_data = RawData(value=data, boefje_meta=meta, mime_types=parsed_mime_types)
-        with meta_repository:
-            raw_id = meta_repository.save_raw(raw_data)
+            raw_data = RawData(value=raw.file.read(), boefje_meta=meta, mime_types=parsed_mime_types)
 
-        event = RawFileReceived(
-            organization=meta.organization,
-            raw_data=RawDataMeta(
-                id=raw_id,
-                boefje_meta=raw_data.boefje_meta,
-                mime_types=raw_data.mime_types,
-            ),
-        )
-        event_manager.publish(event)
-    except Exception as error:
-        logger.exception("Error saving raw data")
-        raise HTTPException(status_code=500, detail="Could not save raw data") from error
+            with meta_repository:
+                raw_id = meta_repository.save_raw(raw_data)
+                raw_ids.append(raw_id)
 
-    return RawResponse(status="success", message="Raw data saved", id=raw_id)
+            event = RawFileReceived(
+                organization=meta.organization,
+                raw_data=RawDataMeta(
+                    id=raw_id,
+                    boefje_meta=raw_data.boefje_meta,
+                    mime_types=raw_data.mime_types,
+                ),
+            )
+            event_manager.publish(event)
+        except Exception as error:
+            logger.exception("Error saving raw data")
+            raise HTTPException(status_code=500, detail="Could not save raw data") from error
+
+    return RawResponse(status="success", message="Raw data saved", ids=raw_ids)
 
 
 @router.get("/raw/{raw_id}", tags=[RAW_TAG])
