@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-23 15:00+0000\n"
+"POT-Creation-Date: 2024-08-28 13:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5784,6 +5784,16 @@ msgid "No scans found for this object."
 msgstr ""
 
 #: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Organization Code"
+msgstr ""
+
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Modified date"
+msgstr ""
+
+#: rocky/templates/tasks/partials/boefje_task_history.html
 msgid "Input Object"
 msgstr ""
 
@@ -6377,6 +6387,14 @@ msgstr ""
 
 #: rocky/views/tasks.py
 msgid "Fetching tasks failed: no connection with scheduler"
+msgstr ""
+
+#: rocky/views/tasks.py
+msgid "All Boefje Tasks"
+msgstr ""
+
+#: rocky/views/tasks.py
+msgid "All Normalizer Tasks"
 msgstr ""
 
 #: rocky/views/upload_csv.py
