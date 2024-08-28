@@ -307,7 +307,7 @@
       "get": {
         "summary": "List",
         "description": "List all schedules",
-        "operationId": "list_schedules_post",
+        "operationId": "list_schedules_get",
         "parameters": [
           {
             "name": "schedule_hash",
@@ -338,7 +338,6 @@
                   "type": "null"
                 }
               ],
-              "default": true,
               "title": "Enabled"
             }
           },
@@ -455,139 +454,26 @@
         }
       },
       "post": {
-        "summary": "List",
-        "description": "List all schedules",
-        "operationId": "list_schedules_post",
-        "parameters": [
-          {
-            "name": "schedule_hash",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Schedule Hash"
-            }
-          },
-          {
-            "name": "enabled",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": true,
-              "title": "Enabled"
-            }
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 0,
-              "title": "Offset"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 10,
-              "title": "Limit"
-            }
-          },
-          {
-            "name": "min_deadline_at",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Min Deadline At"
-            }
-          },
-          {
-            "name": "max_deadline_at",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Max Deadline At"
-            }
-          },
-          {
-            "name": "min_created_at",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Min Created At"
-            }
-          },
-          {
-            "name": "max_created_at",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Max Created At"
+        "summary": "Create",
+        "description": "Create a schedule",
+        "operationId": "create_schedules_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleCreate"
+              }
             }
           }
-        ],
+        },
         "responses": {
-          "200": {
+          "201": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedResponse"
+                  "$ref": "#/components/schemas/Schedule"
                 }
               }
             }
@@ -628,7 +514,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Schedule-Output"
+                  "$ref": "#/components/schemas/Schedule"
                 }
               }
             }
@@ -666,7 +552,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Schedule-Input"
+                "$ref": "#/components/schemas/SchedulePatch"
               }
             }
           }
@@ -677,7 +563,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Schedule-Output"
+                  "$ref": "#/components/schemas/Schedule"
                 }
               }
             }
@@ -1448,6 +1334,13 @@
               },
               {
                 "items": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "type": "array"
+              },
+              {
+                "items": {
                   "type": "null"
                 },
                 "type": "array"
@@ -1611,72 +1504,7 @@
         ],
         "title": "Queue"
       },
-      "Schedule-Input": {
-        "properties": {
-          "hash": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 32
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Hash"
-          },
-          "data": {
-            "anyOf": [
-              {
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Data",
-            "default": {}
-          },
-          "enabled": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Enabled",
-            "default": true
-          },
-          "schedule": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Schedule"
-          },
-          "deadline_at": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Deadline At"
-          }
-        },
-        "type": "object",
-        "title": "Schedule"
-      },
-      "Schedule-Output": {
+      "Schedule": {
         "properties": {
           "id": {
             "type": "string",
@@ -1708,8 +1536,7 @@
                 "type": "null"
               }
             ],
-            "title": "Data",
-            "default": {}
+            "title": "Data"
           },
           "enabled": {
             "type": "boolean",
@@ -1763,6 +1590,92 @@
           "scheduler_id"
         ],
         "title": "Schedule"
+      },
+      "ScheduleCreate": {
+        "properties": {
+          "scheduler_id": {
+            "type": "string",
+            "title": "Scheduler Id"
+          },
+          "data": {
+            "type": "object",
+            "title": "Data"
+          },
+          "schedule": {
+            "type": "string",
+            "title": "Schedule"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scheduler_id",
+          "data",
+          "schedule"
+        ],
+        "title": "ScheduleCreate"
+      },
+      "SchedulePatch": {
+        "properties": {
+          "hash": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 32
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hash"
+          },
+          "data": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
+          },
+          "enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enabled"
+          },
+          "schedule": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schedule"
+          },
+          "deadline_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline At"
+          }
+        },
+        "type": "object",
+        "title": "SchedulePatch"
       },
       "Scheduler": {
         "properties": {
@@ -1910,16 +1823,28 @@
                 "type": "null"
               }
             ],
-            "title": "Priority",
-            "default": 0
+            "title": "Priority"
           },
           "status": {
-            "allOf": [
+            "anyOf": [
               {
                 "$ref": "#/components/schemas/TaskStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
               }
             ],
-            "default": "pending"
+            "title": "Type"
           },
           "hash": {
             "anyOf": [
@@ -2021,6 +1946,17 @@
             ],
             "default": "pending"
           },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type"
+          },
           "hash": {
             "anyOf": [
               {
@@ -2042,8 +1978,7 @@
                 "type": "null"
               }
             ],
-            "title": "Data",
-            "default": {}
+            "title": "Data"
           },
           "created_at": {
             "type": "string",

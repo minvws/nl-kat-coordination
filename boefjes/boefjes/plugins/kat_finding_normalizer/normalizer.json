@@ -1,7 +1,7 @@
 {
-  "id": "kat_cve_2023_normalize",
+  "id": "kat_generic_finding_normalize",
   "consumes": [
-    "boefje/CVE-2023-34039"
+    "openkat/finding"
   ],
   "produces": [
     "Finding",

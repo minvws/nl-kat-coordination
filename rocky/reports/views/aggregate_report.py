@@ -190,7 +190,9 @@ class SaveAggregateReportView(SaveAggregateReportMixin, BreadcrumbsAggregateRepo
     def post(self, request, *args, **kwargs):
         old_report_names = request.POST.getlist("old_report_name")
         new_report_names = request.POST.getlist("report_name")
-        report_names = list(zip(old_report_names, new_report_names))
+        reference_dates = request.POST.getlist("reference_date")
+
+        report_names = list(zip(old_report_names, self.finalise_report_names(new_report_names, reference_dates)))
         report_ooi = self.save_report(report_names)
 
         return redirect(
