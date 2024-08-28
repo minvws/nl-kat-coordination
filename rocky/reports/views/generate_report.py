@@ -134,15 +134,15 @@ class SetupScanGenerateReportView(
     current_step = 3
 
     def post(self, request, *args, **kwargs):
+        if not self.selected_report_types:
+            messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
+            return PostRedirect(self.get_previous())
+
         if "return" in self.request.POST and self.plugins_enabled():
             return PostRedirect(self.get_previous())
 
         if self.plugins_enabled():
             return PostRedirect(self.get_next())
-
-        if not self.selected_report_types:
-            messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
-            return PostRedirect(self.get_previous())
         return self.get(request, *args, **kwargs)
 
 
