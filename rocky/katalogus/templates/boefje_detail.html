@@ -66,16 +66,22 @@
         <section>
             <div>
                 <h2>{% translate "Produces" %}</h2>
-                <p>
+                {% if plugin.produces %}
+                    <p>
+                        {% blocktranslate trimmed with plugin_name=plugin.name %}
+                            {{ plugin_name }} can produce the following output:
+                        {% endblocktranslate %}
+                    </p>
+                    <p>
+                        <ul>
+                            {% for mime_type in plugin.produces %}<li>{{ mime_type }}</li>{% endfor %}
+                        </ul>
+                    </p>
+                {% else %}
                     {% blocktranslate trimmed with plugin_name=plugin.name %}
-                        {{ plugin_name }} can produce the following output:
+                        {{ plugin_name }} doesn't produce any output mimetypes.
                     {% endblocktranslate %}
-                </p>
-                <p>
-                    <ul>
-                        {% for mime_type in plugin.produces %}<li>{{ mime_type }}</li>{% endfor %}
-                    </ul>
-                </p>
+                {% endif %}
             </div>
         </section>
         <section>
