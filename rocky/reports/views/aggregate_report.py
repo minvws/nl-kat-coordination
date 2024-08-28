@@ -14,6 +14,7 @@ from reports.report_types.helpers import get_ooi_types_from_aggregate_report, ge
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
     OOISelectionView,
+    PostRedirect,
     ReportBreadcrumbs,
     ReportPluginView,
     ReportTypeSelectionView,
@@ -116,9 +117,6 @@ class ReportTypesSelectionAggregateReportView(
         )
 
     def post(self, request, *args, **kwargs):
-        if not hasattr(ReportTypesSelectionAggregateReportView, "selected_oois"):
-            self.setup(request, *args, **kwargs)
-
         if not self.selected_oois:
             messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
             return redirect(self.get_previous())
@@ -156,9 +154,9 @@ class SetupScanAggregateReportView(
     def post(self, request, *args, **kwargs):
         # If the user wants to change selection, but all plugins are enabled, it needs to go even further back
         if "return" in self.request.POST and self.plugins_enabled():
-            return ReportTypesSelectionAggregateReportView().post(request, *args, **kwargs)
+            return PostRedirect(self.get_previous())
         if self.plugins_enabled():
-            return ExportSetupAggregateReportView().post(request, *args, **kwargs)
+            return PostRedirect(self.get_next())
         if not self.selected_report_types:
             messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
             return redirect(self.get_previous())
@@ -175,11 +173,6 @@ class ExportSetupAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggre
     current_step = 4
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        # POST can come from a redirected POST which needs to initiate setup to fetch variables
-        if not hasattr(ExportSetupAggregateReportView, "oois_pk") and not hasattr(
-            ExportSetupAggregateReportView, "report_types"
-        ):
-            self.setup(request, *args, **kwargs)
         if not self.selected_report_types:
             messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
             return redirect(self.get_previous())
