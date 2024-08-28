@@ -159,7 +159,7 @@ class SetupScanAggregateReportView(
             return PostRedirect(self.get_next())
         if not self.selected_report_types:
             messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
-            return redirect(self.get_previous())
+            return PostRedirect(self.get_previous())
         return self.get(request, *args, **kwargs)
 
 
@@ -175,7 +175,7 @@ class ExportSetupAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggre
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.selected_report_types:
             messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
-            return redirect(self.get_previous())
+            return PostRedirect(self.get_previous())
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
