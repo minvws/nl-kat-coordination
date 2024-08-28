@@ -4,6 +4,7 @@ import httpx
 import structlog
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from httpx import codes
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import BaseModel, Field, field_serializer
@@ -209,12 +210,17 @@ class KATalogusClientV1:
         return BytesIO(response.content)
 
     def create_plugin(self, plugin: Plugin) -> None:
-        json_data = plugin.model_dump(exclude_none=True)
-        for key, value in json_data.items():
-            if isinstance(value, set):
-                json_data[key] = list(value)
-        response = self.session.post(f"{self.organization_uri}/plugins", json=json_data)
+        response = self.session.post(
+            f"{self.organization_uri}/plugins",
+            headers={"Content-Type": "application/json"},
+            content=plugin.model_dump_json(exclude_none=True),
+        )
         response.raise_for_status()
+
+        if response.status_code == codes.CREATED:
+            logger.info("Plugin %s", plugin.name)
+        else:
+            logger.info("Plugin %s could not be created", plugin.name)
 
 
 def parse_boefje(boefje: dict) -> Boefje:
