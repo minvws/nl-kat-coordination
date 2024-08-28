@@ -24,7 +24,7 @@ class SchedulerListView(ListView):
 
 class TaskListView(SchedulerView, SchedulerListView, PageActionsView):
     paginator_class = RockyPaginator
-    paginate_by = 20
+    paginate_by = 150
     context_object_name = "task_list"
 
     def get_queryset(self):
