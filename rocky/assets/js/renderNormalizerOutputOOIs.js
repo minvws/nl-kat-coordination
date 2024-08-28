@@ -1,4 +1,6 @@
-import { language, organization_code } from "./utils.js";
+const htmlElement = document.getElementsByTagName("html")[0];
+const language = htmlElement.getAttribute("lang");
+const organization_code = htmlElement.getAttribute("data-organization-code");
 
 const buttons = document.querySelectorAll(
   ".expando-button.normalizer-list-table-row",
