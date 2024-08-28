@@ -46,3 +46,21 @@ class Report(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return f"Report {reference.tokenized.report_id}"
+
+
+class ReportRecipe(OOI):
+    recipe_id: UUID
+    object_type: Literal["Report recipe"] = "Report recipe"
+    organization_code: str
+    user: str
+
+    observed_at: datetime
+    input_oois: list[str]
+    report_types: list[str]
+    report_plugins: list[str]
+
+    report: Reference | None = ReferenceField("Report", default=None)
+
+    @classmethod
+    def format_reference_human_readable(cls, reference: Reference) -> str:
+        return f"Report recipe {reference.tokenized.recipe_id}"
