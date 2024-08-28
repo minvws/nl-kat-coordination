@@ -34,23 +34,23 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
     def form_valid(self, form):
         """If the form is valid, redirect to the supplied URL."""
         form_data = form.cleaned_data
-        input_object = type_by_name(form_data["consumes"])
+        input_object = {type_by_name(form_data["consumes"])}
         arguments = form_data["oci_arguments"].split()
-        produces = form_data["produces"].replace(" ", "").split(",")
+        produces = form_data["produces"].replace(",", "").split()
         boefje_id = str(uuid.uuid4())
 
         boefje = Boefje(
             id=boefje_id,
-            name=form_data["name"],
+            name=form_data["name"] or None,
             created=str(datetime.now()),
-            description=form_data["description"],
+            description=form_data["description"] or None,
             enabled=False,
             type="boefje",
             scan_level=form_data["scan_level"],
-            consumes={input_object},
+            consumes=input_object,
             produces=produces,
             schema=form_data["schema"],
-            oci_image=form_data["oci_image"],
+            oci_image=form_data["oci_image"] or None,
             oci_arguments=arguments,
         )
 
