@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-22 18:23+0000\n"
+"POT-Creation-Date: 2024-08-28 08:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3389,7 +3389,16 @@ msgid "Report names:"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
+msgid "(Required)"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
 msgid "Add reference date"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+#: rocky/views/scan_profile.py
+msgid "Reset"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -3924,6 +3933,10 @@ msgstr ""
 
 #: reports/views/base.py
 msgid "Week %W, %Y"
+msgstr ""
+
+#: reports/views/generate_report.py
+msgid "Empty name should not be possible."
 msgstr ""
 
 #: reports/views/generate_report.py
@@ -6676,10 +6689,6 @@ msgstr ""
 #: rocky/views/scan_profile.py
 #, python-brace-format
 msgid "Can not reset scan level. Scan level of {ooi_name} not declared"
-msgstr ""
-
-#: rocky/views/scan_profile.py
-msgid "Reset"
 msgstr ""
 
 #: rocky/views/scheduler.py
