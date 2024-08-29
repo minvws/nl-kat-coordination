@@ -12,24 +12,11 @@ from octopoes.models.types import type_by_name
 
 
 class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
-    """View where the user can create a new boefje"""
+    """Setup view for creating new Boefjes and variants"""
 
     template_name = "boefje_setup.html"
     form_class = BoefjeAddForm
-    permission_required = "tools.can_set_katalogus_settings"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context["breadcrumbs"] = [
-            {"url": reverse("katalogus", kwargs={"organization_code": self.organization.code}), "text": "KAT-alogus"},
-            {
-                "url": reverse("boefje_setup", kwargs={"organization_code": self.organization.code}),
-                "text": "Boefje setup",
-            },
-        ]
-
-        return context
+    permission_required = "tools.can_add_boefje"
 
     def form_valid(self, form):
         """If the form is valid, redirect to the supplied URL."""
@@ -59,3 +46,67 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
         return redirect(
             reverse("boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": boefje_id})
         )
+
+
+class AddBoefjeView(BoefjeSetupView, OrganizationPermissionRequiredMixin, OrganizationView, FormView):
+    """View where the user can create a new Boefje"""
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["breadcrumbs"] = [
+            {"url": reverse("katalogus", kwargs={"organization_code": self.organization.code}), "text": "KAT-alogus"},
+            {
+                "url": reverse("boefje_setup", kwargs={"organization_code": self.organization.code}),
+                "text": "Boefje setup",
+            },
+        ]
+
+        return context
+
+
+class AddBoefjeVariantView(BoefjeSetupView, OrganizationPermissionRequiredMixin, OrganizationView, FormView):
+    """View where the user can create a Boefje variant, based on another Boefje."""
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        katalogus = get_katalogus(self.organization.code)
+        plugin_id = self.kwargs["plugin_id"]
+        boefje = katalogus.get_plugin(plugin_id)
+
+        self.initial = {
+            "oci_image": boefje.oci_image,
+            "oci_arguments": ", ".join(boefje.oci_arguments),
+            "schema": boefje.schema,
+            "consumes": boefje.consumes,
+            "produces": ", ".join(boefje.produces),
+            "scan_level": boefje.scan_level,
+        }
+
+    def get_form(self, form_class=None) -> BoefjeAddForm:
+        if form_class is None:
+            form_class = self.get_form_class()
+
+        form = super().get_form(form_class)
+        form.fields["oci_image"].disabled = True
+        form.fields["consumes"].disabled = True
+
+        return form
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["variant"] = True
+
+        context["breadcrumbs"] = [
+            {"url": reverse("katalogus", kwargs={"organization_code": self.organization.code}), "text": "KAT-alogus"},
+            {
+                "url": reverse(
+                    "boefje_variant_setup",
+                    kwargs={"organization_code": self.organization.code, "plugin_id": self.kwargs["plugin_id"]},
+                ),
+                "text": "Boefje variant setup",
+            },
+        ]
+
+        return context

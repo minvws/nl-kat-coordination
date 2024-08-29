@@ -16,9 +16,10 @@
                 {% endblocktranslate %}
             </p>
         </div>
-        {% if variants %}
+        {% if perms.tools.can_add_boefje %}
             <div class="horizontal-view toolbar">
-                <a class="button ghost" href=""><span class="icon ti-plus"></span>{% translate "Add variant" %}</a>
+                <a class="button ghost"
+                   href="{% url "boefje_variant_setup" plugin_id=plugin.id organization_code=organization.code %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add variant" %}</a>
             </div>
         {% endif %}
     </div>
