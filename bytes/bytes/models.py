@@ -38,6 +38,9 @@ def _validate_timezone_aware_datetime(value: datetime) -> datetime:
 class MimeType(BaseModel):
     value: str
 
+    def __hash__(self):
+        return hash(self.value)
+
 
 class Job(BaseModel):
     id: UUID

@@ -157,25 +157,33 @@ def create_raw(
 
     raw_ids = {}
     mime_types_by_id = {
-        raw.id: raw.mime_types for raw in meta_repository.get_raw(RawDataFilter(boefje_meta_id=boefje_meta_id))
+        raw.id: set(raw.mime_types) for raw in meta_repository.get_raw(RawDataFilter(boefje_meta_id=boefje_meta_id))
     }
+    all_parsed_mime_types = []
 
     for raw in raws:
-        parsed_mime_types = [] if raw.content_type is None else [MimeType(value=x) for x in raw.content_type.split(",")]
+        parsed_mime_types = {} if raw.content_type is None else {MimeType(value=x) for x in raw.content_type.split(",")}
 
         try:
             meta = meta_repository.get_boefje_meta_by_id(boefje_meta_id)
 
             if parsed_mime_types in mime_types_by_id.values():
-                raw_ids[raw.content_type] = list(mime_types_by_id.keys())[
+                raw_ids[raw.content_type] = str(list(mime_types_by_id.keys())[
                     list(mime_types_by_id.values()).index(parsed_mime_types)
-                ]
+                ])
+                all_parsed_mime_types.append(parsed_mime_types)
+                continue
+
+            if parsed_mime_types in all_parsed_mime_types:
+                raise HTTPException(status_code=400, detail="Content types do not define unique sets of mime types.")
 
             raw_data = RawData(value=raw.file.read(), boefje_meta=meta, mime_types=parsed_mime_types)
 
             with meta_repository:
                 raw_id = meta_repository.save_raw(raw_data)
-                raw_ids[raw.content_type] = raw_id
+                raw_ids[raw.content_type] = str(raw_id)
+
+            all_parsed_mime_types.append(parsed_mime_types)
 
             event = RawFileReceived(
                 organization=meta.organization,
