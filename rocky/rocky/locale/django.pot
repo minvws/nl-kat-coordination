@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-28 10:00+0000\n"
+"POT-Creation-Date: 2024-08-29 14:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -713,8 +713,7 @@ msgid ""
 "\n"
 "                        You can create a new Boefje. If you want more "
 "information on this,\n"
-"                        you can check out the <a href=\"\">documentation</"
-"a>.\n"
+"                        you can check out the documentation.\n"
 "                    "
 msgstr ""
 
@@ -1171,6 +1170,20 @@ msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
 msgid "The following arguments are used for this Boefje variant."
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "no variants explanation"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "This Boefje has no variants yet."
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid ""
+"You can make a variant and change the arguments and JSON Schema to customize "
+"it to fit your needs."
 msgstr ""
 
 #: katalogus/templates/plugin_settings_add.html
