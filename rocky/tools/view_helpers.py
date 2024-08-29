@@ -169,6 +169,6 @@ class ObjectsBreadcrumbsMixin(BreadcrumbsMixin):
 class PostRedirect(HttpResponse):
     status_code = 307
 
-    def __init__(self, redirect_to):
-        super().__init__(self)
+    def __init__(self, redirect_to, *args, **kwargs):
+        super().__init__(content=b"", *args, **kwargs)
         self["Location"] = iri_to_uri(redirect_to)
