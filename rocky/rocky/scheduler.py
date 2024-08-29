@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import collections
 import datetime
-import json
+import logging
 import uuid
 from enum import Enum
 from functools import cached_property
@@ -162,6 +163,7 @@ class LazyTaskList:
         else:
             raise TypeError("Invalid slice argument type.")
 
+        logging.info("Getting max %s lazy items at offset %s with filter %s", limit, offset, self.kwargs)
         res = self.scheduler_client.list_tasks(
             limit=limit,
             offset=offset,
@@ -214,7 +216,7 @@ class SchedulerHTTPError(SchedulerError):
 
 
 class SchedulerClient:
-    def __init__(self, base_uri: str, organization_code: str):
+    def __init__(self, base_uri: str, organization_code: str | None):
         self._client = httpx.Client(base_url=base_uri)
         self.organization_code = organization_code
 
@@ -223,8 +225,10 @@ class SchedulerClient:
         **kwargs,
     ) -> PaginatedTasksResponse:
         try:
-            kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
-            res = self._client.get("/tasks", params=kwargs)
+            filter_key = "filters"
+            params = {k: v for k, v in kwargs.items() if v is not None if k != filter_key}  # filter Nones from kwargs
+            endpoint = "/tasks"
+            res = self._client.post(endpoint, params=params, json=kwargs.get(filter_key, None))
             return PaginatedTasksResponse.model_validate_json(res.content)
         except ValidationError:
             raise SchedulerValidationError(extra_message=_("Task list: "))
@@ -232,22 +236,19 @@ class SchedulerClient:
             raise SchedulerConnectError(extra_message=_("Task list: "))
 
     def get_task_details(self, task_id: str) -> Task:
-        try:
-            res = self._client.get(f"/tasks/{task_id}")
-            res.raise_for_status()
-            task_details = Task.model_validate_json(res.content)
+        if self.organization_code is None:
+            raise SchedulerTaskNotFound("No organization defined in client.")
+        task_details = Task.model_validate_json(self._get(f"/tasks/{task_id}", "content"))
 
-            if task_details.type == "normalizer":
-                organization = task_details.data.raw_data.boefje_meta.organization
-            else:
-                organization = task_details.data.organization
+        if task_details.type == "normalizer":
+            organization = task_details.data.raw_data.boefje_meta.organization
+        else:
+            organization = task_details.data.organization
 
-            if organization != self.organization_code:
-                raise SchedulerTaskNotFound()
+        if organization != self.organization_code:
+            raise SchedulerTaskNotFound()
 
-            return task_details
-        except ConnectError:
-            raise SchedulerConnectError()
+        return task_details
 
     def push_task(self, item: Task) -> None:
         try:
@@ -270,24 +271,45 @@ class SchedulerClient:
             raise SchedulerError()
 
     def health(self) -> ServiceHealth:
-        try:
-            health_endpoint = self._client.get("/health")
-            health_endpoint.raise_for_status()
-            return ServiceHealth.model_validate_json(health_endpoint.content)
-        except HTTPError:
-            raise SchedulerHTTPError()
-        except ConnectError:
-            raise SchedulerConnectError()
+        return ServiceHealth.model_validate_json(self._get("/health", return_type="content"))
+
+    def _get_task_stats(self, scheduler_id: str) -> dict:
+        """Return task stats for specific scheduler."""
+        return self._get(f"/tasks/stats/{scheduler_id}")  # type: ignore
 
     def get_task_stats(self, task_type: str) -> dict:
+        """Return task stats for specific task type."""
+        return self._get_task_stats(scheduler_id=f"{task_type}-{self.organization_code}")
+
+    @staticmethod
+    def _merge_stat_dicts(dicts: list[dict]) -> dict:
+        """Merge multiple stats dicts."""
+        stat_sum: dict[str, collections.Counter] = collections.defaultdict(collections.Counter)
+        for dct in dicts:
+            for timeslot, counts in dct.items():
+                stat_sum[timeslot].update(counts)
+        return dict(stat_sum)
+
+    def get_combined_schedulers_stats(self, scheduler_ids: list) -> dict:
+        """Return merged stats for a set of scheduler ids."""
+        return SchedulerClient._merge_stat_dicts(
+            dicts=[self._get_task_stats(scheduler_id=scheduler_id) for scheduler_id in scheduler_ids]
+        )
+
+    def _get(self, path: str, return_type: str = "json") -> dict | bytes:
+        """Helper to do a get request and raise warning for path."""
         try:
-            res = self._client.get(f"/tasks/stats/{task_type}-{self.organization_code}")
+            res = self._client.get(path)
             res.raise_for_status()
-        except ConnectError:
-            raise SchedulerConnectError(extra_message=_("Task statistics: "))
-        task_stats = json.loads(res.content)
-        return task_stats
+        except HTTPError as exc:
+            raise SchedulerError(path) from exc
+        except ConnectError as exc:
+            raise SchedulerConnectError(path) from exc
+
+        if return_type == "content":
+            return res.content
+        return res.json()
 
 
-def scheduler_client(organization_code: str) -> SchedulerClient:
+def scheduler_client(organization_code: str | None) -> SchedulerClient:
     return SchedulerClient(settings.SCHEDULER_API, organization_code)
