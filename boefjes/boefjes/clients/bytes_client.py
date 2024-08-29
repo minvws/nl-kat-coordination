@@ -99,17 +99,16 @@ class BytesAPIClient:
 
     @retry_with_login
     def save_raw(self, boefje_meta_id: str, raw: str | bytes, mime_types: Set[str] = frozenset()) -> UUID:
-        headers = {"content-type": "application/octet-stream"}
-        headers.update(self.headers)
+        content_type = ",".join(mime_types)
         response = self._session.post(
             "/bytes/raw",
-            content=raw,
-            headers=headers,
-            params={"mime_types": list(mime_types), "boefje_meta_id": boefje_meta_id},
+            files=[("raws", ("raws", raw, content_type))],
+            headers=self.headers,
+            params={"boefje_meta_id": str(boefje_meta_id)},
         )
-
         self._verify_response(response)
-        return UUID(response.json()["id"])
+
+        return UUID(response.json()[content_type])
 
     @retry_with_login
     def get_raw(self, raw_data_id: str) -> bytes:

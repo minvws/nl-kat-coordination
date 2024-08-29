@@ -113,15 +113,16 @@ class BytesClient:
         response.raise_for_status()
 
     def _save_raw(self, boefje_meta_id: uuid.UUID, raw: bytes, mime_types: Set[str] = frozenset()) -> str:
+        content_type = ",".join(mime_types)
         response = self.session.post(
             "/bytes/raw",
-            content=raw,
-            headers={"content-type": "application/octet-stream"},
-            params={"mime_types": list(mime_types), "boefje_meta_id": str(boefje_meta_id)},
+            files=[("raws", ("raws", raw, content_type))],
+            params={"boefje_meta_id": str(boefje_meta_id)},
         )
 
         response.raise_for_status()
-        return response.json()["id"]
+
+        return response.json()[content_type]
 
     def get_raw(self, raw_id: str) -> bytes:
         # Note: we assume organization permissions are handled before requesting raw data.
