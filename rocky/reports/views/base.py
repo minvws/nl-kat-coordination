@@ -121,6 +121,9 @@ class ReportRecipeView(OOIFilterView):
     The user selects assets (oois) together with the report types and the resulted plugins.
     """
 
+    NONE_OOI_SELECTION_MESSAGE = _("Select at least one OOI to proceed.")
+    NONE_REPORT_TYPE_SELECTION_MESSAGE = _("Select at least one report type to proceed.")
+
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.report_recipe = self.get_report_recipe()
@@ -218,8 +221,6 @@ class OOISelectionView(ReportRecipeView):
     Shows a list of OOIs to select from and handles OOIs selection requests.
     """
 
-    NONE_OOI_SELECTION_MESSAGE = _("Select at least one OOI to proceed.")
-
     def get_ooi_filter_forms(self, ooi_types: Iterable[type[OOI]]) -> dict[str, Form]:
         return {
             "ooi_type_form": OOITypeMultiCheckboxForReportForm(
@@ -239,8 +240,6 @@ class ReportTypeSelectionView(ReportRecipeView):
     """
     Shows report types and handles selections and requests.
     """
-
-    NONE_REPORT_TYPE_SELECTION_MESSAGE = _("Select at least one report type to proceed.")
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
