@@ -151,23 +151,32 @@ def create_raw(
     raws: list[UploadFile],
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
     event_manager: EventManager = Depends(create_event_manager),
-) -> RawResponse:
-    raw_ids = []
+) -> JSONResponse:
+    """ Parse all the raw files from the request and return the ids. The ids are ordered according to the order
+    from the request data, but since the raw files must have a unique set of mime-types we actually return a mapping
+    of the content type to the id."""
+
+    raw_ids = {}
+    mime_types_by_id = {
+        raw.id: raw.mime_types for raw in meta_repository.get_raw(RawDataFilter(boefje_meta_id=boefje_meta_id))
+    }
+
     for raw in raws:
         parsed_mime_types = [] if raw.content_type is None else [MimeType(value=x) for x in raw.content_type.split(",")]
 
         try:
             meta = meta_repository.get_boefje_meta_by_id(boefje_meta_id)
 
-            if meta_repository.has_raw(meta, parsed_mime_types):
-
-                return RawResponse(status="success", message="Raw data already present")
+            if parsed_mime_types in mime_types_by_id.values():
+                raw_ids[raw.content_type] = list(mime_types_by_id.keys())[
+                    list(mime_types_by_id.values()).index(parsed_mime_types)
+                ]
 
             raw_data = RawData(value=raw.file.read(), boefje_meta=meta, mime_types=parsed_mime_types)
 
             with meta_repository:
                 raw_id = meta_repository.save_raw(raw_data)
-                raw_ids.append(raw_id)
+                raw_ids[raw.content_type] = raw_id
 
             event = RawFileReceived(
                 organization=meta.organization,
@@ -182,7 +191,7 @@ def create_raw(
             logger.exception("Error saving raw data")
             raise HTTPException(status_code=500, detail="Could not save raw data") from error
 
-    return RawResponse(status="success", message="Raw data saved", ids=raw_ids)
+    return JSONResponse(raw_ids)
 
 
 @router.get("/raw/{raw_id}", tags=[RAW_TAG])
