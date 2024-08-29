@@ -2,7 +2,8 @@ import datetime
 from enum import Enum
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from jsonschema.validators import Draft202012Validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class Organisation(BaseModel):
@@ -29,9 +30,20 @@ class Boefje(Plugin):
     scan_level: int = 1
     consumes: set[str] = Field(default_factory=set)
     produces: set[str] = Field(default_factory=set)
+    schema: dict | None = None
     runnable_hash: str | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
+
+    @field_validator("schema")
+    @classmethod
+    def json_schema_valid(cls, schema: dict) -> dict:
+        if schema is not None:
+            Draft202012Validator.check_schema(schema)
+            return schema
+
+    class Config:
+        validate_assignment = True
 
 
 class Normalizer(Plugin):

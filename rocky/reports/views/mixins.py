@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 
 from django.contrib import messages
@@ -57,6 +58,7 @@ class SaveGenerateReportMixin(ReportFinalSettingsView):
                 number_of_reports += 1
 
         observed_at = self.get_observed_at()
+        now = datetime.utcnow()
 
         # if its not a single report, we need a parent
         if number_of_reports > 1:
@@ -68,18 +70,19 @@ class SaveGenerateReportMixin(ReportFinalSettingsView):
                 parent=None,
                 has_parent=False,
                 observed_at=observed_at,
-                name=report_names[0][1],
+                name=now.strftime(report_names[0][1]),
             )
+
             for report_type, ooi_data in report_data.items():
                 for ooi, data in ooi_data.items():
+                    name_to_save = ""
+
                     report_type_name = str(get_report_by_id(report_type).name)
                     ooi_name = Reference.from_str(ooi).human_readable
                     for default_name, updated_name in report_names:
+                        # Use default_name to check if we're on the right index in the list to update the name to save.
                         if ooi_name in default_name and report_type_name in default_name:
-                            name = updated_name
-                            break
-                        else:
-                            name = default_name
+                            name_to_save = updated_name
                             break
 
                     raw_id = self.save_report_raw(data={"report_data": data["data"]})
@@ -91,7 +94,7 @@ class SaveGenerateReportMixin(ReportFinalSettingsView):
                         parent=report_ooi.reference,
                         has_parent=True,
                         observed_at=observed_at,
-                        name=name,
+                        name=now.strftime(name_to_save),
                     )
         # if its a single report we can just save it as complete
         else:
@@ -108,7 +111,7 @@ class SaveGenerateReportMixin(ReportFinalSettingsView):
                 parent=None,
                 has_parent=False,
                 observed_at=observed_at,
-                name=report_names[0][1],
+                name=now.strftime(report_names[0][1]),
             )
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if error_reports:
@@ -171,6 +174,8 @@ class SaveAggregateReportMixin(ReportFinalSettingsView):
                 }
             )
 
+        now = datetime.utcnow()
+
         # Create the report
         report_data_raw_id = self.save_report_raw(data=post_processed_data)
         report_ooi = self.save_report_ooi(
@@ -180,7 +185,7 @@ class SaveAggregateReportMixin(ReportFinalSettingsView):
             parent=None,
             has_parent=False,
             observed_at=observed_at,
-            name=report_names[0][1],
+            name=now.strftime(report_names[0][1]),
         )
 
         # Save the child reports to bytes

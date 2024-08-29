@@ -368,6 +368,25 @@ class ReportFinalSettingsView(ReportRecipeView):
 
         return plugin_data
 
+    @staticmethod
+    def finalise_report_names(report_names: list[str], reference_dates: list[str]) -> list[str]:
+        final_report_names = []
+
+        if len(report_names) == len(reference_dates):
+            for index, report_name in enumerate(report_names):
+                date_format = ""
+                if reference_dates[index] and reference_dates[index] != "":
+                    date_format = " - "
+                    if reference_dates[index] == "week":
+                        date_format += _("Week %W, %Y")
+                    else:
+                        date_format += reference_dates[index]
+                final_report_name = f"{report_name} {date_format}".strip()
+                final_report_names.append(final_report_name)
+        if not final_report_names:
+            return report_names
+        return final_report_names
+
     def save_report_raw(self, data: dict) -> str:
         report_data_raw_id = self.bytes_client.upload_raw(
             raw=ReportDataDict(data).model_dump_json().encode(),
@@ -389,7 +408,7 @@ class ReportFinalSettingsView(ReportRecipeView):
         if not name or name.isspace():
             name = report_type.name
         report_ooi = ReportOOI(
-            name=name,
+            name=str(name),
             report_type=str(report_type.id),
             template=report_type.template_path,
             report_id=uuid4(),

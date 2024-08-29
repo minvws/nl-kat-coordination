@@ -16,7 +16,7 @@ export function initDialog(modal) {
     // Get and clone input elements to be able to "reset" them on "cancel".
     input_elements = modal.querySelectorAll("input, textarea");
 
-    // Clone nodeList input_elements to simple array, instead of making a pointer reference.
+    // Store the initial value in a data attribute
     input_elements.forEach((element) => {
       element.defaultvalue = element.value;
     });
