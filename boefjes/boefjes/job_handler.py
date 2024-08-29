@@ -50,11 +50,18 @@ def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None
         logger.exception("Error getting environment settings")
         raise
 
-    settings_from_katalogus = response.json()
-    new_env = {key.split("BOEFJE_", 1)[1]: value for key, value in os.environ.items() if key.startswith("BOEFJE_")}
+    allowed_keys = schema.get("properties", []) if schema else []
+    new_env = {
+        key.split("BOEFJE_", 1)[1]: value
+        for key, value in os.environ.items()
+        if key.startswith("BOEFJE_") and key in allowed_keys
+    }
 
-    for key, value in settings_from_katalogus.items:
-        new_env[key] = value
+    settings_from_katalogus = response.json()
+
+    for key, value in settings_from_katalogus.items():
+        if key in allowed_keys:
+            new_env[key] = value
 
     # The schema, besides dictating that a boefje cannot run if it is not matched, also provides an extra safeguard:
     # it is possible to inject code if arguments are passed that "escape" the call to a tool. Hence, we should enforce

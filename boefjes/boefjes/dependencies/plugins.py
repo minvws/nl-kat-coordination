@@ -122,14 +122,14 @@ class PluginService:
 
         try:
             self.plugin_storage.boefje_by_id(boefje_id)
-        except PluginNotFound:
+        except PluginNotFound as e:
             try:
                 plugin = self.local_repo.by_id(boefje_id)
             except KeyError:
-                raise
+                raise e
 
             if plugin.type != "boefje":
-                raise
+                raise e
             self.plugin_storage.create_boefje(plugin)
 
     def _put_normalizer(self, normalizer_id: str) -> None:
