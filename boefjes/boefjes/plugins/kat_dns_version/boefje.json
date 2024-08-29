@@ -1,6 +1,6 @@
 {
-  "id": "DNS-bind-version",
-  "name": "DNS-bind-version",
+  "id": "dns-bind-version",
+  "name": "DNS software version",
   "description": "Uses the DNS VERSION.BIND command to attempt to learn the servers software.",
   "consumes": [
     "IPService"

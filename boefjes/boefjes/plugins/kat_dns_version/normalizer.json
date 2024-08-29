@@ -1,5 +1,5 @@
 {
-  "id": "kat_DNS-bind-version_normalize",
+  "id": "dns-bind-version-normalize",
   "consumes": [
     "boefje/dns-bind-version"
   ],
