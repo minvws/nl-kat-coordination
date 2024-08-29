@@ -37,10 +37,12 @@
 
             </section>
         {% endif %}
-        <section>
-            {% include "plugin_container_image.html" %}
+        {% if plugin.oci_image %}
+            <section>
+                {% include "plugin_container_image.html" %}
 
-        </section>
+            </section>
+        {% endif %}
         <section>
             <div>
                 <h2>{% translate "Consumes" %}</h2>
