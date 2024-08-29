@@ -51,12 +51,7 @@ def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None
         raise
 
     settings_from_katalogus = response.json()
-    new_env = {}
-
-    for key, value in os.environ.items():
-        if key.startswith("BOEFJE_"):
-            env_key = key.split("BOEFJE_", 1)[1]
-            new_env[env_key] = value
+    new_env = {key.split("BOEFJE_", 1)[1]: value for key, value in os.environ.items() if key.startswith("BOEFJE_")}
 
     for key, value in settings_from_katalogus.items:
         new_env[key] = value
