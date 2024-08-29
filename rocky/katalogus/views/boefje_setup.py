@@ -90,13 +90,12 @@ class AddBoefjeVariantView(BoefjeSetupView, OrganizationPermissionRequiredMixin,
 
         form = super().get_form(form_class)
         form.fields["oci_image"].disabled = True
-        form.fields["consumes"].disabled = True
 
         return form
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["variant"] = True
+        context["boefje_variant"] = True
 
         context["breadcrumbs"] = [
             {"url": reverse("katalogus", kwargs={"organization_code": self.organization.code}), "text": "KAT-alogus"},
