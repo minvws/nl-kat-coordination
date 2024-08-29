@@ -8,13 +8,13 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
+from tools.view_helpers import PostRedirect
 
 from octopoes.models import Reference
 from reports.report_types.helpers import get_ooi_types_with_report, get_report_types_for_oois
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
     OOISelectionView,
-    PostRedirect,
     ReportBreadcrumbs,
     ReportPluginView,
     ReportTypeSelectionView,

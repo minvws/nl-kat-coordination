@@ -14,7 +14,6 @@ from django.forms import Form
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils.encoding import iri_to_uri
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
@@ -47,14 +46,6 @@ def get_selection(request: HttpRequest, pre_selection: dict[str, str | Sequence[
 
 
 logger = structlog.get_logger(__name__)
-
-
-class PostRedirect(HttpResponse):
-    status_code = 307
-
-    def __init__(self, redirect_to):
-        super().__init__(self)
-        self["Location"] = iri_to_uri(redirect_to)
 
 
 class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
