@@ -6,7 +6,6 @@ from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile
 from fastapi.responses import Response
 from starlette.responses import JSONResponse
 
-from bytes.api.models import RawResponse
 from bytes.auth import authenticate_token
 from bytes.config import get_settings
 from bytes.database.sql_meta_repository import MetaIntegrityError, ObjectNotFoundException, create_meta_data_repository
@@ -152,7 +151,7 @@ def create_raw(
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
     event_manager: EventManager = Depends(create_event_manager),
 ) -> JSONResponse:
-    """ Parse all the raw files from the request and return the ids. The ids are ordered according to the order
+    """Parse all the raw files from the request and return the ids. The ids are ordered according to the order
     from the request data, but since the raw files must have a unique set of mime-types we actually return a mapping
     of the content type to the id."""
 

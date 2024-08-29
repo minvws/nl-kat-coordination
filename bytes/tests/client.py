@@ -126,15 +126,15 @@ class BytesAPIClient:
         if not mime_types:
             mime_types = []
 
+        content_type = ",".join(mime_types)
         response = self.client.post(
             "/bytes/raw",
-            files=[("raws", ("raw1", raw, ",".join(mime_types))), ("raws", ("raw2", raw, "test/type"))],
+            files=[("raws", ("raws", raw, content_type))],
             params={"boefje_meta_id": str(boefje_meta_id)},
         )
         self._verify_response(response)
-        raw_ids = response.json()["ids"]
 
-        return "None" if not raw_ids else raw_ids[0]
+        return response.json()[content_type]
 
     @retry_with_login
     def get_raw(self, raw_id: UUID) -> bytes:

@@ -255,21 +255,21 @@ def test_save_raw_no_mime_types(bytes_api_client: BytesAPIClient) -> None:
     boefje_meta = get_boefje_meta(meta_id=uuid.uuid4())
     bytes_api_client.save_boefje_meta(boefje_meta)
 
-    headers = {"content-type": "application/octet-stream"}
     bytes_api_client.login()
-    headers.update(bytes_api_client.client.headers)
 
     raw_url = f"{bytes_api_client.client.base_url}/bytes/raw"
 
     raw = b"second test 123456"
     response = httpx.post(
-        raw_url, content=raw, headers=headers, params={"boefje_meta_id": str(boefje_meta.id)}, timeout=30
+        raw_url,
+        files=[("raws", ("raw", raw))],
+        headers=bytes_api_client.client.headers,
+        params={"boefje_meta_id": str(boefje_meta.id)},
     )
-
     assert response.status_code == 200
 
     get_raw_without_mime_type_response = httpx.get(
-        f"{raw_url}/{response.json().get('id')}", headers=bytes_api_client.client.headers, timeout=30
+        f"{raw_url}/{response.json()['application/octet-stream']}", headers=bytes_api_client.client.headers, timeout=30
     )
 
     assert get_raw_without_mime_type_response.status_code == 200
