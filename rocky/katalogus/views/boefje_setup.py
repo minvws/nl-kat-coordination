@@ -26,6 +26,11 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
         produces = form_data["produces"].replace(",", "").split()
         boefje_id = str(uuid.uuid4())
 
+        if self.kwargs["plugin_id"]:
+            original_boefje_id = self.kwargs["plugin_id"]
+        else:
+            original_boefje_id = boefje_id
+
         boefje = Boefje(
             id=boefje_id,
             name=form_data["name"] or None,
@@ -44,7 +49,9 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
         get_katalogus(self.organization.code).create_plugin(boefje)
 
         return redirect(
-            reverse("boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": boefje_id})
+            reverse(
+                "boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": original_boefje_id}
+            )
         )
 
 
@@ -71,8 +78,8 @@ class AddBoefjeVariantView(BoefjeSetupView, OrganizationPermissionRequiredMixin,
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        katalogus = get_katalogus(self.organization.code)
         plugin_id = self.kwargs["plugin_id"]
+        katalogus = get_katalogus(self.organization.code)
         boefje = katalogus.get_plugin(plugin_id)
 
         self.initial = {
