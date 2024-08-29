@@ -53,7 +53,7 @@ class PostRedirect(HttpResponse):
     status_code = 307
 
     def __init__(self, redirect_to):
-        HttpResponse.__init__(self)
+        super().__init__(self)
         self["Location"] = iri_to_uri(redirect_to)
 
 
