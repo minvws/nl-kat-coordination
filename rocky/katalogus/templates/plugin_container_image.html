@@ -72,5 +72,15 @@
                 </li>
             </ul>
         </div>
+    {% else %}
+        <p class="explanation"
+           role="group"
+           aria-label="{% translate "no variants explanation" %}">
+            <span>{% translate "This Boefje has no variants yet." %}</span>
+            {% blocktranslate trimmed %}
+                You can make a variant and change the arguments and JSON Schema
+                to customize it to fit your needs.
+            {% endblocktranslate %}
+        </p>
     {% endif %}
 </div>
