@@ -1,7 +1,7 @@
 ---
 authors: JP Bruins Slot <jpbruinsslot@gmail.com>
 state: draft
-discussion: https://github.com/minvws/nl-kat-coordination/pull/
+discussion: https://github.com/minvws/nl-kat-coordination/pull/3425
 labels: process
 ---
 
