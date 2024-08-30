@@ -3,9 +3,7 @@
   "name": "Nikto",
   "description": "Uses Nikto",
   "consumes": [
-    "IPAddressV4",
-    "IPAddressV6",
-    "Hostname"
+    "HostnameHTTPURL"
   ],
   "environment_keys": [],
   "scan_level": 3,

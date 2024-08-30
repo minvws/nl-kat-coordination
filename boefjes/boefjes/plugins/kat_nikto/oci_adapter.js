@@ -15,11 +15,11 @@ function main() {
   // Getting the boefje input
   try {
     var boefje_input = JSON.parse(
-      execSync(`curl --request GET --url ${input_url} -s`).toString(),
+      execSync(`curl --request GET --url ${input_url}`).toString(),
     );
   } catch (error) {
     console.error(`Getting boefje input went wrong with URL: ${input_url}`);
-    throw new Error(error.message);
+    throw new Error(error);
   }
 
   let out = undefined;
