@@ -61,15 +61,24 @@ def status(ctx: click.Context):
 
 
 @cli.command(help='EDN Query (default: "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}")')
+@click.option("--tx-id", type=int, help="Defaulting to latest transaction id (integer)")
+@click.option("--tx-time", type=click.DateTime(), help="Defaulting to latest transaction time (date)")
+@click.option("--valid-time", type=click.DateTime(), help="Defaulting to now (date)")
 @click.argument("edn", required=False)
 @click.pass_context
-def query(ctx: click.Context, edn: str):
+def query(
+    ctx: click.Context,
+    edn: str,
+    valid_time: datetime.datetime | None = None,
+    tx_time: datetime.datetime | None = None,
+    tx_id: int | None = None,
+):
     client: XTDBClient = ctx.obj["client"]
 
     if edn:
-        click.echo(json.dumps(client.query(edn)))
+        click.echo(json.dumps(client.query(edn, valid_time, tx_time, tx_id)))
     else:
-        click.echo(json.dumps(client.query()))
+        click.echo(json.dumps(client.query(valid_time=valid_time, tx_time=tx_time, tx_id=tx_id)))
 
 
 @cli.command(help="List all keys in node")
