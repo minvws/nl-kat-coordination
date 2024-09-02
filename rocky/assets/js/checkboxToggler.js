@@ -1,4 +1,31 @@
 const toggle_all_btn = document.querySelectorAll(".toggle-all");
+
+function SetToggleONWhenAllChecked() {
+  var count_checked = 0;
+  checkbox_target = document.querySelector(".toggle-all[data-toggle-target]");
+  if (checkbox_target) {
+    var checkboxes = document.getElementsByName(
+      checkbox_target.dataset.toggleTarget,
+    );
+
+    for (var i = 0; i < checkboxes.length; i++) {
+      if (
+        checkboxes[i].tagName == "INPUT" &&
+        checkboxes[i].type == "checkbox"
+      ) {
+        if (checkboxes[i].checked) {
+          count_checked++;
+        }
+      }
+    }
+
+    if (count_checked == checkboxes.length) {
+      checkbox_target.classList.toggle("toggle-on");
+    }
+  }
+}
+SetToggleONWhenAllChecked();
+
 for (var i = 0; i < toggle_all_btn.length; i++) {
   toggle_all_btn[i].addEventListener("click", function (event) {
     var toggle_target = event.target.dataset.toggleTarget;
