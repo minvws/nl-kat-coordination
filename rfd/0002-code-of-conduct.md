@@ -66,79 +66,79 @@ labels: process
 
     1.1 _Design_
 
-        Does this change integrate well with the rest of the system? Is it
-        consistent with the existing design and architecture?
+    Does this change integrate well with the rest of the system? Is it
+    consistent with the existing design and architecture?
 
     1.2 _Functionality_
 
-        Does the code behave as the author likely intended? Is the way the code
-        behaves good for its users? This includes the users of the software as
-        well as the developers who will be working with the code. Think about
-        edge cases, look for concurrency problems, try to think like a user,
-        and make sure that there are no bugs that you see just by reading the
-        code.
+    Does the code behave as the author likely intended? Is the way the code
+    behaves good for its users? This includes the users of the software as
+    well as the developers who will be working with the code. Think about
+    edge cases, look for concurrency problems, try to think like a user,
+    and make sure that there are no bugs that you see just by reading the
+    code.
 
     1.3 _Complexity_
 
-        Is the change more complex than it needs to be? **Too complex** usually
-        means: "can't be understood quickly by code readers". It can also
-        mean "developers are likely to introduce bugs when they try or modify
-        this code".
+    Is the change more complex than it needs to be? **Too complex** usually
+    means: "can't be understood quickly by code readers". It can also
+    mean "developers are likely to introduce bugs when they try or modify
+    this code".
 
-        Be cautious of over-engineering, where developers make the code more
-        generalized than necessary or include features that aren't currently
-        required. Encourage developers to address the problem that needs
-        solving right now, rather than focusing on a potential issue that might
-        arise in the future.
+    Be cautious of over-engineering, where developers make the code more
+    generalized than necessary or include features that aren't currently
+    required. Encourage developers to address the problem that needs
+    solving right now, rather than focusing on a potential issue that might
+    arise in the future.
 
     1.4 _Tests_
 
-        Does the code have correct and well-designed automated tests? Ask for
-        unit, integration, or end-to-end tests as appropriate for the change.
+    Does the code have correct and well-designed automated tests? Ask for
+    unit, integration, or end-to-end tests as appropriate for the change.
 
-        Will the tests actually fail when the code is broken? If the code
-        changes, will they begin to produce false positives? Do the tests make
-        clear and meaningful assertions? Are they appropriately divided across
-        different test methods?
+    Will the tests actually fail when the code is broken? If the code
+    changes, will they begin to produce false positives? Do the tests make
+    clear and meaningful assertions? Are they appropriately divided across
+    different test methods?
 
-        Keep in mind that tests are also code that needs maintenance. Avoid
-        allowing complexity in tests just because they aren't part of the main
-        codebase.
+    Keep in mind that tests are also code that needs maintenance. Avoid
+    allowing complexity in tests just because they aren't part of the main
+    codebase.
 
     1.5 _Naming_
 
-        Did the developer choose clear names for variables, classes, methods,
-        etc.? Does the name accurately describe the purpose, behavior, and
-        intent of the code it represents?
+    Did the developer choose clear names for variables, classes, methods,
+    etc.? Does the name accurately describe the purpose, behavior, and
+    intent of the code it represents?
 
     1.6 _Style and Conventions_
 
-        Does the code follow our style and coding guidelines? Are there any
-        violations of the style guide?
+    Does the code follow our style and coding guidelines? Are there any
+    violations of the style guide?
 
     1.7 _Consistency_
 
-        Does the code maintain consistency with the existing code? This
-        includes consistency in naming, style, and design patterns. It’s a
-        judgment call whether the new code should be consistent with the
-        recommendations or the surrounding code.
+    Does the code maintain consistency with the existing code? This
+    includes consistency in naming, style, and design patterns. It’s a
+    judgment call whether the new code should be consistent with the
+    recommendations or the surrounding code.
 
-        The author should maintain consistency with the existing code. This
-        makes sure that the codebase is easier to understand and maintain. When
-        a substantial change should be made to the existing code that would
-        cause inconsistency, it should be discussed with the team, and be
-        addressed in a separate issue.
+    The author should maintain consistency with the existing code. This
+    makes sure that the codebase is easier to understand and maintain. When
+    a substantial change should be made to the existing code that would
+    cause inconsistency, it should be discussed with the team, and be
+    addressed in a separate issue.
 
     1.8 _Comments_
 
-        Are the comments clear and useful? Do they explain why the code is
-        written in a certain way? Do they explain the intent behind the code?
-        Are they up-to-date?
+    Are the comments clear and useful? Do they explain why the code is
+    written in a certain way? Do they explain the intent behind the code?
+    Are they up-to-date?
 
     1.9 _Documentation_
 
-        Did the developer also update relevant documentation? This includes
-        README files, API documentation, and any other relevant documentation.
+    Did the developer also update relevant documentation? This includes
+    README files, API documentation, and any other relevant documentation.
 
 2.  **Assume competence and goodwill**
 
