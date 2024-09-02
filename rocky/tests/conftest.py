@@ -1785,3 +1785,24 @@ def boefje_dns_records():
         runnable_hash=None,
         produces={"boefje/dns-records"},
     )
+
+
+@pytest.fixture
+def boefje_nmap_tcp():
+    return Boefje(
+        id="nmap",
+        name="Nmap TCP",
+        version=None,
+        authors=None,
+        created=None,
+        description="Defaults to top 250 TCP ports. Includes service detection.",
+        environment_keys=None,
+        related=[],
+        enabled=True,
+        type="boefje",
+        scan_level=SCAN_LEVEL.L2,
+        consumes={IPAddressV4, IPAddressV6},
+        options=None,
+        runnable_hash=None,
+        produces={"boefje/nmap"},
+    )
