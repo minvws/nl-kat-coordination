@@ -13,7 +13,8 @@
                value="{{ plugin.id }}"
                {% if checked %}checked{% endif %} />
     {% endif %}
-    <img src="{% url "plugin_cover" organization_code=organization.code plugin_id=plugin.id %}"
+    <img loading="lazy"
+         src="{% url "plugin_cover" organization_code=organization.code plugin_id=plugin.id %}"
          alt="boefje placeholder image" />
     <p class="tile-title">
         <strong>{{ plugin.name }}</strong><span class="label-plugin-type {{ plugin.type }}">{{ plugin.type|title }}</span>

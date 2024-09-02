@@ -1,4 +1,4 @@
-from functools import lru_cache
+from functools import cache
 
 import pika
 import pika.exceptions
@@ -61,7 +61,7 @@ class NullManager(EventManager):
         pass
 
 
-@lru_cache(maxsize=1)
+@cache
 def create_event_manager() -> EventManager:
     settings = get_settings()
 
