@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-29 14:30+0000\n"
+"POT-Creation-Date: 2024-09-02 13:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -713,7 +713,9 @@ msgid ""
 "\n"
 "                        You can create a new Boefje. If you want more "
 "information on this,\n"
-"                        you can check out the documentation.\n"
+"                        you can check out the <a href=\"https://docs.openkat."
+"nl/developer_documentation/development_tutorial/creating_a_boefje."
+"html\">documentation</a>.\n"
 "                    "
 msgstr ""
 
@@ -4110,7 +4112,7 @@ msgid "Input object type"
 msgstr ""
 
 #: tools/forms/boefje.py
-msgid "Output mimetypes"
+msgid "Output mime types"
 msgstr ""
 
 #: tools/forms/finding_type.py
@@ -4397,32 +4399,42 @@ msgstr ""
 
 #: tools/forms/settings.py
 msgid ""
-"If any other settings are needed for your Boefje, add these as a JSON "
-"Schema, otherwise, leave the field empty or 'null'. More information about "
-"how to do this can be found here: <a href='https://json-schema.org/learn/"
-"getting-started-step-by-step'>JSON Schema</a> For inspiration, check the "
-"'schema.json' files of other Boefjes in the repo. "
-msgstr ""
-
-#: tools/forms/settings.py
-msgid "Select the object type that your Boefje consumes."
+"<p>A description of the boefje explaining in short what it can do. This will "
+"both be displayed inside the KAT-alogus and on the Boefje details page.</p> "
 msgstr ""
 
 #: tools/forms/settings.py
 msgid ""
-"<p>Add a set of mime types, separated by commas, for example:</p><p><i>'text/"
-"html, image/jpeg'</i> or <i>'boefje/dns-records'</i>.</p><p>Mime types are "
-"used to match the correct normalizer to a raw file. When the mime type "
-"'boefje/dns-records' is added, the normalizer expects the raw file to "
-"contain dns scan information.</p>"
+"<p>If any other settings are needed for your Boefje, add these as a JSON "
+"Schema, otherwise, leave the field empty or 'null'.</p> <p> This JSON is "
+"used as the basis for a form for the user. When the user enables this Boefje "
+"they can get the option to give extra information. For example, it can "
+"contain an API key that the script requires.</p> <p>More information about "
+"what the schema.json file looks like can be found <a href='https://docs."
+"openkat.nl/developer_documentation/development_tutorial/creating_a_boefje."
+"html'> here</a>.</p> "
 msgstr ""
 
 #: tools/forms/settings.py
 msgid ""
-"Select a clearance level for your Boefje. For more information about the "
-"different clearance levels please check the documentation: <a href='https://"
-"docs.openkat.nl/manual/usermanual.html#scan-levels-clearance-indemnities'> "
-"OpenKAT User Manual</a> "
+"<p>Select the object type that your Boefje consumes.</p> <p>This object type "
+"triggers the Boefje to run. Whenever this OOI gets added, this Boefje will "
+"run with that OOI.</p> "
+msgstr ""
+
+#: tools/forms/settings.py
+msgid ""
+"<p>Add a set of mime types, separated by commas, for example: <i>'text/"
+"html'</i> or <i>'image/jpeg'</i>.</p> <p>Mime types are used to match the "
+"correct normalizer to a raw file.</p> "
+msgstr ""
+
+#: tools/forms/settings.py
+msgid ""
+"<p>Select a clearance level for your Boefje. For more information about the "
+"different clearance levels please check the <a href='https://docs.openkat.nl/"
+"manual/usermanual.html#scan-levels-clearance-indemnities'> documentation</a>."
+"</p> "
 msgstr ""
 
 #: tools/forms/settings.py

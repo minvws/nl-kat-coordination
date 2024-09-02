@@ -59,31 +59,47 @@ OBSERVED_AT_HELP_TEXT = _(
     "Select a datetime to change the view to represent that moment in time."
 )
 
-BOEFJE_SCHEMA_HELP_TEXT = mark_safe(
+BOEFJE_DESCRIPTION_HELP_TEXT = mark_safe(
     _(
-        "If any other settings are needed for your Boefje, add these as a JSON Schema, "
-        "otherwise, leave the field empty or 'null'. "
-        "More information about how to do this can be found here: "
-        "<a href='https://json-schema.org/learn/getting-started-step-by-step'>JSON Schema</a> "
-        "For inspiration, check the 'schema.json' files of other Boefjes in the repo. "
+        "<p>A description of the boefje explaining in short what it can do. "
+        "This will both be displayed inside the KAT-alogus and on the Boefje details page.</p> "
     )
 )
-BOEFJE_CONSUMES_HELP_TEXT = _("Select the object type that your Boefje consumes.")
+
+BOEFJE_SCHEMA_HELP_TEXT = mark_safe(
+    _(
+        "<p>If any other settings are needed for your Boefje, add these as a JSON Schema, "
+        "otherwise, leave the field empty or 'null'.</p> "
+        "<p> This JSON is used as the basis for a form for the user. "
+        "When the user enables this Boefje they can get the option to give extra information. "
+        "For example, it can contain an API key that the script requires.</p> "
+        "<p>More information about what the schema.json file looks like can be found "
+        "<a href='https://docs.openkat.nl/developer_documentation/development_tutorial/creating_a_boefje.html'> "
+        "here</a>.</p> "
+    )
+)
+
+BOEFJE_CONSUMES_HELP_TEXT = mark_safe(
+    _(
+        "<p>Select the object type that your Boefje consumes.</p> "
+        "<p>This object type triggers the Boefje to run. Whenever this OOI gets added, "
+        "this Boefje will run with that OOI.</p> "
+    )
+)
+
 
 BOEFJE_PRODUCES_HELP_TEXT = mark_safe(
     _(
-        "<p>Add a set of mime types, separated by commas, for example:</p><p><i>'text/html, image/jpeg'</i> or "
-        "<i>'boefje/dns-records'</i>.</p><p>Mime types are used to match the correct normalizer to a raw file. "
-        "When the mime type 'boefje/dns-records' is added, the normalizer expects the raw file to contain dns "
-        "scan information.</p>"
+        "<p>Add a set of mime types, separated by commas, for example: <i>'text/html'</i> or <i>'image/jpeg'</i>.</p> "
+        "<p>Mime types are used to match the correct normalizer to a raw file.</p> "
     )
 )
 BOEFJE_SCAN_LEVEL_HELP_TEXT = mark_safe(
     _(
-        "Select a clearance level for your Boefje. For more information about the different "
-        "clearance levels please check the documentation: "
+        "<p>Select a clearance level for your Boefje. For more information about the different "
+        "clearance levels please check the "
         "<a href='https://docs.openkat.nl/manual/usermanual.html#scan-levels-clearance-indemnities'> "
-        "OpenKAT User Manual</a> "
+        "documentation</a>.</p> "
     )
 )
 
