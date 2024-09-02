@@ -1,13 +1,15 @@
-{% extends "partials/list_filters.html" %}
-
-{% load static %}
 {% load i18n %}
 
-{% block title %}
-    {% if count %}<span>{{ count }}</span>{% endif %}
-    {{ title }}
-{% endblock title %}
-{% block filter_form %}
+<div class="filter">
+    <div>
+        <button aria-expanded="false"
+                data-hide-filters-label='{% translate "Hide filters" %}'>
+            {% translate "Show filters" %}
+            {% if active_filters_counter > 0 %}
+                ({{ active_filters_counter }} {% translate "applied" %})
+            {% endif %}
+        </button>
+    </div>
     <form method="get" class="help">
         {% include "partials/form/fieldset.html" with fields=observed_at_form %}
 
@@ -23,4 +25,4 @@
             <a href="{{ request.path }}" class="button ghost">{% translate "Clear filters" %}</a>
         </div>
     </form>
-{% endblock filter_form %}
+</div>
