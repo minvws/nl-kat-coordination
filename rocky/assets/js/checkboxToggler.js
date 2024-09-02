@@ -19,7 +19,10 @@ function SetToggleONWhenAllChecked() {
       }
     }
 
-    checkbox_target.classList.toggle("toggle-on", count_checked == checkboxes.length);
+    checkbox_target.classList.toggle(
+      "toggle-on",
+      count_checked == checkboxes.length,
+    );
   }
 }
 SetToggleONWhenAllChecked();
