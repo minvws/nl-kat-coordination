@@ -13,9 +13,10 @@ from uvicorn import Config, Server
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient, TaskStatus
 from boefjes.config import settings
+from boefjes.dependencies.plugins import PluginService, get_plugin_service
 from boefjes.job_handler import get_environment_settings, get_octopoes_api_connector
 from boefjes.job_models import BoefjeMeta
-from boefjes.local_repository import LocalPluginRepository, get_local_repository
+from boefjes.models import PluginType
 from boefjes.plugins.models import _default_mime_types
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
@@ -88,14 +89,15 @@ async def root():
 def boefje_input(
     task_id: UUID,
     scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),
-    local_repository: LocalPluginRepository = Depends(get_local_repository),
+    plugin_service: PluginService = Depends(get_plugin_service),
 ):
     task = get_task(task_id, scheduler_client)
 
     if task.status is not TaskStatus.RUNNING:
         raise HTTPException(status_code=403, detail="Task does not have status running")
 
-    boefje_meta = create_boefje_meta(task, local_repository)
+    plugin = plugin_service.by_plugin_id(task.data.boefje.id, task.data.organization)
+    boefje_meta = create_boefje_meta(task, plugin)
 
     output_url = str(settings.api).rstrip("/") + f"/api/v0/tasks/{task_id}"
     return BoefjeInput(task_id=task_id, output_url=output_url, boefje_meta=boefje_meta)
@@ -107,14 +109,15 @@ def boefje_output(
     boefje_output: BoefjeOutput,
     scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),
     bytes_client: BytesAPIClient = Depends(get_bytes_client),
-    local_repository: LocalPluginRepository = Depends(get_local_repository),
+    plugin_service: PluginService = Depends(get_plugin_service),
 ):
     task = get_task(task_id, scheduler_client)
 
     if task.status is not TaskStatus.RUNNING:
         raise HTTPException(status_code=403, detail="Task does not have status running")
 
-    boefje_meta = create_boefje_meta(task, local_repository)
+    plugin = plugin_service.by_plugin_id(task.data.boefje.id, task.data.organization)
+    boefje_meta = create_boefje_meta(task, plugin)
     boefje_meta.started_at = task.modified_at
     boefje_meta.ended_at = datetime.now(timezone.utc)
 
@@ -122,7 +125,7 @@ def boefje_output(
     bytes_client.save_boefje_meta(boefje_meta)
 
     if boefje_output.files:
-        mime_types = _default_mime_types(task.data.boefje)
+        mime_types = _default_mime_types(boefje_meta.boefje).union(plugin.produces)
         for file in boefje_output.files:
             raw = base64.b64decode(file.content)
             # when supported, also save file.name to Bytes
@@ -148,15 +151,13 @@ def get_task(task_id, scheduler_client):
     return task
 
 
-def create_boefje_meta(task, local_repository):
-    boefje = task.data.boefje
-    boefje_resource = local_repository.by_id(boefje.id)
-    env_keys = boefje_resource.environment_keys
+def create_boefje_meta(task, plugin: PluginType) -> BoefjeMeta:
+    env_keys = plugin.environment_keys
     environment = get_environment_settings(task.data, env_keys) if env_keys else {}
 
     organization = task.data.organization
     input_ooi = task.data.input_ooi
-    arguments = {"oci_arguments": boefje_resource.oci_arguments}
+    arguments = {"oci_arguments": plugin.oci_arguments}
 
     if input_ooi:
         reference = Reference.from_str(input_ooi)
@@ -169,7 +170,7 @@ def create_boefje_meta(task, local_repository):
 
     boefje_meta = BoefjeMeta(
         id=task.id,
-        boefje=boefje,
+        boefje=task.data.boefje,
         input_ooi=input_ooi,
         arguments=arguments,
         organization=organization,

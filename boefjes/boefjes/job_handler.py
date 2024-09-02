@@ -10,9 +10,9 @@ from httpx import HTTPError
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import settings
+from boefjes.dependencies.plugins import PluginService
 from boefjes.docker_boefjes_runner import DockerBoefjesRunner
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
-from boefjes.local_repository import LocalPluginRepository
 from boefjes.plugins.models import _default_mime_types
 from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
 from octopoes.api.models import Affirmation, Declaration, Observation
@@ -64,26 +64,30 @@ class BoefjeHandler(Handler):
     def __init__(
         self,
         job_runner: BoefjeJobRunner,
-        local_repository: LocalPluginRepository,
+        plugin_service: PluginService,
         bytes_client: BytesAPIClient,
     ):
         self.job_runner = job_runner
-        self.local_repository = local_repository
+        self.plugin_service = plugin_service
         self.bytes_client = bytes_client
 
     def handle(self, boefje_meta: BoefjeMeta) -> None:
         logger.info("Handling boefje %s[task_id=%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
         # Check if this boefje is container-native, if so, continue using the Docker boefjes runner
-        boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)
-        if boefje_resource.oci_image:
+        plugin = self.plugin_service.by_plugin_id(boefje_meta.boefje.id, boefje_meta.organization)
+
+        if plugin.type != "boefje":
+            raise ValueError("Plugin id does not belong to a boefje")
+
+        if plugin.oci_image:
             logger.info(
                 "Delegating boefje %s[task_id=%s] to Docker runner with OCI image [%s]",
                 boefje_meta.boefje.id,
                 str(boefje_meta.id),
-                boefje_resource.oci_image,
+                plugin.oci_image,
             )
-            docker_runner = DockerBoefjesRunner(boefje_resource, boefje_meta)
+            docker_runner = DockerBoefjesRunner(plugin, boefje_meta)
             return docker_runner.run()
 
         if boefje_meta.input_ooi:
@@ -97,12 +101,12 @@ class BoefjeHandler(Handler):
 
             boefje_meta.arguments["input"] = ooi.serialize()
 
-        env_keys = boefje_resource.environment_keys
+        env_keys = plugin.environment_keys
 
-        boefje_meta.runnable_hash = boefje_resource.runnable_hash
+        boefje_meta.runnable_hash = plugin.runnable_hash
         boefje_meta.environment = get_environment_settings(boefje_meta, env_keys) if env_keys else {}
 
-        mime_types = _default_mime_types(boefje_meta.boefje)
+        mime_types = _default_mime_types(boefje_meta.boefje).union(plugin.produces)
 
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
