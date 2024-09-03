@@ -35,8 +35,7 @@
                 {% include "summary/ooi_selection.html" %}
 
             {% endif %}
-            <form id="report_recipe_form"
-                  novalidate
+            <form novalidate
                   method="post"
                   action="{{ previous }}"
                   class="inline layout-wide">
@@ -53,7 +52,8 @@
                 <h2>{% translate "Available report types" %} ({{ available_report_types|length }})</h2>
             {% endif %}
             <p>{% translate "All report types that are available for your selection." %}</p>
-            <a class="toggle-all" data-toggle-target="report_type">{% translate "Toggle all report types" %}</a>
+            <a class="toggle-all {% if all_report_types_checked %}toggle-on{% endif %}"
+               data-toggle-target="report_type">{% translate "Toggle all report types" %}</a>
             <form class="inline layout-wide checkboxes_required"
                   method="post"
                   action="{{ next }}">
