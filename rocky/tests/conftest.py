@@ -1806,3 +1806,12 @@ def boefje_nmap_tcp():
         runnable_hash=None,
         produces={"boefje/nmap"},
     )
+
+
+@pytest.fixture
+def drf_admin_client(create_drf_client, admin_user):
+    client = create_drf_client(admin_user)
+    # We need to set this so that the test client doesn't throw an
+    # exception, but will return error in the API we can test
+    client.raise_request_exception = False
+    return client
