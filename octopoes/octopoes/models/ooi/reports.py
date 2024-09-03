@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Literal
+from typing import Any, Literal
 from uuid import UUID
 
 from octopoes.models import OOI, Reference
@@ -39,6 +39,7 @@ class Report(OOI):
 
     observed_at: datetime
     parent_report: Reference | None = ReferenceField("Report", default=None)
+    report_recipe: Reference | None = ReferenceField("ReportRecipe", default=None)
     has_parent: bool
 
     _natural_key_attrs = ["report_id"]
@@ -50,16 +51,10 @@ class Report(OOI):
 
 class ReportRecipe(OOI):
     recipe_id: UUID
-    object_type: Literal["Report recipe"] = "Report recipe"
-    organization_code: str
-    user: str
-
-    observed_at: datetime
-    input_oois: list[str]
+    object_type: Literal["ReportRecipe"] = "ReportRecipe"
+    cron: str
+    input_recipe: dict[str, Any]
     report_types: list[str]
-    report_plugins: list[str]
-
-    report: Reference | None = ReferenceField("Report", default=None)
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
