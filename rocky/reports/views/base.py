@@ -441,8 +441,6 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
     def get(self, request, *args, **kwargs):
         if "json" in self.request.GET and self.request.GET["json"] == "true":
-            self.bytes_client.login()
-
             response = {
                 "organization_code": self.organization.code,
                 "organization_name": self.organization.name,
@@ -503,6 +501,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         ]
 
     def get_report_data_single_report(self):
+        self.bytes_client.login()
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
         report_data[self.report_ooi.report_type] = {}
 
@@ -519,6 +518,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         return (report_data, input_oois, report_types)
 
     def get_report_data_aggregate_report(self):
+        self.bytes_client.login()
         report_data = self.get_report_data_from_bytes(self.report_ooi)
         children_reports = self.get_children_reports()
         input_oois = self.get_input_oois([self.report_ooi])
@@ -527,6 +527,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         return (report_data, input_oois, report_types)
 
     def get_report_data_concatenated_report(self):
+        self.bytes_client.login()
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
 
         children_reports = self.get_children_reports()
@@ -543,13 +544,9 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         return (report_data, input_oois, report_types)
 
     def get_report_data(self):
-        self.bytes_client.login()
-
-        if issubclass(
-            get_report_by_id(self.report_ooi.report_type), ConcatenatedReport
-        ):  # get single reports data (children's)
+        if issubclass(get_report_by_id(self.report_ooi.report_type), ConcatenatedReport):
             return self.get_report_data_concatenated_report()
-        elif issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):  # its an aggregate report
+        elif issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
             return self.get_report_data_aggregate_report()
         else:
             return self.get_report_data_single_report()
@@ -558,8 +555,8 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         # TODO: add config and plugins
         # TODO: add template OOI
         context = super().get_context_data(**kwargs)
-        context["post_processed_data"] = self.get_report_data_aggregate_report()
         context["report_data"] = self.report_data
+
         context["report_name"] = self.report_ooi.name
         context["report_types"] = [
             report_type for x in REPORTS for report_type in self.report_types if report_type["id"] == x.id
