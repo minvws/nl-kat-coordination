@@ -500,7 +500,9 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
             self.octopoes_api_connector.get(Reference.from_str(ooi), valid_time=self.observed_at) for ooi in ooi_pks
         ]
 
-    def get_report_data_single_report(self):
+    def get_report_data_single_report(
+        self,
+    ) -> tuple[dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]]]:
         self.bytes_client.login()
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
         report_data[self.report_ooi.report_type] = {}
@@ -517,7 +519,9 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         return (report_data, input_oois, report_types)
 
-    def get_report_data_aggregate_report(self):
+    def get_report_data_aggregate_report(
+        self,
+    ) -> tuple[dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]]]:
         self.bytes_client.login()
         report_data = self.get_report_data_from_bytes(self.report_ooi)
         children_reports = self.get_children_reports()
@@ -526,7 +530,9 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         return (report_data, input_oois, report_types)
 
-    def get_report_data_concatenated_report(self):
+    def get_report_data_concatenated_report(
+        self,
+    ) -> tuple[dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]]]:
         self.bytes_client.login()
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
 
