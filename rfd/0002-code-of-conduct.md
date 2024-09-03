@@ -9,11 +9,20 @@ labels: process
 
 ## Introduction
 
-1. Humility
+Code reviews are an essential part of the software development process,
+ensuring that the codebase remains clean, efficient, and maintainable while
+fostering collaboration and knowledge sharing among team members. For both
+authors and reviewers, approaching code reviews with the right mindset and
+strategies can significantly improve the quality of the code and the efficiency
+of the review process.
 
-2. Respect
+By adhering to these best practices, both authors and reviewers can contribute
+to a more effective and enjoyable code review process, ultimately leading to
+higher-quality software and stronger team dynamics.
 
-3. Trust
+Having a code of conduct for code reviews can help set expectations, establish
+a positive and respectful environment, and ensure that the review process is
+productive and beneficial for all team members.[^2]
 
 ## Authors
 
@@ -62,7 +71,10 @@ labels: process
 
 ## Reviewers
 
-1.  **As reviewer look for the following**[^1]. In no particular order:
+1.  **Look for the following**
+
+    As a reviewer look for the following in a pull request[^1]. In no particular
+    order:
 
     1.1 _Design_
 
@@ -241,5 +253,8 @@ labels: process
 - [EngPractices] [google.github.io - Google Engineering Practices Documentation | eng-practices](https://google.github.io/eng-practices/)
 - [Chromium] [chromium.googlesource.com - Chromium Docs - Respectful Changes](https://chromium.googlesource.com/chromium/src/+/refs/heads/main/docs/cl_respect.md)
 - [GoogleTesting] [testing.googleblog.com - Google Testing Blog: Code Health: Respectful Reviews == Useful Reviews](https://testing.googleblog.com/2019/11/code-health-respectful-reviews-useful.html)
+- [Thatham] [chiark.greenend.org.uk - Code review antipatterns](https://www.chiark.greenend.org.uk/~sgtatham/quasiblog/code-review-antipatterns/)
 
 [^1]: Adapted from [EngPractices]
+
+[^2]: A humorous and insightful take on code review antipatterns can be found in [Thatham]
