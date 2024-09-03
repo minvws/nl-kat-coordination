@@ -47,7 +47,8 @@ input[type="reset"] {
       }
     }
 
-    &:hover {
+    &:hover,
+    &:active {
       border-color: var(--colors-purrple-500);
     }
 
