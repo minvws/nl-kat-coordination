@@ -278,7 +278,7 @@ class ReportPluginView(ReportRecipeView):
         super().setup(request, *args, **kwargs)
         self.plugins = self.get_plugins_from_report_type()
 
-    def enabled_plugins(self) -> dict[str, bool]:
+    def plugins_enabled(self) -> dict[str, bool]:
         enabled_plugins_data: dict[str, bool] = {"required": False, "optional": False}
         enabled_plugins = []
 
@@ -342,7 +342,7 @@ class ReportPluginView(ReportRecipeView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["created_at"] = datetime.now()
-        context["enabled_plugins"] = self.enabled_plugins()
+        context["enabled_plugins"] = self.plugins_enabled()
         context["plugin_data"] = self.get_plugin_data()
         context["plugins"] = self.plugins
         return context

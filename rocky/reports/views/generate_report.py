@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
+from tools.view_helpers import PostRedirect
 
 from octopoes.models import OOI
 from reports.report_types.definitions import Report
@@ -110,7 +111,7 @@ class ReportTypesSelectionGenerateReportView(
     def post(self, request, *args, **kwargs):
         if not self.get_ooi_selection():
             messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
-            return redirect(self.get_previous())
+            return PostRedirect(self.get_previous())
         return self.get(request, *args, **kwargs)
 
 
@@ -128,7 +129,13 @@ class SetupScanGenerateReportView(
     def post(self, request, *args, **kwargs):
         if not self.report_recipe.report_types:
             messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
-            return redirect(self.get_previous())
+            return PostRedirect(self.get_previous())
+
+        if "return" in self.request.POST and self.plugins_enabled():
+            return PostRedirect(self.get_previous())
+
+        if self.plugins_enabled():
+            return PostRedirect(self.get_next())
         return self.get(request, *args, **kwargs)
 
 
@@ -145,9 +152,11 @@ class ExportSetupGenerateReportView(
     reports: dict[str, str] = {}
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.report_recipe.report_types:
+            messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
+            return PostRedirect(self.get_previous())
         oois = list(self.get_oois())
         report_types = list(self.get_report_types())
-
         self.reports = create_report_names(oois, report_types)
         return super().get(request, *args, **kwargs)
 

@@ -1,7 +1,13 @@
 from django.urls import path
 
 from katalogus.views.change_clearance_level import ChangeClearanceLevel
-from katalogus.views.katalogus import AboutPluginsView, BoefjeListView, KATalogusView, NormalizerListView
+from katalogus.views.katalogus import (
+    AboutPluginsView,
+    BoefjeListView,
+    KATalogusLandingView,
+    KATalogusView,
+    NormalizerListView,
+)
 from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
 from katalogus.views.plugin_detail import BoefjeDetailView, NormalizerDetailView, PluginCoverImgView
 from katalogus.views.plugin_enable_disable import PluginEnableDisableView
@@ -9,8 +15,7 @@ from katalogus.views.plugin_settings_add import PluginSettingsAddView
 from katalogus.views.plugin_settings_delete import PluginSettingsDeleteView
 
 urlpatterns = [
-    path("", BoefjeListView.as_view(), name="katalogus"),
-    path("view/<view_type>/", KATalogusView.as_view(), name="katalogus"),
+    path("", KATalogusLandingView.as_view(), name="katalogus"),
     path(
         "settings/",
         KATalogusSettingsView.as_view(),
@@ -36,6 +41,7 @@ urlpatterns = [
         NormalizerListView.as_view(),
         name="normalizers_list",
     ),
+    path("plugins/all/<view_type>/", KATalogusView.as_view(), name="all_plugins_list"),
     path(
         "plugins/about-plugins/",
         AboutPluginsView.as_view(),
