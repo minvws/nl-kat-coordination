@@ -1,7 +1,7 @@
 {
   "id": "adr-finding-types",
   "name": "ADR Finding Types",
-  "description": "Checks identified API Design Rules (ADR) for common design mistakes.",
+  "description": "Hydrate information on API Design Rules (ADR) finding types for common design mistakes.",
   "consumes": [
     "ADRFindingType"
   ],

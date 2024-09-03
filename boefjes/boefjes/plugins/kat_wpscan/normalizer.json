@@ -1,5 +1,6 @@
 {
   "id": "kat_wpscan_normalize",
+  "name": "WPscan",
   "consumes": [
     "boefje/wp-scan"
   ],
