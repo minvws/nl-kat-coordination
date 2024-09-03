@@ -54,6 +54,22 @@ class TestAPI(TestCase):
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins?limit=10")
         self.assertEqual(len(response.json()), 10)
 
+        response = self.client.get(
+            f"/v1/organisations/{self.org.id}/plugins", params={"oci_image": "ghcr.io/minvws/openkat/nmap:latest"}
+        )
+        self.assertSetEqual({x["id"] for x in response.json()}, {"nmap", "nmap-udp"})  # Nmap TCP and UDP
+
+        boefje = Boefje(
+            id="test_plugin", name="My test boefje", static=False, oci_image="ghcr.io/minvws/openkat/nmap:latest"
+        )
+        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.json())
+        self.assertEqual(response.status_code, 201)
+
+        response = self.client.get(
+            f"/v1/organisations/{self.org.id}/plugins", params={"oci_image": "ghcr.io/minvws/openkat/nmap:latest"}
+        )
+        self.assertSetEqual({x["id"] for x in response.json()}, {"nmap", "nmap-udp", "test_plugin"})  # Nmap TCP and UDP
+
     def test_cannot_add_plugin_reserved_id(self):
         boefje = Boefje(id="dns-records", name="My test boefje", static=False)
         response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.json())

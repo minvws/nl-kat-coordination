@@ -65,6 +65,10 @@ def list_plugins(
     if filter_params.state is not None:
         plugins = filter(lambda x: x.enabled is filter_params.state, plugins)
 
+    # filter plugins by oci_image
+    if filter_params.oci_image is not None:
+        plugins = filter(lambda x: x.type == "boefje" and x.oci_image == filter_params.oci_image, plugins)
+
     # filter plugins by scan level for boefje plugins
     plugins = list(filter(lambda x: x.type != "boefje" or x.scan_level >= filter_params.scan_level, plugins))
 

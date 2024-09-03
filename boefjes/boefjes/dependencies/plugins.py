@@ -231,5 +231,6 @@ def get_plugins_filter_parameters(
     ids: list[str] | None = Query(None),
     plugin_type: Literal["boefje", "normalizer", "bit"] | None = None,
     state: bool | None = None,
+    oci_image: str | None = None,
 ) -> FilterParameters:
-    return FilterParameters(q=q, ids=ids, type=plugin_type, state=state)
+    return FilterParameters(q=q, ids=ids, type=plugin_type, state=state, oci_image=oci_image)
