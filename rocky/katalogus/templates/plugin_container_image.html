@@ -12,7 +12,7 @@
             <p>
                 {% blocktranslate %}
                     Boefje variants that use the same container image. For more
-                    information about Boefje variants you can read the documentation.
+                    information you can read the documentation.
                 {% endblocktranslate %}
             </p>
         </div>
@@ -35,18 +35,17 @@
                                 <tr>
                                     <th scope="col">{% translate "Name" %}</th>
                                     <th scope="col">{% translate "Scan level" %}</th>
-                                    <th scope="col">{% translate "Published by" %}</th>
-                                    <th scope="col">{% translate "Status" %}</th>
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for variant in variants %}
                                     <tr>
-                                        <td>{{ variant.name }}name</td>
-                                        <td>{{ variant.scan_level }}scan_level</td>
-                                        <td>{{ variant.published_by }}published_by</td>
-                                        <td>{{ variant.status }}status</td>
+                                        <td>{{ variant.name }}</td>
+                                        <td>
+                                            {% include "partials/scan_level_indicator.html" with value=variant.scan_level %}
+
+                                        </td>
                                         <td class="actions">
                                             <button class="expando-button"
                                                     data-icon-open-class="icon ti-chevron-down"
@@ -58,11 +57,10 @@
                                     </tr>
                                     <tr class="expando-row">
                                         <td colspan="5">
+                                            <h5>{% translate "Creation date" %}</h5>
+                                            <p>{{ variant.created }}</p>
                                             <h5>{% translate "Arguments" %}</h5>
                                             <p>{% translate "The following arguments are used for this Boefje variant." %}</p>
-                                            <div>
-                                                <p>Some code example</p>
-                                            </div>
                                         </td>
                                     </tr>
                                 {% endfor %}
