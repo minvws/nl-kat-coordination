@@ -90,8 +90,9 @@ BOEFJE_CONSUMES_HELP_TEXT = mark_safe(
 
 BOEFJE_PRODUCES_HELP_TEXT = mark_safe(
     _(
-        "<p>Add a set of mime types, separated by commas, for example: <i>'text/html'</i> or <i>'image/jpeg'</i>.</p> "
-        "<p>Mime types are used to match the correct normalizer to a raw file.</p> "
+        "<p>Add a set of mime types that are produced by this Boefje, separated by commas. "
+        "For example: <i>'text/html'</i>, <i>'image/jpeg'</i> or <i>'boefje/{boefje-id}'</i></p> "
+        "<p>These output mime types will be shown on the Boefje detail page as information for other users. </p> "
     )
 )
 BOEFJE_SCAN_LEVEL_HELP_TEXT = mark_safe(
