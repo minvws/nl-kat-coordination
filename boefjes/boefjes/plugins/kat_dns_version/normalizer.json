@@ -1,0 +1,10 @@
+{
+  "id": "dns-bind-version-normalize",
+  "consumes": [
+    "boefje/dns-bind-version"
+  ],
+  "produces": [
+    "Software",
+    "SoftwareInstance"
+  ]
+}
