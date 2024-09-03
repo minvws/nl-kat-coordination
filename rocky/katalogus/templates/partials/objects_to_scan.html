@@ -49,10 +49,14 @@
                 Add objects to use this Boefje. This Boefje is able to scan objects of the following types:
             {% endblocktranslate %}
             <p>
-                {% for ooi in plugin.consumes %}
-                    <a href="{% url "ooi_add" ooi_type=ooi organization_code=organization.code %}">{{ ooi }}</a>
-                    {% if ooi != plugin.consumes|last %}-{% endif %}
-                {% endfor %}
+                <ul>
+                    {% for ooi in plugin.consumes %}
+                        <li>
+                            <a href="{% url "ooi_add" ooi_type=ooi organization_code=organization.code %}">{{ ooi }}</a>
+                        </li>
+                        {% if ooi != plugin.consumes|last %}-{% endif %}
+                    {% endfor %}
+                </ul>
             </p>
         {% endif %}
     </div>

@@ -53,10 +53,14 @@
                         {% endblocktranslate %}
                     </p>
                     <p>
-                        {% for ooi_type in plugin.consumes %}
-                            <a href="{% url "ooi_add" organization_code=organization.code ooi_type=ooi_type %}">{{ ooi_type }}</a>
-                            {% if not forloop.last %}-{% endif %}
-                        {% endfor %}
+                        <ul>
+                            {% for ooi_type in plugin.consumes %}
+                                <li>
+                                    <a href="{% url "ooi_add" organization_code=organization.code ooi_type=ooi_type %}">{{ ooi_type }}</a>
+                                </li>
+                                {% if not forloop.last %}-{% endif %}
+                            {% endfor %}
+                        </ul>
                     </p>
                 {% else %}
                     {% blocktranslate trimmed with plugin_name=plugin.name %}
