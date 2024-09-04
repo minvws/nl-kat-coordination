@@ -1,6 +1,10 @@
 @mixin destructive-text-element {
   &.destructive {
     color: var(--color-alert-negative);
+
+    &:hover {
+      color: var(--color-alert-negative-darker);
+    }
   }
 }
 
@@ -8,6 +12,10 @@
   &.destructive {
     color: var(--colors-white);
     background-color: var(--color-alert-negative);
+
+    &:hover {
+      background-color: var(--color-alert-negative-darker);
+    }
 
     &.ghost {
       color: var(--color-alert-negative);

@@ -40,6 +40,7 @@
         background-color: var(--colors-white);
         list-style-type: disc;
         gap: 0;
+        border-radius: var(--border-radius-s);
 
         &:not(:last-child) {
           border-bottom: 1px solid var(--colors-grey-200);

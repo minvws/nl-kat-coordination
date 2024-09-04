@@ -27,6 +27,10 @@ form {
 
     input {
       padding-right: 2.5rem;
+
+      &:hover {
+        border-color: var(--colors-grey-700);
+      }
     }
 
     .icon {
