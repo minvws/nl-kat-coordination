@@ -1,3 +1,5 @@
+@use "destructive";
+
 .dropdown {
   form {
     background-color: transparent;
@@ -9,6 +11,29 @@
       a {
         font-weight: bold;
         text-decoration: none;
+
+        @include destructive.destructive-text-element;
+      }
+
+      button,
+      a.button,
+      input[type="button"],
+      input[type="submit"],
+      input[type="reset"] {
+        background-color: transparent;
+        color: var(--link-text-color);
+        border: 0;
+        padding: 0;
+        min-width: 0;
+        margin: 0;
+        min-height: 0;
+
+        @include destructive.destructive-button;
+
+        &.destructive {
+          color: var(--color-alert-negative);
+          background-color: transparent;
+        }
       }
     }
   }

@@ -4,6 +4,80 @@
 {% spaceless %}
     <div class="horizontal-view toolbar">
         <div class="dropdown">
+            <button aria-controls="export-add"
+                    class="dropdown-button ghost"
+                    id="dropdown-object-type">
+                {% translate "Object types (test)" %}<span aria-hidden="true" class="icon ti-chevron-down"></span>
+            </button>
+            <div id="export-add"
+                 aria-expanded="true"
+                 class="dropdown-list"
+                 role="group"
+                 aria-labelledby="dropdown-object-type">
+                <form action="" method="post">
+                    <label for="form-example-base" class="visually-hidden">Search</label>
+                    <div class="input-icon">
+                        <input id="form-example-base"
+                               name="form-example-base"
+                               type="text"
+                               aria-describedby="form-example-base-explanation">
+                        <span class="icon " aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 class="icon"
+                                 width="24"
+                                 height="24"
+                                 viewBox="0 0 24 24"
+                                 stroke-width="2"
+                                 stroke="currentColor"
+                                 fill="none"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <circle cx="10" cy="10" r="7" />
+                                <line x1="21" y1="21" x2="15" y2="15" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="horizontal-view toolbar">
+                        <button>Select all</button>
+                        <button class="destructive">Clear all</button>
+                    </div>
+                    <div class="checkbox">
+                        <input type="checkbox"
+                               id="checkbox-example-list-a"
+                               name="standaard-checkbox">
+                        <label for="checkbox-example-list-a">
+                            <span class="tag tags-color-1-light">Type A</span>
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <input type="checkbox"
+                               id="checkbox-example-list-b"
+                               name="standaard-checkbox">
+                        <label for="checkbox-example-list-b">
+                            <span class="tag tags-color-2-light">Type B</span>
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <input type="checkbox"
+                               id="checkbox-example-list-c"
+                               name="standaard-checkbox">
+                        <label for="checkbox-example-list-c">
+                            <span class="tag tags-color-3-light">Type C</span>
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <input type="checkbox"
+                               id="checkbox-example-list-d"
+                               name="standaard-checkbox">
+                        <label for="checkbox-example-list-d">
+                            <span class="tag tags-color-4-light">Type D</span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="dropdown">
             <button aria-controls="export-add" class="dropdown-button ghost">
                 {% translate "Add" %}<span aria-hidden="true" class="icon ti-chevron-down"></span>
             </button>
