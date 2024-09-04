@@ -53,7 +53,6 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
     # Relevant network object is received from the normalizer_meta.
     network = Network(name=input_ooi["network"]["name"])
-    yield network
 
     netblock_ref = None
     if "NetBlock" in input_ooi["object_type"]:
