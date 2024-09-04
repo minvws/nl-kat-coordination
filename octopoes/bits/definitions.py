@@ -1,6 +1,6 @@
 import importlib
 import pkgutil
-from functools import lru_cache
+from functools import cache
 from logging import getLogger
 from pathlib import Path
 from types import ModuleType
@@ -29,7 +29,7 @@ class BitDefinition(BaseModel):
     config_ooi_relation_path: str | None = None
 
 
-@lru_cache(maxsize=32)
+@cache
 def get_bit_definitions() -> dict[str, BitDefinition]:
     bit_definitions = {}
 

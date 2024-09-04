@@ -7,7 +7,7 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 from tools.forms.base import ObservedAtForm
-from tools.forms.findings import FindingSeverityMultiSelectForm, MutedFindingSelectionForm
+from tools.forms.findings import FindingSearchForm, FindingSeverityMultiSelectForm, MutedFindingSelectionForm
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models.ooi.findings import RiskLevelSeverity
@@ -61,6 +61,8 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         self.exclude_muted = self.muted_findings == "non-muted"
         self.only_muted = self.muted_findings == "muted"
 
+        self.search_string = request.GET.get("search", "")
+
     def count_observed_at_filter(self) -> int:
         return 1 if datetime.now(timezone.utc).date() != self.observed_at.date() else 0
 
@@ -74,6 +76,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
             severities=self.severities,
             exclude_muted=self.exclude_muted,
             only_muted=self.only_muted,
+            search_string=self.search_string,
         )
 
     def get_context_data(self, **kwargs):
@@ -82,6 +85,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         context["observed_at"] = self.observed_at
         context["severity_filter"] = FindingSeverityMultiSelectForm({"severity": list(self.severities)})
         context["muted_findings_filter"] = MutedFindingSelectionForm({"muted_findings": self.muted_findings})
+        context["finding_search_form"] = FindingSearchForm(self.request.GET)
         context["only_muted"] = self.only_muted
         context["active_filters_counter"] = self.count_active_filters()
         return context
@@ -89,7 +93,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
 
 class FindingListView(BreadcrumbsMixin, FindingListFilter):
     template_name = "findings/finding_list.html"
-    paginate_by = 20
+    paginate_by = 150
 
     def build_breadcrumbs(self):
         return [
