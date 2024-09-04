@@ -211,7 +211,7 @@ class PluginService:
         return plugin
 
 
-def get_plugin_service(organisation_id: str) -> Iterator[PluginService]:
+def get_plugin_service() -> Iterator[PluginService]:
     def closure(session: Session):
         return PluginService(
             create_plugin_storage(session),

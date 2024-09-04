@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-04 12:45+0000\n"
+"POT-Creation-Date: 2024-09-04 13:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -703,7 +703,7 @@ msgstr ""
 
 #: katalogus/templates/boefje_detail.html
 #, python-format
-msgid "%(plugin_name)s doesn't produce any output mimetypes."
+msgid "%(plugin_name)s doesn't produce any output mime types."
 msgstr ""
 
 #: katalogus/templates/boefje_setup.html
@@ -719,7 +719,13 @@ msgid ""
 "\n"
 "                        You can create a new Boefje. If you want more "
 "information on this,\n"
+"<<<<<<< HEAD\n"
 "                        you can check out the documentation.\n"
+"=======\n"
+"                        you can check out the <a href=\"https://docs.openkat."
+"nl/developer_documentation/development_tutorial/creating_a_boefje."
+"html\">documentation</a>.\n"
+">>>>>>> feature/add-new-boefje\n"
 "                    "
 msgstr ""
 
@@ -4137,7 +4143,7 @@ msgid "Input object type"
 msgstr ""
 
 #: tools/forms/boefje.py
-msgid "Output mimetypes"
+msgid "Output mime types"
 msgstr ""
 
 #: tools/forms/finding_type.py
@@ -4277,6 +4283,14 @@ msgstr ""
 msgid "Filter by muted findings"
 msgstr ""
 
+#: tools/forms/findings.py tools/forms/ooi_form.py tools/forms/scheduler.py
+msgid "Search"
+msgstr ""
+
+#: tools/forms/findings.py
+msgid "Object ID contains (case sensitive)"
+msgstr ""
+
 #: tools/forms/ooi.py
 msgid "Filter types"
 msgstr ""
@@ -4313,10 +4327,6 @@ msgstr ""
 
 #: tools/forms/ooi_form.py
 msgid "Filter by clearance type"
-msgstr ""
-
-#: tools/forms/ooi_form.py tools/forms/scheduler.py
-msgid "Search"
 msgstr ""
 
 #: tools/forms/scheduler.py
@@ -4424,11 +4434,8 @@ msgstr ""
 
 #: tools/forms/settings.py
 msgid ""
-"If any other settings are needed for your Boefje, add these as a JSON "
-"Schema, otherwise, leave the field empty or 'null'. More information about "
-"how to do this can be found here: <a href='https://json-schema.org/learn/"
-"getting-started-step-by-step'>JSON Schema</a> For inspiration, check the "
-"'schema.json' files of other Boefjes in the repo. "
+"<p>A description of the boefje explaining in short what it can do. This will "
+"both be displayed inside the KAT-alogus and on the Boefje details page.</p> "
 msgstr ""
 
 #: tools/forms/settings.py
@@ -4440,19 +4447,30 @@ msgstr ""
 
 #: tools/forms/settings.py
 msgid ""
-"<p>Add a set of mime types, separated by commas, for example:</p><p><i>'text/"
-"html, image/jpeg'</i> or <i>'boefje/dns-records'</i>.</p><p>Mime types are "
-"used to match the correct normalizer to a raw file. When the mime type "
-"'boefje/dns-records' is added, the normalizer expects the raw file to "
-"contain dns scan information.</p>"
+"<p>If any other settings are needed for your Boefje, add these as a JSON "
+"Schema, otherwise, leave the field empty or 'null'.</p> <p> This JSON is "
+"used as the basis for a form for the user. When the user enables this Boefje "
+"they can get the option to give extra information. For example, it can "
+"contain an API key that the script requires.</p> <p>More information about "
+"what the schema.json file looks like can be found <a href='https://docs."
+"openkat.nl/developer_documentation/development_tutorial/creating_a_boefje."
+"html'> here</a>.</p> "
 msgstr ""
 
 #: tools/forms/settings.py
 msgid ""
-"Select a clearance level for your Boefje. For more information about the "
-"different clearance levels please check the documentation: <a href='https://"
-"docs.openkat.nl/manual/usermanual.html#scan-levels-clearance-indemnities'> "
-"OpenKAT User Manual</a> "
+"<p>Add a set of mime types that are produced by this Boefje, separated by "
+"commas. For example: <i>'text/html'</i>, <i>'image/jpeg'</i> or <i>'boefje/"
+"{boefje-id}'</i></p> <p>These output mime types will be shown on the Boefje "
+"detail page as information for other users. </p> "
+msgstr ""
+
+#: tools/forms/settings.py
+msgid ""
+"<p>Select a clearance level for your Boefje. For more information about the "
+"different clearance levels please check the <a href='https://docs.openkat.nl/"
+"manual/usermanual.html#scan-levels-clearance-indemnities'> documentation</a>."
+"</p> "
 msgstr ""
 
 #: tools/forms/settings.py
@@ -4613,10 +4631,6 @@ msgstr ""
 
 #: rocky/scheduler.py
 msgid "Task list: "
-msgstr ""
-
-#: rocky/scheduler.py
-msgid "Task statistics: "
 msgstr ""
 
 #: rocky/settings.py
@@ -6254,9 +6268,17 @@ msgid "List of tasks for boefjes"
 msgstr ""
 
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+msgid "Organization Code"
+msgstr ""
+
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 #: rocky/templates/tasks/ooi_detail_task_list.html
 #: rocky/templates/tasks/plugin_detail_task_list.html
 msgid "Created date"
+msgstr ""
+
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+msgid "Modified date"
 msgstr ""
 
 #: rocky/templates/tasks/normalizers.html
@@ -6867,6 +6889,15 @@ msgid ""
 "Your task is scheduled and will soon be started in the background. Results "
 "will be added to the object list when they are in. It may take some time, a "
 "refresh of the page may be needed to show the results."
+msgstr ""
+
+#: rocky/views/tasks.py
+#, python-brace-format
+msgid "Fetching tasks failed: no connection with scheduler: {error}"
+msgstr ""
+
+#: rocky/views/tasks.py
+msgid "All Tasks"
 msgstr ""
 
 #: rocky/views/upload_csv.py

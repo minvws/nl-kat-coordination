@@ -6,6 +6,7 @@ from tools.enums import SCAN_LEVEL
 from tools.forms.base import BaseRockyForm
 from tools.forms.settings import (
     BOEFJE_CONSUMES_HELP_TEXT,
+    BOEFJE_DESCRIPTION_HELP_TEXT,
     BOEFJE_PRODUCES_HELP_TEXT,
     BOEFJE_SCAN_LEVEL_HELP_TEXT,
     BOEFJE_SCHEMA_HELP_TEXT,
@@ -19,7 +20,10 @@ class BoefjeAddForm(BaseRockyForm):
         required=True,
         label=_("Container image"),
         widget=forms.TextInput(
-            attrs={"description": "For example: ghcr.io/minvws/openkat/nmap", "aria-describedby": "input-description"}
+            attrs={
+                "description": "The name of the Docker image. For example: ghcr.io/minvws/openkat/nmap",
+                "aria-describedby": "input-description",
+            }
         ),
     )
     name = forms.CharField(
@@ -30,6 +34,7 @@ class BoefjeAddForm(BaseRockyForm):
         required=False,
         label=_("Description"),
         widget=forms.Textarea(attrs={"rows": 3}),
+        help_text=BOEFJE_DESCRIPTION_HELP_TEXT,
     )
     oci_arguments = forms.CharField(
         required=False,
@@ -51,7 +56,7 @@ class BoefjeAddForm(BaseRockyForm):
     )
     produces = forms.CharField(
         required=False,
-        label=_("Output mimetypes"),
+        label=_("Output mime types"),
         help_text=BOEFJE_PRODUCES_HELP_TEXT,
     )
     scan_level = forms.CharField(

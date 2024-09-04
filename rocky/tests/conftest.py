@@ -1107,6 +1107,25 @@ def plugin_details():
 
 
 @pytest.fixture
+def plugin_details_with_container():
+    return parse_plugin(
+        {
+            "id": "test-boefje",
+            "type": "boefje",
+            "name": "TestBoefje",
+            "description": "Meows to the moon",
+            "scan_level": 1,
+            "consumes": ["Network"],
+            "produces": ["Network"],
+            "enabled": True,
+            "schema": {},
+            "oci_image": "ghcr.io/test/image:123",
+            "oci_arguments": ["-test", "-arg"],
+        }
+    )
+
+
+@pytest.fixture
 def plugin_schema():
     return {
         "title": "Arguments",
@@ -1785,3 +1804,33 @@ def boefje_dns_records():
         runnable_hash=None,
         produces={"boefje/dns-records"},
     )
+
+
+@pytest.fixture
+def boefje_nmap_tcp():
+    return Boefje(
+        id="nmap",
+        name="Nmap TCP",
+        version=None,
+        authors=None,
+        created=None,
+        description="Defaults to top 250 TCP ports. Includes service detection.",
+        environment_keys=None,
+        related=[],
+        enabled=True,
+        type="boefje",
+        scan_level=SCAN_LEVEL.L2,
+        consumes={IPAddressV4, IPAddressV6},
+        options=None,
+        runnable_hash=None,
+        produces={"boefje/nmap"},
+    )
+
+
+@pytest.fixture
+def drf_admin_client(create_drf_client, admin_user):
+    client = create_drf_client(admin_user)
+    # We need to set this so that the test client doesn't throw an
+    # exception, but will return error in the API we can test
+    client.raise_request_exception = False
+    return client

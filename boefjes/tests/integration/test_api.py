@@ -47,9 +47,9 @@ class TestAPI(TestCase):
 
     def test_filter_plugins(self):
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/")
-        self.assertEqual(len(response.json()), 97)
+        self.assertEqual(len(response.json()), 99)
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins?plugin_type=boefje")
-        self.assertEqual(len(response.json()), 43)
+        self.assertEqual(len(response.json()), 44)
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins?limit=10")
         self.assertEqual(len(response.json()), 10)
@@ -90,7 +90,7 @@ class TestAPI(TestCase):
         self.assertEqual(response.status_code, 422)
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/?plugin_type=boefje")
-        self.assertEqual(len(response.json()), 44)
+        self.assertEqual(len(response.json()), 45)
 
         boefje_dict = boefje.dict()
         boefje_dict["consumes"] = list(boefje_dict["consumes"])
@@ -115,7 +115,7 @@ class TestAPI(TestCase):
         self.assertEqual(response.status_code, 201)
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/?plugin_type=normalizer")
-        self.assertEqual(len(response.json()), 55)
+        self.assertEqual(len(response.json()), 56)
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/test_normalizer")
         self.assertEqual(response.json(), normalizer.dict())

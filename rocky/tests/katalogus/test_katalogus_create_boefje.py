@@ -16,6 +16,6 @@ def test_boefje_setup(rf, superuser_member):
     assertContains(response, "Arguments")
     assertContains(response, "JSON Schema")
     assertContains(response, "Input object type")
-    assertContains(response, "Output mimetypes")
+    assertContains(response, "Output mime types")
     assertContains(response, "Clearance level")
     assertContains(response, "Create variant")

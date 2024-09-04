@@ -14,7 +14,7 @@ class PluginSettingsListView(SinglePluginView):
     """
 
     paginator_class = RockyPaginator
-    paginate_by = 10
+    paginate_by = 150
     context_object_name = "plugin_settings"
 
     def get_plugin_settings(self) -> list[dict[str, Any]]:

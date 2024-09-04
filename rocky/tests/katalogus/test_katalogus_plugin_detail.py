@@ -1,5 +1,5 @@
 from katalogus.views.plugin_detail import BoefjeDetailView
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertNotContains
 
 from tests.conftest import setup_request
 
@@ -22,13 +22,40 @@ def test_plugin_detail_view(
     )
 
     assertContains(response, "TestBoefje")
+    assertContains(response, "Produces")
+    assertContains(response, "Tasks")
+    assertContains(response, "Object list")
+    assertContains(response, "Consumes")
+    assertContains(response, plugin_details.description)
+    assertNotContains(response, "Container image")
+    assertNotContains(response, "Variants")
+
+
+def test_plugin_detail_view_with_container_image(
+    rf,
+    superuser_member,
+    mock_mixins_katalogus,
+    plugin_details_with_container,
+    mock_organization_view_octopoes,
+    mock_scheduler_client_task_list,
+):
+    mock_mixins_katalogus().get_plugin.return_value = plugin_details_with_container
+
+    request = setup_request(rf.get("boefje_detail"), superuser_member.user)
+    response = BoefjeDetailView.as_view()(
+        request,
+        organization_code=superuser_member.organization.code,
+        plugin_id="test-plugin",
+    )
+
+    assertContains(response, "TestBoefje")
     assertContains(response, "Container image")
     assertContains(response, "Variants")
     assertContains(response, "Produces")
     assertContains(response, "Tasks")
     assertContains(response, "Object list")
     assertContains(response, "Consumes")
-    assertContains(response, plugin_details.description)
+    assertContains(response, plugin_details_with_container.description)
 
 
 def test_plugin_detail_view_no_consumes(
