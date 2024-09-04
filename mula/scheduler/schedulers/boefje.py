@@ -138,7 +138,7 @@ class BoefjeScheduler(Scheduler):
             new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(self.organisation.id)
         except ExternalServiceError:
             self.logger.error(
-                "Failed to get new boefjes for organisation: %s from katalogus",
+                "Failed to get new boefjes for organisation %s from katalogus",
                 self.organisation.name,
                 organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
