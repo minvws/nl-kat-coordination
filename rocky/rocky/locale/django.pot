@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-04 08:55+0000\n"
+"POT-Creation-Date: 2024-09-04 14:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2923,7 +2923,6 @@ msgid "services are compliant"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
-#: reports/templates/partials/report_header.html
 msgid "Download report"
 msgstr ""
 
@@ -3492,6 +3491,14 @@ msgstr ""
 
 #: reports/templates/partials/plugin_overview_table.html
 msgid "Ready"
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid "Download report (PDF)"
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid "Download report (JSON)"
 msgstr ""
 
 #: reports/templates/partials/report_header.html
