@@ -38,7 +38,7 @@ input[type="reset"] {
     overflow-wrap: break-word;
 
     /* States */
-    &.selected {
+    &[aria-current="page"] {
       background-color: var(--colors-purrple-200);
       border-color: var(--colors-purrple-200);
 
