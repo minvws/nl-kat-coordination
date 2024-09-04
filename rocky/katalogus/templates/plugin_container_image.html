@@ -24,6 +24,16 @@
         {% endif %}
     </div>
     {% if variants %}
+        {% if new_variant %}
+            <p class="confirmation"
+               role="group"
+               aria-label="{% translate "new variant confirmation" %}">
+                <span>{% blocktranslate %}Variant {{ plugin.name }} created.{% endblocktranslate%}</span>
+                {% blocktranslate trimmed %}
+                    The Boefje variant is successfully created and can now be used.
+                {% endblocktranslate %}
+            </p>
+        {% endif %}
         <div class="horizontal-scroll">
             <ul class="accordion">
                 <li>
@@ -57,9 +67,9 @@
                                         </td>
                                         <td>
                                             {% if variant.enabled %}
-                                                <span class="label tags-color-2-light">{% translate "Enabled" %}</span>
+                                                <span class="label tags-color-2-medium">{% translate "Enabled" %}</span>
                                             {% else %}
-                                                <span class="label tags-color-4-light">{% translate "Disabled" %}</span>
+                                                <span class="label tags-color-4-medium">{% translate "Disabled" %}</span>
                                             {% endif %}
                                         </td>
                                         <td class="actions">

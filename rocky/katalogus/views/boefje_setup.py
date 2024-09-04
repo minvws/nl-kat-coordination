@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from urllib.parse import urlencode
 
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.shortcuts import redirect
@@ -51,11 +52,14 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
         )
 
         get_katalogus(self.organization.code).create_plugin(boefje)
+        query_params = urlencode({"new_variant": True})
 
         return redirect(
             reverse(
                 "boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": original_boefje_id}
             )
+            + "?"
+            + query_params
         )
 
 
