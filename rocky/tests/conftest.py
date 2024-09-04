@@ -1097,11 +1097,15 @@ def plugin_details():
             "id": "test-boefje",
             "type": "boefje",
             "name": "TestBoefje",
+            "created": "2023-05-09T09:37:20.909069+00:00",
             "description": "Meows to the moon",
             "scan_level": 1,
             "consumes": ["Network"],
             "produces": ["Network"],
             "enabled": True,
+            "schema": {},
+            "oci_image": None,
+            "oci_arguments": ["-test", "-arg"],
         }
     )
 
@@ -1113,6 +1117,7 @@ def plugin_details_with_container():
             "id": "test-boefje",
             "type": "boefje",
             "name": "TestBoefje",
+            "created": "2023-05-09T09:37:20.909069+00:00",
             "description": "Meows to the moon",
             "scan_level": 1,
             "consumes": ["Network"],
