@@ -176,7 +176,7 @@ class TestAPI(TestCase):
         self.assertEqual(r.status_code, 404)
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/dns-records")
-        self.assertEqual(response.json()["name"], "DnsRecords")
+        self.assertEqual(response.json()["name"], "DNS records")
         self.assertIsNone(response.json()["version"])
         self.assertEqual(response.json()["id"], "dns-records")
 
