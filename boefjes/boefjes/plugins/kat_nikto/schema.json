@@ -1,6 +1,32 @@
 {
   "title": "Arguments",
   "type": "object",
-  "properties": {},
+  "properties": {
+    "PROXYHOST": {
+      "title": "PROXYHOST",
+      "maxLength": 256,
+      "type": "string"
+    },
+    "PROXYPORT": {
+      "title": "PROXYPORT",
+      "maxLength": 256,
+      "type": "string"
+    },
+    "PROXYUSER": {
+      "title": "PROXYUSER",
+      "maxLength": 256,
+      "type": "string"
+    },
+    "PROXYPASS": {
+      "title": "PROXYPASS",
+      "maxLength": 256,
+      "type": "string"
+    },
+    "USERAGENT": {
+      "title": "USERAGENT",
+      "maxLength": 256,
+      "type": "string"
+    }
+  },
   "required": []
 }

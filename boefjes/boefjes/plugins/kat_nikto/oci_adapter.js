@@ -22,6 +22,8 @@ function main() {
     throw new Error(error);
   }
 
+  Object.assign(process.env, boefje_input["boefje_meta"]["environment"]);
+
   let out = undefined;
   let output_url = boefje_input.output_url;
   try {

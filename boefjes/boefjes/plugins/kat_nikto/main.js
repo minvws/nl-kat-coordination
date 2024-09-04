@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import { execSync } from "node:child_process";
+
 /**
  * @param {Object} boefje_meta Information about the task
  * @param {Object} boefje_meta.arguments
@@ -15,18 +16,45 @@ export default function (boefje_meta) {
   // Depending on what OOI triggered this task, the hostname / address will be in a different location
   const hostname = boefje_meta.arguments.input.netloc.name;
   const scheme = boefje_meta.arguments.input.scheme;
+  const IS_USING_PROXY = !!process.env.PROXYHOST;
 
-  let command = `./nikto/program/nikto.pl -h ${hostname} -o ./output.json -404code=301,302,307,308`;
-  if (scheme == "https") command += " -ssl";
+  // Setup config file
+  try {
+    let config_contents =
+      "PROMPTS=no\nUPDATES=no\nCLIOPTS=-404code=301,302,307,308 -o ./output.json";
+
+    // CLI OPTIONS
+    if (scheme == "https") config_contents += " -ssl";
+    if (IS_USING_PROXY) config_contents += " -useproxy";
+    config_contents += "\n";
+
+    if (IS_USING_PROXY) {
+      const PROXY_HOST = process.env.PROXYHOST;
+      const PROXY_PORT = process.env.PROXYPORT || "8080";
+      const PROXY_USER = process.env.PROXYUSER || "";
+      const PROXY_PASS = process.env.PROXYPASS || "";
+
+      config_contents += `PROXYHOST=${PROXY_HOST}\n`;
+      config_contents += `PROXYPORT=${PROXY_PORT}\n`;
+      config_contents += `PROXYUSER=${PROXY_USER}\n`;
+      config_contents += `PROXYPASS=${PROXY_PASS}\n`;
+    }
+
+    if (process.env.USERAGENT)
+      config_contents += `USERAGENT=${process.env.USERAGENT}\n`;
+
+    fs.writeFileSync("./nikto.conf", config_contents);
+  } catch (e) {
+    console.error("Something went wrong writing to the config file.\n" + e);
+  }
 
   // Running nikto and outputting to a file
   try {
-    execSync(command, {
+    execSync(`./nikto/program/nikto.pl -h ${hostname} -config ./nikto.conf`, {
       stdio: "inherit",
     });
   } catch (e) {
-    console.error(e);
-    throw new Error("Something went wrong running the nikto command.\n");
+    throw new Error("Something went wrong running the nikto command.\n" + e);
   }
 
   const raws = [];
@@ -36,10 +64,8 @@ export default function (boefje_meta) {
     var file_contents = fs.readFileSync("./output.json").toString();
     raws.push([["boefje/nikto-output"], file_contents]);
   } catch (e) {
-    console.error(e.message);
     throw new Error(
-      "Something went wrong reading the file from the nikto command.\n" +
-        e.message,
+      "Something went wrong reading the file from the nikto command.\n" + e,
     );
   }
 
@@ -50,7 +76,7 @@ export default function (boefje_meta) {
       if (vulnerability["id"].startsWith("6"))
         raws.push([["openkat/finding"], "KAT-OUTDATED-SOFTWARE"]);
   } catch (e) {
-    console.error(e.message);
+    console.error(e);
   }
 
   return raws;

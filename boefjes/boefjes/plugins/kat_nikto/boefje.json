@@ -5,7 +5,13 @@
   "consumes": [
     "HostnameHTTPURL"
   ],
-  "environment_keys": [],
+  "environment_keys": [
+    "PROXYHOST",
+    "PROXYPORT",
+    "PROXYUSER",
+    "PROXYPASS",
+    "USERAGENT"
+  ],
   "scan_level": 3,
   "oci_image": "openkat/nikto",
   "oci_arguments": []
