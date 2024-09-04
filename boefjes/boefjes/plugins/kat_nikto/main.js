@@ -2,20 +2,10 @@ import fs from "node:fs";
 import { execSync } from "node:child_process";
 
 /**
- * @param {Object} boefje_meta Information about the task
- * @param {Object} boefje_meta.arguments
- * @param {Object} boefje_meta.arguments.input
- * @param {string} boefje_meta.arguments.input.object_type
- * @param {"http" | "https"} boefje_meta.arguments.input.scheme
- * @param {number} boefje_meta.arguments.input.port
- * @param {Object} boefje_meta.arguments.input.netloc
- * @param {string} boefje_meta.arguments.input.netloc.name
- * @returns {(string | string[])[][]}
+ * @param {string} scheme
+ * @returns {string}
  */
-export default function (boefje_meta) {
-  // Depending on what OOI triggered this task, the hostname / address will be in a different location
-  const hostname = boefje_meta.arguments.input.netloc.name;
-  const scheme = boefje_meta.arguments.input.scheme;
+function get_config_content(scheme) {
   const IS_USING_PROXY = !!process.env.PROXYHOST;
 
   // Setup config file
@@ -23,7 +13,6 @@ export default function (boefje_meta) {
     let config_contents =
       "PROMPTS=no\nUPDATES=no\nCLIOPTS=-404code=301,302,307,308 -o ./output.json";
 
-    // CLI OPTIONS
     if (scheme == "https") config_contents += " -ssl";
     if (IS_USING_PROXY) config_contents += " -useproxy";
     config_contents += "\n";
@@ -43,10 +32,31 @@ export default function (boefje_meta) {
     if (process.env.USERAGENT)
       config_contents += `USERAGENT=${process.env.USERAGENT}\n`;
 
-    fs.writeFileSync("./nikto.conf", config_contents);
+    return config_contents;
   } catch (e) {
-    console.error("Something went wrong writing to the config file.\n" + e);
+    throw new Error("Something went wrong writing to the config file.\n" + e);
   }
+}
+
+/**
+ * @param {Object} boefje_meta Information about the task
+ * @param {Object} boefje_meta.arguments
+ * @param {Object} boefje_meta.arguments.input
+ * @param {string} boefje_meta.arguments.input.object_type
+ * @param {"http" | "https"} boefje_meta.arguments.input.scheme
+ * @param {number} boefje_meta.arguments.input.port
+ * @param {Object} boefje_meta.arguments.input.netloc
+ * @param {string} boefje_meta.arguments.input.netloc.name
+ * @returns {(string | string[])[][]}
+ */
+export default function (boefje_meta) {
+  // Depending on what OOI triggered this task, the hostname / address will be in a different location
+  const hostname = boefje_meta.arguments.input.netloc.name;
+
+  const config_contents = get_config_content(
+    boefje_meta.arguments.input.scheme,
+  );
+  fs.writeFileSync("./nikto.conf", config_contents);
 
   // Running nikto and outputting to a file
   try {
@@ -54,7 +64,12 @@ export default function (boefje_meta) {
       stdio: "inherit",
     });
   } catch (e) {
-    throw new Error("Something went wrong running the nikto command.\n" + e);
+    throw new Error(
+      "Something went wrong running the nikto command.\n" +
+        e +
+        "\n" +
+        config_contents,
+    );
   }
 
   const raws = [];
