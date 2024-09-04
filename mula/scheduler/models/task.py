@@ -148,12 +148,9 @@ class BoefjeTask(BaseModel):
 class ReportTask(BaseModel):
     type: ClassVar[str] = "report"
 
-    id: uuid.UUID | None = Field(default_factory=uuid.uuid4)
     organisation_id: str
-    report_recipe: dict[str, Any]
+    report_recipe_id: str
 
-    # TODO: update this to make a unique hash, for this task to find
-    # duplicates in the queue
     @property
     def hash(self) -> str:
-        return mmh3.hash_bytes(f"{self.organisation_id}").hex()
+        return mmh3.hash_bytes(f"{self.report_recipe_id}").hex()
