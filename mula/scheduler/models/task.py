@@ -1,7 +1,7 @@
 import enum
 import uuid
 from datetime import datetime, timezone
-from typing import ClassVar
+from typing import Any, ClassVar
 
 import mmh3
 from pydantic import BaseModel, ConfigDict, Field
@@ -149,10 +149,8 @@ class ReportTask(BaseModel):
     type: ClassVar[str] = "report"
 
     id: uuid.UUID | None = Field(default_factory=uuid.uuid4)
-
     organisation_id: str
-
-    # TODO: implement the necessary fields
+    report_recipe: dict[str, Any]
 
     # TODO: update this to make a unique hash, for this task to find
     # duplicates in the queue
