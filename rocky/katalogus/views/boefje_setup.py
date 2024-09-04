@@ -21,10 +21,14 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
     def form_valid(self, form):
         """If the form is valid, redirect to the supplied URL."""
         form_data = form.cleaned_data
-        input_object = {type_by_name(form_data["consumes"])}
-        arguments = form_data["oci_arguments"].split()
-        produces = form_data["produces"].replace(",", "").split()
+        arguments = form_data["oci_arguments"].split(", ")
+        input_objects = []
+        consumes = form_data["consumes"].strip("[]'").split("', '")
+        produces = form_data["produces"].split(", ")
         boefje_id = str(uuid.uuid4())
+
+        for input_object in consumes:
+            input_objects.append(type_by_name(input_object))
 
         if self.kwargs["plugin_id"]:
             original_boefje_id = self.kwargs["plugin_id"]
@@ -39,7 +43,7 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
             enabled=False,
             type="boefje",
             scan_level=form_data["scan_level"],
-            consumes=input_object,
+            consumes=input_objects,
             produces=produces,
             schema=form_data["schema"],
             oci_image=form_data["oci_image"] or None,
@@ -81,12 +85,16 @@ class AddBoefjeVariantView(BoefjeSetupView, OrganizationPermissionRequiredMixin,
         plugin_id = self.kwargs["plugin_id"]
         katalogus = get_katalogus(self.organization.code)
         boefje = katalogus.get_plugin(plugin_id)
+        consumes = []
+
+        for input_object in list(boefje.consumes):
+            consumes.append(input_object.__name__)
 
         self.initial = {
             "oci_image": boefje.oci_image,
             "oci_arguments": ", ".join(boefje.oci_arguments),
             "schema": boefje.schema,
-            "consumes": boefje.consumes,
+            "consumes": consumes,
             "produces": ", ".join(boefje.produces),
             "scan_level": boefje.scan_level,
         }
