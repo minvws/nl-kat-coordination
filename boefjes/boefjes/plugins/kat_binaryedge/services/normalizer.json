@@ -1,5 +1,6 @@
 {
   "id": "kat_binaryedge_services",
+  "name": "BinaryEdge services",
   "consumes": [
     "boefje/binaryedge"
   ],

@@ -1,5 +1,6 @@
 {
   "id": "kat_binaryedge_http_web",
+  "name": "BinaryEdge Websites",
   "consumes": [
     "boefje/binaryedge"
   ],
