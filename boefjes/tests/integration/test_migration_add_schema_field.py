@@ -124,7 +124,7 @@ class TestSettingsToBoefjeConfig(TestCase):
                     "dns-records",
                     None,
                     "DNS records",
-                    "Fetch the DNS record(s) of a hostname",
+                    "Fetch the DNS record(s) of a hostname.",
                     "1",
                     ["Hostname"],
                     ["boefje/dns-records"],
