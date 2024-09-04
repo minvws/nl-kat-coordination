@@ -1,5 +1,6 @@
 {
   "id": "kat_find_images_in_html",
+  "name": "Webpage analysis find images in html",
   "consumes": [
     "text/html"
   ],
