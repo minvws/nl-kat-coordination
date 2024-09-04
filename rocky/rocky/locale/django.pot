@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-28 10:00+0000\n"
+"POT-Creation-Date: 2024-09-04 12:45+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -604,12 +604,14 @@ msgstr ""
 
 #: katalogus/forms/katalogus_filter.py
 #: katalogus/templates/partials/plugin_tile_modal.html
+#: katalogus/templates/plugin_container_image.html
 #: reports/report_types/dns_report/report.html
 msgid "Enabled"
 msgstr ""
 
 #: katalogus/forms/katalogus_filter.py
 #: katalogus/templates/partials/plugin_tile_modal.html
+#: katalogus/templates/plugin_container_image.html
 msgid "Disabled"
 msgstr ""
 
@@ -705,6 +707,10 @@ msgid "%(plugin_name)s doesn't produce any output mimetypes."
 msgstr ""
 
 #: katalogus/templates/boefje_setup.html
+msgid "Boefje variant setup"
+msgstr ""
+
+#: katalogus/templates/boefje_setup.html
 msgid "Boefje setup"
 msgstr ""
 
@@ -713,8 +719,7 @@ msgid ""
 "\n"
 "                        You can create a new Boefje. If you want more "
 "information on this,\n"
-"                        you can check out the <a href=\"\">documentation</"
-"a>.\n"
+"                        you can check out the documentation.\n"
 "                    "
 msgstr ""
 
@@ -1112,8 +1117,7 @@ msgid ""
 "\n"
 "                    Boefje variants that use the same container image. For "
 "more\n"
-"                    information about Boefje variants you can read the "
-"documentation.\n"
+"                    information you can read the documentation.\n"
 "                "
 msgstr ""
 
@@ -1122,11 +1126,20 @@ msgid "Add variant"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
-msgid "Overview of variants"
+msgid "new variant confirmation"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
-msgid "Published by"
+#, python-format
+msgid "Variant %(plugin.name)s created."
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "The Boefje variant is successfully created and can now be used."
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "Overview of variants"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
@@ -1137,6 +1150,10 @@ msgstr ""
 #: rocky/templates/tasks/ooi_detail_task_list.html
 #: rocky/templates/tasks/plugin_detail_task_list.html
 msgid "Status"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "current"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
@@ -1165,12 +1182,40 @@ msgstr ""
 msgid "Open details"
 msgstr ""
 
+#: katalogus/templates/plugin_container_image.html
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Creation date"
+msgstr ""
+
 #: katalogus/templates/plugin_container_image.html tools/forms/boefje.py
 msgid "Arguments"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
-msgid "The following arguments are used for this Boefje variant."
+msgid "The following arguments are used for this Boefje variant:"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "arguments explanation"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "There are no arguments used for this Boefje variant."
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "no variants explanation"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "This Boefje has no variants yet."
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid ""
+"You can make a variant and change the arguments and JSON Schema to customize "
+"it to fit your needs."
 msgstr ""
 
 #: katalogus/templates/plugin_settings_add.html
@@ -3839,11 +3884,6 @@ msgid "Reference date"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-#: reports/templates/report_overview/subreports_table.html
-msgid "Creation date"
-msgstr ""
-
-#: reports/templates/report_overview/report_history_table.html
 msgid "Shows parent report details"
 msgstr ""
 
@@ -4392,7 +4432,10 @@ msgid ""
 msgstr ""
 
 #: tools/forms/settings.py
-msgid "Select the object type that your Boefje consumes."
+msgid ""
+"Select the object type(s) that your Boefje consumes. To select multiple "
+"objects, press and hold the 'ctrl'/'command' key and then click the items "
+"you want to select. "
 msgstr ""
 
 #: tools/forms/settings.py
