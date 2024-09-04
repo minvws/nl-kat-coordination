@@ -16,7 +16,7 @@ input[type="reset"] {
     box-sizing: border-box;
 
     /* Styling */
-    border-radius: 1rem;
+    border-radius: var(--border-radius-l);
     padding: var(--spacing-grid-150);
     width: 2.75rem;
     height: 2.75rem;
