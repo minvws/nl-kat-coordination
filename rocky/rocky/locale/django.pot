@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-28 08:40+0000\n"
+"POT-Creation-Date: 2024-09-04 09:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5465,6 +5465,11 @@ msgid "Save organization"
 msgstr ""
 
 #: rocky/templates/organizations/organization_list.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Rerun all bits"
+msgstr ""
+
+#: rocky/templates/organizations/organization_list.html
 msgid "Add new organization"
 msgstr ""
 
@@ -5600,10 +5605,6 @@ msgstr ""
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/views/indemnification_add.py
 msgid "Add indemnification"
-msgstr ""
-
-#: rocky/templates/organizations/organization_settings.html
-msgid "Rerun all bits"
 msgstr ""
 
 #: rocky/templates/partials/elements/ooi_detail_settings.html
