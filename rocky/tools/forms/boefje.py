@@ -46,7 +46,7 @@ class BoefjeAddForm(BaseRockyForm):
     consumes = forms.CharField(
         required=False,
         label=_("Input object type"),
-        widget=forms.Select(choices=OOI_TYPE_CHOICES),
+        widget=forms.SelectMultiple(choices=OOI_TYPE_CHOICES),
         help_text=BOEFJE_CONSUMES_HELP_TEXT,
     )
     produces = forms.CharField(

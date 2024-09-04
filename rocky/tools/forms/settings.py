@@ -68,7 +68,11 @@ BOEFJE_SCHEMA_HELP_TEXT = mark_safe(
         "For inspiration, check the 'schema.json' files of other Boefjes in the repo. "
     )
 )
-BOEFJE_CONSUMES_HELP_TEXT = _("Select the object type that your Boefje consumes.")
+BOEFJE_CONSUMES_HELP_TEXT = _(
+    "Select the object type(s) that your Boefje consumes. "
+    "To select multiple objects, press and hold the 'ctrl'/'command' key "
+    "and then click the items you want to select. "
+)
 
 BOEFJE_PRODUCES_HELP_TEXT = mark_safe(
     _(
