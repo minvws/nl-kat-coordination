@@ -1,7 +1,7 @@
 {
   "id": "censys",
   "name": "Censys",
-  "description": "Use Censys to discover open ports, services and certificates",
+  "description": "Use Censys to discover open ports, services and certificates. Requires and API key.",
   "consumes": [
     "IPAddressV4",
     "IPAddressV6"
