@@ -52,8 +52,7 @@ class Report(OOI):
 class ReportRecipe(OOI):
     recipe_id: UUID
     object_type: Literal["ReportRecipe"] = "ReportRecipe"
-    cron: str
-    input_recipe: dict[str, Any]
+    input_recipe: dict[str, Any]  # a live set of OOIs that matches query criteria with filtering or selected OOIs
     report_types: list[str]
 
     @classmethod
