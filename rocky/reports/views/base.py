@@ -493,7 +493,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
             self.bytes_client.get_raw(raw_id=report.data_raw_id)
         )
 
-    def get_input_oois(self, reports: list[ReportOOI]) -> list[OOI]:
+    def get_input_oois(self, reports: list[ReportOOI]) -> list[type[OOI]]:
         ooi_pks = {ooi for report in reports for ooi in report.input_oois}
 
         return [
