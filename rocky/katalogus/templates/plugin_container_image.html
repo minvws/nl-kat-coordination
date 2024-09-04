@@ -35,6 +35,7 @@
                                 <tr>
                                     <th scope="col">{% translate "Name" %}</th>
                                     <th scope="col">{% translate "Scan level" %}</th>
+                                    <th scope="col">{% translate "Status" %}</th>
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
@@ -53,6 +54,13 @@
                                         <td>
                                             {% include "partials/scan_level_indicator.html" with value=variant.scan_level %}
 
+                                        </td>
+                                        <td>
+                                            {% if variant.enabled %}
+                                                <span class="label tags-color-2-light">{% translate "Enabled" %}</span>
+                                            {% else %}
+                                                <span class="label tags-color-4-light">{% translate "Disabled" %}</span>
+                                            {% endif %}
                                         </td>
                                         <td class="actions">
                                             <button class="expando-button"
