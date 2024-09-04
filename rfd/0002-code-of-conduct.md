@@ -61,6 +61,9 @@ productive and beneficial for all team members.[^2]
    Be cognizant that enough context is provided for the reviewer to understand
    the changes you've made.
 
+   When necessary schedule a call or a meeting to discuss the changes in more
+   detail, and walk the reviewer through the changes.
+
 4. **Remember that communication can be hard**
 
    Difference in understanding or opinions are to be expected in the context of
@@ -165,7 +168,8 @@ productive and beneficial for all team members.[^2]
     When there is the possibility to lend out a helping hand, do so. Schedule
     a call or a meeting to discuss the feedback in more detail. This can help
     to clarify the feedback and to make sure that the author understands the
-    feedback.
+    feedback. It also helps to keep up the pace, and potentially avoid multiple
+    review round trips.
 
 4.  **Explain the why**
 
@@ -181,17 +185,20 @@ productive and beneficial for all team members.[^2]
 5.  **Find an end**
 
     If you like things neat, it‘s tempting to go over a code review over and over
-    until it’s perfect, dragging it out for longer than necessary. It‘s
-    soul-deadening for the recipient, though.
+    until it’s perfect, dragging it out for longer and taking more time than
+    necessary. It‘s soul-deadening for the recipient, though.
 
     Keep in mind that "LGTM" does not mean "I vouch my immortal soul this will
-    never fail", but "looks good to me". If it looks good, move on. (That
-    doesn’t mean you shouldn‘t be thorough. It’s a judgment call.) And if there
-    are bigger refactorings to be done, move them to a new issue.
+    never fail", but "looks good to me". If it looks good, move on. That
+    doesn’t mean you shouldn‘t be thorough. It’s a judgment call.
 
-    Especially when there are multiple reviewers, it's important to find an end
-    to the review process. Different reviewers may have different opinions, and
-    it's important to find a balance between the different viewpoints.
+    And if there are bigger refactorings to be done or new feature that need to
+    be addressed. Then move them to a new issue.
+
+    Especially when there are multiple reviewers, and multiple review rounds,
+    it's important to find an end to the review process. Different reviewers
+    may have different opinions, and it's important to find a balance between
+    the different viewpoints.
 
 6.  **Mention the positives**
 
@@ -256,4 +263,5 @@ productive and beneficial for all team members.[^2]
 - [Thatham] [chiark.greenend.org.uk - Code review antipatterns](https://www.chiark.greenend.org.uk/~sgtatham/quasiblog/code-review-antipatterns/)
 
 [^1]: Adapted from [EngPractices]
+
 [^2]: A humorous and insightful take on code review antipatterns can be found in [Thatham]
