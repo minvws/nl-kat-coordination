@@ -42,13 +42,14 @@ class OrganizationListView(
                 try:
                     number_of_bits += OctopoesAPIConnector(settings.OCTOPOES_API, organization.code).recalculate_bits()
                 except Exception as exc:
-                    failed += [f"{organization}, ({str(exc)})"]
+                    failed.append(f"{organization}, ({str(exc)})")
                     logging.warning("Failed recalculating bits for %s, %s", organization, exc)
             duration = datetime.now() - start_time
-            message = f"Recalculated {number_of_bits} bits for {len(organizations)-len(failed)} organizations."
+            n_failed = len(failed)
+            message = f"Recalculated {number_of_bits} bits for {len(organizations)-n_failed} organizations."
             message += f" Duration: {duration}."
             if failed:
-                message += f"\nFailed for {len(failed)} organisations: {', '.join(failed)}"
+                message += f"\nFailed for {n_failed} organisations: {', '.join(failed)}"
             messages.add_message(
                 request,
                 messages.INFO,
