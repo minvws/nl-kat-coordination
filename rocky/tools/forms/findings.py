@@ -35,4 +35,6 @@ class MutedFindingSelectionForm(BaseRockyForm):
 
 
 class FindingSearchForm(BaseRockyForm):
-    search = forms.CharField(label=_("Search"), required=False, max_length=256, help_text="Object ID contains")
+    search = forms.CharField(
+        label=_("Search"), required=False, max_length=256, help_text=_("Object ID contains (case sensitive)")
+    )
