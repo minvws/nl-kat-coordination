@@ -1,6 +1,6 @@
 import logging
 import os
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
 from typing import Any, Literal
 
@@ -155,7 +155,7 @@ class Settings(BaseSettings):
         return env_settings, init_settings, file_secret_settings, backwards_compatible_settings
 
 
-@lru_cache
+@cache
 def get_settings() -> Settings:
     return Settings()
 
