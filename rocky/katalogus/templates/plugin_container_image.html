@@ -41,7 +41,15 @@
                             <tbody>
                                 {% for variant in variants %}
                                     <tr>
-                                        <td>{{ variant.name }}</td>
+                                        <td>
+                                            <a href="{% url "boefje_detail" organization_code=organization.code plugin_id=variant.id %}">
+                                                {% if variant.id == plugin.id %}
+                                                    {{ variant.name }} ({% translate "current" %})
+                                                {% else %}
+                                                    {{ variant.name }}
+                                                {% endif %}
+                                            </a>
+                                        </td>
                                         <td>
                                             {% include "partials/scan_level_indicator.html" with value=variant.scan_level %}
 
@@ -58,9 +66,22 @@
                                     <tr class="expando-row">
                                         <td colspan="5">
                                             <h5>{% translate "Creation date" %}</h5>
-                                            <p>{{ variant.created }}</p>
+                                            {% if variant.created %}
+                                                <p>{{ variant.created }}</p>
+                                            {% else %}
+                                                <p>-</p>
+                                            {% endif %}
                                             <h5>{% translate "Arguments" %}</h5>
-                                            <p>{% translate "The following arguments are used for this Boefje variant." %}</p>
+                                            {% if variant.oci_arguments %}
+                                                <p>{% translate "The following arguments are used for this Boefje variant:" %}</p>
+                                                <p class="explanation"
+                                                   role="group"
+                                                   aria-label="{% translate "arguments explanation" %}">
+                                                    {{ variant.oci_arguments|join:" " }}
+                                                </p>
+                                            {% else %}
+                                                <p>{% translate "There are no arguments used for this Boefje variant." %}</p>
+                                            {% endif %}
                                         </td>
                                     </tr>
                                 {% endfor %}

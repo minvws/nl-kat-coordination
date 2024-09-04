@@ -58,7 +58,6 @@
                                 <li>
                                     <a href="{% url "ooi_add" organization_code=organization.code ooi_type=ooi_type %}">{{ ooi_type }}</a>
                                 </li>
-                                {% if not forloop.last %}-{% endif %}
                             {% endfor %}
                         </ul>
                     </p>
