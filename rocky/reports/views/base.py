@@ -547,7 +547,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                     "template": report.template,
                     "report_name": report.name,
                 }
-        return (report_data, input_oois, report_types)
+        return report_data, input_oois, report_types
 
     def get_report_data(self):
         if issubclass(get_report_by_id(self.report_ooi.report_type), ConcatenatedReport):
