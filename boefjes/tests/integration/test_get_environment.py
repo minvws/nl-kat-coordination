@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from boefjes.dependencies.plugins import PluginService
@@ -8,10 +6,7 @@ from boefjes.models import Organisation
 from tests.loading import get_boefje_meta
 
 
-if os.environ.get("CI") != "1":
-    pytest.skip()
-
-
+@pytest.mark.skipif("os.environ.get('CI') != '1'")
 def test_environment_builds_up_correctly(plugin_service: PluginService, organisation: Organisation):
     plugin_id = "dns-records"
     schema = plugin_service.schema(plugin_id)
