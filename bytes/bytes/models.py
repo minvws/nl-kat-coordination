@@ -72,7 +72,7 @@ class RawDataMeta(BaseModel):
 
     id: UUID
     boefje_meta: BoefjeMeta
-    mime_types: list[MimeType] = Field(default_factory=list)
+    mime_types: set[MimeType] = Field(default_factory=set)
 
     # These are set once the raw is saved
     secure_hash: SecureHash | None = None
@@ -83,7 +83,7 @@ class RawDataMeta(BaseModel):
 class RawData(BaseModel):
     value: bytes
     boefje_meta: BoefjeMeta
-    mime_types: list[MimeType] = Field(default_factory=list)
+    mime_types: set[MimeType] = Field(default_factory=set)
 
     # These are set once the raw is saved
     secure_hash: SecureHash | None = None

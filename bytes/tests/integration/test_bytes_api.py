@@ -148,7 +148,7 @@ def test_normalizer_meta(bytes_api_client: BytesAPIClient, event_manager: Rabbit
     normalizer_meta.raw_data.hash_retrieval_link = retrieved_normalizer_meta.raw_data.hash_retrieval_link
     normalizer_meta.raw_data.signing_provider_url = retrieved_normalizer_meta.raw_data.signing_provider_url
 
-    assert normalizer_meta.dict() == retrieved_normalizer_meta.dict()
+    assert normalizer_meta.model_dump_json() == retrieved_normalizer_meta.model_dump_json()
 
 
 def test_filtered_normalizer_meta(bytes_api_client: BytesAPIClient) -> None:
