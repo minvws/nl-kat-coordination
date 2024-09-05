@@ -1,5 +1,7 @@
 {
   "id": "kat_dns_normalize",
+  "name": "DNS records",
+  "description": "Parses the DNS records.",
   "consumes": [
     "boefje/dns-records"
   ],

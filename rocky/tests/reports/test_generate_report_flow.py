@@ -177,7 +177,8 @@ def test_report_types_selection_nothing_selected(
 
     response = SetupScanGenerateReportView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 302
+    assert response.status_code == 307
+
     assert list(request._messages)[0].message == "Select at least one report type to proceed."
 
 
@@ -214,8 +215,10 @@ def test_report_types_selection(
 
     response = SetupScanGenerateReportView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 200
-    assertContains(response, '<input type="hidden" name="report_type" value="dns-report">', html=True)
+    assert response.status_code == 307
+
+    # Redirect to export setup, all plugins are then enabled
+    assert response.headers["Location"] == "/en/test/reports/generate-report/export-setup/?"
 
 
 def test_save_generate_report_view(
