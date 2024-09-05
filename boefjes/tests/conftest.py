@@ -16,12 +16,16 @@ from boefjes.app import SchedulerWorkerManager
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import Queue, SchedulerClientInterface, Task, TaskStatus
 from boefjes.config import Settings, settings
+from boefjes.dependencies.plugins import PluginService
 from boefjes.job_handler import bytes_api_client
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
+from boefjes.local_repository import get_local_repository
 from boefjes.models import Organisation
 from boefjes.runtime_interfaces import Handler, WorkerManager
+from boefjes.sql.config_storage import SQLConfigStorage, create_encrypter
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
+from boefjes.sql.plugin_storage import SQLPluginStorage
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
@@ -142,21 +146,47 @@ def api(tmp_path):
 
 
 @pytest.fixture
-def organisation_repository():
+def session():
     engine = get_engine()
     session = sessionmaker(bind=engine)()
 
-    yield SQLOrganisationStorage(session, settings)
+    yield session
 
     session.execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables]))
+    session.commit()
     session.close()
 
 
 @pytest.fixture
-def organisation(organisation_repository) -> Organisation:
+def organisation_storage(session):
+    return SQLOrganisationStorage(session, settings)
+
+
+@pytest.fixture
+def config_storage(session):
+    return SQLConfigStorage(session, create_encrypter())
+
+
+@pytest.fixture
+def plugin_storage(session):
+    return SQLPluginStorage(session, settings)
+
+
+@pytest.fixture
+def local_repo():
+    return get_local_repository()
+
+
+@pytest.fixture
+def plugin_service(plugin_storage, config_storage, local_repo):
+    return PluginService(plugin_storage, config_storage, local_repo)
+
+
+@pytest.fixture
+def organisation(organisation_storage) -> Organisation:
     organisation = Organisation(id="test", name="Test org")
 
-    with organisation_repository as repo:
+    with organisation_storage as repo:
         repo.create(organisation)
 
     return organisation

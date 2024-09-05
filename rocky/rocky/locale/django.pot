@@ -5279,6 +5279,10 @@ msgid "When"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
+msgid "This scan was manually created."
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html
 msgid "The boefje has since been deleted or disabled."
 msgstr ""
 
@@ -5473,6 +5477,10 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_edit.html
 msgid "Save organization"
+msgstr ""
+
+#: rocky/templates/organizations/organization_list.html
+msgid "Rerun all bits for all my organizations"
 msgstr ""
 
 #: rocky/templates/organizations/organization_list.html

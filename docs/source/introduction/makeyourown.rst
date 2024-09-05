@@ -15,7 +15,7 @@ What types of plugins are available?
 
 There are three types of plugins, deployed by OpenKAT to collect information, translate it into objects for the data model and then analyze it. Boefjes gather facts, Whiskers structure the information for the data model and Bits determine what you want to think about it; they are the business rules. Each action is cut into the smallest possible pieces.
 
-- Boefjes gather factual information, such as by calling an external scanning tool like nmap or using a database like shodan.
+- Boefjes gather factual information, such as by calling an external scanning tool like nmap or using a database like Shodan.
 
 - Whiskers analyze the information and turn it into objects for the data model in Octopoes.
 
@@ -51,7 +51,7 @@ To make a finding about a CVE to a software version, you need multiple objects: 
 Existing boefjes
 ================
 
-The existing boefjes can be viewed via the KATalog in OpenKAT and are on `GitHUB in the boefjes repository. <https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes>`_
+The existing boefjes can be viewed via the KATalog in OpenKAT and are on `GitHub in the boefjes repository. <https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes>`_
 
 Object-types, classes and objects.
 ----------------------------------
@@ -65,7 +65,7 @@ When we talk about objects, we usually mean instance of such a class, or a 'reco
 Example: the boefje for shodan
 ------------------------------
 
-The boefje calling shodan gives a good first impression of its capabilities. The boefje includes the following files.
+The boefje calling Shodan gives a good first impression of its capabilities. The boefje includes the following files.
 
 - __init.py__, which remains empty
 - boefje.json, containing the normalizers and object-types in the data model
@@ -75,7 +75,7 @@ The boefje calling shodan gives a good first impression of its capabilities. The
 - normalize.py, the normalizer (whiskers)
 - normalizer.json, which accepts and supplies the normalizer
 - requirements.txt, with the requirements for this boefje
-- schema.json, settings for the web interface
+- schema.json, settings for the web interface formatted as JSON Schema
 
 boefje.json
 ***********
@@ -99,7 +99,6 @@ An example:
             "IPPort",
             "CVEFindingType"
         ],
-        "environment_keys": ["SHODAN_API"],
         "scan_level": 1
     }
 
@@ -111,15 +110,15 @@ Using the template as a base, you can create a boefje.json for your own boefje. 
 
 NOTE: If your boefje needs object-types that do not exist, you will need to create those. This will be described later in the document.
 
-The boefje also uses variables from the web interface, like the Shodan the API key. There are more possibilities, you can be creative with this and let the end user bring settings from the web interface. Use *environment_keys* for this. The schema.json file defines the metadata for these fields.
+The boefje also uses variables from the web interface, like the Shodan the API key. There are more possibilities, you can be creative with this and let the end user bring settings from the web interface. Use environment variables or KATalogus settings for this. The schema.json file defines the metadata for these fields.
 
 
 schema.json
 ***********
 
-To allow the user to add information through the web interface, add the schema.json file to the folder where your boefje is located. This json is used as the basis for a form for the user. In this case, it can contain an API key, but it can also be something else that your boefje responds to. This Schema must conform to the https://json-schema.org/ standard.
-
-Currently, however, OpenKAT only understands fairly shallow structures. For example, not all field types are supported, nor does OpenKAT understand references. You can test whether your Schema is neatly understood by checking the settings form in Rocky's KAT catalog for your boefje.
+To allow the user to pass information to a boefje runtime, add a schema.json file to the folder where your boefje is located.
+This can be used, for example, to add an API key that the script requires.
+It must conform to the https://json-schema.org/ standard, see for example the schema.json for Shodan:
 
 .. code-block:: json
 
@@ -138,6 +137,24 @@ Currently, however, OpenKAT only understands fairly shallow structures. For exam
     "SHODAN_API"
   ]
  }
+
+This JSON defines which additional environment variables can be set for the boefje.
+There are two ways to do this.
+Firstly, using the Shodan schema as an example, you could set the ``BOEFJE_SHODAN_API`` environment variable in the boefje runtime.
+Prepending the key with ``BOEFJE_`` provides an extra safeguard.
+Note that setting an environment variable means this configuration is applied to _all_ organisations.
+Secondly, if you want to avoid setting environment variables or configure it for just one organisation,
+it is also possible to set the API key through the KAT-alogus.
+Navigate to the boefje detail page of Shodan to find the schema as a form.
+These values take precedence over the environment variables.
+This is also a way to test whether the schema is properly understood for your boefje.
+If encryption has been set up for the KATalogus, all keys provided through this form are stored encrypted in the database.
+
+Although the Shodan boefje defines an API key, the schema could contain anything your boefje needs.
+However, OpenKAT currently only officially supports "string" and "integer" properties that are one level deep.
+Because keys may be passed through environment variables,
+schema validation does not happen right away when settings are added or boefjes enabled.
+Schema validation happens right before spawning a boefje, meaning your tasks will fail if is missing a required variable.
 
 main.py
 *******
@@ -190,8 +207,8 @@ normalizer.json
 
 The normalizers translate the output of a boefje into objects that fit the data model.
 Each normalizer defines what input it accepts and what object-types it provides.
-In the case of the shodan normalizer,
-it involves the entire output of the shodan boefje (created based on IP address),
+In the case of the Shodan normalizer,
+it involves the entire output of the Shodan boefje (created based on IP address),
 where findings and ports come out. The `normalizer.json` defines these:
 
 .. code-block:: json
@@ -295,7 +312,7 @@ If you want to add an object-type, you need to know with which other object-type
 
 Adding object-types to the data model requires an addition in octopus. Here, an object-type can be added if it is connected to other object-types. Visually this is well understood using the `Graph explorer <https://mispo.es/model-explorer/model-explorer.html>`_. The actual code is `in the Octopoes repo <https://github.com/minvws/nl-kat-octopoes/tree/main/octopoes/models/ooi>`_.
 
-As with the boefje for shodan, here we again use the example from the functional documentation. A description of an object-type in the data model, in this case an IPPort, looks like this:
+As with the boefje for Shodan, here we again use the example from the functional documentation. A description of an object-type in the data model, in this case an IPPort, looks like this:
 
 
 .. code-block:: python
@@ -521,4 +538,4 @@ There are a number of ways to add your new boefje to OpenKAT.
 - Do a commit of your code, after review it can be included
 - Add an image server in the KAT catalog config file ``*``
 
-``*`` If you want to add an image server, join the ongoing project to standardize and describe it. The idea is to add an image server in the KAT catalog config file that has artifacts from your boefjes and normalizers as outputted by the Github CI.
+``*`` If you want to add an image server, join the ongoing project to standardize and describe it. The idea is to add an image server in the KAT catalog config file that has artifacts from your boefjes and normalizers as outputted by the GitHub CI.
