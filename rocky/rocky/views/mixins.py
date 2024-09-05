@@ -182,7 +182,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
                         origin.boefje = katalogus.get_plugin(boefje_id)
                     except HTTPError as e:
                         logger.error(
-                            "Could not load boefje: %s from katalogus, error: %s",
+                            "Could not load boefje %s from katalogus: %s",
                             boefje_id,
                             e,
                         )
