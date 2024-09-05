@@ -830,6 +830,17 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
         self.assertEqual(2, response.json()["count"])
         self.assertEqual(2, len(response.json()["results"]))
 
+    def test_list_schedules_scheduler_id(self):
+        response = self.client.get(f"/schedules?scheduler_id={self.scheduler.scheduler_id}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, response.json()["count"])
+        self.assertEqual(2, len(response.json()["results"]))
+
+        response = self.client.get(f"/schedules?scheduler_id={uuid.uuid4()}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(0, response.json()["count"])
+        self.assertEqual(0, len(response.json()["results"]))
+
     def test_list_schedules_enabled(self):
         response = self.client.get("/schedules?enabled=true")
         self.assertEqual(200, response.status_code)

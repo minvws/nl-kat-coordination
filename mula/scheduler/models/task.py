@@ -1,7 +1,7 @@
 import enum
 import uuid
 from datetime import datetime, timezone
-from typing import Any, ClassVar
+from typing import ClassVar
 
 import mmh3
 from pydantic import BaseModel, ConfigDict, Field
@@ -153,4 +153,4 @@ class ReportTask(BaseModel):
 
     @property
     def hash(self) -> str:
-        return mmh3.hash_bytes(f"{self.report_recipe_id}").hex()
+        return mmh3.hash_bytes(f"{self.report_recipe_id}-{self.organisation_id}").hex()

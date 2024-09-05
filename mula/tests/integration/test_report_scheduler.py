@@ -92,6 +92,7 @@ class ReportSchedulerTestCase(ReportSchedulerBaseTestCase):
         # Arrange
         report_task = models.ReportTask(
             organisation_id=self.organisation.id,
+            report_recipe_id="123",
         )
 
         schedule = models.Schedule(
@@ -125,6 +126,7 @@ class ReportSchedulerTestCase(ReportSchedulerBaseTestCase):
         # Arrange
         report_task = models.ReportTask(
             organisation_id=self.organisation.id,
+            report_recipe_id="123",
         )
 
         schedule = models.Schedule(
