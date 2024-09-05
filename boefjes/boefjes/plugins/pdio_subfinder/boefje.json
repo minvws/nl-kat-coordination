@@ -5,5 +5,9 @@
   "consumes": [
     "Hostname"
   ],
+  "environment_keys": [
+    "SUBFINDER_RATE_LIMIT",
+    "SUBFINDER_VERSION"
+  ],
   "scan_level": 2
 }
