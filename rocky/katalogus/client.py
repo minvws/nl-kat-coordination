@@ -25,7 +25,6 @@ class Plugin(BaseModel):
     authors: str | None = None
     created: str | None = None
     description: str | None = None
-    environment_keys: list[str] | None = None
     related: list[str] = Field(default_factory=list)
     enabled: bool
     type: str

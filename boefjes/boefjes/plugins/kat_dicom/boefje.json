@@ -1,7 +1,7 @@
 {
   "id": "dicom",
   "name": "DICOM",
-  "description": "Find exposed DICOM servers.",
+  "description": "Find exposed DICOM servers. DICOM servers are used to process medical imaging information.",
   "consumes": [
     "IPAddressV4",
     "IPAddressV6"
