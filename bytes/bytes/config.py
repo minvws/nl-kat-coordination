@@ -138,6 +138,13 @@ class Settings(BaseSettings):
 
     db_connection_pool_size: int = Field(16, description="Database connection pool size")
 
+    s3_bucket_prefix: str | None = Field("OpenKAT-")
+    s3_bucket_name: str | None = Field("OpenKAT")
+    s3_region: str | None = Field(None)
+    access_key_id: str
+    secret_access_key: str
+    bucket_per_org: bool = Field(True)
+
     model_config = SettingsConfigDict(env_prefix="BYTES_")
 
     @classmethod

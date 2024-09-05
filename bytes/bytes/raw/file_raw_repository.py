@@ -2,6 +2,7 @@ import logging
 from pathlib import Path
 from uuid import UUID
 
+from boto3 import Session
 from boto3.session import Session as BotoSession
 
 from bytes.config import Settings
@@ -11,17 +12,25 @@ from bytes.repositories.raw_repository import BytesFileNotFoundException, RawRep
 
 logger = logging.getLogger(__name__)
 
-BUCKETPREFIX = env.get("S3_BUCKET_PREFIX", "OpenKAT-")
-BUCKET = env.get("S3_BUCKET", "OpenKAT")
-S3_REGION = env.get("S3_REGION", None)
 
 def create_raw_repository(settings: Settings) -> RawRepository:
-    return FileRawRepository(
-        settings.data_dir,
-        make_middleware(),
-        folder_permissions=int(settings.folder_permission, 8),
-        file_permissions=int(settings.file_permission, 8),
-    )
+    if settings.access_key_id and settings.secret_access_key:
+        return S3RawRepository(
+            make_middleware(),
+            settings.access_key_id,
+            settings.secret_access_key,
+            settings.bucket_per_org,
+            settings.s3_bucket_prefix,
+            settings.s3_bucket_name,
+            settings.s3_region,
+        )
+    else:
+        return FileRawRepository(
+            settings.data_dir,
+            make_middleware(),
+            folder_permissions=int(settings.folder_permission, 8),
+            file_permissions=int(settings.file_permission, 8),
+        )
 
 
 class FileRawRepository(RawRepository):
@@ -71,66 +80,73 @@ class FileRawRepository(RawRepository):
 class S3RawRepository(RawRepository):
     def __init__(
         self,
-        base_path: Str,
         file_middleware: FileMiddleware,
-        access_key_id: Str,
-        secret_access_key: Str,
-        bucket_per_orga: Bool = True
+        access_key_id: str,
+        secret_access_key: str,
+        bucket_per_org: bool,
+        s3_bucket_prefix: str | None,
+        s3_bucket_name: str | None,
+        s3_region: str | None,
     ) -> None:
-        self.endpoint = endpoint
         self.file_middleware = file_middleware
         self.access_key_id = access_key_id
         self.secret_access_key = secret_access_key
-        self.bucket_per_orga = bucket_per_orga
-        self._session = None
+        self.bucket_per_org = bucket_per_org
+        self.s3_bucket_prefix = s3_bucket_prefix
+        self.s3_bucket_name = s3_bucket_name
+        self.s3_region = s3_region
+
+        self._session: Session = None
         self._s3resource = None
-    
+
     @property
     def s3resource(self):
         if self._s3resource:
             return self._s3resource
         self._session = BotoSession(
             aws_access_key_id=self.access_key_id,
-            aws_secret_access_key=self.secret_access_key)
+            aws_secret_access_key=self.secret_access_key,
+            region_name=self.s3_region,
+        )
         self._s3resource = self._session.resource("s3")
         return self._s3resource
 
-    def get_or_create_bucket(self, organization: Str):
-        bucketname = S3_BUCKET
-        s3region = S3_REGION
-        if self.bucket_per_orga:
-            bucketname = f"{S3_BUCKET_PREFIX}{organization}"
+    def get_or_create_bucket(self, organization: str):
+        # Create a bucket, and if it exists already
+        bucketname = self.s3_bucket_name
+        if self.bucket_per_org:
+            bucketname = f"{self.s3_bucket_prefix}{organization}"
             try:
-                bucket = self.s3resource.create_bucket(Bucket=bucketname, region=s3region)
+                bucket = self.s3resource.create_bucket(Bucket=bucketname, region=self.s3_region)
                 bucket.wait_until_exists()
                 return bucket
-            except self.s3resource.meta.client.exceptions.BucketAlreadyExists
-                pass # we might not be the only Bytes client trying to create this bucket
-        return self.s3resource.Bucket(name=bucketname, region=s3region)
-    
+            except self.s3resource.meta.client.exceptions.BucketAlreadyExists:
+                pass
+        return self.s3resource.Bucket(name=bucketname, region=self.s3_region)
+
     def save_raw(self, raw_id: UUID, raw: RawData) -> None:
         file_name = self._raw_file_name(raw_id, raw.boefje_meta)
         contents = self.file_middleware.encode(raw.value)
 
         logger.info("Writing raw data with id %s to s3", raw_id)
         bucket = self.get_or_create_bucket(raw.boefje_meta.organization)
-        bucket.Object(file_name).put(contents)
+        bucket.Object(file_name).put(Body=contents)
 
     def get_raw(self, raw_id: UUID, boefje_meta: BoefjeMeta) -> RawData:
         file_name = self._raw_file_name(raw_id, boefje_meta)
-        bucket = self.get_or_create_bucket(raw.boefje_meta.organization)
+        bucket = self.get_or_create_bucket(boefje_meta.organization)
 
         try:
-            contents = bucket.Object(file_name).get()['Body'].read()
+            contents = bucket.Object(file_name).get()["Body"].read()
         except self.s3resource.meta.client.exceptions as error:
-            if error.response['Error']['Code'] == "404":
+            if error.response["Error"]["Code"] == "404":
                 raise BytesFileNotFoundException(error)
-            logger.error(f"Could not get file from s3: {bucket.name}/{file_name} due to {error}")
+            logger.error("Could not get file from s3: %s/%s due to %s", bucket.name, file_name, error)
             raise error
 
         return RawData(value=self.file_middleware.decode(contents), boefje_meta=boefje_meta)
 
-    def _raw_file_name(self, raw_id: UUID, boefje_meta: BoefjeMeta) -> Str:
-        if self.bucket_per_orga:
+    def _raw_file_name(self, raw_id: UUID, boefje_meta: BoefjeMeta) -> str:
+        if self.bucket_per_org:
             return str(raw_id)
         return f"{boefje_meta.organization}/{raw_id}"
