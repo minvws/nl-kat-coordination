@@ -59,7 +59,7 @@ def test_scan_profile(rf, redteam_member, mock_scheduler, mock_organization_view
     response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 200
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
 
     assertContains(response, "Set clearance level")
 
@@ -125,7 +125,7 @@ def test_scan_profile_no_permissions_acknowledged(
     response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 200
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
 
     assertNotContains(response, "Set clearance level")
 
@@ -146,7 +146,7 @@ def test_scan_profile_no_permissions_trusted(
     response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 200
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
 
     assertNotContains(response, "Set clearance level")
 
@@ -162,7 +162,7 @@ def test_scan_profile_reset_view(rf, redteam_member, mock_scheduler, mock_organi
     response = ScanProfileResetView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 200
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
 
     assertContains(response, "Set clearance level")
     assertContains(response, "Yes, set to inherit")
@@ -183,5 +183,5 @@ def test_scan_reset_calls_octopoes(rf, redteam_member, mock_scheduler, mock_orga
     response = ScanProfileResetView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 302
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
     assert mock_organization_view_octopoes().save_scan_profile.call_count == 1

@@ -5,6 +5,5 @@
   "consumes": [
     "DNSZone"
   ],
-  "environment_keys": [],
   "scan_level": 1
 }
