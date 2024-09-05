@@ -1,6 +1,6 @@
 ---
 authors: JP Bruins Slot <jpbruinsslot@gmail.com>
-state: draft
+state: discussion
 discussion: https://github.com/minvws/nl-kat-coordination/pull/3425
 labels: process
 ---
@@ -263,4 +263,5 @@ productive and beneficial for all team members.[^2]
 - [Thatham] [chiark.greenend.org.uk - Code review antipatterns](https://www.chiark.greenend.org.uk/~sgtatham/quasiblog/code-review-antipatterns/)
 
 [^1]: Adapted from [EngPractices]
+
 [^2]: A humorous and insightful take on code review antipatterns can be found in [Thatham]
