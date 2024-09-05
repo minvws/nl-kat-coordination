@@ -50,8 +50,9 @@ This file contains a description of the boefje to explain to the user what this 
 
 ## `schema.json`
 
-This JSON is used as the basis for a form for the user. When the user enables this boefje they can get the option to give extra information. For example, it can contain an API key that the script requires.
-This is an example of a `schema.json` file:
+To allow the user to pass information to a boefje runtime, add a schema.json file to the folder where your boefje is located.
+This can be used, for example, to add an API key that the script requires.
+It must conform to the https://json-schema.org/ standard, for example:
 
 ```json
 {
@@ -75,6 +76,24 @@ This is an example of a `schema.json` file:
   "required": ["MESSAGE"]
 }
 ```
+
+This JSON defines which additional environment variables can be set for the boefje.
+There are two ways to do this.
+Firstly, using this schema as an example, you could set the `BOEFJE_MESSAGE` environment variable in the boefje runtime.
+Prepending the key with `BOEFJE_` provides an extra safeguard.
+Note that setting an environment variable means this configuration is applied to _all_ organisations.
+Secondly, if you want to avoid setting environment variables or configure it for just one organisation,
+it is also possible to set the API key through the KAT-alogus.
+Navigate to the boefje detail page of Shodan to find the schema as a form.
+These values take precedence over the environment variables.
+This is also a way to test whether the schema is properly understood for your boefje.
+If encryption has been set up for the KATalogus, all keys provided through this form are stored encrypted in the database.
+
+Although the Shodan boefje defines an API key, the schema could contain anything your boefje needs.
+However, OpenKAT currently officially only supports "string" and "integer" properties that are one level deep.
+Because keys may be passed through environment variables,
+schema validation does not happen right away when settings are added or boefjes enabled.
+Schema validation happens right before spawning a boefje, meaning your tasks will fail if is missing a required variable.
 
 - `title`: This should always contain a string containing 'Arguments'.
 - `type`: This should always contain a string containing 'object'.
