@@ -282,6 +282,9 @@ class FindingList:
         severities: set[RiskLevelSeverity],
         exclude_muted: bool = True,
         only_muted: bool = False,
+        search_string: str | None = None,
+        order_by: Literal["score", "finding_type"] = "score",
+        asc_desc: Literal["asc", "desc"] = "desc",
     ):
         self.octopoes_connector = octopoes_connector
         self.valid_time = valid_time
@@ -290,6 +293,9 @@ class FindingList:
         self.severities = severities
         self.exclude_muted = exclude_muted
         self.only_muted = only_muted
+        self.search_string = search_string
+        self.order_by = order_by
+        self.asc_desc = asc_desc
 
     @cached_property
     def count(self) -> int:
@@ -299,6 +305,7 @@ class FindingList:
             exclude_muted=self.exclude_muted,
             only_muted=self.only_muted,
             limit=0,
+            search_string=self.search_string,
         ).count
 
     def __len__(self):
@@ -317,6 +324,9 @@ class FindingList:
                 only_muted=self.only_muted,
                 offset=offset,
                 limit=limit,
+                search_string=self.search_string,
+                order_by=self.order_by,
+                asc_desc=self.asc_desc,
             ).items
             ooi_references = {finding.ooi for finding in findings}
             finding_type_references = {finding.finding_type for finding in findings}

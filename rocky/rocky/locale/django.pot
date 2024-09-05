@@ -4151,6 +4151,14 @@ msgstr ""
 msgid "Filter by muted findings"
 msgstr ""
 
+#: tools/forms/findings.py tools/forms/ooi_form.py tools/forms/scheduler.py
+msgid "Search"
+msgstr ""
+
+#: tools/forms/findings.py
+msgid "Object ID contains (case sensitive)"
+msgstr ""
+
 #: tools/forms/ooi.py
 msgid "Filter types"
 msgstr ""
@@ -4187,10 +4195,6 @@ msgstr ""
 
 #: tools/forms/ooi_form.py
 msgid "Filter by clearance type"
-msgstr ""
-
-#: tools/forms/ooi_form.py tools/forms/scheduler.py
-msgid "Search"
 msgstr ""
 
 #: tools/forms/scheduler.py
@@ -5466,6 +5470,10 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_edit.html
 msgid "Save organization"
+msgstr ""
+
+#: rocky/templates/organizations/organization_list.html
+msgid "Rerun all bits for all my organizations"
 msgstr ""
 
 #: rocky/templates/organizations/organization_list.html
