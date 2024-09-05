@@ -1,4 +1,5 @@
 import uuid
+from base64 import b64encode
 
 import httpx
 import pytest
@@ -260,16 +261,25 @@ def test_save_raw_no_mime_types(bytes_api_client: BytesAPIClient) -> None:
     raw_url = f"{bytes_api_client.client.base_url}/bytes/raw"
 
     raw = b"second test 123456"
+    file_name = "raw"
     response = httpx.post(
         raw_url,
-        files=[("raws", ("raw", raw))],
+        json={
+            "files": [
+                {
+                    "name": file_name,
+                    "content": b64encode(raw).decode(),
+                    "tags": [],
+                }
+            ]
+        },
         headers=bytes_api_client.client.headers,
         params={"boefje_meta_id": str(boefje_meta.id)},
     )
     assert response.status_code == 200
 
     get_raw_without_mime_type_response = httpx.get(
-        f"{raw_url}/{response.json()['application/octet-stream']}", headers=bytes_api_client.client.headers, timeout=30
+        f"{raw_url}/{response.json()[file_name]}", headers=bytes_api_client.client.headers, timeout=30
     )
 
     assert get_raw_without_mime_type_response.status_code == 200

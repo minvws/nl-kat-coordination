@@ -1,5 +1,6 @@
 import typing
 import uuid
+from base64 import b64encode
 from collections.abc import Callable, Set
 from functools import wraps
 from typing import Any
@@ -99,16 +100,25 @@ class BytesAPIClient:
 
     @retry_with_login
     def save_raw(self, boefje_meta_id: str, raw: str | bytes, mime_types: Set[str] = frozenset()) -> UUID:
-        content_type = ",".join(mime_types)
+        file_name = "raw"
+
         response = self._session.post(
             "/bytes/raw",
-            files=[("raws", ("raws", raw, content_type))],
+            json={
+                "files": [
+                    {
+                        "name": file_name,
+                        "content": b64encode(raw if isinstance(raw, bytes) else raw.encode()).decode(),
+                        "tags": mime_types,
+                    }
+                ]
+            },
             headers=self.headers,
             params={"boefje_meta_id": str(boefje_meta_id)},
         )
         self._verify_response(response)
 
-        return UUID(response.json()[content_type])
+        return UUID(response.json()[file_name])
 
     @retry_with_login
     def get_raw(self, raw_data_id: str) -> bytes:

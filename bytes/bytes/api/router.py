@@ -1,11 +1,13 @@
+from base64 import b64decode
 from uuid import UUID
 
 import structlog
 from cachetools import TTLCache, cached
-from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import Response
 from starlette.responses import JSONResponse
 
+from bytes.api.models import BoefjeOutput
 from bytes.auth import authenticate_token
 from bytes.config import get_settings
 from bytes.database.sql_meta_repository import MetaIntegrityError, ObjectNotFoundException, create_meta_data_repository
@@ -147,41 +149,39 @@ def get_normalizer_meta(
 @router.post("/raw", tags=[RAW_TAG])
 def create_raw(
     boefje_meta_id: UUID,
-    raws: list[UploadFile],
+    boefje_output: BoefjeOutput,
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
     event_manager: EventManager = Depends(create_event_manager),
 ) -> JSONResponse:
-    """Parse all the raw files from the request and return the ids. The ids are ordered according to the order
-    from the request data, but since the raw files must have a unique set of mime-types we actually return a mapping
-    of the content type to the id."""
+    """Parse all the raw files from the request and return the ids. The ids are ordered according to the order from the
+    request data, but we assume the `name` field is unique, and hence return a mapping of the file name to the id."""
 
     raw_ids = {}
     mime_types_by_id = {
         raw.id: set(raw.mime_types) for raw in meta_repository.get_raw(RawDataFilter(boefje_meta_id=boefje_meta_id))
     }
-    all_parsed_mime_types = []
+    all_parsed_mime_types = list(mime_types_by_id.values())
 
-    for raw in raws:
-        parsed_mime_types = {} if raw.content_type is None else {MimeType(value=x) for x in raw.content_type.split(",")}
+    for raw in boefje_output.files:
+        parsed_mime_types = {MimeType(value=x) for x in raw.tags}
+
+        if parsed_mime_types in mime_types_by_id.values():
+            # Set the id for this file using the precomputed dict that maps existing primary keys to the mime-type set.
+            raw_ids[raw.name] = str(
+                list(mime_types_by_id.keys())[list(mime_types_by_id.values()).index(parsed_mime_types)]
+            )
+            continue
+
+        if parsed_mime_types in all_parsed_mime_types:
+            raise HTTPException(status_code=400, detail="Content types do not define unique sets of mime types.")
 
         try:
             meta = meta_repository.get_boefje_meta_by_id(boefje_meta_id)
-
-            if parsed_mime_types in mime_types_by_id.values():
-                raw_ids[raw.content_type] = str(list(mime_types_by_id.keys())[
-                    list(mime_types_by_id.values()).index(parsed_mime_types)
-                ])
-                all_parsed_mime_types.append(parsed_mime_types)
-                continue
-
-            if parsed_mime_types in all_parsed_mime_types:
-                raise HTTPException(status_code=400, detail="Content types do not define unique sets of mime types.")
-
-            raw_data = RawData(value=raw.file.read(), boefje_meta=meta, mime_types=parsed_mime_types)
+            raw_data = RawData(value=b64decode(raw.content.encode()), boefje_meta=meta, mime_types=parsed_mime_types)
 
             with meta_repository:
                 raw_id = meta_repository.save_raw(raw_data)
-                raw_ids[raw.content_type] = str(raw_id)
+                raw_ids[raw.name] = str(raw_id)
 
             all_parsed_mime_types.append(parsed_mime_types)
 
@@ -197,6 +197,8 @@ def create_raw(
         except Exception as error:
             logger.exception("Error saving raw data")
             raise HTTPException(status_code=500, detail="Could not save raw data") from error
+
+        all_parsed_mime_types.append(parsed_mime_types)
 
     return JSONResponse(raw_ids)
 

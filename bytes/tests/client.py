@@ -1,4 +1,5 @@
 import typing
+from base64 import b64encode
 from collections.abc import Callable
 from functools import wraps
 from typing import Any
@@ -126,15 +127,23 @@ class BytesAPIClient:
         if not mime_types:
             mime_types = []
 
-        content_type = ",".join(mime_types)
+        file_name = "raw"
         response = self.client.post(
             "/bytes/raw",
-            files=[("raws", ("raws", raw, content_type))],
+            json={
+                "files": [
+                    {
+                        "name": file_name,
+                        "content": b64encode(raw).decode(),
+                        "tags": mime_types,
+                    }
+                ],
+            },
             params={"boefje_meta_id": str(boefje_meta_id)},
         )
         self._verify_response(response)
 
-        return response.json()[content_type]
+        return response.json()[file_name]
 
     @retry_with_login
     def get_raw(self, raw_id: UUID) -> bytes:
