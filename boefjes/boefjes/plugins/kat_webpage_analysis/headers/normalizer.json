@@ -1,5 +1,6 @@
 {
   "id": "kat_webpage_analysis_headers_normalize",
+  "name": "Webpage analysis HTTP headers",
   "consumes": [
     "openkat-http/headers"
   ],

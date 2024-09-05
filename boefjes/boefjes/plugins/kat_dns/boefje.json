@@ -1,7 +1,7 @@
 {
   "id": "dns-records",
-  "name": "DnsRecords",
-  "description": "Fetch the DNS record(s) of a hostname",
+  "name": "DNS records",
+  "description": "Fetch the DNS record(s) of a hostname.",
   "consumes": [
     "Hostname"
   ],

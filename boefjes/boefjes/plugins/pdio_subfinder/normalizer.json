@@ -1,5 +1,6 @@
 {
   "id": "pdio-subfinder-normalizer",
+  "name": "PDIO subfinder",
   "consumes": [
     "boefje/pdio-subfinder"
   ],
