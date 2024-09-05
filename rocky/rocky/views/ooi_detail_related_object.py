@@ -133,7 +133,7 @@ class OOIRelatedObjectAddView(OOIRelatedObjectManager, TemplateView):
 
     def get(self, request, *args, **kwargs):
         if "ooi_id" in request.GET:
-            self.ooi_id = self.get_ooi(pk=request.GET.get("ooi_id"))
+            self.ooi_id = self.get_ooi(pk=request.GET["ooi_id"])
 
         if "add_ooi_type" in request.GET:
             ooi_type_choice = self.split_ooi_type_choice(request.GET["add_ooi_type"])
