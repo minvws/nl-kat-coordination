@@ -127,7 +127,7 @@ class BytesAPIClient:
         if not mime_types:
             mime_types = []
 
-        file_name = "raw"
+        file_name = "raw"  # The name provides a key for all ids returned, so this is arbitrary as we only upload 1 file
         response = self.client.post(
             "/bytes/raw",
             json={

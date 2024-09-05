@@ -100,7 +100,7 @@ class BytesAPIClient:
 
     @retry_with_login
     def save_raw(self, boefje_meta_id: str, raw: str | bytes, mime_types: Set[str] = frozenset()) -> UUID:
-        file_name = "raw"
+        file_name = "raw"  # The name provides a key for all ids returned, so this is arbitrary as we only upload 1 file
 
         response = self._session.post(
             "/bytes/raw",

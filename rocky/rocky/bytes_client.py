@@ -114,7 +114,7 @@ class BytesClient:
         response.raise_for_status()
 
     def _save_raw(self, boefje_meta_id: uuid.UUID, raw: bytes, mime_types: Set[str] = frozenset()) -> str:
-        file_name = "raw"
+        file_name = "raw"  # The name provides a key for all ids returned, so this is arbitrary as we only upload 1 file
 
         response = self.session.post(
             "/bytes/raw",
