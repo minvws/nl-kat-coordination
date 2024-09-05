@@ -6,9 +6,5 @@
     "IPAddressV4",
     "IPAddressV6"
   ],
-  "environment_keys": [
-    "CENSYS_API_ID",
-    "CENSYS_API_SECRET"
-  ],
   "scan_level": 1
 }
