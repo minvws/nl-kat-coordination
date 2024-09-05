@@ -528,7 +528,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         input_oois = self.get_input_oois([self.report_ooi])
         report_types = self.get_report_types(children_reports)
 
-        return (report_data, input_oois, report_types)
+        return report_data, input_oois, report_types
 
     def get_report_data_concatenated_report(
         self,
