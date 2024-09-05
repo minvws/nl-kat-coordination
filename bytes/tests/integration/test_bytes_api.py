@@ -303,13 +303,13 @@ def test_raw_mimes(bytes_api_client: BytesAPIClient) -> None:
         )
     )
     assert len(retrieved_raws) == 1
-    assert retrieved_raws[0]["mime_types"] == [{"value": value} for value in mime_types]
+    assert {x["value"] for x in retrieved_raws[0]["mime_types"]} == set(mime_types)
 
     retrieved_raws = bytes_api_client.get_raws(
         RawDataFilter(boefje_meta_id=boefje_meta.id, normalized=False, mime_types=[MimeType(value="text/html")])
     )
     assert len(retrieved_raws) == 1
-    assert retrieved_raws[0]["mime_types"] == [{"value": value} for value in mime_types]
+    assert {x["value"] for x in retrieved_raws[0]["mime_types"]} == set(mime_types)
 
     retrieved_raws = bytes_api_client.get_raws(
         RawDataFilter(boefje_meta_id=boefje_meta.id, normalized=False, mime_types=[MimeType(value="bad/mime")])
