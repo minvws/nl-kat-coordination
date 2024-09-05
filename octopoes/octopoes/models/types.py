@@ -17,6 +17,8 @@ from octopoes.models.ooi.dns.records import (
     DNSARecord,
     DNSCAARecord,
     DNSCNAMERecord,
+    DNSGPOSRecord,
+    DNSLOCRecord,
     DNSMXRecord,
     DNSNSRecord,
     DNSPTRRecord,
@@ -93,6 +95,8 @@ DnsRecordType = (
     | DNSSOARecord
     | DNSCNAMERecord
     | DNSCAARecord
+    | DNSLOCRecord
+    | DNSGPOSRecord
     | ResolvedHostname
     | NXDOMAIN
 )
