@@ -55,27 +55,13 @@ class TestPluginsService(TestCase):
     def test_update_by_id_bad_schema(self):
         plugin_id = "kat_test"
 
-        with self.assertRaises(SettingsNotConformingToSchema) as ctx:
-            self.service.set_enabled_by_id(plugin_id, self.organisation, True)
-
-        msg = (
-            "Settings for organisation test and plugin kat_test are not conform the plugin schema: 'api_key' is a "
-            "required property"
-        )
-        self.assertEqual(ctx.exception.message, msg)
-
         self.service.config_storage.upsert(self.organisation, plugin_id, {"api_key": 128 * "a"})
         self.service.set_enabled_by_id(plugin_id, self.organisation, True)
 
-        value = 129 * "a"
-        self.service.config_storage.upsert(self.organisation, plugin_id, {"api_key": 129 * "a"})
         with self.assertRaises(SettingsNotConformingToSchema) as ctx:
-            self.service.set_enabled_by_id(plugin_id, self.organisation, True)
+            self.service.upsert_settings({"api_key": 129 * "a"}, self.organisation, plugin_id)
 
-        msg = (
-            f"Settings for organisation test and plugin kat_test are not conform the plugin schema: "
-            f"'{value}' is too long"
-        )
+        msg = f"Settings for plugin kat_test are not conform the plugin schema: '{129 * 'a'}' is too long"
         self.assertEqual(ctx.exception.message, msg)
 
     def test_get_schema(self):
@@ -93,7 +79,7 @@ class TestPluginsService(TestCase):
         schema = self.service.schema("kat_test_normalize")
         self.assertIsNone(schema)
 
-    def test_removing_mandatory_setting_disables_plugin(self):
+    def test_removing_mandatory_setting_does_not_disable_plugin_anymore(self):
         plugin_id = "kat_test"
 
         self.service.config_storage.upsert(self.organisation, plugin_id, {"api_key": 128 * "a"})
@@ -105,20 +91,17 @@ class TestPluginsService(TestCase):
         self.service.delete_settings(self.organisation, plugin_id)
 
         plugin = self.service.by_plugin_id(plugin_id, self.organisation)
-        self.assertFalse(plugin.enabled)
+        self.assertTrue(plugin.enabled)
 
     def test_adding_integer_settings_within_given_constraints(self):
         plugin_id = "kat_test_2"
 
-        self.service.config_storage.upsert(self.organisation, plugin_id, {"api_key": "24"})
-
         with self.assertRaises(SettingsNotConformingToSchema) as ctx:
-            self.service.set_enabled_by_id(plugin_id, self.organisation, True)
+            self.service.upsert_settings({"api_key": "24"}, self.organisation, plugin_id)
 
         self.assertIn("'24' is not of type 'integer'", ctx.exception.message)
 
-        self.service.config_storage.upsert(self.organisation, plugin_id, {"api_key": 24})
-
+        self.service.upsert_settings({"api_key": 24}, self.organisation, plugin_id)
         self.service.set_enabled_by_id(plugin_id, self.organisation, True)
 
         plugin = self.service.by_plugin_id(plugin_id, self.organisation)
@@ -155,7 +138,6 @@ class TestPluginsService(TestCase):
 
         all_settings_1 = {"api_key": "123"}
         self.service.upsert_settings(all_settings_1, self.organisation, plugin_id_1)
-
         self.service.clone_settings_to_organisation(self.organisation, "org2")
 
         all_settings_for_new_org = self.service.get_all_settings("org2", plugin_id_1)
