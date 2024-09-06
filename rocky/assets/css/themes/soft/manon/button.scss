@@ -4,7 +4,7 @@
   /* Button */
   --button-base-background-color: var(--branding-color-2-background-color);
   --button-base-text-color: var(--branding-color-2-text-color);
-  --button-base-border-radius: 1rem;
+  --button-base-border-radius: var(--border-radius-l);
   --button-base-font-family: var(--application-base-font-family);
   --button-base-padding-top: var(--spacing-grid-150);
   --button-base-padding-right: var(--spacing-grid-200);
