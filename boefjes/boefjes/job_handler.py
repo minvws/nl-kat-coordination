@@ -222,6 +222,23 @@ class NormalizerHandler(Handler):
                     )
                 )
 
+            if (
+                normalizer_meta.raw_data.boefje_meta.input_ooi  # No input OOI means no deletion propagation
+                and not results.observations + results.declarations + results.affirmations
+            ):
+                # There were no results found, which we still need to signal to Octopoes for deletion propagation
+
+                connector.save_observation(
+                    Observation(
+                        method=normalizer_meta.normalizer.id,
+                        source=Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi),
+                        source_method=normalizer_meta.raw_data.boefje_meta.boefje.id,
+                        task_id=normalizer_meta.id,
+                        valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
+                        result=[],
+                    )
+                )
+
             corrected_scan_profiles = []
             for profile in results.scan_profiles:
                 profile.level = ScanLevel(
