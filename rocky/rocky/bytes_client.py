@@ -127,6 +127,7 @@ class BytesClient:
         # Note: we assume organization permissions are handled before requesting raw data.
 
         response = self.session.get(f"/bytes/raw/{raw_id}")
+
         response.raise_for_status()
         return response.content
 
