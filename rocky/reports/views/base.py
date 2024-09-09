@@ -459,7 +459,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         return super().get(request, *args, **kwargs)
 
-    def get_report_ooi(self, ooi_pk: str) -> type[OOI]:
+    def get_report_ooi(self, ooi_pk: str) -> ReportOOI:
         return self.octopoes_api_connector.get(Reference.from_str(f"{ooi_pk}"), valid_time=self.observed_at)
 
     def get_template_names(self):
@@ -472,7 +472,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                 "generate_report.html",
             ]
 
-    def get_children_reports(self) -> list[type[OOI]]:
+    def get_children_reports(self) -> list[ReportOOI]:
         return [
             child
             for x in REPORTS

@@ -1996,8 +1996,8 @@ def get_aggregate_report_from_bytes():
                 "name": "Nmap IP range",
                 "scan_level": 2,
                 "type": "boefje",
-                "description": "Scan an IP range and store found IPs. Defaults to top-250 TCP and top-10 UDP on ranges \
-                    with 1024 addresses or less. Larger ranges are skipped by default.",
+                "description": "Scan an IP range and store found IPs. Defaults to top-250 TCP and top-10 UDP on ranges "
+                "with 1024 addresses or less. Larger ranges are skipped by default.",
             },
             {
                 "required": False,
@@ -2044,8 +2044,8 @@ def get_aggregate_report_from_bytes():
             {"name": "Open Ports Report", "description": "Find open ports of IP addresses", "label_style": "5-light"},
             {
                 "name": "RPKI Report",
-                "description": "Shows whether the IP is covered by a valid RPKI ROA. For a hostname it shows the IP \
-                    addresses and whether they are covered by a valid RPKI ROA.",
+                "description": "Shows whether the IP is covered by a valid RPKI ROA. For a hostname it shows the IP "
+                "addresses and whether they are covered by a valid RPKI ROA.",
                 "label_style": "4-light",
             },
             {
