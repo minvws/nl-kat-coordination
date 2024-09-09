@@ -706,6 +706,13 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(0, len(response.json()["results"]))
 
+    def test_get_normalizer_filtered(self):
+        # This used to be a bug where the normalizer filter was missing a nesting on the operator
+        params = {"task_type": "normalizer", "plugin_id": "kat_nmap_normalize"}
+        response = self.client.get("/tasks", params=params)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(0, len(response.json()["results"]))
+
     def test_get_tasks_filtered(self):
         response = self.client.post(
             "/tasks",
