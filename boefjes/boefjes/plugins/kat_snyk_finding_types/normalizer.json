@@ -1,5 +1,6 @@
 {
   "id": "kat_snyk_finding_types_normalize",
+  "name": "Snyk.io finding types",
   "consumes": [
     "boefje/snyk-finding-types"
   ],
