@@ -25,21 +25,25 @@ class TaskTest(TestCase):
         self.boefjes = [
             Boefje(
                 id="test-boefje-1",
+                name="test-boefje-1",
                 consumes={"SomeOOI"},
                 produces=["test-boef-1", "test/text"],
             ),
             Boefje(
                 id="test-boefje-2",
+                name="test-boefje-2",
                 consumes={"SomeOOI"},
                 produces=["test-boef-2", "test/text"],
             ),
             Boefje(
                 id="test-boefje-3",
+                name="test-boefje-3",
                 consumes={"SomeOOI"},
                 produces=["test-boef-3", "test/plain"],
             ),
             Boefje(
                 id="test-boefje-4",
+                name="test-boefje-4",
                 consumes={"SomeOOI"},
                 produces=["test-boef-4", "test/and-simple"],
             ),
@@ -47,11 +51,13 @@ class TaskTest(TestCase):
         self.normalizers = [
             Normalizer(
                 id="test-normalizer-1",
+                name="test-normalizer-1",
                 consumes=["test-boef-3", "test/text"],
                 produces=["SomeOOI", "OtherOOI"],
             ),
             Normalizer(
                 id="test-normalizer-2",
+                name="test-normalizer-2",
                 consumes=["test/text"],
                 produces=["SomeOtherOOI"],
             ),
@@ -59,12 +65,14 @@ class TaskTest(TestCase):
         self.bits = [
             Bit(
                 id="test-bit-1",
+                name="test-bit-1",
                 consumes="SomeOOI",
                 produces=["SomeOOI"],
                 parameters=[],
             ),
             Bit(
                 id="test-bit-2",
+                name="test-bit-2",
                 consumes="SomeOOI",
                 produces=["SomeOOI", "SomeOtherOOI"],
                 parameters=[],
