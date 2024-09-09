@@ -17,7 +17,6 @@ class Plugin(BaseModel):
     version: str | None = None
     created: datetime.datetime | None = None
     description: str | None = None
-    environment_keys: list[str] = Field(default_factory=list)
     enabled: bool = False
     static: bool = True  # We need to differentiate between local and remote plugins to know which ones can be deleted
 

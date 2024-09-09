@@ -1799,7 +1799,6 @@ def boefje_dns_records():
         authors=None,
         created=None,
         description="Fetch the DNS record(s) of a hostname",
-        environment_keys=None,
         related=[],
         enabled=True,
         type="boefje",

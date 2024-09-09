@@ -1,5 +1,6 @@
 {
   "id": "kat_green_hosting_normalize",
+  "description": "Parses the Green Hosting output into findings.",
   "consumes": [
     "boefje/green-hosting"
   ],
