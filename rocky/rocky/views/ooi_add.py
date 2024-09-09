@@ -9,12 +9,15 @@ from tools.view_helpers import existing_ooi_type
 
 from octopoes.models import OOI
 from octopoes.models.ooi.monitoring import Incident
+from octopoes.models.ooi.question import Question
 from octopoes.models.ooi.reports import Report, ReportData
 from octopoes.models.ooi.web import RESTAPI, ImageMetadata
 from octopoes.models.types import type_by_name
 from rocky.views.ooi_view import BaseOOIFormView
 
-EXCLUDE_OOI_TYPES = [ooi_type.get_object_type() for ooi_type in [RESTAPI, Incident, ImageMetadata, Report, ReportData]]
+EXCLUDE_OOI_TYPES = [
+    ooi_type.get_object_type() for ooi_type in [Question, RESTAPI, Incident, ImageMetadata, Report, ReportData]
+]
 
 
 def ooi_type_input_choices():
