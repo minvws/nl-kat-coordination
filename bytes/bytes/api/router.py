@@ -4,6 +4,7 @@ import structlog
 from cachetools import TTLCache, cached
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import Response
+from starlette.concurrency import run_in_threadpool
 from starlette.responses import JSONResponse
 
 from bytes.api.models import RawResponse
@@ -161,11 +162,10 @@ async def create_raw(
         if meta_repository.has_raw(meta, parsed_mime_types):
             return RawResponse(status="success", message="Raw data already present")
 
-        # Await the request body directly
         data = await request.body()
         raw_data = RawData(value=data, boefje_meta=meta, mime_types=parsed_mime_types)
         with meta_repository:
-            raw_id = meta_repository.save_raw(raw_data)
+            raw_id = await run_in_threadpool(meta_repository.save_raw, raw_data)
 
         event = RawFileReceived(
             organization=meta.organization,
@@ -175,7 +175,7 @@ async def create_raw(
                 mime_types=raw_data.mime_types,
             ),
         )
-        event_manager.publish(event)
+        await run_in_threadpool(event_manager.publish, event)
     except Exception as error:
         logger.exception("Error saving raw data")
         raise HTTPException(status_code=500, detail="Could not save raw data") from error
