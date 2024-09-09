@@ -1,5 +1,6 @@
 {
   "id": "kat_shodan_normalize",
+  "name": "Shodan",
   "consumes": [
     "boefje/shodan"
   ],
