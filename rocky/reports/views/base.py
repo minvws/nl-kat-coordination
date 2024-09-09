@@ -433,10 +433,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.report_id = request.GET.get("report_id")
-        self.report_ooi = self.octopoes_api_connector.get(
-            Reference.from_str(f"{self.report_id}"), valid_time=self.observed_at
-        )
+        self.report_ooi = self.get_report_ooi(request.GET.get("report_id"))
         self.report_data, self.input_oois, self.report_types = self.get_report_data()
 
     def get(self, request, *args, **kwargs):
@@ -461,6 +458,9 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                 return response
 
         return super().get(request, *args, **kwargs)
+
+    def get_report_ooi(self, ooi_pk: str) -> type[OOI]:
+        return self.octopoes_api_connector.get(Reference.from_str(f"{ooi_pk}"), valid_time=self.observed_at)
 
     def get_template_names(self):
         if self.report_ooi.report_type and issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
@@ -517,7 +517,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         input_oois = self.get_input_oois([self.report_ooi])
         report_types = self.get_report_types([self.report_ooi])
 
-        return (report_data, input_oois, report_types)
+        return report_data, input_oois, report_types
 
     def get_report_data_aggregate_report(
         self,
@@ -525,10 +525,11 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         self.bytes_client.login()
         report_data = self.get_report_data_from_bytes(self.report_ooi)
         children_reports = self.get_children_reports()
+
         input_oois = self.get_input_oois([self.report_ooi])
         report_types = self.get_report_types(children_reports)
 
-        return (report_data, input_oois, report_types)
+        return report_data, input_oois, report_types
 
     def get_report_data_concatenated_report(
         self,
@@ -547,7 +548,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                     "template": report.template,
                     "report_name": report.name,
                 }
-        return (report_data, input_oois, report_types)
+        return report_data, input_oois, report_types
 
     def get_report_data(self):
         if issubclass(get_report_by_id(self.report_ooi.report_type), ConcatenatedReport):
