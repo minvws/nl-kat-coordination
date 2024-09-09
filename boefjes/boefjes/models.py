@@ -13,7 +13,7 @@ class Organisation(BaseModel):
 
 class Plugin(BaseModel):
     id: str
-    name: str | None = None
+    name: str
     version: str | None = None
     created: datetime.datetime | None = None
     description: str | None = None
