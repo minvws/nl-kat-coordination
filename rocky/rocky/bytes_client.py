@@ -123,7 +123,7 @@ class BytesClient:
                     {
                         "name": file_name,
                         "content": b64encode(raw).decode(),
-                        "tags": mime_types,
+                        "tags": list(mime_types),
                     }
                 ]
             },

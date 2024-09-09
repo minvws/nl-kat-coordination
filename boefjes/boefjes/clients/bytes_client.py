@@ -109,7 +109,7 @@ class BytesAPIClient:
                     {
                         "name": file_name,
                         "content": b64encode(raw if isinstance(raw, bytes) else raw.encode()).decode(),
-                        "tags": mime_types,
+                        "tags": list(mime_types),
                     }
                 ]
             },
