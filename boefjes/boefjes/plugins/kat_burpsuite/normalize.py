@@ -18,13 +18,7 @@ from octopoes.models.ooi.web import URL, HostnameHTTPURL, HTTPHeader, HTTPResour
 def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     parser = minidom.parseString(raw.decode("UTF-8"))
 
-    # assume that input ooi is none or a HostnameHTTPURL
-    if input_ooi:
-        ooi = Reference.from_str(input_ooi["primary_key"])
-        network = Network(name=ooi.tokenized.netloc.network.name)
-    else:
-        network = Network(name="internet")
-        yield network
+    network = Network(name="internet")
 
     tcp_protocol = Protocol.TCP
 
