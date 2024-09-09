@@ -1,7 +1,6 @@
 from uuid import UUID
 
 import structlog
-from asgiref.sync import async_to_sync
 from cachetools import TTLCache, cached
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import Response
@@ -147,7 +146,7 @@ def get_normalizer_meta(
 
 
 @router.post("/raw", tags=[RAW_TAG])
-def create_raw(
+async def create_raw(
     request: Request,
     boefje_meta_id: UUID,
     mime_types: list[str] | None = Query(None),
@@ -162,10 +161,8 @@ def create_raw(
         if meta_repository.has_raw(meta, parsed_mime_types):
             return RawResponse(status="success", message="Raw data already present")
 
-        # FastAPI/starlette only has async versions of the Request methods, but
-        # all our code is sync, so we wrap it in async_to_sync.
-        data = async_to_sync(request.body)()
-
+        # Await the request body directly
+        data = await request.body()
         raw_data = RawData(value=data, boefje_meta=meta, mime_types=parsed_mime_types)
         with meta_repository:
             raw_id = meta_repository.save_raw(raw_data)
