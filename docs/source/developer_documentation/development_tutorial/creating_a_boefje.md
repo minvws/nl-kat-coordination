@@ -28,7 +28,6 @@ This file contains information about our boefje. For example, this file contains
   "name": "Hello Katty",
   "description": "A simple boefje that can say hello",
   "consumes": ["IPAddressV4", "IPAddressV6"],
-  "environment_keys": ["MESSAGE", "NUMBER"],
   "scan_level": 0,
   "oci_image": "openkat/hello-katty"
 }
@@ -38,7 +37,6 @@ This file contains information about our boefje. For example, this file contains
 - **`name`**: A name to display in the KAT-alogus.
 - **`description`**: A description in the KAT-alogus.
 - **`consumes`**: A list of OOI types that trigger the boefje to run. Whenever one of these OOIs gets added, this boefje will run with that OOI. In our case, we will run our boefje whenever a new IPAddressV4 or IPAddressV6 gets added.
-- **`environment_keys`**: A list of inputs provided by the user. More information about these inputs can be found in `schema.json`. OpenKAT also provides some environment variables.
 - **`scan_level`**: A scan level that decides how intrusively this boefje will scan the provided OOIs. Since we will not make any external requests our boefje will have a scan level of 0.
 - **`oci_image`**: The name of the docker image that is provided inside `boefjes/Makefile`
 
@@ -52,8 +50,9 @@ This file contains a description of the boefje to explain to the user what this 
 
 ## `schema.json`
 
-This JSON is used as the basis for a form for the user. When the user enables this boefje they can get the option to give extra information. For example, it can contain an API key that the script requires.
-This is an example of a `schema.json` file:
+To allow the user to pass information to a boefje runtime, add a schema.json file to the folder where your boefje is located.
+This can be used, for example, to add an API key that the script requires.
+It must conform to the https://json-schema.org/ standard, for example:
 
 ```json
 {
@@ -77,6 +76,24 @@ This is an example of a `schema.json` file:
   "required": ["MESSAGE"]
 }
 ```
+
+This JSON defines which additional environment variables can be set for the boefje.
+There are two ways to do this.
+Firstly, using this schema as an example, you could set the `BOEFJE_MESSAGE` environment variable in the boefje runtime.
+Prepending the key with `BOEFJE_` provides an extra safeguard.
+Note that setting an environment variable means this configuration is applied to _all_ organisations.
+Secondly, if you want to avoid setting environment variables or configure it for just one organisation,
+it is also possible to set the API key through the KAT-alogus.
+Navigate to the boefje detail page of Shodan to find the schema as a form.
+These values take precedence over the environment variables.
+This is also a way to test whether the schema is properly understood for your boefje.
+If encryption has been set up for the KATalogus, all keys provided through this form are stored encrypted in the database.
+
+Although the Shodan boefje defines an API key, the schema could contain anything your boefje needs.
+However, OpenKAT currently officially only supports "string" and "integer" properties that are one level deep.
+Because keys may be passed through environment variables,
+schema validation does not happen right away when settings are added or boefjes enabled.
+Schema validation happens right before spawning a boefje, meaning your tasks will fail if is missing a required variable.
 
 - `title`: This should always contain a string containing 'Arguments'.
 - `type`: This should always contain a string containing 'object'.
@@ -125,6 +142,8 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
 ```
 
 The most important part is the return value we send back. This is what will be used by our normalizer to create our new OOIs.
+
+For ease of development, we added a generic finding normalizer. When we just want to create a CVE or other type of finding on the input OOI, we can return the CVE ID or KAT ID as a string with `openkat/finding` as mime-type.
 
 ---
 
