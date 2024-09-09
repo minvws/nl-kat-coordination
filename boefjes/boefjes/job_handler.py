@@ -116,10 +116,8 @@ class BoefjeHandler(Handler):
 
             boefje_meta.arguments["input"] = ooi.serialize()
 
-        env_keys = plugin.environment_keys
-
         boefje_meta.runnable_hash = plugin.runnable_hash
-        boefje_meta.environment = get_environment_settings(boefje_meta, env_keys) if env_keys else {}
+        boefje_meta.environment = get_environment_settings(boefje_meta, plugin.schema)
 
         mime_types = _default_mime_types(boefje_meta.boefje).union(plugin.produces)
 
