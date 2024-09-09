@@ -224,7 +224,7 @@ class NormalizerHandler(Handler):
 
             if (
                 normalizer_meta.raw_data.boefje_meta.input_ooi  # No input OOI means no deletion propagation
-                and not results.observations + results.declarations + results.affirmations
+                and not (results.observations or results.declarations or results.affirmations)
             ):
                 # There were no results found, which we still need to signal to Octopoes for deletion propagation
 
