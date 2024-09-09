@@ -472,7 +472,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                 "generate_report.html",
             ]
 
-    def get_children_reports(self) -> list[ReportOOI]:
+    def get_children_reports(self) -> list[type[OOI]]:
         return [
             child
             for x in REPORTS
