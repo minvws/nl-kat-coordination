@@ -111,7 +111,6 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             consumes=boefje.consumes,
             produces=boefje.produces,
             schema=boefje.schema,
-            environment_keys=boefje.environment_keys,
             oci_image=boefje.oci_image,
             oci_arguments=boefje.oci_arguments,
             version=boefje.version,
@@ -127,7 +126,6 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             description=normalizer.description,
             consumes=normalizer.consumes,
             produces=normalizer.produces,
-            environment_keys=normalizer.environment_keys,
             version=normalizer.version,
             static=normalizer.static,
         )
@@ -144,7 +142,6 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             consumes=boefje_in_db.consumes,
             produces=boefje_in_db.produces,
             schema=boefje_in_db.schema,
-            environment_keys=boefje_in_db.environment_keys,
             oci_image=boefje_in_db.oci_image,
             oci_arguments=boefje_in_db.oci_arguments,
             version=boefje_in_db.version,
@@ -161,7 +158,6 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             description=normalizer_in_db.description,
             consumes=normalizer_in_db.consumes,
             produces=normalizer_in_db.produces,
-            environment_keys=normalizer_in_db.environment_keys,
             version=normalizer_in_db.version,
             static=normalizer_in_db.static,
         )

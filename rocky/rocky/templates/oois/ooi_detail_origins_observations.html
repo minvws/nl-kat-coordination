@@ -24,7 +24,11 @@
                                     <a href="{% url 'boefje_detail' organization_code=organization.code plugin_id=observation.boefje.id %}"
                                        title="{{ observation.boefje.id }}">{{ observation.boefje.name }}</a>
                                 {% else %}
-                                    {% translate "The boefje has since been deleted or disabled." %}
+                                    {% if observation.normalizer.raw_data.boefje_meta.boefje.id == "manual" %}
+                                        {% translate "This scan was manually created." %}
+                                    {% else %}
+                                        {% translate "The boefje has since been deleted or disabled." %}
+                                    {% endif %}
                                 {% endif %}
                             </td>
                             <td>

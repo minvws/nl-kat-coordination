@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-04 08:55+0000\n"
+"POT-Creation-Date: 2024-09-06 08:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1196,14 +1196,6 @@ msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py
 msgid "{} '{}' disabled."
-msgstr ""
-
-#: katalogus/views/plugin_enable_disable.py
-msgid "Failed fetching settings for {}. Is the Katalogus up?"
-msgstr ""
-
-#: katalogus/views/plugin_enable_disable.py
-msgid "Before enabling, please set the required settings for '{}'."
 msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py
@@ -5272,6 +5264,10 @@ msgid "When"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
+msgid "This scan was manually created."
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html
 msgid "The boefje has since been deleted or disabled."
 msgstr ""
 
@@ -5466,6 +5462,10 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_edit.html
 msgid "Save organization"
+msgstr ""
+
+#: rocky/templates/organizations/organization_list.html
+msgid "Rerun all bits for all my organizations"
 msgstr ""
 
 #: rocky/templates/organizations/organization_list.html

@@ -1,5 +1,6 @@
 {
   "id": "kat_check_images",
+  "name": "Webpage analysis check images",
   "consumes": [
     "image/jpeg",
     "image/jpg",

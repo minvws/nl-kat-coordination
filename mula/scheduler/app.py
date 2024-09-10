@@ -60,7 +60,10 @@ class App:
 
         self.schedulers: dict[
             str,
-            schedulers.Scheduler | schedulers.BoefjeScheduler | schedulers.NormalizerScheduler,
+            schedulers.Scheduler
+            | schedulers.BoefjeScheduler
+            | schedulers.NormalizerScheduler
+            | schedulers.ReportScheduler,
         ] = {}
         self.server: server.Server | None = None
 
@@ -136,12 +139,21 @@ class App:
                 callback=self.remove_scheduler,
             )
 
+            scheduler_report = schedulers.ReportScheduler(
+                ctx=self.ctx,
+                scheduler_id=f"report-{org.id}",
+                organisation=org,
+                callback=self.remove_scheduler,
+            )
+
             with self.lock:
                 self.schedulers[scheduler_boefje.scheduler_id] = scheduler_boefje
                 self.schedulers[scheduler_normalizer.scheduler_id] = scheduler_normalizer
+                self.schedulers[scheduler_report.scheduler_id] = scheduler_report
 
             scheduler_normalizer.run()
             scheduler_boefje.run()
+            scheduler_report.run()
 
         if additions:
             # Flush katalogus caches when new organisations are added
@@ -200,6 +212,14 @@ class App:
                 callback=self.remove_scheduler,
             )
             self.schedulers[normalizer_scheduler.scheduler_id] = normalizer_scheduler
+
+            report_scheduler = schedulers.ReportScheduler(
+                ctx=self.ctx,
+                scheduler_id=f"report-{org.id}",
+                organisation=org,
+                callback=self.remove_scheduler,
+            )
+            self.schedulers[report_scheduler.scheduler_id] = report_scheduler
 
         # Start schedulers
         for scheduler in self.schedulers.values():
