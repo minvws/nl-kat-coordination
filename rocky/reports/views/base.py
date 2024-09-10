@@ -1,4 +1,3 @@
-import json
 from collections import defaultdict
 from collections.abc import Iterable, Sequence
 from datetime import datetime, timezone
@@ -442,7 +441,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                 "organization_code": self.organization.code,
                 "organization_name": self.organization.name,
                 "organization_tags": list(self.organization.tags.all()),
-                "data": json.loads(json.dumps(self.report_data)),
+                "data": self.report_data,
             }
 
             try:
@@ -524,8 +523,8 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     ) -> tuple[dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]]]:
         self.bytes_client.login()
         report_data = self.get_report_data_from_bytes(self.report_ooi)
-        children_reports = self.get_children_reports()
 
+        children_reports = self.get_children_reports()
         input_oois = self.get_input_oois([self.report_ooi])
         report_types = self.get_report_types(children_reports)
 
