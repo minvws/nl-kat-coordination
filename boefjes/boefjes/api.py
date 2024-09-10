@@ -152,9 +152,6 @@ def get_task(task_id, scheduler_client):
 
 
 def create_boefje_meta(task, plugin: PluginType) -> BoefjeMeta:
-    env_keys = plugin.environment_keys
-    environment = get_environment_settings(task.data, env_keys) if env_keys else {}
-
     organization = task.data.organization
     input_ooi = task.data.input_ooi
     arguments = {"oci_arguments": plugin.oci_arguments}
@@ -174,6 +171,6 @@ def create_boefje_meta(task, plugin: PluginType) -> BoefjeMeta:
         input_ooi=input_ooi,
         arguments=arguments,
         organization=organization,
-        environment=environment,
+        environment=get_environment_settings(task.data, plugin.schema),
     )
     return boefje_meta

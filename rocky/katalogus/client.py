@@ -25,7 +25,6 @@ class Plugin(BaseModel):
     authors: str | None = None
     created: str | None = None
     description: str | None = None
-    environment_keys: list[str] | None = None
     related: list[str] = Field(default_factory=list)
     enabled: bool
     type: str
@@ -174,14 +173,14 @@ class KATalogusClientV1:
     def get_boefjes(self) -> list[Plugin]:
         return self.get_plugins(plugin_type="boefje")
 
-    def enable_boefje(self, plugin: Plugin) -> None:
-        self._patch_boefje_state(plugin.id, True)
+    def enable_plugin(self, plugin: Plugin) -> None:
+        self._patch_plugin_state(plugin.id, True)
 
     def enable_boefje_by_id(self, boefje_id: str) -> None:
-        self.enable_boefje(self.get_plugin(boefje_id))
+        self.enable_plugin(self.get_plugin(boefje_id))
 
-    def disable_boefje(self, plugin: Plugin) -> None:
-        self._patch_boefje_state(plugin.id, False)
+    def disable_plugin(self, plugin: Plugin) -> None:
+        self._patch_plugin_state(plugin.id, False)
 
     def get_enabled_boefjes(self) -> list[Plugin]:
         return [plugin for plugin in self.get_boefjes() if plugin.enabled]
@@ -189,7 +188,7 @@ class KATalogusClientV1:
     def get_enabled_normalizers(self) -> list[Plugin]:
         return [plugin for plugin in self.get_normalizers() if plugin.enabled]
 
-    def _patch_boefje_state(self, boefje_id: str, enabled: bool) -> None:
+    def _patch_plugin_state(self, boefje_id: str, enabled: bool) -> None:
         logger.info("Toggle plugin state", plugin_id=boefje_id, enabled=enabled)
 
         response = self.session.patch(

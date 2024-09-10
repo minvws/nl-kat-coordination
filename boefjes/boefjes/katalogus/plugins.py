@@ -127,7 +127,6 @@ class BoefjeIn(BaseModel):
     version: str | None = None
     created: datetime.datetime | None = None
     description: str | None = None
-    environment_keys: list[str] = Field(default_factory=list)
     scan_level: int = 1
     consumes: set[str] = Field(default_factory=set)
     produces: set[str] = Field(default_factory=set)
@@ -171,7 +170,6 @@ class NormalizerIn(BaseModel):
     version: str | None = None
     created: datetime.datetime | None = None
     description: str | None = None
-    environment_keys: list[str] = Field(default_factory=list)
     consumes: list[str] = Field(default_factory=list)  # mime types (and/ or boefjes)
     produces: list[str] = Field(default_factory=list)  # oois
 
