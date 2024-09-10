@@ -156,6 +156,7 @@ def test_null(manager: SchedulerWorkerManager, tmp_path: Path, item_handler: Moc
         [get_dummy_data("scheduler/pop_response_normalizer.json")],
         tmp_path / "patch_task_log",
         iterations_to_wait_for_exception=2,
+        sleep_time=0.3,
     )
 
     with pytest.raises(KeyboardInterrupt):
@@ -165,11 +166,12 @@ def test_null(manager: SchedulerWorkerManager, tmp_path: Path, item_handler: Moc
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
 
     assert len(items) == 3
-    assert len(patched_tasks) == 5
+    assert len(patched_tasks) == 6
     assert set(patched_tasks) == {
         ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
         ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
         ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
         ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
         ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
     }

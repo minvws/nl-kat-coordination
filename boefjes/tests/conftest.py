@@ -44,7 +44,7 @@ class MockSchedulerClient(SchedulerClientInterface):
         log_path: Path,
         raise_on_empty_queue: Exception = KeyboardInterrupt,
         iterations_to_wait_for_exception: int = 0,
-        sleep_time: int = 0.1,
+        sleep_time: float = 0.1,
     ):
         self.queue_response = queue_response
         self.boefje_responses = boefje_responses
