@@ -75,7 +75,7 @@ class BoefjeInDB(SQL_BASE):
     # Job specifications
     consumes = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
     produces = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
-    environment_keys = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
+    schema = Column(types.JSON(), nullable=True)
 
     # Image specifications
     oci_image = Column(types.String(length=256), nullable=True)
@@ -98,5 +98,4 @@ class NormalizerInDB(SQL_BASE):
     # Job specifications
     consumes = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
     produces = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
-    environment_keys = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
     version = Column(types.String(length=16), nullable=True)

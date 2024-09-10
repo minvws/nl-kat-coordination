@@ -21,14 +21,14 @@
     "recommendation": "This header is not supported by default by Mozilla. If this header is required for your environment: Set the HTTP header X-Permitted-Cross- Domain-Policies: none in all HTTP responses. Use value master-only if a Flash or Acrobat cross- domain configuration file is used that is placed in the root of the web server"
   },
   "KAT-NO-EXPLICIT-XSS-PROTECTION": {
-    "description": "This is a deprecated header previously used to prevent against Cross-Site-Scripting attacks. Support in modern browsers could introduce XSS attacks again.",
+    "description": "The 'X-XSS-Protection' header is a deprecated header previously used to prevent against Cross-Site-Scripting attacks. Support in modern browsers could introduce XSS attacks again.",
     "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection",
     "risk": "recommendation",
     "impact": "Reflected cross-site scripting attacks may not be blocked.",
-    "recommendation": "This header is deprecated and should not be used."
+    "recommendation": "Remove the deprecated header to reduce the chance of XSS attacks."
   },
   "KAT-NO-X-FRAME-OPTIONS": {
-    "description": "HTTP header 'X-Frame-Options' is missing. It is possible that the website can be loaded via an <iframe>.",
+    "description": "The HTTP header 'X-Frame-Options' is missing. It is possible that the website can be loaded via an <iframe>.",
     "source": "https://owasp.org/www-project-secure-headers/#div-headers",
     "risk": "recommendation",
     "impact": "There is a change that clickjacking is possible. This is an attack technique in which the website is invisibly loaded. On top of the original website, another malicious website is loaded that contains specially placed buttons or links. When the victim clicks on those buttons or links, the mouse click and thus its corresponding action is performed on the original website (which is made invisible). If the victim is logged in, then this click can perform an unauthorized action.",
@@ -39,10 +39,10 @@
     "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control",
     "risk": "recommendation",
     "impact": "This header not production ready and thus not officially supported by Mozilla MDN.",
-    "recommendation": "If support is required: Set HTTP header X-DNS-Prefetch-Control: off in all HTTP answers."
+    "recommendation": "If support is required: Set the HTTP header to: `X-DNS-Prefetch-Control: off` in all HTTP answers."
   },
   "KAT-NO-EXCPECT-CT": {
-    "description": "HTTP header 'Expect-CT' is missing. The Expect-CT header allows sites to opt in to reporting and/or enforcement of Certificate Transparency requirements.",
+    "description": "The 'Expect-CT' header is deprecated. The Expect-CT header allowed sites to opt in to reporting and/or enforcement of Certificate Transparency requirements. This header is not supported by common browsers, as certificate transparency is now a standard functionality.",
     "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Expect-CT",
     "risk": "recommendation",
     "impact": "The Expect-CT header prevents the use of misissued certificates for the website from going unnoticed. This header is currently deprecated thus browsers support is limited.",
@@ -60,14 +60,14 @@
     "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy",
     "risk": "recommendation",
     "impact": "When a website visitor clicks on a link to another website, the browser sends the Referer HTTP header (a part of the URL) to the other website. This is a privacy leak for the website visitor. In some cases, sensitive information such as session tokens may leak to websites that are linked to.",
-    "recommendation": "Set the header Referrer-Policy: no- referrer in every HTTP answer."
+    "recommendation": "Set the header to 'Referrer-Policy: no-referrer' in every HTTP answer."
   },
   "KAT-NO-X-CONTENT-TYPE-OPTIONS": {
-    "description": "The HTTP header <c>X-Content-Type- Options</c> is not set. Internet Explorer and Chrome apply MIME type sniffing in order to guess the content type of a document served and ignore the file extension.",
+    "description": "The HTTP header 'X-Content-Type- Options' is not set. Internet Explorer and Chrome apply MIME type sniffing in order to guess the content type of a document served and ignore the file extension.",
     "source": "http://www.owasp.org/index.php/Cross-site_Scripting_(XSS)",
     "risk": "recommendation",
-    "impact": "A malicious user of the system could upload a legitimate file containing HTML code to the website (if such functionality exists) with a file extension such as <c>.jpg</c> or <c>.png</c>. If the victim uses Internet Explorer or Chrome and downloads the malicious file, the uploaded HTML code will be executed, even though the file contains an image extension and the server would return an image header such as <c>Content-Type: image/jpeg</c>. This may include a <i>cross-site scripting</i> vulnerability.",
-    "recommendation": "Set the HTTP header <c>X-Content-Type- Options: nosniff</c> in at least all web pages that contain user input (and uploads)."
+    "impact": "A malicious user of the system could upload a legitimate file containing HTML code to the website (if such functionality exists) with a file extension such as '.jpg' or '.png'. If the victim uses Internet Explorer or Chrome and downloads the malicious file, the uploaded HTML code will be executed, even though the file contains an image extension and the server would return an image header such as 'Content-Type: image/jpeg'. This may include a cross-site scripting vulnerability.",
+    "recommendation": "Set the HTTP header 'X-Content-Type- Options: nosniff' in at least all web pages that contain user input (and uploads)."
   },
   "KAT-SSL-2-SUPPORT": {
     "description": "The server supports SSL version 2. This is a protocol that encrypts data traffic by using a legacy protocol and encryption ciphers which contains various security vulnerabilities.",
@@ -140,7 +140,7 @@
     "recommendation": "Determine if this port should be reachable from the identified location. Limit access to reduce the attack surface if necessary. "
   },
   "KAT-UNCOMMON-OPEN-PORT": {
-    "description": "The firewall may be configured in a riskful manner.",
+    "description": "An uncommon open port was identified. This could introduce security risks.",
     "source": "https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers",
     "risk": "medium",
     "impact": "Uncommon ports are sometimes overlooked and may become unwanted entry points for attackers into an organisations network.",
@@ -241,8 +241,8 @@
     "description": "A lot of ports are open which were not open a week ago.",
     "source": "Check your OpenKAT install on which ports are identified.",
     "risk": "critical",
-    "impact": "Impact depends on what was identified.",
-    "recommendation": "Validate if the firewall config is correct."
+    "impact": "Impact depends on the services reachable through these open ports.",
+    "recommendation": "Validate the presence of all identified open ports. Close ports if they are not required."
   },
   "KAT-LEAKIX-CRITICAL": {
     "description": "A leak with severity critical has been found.",
@@ -392,7 +392,7 @@
     "recommendation": "Make sure the security.txt is in line with the requirements."
   },
   "KAT-BAD-FORMAT-SECURITY-TXT": {
-    "description": "There are flaws in the format of the security.txt.",
+    "description": "There are formatting mistakes in the security.txt file.",
     "source": "https://www.rfc-editor.org/rfc/rfc9116.html#section-4",
     "risk": "recommendation",
     "impact": "Security researchers and/or bounty hunter may not be able to properly disclose vulnerabilities for your website.",
@@ -493,5 +493,10 @@
     "source": "https://www.icann.org/resources/pages/contact-verification-2013-05-03-en",
     "impact": "Domain points to placeholder DNS-Servers, and is offline for regular use.",
     "recommendation": "Verify ownership by following the emailed link."
+  },
+  "KAT-SOFTWARE-VERSION-NOT-FOUND": {
+    "description": "The version of the software is not found.",
+    "risk": "recommendation",
+    "recommendation": "There was no version found for this software but there are known vulnerabilities for this software."
   }
 }

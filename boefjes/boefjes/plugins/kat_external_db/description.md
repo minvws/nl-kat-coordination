@@ -33,4 +33,4 @@ For example:
 }
 ```
 
-The expected ip and domain (item) key lists can be configured in `normalize.py`. Ranges are expected as strings in CIDR notation. Clearance level for fetched items is set to `L0`. Reference implementation of the API server is in the works.
+The expected ip and domain (item) key lists can be configured in `normalize.py`. Ranges are expected as strings in CIDR notation. Clearance level for fetched items is set to `L3` when `BOEFJES_SCAN_PROFILE_WHITELIST='{"kat_external_db_normalize": 3}'` is added to the `.env` file otherwise it is set to `L0`. Reference implementation of the API server is in the works.

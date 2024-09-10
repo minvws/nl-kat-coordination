@@ -8,13 +8,15 @@
                 <button aria-controls="export-add" class="dropdown-button ghost">
                     {% translate "Export" %}<span aria-hidden="true" class="icon ti-chevron-down"></span>
                 </button>
-                <ul id="export-add" aria-expanded="false" class="dropdown-list">
-                    <li>
-                        <a href="{{ report_download_pdf_url }}"
-                           target="_blank"
-                           rel="noopener noreferrer">{% translate "Download report" %}</a>
-                    </li>
-                </ul>
+                <div id="export-add" aria-expanded="false" class="dropdown-list">
+                    <ul>
+                        <li>
+                            <a href="{{ report_download_pdf_url }}"
+                               target="_blank"
+                               rel="noopener noreferrer"><span class="icon ti-download" aria-hidden="true"></span>{% translate "Download report" %}</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
         <div>

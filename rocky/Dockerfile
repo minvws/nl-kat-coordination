@@ -39,10 +39,7 @@ ARG ENVIRONMENT
 # requirements separately
 COPY rocky/requirements*.txt .
 RUN --mount=type=cache,target=/root/.cache \
-    # Workaround for https://github.com/pypa/setuptools/issues/4519 \
-    echo "setuptools<72" > /tmp/constraints.txt \
-    && export PIP_CONSTRAINT=/tmp/constraints.txt \
-    && pip install --upgrade pip \
+    pip install --upgrade pip \
     && if [ "$ENVIRONMENT" = "dev" ]; \
     then \
     grep -v git+https:// requirements-dev.txt | pip install -r /dev/stdin && \
@@ -50,8 +47,7 @@ RUN --mount=type=cache,target=/root/.cache \
     else \
     grep -v git+https:// requirements.txt | pip install -r /dev/stdin && \
     grep git+https:// requirements.txt | pip install -r /dev/stdin ; \
-    fi \
-    && rm /tmp/constraints.txt
+    fi
 
 FROM dev
 
