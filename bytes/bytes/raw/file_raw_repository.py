@@ -14,15 +14,14 @@ logger = logging.getLogger(__name__)
 
 
 def create_raw_repository(settings: Settings) -> RawRepository:
-    if settings.access_key_id and settings.secret_access_key:
+    if settings.s3_bucket_name or settings.s3_bucket_prefix:
+        logger.info("SOUF IT IS S3 TIME")
         return S3RawRepository(
             make_middleware(),
-            settings.access_key_id,
-            settings.secret_access_key,
             settings.bucket_per_org,
+            settings.s3_region,
             settings.s3_bucket_prefix,
             settings.s3_bucket_name,
-            settings.s3_region,
         )
     else:
         return FileRawRepository(
@@ -81,20 +80,16 @@ class S3RawRepository(RawRepository):
     def __init__(
         self,
         file_middleware: FileMiddleware,
-        access_key_id: str,
-        secret_access_key: str,
         bucket_per_org: bool,
-        s3_bucket_prefix: str | None,
-        s3_bucket_name: str | None,
         s3_region: str | None,
+        s3_bucket_prefix: str | None = "OpenKAT-",
+        s3_bucket_name: str | None = "OpenKAT",
     ) -> None:
         self.file_middleware = file_middleware
-        self.access_key_id = access_key_id
-        self.secret_access_key = secret_access_key
         self.bucket_per_org = bucket_per_org
+        self.s3_region = s3_region
         self.s3_bucket_prefix = s3_bucket_prefix
         self.s3_bucket_name = s3_bucket_name
-        self.s3_region = s3_region
 
         self._session: Session = None
         self._s3resource = None
@@ -103,11 +98,7 @@ class S3RawRepository(RawRepository):
     def s3resource(self):
         if self._s3resource:
             return self._s3resource
-        self._session = BotoSession(
-            aws_access_key_id=self.access_key_id,
-            aws_secret_access_key=self.secret_access_key,
-            region_name=self.s3_region,
-        )
+        self._session = BotoSession()
         self._s3resource = self._session.resource("s3")
         return self._s3resource
 
@@ -117,12 +108,12 @@ class S3RawRepository(RawRepository):
         if self.bucket_per_org:
             bucketname = f"{self.s3_bucket_prefix}{organization}"
             try:
-                bucket = self.s3resource.create_bucket(Bucket=bucketname, region=self.s3_region)
+                bucket = self.s3resource.create_bucket(Bucket=bucketname)
                 bucket.wait_until_exists()
                 return bucket
-            except self.s3resource.meta.client.exceptions.BucketAlreadyExists:
-                pass
-        return self.s3resource.Bucket(name=bucketname, region=self.s3_region)
+            except Exception as error:
+                logger.error("SOUF SOMETHING WENT WRONG WITH CREATING BUCKET\n%s", error)
+        return self.s3resource.Bucket(name=bucketname)
 
     def save_raw(self, raw_id: UUID, raw: RawData) -> None:
         file_name = self._raw_file_name(raw_id, raw.boefje_meta)

@@ -24,7 +24,7 @@ ARG ENVIRONMENT
 
 COPY requirements.txt requirements-dev.txt ./
 RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip \
-    && pip install -r requirements.txt \
+    && pip install boto3 && pip install -r requirements.txt \
     && if [ "$ENVIRONMENT" = "dev" ]; then pip install -r requirements-dev.txt; fi
 
 USER bytes
