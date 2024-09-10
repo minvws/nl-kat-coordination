@@ -486,5 +486,10 @@
     "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers",
     "impact": "Nonstandard headers may not be supported by all browsers and may not provide the security that is expected.",
     "recommendation": "Remove the nonstandard headers from the response."
+  },
+  "KAT-SOFTWARE-VERSION-NOT-FOUND": {
+    "description": "The version of the software is not found.",
+    "risk": "recommendation",
+    "recommendation": "There was no version found for this software but there are known vulnerabilities for this software."
   }
 }
