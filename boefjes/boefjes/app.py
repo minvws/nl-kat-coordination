@@ -248,8 +248,10 @@ def _start_working(
             raise
         finally:
             try:
-                scheduler_client.patch_task(p_item.id, status)  # Note: implicitly, we have p_item.id == task_id
-                logger.info("Set status to %s in the scheduler for task[id=%s]", status, p_item.data.id)
+                if scheduler_client.get_task(p_item.id).status == TaskStatus.RUNNING:
+                    # The docker runner could have handled this already
+                    scheduler_client.patch_task(p_item.id, status)  # Note that implicitly, we have p_item.id == task_id
+                    logger.info("Set status to %s in the scheduler for task[id=%s]", status, p_item.data.id)
             except HTTPError:
                 logger.exception("Could not patch scheduler task to %s", status.value)
 
