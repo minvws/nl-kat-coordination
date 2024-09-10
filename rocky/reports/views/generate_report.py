@@ -71,6 +71,10 @@ class LandingGenerateReportView(BreadcrumbsGenerateReportView):
         )
 
 
+class LocationReportView(TemplateView):
+    template_name = "location_report.html"
+
+
 class OOISelectionGenerateReportView(
     GenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseOOIListView, OOISelectionView
 ):
