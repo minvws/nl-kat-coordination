@@ -22,32 +22,28 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
     def form_valid(self, form):
         """If the form is valid, redirect to the supplied URL."""
         form_data = form.cleaned_data
-        arguments = form_data["oci_arguments"].split(", ")
+        plugin_id = self.kwargs.get("plugin_id", str(uuid.uuid4()))
+
+        arguments = [] if form_data["oci_arguments"] == "" else form_data["oci_arguments"].split()
+        consumes = [] if form_data["consumes"] == "" else form_data["consumes"].strip("[]'").split("', '")
+        produces = [] if form_data["produces"] == "" else form_data["produces"].split(", ")
         input_objects = []
-        consumes = form_data["consumes"].strip("[]'").split("', '")
-        produces = form_data["produces"].split(", ")
-        boefje_id = str(uuid.uuid4())
 
         for input_object in consumes:
             input_objects.append(type_by_name(input_object))
 
-        if self.kwargs["plugin_id"]:
-            original_boefje_id = self.kwargs["plugin_id"]
-        else:
-            original_boefje_id = boefje_id
-
         boefje = Boefje(
-            id=boefje_id,
-            name=form_data["name"] or None,
+            id=plugin_id,
+            name=form_data.get("name"),
             created=str(datetime.now()),
-            description=form_data["description"] or None,
+            description=form_data.get("description"),
             enabled=False,
             type="boefje",
             scan_level=form_data["scan_level"],
             consumes=input_objects,
             produces=produces,
             schema=form_data["schema"],
-            oci_image=form_data["oci_image"] or None,
+            oci_image=form_data.get("oci_image"),
             oci_arguments=arguments,
         )
 
@@ -55,15 +51,13 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
         query_params = urlencode({"new_variant": True})
 
         return redirect(
-            reverse(
-                "boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": original_boefje_id}
-            )
+            reverse("boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": plugin_id})
             + "?"
             + query_params
         )
 
 
-class AddBoefjeView(BoefjeSetupView, OrganizationPermissionRequiredMixin, OrganizationView, FormView):
+class AddBoefjeView(BoefjeSetupView):
     """View where the user can create a new Boefje"""
 
     def get_context_data(self, **kwargs):
@@ -80,7 +74,7 @@ class AddBoefjeView(BoefjeSetupView, OrganizationPermissionRequiredMixin, Organi
         return context
 
 
-class AddBoefjeVariantView(BoefjeSetupView, OrganizationPermissionRequiredMixin, OrganizationView, FormView):
+class AddBoefjeVariantView(BoefjeSetupView):
     """View where the user can create a Boefje variant, based on another Boefje."""
 
     def setup(self, request, *args, **kwargs):
@@ -88,19 +82,19 @@ class AddBoefjeVariantView(BoefjeSetupView, OrganizationPermissionRequiredMixin,
 
         plugin_id = self.kwargs["plugin_id"]
         katalogus = get_katalogus(self.organization.code)
-        boefje = katalogus.get_plugin(plugin_id)
+        self.plugin = katalogus.get_plugin(plugin_id)
         consumes = []
 
-        for input_object in list(boefje.consumes):
+        for input_object in list(self.plugin.consumes):
             consumes.append(input_object.__name__)
 
         self.initial = {
-            "oci_image": boefje.oci_image,
-            "oci_arguments": ", ".join(boefje.oci_arguments),
-            "schema": boefje.schema,
+            "oci_image": self.plugin.oci_image,
+            "oci_arguments": ", ".join(self.plugin.oci_arguments),
+            "schema": self.plugin.schema,
             "consumes": consumes,
-            "produces": ", ".join(boefje.produces),
-            "scan_level": boefje.scan_level,
+            "produces": ", ".join(self.plugin.produces),
+            "scan_level": self.plugin.scan_level,
         }
 
     def get_form(self, form_class=None) -> BoefjeAddForm:
@@ -121,7 +115,7 @@ class AddBoefjeVariantView(BoefjeSetupView, OrganizationPermissionRequiredMixin,
             {
                 "url": reverse(
                     "boefje_variant_setup",
-                    kwargs={"organization_code": self.organization.code, "plugin_id": self.kwargs["plugin_id"]},
+                    kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id},
                 ),
                 "text": "Boefje variant setup",
             },
