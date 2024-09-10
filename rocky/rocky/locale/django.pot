@@ -1199,14 +1199,6 @@ msgid "{} '{}' disabled."
 msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py
-msgid "Failed fetching settings for {}. Is the Katalogus up?"
-msgstr ""
-
-#: katalogus/views/plugin_enable_disable.py
-msgid "Before enabling, please set the required settings for '{}'."
-msgstr ""
-
-#: katalogus/views/plugin_enable_disable.py
 msgid "{} '{}' enabled."
 msgstr ""
 
