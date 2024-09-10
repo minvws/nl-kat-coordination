@@ -6,6 +6,7 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPPort, Network
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
+from octopoes.models.types import Finding, KATFindingType
 from tests.loading import get_dummy_data
 
 input_ooi = {
@@ -38,9 +39,6 @@ class SecurityTXTTest(TestCase):
         )
 
         expected = []
-        expected.append(
-            URL(raw="https://example.com/.well-known/security.txt", network=Network(name="internet").reference)
-        )
         url = URL(raw="https://example.com/.well-known/security.txt", network=Network(name="internet").reference)
         expected.append(url)
         expected.append(
@@ -94,4 +92,37 @@ class SecurityTXTTest(TestCase):
                 redirects_to=security_txt.reference,
             )
         )
+        self.assertEqual(expected, oois)
+
+    def test_security_txt_legacy_only(self):
+        oois = list(
+            run(
+                input_ooi,
+                get_dummy_data("inputs/security_txt_results_legacy_only.json"),
+            )
+        )
+
+        expected = []
+        url = URL(raw="https://example.com/security.txt", network=Network(name="internet").reference)
+        expected.append(url)
+        content = "Contact: mailto:security@example.com\nPreferred-Languages: nl, en\nExpires: 2030-01-01T00:00:00.000Z"
+        expected.append(
+            SecurityTXT(
+                website=Reference.from_str("Website|internet|192.0.2.0|tcp|443|https|internet|example.com"),
+                url=url.reference,
+                security_txt=content,
+                redirects_to=None,
+            )
+        )
+
+        ft = KATFindingType(id="KAT-LEGACY-SECURITY-LOCATION")
+        expected.append(ft)
+        expected.append(
+            Finding(
+                description="Only legacy /security.txt location found.",
+                finding_type=ft.reference,
+                ooi=Reference.from_str("Website|internet|192.0.2.0|tcp|443|https|internet|example.com"),
+            )
+        )
+
         self.assertEqual(expected, oois)

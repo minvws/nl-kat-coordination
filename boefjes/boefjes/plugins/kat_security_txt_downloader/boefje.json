@@ -2,6 +2,10 @@
   "id": "security_txt_downloader",
   "name": "Security.txt downloader",
   "description": "Downloads the security.txt file from the target host.",
+  "environment_keys": [
+    "USERAGENT",
+    "TIMEOUT"
+  ],
   "consumes": [
     "Website"
   ],
