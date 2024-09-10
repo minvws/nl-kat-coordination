@@ -174,10 +174,17 @@ class TestRepositories(TestCase):
         returned_boefje = storage.boefje_by_id(boefje.id)
         self.assertEqual(boefje, returned_boefje)
 
-        storage.update_boefje(boefje.id, {"description": "4"})
+        with self.plugin_storage as storage:
+            storage.update_boefje(boefje.id, {"description": "4"})
         self.assertEqual(storage.boefje_by_id(boefje.id).description, "4")
-        boefje.description = "4"
 
+        with self.plugin_storage as storage:
+            storage.update_boefje(boefje.id, {"scan_level": 3})
+
+        self.assertEqual(storage.boefje_by_id(boefje.id).scan_level, 3)
+
+        boefje.description = "4"
+        boefje.scan_level = 3
         all_plugins = storage.get_all()
         self.assertEqual(all_plugins, [boefje])
 

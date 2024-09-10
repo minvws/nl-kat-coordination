@@ -136,10 +136,12 @@ class TestAPI(TestCase):
 
         self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.json())
         self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/{boefje.id}", json={"description": "4"})
+        self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/{boefje.id}", json={"scan_level": 3})
         self.client.patch(f"/v1/organisations/{self.org.id}/plugins/{boefje.id}", json={"enabled": True})
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/{boefje.id}")
         self.assertEqual(response.json()["description"], "4")
+        self.assertEqual(response.json()["scan_level"], 3)
         self.assertTrue(response.json()["enabled"])
 
         self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.json())
