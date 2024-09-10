@@ -41,6 +41,9 @@ class MimeType(BaseModel):
     def __hash__(self):
         return hash(self.value)
 
+    def __lt__(self, other: MimeType):
+        return self.value < other.value
+
 
 class Job(BaseModel):
     id: UUID

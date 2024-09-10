@@ -6,7 +6,7 @@ import pytest
 from httpx import HTTPError
 from prometheus_client.parser import text_string_to_metric_families
 
-from bytes.api.models import File, BoefjeOutput
+from bytes.api.models import BoefjeOutput, File
 from bytes.models import MimeType
 from bytes.rabbitmq import RabbitMQEventManager
 from bytes.repositories.meta_repository import BoefjeMetaFilter, NormalizerMetaFilter, RawDataFilter
@@ -148,6 +148,9 @@ def test_normalizer_meta(bytes_api_client: BytesAPIClient, event_manager: Rabbit
     normalizer_meta.raw_data.secure_hash = retrieved_normalizer_meta.raw_data.secure_hash
     normalizer_meta.raw_data.hash_retrieval_link = retrieved_normalizer_meta.raw_data.hash_retrieval_link
     normalizer_meta.raw_data.signing_provider_url = retrieved_normalizer_meta.raw_data.signing_provider_url
+
+    normalizer_meta.raw_data.mime_types = sorted(normalizer_meta.raw_data.mime_types)
+    retrieved_normalizer_meta.raw_data.mime_types = sorted(retrieved_normalizer_meta.raw_data.mime_types)
 
     assert normalizer_meta.model_dump_json() == retrieved_normalizer_meta.model_dump_json()
 
@@ -355,10 +358,12 @@ def test_save_multiple_raw_files(bytes_api_client: BytesAPIClient) -> None:
 
     first_raw = b"first"
     second_raw = b"second"
-    boefje_output = BoefjeOutput(files=[
-        File(name="first", content=b64encode(first_raw).decode(), tags=[]),
-        File(name="second", content=b64encode(second_raw).decode(), tags=["mime", "type"]),
-    ])
+    boefje_output = BoefjeOutput(
+        files=[
+            File(name="first", content=b64encode(first_raw).decode(), tags=[]),
+            File(name="second", content=b64encode(second_raw).decode(), tags=["mime", "type"]),
+        ]
+    )
 
     ids = bytes_api_client.save_raws(boefje_meta.id, boefje_output)
 
