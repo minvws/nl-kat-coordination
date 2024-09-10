@@ -13,11 +13,10 @@ class Organisation(BaseModel):
 
 class Plugin(BaseModel):
     id: str
-    name: str | None = None
+    name: str
     version: str | None = None
     created: datetime.datetime | None = None
     description: str | None = None
-    environment_keys: list[str] = Field(default_factory=list)
     enabled: bool = False
     static: bool = True  # We need to differentiate between local and remote plugins to know which ones can be deleted
 

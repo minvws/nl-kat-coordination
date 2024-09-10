@@ -95,7 +95,7 @@ def upgrade() -> None:
             str(boefje.scan_level),
             list(boefje.consumes),
             list(boefje.produces),
-            boefje.environment_keys,
+            ["TEST_KEY"],
             boefje.oci_image,
             boefje.oci_arguments,
             boefje.version,
@@ -137,7 +137,7 @@ def upgrade() -> None:
             str(boefje.scan_level),
             list(boefje.consumes),
             list(boefje.produces),
-            boefje.environment_keys,
+            ["TEST_KEY"],
             boefje.oci_image,
             boefje.oci_arguments,
             boefje.version,
@@ -177,7 +177,7 @@ def upgrade() -> None:
             normalizer.description,
             normalizer.consumes,
             normalizer.produces,
-            normalizer.environment_keys,
+            ["TEST_KEY"],
             normalizer.version,
         )
         for normalizer in normalizers_to_insert
