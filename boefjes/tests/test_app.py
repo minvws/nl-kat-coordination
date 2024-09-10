@@ -22,10 +22,15 @@ def test_one_process(manager: SchedulerWorkerManager, item_handler: MockHandler)
 
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
 
-    assert len(patched_tasks) == 3
-    assert patched_tasks[0] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
-    assert patched_tasks[1] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
-    assert patched_tasks[2] == ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed")
+    assert len(patched_tasks) == 6
+    assert set(patched_tasks) == {
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
+        ("70da7d4f-f41f-4940-901b-d98a92e9014c", "running"),
+        ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running"),
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
+        ("70da7d4f-f41f-4940-901b-d98a92e9014c", "completed"),
+        ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed"),
+    }
 
 
 def test_two_processes(manager: SchedulerWorkerManager, item_handler: MockHandler) -> None:
@@ -39,9 +44,14 @@ def test_two_processes(manager: SchedulerWorkerManager, item_handler: MockHandle
     assert len(items) == 2
 
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
-    assert len(patched_tasks) == 3
-    assert patched_tasks.count(("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")) == 2
-    assert patched_tasks.count(("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed")) == 1
+    assert set(patched_tasks) == {
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
+        ("70da7d4f-f41f-4940-901b-d98a92e9014c", "running"),
+        ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running"),
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
+        ("70da7d4f-f41f-4940-901b-d98a92e9014c", "completed"),
+        ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed"),
+    }
 
 
 def test_two_processes_exception(manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path) -> None:
@@ -78,7 +88,7 @@ def test_two_processes_handler_exception(manager: SchedulerWorkerManager, item_h
 
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
 
-    assert len(patched_tasks) == 3
+    assert len(patched_tasks) == 6
     # Handler starts raising an Exception from the second call onward,
     # so we have 2 completed tasks and 4 failed tasks.
     assert patched_tasks.count(("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")) == 1
@@ -89,9 +99,11 @@ def test_two_processes_cleanup_unfinished_tasks(
     manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path
 ) -> None:
     """
-    Push 3 slow tasks to 2 workers,
-    then crash (from popping from an empty queue),
-    then clean up task on queue and the tasks being handled
+    We push 2 slow tasks to the Queue, which will be popped by 2 workers, emptying the Queue and stalling the 2 workers.
+    Because the Queue is now empty, the manager will get 2 new tasks from the scheduler to push to the queue. But only
+    one will be pushed because we do not have any tasks from the scheduler anymore (triggering a KeyboardInterrupt to
+    crash the main process). Then the manager should clean up the running tasks by setting the status of the running
+    tasks to failed and push any tasks still on the Queue back to the scheduler.
     """
 
     manager.scheduler_client = MockSchedulerClient(
@@ -112,10 +124,14 @@ def test_two_processes_cleanup_unfinished_tasks(
     assert len(items) == 0
 
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
-    assert len(patched_tasks) == 1
+    assert len(patched_tasks) == 3
 
     # Task was running but main process crashed intentionally and cleaned it up
-    assert patched_tasks.count(("70da7d4f-f41f-4940-901b-d98a92e9014b", "failed")) == 1
+    assert set(patched_tasks) == {
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"),
+    }
 
     # Tasks (one with the same id) was still unhandled the queue and pushed back to the scheduler by the main process
     assert manager.scheduler_client._pushed_items["70da7d4f-f41f-4940-901b-d98a92e9014b"][0] == "boefje"
@@ -149,9 +165,14 @@ def test_null(manager: SchedulerWorkerManager, tmp_path: Path, item_handler: Moc
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
 
     assert len(items) == 3
-    assert len(patched_tasks) == 3
-    assert patched_tasks[0] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
-    assert patched_tasks[2] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
+    assert len(patched_tasks) == 5
+    assert set(patched_tasks) == {
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
+    }
 
 
 def test_create_manager():
