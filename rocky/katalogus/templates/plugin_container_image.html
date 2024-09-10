@@ -100,6 +100,12 @@
                                             {% else %}
                                                 <p>{% translate "There are no arguments used for this Boefje variant." %}</p>
                                             {% endif %}
+                                            {% if perms.tools.can_add_boefje %}
+                                                <div class="horizontal-view toolbar">
+                                                    <a class="button ghost"
+                                                       href="{% url "edit_boefje" plugin_id=variant.id organization_code=organization.code %}"><span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit variant" %}</a>
+                                                </div>
+                                            {% endif %}
                                         </td>
                                     </tr>
                                 {% endfor %}

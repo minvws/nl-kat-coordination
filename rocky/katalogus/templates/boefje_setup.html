@@ -24,10 +24,17 @@
                     {% csrf_token %}
                     {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
 
-                    <div class="button-container">
-                        <button type="submit">{% translate "Create variant" %}</button>
-                        <button type="button" class="ghost">{% translate "Discard variant" %}</button>
-                    </div>
+                    {% if edit_boefje %}
+                        <div class="button-container">
+                            <button type="submit">{% translate "Save changes" %}</button>
+                            <button type="button" class="ghost">{% translate "Discard changes" %}</button>
+                        </div>
+                    {% else %}
+                        <div class="button-container">
+                            <button type="submit">{% translate "Create variant" %}</button>
+                            <button type="button" class="ghost">{% translate "Discard variant" %}</button>
+                        </div>
+                    {% endif %}
                 </form>
             </div>
         </section>
