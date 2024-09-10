@@ -140,7 +140,6 @@ class Settings(BaseSettings):
 
     s3_bucket_prefix: str | None = Field(None, validation_alias="S3_BUCKET_PREFIX")
     s3_bucket_name: str | None = Field(None, validation_alias="S3_BUCKET")
-    s3_region: str | None = Field(None, validation_alias="AWS_DEFAULT_REGION")
     bucket_per_org: bool = Field(True, validation_alias="BUCKET_PER_ORG")
 
     model_config = SettingsConfigDict(env_prefix="BYTES_")

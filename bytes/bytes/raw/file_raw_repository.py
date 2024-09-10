@@ -15,11 +15,9 @@ logger = logging.getLogger(__name__)
 
 def create_raw_repository(settings: Settings) -> RawRepository:
     if settings.s3_bucket_name or settings.s3_bucket_prefix:
-        logger.info("SOUF IT IS S3 TIME")
         return S3RawRepository(
             make_middleware(),
             settings.bucket_per_org,
-            settings.s3_region,
             settings.s3_bucket_prefix,
             settings.s3_bucket_name,
         )
@@ -81,13 +79,11 @@ class S3RawRepository(RawRepository):
         self,
         file_middleware: FileMiddleware,
         bucket_per_org: bool,
-        s3_region: str | None,
         s3_bucket_prefix: str | None = "OpenKAT-",
         s3_bucket_name: str | None = "OpenKAT",
     ) -> None:
         self.file_middleware = file_middleware
         self.bucket_per_org = bucket_per_org
-        self.s3_region = s3_region
         self.s3_bucket_prefix = s3_bucket_prefix
         self.s3_bucket_name = s3_bucket_name
 
@@ -103,17 +99,17 @@ class S3RawRepository(RawRepository):
         return self._s3resource
 
     def get_or_create_bucket(self, organization: str):
-        # Create a bucket, and if it exists already
-        bucketname = self.s3_bucket_name
+        # Create a bucket, and if it exists already return that instead
+        bucket_name = self.s3_bucket_name
         if self.bucket_per_org:
-            bucketname = f"{self.s3_bucket_prefix}{organization}"
+            bucket_name = f"{self.s3_bucket_prefix}{organization}"
             try:
-                bucket = self.s3resource.create_bucket(Bucket=bucketname)
+                bucket = self.s3resource.create_bucket(Bucket=bucket_name)
                 bucket.wait_until_exists()
                 return bucket
             except Exception as error:
-                logger.error("SOUF SOMETHING WENT WRONG WITH CREATING BUCKET\n%s", error)
-        return self.s3resource.Bucket(name=bucketname)
+                logger.error("Something went wrong with creating bucket %s\n%s", bucket_name, error)
+        return self.s3resource.Bucket(name=bucket_name)
 
     def save_raw(self, raw_id: UUID, raw: RawData) -> None:
         file_name = self._raw_file_name(raw_id, raw.boefje_meta)
