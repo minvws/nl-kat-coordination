@@ -174,15 +174,15 @@ def create_boefje_with_form_data(form_data, plugin_id, created):
 
     return Boefje(
         id=plugin_id,
-        name=form_data["name"] or None,
+        name=form_data.get("name"),
         created=created,
-        description=form_data["description"] or None,
+        description=form_data.get("description"),
         enabled=False,
         type="boefje",
         scan_level=form_data["scan_level"],
         consumes=input_objects,
         produces=produces,
         schema=form_data["schema"],
-        oci_image=form_data["oci_image"] or None,
+        oci_image=form_data.get("oci_image"),
         oci_arguments=arguments,
     )
