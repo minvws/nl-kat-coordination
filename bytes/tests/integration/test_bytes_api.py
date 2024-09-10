@@ -6,6 +6,7 @@ import pytest
 from httpx import HTTPError
 from prometheus_client.parser import text_string_to_metric_families
 
+from bytes.api.models import File, BoefjeOutput
 from bytes.models import MimeType
 from bytes.rabbitmq import RabbitMQEventManager
 from bytes.repositories.meta_repository import BoefjeMetaFilter, NormalizerMetaFilter, RawDataFilter
@@ -346,3 +347,20 @@ def test_cannot_overwrite_raw(bytes_api_client: BytesAPIClient) -> None:
     retrieved_raw = bytes_api_client.get_raw(first_raw_id)
 
     assert retrieved_raw == right_raw
+
+
+def test_save_multiple_raw_files(bytes_api_client: BytesAPIClient) -> None:
+    boefje_meta = get_boefje_meta()
+    bytes_api_client.save_boefje_meta(boefje_meta)
+
+    first_raw = b"first"
+    second_raw = b"second"
+    boefje_output = BoefjeOutput(files=[
+        File(name="first", content=b64encode(first_raw).decode(), tags=[]),
+        File(name="second", content=b64encode(second_raw).decode(), tags=["mime", "type"]),
+    ])
+
+    ids = bytes_api_client.save_raws(boefje_meta.id, boefje_output)
+
+    assert bytes_api_client.get_raw(ids["first"]) == first_raw
+    assert bytes_api_client.get_raw(ids["second"]) == second_raw

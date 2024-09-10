@@ -8,6 +8,7 @@ from uuid import UUID
 import httpx
 from httpx import HTTPError
 
+from bytes.api.models import BoefjeOutput
 from bytes.models import BoefjeMeta, NormalizerMeta
 from bytes.repositories.meta_repository import BoefjeMetaFilter, NormalizerMetaFilter, RawDataFilter
 
@@ -144,6 +145,17 @@ class BytesAPIClient:
         self._verify_response(response)
 
         return response.json()[file_name]
+
+    @retry_with_login
+    def save_raws(self, boefje_meta_id: UUID, boefje_output: BoefjeOutput) -> dict[str, str]:
+        response = self.client.post(
+            "/bytes/raw",
+            content=boefje_output.model_dump_json(),
+            params={"boefje_meta_id": str(boefje_meta_id)},
+        )
+        self._verify_response(response)
+
+        return response.json()
 
     @retry_with_login
     def get_raw(self, raw_id: UUID) -> bytes:
