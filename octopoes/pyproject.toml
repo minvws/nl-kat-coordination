@@ -43,6 +43,8 @@ opentelemetry-util-http = "^0.47b0"
 
 fastapi-slim = "^0.111.0"
 structlog = "^24.2.0"
+asgiref = "^3.8.1"
+
 [tool.poetry.group.dev.dependencies]
 robotframework = "^7.0"
 robotframework-requests = "^0.9.3"

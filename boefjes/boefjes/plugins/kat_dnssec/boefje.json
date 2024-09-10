@@ -1,6 +1,6 @@
 {
   "id": "dns-sec",
-  "name": "Dnssec",
+  "name": "DNSSEC",
   "description": "Validates DNSSec of a hostname",
   "consumes": [
     "Hostname"

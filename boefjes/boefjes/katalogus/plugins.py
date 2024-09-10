@@ -3,7 +3,8 @@ from functools import partial
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.responses import FileResponse, JSONResponse, Response
-from pydantic import BaseModel, Field
+from jsonschema.validators import Draft202012Validator
+from pydantic import BaseModel, Field, field_validator
 
 from boefjes.dependencies.plugins import (
     PluginService,
@@ -90,6 +91,8 @@ def get_plugin(
 @router.post("/plugins", status_code=status.HTTP_201_CREATED)
 def add_plugin(plugin: PluginType, plugin_service: PluginService = Depends(get_plugin_service)):
     with plugin_service as service:
+        plugin.static = False  # Creation through the API implies that these cannot be static
+
         if plugin.type == "boefje":
             return service.create_boefje(plugin)
 
@@ -120,12 +123,21 @@ class BoefjeIn(BaseModel):
     version: str | None = None
     created: datetime.datetime | None = None
     description: str | None = None
-    environment_keys: list[str] = Field(default_factory=list)
     scan_level: int = 1
     consumes: set[str] = Field(default_factory=set)
     produces: set[str] = Field(default_factory=set)
+    schema: dict | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
+
+    @field_validator("schema")
+    @classmethod
+    def json_schema_valid(cls, schema: dict | None) -> dict | None:
+        if schema is not None:
+            Draft202012Validator.check_schema(schema)
+            return schema
+
+        return None
 
 
 @router.patch("/boefjes/{boefje_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -154,7 +166,6 @@ class NormalizerIn(BaseModel):
     version: str | None = None
     created: datetime.datetime | None = None
     description: str | None = None
-    environment_keys: list[str] = Field(default_factory=list)
     consumes: list[str] = Field(default_factory=list)  # mime types (and/ or boefjes)
     produces: list[str] = Field(default_factory=list)  # oois
 

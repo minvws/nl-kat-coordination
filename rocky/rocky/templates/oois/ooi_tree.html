@@ -11,9 +11,7 @@
         <section>
             <div>
                 {% include "partials/ooi_head.html" with ooi=ooi view="ooi_tree" %}
-
-                {% translate "Object tree" as filter_title %}
-                {% include "partials/ooi_list_filters.html" with title=filter_title ooi_id=ooi.primary_key %}
+                {% include "partials/ooi_list_filters.html" with ooi_id=ooi.primary_key %}
 
                 {% if tree_view == "table" %}
                     {% include "partials/elements/ooi_tree_table.html" with list=tree ooi_id=ooi.primary_key %}

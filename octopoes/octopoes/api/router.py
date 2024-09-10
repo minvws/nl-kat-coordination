@@ -5,8 +5,9 @@ from collections.abc import Generator
 from datetime import datetime
 from logging import getLogger
 from operator import itemgetter
-from typing import Any
+from typing import Any, Literal
 
+from asgiref.sync import sync_to_async
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
 from httpx import HTTPError
 from pydantic import AwareDatetime
@@ -124,8 +125,13 @@ def list_objects(
     scan_profile_type: set[ScanProfileType] = Query(DEFAULT_SCAN_PROFILE_TYPE_FILTER),
     offset: int = 0,
     limit: int = 20,
+    search_string: str | None = None,
+    order_by: Literal["scan_level", "object_type"] = "object_type",
+    asc_desc: Literal["asc", "desc"] = "asc",
 ):
-    return octopoes.list_ooi(types, valid_time, offset, limit, scan_level, scan_profile_type)
+    return octopoes.list_ooi(
+        types, valid_time, offset, limit, scan_level, scan_profile_type, search_string, order_by, asc_desc
+    )
 
 
 @router.get("/query", tags=["Objects"])
@@ -453,6 +459,9 @@ def list_findings(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     severities: set[RiskLevelSeverity] = Query(DEFAULT_SEVERITY_FILTER),
+    search_string: str | None = None,
+    order_by: Literal["score", "finding_type"] = "score",
+    asc_desc: Literal["asc", "desc"] = "desc",
 ) -> Paginated[Finding]:
     return octopoes.ooi_repository.list_findings(
         severities,
@@ -461,6 +470,9 @@ def list_findings(
         only_muted,
         offset,
         limit,
+        search_string,
+        order_by,
+        asc_desc,
     )
 
 
@@ -531,6 +543,7 @@ def exporter(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> Any:
     return xtdb_session_.client.export_transactions()
 
 
+@sync_to_async
 def importer(data: bytes, xtdb_session_: XTDBSession, reset: bool = False) -> dict[str, int]:
     try:
         ops: list[dict[str, Any]] = list(map(itemgetter("txOps"), json.loads(data)))
@@ -573,7 +586,7 @@ async def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xt
         data = await request.body()
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
-    return importer(data, xtdb_session_)
+    return await importer(data, xtdb_session_)
 
 
 @router.post("/io/import/new", tags=["io"])
@@ -582,7 +595,7 @@ async def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xt
         data = await request.body()
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
-    return importer(data, xtdb_session_, True)
+    return await importer(data, xtdb_session_, True)
 
 
 @router.post("/origins/migrate", tags=["Origins"])

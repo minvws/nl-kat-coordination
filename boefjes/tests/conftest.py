@@ -14,14 +14,18 @@ from sqlalchemy.orm import sessionmaker
 
 from boefjes.app import SchedulerWorkerManager
 from boefjes.clients.bytes_client import BytesAPIClient
-from boefjes.clients.scheduler_client import Queue, QueuePrioritizedItem, SchedulerClientInterface, Task, TaskStatus
+from boefjes.clients.scheduler_client import Queue, SchedulerClientInterface, Task, TaskStatus
 from boefjes.config import Settings, settings
+from boefjes.dependencies.plugins import PluginService
 from boefjes.job_handler import bytes_api_client
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
+from boefjes.local_repository import get_local_repository
 from boefjes.models import Organisation
 from boefjes.runtime_interfaces import Handler, WorkerManager
+from boefjes.sql.config_storage import SQLConfigStorage, create_encrypter
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
+from boefjes.sql.plugin_storage import SQLPluginStorage
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
@@ -52,25 +56,25 @@ class MockSchedulerClient(SchedulerClientInterface):
 
         self._iterations = 0
         self._tasks: dict[str, Task] = multiprocessing.Manager().dict()
-        self._popped_items: dict[str, QueuePrioritizedItem] = multiprocessing.Manager().dict()
-        self._pushed_items: dict[str, tuple[str, QueuePrioritizedItem]] = multiprocessing.Manager().dict()
+        self._popped_items: dict[str, Task] = multiprocessing.Manager().dict()
+        self._pushed_items: dict[str, tuple[str, Task]] = multiprocessing.Manager().dict()
 
     def get_queues(self) -> list[Queue]:
         time.sleep(self.sleep_time)
         return TypeAdapter(list[Queue]).validate_json(self.queue_response)
 
-    def pop_item(self, queue: str) -> QueuePrioritizedItem | None:
+    def pop_item(self, queue: str) -> Task | None:
         time.sleep(self.sleep_time)
 
         try:
             if WorkerManager.Queue.BOEFJES.value in queue:
-                p_item = TypeAdapter(QueuePrioritizedItem).validate_json(self.boefje_responses.pop(0))
+                p_item = TypeAdapter(Task).validate_json(self.boefje_responses.pop(0))
                 self._popped_items[str(p_item.id)] = p_item
                 self._tasks[str(p_item.id)] = self._task_from_id(p_item.id)
                 return p_item
 
             if WorkerManager.Queue.NORMALIZERS.value in queue:
-                p_item = TypeAdapter(QueuePrioritizedItem).validate_json(self.normalizer_responses.pop(0))
+                p_item = TypeAdapter(Task).validate_json(self.normalizer_responses.pop(0))
                 self._popped_items[str(p_item.id)] = p_item
                 return p_item
         except IndexError:
@@ -92,17 +96,9 @@ class MockSchedulerClient(SchedulerClientInterface):
         return self._task_from_id(task_id) if str(task_id) not in self._tasks else self._tasks[str(task_id)]
 
     def _task_from_id(self, task_id: UUID):
-        return Task(
-            id=task_id,
-            scheduler_id="test",
-            type="test",
-            p_item=self._popped_items[str(task_id)],
-            status=TaskStatus.DISPATCHED,
-            created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc),
-        )
+        return self._popped_items[str(task_id)]
 
-    def push_item(self, queue_id: str, p_item: QueuePrioritizedItem) -> None:
+    def push_item(self, queue_id: str, p_item: Task) -> None:
         self._pushed_items[str(p_item.id)] = (queue_id, p_item)
 
 
@@ -131,10 +127,12 @@ def item_handler(tmp_path: Path):
 @pytest.fixture
 def manager(item_handler: MockHandler, tmp_path: Path) -> SchedulerWorkerManager:
     scheduler_client = MockSchedulerClient(
-        get_dummy_data("scheduler/queues_response.json"),
-        2 * [get_dummy_data("scheduler/pop_response_boefje.json")] + [get_dummy_data("scheduler/should_crash.json")],
-        [get_dummy_data("scheduler/pop_response_normalizer.json")],
-        tmp_path / "patch_task_log",
+        queue_response=get_dummy_data("scheduler/queues_response.json"),
+        boefje_responses=(
+            2 * [get_dummy_data("scheduler/pop_response_boefje.json")] + [get_dummy_data("scheduler/should_crash.json")]
+        ),
+        normalizer_responses=[get_dummy_data("scheduler/pop_response_normalizer.json")],
+        log_path=tmp_path / "patch_task_log",
     )
 
     return SchedulerWorkerManager(item_handler, scheduler_client, Settings(pool_size=1, poll_interval=0.01), "DEBUG")
@@ -148,21 +146,47 @@ def api(tmp_path):
 
 
 @pytest.fixture
-def organisation_repository():
+def session():
     engine = get_engine()
     session = sessionmaker(bind=engine)()
 
-    yield SQLOrganisationStorage(session, settings)
+    yield session
 
     session.execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables]))
+    session.commit()
     session.close()
 
 
 @pytest.fixture
-def organisation(organisation_repository) -> Organisation:
+def organisation_storage(session):
+    return SQLOrganisationStorage(session, settings)
+
+
+@pytest.fixture
+def config_storage(session):
+    return SQLConfigStorage(session, create_encrypter())
+
+
+@pytest.fixture
+def plugin_storage(session):
+    return SQLPluginStorage(session, settings)
+
+
+@pytest.fixture
+def local_repo():
+    return get_local_repository()
+
+
+@pytest.fixture
+def plugin_service(plugin_storage, config_storage, local_repo):
+    return PluginService(plugin_storage, config_storage, local_repo)
+
+
+@pytest.fixture
+def organisation(organisation_storage) -> Organisation:
     organisation = Organisation(id="test", name="Test org")
 
-    with organisation_repository as repo:
+    with organisation_storage as repo:
         repo.create(organisation)
 
     return organisation
