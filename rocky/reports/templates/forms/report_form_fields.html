@@ -1,7 +1,9 @@
 <input type="hidden"
        name="observed_at"
        value="{{ observed_at|date:"Y-m-d" }}">
-{% for ooi in selected_oois %}<input type="hidden" name="ooi" value="{{ ooi }}">{% endfor %}
+{% if report_recipe.input_oois and not disable_ooi_selection_fields %}
+    {% for ooi in report_recipe.input_oois %}<input type="hidden" name="ooi" value="{{ ooi }}">{% endfor %}
+{% endif %}
 {% for ooi_type in ooi_types_selection %}<input type="hidden" name="ooi_type" value="{{ ooi_type }}">{% endfor %}
 {% for clearance_level in clearance_levels_selection %}
     <input type="hidden" name="clearance_level" value="{{ clearance_level }}">
@@ -9,14 +11,14 @@
 {% for clearance_type in clearance_types_selection %}
     <input type="hidden" name="clearance_type" value="{{ clearance_type }}">
 {% endfor %}
-{% if selected_report_types %}
-    {% for report_type in selected_report_types %}
+{% if report_recipe.report_types and not disable_report_type_fields %}
+    {% for report_type in report_recipe.report_types %}
         <input type="hidden" name="report_type" value="{{ report_type }}">
     {% endfor %}
 {% endif %}
-{% if plugins.required %}
-    {% for required_plugin in plugins.required %}
-        <input type="hidden" name="plugin" value="{{ required_plugin.id }}">
+{% if report_recipe.plugins.required and not disable_plugin_fields %}
+    {% for required_plugin in report_recipe.plugins.required %}
+        <input type="hidden" name="plugin" value="{{ required_plugin }}">
     {% endfor %}
 {% endif %}
 {% if request.GET.page %}<input type="hidden" name="page" value="{{ request.GET.page }}">{% endif %}

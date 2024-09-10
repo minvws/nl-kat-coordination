@@ -57,7 +57,7 @@
                     {% include "forms/report_form_fields.html" %}
 
                 {% else %}
-                    {% include "forms/report_form_fields.html" with selected_oois=None %}
+                    {% include "forms/report_form_fields.html" with disable_ooi_selection_fields=True %}
 
                 {% endif %}
                 <table>
@@ -104,7 +104,7 @@
     </div>
 </section>
 <form novalidate id="select_all_objects_form" class="inline" method="get">
-    {% include "forms/report_form_fields.html" with selected_oois=None %}
+    {% include "forms/report_form_fields.html" with disable_ooi_selection_fields=True %}
 
     {% if "all" not in selected_oois %}<input type="hidden" name="ooi" value="all">{% endif %}
 </form>

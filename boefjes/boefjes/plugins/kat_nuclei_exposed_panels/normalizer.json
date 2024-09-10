@@ -1,5 +1,6 @@
 {
   "id": "kat_nuclei_exposed_panels_normalize",
+  "name": "Nuclei exposed admin panels",
   "consumes": [
     "boefje/nuclei-exposed-panels"
   ],

@@ -36,6 +36,8 @@ MULTI_REPORTS = [MultiOrganizationReport]
 
 CONCATENATED_REPORTS = [ConcatenatedReport]
 
+ALL_REPORT_TYPES = REPORTS + AGGREGATE_REPORTS + MULTI_REPORTS + CONCATENATED_REPORTS
+
 
 def get_ooi_types_with_report() -> set[type[OOI]]:
     """
@@ -53,20 +55,21 @@ def get_report_types_for_ooi(ooi_pk: str) -> list[type[Report]]:
     return [report for report in REPORTS if ooi_type in report.input_ooi_types]
 
 
-def get_report_types_for_oois(ooi_pks: list[str]) -> set[type[Report]]:
+def get_report_types_for_oois(oois: list[str]) -> set[type[Report]]:
     """
     Get all report types that can be generated for a given list of OOIs
     """
-    return {report for ooi_pk in ooi_pks for report in get_report_types_for_ooi(ooi_pk)}
+
+    return {report for ooi_pk in oois for report in get_report_types_for_ooi(ooi_pk)}
 
 
-def get_report_by_id(report_id: str) -> type[Report] | type[MultiReport] | type[AggregateReport]:
+def get_report_by_id(report_id: str) -> type[Report]:
     """
     Get report type by id
     """
-    if report_id is None:
+    if not report_id:
         return ConcatenatedReport
-    for report in REPORTS + MULTI_REPORTS + AGGREGATE_REPORTS + CONCATENATED_REPORTS:
+    for report in ALL_REPORT_TYPES:
         if report.id == report_id:
             return report
     raise ValueError(f"Report with id {report_id} not found")

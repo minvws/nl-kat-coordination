@@ -1,5 +1,6 @@
 {
   "id": "dns-bind-version-normalize",
+  "name": "DNS bind version normalizer",
   "consumes": [
     "boefje/dns-bind-version"
   ],
