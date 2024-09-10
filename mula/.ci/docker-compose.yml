@@ -29,6 +29,8 @@ services:
 
   ci_postgres:
     image: docker.io/library/postgres:15
+    command:
+      ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]
     healthcheck:
       test: ["CMD", "gosu", "postgres", "pg_isready"]
       interval: 3s
@@ -75,7 +77,7 @@ services:
       target: dev
       args:
         ENVIRONMENT: dev
-    command: uvicorn boefjes.katalogus.api.root:app --host 0.0.0.0
+    command: uvicorn boefjes.katalogus.root:app --host 0.0.0.0
     ports:
       - "127.0.0.1:8003:8000"
     env_file:

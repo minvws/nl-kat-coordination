@@ -1,10 +1,10 @@
 import datetime
-import logging
 from collections.abc import Iterable
 from enum import Enum
 from functools import cached_property
 from typing import cast
 
+import structlog
 import tagulous.models
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission
@@ -30,7 +30,7 @@ GROUP_ADMIN = "admin"
 GROUP_REDTEAM = "redteam"
 GROUP_CLIENT = "clients"
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 ORGANIZATION_CODE_LENGTH = 32
 DENY_ORGANIZATION_CODES = [
@@ -90,6 +90,8 @@ class Organization(models.Model):
         ),
     )
     tags = tagulous.models.TagField(to=OrganizationTag, blank=True)
+
+    EVENT_CODES = {"created": 900201, "updated": 900202, "deleted": 900203}
 
     def __str__(self):
         return str(self.name)
@@ -229,6 +231,8 @@ class OrganizationMember(models.Model):
         default=-1, validators=[MinValueValidator(-1), MaxValueValidator(max(scan_levels))]
     )
 
+    EVENT_CODES = {"created": 900211, "updated": 900212, "deleted": 900213}
+
     @cached_property
     def all_permissions(self) -> set[str]:
         if self.user.is_active and self.user.is_superuser:
@@ -266,12 +270,16 @@ class Indemnification(models.Model):
     user = models.ForeignKey("account.KATUser", on_delete=models.SET_NULL, null=True)
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
 
+    EVENT_CODES = {"created": 900221, "updated": 900222, "deleted": 900223}
+
 
 class OOIInformation(models.Model):
     id = models.CharField(max_length=256, primary_key=True)
     last_updated = models.DateTimeField(auto_now=True)
     data = models.JSONField(null=True)
     consult_api = models.BooleanField(default=False)
+
+    EVENT_CODES = {"created": 900231, "updated": 900232, "deleted": 900233}
 
     def save(self, *args, **kwargs):
         if self.data is None:

@@ -1,0 +1,11 @@
+{
+  "id": "kat_generic_finding_normalize",
+  "name": "Finding types",
+  "consumes": [
+    "openkat/finding"
+  ],
+  "produces": [
+    "Finding",
+    "CVEFindingType"
+  ]
+}

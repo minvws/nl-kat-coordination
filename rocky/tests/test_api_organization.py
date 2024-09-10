@@ -2,13 +2,16 @@ from typing import Any
 from unittest.mock import patch
 
 import pytest
+from django.urls import reverse
 from httpx import HTTPError
 from pytest_assert_utils import assert_model_attrs
 from pytest_common_subject import precondition_fixture
 from pytest_drf import (
+    APIViewTest,
     Returns200,
     Returns201,
     Returns204,
+    Returns409,
     Returns500,
     UsesDeleteMethod,
     UsesDetailEndpoint,
@@ -51,13 +54,7 @@ class TestOrganizationViewSet(ViewSetTest):
     list_url = lambda_fixture(lambda: url_for("organization-list"))
     detail_url = lambda_fixture(lambda organization: url_for("organization-detail", organization.pk))
 
-    @pytest.fixture
-    def client(self, create_drf_client, admin_user):
-        client = create_drf_client(admin_user)
-        # We need to set this so that the test client doesn't throw an
-        # exception, but will return error in the API we can test
-        client.raise_request_exception = False
-        return client
+    client = lambda_fixture("drf_admin_client")
 
     class TestList(
         UsesGetMethod,
@@ -222,10 +219,15 @@ class TestOrganizationViewSet(ViewSetTest):
             async_=False,
         )
 
-        def test_it_deletes_organization(self, initial_ids, organization):
+        def test_it_deletes_organization(self, initial_ids, organization, log_output):
             expected = initial_ids - {organization.id}
             actual = set(Organization.objects.values_list("id", flat=True))
             assert actual == expected
+
+            organization_created_log = log_output.entries[-2]
+            assert organization_created_log["event"] == "%s %s deleted"
+            assert organization_created_log["object"] == "Test Organization 1"
+            assert organization_created_log["object_type"] == "Organization"
 
     class TestDestroyKatalogusError(
         UsesDeleteMethod,
@@ -275,3 +277,45 @@ class TestOrganizationViewSet(ViewSetTest):
                 ],
             }
             assert json == expected
+
+
+class TestGetIndemnification(APIViewTest, UsesGetMethod, Returns200):
+    # The superuser_member fixture creates the indemnification
+    url = lambda_fixture(
+        lambda organization, superuser_member: reverse("organization-indemnification", args=[organization.pk])
+    )
+    client = lambda_fixture("drf_admin_client")
+
+    def test_it_returns_indemnification(self, json, superuser_member):
+        expected = {"indemnification": True, "user": superuser_member.user.id}
+        assert json == expected
+
+
+class TestIndemnificationDoesNotExist(APIViewTest, UsesGetMethod, Returns200):
+    url = lambda_fixture(lambda organization: reverse("organization-indemnification", args=[organization.pk]))
+    client = lambda_fixture("drf_admin_client")
+
+    def test_it_returns_no_indemnification(self, json):
+        expected = {"indemnification": False, "user": None}
+        assert json == expected
+
+
+class TestSetIndemnification(APIViewTest, UsesPostMethod, Returns201):
+    url = lambda_fixture(lambda organization: reverse("organization-indemnification", args=[organization.pk]))
+    client = lambda_fixture("drf_admin_client")
+
+    def test_it_sets_indemnification(self, json, admin_user):
+        expected = {"indemnification": True, "user": admin_user.id}
+        assert json == expected
+
+
+class TestIndemnificationAlreadyExists(APIViewTest, UsesPostMethod, Returns409):
+    # The superuser_member fixture creates the indemnification
+    url = lambda_fixture(
+        lambda organization, superuser_member: reverse("organization-indemnification", args=[organization.pk])
+    )
+    client = lambda_fixture("drf_admin_client")
+
+    def test_it_returns_indemnification(self, json, superuser_member):
+        expected = {"indemnification": True, "user": superuser_member.user.id}
+        assert json == expected

@@ -4,8 +4,11 @@
 @import "fonts/fonts";
 
 /* Styling sets. E.g color sets */
-@import "colors";
-@import "manon/body-text-set";
+@import "fundamentals/body-text-set";
+@import "fundamentals/border-radii";
+@import "fundamentals/colors";
+@import "fundamentals/tag-colors";
+@import "fundamentals/tags-6-3";
 @import "manon/spot-large";
 @import "manon/headings-base-set";
 @import "manon/text-colors";
@@ -16,14 +19,6 @@
 
 /* Base - Top level styling */
 @import "manon/application-base";
-
-/* Styling on the highest level */
-
-/* Helpers */
-
-/* @import "manon/center-only-child.scss"; */
-
-/* Can be added after v10.1.1 */
 
 /* Layout */
 @import "manon/layout-set";
@@ -62,9 +57,11 @@
 @import "manon/header-navigation-collapsible";
 @import "manon/header-navigation-link";
 @import "manon/header-navigation-link-active";
+@import "manon/notification-colors";
 @import "manon/notification-block";
 @import "manon/icon";
 @import "manon/layout-column-4";
+@import "manon/layout-form";
 @import "manon/max-line-length";
 @import "manon/description-list";
 @import "manon/form-fieldset";

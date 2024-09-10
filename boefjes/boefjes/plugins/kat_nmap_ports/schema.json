@@ -6,7 +6,7 @@
       "title": "PORTS",
       "maxLength": 2048,
       "type": "string",
-      "description": "A valid Nmap ports argument (-p)."
+      "description": "Specify the ports that need to be scanned (nmap format). Single ports are comma separated, port ranges can be specified using the dash symbol. For example: 22,111,137,80-100 will scan ports 22, 111, 137 and the port range 80 up to 100."
     }
   },
   "required": [

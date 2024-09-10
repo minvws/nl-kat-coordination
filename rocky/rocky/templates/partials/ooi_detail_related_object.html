@@ -13,12 +13,13 @@
         {% if not ooi|is_finding and not ooi|is_finding_type %}
             <div class="horizontal-view {% if related %}toolbar{% endif %}">
                 <a href="{% ooi_url "ooi_add_related" ooi.primary_key organization.code %}"
-                   class="button ghost">Add</a>
+                   class="button ghost">{% translate "Add" %}</a>
             </div>
         {% endif %}
     {% endif %}
     {% if related %}
         <table>
+            <caption class="visually-hidden">{% translate "Related objects" %}</caption>
             <thead>
                 <tr>
                     <th>{% translate "Name" %}</th>

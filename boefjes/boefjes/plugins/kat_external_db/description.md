@@ -25,12 +25,12 @@ For example:
 ```json
 {
   "ip_addresses": [
-    { "ip_address": "198.51.100.2" },
-    { "ip_address": "2001:db8:ffff:ffff:ffff:ffff:ffff:ffff" },
-    { "ip_address": "192.0.2.0/24" }
+    { "address": "198.51.100.2" },
+    { "address": "2001:db8:ffff:ffff:ffff:ffff:ffff:ffff" },
+    { "address": "192.0.2.0/24" }
   ],
-  "domains": [{ "domain": "example.com" }]
+  "domains": [{ "name": "example.com" }]
 }
 ```
 
-The expected ip and domain (item) key lists can be configured in `normalize.py`. Ranges are expected as strings in CIDR notation. Clearance level for fetched items is set to `L0`. Reference implementation of the API server is in the works.
+The expected ip and domain (item) key lists can be configured in `normalize.py`. Ranges are expected as strings in CIDR notation. Clearance level for fetched items is set to `L3` when `BOEFJES_SCAN_PROFILE_WHITELIST='{"kat_external_db_normalize": 3}'` is added to the `.env` file otherwise it is set to `L0`. Reference implementation of the API server is in the works.

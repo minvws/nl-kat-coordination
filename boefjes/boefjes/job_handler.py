@@ -1,29 +1,31 @@
-import logging
 import os
 import traceback
 from collections.abc import Callable
 from datetime import datetime, timezone
-from enum import Enum
-from typing import Any, cast
+from typing import cast
 
 import httpx
+import structlog
 from httpx import HTTPError
+from jsonschema.exceptions import ValidationError
+from jsonschema.validators import validate
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import settings
 from boefjes.docker_boefjes_runner import DockerBoefjesRunner
-from boefjes.job_models import BoefjeMeta, NormalizerMeta, SerializedOOI, SerializedOOIValue
-from boefjes.katalogus.local_repository import LocalPluginRepository
+from boefjes.job_models import BoefjeMeta, NormalizerMeta
+from boefjes.local_repository import LocalPluginRepository
 from boefjes.plugins.models import _default_mime_types
 from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
+from boefjes.storage.interfaces import SettingsNotConformingToSchema
 from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI, Reference, ScanLevel
+from octopoes.models import Reference, ScanLevel
 from octopoes.models.exception import ObjectNotFoundException
 
 MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought to be reasonable
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 bytes_api_client = BytesAPIClient(
     str(settings.bytes_api),
@@ -32,39 +34,11 @@ bytes_api_client = BytesAPIClient(
 )
 
 
-def _serialize_value(value: Any, required: bool) -> SerializedOOIValue:
-    if isinstance(value, list):
-        return [_serialize_value(item, required) for item in value]
-    if isinstance(value, Reference):
-        try:
-            return value.tokenized.root
-        except AttributeError:
-            if required:
-                raise
-
-            return None
-    if isinstance(value, Enum):
-        return value.value
-    if isinstance(value, int | float):
-        return value
-    else:
-        return str(value)
-
-
-def serialize_ooi(ooi: OOI) -> SerializedOOI:
-    serialized_oois = {}
-    for key, value in ooi:
-        if key not in ooi.model_fields:
-            continue
-        serialized_oois[key] = _serialize_value(value, ooi.model_fields[key].is_required())
-    return serialized_oois
-
-
 def get_octopoes_api_connector(org_code: str) -> OctopoesAPIConnector:
     return OctopoesAPIConnector(str(settings.octopoes_api), org_code)
 
 
-def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: list[str]) -> dict[str, str]:
+def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None) -> dict[str, str]:
     try:
         katalogus_api = str(settings.katalogus_api).rstrip("/")
         response = httpx.get(
@@ -72,21 +46,33 @@ def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: list[str
             timeout=30,
         )
         response.raise_for_status()
-        environment = response.json()
-
-        # Add prefixed BOEFJE_* global environment variables
-        for key, value in os.environ.items():
-            if key.startswith("BOEFJE_"):
-                katalogus_key = key.split("BOEFJE_", 1)[1]
-                # Only pass the environment variable if it is not explicitly set through the katalogus,
-                # if and only if they are defined in boefje.json
-                if katalogus_key in environment_keys and katalogus_key not in environment:
-                    environment[katalogus_key] = value
-
-        return {k: str(v) for k, v in environment.items() if k in environment_keys}
     except HTTPError:
         logger.exception("Error getting environment settings")
         raise
+
+    allowed_keys = schema.get("properties", []) if schema else []
+    new_env = {
+        key.split("BOEFJE_", 1)[1]: value
+        for key, value in os.environ.items()
+        if key.startswith("BOEFJE_") and key in allowed_keys
+    }
+
+    settings_from_katalogus = response.json()
+
+    for key, value in settings_from_katalogus.items():
+        if key in allowed_keys:
+            new_env[key] = value
+
+    # The schema, besides dictating that a boefje cannot run if it is not matched, also provides an extra safeguard:
+    # it is possible to inject code if arguments are passed that "escape" the call to a tool. Hence, we should enforce
+    # the schema somewhere and make the schema as strict as possible.
+    if schema is not None:
+        try:
+            validate(instance=new_env, schema=schema)
+        except ValidationError as e:
+            raise SettingsNotConformingToSchema(boefje_meta.boefje.id, e.message) from e
+
+    return new_env
 
 
 class BoefjeHandler(Handler):
@@ -124,12 +110,10 @@ class BoefjeHandler(Handler):
             except ObjectNotFoundException as e:
                 raise ObjectNotFoundException(f"Object {reference} not found in Octopoes") from e
 
-            boefje_meta.arguments["input"] = serialize_ooi(ooi)
-
-        env_keys = boefje_resource.environment_keys
+            boefje_meta.arguments["input"] = ooi.serialize()
 
         boefje_meta.runnable_hash = boefje_resource.runnable_hash
-        boefje_meta.environment = get_environment_settings(boefje_meta, env_keys) if env_keys else {}
+        boefje_meta.environment = get_environment_settings(boefje_meta, boefje_resource.schema)
 
         mime_types = _default_mime_types(boefje_meta.boefje)
 
@@ -209,6 +193,7 @@ class NormalizerHandler(Handler):
                     Observation(
                         method=normalizer_meta.normalizer.id,
                         source=reference,
+                        source_method=normalizer_meta.raw_data.boefje_meta.boefje.id,
                         task_id=normalizer_meta.id,
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
                         result=[ooi for ooi in observation.results if ooi.primary_key != observation.input_ooi],
@@ -219,6 +204,7 @@ class NormalizerHandler(Handler):
                 connector.save_declaration(
                     Declaration(
                         method=normalizer_meta.normalizer.id,
+                        source_method=normalizer_meta.raw_data.boefje_meta.boefje.id,
                         ooi=declaration.ooi,
                         task_id=normalizer_meta.id,
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
@@ -229,9 +215,27 @@ class NormalizerHandler(Handler):
                 connector.save_affirmation(
                     Affirmation(
                         method=normalizer_meta.normalizer.id,
+                        source_method=normalizer_meta.raw_data.boefje_meta.boefje.id,
                         ooi=affirmation.ooi,
                         task_id=normalizer_meta.id,
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
+                    )
+                )
+
+            if (
+                normalizer_meta.raw_data.boefje_meta.input_ooi  # No input OOI means no deletion propagation
+                and not (results.observations or results.declarations or results.affirmations)
+            ):
+                # There were no results found, which we still need to signal to Octopoes for deletion propagation
+
+                connector.save_observation(
+                    Observation(
+                        method=normalizer_meta.normalizer.id,
+                        source=Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi),
+                        source_method=normalizer_meta.raw_data.boefje_meta.boefje.id,
+                        task_id=normalizer_meta.id,
+                        valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
+                        result=[],
                     )
                 )
 

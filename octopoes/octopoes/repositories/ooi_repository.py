@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import json
-import logging
+import re
 from collections import Counter
 from datetime import datetime
-from typing import Any, cast
+from typing import Any, Literal, cast
 
+import structlog
 from bits.definitions import BitDefinition
 from httpx import HTTPStatusError, codes
 from pydantic import RootModel, TypeAdapter
@@ -22,6 +23,7 @@ from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
+from octopoes.models.ooi.reports import Report
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Direction, Path, Segment, get_paths_to_neighours
 from octopoes.models.transaction import TransactionRecord
@@ -31,11 +33,11 @@ from octopoes.repositories.repository import Repository
 from octopoes.xtdb import Datamodel, FieldSet, ForeignKey
 from octopoes.xtdb.client import OperationType as XTDBOperationType
 from octopoes.xtdb.client import XTDBSession
-from octopoes.xtdb.query import Query
+from octopoes.xtdb.query import Aliased, Query
 from octopoes.xtdb.query_builder import generate_pull_query, str_val
 from octopoes.xtdb.related_field_generator import RelatedFieldNode
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def merge_ooi(ooi_new: OOI, ooi_old: OOI) -> tuple[OOI, bool]:
@@ -78,6 +80,9 @@ class OOIRepository(Repository):
     def load_bulk(self, references: set[Reference], valid_time: datetime) -> dict[str, OOI]:
         raise NotImplementedError
 
+    def load_bulk_as_list(self, references: set[Reference], valid_time: datetime) -> list[OOI]:
+        raise NotImplementedError
+
     def get_neighbours(
         self, reference: Reference, valid_time: datetime, paths: set[Path] | None = None
     ) -> dict[Path, list[OOI]]:
@@ -91,7 +96,17 @@ class OOIRepository(Repository):
         limit: int = 20,
         scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+        search_string: str | None = None,
+        order_by: Literal["scan_level", "object_type"] = "object_type",
+        asc_desc: Literal["asc", "desc"] = "asc",
     ) -> Paginated[OOI]:
+        raise NotImplementedError
+
+    def list_oois_by_object_types(
+        self,
+        types: set[type[OOI]],
+        valid_time: datetime,
+    ) -> list[OOI]:
         raise NotImplementedError
 
     def list_random(
@@ -131,7 +146,16 @@ class OOIRepository(Repository):
         only_muted,
         offset,
         limit,
+        search_string,
+        order_by,
+        asc_desc,
     ) -> Paginated[Finding]:
+        raise NotImplementedError
+
+    def list_reports(self, valid_time, offset, limit) -> Paginated[Report]:
+        raise NotImplementedError
+
+    def get_report(self, report_id) -> Report:
         raise NotImplementedError
 
     def get_bit_configs(self, source: OOI, bit_definition: BitDefinition, valid_time: datetime) -> list[Config]:
@@ -184,6 +208,11 @@ for ooi_type_ in get_concrete_types():
 datamodel = Datamodel(entities=entities)
 
 
+def escape_string(string):
+    escaped_string = re.sub(r'(["\\])', r"\\\1", string)
+    return escaped_string
+
+
 class XTDBOOIRepository(OOIRepository):
     pk_prefix = "xt/id"
 
@@ -197,13 +226,15 @@ class XTDBOOIRepository(OOIRepository):
     @classmethod
     def serialize(cls, ooi: OOI) -> dict[str, Any]:
         # export model with pydantic serializers
-        export = json.loads(ooi.json())
+        export = json.loads(ooi.model_dump_json())
 
         # prefix fields, but not object_type
         export.pop("object_type")
+        user_id = export.pop("user_id", None)
         export = {f"{ooi.__class__.__name__}/{key}": value for key, value in export.items() if value is not None}
 
         export["object_type"] = ooi.__class__.__name__
+        export["user_id"] = user_id
         export[cls.pk_prefix] = ooi.primary_key
 
         return export
@@ -216,10 +247,12 @@ class XTDBOOIRepository(OOIRepository):
         # pop global attributes
         object_cls = type_by_name(data.pop("object_type"))
         data.pop(cls.pk_prefix)
+        user_id = data.pop("user_id", None)
 
         # remove type prefixes
         stripped = {key.split("/")[1]: value for key, value in data.items()}
-        return object_cls.parse_obj(stripped)
+        stripped["user_id"] = user_id
+        return object_cls.model_validate(stripped)
 
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
         try:
@@ -260,11 +293,12 @@ class XTDBOOIRepository(OOIRepository):
             raise
 
     def load_bulk(self, references: set[Reference], valid_time: datetime) -> dict[str, OOI]:
-        ids = list(map(str, references))
-        query = generate_pull_query(FieldSet.ALL_FIELDS, {self.pk_prefix: ids})
-        res = self.session.client.query(query, valid_time)
-        oois = [self.deserialize(x[0]) for x in res]
+        oois = self.load_bulk_as_list(references, valid_time)
         return {ooi.primary_key: ooi for ooi in oois}
+
+    def load_bulk_as_list(self, references: set[Reference], valid_time: datetime) -> list[OOI]:
+        query = generate_pull_query(FieldSet.ALL_FIELDS, {self.pk_prefix: list(map(str, references))})
+        return [self.deserialize(x[0]) for x in self.session.client.query(query, valid_time)]
 
     def list_oois(
         self,
@@ -274,8 +308,20 @@ class XTDBOOIRepository(OOIRepository):
         limit: int = 20,
         scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+        search_string: str | None = None,
+        order_by: Literal["scan_level", "object_type"] = "object_type",
+        asc_desc: Literal["asc", "desc"] = "asc",
     ) -> Paginated[OOI]:
         types = to_concrete(types)
+
+        search_statement = (
+            f"""[?e :xt/id ?id]
+                                [(clojure.string/includes? ?id \"{escape_string(search_string)}\")]"""
+            if search_string
+            else ""
+        )
+
+        order_statement = f":order-by [[_{order_by} :{asc_desc}]]"
 
         count_query = """
                 {{
@@ -286,7 +332,8 @@ class XTDBOOIRepository(OOIRepository):
                                 [?scan_profile :type "ScanProfile"]
                                 [?scan_profile :reference ?e]
                                 [?scan_profile :level _scan_level]
-                                [?scan_profile :scan_profile_type _scan_profile_type]]
+                                [?scan_profile :scan_profile_type _scan_profile_type]
+                                {search_statement}]
                     }}
                     :in-args [[{object_types}], [{scan_levels}], [{scan_profile_types}]]
                 }}
@@ -294,6 +341,7 @@ class XTDBOOIRepository(OOIRepository):
             object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)),
             scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]),
             scan_profile_types=" ".join([str_val(scan_profile_type.value) for scan_profile_type in scan_profile_types]),
+            search_statement=search_statement,
         )
 
         res_count = self.session.client.query(count_query, valid_time)
@@ -302,13 +350,15 @@ class XTDBOOIRepository(OOIRepository):
         data_query = """
                 {{
                     :query {{
-                        :find [(pull ?e [*])]
+                        :find [(pull ?e [*]) _object_type _scan_level]
                         :in [[_object_type ...] [_scan_level ...]  [_scan_profile_type ...]]
                         :where [[?e :object_type _object_type]
                                 [?scan_profile :type "ScanProfile"]
                                 [?scan_profile :reference ?e]
                                 [?scan_profile :level _scan_level]
-                                [?scan_profile :scan_profile_type _scan_profile_type]]
+                                [?scan_profile :scan_profile_type _scan_profile_type]
+                                {search_statement}]
+                        {order_statement}
                         :limit {limit}
                         :offset {offset}
                     }}
@@ -318,6 +368,8 @@ class XTDBOOIRepository(OOIRepository):
             object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)),
             scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]),
             scan_profile_types=" ".join([str_val(scan_profile_type.value) for scan_profile_type in scan_profile_types]),
+            search_statement=search_statement,
+            order_statement=order_statement,
             limit=limit,
             offset=offset,
         )
@@ -328,6 +380,26 @@ class XTDBOOIRepository(OOIRepository):
             count=count,
             items=oois,
         )
+
+    def list_oois_by_object_types(
+        self,
+        types: set[type[OOI]],
+        valid_time: datetime,
+    ) -> list[OOI]:
+        types = to_concrete(types)
+        data_query = """
+                {{
+                    :query {{
+                        :find [(pull ?e [*])]
+                        :in [[_object_type ...]]
+                        :where [[?e :object_type _object_type]]
+                    }}
+                    :in-args [[{object_types}]]
+                }}
+        """.format(
+            object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)),
+        )
+        return [self.deserialize(x[0]) for x in self.session.client.query(data_query, valid_time)]
 
     def list_random(
         self, valid_time: datetime, amount: int = 1, scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER
@@ -660,6 +732,9 @@ class XTDBOOIRepository(OOIRepository):
         only_muted=False,
         offset=DEFAULT_OFFSET,
         limit=DEFAULT_LIMIT,
+        search_string: str | None = None,
+        order_by: Literal["score", "finding_type"] = "score",
+        asc_desc: Literal["asc", "desc"] = "desc",
     ) -> Paginated[Finding]:
         # clause to find risk_severity
         concrete_finding_types = to_concrete({FindingType})
@@ -682,6 +757,15 @@ class XTDBOOIRepository(OOIRepository):
         elif only_muted:
             muted_clause = "[?muted_finding :MutedFinding/finding ?finding]"
 
+        search_statement = (
+            f"""[?finding :xt/id ?id]
+                                [(clojure.string/includes? ?id \"{escape_string(search_string)}\")]"""
+            if search_string
+            else ""
+        )
+
+        order_statement = f":order-by [[?{order_by} :{asc_desc}]]"
+
         severity_values = ", ".join([str_val(severity.value) for severity in severities])
 
         count_query = f"""
@@ -691,6 +775,7 @@ class XTDBOOIRepository(OOIRepository):
                     :in [[severities_ ...]]
                     :where [[?finding :object_type "Finding"]
                             [?finding :Finding/finding_type ?finding_type]
+                            {search_statement}
                             [(== ?severity severities_)]
                             {or_severities}
                             {muted_clause}]
@@ -707,17 +792,18 @@ class XTDBOOIRepository(OOIRepository):
         finding_query = f"""
             {{
                 :query {{
-                    :find [(pull ?finding [*]) ?score]
+                    :find [(pull ?finding [*]) ?score ?finding_type]
                     :in [[severities_ ...]]
                     :where [[?finding :object_type "Finding"]
                             [?finding :Finding/finding_type ?finding_type]
                             [(== ?severity severities_)]
                             {or_severities}
                             {or_scores}
-                            {muted_clause}]
+                            {muted_clause}
+                            {search_statement}]
                     :limit {limit}
                     :offset {offset}
-                    :order-by [[?score :desc]]
+                    {order_statement}
                 }}
                :in-args [[{severity_values}]]
             }}
@@ -726,6 +812,61 @@ class XTDBOOIRepository(OOIRepository):
         return Paginated(
             count=count,
             items=[x[0] for x in self.query(finding_query, valid_time)],
+        )
+
+    def simplify_keys(self, data: dict[str, Any]) -> dict[str, Any]:
+        new_data: dict[str, Any] = {}
+        for key, value in data.items():
+            if isinstance(value, list):
+                new_data[key.split("/")[-1]] = [
+                    self.simplify_keys(item) if isinstance(item, dict) else item for item in value
+                ]
+            elif isinstance(value, dict):
+                new_data[key.split("/")[-1]] = self.simplify_keys(value)
+            else:
+                new_key = key.split("/")[-1] if key.startswith("Report/") else key
+                new_data[new_key] = value
+        return new_data
+
+    def list_reports(self, valid_time, offset, limit) -> Paginated[tuple[Report, list[Report | None]]]:
+        count_query = """
+                            {
+                                :query {
+                                    :find [(count ?report)]
+                                    :where [[?report :object_type "Report"]
+                                        [?report :Report/has_parent false]]
+                                }
+                            }
+                        """
+        count_results = self.session.client.query(count_query, valid_time)
+        count = 0
+        if count_results and count_results[0]:
+            count = count_results[0][0]
+
+        date = Aliased(Report, field="date_generated")
+        query = (
+            Query(Report)
+            .pull(Report, fields="[* {:Report/_parent_report [*]}]")
+            .find(date)
+            .where(Report, has_parent=False, date_generated=date)
+            .order_by(date, ascending=False)
+            .limit(limit)
+            .offset(offset)
+        )
+
+        results = [
+            (
+                self.simplify_keys(x[0]),
+                [self.simplify_keys(y) for y in x[0]["Report/_parent_report"]]
+                if "Report/_parent_report" in x[0]
+                else [],
+            )
+            for x in self.session.client.query(query)
+        ]
+
+        return Paginated(
+            count=count,
+            items=results,
         )
 
     def query(self, query: str | Query, valid_time: datetime) -> list[OOI | tuple]:

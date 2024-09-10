@@ -10,6 +10,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.urls.base import reverse
+from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
@@ -18,11 +19,12 @@ from katalogus.client import Plugin, get_katalogus
 from reports.report_types.definitions import ReportPlugins
 from reports.report_types.dns_report.report import DNSReport
 from reports.views.base import get_selection
+from reports.views.generate_report import SaveGenerateReportMixin
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization, OrganizationMember
 from tools.ooi_helpers import get_or_create_ooi
 from tools.view_helpers import Breadcrumb
 
-from octopoes.models import OOI, Reference
+from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 from octopoes.models.ooi.web import URL
@@ -39,7 +41,7 @@ from onboarding.view_helpers import (
 from rocky.exceptions import RockyError
 from rocky.messaging import clearance_level_warning_dns_report
 from rocky.views.indemnification_add import IndemnificationAddView
-from rocky.views.ooi_view import SingleOOITreeMixin
+from rocky.views.ooi_view import SingleOOIMixin, SingleOOITreeMixin
 
 User = get_user_model()
 
@@ -137,7 +139,7 @@ class OnboardingSetupScanOOIAddView(
 
     def get_or_create_url_object(self, url: str) -> OOI:
         network = Network(name="internet")
-        url = URL(network=network.reference, raw=url)
+        url = URL(network=network.reference, raw=url, user_id=self.request.user.id)
         observed_at = datetime.now(timezone.utc)
         url_ooi, _ = get_or_create_ooi(self.octopoes_api_connector, self.bytes_client, url, observed_at)
         return url_ooi
@@ -181,7 +183,7 @@ class OnboardingClearanceLevelIntroductionView(
             {
                 "id": "dns_zone",
                 "type": "boefje",
-                "scan_level": "l1",
+                "scan_level": "1",
                 "name": "DNS-Zone",
                 "description": _("Fetch the parent DNS zone of a hostname"),
                 "enabled": False,
@@ -189,7 +191,7 @@ class OnboardingClearanceLevelIntroductionView(
             {
                 "id": "fierce",
                 "type": "boefje",
-                "scan_level": "l3",
+                "scan_level": "3",
                 "name": "Fierce",
                 "description": _("Finds subdomains by brute force"),
                 "enabled": False,
@@ -263,6 +265,7 @@ class OnboardingSetClearanceLevelView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["ooi"] = self.url
+        context["dns_report_least_clearance_level"] = DNS_REPORT_LEAST_CLEARANCE_LEVEL
         return context
 
 
@@ -345,8 +348,9 @@ class OnboardingSetupScanOOIDetailView(
 
 class OnboardingReportView(
     OrganizationPermissionRequiredMixin,
+    SaveGenerateReportMixin,
     IntroductionStepsMixin,
-    SingleOOITreeMixin,
+    SingleOOIMixin,
     TemplateView,
 ):
     """
@@ -360,29 +364,22 @@ class OnboardingReportView(
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.report_type = request.GET.get("report_type", "")
-        self.ooi = self.get_ooi(self.request.GET.get("ooi", ""))
-        self.hostname = self.get_hostname_from_url_tree()
+        ooi = self.get_ooi(self.request.GET.get("ooi", ""))
+        self.oois = [Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network)]
+        self.selected_oois = [self.oois[0].primary_key]
 
-    def get_hostname_from_url_tree(self) -> Hostname:
-        tree = self.octopoes_api_connector.get_tree(
-            Reference.from_str(self.ooi.primary_key), valid_time=datetime.now(timezone.utc), depth=2
-        )
-        hostname_ref = tree.store[self.ooi.web_url].netloc
-        return tree.store[str(hostname_ref)]
+    def get_report_type_selection(self) -> list[str]:
+        return [self.request.GET.get("report_type", "")]
 
     def post(self, request, *args, **kwargs):
-        selection = {
-            "observed_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-            "ooi": self.hostname.primary_key,
-            "report_type": self.report_type,
-        }
-
         self.set_member_onboarded()
 
+        report_ooi = self.save_report([("Onboarding Report", "Onboarding Report")])
+
         return redirect(
-            reverse("generate_report_view", kwargs={"organization_code": self.organization.code})
-            + get_selection(self.request, selection)
+            reverse("view_report", kwargs={"organization_code": self.organization.code})
+            + "?"
+            + urlencode({"report_id": report_ooi.reference})
         )
 
     def set_member_onboarded(self):

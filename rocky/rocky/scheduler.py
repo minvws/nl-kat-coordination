@@ -1,21 +1,20 @@
 from __future__ import annotations
 
+import collections
 import datetime
-import json
+import logging
 import uuid
 from enum import Enum
-from logging import getLogger
+from functools import cached_property
 from typing import Any
 
 import httpx
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from httpx import HTTPError, HTTPStatusError, RequestError, codes
-from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny
+from httpx import ConnectError, HTTPError, HTTPStatusError, RequestError, codes
+from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny, ValidationError
 
 from rocky.health import ServiceHealth
-
-logger = getLogger(__name__)
 
 
 class Boefje(BaseModel):
@@ -65,54 +64,61 @@ class NormalizerMeta(BaseModel):
 class NormalizerTask(BaseModel):
     """NormalizerTask represent data needed for a Normalizer to run."""
 
+    type: str = "normalizer"
+
     id: uuid.UUID | None = None
     normalizer: Normalizer
     raw_data: RawData
-    type: str = "normalizer"
 
 
 class BoefjeTask(BaseModel):
     """BoefjeTask represent data needed for a Boefje to run."""
 
+    type: str = "boefje"
+
     id: uuid.UUID | None = None
     boefje: Boefje
     input_ooi: str | None = None
     organization: str
-    type: str = "boefje"
-
-
-class PrioritizedItem(BaseModel):
-    """Representation of a queue.PrioritizedItem on the priority queue. Used
-    for unmarshalling of priority queue prioritized items to a JSON
-    representation.
-    """
-
-    id: uuid.UUID | None = None
-    hash: str | None = None
-    priority: int
-    data: SerializeAsAny[BoefjeTask | NormalizerTask]
 
 
 class TaskStatus(Enum):
-    """Status of a task."""
-
+    # Task has been created but not yet queued
     PENDING = "pending"
+
+    # Task has been pushed onto queue and is ready to be picked up
     QUEUED = "queued"
+
+    # Task has been picked up by a worker
     DISPATCHED = "dispatched"
+
+    # Task has been picked up by a worker, and the worker indicates that it is
+    # running.
     RUNNING = "running"
+
+    # Task has been completed
     COMPLETED = "completed"
+
+    # Task has failed
     FAILED = "failed"
+
+    # Task has been cancelled
+    CANCELLED = "cancelled"
 
 
 class Task(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: uuid.UUID | None = None
     scheduler_id: str
-    type: str
-    p_item: PrioritizedItem
-    status: TaskStatus
-    created_at: datetime.datetime
-    modified_at: datetime.datetime
-    model_config = ConfigDict(from_attributes=True)
+    schedule_id: str | None = None
+    priority: int
+    status: TaskStatus | None = TaskStatus.PENDING
+    type: str | None = None
+    hash: str | None = None
+    data: SerializeAsAny[BoefjeTask | NormalizerTask]
+    created_at: datetime.datetime | None = None
+    modified_at: datetime.datetime | None = None
 
 
 class PaginatedTasksResponse(BaseModel):
@@ -123,6 +129,8 @@ class PaginatedTasksResponse(BaseModel):
 
 
 class LazyTaskList:
+    HARD_LIMIT = 500
+
     def __init__(
         self,
         scheduler_client: SchedulerClient,
@@ -132,7 +140,7 @@ class LazyTaskList:
         self.kwargs = kwargs
         self._count: int | None = None
 
-    @property
+    @cached_property
     def count(self) -> int:
         if self._count is None:
             self._count = self.scheduler_client.list_tasks(
@@ -147,13 +155,15 @@ class LazyTaskList:
     def __getitem__(self, key) -> list[Task]:
         if isinstance(key, slice):
             offset = key.start or 0
-            limit = key.stop - offset
+            limit = min(LazyTaskList.HARD_LIMIT, key.stop - offset or key.stop or LazyTaskList.HARD_LIMIT)
+
         elif isinstance(key, int):
             offset = key
             limit = 1
         else:
             raise TypeError("Invalid slice argument type.")
 
+        logging.info("Getting max %s lazy items at offset %s with filter %s", limit, offset, self.kwargs)
         res = self.scheduler_client.list_tasks(
             limit=limit,
             offset=offset,
@@ -161,115 +171,145 @@ class LazyTaskList:
         )
 
         self._count = res.count
+
         return res.results
 
 
 class SchedulerError(Exception):
-    message = _("Connectivity issues with Mula.")
+    message: str = _("The Scheduler has an unexpected error. Check the Scheduler logs for further details.")
+
+    def __init__(self, *args: object, extra_message: str | None = None) -> None:
+        super().__init__(*args)
+        if extra_message is not None:
+            self.message = extra_message + self.message
 
     def __str__(self):
         return str(self.message)
 
 
-class TooManyRequestsError(SchedulerError):
-    message = _("Task queue is full, please try again later.")
+class SchedulerConnectError(SchedulerError):
+    message = _("Could not connect to Scheduler. Service is possibly down.")
 
 
-class BadRequestError(SchedulerError):
-    message = _("Task is invalid.")
+class SchedulerValidationError(SchedulerError):
+    message = _("Your request could not be validated.")
 
 
-class ConflictError(SchedulerError):
-    message = _("Task already queued.")
+class SchedulerTaskNotFound(SchedulerError):
+    message = _("Task could not be found.")
 
 
-class TaskNotFoundError(SchedulerError):
-    message = _("Task not found.")
+class SchedulerTooManyRequestError(SchedulerError):
+    message = _("Scheduler is receiving too many requests. Increase SCHEDULER_PQ_MAXSIZE or wait for task to finish.")
+
+
+class SchedulerBadRequestError(SchedulerError):
+    message = _("Bad request. Your request could not be interpreted by the Scheduler.")
+
+
+class SchedulerConflictError(SchedulerError):
+    message = _("The Scheduler has received a conflict. Your task is already in queue.")
+
+
+class SchedulerHTTPError(SchedulerError):
+    message = _("A HTTPError occurred. See Scheduler logs for more info.")
 
 
 class SchedulerClient:
-    def __init__(self, base_uri: str):
+    def __init__(self, base_uri: str, organization_code: str | None):
         self._client = httpx.Client(base_url=base_uri)
+        self.organization_code = organization_code
 
     def list_tasks(
         self,
         **kwargs,
     ) -> PaginatedTasksResponse:
-        kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
-        res = self._client.get("/tasks", params=kwargs)
-        return PaginatedTasksResponse.model_validate_json(res.content)
+        try:
+            filter_key = "filters"
+            params = {k: v for k, v in kwargs.items() if v is not None if k != filter_key}  # filter Nones from kwargs
+            endpoint = "/tasks"
+            res = self._client.post(endpoint, params=params, json=kwargs.get(filter_key, None))
+            return PaginatedTasksResponse.model_validate_json(res.content)
+        except ValidationError:
+            raise SchedulerValidationError(extra_message=_("Task list: "))
+        except ConnectError:
+            raise SchedulerConnectError(extra_message=_("Task list: "))
 
-    def get_lazy_task_list(
-        self,
-        scheduler_id: str,
-        task_type: str | None = None,
-        status: str | None = None,
-        min_created_at: datetime.datetime | None = None,
-        max_created_at: datetime.datetime | None = None,
-        input_ooi: str | None = None,
-        plugin_id: str | None = None,
-        boefje_name: str | None = None,
-    ) -> LazyTaskList:
-        return LazyTaskList(
-            self,
-            scheduler_id=scheduler_id,
-            type=task_type,
-            status=status,
-            min_created_at=min_created_at,
-            max_created_at=max_created_at,
-            input_ooi=input_ooi,
-            plugin_id=plugin_id,
-            boefje_name=boefje_name,
-        )
-
-    def get_task_details(self, organization_code: str, task_id: str) -> Task:
-        res = self._client.get(f"/tasks/{task_id}")
-        res.raise_for_status()
-        task_details = Task.model_validate_json(res.content)
+    def get_task_details(self, task_id: str) -> Task:
+        if self.organization_code is None:
+            raise SchedulerTaskNotFound("No organization defined in client.")
+        task_details = Task.model_validate_json(self._get(f"/tasks/{task_id}", "content"))
 
         if task_details.type == "normalizer":
-            organization = task_details.p_item.data.raw_data.boefje_meta.organization
+            organization = task_details.data.raw_data.boefje_meta.organization
         else:
-            organization = task_details.p_item.data.organization
+            organization = task_details.data.organization
 
-        if organization != organization_code:
-            raise TaskNotFoundError()
+        if organization != self.organization_code:
+            raise SchedulerTaskNotFound()
+
         return task_details
 
-    def push_task(self, queue_name: str, prioritized_item: PrioritizedItem) -> None:
+    def push_task(self, item: Task) -> None:
         try:
+            queue_name = f"{item.data.type}-{self.organization_code}"
             res = self._client.post(
                 f"/queues/{queue_name}/push",
-                content=prioritized_item.json(),
+                content=item.json(exclude_none=True),
                 headers={"Content-Type": "application/json"},
             )
             res.raise_for_status()
         except HTTPStatusError as http_error:
             code = http_error.response.status_code
             if code == codes.TOO_MANY_REQUESTS:
-                raise TooManyRequestsError()
+                raise SchedulerTooManyRequestError()
             elif code == codes.BAD_REQUEST:
-                raise BadRequestError()
+                raise SchedulerBadRequestError()
             elif code == codes.CONFLICT:
-                raise ConflictError()
-            else:
-                raise SchedulerError()
+                raise SchedulerConflictError()
         except RequestError:
             raise SchedulerError()
 
     def health(self) -> ServiceHealth:
-        health_endpoint = self._client.get("/health")
-        health_endpoint.raise_for_status()
-        return ServiceHealth.model_validate_json(health_endpoint.content)
+        return ServiceHealth.model_validate_json(self._get("/health", return_type="content"))
 
-    def get_task_stats(self, organization_code: str, task_type: str) -> dict:
+    def _get_task_stats(self, scheduler_id: str) -> dict:
+        """Return task stats for specific scheduler."""
+        return self._get(f"/tasks/stats/{scheduler_id}")  # type: ignore
+
+    def get_task_stats(self, task_type: str) -> dict:
+        """Return task stats for specific task type."""
+        return self._get_task_stats(scheduler_id=f"{task_type}-{self.organization_code}")
+
+    @staticmethod
+    def _merge_stat_dicts(dicts: list[dict]) -> dict:
+        """Merge multiple stats dicts."""
+        stat_sum: dict[str, collections.Counter] = collections.defaultdict(collections.Counter)
+        for dct in dicts:
+            for timeslot, counts in dct.items():
+                stat_sum[timeslot].update(counts)
+        return dict(stat_sum)
+
+    def get_combined_schedulers_stats(self, scheduler_ids: list) -> dict:
+        """Return merged stats for a set of scheduler ids."""
+        return SchedulerClient._merge_stat_dicts(
+            dicts=[self._get_task_stats(scheduler_id=scheduler_id) for scheduler_id in scheduler_ids]
+        )
+
+    def _get(self, path: str, return_type: str = "json") -> dict | bytes:
+        """Helper to do a get request and raise warning for path."""
         try:
-            res = self._client.get(f"/tasks/stats/{task_type}-{organization_code}")
+            res = self._client.get(path)
             res.raise_for_status()
-        except HTTPError:
-            raise SchedulerError()
-        task_stats = json.loads(res.content)
-        return task_stats
+        except HTTPError as exc:
+            raise SchedulerError(path) from exc
+        except ConnectError as exc:
+            raise SchedulerConnectError(path) from exc
+
+        if return_type == "content":
+            return res.content
+        return res.json()
 
 
-client = SchedulerClient(settings.SCHEDULER_API)
+def scheduler_client(organization_code: str | None) -> SchedulerClient:
+    return SchedulerClient(settings.SCHEDULER_API, organization_code)

@@ -13,6 +13,7 @@ def test_generate_report_setup_scan_wrong_plugin_id(
     valid_time,
     mocker,
     mock_organization_view_octopoes,
+    mock_bytes_client,
     listed_hostnames,
 ):
     katalogus_client = mocker.patch("reports.views.base.get_katalogus")()
@@ -21,11 +22,12 @@ def test_generate_report_setup_scan_wrong_plugin_id(
     )
 
     katalogus_client.get_plugins.side_effect = KATalogusHTTPStatusError
+    mock_bytes_client().upload_raw.return_value = "raw_id"
 
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("generate_report_setup_scan", kwargs=kwargs)
 
-    request = rf.get(
+    request = rf.post(
         url,
         {
             "observed_at": valid_time.strftime("%Y-%m-%d"),
@@ -39,5 +41,5 @@ def test_generate_report_setup_scan_wrong_plugin_id(
 
     response = SetupScanGenerateReportView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 302
+    assert response.status_code == 200
     assert list(request._messages)[0].message == "A HTTP error occurred. Check logs for more info."

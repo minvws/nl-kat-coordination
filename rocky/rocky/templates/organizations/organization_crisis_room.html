@@ -9,7 +9,7 @@
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate "Crisis room:" %} {{ organization.name }}</h1>
+                <h1>{% translate "Crisis room" %} {{ organization.name }} @ {{ observed_at|date:'M d, Y' }}</h1>
                 {% if not indemnification_present %}
                     <p class="warning"
                        role="group"
@@ -27,9 +27,12 @@
                 </p>
                 <h2>{% translate "Top 10 most severe Findings" %}</h2>
                 {% translate "Object list" as filter_title %}
+                <p class="de-emphasized">
+                    {% translate "Showing " %}{{ object_list|length }} {% translate "of" %} {{ paginator.count }} {% translate "findings" %}
+                </p>
                 <div class="horizontal-scroll">
                     <table class="action-buttons nowrap">
-                        <caption>{% translate "Showing " %}{{ object_list|length }} {% translate "of" %} {{ paginator.count }} {% translate "findings" %}</caption>
+                        <caption class="visually-hidden">{% translate "Findings table" %}</caption>
                         <thead>
                             <tr>
                                 <th>{% translate "Severity" %}</th>

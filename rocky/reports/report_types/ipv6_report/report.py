@@ -1,7 +1,6 @@
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
-from logging import getLogger
 from typing import Any
 
 from django.utils.translation import gettext_lazy as _
@@ -9,8 +8,6 @@ from django.utils.translation import gettext_lazy as _
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
-
-logger = getLogger(__name__)
 
 
 @dataclass
@@ -22,7 +19,7 @@ class System:
 class IPv6Report(Report):
     id = "ipv6-report"
     name = _("IPv6 Report")
-    description = _("Check whether hostnames point to ipv6 addresses.")
+    description = _("Check whether hostnames point to IPv6 addresses.")
     plugins = {"required": ["dns-records"], "optional": []}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "ipv6_report/report.html"

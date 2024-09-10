@@ -35,6 +35,6 @@
     ]
   },
   "normalizer": {
-    "id": "adr-validator"
+    "id": "adr-validator-normalize"
   }
 }

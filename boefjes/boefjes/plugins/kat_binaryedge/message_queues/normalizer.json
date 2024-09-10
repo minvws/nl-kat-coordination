@@ -1,5 +1,6 @@
 {
   "id": "kat_binaryedge_message_queues",
+  "name": "BinaryEdge message queues",
   "consumes": [
     "boefje/binaryedge"
   ],

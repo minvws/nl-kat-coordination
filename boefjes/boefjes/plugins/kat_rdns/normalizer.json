@@ -1,5 +1,6 @@
 {
   "id": "kat_rdns_normalize",
+  "name": "RDNS",
   "consumes": [
     "boefje/rdns"
   ],

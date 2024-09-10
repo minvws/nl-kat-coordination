@@ -1,7 +1,7 @@
 {% load static %}
 {% load i18n %}
 
-<header>
+<header id="page-header">
     {% include "partials/skip-to-content.html" %}
 
     <nav data-open-label="{% translate "Menu" %}"
@@ -31,6 +31,11 @@
                             <li>
                                 <a href="{{ index_url }}"
                                    {% if index_url == request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Crisis room" %}</a>
+                            </li>
+                            <li>
+                                {% url "all_task_list" as index_url %}
+                                <a href="{{ index_url }}"
+                                   {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Tasks" %}</a>
                             </li>
                         {% else %}
                             <li>

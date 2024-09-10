@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-23 15:00+0000\n"
+"POT-Creation-Date: 2024-07-29 14:05+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -28,6 +28,9 @@ msgstr ""
 #: katalogus/templates/plugin_settings_list.html
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/tls_report/report.html
+#: reports/templates/partials/export_report_settings.html
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/templates/partials/ooi_detail_related_object.html
@@ -338,8 +341,6 @@ msgid "Member type"
 msgstr ""
 
 #: account/templates/account_detail.html
-#: onboarding/templates/account/step_2a_organization_setup.html
-#: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 msgid "Organization"
 msgstr ""
@@ -564,6 +565,23 @@ msgid ""
 "We couldn't send a password reset link. Contact your system administrator."
 msgstr ""
 
+#: components/modal/template.html
+msgid "Close modal"
+msgstr ""
+
+#: components/modal/template.html
+#: katalogus/templates/change_clearance_level.html
+#: katalogus/templates/confirmation_clone_settings.html
+#: katalogus/templates/plugin_settings_delete.html
+#: reports/templates/partials/export_report_settings.html
+#: rocky/templates/oois/ooi_delete.html
+#: rocky/templates/oois/ooi_mute_finding.html
+#: rocky/templates/organizations/organization_edit.html
+#: rocky/templates/organizations/organization_member_edit.html
+#: rocky/templates/two_factor/_wizard_actions.html
+msgid "Cancel"
+msgstr ""
+
 #: crisis_room/views.py
 msgid ""
 "Failed to get list of findings for organization {}, check server logs for "
@@ -609,6 +627,7 @@ msgid "Sorting options"
 msgstr ""
 
 #: katalogus/forms/plugin_settings.py
+#: reports/templates/partials/export_report_settings.html
 msgid "This field is required."
 msgstr ""
 
@@ -715,13 +734,15 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
-msgid "Selected objects:"
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/report_asset_overview.html
+msgid "Selected objects"
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/report_overview/report_history_table.html
 #: reports/templates/summary/ooi_selection.html
-#: rocky/templates/partials/task_history.html
 msgid "Object"
 msgstr ""
 
@@ -740,17 +761,6 @@ msgstr ""
 #: katalogus/templates/change_clearance_level.html
 #: rocky/templates/oois/ooi_detail.html
 msgid "Scan"
-msgstr ""
-
-#: katalogus/templates/change_clearance_level.html
-#: katalogus/templates/confirmation_clone_settings.html
-#: katalogus/templates/plugin_settings_delete.html
-#: rocky/templates/oois/ooi_delete.html
-#: rocky/templates/oois/ooi_mute_finding.html
-#: rocky/templates/organizations/organization_edit.html
-#: rocky/templates/organizations/organization_member_edit.html
-#: rocky/templates/two_factor/_wizard_actions.html
-msgid "Cancel"
 msgstr ""
 
 #: katalogus/templates/clone_settings.html
@@ -799,6 +809,7 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/katalogus_settings.html
+#: reports/templates/partials/export_report_settings.html
 #: reports/templates/partials/report_setup_scan.html
 #: reports/templates/partials/report_types_selection.html
 #: rocky/templates/two_factor/core/otp_required.html
@@ -810,11 +821,11 @@ msgid "This is an overview of the latest settings of all plugins."
 msgstr ""
 
 #: katalogus/templates/katalogus_settings.html
-msgid "Latest plugin settings:"
+msgid "Latest plugin settings"
 msgstr ""
 
 #: katalogus/templates/katalogus_settings.html
-#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/ooi_detail_task_list.html
 msgid "Plugin"
 msgstr ""
 
@@ -827,6 +838,10 @@ msgstr ""
 #: katalogus/templates/normalizer_detail.html
 #, python-format
 msgid "%(plugin_name)s is able to process the following mime types:"
+msgstr ""
+
+#: katalogus/templates/partials/boefje_tile.html
+msgid "This object type is required"
 msgstr ""
 
 #: katalogus/templates/partials/boefje_tile.html
@@ -896,6 +911,7 @@ msgstr ""
 
 #: katalogus/templates/partials/objects_to_scan.html
 #: rocky/templates/findings/finding_list.html
+#: rocky/templates/forms/widgets/checkbox_group_table.html
 #: rocky/templates/oois/ooi_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid "Object list"
@@ -949,6 +965,7 @@ msgstr ""
 #: katalogus/templates/partials/plugin_settings_required.html
 #: katalogus/templates/plugin_settings_list.html
 #: rocky/templates/findings/finding_add.html
+#: rocky/templates/partials/ooi_detail_related_object.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Add"
 msgstr ""
@@ -982,15 +999,17 @@ msgid "Actions"
 msgstr ""
 
 #: katalogus/templates/partials/plugins_navigation.html
+#: reports/templates/report_overview/report_overview_navigation.html
 msgid "Plugins Navigation"
 msgstr ""
 
 #: katalogus/templates/partials/plugins_navigation.html
+#: tools/forms/scheduler.py
 msgid "All"
 msgstr ""
 
 #: katalogus/templates/partials/plugins_navigation.html
-#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/scan.html rocky/templates/tasks/boefjes.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Boefjes"
 msgstr ""
@@ -1071,7 +1090,7 @@ msgid " Details"
 msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
-msgid "Overview of settings:"
+msgid "Overview of settings"
 msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
@@ -1129,10 +1148,6 @@ msgstr ""
 msgid ""
 "Some selected OOIs needs an increase of clearance level to perform scans. "
 "You do not have the permission to change clearance level."
-msgstr ""
-
-#: katalogus/views/plugin_detail.py
-msgid "Please select an OOI to start scan."
 msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py
@@ -1282,6 +1297,7 @@ msgstr ""
 #: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/organizations/organization_add.html
 #: rocky/templates/organizations/organization_settings.html
+#: rocky/templates/partials/organization_properties_table.html
 msgid "Organization details"
 msgstr ""
 
@@ -1296,7 +1312,6 @@ msgstr ""
 #: rocky/templates/partials/elements/ooi_detail_settings.html
 #: rocky/templates/partials/elements/ooi_report_settings.html
 #: rocky/templates/partials/form/indemnification_add_form.html
-#: rocky/templates/partials/task_history.html
 #: rocky/templates/two_factor/_wizard_actions.html
 msgid "Submit"
 msgstr ""
@@ -1315,6 +1330,7 @@ msgstr ""
 #: onboarding/templates/account/step_2a_organization_update.html
 #: onboarding/templates/account/step_2b_indemnification_setup.html
 #: onboarding/templates/step_3d_clearance_level_introduction.html
+#: reports/templates/partials/report_setup_scan.html
 msgid "Continue"
 msgstr ""
 
@@ -1477,6 +1493,7 @@ msgid "OpenKAT introduction"
 msgstr ""
 
 #: onboarding/templates/dns_report.html
+#: onboarding/templates/step_2b_choose_report_type.html
 #: reports/report_types/dns_report/report.py
 msgid "DNS Report"
 msgstr ""
@@ -1550,8 +1567,9 @@ msgstr ""
 msgid "Choose a report - Introduction"
 msgstr ""
 
-#: onboarding/templates/step_2a_choose_report_info.html reports/views/base.py
-#: rocky/templates/header.html
+#: onboarding/templates/step_2a_choose_report_info.html
+#: reports/templates/report_overview/report_overview_header.html
+#: reports/views/base.py rocky/templates/header.html
 msgid "Reports"
 msgstr ""
 
@@ -1624,22 +1642,18 @@ msgstr ""
 msgid ""
 "Within OpenKAT you can view reports for each of your current objects. For "
 "specific reports you can choose one of the available report types and "
-"generate a report. Such as a pen-test, a DNS-report or a mail report to give "
+"generate a report. Such as a pentest, a DNS-report or a Mail Report to give "
 "some examples."
 msgstr ""
 
 #: onboarding/templates/step_2b_choose_report_type.html
-msgid "For this tutorial we suggest a DNS-report to get you started."
+msgid "For this tutorial we will create a DNS-report to get you started."
 msgstr ""
 
 #: onboarding/templates/step_2b_choose_report_type.html
 msgid ""
 "When you start to generate this report. OpenKAT will guide you through the "
 "necessary steps."
-msgstr ""
-
-#: onboarding/templates/step_2b_choose_report_type.html
-msgid "DNS report"
 msgstr ""
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
@@ -1666,7 +1680,7 @@ msgstr ""
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid ""
 "A lot of things can be an object within the scope of OpenKAT. For example a "
-"mailserver, an ip-address, a URL, a DNS record, a hostname or a network to "
+"mailserver, an IP address, a URL, a DNS record, a hostname or a network to "
 "name a few.  While these objects can be related to each other they are all "
 "objects within OpenKAT that can be scanned to gain valuable insight."
 msgstr ""
@@ -1714,7 +1728,7 @@ msgstr ""
 msgid ""
 "Most objects have dependencies on the existence of other objects. For "
 "example a URL needs to be connected to a network, hostname, fqdn (fully "
-"qualified domain name) and ip-address. OpenKAT collects these additional "
+"qualified domain name) and IP address. OpenKAT collects these additional "
 "object automatically when possible. By running plugins to collect or extract "
 "this data."
 msgstr ""
@@ -1948,7 +1962,6 @@ msgid ""
 msgstr ""
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: rocky/templates/scan.html
 msgid "Boefjes:"
 msgstr ""
 
@@ -2105,7 +2118,7 @@ msgstr ""
 msgid "Filter by OOI types"
 msgstr ""
 
-#: reports/forms.py
+#: reports/forms.py reports/templates/report_overview/report_history_table.html
 msgid "Report types"
 msgstr ""
 
@@ -2113,11 +2126,6 @@ msgstr ""
 #: reports/report_types/multi_organization_report/appendix.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Appendix"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_asset_overview.html
-msgid "Selected objects"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -2131,7 +2139,13 @@ msgid "Selected Report Types"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Selected report types"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/plugin_overview_table.html
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
 #: reports/templates/summary/report_asset_overview.html
 msgid "Report type"
 msgstr ""
@@ -2139,6 +2153,10 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Service Versions and Health"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Service, version and health"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -2168,6 +2186,10 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 msgid "Used Config objects"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Used config objects"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -2255,10 +2277,6 @@ msgstr ""
 #: reports/report_types/rpki_report/report.html
 #: reports/report_types/safe_connections_report/report.html
 msgid "server"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/introduction.html
-msgid "OpenKAT Aggregate Report"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
@@ -2476,12 +2494,14 @@ msgstr ""
 #: reports/report_types/vulnerability_report/report.html
 #: reports/report_types/web_system_report/report.html
 #: reports/templates/partials/report_severity_totals_table.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/ooi_report_findings_block.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
 #: rocky/views/finding_list.py rocky/views/finding_type_add.py
 #: rocky/views/ooi_view.py
 msgid "Findings"
@@ -2583,6 +2603,10 @@ msgid ""
 "format."
 msgstr ""
 
+#: reports/report_types/concatenated_report/report.py
+msgid "Concatenated Report"
+msgstr ""
+
 #: reports/report_types/dns_report/report.html
 msgid "Records found"
 msgstr ""
@@ -2665,9 +2689,9 @@ msgstr ""
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
 msgid "Details"
 msgstr ""
 
@@ -2677,9 +2701,9 @@ msgstr ""
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
 msgid "Close details"
 msgstr ""
 
@@ -2689,9 +2713,9 @@ msgstr ""
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
 msgid "Open details"
 msgstr ""
 
@@ -2718,7 +2742,7 @@ msgstr ""
 
 #: reports/report_types/findings_report/report.html
 msgid ""
-"The findings report provides an overview of the identified findings on the "
+"The Findings Report provides an overview of the identified findings on the "
 "scanned systems. For each finding it shows the risk level and the number of "
 "occurrences of the finding. Under the 'Details' section a description, "
 "impact, recommendation and location of the finding can be found. The risk "
@@ -2760,7 +2784,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
-msgid "IPV6 overview"
+msgid "IPv6 overview"
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
@@ -2773,13 +2797,13 @@ msgid "IPv6 Report"
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.py
-msgid "Check whether hostnames point to ipv6 addresses."
+msgid "Check whether hostnames point to IPv6 addresses."
 msgstr ""
 
 #: reports/report_types/mail_report/report.html
 msgid ""
-"The mail report provides an overview of the compliance checks associated "
-"with e-mail servers. The current compliance check the presence of SPF, DKIM "
+"The Mail Report provides an overview of the compliance checks associated "
+"with e-mail servers. The current compliance checks the presence of SPF, DKIM "
 "and DMARC records. The table below shows for each of these checks how many "
 "of the identified mail servers are compliant, and if applicable a compliance "
 "issue description and risk level. The risk level may be different for your "
@@ -2804,7 +2828,7 @@ msgstr ""
 
 #: reports/report_types/mail_report/report.py
 msgid ""
-"System specific mail report that focusses on IP addresses and hostnames."
+"System specific Mail Report that focusses on IP addresses and hostnames."
 msgstr ""
 
 #: reports/report_types/multi_organization_report/asset_overview.html
@@ -2919,7 +2943,7 @@ msgid " systems have an IPv6 connection."
 msgstr ""
 
 #: reports/report_types/multi_organization_report/ipv6.html
-msgid "Overview of ip version compliance"
+msgid "Overview of IP version compliance"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/open_ports.html
@@ -2939,7 +2963,7 @@ msgid "Open ports"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/open_ports.html
-msgid "Occurrences (IP addressees)"
+msgid "Occurrences (IP addresses)"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/open_ports.html
@@ -2984,7 +3008,7 @@ msgstr ""
 
 #: reports/report_types/name_server_report/report.html
 msgid ""
-"The name server report provides an overview of the compliance checks that "
+"The Name Server Report provides an overview of the compliance checks that "
 "were performed against the identified Domain Name Servers (DNS). The "
 "compliance checks verify the presence and validity of DNSSEC and whether no "
 "unnecessary ports were identified to be open. The table below gives an "
@@ -3024,12 +3048,12 @@ msgid "Name Server Report"
 msgstr ""
 
 #: reports/report_types/name_server_report/report.py
-msgid "Name server report checks name servers on basic security standards."
+msgid "Name Server Report checks name servers on basic security standards."
 msgstr ""
 
 #: reports/report_types/open_ports_report/report.html
 msgid ""
-"The open ports report provides an overview of the open ports identified on a "
+"The Open Ports Report provides an overview of the open ports identified on a "
 "system. The ports that are marked as <b>bold</b> were identified by direct "
 "scans performed by OpenKAT (such as nmap). Ports that are not marked in bold "
 "were identified through external services and/or scans (such as Shodan). "
@@ -3063,7 +3087,7 @@ msgstr ""
 
 #: reports/report_types/rpki_report/report.html
 msgid ""
-"The RPKI report shows if an RPKI route announcement was available for the "
+"The RPKI Report shows if an RPKI route announcement was available for the "
 "system and if this announcement is not expired."
 msgstr ""
 
@@ -3076,7 +3100,7 @@ msgid "RPKI Available"
 msgstr ""
 
 #: reports/report_types/rpki_report/report.html
-msgid "RPKI Not expired"
+msgid "RPKI valid"
 msgstr ""
 
 #: reports/report_types/rpki_report/report.html
@@ -3098,8 +3122,8 @@ msgstr ""
 
 #: reports/report_types/rpki_report/report.py
 msgid ""
-"Shows whether the ip is covered by a valid RPKI ROA. For a hostname it shows "
-"the ip addresses and whether they are covered by a valid RPKI ROA."
+"Shows whether the IP is covered by a valid RPKI ROA. For a hostname it shows "
+"the IP addresses and whether they are covered by a valid RPKI ROA."
 msgstr ""
 
 #: reports/report_types/safe_connections_report/report.html
@@ -3126,7 +3150,7 @@ msgstr ""
 
 #: reports/report_types/systems_report/report.html
 msgid ""
-"The system report provides an overview of the system types (types of similar "
+"The System Report provides an overview of the system types (types of similar "
 "services) that were identified for each system. The following system types "
 "can be identified: DNS servers, Web servers, Mail servers and those "
 "classified as 'Other' servers. Each hostname and/or IP address is given one "
@@ -3152,7 +3176,7 @@ msgstr ""
 
 #: reports/report_types/tls_report/report.html
 msgid ""
-"The TLS report shows which TLS protocols and ciphers were identified on the "
+"The TLS Report shows which TLS protocols and ciphers were identified on the "
 "host for the provided port."
 msgstr ""
 
@@ -3169,10 +3193,9 @@ msgstr ""
 #: reports/report_types/tls_report/report.html
 #: reports/templates/partials/plugin_overview_table.html
 #: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-#: rocky/templates/tasks/partials/task_filter.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
 msgid "Status"
 msgstr ""
 
@@ -3224,13 +3247,13 @@ msgstr ""
 
 #: reports/report_types/tls_report/report.py
 msgid ""
-"TLS reports assess the security of data encryption and transmission "
+"TLS Report assesses the security of data encryption and transmission "
 "protocols."
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
 msgid ""
-"The vulnerability report provides an overview of all identified CVE "
+"The Vulnerability Report provides an overview of all identified CVE "
 "vulnerabilities that were identified on the selected systems. For each CVE "
 "the table shows the CVE scoring, the number of occurrences, and the CVE "
 "details."
@@ -3269,7 +3292,7 @@ msgstr ""
 
 #: reports/report_types/web_system_report/report.html
 msgid ""
-"The web system report provides an overview of various web server checks that "
+"The Web System Report provides an overview of various web server checks that "
 "were performed against the scanned system(s). For each performed check the "
 "table below shows whether or not the server is compliant with the checks. A "
 "description of why this compliant check failed is also shown, including an "
@@ -3326,13 +3349,77 @@ msgid "Web System Report"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.py
-msgid "Web system reports check web systems on basic security standards."
+msgid "Web System Reports check web systems on basic security standards."
 msgstr ""
 
-#: reports/templates/generate_report.html
-#: reports/templates/generate_report_pdf.html
-#: reports/templates/partials/generate_report_sidemenu.html
-msgid "for"
+#: reports/templates/partials/export_report_settings.html
+msgid "Report name"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "You can name individual reports."
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Report names:"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Edit "
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid ""
+"\n"
+"                                            Give your report a custom name "
+"and optionally add the reports' reference date\n"
+"                                            to the name. To do so you can "
+"select a standard option or use a\n"
+"                                            <a href=\"https://strftime.org/"
+"\">Python strftime code</a> in the report name.\n"
+"                                        "
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Report name settings."
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Add reference date"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Select option"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "No reference date"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Day"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Week"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Month"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Year"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Confirm"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+#: reports/templates/report_overview/report_overview_header.html
+#: reports/views/generate_report.py
+msgid "Generate report"
 msgstr ""
 
 #: reports/templates/partials/generate_report_sidemenu.html
@@ -3379,10 +3466,6 @@ msgid "Ready"
 msgstr ""
 
 #: reports/templates/partials/report_header.html
-msgid "OpenKAT Report"
-msgstr ""
-
-#: reports/templates/partials/report_header.html
 msgid ""
 "All selected report types for the selected objects are displayed one below "
 "the other."
@@ -3405,10 +3488,12 @@ msgid "Generate Report"
 msgstr ""
 
 #: reports/templates/partials/report_navigation.html
+#: reports/views/aggregate_report.py
 msgid "Aggregate Report"
 msgstr ""
 
 #: reports/templates/partials/report_navigation.html
+#: reports/views/multi_report.py
 msgid "Multi Report"
 msgstr ""
 
@@ -3425,7 +3510,6 @@ msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
 #: rocky/templates/admin/change_list.html rocky/templates/oois/ooi_list.html
-#: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Filter"
 msgstr ""
@@ -3465,6 +3549,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/report_overview/report_history_table.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: tools/view_helpers.py rocky/templates/admin/delete_confirmation.html
 #: rocky/templates/admin/delete_selected_confirmation.html
@@ -3567,11 +3652,6 @@ msgstr ""
 msgid "Show more suggested plugins"
 msgstr ""
 
-#: reports/templates/partials/report_setup_scan.html
-#: reports/views/generate_report.py
-msgid "Generate report"
-msgstr ""
-
 #: reports/templates/partials/report_severity_totals.html
 #: reports/templates/partials/report_severity_totals_table.html
 msgid "Findings overview"
@@ -3635,6 +3715,135 @@ msgstr ""
 msgid "Toggle all report types"
 msgstr ""
 
+#: reports/templates/report_overview/report_history.html
+#: reports/views/report_overview.py
+msgid "Reports history"
+msgstr ""
+
+#: reports/templates/report_overview/report_history.html
+msgid "An overview of all your generated reports."
+msgstr ""
+
+#: reports/templates/report_overview/report_history.html
+#, python-format
+msgid "Showing %(length)s of %(total)s reports"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Reports:"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Input Objects"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Reference date"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Creation date"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Shows parent report details"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Close children report object details"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Subreports details:"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+#, python-format
+msgid ""
+"\n"
+"                                    This report consist of %(counter)s "
+"subreport with the following report type and object.\n"
+"                                "
+msgid_plural ""
+"\n"
+"                                    This report consist of %(counter)s "
+"subreports with the following report types and objects.\n"
+"                                "
+msgstr[0] ""
+msgstr[1] ""
+
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/subreports_header.html
+#: reports/views/report_overview.py
+msgid "Subreports"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Report ID"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Shows subreport details"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "View all subreports"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_header.html
+msgid "Overview of reports"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Recent"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Presets"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Scheduled"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "Folders"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+msgid "History"
+msgstr ""
+
+#: reports/templates/report_overview/subreports.html
+#, python-format
+msgid "Showing %(length)s of %(total)s subreports"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_header.html
+msgid "Back to Reports History"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_header.html
+msgid "An overview of all underlying reports of"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_header.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Shows report details"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_table.html
+msgid "Subreports:"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_table.html
+#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "Input Object"
+msgstr ""
+
 #: reports/templates/summary/report_asset_overview.html
 msgid ""
 "The objects listed in the table below were used to generate this report. For "
@@ -3653,6 +3862,10 @@ msgstr ""
 msgid ""
 "The table below shows all required or optional plugins for the selected "
 "reports."
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid "Required and optional plugins"
 msgstr ""
 
 #: reports/templates/summary/selected_plugins.html
@@ -3678,7 +3891,8 @@ msgid "Aggregate report"
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
-msgid "Select Objects"
+#: reports/views/multi_report.py
+msgid "Select objects"
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
@@ -3688,7 +3902,11 @@ msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 #: reports/views/multi_report.py
-msgid "View report"
+msgid "Export setup"
+msgstr ""
+
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+msgid "Save report"
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
@@ -3697,13 +3915,14 @@ msgid "Select at least one OOI to proceed."
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
-msgid "Select at least one report type to proceed."
-msgstr ""
-
-#: reports/views/aggregate_report.py reports/views/generate_report.py
 msgid ""
 "No data could be found for %(report_types). Object(s) did not exist on "
 "%(date)s."
+msgstr ""
+
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+#: reports/views/multi_report.py
+msgid "Select at least one report type to proceed."
 msgstr ""
 
 #: reports/views/base.py
@@ -3711,12 +3930,32 @@ msgstr ""
 msgid "Report type '%s' does not exist."
 msgstr ""
 
+#: reports/views/generate_report.py
+#, python-brace-format
+msgid "Concatenated Report for {oois_count} objects"
+msgstr ""
+
+#: reports/views/generate_report.py
+#, python-brace-format
+msgid "Concatenated Report for {ooi}"
+msgstr ""
+
+#: reports/views/generate_report.py
+#, python-brace-format
+msgid "{report_type} for {oois_count} objects"
+msgstr ""
+
+#: reports/views/generate_report.py
+#, python-brace-format
+msgid "{report_type} for {ooi}"
+msgstr ""
+
 #: reports/views/multi_report.py
 msgid "Multi report"
 msgstr ""
 
 #: reports/views/multi_report.py
-msgid "Select OOIs"
+msgid "View report"
 msgstr ""
 
 #: reports/views/view_helpers.py
@@ -3731,11 +3970,19 @@ msgstr ""
 msgid "3: Configuration"
 msgstr ""
 
+#: reports/views/view_helpers.py
+msgid "4: Export setup"
+msgstr ""
+
+#: reports/views/view_helpers.py
+msgid "3: Export setup"
+msgstr ""
+
 #: tools/forms/base.py
 msgid "Date"
 msgstr ""
 
-#: tools/forms/base.py
+#: tools/forms/base.py tools/forms/scheduler.py
 msgid "The selected date is in the future. Please select a different date."
 msgstr ""
 
@@ -3914,6 +4161,50 @@ msgstr ""
 msgid "Filter by clearance type"
 msgstr ""
 
+#: tools/forms/scheduler.py
+msgid "From"
+msgstr ""
+
+#: tools/forms/scheduler.py
+msgid "To"
+msgstr ""
+
+#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+msgid "Cancelled"
+msgstr ""
+
+#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+msgid "Completed"
+msgstr ""
+
+#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+msgid "Dispatched"
+msgstr ""
+
+#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+msgid "Failed"
+msgstr ""
+
+#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+msgid "Pending"
+msgstr ""
+
+#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+msgid "Queued"
+msgstr ""
+
+#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+msgid "Running"
+msgstr ""
+
+#: tools/forms/scheduler.py
+msgid "Search"
+msgstr ""
+
+#: tools/forms/scheduler.py
+msgid "Search by object name"
+msgstr ""
+
 #: tools/forms/settings.py
 msgid "--- Show all ----"
 msgstr ""
@@ -4067,17 +4358,6 @@ msgstr ""
 msgid "Members"
 msgstr ""
 
-#: tools/view_helpers.py
-msgid ""
-"Your task is scheduled and will soon be started in the background. Results "
-"will be added to the object list when they are in. It may take some time, a "
-"refresh of the page may be needed to show the results."
-msgstr ""
-
-#: tools/view_helpers.py rocky/scheduler.py
-msgid "Task not found."
-msgstr ""
-
 #: rocky/messaging.py
 msgid ""
 "You have trusted this member with a clearance level of L{}. This member "
@@ -4098,19 +4378,47 @@ msgid "That page contains no results"
 msgstr ""
 
 #: rocky/scheduler.py
-msgid "Connectivity issues with Mula."
+msgid ""
+"The Scheduler has an unexpected error. Check the Scheduler logs for further "
+"details."
 msgstr ""
 
 #: rocky/scheduler.py
-msgid "Task queue is full, please try again later."
+msgid "Could not connect to Scheduler. Service is possibly down."
 msgstr ""
 
 #: rocky/scheduler.py
-msgid "Task is invalid."
+msgid "Your request could not be validated."
 msgstr ""
 
 #: rocky/scheduler.py
-msgid "Task already queued."
+msgid "Task could not be found."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid ""
+"Scheduler is receiving too many requests. Increase SCHEDULER_PQ_MAXSIZE or "
+"wait for task to finish."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "Bad request. Your request could not be interpreted by the Scheduler."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "The Scheduler has received a conflict. Your task is already in queue."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "A HTTPError occurred. See Scheduler logs for more info."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "Task list: "
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "Task statistics: "
 msgstr ""
 
 #: rocky/settings.py
@@ -4279,6 +4587,14 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: rocky/templates/admin/change_list.html
+msgid "Hide counts"
+msgstr ""
+
+#: rocky/templates/admin/change_list.html
+msgid "Show counts"
+msgstr ""
+
+#: rocky/templates/admin/change_list.html
 msgid "Clear all filters"
 msgstr ""
 
@@ -4363,6 +4679,12 @@ msgid " Finding Details"
 msgstr ""
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Finding details"
+msgstr ""
+
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/organizations/organization_list.html
 msgid "There were no organizations found for your user account"
 msgstr ""
@@ -4403,7 +4725,7 @@ msgid "Welcome"
 msgstr ""
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-msgid "User overview:"
+msgid "User overview"
 msgstr ""
 
 #: rocky/templates/dashboard_redteam.html
@@ -4413,6 +4735,7 @@ msgid "warning"
 msgstr ""
 
 #: rocky/templates/dashboard_redteam.html
+#: rocky/templates/oois/ooi_detail_origins_observations.html
 #: rocky/templates/partials/notifications_block.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Warning:"
@@ -4469,6 +4792,11 @@ msgid "findings"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "Findings table"
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
@@ -4489,8 +4817,8 @@ msgid "Show details for %(finding)s"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "Finding type:"
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+msgid "Finding type"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -4500,8 +4828,7 @@ msgid "Show details for %(finding_type)s"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "OOI type:"
+msgid "OOI type"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -4511,8 +4838,7 @@ msgid "Show %(ooi_type)s objects"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "Source OOI:"
+msgid "Source OOI"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -4521,7 +4847,7 @@ msgid "Show details for %(ooi)s"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-msgid "Risk score:"
+msgid "Risk score"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -4582,15 +4908,18 @@ msgstr ""
 msgid "Crisis room"
 msgstr ""
 
-#: rocky/templates/header.html rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
+#: rocky/templates/header.html rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
 #: rocky/views/task_detail.py rocky/views/tasks.py
 msgid "Tasks"
 msgstr ""
 
 #: rocky/templates/health.html
 msgid "Health Checks"
+msgstr ""
+
+#: rocky/templates/health.html
+msgid "Health checks"
 msgstr ""
 
 #: rocky/templates/health.html
@@ -4739,6 +5068,10 @@ msgid "Here you can delete the %(display_type)s."
 msgstr ""
 
 #: rocky/templates/oois/ooi_delete.html
+msgid "To be deleted object(s)"
+msgstr ""
+
+#: rocky/templates/oois/ooi_delete.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 msgid "Key"
 msgstr ""
@@ -4757,11 +5090,14 @@ msgstr ""
 msgid "using boefjes"
 msgstr ""
 
+#: rocky/templates/oois/ooi_detail.html rocky/templates/scan.html
+msgid "Boefjes overview"
+msgstr ""
+
 #: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_origins_observations.html
-#: rocky/templates/scan.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
+#: rocky/templates/scan.html rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/normalizers.html
 msgid "Boefje"
 msgstr ""
 
@@ -4834,11 +5170,6 @@ msgstr ""
 msgid "Score"
 msgstr ""
 
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Finding details"
-msgstr ""
-
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 msgid "Overview of the number of findings and their severity found on"
 msgstr ""
@@ -4875,11 +5206,27 @@ msgid "Parameters"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
-msgid "Observed by"
+msgid "Last observed by"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 msgid "Task ID"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html
+msgid "When"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html
+msgid "The boefje has since been deleted or disabled."
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html
+msgid "No Raw file could be found, this might point to an error in OpenKAT"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html
+msgid "Warning"
 msgstr ""
 
 #: rocky/templates/oois/ooi_edit.html
@@ -5053,6 +5400,18 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid "Top 10 most severe Findings"
+msgstr ""
+
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "Finding type:"
+msgstr ""
+
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "OOI type:"
+msgstr ""
+
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "Source OOI:"
 msgstr ""
 
 #: rocky/templates/organizations/organization_edit.html
@@ -5272,7 +5631,7 @@ msgid "graph"
 msgstr ""
 
 #: rocky/templates/partials/explanations.html
-msgid "Clearance level inheritance:"
+msgid "Clearance level inheritance"
 msgstr ""
 
 #: rocky/templates/partials/explanations.html
@@ -5491,10 +5850,6 @@ msgid "Findings for %(type)s %(name)s on %(observed_at)s:"
 msgstr ""
 
 #: rocky/templates/partials/ooi_report_findings_block_table.html
-msgid "Finding type"
-msgstr ""
-
-#: rocky/templates/partials/ooi_report_findings_block_table.html
 msgid "Open finding details"
 msgstr ""
 
@@ -5598,91 +5953,12 @@ msgstr ""
 msgid "Go to content"
 msgstr ""
 
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Hide filters"
-msgstr ""
-
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Show filters"
-msgstr ""
-
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "From"
-msgstr ""
-
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "To"
-msgstr ""
-
-#: rocky/templates/partials/task_history.html
-msgid "Select status"
-msgstr ""
-
-#: rocky/templates/partials/task_history.html
-msgid "Success"
-msgstr ""
-
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/stats.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Failed"
-msgstr ""
-
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Search"
-msgstr ""
-
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Search by object name"
-msgstr ""
-
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "No tasks found for this object."
-msgstr ""
-
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Created date"
-msgstr ""
-
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Yielded objects"
-msgstr ""
-
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/boefje_task_detail.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Download meta and raw data"
-msgstr ""
-
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Reschedule"
-msgstr ""
-
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Download task data"
-msgstr ""
-
-#: rocky/templates/scan.html
-msgid "Boefjes overview:"
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Current clearance level"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
-msgid "Clearance level:"
+msgid "Inactive"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
@@ -5728,10 +6004,6 @@ msgid ""
 "            "
 msgstr ""
 
-#: rocky/templates/scan_profiles/scan_profile_detail.html
-msgid "Set clearance level:"
-msgstr ""
-
 #: rocky/templates/scan_profiles/scan_profile_reset.html
 msgid "Set clearance level for:"
 msgstr ""
@@ -5754,6 +6026,11 @@ msgid ""
 msgstr ""
 
 #: rocky/templates/tasks/boefje_task_detail.html
+#: rocky/templates/tasks/partials/task_actions.html
+msgid "Download meta and raw data"
+msgstr ""
+
+#: rocky/templates/tasks/boefje_task_detail.html
 msgid "Download meta data"
 msgstr ""
 
@@ -5769,6 +6046,12 @@ msgstr ""
 msgid "List of tasks for boefjes"
 msgstr ""
 
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "Created date"
+msgstr ""
+
 #: rocky/templates/tasks/normalizers.html
 msgid "There are no tasks for normalizers"
 msgstr ""
@@ -5777,24 +6060,26 @@ msgstr ""
 msgid "List of tasks for normalizers"
 msgstr ""
 
-#: rocky/templates/tasks/partials/boefje_task_history.html
-msgid "No scans found for this object."
-msgstr ""
-
-#: rocky/templates/tasks/partials/boefje_task_history.html
-msgid "Input Object"
-msgstr ""
-
-#: rocky/templates/tasks/partials/normalizer_task_history.html
+#: rocky/templates/tasks/normalizers.html
 msgid "Normalizer"
 msgstr ""
 
-#: rocky/templates/tasks/partials/normalizer_task_history.html
+#: rocky/templates/tasks/normalizers.html
 msgid "Boefje input OOI"
 msgstr ""
 
+#: rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "There are no tasks for"
+msgstr ""
+
+#: rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "List of tasks for"
+msgstr ""
+
 #: rocky/templates/tasks/partials/stats.html
-msgid "Stats - Last 24 hours"
+msgid "Task statistics - Last 24 hours"
 msgstr ""
 
 #: rocky/templates/tasks/partials/stats.html
@@ -5806,34 +6091,6 @@ msgid "Timeslot"
 msgstr ""
 
 #: rocky/templates/tasks/partials/stats.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Pending"
-msgstr ""
-
-#: rocky/templates/tasks/partials/stats.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Queued"
-msgstr ""
-
-#: rocky/templates/tasks/partials/stats.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Dispatched"
-msgstr ""
-
-#: rocky/templates/tasks/partials/stats.html
-msgid "Running"
-msgstr ""
-
-#: rocky/templates/tasks/partials/stats.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Completed"
-msgstr ""
-
-#: rocky/templates/tasks/partials/stats.html
-msgid "Cancelled"
-msgstr ""
-
-#: rocky/templates/tasks/partials/stats.html
 msgid "Could not load stats, Scheduler error."
 msgstr ""
 
@@ -5841,8 +6098,24 @@ msgstr ""
 msgid "List of tasks"
 msgstr ""
 
+#: rocky/templates/tasks/partials/task_actions.html
+msgid "Yielded objects"
+msgstr ""
+
+#: rocky/templates/tasks/partials/task_actions.html
+msgid "Reschedule"
+msgstr ""
+
+#: rocky/templates/tasks/partials/task_actions.html
+msgid "Download task data"
+msgstr ""
+
 #: rocky/templates/tasks/partials/task_filter.html
-msgid "all"
+msgid "Hide filters"
+msgstr ""
+
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Show filters"
 msgstr ""
 
 #: rocky/templates/two_factor/_wizard_actions.html
@@ -6125,6 +6398,10 @@ msgstr ""
 msgid "Only Question OOIs can be answered."
 msgstr ""
 
+#: rocky/views/ooi_detail.py
+msgid "Question has been answered."
+msgstr ""
+
 #: rocky/views/ooi_detail_related_object.py
 msgid " (as "
 msgstr ""
@@ -6364,6 +6641,10 @@ msgstr ""
 msgid "Recalculated {number_of_bits} bits. Duration: {duration}"
 msgstr ""
 
+#: rocky/views/page_actions.py
+msgid "Could not process your request, action required."
+msgstr ""
+
 #: rocky/views/scan_profile.py
 #, python-brace-format
 msgid "Can not reset scan level. Scan level of {ooi_name} not declared"
@@ -6373,8 +6654,11 @@ msgstr ""
 msgid "Reset"
 msgstr ""
 
-#: rocky/views/tasks.py
-msgid "Fetching tasks failed: no connection with scheduler"
+#: rocky/views/scheduler.py
+msgid ""
+"Your task is scheduled and will soon be started in the background. Results "
+"will be added to the object list when they are in. It may take some time, a "
+"refresh of the page may be needed to show the results."
 msgstr ""
 
 #: rocky/views/upload_csv.py

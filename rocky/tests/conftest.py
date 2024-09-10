@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch
 from uuid import UUID
 
 import pytest
+import structlog
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission
 from django.contrib.messages.middleware import MessageMiddleware
@@ -17,7 +18,8 @@ from django.utils.translation import activate, deactivate
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from httpx import Response
-from katalogus.client import parse_plugin
+from katalogus.client import Boefje, parse_plugin
+from tools.enums import SCAN_LEVEL
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 
 from octopoes.config.settings import (
@@ -30,6 +32,7 @@ from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel, Scan
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
+from octopoes.models.ooi.reports import Report
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
@@ -38,12 +41,24 @@ from octopoes.models.pagination import Paginated
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
-from rocky.scheduler import Task
+from rocky.health import ServiceHealth
+from rocky.scheduler import PaginatedTasksResponse, Task
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
 
 # Quiet faker locale messages down in tests.
 logging.getLogger("faker").setLevel(logging.INFO)
+
+
+# Copied from https://www.structlog.org/en/stable/testing.html
+@pytest.fixture
+def log_output():
+    return structlog.testing.LogCapture()
+
+
+@pytest.fixture(autouse=True)
+def fixture_configure_structlog(log_output):
+    structlog.configure(processors=[log_output])
 
 
 @pytest.fixture
@@ -158,14 +173,24 @@ def organization_b():
 @pytest.fixture
 def superuser(django_user_model):
     return create_user(
-        django_user_model, "superuser@openkat.nl", "SuperSuper123!!", "Superuser name", "default", superuser=True
+        django_user_model,
+        "superuser@openkat.nl",
+        "SuperSuper123!!",
+        "Superuser name",
+        "default",
+        superuser=True,
     )
 
 
 @pytest.fixture
 def superuser_b(django_user_model):
     return create_user(
-        django_user_model, "superuserB@openkat.nl", "SuperBSuperB123!!", "Superuser B name", "default_b", superuser=True
+        django_user_model,
+        "superuserB@openkat.nl",
+        "SuperBSuperB123!!",
+        "Superuser B name",
+        "default_b",
+        superuser=True,
     )
 
 
@@ -181,12 +206,24 @@ def superuser_member_b(superuser_b, organization_b):
 
 @pytest.fixture
 def adminuser(django_user_model):
-    return create_user(django_user_model, "admin@openkat.nl", "AdminAdmin123!!", "Admin name", "default_admin")
+    return create_user(
+        django_user_model,
+        "admin@openkat.nl",
+        "AdminAdmin123!!",
+        "Admin name",
+        "default_admin",
+    )
 
 
 @pytest.fixture
 def adminuser_b(django_user_model):
-    return create_user(django_user_model, "adminB@openkat.nl", "AdminBAdminB123!!", "Admin B name", "default_admin_b")
+    return create_user(
+        django_user_model,
+        "adminB@openkat.nl",
+        "AdminBAdminB123!!",
+        "Admin B name",
+        "default_admin_b",
+    )
 
 
 @pytest.fixture
@@ -208,14 +245,22 @@ def admin_member_b(adminuser_b, organization_b):
 @pytest.fixture
 def redteamuser(django_user_model):
     return create_user(
-        django_user_model, "redteamer@openkat.nl", "RedteamRedteam123!!", "Redteam name", "default_redteam"
+        django_user_model,
+        "redteamer@openkat.nl",
+        "RedteamRedteam123!!",
+        "Redteam name",
+        "default_redteam",
     )
 
 
 @pytest.fixture
 def redteamuser_b(django_user_model):
     return create_user(
-        django_user_model, "redteamerB@openkat.nl", "RedteamBRedteamB123!!", "Redteam B name", "default_redteam_b"
+        django_user_model,
+        "redteamerB@openkat.nl",
+        "RedteamBRedteamB123!!",
+        "Redteam B name",
+        "default_redteam_b",
     )
 
 
@@ -235,13 +280,23 @@ def redteam_member_b(redteamuser_b, organization_b):
 
 @pytest.fixture
 def clientuser(django_user_model):
-    return create_user(django_user_model, "client@openkat.nl", "ClientClient123!!", "Client name", "default_client")
+    return create_user(
+        django_user_model,
+        "client@openkat.nl",
+        "ClientClient123!!",
+        "Client name",
+        "default_client",
+    )
 
 
 @pytest.fixture
 def clientuser_b(django_user_model):
     return create_user(
-        django_user_model, "clientB@openkat.nl", "ClientBClientB123!!", "Client B name", "default_client_b"
+        django_user_model,
+        "clientB@openkat.nl",
+        "ClientBClientB123!!",
+        "Client B name",
+        "default_client_b",
     )
 
 
@@ -270,7 +325,13 @@ def client_user_two_organizations(clientuser, organization, organization_b):
 
 @pytest.fixture
 def new_member(django_user_model, organization):
-    user = create_user(django_user_model, "cl1@openkat.nl", "TestTest123!!", "New user", "default_new_user")
+    user = create_user(
+        django_user_model,
+        "cl1@openkat.nl",
+        "TestTest123!!",
+        "New user",
+        "default_new_user",
+    )
     member = create_member(user, organization)
     member.status = OrganizationMember.STATUSES.NEW
     member.save()
@@ -279,7 +340,13 @@ def new_member(django_user_model, organization):
 
 @pytest.fixture
 def active_member(django_user_model, organization):
-    user = create_user(django_user_model, "cl2@openkat.nl", "TestTest123!!", "Active user", "default_active_user")
+    user = create_user(
+        django_user_model,
+        "cl2@openkat.nl",
+        "TestTest123!!",
+        "Active user",
+        "default_active_user",
+    )
     member = create_member(user, organization)
     member.status = OrganizationMember.STATUSES.ACTIVE
     member.save()
@@ -288,7 +355,13 @@ def active_member(django_user_model, organization):
 
 @pytest.fixture
 def blocked_member(django_user_model, organization):
-    user = create_user(django_user_model, "cl3@openkat.nl", "TestTest123!!", "Blocked user", "default_blocked_user")
+    user = create_user(
+        django_user_model,
+        "cl3@openkat.nl",
+        "TestTest123!!",
+        "Blocked user",
+        "default_blocked_user",
+    )
     member = create_member(user, organization)
     member.status = OrganizationMember.STATUSES.ACTIVE
     member.blocked = True
@@ -341,39 +414,36 @@ def task() -> Task:
             "id": "1b20f85f-63d5-4baa-be9e-f3f19d6e3fae",
             "hash": "19ed51514b37d42f79c5e95469956b05",
             "scheduler_id": "boefje-test",
+            "schedule_id": None,
             "type": "boefje",
-            "p_item": {
-                "id": "1b20f85f-63d5-4baa-be9e-f3f19d6e3fae",
-                "hash": "19ed51514b37d42f79c5e95469956b05",
-                "priority": 1,
-                "data": {
-                    "id": "1b20f85f63d54baabe9ef3f19d6e3fae",
-                    "boefje": {
-                        "id": "test-boefje",
-                        "name": "TestBoefje",
-                        "description": "Fetch the DNS record(s) of a hostname",
-                        "version": None,
-                        "scan_level": 1,
-                        "consumes": ["Hostname"],
-                        "produces": [
-                            "DNSNSRecord",
-                            "DNSARecord",
-                            "DNSCNAMERecord",
-                            "DNSMXRecord",
-                            "DNSZone",
-                            "Hostname",
-                            "DNSAAAARecord",
-                            "IPAddressV4",
-                            "DNSSOARecord",
-                            "DNSTXTRecord",
-                            "IPAddressV6",
-                            "Network",
-                            "NXDOMAIN",
-                        ],
-                    },
-                    "input_ooi": "Hostname|internet|mispo.es",
-                    "organization": "test",
+            "priority": 1,
+            "data": {
+                "id": "1b20f85f63d54baabe9ef3f19d6e3fae",
+                "boefje": {
+                    "id": "test-boefje",
+                    "name": "TestBoefje",
+                    "description": "Fetch the DNS record(s) of a hostname",
+                    "version": None,
+                    "scan_level": 1,
+                    "consumes": ["Hostname"],
+                    "produces": [
+                        "DNSNSRecord",
+                        "DNSARecord",
+                        "DNSCNAMERecord",
+                        "DNSMXRecord",
+                        "DNSZone",
+                        "Hostname",
+                        "DNSAAAARecord",
+                        "IPAddressV4",
+                        "DNSSOARecord",
+                        "DNSTXTRecord",
+                        "IPAddressV6",
+                        "Network",
+                        "NXDOMAIN",
+                    ],
                 },
+                "input_ooi": "Hostname|internet|mispo.es",
+                "organization": "test",
             },
             "status": "completed",
             "created_at": "2022-08-09 11:53:41.378292",
@@ -445,8 +515,11 @@ def network() -> Network:
 def url(network) -> URL:
     return URL(
         scan_profile=DeclaredScanProfile(
-            scan_profile_type="declared", reference=Reference("URL|testnetwork|http://example.com/"), level=ScanLevel.L1
+            scan_profile_type="declared",
+            reference=Reference("URL|testnetwork|http://example.com/"),
+            level=ScanLevel.L1,
         ),
+        user_id=None,
         primary_key="URL|testnetwork|http://example.com/",
         network=network.reference,
         raw="http://example.com",
@@ -641,8 +714,8 @@ def no_rpki_finding_type() -> KATFindingType:
 
 
 @pytest.fixture
-def expired_rpki_finding_type() -> KATFindingType:
-    return KATFindingType(id="KAT-EXPIRED-RPKI")
+def invalid_rpki_finding_type() -> KATFindingType:
+    return KATFindingType(id="KAT-INVALID-RPKI")
 
 
 @pytest.fixture
@@ -1080,6 +1153,238 @@ def plugin_schema_no_required():
     }
 
 
+parent_report = [
+    Report(
+        object_type="Report",
+        scan_profile=None,
+        user_id=None,
+        primary_key="Report|e821aaeb-a6bd-427f-b064-e46837911a5d",
+        name="Test Parent Report",
+        report_type="concatenated-report",
+        template="report.html",
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_oois=[],
+        report_id=UUID("e821aaeb-a6bd-427f-b064-e46837911a5d"),
+        organization_code="test_organization",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="a5ccf97b-d4e9-442d-85bf-84e739b6d3ed",
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        parent_report=None,
+        has_parent=False,
+    ),
+]
+
+subreports = [
+    Report(
+        object_type="Report",
+        scan_profile=None,
+        user_id=None,
+        primary_key="Report|1730b72f-b115-412e-ad44-dae6ab3edff9",
+        name="RPKI Report",
+        report_type="rpki-report",
+        template="rpki_report/report.html",
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_oois=[Reference("Hostname|internet|example.com")],
+        report_id=UUID("1730b72f-b115-412e-ad44-dae6ab3edff9"),
+        organization_code="test_organization",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="acbd2250-85f4-471a-ab70-ba1750280194",
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+        has_parent=True,
+    ),
+    Report(
+        object_type="Report",
+        scan_profile=None,
+        user_id=None,
+        primary_key="Report|463c7f72-fef9-42ef-baf9-f10fcfb91abe",
+        name="Safe Connections Report",
+        report_type="safe-connections-report",
+        template="safe_connections_report/report.html",
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_oois=[Reference("Hostname|internet|example.com")],
+        report_id=UUID("463c7f72-fef9-42ef-baf9-f10fcfb91abe"),
+        organization_code="test_organization",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="ba2d86b8-aca8-4009-adc0-e3d59ea34904",
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+        has_parent=True,
+    ),
+    Report(
+        object_type="Report",
+        scan_profile=None,
+        user_id=None,
+        primary_key="Report|47a28977-04c6-43b6-9705-3c5f0c955833",
+        name="System Report",
+        report_type="systems-report",
+        template="systems_report/report.html",
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_oois=[Reference("Hostname|internet|example.com")],
+        report_id=UUID("47a28977-04c6-43b6-9705-3c5f0c955833"),
+        organization_code="test_organization",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="3d2ea955-13c1-46f6-81f3-edfe72d8af0b",
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+        has_parent=True,
+    ),
+    Report(
+        object_type="Report",
+        scan_profile=None,
+        user_id=None,
+        primary_key="Report|57c8f1b9-da3e-48ca-acb1-554e6966b4aa",
+        name="Mail Report",
+        report_type="mail-report",
+        template="mail_report/report.html",
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_oois=[Reference("Hostname|internet|example.com")],
+        report_id=UUID("57c8f1b9-da3e-48ca-acb1-554e6966b4aa"),
+        organization_code="test_organization",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="fe4d0f5d-5447-47d3-952d-74544c8a9d8d",
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+        has_parent=True,
+    ),
+    Report(
+        object_type="Report",
+        scan_profile=None,
+        user_id=None,
+        primary_key="Report|8075a64c-1acb-44b8-8376-b68d4ee972e5",
+        name="IPv6 Report",
+        report_type="ipv6-report",
+        template="ipv6_report/report.html",
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_oois=[Reference("Hostname|internet|example.com")],
+        report_id=UUID("8075a64c-1acb-44b8-8376-b68d4ee972e5"),
+        organization_code="test_organization",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="3ca35c20-1139-4bf4-a11a-a0b83f3c48ff",
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+        has_parent=True,
+    ),
+    Report(
+        object_type="Report",
+        scan_profile=None,
+        user_id=None,
+        primary_key="Report|8f3c6b75-b237-4c9a-8d9b-7745f3708d4a",
+        name="Web System Report",
+        report_type="web-system-report",
+        template="web_system_report/report.html",
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_oois=[Reference("Hostname|internet|example.com")],
+        report_id=UUID("8f3c6b75-b237-4c9a-8d9b-7745f3708d4a"),
+        organization_code="test_organization",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="1e419bee-672f-4561-b3b9-f47bd6ce60b7",
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+        has_parent=True,
+    ),
+    Report(
+        object_type="Report",
+        scan_profile=None,
+        user_id=None,
+        primary_key="Report|8f3c6b75-b237-4c9a-8d9b-7745f3708d4a",
+        name="Web System Report",
+        report_type="web-system-report",
+        template="web_system_report/report.html",
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_oois=[Reference("Hostname|internet|example2.com")],
+        report_id=UUID("8f3c6b75-b237-4c9a-8d9b-7745f3708d4a"),
+        organization_code="test_organization",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="1e419bee-672f-4561-b3b9-f47bd6ce60b7",
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+        has_parent=True,
+    ),
+]
+
+dns_report = [
+    Report(
+        object_type="Report",
+        scan_profile=None,
+        primary_key="Report|e821aaeb-a6bd-427f-b064-e46837913b4d",
+        name="DNS Report",
+        report_type="dns-report",
+        template="dns_report/report.html",
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_oois=[],
+        report_id=UUID("e821aaeb-a6bd-427f-b064-e46837911a5d"),
+        organization_code="test_organization",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="a5ccf97b-d4e9-442d-85bf-84e739b63da9s",
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        parent_report=None,
+        has_parent=False,
+    ),
+]
+
+
+@pytest.fixture
+def report_list_one_subreport():
+    return [
+        (
+            subreports[0],
+            [],
+        )
+    ]
+
+
+@pytest.fixture
+def report_list_two_subreports():
+    return [
+        (
+            parent_report[0],
+            [
+                subreports[5],
+                subreports[6],
+            ],
+        )
+    ]
+
+
+@pytest.fixture
+def report_list_six_subreports():
+    return [
+        (
+            parent_report[0],
+            [
+                subreports[0],
+                subreports[1],
+                subreports[2],
+                subreports[3],
+                subreports[4],
+                subreports[5],
+            ],
+        )
+    ]
+
+
+@pytest.fixture
+def get_subreports() -> list[tuple[str, Report]]:
+    return [
+        (parent_report[0].primary_key, subreports[0]),
+        (parent_report[0].primary_key, subreports[1]),
+        (parent_report[0].primary_key, subreports[2]),
+        (parent_report[0].primary_key, subreports[3]),
+        (parent_report[0].primary_key, subreports[4]),
+        (parent_report[0].primary_key, subreports[5]),
+    ]
+
+
 def setup_request(request, user):
     request = SessionMiddleware(lambda r: r)(request)
     request.session[DEVICE_ID_SESSION_KEY] = user.staticdevice_set.get().persistent_id
@@ -1093,7 +1398,7 @@ def setup_request(request, user):
 
 @pytest.fixture
 def mock_scheduler(mocker):
-    return mocker.patch("rocky.views.ooi_detail.scheduler.client")
+    return mocker.patch("rocky.views.scheduler.scheduler_client")()
 
 
 def get_stub_path(file_name: str) -> Path:
@@ -1118,8 +1423,8 @@ def mock_mixins_katalogus(mocker):
 
 
 @pytest.fixture
-def mock_scheduler_client_task_list(mocker):
-    mock_scheduler_client_session = mocker.patch("rocky.scheduler.client._client")
+def mock_scheduler_client_task_list(mock_scheduler):
+    mock_scheduler_session = mock_scheduler._client
     response = Response(
         200,
         content=(
@@ -1131,22 +1436,17 @@ def mock_scheduler_client_task_list(mocker):
                     "results": [
                         {
                             "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
+                            "hash": "416aa907e0b2a16c1b324f7d3261c5a4",
                             "scheduler_id": "boefje-test",
+                            "schedule_id": None,
                             "type": "boefje",
-                            "p_item": {
-                                "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
-                                "scheduler_id": "boefje-test",
-                                "hash": "416aa907e0b2a16c1b324f7d3261c5a4",
-                                "priority": 631,
-                                "data": {
-                                    "id": "2e757dd366c746b899877cd18252cc6d",
-                                    "boefje": {"id": "test-plugin", "version": None},
-                                    "input_ooi": "Hostname|internet|example.com",
-                                    "organization": "test",
-                                    "dispatches": [],
-                                },
-                                "created_at": "2023-05-09T09:37:20.899668+00:00",
-                                "modified_at": "2023-05-09T09:37:20.899675+00:00",
+                            "priority": 631,
+                            "data": {
+                                "id": "2e757dd366c746b899877cd18252cc6d",
+                                "boefje": {"id": "test-plugin", "version": None},
+                                "input_ooi": "Hostname|internet|example.com",
+                                "organization": "test",
+                                "dispatches": [],
                             },
                             "status": "completed",
                             "created_at": "2023-05-09T09:37:20.909069+00:00",
@@ -1158,9 +1458,9 @@ def mock_scheduler_client_task_list(mocker):
         ),
     )
 
-    mock_scheduler_client_session.get.return_value = response
+    mock_scheduler_session.get.return_value = response
 
-    return mock_scheduler_client_session
+    return mock_scheduler_session
 
 
 class MockOctopoesAPIConnector:
@@ -1175,7 +1475,11 @@ class MockOctopoesAPIConnector:
         return self.oois[reference]
 
     def get_tree(
-        self, reference: Reference, valid_time: datetime, types: set = frozenset(), depth: int = 1
+        self,
+        reference: Reference,
+        valid_time: datetime,
+        types: set = frozenset(),
+        depth: int = 1,
     ) -> ReferenceTree:
         return self.tree[reference]
 
@@ -1251,3 +1555,262 @@ def listed_hostnames(network) -> list[Hostname]:
         Hostname(network=network.reference, name="e.example.com"),
         Hostname(network=network.reference, name="f.example.com"),
     ]
+
+
+@pytest.fixture
+def paginated_task_list(task):
+    return PaginatedTasksResponse(
+        count=1,
+        next="",
+        previous=None,
+        results=[task],
+    )
+
+
+@pytest.fixture
+def reports_more_input_oois():
+    return [
+        (
+            Report(
+                object_type="Report",
+                scan_profile=None,
+                primary_key="Report|e821aaeb-a6bd-427f-b064-e46837911a5d",
+                name="Test Parent Report",
+                report_type="concatenated-report",
+                template="report.html",
+                date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                input_oois=[],
+                report_id=UUID("e821aaeb-a6bd-427f-b064-e46837911a5d"),
+                organization_code="test_organization",
+                organization_name="Test Organization",
+                organization_tags=[],
+                data_raw_id="a5ccf97b-d4e9-442d-85bf-84e739b6d3ed",
+                observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                parent_report=None,
+                has_parent=False,
+            ),
+            [
+                Report(
+                    object_type="Report",
+                    scan_profile=None,
+                    primary_key="Report|1730b72f-b115-412e-ad44-dae6ab3edff7",
+                    name="RPKI Report",
+                    report_type="rpki-report",
+                    template="rpki_report/report.html",
+                    date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                    input_oois=[
+                        Reference("Hostname|internet|example1.com"),
+                        Reference("Hostname|internet|example2.com"),
+                    ],
+                    report_id=UUID("1730b72f-b115-412e-ad44-dae6ab3edff7"),
+                    organization_code="test_organization",
+                    organization_name="Test Organization",
+                    organization_tags=[],
+                    data_raw_id="acbd2250-85f4-471a-ab70-ba1750280192",
+                    observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                    parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+                    has_parent=True,
+                ),
+                Report(
+                    object_type="Report",
+                    scan_profile=None,
+                    primary_key="Report|1730b72f-b115-412e-ad44-dae6ab3edff9",
+                    name="RPKI Report",
+                    report_type="rpki-report",
+                    template="rpki_report/report.html",
+                    date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                    input_oois=[
+                        Reference("Hostname|internet|example3.com"),
+                        Reference("Hostname|internet|example4.com"),
+                    ],
+                    report_id=UUID("1730b72f-b115-412e-ad44-dae6ab3edff9"),
+                    organization_code="test_organization",
+                    organization_name="Test Organization",
+                    organization_tags=[],
+                    data_raw_id="acbd2250-85f4-471a-ab70-ba1750280194",
+                    observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                    parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+                    has_parent=True,
+                ),
+                Report(
+                    object_type="Report",
+                    scan_profile=None,
+                    primary_key="Report|463c7f72-fef9-42ef-baf9-f10fcfb91abf",
+                    name="Safe Connections Report",
+                    report_type="safe-connections-report",
+                    template="safe_connections_report/report.html",
+                    date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                    input_oois=[
+                        Reference("Hostname|internet|example5.com"),
+                        Reference("Hostname|internet|example6.com"),
+                    ],
+                    report_id=UUID("463c7f72-fef9-42ef-baf9-f10fcfb91abf"),
+                    organization_code="test_organization",
+                    organization_name="Test Organization",
+                    organization_tags=[],
+                    data_raw_id="ba2d86b8-aca8-4009-adc0-e3d59ea34906",
+                    observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                    parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+                    has_parent=True,
+                ),
+                Report(
+                    object_type="Report",
+                    scan_profile=None,
+                    primary_key="Report|463c7f72-fef9-42ef-baf9-f10fcfb91abe",
+                    name="Safe Connections Report",
+                    report_type="safe-connections-report",
+                    template="safe_connections_report/report.html",
+                    date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                    input_oois=[
+                        Reference("Hostname|internet|example7.com"),
+                        Reference("Hostname|internet|example8.com"),
+                    ],
+                    report_id=UUID("463c7f72-fef9-42ef-baf9-f10fcfb91abe"),
+                    organization_code="test_organization",
+                    organization_name="Test Organization",
+                    organization_tags=[],
+                    data_raw_id="ba2d86b8-aca8-4009-adc0-e3d59ea34904",
+                    observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                    parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+                    has_parent=True,
+                ),
+            ],
+        )
+    ]
+
+
+def onboarding_collect_data():
+    return {
+        "Hostname|internet|mispo.es": {
+            "input_ooi": "Hostname|internet|mispo.es",
+            "records": [
+                {
+                    "type": "A",
+                    "ttl": 480,
+                    "name": "mispo.es",
+                    "content": "134.209.85.72",
+                },
+                {
+                    "type": "MX",
+                    "ttl": 480,
+                    "name": "mispo.es",
+                    "content": "10 mx.wijmailenveilig.nl.",
+                },
+                {
+                    "type": "NS",
+                    "ttl": 480,
+                    "name": "mispo.es",
+                    "content": "ns1.domaindiscount24.net.",
+                },
+                {
+                    "type": "NS",
+                    "ttl": 480,
+                    "name": "mispo.es",
+                    "content": "ns2.domaindiscount24.net.",
+                },
+                {
+                    "type": "NS",
+                    "ttl": 480,
+                    "name": "mispo.es",
+                    "content": "ns3.domaindiscount24.net.",
+                },
+                {
+                    "type": "SOA",
+                    "ttl": 480,
+                    "name": "mispo.es",
+                    "content": "ns1.domaindiscount24.net. tech.key-systems.net. 2023012324 10800 3600 604800 3600",
+                },
+            ],
+            "security": {"spf": False, "dkim": False, "dmarc": False, "dnssec": False, "caa": False},
+            "finding_types": [],
+        }
+    }
+
+
+@pytest.fixture
+def rocky_health():
+    ServiceHealth(
+        service="rocky",
+        healthy=True,
+        version="0.0.1.dev1",
+        additional=None,
+        results=[
+            ServiceHealth(
+                service="octopoes",
+                healthy=True,
+                version="0.0.1.dev1",
+                additional=None,
+                results=[
+                    ServiceHealth(
+                        service="xtdb",
+                        healthy=True,
+                        version="1.24.1",
+                        additional={
+                            "version": "1.24.1",
+                            "revision": "1164f9a3c7e36edbc026867945765fd4366c1731",
+                            "indexVersion": 22,
+                            "consumerState": None,
+                            "kvStore": "xtdb.rocksdb.RocksKv",
+                            "estimateNumKeys": 24552,
+                            "size": 24053091,
+                        },
+                        results=[],
+                    )
+                ],
+            ),
+            ServiceHealth(service="katalogus", healthy=True, version="0.0.1-development", additional=None, results=[]),
+            ServiceHealth(service="scheduler", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
+            ServiceHealth(service="bytes", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
+            ServiceHealth(service="keiko", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
+        ],
+    )
+
+
+@pytest.fixture
+def boefje_dns_records():
+    return Boefje(
+        id="dns-records",
+        name="DnsRecords",
+        version=None,
+        authors=None,
+        created=None,
+        description="Fetch the DNS record(s) of a hostname",
+        related=[],
+        enabled=True,
+        type="boefje",
+        scan_level=SCAN_LEVEL.L1,
+        consumes={Hostname},
+        options=None,
+        runnable_hash=None,
+        produces={"boefje/dns-records"},
+    )
+
+
+@pytest.fixture
+def boefje_nmap_tcp():
+    return Boefje(
+        id="nmap",
+        name="Nmap TCP",
+        version=None,
+        authors=None,
+        created=None,
+        description="Defaults to top 250 TCP ports. Includes service detection.",
+        environment_keys=None,
+        related=[],
+        enabled=True,
+        type="boefje",
+        scan_level=SCAN_LEVEL.L2,
+        consumes={IPAddressV4, IPAddressV6},
+        options=None,
+        runnable_hash=None,
+        produces={"boefje/nmap"},
+    )
+
+
+@pytest.fixture
+def drf_admin_client(create_drf_client, admin_user):
+    client = create_drf_client(admin_user)
+    # We need to set this so that the test client doesn't throw an
+    # exception, but will return error in the API we can test
+    client.raise_request_exception = False
+    return client

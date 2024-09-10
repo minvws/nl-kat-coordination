@@ -8,6 +8,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddress, IPAddressV4, Network
+from octopoes.models.ooi.reports import Report
 from octopoes.models.ooi.web import URL
 from octopoes.models.path import Path
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
@@ -15,7 +16,7 @@ from octopoes.repositories.origin_repository import XTDBOriginRepository
 from octopoes.xtdb.client import OperationType, XTDBHTTPClient, XTDBSession
 from octopoes.xtdb.exceptions import NodeNotFound
 from octopoes.xtdb.query import Aliased, Query
-from tests.conftest import seed_system
+from tests.conftest import seed_report, seed_system
 
 logger = logging.getLogger(__name__)
 
@@ -71,6 +72,7 @@ def test_query_simple_filter(xtdb_session: XTDBSession, valid_time: datetime):
                 "Network/primary_key": "Network|testnetwork",
                 "Network/name": "testnetwork",
                 "object_type": "Network",
+                "user_id": None,
                 "xt/id": "Network|testnetwork",
             }
         ]
@@ -100,6 +102,7 @@ def test_query_not_empty_on_reference_filter_for_hostname(xtdb_session: XTDBSess
                 "Network/primary_key": "Network|testnetwork",
                 "Network/name": "testnetwork",
                 "object_type": "Network",
+                "user_id": None,
                 "xt/id": "Network|testnetwork",
             }
         ]
@@ -113,6 +116,7 @@ def test_query_not_empty_on_reference_filter_for_hostname(xtdb_session: XTDBSess
                 "Network/primary_key": "Network|testnetwork",
                 "Network/name": "testnetwork",
                 "object_type": "Network",
+                "user_id": None,
                 "xt/id": "Network|testnetwork",
             }
         ]
@@ -137,6 +141,7 @@ def test_query_empty_on_reference_filter_for_wrong_hostname(xtdb_session: XTDBSe
                 "Network/primary_key": "Network|testnetwork",
                 "Network/name": "testnetwork",
                 "object_type": "Network",
+                "user_id": None,
                 "xt/id": "Network|testnetwork",
             }
         ]
@@ -388,6 +393,7 @@ def test_query_subclass_fields_and_returning_only_fields(
         [
             {
                 "object_type": "Network",
+                "user_id": None,
                 "Network/primary_key": "Network|test",
                 "Network/name": "test",
                 "xt/id": "Network|test",
@@ -412,6 +418,7 @@ def test_query_subclass_fields_and_returning_only_fields(
             {
                 "Hostname/primary_key": "Hostname|test|example.com",
                 "object_type": "Hostname",
+                "user_id": None,
                 "Hostname/network": "Network|test",
                 "Hostname/name": "example.com",
                 "xt/id": "Hostname|test|example.com",
@@ -442,3 +449,51 @@ def test_query_subclass_fields_and_returning_only_fields(
         "URL.web_url.netloc.name", valid_time, ["URL|test|https://test.com/security", "URL|test|https://test.com/test"]
     )
     assert result == [("URL|test|https://test.com/security", "example.com")]
+
+
+def test_order_reports_and_filter_on_parent(
+    octopoes_api_connector: OctopoesAPIConnector,
+    xtdb_ooi_repository: XTDBOOIRepository,
+    xtdb_origin_repository: XTDBOriginRepository,
+    xtdb_session: XTDBSession,
+    valid_time: datetime,
+):
+    seed_system(xtdb_ooi_repository, xtdb_origin_repository, valid_time)
+    seed_report("test", valid_time, xtdb_ooi_repository, xtdb_origin_repository)
+
+    assert xtdb_session.client.query(Query(Report).count(Report).where(Report, has_parent=False)) == [[1]]
+    assert xtdb_ooi_repository.list_reports(valid_time, 0, 2).count == 1
+
+    date = Aliased(Report, field="date_generated")
+    query = Query(Report).pull(Report).find(date).where(Report, has_parent=False, date_generated=date).order_by(date)
+
+    assert len(xtdb_session.client.query(query)) == 1
+    assert len(xtdb_session.client.query(Query(Report).where(Report, has_parent=True))) == 0
+
+
+def test_query_children_of_reports(
+    octopoes_api_connector: OctopoesAPIConnector,
+    xtdb_ooi_repository: XTDBOOIRepository,
+    xtdb_origin_repository: XTDBOriginRepository,
+    xtdb_session: XTDBSession,
+    valid_time: datetime,
+):
+    seed_system(xtdb_ooi_repository, xtdb_origin_repository, valid_time)
+    report = seed_report("test", valid_time, xtdb_ooi_repository, xtdb_origin_repository)
+    report2 = seed_report("test2", valid_time, xtdb_ooi_repository, xtdb_origin_repository)
+    child = seed_report("child", valid_time, xtdb_ooi_repository, xtdb_origin_repository, parent_report=report)
+
+    assert xtdb_ooi_repository.list_reports(valid_time, 0, 2).count == 2  # We filter on has_parent = False
+    assert len(xtdb_session.client.query(Query(Report))) == 3
+    assert len(xtdb_session.client.query(Query(Report).where(Report, has_parent=True))) == 1
+
+    # See https://v1-docs.xtdb.com/language-reference/1.24.3/datalog-queries/#pull for documentation about prepending
+    # a "_" to query in the reverse direction in a pull statement.
+    query = Query(Report).pull(Report, fields="[* {:Report/_parent_report [*]}]").where(Report, has_parent=False)
+
+    results = xtdb_session.client.query(query)
+    assert len(results) == 2
+    assert [xtdb_ooi_repository.serialize(report2)] in results
+    assert [
+        xtdb_ooi_repository.serialize(report) | {"Report/_parent_report": [xtdb_ooi_repository.serialize(child)]}
+    ] in results

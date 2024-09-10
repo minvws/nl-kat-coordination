@@ -5,9 +5,10 @@ services:
       dockerfile: boefjes/Dockerfile
       args:
         - ENVIRONMENT=dev
-    command: sh -c 'python -m pytest -v boefjes/katalogus/tests/integration'
+    command: sh -c 'python -m pytest -v tests/integration'
     depends_on:
       - ci_katalogus-db
+      - ci_katalogus
     env_file:
       - .ci/.env.test
     volumes:
@@ -17,3 +18,101 @@ services:
     image: docker.io/library/postgres:15
     env_file:
       - .ci/.env.test
+
+  migration_bench:
+    build:
+      context: ..
+      dockerfile: boefjes/Dockerfile
+      args:
+        - ENVIRONMENT=dev
+    command: bash -c "python -m cProfile -o .ci/bench_$(date +%Y_%m_%d-%H:%M:%S).pstat -m pytest -v -m slow tests/integration"
+    depends_on:
+      - ci_bytes
+      - ci_octopoes
+      - ci_katalogus-db
+    env_file:
+      - .ci/.env.test
+    volumes:
+      - .:/app/boefjes
+    environment:
+      - DATABASE_MIGRATION=1
+
+  ci_bytes:
+    build:
+      context: ../bytes
+      args:
+        ENVIRONMENT: dev
+    command: uvicorn bytes.api:app --host 0.0.0.0
+    depends_on:
+      ci_rabbitmq:
+        condition: service_healthy
+      ci_bytes-db:
+        condition: service_started
+    env_file:
+      - .ci/.env.test
+    environment:
+      - DATABASE_MIGRATION=1
+
+  ci_bytes-db:
+    image: docker.io/library/postgres:15
+    env_file:
+      - .ci/.env.test
+
+  ci_octopoes:
+    build:
+      context: ../octopoes
+    command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80
+    depends_on:
+      ci_rabbitmq:
+        condition: service_healthy
+      ci_xtdb:
+        condition: service_started
+      ci_katalogus:
+        condition: service_started
+      ci_octopoes_api_worker:
+        condition: service_started
+    env_file:
+      - .ci/.env.test
+
+  ci_rabbitmq:
+    restart: on-failure
+    image: "docker.io/library/rabbitmq:3.12-management"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      retries: 4
+    env_file:
+      - .ci/.env.test
+
+  ci_xtdb:
+    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.8"
+
+  ci_octopoes_api_worker:
+    build:
+      context: ../octopoes
+    command: celery -A octopoes.tasks.tasks worker -E --loglevel=INFO
+    depends_on:
+      ci_rabbitmq:
+        condition: service_healthy
+      ci_xtdb:
+        condition: service_started
+    env_file:
+      - .ci/.env.test
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+  ci_katalogus:
+    build:
+      context: ..
+      dockerfile: boefjes/Dockerfile
+      args:
+        - ENVIRONMENT=dev
+    command: uvicorn boefjes.katalogus.root:app --host 0.0.0.0 --port 8080
+    depends_on:
+      - ci_katalogus-db
+    env_file:
+      - .ci/.env.test
+    volumes:
+      - .:/app/boefjes

@@ -1,5 +1,6 @@
 {
   "id": "kat_censys_normalize",
+  "name": "Censys",
   "consumes": [
     "boefje/censys"
   ],

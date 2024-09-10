@@ -3,19 +3,32 @@ from bits.check_csp_header.check_csp_header import run
 from octopoes.models.ooi.web import HTTPHeader
 
 
-def test_https_hsts(http_resource_https):
-    results = [
-        list(run(HTTPHeader(resource=http_resource_https.reference, key=key, value=value), [], {}))
-        for key, value in [
-            ("Content-Type", "text/html"),
-            ("Content-security-poliCY", "text/html"),
-            ("content-security-policy", "http://abc.com"),
-            ("content-security-policy", "https://abc.com"),
-            ("content-security-policy", "https://*.com"),
-            ("content-security-policy", "https://a.com; ...; media-src 'self'; media-src 10.10.10.10;"),
-            ("content-security-policy", "unsafe-inline-uri * strict-dynamic; test http: 127.0.0.1"),
-        ]
+def test_check_csp_headers(http_resource_https):
+    headers_to_test = [
+        ("Content-Type", "text/html"),
+        ("Content-security-poliCY", "text/html"),
+        ("content-security-policy", "http://abc.com"),
+        ("content-security-policy", "https://abc.com"),
+        ("content-security-policy", "https://*.com"),
+        ("content-security-policy", "https://a.com; ...; media-src 'self'; media-src 10.10.10.10;"),
+        ("content-security-policy", "unsafe-inline-uri * strict-dynamic; test http: 127.0.0.1"),
     ]
+
+    results = []
+
+    # Iterate over headers and execute `run` function for each adding the content type header for xss capability check
+    for key, value in headers_to_test:
+        result = list(
+            run(
+                resource=http_resource_https,
+                additional_oois=[
+                    HTTPHeader(resource=http_resource_https.reference, key="Content-Type", value="text/html"),
+                    HTTPHeader(resource=http_resource_https.reference, key=key, value=value),
+                ],
+                config={},
+            )
+        )
+        results.append(result)
 
     assert results[0] == []
     assert len(results[1]) == 2
@@ -99,3 +112,33 @@ def test_https_hsts(http_resource_https):
  9. a blanket protocol source should not be used in the value of any type in the CSP settings.
  10. Private, local, reserved, multicast, loopback ips should not be allowed in the CSP settings."""
     )
+
+
+def test_check_csp_headers_non_xss_capable(http_resource_https):
+    headers_to_test = [
+        ("Content-security-poliCY", "text/html"),
+        ("content-security-policy", "http://abc.com"),
+        ("content-security-policy", "https://abc.com"),
+        ("content-security-policy", "https://*.com"),
+        ("content-security-policy", "https://a.com; ...; media-src 'self'; media-src 10.10.10.10;"),
+        ("content-security-policy", "unsafe-inline-uri * strict-dynamic; test http: 127.0.0.1"),
+    ]
+
+    results = []
+
+    # Iterate over headers and execute `run` function for each adding the content type header for xss capability check
+    for key, value in headers_to_test:
+        result = list(
+            run(
+                resource=http_resource_https,
+                additional_oois=[
+                    HTTPHeader(resource=http_resource_https.reference, key="Content-Type", value="text/plain"),
+                    HTTPHeader(resource=http_resource_https.reference, key=key, value=value),
+                ],
+                config={},
+            )
+        )
+        results.append(result)
+
+    for result in results:
+        assert result == []

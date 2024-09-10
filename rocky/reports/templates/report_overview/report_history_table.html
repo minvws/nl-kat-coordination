@@ -1,0 +1,132 @@
+{% load i18n %}
+{% load ooi_extra %}
+{% load report_extra %}
+
+<div class="horizontal-scroll">
+    <table>
+        <caption class="visually-hidden">{% translate "Reports:" %}</caption>
+        <thead>
+            <tr>
+                <th scope="col">{% translate "Name" %}</th>
+                <th scope="col">{% translate "Report type" %}</th>
+                <th scope="col">{% translate "Input Objects" %}</th>
+                <th scope="col">{% translate "Reference date" %}</th>
+                <th scope="col">{% translate "Creation date" %}</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+                <tr>
+                    <td>
+                        <a href="{% url "view_report" organization.code %}?report_id={{ report.parent_report.reference }}&observed_at={{ report.parent_report.observed_at|date:"Y-m-d H:i:s:u" }}"
+                           title="{% translate "Shows parent report details" %}">{{ report.parent_report.name }}</a>
+                    </td>
+                    <td>
+                        {% if report.parent_report.report_type == "concatenated-report" or report.parent_report.report_type is None %}
+                            {% for report_type, total_objects in report.report_type_summary.items %}
+                                {% if forloop.counter0 < 2 %}
+                                    <span class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</span>
+                                {% endif %}
+                                {% if forloop.counter0 == 2 %}
+                                    <span class="label tags-color-grey-2">+ {{ report.report_type_summary|length|add:"-2" }}</span>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <span class="label tags-color-{{ report.parent_report.report_type|get_report_type_label_style }}">{{ report.parent_report.report_type|get_report_type_name }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if report.parent_report.input_oois|length == 1 %}
+                            <a href="{% ooi_url "ooi_detail" report.parent_report.input_oois.0 organization.code query=ooi.mandatory_fields %}">{{ report.parent_report.input_oois.0|human_readable }}</a>
+                        {% elif report.total_objects == 1 %}
+                            <a href="{% ooi_url 'ooi_detail' report.children_reports.0.input_oois.0 organization.code query=ooi.mandatory_fields %}">{{ report.children_reports.0.input_oois.0|human_readable }}</a>
+                        {% else %}
+                            {{ report.total_objects }}
+                        {% endif %}
+                    </td>
+                    <td class="nowrap">{{ report.parent_report.observed_at|date }}</td>
+                    <td class="nowrap">{{ report.parent_report.date_generated }}</td>
+                    <td>
+                        {% if report.children_reports %}
+                            <button type="button"
+                                    class="expando-button icon ti-chevron-down"
+                                    data-icon-open-class="icon ti-chevron-down"
+                                    data-icon-close-class="icon ti-chevron-up"
+                                    data-close-label="{% translate "Close children report object details" %}"
+                                    aria-expanded="false"></button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% if report.children_reports %}
+                    <tr class="expando-row">
+                        <td colspan="6">
+                            <table>
+                                <caption class="visually-hidden">{% translate "Subreports details:" %}</caption>
+                                <h5>{% translate "Report types" %}</h5>
+                                <p>
+                                    {% blocktranslate count counter=report.total_children_reports %}
+                                    This report consist of {{counter}} subreport with the following report type and object.
+                                {% plural %}
+                                    This report consist of {{counter}} subreports with the following report types and objects.
+                                {% endblocktranslate %}
+                                </p>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">{% translate "Report type" %}</th>
+                                        <th scope="col">{% translate "Objects" %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for report_type, total_objects in report.report_type_summary.items %}
+                                        <tr>
+                                            <td>
+                                                <span class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</span>
+                                            </td>
+                                            <td>{{ total_objects }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            <table>
+                                <h5>
+                                    {% translate "Subreports" %}
+                                    ({{ report.children_reports|length }}/{{ report.total_children_reports }})
+                                </h5>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">{% translate "Report type" %}</th>
+                                        <th scope="col">{% translate "Object" %}</th>
+                                        <th scope="col">{% translate "Report ID" %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for child_report in report.children_reports %}
+                                        <tr>
+                                            <td>
+                                                <span class="label tags-color-{{ child_report.report_type|get_report_type_label_style }}">{{ child_report.report_type|get_report_type_name }}</span>
+                                            </td>
+                                            <td>
+                                                <a href="{% ooi_url 'ooi_detail' child_report.input_oois.0 organization.code %}">{{ child_report.input_oois.0|human_readable }}</a>
+                                            </td>
+                                            <td>
+                                                <a href="{% url "view_report" organization.code %}?report_id={{ child_report }}&observed_at={{ child_report.observed_at|date:"Y-m-d H:i:s:u" }}"
+                                                   title="{% translate "Shows subreport details" %}">{{ child_report }}</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            <div class="button-container">
+                                {% if report.total_children_reports > 5 %}
+                                    <a href="{% url "subreports" organization.code %}?report_id={{ report.parent_report.reference }}"
+                                       class="button">{% translate "View all subreports" %}</a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -1,4 +1,7 @@
+from datetime import datetime, timezone
+
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView
 from tools.forms.ooi import OoiTreeSettingsForm
 from tools.ooi_helpers import create_object_tree_item_from_ref, filter_ooi_tree, get_ooi_types_from_tree
 from tools.view_helpers import Breadcrumb, get_ooi_url
@@ -6,7 +9,7 @@ from tools.view_helpers import Breadcrumb, get_ooi_url
 from rocky.views.ooi_view import BaseOOIDetailView
 
 
-class OOITreeView(BaseOOIDetailView):
+class OOITreeView(BaseOOIDetailView, TemplateView):
     template_name = "oois/ooi_tree.html"
     connector_form_class = OoiTreeSettingsForm
 
@@ -16,6 +19,14 @@ class OOITreeView(BaseOOIDetailView):
     def get_filtered_tree(self, tree_dict):
         filtered_types = self.request.GET.getlist("ooi_type", [])
         return filter_ooi_tree(tree_dict, filtered_types)
+
+    def count_observed_at_filter(self) -> int:
+        return 1 if datetime.now(timezone.utc).date() != self.observed_at.date() else 0
+
+    def count_active_filters(self):
+        count_depth_filter = len(self.request.GET.getlist("depth", []))
+        count_ooi_type_filter = len(self.request.GET.getlist("ooi_type", []))
+        return self.count_observed_at_filter() + count_depth_filter + count_ooi_type_filter
 
     def get_connector_form_kwargs(self):
         kwargs = super().get_connector_form_kwargs()
@@ -43,7 +54,7 @@ class OOITreeView(BaseOOIDetailView):
         context["tree"] = self.get_filtered_tree(self.get_tree_dict())
         context["tree_view"] = self.request.GET.get("view", "condensed")
         context["observed_at_form"] = self.get_connector_form()
-
+        context["active_filters_counter"] = self.count_active_filters()
         return context
 
 

@@ -1,7 +1,8 @@
 {
   "id": "kat_rpki_normalize",
+  "name": "RPKI",
   "consumes": [
-    "boefje/rpki"
+    "rpki/results"
   ],
   "produces": [
     "Finding",

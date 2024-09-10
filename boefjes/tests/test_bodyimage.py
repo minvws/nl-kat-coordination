@@ -6,8 +6,8 @@ from unittest.mock import MagicMock
 from requests.models import CaseInsensitiveDict, PreparedRequest, Response
 
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
-from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
+from boefjes.local_repository import LocalPluginRepository
 from tests.loading import get_dummy_data
 
 
@@ -71,6 +71,7 @@ class WebsiteAnalysisTest(TestCase):
                 "resource": "HTTPResource|internet|134.209.85.72|tcp|443|https|internet"
                 "|mispo.es|https|internet|mispo.es|443|/",
                 "scan_profile": None,
+                "user_id": None,
                 "image_info": {
                     "format": "JPEG",
                     "frames": 1,

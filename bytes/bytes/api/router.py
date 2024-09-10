@@ -1,12 +1,14 @@
-import logging
+from base64 import b64decode
 from uuid import UUID
 
+import structlog
 from cachetools import TTLCache, cached
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import Response
+from httpx import codes
 from starlette.responses import JSONResponse
 
-from bytes.api.models import RawResponse
+from bytes.api.models import BoefjeOutput
 from bytes.auth import authenticate_token
 from bytes.config import get_settings
 from bytes.database.sql_meta_repository import MetaIntegrityError, ObjectNotFoundException, create_meta_data_repository
@@ -16,7 +18,7 @@ from bytes.models import BoefjeMeta, MimeType, NormalizerMeta, RawData, RawDataM
 from bytes.rabbitmq import create_event_manager
 from bytes.repositories.meta_repository import BoefjeMetaFilter, MetaDataRepository, NormalizerMetaFilter, RawDataFilter
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 router = APIRouter(dependencies=[Depends(authenticate_token)])
 BOEFJE_META_TAG = "BoefjeMeta"
 NORMALIZER_META_TAG = "NormalizerMeta"
@@ -33,10 +35,11 @@ def create_boefje_meta(
             meta_repository.save_boefje_meta(boefje_meta)
     except MetaIntegrityError:
         return JSONResponse(
-            {"status": "failed", "message": "Integrity error: object might already exist"}, status_code=400
+            {"status": "failed", "message": "Integrity error: object might already exist"},
+            status_code=codes.BAD_REQUEST,
         )
 
-    return JSONResponse({"status": "success"}, status_code=201)
+    return JSONResponse({"status": "success"}, status_code=codes.CREATED)
 
 
 @router.get("/boefje_meta/{boefje_meta_id}", response_model=BoefjeMeta, tags=[BOEFJE_META_TAG])
@@ -94,10 +97,11 @@ def create_normalizer_meta(
             meta_repository.save_normalizer_meta(normalizer_meta)
     except MetaIntegrityError:
         return JSONResponse(
-            {"status": "failed", "message": "Integrity error: object might already exist"}, status_code=400
+            {"status": "failed", "message": "Integrity error: object might already exist"},
+            status_code=codes.BAD_REQUEST,
         )
 
-    return JSONResponse({"status": "success"}, status_code=201)
+    return JSONResponse({"status": "success"}, status_code=codes.CREATED)
 
 
 @router.get("/normalizer_meta/{normalizer_meta_id}", response_model=NormalizerMeta, tags=[NORMALIZER_META_TAG])
@@ -105,8 +109,10 @@ def get_normalizer_meta_by_id(
     normalizer_meta_id: UUID,
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
 ) -> NormalizerMeta:
-    with meta_repository:
+    try:
         return meta_repository.get_normalizer_meta_by_id(normalizer_meta_id)
+    except ObjectNotFoundException as error:
+        raise HTTPException(status_code=codes.NOT_FOUND, detail="Normalizer meta not found") from error
 
 
 @router.get("/normalizer_meta", response_model=list[NormalizerMeta], tags=[NORMALIZER_META_TAG])
@@ -144,41 +150,61 @@ def get_normalizer_meta(
 
 
 @router.post("/raw", tags=[RAW_TAG])
-async def create_raw(
-    request: Request,
+def create_raw(
     boefje_meta_id: UUID,
-    mime_types: list[str] | None = Query(None),
+    boefje_output: BoefjeOutput,
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
     event_manager: EventManager = Depends(create_event_manager),
-) -> RawResponse:
-    parsed_mime_types = [] if mime_types is None else [MimeType(value=mime_type) for mime_type in mime_types]
+) -> dict[str, UUID]:
+    """Parse all the raw files from the request and return the ids. The ids are ordered according to the order from the
+    request data, but we assume the `name` field is unique, and hence return a mapping of the file name to the id."""
 
-    try:
-        meta = meta_repository.get_boefje_meta_by_id(boefje_meta_id)
+    raw_ids = {}
+    mime_types_by_id = {
+        raw.id: set(raw.mime_types) for raw in meta_repository.get_raw(RawDataFilter(boefje_meta_id=boefje_meta_id))
+    }
+    all_parsed_mime_types = list(mime_types_by_id.values())
 
-        if meta_repository.has_raw(meta, parsed_mime_types):
-            return RawResponse(status="success", message="Raw data already present")
+    for raw in boefje_output.files:
+        parsed_mime_types = {MimeType(value=x) for x in raw.tags}
 
-        data = await request.body()
+        if parsed_mime_types in mime_types_by_id.values():
+            # Set the id for this file using the precomputed dict that maps existing primary keys to the mime-type set.
+            raw_ids[raw.name] = list(mime_types_by_id.keys())[list(mime_types_by_id.values()).index(parsed_mime_types)]
 
-        raw_data = RawData(value=data, boefje_meta=meta, mime_types=parsed_mime_types)
-        with meta_repository:
-            raw_id = meta_repository.save_raw(raw_data)
+            continue
 
-        event = RawFileReceived(
-            organization=meta.organization,
-            raw_data=RawDataMeta(
-                id=raw_id,
-                boefje_meta=raw_data.boefje_meta,
-                mime_types=raw_data.mime_types,
-            ),
-        )
-        event_manager.publish(event)
-    except Exception as error:
-        logger.exception("Error saving raw data")
-        raise HTTPException(status_code=500, detail="Could not save raw data") from error
+        if parsed_mime_types in all_parsed_mime_types:
+            raise HTTPException(
+                status_code=codes.BAD_REQUEST, detail="Content types do not define unique sets of mime types."
+            )
 
-    return RawResponse(status="success", message="Raw data saved", id=raw_id)
+        try:
+            meta = meta_repository.get_boefje_meta_by_id(boefje_meta_id)
+            raw_data = RawData(value=b64decode(raw.content.encode()), boefje_meta=meta, mime_types=parsed_mime_types)
+
+            with meta_repository:
+                raw_id = meta_repository.save_raw(raw_data)
+                raw_ids[raw.name] = raw_id
+
+            all_parsed_mime_types.append(parsed_mime_types)
+
+            event = RawFileReceived(
+                organization=meta.organization,
+                raw_data=RawDataMeta(
+                    id=raw_id,
+                    boefje_meta=raw_data.boefje_meta,
+                    mime_types=raw_data.mime_types,
+                ),
+            )
+            event_manager.publish(event)
+        except Exception as error:
+            logger.exception("Error saving raw data")
+            raise HTTPException(status_code=codes.INTERNAL_SERVER_ERROR, detail="Could not save raw data") from error
+
+        all_parsed_mime_types.append(parsed_mime_types)
+
+    return raw_ids
 
 
 @router.get("/raw/{raw_id}", tags=[RAW_TAG])
@@ -189,7 +215,7 @@ def get_raw_by_id(
     try:
         raw_data = meta_repository.get_raw_by_id(raw_id)
     except ObjectNotFoundException as error:
-        raise HTTPException(status_code=404, detail="No raw data found") from error
+        raise HTTPException(status_code=codes.NOT_FOUND, detail="No raw data found") from error
 
     return Response(raw_data.value, media_type="application/octet-stream")
 
@@ -202,7 +228,7 @@ def get_raw_meta_by_id(
     try:
         raw_meta = meta_repository.get_raw_meta_by_id(raw_id)
     except ObjectNotFoundException as error:
-        raise HTTPException(status_code=404, detail="No raw data found") from error
+        raise HTTPException(status_code=codes.NOT_FOUND, detail="No raw data found") from error
 
     return raw_meta
 
