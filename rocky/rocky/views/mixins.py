@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from functools import cached_property
 from operator import attrgetter
-from typing import TypedDict
+from typing import Literal, TypedDict
 
 import structlog
 from account.mixins import OrganizationView
@@ -172,16 +172,20 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
                 boefje_meta = normalizer_data["raw_data"]["boefje_meta"]
                 boefje_id = boefje_meta["boefje"]["id"]
                 if boefje_meta.get("ended_at"):
-                    boefje_meta["ended_at"] = datetime.strptime(boefje_meta["ended_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
+                    try:
+                        boefje_meta["ended_at"] = datetime.strptime(boefje_meta["ended_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
+                    except ValueError:
+                        boefje_meta["ended_at"] = datetime.strptime(boefje_meta["ended_at"], "%Y-%m-%dT%H:%M:%SZ")
                 origin.normalizer = normalizer_data
-                try:
-                    origin.boefje = katalogus.get_plugin(boefje_id)
-                except HTTPError as e:
-                    logger.error(
-                        "Could not load boefje: %s from katalogus, error: %s",
-                        boefje_id,
-                        e,
-                    )
+                if boefje_id != "manual":
+                    try:
+                        origin.boefje = katalogus.get_plugin(boefje_id)
+                    except HTTPError as e:
+                        logger.error(
+                            "Could not load boefje %s from katalogus: %s",
+                            boefje_id,
+                            e,
+                        )
             observations.append(origin)
 
         return results
@@ -206,6 +210,9 @@ class OOIList:
         valid_time: datetime,
         scan_level: set[ScanLevel],
         scan_profile_type: set[ScanProfileType],
+        search_string: str | None = None,
+        order_by: Literal["scan_level", "object_type"] = "object_type",
+        asc_desc: Literal["asc", "desc"] = "asc",
     ):
         self.octopoes_connector = octopoes_connector
         self.ooi_types = ooi_types
@@ -214,6 +221,9 @@ class OOIList:
         self._count = 0
         self.scan_level = scan_level
         self.scan_profile_type = scan_profile_type
+        self.search_string = search_string
+        self.order_by = order_by
+        self.asc_desc = asc_desc
 
     @cached_property
     def count(self) -> int:
@@ -223,6 +233,7 @@ class OOIList:
             limit=0,
             scan_level=self.scan_level,
             scan_profile_type=self.scan_profile_type,
+            search_string=self.search_string,
         ).count
 
     def __len__(self):
@@ -242,6 +253,9 @@ class OOIList:
                 limit=limit,
                 scan_level=self.scan_level,
                 scan_profile_type=self.scan_profile_type,
+                search_string=self.search_string,
+                order_by=self.order_by,
+                asc_desc=self.asc_desc,
             ).items
 
         elif isinstance(key, int):
@@ -252,6 +266,9 @@ class OOIList:
                 limit=1,
                 scan_level=self.scan_level,
                 scan_profile_type=self.scan_profile_type,
+                search_string=self.search_string,
+                order_by=self.order_by,
+                asc_desc=self.asc_desc,
             ).items
 
 
@@ -265,6 +282,9 @@ class FindingList:
         severities: set[RiskLevelSeverity],
         exclude_muted: bool = True,
         only_muted: bool = False,
+        search_string: str | None = None,
+        order_by: Literal["score", "finding_type"] = "score",
+        asc_desc: Literal["asc", "desc"] = "desc",
     ):
         self.octopoes_connector = octopoes_connector
         self.valid_time = valid_time
@@ -273,6 +293,9 @@ class FindingList:
         self.severities = severities
         self.exclude_muted = exclude_muted
         self.only_muted = only_muted
+        self.search_string = search_string
+        self.order_by = order_by
+        self.asc_desc = asc_desc
 
     @cached_property
     def count(self) -> int:
@@ -282,6 +305,7 @@ class FindingList:
             exclude_muted=self.exclude_muted,
             only_muted=self.only_muted,
             limit=0,
+            search_string=self.search_string,
         ).count
 
     def __len__(self):
@@ -300,6 +324,9 @@ class FindingList:
                 only_muted=self.only_muted,
                 offset=offset,
                 limit=limit,
+                search_string=self.search_string,
+                order_by=self.order_by,
+                asc_desc=self.asc_desc,
             ).items
             ooi_references = {finding.ooi for finding in findings}
             finding_type_references = {finding.finding_type for finding in findings}

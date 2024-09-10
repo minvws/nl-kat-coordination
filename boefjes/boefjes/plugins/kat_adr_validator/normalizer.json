@@ -1,5 +1,7 @@
 {
   "id": "adr-validator-normalize",
+  "name": "API Design Rules validator",
+  "description": "TODO",
   "consumes": [
     "boefje/adr-validator"
   ],

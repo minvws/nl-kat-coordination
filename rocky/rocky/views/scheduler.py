@@ -47,12 +47,22 @@ class SchedulerView(OctopoesView):
             "scheduler_id": self.scheduler_id,
             "task_type": self.task_type,
             "plugin_id": None,  # plugin_id present and set at plugin detail
-            **self.get_form_data(),
+            **self.get_task_filter_form_data(),
         }
 
-    def get_form_data(self) -> dict[str, Any]:
+    def get_task_filter_form_data(self) -> dict[str, Any]:
         form_data = self.get_task_filter_form().data.dict()
         return {k: v for k, v in form_data.items() if v}
+
+    def count_active_task_filters(self):
+        form_data = self.get_task_filter_form_data()
+
+        count = len(form_data)
+        for task_filter in form_data:
+            if task_filter in ("observed_at", "ooi_id"):
+                count -= 1
+
+        return count
 
     def get_task_filter_form(self) -> TaskFilterForm:
         return self.task_filter_form(self.request.GET)
@@ -81,12 +91,24 @@ class SchedulerView(OctopoesView):
         try:
             self.bytes_client.get_raw(report_ooi.data_raw_id)
             schedule = self.convert_recurrence_to_cron_expressions(start_date, recurrence)
-            schedule_request = ScheduleRequest(
-                scheduler_id=self.scheduler_id, hash="", data={}, schedule=schedule, deadline_at=None
-            )
+            schedule_request = ScheduleRequest(scheduler_id=self.scheduler_id, hash="", data={}, schedule=schedule)
             return self.scheduler_client.post_schedule(schedule=schedule_request)
         except SchedulerError as error:
             return messages.error(self.request, error.message)
+
+    def schedule_report(self, report_ooi: type[OOI]) -> bool:
+        form_data = self.get_schedule_filter_form_data()
+        # A schedule must be set or skip.
+        if "start_date" in form_data and "recurrence" in form_data:
+            start_date = form_data.get("start_date", "")
+            recurrence = form_data.get("recurrence", "")
+            self.create_report_schedule(report_ooi, start_date, recurrence)
+            messages.success(
+                self.request, _("Success! Your report has been successfully added to the queue for scheduling.")
+            )
+            return True
+        messages.warning(self.request, _("No schedule set for this report."))
+        return False
 
     def get_task_statistics(self) -> dict[Any, Any]:
         stats = {}

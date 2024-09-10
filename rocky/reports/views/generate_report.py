@@ -7,6 +7,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
+from tools.view_helpers import PostRedirect
 
 from octopoes.models import Reference
 from reports.forms import ReportScheduleForm
@@ -109,12 +110,14 @@ class ReportTypesSelectionGenerateReportView(
     def post(self, request, *args, **kwargs):
         if not self.selected_oois:
             messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
-            return redirect(self.get_previous())
+            return PostRedirect(self.get_previous())
         return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["available_report_types"] = self.get_report_types(get_report_types_for_oois(self.get_oois_pk()))
+        available_report_types = self.get_report_types(get_report_types_for_oois(self.get_oois_pk()))
+        context["available_report_types"] = available_report_types
+        context["all_report_types_checked"] = len(available_report_types) == len(self.get_report_type_selection())
         context["total_oois"] = self.get_total_objects()
         return context
 
@@ -136,7 +139,13 @@ class SetupScanGenerateReportView(
     def post(self, request, *args, **kwargs):
         if not self.selected_report_types:
             messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
-            return redirect(self.get_previous())
+            return PostRedirect(self.get_previous())
+
+        if "return" in self.request.POST and self.plugins_enabled():
+            return PostRedirect(self.get_previous())
+
+        if self.plugins_enabled():
+            return PostRedirect(self.get_next())
         return self.get(request, *args, **kwargs)
 
 
@@ -151,6 +160,9 @@ class ExportSetupGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenerat
     reports: dict[str, str] = {}
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.selected_report_types:
+            messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
+            return PostRedirect(self.get_previous())
         self.reports = create_report_names(self.oois_pk, self.report_types)
         return super().get(request, *args, **kwargs)
 
@@ -174,22 +186,21 @@ class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportV
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         old_report_names = request.POST.getlist("old_report_name")
-        new_report_names = request.POST.getlist("report_name")
-        report_names = list(zip(old_report_names, new_report_names))
-        report_ooi = self.save_report(report_names)
+        report_names = request.POST.getlist("report_name")
+        reference_dates = request.POST.getlist("reference_date")
 
-        form_data = self.get_schedule_filter_form_data()
-        # A schedule must be set or skip.
-        if "start_date" in form_data and "recurrence" in form_data:
-            start_date = form_data.get("start_date", "")
-            recurrence = form_data.get("recurrence", "")
-            self.create_report_schedule(report_ooi, start_date, recurrence)
+        if "" not in report_names and report_names:
+            final_report_names = list(zip(old_report_names, self.finalise_report_names(report_names, reference_dates)))
+            report_ooi = self.save_report(final_report_names)
+            self.schedule_report(report_ooi)
 
-        return redirect(
-            reverse("view_report", kwargs={"organization_code": self.organization.code})
-            + "?"
-            + urlencode({"report_id": report_ooi.reference})
-        )
+            return redirect(
+                reverse("view_report", kwargs={"organization_code": self.organization.code})
+                + "?"
+                + urlencode({"report_id": report_ooi.reference})
+            )
+        messages.error(self.request, _("Empty report name found."))
+        return PostRedirect(self.get_previous())
 
 
 def create_report_names(oois_pk, report_types) -> dict[str, str]:

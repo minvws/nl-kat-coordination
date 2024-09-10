@@ -1,5 +1,6 @@
 {
   "id": "kat_manual_csv",
+  "name": "Manual CSV",
   "consumes": [
     "manual/csv"
   ],

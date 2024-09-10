@@ -8,8 +8,6 @@ class ScheduleCreate(BaseModel):
 
     scheduler_id: str
 
-    hash: str = Field(max_length=32)
-
     data: dict
 
     schedule: str

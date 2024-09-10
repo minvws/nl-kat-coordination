@@ -61,6 +61,11 @@ class Schedule(BaseModel):
     def deadline_at(self, value: datetime | None):
         self._deadline_at = value
 
+    def model_post_init(self, context) -> None:
+        """Post init method to set the deadline_at if it is not set."""
+        if self.deadline_at is None and self.schedule:
+            self.deadline_at = cron.next_run(self.schedule)
+
     @field_validator("schedule")
     @classmethod
     def validate_schedule(cls, value: str) -> str:

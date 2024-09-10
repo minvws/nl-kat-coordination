@@ -16,12 +16,12 @@ class ScheduleAPI:
         self,
         api: fastapi.FastAPI,
         ctx: context.AppContext,
-        s: dict[str, schedulers.Scheduler],
+        schedulers: dict[str, schedulers.Scheduler],
     ) -> None:
-        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
+        self.logger: structlog.BoundLogger = structlog.get_logger(__name__)
         self.api = api
         self.ctx = ctx
-        self.schedulers: dict[str, schedulers.Scheduler] = s
+        self.schedulers = schedulers
 
         self.api.add_api_route(
             path="/schedules",
@@ -63,6 +63,7 @@ class ScheduleAPI:
     def list(
         self,
         request: fastapi.Request,
+        scheduler_id: str | None = None,
         schedule_hash: str | None = None,
         enabled: bool | None = None,
         offset: int = 0,
@@ -86,6 +87,7 @@ class ScheduleAPI:
 
         try:
             results, count = self.ctx.datastores.schedule_store.get_schedules(
+                scheduler_id=scheduler_id,
                 schedule_hash=schedule_hash,
                 enabled=enabled,
                 min_deadline_at=min_deadline_at,
@@ -116,7 +118,7 @@ class ScheduleAPI:
 
     def create(self, schedule: serializers.ScheduleCreate) -> Any:
         try:
-            new_schedule = models.Schedule(**schedule.model_dump())
+            new_schedule = models.Schedule(**schedule.dict())
         except pydantic.ValidationError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
@@ -137,7 +139,7 @@ class ScheduleAPI:
 
         # Validate data with task type of the scheduler
         try:
-            instance = s.ITEM_TYPE.parse_obj(new_schedule.data)
+            instance = s.ITEM_TYPE.model_validate(new_schedule.data)
         except pydantic.ValidationError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
@@ -166,6 +168,22 @@ class ScheduleAPI:
                 status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"error occurred while accessing the database [exception: {exc}]",
             ) from exc
+
+        try:
+            self.ctx.datastores.schedule_store.create_schedule(new_schedule)
+        except storage.errors.StorageError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=f"error occurred while accessing the database [exception: {exc}]",
+            ) from exc
+        except Exception as exc:
+            self.logger.exception(exc)
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"failed to create schedule [exception: {exc}]",
+            ) from exc
+
+        return new_schedule
 
     def get(self, schedule_id: uuid.UUID) -> Any:
         try:
