@@ -132,10 +132,8 @@ class ScheduleRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     scheduler_id: str
-    hash: str
     data: dict
     schedule: str
-    deadline_at: datetime.datetime | None = None
 
 
 class ScheduleResponse(BaseModel):
@@ -258,7 +256,6 @@ class SchedulerClient:
         self._client = httpx.Client(base_url=base_uri)
         self.organization_code = organization_code
 
-    # TODO: review the kwargs
     def list_schedules(self, **kwargs) -> PaginatedSchedulesResponse:
         try:
             kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
