@@ -5,25 +5,25 @@ from typing import Any
 from django.contrib import messages
 from django.http import JsonResponse
 from django.utils.translation import gettext_lazy as _
+from octopoes.models import OOI
+
 from katalogus.client import Boefje, Normalizer
 from reports.forms import ReportScheduleForm
-from tools.forms.scheduler import TaskFilterForm
-
-from octopoes.models import OOI
 from rocky.scheduler import Boefje as SchedulerBoefje
+from rocky.scheduler import BoefjeTask, LazyTaskList
+from rocky.scheduler import Normalizer as SchedulerNormalizer
 from rocky.scheduler import (
-    BoefjeTask,
-    LazyTaskList,
     NormalizerTask,
     RawData,
+    ReportTask,
     ScheduleRequest,
     SchedulerError,
     ScheduleResponse,
     Task,
     scheduler_client,
 )
-from rocky.scheduler import Normalizer as SchedulerNormalizer
 from rocky.views.mixins import OctopoesView
+from tools.forms.scheduler import TaskFilterForm
 
 
 def get_date_time(date: str | None) -> datetime | None:
@@ -91,7 +91,14 @@ class SchedulerView(OctopoesView):
         try:
             self.bytes_client.get_raw(report_ooi.data_raw_id)
             schedule = self.convert_recurrence_to_cron_expressions(start_date, recurrence)
-            schedule_request = ScheduleRequest(scheduler_id=self.scheduler_id, hash="", data={}, schedule=schedule)
+            schedule_request = ScheduleRequest(
+                scheduler_id=self.scheduler_id,
+                data=ReportTask(
+                    organisation_id=self.organization.code,
+                    report_recipe_id="",  # TODO
+                ),
+                schedule=schedule,
+            )
             return self.scheduler_client.post_schedule(schedule=schedule_request)
         except SchedulerError as error:
             return messages.error(self.request, error.message)
