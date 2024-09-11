@@ -28,13 +28,14 @@ from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.concatenated_report.report import ConcatenatedReport
-from reports.report_types.definitions import AggregateReport, Report
+from reports.report_types.definitions import AggregateReport, MultiReport, Report
 from reports.report_types.helpers import (
     REPORTS,
     get_report_by_id,
     get_report_types_for_oois,
     get_report_types_from_aggregate_report,
 )
+from reports.report_types.multi_organization_report.report import MultiOrganizationReport
 from reports.utils import JSONEncoder, debug_json_keys
 from rocky.views.mixins import ObservedAtMixin, OOIList
 from rocky.views.ooi_view import OOIFilterView
@@ -177,7 +178,9 @@ class ReportRecipeView(OOIFilterView):
         return {get_report_by_id(report_type_id) for report_type_id in self.get_report_type_ids()}
 
     @staticmethod
-    def get_report_types_from_ooi_selelection(report_types: set[type[Report]]) -> list[dict[str, str]]:
+    def get_report_types_from_ooi_selelection(
+        report_types: set[type[Report]] | set[type[MultiReport]],
+    ) -> list[dict[str, str]]:
         """
         The report types are fetched from which ooi is selected. Shows all report types for the oois.
         """
@@ -281,12 +284,17 @@ class ReportTypeSelectionView(ReportRecipeView):
         return report_types
 
     def get_availabel_report_types(self) -> tuple[list[dict[str, str]] | dict[str, list[dict[str, str]]], int]:
-        if self.report_type is not None and self.report_type == AggregateOrganisationReport:
-            report_types = self.get_report_types_for_aggregate_report()
-            return report_types, len(report_types.values())
-        else:
-            report_types = self.get_report_types_for_generate_report()
-            return report_types, len(report_types)
+        if self.report_type is not None:
+            if self.report_type == AggregateOrganisationReport:
+                report_types = self.get_report_types_for_aggregate_report()
+                return report_types, len(report_types.values())
+
+            elif self.report_type == MultiOrganizationReport:
+                report_types = self.get_report_types_from_ooi_selelection({MultiOrganizationReport})
+                return report_types, len(report_types)
+
+        report_types = self.get_report_types_for_generate_report()
+        return report_types, len(report_types)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
