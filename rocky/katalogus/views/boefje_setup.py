@@ -25,8 +25,9 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
         plugin_id = self.kwargs.get("plugin_id", str(uuid.uuid4()))
 
         arguments = [] if form_data["oci_arguments"] == "" else form_data["oci_arguments"].split()
-        consumes = [] if form_data["consumes"] == "" else form_data["consumes"].strip("[]'").split("', '")
-        produces = [] if form_data["produces"] == "" else form_data["produces"].split(", ")
+        consumes = [] if form_data["consumes"] == "" else form_data["consumes"].strip("[]").replace("'", "").split(", ")
+        produces = [] if form_data["produces"] == "" else form_data["produces"].split(",")
+        produces = [p.strip() for p in produces]
         input_objects = []
 
         for input_object in consumes:
