@@ -24,7 +24,7 @@ class PluginSettingsListView(SinglePluginView):
                 return []
 
             settings = self.katalogus_client.get_plugin_settings(plugin_id=self.plugin.id)
-            props = self.plugin_schema["properties"]
+            props = self.plugin_schema.get("properties", [])
 
             return [
                 {
