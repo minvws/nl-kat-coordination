@@ -108,7 +108,7 @@ class S3RawRepository(RawRepository):
                 bucket.wait_until_exists()
                 return bucket
             except Exception as error:
-                logger.error("Something went wrong with creating bucket %s\n%s", bucket_name, error)
+                logger.error("Something went wrong with creating bucket %s: %s", bucket_name, error)
                 raise error
         return self.__s3resource.Bucket(name=bucket_name)
 
