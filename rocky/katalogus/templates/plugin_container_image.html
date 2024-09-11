@@ -25,9 +25,7 @@
     </div>
     {% if variants %}
         {% if new_variant %}
-            <p class="confirmation"
-               role="group"
-               aria-label="{% translate "new variant confirmation" %}">
+            <p class="confirmation" aria-label="{% translate "confirmation" %}">
                 <span>{% blocktranslate %}Variant {{ plugin.name }} created.{% endblocktranslate%}</span>
                 {% blocktranslate trimmed %}
                     The Boefje variant is successfully created and can now be used.
@@ -92,11 +90,7 @@
                                             <h5>{% translate "Arguments" %}</h5>
                                             {% if variant.oci_arguments %}
                                                 <p>{% translate "The following arguments are used for this Boefje variant:" %}</p>
-                                                <p class="explanation"
-                                                   role="group"
-                                                   aria-label="{% translate "arguments explanation" %}">
-                                                    {{ variant.oci_arguments|join:" " }}
-                                                </p>
+                                                <p class="explanation" aria-label="{% translate "explanation" %}">{{ variant.oci_arguments|join:" " }}</p>
                                             {% else %}
                                                 <p>{% translate "There are no arguments used for this Boefje variant." %}</p>
                                             {% endif %}
@@ -110,9 +104,7 @@
             </ul>
         </div>
     {% else %}
-        <p class="explanation"
-           role="group"
-           aria-label="{% translate "no variants explanation" %}">
+        <p class="explanation" aria-label="{% translate "explanation" %}">
             <span>{% translate "This Boefje has no variants yet." %}</span>
             {% blocktranslate trimmed %}
                 You can make a variant and change the arguments and JSON Schema
