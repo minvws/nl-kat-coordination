@@ -10,10 +10,10 @@ from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.report_types.aggregate_organisation_report.report import aggregate_reports
 from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.helpers import REPORTS, get_report_by_id
-from reports.views.base import ReportPluginView
+from reports.views.base import ReportFinalSettingsView
 
 
-class SaveGenerateReportMixin(ReportPluginView):
+class SaveGenerateReportMixin(ReportFinalSettingsView):
     def save_report(self, report_names: list) -> ReportOOI:
         error_reports = []
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
@@ -21,7 +21,7 @@ class SaveGenerateReportMixin(ReportPluginView):
 
         number_of_reports = 0
 
-        for ooi in self.get_oois_pk():
+        for ooi in self.report_recipe.input_oois:
             ooi_type = Reference.from_str(ooi).class_
 
             if ooi_type not in by_type:
@@ -29,7 +29,7 @@ class SaveGenerateReportMixin(ReportPluginView):
 
             by_type[ooi_type].append(ooi)
 
-        sorted_report_types = list(filter(lambda x: x in self.report_types, REPORTS))
+        sorted_report_types = list(filter(lambda x: x in self.report_recipe.report_types, REPORTS))
 
         for report_class in sorted_report_types:
             oois = {
@@ -126,14 +126,14 @@ class SaveGenerateReportMixin(ReportPluginView):
         return report_ooi
 
 
-class SaveAggregateReportMixin(ReportPluginView):
+class SaveAggregateReportMixin(ReportFinalSettingsView):
     def save_report(self, report_names: list) -> ReportOOI:
         input_oois = self.get_oois()
 
         aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
             self.octopoes_api_connector,
-            input_oois,
-            self.selected_report_types,
+            list(input_oois),
+            self.report_recipe.report_types,
             self.observed_at,
             self.organization.code,
         )
@@ -165,7 +165,7 @@ class SaveAggregateReportMixin(ReportPluginView):
             )
 
         post_processed_data["report_types"] = []
-        for report_type in self.report_types:
+        for report_type in self.get_report_types():
             post_processed_data["report_types"].append(
                 {
                     "name": str(report_type.name),

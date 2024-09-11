@@ -5,7 +5,7 @@
             <input type="checkbox"
                    name="report_type"
                    value="{{ report_type.id }}"
-                   {% if report_type.id in selected_report_types %}checked{% endif %} />
+                   {% if report_type.id in report_recipe.report_types %}checked{% endif %} />
         </p>
         <p class="tile-description">{{ report_type.description }}</p>
     </div>

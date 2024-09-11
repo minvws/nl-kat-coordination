@@ -7,11 +7,12 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView
 from tools.view_helpers import PostRedirect
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
-from reports.report_types.definitions import AggregateReport, MultiReport, Report
-from reports.report_types.helpers import get_ooi_types_from_aggregate_report, get_report_types_from_aggregate_report
+from reports.report_types.definitions import Report
+from reports.report_types.helpers import get_ooi_types_from_aggregate_report
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
     OOISelectionView,
@@ -84,7 +85,8 @@ class OOISelectionAggregateReportView(
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
     def post(self, request, *args, **kwargs):
-        if not self.selected_oois:
+        report_recipe = self.get_report_recipe()
+        if not report_recipe.input_oois:
             messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
         return self.get(request, *args, **kwargs)
 
@@ -95,10 +97,7 @@ class OOISelectionAggregateReportView(
 
 
 class ReportTypesSelectionAggregateReportView(
-    AggregateReportStepsMixin,
-    BreadcrumbsAggregateReportView,
-    OOISelectionView,
-    ReportTypeSelectionView,
+    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, OOISelectionView, ReportTypeSelectionView, TemplateView
 ):
     """
     Shows all possible report types from a list of Objects.
@@ -108,44 +107,19 @@ class ReportTypesSelectionAggregateReportView(
     template_name = "aggregate_report/select_report_types.html"
     breadcrumbs_step = 4
     current_step = 2
-    ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.available_report_types = self.get_report_types_for_aggregate_report(
-            get_report_types_from_aggregate_report(AggregateOrganisationReport)
-        )
+    report_type = AggregateOrganisationReport
+    ooi_types = get_ooi_types_from_aggregate_report(report_type)
 
     def post(self, request, *args, **kwargs):
-        if not self.selected_oois:
+        report_recipe = self.get_report_recipe()
+        if not report_recipe.input_oois:
             messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
             return PostRedirect(self.get_previous())
         return self.get(request, *args, **kwargs)
 
-    def get_report_types_for_aggregate_report(
-        self, reports_dict: dict[str, set[type[Report]]]
-    ) -> dict[str, list[dict[str, str]]]:
-        report_types = {}
-        for option, reports in reports_dict.items():
-            report_types[option] = self.get_report_types(reports)
-        return report_types
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["available_report_types_aggregate"] = self.available_report_types
-
-        context["count_available_report_types_aggregate"] = len(self.available_report_types["required"]) + len(
-            self.available_report_types["optional"]
-        )
-        context["all_report_types_checked"] = (
-            len(self.get_report_type_selection()) == context["count_available_report_types_aggregate"]
-        )
-        context["total_oois"] = self.get_total_objects()
-        return context
-
 
 class SetupScanAggregateReportView(
-    SaveAggregateReportMixin, AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportPluginView
+    SaveAggregateReportMixin, AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportPluginView, TemplateView
 ):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
@@ -156,8 +130,7 @@ class SetupScanAggregateReportView(
     current_step = 3
 
     def post(self, request, *args, **kwargs):
-        # If the user wants to change selection, but all plugins are enabled, it needs to go even further back
-        if not self.selected_report_types:
+        if not self.report_recipe.report_types:
             messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
             return PostRedirect(self.get_previous())
 
@@ -170,7 +143,9 @@ class SetupScanAggregateReportView(
         return self.get(request, *args, **kwargs)
 
 
-class ExportSetupAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportPluginView):
+class ExportSetupAggregateReportView(
+    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportPluginView, TemplateView
+):
     """
     Shows the export setup page where users can set their export preferences.
     """
@@ -180,7 +155,7 @@ class ExportSetupAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggre
     current_step = 4
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.selected_report_types:
+        if not self.report_recipe.report_types:
             messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
             return PostRedirect(self.get_previous())
         return super().get(request, *args, **kwargs)
@@ -201,7 +176,7 @@ class SaveAggregateReportView(SaveAggregateReportMixin, BreadcrumbsAggregateRepo
     breadcrumbs_step = 6
     current_step = 6
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
-    report_types: list[type[Report] | type[MultiReport] | type[AggregateReport]]
+    report_types: list[type[Report]]
 
     def post(self, request, *args, **kwargs):
         old_report_names = request.POST.getlist("old_report_name")
