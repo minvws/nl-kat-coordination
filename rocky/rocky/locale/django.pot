@@ -3,12 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#: reports/forms.py
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-05 15:36+0000\n"
+"POT-Creation-Date: 2024-09-11 13:36+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2280,6 +2281,74 @@ msgstr ""
 msgid "Filter by OOI types"
 msgstr ""
 
+#: reports/forms.py
+msgid "Start date"
+msgstr ""
+
+#: reports/forms.py
+msgid "Recurrence"
+msgstr ""
+
+#: reports/forms.py
+msgid "Does not repeat"
+msgstr ""
+
+#: reports/forms.py
+msgid "Daily"
+msgstr ""
+
+#: reports/forms.py
+msgid "Weekly"
+msgstr ""
+
+#: reports/forms.py
+msgid "Monthly"
+msgstr ""
+
+#: reports/forms.py
+msgid "Yearly"
+msgstr ""
+
+#: reports/forms.py
+msgid "Warning: Recurrence is set in February only for leap years."
+msgstr ""
+
+#: reports/forms.py
+msgid "Warning: Recurrence is not set for February."
+msgstr ""
+
+#: reports/forms.py
+msgid "Warning: Recurrence will skip months that does not have 31 days."
+msgstr ""
+
+#: reports/forms.py
+msgid "day"
+msgstr ""
+
+#: reports/forms.py
+msgid "week"
+msgstr ""
+
+#: reports/forms.py
+msgid "month"
+msgstr ""
+
+#: reports/forms.py
+msgid "year"
+msgstr ""
+
+#: reports/forms.py
+msgid "Never"
+msgstr ""
+
+#: reports/forms.py
+msgid "On"
+msgstr ""
+
+#: reports/forms.py
+msgid "After"
+msgstr ""
+
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/report_types/multi_organization_report/appendix.html
 #: reports/templates/partials/report_sidemenu.html
@@ -3478,6 +3547,16 @@ msgid "Web System Reports check web systems on basic security standards."
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
+msgid "Report schedule"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid ""
+"The date you select will be the reference date for the data set for your "
+"report. Please allow for up to 24 hours for your report to be ready."
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
 msgid "Report name"
 msgstr ""
 
@@ -3717,15 +3796,23 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-msgid "This report type requires the following plugins to be enabled:"
-msgstr ""
-
-#: reports/templates/partials/report_setup_scan.html
 msgid "Good job! All required plugins are enabled."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
+msgid "This report type requires the following plugins to be enabled:"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
 msgid "Show enabled plugins"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "There are no required plugins."
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "Good job! All suggested plugins are enabled"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -3735,15 +3822,15 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-msgid "Good job! All suggested plugins are enabled"
-msgstr ""
-
-#: reports/templates/partials/report_setup_scan.html
 msgid "Hide suggested plugins"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Show more suggested plugins"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "There are no optional plugins."
 msgstr ""
 
 #: reports/templates/partials/report_severity_totals.html
@@ -4021,16 +4108,11 @@ msgid "Select at least one report type to proceed."
 msgstr ""
 
 #: reports/views/base.py
-#, python-format
-msgid "Report type '%s' does not exist."
-msgstr ""
-
-#: reports/views/base.py
 msgid "Week %W, %Y"
 msgstr ""
 
 #: reports/views/generate_report.py
-msgid "Empty name should not be possible."
+msgid "Empty report name found."
 msgstr ""
 
 #: reports/views/generate_report.py
@@ -4588,6 +4670,10 @@ msgstr ""
 
 #: rocky/scheduler.py
 msgid "A HTTPError occurred. See Scheduler logs for more info."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "Schedule list: "
 msgstr ""
 
 #: rocky/scheduler.py
@@ -6851,6 +6937,15 @@ msgstr ""
 #: rocky/views/scan_profile.py
 #, python-brace-format
 msgid "Can not reset scan level. Scan level of {ooi_name} not declared"
+msgstr ""
+
+#: rocky/views/scheduler.py
+msgid ""
+"Success! Your report has been successfully added to the queue for scheduling."
+msgstr ""
+
+#: rocky/views/scheduler.py
+msgid "No schedule set for this report."
 msgstr ""
 
 #: rocky/views/scheduler.py
