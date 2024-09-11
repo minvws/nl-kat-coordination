@@ -1,8 +1,7 @@
-import logging
-
+import structlog
 from amqp import AMQPError
 
-from octopoes.config.settings import QUEUE_NAME_OCTOPOES, Settings
+from octopoes.config.settings import GATHER_BIT_METRICS, QUEUE_NAME_OCTOPOES, Settings
 from octopoes.core.service import OctopoesService
 from octopoes.events.manager import EventManager, get_rabbit_channel
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
@@ -12,7 +11,7 @@ from octopoes.repositories.scan_profile_repository import XTDBScanProfileReposit
 from octopoes.tasks.app import app as celery_app
 from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def get_xtdb_client(base_uri: str, client: str) -> XTDBHTTPClient:
@@ -39,6 +38,9 @@ def bootstrap_octopoes(settings: Settings, client: str, xtdb_session: XTDBSessio
     origin_param_repository = XTDBOriginParameterRepository(event_manager, xtdb_session)
     scan_profile_repository = XTDBScanProfileRepository(event_manager, xtdb_session)
 
-    octopoes = OctopoesService(ooi_repository, origin_repository, origin_param_repository, scan_profile_repository)
-
-    return octopoes
+    if GATHER_BIT_METRICS:
+        return OctopoesService(
+            ooi_repository, origin_repository, origin_param_repository, scan_profile_repository, xtdb_session
+        )
+    else:
+        return OctopoesService(ooi_repository, origin_repository, origin_param_repository, scan_profile_repository)

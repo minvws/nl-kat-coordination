@@ -139,7 +139,7 @@ class OnboardingSetupScanOOIAddView(
 
     def get_or_create_url_object(self, url: str) -> OOI:
         network = Network(name="internet")
-        url = URL(network=network.reference, raw=url)
+        url = URL(network=network.reference, raw=url, user_id=self.request.user.id)
         observed_at = datetime.now(timezone.utc)
         url_ooi, _ = get_or_create_ooi(self.octopoes_api_connector, self.bytes_client, url, observed_at)
         return url_ooi
@@ -183,7 +183,7 @@ class OnboardingClearanceLevelIntroductionView(
             {
                 "id": "dns_zone",
                 "type": "boefje",
-                "scan_level": "l1",
+                "scan_level": "1",
                 "name": "DNS-Zone",
                 "description": _("Fetch the parent DNS zone of a hostname"),
                 "enabled": False,
@@ -191,7 +191,7 @@ class OnboardingClearanceLevelIntroductionView(
             {
                 "id": "fierce",
                 "type": "boefje",
-                "scan_level": "l3",
+                "scan_level": "3",
                 "name": "Fierce",
                 "description": _("Finds subdomains by brute force"),
                 "enabled": False,
@@ -362,19 +362,19 @@ class OnboardingReportView(
     current_step = 4
     permission_required = "tools.can_scan_organization"
 
-    def get_oois_pk(self) -> list[str]:
-        """
-        Gets the Hostname primary key out of the URL object specified by the ooi query parameter.
-        """
-        ooi_pk = self.request.GET.get("ooi", "")
-        ooi = self.get_ooi(ooi_pk)
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        ooi = self.get_ooi(self.request.GET.get("ooi", ""))
+        self.oois = [Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network)]
+        self.selected_oois = [self.oois[0].primary_key]
 
-        return [Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network).primary_key]
+    def get_report_type_selection(self) -> list[str]:
+        return [self.request.GET.get("report_type", "")]
 
     def post(self, request, *args, **kwargs):
         self.set_member_onboarded()
 
-        report_ooi = self.save_report()
+        report_ooi = self.save_report([("Onboarding Report", "Onboarding Report")])
 
         return redirect(
             reverse("view_report", kwargs={"organization_code": self.organization.code})

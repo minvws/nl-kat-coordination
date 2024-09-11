@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import json
-import logging
+import re
 from collections import Counter
 from datetime import datetime
-from typing import Any, cast
+from typing import Any, Literal, cast
 
+import structlog
 from bits.definitions import BitDefinition
 from httpx import HTTPStatusError, codes
 from pydantic import RootModel, TypeAdapter
@@ -36,7 +37,7 @@ from octopoes.xtdb.query import Aliased, Query
 from octopoes.xtdb.query_builder import generate_pull_query, str_val
 from octopoes.xtdb.related_field_generator import RelatedFieldNode
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def merge_ooi(ooi_new: OOI, ooi_old: OOI) -> tuple[OOI, bool]:
@@ -95,6 +96,9 @@ class OOIRepository(Repository):
         limit: int = 20,
         scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+        search_string: str | None = None,
+        order_by: Literal["scan_level", "object_type"] = "object_type",
+        asc_desc: Literal["asc", "desc"] = "asc",
     ) -> Paginated[OOI]:
         raise NotImplementedError
 
@@ -142,6 +146,9 @@ class OOIRepository(Repository):
         only_muted,
         offset,
         limit,
+        search_string,
+        order_by,
+        asc_desc,
     ) -> Paginated[Finding]:
         raise NotImplementedError
 
@@ -201,6 +208,11 @@ for ooi_type_ in get_concrete_types():
 datamodel = Datamodel(entities=entities)
 
 
+def escape_string(string):
+    escaped_string = re.sub(r'(["\\])', r"\\\1", string)
+    return escaped_string
+
+
 class XTDBOOIRepository(OOIRepository):
     pk_prefix = "xt/id"
 
@@ -214,13 +226,15 @@ class XTDBOOIRepository(OOIRepository):
     @classmethod
     def serialize(cls, ooi: OOI) -> dict[str, Any]:
         # export model with pydantic serializers
-        export = json.loads(ooi.json())
+        export = json.loads(ooi.model_dump_json())
 
         # prefix fields, but not object_type
         export.pop("object_type")
+        user_id = export.pop("user_id", None)
         export = {f"{ooi.__class__.__name__}/{key}": value for key, value in export.items() if value is not None}
 
         export["object_type"] = ooi.__class__.__name__
+        export["user_id"] = user_id
         export[cls.pk_prefix] = ooi.primary_key
 
         return export
@@ -233,10 +247,12 @@ class XTDBOOIRepository(OOIRepository):
         # pop global attributes
         object_cls = type_by_name(data.pop("object_type"))
         data.pop(cls.pk_prefix)
+        user_id = data.pop("user_id", None)
 
         # remove type prefixes
         stripped = {key.split("/")[1]: value for key, value in data.items()}
-        return object_cls.parse_obj(stripped)
+        stripped["user_id"] = user_id
+        return object_cls.model_validate(stripped)
 
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
         try:
@@ -292,8 +308,20 @@ class XTDBOOIRepository(OOIRepository):
         limit: int = 20,
         scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+        search_string: str | None = None,
+        order_by: Literal["scan_level", "object_type"] = "object_type",
+        asc_desc: Literal["asc", "desc"] = "asc",
     ) -> Paginated[OOI]:
         types = to_concrete(types)
+
+        search_statement = (
+            f"""[?e :xt/id ?id]
+                                [(clojure.string/includes? ?id \"{escape_string(search_string)}\")]"""
+            if search_string
+            else ""
+        )
+
+        order_statement = f":order-by [[_{order_by} :{asc_desc}]]"
 
         count_query = """
                 {{
@@ -304,7 +332,8 @@ class XTDBOOIRepository(OOIRepository):
                                 [?scan_profile :type "ScanProfile"]
                                 [?scan_profile :reference ?e]
                                 [?scan_profile :level _scan_level]
-                                [?scan_profile :scan_profile_type _scan_profile_type]]
+                                [?scan_profile :scan_profile_type _scan_profile_type]
+                                {search_statement}]
                     }}
                     :in-args [[{object_types}], [{scan_levels}], [{scan_profile_types}]]
                 }}
@@ -312,6 +341,7 @@ class XTDBOOIRepository(OOIRepository):
             object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)),
             scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]),
             scan_profile_types=" ".join([str_val(scan_profile_type.value) for scan_profile_type in scan_profile_types]),
+            search_statement=search_statement,
         )
 
         res_count = self.session.client.query(count_query, valid_time)
@@ -320,13 +350,15 @@ class XTDBOOIRepository(OOIRepository):
         data_query = """
                 {{
                     :query {{
-                        :find [(pull ?e [*])]
+                        :find [(pull ?e [*]) _object_type _scan_level]
                         :in [[_object_type ...] [_scan_level ...]  [_scan_profile_type ...]]
                         :where [[?e :object_type _object_type]
                                 [?scan_profile :type "ScanProfile"]
                                 [?scan_profile :reference ?e]
                                 [?scan_profile :level _scan_level]
-                                [?scan_profile :scan_profile_type _scan_profile_type]]
+                                [?scan_profile :scan_profile_type _scan_profile_type]
+                                {search_statement}]
+                        {order_statement}
                         :limit {limit}
                         :offset {offset}
                     }}
@@ -336,6 +368,8 @@ class XTDBOOIRepository(OOIRepository):
             object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)),
             scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]),
             scan_profile_types=" ".join([str_val(scan_profile_type.value) for scan_profile_type in scan_profile_types]),
+            search_statement=search_statement,
+            order_statement=order_statement,
             limit=limit,
             offset=offset,
         )
@@ -698,6 +732,9 @@ class XTDBOOIRepository(OOIRepository):
         only_muted=False,
         offset=DEFAULT_OFFSET,
         limit=DEFAULT_LIMIT,
+        search_string: str | None = None,
+        order_by: Literal["score", "finding_type"] = "score",
+        asc_desc: Literal["asc", "desc"] = "desc",
     ) -> Paginated[Finding]:
         # clause to find risk_severity
         concrete_finding_types = to_concrete({FindingType})
@@ -720,6 +757,15 @@ class XTDBOOIRepository(OOIRepository):
         elif only_muted:
             muted_clause = "[?muted_finding :MutedFinding/finding ?finding]"
 
+        search_statement = (
+            f"""[?finding :xt/id ?id]
+                                [(clojure.string/includes? ?id \"{escape_string(search_string)}\")]"""
+            if search_string
+            else ""
+        )
+
+        order_statement = f":order-by [[?{order_by} :{asc_desc}]]"
+
         severity_values = ", ".join([str_val(severity.value) for severity in severities])
 
         count_query = f"""
@@ -729,6 +775,7 @@ class XTDBOOIRepository(OOIRepository):
                     :in [[severities_ ...]]
                     :where [[?finding :object_type "Finding"]
                             [?finding :Finding/finding_type ?finding_type]
+                            {search_statement}
                             [(== ?severity severities_)]
                             {or_severities}
                             {muted_clause}]
@@ -745,17 +792,18 @@ class XTDBOOIRepository(OOIRepository):
         finding_query = f"""
             {{
                 :query {{
-                    :find [(pull ?finding [*]) ?score]
+                    :find [(pull ?finding [*]) ?score ?finding_type]
                     :in [[severities_ ...]]
                     :where [[?finding :object_type "Finding"]
                             [?finding :Finding/finding_type ?finding_type]
                             [(== ?severity severities_)]
                             {or_severities}
                             {or_scores}
-                            {muted_clause}]
+                            {muted_clause}
+                            {search_statement}]
                     :limit {limit}
                     :offset {offset}
-                    :order-by [[?score :desc]]
+                    {order_statement}
                 }}
                :in-args [[{severity_values}]]
             }}

@@ -1,8 +1,8 @@
 import logging
 import os
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import AmqpDsn, AnyHttpUrl, DirectoryPath, Field, FilePath, PostgresDsn
 from pydantic_settings import BaseSettings, EnvSettingsSource, PydanticBaseSettingsSource, SettingsConfigDict
@@ -138,6 +138,8 @@ class Settings(BaseSettings):
 
     db_connection_pool_size: int = Field(16, description="Database connection pool size")
 
+    logging_format: Literal["text", "json"] = Field("text", description="Logging format")
+
     s3_bucket_prefix: str | None = Field(None, validation_alias="S3_BUCKET_PREFIX")
     s3_bucket_name: str | None = Field(None, validation_alias="S3_BUCKET")
     bucket_per_org: bool = Field(True, validation_alias="BUCKET_PER_ORG")
@@ -157,7 +159,7 @@ class Settings(BaseSettings):
         return env_settings, init_settings, file_secret_settings, backwards_compatible_settings
 
 
-@lru_cache
+@cache
 def get_settings() -> Settings:
     return Settings()
 

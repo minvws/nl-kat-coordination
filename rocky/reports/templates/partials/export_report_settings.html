@@ -1,0 +1,83 @@
+{% load i18n %}
+{% load static %}
+{% load report_extra %}
+{% load ooi_extra %}
+{% load compress %}
+
+<section>
+    <div>
+        {% if selected_oois and selected_report_types %}
+            <h2>{% translate "Report name" %}</h2>
+            {% include "partials/return_button.html" with btn_text="Change selection" %}
+
+            <p>
+                {% blocktranslate trimmed %}
+                    Give your report a custom name and optionally add the reports' reference date
+                    to the name. To do so you can select a standard option or use a <a href="https://strftime.org/" target="_blank">Python
+                    strftime code</a> in the report name.
+                {% endblocktranslate %}
+            </p>
+            <form id="generate_report" class="inline" method="post" action="{{ next }}">
+                <table id="report-name-table">
+                    <caption class="visually-hidden">{% translate "Report names:" %}</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col" colspan="2">
+                                {% translate "Name" %} <span class="nota-bene" aria-hidden>{% translate "(Required)" %}</span>
+                            </th>
+                            <th scope="col">{% translate "Add reference date" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for report_name in reports %}
+                            {% with report_id=report_name|slugify %}
+                                <input type="hidden" name="old_report_name" value="{{ report_name }}" />
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <input id="{{ report_id }}"
+                                                   class="name-input"
+                                                   name="report_name"
+                                                   type="text"
+                                                   value="{{ report_name }}"
+                                                   required
+                                                   minlength="3" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button type="button"
+                                                class="icon ti-arrow-back-up action-button reset-button hidden"
+                                                aria-label="{% translate "Reset" %}"></button>
+                                    </td>
+                                    <td>
+                                        <select class="reference-date" name="reference_date">
+                                            <option value="">{% translate "No reference date" %}</option>
+                                            <option value="%b %d %Y, %H:%M">{% translate "Day" %} ({{ current_datetime|date:"N jS Y, H:i" }})</option>
+                                            <option value="week">{% translate "Week" %} ({% translate "Week" %} {{ current_datetime|date:"W, Y" }})</option>
+                                            <option value="%b, %Y">{% translate "Month" %} ({{ current_datetime|date:"N, Y" }})</option>
+                                            <option value="%Y">{% translate "Year" %} ({{ current_datetime|date:"Y" }})</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            {% endwith %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% csrf_token %}
+                <button type="submit" form="generate_report">
+                    {% include "forms/report_form_fields.html" %}
+
+                    {% translate "Generate report" %}<span class="icon ti-chevron-right" aria-hidden="true"></span>
+                </button>
+            </form>
+        {% else %}
+            {% include "partials/return_button.html" with btn_text="Go back" %}
+
+        {% endif %}
+    </div>
+</section>
+{% block html_at_end_body %}
+    {% compress js %}
+        <script src="{% static "js/renameReports.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
+    {% endcompress %}
+{% endblock html_at_end_body %}

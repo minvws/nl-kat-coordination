@@ -11,7 +11,7 @@
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate "Findings @ " %}{{ valid_time|date }}</h1>
+                <h1>{% translate "Findings @ " %}{{ observed_at|date }}</h1>
                 <p>
                     {% blocktranslate trimmed with organization.name as organization_name %}
                         An overview of all findings OpenKAT found for organization <strong>{{ organization_name }}</strong>.
@@ -113,6 +113,10 @@
                                     <div>
                                         <textarea name="reason" cols="5" rows="3" id="id_reason"></textarea>
                                     </div>
+                                    <div>
+                                        <label for="id_end_valid_time">{% translate "Expires by (UTC):" %}</label>
+                                        <input type="datetime-local" name="end_valid_time" id="id_end_valid_time">
+                                    </div>
                                 </div>
                             </fieldset>
                         {% endif %}
@@ -126,7 +130,7 @@
                         </div>
                     </form>
                 {% endif %}
-                {% include "partials/pagination.html" %}
+                {% include "partials/list_paginator.html" %}
 
             </div>
         </section>

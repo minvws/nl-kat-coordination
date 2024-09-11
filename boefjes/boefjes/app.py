@@ -1,4 +1,3 @@
-import logging
 import multiprocessing as mp
 import os
 import signal
@@ -6,22 +5,18 @@ import sys
 import time
 from queue import Queue
 
+import structlog
 from httpx import HTTPError
 from pydantic import ValidationError
 
-from boefjes.clients.scheduler_client import (
-    QueuePrioritizedItem,
-    SchedulerAPIClient,
-    SchedulerClientInterface,
-    TaskStatus,
-)
+from boefjes.clients.scheduler_client import SchedulerAPIClient, SchedulerClientInterface, Task, TaskStatus
 from boefjes.config import Settings
 from boefjes.job_handler import BoefjeHandler, NormalizerHandler, bytes_api_client
-from boefjes.katalogus.local_repository import get_local_repository
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
+from boefjes.local_repository import get_local_repository
 from boefjes.runtime_interfaces import Handler, WorkerManager
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class SchedulerWorkerManager(WorkerManager):
@@ -192,7 +187,7 @@ class SchedulerWorkerManager(WorkerManager):
                 logger.info("Received %s, exiting", signal.Signals(signum).name)
 
             if not self.task_queue.empty():
-                items: list[QueuePrioritizedItem] = [self.task_queue.get() for _ in range(self.task_queue.qsize())]
+                items: list[Task] = [self.task_queue.get() for _ in range(self.task_queue.qsize())]
 
                 for p_item in items:
                     try:

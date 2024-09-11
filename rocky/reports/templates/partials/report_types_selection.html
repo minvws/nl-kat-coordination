@@ -13,10 +13,9 @@
                 improvements are needed.
             {% endblocktranslate %}
         </p>
-        {% if not oois %}
-            <a class="button ghost" href="{{ previous }}">
-                <span class="icon ti-chevron-left"></span>{% translate "Go back" %}
-            </a>
+        {% if not selected_oois %}
+            {% include "partials/return_button.html" with btn_text="Go back" selected_report_types=None %}
+
         {% else %}
             <h2>
                 {% blocktranslate trimmed count counter=oois|length %}
@@ -25,32 +24,41 @@
                     Selected objects ({{ total_oois }})
                 {% endblocktranslate %}
             </h2>
-            {% if 'all' in selected_oois %}
-                <p>
-                    {% blocktranslate trimmed count counter=oois|length %}
-                        You have selected {{ total_oois }} object in previous step.
-                    {% plural %}
-                        You have selected {{ total_oois }} objects in previous step.
-                    {% endblocktranslate %}
-                </p>
-            {% else %}
+            <p>
+                {% blocktranslate trimmed count counter=oois|length %}
+                    You have selected {{ total_oois }} object in previous step.
+                {% plural %}
+                    You have selected {{ total_oois }} objects in previous step.
+                {% endblocktranslate %}
+            </p>
+            {% if not "all" in selected_oois %}
                 {% include "summary/ooi_selection.html" %}
 
             {% endif %}
-            <a href="{{ previous }}" class="button ghost">
-                <span class="icon ti-chevron-left"></span>{% translate "Change selection" %}
-            </a>
+            <form novalidate
+                  method="post"
+                  action="{{ previous }}"
+                  class="inline layout-wide">
+                {% csrf_token %}
+                {% include "forms/report_form_fields.html" with selected_report_types=None %}
+
+                <button type="submit" class="button ghost">
+                    <span class="icon ti-chevron-left"></span>{% translate "Change selection" %}
+                </button>
+            </form>
             {% if available_report_types_aggregate %}
                 <h2>{% translate "Available report types" %} ({{ count_available_report_types_aggregate }})</h2>
             {% else %}
                 <h2>{% translate "Available report types" %} ({{ available_report_types|length }})</h2>
             {% endif %}
             <p>{% translate "All report types that are available for your selection." %}</p>
-            <a class="toggle-all" data-toggle-target="report_type">{% translate "Toggle all report types" %}</a>
+            <a class="toggle-all {% if all_report_types_checked %}toggle-on{% endif %}"
+               data-toggle-target="report_type">{% translate "Toggle all report types" %}</a>
             <form class="inline layout-wide checkboxes_required"
-                  method="get"
+                  method="post"
                   action="{{ next }}">
-                {% include "forms/report_form_fields.html" %}
+                {% csrf_token %}
+                {% include "forms/report_form_fields.html" with selected_report_types=None %}
 
                 <div class="column-4 tiles">
                     {% if available_report_types_aggregate %}

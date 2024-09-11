@@ -20,6 +20,7 @@ from tools.models import SCAN_LEVEL
 
 class OOIForm(BaseRockyForm):
     def __init__(self, ooi_class: type[OOI], connector: OctopoesAPIConnector, *args, **kwargs):
+        self.user_id = kwargs.pop("user_id", None)
         super().__init__(*args, **kwargs)
         self.ooi_class = ooi_class
         self.api_connector = connector
@@ -30,6 +31,7 @@ class OOIForm(BaseRockyForm):
             self.fields[name] = field
 
     def clean(self):
+        super().clean()["user_id"] = self.user_id
         return {key: value for key, value in super().clean().items() if value}
 
     def get_fields(self) -> dict[str, forms.fields.Field]:
@@ -47,6 +49,9 @@ class OOIForm(BaseRockyForm):
             optional_type = get_args(annotation)[0] if get_origin(annotation) == Union else None
 
             if name == "primary_key":
+                continue
+
+            if name == "user_id":
                 continue
 
             # skip literals
@@ -94,6 +99,18 @@ class OOIForm(BaseRockyForm):
                     )
             else:
                 fields[name] = forms.CharField(max_length=256, **default_attrs)
+
+        # ruff: noqa: ERA001
+        # Currently we are not ready to use the following line as the
+        # event manager is not aware of the deletion of a generic OOI
+        # it does work for 'end-point'-OOIs like MutedFinding and the
+        # field is hidden for now
+        # fields["end_valid_time"] = forms.DateTimeField(
+        #     label="Expires by",
+        #     widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
+        #     required=False,
+        # )
+        fields["end_valid_time"] = forms.DateTimeField(widget=forms.HiddenInput(), required=False)
 
         return fields
 
@@ -197,3 +214,7 @@ class OOITypeMultiCheckboxForm(BaseRockyForm):
         choices=OOI_TYPE_CHOICES,
         widget=forms.CheckboxSelectMultiple,
     )
+
+
+class OOISearchForm(BaseRockyForm):
+    search = forms.CharField(label=_("Search"), required=False, max_length=256, help_text="Object ID contains")

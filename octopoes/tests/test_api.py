@@ -28,7 +28,10 @@ def test_health(httpx_mock, patch_pika):
     }
 
     httpx_mock.add_response(
-        method="GET", url="http://testxtdb:3000/_xtdb/_dev/status", json=xtdb_status, status_code=200
+        method="GET",
+        url="http://testxtdb:3000/_xtdb/_dev/status",
+        json=xtdb_status,
+        status_code=200,
     )
     response = client.get("/_dev/health")
     assert response.json() == {
@@ -51,7 +54,9 @@ def test_health(httpx_mock, patch_pika):
 
 def test_health_no_xtdb_connection(httpx_mock, patch_pika):
     httpx_mock.add_exception(
-        httpx.ConnectTimeout("Connection timed out"), method="GET", url="http://testxtdb:3000/_xtdb/_dev/status"
+        httpx.ConnectTimeout("Connection timed out"),
+        method="GET",
+        url="http://testxtdb:3000/_xtdb/_dev/status",
     )
     response = client.get("/_dev/health")
     assert response.json() == {
@@ -94,12 +99,22 @@ def test_get_scan_profiles(httpx_mock, patch_pika, valid_time):
     )
     response = client.get("/_dev/scan_profiles", params={"valid_time": str(valid_time)})
     assert response.status_code == 200
-    assert response.json() == [{"level": 0, "reference": "Hostname|internet|mispo.es", "scan_profile_type": "empty"}]
+    assert response.json() == [
+        {
+            "level": 0,
+            "reference": "Hostname|internet|mispo.es",
+            "scan_profile_type": "empty",
+            "user_id": None,
+        }
+    ]
 
 
 def test_create_node(httpx_mock):
     httpx_mock.add_response(
-        method="POST", url="http://testxtdb:3000/_xtdb/create-node", json={"created": "true"}, status_code=200
+        method="POST",
+        url="http://testxtdb:3000/_xtdb/create-node",
+        json={"created": "true"},
+        status_code=200,
     )
     response = client.post("/_dev/node")
     assert response.status_code == 200
@@ -107,7 +122,10 @@ def test_create_node(httpx_mock):
 
 def test_delete_node(httpx_mock):
     httpx_mock.add_response(
-        method="POST", url="http://testxtdb:3000/_xtdb/delete-node", json={"deleted": "true"}, status_code=200
+        method="POST",
+        url="http://testxtdb:3000/_xtdb/delete-node",
+        json={"deleted": "true"},
+        status_code=200,
     )
     response = client.delete("/_dev/node")
     assert response.status_code == 200
@@ -157,10 +175,10 @@ def test_count_findings_by_severity(httpx_mock, patch_pika, caplog, valid_time):
         "unknown": 0,
     }
 
-    assert caplog.record_tuples == [
-        (
-            "octopoes.repositories.ooi_repository",
-            logging.WARNING,
-            "There are 2 KATFindingType|KAT-NO-FINDING-TYPE findings but the finding type is not in the database",
-        )
-    ]
+    assert len(caplog.record_tuples) == 1
+    logger, level, message = caplog.record_tuples[0]
+    assert logger == "octopoes.repositories.ooi_repository"
+    assert level == logging.WARNING
+    assert (
+        "There are 2 KATFindingType|KAT-NO-FINDING-TYPE findings but the finding type is not in the database" in message
+    )

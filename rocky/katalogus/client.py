@@ -1,7 +1,7 @@
 from io import BytesIO
-from logging import getLogger
 
 import httpx
+import structlog
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from jsonschema.exceptions import SchemaError
@@ -14,7 +14,7 @@ from octopoes.models.exception import TypeNotFound
 from octopoes.models.types import type_by_name
 from rocky.health import ServiceHealth
 
-logger = getLogger(__name__)
+logger = structlog.get_logger("katalogus_client")
 
 
 class Plugin(BaseModel):
@@ -24,7 +24,6 @@ class Plugin(BaseModel):
     authors: str | None = None
     created: str | None = None
     description: str | None = None
-    environment_keys: list[str] | None = None
     related: list[str] = Field(default_factory=list)
     enabled: bool
     type: str
@@ -94,9 +93,13 @@ class KATalogusClientV1:
         response = self.session.post("/v1/organisations/", json={"id": self.organization, "name": name})
         response.raise_for_status()
 
+        logger.info("Created organization", name=name)
+
     def delete_organization(self):
         response = self.session.delete(self.organization_uri)
         response.raise_for_status()
+
+        logger.info("Deleted organization", organization_code=self.organization)
 
     def get_plugins(self, **params):
         try:
@@ -109,6 +112,7 @@ class KATalogusClientV1:
     def get_plugin(self, plugin_id: str) -> Plugin:
         response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}")
         response.raise_for_status()
+
         return parse_plugin(response.json())
 
     def get_plugin_schema(self, plugin_id) -> dict | None:
@@ -137,9 +141,14 @@ class KATalogusClientV1:
         response = self.session.put(f"{self.organization_uri}/{plugin_id}/settings", json=values)
         response.raise_for_status()
 
+        logger.info("Upsert plugin settings", plugin_id=plugin_id)
+
     def delete_plugin_settings(self, plugin_id: str):
         response = self.session.delete(f"{self.organization_uri}/{plugin_id}/settings")
         response.raise_for_status()
+
+        logger.info("Delete plugin settings", plugin_id=plugin_id)
+
         return response
 
     def clone_all_configuration_to_organization(self, to_organization: str):
@@ -160,14 +169,14 @@ class KATalogusClientV1:
     def get_boefjes(self) -> list[Plugin]:
         return self.get_plugins(plugin_type="boefje")
 
-    def enable_boefje(self, plugin: Plugin) -> None:
-        self._patch_boefje_state(plugin.id, True)
+    def enable_plugin(self, plugin: Plugin) -> None:
+        self._patch_plugin_state(plugin.id, True)
 
     def enable_boefje_by_id(self, boefje_id: str) -> None:
-        self.enable_boefje(self.get_plugin(boefje_id))
+        self.enable_plugin(self.get_plugin(boefje_id))
 
-    def disable_boefje(self, plugin: Plugin) -> None:
-        self._patch_boefje_state(plugin.id, False)
+    def disable_plugin(self, plugin: Plugin) -> None:
+        self._patch_plugin_state(plugin.id, False)
 
     def get_enabled_boefjes(self) -> list[Plugin]:
         return [plugin for plugin in self.get_boefjes() if plugin.enabled]
@@ -175,7 +184,9 @@ class KATalogusClientV1:
     def get_enabled_normalizers(self) -> list[Plugin]:
         return [plugin for plugin in self.get_normalizers() if plugin.enabled]
 
-    def _patch_boefje_state(self, boefje_id: str, enabled: bool) -> None:
+    def _patch_plugin_state(self, boefje_id: str, enabled: bool) -> None:
+        logger.info("Toggle plugin state", plugin_id=boefje_id, enabled=enabled)
+
         response = self.session.patch(
             f"{self.organization_uri}/plugins/{boefje_id}",
             json={"enabled": enabled},
