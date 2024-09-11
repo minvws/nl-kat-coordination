@@ -8,52 +8,54 @@
             <thead>
                 <tr>
                     <th>{% translate "Plugin name" %}</th>
-                    {% if active == "all"}<th>{% translate "Plugin type" %}</th>{% endif %}
-                <th>{% translate "Plugin description" %}</th>
-                <th colspan="2">{% translate "Actions" %}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for plugin in object_list %}
-                <tr id="plugin_{{ plugin.id|slugify }}">
-                    <td scope="row">
-                        <span class="plugin-title">
-                            <strong>{{ plugin.name }}</strong>
-                        </span>
-                    </td>
-                    {% if active == "all"}
-                        <td scope="row">
-                            <p class="plugin-title">
-                                <span class="label-plugin-type {{ plugin.type }}">{{ plugin.type|title }}</span>
-                            </p>
-                        </td>
+                    {% if active == "all" %}
+                        <th>{% translate "Plugin type" %}</th>
                     {% endif %}
-                    <td>
-                        {% if plugin.description %}<span class="plugin-description">{{ plugin.description }}</span>{% endif %}
-                    </td>
-                    <td>
-                        {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
-
-                    </td>
-                    <td>
-                        {% if plugin.scan_level != None %}
-                            <a href="{% url "boefje_detail" organization_code=organization.code plugin_id=plugin.id %}"
-                               class="nowrap">{% translate "See details" %}</a>
-                        {% else %}
-                            <a href="{% url "normalizer_detail" organization_code=organization.code plugin_id=plugin.id %}"
-                               class="nowrap">{% translate "See details" %}</a>
-                        {% endif %}
-                    </td>
+                    <th>{% translate "Plugin description" %}</th>
+                    <th colspan="2">{% translate "Actions" %}</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-{% else %}
-<div class="column-4 tiles plugins images-cover">
-    {% for plugin in object_list %}
-        {% include "partials/plugin_tile.html" with plugin=plugin %}
+            </thead>
+            <tbody>
+                {% for plugin in object_list %}
+                    <tr id="plugin_{{ plugin.id|slugify }}">
+                        <td scope="row">
+                            <span class="plugin-title">
+                                <strong>{{ plugin.name }}</strong>
+                            </span>
+                        </td>
+                        {% if active == "all" %}
+                            <td scope="row">
+                                <p class="plugin-title">
+                                    <span class="label-plugin-type {{ plugin.type }}">{{ plugin.type|title }}</span>
+                                </p>
+                            </td>
+                        {% endif %}
+                        <td>
+                            {% if plugin.description %}<span class="plugin-description">{{ plugin.description }}</span>{% endif %}
+                        </td>
+                        <td>
+                            {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
 
-    {% endfor %}
-</div>
+                        </td>
+                        <td>
+                            {% if plugin.scan_level != None %}
+                                <a href="{% url "boefje_detail" organization_code=organization.code plugin_id=plugin.id %}"
+                                   class="nowrap">{% translate "See details" %}</a>
+                            {% else %}
+                                <a href="{% url "normalizer_detail" organization_code=organization.code plugin_id=plugin.id %}"
+                                   class="nowrap">{% translate "See details" %}</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="column-4 tiles plugins images-cover">
+        {% for plugin in object_list %}
+            {% include "partials/plugin_tile.html" with plugin=plugin %}
+
+        {% endfor %}
+    </div>
 {% endif %}
