@@ -14,7 +14,7 @@
             {% endblocktranslate %}
         </p>
         {% if not selected_oois %}
-            {% include "partials/return_button.html" with btn_text="Go back" %}
+            {% include "partials/return_button.html" with btn_text="Go back" selected_report_types=None %}
 
         {% else %}
             <h2>
@@ -40,7 +40,7 @@
                   action="{{ previous }}"
                   class="inline layout-wide">
                 {% csrf_token %}
-                {% include "forms/report_form_fields.html" %}
+                {% include "forms/report_form_fields.html" with selected_report_types=None %}
 
                 <button type="submit" class="button ghost">
                     <span class="icon ti-chevron-left"></span>{% translate "Change selection" %}
@@ -52,12 +52,13 @@
                 <h2>{% translate "Available report types" %} ({{ available_report_types|length }})</h2>
             {% endif %}
             <p>{% translate "All report types that are available for your selection." %}</p>
-            <a class="toggle-all" data-toggle-target="report_type">{% translate "Toggle all report types" %}</a>
+            <a class="toggle-all {% if all_report_types_checked %}toggle-on{% endif %}"
+               data-toggle-target="report_type">{% translate "Toggle all report types" %}</a>
             <form class="inline layout-wide checkboxes_required"
                   method="post"
                   action="{{ next }}">
                 {% csrf_token %}
-                {% include "forms/report_form_fields.html" %}
+                {% include "forms/report_form_fields.html" with selected_report_types=None %}
 
                 <div class="column-4 tiles">
                     {% if available_report_types_aggregate %}

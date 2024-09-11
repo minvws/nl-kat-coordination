@@ -172,16 +172,20 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
                 boefje_meta = normalizer_data["raw_data"]["boefje_meta"]
                 boefje_id = boefje_meta["boefje"]["id"]
                 if boefje_meta.get("ended_at"):
-                    boefje_meta["ended_at"] = datetime.strptime(boefje_meta["ended_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
+                    try:
+                        boefje_meta["ended_at"] = datetime.strptime(boefje_meta["ended_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
+                    except ValueError:
+                        boefje_meta["ended_at"] = datetime.strptime(boefje_meta["ended_at"], "%Y-%m-%dT%H:%M:%SZ")
                 origin.normalizer = normalizer_data
-                try:
-                    origin.boefje = katalogus.get_plugin(boefje_id)
-                except HTTPError as e:
-                    logger.error(
-                        "Could not load boefje: %s from katalogus, error: %s",
-                        boefje_id,
-                        e,
-                    )
+                if boefje_id != "manual":
+                    try:
+                        origin.boefje = katalogus.get_plugin(boefje_id)
+                    except HTTPError as e:
+                        logger.error(
+                            "Could not load boefje %s from katalogus: %s",
+                            boefje_id,
+                            e,
+                        )
             observations.append(origin)
 
         return results

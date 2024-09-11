@@ -194,7 +194,6 @@ class TestRepositories(TestCase):
             version="v1.09",
             created=datetime.datetime(2010, 10, 10, 10, 10, 10, tzinfo=datetime.UTC),
             description="My Boefje",
-            environment_keys=["api_key", "TOKEN"],
             scan_level=4,
             consumes=["Internet"],
             produces=[
@@ -244,7 +243,6 @@ class TestRepositories(TestCase):
             version="v1.19",
             created=datetime.datetime(2010, 10, 10, 10, 10, 10, tzinfo=datetime.UTC),
             description="My Normalizer",
-            environment_keys=["api_key", "TOKEN"],
             scan_level=4,
             consumes=["Internet"],
             produces=[
