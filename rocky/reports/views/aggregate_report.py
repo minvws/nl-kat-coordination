@@ -133,8 +133,12 @@ class ReportTypesSelectionAggregateReportView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["available_report_types_aggregate"] = self.available_report_types
+
         context["count_available_report_types_aggregate"] = len(self.available_report_types["required"]) + len(
             self.available_report_types["optional"]
+        )
+        context["all_report_types_checked"] = (
+            len(self.get_report_type_selection()) == context["count_available_report_types_aggregate"]
         )
         context["total_oois"] = self.get_total_objects()
         return context
