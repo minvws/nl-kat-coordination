@@ -8,13 +8,18 @@ from queue import Queue
 import structlog
 from httpx import HTTPError
 from pydantic import ValidationError
+from sqlalchemy.orm import sessionmaker
 
 from boefjes.clients.scheduler_client import SchedulerAPIClient, SchedulerClientInterface, Task, TaskStatus
 from boefjes.config import Settings
+from boefjes.dependencies.plugins import PluginService
 from boefjes.job_handler import BoefjeHandler, NormalizerHandler, bytes_api_client
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
 from boefjes.local_repository import get_local_repository
 from boefjes.runtime_interfaces import Handler, WorkerManager
+from boefjes.sql.config_storage import create_config_storage
+from boefjes.sql.db import get_engine
+from boefjes.sql.plugin_storage import create_plugin_storage
 
 logger = structlog.get_logger(__name__)
 
@@ -256,9 +261,17 @@ def _start_working(
 
 def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_level: str) -> WorkerManager:
     local_repository = get_local_repository()
+
+    session = sessionmaker(bind=get_engine())()
+    plugin_service = PluginService(
+        create_plugin_storage(session),
+        create_config_storage(session),
+        local_repository,
+    )
+
     item_handler: Handler
     if queue is WorkerManager.Queue.BOEFJES:
-        item_handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository, bytes_api_client)
+        item_handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), plugin_service, bytes_api_client)
     else:
         item_handler = NormalizerHandler(
             LocalNormalizerJobRunner(local_repository), bytes_api_client, settings.scan_profile_whitelist

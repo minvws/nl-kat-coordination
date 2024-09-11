@@ -1,0 +1,85 @@
+{% load static %}
+{% load i18n %}
+
+<div>
+    <h2>{% translate "Container image" %}</h2>
+    <p>
+        {% translate "The container image for this Boefje is:" %} <a href="{{ plugin.oci_image }}">{{ plugin.oci_image }}</a>
+    </p>
+    <div class="fifty-fifty">
+        <div>
+            <h3>{% translate "Variants" %}</h3>
+            <p>
+                {% blocktranslate %}
+                    Boefje variants that use the same container image. For more
+                    information about Boefje variants you can read the documentation.
+                {% endblocktranslate %}
+            </p>
+        </div>
+        {% if variants %}
+            <div class="horizontal-view toolbar">
+                <a class="button ghost" href=""><span class="icon ti-plus"></span>{% translate "Add variant" %}</a>
+            </div>
+        {% endif %}
+    </div>
+    {% if variants %}
+        <div class="horizontal-scroll">
+            <ul class="accordion">
+                <li>
+                    <button id="definition-asset" aria-expanded="true">All variants</button>
+                    <div aria-labelledby="definition-asset">
+                        <table>
+                            <caption class="visually-hidden">{% translate "Overview of variants" %}</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">{% translate "Name" %}</th>
+                                    <th scope="col">{% translate "Scan level" %}</th>
+                                    <th scope="col">{% translate "Published by" %}</th>
+                                    <th scope="col">{% translate "Status" %}</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for variant in variants %}
+                                    <tr>
+                                        <td>{{ variant.name }}name</td>
+                                        <td>{{ variant.scan_level }}scan_level</td>
+                                        <td>{{ variant.published_by }}published_by</td>
+                                        <td>{{ variant.status }}status</td>
+                                        <td class="actions">
+                                            <button class="expando-button"
+                                                    data-icon-open-class="icon ti-chevron-down"
+                                                    data-icon-close-class="icon ti-chevron-up"
+                                                    data-close-label="{% translate "Close details" %}">
+                                                {% translate "Open details" %}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="expando-row">
+                                        <td colspan="5">
+                                            <h5>{% translate "Arguments" %}</h5>
+                                            <p>{% translate "The following arguments are used for this Boefje variant." %}</p>
+                                            <div>
+                                                <p>Some code example</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    {% else %}
+        <p class="explanation"
+           role="group"
+           aria-label="{% translate "no variants explanation" %}">
+            <span>{% translate "This Boefje has no variants yet." %}</span>
+            {% blocktranslate trimmed %}
+                You can make a variant and change the arguments and JSON Schema
+                to customize it to fit your needs.
+            {% endblocktranslate %}
+        </p>
+    {% endif %}
+</div>
