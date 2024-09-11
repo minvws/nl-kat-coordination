@@ -101,6 +101,7 @@ class Organization(models.Model):
             ("can_switch_organization", "Can switch organization"),
             ("can_scan_organization", "Can scan organization"),
             ("can_enable_disable_boefje", "Can enable or disable boefje"),
+            ("can_add_boefje", "Can add new or duplicate boefjes"),
             ("can_set_clearance_level", "Can set clearance level"),
             ("can_delete_oois", "Can delete oois"),
             ("can_mute_findings", "Can mute findings"),

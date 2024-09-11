@@ -1107,6 +1107,25 @@ def plugin_details():
 
 
 @pytest.fixture
+def plugin_details_with_container():
+    return parse_plugin(
+        {
+            "id": "test-boefje",
+            "type": "boefje",
+            "name": "TestBoefje",
+            "description": "Meows to the moon",
+            "scan_level": 1,
+            "consumes": ["Network"],
+            "produces": ["Network"],
+            "enabled": True,
+            "schema": {},
+            "oci_image": "ghcr.io/test/image:123",
+            "oci_arguments": ["-test", "-arg"],
+        }
+    )
+
+
+@pytest.fixture
 def plugin_schema():
     return {
         "title": "Arguments",
