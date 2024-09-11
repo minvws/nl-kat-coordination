@@ -291,18 +291,6 @@ class SchedulerClient:
         except ConnectError:
             raise SchedulerConnectError(extra_message="Report schedule failed: ")
 
-    # TODO: arguments, a Schedule model, a dict?
-    def patch_schedule(self, schedule_id: str, enabled: bool, schedule: str) -> None:
-        # FIXME: this is just an example
-        try:
-            res = self._client.patch(
-                f"/schedules/{schedule_id}",
-                json={"enabled": enabled, "schedule": schedule},
-            )
-            res.raise_for_status()
-        except ConnectError:
-            raise SchedulerConnectError()
-
     def list_tasks(
         self,
         **kwargs,
