@@ -65,6 +65,7 @@ BOEFJE_DESCRIPTION_HELP_TEXT = mark_safe(
         "This will both be displayed inside the KAT-alogus and on the Boefje details page.</p> "
     )
 )
+
 BOEFJE_CONSUMES_HELP_TEXT = _(
     "Select the object type(s) that your Boefje consumes. "
     "To select multiple objects, press and hold the 'ctrl'/'command' key "
