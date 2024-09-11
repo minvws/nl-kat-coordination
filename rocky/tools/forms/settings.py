@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from tools.enums import SCAN_LEVEL
@@ -56,6 +57,51 @@ OBSERVED_AT_HELP_TEXT = _(
     "OpenKAT stores a time indication with every observation, "
     "so it is possible to see the status of your network through time. "
     "Select a datetime to change the view to represent that moment in time."
+)
+
+BOEFJE_DESCRIPTION_HELP_TEXT = mark_safe(
+    _(
+        "<p>A description of the boefje explaining in short what it can do. "
+        "This will both be displayed inside the KAT-alogus and on the Boefje details page.</p> "
+    )
+)
+
+BOEFJE_SCHEMA_HELP_TEXT = mark_safe(
+    _(
+        "<p>If any other settings are needed for your Boefje, add these as a JSON Schema, "
+        "otherwise, leave the field empty or 'null'.</p> "
+        "<p> This JSON is used as the basis for a form for the user. "
+        "When the user enables this Boefje they can get the option to give extra information. "
+        "For example, it can contain an API key that the script requires.</p> "
+        "<p>More information about what the schema.json file looks like can be found "
+        "<a href='https://docs.openkat.nl/developer_documentation/development_tutorial/creating_a_boefje.html'> "
+        "here</a>.</p> "
+    )
+)
+
+BOEFJE_CONSUMES_HELP_TEXT = mark_safe(
+    _(
+        "<p>Select the object type that your Boefje consumes.</p> "
+        "<p>This object type triggers the Boefje to run. Whenever this OOI gets added, "
+        "this Boefje will run with that OOI.</p> "
+    )
+)
+
+
+BOEFJE_PRODUCES_HELP_TEXT = mark_safe(
+    _(
+        "<p>Add a set of mime types that are produced by this Boefje, separated by commas. "
+        "For example: <i>'text/html'</i>, <i>'image/jpeg'</i> or <i>'boefje/{boefje-id}'</i></p> "
+        "<p>These output mime types will be shown on the Boefje detail page as information for other users. </p> "
+    )
+)
+BOEFJE_SCAN_LEVEL_HELP_TEXT = mark_safe(
+    _(
+        "<p>Select a clearance level for your Boefje. For more information about the different "
+        "clearance levels please check the "
+        "<a href='https://docs.openkat.nl/manual/usermanual.html#scan-levels-clearance-indemnities'> "
+        "documentation</a>.</p> "
+    )
 )
 
 DEPTH_DEFAULT = 9

@@ -1,10 +1,12 @@
 import uuid
+from base64 import b64encode
 
 import httpx
 import pytest
 from httpx import HTTPError
 from prometheus_client.parser import text_string_to_metric_families
 
+from bytes.api.models import BoefjeOutput, File
 from bytes.models import MimeType
 from bytes.rabbitmq import RabbitMQEventManager
 from bytes.repositories.meta_repository import BoefjeMetaFilter, NormalizerMetaFilter, RawDataFilter
@@ -147,7 +149,10 @@ def test_normalizer_meta(bytes_api_client: BytesAPIClient, event_manager: Rabbit
     normalizer_meta.raw_data.hash_retrieval_link = retrieved_normalizer_meta.raw_data.hash_retrieval_link
     normalizer_meta.raw_data.signing_provider_url = retrieved_normalizer_meta.raw_data.signing_provider_url
 
-    assert normalizer_meta.dict() == retrieved_normalizer_meta.dict()
+    normalizer_meta.raw_data.mime_types = sorted(normalizer_meta.raw_data.mime_types)
+    retrieved_normalizer_meta.raw_data.mime_types = sorted(retrieved_normalizer_meta.raw_data.mime_types)
+
+    assert normalizer_meta.model_dump_json() == retrieved_normalizer_meta.model_dump_json()
 
 
 def test_filtered_normalizer_meta(bytes_api_client: BytesAPIClient) -> None:
@@ -255,21 +260,30 @@ def test_save_raw_no_mime_types(bytes_api_client: BytesAPIClient) -> None:
     boefje_meta = get_boefje_meta(meta_id=uuid.uuid4())
     bytes_api_client.save_boefje_meta(boefje_meta)
 
-    headers = {"content-type": "application/octet-stream"}
     bytes_api_client.login()
-    headers.update(bytes_api_client.client.headers)
 
     raw_url = f"{bytes_api_client.client.base_url}/bytes/raw"
 
     raw = b"second test 123456"
+    file_name = "raw"
     response = httpx.post(
-        raw_url, content=raw, headers=headers, params={"boefje_meta_id": str(boefje_meta.id)}, timeout=30
+        raw_url,
+        json={
+            "files": [
+                {
+                    "name": file_name,
+                    "content": b64encode(raw).decode(),
+                    "tags": [],
+                }
+            ]
+        },
+        headers=bytes_api_client.client.headers,
+        params={"boefje_meta_id": str(boefje_meta.id)},
     )
-
     assert response.status_code == 200
 
     get_raw_without_mime_type_response = httpx.get(
-        f"{raw_url}/{response.json().get('id')}", headers=bytes_api_client.client.headers, timeout=30
+        f"{raw_url}/{response.json()[file_name]}", headers=bytes_api_client.client.headers, timeout=30
     )
 
     assert get_raw_without_mime_type_response.status_code == 200
@@ -293,13 +307,13 @@ def test_raw_mimes(bytes_api_client: BytesAPIClient) -> None:
         )
     )
     assert len(retrieved_raws) == 1
-    assert retrieved_raws[0]["mime_types"] == [{"value": value} for value in mime_types]
+    assert {x["value"] for x in retrieved_raws[0]["mime_types"]} == set(mime_types)
 
     retrieved_raws = bytes_api_client.get_raws(
         RawDataFilter(boefje_meta_id=boefje_meta.id, normalized=False, mime_types=[MimeType(value="text/html")])
     )
     assert len(retrieved_raws) == 1
-    assert retrieved_raws[0]["mime_types"] == [{"value": value} for value in mime_types]
+    assert {x["value"] for x in retrieved_raws[0]["mime_types"]} == set(mime_types)
 
     retrieved_raws = bytes_api_client.get_raws(
         RawDataFilter(boefje_meta_id=boefje_meta.id, normalized=False, mime_types=[MimeType(value="bad/mime")])
@@ -336,3 +350,22 @@ def test_cannot_overwrite_raw(bytes_api_client: BytesAPIClient) -> None:
     retrieved_raw = bytes_api_client.get_raw(first_raw_id)
 
     assert retrieved_raw == right_raw
+
+
+def test_save_multiple_raw_files(bytes_api_client: BytesAPIClient) -> None:
+    boefje_meta = get_boefje_meta()
+    bytes_api_client.save_boefje_meta(boefje_meta)
+
+    first_raw = b"first"
+    second_raw = b"second"
+    boefje_output = BoefjeOutput(
+        files=[
+            File(name="first", content=b64encode(first_raw).decode(), tags=[]),
+            File(name="second", content=b64encode(second_raw).decode(), tags=["mime", "type"]),
+        ]
+    )
+
+    ids = bytes_api_client.save_raws(boefje_meta.id, boefje_output)
+
+    assert bytes_api_client.get_raw(ids["first"]) == first_raw
+    assert bytes_api_client.get_raw(ids["second"]) == second_raw

@@ -26,9 +26,15 @@ from tools.view_helpers import BreadcrumbsMixin, url_with_querystring
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
+from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import AggregateReport, Report
-from reports.report_types.helpers import REPORTS, get_report_by_id, get_report_types_for_oois
+from reports.report_types.helpers import (
+    REPORTS,
+    get_report_by_id,
+    get_report_types_for_oois,
+    get_report_types_from_aggregate_report,
+)
 from reports.utils import JSONEncoder, debug_json_keys
 from rocky.views.mixins import ObservedAtMixin, OOIList
 from rocky.views.ooi_view import OOIFilterView
@@ -170,6 +176,22 @@ class ReportRecipeView(OOIFilterView):
     def get_report_types(self) -> set[type[Report]]:
         return {get_report_by_id(report_type_id) for report_type_id in self.get_report_type_ids()}
 
+    @staticmethod
+    def get_report_types_from_ooi_selelection(report_types: set[type[Report]]) -> list[dict[str, str]]:
+        """
+        The report types are fetched from which ooi is selected. Shows all report types for the oois.
+        """
+
+        return [
+            {
+                "id": report_type.id,
+                "name": report_type.name,
+                "description": report_type.description,
+                "label_style": report_type.label_style,
+            }
+            for report_type in report_types
+        ]
+
     def get_plugins_from_report_type(self) -> dict[str, list[Plugin]]:
         """
         Returns plugins from KAT-alogus from the selected report types.
@@ -241,31 +263,41 @@ class ReportTypeSelectionView(ReportRecipeView):
     Shows report types and handles selections and requests.
     """
 
+    report_type = None
+
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.show_report_types = get_report_types_for_oois(self.get_ooi_pks())
+        self.available_report_types, self.counted_report_types = self.get_availabel_report_types()
 
-    def get_report_types_from_ooi_selelection(self) -> list[dict[str, str]]:
-        """
-        The report types are fetched from which ooi is selected. Shows all report types for the oois.
-        """
+    def get_report_types_for_generate_report(self):
+        return self.get_report_types_from_ooi_selelection(get_report_types_for_oois(self.get_ooi_pks()))
 
-        report_types = [
-            {
-                "id": report_type.id,
-                "name": report_type.name,
-                "description": report_type.description,
-                "label_style": report_type.label_style,
-            }
-            for report_type in self.show_report_types
-        ]
+    def get_report_types_for_aggregate_report(self) -> dict[str, list[dict[str, str]]]:
+        reports_dict = get_report_types_from_aggregate_report(AggregateOrganisationReport)
+        report_types: dict[str, list[dict[str, str]]] = {}
+
+        for option, reports in reports_dict.items():
+            report_types[option] = self.get_report_types_from_ooi_selelection({report for report in reports})
         return report_types
+
+    def get_availabel_report_types(self) -> tuple[list[dict[str, str]] | dict[str, list[dict[str, str]]], int]:
+        if self.report_type is not None and self.report_type == AggregateOrganisationReport:
+            report_types = self.get_report_types_for_aggregate_report()
+            return report_types, len(report_types.values())
+        else:
+            report_types = self.get_report_types_for_generate_report()
+            return report_types, len(report_types)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["total_oois"] = len(self.report_recipe.input_oois)
         context["oois"] = self.get_oois()
-        context["available_report_types"] = self.get_report_types_from_ooi_selelection()
+
+        context["available_report_types"] = self.available_report_types
+
+        context["count_available_report_types"] = self.counted_report_types
+        context["all_report_types_checked"] = len(self.get_report_type_ids()) == self.counted_report_types
+
         return context
 
 
@@ -468,24 +500,16 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.report_id = request.GET.get("report_id")
-        self.report_ooi = self.octopoes_api_connector.get(
-            Reference.from_str(f"{self.report_id}"), valid_time=self.observed_at
-        )
+        self.report_ooi = self.get_report_ooi(request.GET.get("report_id"))
+        self.report_data, self.input_oois, self.report_types = self.get_report_data()
 
     def get(self, request, *args, **kwargs):
         if "json" in self.request.GET and self.request.GET["json"] == "true":
-            self.bytes_client.login()
-            data = json.loads(self.bytes_client.get_raw(raw_id=self.report_ooi.data_raw_id))
-
             response = {
                 "organization_code": self.organization.code,
                 "organization_name": self.organization.name,
                 "organization_tags": list(self.organization.tags.all()),
-                "data": {
-                    "report_data": {},
-                    "post_processed_data": data,
-                },
+                "data": self.report_data,
             }
 
             try:
@@ -494,13 +518,16 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                 # We can't use translated strings as keys in JSON. This
                 # debugging code makes it easy to spot where the problem is.
                 if settings.DEBUG:
-                    debug_json_keys(data, [])
+                    debug_json_keys(self.report_data, [])
                 raise
             else:
                 response["Content-Disposition"] = f"attachment; filename=report-{self.organization.code}.json"
                 return response
 
         return super().get(request, *args, **kwargs)
+
+    def get_report_ooi(self, ooi_pk: str) -> ReportOOI:
+        return self.octopoes_api_connector.get(Reference.from_str(f"{ooi_pk}"), valid_time=self.observed_at)
 
     def get_template_names(self):
         if self.report_ooi.report_type and issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
@@ -513,11 +540,16 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
             ]
 
     def get_children_reports(self) -> list[ReportOOI]:
-        return self.octopoes_api_connector.query(
-            "Report.<parent_report[is Report]",
-            valid_time=self.observed_at,
-            source=self.report_ooi.reference,
-        )
+        return [
+            child
+            for x in REPORTS
+            for child in self.octopoes_api_connector.query(
+                "Report.<parent_report[is Report]",
+                valid_time=self.observed_at,
+                source=self.report_ooi.reference,
+            )
+            if child.report_type == x.id
+        ]
 
     @staticmethod
     def get_report_types(reports: list[ReportOOI]) -> list[dict[str, Any]]:
@@ -528,69 +560,85 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
             self.bytes_client.get_raw(raw_id=report.data_raw_id)
         )
 
-    def get_input_oois(self, reports: list[ReportOOI]) -> list[OOI]:
+    def get_input_oois(self, reports: list[ReportOOI]) -> list[type[OOI]]:
         ooi_pks = {ooi for report in reports for ooi in report.input_oois}
 
         return [
             self.octopoes_api_connector.get(Reference.from_str(ooi), valid_time=self.observed_at) for ooi in ooi_pks
         ]
 
+    def get_report_data_single_report(
+        self,
+    ) -> tuple[dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]]]:
+        self.bytes_client.login()
+        report_data: dict[str, dict[str, dict[str, Any]]] = {}
+        report_data[self.report_ooi.report_type] = {}
+
+        for ooi in self.report_ooi.input_oois:
+            report_data[self.report_ooi.report_type][ooi] = {
+                "data": self.get_report_data_from_bytes(self.report_ooi)["report_data"],
+                "template": self.report_ooi.template,
+                "report_name": self.report_ooi.name,
+            }
+
+        input_oois = self.get_input_oois([self.report_ooi])
+        report_types = self.get_report_types([self.report_ooi])
+
+        return report_data, input_oois, report_types
+
+    def get_report_data_aggregate_report(
+        self,
+    ) -> tuple[dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]]]:
+        self.bytes_client.login()
+        report_data = self.get_report_data_from_bytes(self.report_ooi)
+
+        children_reports = self.get_children_reports()
+        input_oois = self.get_input_oois([self.report_ooi])
+        report_types = self.get_report_types(children_reports)
+
+        return report_data, input_oois, report_types
+
+    def get_report_data_concatenated_report(
+        self,
+    ) -> tuple[dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]]]:
+        self.bytes_client.login()
+        report_data: dict[str, dict[str, dict[str, Any]]] = {}
+
+        children_reports = self.get_children_reports()
+        input_oois = self.get_input_oois(children_reports)
+        report_types = self.get_report_types(children_reports)
+
+        for report in children_reports:
+            for ooi in report.input_oois:
+                report_data.setdefault(report.report_type, {})[ooi] = {
+                    "data": self.get_report_data_from_bytes(report)["report_data"],
+                    "template": report.template,
+                    "report_name": report.name,
+                }
+        return report_data, input_oois, report_types
+
+    def get_report_data(self):
+        if issubclass(get_report_by_id(self.report_ooi.report_type), ConcatenatedReport):
+            return self.get_report_data_concatenated_report()
+        elif issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
+            return self.get_report_data_aggregate_report()
+        else:
+            return self.get_report_data_single_report()
+
     def get_context_data(self, **kwargs):
         # TODO: add config and plugins
         # TODO: add template OOI
         context = super().get_context_data(**kwargs)
+        context["report_data"] = self.report_data
 
-        self.bytes_client.login()
-        report_data: dict[str, dict[str, dict[str, Any]]] = {}
-
-        children_reports = [
-            child for x in REPORTS for child in self.get_children_reports() if child.report_type == x.id
-        ]
-        report_types: list[dict[str, Any]] = []
-
-        if issubclass(
-            get_report_by_id(self.report_ooi.report_type), ConcatenatedReport
-        ):  # get single reports data (children's)
-            context["data"] = self.get_report_data_from_bytes(self.report_ooi)
-            for report in children_reports:
-                for ooi in report.input_oois:
-                    report_data.setdefault(report.report_type, {})[ooi] = {
-                        "data": self.get_report_data_from_bytes(report)["report_data"],
-                        "template": report.template,
-                        "report_name": report.name,
-                    }
-
-            input_oois = self.get_input_oois(children_reports)
-            report_types = self.get_report_types(children_reports)
-
-        elif issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):  # its an aggregate report
-            context["post_processed_data"] = self.get_report_data_from_bytes(self.report_ooi)
-            input_oois = self.get_input_oois([self.report_ooi])
-            report_types = self.get_report_types(children_reports)
-
-        else:
-            # its a single report
-            report_data[self.report_ooi.report_type] = {}
-            context["data"] = self.get_report_data_from_bytes(self.report_ooi)
-            for ooi in self.report_ooi.input_oois:
-                report_data[self.report_ooi.report_type][ooi] = {
-                    "data": context["data"]["report_data"],
-                    "template": self.report_ooi.template,
-                    "report_name": self.report_ooi.name,
-                }
-
-            input_oois = self.get_input_oois([self.report_ooi])
-            report_types = self.get_report_types([self.report_ooi])
-
-        context["report_data"] = report_data
         context["report_name"] = self.report_ooi.name
         context["report_types"] = [
-            report_type for x in REPORTS for report_type in report_types if report_type["id"] == x.id
+            report_type for x in REPORTS for report_type in self.report_types if report_type["id"] == x.id
         ]
         context["created_at"] = self.report_ooi.date_generated
         context["observed_at"] = self.report_ooi.observed_at
-        context["total_oois"] = len(input_oois)
-        context["oois"] = input_oois
+        context["total_oois"] = len(self.input_oois)
+        context["oois"] = self.input_oois
 
         context["template"] = self.report_ooi.template
         context["report_download_pdf_url"] = url_with_querystring(
