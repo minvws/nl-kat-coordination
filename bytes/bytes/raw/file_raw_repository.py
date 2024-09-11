@@ -2,8 +2,8 @@ from pathlib import Path
 from uuid import UUID
 
 import structlog
-from boto3 import Session
 from boto3.session import Session as BotoSession
+from mypy_boto3_s3 import S3ServiceResource
 
 from bytes.config import Settings
 from bytes.models import BoefjeMeta, RawData
@@ -79,23 +79,22 @@ class S3RawRepository(RawRepository):
         self,
         file_middleware: FileMiddleware,
         bucket_per_org: bool,
-        s3_bucket_prefix: str | None = "OpenKAT-",
-        s3_bucket_name: str | None = "OpenKAT",
+        s3_bucket_prefix: str = "OpenKAT-",
+        s3_bucket_name: str = "OpenKAT",
     ) -> None:
         self.file_middleware = file_middleware
         self.bucket_per_org = bucket_per_org
         self.s3_bucket_prefix = s3_bucket_prefix
         self.s3_bucket_name = s3_bucket_name
 
-        self._session: Session = None
-        self._s3resource = None
+        self._s3resource: S3ServiceResource | None = None
 
     @property
-    def s3resource(self):
+    def __s3resource(self) -> S3ServiceResource:
         if self._s3resource:
             return self._s3resource
-        self._session = BotoSession()
-        self._s3resource = self._session.resource("s3")
+        session = BotoSession()
+        self._s3resource = session.resource("s3")
         return self._s3resource
 
     def get_or_create_bucket(self, organization: str):
@@ -104,12 +103,12 @@ class S3RawRepository(RawRepository):
         if self.bucket_per_org:
             bucket_name = f"{self.s3_bucket_prefix}{organization}"
             try:
-                bucket = self.s3resource.create_bucket(Bucket=bucket_name)
+                bucket = self.__s3resource.create_bucket(Bucket=bucket_name)
                 bucket.wait_until_exists()
                 return bucket
             except Exception as error:
                 logger.error("Something went wrong with creating bucket %s\n%s", bucket_name, error)
-        return self.s3resource.Bucket(name=bucket_name)
+        return self.__s3resource.Bucket(name=bucket_name)
 
     def save_raw(self, raw_id: UUID, raw: RawData) -> None:
         file_name = self._raw_file_name(raw_id, raw.boefje_meta)
@@ -125,7 +124,7 @@ class S3RawRepository(RawRepository):
 
         try:
             contents = bucket.Object(file_name).get()["Body"].read()
-        except self.s3resource.meta.client.exceptions as error:
+        except self.__s3resource.meta.client.exceptions as error:
             if error.response["Error"]["Code"] == "404":
                 raise BytesFileNotFoundException(error)
             logger.error("Could not get file from s3: %s/%s due to %s", bucket.name, file_name, error)
