@@ -4,6 +4,7 @@ import httpx
 import structlog
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from httpx import codes
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import BaseModel, Field, field_serializer
@@ -38,10 +39,13 @@ class Plugin(BaseModel):
 
 class Boefje(Plugin):
     scan_level: SCAN_LEVEL
-    consumes: set[type[OOI]]
+    consumes: set[type[OOI]] = Field(default_factory=set)
+    produces: set[str] = Field(default_factory=set)
     options: list[str] | None = None
     runnable_hash: str | None = None
-    produces: set[str]
+    schema: dict | None = None
+    oci_image: str | None = None
+    oci_arguments: list[str] = Field(default_factory=list)
 
     # use a custom field_serializer for `consumes`
     @field_serializer("consumes")
@@ -204,6 +208,19 @@ class KATalogusClientV1:
         response.raise_for_status()
         return BytesIO(response.content)
 
+    def create_plugin(self, plugin: Plugin) -> None:
+        response = self.session.post(
+            f"{self.organization_uri}/plugins",
+            headers={"Content-Type": "application/json"},
+            content=plugin.model_dump_json(exclude_none=True),
+        )
+        response.raise_for_status()
+
+        if response.status_code == codes.CREATED:
+            logger.info("Plugin %s", plugin.name)
+        else:
+            logger.info("Plugin %s could not be created", plugin.name)
+
 
 def parse_boefje(boefje: dict) -> Boefje:
     scan_level = SCAN_LEVEL(boefje["scan_level"])
@@ -225,6 +242,9 @@ def parse_boefje(boefje: dict) -> Boefje:
         scan_level=scan_level,
         consumes=consumes,
         produces=boefje["produces"],
+        schema=boefje.get("schema"),
+        oci_image=boefje.get("oci_image"),
+        oci_arguments=boefje.get("oci_arguments", []),
     )
 
 
