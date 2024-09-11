@@ -108,6 +108,7 @@ class S3RawRepository(RawRepository):
                 return bucket
             except Exception as error:
                 logger.error("Something went wrong with creating bucket %s\n%s", bucket_name, error)
+                raise error
         return self.__s3resource.Bucket(name=bucket_name)
 
     def save_raw(self, raw_id: UUID, raw: RawData) -> None:
