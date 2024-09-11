@@ -86,8 +86,7 @@ class ReportTask(BaseModel):
     type: str = "report"
 
     organization: str
-
-    # TODO: add more fields
+    report_recipe_id: str
 
 
 class TaskStatus(Enum):
