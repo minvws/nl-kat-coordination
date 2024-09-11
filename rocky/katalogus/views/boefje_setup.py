@@ -22,7 +22,9 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
     def form_valid(self, form):
         """If the form is valid, redirect to the supplied URL."""
         form_data = form.cleaned_data
-        plugin_id = self.kwargs.get("plugin_id", str(uuid.uuid4()))
+
+        plugin_id = str(uuid.uuid4())
+        return_to_plugin_id = self.kwargs.get("plugin_id", plugin_id)
 
         arguments = [] if form_data["oci_arguments"] == "" else form_data["oci_arguments"].split()
         consumes = [] if form_data["consumes"] == "" else form_data["consumes"].strip("[]").replace("'", "").split(", ")
@@ -52,7 +54,9 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
         query_params = urlencode({"new_variant": True})
 
         return redirect(
-            reverse("boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": plugin_id})
+            reverse(
+                "boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": return_to_plugin_id}
+            )
             + "?"
             + query_params
         )
