@@ -107,7 +107,8 @@ class ReportTypesSelectionAggregateReportView(
     template_name = "aggregate_report/select_report_types.html"
     breadcrumbs_step = 4
     current_step = 2
-    ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
+    report_type = AggregateOrganisationReport
+    ooi_types = get_ooi_types_from_aggregate_report(report_type)
 
     def post(self, request, *args, **kwargs):
         report_recipe = self.get_report_recipe()
