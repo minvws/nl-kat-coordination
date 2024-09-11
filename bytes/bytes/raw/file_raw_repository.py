@@ -4,6 +4,7 @@ from uuid import UUID
 import structlog
 from boto3.session import Session as BotoSession
 from mypy_boto3_s3 import S3ServiceResource
+from mypy_boto3_s3.service_resource import Bucket
 
 from bytes.config import Settings
 from bytes.models import BoefjeMeta, RawData
@@ -82,7 +83,7 @@ class S3RawRepository(RawRepository):
         s3_bucket_prefix: str = "OpenKAT-",
         s3_bucket_name: str = "OpenKAT",
     ) -> None:
-        self.file_middleware = file_middleware
+        self._file_middleware = file_middleware
         self.bucket_per_org = bucket_per_org
         self.s3_bucket_prefix = s3_bucket_prefix
         self.s3_bucket_name = s3_bucket_name
@@ -97,7 +98,7 @@ class S3RawRepository(RawRepository):
         self._s3resource = session.resource("s3")
         return self._s3resource
 
-    def get_or_create_bucket(self, organization: str):
+    def get_or_create_bucket(self, organization: str) -> Bucket:
         # Create a bucket, and if it exists already return that instead
         bucket_name = self.s3_bucket_name
         if self.bucket_per_org:
@@ -113,7 +114,7 @@ class S3RawRepository(RawRepository):
 
     def save_raw(self, raw_id: UUID, raw: RawData) -> None:
         file_name = self._raw_file_name(raw_id, raw.boefje_meta)
-        contents = self.file_middleware.encode(raw.value)
+        contents = self._file_middleware.encode(raw.value)
 
         logger.info("Writing raw data with id %s to s3", raw_id)
         bucket = self.get_or_create_bucket(raw.boefje_meta.organization)
@@ -125,13 +126,13 @@ class S3RawRepository(RawRepository):
 
         try:
             contents = bucket.Object(file_name).get()["Body"].read()
-        except self.__s3resource.meta.client.exceptions as error:
+        except self.__s3resource.meta.client.exceptions.NoSuchBucket as error:
             if error.response["Error"]["Code"] == "404":
                 raise BytesFileNotFoundException(error)
             logger.error("Could not get file from s3: %s/%s due to %s", bucket.name, file_name, error)
             raise error
 
-        return RawData(value=self.file_middleware.decode(contents), boefje_meta=boefje_meta)
+        return RawData(value=self._file_middleware.decode(contents), boefje_meta=boefje_meta)
 
     def _raw_file_name(self, raw_id: UUID, boefje_meta: BoefjeMeta) -> str:
         if self.bucket_per_org:
