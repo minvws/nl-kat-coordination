@@ -27,7 +27,7 @@ from octopoes.models.pagination import Paginated
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
-from octopoes.types import DECLARATION_CREATED, OBSERVATION_CREATED, ORIGIN_DELETED
+from octopoes.types import DECLARATION_CREATED, OBJECT_DELETED, OBSERVATION_CREATED, ORIGIN_DELETED
 
 
 class OctopoesAPIConnector:
@@ -227,7 +227,7 @@ class OctopoesAPIConnector:
         params = {"reference": str(reference), "valid_time": str(valid_time)}
         self.session.delete(f"/{self.client}/", params=params)
 
-        self.logger.info("Deleted object", reference=reference, valid_time=valid_time)
+        self.logger.info("Deleted object", reference=reference, valid_time=valid_time, event_code=OBJECT_DELETED)
 
     def delete_many(self, references: list[Reference], valid_time: datetime) -> None:
         params = {"valid_time": str(valid_time)}
