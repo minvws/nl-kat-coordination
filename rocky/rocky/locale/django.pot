@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-11 13:36+0000\n"
+"POT-Creation-Date: 2024-09-12 09:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4103,7 +4103,7 @@ msgstr ""
 msgid "Select at least one OOI to proceed."
 msgstr ""
 
-#: reports/views/base.py reports/views/multi_report.py
+#: reports/views/base.py
 msgid "Select at least one report type to proceed."
 msgstr ""
 
@@ -4112,7 +4112,7 @@ msgid "Week %W, %Y"
 msgstr ""
 
 #: reports/views/generate_report.py
-msgid "Empty report name found."
+msgid "Empty name should not be possible."
 msgstr ""
 
 #: reports/views/generate_report.py

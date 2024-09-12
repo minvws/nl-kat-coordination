@@ -194,7 +194,7 @@ class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportV
                 + "?"
                 + urlencode({"report_id": report_ooi.reference})
             )
-        messages.error(self.request, _("Empty report name found."))
+        messages.error(self.request, _("Empty name should not be possible."))
         return PostRedirect(self.get_previous())
 
 
