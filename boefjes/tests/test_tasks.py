@@ -3,7 +3,7 @@ import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from unittest import TestCase, mock
+from unittest import mock
 from uuid import UUID
 
 import pytest
@@ -18,7 +18,6 @@ from boefjes.runtime_interfaces import JobRuntimeError
 from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.plugin_storage import create_plugin_storage
 from tests.loading import get_dummy_data
-
 
 boefjes = [
     Boefje(
