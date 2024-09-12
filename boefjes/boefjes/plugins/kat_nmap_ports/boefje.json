@@ -6,8 +6,5 @@
     "IPAddressV4",
     "IPAddressV6"
   ],
-  "environment_keys": [
-    "PORTS"
-  ],
   "scan_level": 2
 }

@@ -4,6 +4,7 @@ import httpx
 import structlog
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from httpx import codes
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import BaseModel, Field, field_serializer
@@ -24,7 +25,6 @@ class Plugin(BaseModel):
     authors: str | None = None
     created: str | None = None
     description: str | None = None
-    environment_keys: list[str] | None = None
     related: list[str] = Field(default_factory=list)
     enabled: bool
     type: str
@@ -39,10 +39,13 @@ class Plugin(BaseModel):
 
 class Boefje(Plugin):
     scan_level: SCAN_LEVEL
-    consumes: set[type[OOI]]
+    consumes: set[type[OOI]] = Field(default_factory=set)
+    produces: set[str] = Field(default_factory=set)
     options: list[str] | None = None
     runnable_hash: str | None = None
-    produces: set[str]
+    schema: dict | None = None
+    oci_image: str | None = None
+    oci_arguments: list[str] = Field(default_factory=list)
 
     # use a custom field_serializer for `consumes`
     @field_serializer("consumes")
@@ -170,14 +173,14 @@ class KATalogusClientV1:
     def get_boefjes(self) -> list[Plugin]:
         return self.get_plugins(plugin_type="boefje")
 
-    def enable_boefje(self, plugin: Plugin) -> None:
-        self._patch_boefje_state(plugin.id, True)
+    def enable_plugin(self, plugin: Plugin) -> None:
+        self._patch_plugin_state(plugin.id, True)
 
     def enable_boefje_by_id(self, boefje_id: str) -> None:
-        self.enable_boefje(self.get_plugin(boefje_id))
+        self.enable_plugin(self.get_plugin(boefje_id))
 
-    def disable_boefje(self, plugin: Plugin) -> None:
-        self._patch_boefje_state(plugin.id, False)
+    def disable_plugin(self, plugin: Plugin) -> None:
+        self._patch_plugin_state(plugin.id, False)
 
     def get_enabled_boefjes(self) -> list[Plugin]:
         return [plugin for plugin in self.get_boefjes() if plugin.enabled]
@@ -185,7 +188,7 @@ class KATalogusClientV1:
     def get_enabled_normalizers(self) -> list[Plugin]:
         return [plugin for plugin in self.get_normalizers() if plugin.enabled]
 
-    def _patch_boefje_state(self, boefje_id: str, enabled: bool) -> None:
+    def _patch_plugin_state(self, boefje_id: str, enabled: bool) -> None:
         logger.info("Toggle plugin state", plugin_id=boefje_id, enabled=enabled)
 
         response = self.session.patch(
@@ -204,6 +207,19 @@ class KATalogusClientV1:
         response = self.session.get(f"{self.organization_uri}/plugins/{boefje_id}/cover.jpg")
         response.raise_for_status()
         return BytesIO(response.content)
+
+    def create_plugin(self, plugin: Plugin) -> None:
+        response = self.session.post(
+            f"{self.organization_uri}/plugins",
+            headers={"Content-Type": "application/json"},
+            content=plugin.model_dump_json(exclude_none=True),
+        )
+        response.raise_for_status()
+
+        if response.status_code == codes.CREATED:
+            logger.info("Plugin %s", plugin.name)
+        else:
+            logger.info("Plugin %s could not be created", plugin.name)
 
 
 def parse_boefje(boefje: dict) -> Boefje:
@@ -226,6 +242,9 @@ def parse_boefje(boefje: dict) -> Boefje:
         scan_level=scan_level,
         consumes=consumes,
         produces=boefje["produces"],
+        schema=boefje.get("schema"),
+        oci_image=boefje.get("oci_image"),
+        oci_arguments=boefje.get("oci_arguments", []),
     )
 
 

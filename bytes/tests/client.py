@@ -1,12 +1,14 @@
 import typing
+from base64 import b64encode
 from collections.abc import Callable
 from functools import wraps
 from typing import Any
 from uuid import UUID
 
 import httpx
-from httpx import HTTPError
+from httpx import HTTPError, HTTPStatusError
 
+from bytes.api.models import BoefjeOutput
 from bytes.models import BoefjeMeta, NormalizerMeta
 from bytes.repositories.meta_repository import BoefjeMetaFilter, NormalizerMetaFilter, RawDataFilter
 
@@ -21,7 +23,7 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
         try:
             return function(self, *args, **kwargs)
         except HTTPError as error:
-            if error.response.status_code != 401:
+            if not isinstance(error, HTTPStatusError) or error.response.status_code != 401:
                 raise
 
             self.login()
@@ -126,19 +128,34 @@ class BytesAPIClient:
         if not mime_types:
             mime_types = []
 
-        headers = {"content-type": "application/octet-stream"}
-
+        file_name = "raw"  # The name provides a key for all ids returned, so this is arbitrary as we only upload 1 file
         response = self.client.post(
             "/bytes/raw",
-            content=raw,
-            headers=headers,
-            params={"mime_types": mime_types, "boefje_meta_id": str(boefje_meta_id)},
+            json={
+                "files": [
+                    {
+                        "name": file_name,
+                        "content": b64encode(raw).decode(),
+                        "tags": mime_types,
+                    }
+                ],
+            },
+            params={"boefje_meta_id": str(boefje_meta_id)},
         )
-
         self._verify_response(response)
-        raw_id = response.json()["id"]
 
-        return str(raw_id)
+        return response.json()[file_name]
+
+    @retry_with_login
+    def save_raws(self, boefje_meta_id: UUID, boefje_output: BoefjeOutput) -> dict[str, str]:
+        response = self.client.post(
+            "/bytes/raw",
+            content=boefje_output.model_dump_json(),
+            params={"boefje_meta_id": str(boefje_meta_id)},
+        )
+        self._verify_response(response)
+
+        return response.json()
 
     @retry_with_login
     def get_raw(self, raw_id: UUID) -> bytes:

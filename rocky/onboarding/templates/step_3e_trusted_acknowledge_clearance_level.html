@@ -12,7 +12,7 @@
                 <h1>{% translate "OpenKAT Introduction" %}</h1>
                 {% include "partials/stepper.html" %}
 
-                <h2>{% translate "Setup scan - OOI clearance for" %} {{ ooi }}</h2>
+                <h2>{% translate "Setup scan - OOI clearance for" %} {{ ooi|human_readable }}</h2>
                 <h3>{% translate "Trusted clearance level" %}</h3>
                 {% blocktranslate %}
                     OpenKAT has a permission system that allows administrators to
