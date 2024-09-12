@@ -193,6 +193,16 @@ class ReportRecipeView(OOIFilterView):
             for report_type in report_types
         ]
 
+    def get_report_plugins_from_katalogus(self, plugins: dict[str, set[str]]) -> dict[str, list[Plugin]]:
+        katalogus_plugins: dict[str, Any] = {"required": [], "optional": []}
+        for required_optional, plugin_ids in plugins.items():
+            if plugin_ids:
+                katalogus_plugins[required_optional] = sorted(
+                    get_katalogus(self.organization.code).get_plugins(ids=list(plugin_ids)), key=attrgetter("name")
+                )
+
+        return katalogus_plugins
+
     def get_plugins_from_report_type(self) -> dict[str, list[Plugin]]:
         """
         Returns plugins from KAT-alogus from the selected report types.
@@ -215,13 +225,7 @@ class ReportRecipeView(OOIFilterView):
 
         # Finally we can get the plugins from KAT-alogus with the set of plugin ids and sort them by name and ascending.
         try:
-            return {
-                required_optional: sorted(
-                    get_katalogus(self.organization.code).get_plugins(ids=list(plugin_ids)), key=attrgetter("name")
-                )
-                for required_optional, plugin_ids in plugins.items()
-                if plugin_ids
-            }
+            return self.get_report_plugins_from_katalogus(plugins)
         except KATalogusError as error:
             messages.error(self.request, error.message)
             return {}
@@ -264,11 +268,11 @@ class ReportTypeSelectionView(ReportRecipeView):
     Shows report types and handles selections and requests.
     """
 
-    report_type = None
+    report_type: type[BaseReport] | None = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.available_report_types, self.counted_report_types = self.get_availabel_report_types()
+        self.available_report_types, self.counted_report_types = self.get_available_report_types()
 
     def get_report_types_for_generate_report(self):
         return self.get_report_types_from_ooi_selelection(get_report_types_for_oois(self.get_ooi_pks()))
@@ -281,7 +285,8 @@ class ReportTypeSelectionView(ReportRecipeView):
             report_types[option] = self.get_report_types_from_ooi_selelection({report for report in reports})
         return report_types
 
-    def get_availabel_report_types(self) -> tuple[list[dict[str, str]] | dict[str, list[dict[str, str]]], int]:
+    def get_available_report_types(self) -> tuple[list[dict[str, str]] | dict[str, list[dict[str, str]]], int]:
+        report_types: list[dict[str, str]] | dict[str, list[dict[str, str]]] = {}
         if self.report_type is not None:
             if self.report_type == AggregateOrganisationReport:
                 report_types = self.get_report_types_for_aggregate_report()
