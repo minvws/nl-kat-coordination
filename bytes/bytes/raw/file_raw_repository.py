@@ -3,8 +3,6 @@ from uuid import UUID
 
 import structlog
 from boto3.session import Session as BotoSession
-from mypy_boto3_s3 import S3ServiceResource
-from mypy_boto3_s3.service_resource import Bucket
 
 from bytes.config import Settings
 from bytes.models import BoefjeMeta, RawData
@@ -88,17 +86,17 @@ class S3RawRepository(RawRepository):
         self.s3_bucket_prefix = s3_bucket_prefix
         self.s3_bucket_name = s3_bucket_name
 
-        self._s3resource: S3ServiceResource | None = None
+        self._s3resource = None
 
     @property
-    def __s3resource(self) -> S3ServiceResource:
+    def __s3resource(self):
         if self._s3resource:
             return self._s3resource
         session = BotoSession()
         self._s3resource = session.resource("s3")
         return self._s3resource
 
-    def get_or_create_bucket(self, organization: str) -> Bucket:
+    def get_or_create_bucket(self, organization: str):
         # Create a bucket, and if it exists already return that instead
         bucket_name = self.s3_bucket_name
         if self.bucket_per_org:
