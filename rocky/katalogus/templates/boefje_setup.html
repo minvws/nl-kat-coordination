@@ -11,6 +11,8 @@
             <div class="layout-form">
                 {% if boefje_variant %}
                     <h1>{% translate "Boefje variant setup" %}</h1>
+                {% elif edit_boefje %}
+                    <h1>{% translate "Edit" %} "{{ edit_boefje }}"</h1>
                 {% else %}
                     <h1>{% translate "Boefje setup" %}</h1>
                 {% endif %}

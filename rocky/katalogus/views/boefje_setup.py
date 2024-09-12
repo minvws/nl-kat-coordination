@@ -150,7 +150,7 @@ class EditBoefjeView(BoefjeSetupView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["edit_boefje"] = True
+        context["edit_boefje"] = self.plugin.name
 
         context["breadcrumbs"] = [
             {
