@@ -1,9 +1,9 @@
 import os
-from unittest import TestCase, skipIf
 
 import alembic.config
+import pytest
 from sqlalchemy import text
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 from boefjes.config import settings
 from boefjes.dependencies.encryption import NaclBoxMiddleware
@@ -12,71 +12,73 @@ from boefjes.sql.config_storage import create_encrypter
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
 
+pytestmark = pytest.mark.skipif(os.environ.get("CI") != "1", reason="Needs a CI database.")
 
-@skipIf(os.environ.get("CI") != "1", "Needs a CI database.")
-class TestJsonSecretsMigration(TestCase):
-    def setUp(self) -> None:
-        self.engine = get_engine()
 
-        # To reset autoincrement ids
-        alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "downgrade", "base"])
-        # Set state to revision 197672984df0
-        alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "197672984df0"])
+@pytest.fixture
+def migration_197672984df0() -> Session:
+    alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"])
+    # To reset autoincrement ids
+    alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "downgrade", "base"])
+    # Set state to revision 197672984df0
+    alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "197672984df0"])
 
-    def test_setting_to_settings_json(self):
-        session = sessionmaker(bind=self.engine)()
+    engine = get_engine()
+    session = sessionmaker(bind=engine)()
 
-        with SQLOrganisationStorage(session, settings) as storage:
-            storage.create(Organisation(id="dev1", name="Test 1 "))
-            storage.create(Organisation(id="dev2", name="Test 2 "))
-            storage.create(Organisation(id="dev3", name="Test 3 "))
+    yield session
+    session.commit()
+    session.close()
 
-        encrypter = create_encrypter()
-        entries = self._collect_entries(encrypter)
-        query = f"INSERT INTO setting (key, value, organisation_pk, plugin_id) values {','.join(map(str, entries))}"  # noqa: S608
-        self.engine.execute(text(query))
+    alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"])
 
-        alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "cd34fdfafdaf"])
+    session.execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables]))
+    session.commit()
+    session.close()
 
-        all_settings = list(self.engine.execute(text("select * from settings")).fetchall())
-        self.assertSetEqual(
-            {(encrypter.decode(x[1]), x[2], x[3]) for x in all_settings},
-            {
-                ('{"key2": "val2"}', "dns-records", 2),
-                ('{"key5": "val5", "key7": "val7"}', "nmap", 1),
-                ('{"key4": "val4", "key6": "val6"}', "nmap", 2),
-                ('{"key1": "val1", "key3": "val3"}', "dns-records", 1),
-            },
-        )
 
-        session.close()
-        alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "downgrade", "-1"])
+def test_setting_to_settings_json(migration_197672984df0):
+    session = migration_197672984df0
 
-        results = [x[1:] for x in self.engine.execute(text("SELECT * FROM setting")).fetchall()]  # ignore pk's
-        decoded_results = [(x[0], encrypter.decode(x[1]), x[2], x[3]) for x in results]  # compare decoded, since
-        decoded_entries = [(x[0], encrypter.decode(x[1]), x[2], x[3]) for x in entries]  # encoding changes every time.
+    with SQLOrganisationStorage(session, settings) as storage:
+        storage.create(Organisation(id="dev1", name="Test 1 "))
+        storage.create(Organisation(id="dev2", name="Test 2 "))
+        storage.create(Organisation(id="dev3", name="Test 3 "))
 
-        assert set(decoded_entries) == set(decoded_results)
+    encrypter = create_encrypter()
+    entries = _collect_entries(encrypter)
+    query = f"INSERT INTO setting (key, value, organisation_pk, plugin_id) values {','.join(map(str, entries))}"  # noqa: S608
+    session.execute(text(query))
+    session.commit()
+    session.close()
 
-    def tearDown(self) -> None:
-        alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"])
+    alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "cd34fdfafdaf"])
 
-        session = sessionmaker(bind=get_engine())()
+    all_settings = list(session.execute(text("select * from settings")).fetchall())
+    assert {(encrypter.decode(x[1]), x[2], x[3]) for x in all_settings} == {
+        ('{"key2": "val2"}', "dns-records", 2),
+        ('{"key5": "val5", "key7": "val7"}', "nmap", 1),
+        ('{"key4": "val4", "key6": "val6"}', "nmap", 2),
+        ('{"key1": "val1", "key3": "val3"}', "dns-records", 1),
+    }
 
-        for table in SQL_BASE.metadata.tables:
-            session.execute(f"DELETE FROM {table} CASCADE")  # noqa: S608
+    session.close()
+    alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "downgrade", "-1"])
 
-        session.commit()
-        session.close()
+    results = [x[1:] for x in session.execute(text("SELECT * FROM setting")).fetchall()]  # ignore pk's
+    decoded_results = [(x[0], encrypter.decode(x[1]), x[2], x[3]) for x in results]  # compare decoded, since
+    decoded_entries = [(x[0], encrypter.decode(x[1]), x[2], x[3]) for x in entries]  # encoding changes every time.
 
-    @staticmethod
-    def _collect_entries(encrypter: NaclBoxMiddleware):
-        return [
-            ("key1", encrypter.encode("val1"), 1, "dns-records"),
-            ("key2", encrypter.encode("val2"), 2, "dns-records"),
-            ("key3", encrypter.encode("val3"), 1, "dns-records"),
-            ("key4", encrypter.encode("val4"), 2, "nmap"),
-            ("key5", encrypter.encode("val5"), 1, "nmap"),
-            ("key6", encrypter.encode("val6"), 2, "nmap"),
-            ("key7", encrypter.encode("val7"), 1, "nmap"),
-        ]
+    assert set(decoded_entries) == set(decoded_results)
+
+
+def _collect_entries(encrypter: NaclBoxMiddleware):
+    return [
+        ("key1", encrypter.encode("val1"), 1, "dns-records"),
+        ("key2", encrypter.encode("val2"), 2, "dns-records"),
+        ("key3", encrypter.encode("val3"), 1, "dns-records"),
+        ("key4", encrypter.encode("val4"), 2, "nmap"),
+        ("key5", encrypter.encode("val5"), 1, "nmap"),
+        ("key6", encrypter.encode("val6"), 2, "nmap"),
+        ("key7", encrypter.encode("val7"), 1, "nmap"),
+    ]

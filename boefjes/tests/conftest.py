@@ -7,11 +7,11 @@ from multiprocessing import Manager
 from pathlib import Path
 from uuid import UUID
 
+import alembic.config
 import pytest
 from fastapi.testclient import TestClient
 from pydantic import TypeAdapter
 from sqlalchemy.orm import sessionmaker
-from starlette.testclient import TestClient
 
 from boefjes.app import SchedulerWorkerManager
 from boefjes.clients.bytes_client import BytesAPIClient
@@ -158,10 +158,13 @@ def api(tmp_path):
 
 @pytest.fixture
 def session():
+    alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"])
     engine = get_engine()
     session = sessionmaker(bind=engine)()
 
     yield session
+
+    alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"])
 
     session.execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables]))
     session.commit()
@@ -240,7 +243,7 @@ def organisation(organisation_storage, test_organisation) -> Organisation:
 
 
 @pytest.fixture
-def client(mock_plugin_service) -> TestClient:
+def unit_test_client(mock_plugin_service) -> TestClient:
     client = TestClient(app)
     _store = OrganisationStorageMemory({"test": Organisation(id="test", name="Test")})
 
@@ -261,6 +264,11 @@ def client(mock_plugin_service) -> TestClient:
     yield client
 
     app.dependency_overrides = {}
+
+
+@pytest.fixture
+def test_client() -> TestClient:
+    return TestClient(app)
 
 
 @pytest.fixture
