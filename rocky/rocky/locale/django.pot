@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-05 15:36+0000\n"
+"POT-Creation-Date: 2024-09-12 06:46+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1129,7 +1129,8 @@ msgid "Add variant"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
-msgid "new variant confirmation"
+#: rocky/templates/partials/notifications_block.html
+msgid "confirmation"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
@@ -1200,15 +1201,14 @@ msgid "The following arguments are used for this Boefje variant:"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
-msgid "arguments explanation"
+#: rocky/templates/partials/form/field_input_help_text.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/two_factor/core/login.html
+msgid "explanation"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
 msgid "There are no arguments used for this Boefje variant."
-msgstr ""
-
-#: katalogus/templates/plugin_container_image.html
-msgid "no variants explanation"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
@@ -1296,7 +1296,7 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
-msgid "Edit Settings"
+msgid "Configure Settings"
 msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
@@ -1305,20 +1305,6 @@ msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Variable"
-msgstr ""
-
-#: katalogus/templates/plugin_settings_list.html
-msgid "Required"
-msgstr ""
-
-#: katalogus/templates/plugin_settings_list.html
-#: reports/report_types/dns_report/report.html
-msgid "Yes"
-msgstr ""
-
-#: katalogus/templates/plugin_settings_list.html
-#: reports/report_types/dns_report/report.html
-msgid "No"
 msgstr ""
 
 #: katalogus/views/change_clearance_level.py
@@ -2847,6 +2833,14 @@ msgstr ""
 msgid ""
 "The security measures table below shows which DNS relating security measures "
 "are enabled based on the contents of the DNS records."
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "Yes"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "No"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -5917,12 +5911,6 @@ msgstr ""
 #: rocky/templates/partials/form/field_input_help_text.html
 #: rocky/templates/partials/notifications_block.html
 #: rocky/templates/two_factor/core/login.html
-msgid "explanation"
-msgstr ""
-
-#: rocky/templates/partials/form/field_input_help_text.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/two_factor/core/login.html
 msgid "Explanation:"
 msgstr ""
 
@@ -5995,10 +5983,6 @@ msgstr ""
 
 #: rocky/templates/partials/list_paginator.html
 msgid "Next"
-msgstr ""
-
-#: rocky/templates/partials/notifications_block.html
-msgid "confirmation"
 msgstr ""
 
 #: rocky/templates/partials/notifications_block.html
