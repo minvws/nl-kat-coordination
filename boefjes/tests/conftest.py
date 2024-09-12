@@ -19,7 +19,8 @@ from boefjes.config import Settings, settings
 from boefjes.dependencies.plugins import PluginService
 from boefjes.job_handler import bytes_api_client
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
-from boefjes.local_repository import get_local_repository
+from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
+from boefjes.local_repository import LocalPluginRepository, get_local_repository
 from boefjes.models import Organisation
 from boefjes.runtime_interfaces import Handler, WorkerManager
 from boefjes.sql.config_storage import SQLConfigStorage, create_encrypter
@@ -178,13 +179,38 @@ def plugin_storage(session):
 
 
 @pytest.fixture
-def local_repo():
+def local_repository():
     return get_local_repository()
 
 
 @pytest.fixture
-def plugin_service(plugin_storage, config_storage, local_repo):
-    return PluginService(plugin_storage, config_storage, local_repo)
+def mock_local_repository():
+    return LocalPluginRepository(Path(__file__).parent / "modules")
+
+
+@pytest.fixture
+def normalizer_runner(local_repository: LocalPluginRepository):
+    return LocalNormalizerJobRunner(local_repository)
+
+
+@pytest.fixture
+def boefje_runner(local_repository: LocalPluginRepository):
+    return LocalBoefjeJobRunner(local_repository)
+
+
+@pytest.fixture
+def mock_normalizer_runner(mock_local_repository: LocalPluginRepository):
+    return LocalNormalizerJobRunner(mock_local_repository)
+
+
+@pytest.fixture
+def mock_boefje_runner(mock_local_repository: LocalPluginRepository):
+    return LocalBoefjeJobRunner(mock_local_repository)
+
+
+@pytest.fixture
+def plugin_service(plugin_storage, config_storage, local_repository):
+    return PluginService(plugin_storage, config_storage, local_repository)
 
 
 @pytest.fixture
