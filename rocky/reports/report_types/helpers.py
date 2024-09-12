@@ -36,7 +36,7 @@ MULTI_REPORTS = [MultiOrganizationReport]
 
 CONCATENATED_REPORTS = [ConcatenatedReport]
 
-ALL_REPORT_TYPES = REPORTS + AGGREGATE_REPORTS + MULTI_REPORTS
+ALL_REPORT_TYPES = REPORTS + AGGREGATE_REPORTS + MULTI_REPORTS + CONCATENATED_REPORTS
 
 
 def get_ooi_types_with_report() -> set[type[OOI]]:
@@ -67,8 +67,7 @@ def get_report_by_id(report_id: str) -> type[BaseReport]:
     """
     Get report type by id
     """
-    if not report_id:
-        return ConcatenatedReport
+
     for report in ALL_REPORT_TYPES:
         if report.id == report_id:
             return report
