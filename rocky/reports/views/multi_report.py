@@ -99,6 +99,7 @@ class ReportTypesSelectionMultiReportView(
     template_name = "generate_report/select_report_types.html"
     breadcrumbs_step = 4
     current_step = 2
+    report_type = MultiOrganizationReport
 
     def get(self, request, *args, **kwargs):
         if not self.get_ooi_selection():
