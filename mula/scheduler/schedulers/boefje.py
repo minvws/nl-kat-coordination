@@ -8,7 +8,7 @@ from typing import Any
 import structlog
 from opentelemetry import trace
 
-from scheduler import context, queues, rankers, storage
+from scheduler import context, queues, rankers, storage, utils
 from scheduler.connectors import listeners
 from scheduler.connectors.errors import ExternalServiceError
 from scheduler.models import (
@@ -997,3 +997,19 @@ class BoefjeScheduler(Scheduler):
         )
 
         return boefjes
+
+    def calculate_deadline(self, task: Task) -> datetime:
+        """Calculate the deadline for a task.
+
+        Args:
+            task: The task to calculate the deadline for.
+
+        Returns:
+            The calculated deadline.
+        """
+        # Does the boefje have an interval defined?
+        interval = utils.deep_get(task.data, "boefje", "interval")
+        if interval is not None:
+            return datetime.now(timezone.utc) + timedelta(seconds=interval)  # FIXME: check if it is seconds or minutes
+
+        return super().calculate_deadline(task)
