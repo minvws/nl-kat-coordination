@@ -236,8 +236,8 @@ def parse_boefje(boefje: dict) -> Boefje:
     return Boefje(
         id=boefje["id"],
         name=boefje.get("name") or boefje["id"],
-        created=boefje["created"],
-        description=boefje["description"],
+        created=boefje.get("created"),
+        description=boefje.get("description"),
         enabled=boefje["enabled"],
         type=boefje["type"],
         scan_level=scan_level,
