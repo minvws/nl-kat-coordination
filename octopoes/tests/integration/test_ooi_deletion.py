@@ -477,3 +477,51 @@ def test_affirming_ooi_delete(octopoes_api_connector: OctopoesAPIConnector, vali
     octopoes_api_connector.delete(network.reference, valid_time)
     time.sleep(1)
     assert octopoes_api_connector.list_objects({Hostname}, valid_time).count == 0
+
+
+def test_delecration_ooi_delete(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
+    # Make an object A
+    network = Network(name="internet")
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
+
+    # Observe an object B "derived" by A
+    url = "mispo.es"
+    hostname = Hostname(network=network.reference, name=url)
+    hostname_origin = Observation(
+        method="",
+        source=network.reference,
+        source_method=None,
+        result=[hostname],
+        task_id=uuid.uuid4(),
+        valid_time=valid_time,
+    )
+    octopoes_api_connector.save_observation(hostname_origin)
+    time.sleep(1)
+    assert octopoes_api_connector.list_objects({Hostname}, valid_time).count == 1
+
+    # Delete A and validate B is not present
+    octopoes_api_connector.delete(network.reference, valid_time)
+    time.sleep(1)
+    assert octopoes_api_connector.list_objects({Hostname}, valid_time).count == 0
+
+    # Re-observe an object B "derived" by A
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
+    octopoes_api_connector.save_observation(hostname_origin)
+    time.sleep(1)
+    assert octopoes_api_connector.list_objects({Hostname}, valid_time).count == 1
+
+    # Infer object B
+    octopoes_api_connector.save_declaration(
+        Declaration(
+            ooi=hostname,
+            source_method=None,
+            task_id=uuid.uuid4(),
+            valid_time=valid_time,
+        )
+    )
+    time.sleep(1)
+
+    # Delete A and validate B is not present
+    octopoes_api_connector.delete(network.reference, valid_time)
+    time.sleep(1)
+    assert octopoes_api_connector.list_objects({Hostname}, valid_time).count == 1

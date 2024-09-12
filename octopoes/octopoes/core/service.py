@@ -165,7 +165,10 @@ class OctopoesService:
         if not any(
             origin
             for origin in referencing_origins
-            if origin.origin_type not in [OriginType.AFFIRMATION, OriginType.INFERENCE] and origin.source == reference
+            if not (
+                origin.origin_type == OriginType.AFFIRMATION
+                or (origin.origin_type == OriginType.INFERENCE and origin.source == reference)
+            )
         ):
             self.ooi_repository.delete(reference, valid_time)
 
