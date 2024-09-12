@@ -12,7 +12,7 @@ from tools.view_helpers import PostRedirect
 
 from octopoes.models import OOI
 from reports.forms import ReportScheduleForm
-from reports.report_types.definitions import Report
+from reports.report_types.definitions import BaseReport
 from reports.report_types.helpers import get_ooi_types_with_report
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
@@ -198,7 +198,7 @@ class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportV
         return PostRedirect(self.get_previous())
 
 
-def create_report_names(oois: list[type[OOI]], report_types: list[type[Report]]) -> dict[str, str]:
+def create_report_names(oois: list[type[OOI]], report_types: list[type[BaseReport]]) -> dict[str, str]:
     reports = {}
     oois_count = len(oois)
     report_types_count = len(report_types)

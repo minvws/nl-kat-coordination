@@ -28,7 +28,7 @@ from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.concatenated_report.report import ConcatenatedReport
-from reports.report_types.definitions import AggregateReport, MultiReport, Report
+from reports.report_types.definitions import AggregateReport, BaseReport
 from reports.report_types.helpers import (
     REPORTS,
     get_report_by_id,
@@ -154,7 +154,7 @@ class ReportRecipeView(OOIFilterView):
             return sorted([ooi.primary_key for ooi in self.get_oois()])
         return selected_oois
 
-    def get_oois(self) -> set[type[OOI]]:
+    def get_oois(self) -> set[OOI]:
         selected_oois = self.get_ooi_selection()
         oois = set()
         if "all" in selected_oois:
@@ -174,13 +174,11 @@ class ReportRecipeView(OOIFilterView):
     def get_report_type_ids(self) -> list[str]:
         return sorted(set(self.request.POST.getlist("report_type", [])))
 
-    def get_report_types(self) -> set[type[Report]]:
+    def get_report_types(self) -> set[type[BaseReport]]:
         return {get_report_by_id(report_type_id) for report_type_id in self.get_report_type_ids()}
 
     @staticmethod
-    def get_report_types_from_ooi_selelection(
-        report_types: set[type[Report]] | set[type[MultiReport]],
-    ) -> list[dict[str, str]]:
+    def get_report_types_from_ooi_selelection(report_types: set[type[BaseReport]]) -> list[dict[str, str]]:
         """
         The report types are fetched from which ooi is selected. Shows all report types for the oois.
         """
@@ -437,7 +435,7 @@ class ReportFinalSettingsView(ReportRecipeView):
     def save_report_ooi(
         self,
         report_data_raw_id: str,
-        report_type: type[Report],
+        report_type: type[BaseReport],
         input_oois: list[str],
         parent: Reference | None,
         has_parent: bool,
