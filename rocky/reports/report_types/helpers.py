@@ -1,7 +1,7 @@
 from octopoes.models import OOI, Reference
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.concatenated_report.report import ConcatenatedReport
-from reports.report_types.definitions import AggregateReport, MultiReport, Report
+from reports.report_types.definitions import AggregateReport, BaseReport, Report
 from reports.report_types.dns_report.report import DNSReport
 from reports.report_types.findings_report.report import FindingsReport
 from reports.report_types.ipv6_report.report import IPv6Report
@@ -36,7 +36,7 @@ MULTI_REPORTS = [MultiOrganizationReport]
 
 CONCATENATED_REPORTS = [ConcatenatedReport]
 
-ALL_REPORT_TYPES = REPORTS + AGGREGATE_REPORTS + MULTI_REPORTS + CONCATENATED_REPORTS
+ALL_REPORT_TYPES = REPORTS + AGGREGATE_REPORTS + MULTI_REPORTS
 
 
 def get_ooi_types_with_report() -> set[type[OOI]]:
@@ -46,7 +46,7 @@ def get_ooi_types_with_report() -> set[type[OOI]]:
     return {ooi_type for report in REPORTS for ooi_type in report.input_ooi_types}
 
 
-def get_report_types_for_ooi(ooi_pk: str) -> list[type[Report]]:
+def get_report_types_for_ooi(ooi_pk: str) -> list[type[BaseReport]]:
     """
     Get all report types that can be generated for a given OOI
     """
@@ -55,7 +55,7 @@ def get_report_types_for_ooi(ooi_pk: str) -> list[type[Report]]:
     return [report for report in REPORTS if ooi_type in report.input_ooi_types]
 
 
-def get_report_types_for_oois(oois: list[str]) -> set[type[Report]]:
+def get_report_types_for_oois(oois: list[str]) -> set[type[BaseReport]]:
     """
     Get all report types that can be generated for a given list of OOIs
     """
@@ -63,7 +63,7 @@ def get_report_types_for_oois(oois: list[str]) -> set[type[Report]]:
     return {report for ooi_pk in oois for report in get_report_types_for_ooi(ooi_pk)}
 
 
-def get_report_by_id(report_id: str) -> type[Report]:
+def get_report_by_id(report_id: str) -> type[BaseReport]:
     """
     Get report type by id
     """
@@ -75,7 +75,7 @@ def get_report_by_id(report_id: str) -> type[Report]:
     raise ValueError(f"Report with id {report_id} not found")
 
 
-def get_reports(report_ids: list[str]) -> list[type[Report] | type[MultiReport] | type[AggregateReport]]:
+def get_reports(report_ids: list[str]) -> list[type[BaseReport]]:
     return [get_report_by_id(report_id) for report_id in report_ids]
 
 
