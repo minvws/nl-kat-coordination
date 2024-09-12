@@ -28,7 +28,7 @@ from octopoes.config.settings import (
     DEFAULT_SCAN_LEVEL_FILTER,
     DEFAULT_SCAN_PROFILE_TYPE_FILTER,
 )
-from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel, ScanProfileType
+from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Reference, ScanLevel, ScanProfileType
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
@@ -1437,6 +1437,10 @@ def get_normalizers_data() -> list[dict]:
     return json.loads(get_stub_path("katalogus_normalizers.json").read_text())
 
 
+def get_aggregate_report_data():
+    return json.loads(get_stub_path("aggregate_report_data.json").read_text())
+
+
 def get_plugins_data() -> list[dict]:
     return get_boefjes_data() + get_normalizers_data()
 
@@ -1838,3 +1842,256 @@ def drf_admin_client(create_drf_client, admin_user):
     # exception, but will return error in the API we can test
     client.raise_request_exception = False
     return client
+
+
+@pytest.fixture
+def get_aggregate_report_ooi():
+    return Report(
+        object_type="Report",
+        scan_profile=EmptyScanProfile(
+            scan_profile_type="empty",
+            reference=Reference("Report|6a073ba0-46d3-451c-a7f8-46923c2b841b"),
+            level=ScanLevel.L0,
+            user_id=None,
+        ),
+        primary_key="Report|6a073ba0-46d3-451c-a7f8-46923c2b841b",
+        name="Aggregate Report",
+        report_type="aggregate-organisation-report",
+        template="aggregate_organisation_report/report.html",
+        date_generated=datetime(2024, 9, 3, 14, 14, 46, 999999),
+        input_oois=["Hostname|internet|mispo.es"],
+        report_id=UUID("6a073ba0-46d3-451c-a7f8-46923c2b841b"),
+        organization_code="_test",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="250cf43e-bfe2-4249-b493-a12921cb79f6",
+        observed_at=datetime(2024, 9, 3, 14, 14, 45, 999999),
+        parent_report=None,
+        has_parent=False,
+    )
+
+
+@pytest.fixture
+def get_aggregate_report_from_bytes():
+    data = {
+        "systems": {
+            "services": {
+                "IPAddressV4|internet|134.209.85.72": {"hostnames": ["Hostname|internet|mispo.es"], "services": []}
+            }
+        },
+        "services": {},
+        "recommendations": [],
+        "recommendation_counts": {},
+        "open_ports": {"134.209.85.72": {"ports": {}, "hostnames": ["mispo.es"], "services": {}}},
+        "ipv6": {"mispo.es": {"enabled": False, "systems": []}},
+        "vulnerabilities": {
+            "IPAddressV4|internet|134.209.85.72": {
+                "hostnames": "(mispo.es)",
+                "vulnerabilities": {},
+                "summary": {"total_findings": 0, "total_criticals": 0, "terms": [], "recommendations": []},
+                "title": "134.209.85.72",
+            }
+        },
+        "basic_security": {
+            "rpki": {},
+            "system_specific": {"Mail": [], "Web": [], "DNS": []},
+            "safe_connections": {},
+            "summary": {},
+        },
+        "summary": {"Critical vulnerabilities": 0, "IPs scanned": 1, "Hostnames scanned": 1, "Terms in report": ""},
+        "total_findings": 0,
+        "total_systems": 1,
+        "total_hostnames": 1,
+        "total_systems_basic_security": 0,
+        "health": [
+            {"service": "rocky", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+            {"service": "octopoes", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+            {
+                "service": "xtdb",
+                "healthy": True,
+                "version": "1.24.1",
+                "additional": {
+                    "version": "1.24.1",
+                    "revision": "1164f9a3c7e36edbc026867945765fd4366c1731",
+                    "indexVersion": 22,
+                    "consumerState": None,
+                    "kvStore": "xtdb.rocksdb.RocksKv",
+                    "estimateNumKeys": 36846,
+                    "size": 33301692,
+                },
+                "results": [],
+            },
+            {
+                "service": "katalogus",
+                "healthy": True,
+                "version": "0.0.1-development",
+                "additional": None,
+                "results": [],
+            },
+            {"service": "scheduler", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+            {"service": "bytes", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+            {"service": "keiko", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+        ],
+        "config_oois": [],
+        "plugins": [
+            {
+                "required": True,
+                "enabled": False,
+                "name": "SSLCertificates",
+                "scan_level": 1,
+                "type": "boefje",
+                "description": "Scan SSL certificates of websites",
+            },
+            {
+                "required": True,
+                "enabled": False,
+                "name": "Security.txt downloader",
+                "scan_level": 2,
+                "type": "boefje",
+                "description": "Downloads the security.txt file from the target host.",
+            },
+            {
+                "required": True,
+                "enabled": False,
+                "name": "WebpageAnalysis",
+                "scan_level": 2,
+                "type": "boefje",
+                "description": "Downloads a resource and uses several different normalizers to analyze",
+            },
+            {
+                "required": True,
+                "enabled": False,
+                "name": "SSLScan",
+                "scan_level": 2,
+                "type": "boefje",
+                "description": "Scan SSL/TLS versions of websites",
+            },
+            {
+                "required": True,
+                "enabled": False,
+                "name": "RPKI",
+                "scan_level": 1,
+                "type": "boefje",
+                "description": "Check if an IPv4 or IPv6 address has a valid VRPS record.",
+            },
+            {
+                "required": True,
+                "enabled": False,
+                "name": "Nmap TCP",
+                "scan_level": 2,
+                "type": "boefje",
+                "description": "Defaults to top 250 TCP ports. Includes service detection.",
+            },
+            {
+                "required": True,
+                "enabled": True,
+                "name": "DnsRecords",
+                "scan_level": 1,
+                "type": "boefje",
+                "description": "Fetch the DNS record(s) of a hostname",
+            },
+            {
+                "required": True,
+                "enabled": False,
+                "name": "Testssl.sh Ciphers",
+                "scan_level": 2,
+                "type": "boefje",
+                "description": "Run testssl.sh Docker container and check ciphers",
+            },
+            {
+                "required": True,
+                "enabled": True,
+                "name": "Dnssec",
+                "scan_level": 1,
+                "type": "boefje",
+                "description": "Validates DNSSec of a hostname",
+            },
+            {
+                "required": False,
+                "enabled": False,
+                "name": "masscan",
+                "scan_level": 2,
+                "type": "boefje",
+                "description": "Quickly scan large amounts of IPs.",
+            },
+            {
+                "required": False,
+                "enabled": False,
+                "name": "Nmap IP range",
+                "scan_level": 2,
+                "type": "boefje",
+                "description": "Scan an IP range and store found IPs. Defaults to top-250 TCP and top-10 UDP on ranges "
+                "with 1024 addresses or less. Larger ranges are skipped by default.",
+            },
+            {
+                "required": False,
+                "enabled": False,
+                "name": "Shodan",
+                "scan_level": 1,
+                "type": "boefje",
+                "description": "Use Shodan to find open ports with vulnerabilities that are found on that port",
+            },
+            {
+                "required": False,
+                "enabled": False,
+                "name": "Nmap UDP",
+                "scan_level": 2,
+                "type": "boefje",
+                "description": "Defaults to top 250 UDP ports. Includes service detection.",
+            },
+            {
+                "required": False,
+                "enabled": False,
+                "name": "Nmap Ports",
+                "scan_level": 2,
+                "type": "boefje",
+                "description": "Scan a specific set of ports including service detection",
+            },
+        ],
+        "oois": [{"name": "mispo.es", "type": "Hostname", "scan_profile_level": 1, "scan_profile_type": "declared"}],
+        "report_types": [
+            {
+                "name": "IPv6 Report",
+                "description": "Check whether hostnames point to IPv6 addresses.",
+                "label_style": "4-light",
+            },
+            {
+                "name": "Mail Report",
+                "description": "System specific Mail Report that focusses on IP addresses and hostnames.",
+                "label_style": "2-light",
+            },
+            {
+                "name": "Name Server Report",
+                "description": "Name Server Report checks name servers on basic security standards.",
+                "label_style": "1-light",
+            },
+            {"name": "Open Ports Report", "description": "Find open ports of IP addresses", "label_style": "5-light"},
+            {
+                "name": "RPKI Report",
+                "description": "Shows whether the IP is covered by a valid RPKI ROA. For a hostname it shows the IP "
+                "addresses and whether they are covered by a valid RPKI ROA.",
+                "label_style": "4-light",
+            },
+            {
+                "name": "Safe Connections Report",
+                "description": "Shows whether the IPService contains safe ciphers.",
+                "label_style": "2-light",
+            },
+            {
+                "name": "System Report",
+                "description": "Combine IP addresses, hostnames and services into systems.",
+                "label_style": "6-light",
+            },
+            {
+                "name": "Vulnerability Report",
+                "description": "Vulnerabilities found are grouped for each system.",
+                "label_style": "5-light",
+            },
+            {
+                "name": "Web System Report",
+                "description": "Web System Reports check web systems on basic security standards.",
+                "label_style": "3-light",
+            },
+        ],
+    }
+    return json.dumps(data).encode("utf-8")
