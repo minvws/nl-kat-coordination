@@ -165,7 +165,7 @@ class EditBoefjeView(BoefjeSetupView):
                         "plugin_id": self.plugin.id,
                     },
                 ),
-                "text": self.plugin.name,
+                "text": 'Edit "' + self.plugin.name + '"',
             },
         ]
 
