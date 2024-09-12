@@ -36,7 +36,6 @@ class DockerBoefjesRunner:
         stderr_mime_types = boefjes.plugins.models._default_mime_types(self.boefje_meta.boefje)
 
         task_id = self.boefje_meta.id
-        self.scheduler_client.patch_task(task_id, TaskStatus.RUNNING)
         self.boefje_meta.started_at = datetime.now(timezone.utc)
 
         try:

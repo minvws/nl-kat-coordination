@@ -6,7 +6,7 @@ from typing import Any
 from uuid import UUID
 
 import httpx
-from httpx import HTTPError
+from httpx import HTTPError, HTTPStatusError
 
 from bytes.api.models import BoefjeOutput
 from bytes.models import BoefjeMeta, NormalizerMeta
@@ -23,7 +23,7 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
         try:
             return function(self, *args, **kwargs)
         except HTTPError as error:
-            if error.response.status_code != 401:
+            if not isinstance(error, HTTPStatusError) or error.response.status_code != 401:
                 raise
 
             self.login()
