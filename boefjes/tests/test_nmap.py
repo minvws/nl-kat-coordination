@@ -27,9 +27,10 @@ def test_normalizer():
 
 def get_pattern():
     max_65535 = r"(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|[1-5]\d{0,4}|\d)"
-    max_65535_or_range = f"({max_65535}|{max_65535}-{max_65535})"
+    max_65535_or_port_range = f"({max_65535}|{max_65535}-{max_65535})"
+    one_or_comma_separated = f"^{max_65535_or_port_range}$|^{max_65535_or_port_range}(,{max_65535_or_port_range})+$"
 
-    return re.compile(f"^{max_65535_or_range}$|^{max_65535_or_range}(,{max_65535_or_range})+$")
+    return re.compile(one_or_comma_separated)
 
 
 def test_single_port_pattern(local_repo):
