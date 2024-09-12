@@ -133,7 +133,7 @@ class ExportSetupMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportVi
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.get_report_type_ids():
-            messages.error(request, _("Select at least one report type to proceed."))
+            messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
             return redirect(self.get_previous())
 
         return super().get(request, *args, **kwargs)
