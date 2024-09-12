@@ -1,3 +1,4 @@
+from functools import cached_property
 from pathlib import Path
 from uuid import UUID
 
@@ -86,15 +87,10 @@ class S3RawRepository(RawRepository):
         self.s3_bucket_prefix = s3_bucket_prefix
         self.s3_bucket_name = s3_bucket_name
 
-        self._s3resource = None
-
-    @property
-    def __s3resource(self):
-        if self._s3resource:
-            return self._s3resource
+    @cached_property
+    def _s3resource(self):
         session = BotoSession()
-        self._s3resource = session.resource("s3")
-        return self._s3resource
+        return session.resource("s3")
 
     def get_or_create_bucket(self, organization: str):
         # Create a bucket, and if it exists already return that instead
@@ -102,13 +98,13 @@ class S3RawRepository(RawRepository):
         if self.bucket_per_org:
             bucket_name = f"{self.s3_bucket_prefix}{organization}"
             try:
-                bucket = self.__s3resource.create_bucket(Bucket=bucket_name)
+                bucket = self._s3resource.create_bucket(Bucket=bucket_name)
                 bucket.wait_until_exists()
                 return bucket
             except Exception as error:
                 logger.error("Something went wrong with creating bucket %s: %s", bucket_name, error)
                 raise error
-        return self.__s3resource.Bucket(name=bucket_name)
+        return self._s3resource.Bucket(name=bucket_name)
 
     def save_raw(self, raw_id: UUID, raw: RawData) -> None:
         file_name = self._raw_file_name(raw_id, raw.boefje_meta)
@@ -124,7 +120,7 @@ class S3RawRepository(RawRepository):
 
         try:
             contents = bucket.Object(file_name).get()["Body"].read()
-        except self.__s3resource.meta.client.exceptions.NoSuchBucket as error:
+        except self._s3resource.meta.client.exceptions.NoSuchBucket as error:
             if error.response["Error"]["Code"] == "404":
                 raise BytesFileNotFoundException(error)
             logger.error("Could not get file from s3: %s/%s due to %s", bucket.name, file_name, error)
