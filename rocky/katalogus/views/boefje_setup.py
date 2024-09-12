@@ -23,14 +23,16 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
         """If the form is valid, redirect to the supplied URL."""
         form_data = form.cleaned_data
 
-        plugin_id = self.kwargs.get("plugin_id", str(uuid.uuid4()))
-        plugin = create_boefje_with_form_data(form_data, plugin_id, str(datetime.now()))
+        plugin = create_boefje_with_form_data(form_data, self.plugin_id, str(datetime.now()))
 
         get_katalogus(self.organization.code).create_plugin(plugin)
         query_params = urlencode({"new_variant": True})
 
         return redirect(
-            reverse("boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": plugin_id})
+            reverse(
+                "boefje_detail",
+                kwargs={"organization_code": self.organization.code, "plugin_id": self.return_to_plugin_id},
+            )
             + "?"
             + query_params
         )
@@ -38,6 +40,12 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
 
 class AddBoefjeView(BoefjeSetupView):
     """View where the user can create a new Boefje"""
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.plugin_id = str(uuid.uuid4())
+        self.return_to_plugin_id = self.plugin_id
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -59,9 +67,10 @@ class AddBoefjeVariantView(BoefjeSetupView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        plugin_id = self.kwargs.get("plugin_id")
+        self.plugin_id = str(uuid.uuid4())
+        self.return_to_plugin_id = self.kwargs.get("plugin_id")
         katalogus = get_katalogus(self.organization.code)
-        self.plugin = katalogus.get_plugin(plugin_id)
+        self.plugin = katalogus.get_plugin(self.return_to_plugin_id)
         consumes = []
 
         for input_object in list(self.plugin.consumes):
@@ -94,7 +103,7 @@ class AddBoefjeVariantView(BoefjeSetupView):
             {
                 "url": reverse(
                     "boefje_variant_setup",
-                    kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id},
+                    kwargs={"organization_code": self.organization.code, "plugin_id": self.return_to_plugin_id},
                 ),
                 "text": "Boefje variant setup",
             },
