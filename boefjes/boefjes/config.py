@@ -131,10 +131,13 @@ class Settings(BaseSettings):
         None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
     )
 
-    network_scopes: list[str] = Field(
-        ["internet"],
+    task_capabilities: list[str] = Field(
+        ["network/internet", "ipv6", "ipv4"],
         description="List of networks the boefje ",
-        examples=[["internet", "dentist", "remote-location"], ["dentist"]],
+        examples=[
+            ["network/internet", "network/dentist", "network/remote-location", "ipv6"],
+            ["network/dentist", "ipv4"],
+        ],
         validation_alias="NETWORK_SCOPES",
     )
 

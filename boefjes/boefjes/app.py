@@ -273,7 +273,7 @@ def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_leve
         item_handler,
         SchedulerAPIClient(
             base_url=str(settings.scheduler_api),
-            network_scopes=settings.network_scopes,
+            task_capabilities=settings.task_capabilities,
         ),  # Do not share a session between workers
         settings,
         log_level,

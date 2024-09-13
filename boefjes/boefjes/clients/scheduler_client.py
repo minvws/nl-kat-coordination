@@ -78,9 +78,9 @@ class SchedulerClientInterface:
 
 
 class SchedulerAPIClient(SchedulerClientInterface):
-    def __init__(self, base_url: str, network_scopes: list[str] = []):
+    def __init__(self, base_url: str, task_capabilities: list[str]):
         self._session = Client(base_url=base_url, transport=HTTPTransport(retries=6))
-        self._network_scopes = network_scopes
+        self.task_capabilities = task_capabilities
 
     @staticmethod
     def _verify_response(response: Response) -> None:
@@ -101,7 +101,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
                         column="data",
                         field="network_scope",
                         operator="in",
-                        value=self._network_scopes,
+                        value=self.task_capabilities,
                     )
                 ]
             ).model_dump_json(),
