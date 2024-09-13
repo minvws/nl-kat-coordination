@@ -28,7 +28,7 @@ from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.concatenated_report.report import ConcatenatedReport
-from reports.report_types.definitions import AggregateReport, BaseReport
+from reports.report_types.definitions import AggregateReport, BaseReport, Report
 from reports.report_types.helpers import (
     REPORTS,
     get_report_by_id,
@@ -179,7 +179,7 @@ class ReportRecipeView(OOIFilterView):
 
     @staticmethod
     def get_report_types_from_ooi_selelection(
-        report_types: set[type[BaseReport]],
+        report_types: set[type[BaseReport]] | set[type[Report]] | set[type[MultiOrganizationReport]],
     ) -> list[dict[str, str]]:
         """
         The report types are fetched from which ooi is selected. Shows all report types for the oois.

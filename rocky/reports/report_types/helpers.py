@@ -1,7 +1,7 @@
 from octopoes.models import OOI, Reference
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.concatenated_report.report import ConcatenatedReport
-from reports.report_types.definitions import AggregateReport, BaseReport
+from reports.report_types.definitions import AggregateReport, BaseReport, Report
 from reports.report_types.dns_report.report import DNSReport
 from reports.report_types.findings_report.report import FindingsReport
 from reports.report_types.ipv6_report.report import IPv6Report
@@ -94,7 +94,7 @@ def get_plugins_for_report_ids(reports: list[str]) -> dict[str, set[str]]:
 
 def get_report_types_from_aggregate_report(
     aggregate_report: type[AggregateReport],
-) -> dict[str, set[type[BaseReport]]]:
+) -> dict[str, set[type[Report]]]:
     required_reports = set()
     optional_reports = set()
 
