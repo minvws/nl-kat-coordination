@@ -7,6 +7,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
+from tools.view_helpers import PostRedirect
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.definitions import AggregateReport, MultiReport, Report
@@ -118,7 +119,7 @@ class ReportTypesSelectionAggregateReportView(
     def post(self, request, *args, **kwargs):
         if not self.selected_oois:
             messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
-            return redirect(self.get_previous())
+            return PostRedirect(self.get_previous())
         return self.get(request, *args, **kwargs)
 
     def get_report_types_for_aggregate_report(
@@ -132,8 +133,12 @@ class ReportTypesSelectionAggregateReportView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["available_report_types_aggregate"] = self.available_report_types
+
         context["count_available_report_types_aggregate"] = len(self.available_report_types["required"]) + len(
             self.available_report_types["optional"]
+        )
+        context["all_report_types_checked"] = (
+            len(self.get_report_type_selection()) == context["count_available_report_types_aggregate"]
         )
         context["total_oois"] = self.get_total_objects()
         return context
@@ -151,9 +156,17 @@ class SetupScanAggregateReportView(
     current_step = 3
 
     def post(self, request, *args, **kwargs):
+        # If the user wants to change selection, but all plugins are enabled, it needs to go even further back
         if not self.selected_report_types:
             messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
-            return redirect(self.get_previous())
+            return PostRedirect(self.get_previous())
+
+        if "return" in self.request.POST and self.plugins_enabled():
+            return PostRedirect(self.get_previous())
+
+        if self.plugins_enabled():
+            return PostRedirect(self.get_next())
+
         return self.get(request, *args, **kwargs)
 
 
@@ -167,6 +180,9 @@ class ExportSetupAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggre
     current_step = 4
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.selected_report_types:
+            messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
+            return PostRedirect(self.get_previous())
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):

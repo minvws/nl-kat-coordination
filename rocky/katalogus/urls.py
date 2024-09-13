@@ -1,5 +1,6 @@
-from django.urls import path
+from django.urls import path, re_path
 
+from katalogus.views.boefje_setup import BoefjeSetupView
 from katalogus.views.change_clearance_level import ChangeClearanceLevel
 from katalogus.views.katalogus import (
     AboutPluginsView,
@@ -32,7 +33,12 @@ urlpatterns = [
         name="confirm_clone_settings",
     ),
     path(
-        "plugins/boefjes/<view_type>/",
+        "plugins/boefjes/add/",
+        BoefjeSetupView.as_view(),
+        name="boefje_setup",
+    ),
+    re_path(
+        r"^plugins/boefjes/(?P<view_type>(grid|table))/$",
         BoefjeListView.as_view(),
         name="boefjes_list",
     ),
