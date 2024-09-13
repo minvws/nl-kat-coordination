@@ -178,7 +178,9 @@ class ReportRecipeView(OOIFilterView):
         return {get_report_by_id(report_type_id) for report_type_id in self.get_report_type_ids()}
 
     @staticmethod
-    def get_report_types_from_ooi_selelection(report_types: set[type[BaseReport]]) -> list[dict[str, str]]:
+    def get_report_types_from_ooi_selelection(
+        report_types: set[type[BaseReport]],
+    ) -> list[dict[str, str]]:
         """
         The report types are fetched from which ooi is selected. Shows all report types for the oois.
         """
@@ -282,7 +284,7 @@ class ReportTypeSelectionView(ReportRecipeView):
         report_types: dict[str, list[dict[str, str]]] = {}
 
         for option, reports in reports_dict.items():
-            report_types[option] = self.get_report_types_from_ooi_selelection({report for report in reports})
+            report_types[option] = self.get_report_types_from_ooi_selelection(reports)
         return report_types
 
     def get_available_report_types(self) -> tuple[list[dict[str, str]] | dict[str, list[dict[str, str]]], int]:
@@ -290,7 +292,9 @@ class ReportTypeSelectionView(ReportRecipeView):
         if self.report_type is not None:
             if self.report_type == AggregateOrganisationReport:
                 report_types = self.get_report_types_for_aggregate_report()
-                return report_types, len(report_types.values())
+                return report_types, len(
+                    [report_type for report_type_list in report_types.values() for report_type in report_type_list]
+                )
 
             elif self.report_type == MultiOrganizationReport:
                 report_types = self.get_report_types_from_ooi_selelection({MultiOrganizationReport})
