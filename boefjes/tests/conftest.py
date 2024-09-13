@@ -44,11 +44,13 @@ class MockSchedulerClient(SchedulerClientInterface):
         log_path: Path,
         raise_on_empty_queue: Exception = KeyboardInterrupt,
         iterations_to_wait_for_exception: int = 0,
-        sleep_time: int = 0.1,
+        sleep_time: float = 0.1,
     ):
         self.queue_response = queue_response
         self.boefje_responses = boefje_responses
         self.normalizer_responses = normalizer_responses
+
+        log_path.touch(exist_ok=True)
         self.log_path = log_path
         self.raise_on_empty_queue = raise_on_empty_queue
         self.iterations_to_wait_for_exception = iterations_to_wait_for_exception
@@ -76,6 +78,7 @@ class MockSchedulerClient(SchedulerClientInterface):
             if WorkerManager.Queue.NORMALIZERS.value in queue:
                 p_item = TypeAdapter(Task).validate_json(self.normalizer_responses.pop(0))
                 self._popped_items[str(p_item.id)] = p_item
+                self._tasks[str(p_item.id)] = self._task_from_id(p_item.id)
                 return p_item
         except IndexError:
             raise self.raise_on_empty_queue
@@ -128,9 +131,11 @@ def item_handler(tmp_path: Path):
 def manager(item_handler: MockHandler, tmp_path: Path) -> SchedulerWorkerManager:
     scheduler_client = MockSchedulerClient(
         queue_response=get_dummy_data("scheduler/queues_response.json"),
-        boefje_responses=(
-            2 * [get_dummy_data("scheduler/pop_response_boefje.json")] + [get_dummy_data("scheduler/should_crash.json")]
-        ),
+        boefje_responses=[
+            get_dummy_data("scheduler/pop_response_boefje.json"),
+            get_dummy_data("scheduler/pop_response_boefje_2.json"),
+            get_dummy_data("scheduler/should_crash.json"),
+        ],
         normalizer_responses=[get_dummy_data("scheduler/pop_response_normalizer.json")],
         log_path=tmp_path / "patch_task_log",
     )
