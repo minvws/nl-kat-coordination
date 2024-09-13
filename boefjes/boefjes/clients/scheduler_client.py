@@ -78,7 +78,7 @@ class SchedulerClientInterface:
 
 
 class SchedulerAPIClient(SchedulerClientInterface):
-    def __init__(self, base_url: str, task_capabilities: list[str]):
+    def __init__(self, base_url: str, task_capabilities: list[str] | None = None):
         self._session = Client(base_url=base_url, transport=HTTPTransport(retries=6))
         self.task_capabilities = task_capabilities
 
@@ -93,6 +93,8 @@ class SchedulerAPIClient(SchedulerClientInterface):
         return TypeAdapter(list[Queue]).validate_json(response.content)
 
     def pop_item(self, queue: str) -> QueuePrioritizedItem | None:
+        if not bool(self.task_capabilities):
+            logger.error("Tried popping item from the stack without assigning `task_capabilities`")
         response = self._session.post(
             f"/queues/{queue}/pop",
             data=QueuePopRequest(
