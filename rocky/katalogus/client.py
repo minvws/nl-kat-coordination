@@ -12,6 +12,7 @@ from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import AfterValidator, BaseModel, Field, field_serializer
 from tools.enums import SCAN_LEVEL
+from urllib.parse import urlencode
 
 from octopoes.models import OOI
 from octopoes.models.exception import TypeNotFound
@@ -94,15 +95,6 @@ class KATalogusHTTPStatusError(KATalogusError):
         self.message = status_message + _("A HTTP error occurred. Check logs for more info.")
 
 
-def validate_plugin_id(func):
-    @functools.wraps(func)
-    def wrapper(self, plugin_id, *args, **kwargs):
-        plugin_id = valid_plugin_id(plugin_id)
-        return func(self, plugin_id, *args, **kwargs)
-
-    return wrapper
-
-
 def validate_organization_code(func):
     @functools.wraps(func)
     def wrapper(self, organization_code):
@@ -149,16 +141,16 @@ class KATalogusClientV1:
             raise KATalogusHTTPStatusError(status_code=str(error.response.status_code))
         return [parse_plugin(plugin) for plugin in response.json()]
 
-    @validate_plugin_id
     def get_plugin(self, plugin_id: str) -> Plugin:
-        response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}")
+        safe_plugin_id = urlencode(plugin_id)
+        response = self.session.get(f"{self.organization_uri}/plugins/{safe_plugin_id}")
         response.raise_for_status()
 
         return parse_plugin(response.json())
 
-    @validate_plugin_id
     def get_plugin_schema(self, plugin_id: str) -> dict | None:
-        response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}/schema.json")
+        safe_plugin_id = urlencode(plugin_id)
+        response = self.session.get(f"{self.organization_uri}/plugins/{safe_plugin_id}/schema.json")
         response.raise_for_status()
 
         schema = response.json()
@@ -174,31 +166,31 @@ class KATalogusClientV1:
 
         return None
 
-    @validate_plugin_id
     def get_plugin_settings(self, plugin_id: str) -> dict:
-        response = self.session.get(f"{self.organization_uri}/{plugin_id}/settings")
+        safe_plugin_id = urlencode(plugin_id)
+        response = self.session.get(f"{self.organization_uri}/{safe_plugin_id}/settings")
         response.raise_for_status()
         return response.json()
 
-    @validate_plugin_id
     def upsert_plugin_settings(self, plugin_id: str, values: dict) -> None:
-        response = self.session.put(f"{self.organization_uri}/{plugin_id}/settings", json=values)
+        safe_plugin_id = urlencode(plugin_id)
+        response = self.session.put(f"{self.organization_uri}/{safe_plugin_id}/settings", json=values)
         response.raise_for_status()
 
         logger.info("Upsert plugin settings", plugin_id=plugin_id)
 
-    @validate_plugin_id
     def delete_plugin_settings(self, plugin_id: str):
-        response = self.session.delete(f"{self.organization_uri}/{plugin_id}/settings")
+        safe_plugin_id = urlencode(plugin_id)
+        response = self.session.delete(f"{self.organization_uri}/{safe_plugin_id}/settings")
         response.raise_for_status()
 
         logger.info("Delete plugin settings", plugin_id=plugin_id)
 
         return response
 
-    @validate_organization_code
     def clone_all_configuration_to_organization(self, to_organization: str):
-        response = self.session.post(f"{self.organization_uri}/settings/clone/{to_organization}")
+        safe_to_organization = urlencode(to_organization)
+        response = self.session.post(f"{self.organization_uri}/settings/clone/{safe_to_organization}")
         response.raise_for_status()
 
         return response
@@ -230,24 +222,25 @@ class KATalogusClientV1:
     def get_enabled_normalizers(self) -> list[Plugin]:
         return [plugin for plugin in self.get_normalizers() if plugin.enabled]
 
-    def _patch_plugin_state(self, boefje_id: str, enabled: bool) -> None:
-        logger.info("Toggle plugin state", plugin_id=boefje_id, enabled=enabled)
-
+    def _patch_plugin_state(self, plugin_id: str, enabled: bool) -> None:
+        logger.info("Toggle plugin state", plugin_id=plugin_id, enabled=enabled)
+        safe_plugin_id = urlencode(plugin_id)
+        
         response = self.session.patch(
-            f"{self.organization_uri}/plugins/{boefje_id}",
+            f"{self.organization_uri}/plugins/{safe_plugin_id}",
             json={"enabled": enabled},
         )
         response.raise_for_status()
 
-    @validate_plugin_id
     def get_description(self, plugin_id: str) -> str:
-        response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}/description.md")
+        safe_plugin_id = urlencode(plugin_id)        
+        response = self.session.get(f"{self.organization_uri}/plugins/{safe_plugin_id}/description.md")
         response.raise_for_status()
 
         return response.content.decode("utf-8")
 
-    @validate_plugin_id
     def get_cover(self, plugin_id: str) -> BytesIO:
+        safe_plugin_id = urlencode(plugin_id)        
         response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}/cover.jpg")
         response.raise_for_status()
         return BytesIO(response.content)
