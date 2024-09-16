@@ -61,9 +61,9 @@ def status(ctx: click.Context):
 
 
 @cli.command(help='EDN Query (default: "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}")')
-@click.option("--tx-id", type=int, help="Defaulting to latest transaction id (integer)")
-@click.option("--tx-time", type=click.DateTime(), help="Defaulting to latest transaction time (date)")
-@click.option("--valid-time", type=click.DateTime(), help="Defaulting to now (date)")
+@click.option("--tx-id", type=int, help="In UTC, defaulting to latest transaction id (integer)")
+@click.option("--tx-time", type=click.DateTime(), help="In UTC, defaulting to latest transaction time (date)")
+@click.option("--valid-time", type=click.DateTime(), help="In UTC, defaulting to now (date)")
 @click.argument("edn", required=False)
 @click.pass_context
 def query(
@@ -98,9 +98,9 @@ def list_values(ctx: click.Context):
 
 
 @cli.command(help="Returns the document map for a particular entity.")
-@click.option("--tx-id", type=int, help="Defaulting to latest transaction id (integer)")
-@click.option("--tx-time", type=click.DateTime(), help="Defaulting to latest transaction time (date)")
-@click.option("--valid-time", type=click.DateTime(), help="Defaulting to now (date)")
+@click.option("--tx-id", type=int, help="In UTC, defaulting to latest transaction id (integer)")
+@click.option("--tx-time", type=click.DateTime(), help="In UTC, defaulting to latest transaction time (date)")
+@click.option("--valid-time", type=click.DateTime(), help="In UTC, defaulting to now (date)")
 @click.argument("key")
 @click.pass_context
 def entity(
@@ -125,7 +125,7 @@ def entity(
     "--with-corrections",
     is_flag=True,
     help="""Includes bitemporal corrections in the response, inline,
-    sorted by valid-time then tx-id (boolean, default: false)""",
+    sorted by valid-time (in UTC) then tx-id (boolean, default: false)""",
 )
 @click.argument("key")
 @click.pass_context
@@ -136,9 +136,9 @@ def history(ctx: click.Context, key: str, with_corrections: bool, with_docs: boo
 
 
 @cli.command(help="Returns the transaction details for an entity - returns a map containing the tx-id and tx-time.")
-@click.option("--tx-id", type=int, help="Defaulting to the latest transaction id (integer)")
-@click.option("--tx-time", type=click.DateTime(), help="Defaulting to the latest transaction time (date)")
-@click.option("--valid-time", type=click.DateTime(), help="Defaulting to now (date)")
+@click.option("--tx-id", type=int, help="In UTC, defaulting to the latest transaction id (integer)")
+@click.option("--tx-time", type=click.DateTime(), help="In UTC, defaulting to the latest transaction time (date)")
+@click.option("--valid-time", type=click.DateTime(), help="In UTC, defaulting to now (date)")
 @click.argument("key")
 @click.pass_context
 def entity_tx(
@@ -191,7 +191,7 @@ def await_tx(ctx: click.Context, tx_id: int, timeout: int | None):
     The returned date is the latest index time when this node has caught up as of this call."""
 )
 @click.option("--timeout", type=int, help="Specified in milliseconds, defaulting to 10 seconds (integer)")
-@click.argument("tx-time", type=click.DateTime())
+@click.argument("tx-time", type=click.DateTime(), help="In UTC")
 @click.pass_context
 def await_tx_time(
     ctx: click.Context,
