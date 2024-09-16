@@ -11,8 +11,12 @@ export function initDialogs(element) {
 
 export function initDialog(modal) {
   let input_elements = [];
+  let dialog_element = modal.querySelector("dialog");
+  let trigger = document.querySelector(
+    "[data-modal-id='" + dialog_element.id + "']",
+  );
 
-  modal.querySelector(".modal-trigger").addEventListener("click", (event) => {
+  trigger.addEventListener("click", (event) => {
     // Get and clone input elements to be able to "reset" them on "cancel".
     input_elements = modal.querySelectorAll("input, textarea");
 
@@ -21,9 +25,8 @@ export function initDialog(modal) {
       element.defaultvalue = element.value;
     });
 
-    // Used ".closest" instead of ".parentNode" to make sure we stay flexible in terms of
-    // HTML-structure when implementing the trigger.
-    event.target.closest(".modal-wrapper").querySelector("dialog").showModal();
+    // Show modal, selected by ID
+    modal.querySelector("#" + dialog_element.id).showModal();
   });
 
   modal.querySelector("dialog").addEventListener("click", (event) => {
