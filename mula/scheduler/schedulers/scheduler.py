@@ -305,12 +305,10 @@ class Scheduler(abc.ABC):
             schedule_db = self.ctx.datastores.schedule_store.get_schedule_by_hash(item.hash)
             if schedule_db is None:
                 deadline_at = self.calculate_deadline(item)
-                cron_expression = f"{deadline_at.minute} {deadline_at.hour} * * *"
 
                 schedule = models.Schedule(
                     scheduler_id=self.scheduler_id,
                     hash=item.hash,
-                    schedule=cron_expression,
                     deadline_at=deadline_at,
                     data=item.data,
                 )
@@ -337,7 +335,13 @@ class Scheduler(abc.ABC):
             )
             return item
 
-        schedule_db.deadline_at = cron.next_run(schedule_db.schedule)
+        deadline_at = None
+        if schedule_db.schedule is not None:
+            deadline_at = cron.next_run(schedule_db.schedule)
+        else:
+            deadline_at = self.calculate_deadline(item)
+
+        schedule_db.deadline_at = deadline_at
         self.ctx.datastores.schedule_store.update_schedule(schedule_db)
 
         return item

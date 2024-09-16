@@ -1008,7 +1008,7 @@ class BoefjeScheduler(Scheduler):
             The calculated deadline.
         """
         # Does the boefje have an interval defined?
-        interval = utils.deep_get(task.data, "boefje", "interval")
+        interval = utils.deep_get(task.data, ["boefje", "interval"])
         if interval is not None:
             return datetime.now(timezone.utc) + timedelta(seconds=interval)  # FIXME: check if it is seconds or minutes
 
