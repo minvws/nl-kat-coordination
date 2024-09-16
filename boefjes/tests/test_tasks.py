@@ -8,12 +8,15 @@ from uuid import UUID
 
 import pytest
 
+from boefjes.dependencies.plugins import PluginService
 from boefjes.job_handler import BoefjeHandler
 from boefjes.job_models import BoefjeMeta, InvalidReturnValueNormalizer, NormalizerMeta
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
 from boefjes.local_repository import LocalPluginRepository
 from boefjes.models import Bit, Boefje, Normalizer, PluginType
 from boefjes.runtime_interfaces import JobRuntimeError
+from boefjes.sql.config_storage import create_config_storage
+from boefjes.sql.plugin_storage import create_plugin_storage
 from tests.loading import get_dummy_data
 
 
@@ -22,21 +25,25 @@ class TaskTest(TestCase):
         self.boefjes = [
             Boefje(
                 id="test-boefje-1",
+                name="test-boefje-1",
                 consumes={"SomeOOI"},
                 produces=["test-boef-1", "test/text"],
             ),
             Boefje(
                 id="test-boefje-2",
+                name="test-boefje-2",
                 consumes={"SomeOOI"},
                 produces=["test-boef-2", "test/text"],
             ),
             Boefje(
                 id="test-boefje-3",
+                name="test-boefje-3",
                 consumes={"SomeOOI"},
                 produces=["test-boef-3", "test/plain"],
             ),
             Boefje(
                 id="test-boefje-4",
+                name="test-boefje-4",
                 consumes={"SomeOOI"},
                 produces=["test-boef-4", "test/and-simple"],
             ),
@@ -44,11 +51,13 @@ class TaskTest(TestCase):
         self.normalizers = [
             Normalizer(
                 id="test-normalizer-1",
+                name="test-normalizer-1",
                 consumes=["test-boef-3", "test/text"],
                 produces=["SomeOOI", "OtherOOI"],
             ),
             Normalizer(
                 id="test-normalizer-2",
+                name="test-normalizer-2",
                 consumes=["test/text"],
                 produces=["SomeOtherOOI"],
             ),
@@ -56,12 +65,14 @@ class TaskTest(TestCase):
         self.bits = [
             Bit(
                 id="test-bit-1",
+                name="test-bit-1",
                 consumes="SomeOOI",
                 produces=["SomeOOI"],
                 parameters=[],
             ),
             Bit(
                 id="test-bit-2",
+                name="test-bit-2",
                 consumes="SomeOOI",
                 produces=["SomeOOI", "SomeOtherOOI"],
                 parameters=[],
@@ -98,11 +109,19 @@ class TaskTest(TestCase):
             arguments={},
             organization="_dev",
         )
-
         local_repository = LocalPluginRepository(Path(__file__).parent / "modules")
 
+        mock_session = mock.MagicMock()
+        mock_session.query.all.return_value = []
+
+        plugin_service = PluginService(
+            create_plugin_storage(mock_session),
+            create_config_storage(mock_session),
+            local_repository,
+        )
+
         with pytest.raises(RuntimeError):  # Bytes still saves exceptions before they are reraised
-            BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository, mock_bytes_api_client).handle(meta)
+            BoefjeHandler(LocalBoefjeJobRunner(local_repository), plugin_service, mock_bytes_api_client).handle(meta)
 
         mock_bytes_api_client.save_boefje_meta.assert_called_once_with(meta)
         mock_bytes_api_client.save_raw.assert_called_once()
