@@ -80,7 +80,7 @@ class NormalizersTaskListView(TaskListView):
         plugin_dict = {p.id: p.name for p in plugins}
 
         for task in task_list:
-            task.data.raw_data.boefje_meta.boefje.name = plugin_dict.get(task.data.raw_data.boefje_meta.boefje.id)
+            task.data.raw_data.boefje_meta.boefje.name = plugin_dict[task.data.raw_data.boefje_meta.boefje.id]
 
         return context
 
