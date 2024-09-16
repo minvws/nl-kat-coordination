@@ -522,6 +522,7 @@ class Server:
 
     def pop_queue(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
         s = self.schedulers.get(queue_id)
+        self.logger.info("SOUF POPPING QUEUE", queue_id=queue_id, filters=filters)
         if s is None:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_404_NOT_FOUND,

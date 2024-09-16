@@ -101,8 +101,8 @@ class SchedulerAPIClient(SchedulerClientInterface):
                 filters=[
                     Filter(
                         column="data",
-                        field="network_scope",
-                        operator="in",
+                        field="requirements",
+                        operator="<@",
                         value=self.task_capabilities,
                     )
                 ]

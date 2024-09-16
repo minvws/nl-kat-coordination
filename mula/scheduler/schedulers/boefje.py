@@ -558,19 +558,27 @@ class BoefjeScheduler(Scheduler):
             caller: The name of the function that called this function, used for logging.
 
         """
+        requirements: list[str] = []
 
-        # TODO: see what types have a network attribute. How?
-        network_scope = "internet"
-        if ooi.object_type in ["IPAddressV4", "IPAddressV6"]:
-            split = ooi.primary_key.split("|")
-            if len(split) == 3:
-                network_scope = split[1]
+        self.logger.info(
+            "Souf, the ooi:",
+            ooi=ooi.model_dump_json(),
+        )
+
+        # We implicitly assume that the an ooi with the attribute `network` is from a `Network` OOI
+        if ooi.network:
+            requirements.append("network/" + ooi.network.split("|")[1])
+
+        if ooi.object_type == "IPAddressV4":
+            requirements.append("ipv4")
+        elif ooi.object_type == "IPAddressV6":
+            requirements.append("ipv6")
 
         task = BoefjeTask(
             boefje=Boefje.parse_obj(boefje.dict()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
-            network_scope=network_scope,
+            requirements=requirements,
         )
 
         if not self.is_task_allowed_to_run(boefje, ooi):
