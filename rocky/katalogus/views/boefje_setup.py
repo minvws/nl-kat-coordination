@@ -78,7 +78,7 @@ class AddBoefjeVariantView(BoefjeSetupView):
 
         self.initial = {
             "oci_image": self.plugin.oci_image,
-            "oci_arguments": ", ".join(self.plugin.oci_arguments),
+            "oci_arguments": " ".join(self.plugin.oci_arguments),
             "schema": self.plugin.schema,
             "consumes": consumes,
             "produces": ", ".join(self.plugin.produces),

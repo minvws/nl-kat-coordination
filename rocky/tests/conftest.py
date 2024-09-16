@@ -1811,6 +1811,9 @@ def boefje_dns_records():
         options=None,
         runnable_hash=None,
         produces={"boefje/dns-records"},
+        schema={},
+        oci_image="ghcr.io/test/image:123",
+        oci_arguments=["-test", "-arg"],
     )
 
 
@@ -1832,6 +1835,9 @@ def boefje_nmap_tcp():
         options=None,
         runnable_hash=None,
         produces={"boefje/nmap"},
+        schema={},
+        oci_image="ghcr.io/test/image:123",
+        oci_arguments=["-test", "-arg"],
     )
 
 
