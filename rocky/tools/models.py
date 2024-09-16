@@ -1,8 +1,6 @@
 import datetime
 from collections.abc import Iterable
-from enum import Enum
 from functools import cached_property
-from typing import cast
 
 import structlog
 import tagulous.models
@@ -23,7 +21,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.ooi.web import Network
 from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesUnhealthyException
 from tools.add_ooi_information import SEPARATOR, get_info
-from tools.enums import SCAN_LEVEL
+from tools.enums import MAX_SCAN_LEVEL
 from tools.fields import LowerCaseSlugField
 
 GROUP_ADMIN = "admin"
@@ -108,6 +106,7 @@ class Organization(models.Model):
             ("can_view_katalogus_settings", "Can view KAT-alogus settings"),
             ("can_set_katalogus_settings", "Can set KAT-alogus settings"),
             ("can_recalculate_bits", "Can recalculate bits"),
+            ("can_access_all_organizations", "Can access all organizations"),
         )
 
     def get_absolute_url(self):
@@ -217,8 +216,6 @@ class OrganizationMember(models.Model):
         ACTIVE = "active", _("active")
         NEW = "new", _("new")
 
-    scan_levels = [scan_level.value for scan_level in cast(type[Enum], SCAN_LEVEL)]
-
     user = models.ForeignKey("account.KATUser", on_delete=models.PROTECT, related_name="members")
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="members")
     groups = models.ManyToManyField(Group, blank=True)
@@ -226,10 +223,10 @@ class OrganizationMember(models.Model):
     blocked = models.BooleanField(default=False)
     onboarded = models.BooleanField(default=False)
     trusted_clearance_level = models.IntegerField(
-        default=-1, validators=[MinValueValidator(-1), MaxValueValidator(max(scan_levels))]
+        default=-1, validators=[MinValueValidator(-1), MaxValueValidator(MAX_SCAN_LEVEL)]
     )
     acknowledged_clearance_level = models.IntegerField(
-        default=-1, validators=[MinValueValidator(-1), MaxValueValidator(max(scan_levels))]
+        default=-1, validators=[MinValueValidator(-1), MaxValueValidator(MAX_SCAN_LEVEL)]
     )
 
     EVENT_CODES = {"created": 900211, "updated": 900212, "deleted": 900213}
@@ -259,6 +256,13 @@ class OrganizationMember(models.Model):
 
     def has_perms(self, perm_list: Iterable[str]) -> bool:
         return all(self.has_perm(perm) for perm in perm_list)
+
+    @property
+    def max_clearance_level(self) -> int:
+        return max(min(self.trusted_clearance_level, self.acknowledged_clearance_level), self.user.clearance_level)
+
+    def has_clearance_level(self, level: int) -> bool:
+        return level <= self.max_clearance_level
 
     class Meta:
         unique_together = ["user", "organization"]

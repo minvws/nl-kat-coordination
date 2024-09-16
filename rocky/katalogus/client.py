@@ -53,7 +53,7 @@ class Boefje(Plugin):
         return {ooi_class.get_ooi_type() for ooi_class in consumes}
 
     def can_scan(self, member) -> bool:
-        return super().can_scan(member) and member.acknowledged_clearance_level >= self.scan_level.value
+        return super().can_scan(member) and member.has_clearance_level(self.scan_level.value)
 
 
 class Normalizer(Plugin):
