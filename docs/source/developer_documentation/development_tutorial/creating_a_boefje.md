@@ -1,13 +1,13 @@
 # Creating a Boefje
 
-There are two ways to create a Boefje. The first is to create your own Boefje in the backend. The second is to create it in the User Interface.
+There are two ways to create a Boefje. The first is to create a Boefje with the User Interface (UI). The second option is to create it in the backend.
 
 ## Creating a Boefje (variant) in the User Interface
 
 **Note:** Currently, only admins are able to create Boefjes in the UI.
 
-To create a new Boefje, go to the KAT-alogus. Here you will find the _'Add Boefje'_ button.
-To create a variant of an existing Boefje, go to the Boefje detail page of the Boefje you would like to use as a template and press the 'Add variant' button.
+To create a **new** Boefje, go to the KAT-alogus. Here you will find the _'Add Boefje'_ button.
+To create a **variant** of an existing Boefje, go to the Boefje detail page of the Boefje you would like to use as a template and press the _'Add variant'_ button.
 
 ### Setup your Boefje
 
@@ -16,17 +16,17 @@ You will be directed to the Setup page, where you can configure your Boefje. The
 | Field             | Required | Explanation                                                                                                                                                                                                                                                                                                                             |
 | ----------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Container image   | Yes      | The name of the Docker image. For example: _'ghcr.io/minvws/openkat/nmap'_                                                                                                                                                                                                                                                              |
-| Name              | Yes      | Give your Boefje a suiting name. This name will be visible in the KAT-alogus                                                                                                                                                                                                                                                            |
-| Description       | No       | A description of the boefje explaining in short what it can do. This will both be displayed inside the KAT-alogus and on the Boefje details page.                                                                                                                                                                                       |
+| Name              | Yes      | Give your Boefje a suiting name. This name will be visible in the KAT-alogus.                                                                                                                                                                                                                                                           |
+| Description       | No       | A description of the Boefje explaining in short what it can do. This will both be displayed inside the KAT-alogus and on the Boefje details page.                                                                                                                                                                                       |
 | Arguments         | No       | For example: _'-sTU --top-ports 1000'_                                                                                                                                                                                                                                                                                                  |
 | Json Schema       | No       | If any other settings are needed for your Boefje, add these as a JSON Schema, otherwise, leave the field empty or 'null'. This JSON is used as the basis for a form for the user. When the user enables this Boefje they can get the option to give extra information. For example, it can contain an API key that the script requires. |
-| Input object type | No       | Select the object type(s) that your Boefje consumes.                                                                                                                                                                                                                                                                                    |
+| Input object type | No       | Select the object type(s) that your Boefje. consumes.                                                                                                                                                                                                                                                                                   |
 | Output mime-types | No       | Add a set of mime-types that are produced by this Boefje, separated by commas. For example: _'text/html'_, _'image/jpeg'_ or _'boefje/{boefje-id}'_. These output mime-types will be shown on the Boefje detail page as information for other users.                                                                                    |
 | Clearance level   | No       | Select a clearance level for your Boefje, which indicates how deeply your Boefje can scan objects.                                                                                                                                                                                                                                      |
 
 ### Using your Boefje
 
-After finishing the setup and creating your Boefje, you can view it in the KAT-alogus. The Boefje detail page will show you all the information about your newly created Boefje.
+After finishing the setup and creating your Boefje, you can view it in the KAT-alogus. The Boefje detail page will show you all the detailed information about your newly created Boefje. Both on the KAT-alogus as on the Boefje detail page, you can enable or disable your Boefje.
 
 ### Updating your Boefje
 
