@@ -1,4 +1,5 @@
 import uuid
+from base64 import b64encode
 from collections.abc import Set
 from datetime import datetime, timezone
 
@@ -113,15 +114,25 @@ class BytesClient:
         response.raise_for_status()
 
     def _save_raw(self, boefje_meta_id: uuid.UUID, raw: bytes, mime_types: Set[str] = frozenset()) -> str:
+        file_name = "raw"  # The name provides a key for all ids returned, so this is arbitrary as we only upload 1 file
+
         response = self.session.post(
             "/bytes/raw",
-            content=raw,
-            headers={"content-type": "application/octet-stream"},
-            params={"mime_types": list(mime_types), "boefje_meta_id": str(boefje_meta_id)},
+            json={
+                "files": [
+                    {
+                        "name": file_name,
+                        "content": b64encode(raw).decode(),
+                        "tags": list(mime_types),
+                    }
+                ]
+            },
+            params={"boefje_meta_id": str(boefje_meta_id)},
         )
 
         response.raise_for_status()
-        return response.json()["id"]
+
+        return response.json()[file_name]
 
     def get_raw(self, raw_id: str) -> bytes:
         # Note: we assume organization permissions are handled before requesting raw data.

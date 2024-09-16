@@ -139,12 +139,16 @@ class TaskAPI:
                     ]
                 }
             elif task_type == "normalizer":
-                f_plugin = storage.filters.Filter(
-                    column="data",
-                    field="normalizer__id",
-                    operator="eq",
-                    value=plugin_id,
-                )
+                f_plugin = {
+                    "and": [
+                        storage.filters.Filter(
+                            column="data",
+                            field="normalizer__id",
+                            operator="eq",
+                            value=plugin_id,
+                        )
+                    ]
+                }
             else:
                 f_plugin = {
                     "or": [
@@ -182,6 +186,7 @@ class TaskAPI:
                 detail=f"invalid filter(s) [exception: {exc}]",
             ) from exc
         except storage.errors.StorageError as exc:
+            self.logger.exception(exc)
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"error occurred while accessing the database [exception: {exc}]",
