@@ -162,7 +162,14 @@ class OctopoesService:
 
     def _delete_ooi(self, reference: Reference, valid_time: datetime) -> None:
         referencing_origins = self.origin_repository.list_origins(valid_time, result=reference)
-        if not referencing_origins:
+        if not any(
+            origin
+            for origin in referencing_origins
+            if not (
+                origin.origin_type == OriginType.AFFIRMATION
+                or (origin.origin_type == OriginType.INFERENCE and origin.source == reference)
+            )
+        ):
             self.ooi_repository.delete(reference, valid_time)
 
     def save_origin(
