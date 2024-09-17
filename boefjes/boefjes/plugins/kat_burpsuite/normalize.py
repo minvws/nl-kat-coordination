@@ -14,10 +14,22 @@ from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.web import URL, HostnameHTTPURL, HTTPHeader, HTTPResource, IPAddressHTTPURL, WebScheme, Website
 
 
+def find_network(data: dict) -> dict:
+    if "network" in data:
+        return data["network"]
+    for key, value in data.items():
+        if isinstance(value, dict):
+            result = find_network(value)
+            if result is not None:
+                return result
+    # Return internet if network is not found
+    return {"name": "internet"}
+
+
 def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     parser = minidom.parseString(raw.decode("UTF-8"))
 
-    network = Network(name="internet")
+    network = Network(name=find_network(input_ooi).get("name", "internet"))
 
     tcp_protocol = Protocol.TCP
 
