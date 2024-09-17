@@ -4,9 +4,9 @@ from datetime import datetime, timezone
 from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import config, models, queues, storage
 from structlog.testing import capture_logs
 
+from scheduler import config, models, queues, storage
 from tests.mocks import item as mock_item
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
@@ -221,7 +221,10 @@ class SchedulerTestCase(unittest.TestCase):
 
         # Assert: schedule should have a deadline
         self.assertIsNotNone(schedule_db.deadline_at)
-        self.assertIsNotNone(schedule_db.schedule)
+
+        # TODO: check this
+        # Assert Schedule cron should not be set
+        self.assertIsNone(schedule_db.schedule)
 
         # Assert: deadline should be in the future, at least later than the
         # grace period
@@ -257,7 +260,10 @@ class SchedulerTestCase(unittest.TestCase):
 
         # Assert: schedule should have a deadline
         self.assertIsNotNone(schedule_db.deadline_at)
-        self.assertIsNotNone(schedule_db.schedule)
+
+        # TODO: check this
+        # Assert Schedule cron should not be set
+        self.assertIsNone(schedule_db.schedule)
 
         # Assert: deadline should be in the future, at least later than the
         # grace period
@@ -327,6 +333,12 @@ class SchedulerTestCase(unittest.TestCase):
         schedules, _ = self.mock_ctx.datastores.schedule_store.get_schedules(scheduler_id=self.scheduler.scheduler_id)
 
         self.assertEqual(1, len(schedules))
+
+    def test_post_push_schedule_is_none(self):
+        self.assertFail("Not implemented yet")
+
+    def test_post_push_schedule_is_not_none(self):
+        self.assertFail("Not implemented yet")
 
     def test_post_pop(self):
         """When a task is popped from the queue, it should be removed from the database"""

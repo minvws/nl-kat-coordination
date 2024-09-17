@@ -3,9 +3,9 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import config, connectors, models, schedulers, storage
 from structlog.testing import capture_logs
 
+from scheduler import config, connectors, models, schedulers, storage
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -829,6 +829,24 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
         self.assertEqual(task_db.id, item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Schedule should be in datastore
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(task_db.schedule_id)
+        self.assertIsNotNone(schedule_db)
+        self.assertEqual(schedule_db.id, task_db.schedule_id)
+
+        # Schedule deadline should be set
+        self.assertIsNotNone(schedule_db.deadline_at)
+
+        # TODO: check this
+        # Schedule cron should not be set
+        self.assertIsNotNone(schedule_db.schedule)
+
+    def test_post_push_boefje_cron(self):
+        self.assertFail("Not implemented yet")
+
+    def test_post_push_boefje_interval(self):
+        self.assertFail("Not implemented yet")
 
     def test_post_pop(self):
         """When a task is removed from the queue, its status should be updated"""
