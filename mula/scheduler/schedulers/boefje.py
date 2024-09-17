@@ -998,6 +998,29 @@ class BoefjeScheduler(Scheduler):
 
         return boefjes
 
+    def post_push(self, item: Task) -> Task:
+        """When a boefje specifies we schedule for its execution"""
+        # Does a boefje have a schedule defined?
+        schedule = utils.deep_get(item.data, ["boefje", "schedule"])  # FIXME: based on implementation
+        if schedule is None:
+            return super().post_push(item)
+
+        schedule_db = self.ctx.datastores.schedule_store.get_schedule_by_hash(item.hash)
+        if schedule_db is None:
+            # Create schedule when not found
+            schedule_db = self.ctx.datastores.schedule_store.create_schedule(
+                item.scheduler_id,
+                item.hash,
+                schedule,
+            )
+        else:
+            # We update the schedule if it already exists, this makes sure
+            # that when a boefje schedule is updated, we also update the schedule.
+            schedule_db.schedule = schedule
+            self.ctx.datastores.schedule_store.update_schedule(schedule_db)
+
+        return super().post_push(item)
+
     def calculate_deadline(self, task: Task) -> datetime:
         """Calculate the deadline for a task.
 
@@ -1008,8 +1031,8 @@ class BoefjeScheduler(Scheduler):
             The calculated deadline.
         """
         # Does the boefje have an interval defined?
-        interval = utils.deep_get(task.data, ["boefje", "interval"])
+        interval = utils.deep_get(task.data, ["boefje", "interval"])  # FIXME: based on implementation
         if interval is not None:
-            return datetime.now(timezone.utc) + timedelta(seconds=interval)  # FIXME: check if it is seconds or minutes
+            return datetime.now(timezone.utc) + timedelta(minutes=interval)
 
         return super().calculate_deadline(task)

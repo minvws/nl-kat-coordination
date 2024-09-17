@@ -335,6 +335,10 @@ class Scheduler(abc.ABC):
             )
             return item
 
+        # We have a schedule for this item, let's update the deadline.
+        # If the schedule has a cron schedule, we calculate the next run
+        # based on the cron schedule, otherwise we calculate the deadline
+        # based on the item.
         deadline_at = None
         if schedule_db.schedule is not None:
             deadline_at = cron.next_run(schedule_db.schedule)
