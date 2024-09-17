@@ -29,7 +29,7 @@ productive and beneficial for all team members.[^2]
 1. **Mind your reviewer**
 
    Make choices or options that minimize time and cognitive load for the reviewer,
-   such opting for multiple short changes instead of one massive one.
+   such as opting for multiple short changes instead of one massive one.
 
 2. **Satisfy preconditions**
 
