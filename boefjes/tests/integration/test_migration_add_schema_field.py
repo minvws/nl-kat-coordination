@@ -58,7 +58,7 @@ def migration_f9de6eb7824b(local_repository) -> Session:
     session.commit()
     session.close()
 
- 
+
 def test_fail_on_wrong_plugin_ids(migration_f9de6eb7824b):
     session = migration_f9de6eb7824b
     assert session.execute("SELECT * from boefje").fetchall() == [
