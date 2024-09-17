@@ -28,7 +28,7 @@ The trigger element needs some explaining. This will be the element that `on cli
 the `element` gets assigned the click handler by JavaScript.
 It's essential to include the data attribute `data-modal-id="xx"`, where "xx" is the same as the `id` attribute on the intended modal. This is what defines the modal dialog that this trigger is meant to target.
 While it might seem obvious to use a `button` as a trigger, the modal is setup in a way that allows for any HTML element to be used as a trigger.
-The trigger doesn't need to be part of the `{% component %}` itself and can be placed anywhere in the HTML template, though it make sense to place them adjacent or as close as possible to each other.
+The trigger doesn't need to be part of the `{% component %}` itself and can be placed anywhere in the HTML template, though it makes sense to place them adjacent or as close as possible to each other.
 
 ### Slots and fills
 
