@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-11 14:03+0000\n"
+"POT-Creation-Date: 2024-09-17 09:47+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5091,7 +5091,8 @@ msgstr ""
 msgid "Crisis room"
 msgstr ""
 
-#: rocky/templates/header.html rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/header.html rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/ooi_detail_task_list.html
 #: rocky/templates/tasks/plugin_detail_task_list.html
 #: rocky/views/task_detail.py rocky/views/tasks.py
 msgid "Tasks"
@@ -6226,6 +6227,17 @@ msgstr ""
 
 #: rocky/templates/tasks/boefje_task_detail.html
 msgid "Input object"
+msgstr ""
+
+#: rocky/templates/tasks/boefjes.html
+#, python-format
+msgid ""
+"\n"
+"                        An overview of the tasks for %(organization)s. Tasks "
+"are divided in Boefjes and Normalizers.\n"
+"                        Boefjes scan objects and Normalizers dispatch on the "
+"output mime-type.\n"
+"                    "
 msgstr ""
 
 #: rocky/templates/tasks/boefjes.html
