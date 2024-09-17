@@ -3,10 +3,10 @@ import uuid
 from collections import Counter
 from collections.abc import Generator
 from datetime import datetime
-from logging import getLogger
 from operator import itemgetter
 from typing import Any, Literal
 
+import structlog
 from asgiref.sync import sync_to_async
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
 from httpx import HTTPError
@@ -41,7 +41,7 @@ from octopoes.xtdb.exceptions import XTDBException
 from octopoes.xtdb.query import Aliased
 from octopoes.xtdb.query import Query as XTDBQuery
 
-logger = getLogger(__name__)
+logger = structlog.get_logger(__name__)
 router = APIRouter(prefix="/{client}")
 
 
