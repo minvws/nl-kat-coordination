@@ -51,7 +51,7 @@ productive and beneficial for all team members.[^2]
 3. **Provide context**
 
    When opening a PR for review be clear to your reviewer about your
-   expectations. In terms of the review, this means specifying the kind of
+   expectations. In terms of the review, this means specifying in the description of the PR, the kind of
    reviewing as well as who should review what using which level of scrutiny
    and rigor.
 
