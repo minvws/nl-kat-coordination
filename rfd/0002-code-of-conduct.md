@@ -163,7 +163,7 @@ productive and beneficial for all team members.[^2]
 
     Be helpful and constructive in your feedback. If you see something that
     could be improved, suggest a way to improve it. Don't only just point out
-    what's wrong, but also suggest how to fix it.
+    what's wrong, but also suggest how to fix it, for example by utilising the "add suggestion" feature in review comments.
 
     When there is the possibility to lend out a helping hand, do so. Schedule
     a call or a meeting to discuss the feedback in more detail. This can help
