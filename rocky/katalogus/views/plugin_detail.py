@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from account.mixins import OrganizationView
+from dateutil import parser
 from django.contrib import messages
 from django.http import FileResponse
 from django.shortcuts import redirect
@@ -130,6 +131,10 @@ class BoefjeDetailView(PluginDetailView):
         context = super().get_context_data(**kwargs)
         context["new_variant"] = self.request.GET.get("new_variant")
         context["variants"] = get_katalogus(self.organization.code).get_plugins(oci_image=self.plugin.oci_image)
+
+        for variant in context["variants"]:
+            variant.created = parser.isoparse(variant.created)
+
         context["select_ooi_filter_form"] = SelectOOIFilterForm
         if "show_all" in self.request.GET:
             context["select_oois_form"] = SelectOOIForm(
