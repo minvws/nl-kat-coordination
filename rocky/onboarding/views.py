@@ -369,8 +369,8 @@ class OnboardingReportView(
 
     def get_ooi_pks(self) -> list[str]:
         ooi = self.get_ooi(self.request.GET.get("ooi", ""))
-        ooi = [Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network)]
-        return [ooi[0].primary_key]
+        hostname_ooi = [Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network)]
+        return [hostname_ooi[0].primary_key]
 
     def get_report_type_ids(self) -> list[str]:
         return [self.request.GET.get("report_type", "")]
