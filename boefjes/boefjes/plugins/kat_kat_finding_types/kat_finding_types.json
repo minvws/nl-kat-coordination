@@ -13,14 +13,14 @@
     "impact": "The usage possibility of JavaScript is not limited by the website. If the website contains a cross-site scripting vulnerability, then JavaScript code can be injected into the web page. This code is then executed by the browser of the victim. If a well-established Content Security Policy is active, the attacker can inject JavaScript code into the browser of the victim, but then the code will not get executed by the browser. A good configured Content Security Policy is a strong protection against cross-site scripting vulnerabilities.",
     "recommendation": "1. Set the Content-Security-Policy HTTP header in all HTTP answers. 2. Make sure that when the Content Security Policy is violated by a browser, that this violation is logged and monitored. Point the content security violation variable report-uri to a server-side log script. 3. Implement a process that periodically analyses these logs for programming errors and hack attacks."
   },
-  "KAT-NO-X-PERMITTED-CROSS-DOMAIN-POLICIES": {
+  "KAT-X-PERMITTED-CROSS-DOMAIN-POLICIES": {
     "description": "The HTTP header X-Permitted-Cross-Domain- Policies is missing in HTTP responses. This header is not officially supported by Mozilla MDN.",
     "source": "https://owasp.org/www-project-secure-headers/#div-headers",
     "risk": "recommendation",
     "impact": "When the value of this header is not set to master- only, Adobe Flash or Adobe Acrobat (and possibly other software) can also look at cross-domain configuration files hosted at the web server.",
     "recommendation": "This header is not supported by default by Mozilla. If this header is required for your environment: Set the HTTP header X-Permitted-Cross- Domain-Policies: none in all HTTP responses. Use value master-only if a Flash or Acrobat cross- domain configuration file is used that is placed in the root of the web server"
   },
-  "KAT-NO-EXPLICIT-XSS-PROTECTION": {
+  "KAT-EXPLICIT-XSS-PROTECTION": {
     "description": "The 'X-XSS-Protection' header is a deprecated header previously used to prevent against Cross-Site-Scripting attacks. Support in modern browsers could introduce XSS attacks again.",
     "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection",
     "risk": "recommendation",
@@ -34,14 +34,14 @@
     "impact": "There is a change that clickjacking is possible. This is an attack technique in which the website is invisibly loaded. On top of the original website, another malicious website is loaded that contains specially placed buttons or links. When the victim clicks on those buttons or links, the mouse click and thus its corresponding action is performed on the original website (which is made invisible). If the victim is logged in, then this click can perform an unauthorized action.",
     "recommendation": "1. Set the HTTP header <c>X-Frame- Options</c> with value deny (safest) or sameorigin in every HTTP answer for older browsers. 2. Set the frame-ancestors variable in the Content-Security-Policy header for modern browsers. 3. Add JavaScript code to all pages to ensure that these web pages may not be loaded within an <iframe>. In this manner also very old browsers are protected that do not support the HTTP header X-Frame-Options."
   },
-  "KAT-NO-X-DNS-PREFETCH-CONTROL": {
+  "KAT-X-DNS-PREFETCH-CONTROL": {
     "description": "This is a non-standard header. The HTTP header X-DNS-Prefetch-Control is missing. The X-DNS-Prefetch-Control HTTP response header controls DNS prefetching, a feature by which browsers proactively perform domain name resolution on both links that the user may choose to follow as well as URLs for items referenced by the document.",
     "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control",
     "risk": "recommendation",
     "impact": "This header not production ready and thus not officially supported by Mozilla MDN.",
     "recommendation": "If support is required: Set the HTTP header to: `X-DNS-Prefetch-Control: off` in all HTTP answers."
   },
-  "KAT-NO-EXCPECT-CT": {
+  "KAT-EXCPECT-CT": {
     "description": "The 'Expect-CT' header is deprecated. The Expect-CT header allowed sites to opt in to reporting and/or enforcement of Certificate Transparency requirements. This header is not supported by common browsers, as certificate transparency is now a standard functionality.",
     "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Expect-CT",
     "risk": "recommendation",
@@ -419,7 +419,7 @@
     "impact": "An attacker using your hosting provider may setup a virtual host for your domain and thus intercept and trick users.",
     "recommendation": "To prevent subdomain takeover, organizations should regularly monitor their DNS records to identify and remove any unused subdomains. Additionally, they should ensure that all subdomains are properly configured and point to valid services."
   },
-  "EXPOSED-PANELS": {
+  "EXPOSED-ADMIN-PANELS": {
     "description": "Exposed login panels for services can pose security risks as they can be targeted by malicious actors for brute-force attacks, phishing attempts, and other forms of unauthorized access.",
     "source": "https://resources.infosecinstitute.com/topics/application-security/dangers-web-management/",
     "risk": "recommendation",
@@ -463,6 +463,7 @@
   },
   "KAT-INVALID-RPKI": {
     "description": "A route announcement that is matched by the published Route Policy and Authorization (RPKI) is invalid",
+    "source": "https://blog.cloudflare.com/rpki/",
     "risk": "medium",
     "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
     "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired."
@@ -476,6 +477,7 @@
   },
   "KAT-DISALLOWED-DOMAIN-IN-CSP": {
     "description": "This CSP header contains domains that are not allowed, If the website contains a cross-site scripting vulnerability, then JavaScript code can be injected into the web page hosted on these domains which can host files for anyone.",
+    "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP",
     "risk": "medium",
     "impact": "Disallowed domains are domains that are for example 'world writable', this opens up the possibility for an atacker to host malicious files on a csp whitelisted domain.",
     "recommendation": "Remove the offending hostname from the CSP header."
@@ -497,6 +499,8 @@
   "KAT-SOFTWARE-VERSION-NOT-FOUND": {
     "description": "The version of the software is not found.",
     "risk": "recommendation",
-    "recommendation": "There was no version found for this software but there are known vulnerabilities for this software."
+    "source": "Check the version of the host manually.",
+    "impact": "Unknown. The server may or may not be vulnerable. OpenKAT is not able to determine the version.",
+    "recommendation": "Verify manually if the software is up to date as OpenKAT is not able to determine the software version ."
   }
 }

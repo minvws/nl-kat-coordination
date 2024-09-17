@@ -191,7 +191,7 @@ def await_tx(ctx: click.Context, tx_id: int, timeout: int | None):
     The returned date is the latest index time when this node has caught up as of this call."""
 )
 @click.option("--timeout", type=int, help="Specified in milliseconds, defaulting to 10 seconds (integer)")
-@click.argument("tx-time", type=click.DateTime(), help="In UTC")
+@click.argument("tx-time", type=click.DateTime())
 @click.pass_context
 def await_tx_time(
     ctx: click.Context,
