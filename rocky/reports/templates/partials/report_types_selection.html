@@ -31,7 +31,7 @@
                     You have selected {{ total_oois }} objects in previous step.
                 {% endblocktranslate %}
             </p>
-            {% if not "all" in selected_oois %}
+            {% if not all_oois_selected %}
                 {% include "summary/ooi_selection.html" %}
 
             {% endif %}

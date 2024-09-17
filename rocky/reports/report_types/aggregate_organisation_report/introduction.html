@@ -3,7 +3,7 @@
 <section class="introduction" id="introduction">
     <div>
         <div class="horizontal-view toolbar">
-            <h1>{{ report_name }}</h1>
+            <h1>{{ report_ooi.name }}</h1>
             <div class="dropdown">
                 <button aria-controls="export-add" class="dropdown-button ghost">
                     {% translate "Export" %}<span aria-hidden="true" class="icon ti-chevron-down"></span>
@@ -23,10 +23,10 @@
         <div>
             <p>{% translate "This is the OpenKAT report for organization" %} {{ organization.name }}</p>
             <p>
-                {% translate "Created with data from:" %} <strong>{{ observed_at }} {{ TIME_ZONE }}</strong>
+                {% translate "Created with data from:" %} <strong>{{ report_ooi.observed_at }} {{ TIME_ZONE }}</strong>
             </p>
             <p>
-                {% translate "Created on:" %} <strong>{{ created_at }}</strong>
+                {% translate "Created on:" %} <strong>{{ report_ooi.date_generated }}</strong>
             </p>
             <p>
                 {% translate "Created by:" %} <strong>{{ organization_member.user.full_name }}</strong>

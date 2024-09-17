@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from django.contrib import messages
@@ -6,22 +6,22 @@ from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import Reference, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
-from octopoes.models.ooi.reports import Report as ReportOOI
+from octopoes.models.ooi.reports import Report
 from reports.report_types.aggregate_organisation_report.report import aggregate_reports
 from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.helpers import REPORTS, get_report_by_id
-from reports.views.base import ReportFinalSettingsView
+from reports.views.base import BaseReportView
 
 
-class SaveGenerateReportMixin(ReportFinalSettingsView):
-    def save_report(self, report_names: list) -> ReportOOI:
+class SaveGenerateReportMixin(BaseReportView):
+    def save_report(self, report_names: list) -> Report:
         error_reports = []
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
         by_type: dict[str, list[str]] = {}
 
         number_of_reports = 0
 
-        for ooi in self.report_recipe.input_oois:
+        for ooi in self.get_ooi_pks():
             ooi_type = Reference.from_str(ooi).class_
 
             if ooi_type not in by_type:
@@ -58,7 +58,7 @@ class SaveGenerateReportMixin(ReportFinalSettingsView):
                 number_of_reports += 1
 
         observed_at = self.get_observed_at()
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
 
         # if its not a single report, we need a parent
         if number_of_reports > 1:
@@ -126,14 +126,14 @@ class SaveGenerateReportMixin(ReportFinalSettingsView):
         return report_ooi
 
 
-class SaveAggregateReportMixin(ReportFinalSettingsView):
-    def save_report(self, report_names: list) -> ReportOOI:
+class SaveAggregateReportMixin(BaseReportView):
+    def save_report(self, report_names: list) -> Report:
         input_oois = self.get_oois()
 
         aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
             self.octopoes_api_connector,
             list(input_oois),
-            self.report_recipe.report_types,
+            self.get_report_type_ids(),
             self.observed_at,
             self.organization.code,
         )

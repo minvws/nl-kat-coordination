@@ -22,7 +22,7 @@
                    href="{% url 'ooi_list' organization_code=organization.code %}">{% translate "Go to the object page" %}</a>
             </div>
         {% else %}
-            {% if "all" in selected_oois %}
+            {% if all_oois_selected %}
                 <div class="horizontal-view horizontal-scroll toolbar start">
                     <p class="de-emphasized">{{ total_oois }} {% translate "objects selected" %}</p>
                     <a class="select_all_objects_element">{% translate "Deselect all objects" %}</a>
@@ -53,7 +53,7 @@
                   action="{{ next }}"
                   class="inline layout-wide checkboxes_required">
                 {% csrf_token %}
-                {% if "all" in selected_oois %}
+                {% if all_oois_selected %}
                     {% include "forms/report_form_fields.html" %}
 
                 {% else %}
@@ -66,7 +66,7 @@
                         <th>
                             <input class="select_all_objects_element"
                                    type="checkbox"
-                                   {% if "all" in selected_oois %}checked{% endif %}>
+                                   {% if all_oois_selected %}checked{% endif %}>
                         </th>
                         <th>{% translate "Object" %}</th>
                         <th>{% translate "Type" %}</th>
@@ -80,8 +80,8 @@
                                     <input type="checkbox"
                                            name="ooi"
                                            value="{{ object.primary_key }}"
-                                           {% if object.primary_key in selected_oois or "all" in selected_oois %}checked{% endif %}
-                                           {% if "all" in selected_oois %}disabled{% endif %}>
+                                           {% if object.primary_key in selected_oois or all_oois_selected %}checked{% endif %}
+                                           {% if all_oois_selected %}disabled{% endif %}>
                                 </td>
                                 <td>{{ object.human_readable }}</td>
                                 <td>{{ object.ooi_type }}</td>
@@ -106,5 +106,5 @@
 <form novalidate id="select_all_objects_form" class="inline" method="get">
     {% include "forms/report_form_fields.html" with disable_ooi_selection_fields=True %}
 
-    {% if "all" not in selected_oois %}<input type="hidden" name="ooi" value="all">{% endif %}
+    {% if not all_oois_selected %}<input type="hidden" name="ooi" value="all">{% endif %}
 </form>
