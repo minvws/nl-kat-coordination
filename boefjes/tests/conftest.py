@@ -7,6 +7,7 @@ from multiprocessing import Manager
 from pathlib import Path
 from uuid import UUID
 
+import alembic.config
 import pytest
 from fastapi.testclient import TestClient
 from pydantic import TypeAdapter
@@ -16,16 +17,21 @@ from boefjes.app import SchedulerWorkerManager
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import Queue, SchedulerClientInterface, Task, TaskStatus
 from boefjes.config import Settings, settings
-from boefjes.dependencies.plugins import PluginService
+from boefjes.dependencies.plugins import PluginService, get_plugin_service
 from boefjes.job_handler import bytes_api_client
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
-from boefjes.local_repository import get_local_repository
+from boefjes.katalogus.organisations import check_organisation_exists
+from boefjes.katalogus.root import app
+from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
+from boefjes.local_repository import LocalPluginRepository, get_local_repository
 from boefjes.models import Organisation
 from boefjes.runtime_interfaces import Handler, WorkerManager
 from boefjes.sql.config_storage import SQLConfigStorage, create_encrypter
 from boefjes.sql.db import SQL_BASE, get_engine
-from boefjes.sql.organisation_storage import SQLOrganisationStorage
+from boefjes.sql.organisation_storage import SQLOrganisationStorage, get_organisations_store
 from boefjes.sql.plugin_storage import SQLPluginStorage
+from boefjes.storage.interfaces import OrganisationNotFound
+from boefjes.storage.memory import ConfigStorageMemory, OrganisationStorageMemory, PluginStorageMemory
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
@@ -152,14 +158,14 @@ def api(tmp_path):
 
 @pytest.fixture
 def session():
+    alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"])
     engine = get_engine()
     session = sessionmaker(bind=engine)()
 
     yield session
 
-    session.execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables]))
     session.commit()
-    session.close()
+    engine.execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables]))
 
 
 @pytest.fixture
@@ -178,23 +184,88 @@ def plugin_storage(session):
 
 
 @pytest.fixture
-def local_repo():
+def local_repository():
     return get_local_repository()
 
 
 @pytest.fixture
-def plugin_service(plugin_storage, config_storage, local_repo):
-    return PluginService(plugin_storage, config_storage, local_repo)
+def mock_local_repository():
+    return LocalPluginRepository(Path(__file__).parent / "modules")
 
 
 @pytest.fixture
-def organisation(organisation_storage) -> Organisation:
-    organisation = Organisation(id="test", name="Test org")
+def normalizer_runner(local_repository: LocalPluginRepository):
+    return LocalNormalizerJobRunner(local_repository)
 
+
+@pytest.fixture
+def boefje_runner(local_repository: LocalPluginRepository):
+    return LocalBoefjeJobRunner(local_repository)
+
+
+@pytest.fixture
+def mock_normalizer_runner(mock_local_repository: LocalPluginRepository):
+    return LocalNormalizerJobRunner(mock_local_repository)
+
+
+@pytest.fixture
+def mock_boefje_runner(mock_local_repository: LocalPluginRepository):
+    return LocalBoefjeJobRunner(mock_local_repository)
+
+
+@pytest.fixture
+def plugin_service(plugin_storage, config_storage, local_repository):
+    return PluginService(plugin_storage, config_storage, local_repository)
+
+
+@pytest.fixture
+def test_organisation():
+    return Organisation(id="test", name="Test org")
+
+
+@pytest.fixture
+def mock_plugin_service(mock_local_repository, test_organisation) -> PluginService:
+    storage = ConfigStorageMemory()
+    storage.upsert(test_organisation.id, "test_plugin", {"DUMMY_VAR": "123"})
+
+    return PluginService(PluginStorageMemory(), storage, mock_local_repository)
+
+
+@pytest.fixture
+def organisation(organisation_storage, test_organisation) -> Organisation:
     with organisation_storage as repo:
-        repo.create(organisation)
+        repo.create(test_organisation)
 
-    return organisation
+    return test_organisation
+
+
+@pytest.fixture
+def unit_test_client(mock_plugin_service) -> TestClient:
+    client = TestClient(app)
+    _store = OrganisationStorageMemory({"test": Organisation(id="test", name="Test")})
+
+    services = {
+        "test": mock_plugin_service,
+    }
+
+    def get_service(organisation_id: str):
+        if organisation_id in services:
+            return services.get(organisation_id)
+
+        raise OrganisationNotFound(organisation_id)
+
+    app.dependency_overrides[get_organisations_store] = lambda: _store
+    app.dependency_overrides[get_plugin_service] = get_service
+    app.dependency_overrides[check_organisation_exists] = lambda: None
+
+    yield client
+
+    app.dependency_overrides = {}
+
+
+@pytest.fixture
+def test_client() -> TestClient:
+    return TestClient(app)
 
 
 @pytest.fixture
