@@ -71,24 +71,25 @@ class AddBoefjeVariantView(BoefjeSetupView):
         self.return_to_plugin_id = self.kwargs.get("plugin_id")
         katalogus = get_katalogus(self.organization.code)
         self.plugin = katalogus.get_plugin(self.return_to_plugin_id)
+
+    def get_initial(self):
+        initial = super().get_initial()
+
         consumes = []
 
-        for input_object in list(self.plugin.consumes):
+        for input_object in self.plugin.consumes:
             consumes.append(input_object.__name__)
 
-        self.initial = {
-            "oci_image": self.plugin.oci_image,
-            "oci_arguments": " ".join(self.plugin.oci_arguments),
-            "schema": self.plugin.schema,
-            "consumes": consumes,
-            "produces": ", ".join(self.plugin.produces),
-            "scan_level": self.plugin.scan_level,
-        }
+        initial["oci_image"] = self.plugin.oci_image
+        initial["oci_arguments"] = " ".join(self.plugin.oci_arguments)
+        initial["schema"] = self.plugin.schema
+        initial["consumes"] = consumes
+        initial["produces"] = ", ".join(self.plugin.produces)
+        initial["scan_level"] = self.plugin.scan_level
+
+        return initial
 
     def get_form(self, form_class=None) -> BoefjeAddForm:
-        if form_class is None:
-            form_class = self.get_form_class()
-
         form = super().get_form(form_class)
         form.fields["oci_image"].disabled = True
 
@@ -121,21 +122,25 @@ class EditBoefjeView(BoefjeSetupView):
         plugin_id = self.kwargs.get("plugin_id")
         katalogus = get_katalogus(self.organization.code)
         self.plugin = katalogus.get_plugin(plugin_id)
+
+    def get_initial(self):
+        initial = super().get_initial()
+
         consumes = []
 
-        for input_object in list(self.plugin.consumes):
+        for input_object in self.plugin.consumes:
             consumes.append(input_object.__name__)
 
-        self.initial = {
-            "name": self.plugin.name,
-            "description": self.plugin.description,
-            "oci_image": self.plugin.oci_image,
-            "oci_arguments": ", ".join(self.plugin.oci_arguments),
-            "schema": self.plugin.schema,
-            "consumes": consumes,
-            "produces": ", ".join(self.plugin.produces),
-            "scan_level": self.plugin.scan_level,
-        }
+        initial["name"] = self.plugin.name
+        initial["description"] = self.plugin.description
+        initial["oci_image"] = self.plugin.oci_image
+        initial["oci_arguments"] = " ".join(self.plugin.oci_arguments)
+        initial["schema"] = self.plugin.schema
+        initial["consumes"] = consumes
+        initial["produces"] = ", ".join(self.plugin.produces)
+        initial["scan_level"] = self.plugin.scan_level
+
+        return initial
 
     def form_valid(self, form):
         """If the form is valid, redirect to the supplied URL."""
@@ -172,7 +177,7 @@ class EditBoefjeView(BoefjeSetupView):
         return context
 
 
-def create_boefje_with_form_data(form_data, plugin_id, created):
+def create_boefje_with_form_data(form_data, plugin_id: str, created: str):
     arguments = [] if form_data["oci_arguments"] == "" else form_data["oci_arguments"].split()
     consumes = [] if form_data["consumes"] == "" else form_data["consumes"].strip("[]").replace("'", "").split(", ")
     produces = [] if form_data["produces"] == "" else form_data["produces"].split(",")
