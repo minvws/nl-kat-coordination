@@ -1,19 +1,14 @@
 import json
-from pathlib import Path
 
 from boefjes.job_models import NormalizerDeclaration, NormalizerMeta
-from boefjes.local import LocalNormalizerJobRunner
-from boefjes.local_repository import LocalPluginRepository
 from tests.loading import get_dummy_data
 
 
-def test_report_data():
-    local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
-    runner = LocalNormalizerJobRunner(local_repository)
+def test_report_data(normalizer_runner):
     meta = NormalizerMeta.model_validate_json(get_dummy_data("report-data-normalize.json"))
 
     raw = get_dummy_data("report-data.json")
-    output = runner.run(meta, raw)
+    output = normalizer_runner.run(meta, raw)
     ooi_dict = json.loads(raw)
 
     declaration = NormalizerDeclaration(
