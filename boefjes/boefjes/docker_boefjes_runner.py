@@ -62,7 +62,11 @@ class DockerBoefjesRunner:
                 # have to raise exception to prevent _start_working function from setting status to completed
                 raise RuntimeError("Boefje did not call output API endpoint")
         except ContainerError as e:
-            logger.exception("Container error")
+            logger.error(
+                "Container for task %s failed and returned exit status %d, stderr saved to bytes",
+                task_id,
+                e.exit_status,
+            )
 
             # save container log (stderr) to bytes
             self.bytes_api_client.login()
@@ -74,9 +78,9 @@ class DockerBoefjesRunner:
                 logger.error("Failed to save boefje meta to bytes, continuing anyway")
             self.bytes_api_client.save_raw(task_id, e.stderr, stderr_mime_types)
             self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
-            # have to raise exception to prevent _start_working function from setting status to completed
-            raise e
-        except (APIError, ImageNotFound) as e:
-            logger.exception("API error or image not found")
+        except ImageNotFound:
+            logger.error("Docker image %s not found", self.boefje_resource.oci_image)
             self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
-            raise e
+        except APIError as e:
+            logger.error("Docker API error: %s", e)
+            self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
