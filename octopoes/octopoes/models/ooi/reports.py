@@ -51,6 +51,7 @@ class Report(OOI):
 
 class ReportRecipe(OOI):
     recipe_id: UUID
+    name: str
     object_type: Literal["ReportRecipe"] = "ReportRecipe"
     input_recipe: dict[str, Any]  # can contain a query which maintains a live set of OOIs or manually picked OOIs.
     report_types: list[str]
