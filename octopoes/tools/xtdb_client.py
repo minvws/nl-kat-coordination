@@ -37,8 +37,22 @@ class XTDBClient:
 
         return res.json()
 
-    def query(self, query: str = "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}") -> JsonValue:
-        res = self._client.post("/query", content=query, headers={"Content-Type": "application/edn"})
+    def query(
+        self,
+        query: str = "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}",
+        valid_time: datetime.datetime | None = None,
+        tx_time: datetime.datetime | None = None,
+        tx_id: int | None = None,
+    ) -> JsonValue:
+        params = {}
+        if valid_time is not None:
+            params["valid-time"] = valid_time.isoformat()
+        if tx_time is not None:
+            params["tx-time"] = tx_time.isoformat()
+        if tx_id is not None:
+            params["tx-id"] = str(tx_id)
+
+        res = self._client.post("/query", params=params, content=query, headers={"Content-Type": "application/edn"})
 
         return res.json()
 
