@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-12 06:46+0000\n"
+"POT-Creation-Date: 2024-09-17 13:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -711,6 +711,13 @@ msgid "Boefje variant setup"
 msgstr ""
 
 #: katalogus/templates/boefje_setup.html
+#: rocky/templates/organizations/organization_member_list.html
+#: rocky/templates/organizations/organization_settings.html
+#: rocky/views/ooi_edit.py rocky/views/organization_edit.py
+msgid "Edit"
+msgstr ""
+
+#: katalogus/templates/boefje_setup.html
 msgid "Boefje setup"
 msgstr ""
 
@@ -726,11 +733,27 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/boefje_setup.html
+msgid "Save changes"
+msgstr ""
+
+#: katalogus/templates/boefje_setup.html
+msgid "Discard changes"
+msgstr ""
+
+#: katalogus/templates/boefje_setup.html
 msgid "Create variant"
 msgstr ""
 
 #: katalogus/templates/boefje_setup.html
 msgid "Discard variant"
+msgstr ""
+
+#: katalogus/templates/boefje_setup.html
+msgid "Create new Boefje"
+msgstr ""
+
+#: katalogus/templates/boefje_setup.html
+msgid "Discard new Boefje"
 msgstr ""
 
 #: katalogus/templates/boefjes.html katalogus/templates/normalizers.html
@@ -1187,6 +1210,10 @@ msgid "Open details"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
+msgid "Boefje ID"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/subreports_table.html
 msgid "Creation date"
@@ -1209,6 +1236,10 @@ msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
 msgid "There are no arguments used for this Boefje variant."
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "Edit variant"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
@@ -4417,7 +4448,15 @@ msgstr ""
 
 #: tools/forms/settings.py
 msgid ""
-"<p>A description of the boefje explaining in short what it can do. This will "
+"<p>The name of the Docker image. For example: <i>'ghcr.io/minvws/openkat/"
+"nmap'</i>. In OpenKAT, all Boefjes with the same container image will be "
+"seen as 'variants' and will be shown together on the Boefje detail page. </"
+"p> "
+msgstr ""
+
+#: tools/forms/settings.py
+msgid ""
+"<p>A description of the Boefje explaining in short what it can do. This will "
 "both be displayed inside the KAT-alogus and on the Boefje details page.</p> "
 msgstr ""
 
@@ -5713,12 +5752,6 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Assigned clearance level"
-msgstr ""
-
-#: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/organizations/organization_settings.html
-#: rocky/views/ooi_edit.py rocky/views/organization_edit.py
-msgid "Edit"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
