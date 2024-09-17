@@ -23,20 +23,20 @@ def test_filter_plugins(test_client, organisation):
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins?limit=10")
     assert len(response.json()) == 10
-    
-    response = self.client.get(
-        f"/v1/organisations/{self.org.id}/plugins", params={"oci_image": "ghcr.io/minvws/openkat/nmap:latest"}
+
+    response = test_client.get(
+        f"/v1/organisations/{organisation.id}/plugins", params={"oci_image": "ghcr.io/minvws/openkat/nmap:latest"}
     )
     assert {x["id"] for x in response.json()} == {"nmap", "nmap-udp"}  # Nmap TCP and UDP
 
     boefje = Boefje(
         id="test_plugin", name="My test boefje", static=False, oci_image="ghcr.io/minvws/openkat/nmap:latest"
     )
-    response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.json())
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.json())
     assert response.status_code == 201
 
-    response = self.client.get(
-        f"/v1/organisations/{self.org.id}/plugins", params={"oci_image": "ghcr.io/minvws/openkat/nmap:latest"}
+    response = test_client.get(
+        f"/v1/organisations/{organisation.id}/plugins", params={"oci_image": "ghcr.io/minvws/openkat/nmap:latest"}
     )
     assert {x["id"] for x in response.json()} == {"nmap", "nmap-udp", "test_plugin"}  # Nmap TCP and UDP
 
