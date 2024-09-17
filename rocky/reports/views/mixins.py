@@ -132,7 +132,7 @@ class SaveAggregateReportMixin(BaseReportView):
 
         aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
             self.octopoes_api_connector,
-            list(input_oois),
+            input_oois,
             self.get_report_type_ids(),
             self.observed_at,
             self.organization.code,
@@ -181,7 +181,7 @@ class SaveAggregateReportMixin(BaseReportView):
         report_ooi = self.save_report_ooi(
             report_data_raw_id=report_data_raw_id,
             report_type=type(aggregate_report),
-            input_oois=[ooi.primary_key for ooi in input_oois],
+            input_oois=self.get_ooi_pks(),
             parent=None,
             has_parent=False,
             observed_at=observed_at,

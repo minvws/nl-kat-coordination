@@ -364,11 +364,15 @@ class OnboardingReportView(
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        ooi = self.get_ooi(self.request.GET.get("ooi", ""))
-        self.oois = [Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network)]
-        self.selected_oois = [self.oois[0].primary_key]
+        self.selected_oois = self.get_ooi_pks()
+        self.selected_report_types = self.get_report_type_ids()
 
-    def get_report_type_selection(self) -> list[str]:
+    def get_ooi_pks(self) -> list[str]:
+        ooi = self.get_ooi(self.request.GET.get("ooi", ""))
+        ooi = [Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network)]
+        return [ooi[0].primary_key]
+
+    def get_report_type_ids(self) -> list[str]:
         return [self.request.GET.get("report_type", "")]
 
     def post(self, request, *args, **kwargs):

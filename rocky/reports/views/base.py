@@ -129,7 +129,8 @@ class ReportsLandingView(ReportBreadcrumbs, TemplateView):
 
 class BaseReportView(OOIFilterView):
     """
-    This view is the base for the report creation wizard. All the necessary functions and variables needed.
+    This view is the base for the report creation wizard.
+    All the necessary functions and variables needed.
     """
 
     NONE_OOI_SELECTION_MESSAGE = _("Select at least one OOI to proceed.")
@@ -139,7 +140,6 @@ class BaseReportView(OOIFilterView):
         super().setup(request, *args, **kwargs)
         self.selected_oois = self.get_ooi_pks()
         self.selected_report_types = self.get_report_type_ids()
-        self.plugins = self.get_plugins_from_report_type()
 
     def get_ooi_selection(self) -> list[str]:
         return sorted(set(self.request.POST.getlist("ooi", [])))
@@ -183,6 +183,7 @@ class BaseReportView(OOIFilterView):
 
     def get_report_plugins_from_katalogus(self, plugins: dict[str, set[str]]) -> dict[str, list[Plugin]]:
         katalogus_plugins: dict[str, Any] = {"required": [], "optional": []}
+
         for required_optional, plugin_ids in plugins.items():
             if plugin_ids:
                 katalogus_plugins[required_optional] = sorted(
@@ -191,65 +192,49 @@ class BaseReportView(OOIFilterView):
 
         return katalogus_plugins
 
-    def get_plugins_from_report_type(self) -> dict[str, list[Plugin]]:
+    def get_plugins_from_report_type(self) -> dict[str, list[Plugin]] | None:
         """
         Returns plugins from KAT-alogus from the selected report types.
         """
 
         report_types = self.get_report_types()
-        plugins: dict[str, Any] = {"required": [], "optional": []}
+        plugins: dict[str, Any] = {"required": set(), "optional": set()}
 
         for report_type in report_types:
             for required_optional, report_type_plugin_ids in report_type.plugins.items():
-                plugins[required_optional] += report_type_plugin_ids
-
-        # remove duplicate plugins
-        plugins = {required_optional: set(plugin_ids) for required_optional, plugin_ids in plugins.items()}
+                plugins[required_optional].update(report_type_plugin_ids)  # also removes duplicates
 
         # remove optional plugins that is also in the set of required plugins
         for plugin_id in plugins["required"]:
             if plugin_id in plugins["optional"]:
                 plugins["optional"].remove(plugin_id)
-
-        # Finally we can get the plugins from KAT-alogus with the set of plugin ids and sort them by name and ascending.
         try:
             return self.get_report_plugins_from_katalogus(plugins)
         except KATalogusError as error:
-            messages.error(self.request, error.message)
-            return {}
+            return messages.error(self.request, error.message)
 
-    def get_plugin_ids(self) -> dict[str, list[str]]:
-        report_type_plugins = self.get_plugins_from_report_type()
+    def get_plugin_ids(self, report_type_plugins: dict[str, list[Plugin]]) -> dict[str, list[str]]:
         plugin_ids: dict[str, list[str]] = {"required": [], "optional": []}
         for required_optional, plugins in report_type_plugins.items():
             plugin_ids[required_optional] = [plugin.id for plugin in plugins]
         return plugin_ids
 
-    def plugins_enabled(self) -> dict[str, bool]:
-        enabled_plugins_data: dict[str, bool] = {"required": False, "optional": False}
-        enabled_plugins = []
-        if self.plugins is not None:
-            for required_optional, plugins in self.plugins.items():
-                for plugin in plugins:
-                    enabled_plugins.append(plugin.enabled)
-                enabled_plugins_data[required_optional] = all(enabled_plugins)
-        return enabled_plugins_data
-
     def get_plugin_data_for_saving(self) -> list[dict]:
         plugin_data = []
         report_type_plugins = self.get_plugins_from_report_type()
-        for required_optional, plugins in report_type_plugins.items():
-            for plugin in plugins:
-                plugin_data.append(
-                    {
-                        "required": required_optional == "required",
-                        "enabled": plugin.enabled,
-                        "name": plugin.name,
-                        "scan_level": plugin.scan_level.value if isinstance(plugin, Boefje) else 0,
-                        "type": plugin.type,
-                        "description": plugin.description,
-                    }
-                )
+        if report_type_plugins is not None:
+            for required_optional, plugins in report_type_plugins.items():
+                for plugin in plugins:
+                    plugin_data.append(
+                        {
+                            "required": required_optional == "required",
+                            "enabled": plugin.enabled,
+                            "name": plugin.name,
+                            "scan_level": plugin.scan_level.value if isinstance(plugin, Boefje) else 0,
+                            "type": plugin.type,
+                            "description": plugin.description,
+                        }
+                    )
 
         return plugin_data
 
@@ -307,7 +292,6 @@ class BaseReportView(OOIFilterView):
         context["all_oois_selected"] = self.all_oois_selected()
         context["selected_oois"] = self.selected_oois
         context["selected_report_types"] = self.selected_report_types
-        context["plugins"] = self.plugins
 
         return context
 
@@ -333,7 +317,7 @@ class ReportTypeSelectionView(BaseReportView, ReportBreadcrumbs, TemplateView):
     Shows report types and handles selections and requests.
     """
 
-    report_type: type[BaseReport] | None = None
+    report_type: type[BaseReport] | None = None  # Get report types from a specific report type ex. AggregateReport
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -410,18 +394,41 @@ class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
     This view shows the required and optional plugins together with the summary per report type.
     """
 
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.plugins = self.get_plugins_from_report_type()
+
     def post(self, request, *args, **kwargs):
+        if self.plugins is None:
+            return PostRedirect(self.get_previous())
+
+        all_plugins_enabled = self.all_plugins_enabled()
+
         if not self.get_report_type_ids():
             messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
             return PostRedirect(self.get_previous())
 
-        if "return" in self.request.POST and self.plugins_enabled():
+        if "return" in self.request.POST and all_plugins_enabled:
             return PostRedirect(self.get_previous())
 
-        enabled_plugins = self.plugins_enabled()
-        if enabled_plugins["required"] and enabled_plugins["optional"]:
+        if all_plugins_enabled:
             return PostRedirect(self.get_next())
         return self.get(request, *args, **kwargs)
+
+    def all_plugins_enabled(self):
+        enabled_plugins = self.plugins_enabled()
+        return enabled_plugins["required"] and enabled_plugins["optional"]
+
+    def plugins_enabled(self) -> dict[str, bool]:
+        enabled_plugins_data: dict[str, bool] = {"required": False, "optional": False}
+        enabled_plugins = []
+        if self.plugins is not None:
+            for required_optional, plugins in self.plugins.items():
+                if plugins:
+                    for plugin in plugins:
+                        enabled_plugins.append(plugin.enabled)
+                    enabled_plugins_data[required_optional] = all(enabled_plugins)
+        return enabled_plugins_data
 
     def get_plugins_data(self):
         report_types: dict[str, Any] = {}
@@ -465,19 +472,20 @@ class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
                     report_types[report_type.name][f"number_of_enabled_{plugin_type}"] = number_of_enabled
                     report_types[report_type.name][f"number_of_available_{plugin_type}"] = len(report_plugins)
 
-        plugin_data = {
-            "total_enabled_plugins": total_enabled_plugins,
-            "total_available_plugins": total_available_plugins,
-            "report_types": report_types,
-            "plugin_report_types": plugin_report_types,
-        }
+            plugin_data = {
+                "total_enabled_plugins": total_enabled_plugins,
+                "total_available_plugins": total_available_plugins,
+                "report_types": report_types,
+                "plugin_report_types": plugin_report_types,
+            }
 
-        return plugin_data
+            return plugin_data
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["enabled_plugins"] = self.plugins_enabled()
+        context["enabled_plugins"] = self.all_plugins_enabled()
         context["plugin_data"] = self.get_plugins_data()
+        context["plugins"] = self.plugins
         return context
 
 
