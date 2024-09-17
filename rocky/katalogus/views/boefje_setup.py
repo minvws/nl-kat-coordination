@@ -89,18 +89,20 @@ class AddBoefjeVariantView(BoefjeSetupView):
 
         return initial
 
-    def get_form(self, form_class=None) -> BoefjeAddForm:
-        form = super().get_form(form_class)
-        form.fields["oci_image"].disabled = True
-
-        return form
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["boefje_variant"] = True
+        context["return_to_plugin_id"] = self.return_to_plugin_id
 
         context["breadcrumbs"] = [
             {"url": reverse("katalogus", kwargs={"organization_code": self.organization.code}), "text": "KAT-alogus"},
+            {
+                "url": reverse(
+                    "boefje_detail",
+                    kwargs={"organization_code": self.organization.code, "plugin_id": self.return_to_plugin_id},
+                ),
+                "text": "Boefje detail page",
+            },
             {
                 "url": reverse(
                     "boefje_variant_setup",
@@ -155,7 +157,8 @@ class EditBoefjeView(BoefjeSetupView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["edit_boefje"] = self.plugin.name
+        context["edit_boefje_name"] = self.plugin.name
+        context["return_to_plugin_id"] = self.plugin.id
 
         context["breadcrumbs"] = [
             {
@@ -165,6 +168,16 @@ class EditBoefjeView(BoefjeSetupView):
             {
                 "url": reverse(
                     "boefje_detail",
+                    kwargs={
+                        "organization_code": self.organization.code,
+                        "plugin_id": self.plugin.id,
+                    },
+                ),
+                "text": self.plugin.name,
+            },
+            {
+                "url": reverse(
+                    "edit_boefje",
                     kwargs={
                         "organization_code": self.organization.code,
                         "plugin_id": self.plugin.id,
