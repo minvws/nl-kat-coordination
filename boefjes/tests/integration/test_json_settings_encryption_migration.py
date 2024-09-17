@@ -28,13 +28,10 @@ def migration_197672984df0() -> Session:
 
     yield session
     session.commit()
-    session.close()
 
     alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"])
 
-    session.execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables]))
-    session.commit()
-    session.close()
+    engine.execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables]))
 
 
 def test_setting_to_settings_json(migration_197672984df0):
@@ -48,9 +45,7 @@ def test_setting_to_settings_json(migration_197672984df0):
     encrypter = create_encrypter()
     entries = _collect_entries(encrypter)
     query = f"INSERT INTO setting (key, value, organisation_pk, plugin_id) values {','.join(map(str, entries))}"  # noqa: S608
-    session.execute(text(query))
-    session.commit()
-    session.close()
+    session.get_bind().execute(text(query))
 
     alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "cd34fdfafdaf"])
 

@@ -28,7 +28,6 @@ def migration_6f99834a4a5a() -> Session:
     with SQLOrganisationStorage(session, settings) as storage:
         storage.create(Organisation(id="dev1", name="Test 1 "))
         storage.create(Organisation(id="dev2", name="Test 2 "))
-    session.close()
 
     encrypter = create_encrypter()
     entries = [
@@ -38,25 +37,18 @@ def migration_6f99834a4a5a() -> Session:
     ]
     query = f"INSERT INTO settings (id, values, plugin_id, organisation_pk) values {','.join(map(str, entries))}"  # noqa: S608
 
-    session.execute(text(query))
-    session.commit()
-    session.close()
+    engine.execute(text(query))
 
     entries = [(1, "dns-records", True, 1), (2, "nmap-udp", True, 1)]
     query = f"INSERT INTO plugin_state (id, plugin_id, enabled, organisation_pk) values {','.join(map(str, entries))}"  # noqa: S608
-    session.execute(text(query))
-    session.commit()
-    session.close()
+    engine.execute(text(query))
 
     yield session
     session.commit()
-    session.close()
 
     alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"])
 
-    session.execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables]))
-    session.commit()
-    session.close()
+    engine.execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables]))
 
 
 def test_fail_on_wrong_plugin_ids(migration_6f99834a4a5a):
