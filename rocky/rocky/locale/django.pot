@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-11 14:03+0000\n"
+"POT-Creation-Date: 2024-09-17 16:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3597,13 +3597,11 @@ msgstr ""
 msgid "Generate Report"
 msgstr ""
 
-#: reports/templates/partials/report_navigation.html
-#: reports/views/aggregate_report.py
+#: reports/templates/partials/report_navigation.html reports/views/base.py
 msgid "Aggregate Report"
 msgstr ""
 
-#: reports/templates/partials/report_navigation.html
-#: reports/views/multi_report.py
+#: reports/templates/partials/report_navigation.html reports/views/base.py
 msgid "Multi Report"
 msgstr ""
 
@@ -3680,6 +3678,7 @@ msgid "Set up the required plugins for this report."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
+#: reports/templates/summary/selected_plugins.html
 msgid "Plugins"
 msgstr ""
 
@@ -3717,15 +3716,23 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-msgid "This report type requires the following plugins to be enabled:"
-msgstr ""
-
-#: reports/templates/partials/report_setup_scan.html
 msgid "Good job! All required plugins are enabled."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
+msgid "This report type requires the following plugins to be enabled:"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
 msgid "Show enabled plugins"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "There are no required plugins."
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "Good job! All suggested plugins are enabled"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -3735,15 +3742,15 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-msgid "Good job! All suggested plugins are enabled"
-msgstr ""
-
-#: reports/templates/partials/report_setup_scan.html
 msgid "Hide suggested plugins"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Show more suggested plugins"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "There are no optional plugins."
 msgstr ""
 
 #: reports/templates/partials/report_severity_totals.html
@@ -3761,7 +3768,6 @@ msgid "Selected Objects"
 msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
-#: reports/templates/summary/selected_plugins.html
 msgid "Selected Plugins"
 msgstr ""
 
@@ -4016,41 +4022,36 @@ msgstr ""
 msgid "Select at least one OOI to proceed."
 msgstr ""
 
-#: reports/views/base.py reports/views/multi_report.py
+#: reports/views/base.py
 msgid "Select at least one report type to proceed."
 msgstr ""
 
 #: reports/views/base.py
-#, python-format
-msgid "Report type '%s' does not exist."
-msgstr ""
-
-#: reports/views/base.py
-msgid "Week %W, %Y"
-msgstr ""
-
-#: reports/views/generate_report.py
-msgid "Empty name should not be possible."
-msgstr ""
-
-#: reports/views/generate_report.py
 #, python-brace-format
 msgid "Concatenated Report for {oois_count} objects"
 msgstr ""
 
-#: reports/views/generate_report.py
+#: reports/views/base.py
 #, python-brace-format
 msgid "Concatenated Report for {ooi}"
 msgstr ""
 
-#: reports/views/generate_report.py
+#: reports/views/base.py
 #, python-brace-format
 msgid "{report_type} for {oois_count} objects"
 msgstr ""
 
-#: reports/views/generate_report.py
+#: reports/views/base.py
 #, python-brace-format
 msgid "{report_type} for {ooi}"
+msgstr ""
+
+#: reports/views/base.py
+msgid "Empty name should not be possible."
+msgstr ""
+
+#: reports/views/base.py
+msgid "Week %W, %Y"
 msgstr ""
 
 #: reports/views/mixins.py
