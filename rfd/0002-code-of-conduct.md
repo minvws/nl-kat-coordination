@@ -133,15 +133,12 @@ productive and beneficial for all team members.[^2]
 
     1.7 _Consistency_
 
-    Does the code maintain consistency with the existing code? This
-    includes consistency in naming, style, and design patterns. It’s a
-    judgment call whether the new code should be consistent with the
-    recommendations or the surrounding code.
+    Preferably the author should maintain consistency with the existing code.
+    This includes consistency in naming, style, structure, and design patterns.
 
-    The author should maintain consistency with the existing code. This
-    makes sure that the codebase is easier to understand and maintain. When
-    a substantial change should be made to the existing code that would
-    cause inconsistency, it should be discussed with the team, and be
+    This makes sure that the codebase is easier to understand and maintain.
+    When a substantial change should be made to the existing code that would
+    cause inconsistencies, it should be discussed with the team, and be
     addressed in a separate issue.
 
     1.8 _Comments_
@@ -263,4 +260,5 @@ productive and beneficial for all team members.[^2]
 - [Thatham] [chiark.greenend.org.uk - Code review antipatterns](https://www.chiark.greenend.org.uk/~sgtatham/quasiblog/code-review-antipatterns/)
 
 [^1]: Adapted from [EngPractices]
+
 [^2]: A humorous and insightful take on code review antipatterns can be found in [Thatham]
