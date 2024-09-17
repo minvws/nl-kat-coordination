@@ -28,7 +28,7 @@ from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.concatenated_report.report import ConcatenatedReport
-from reports.report_types.definitions import AggregateReport, BaseReport
+from reports.report_types.definitions import AggregateReport, BaseReport, Report
 from reports.report_types.helpers import (
     REPORTS,
     get_report_by_id,
@@ -178,7 +178,9 @@ class ReportRecipeView(OOIFilterView):
         return {get_report_by_id(report_type_id) for report_type_id in self.get_report_type_ids()}
 
     @staticmethod
-    def get_report_types_from_ooi_selelection(report_types: set[type[BaseReport]]) -> list[dict[str, str]]:
+    def get_report_types_from_ooi_selelection(
+        report_types: set[type[BaseReport]] | set[type[Report]] | set[type[MultiOrganizationReport]],
+    ) -> list[dict[str, str]]:
         """
         The report types are fetched from which ooi is selected. Shows all report types for the oois.
         """
@@ -192,6 +194,16 @@ class ReportRecipeView(OOIFilterView):
             }
             for report_type in report_types
         ]
+
+    def get_report_plugins_from_katalogus(self, plugins: dict[str, set[str]]) -> dict[str, list[Plugin]]:
+        katalogus_plugins: dict[str, Any] = {"required": [], "optional": []}
+        for required_optional, plugin_ids in plugins.items():
+            if plugin_ids:
+                katalogus_plugins[required_optional] = sorted(
+                    get_katalogus(self.organization.code).get_plugins(ids=list(plugin_ids)), key=attrgetter("name")
+                )
+
+        return katalogus_plugins
 
     def get_plugins_from_report_type(self) -> dict[str, list[Plugin]]:
         """
@@ -215,13 +227,7 @@ class ReportRecipeView(OOIFilterView):
 
         # Finally we can get the plugins from KAT-alogus with the set of plugin ids and sort them by name and ascending.
         try:
-            return {
-                required_optional: sorted(
-                    get_katalogus(self.organization.code).get_plugins(ids=list(plugin_ids)), key=attrgetter("name")
-                )
-                for required_optional, plugin_ids in plugins.items()
-                if plugin_ids
-            }
+            return self.get_report_plugins_from_katalogus(plugins)
         except KATalogusError as error:
             messages.error(self.request, error.message)
             return {}
@@ -264,11 +270,11 @@ class ReportTypeSelectionView(ReportRecipeView):
     Shows report types and handles selections and requests.
     """
 
-    report_type = None
+    report_type: type[BaseReport] | None = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.available_report_types, self.counted_report_types = self.get_availabel_report_types()
+        self.available_report_types, self.counted_report_types = self.get_available_report_types()
 
     def get_report_types_for_generate_report(self):
         return self.get_report_types_from_ooi_selelection(get_report_types_for_oois(self.get_ooi_pks()))
@@ -278,14 +284,17 @@ class ReportTypeSelectionView(ReportRecipeView):
         report_types: dict[str, list[dict[str, str]]] = {}
 
         for option, reports in reports_dict.items():
-            report_types[option] = self.get_report_types_from_ooi_selelection({report for report in reports})
+            report_types[option] = self.get_report_types_from_ooi_selelection(reports)
         return report_types
 
-    def get_availabel_report_types(self) -> tuple[list[dict[str, str]] | dict[str, list[dict[str, str]]], int]:
+    def get_available_report_types(self) -> tuple[list[dict[str, str]] | dict[str, list[dict[str, str]]], int]:
+        report_types: list[dict[str, str]] | dict[str, list[dict[str, str]]] = {}
         if self.report_type is not None:
             if self.report_type == AggregateOrganisationReport:
                 report_types = self.get_report_types_for_aggregate_report()
-                return report_types, len(report_types.values())
+                return report_types, len(
+                    [report_type for report_type_list in report_types.values() for report_type in report_type_list]
+                )
 
             elif self.report_type == MultiOrganizationReport:
                 report_types = self.get_report_types_from_ooi_selelection({MultiOrganizationReport})

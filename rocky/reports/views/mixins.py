@@ -29,7 +29,7 @@ class SaveGenerateReportMixin(ReportFinalSettingsView):
 
             by_type[ooi_type].append(ooi)
 
-        sorted_report_types = list(filter(lambda x: x in self.report_recipe.report_types, REPORTS))
+        sorted_report_types = list(filter(lambda x: x in self.get_report_types(), REPORTS))
 
         for report_class in sorted_report_types:
             oois = {

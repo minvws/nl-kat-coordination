@@ -194,7 +194,7 @@ class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportV
             )
 
 
-def create_report_names(oois: list[type[OOI]], report_types: list[type[BaseReport]]) -> dict[str, str]:
+def create_report_names(oois: list[OOI], report_types: list[type[BaseReport]]) -> dict[str, str]:
     reports = {}
     oois_count = len(oois)
     report_types_count = len(report_types)
@@ -215,8 +215,8 @@ def create_report_names(oois: list[type[OOI]], report_types: list[type[BaseRepor
 
     # Create name for subreports or single reports
     for ooi in oois:
-        for report_type in report_types:
-            name = _("{report_type} for {ooi}").format(report_type=report_type.name, ooi=ooi.human_readable)
+        for report_type_ in report_types:
+            name = _("{report_type} for {ooi}").format(report_type=report_type_.name, ooi=ooi.human_readable)
             reports[name] = ""
 
     return reports
