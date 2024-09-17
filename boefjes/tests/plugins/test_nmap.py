@@ -33,44 +33,44 @@ def get_pattern():
     return re.compile(one_or_comma_separated)
 
 
-def test_single_port_pattern(local_repo):
-    schema = local_repo.schema("nmap-ports")
+def test_single_port_pattern(local_repository):
+    schema = local_repository.schema("nmap-ports")
     for single_port in ["1", "2", "20", "200", "2000", "20000", "65535"]:
         assert get_pattern().search(single_port) is not None
         validate(instance={"PORTS": single_port}, schema=schema)
 
 
-def test_bad_single_port_pattern(local_repo):
-    schema = local_repo.schema("nmap-ports")
+def test_bad_single_port_pattern(local_repository):
+    schema = local_repository.schema("nmap-ports")
     for bad_single_port in ["-1", "-2000", "65536", "222222"]:
         assert get_pattern().search(bad_single_port) is None
         with pytest.raises(ValidationError):
             validate(instance={"PORTS": bad_single_port}, schema=schema)
 
 
-def test_multi_ports_pattern(local_repo):
-    schema = local_repo.schema("nmap-ports")
+def test_multi_ports_pattern(local_repository):
+    schema = local_repository.schema("nmap-ports")
     for multi_port in ["1,2", "2,3,4", "2,3,4,5,6,7", "2,20,200,2000,65535"]:
         assert get_pattern().search(multi_port) is not None
         validate(instance={"PORTS": multi_port}, schema=schema)
 
 
-def test_port_range_pattern(local_repo):
-    schema = local_repo.schema("nmap-ports")
+def test_port_range_pattern(local_repository):
+    schema = local_repository.schema("nmap-ports")
     for port_range in ["1-2", "2-20000", "65533-65535"]:
         assert get_pattern().search(port_range) is not None
         validate(instance={"PORTS": port_range}, schema=schema)
 
 
-def test_combined(local_repo):
-    schema = local_repo.schema("nmap-ports")
+def test_combined(local_repository):
+    schema = local_repository.schema("nmap-ports")
     for port_range in ["1,1-65000", "1,2,234,4300-5999,1"]:
         assert get_pattern().search(port_range) is not None
         validate(instance={"PORTS": port_range}, schema=schema)
 
 
-def test_badly_combined(local_repo):
-    schema = local_repo.schema("nmap-ports")
+def test_badly_combined(local_repository):
+    schema = local_repository.schema("nmap-ports")
     for port_range in ["1,1-", "1-234-323"]:
         assert get_pattern().search(port_range) is None
         with pytest.raises(ValidationError):
