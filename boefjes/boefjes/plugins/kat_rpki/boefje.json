@@ -1,7 +1,7 @@
 {
   "id": "rpki",
   "name": "RPKI",
-  "description": "Check if an IPv4 or IPv6 address has a valid VRPS record.",
+  "description": "Check BGP announcements to see if an IPv4 or IPv6 address has Validated ROA Payload (VRPs).",
   "consumes": [
     "IPAddressV4",
     "IPAddressV6"

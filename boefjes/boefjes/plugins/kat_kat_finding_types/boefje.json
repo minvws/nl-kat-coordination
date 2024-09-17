@@ -1,7 +1,7 @@
 {
   "id": "kat-finding-types",
   "name": "KAT Finding Types",
-  "description": "Hydrate information of KAT finding types",
+  "description": "Hydrate information of KAT finding types.",
   "consumes": [
     "KATFindingType"
   ],

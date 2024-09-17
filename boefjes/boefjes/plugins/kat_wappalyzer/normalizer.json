@@ -1,6 +1,7 @@
 {
   "id": "kat_wappalyzer_normalize",
   "name": "Wappalyzer",
+  "description": "Checks HTTP responses for Software versions.",
   "consumes": [
     "openkat-http/response"
   ],

@@ -1,6 +1,7 @@
 {
   "id": "kat_nuclei_exposed_panels_normalize",
   "name": "Nuclei exposed admin panels",
+  "description": "Parses Nuclei of exposed panels into findings.",
   "consumes": [
     "boefje/nuclei-exposed-panels"
   ],

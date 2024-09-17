@@ -1,7 +1,7 @@
 {
   "id": "webpage-capture",
   "name": "Webpage Capture",
-  "description": "Takes a screenshot of a webpage. Image is stored to bytes.",
+  "description": "Takes a screenshot of a webpage. Image can be found on the Tasks page in the downloadable 'meta and raw data' file.",
   "consumes": [
     "HostnameHTTPURL",
     "IPAddressHTTPURL"

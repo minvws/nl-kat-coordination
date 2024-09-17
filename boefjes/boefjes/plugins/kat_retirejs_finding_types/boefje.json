@@ -1,7 +1,7 @@
 {
   "id": "retirejs-finding-types",
   "name": "RetireJS Finding Types",
-  "description": "Hydrate information of RetireJS finding types",
+  "description": "Hydrate information of RetireJS finding types.",
   "consumes": [
     "RetireJSFindingType"
   ],

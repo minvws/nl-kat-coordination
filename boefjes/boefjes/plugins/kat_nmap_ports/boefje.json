@@ -1,7 +1,7 @@
 {
   "id": "nmap-ports",
   "name": "Nmap Ports",
-  "description": "Scan a specific set of ports including service detection",
+  "description": "Scan a specific set of ports including service detection.",
   "consumes": [
     "IPAddressV4",
     "IPAddressV6"

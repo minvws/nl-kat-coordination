@@ -1,7 +1,7 @@
 {
   "id": "ssl-version",
   "name": "SSLScan",
-  "description": "Scan SSL/TLS versions of websites",
+  "description": "Scan SSL/TLS versions (protocols) of websites. Will result in findings if outdated SSL/TLS versions are identified such as SSLv3. ",
   "consumes": [
     "Website"
   ],

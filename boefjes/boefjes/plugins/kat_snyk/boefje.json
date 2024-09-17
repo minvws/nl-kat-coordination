@@ -1,7 +1,7 @@
 {
   "id": "snyk",
   "name": "Snyk.io-vulnerabilities",
-  "description": "Get Snyk.io vulnerabilities based on Software",
+  "description": "Get Snyk.io vulnerabilities based on identified Software.",
   "consumes": [
     "SoftwareInstance"
   ],

@@ -1,6 +1,7 @@
 {
   "id": "kat_shodan_normalize",
   "name": "Shodan",
+  "description": "Parses Shodan data into (CVE) findings and ports.",
   "consumes": [
     "boefje/shodan"
   ],
