@@ -41,5 +41,5 @@ def test_generate_report_setup_scan_wrong_plugin_id(
 
     response = SetupScanGenerateReportView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 200
+    assert response.status_code == 307
     assert list(request._messages)[0].message == "A HTTP error occurred. Check logs for more info."

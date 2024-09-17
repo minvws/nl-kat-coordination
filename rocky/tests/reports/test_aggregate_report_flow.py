@@ -34,7 +34,7 @@ def test_select_all_oois_post_to_select_report_types(
             "aggregate_report_select_report_types",
             {
                 "observed_at": valid_time.strftime("%Y-%m-%d"),
-                "ooi": "all",
+                "ooi": listed_hostnames,
             },
         ),
         client_member.user,
@@ -260,7 +260,7 @@ def test_save_aggregate_report_view(
             "aggregate_report_save",
             {
                 "observed_at": valid_time.strftime("%Y-%m-%d"),
-                "ooi": "all",
+                "ooi": listed_hostnames,
                 "report_type": ["systems-report", "dns-report"],
                 "old_report_name": ["Aggregate Report"],
                 "report_name": ["Testing a new name for Aggregate Report"],
