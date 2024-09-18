@@ -15,7 +15,7 @@
             </div>
             <div class="horizontal-view toolbar">
                 <a class="button ghost"
-                   href="{% url 'plugin_settings_add' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}"><span class="icon ti-settings"></span>{% translate "Edit Settings" %}</a>
+                   href="{% url 'plugin_settings_add' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}"><span class="icon ti-settings"></span>{% translate "Configure Settings" %}</a>
             </div>
         </div>
         <div class="horizontal-scroll">
@@ -25,7 +25,6 @@
                     <tr>
                         <th scope="col">{% translate "Variable" %}</th>
                         <th scope="col">{% translate "Value" %}</th>
-                        <th scope="col">{% translate "Required" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -39,13 +38,6 @@
                                     •••••••••••••
                                 {% else %}
                                     {{ setting.value }}
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if setting.required %}
-                                    {% translate "Yes" %}
-                                {% else %}
-                                    {% translate "No" %}
                                 {% endif %}
                             </td>
                         </tr>
