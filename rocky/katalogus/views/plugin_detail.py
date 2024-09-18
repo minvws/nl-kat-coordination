@@ -133,7 +133,8 @@ class BoefjeDetailView(PluginDetailView):
         context["variants"] = get_katalogus(self.organization.code).get_plugins(oci_image=self.plugin.oci_image)
 
         for variant in context["variants"]:
-            variant.created = parser.isoparse(variant.created)
+            if variant.created:
+                variant.created = parser.isoparse(variant.created)
 
         context["select_ooi_filter_form"] = SelectOOIFilterForm
         if "show_all" in self.request.GET:
