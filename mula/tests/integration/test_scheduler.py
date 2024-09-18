@@ -222,8 +222,7 @@ class SchedulerTestCase(unittest.TestCase):
         # Assert: schedule should have a deadline
         self.assertIsNotNone(schedule_db.deadline_at)
 
-        # TODO: check this
-        # Assert Schedule cron should not be set
+        # Assert Schedule cron should NOT be set
         self.assertIsNone(schedule_db.schedule)
 
         # Assert: deadline should be in the future, at least later than the
@@ -261,8 +260,7 @@ class SchedulerTestCase(unittest.TestCase):
         # Assert: schedule should have a deadline
         self.assertIsNotNone(schedule_db.deadline_at)
 
-        # TODO: check this
-        # Assert Schedule cron should not be set
+        # Assert Schedule cron should NOT be set
         self.assertIsNone(schedule_db.schedule)
 
         # Assert: deadline should be in the future, at least later than the

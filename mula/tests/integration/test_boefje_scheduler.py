@@ -838,17 +838,17 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Schedule deadline should be set
         self.assertIsNotNone(schedule_db.deadline_at)
 
-        # TODO: check this
-        # Schedule cron should not be set
+        # Schedule cron should NOT be set
         self.assertIsNone(schedule_db.schedule)
 
     def test_post_push_boefje_cron(self):
         """When a boefje specifies a cron schedule, the schedule should be set"""
         # Arrange
+        cron = "0 0 * * *"
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(cron="0 0 * * *"),
+            boefje=BoefjeFactory(cron=cron),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
@@ -893,6 +893,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
 
         # Schedule cron should be set
         self.assertIsNotNone(schedule_db.schedule)
+        self.assertEqual(schedule_db.schedule, cron)
 
         # Check if the deadline_at is set correctly, to the next
         # day at midnight
@@ -901,12 +902,120 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1),
         )
 
+    def test_post_push_boefje_cron_multiple_tasks(self):
+        """When a boefje specifies a cron schedule, and that boefje
+        can run on multiple ooi's the cron schedule should then
+        be set for each resulting task.
+        """
+        # Arrange
+        cron = "0 0 * * *"
+        scan_profile = ScanProfileFactory(level=0)
+        boefje = BoefjeFactory(cron=cron)
+
+        ooi1 = OOIFactory(scan_profile=scan_profile)
+        ooi2 = OOIFactory(scan_profile=scan_profile)
+
+        boefje_task1 = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi1.primary_key,
+            organization=self.organisation.id,
+        )
+
+        boefje_task2 = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi2.primary_key,
+            organization=self.organisation.id,
+        )
+
+        task1 = models.Task(
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            type=models.BoefjeTask.type,
+            hash=boefje_task1.hash,
+            data=boefje_task1.model_dump(),
+            created_at=datetime.now(timezone.utc),
+            modified_at=datetime.now(timezone.utc),
+        )
+
+        task2 = models.Task(
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            type=models.BoefjeTask.type,
+            hash=boefje_task2.hash,
+            data=boefje_task2.model_dump(),
+            created_at=datetime.now(timezone.utc),
+            modified_at=datetime.now(timezone.utc),
+        )
+
+        item1 = functions.create_item(
+            scheduler_id=self.organisation.id,
+            priority=1,
+            task=task1,
+        )
+
+        item2 = functions.create_item(
+            scheduler_id=self.organisation.id,
+            priority=1,
+            task=task2,
+        )
+
+        # Act
+        self.scheduler.push_item_to_queue(item1)
+        self.scheduler.push_item_to_queue(item2)
+
+        # Tasks should be on priority queue
+        task_pq1 = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        task_pq2 = models.BoefjeTask(**self.scheduler.queue.peek(1).data)
+        self.assertEqual(2, self.scheduler.queue.qsize())
+        self.assertEqual(ooi1.primary_key, task_pq1.input_ooi)
+        self.assertEqual(boefje_task1.boefje.id, task_pq1.boefje.id)
+        self.assertEqual(ooi2.primary_key, task_pq2.input_ooi)
+        self.assertEqual(boefje_task2.boefje.id, task_pq2.boefje.id)
+
+        # Task should be in datastore, and queued
+        task_db1 = self.mock_ctx.datastores.task_store.get_task(item1.id)
+        task_db2 = self.mock_ctx.datastores.task_store.get_task(item2.id)
+        self.assertEqual(task_db1.id, item1.id)
+        self.assertEqual(task_db1.status, models.TaskStatus.QUEUED)
+        self.assertEqual(task_db2.id, item2.id)
+        self.assertEqual(task_db2.status, models.TaskStatus.QUEUED)
+
+        # Schedule should be in datastore
+        schedule_db1 = self.mock_ctx.datastores.schedule_store.get_schedule(task_db1.schedule_id)
+        schedule_db2 = self.mock_ctx.datastores.schedule_store.get_schedule(task_db2.schedule_id)
+        self.assertIsNotNone(schedule_db1)
+        self.assertEqual(schedule_db1.id, task_db1.schedule_id)
+        self.assertIsNotNone(schedule_db2)
+        self.assertEqual(schedule_db2.id, task_db2.schedule_id)
+
+        # Schedule deadline should be set
+        self.assertIsNotNone(schedule_db1.deadline_at)
+        self.assertIsNotNone(schedule_db2.deadline_at)
+
+        # Schedule cron should be set
+        self.assertIsNotNone(schedule_db1.schedule)
+        self.assertEqual(schedule_db1.schedule, cron)
+        self.assertIsNotNone(schedule_db2.schedule)
+        self.assertEqual(schedule_db2.schedule, cron)
+
+        # Check if the deadline_at is set correctly, to the next
+        # day at midnight
+        self.assertEqual(
+            schedule_db1.deadline_at,
+            datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1),
+        )
+
+        self.assertEqual(
+            schedule_db2.deadline_at,
+            datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1),
+        )
+
     def test_post_push_boefje_interval(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(interval=1440),
+            boefje=BoefjeFactory(interval=1500),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
@@ -953,10 +1062,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertIsNone(schedule_db.schedule)
 
         # Check if the deadline_at is set correctly with the interval
-        # set to 1440 minutes (24 hours) to at least the next day
+        # set to 1500 minutes (25 hours) to at least the next day
         self.assertGreater(
             schedule_db.deadline_at,
-            datetime.now(timezone.utc) + timedelta(minutes=1440),
+            datetime.now(timezone.utc) + timedelta(days=1),
         )
 
     def test_post_pop(self):
