@@ -188,7 +188,7 @@ class EditBoefjeView(BoefjeSetupView):
         ]
 
         return context
-
+      
 
 def create_boefje_with_form_data(form_data, plugin_id: str, created: str):
     arguments = [] if form_data["oci_arguments"] == "" else form_data["oci_arguments"].split()
