@@ -1,4 +1,42 @@
-# Creating a boefje
+# Creating a Boefje
+
+There are two ways to create a Boefje. The first is to create a Boefje with the User Interface (UI). The second option is to create it in the backend.
+
+## Boefje variants
+
+Boefje variants are Boefjes that use the same container image. In OpenKAT, all Boefjes with the same container image will be seen as 'variants' of each other and will be shown together on those Boefje detail pages.
+
+## Creating a Boefje (variant) in the User Interface
+
+**Note:** Currently, only admins are able to create Boefjes in the UI.
+
+To create a **new** Boefje, go to the KAT-alogus. Here you will find the _'Add Boefje'_ button.
+To create a **variant** of an existing Boefje, go to the Boefje detail page of the Boefje you would like to use as a template and press the _'Add variant'_ button.
+
+### Set up your Boefje
+
+You will be directed to the Setup page, where you can configure your Boefje. The following items can be filled in:
+
+| Field             | Required | Explanation                                                                                                                                                                                                                                                                                                                             |
+| ----------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Container image   | Yes      | The name of the Docker image. For example: _'ghcr.io/minvws/openkat/nmap'_                                                                                                                                                                                                                                                              |
+| Name              | Yes      | Give your Boefje a suitable name. This name will be visible in the KAT-alogus.                                                                                                                                                                                                                                                          |
+| Description       | No       | A description of the Boefje explaining in short what it can do. This will both be displayed inside the KAT-alogus and on the Boefje details page.                                                                                                                                                                                       |
+| Arguments         | No       | For example: _'-sTU --top-ports 1000'_                                                                                                                                                                                                                                                                                                  |
+| Json Schema       | No       | If any other settings are needed for your Boefje, add these as a JSON Schema, otherwise, leave the field empty or 'null'. This JSON is used as the basis for a form for the user. When the user enables this Boefje they can get the option to give extra information. For example, it can contain an API key that the script requires. |
+| Input object type | No       | Select the object type(s) that your Boefje consumes.                                                                                                                                                                                                                                                                                    |
+| Output mime-types | No       | Add a set of mime-types that are produced by this Boefje, separated by commas. For example: _'text/html'_, _'image/jpeg'_ or _'boefje/{boefje-id}'_. These output mime-types will be shown on the Boefje detail page as information for other users.                                                                                    |
+| Clearance level   | No       | Select a clearance level for your Boefje, which indicates the clearance level the OOI's need before your Boefje will be scheduled on them.                                                                                                                                                                                              |
+
+### Using your Boefje
+
+After finishing the setup and creating your Boefje, you can view it in the KAT-alogus for All Organizations in your OpenKAT-install. The Boefje detail page will show you all the detailed information about your newly created Boefje. Both on the KAT-alogus as on the Boefje detail page, you can enable or disable your Boefje.
+
+### Updating your Boefje
+
+To update your Boefje, you go to the _'Variants'_ section on the Boefje detail page. Expand the table row of the Boefje you want to change and press the _'Edit Boefje'_ button.
+
+## Creating a boefje in the code
 
 Inside `boefjes/boefjes/plugins/` create a new folder with a name starting with `kat_` for this example we use `kat_hello_katty`
 
@@ -14,11 +52,11 @@ $ tree boefjes/boefjes/plugins/kat_hello_katty/
 └── schema.json
 ```
 
-## `__init__.py`
+### `__init__.py`
 
 This file stays empty.
 
-## `boefje.json`
+### `boefje.json`
 
 This file contains information about our boefje. For example, this file contains information about what OOIs our boefje should be looking out for. Here is the example we will be using:
 
@@ -40,15 +78,15 @@ This file contains information about our boefje. For example, this file contains
 - **`scan_level`**: A scan level that decides how intrusively this boefje will scan the provided OOIs. Since we will not make any external requests our boefje will have a scan level of 0.
 - **`oci_image`**: The name of the docker image that is provided inside `boefjes/Makefile`
 
-## `cover.jpg`
+### `cover.jpg`
 
 This file has to be an image of the developer's cat. This image will be used as a thumbnail for the boefje.
 
-## `description.md`
+### `description.md`
 
 This file contains a description of the boefje to explain to the user what this boefje does. For this example we can leave this empty.
 
-## `schema.json`
+### `schema.json`
 
 To allow the user to pass information to a boefje runtime, add a schema.json file to the folder where your boefje is located.
 This can be used, for example, to add an API key that the script requires.
@@ -104,7 +142,7 @@ Schema validation happens right before spawning a boefje, meaning your tasks wil
   - `NUMBER`: For this property we ask the user to send us an integer between 0 and 9.
 - `required`: In here we need to give a list of the objects' names that the user has to provide to run our boefje. For this example, we will only require the user to give us the `MESSAGE` variable. We do this by adding `"MESSAGE"` to the `required` list.
 
-## `main.py`
+### `main.py`
 
 This is the file where the boefje's meowgic happens. This file has to contain a run method that accepts a dictionary and returns a `list[tuple[set, bytes | str]]`.
 This function will run whenever a new OOI gets created with one of the types mentioned in `consumes` inside `boefje.json`. :

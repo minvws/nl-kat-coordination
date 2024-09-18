@@ -37,7 +37,7 @@ class SessionMixin:
         error = None
 
         try:
-            logger.info("Committing session")
+            logger.debug("Committing session")
             self.session.commit()
         except DatabaseError as e:
             error = e
