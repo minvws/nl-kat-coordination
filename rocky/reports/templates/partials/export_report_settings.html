@@ -7,17 +7,19 @@
 <section>
     <div>
         {% if selected_oois and selected_report_types %}
-            <h2>{% translate "Report schedule" %}</h2>
-            <p>
-                {% blocktranslate trimmed %}
-                    The date you select will be the reference date for the data set for your report.
-                    Please allow for up to 24 hours for your report to be ready.
-                {% endblocktranslate %}
-            </p>
-            <form class="inline">
-                {% include "partials/form/fieldset.html" with fields=report_schedule_form fieldset_parent_class="column-2" %}
+            {% if report_schedule_form %}
+                <h2>{% translate "Report schedule" %}</h2>
+                <p>
+                    {% blocktranslate trimmed %}
+                        The date you select will be the reference date for the data set for your report.
+                        Please allow for up to 24 hours for your report to be ready.
+                    {% endblocktranslate %}
+                </p>
+                <form class="inline">
+                    {% include "partials/form/fieldset.html" with fields=report_schedule_form fieldset_parent_class="column-2" %}
 
-            </form>
+                </form>
+            {% endif %}
             <h2>{% translate "Report name" %}</h2>
             {% include "partials/return_button.html" with btn_text="Change selection" %}
 

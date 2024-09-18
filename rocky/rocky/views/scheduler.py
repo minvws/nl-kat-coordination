@@ -78,7 +78,7 @@ class SchedulerView(OctopoesView):
     def get_report_schedule_form(self) -> ReportScheduleForm:
         return self.report_schedule_form(self.request.POST)
 
-    def get_schedule_filter_form_data(self):
+    def get_report_schedule_form_data(self):
         form_data = self.get_report_schedule_form().data.dict()
         return {k: v for k, v in form_data.items() if v}
 
@@ -105,7 +105,7 @@ class SchedulerView(OctopoesView):
             return messages.error(self.request, error.message)
 
     def schedule_report(self, report_ooi: type[OOI]) -> bool:
-        form_data = self.get_schedule_filter_form_data()
+        form_data = self.get_report_schedule_form_data()
         # A schedule must be set or skip.
         if "start_date" in form_data and "recurrence" in form_data:
             start_date = form_data.get("start_date", "")
