@@ -1,8 +1,8 @@
-from functools import cached_property
 from pathlib import Path
 from uuid import UUID
 
 import structlog
+from boto3.resources.base import ServiceResource
 from boto3.session import Session as BotoSession
 
 from bytes.config import Settings
@@ -87,10 +87,7 @@ class S3RawRepository(RawRepository):
         self.s3_bucket_prefix = s3_bucket_prefix
         self.s3_bucket_name = s3_bucket_name
 
-    @cached_property
-    def _s3resource(self):
-        session = BotoSession()
-        return session.resource("s3")
+        self._s3resource: ServiceResource = BotoSession().resource("s3")
 
     def get_or_create_bucket(self, organization: str):
         # Create a bucket, and if it exists already return that instead
