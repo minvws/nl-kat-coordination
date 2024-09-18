@@ -49,8 +49,9 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
         if instance.static:
             raise NotAllowed(f"Plugin with id '{boefje_id}' is static, so updating it is not allowed")
 
+        field_mapping = {"boefje_schema": "schema"}  # since Boefje.boefje_schema is the same as BoefjeInDB.schema
         for key, value in data.items():
-            setattr(instance, key, value)
+            setattr(instance, field_mapping.get(key, key), value)
 
         self.session.add(instance)
 
