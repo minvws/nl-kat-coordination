@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.list import ListView
 from httpx import HTTPError
+from katalogus.client import get_katalogus
 from tools.forms.scheduler import TaskFilterForm
 
 from rocky.paginator import RockyPaginator
@@ -64,6 +65,24 @@ class BoefjesTaskListView(TaskListView):
 class NormalizersTaskListView(TaskListView):
     template_name = "tasks/normalizers.html"
     task_type = "normalizer"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Search for the corresponding Boefje names and add those to the task_list
+        task_list = context["task_list"]
+        ids = [
+            task.data.raw_data.boefje_meta.boefje.id
+            for task in task_list
+            if task.data.raw_data.boefje_meta.boefje.id != "manual"
+        ]
+        plugins = get_katalogus(self.organization.code).get_plugins(ids=ids)
+        plugin_dict = {p.id: p.name for p in plugins}
+
+        for task in task_list:
+            task.data.raw_data.boefje_meta.boefje.name = plugin_dict[task.data.raw_data.boefje_meta.boefje.id]
+
+        return context
 
 
 class AllTaskListView(SchedulerListView, PageActionsView):
