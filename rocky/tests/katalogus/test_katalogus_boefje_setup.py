@@ -21,7 +21,9 @@ def test_boefje_setup(rf, superuser_member):
     assertContains(response, "Create new Boefje")
 
 
-def test_boefje_variant_setup(rf, superuser_member, boefje_dns_records):
+def test_boefje_variant_setup(rf, superuser_member, boefje_dns_records, mocker):
+    katalogus_mocker = mocker.patch("katalogus.client.KATalogusClientV1")()
+    katalogus_mocker.get_plugin.return_value = boefje_dns_records
     request = setup_request(rf.get("boefje_variant_setup"), superuser_member.user)
     response = AddBoefjeVariantView.as_view()(
         request, organization_code=superuser_member.organization.code, plugin_id=boefje_dns_records.id
@@ -40,7 +42,9 @@ def test_boefje_variant_setup(rf, superuser_member, boefje_dns_records):
     assertContains(response, "Create variant")
 
 
-def test_edit_boefje_view(rf, superuser_member, boefje_dns_records):
+def test_edit_boefje_view(rf, superuser_member, boefje_dns_records, mocker):
+    katalogus_mocker = mocker.patch("katalogus.client.KATalogusClientV1")()
+    katalogus_mocker.get_plugin.return_value = boefje_dns_records
     request = setup_request(rf.get("edit_boefje"), superuser_member.user)
     response = EditBoefjeView.as_view()(
         request, organization_code=superuser_member.organization.code, plugin_id=boefje_dns_records.id
