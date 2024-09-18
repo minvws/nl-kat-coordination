@@ -59,7 +59,7 @@ class StatusEnum(str, Enum):
 
 class File(BaseModel):
     name: str | None = None
-    content: str = Field(..., contentEncoding="base64")
+    content: str = Field(json_schema_extra={"contentEncoding": "base64"})
     tags: list[str] | None = None
 
 

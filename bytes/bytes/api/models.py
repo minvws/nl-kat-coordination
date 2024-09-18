@@ -9,7 +9,7 @@ class RawResponse(BaseModel):
 
 class File(BaseModel):
     name: str
-    content: str = Field(..., contentEncoding="base64")
+    content: str = Field(json_schema_extra={"contentEncoding": "base64"})
     tags: list[str] = Field(default_factory=list)
 
 
