@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from factory import Factory, Faker, LazyFunction, fuzzy
+
 from scheduler.models import Boefje, BoefjeMeta
 
 
@@ -15,6 +16,8 @@ class BoefjeFactory(Factory):
     scan_level: int = fuzzy.FuzzyInteger(0, 4)
     consumes: list[str] = LazyFunction(lambda: [])
     produces: list[str] = LazyFunction(lambda: [])
+    cron: str | None = None
+    interval: int | None = None
 
 
 class BoefjeMetaFactory(Factory):

@@ -840,13 +840,124 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
 
         # TODO: check this
         # Schedule cron should not be set
-        self.assertIsNotNone(schedule_db.schedule)
+        self.assertIsNone(schedule_db.schedule)
 
     def test_post_push_boefje_cron(self):
-        self.assertFail("Not implemented yet")
+        """When a boefje specifies a cron schedule, the schedule should be set"""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje_task = models.BoefjeTask(
+            boefje=BoefjeFactory(cron="0 0 * * *"),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        task = models.Task(
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            type=models.BoefjeTask.type,
+            hash=boefje_task.hash,
+            data=boefje_task.model_dump(),
+            created_at=datetime.now(timezone.utc),
+            modified_at=datetime.now(timezone.utc),
+        )
+
+        item = functions.create_item(
+            scheduler_id=self.organisation.id,
+            priority=1,
+            task=task,
+        )
+
+        # Act
+        self.scheduler.push_item_to_queue(item)
+
+        # Task should be on priority queue
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje_task.boefje.id, task_pq.boefje.id)
+
+        # Task should be in datastore, and queued
+        task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
+        self.assertEqual(task_db.id, item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Schedule should be in datastore
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(task_db.schedule_id)
+        self.assertIsNotNone(schedule_db)
+        self.assertEqual(schedule_db.id, task_db.schedule_id)
+
+        # Schedule deadline should be set
+        self.assertIsNotNone(schedule_db.deadline_at)
+
+        # Schedule cron should be set
+        self.assertIsNotNone(schedule_db.schedule)
+
+        # Check if the deadline_at is set correctly, to the next
+        # day at midnight
+        self.assertEqual(
+            schedule_db.deadline_at,
+            datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1),
+        )
 
     def test_post_push_boefje_interval(self):
-        self.assertFail("Not implemented yet")
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje_task = models.BoefjeTask(
+            boefje=BoefjeFactory(interval=1440),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        task = models.Task(
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            type=models.BoefjeTask.type,
+            hash=boefje_task.hash,
+            data=boefje_task.model_dump(),
+            created_at=datetime.now(timezone.utc),
+            modified_at=datetime.now(timezone.utc),
+        )
+
+        item = functions.create_item(
+            scheduler_id=self.organisation.id,
+            priority=1,
+            task=task,
+        )
+
+        # Act
+        self.scheduler.push_item_to_queue(item)
+
+        # Task should be on priority queue
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje_task.boefje.id, task_pq.boefje.id)
+
+        # Task should be in datastore, and queued
+        task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
+        self.assertEqual(task_db.id, item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Schedule should be in datastore
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(task_db.schedule_id)
+        self.assertIsNotNone(schedule_db)
+        self.assertEqual(schedule_db.id, task_db.schedule_id)
+
+        # Schedule deadline should be set
+        self.assertIsNotNone(schedule_db.deadline_at)
+
+        # Schedule cron should NOT be set
+        self.assertIsNone(schedule_db.schedule)
+
+        # Check if the deadline_at is set correctly with the interval
+        # set to 1440 minutes (24 hours) to at least the next day
+        self.assertGreater(
+            schedule_db.deadline_at,
+            datetime.now(timezone.utc) + timedelta(minutes=1440),
+        )
 
     def test_post_pop(self):
         """When a task is removed from the queue, its status should be updated"""

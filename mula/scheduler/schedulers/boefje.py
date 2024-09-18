@@ -19,6 +19,7 @@ from scheduler.models import (
     Organisation,
     Plugin,
     ScanProfileMutation,
+    Schedule,
     Task,
     TaskStatus,
 )
@@ -999,20 +1000,27 @@ class BoefjeScheduler(Scheduler):
         return boefjes
 
     def post_push(self, item: Task) -> Task:
-        """When a boefje specifies we schedule for its execution"""
+        """Override for the post_push when a boefje specifies we schedule for its execution"""
         # Does a boefje have a schedule defined?
-        schedule = utils.deep_get(item.data, ["boefje", "schedule"])  # FIXME: based on implementation
+        schedule = utils.deep_get(item.data, ["boefje", "cron"])  # FIXME: based on implementation
         if schedule is None:
             return super().post_push(item)
 
         schedule_db = self.ctx.datastores.schedule_store.get_schedule_by_hash(item.hash)
         if schedule_db is None:
             # Create schedule when not found
-            schedule_db = self.ctx.datastores.schedule_store.create_schedule(
-                item.scheduler_id,
-                item.hash,
-                schedule,
+            schedule = Schedule(
+                scheduler_id=self.scheduler_id,
+                hash=item.hash,
+                deadline_at=self.calculate_deadline(item),
+                data=item.data,
+                schedule=schedule,
             )
+
+            schedule_db = self.ctx.datastores.schedule_store.create_schedule(schedule)
+
+            item.schedule_id = schedule_db.id
+            self.ctx.datastores.task_store.update_task(item)
         else:
             # We update the schedule if it already exists, this makes sure
             # that when a boefje schedule is updated, we also update the schedule.
