@@ -51,7 +51,9 @@ class Report(OOI):
 
 class ReportRecipe(OOI):
     recipe_id: UUID
-    name: str
+    # object can be the total objects or 1 object, but then the ooi itself.
+    report_name_format: str = "{report_type} for {objects} - {reference_date}"
+    subreport_name_format: str = "{report_type} for {ooi} - {reference_date}"
     object_type: Literal["ReportRecipe"] = "ReportRecipe"
     input_recipe: dict[str, Any]  # can contain a query which maintains a live set of OOIs or manually picked OOIs.
     report_types: list[str]
