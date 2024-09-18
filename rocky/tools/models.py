@@ -261,15 +261,21 @@ class OrganizationMember(models.Model):
     def max_clearance_level(self) -> int:
         """The maximum clearance level the user has for this organization.
 
-        This is the maximum of the global and organization-specific clearance
-        level. For the organization specific clearance level we take the minimum
+        When the user has an organization specific clearance level that is lower
+        than the global clearance level this will overrule the global clearance
+        level.
+
+        For the organization specific clearance level we take the minimum
         of the trusted clearance level and acknowledged clearance level. If the
         user did not acknowledge a changed clearance level, we need to use the
         level that was previously. If an admin lowered the users clearance
         level, we also need to use that level instead of the previously
         acknowledged level.
         """
-        return max(min(self.trusted_clearance_level, self.acknowledged_clearance_level), self.user.clearance_level)
+        if self.trusted_clearance_level == -1 and self.acknowledged_clearance_level == -1:
+            return self.user.clearance_level
+        else:
+            return min(self.trusted_clearance_level, self.acknowledged_clearance_level)
 
     def has_clearance_level(self, level: int) -> bool:
         return level <= self.max_clearance_level

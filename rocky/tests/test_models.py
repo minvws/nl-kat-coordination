@@ -77,3 +77,67 @@ def test_can_access_all_organizations(client_member, organization_b):
     client_member.user.user_permissions.add(can_access_all_organizations)
 
     assert client_member.user.organizations == [client_member.organization, organization_b]
+
+
+def test_max_clearance_level(client_member):
+    client_member.user.clearance_level = -1
+    client_member.trusted_clearance_level = -1
+    client_member.acknowledged_clearance_level = -1
+
+    assert client_member.max_clearance_level == -1
+
+    client_member.user.clearance_level = 4
+    client_member.trusted_clearance_level = -1
+    client_member.acknowledged_clearance_level = -1
+
+    assert client_member.max_clearance_level == 4
+
+    client_member.user.clearance_level = -1
+    client_member.trusted_clearance_level = 4
+    client_member.acknowledged_clearance_level = 4
+
+    assert client_member.max_clearance_level == 4
+
+    client_member.user.clearance_level = 4
+    client_member.trusted_clearance_level = 2
+    client_member.acknowledged_clearance_level = 2
+
+    assert client_member.max_clearance_level == 2
+
+    client_member.user.clearance_level = 2
+    client_member.trusted_clearance_level = 4
+    client_member.acknowledged_clearance_level = 4
+
+    assert client_member.max_clearance_level == 4
+
+
+def test_max_clearance_level_not_acknowledged(client_member):
+    client_member.user.clearance_level = 2
+    client_member.trusted_clearance_level = 1
+    client_member.acknowledged_clearance_level = -1
+
+    assert client_member.max_clearance_level == -1
+
+    client_member.user.clearance_level = 2
+    client_member.trusted_clearance_level = -1
+    client_member.acknowledged_clearance_level = 1
+
+    assert client_member.max_clearance_level == -1
+
+    client_member.user.clearance_level = -1
+    client_member.trusted_clearance_level = -1
+    client_member.acknowledged_clearance_level = 1
+
+    assert client_member.max_clearance_level == -1
+
+    client_member.user.clearance_level = -1
+    client_member.trusted_clearance_level = 2
+    client_member.acknowledged_clearance_level = -1
+
+    assert client_member.max_clearance_level == -1
+
+    client_member.user.clearance_level = -1
+    client_member.trusted_clearance_level = 2
+    client_member.acknowledged_clearance_level = 1
+
+    assert client_member.max_clearance_level == 1
