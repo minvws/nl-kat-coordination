@@ -85,7 +85,7 @@ services:
       - .ci/.env.test
 
   ci_xtdb:
-    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.8"
+    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.1.0"
 
   ci_octopoes_api_worker:
     build:
