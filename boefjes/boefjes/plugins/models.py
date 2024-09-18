@@ -69,7 +69,7 @@ class BoefjeResource:
 
         if (path / SCHEMA_FILE).exists():
             try:
-                self.boefje.schema = json.load((path / SCHEMA_FILE).open())
+                self.boefje.boefje_schema = json.load((path / SCHEMA_FILE).open())
             except JSONDecodeError as e:
                 raise ModuleException("Invalid schema file") from e
             except SchemaError as e:

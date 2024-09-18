@@ -45,7 +45,7 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
             scan_level=form_data["scan_level"],
             consumes=input_objects,
             produces=produces,
-            schema=form_data["schema"],
+            boefje_schema=form_data["schema"],
             oci_image=form_data.get("oci_image"),
             oci_arguments=arguments,
         )

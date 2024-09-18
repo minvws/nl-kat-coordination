@@ -171,6 +171,6 @@ def create_boefje_meta(task, plugin: PluginType) -> BoefjeMeta:
         input_ooi=input_ooi,
         arguments=arguments,
         organization=organization,
-        environment=get_environment_settings(task.data, plugin.schema),
+        environment=get_environment_settings(task.data, plugin.boefje_schema),
     )
     return boefje_meta
