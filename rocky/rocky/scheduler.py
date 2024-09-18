@@ -262,13 +262,13 @@ class SchedulerClient:
         except HTTPStatusError as http_error:
             code = http_error.response.status_code
             if code == codes.TOO_MANY_REQUESTS:
-                raise SchedulerTooManyRequestError()
+                raise SchedulerTooManyRequestError() from http_error
             elif code == codes.BAD_REQUEST:
-                raise SchedulerBadRequestError()
+                raise SchedulerBadRequestError() from http_error
             elif code == codes.CONFLICT:
-                raise SchedulerConflictError()
-        except RequestError:
-            raise SchedulerError()
+                raise SchedulerConflictError() from http_error
+        except RequestError as request_error:
+            raise SchedulerError() from request_error
 
     def health(self) -> ServiceHealth:
         return ServiceHealth.model_validate_json(self._get("/health", return_type="content"))
