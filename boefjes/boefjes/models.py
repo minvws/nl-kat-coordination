@@ -30,6 +30,8 @@ class Boefje(Plugin):
     consumes: set[str] = Field(default_factory=set)
     produces: set[str] = Field(default_factory=set)
     schema: dict | None = None
+    cron: str | None = None
+    interval: int | None = None
     runnable_hash: str | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
