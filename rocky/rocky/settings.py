@@ -534,3 +534,7 @@ structlog.configure(
     wrapper_class=structlog.stdlib.BoundLogger,
     cache_logger_on_first_use=True,
 )
+
+POOL_SIZE = env.int("POOL_SIZE", default=2)
+POLL_INTERVAL = env.int("POLL_INTERVAL", default=2)
+WORKER_HEARTBEAT = env.int("WORKER_HEARTBEAT", default=2)

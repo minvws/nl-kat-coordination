@@ -15,13 +15,18 @@ from reports.views.base import BaseReportView
 
 class SaveGenerateReportMixin(BaseReportView):
     def save_report(self, report_names: list) -> Report:
+        ooi_pks = self.get_ooi_pks()
+        sorted_report_types = list(filter(lambda x: x in self.get_report_types(), REPORTS))
+        octopoes_api_connector = self.octopoes_api_connector
+        observed_at = self.observed_at
+
         error_reports = []
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
         by_type: dict[str, list[str]] = {}
 
         number_of_reports = 0
 
-        for ooi in self.get_ooi_pks():
+        for ooi in ooi_pks:
             ooi_type = Reference.from_str(ooi).class_
 
             if ooi_type not in by_type:
@@ -29,15 +34,13 @@ class SaveGenerateReportMixin(BaseReportView):
 
             by_type[ooi_type].append(ooi)
 
-        sorted_report_types = list(filter(lambda x: x in self.get_report_types(), REPORTS))
-
         for report_class in sorted_report_types:
             oois = {
                 ooi for ooi_type in report_class.input_ooi_types for ooi in by_type.get(ooi_type.get_object_type(), [])
             }
 
             try:
-                results = report_class(self.octopoes_api_connector).collect_data(oois, self.observed_at)
+                results = report_class(octopoes_api_connector).collect_data(oois, observed_at)
 
             except ObjectNotFoundException:
                 error_reports.append(report_class.id)
@@ -57,7 +60,6 @@ class SaveGenerateReportMixin(BaseReportView):
                 }
                 number_of_reports += 1
 
-        observed_at = self.get_observed_at()
         now = datetime.now(timezone.utc)
 
         # if its not a single report, we need a parent
