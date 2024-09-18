@@ -13,7 +13,7 @@
         </p>
         {% include "summary/ooi_selection.html" %}
 
-        <h3>{% translate "Selected Report Types" %}</h3>
+        <h3>{% translate "Selected Report Types" %} ({{ report_types|length }})</h3>
         <p>
             {% blocktranslate trimmed %}
                 The table below shows which reports were chosen to generate this report,
@@ -39,6 +39,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        {{ data }}
         {% include "summary/selected_plugins.html" %}
 
     </div>

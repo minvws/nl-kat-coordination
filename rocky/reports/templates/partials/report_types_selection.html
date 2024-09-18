@@ -31,7 +31,7 @@
                     You have selected {{ total_oois }} objects in previous step.
                 {% endblocktranslate %}
             </p>
-            {% if not "all" in selected_oois %}
+            {% if not all_oois_selected %}
                 {% include "summary/ooi_selection.html" %}
 
             {% endif %}
@@ -57,8 +57,8 @@
                 {% include "forms/report_form_fields.html" with disable_report_type_fields=True %}
 
                 <div class="column-4 tiles">
-                    {% if available_report_types_aggregate %}
-                        {% include "partials/report_types_tiles_required_optional.html" with report_types=available_report_types_aggregate %}
+                    {% if "required" in available_report_types %}
+                        {% include "partials/report_types_tiles_required_optional.html" with report_types=available_report_types %}
 
                     {% else %}
                         {% include "partials/report_types_tiles.html" with report_types=available_report_types %}

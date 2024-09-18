@@ -5,7 +5,7 @@
     <div>
         <h2>{% translate "Configuration" %}</h2>
         <p class="emphasized">{% translate "Set up the required plugins for this report." %}</p>
-        {% if report_recipe.input_oois and report_recipe.report_types %}
+        {% if selected_oois and selected_report_types %}
             {% include "partials/return_button.html" with btn_text="Change selection" %}
             {% include "partials/plugin_overview_table.html" %}
 
@@ -39,7 +39,7 @@
             <h3>{% translate "Required plugins" %}</h3>
             {% if enabled_plugins.required %}
                 <p>{% translate "Good job! All required plugins are enabled." %}</p>
-            {% elif report_recipe.plugins.required %}
+            {% elif plugins.required %}
                 <p>{% translate "This report type requires the following plugins to be enabled:" %}</p>
                 <div class="required-plugin-container">
                     <div class="toolbar">
@@ -63,7 +63,7 @@
             <h3>{% translate "Suggested plugins" %}</h3>
             {% if enabled_plugins.optional %}
                 <p>{% translate "Good job! All suggested plugins are enabled" %}</p>
-            {% elif report_recipe.plugins.optional %}
+            {% elif plugins.optional %}
                 <p>
                     {% translate "This report requires at least one of the following plugins to be enabled to generate the report:" %}
                 </p>

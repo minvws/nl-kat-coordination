@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-12 09:25+0000\n"
+"POT-Creation-Date: 2024-09-18 08:49+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3676,13 +3676,11 @@ msgstr ""
 msgid "Generate Report"
 msgstr ""
 
-#: reports/templates/partials/report_navigation.html
-#: reports/views/aggregate_report.py
+#: reports/templates/partials/report_navigation.html reports/views/base.py
 msgid "Aggregate Report"
 msgstr ""
 
-#: reports/templates/partials/report_navigation.html
-#: reports/views/multi_report.py
+#: reports/templates/partials/report_navigation.html reports/views/base.py
 msgid "Multi Report"
 msgstr ""
 
@@ -3759,6 +3757,7 @@ msgid "Set up the required plugins for this report."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
+#: reports/templates/summary/selected_plugins.html
 msgid "Plugins"
 msgstr ""
 
@@ -3848,7 +3847,6 @@ msgid "Selected Objects"
 msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
-#: reports/templates/summary/selected_plugins.html
 msgid "Selected Plugins"
 msgstr ""
 
@@ -4108,31 +4106,31 @@ msgid "Select at least one report type to proceed."
 msgstr ""
 
 #: reports/views/base.py
-msgid "Week %W, %Y"
-msgstr ""
-
-#: reports/views/generate_report.py
-msgid "Empty name should not be possible."
-msgstr ""
-
-#: reports/views/generate_report.py
 #, python-brace-format
 msgid "Concatenated Report for {oois_count} objects"
 msgstr ""
 
-#: reports/views/generate_report.py
+#: reports/views/base.py
 #, python-brace-format
 msgid "Concatenated Report for {ooi}"
 msgstr ""
 
-#: reports/views/generate_report.py
+#: reports/views/base.py
 #, python-brace-format
 msgid "{report_type} for {oois_count} objects"
 msgstr ""
 
-#: reports/views/generate_report.py
+#: reports/views/base.py
 #, python-brace-format
 msgid "{report_type} for {ooi}"
+msgstr ""
+
+#: reports/views/base.py
+msgid "Empty name should not be possible."
+msgstr ""
+
+#: reports/views/base.py
+msgid "Week %W, %Y"
 msgstr ""
 
 #: reports/views/mixins.py

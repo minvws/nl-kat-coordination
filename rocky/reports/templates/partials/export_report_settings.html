@@ -6,7 +6,7 @@
 
 <section>
     <div>
-        {% if report_recipe.input_oois and report_recipe.report_types %}
+        {% if selected_oois and selected_report_types %}
             <h2>{% translate "Report schedule" %}</h2>
             <p>
                 {% blocktranslate trimmed %}
@@ -63,10 +63,10 @@
                                     <td>
                                         <select class="reference-date" name="reference_date">
                                             <option value="">{% translate "No reference date" %}</option>
-                                            <option value="%b %d %Y, %H:%M">{% translate "Day" %} ({{ current_datetime|date:"N jS Y, H:i" }})</option>
-                                            <option value="week">{% translate "Week" %} ({% translate "Week" %} {{ current_datetime|date:"W, Y" }})</option>
-                                            <option value="%b, %Y">{% translate "Month" %} ({{ current_datetime|date:"N, Y" }})</option>
-                                            <option value="%Y">{% translate "Year" %} ({{ current_datetime|date:"Y" }})</option>
+                                            <option value="%b %d %Y, %H:%M">{% translate "Day" %} ({{ created_at|date:"N jS Y, H:i" }})</option>
+                                            <option value="week">{% translate "Week" %} ({% translate "Week" %} {{ created_at|date:"W, Y" }})</option>
+                                            <option value="%b, %Y">{% translate "Month" %} ({{ created_at|date:"N, Y" }})</option>
+                                            <option value="%Y">{% translate "Year" %} ({{ created_at|date:"Y" }})</option>
                                         </select>
                                     </td>
                                 </tr>

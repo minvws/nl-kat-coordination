@@ -1,31 +1,23 @@
-from datetime import datetime, timezone
 from typing import Any
 
-from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import TemplateView
-from tools.view_helpers import PostRedirect
 
-from octopoes.models import OOI
-from reports.forms import ReportScheduleForm
-from reports.report_types.definitions import BaseReport
 from reports.report_types.helpers import get_ooi_types_with_report
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
     OOISelectionView,
     ReportBreadcrumbs,
+    ReportFinalSettingsView,
     ReportPluginView,
     ReportTypeSelectionView,
+    SaveReportView,
     get_selection,
 )
 from reports.views.mixins import SaveGenerateReportMixin
 from reports.views.view_helpers import GenerateReportStepsMixin
-from rocky.views.ooi_view import BaseOOIListView
-from rocky.views.scheduler import SchedulerView
 
 
 class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
@@ -74,9 +66,7 @@ class LandingGenerateReportView(BreadcrumbsGenerateReportView):
         )
 
 
-class OOISelectionGenerateReportView(
-    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseOOIListView, OOISelectionView
-):
+class OOISelectionGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenerateReportView, OOISelectionView):
     """
     Select objects for the 'Generate Report' flow.
     """
@@ -86,11 +76,6 @@ class OOISelectionGenerateReportView(
     current_step = 1
     ooi_types = get_ooi_types_with_report()
 
-    def post(self, request, *args, **kwargs):
-        if not self.get_ooi_selection():
-            messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
-        return self.get(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["channel"] = "generate_report"
@@ -98,7 +83,7 @@ class OOISelectionGenerateReportView(
 
 
 class ReportTypesSelectionGenerateReportView(
-    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, OOISelectionView, ReportTypeSelectionView, TemplateView
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportTypeSelectionView
 ):
     """
     Shows all possible report types from a list of OOIs.
@@ -109,15 +94,9 @@ class ReportTypesSelectionGenerateReportView(
     breadcrumbs_step = 4
     current_step = 2
 
-    def post(self, request, *args, **kwargs):
-        if not self.get_ooi_selection():
-            messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
-            return PostRedirect(self.get_previous())
-        return self.get(request, *args, **kwargs)
-
 
 class SetupScanGenerateReportView(
-    SaveGenerateReportMixin, GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportPluginView, TemplateView
+    SaveGenerateReportMixin, GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportPluginView
 ):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
@@ -127,22 +106,8 @@ class SetupScanGenerateReportView(
     breadcrumbs_step = 5
     current_step = 3
 
-    def post(self, request, *args, **kwargs):
-        if not self.report_recipe.report_types:
-            messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
-            return PostRedirect(self.get_previous())
 
-        if "return" in self.request.POST and self.plugins_enabled():
-            return PostRedirect(self.get_previous())
-
-        if self.plugins_enabled():
-            return PostRedirect(self.get_next())
-        return self.get(request, *args, **kwargs)
-
-
-class ExportSetupGenerateReportView(
-    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportPluginView, TemplateView
-):
+class ExportSetupGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportFinalSettingsView):
     """
     Shows the export setup page where users can set their export preferences.
     """
@@ -150,77 +115,13 @@ class ExportSetupGenerateReportView(
     template_name = "generate_report/export_setup.html"
     breadcrumbs_step = 6
     current_step = 4
-    reports: dict[str, str] = {}
-
-    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.report_recipe.report_types:
-            messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
-            return PostRedirect(self.get_previous())
-        oois = list(self.get_oois())
-        report_types = list(self.get_report_types())
-        self.reports = create_report_names(oois, report_types)
-        return super().get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["reports"] = self.reports
-        context["current_datetime"] = datetime.now(timezone.utc)
-        context["schedule_report_form"] = ReportScheduleForm(self.request.POST)
-        return context
 
 
-class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportView, ReportPluginView, SchedulerView):
+class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportView, SaveReportView):
     """
     Save the report generated.
     """
 
     template_name = "generate_report.html"
     breadcrumbs_step = 6
-    current_step = 4
-    task_type = "report"
-
-    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        old_report_names = request.POST.getlist("old_report_name")
-        report_names = request.POST.getlist("report_name")
-        reference_dates = request.POST.getlist("reference_date")
-
-        if "" not in report_names and report_names:
-            final_report_names = list(zip(old_report_names, self.finalise_report_names(report_names, reference_dates)))
-            report_ooi = self.save_report(final_report_names)
-            self.schedule_report(report_ooi)
-
-            return redirect(
-                reverse("view_report", kwargs={"organization_code": self.organization.code})
-                + "?"
-                + urlencode({"report_id": report_ooi.reference})
-            )
-        messages.error(self.request, _("Empty name should not be possible."))
-        return PostRedirect(self.get_previous())
-
-
-def create_report_names(oois: list[OOI], report_types: list[type[BaseReport]]) -> dict[str, str]:
-    reports = {}
-    oois_count = len(oois)
-    report_types_count = len(report_types)
-    ooi = oois[0].human_readable
-    report_type = report_types[0].name
-
-    # Create name for parent report
-    if not (report_types_count == 1 and oois_count == 1):
-        if report_types_count > 1 and oois_count > 1:
-            name = _("Concatenated Report for {oois_count} objects").format(
-                report_type=report_type, oois_count=oois_count
-            )
-        elif report_types_count > 1 and oois_count == 1:
-            name = _("Concatenated Report for {ooi}").format(ooi=ooi)
-        elif report_types_count == 1 and oois_count > 1:
-            name = _("{report_type} for {oois_count} objects").format(report_type=report_type, oois_count=oois_count)
-        reports[name] = ""
-
-    # Create name for subreports or single reports
-    for ooi in oois:
-        for report_type_ in report_types:
-            name = _("{report_type} for {ooi}").format(report_type=report_type_.name, ooi=ooi.human_readable)
-            reports[name] = ""
-
-    return reports
+    current_step = 5
