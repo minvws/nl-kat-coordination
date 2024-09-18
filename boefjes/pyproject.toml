@@ -73,6 +73,7 @@ fastapi-slim = "^0.111.0"
 structlog = "^24.2.0"
 # required by kat_maxmind_geoip
 maxminddb = "^2.6.2"
+croniter = "^3.0.3"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.0"

@@ -2,6 +2,8 @@ import datetime
 from enum import Enum
 from typing import Literal
 
+from croniter import croniter
+from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import BaseModel, Field, field_validator
 
@@ -40,8 +42,20 @@ class Boefje(Plugin):
     @classmethod
     def json_schema_valid(cls, schema: dict) -> dict:
         if schema is not None:
-            Draft202012Validator.check_schema(schema)
-            return schema
+            try:
+                Draft202012Validator.check_schema(schema)
+            except SchemaError as e:
+                raise ValueError("The schema field is not a valid JSON schema") from e
+
+        return schema
+
+    @field_validator("cron")
+    @classmethod
+    def cron_valid(cls, cron: str | None) -> str | None:
+        if cron is not None:
+            croniter(cron)  # Raises a ValueError
+
+        return cron
 
     class Config:
         validate_assignment = True

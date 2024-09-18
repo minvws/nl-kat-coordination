@@ -1,8 +1,10 @@
 import datetime
 from functools import partial
 
+from croniter import croniter
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.responses import FileResponse, JSONResponse, Response
+from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import BaseModel, Field, field_validator
 
@@ -131,6 +133,8 @@ class BoefjeIn(BaseModel):
     consumes: set[str] = Field(default_factory=set)
     produces: set[str] = Field(default_factory=set)
     schema: dict | None = None
+    cron: str | None = None
+    interval: int | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
 
@@ -138,10 +142,20 @@ class BoefjeIn(BaseModel):
     @classmethod
     def json_schema_valid(cls, schema: dict | None) -> dict | None:
         if schema is not None:
-            Draft202012Validator.check_schema(schema)
-            return schema
+            try:
+                Draft202012Validator.check_schema(schema)
+            except SchemaError as e:
+                raise ValueError("The schema field is not a valid JSON schema") from e
 
-        return None
+        return schema
+
+    @field_validator("cron")
+    @classmethod
+    def cron_valid(cls, cron: str | None) -> str | None:
+        if cron is not None:
+            croniter(cron)  # Raises a ValueError
+
+        return cron
 
 
 @router.patch("/boefjes/{boefje_id}", status_code=status.HTTP_204_NO_CONTENT)
