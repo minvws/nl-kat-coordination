@@ -33,7 +33,7 @@ productive and beneficial for all team members.[^2]
 
 2. **Satisfy preconditions**
 
-   Ensure that your code is ready for review before you send it, and if you feel that it is not entirely there yet please mark it as 'draft' to signal this to potential reviewers:
+   Ensure that your code is ready for review before you send it, and if you feel that it is not entirely there yet please mark it as 'draft' to signal this to potential reviewers. Things to check before putting your code up for review:
 
    - It should work and is able to run,
    - There should be no unresolved merge conflicts,
