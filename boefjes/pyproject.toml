@@ -45,7 +45,7 @@ python-libnmap = "0.7.3"
 # required by kat_shodan boefje
 shodan = "1.25.0"
 # required by kat_ssl_certificates boefje
-cryptography = "^42.0.1"
+cryptography = "^43.0.1"
 # required by kat_webpage_analysis
 forcediphttpsadapter = "1.1.0"
 python-wappalyzer = {git = "https://github.com/chorsley/python-Wappalyzer.git", rev = "0.4.0"}
@@ -77,6 +77,7 @@ maxminddb = "^2.6.2"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.0"
 pytest-env = "^1.1.3"
+pytest-mock = "^3.14.0"
 
 [build-system]
 requires = ["setuptools>=45", "wheel"]
@@ -87,6 +88,7 @@ line-length = 120
 transform-concats = true
 
 [tool.pytest.ini_options]
+markers = ["slow: marks tests as slow"]
 addopts = "-m 'not slow'"
 env = [
     "D:KATALOGUS_DB_URI=postgresql://postgres:postgres@ci_katalogus-db:5432/ci_katalogus",

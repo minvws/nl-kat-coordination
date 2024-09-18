@@ -98,7 +98,7 @@ class PluginService:
             self.set_enabled_by_id(plugin_id, to_organisation, enabled=True)
 
     def upsert_settings(self, settings: dict, organisation_id: str, plugin_id: str):
-        self._assert_settings_match_schema(settings, organisation_id, plugin_id)
+        self._assert_settings_match_schema(settings, plugin_id)
         self._put_boefje(plugin_id)
 
         return self.config_storage.upsert(organisation_id, plugin_id, settings=settings)
@@ -122,14 +122,14 @@ class PluginService:
 
         try:
             self.plugin_storage.boefje_by_id(boefje_id)
-        except PluginNotFound:
+        except PluginNotFound as e:
             try:
                 plugin = self.local_repo.by_id(boefje_id)
             except KeyError:
-                raise
+                raise e
 
             if plugin.type != "boefje":
-                raise
+                raise e
             self.plugin_storage.create_boefje(plugin)
 
     def _put_normalizer(self, normalizer_id: str) -> None:
@@ -150,12 +150,7 @@ class PluginService:
     def delete_settings(self, organisation_id: str, plugin_id: str):
         self.config_storage.delete(organisation_id, plugin_id)
 
-        try:
-            self._assert_settings_match_schema({}, organisation_id, plugin_id)
-        except SettingsNotConformingToSchema:
-            logger.warning("Making sure %s is disabled for %s because settings are deleted", plugin_id, organisation_id)
-
-            self.set_enabled_by_id(plugin_id, organisation_id, False)
+        # We don't check the schema anymore because we can provide entries through the global environment as well
 
     def schema(self, plugin_id: str) -> dict | None:
         try:
@@ -184,9 +179,7 @@ class PluginService:
             return ""
 
     def set_enabled_by_id(self, plugin_id: str, organisation_id: str, enabled: bool):
-        if enabled:
-            all_settings = self.get_all_settings(organisation_id, plugin_id)
-            self._assert_settings_match_schema(all_settings, organisation_id, plugin_id)
+        # We don't check the schema anymore because we can provide entries through the global environment as well
 
         try:
             self._put_boefje(plugin_id)
@@ -195,14 +188,14 @@ class PluginService:
 
         self.config_storage.upsert(organisation_id, plugin_id, enabled=enabled)
 
-    def _assert_settings_match_schema(self, all_settings: dict, organisation_id: str, plugin_id: str):
+    def _assert_settings_match_schema(self, all_settings: dict, plugin_id: str):
         schema = self.schema(plugin_id)
 
         if schema:  # No schema means that there is nothing to assert
             try:
                 validate(instance=all_settings, schema=schema)
             except ValidationError as e:
-                raise SettingsNotConformingToSchema(organisation_id, plugin_id, e.message) from e
+                raise SettingsNotConformingToSchema(plugin_id, e.message) from e
 
     def _set_plugin_enabled(self, plugin: PluginType, organisation_id: str) -> PluginType:
         with contextlib.suppress(KeyError, NotFound):
@@ -211,7 +204,7 @@ class PluginService:
         return plugin
 
 
-def get_plugin_service(organisation_id: str) -> Iterator[PluginService]:
+def get_plugin_service() -> Iterator[PluginService]:
     def closure(session: Session):
         return PluginService(
             create_plugin_storage(session),

@@ -1,4 +1,6 @@
-import { language, organization_code } from "./utils.js";
+const htmlElement = document.getElementsByTagName("html")[0];
+const language = htmlElement.getAttribute("lang");
+const organization_code = htmlElement.getAttribute("data-organization-code");
 
 const buttons = document.querySelectorAll(
   ".expando-button.normalizer-list-table-row",
@@ -11,11 +13,14 @@ buttons.forEach((button) => {
     .closest("tr")
     .getAttribute("data-task-id")
     .replace(/-/g, "");
+  const organization =
+    organization_code ||
+    button.closest("tr").getAttribute("data-organization-code");
   const json_url =
     "/" +
     language +
     "/" +
-    organization_code +
+    organization +
     "/tasks/normalizers/" +
     encodeURI(task_id);
 
@@ -79,7 +84,7 @@ buttons.forEach((button) => {
             "/" +
             language +
             "/" +
-            escapeHTMLEntities(encodeURIComponent(organization_code));
+            escapeHTMLEntities(encodeURIComponent(organization));
           let object_list = "";
           // set the observed at time a fews seconds into the future, as the job finish time is not the same as the ooi-creation time. Due to async reasons the object might be a bit slow.
           data["timestamp"] = Date.parse(data["valid_time"] + "Z");

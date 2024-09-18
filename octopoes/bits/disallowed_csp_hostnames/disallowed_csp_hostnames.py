@@ -1,4 +1,3 @@
-import logging
 from collections.abc import Iterator
 from typing import Any
 
@@ -9,8 +8,6 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.web import HTTPHeaderHostname
 
 LINK_SHORTENERS = link_shorteners_list()
-
-logger = logging.getLogger(__name__)
 
 
 def get_disallowed_hostnames_from_config(config, config_key, default):

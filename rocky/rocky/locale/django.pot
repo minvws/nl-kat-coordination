@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-22 09:47+0000\n"
+"POT-Creation-Date: 2024-09-11 14:03+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,13 +27,13 @@ msgid "Important dates"
 msgstr ""
 
 #: account/forms/account_setup.py katalogus/templates/katalogus_settings.html
-#: katalogus/templates/plugin_settings_list.html
+#: katalogus/templates/plugin_container_image.html
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/tls_report/report.html
 #: reports/templates/partials/export_report_settings.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/subreports_table.html
-#: rocky/templates/organizations/organization_list.html
+#: tools/forms/boefje.py rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/templates/partials/ooi_detail_related_object.html
 msgid "Name"
@@ -575,7 +575,6 @@ msgstr ""
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/confirmation_clone_settings.html
 #: katalogus/templates/plugin_settings_delete.html
-#: reports/templates/partials/export_report_settings.html
 #: rocky/templates/oois/ooi_delete.html
 #: rocky/templates/oois/ooi_mute_finding.html
 #: rocky/templates/organizations/organization_edit.html
@@ -631,7 +630,6 @@ msgid "Sorting options"
 msgstr ""
 
 #: katalogus/forms/plugin_settings.py
-#: reports/templates/partials/export_report_settings.html
 msgid "This field is required."
 msgstr ""
 
@@ -649,8 +647,9 @@ msgstr ""
 
 #: katalogus/templates/about_plugins.html katalogus/templates/boefjes.html
 msgid ""
-"Boefjes gather factual information, such as by calling an external scanning "
-"tool like nmap or using a database like shodan."
+"Boefjes are used to scan for objects. They detect vulnerabilities, security "
+"issues, and give insight. Each boefje is a separate scan that can run on a "
+"selection of objects."
 msgstr ""
 
 #: katalogus/templates/about_plugins.html katalogus/templates/normalizers.html
@@ -667,19 +666,8 @@ msgstr ""
 
 #: katalogus/templates/boefje_detail.html
 #: katalogus/templates/partials/plugin_tile_modal.html
+#: katalogus/templates/plugin_container_image.html
 msgid "Scan level"
-msgstr ""
-
-#: katalogus/templates/boefje_detail.html
-#: katalogus/templates/normalizer_detail.html
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/report_types/dns_report/report.html
-#: reports/report_types/findings_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/templates/summary/report_asset_overview.html
-#: tools/forms/finding_type.py rocky/templates/oois/ooi_detail.html
-#: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
-msgid "Description"
 msgstr ""
 
 #: katalogus/templates/boefje_detail.html
@@ -711,8 +699,40 @@ msgstr ""
 msgid "%(plugin_name)s can produce the following output:"
 msgstr ""
 
+#: katalogus/templates/boefje_detail.html
+#, python-format
+msgid "%(plugin_name)s doesn't produce any output mime types."
+msgstr ""
+
+#: katalogus/templates/boefje_setup.html
+msgid "Boefje setup"
+msgstr ""
+
+#: katalogus/templates/boefje_setup.html
+msgid ""
+"\n"
+"                        You can create a new Boefje. If you want more "
+"information on this,\n"
+"                        you can check out the <a href=\"https://docs.openkat."
+"nl/developer_documentation/development_tutorial/creating_a_boefje."
+"html\">documentation</a>.\n"
+"                    "
+msgstr ""
+
+#: katalogus/templates/boefje_setup.html
+msgid "Create variant"
+msgstr ""
+
+#: katalogus/templates/boefje_setup.html
+msgid "Discard variant"
+msgstr ""
+
 #: katalogus/templates/boefjes.html katalogus/templates/normalizers.html
 msgid "available"
+msgstr ""
+
+#: katalogus/templates/boefjes.html
+msgid "Add Boefje"
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
@@ -755,8 +775,8 @@ msgstr ""
 
 #: katalogus/templates/change_clearance_level.html onboarding/forms.py
 #: reports/templates/partials/report_ooi_list.html
-#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
-#: rocky/templates/oois/ooi_page_tabs.html
+#: reports/templates/summary/ooi_selection.html tools/forms/boefje.py
+#: tools/forms/ooi.py rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/explanations.html
 msgid "Clearance level"
 msgstr ""
@@ -840,6 +860,17 @@ msgid "Value"
 msgstr ""
 
 #: katalogus/templates/normalizer_detail.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/templates/summary/report_asset_overview.html tools/forms/boefje.py
+#: tools/forms/finding_type.py rocky/templates/oois/ooi_detail.html
+#: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
+msgid "Description"
+msgstr ""
+
+#: katalogus/templates/normalizer_detail.html
 #, python-format
 msgid "%(plugin_name)s is able to process the following mime types:"
 msgstr ""
@@ -874,6 +905,30 @@ msgstr ""
 
 #: katalogus/templates/partials/enable_disable_plugin.html
 msgid "You don't have permission to enable"
+msgstr ""
+
+#: katalogus/templates/partials/katalogus_filter.html
+#: rocky/templates/findings/findings_filter.html
+#: rocky/templates/partials/ooi_list_filters.html
+#: rocky/templates/partials/organization_member_list_filters.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Hide filters"
+msgstr ""
+
+#: katalogus/templates/partials/katalogus_filter.html
+#: rocky/templates/findings/findings_filter.html
+#: rocky/templates/partials/ooi_list_filters.html
+#: rocky/templates/partials/organization_member_list_filters.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Show filters"
+msgstr ""
+
+#: katalogus/templates/partials/katalogus_filter.html
+#: rocky/templates/findings/findings_filter.html
+#: rocky/templates/partials/ooi_list_filters.html
+#: rocky/templates/partials/organization_member_list_filters.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "applied"
 msgstr ""
 
 #: katalogus/templates/partials/katalogus_filter.html
@@ -968,7 +1023,6 @@ msgid "Required settings"
 msgstr ""
 
 #: katalogus/templates/partials/plugin_settings_required.html
-#: katalogus/templates/plugin_settings_list.html
 #: rocky/templates/findings/finding_add.html
 #: rocky/templates/partials/ooi_detail_related_object.html
 #: rocky/templates/partials/ooi_list_toolbar.html
@@ -1026,11 +1080,6 @@ msgid "Plugins Navigation"
 msgstr ""
 
 #: katalogus/templates/partials/plugins_navigation.html
-#: tools/forms/scheduler.py
-msgid "All"
-msgstr ""
-
-#: katalogus/templates/partials/plugins_navigation.html
 #: rocky/templates/scan.html rocky/templates/tasks/boefjes.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Boefjes"
@@ -1040,6 +1089,103 @@ msgstr ""
 #: rocky/templates/tasks/normalizers.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Normalizers"
+msgstr ""
+
+#: katalogus/templates/partials/plugins_navigation.html
+#: tools/forms/scheduler.py
+msgid "All"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html tools/forms/boefje.py
+msgid "Container image"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "The container image for this Boefje is:"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "Variants"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid ""
+"\n"
+"                    Boefje variants that use the same container image. For "
+"more\n"
+"                    information about Boefje variants you can read the "
+"documentation.\n"
+"                "
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "Add variant"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "Overview of variants"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "Published by"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+#: reports/report_types/tls_report/report.html
+#: reports/templates/partials/plugin_overview_table.html
+#: rocky/templates/organizations/organization_member_list.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "Status"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "Close details"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "Open details"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html tools/forms/boefje.py
+msgid "Arguments"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "The following arguments are used for this Boefje variant."
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "no variants explanation"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "This Boefje has no variants yet."
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid ""
+"You can make a variant and change the arguments and JSON Schema to customize "
+"it to fit your needs."
 msgstr ""
 
 #: katalogus/templates/plugin_settings_add.html
@@ -1101,14 +1247,23 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/plugin_settings_delete.html
-#: katalogus/templates/plugin_settings_list.html
 #: katalogus/views/plugin_settings_delete.py
 #: rocky/templates/admin/delete_confirmation.html rocky/views/ooi_delete.py
 msgid "Delete"
 msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
-msgid " Details"
+msgid ""
+"\n"
+"                        In the table below the settings for this specific "
+"Boefje can be seen.\n"
+"                        Set or change the value of the variables by editing "
+"the settings.\n"
+"                    "
+msgstr ""
+
+#: katalogus/templates/plugin_settings_list.html
+msgid "Edit Settings"
 msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
@@ -1116,15 +1271,11 @@ msgid "Overview of settings"
 msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
+msgid "Variable"
+msgstr ""
+
+#: katalogus/templates/plugin_settings_list.html
 msgid "Required"
-msgstr ""
-
-#: katalogus/templates/plugin_settings_list.html
-msgid "Action"
-msgstr ""
-
-#: katalogus/templates/plugin_settings_list.html
-msgid "Unset"
 msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
@@ -1135,13 +1286,6 @@ msgstr ""
 #: katalogus/templates/plugin_settings_list.html
 #: reports/report_types/dns_report/report.html
 msgid "No"
-msgstr ""
-
-#: katalogus/templates/plugin_settings_list.html
-#: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/organizations/organization_settings.html
-#: rocky/views/ooi_edit.py rocky/views/organization_edit.py
-msgid "Edit"
 msgstr ""
 
 #: katalogus/views/change_clearance_level.py
@@ -1174,14 +1318,6 @@ msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py
 msgid "{} '{}' disabled."
-msgstr ""
-
-#: katalogus/views/plugin_enable_disable.py
-msgid "Failed fetching settings for {}. Is the Katalogus up?"
-msgstr ""
-
-#: katalogus/views/plugin_enable_disable.py
-msgid "Before enabling, please set the required settings for '{}'."
 msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py
@@ -2718,30 +2854,6 @@ msgid "Details"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-#: reports/report_types/findings_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-#: rocky/templates/tasks/ooi_detail_task_list.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "Close details"
-msgstr ""
-
-#: reports/report_types/dns_report/report.html
-#: reports/report_types/findings_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-#: rocky/templates/tasks/ooi_detail_task_list.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "Open details"
-msgstr ""
-
-#: reports/report_types/dns_report/report.html
 msgid "Findings information"
 msgstr ""
 
@@ -3213,15 +3325,6 @@ msgid "Ciphers"
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
-#: reports/templates/partials/plugin_overview_table.html
-#: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-#: rocky/templates/tasks/ooi_detail_task_list.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "Status"
-msgstr ""
-
-#: reports/report_types/tls_report/report.html
 msgid "Protocol"
 msgstr ""
 
@@ -3379,7 +3482,11 @@ msgid "Report name"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-msgid "You can name individual reports."
+msgid ""
+"Give your report a custom name and optionally add the reports' reference "
+"date to the name. To do so you can select a standard option or use a <a "
+"href=\"https://strftime.org/\" target=\"_blank\">Python strftime code</a> in "
+"the report name."
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -3387,21 +3494,7 @@ msgid "Report names:"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-msgid "Edit "
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid ""
-"\n"
-"                                                            Give your report "
-"a custom name and optionally add the reports' reference date\n"
-"                                                            to the name. To "
-"do so you can select an option below.\n"
-"                                                        "
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Report name settings."
+msgid "(Required)"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -3409,7 +3502,8 @@ msgid "Add reference date"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-msgid "Select option"
+#: rocky/views/scan_profile.py
+msgid "Reset"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -3430,10 +3524,6 @@ msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
 msgid "Year"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Confirm"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -3526,17 +3616,6 @@ msgstr[1] ""
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "Select which objects you want to include in your report."
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
-#: rocky/templates/admin/change_list.html rocky/templates/oois/ooi_list.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Filter"
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
-#: rocky/templates/oois/ooi_list.html
-msgid "Currently filtered on:"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
@@ -3946,6 +4025,14 @@ msgstr ""
 msgid "Report type '%s' does not exist."
 msgstr ""
 
+#: reports/views/base.py
+msgid "Week %W, %Y"
+msgstr ""
+
+#: reports/views/generate_report.py
+msgid "Empty name should not be possible."
+msgstr ""
+
 #: reports/views/generate_report.py
 #, python-brace-format
 msgid "Concatenated Report for {oois_count} objects"
@@ -4006,6 +4093,18 @@ msgstr ""
 
 #: tools/forms/base.py tools/forms/scheduler.py
 msgid "The selected date is in the future. Please select a different date."
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid "JSON Schema"
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid "Input object type"
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid "Output mime types"
 msgstr ""
 
 #: tools/forms/finding_type.py
@@ -4145,6 +4244,14 @@ msgstr ""
 msgid "Filter by muted findings"
 msgstr ""
 
+#: tools/forms/findings.py tools/forms/ooi_form.py tools/forms/scheduler.py
+msgid "Search"
+msgstr ""
+
+#: tools/forms/findings.py
+msgid "Object ID contains (case sensitive)"
+msgstr ""
+
 #: tools/forms/ooi.py
 msgid "Filter types"
 msgstr ""
@@ -4181,10 +4288,6 @@ msgstr ""
 
 #: tools/forms/ooi_form.py
 msgid "Filter by clearance type"
-msgstr ""
-
-#: tools/forms/ooi_form.py tools/forms/scheduler.py
-msgid "Search"
 msgstr ""
 
 #: tools/forms/scheduler.py
@@ -4291,6 +4394,47 @@ msgid ""
 msgstr ""
 
 #: tools/forms/settings.py
+msgid ""
+"<p>A description of the boefje explaining in short what it can do. This will "
+"both be displayed inside the KAT-alogus and on the Boefje details page.</p> "
+msgstr ""
+
+#: tools/forms/settings.py
+msgid ""
+"<p>If any other settings are needed for your Boefje, add these as a JSON "
+"Schema, otherwise, leave the field empty or 'null'.</p> <p> This JSON is "
+"used as the basis for a form for the user. When the user enables this Boefje "
+"they can get the option to give extra information. For example, it can "
+"contain an API key that the script requires.</p> <p>More information about "
+"what the schema.json file looks like can be found <a href='https://docs."
+"openkat.nl/developer_documentation/development_tutorial/creating_a_boefje."
+"html'> here</a>.</p> "
+msgstr ""
+
+#: tools/forms/settings.py
+msgid ""
+"<p>Select the object type that your Boefje consumes.</p> <p>This object type "
+"triggers the Boefje to run. Whenever this OOI gets added, this Boefje will "
+"run with that OOI.</p> "
+msgstr ""
+
+#: tools/forms/settings.py
+msgid ""
+"<p>Add a set of mime types that are produced by this Boefje, separated by "
+"commas. For example: <i>'text/html'</i>, <i>'image/jpeg'</i> or <i>'boefje/"
+"{boefje-id}'</i></p> <p>These output mime types will be shown on the Boefje "
+"detail page as information for other users. </p> "
+msgstr ""
+
+#: tools/forms/settings.py
+msgid ""
+"<p>Select a clearance level for your Boefje. For more information about the "
+"different clearance levels please check the <a href='https://docs.openkat.nl/"
+"manual/usermanual.html#scan-levels-clearance-indemnities'> documentation</a>."
+"</p> "
+msgstr ""
+
+#: tools/forms/settings.py
 msgid "Depth of the tree."
 msgstr ""
 
@@ -4387,7 +4531,6 @@ msgstr ""
 #: tools/view_helpers.py rocky/templates/header.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/partials/organization_member_list_filters.html
 #: rocky/views/organization_member_edit.py
 msgid "Members"
 msgstr ""
@@ -4449,10 +4592,6 @@ msgstr ""
 
 #: rocky/scheduler.py
 msgid "Task list: "
-msgstr ""
-
-#: rocky/scheduler.py
-msgid "Task statistics: "
 msgstr ""
 
 #: rocky/settings.py
@@ -4619,6 +4758,10 @@ msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] ""
 msgstr[1] ""
+
+#: rocky/templates/admin/change_list.html
+msgid "Filter"
+msgstr ""
 
 #: rocky/templates/admin/change_list.html
 msgid "Hide counts"
@@ -4942,7 +5085,9 @@ msgstr ""
 msgid "OpenKAT logo, go to the homepage of OpenKAT"
 msgstr ""
 
-#: rocky/templates/header.html rocky/views/finding_list.py
+#: rocky/templates/header.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/views/finding_list.py
 msgid "Crisis room"
 msgstr ""
 
@@ -5261,6 +5406,10 @@ msgid "When"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
+msgid "This scan was manually created."
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html
 msgid "The boefje has since been deleted or disabled."
 msgstr ""
 
@@ -5409,14 +5558,6 @@ msgstr ""
 msgid "shows the same objects."
 msgstr ""
 
-#: rocky/templates/oois/ooi_tree.html
-msgid "Object tree"
-msgstr ""
-
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "Crisis room:"
-msgstr ""
-
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "indemnification warning"
@@ -5463,6 +5604,10 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_edit.html
 msgid "Save organization"
+msgstr ""
+
+#: rocky/templates/organizations/organization_list.html
+msgid "Rerun all bits for all my organizations"
 msgstr ""
 
 #: rocky/templates/organizations/organization_list.html
@@ -5546,6 +5691,12 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Assigned clearance level"
+msgstr ""
+
+#: rocky/templates/organizations/organization_member_list.html
+#: rocky/templates/organizations/organization_settings.html
+#: rocky/views/ooi_edit.py rocky/views/organization_edit.py
+msgid "Edit"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
@@ -6086,9 +6237,17 @@ msgid "List of tasks for boefjes"
 msgstr ""
 
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+msgid "Organization Code"
+msgstr ""
+
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 #: rocky/templates/tasks/ooi_detail_task_list.html
 #: rocky/templates/tasks/plugin_detail_task_list.html
 msgid "Created date"
+msgstr ""
+
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+msgid "Modified date"
 msgstr ""
 
 #: rocky/templates/tasks/normalizers.html
@@ -6147,14 +6306,6 @@ msgstr ""
 
 #: rocky/templates/tasks/partials/task_actions.html
 msgid "Download task data"
-msgstr ""
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Hide filters"
-msgstr ""
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Show filters"
 msgstr ""
 
 #: rocky/templates/two_factor/_wizard_actions.html
@@ -6567,6 +6718,10 @@ msgid "Graph Visualisation"
 msgstr ""
 
 #: rocky/views/ooi_view.py
+msgid "Observed_at: "
+msgstr ""
+
+#: rocky/views/ooi_view.py
 msgid "OOI types: "
 msgstr ""
 
@@ -6698,15 +6853,20 @@ msgstr ""
 msgid "Can not reset scan level. Scan level of {ooi_name} not declared"
 msgstr ""
 
-#: rocky/views/scan_profile.py
-msgid "Reset"
-msgstr ""
-
 #: rocky/views/scheduler.py
 msgid ""
 "Your task is scheduled and will soon be started in the background. Results "
 "will be added to the object list when they are in. It may take some time, a "
 "refresh of the page may be needed to show the results."
+msgstr ""
+
+#: rocky/views/tasks.py
+#, python-brace-format
+msgid "Fetching tasks failed: no connection with scheduler: {error}"
+msgstr ""
+
+#: rocky/views/tasks.py
+msgid "All Tasks"
 msgstr ""
 
 #: rocky/views/upload_csv.py
