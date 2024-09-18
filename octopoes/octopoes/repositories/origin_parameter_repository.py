@@ -1,6 +1,5 @@
 from datetime import datetime
 from http import HTTPStatus
-from logging import getLogger
 from typing import Any
 
 from httpx import HTTPStatusError
@@ -15,8 +14,6 @@ from octopoes.xtdb import FieldSet
 from octopoes.xtdb.client import OperationType as XTDBOperationType
 from octopoes.xtdb.client import XTDBSession
 from octopoes.xtdb.query_builder import generate_pull_query
-
-logger = getLogger(__name__)
 
 
 class OriginParameterRepository(Repository):
