@@ -39,6 +39,7 @@ from reports.report_types.multi_organization_report.report import MultiOrganizat
 from reports.utils import JSONEncoder, debug_json_keys
 from rocky.views.mixins import ObservedAtMixin, OOIList
 from rocky.views.ooi_view import BaseOOIListView, OOIFilterView
+from rocky.views.scheduler import SchedulerView
 
 REPORTS_PRE_SELECTION = {
     "clearance_level": ["2", "3", "4"],
@@ -489,8 +490,9 @@ class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
         return context
 
 
-class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, TemplateView):
+class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, SchedulerView, TemplateView):
     report_type: type[BaseReport] | None = None
+    task_type = "report"
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.get_report_type_ids():
@@ -539,6 +541,7 @@ class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["reports"] = self.get_report_names()
+        context["report_schedule_form"] = self.get_report_schedule_form()
         context["created_at"] = datetime.now()
         return context
 

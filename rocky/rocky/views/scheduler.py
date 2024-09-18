@@ -36,7 +36,7 @@ def get_date_time(date: str | None) -> datetime | None:
 class SchedulerView(OctopoesView):
     task_type: str
     task_filter_form = TaskFilterForm
-    schedule_report_form = ReportScheduleForm
+    report_schedule_form = ReportScheduleForm
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -75,11 +75,11 @@ class SchedulerView(OctopoesView):
             messages.error(self.request, error.message)
         return []
 
-    def get_schedule_filter_form(self) -> ReportScheduleForm:
-        return self.schedule_report_form(self.request.POST)
+    def get_report_schedule_form(self) -> ReportScheduleForm:
+        return self.report_schedule_form(self.request.POST)
 
     def get_schedule_filter_form_data(self):
-        form_data = self.get_schedule_filter_form().data.dict()
+        form_data = self.get_report_schedule_form().data.dict()
         return {k: v for k, v in form_data.items() if v}
 
     def get_task_details(self, task_id: str) -> Task | None:
