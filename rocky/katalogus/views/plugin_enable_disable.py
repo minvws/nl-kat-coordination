@@ -43,9 +43,8 @@ class PluginEnableDisableView(SinglePluginView):
                 clearance_level = self.organization_member.max_clearance_level
 
                 member_clearance_level_text = _(
-                    f"Your clearance level is L{clearance_level}. Contact your "
-                    f"administrator to get a higher clearance level."
-                )
+                    "Your clearance level is L{}. Contact your administrator to get a higher clearance level."
+                ).format(clearance_level)
 
             messages.add_message(
                 self.request,
