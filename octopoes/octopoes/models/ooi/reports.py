@@ -61,4 +61,4 @@ class ReportRecipe(OOI):
     report_types: list[str]
 
     def human_readable(self) -> str:
-        return f"Report recipe {self.report_name_format}"
+        return self.report_name_format
