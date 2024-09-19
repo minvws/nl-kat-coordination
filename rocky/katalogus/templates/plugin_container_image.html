@@ -16,13 +16,22 @@
                 {% endblocktranslate %}
             </p>
         </div>
-        {% if variants %}
+        {% if perms.tools.can_add_boefje %}
             <div class="horizontal-view toolbar">
-                <a class="button ghost" href=""><span class="icon ti-plus"></span>{% translate "Add variant" %}</a>
+                <a class="button ghost"
+                   href="{% url "boefje_variant_setup" plugin_id=plugin.id organization_code=organization.code %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add variant" %}</a>
             </div>
         {% endif %}
     </div>
     {% if variants %}
+        {% if new_variant %}
+            <p class="confirmation" aria-label="{% translate "confirmation" %}">
+                <span>{% blocktranslate %}Variant {{ plugin.name }} created.{% endblocktranslate%}</span>
+                {% blocktranslate trimmed %}
+                    The Boefje variant is successfully created and can now be used.
+                {% endblocktranslate %}
+            </p>
+        {% endif %}
         <div class="horizontal-scroll">
             <ul class="accordion">
                 <li>
@@ -34,7 +43,6 @@
                                 <tr>
                                     <th scope="col">{% translate "Name" %}</th>
                                     <th scope="col">{% translate "Scan level" %}</th>
-                                    <th scope="col">{% translate "Published by" %}</th>
                                     <th scope="col">{% translate "Status" %}</th>
                                     <th scope="col"></th>
                                 </tr>
@@ -42,10 +50,26 @@
                             <tbody>
                                 {% for variant in variants %}
                                     <tr>
-                                        <td>{{ variant.name }}name</td>
-                                        <td>{{ variant.scan_level }}scan_level</td>
-                                        <td>{{ variant.published_by }}published_by</td>
-                                        <td>{{ variant.status }}status</td>
+                                        <td>
+                                            <a href="{% url "boefje_detail" organization_code=organization.code plugin_id=variant.id %}">
+                                                {% if variant.id == plugin.id %}
+                                                    {{ variant.name }} ({% translate "current" %})
+                                                {% else %}
+                                                    {{ variant.name }}
+                                                {% endif %}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {% include "partials/scan_level_indicator.html" with value=variant.scan_level %}
+
+                                        </td>
+                                        <td>
+                                            {% if variant.enabled %}
+                                                <span class="label tags-color-2-medium">{% translate "Enabled" %}</span>
+                                            {% else %}
+                                                <span class="label tags-color-4-medium">{% translate "Disabled" %}</span>
+                                            {% endif %}
+                                        </td>
                                         <td class="actions">
                                             <button class="expando-button"
                                                     data-icon-open-class="icon ti-chevron-down"
@@ -57,11 +81,19 @@
                                     </tr>
                                     <tr class="expando-row">
                                         <td colspan="5">
+                                            <h5>{% translate "Creation date" %}</h5>
+                                            {% if variant.created %}
+                                                <p>{{ variant.created }}</p>
+                                            {% else %}
+                                                <p>-</p>
+                                            {% endif %}
                                             <h5>{% translate "Arguments" %}</h5>
-                                            <p>{% translate "The following arguments are used for this Boefje variant." %}</p>
-                                            <div>
-                                                <p>Some code example</p>
-                                            </div>
+                                            {% if variant.oci_arguments %}
+                                                <p>{% translate "The following arguments are used for this Boefje variant:" %}</p>
+                                                <p class="explanation" aria-label="{% translate "explanation" %}">{{ variant.oci_arguments|join:" " }}</p>
+                                            {% else %}
+                                                <p>{% translate "There are no arguments used for this Boefje variant." %}</p>
+                                            {% endif %}
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -72,9 +104,7 @@
             </ul>
         </div>
     {% else %}
-        <p class="explanation"
-           role="group"
-           aria-label="{% translate "no variants explanation" %}">
+        <p class="explanation" aria-label="{% translate "explanation" %}">
             <span>{% translate "This Boefje has no variants yet." %}</span>
             {% blocktranslate trimmed %}
                 You can make a variant and change the arguments and JSON Schema

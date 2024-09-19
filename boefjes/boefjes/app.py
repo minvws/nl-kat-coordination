@@ -174,7 +174,7 @@ class SchedulerWorkerManager(WorkerManager):
         try:
             task = self.scheduler_client.get_task(handling_task_id)
 
-            if task.status is TaskStatus.DISPATCHED:
+            if task.status is TaskStatus.DISPATCHED or task.status is TaskStatus.RUNNING:
                 try:
                     self.scheduler_client.patch_task(task.id, TaskStatus.FAILED)
                     logger.warning("Set status to failed in the scheduler for task[id=%s]", handling_task_id)
@@ -244,6 +244,7 @@ def _start_working(
         handling_tasks[os.getpid()] = str(p_item.id)
 
         try:
+            scheduler_client.patch_task(p_item.id, TaskStatus.RUNNING)
             handler.handle(p_item.data)
             status = TaskStatus.COMPLETED
         except Exception:  # noqa
@@ -253,8 +254,10 @@ def _start_working(
             raise
         finally:
             try:
-                scheduler_client.patch_task(p_item.id, status)  # Note: implicitly, we have p_item.id == task_id
-                logger.info("Set status to %s in the scheduler for task[id=%s]", status, p_item.data.id)
+                if scheduler_client.get_task(p_item.id).status == TaskStatus.RUNNING:
+                    # The docker runner could have handled this already
+                    scheduler_client.patch_task(p_item.id, status)  # Note that implicitly, we have p_item.id == task_id
+                    logger.info("Set status to %s in the scheduler for task[id=%s]", status, p_item.data.id)
             except HTTPError:
                 logger.exception("Could not patch scheduler task to %s", status.value)
 

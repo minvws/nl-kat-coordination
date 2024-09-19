@@ -2,10 +2,10 @@ import json
 from collections import Counter
 from collections.abc import Callable, ValuesView
 from datetime import datetime, timezone
-from logging import getLogger
 from time import perf_counter
 from typing import Literal, overload
 
+import structlog
 from bits.definitions import get_bit_definitions
 from bits.runner import BitRunner
 from pydantic import TypeAdapter
@@ -47,7 +47,7 @@ from octopoes.repositories.origin_repository import OriginRepository
 from octopoes.repositories.scan_profile_repository import ScanProfileRepository
 from octopoes.xtdb.client import Operation, OperationType, XTDBSession
 
-logger = getLogger(__name__)
+logger = structlog.get_logger("octopoes-core-service")
 settings = Settings()
 
 
@@ -162,7 +162,14 @@ class OctopoesService:
 
     def _delete_ooi(self, reference: Reference, valid_time: datetime) -> None:
         referencing_origins = self.origin_repository.list_origins(valid_time, result=reference)
-        if not referencing_origins:
+        if not any(
+            origin
+            for origin in referencing_origins
+            if not (
+                origin.origin_type == OriginType.AFFIRMATION
+                or (origin.origin_type == OriginType.INFERENCE and origin.source == reference)
+            )
+        ):
             self.ooi_repository.delete(reference, valid_time)
 
     def save_origin(

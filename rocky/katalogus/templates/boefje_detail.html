@@ -32,7 +32,7 @@
                 </div>
             </div>
         </section>
-        {% if perms.tools.can_view_katalogus_settings and object_list %}
+        {% if perms.tools.can_view_katalogus_settings and plugin_settings %}
             <section>
                 {% include "plugin_settings_list.html" with object_list=plugin_settings plugin=plugin %}
 
