@@ -17,5 +17,5 @@ class Plugin(BaseModel):
     consumes: str | list[str]
     options: list[str] | None = None
     produces: list[str]
-    cron: str | None = None  # FIXME: placeholder
-    interval: int | None = None  # FIXME: placeholder
+    cron: str | None = None
+    interval: int | None = None

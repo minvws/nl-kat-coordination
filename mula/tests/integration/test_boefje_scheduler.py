@@ -848,7 +848,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(cron=cron),
+            boefje=BoefjeFactory(),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
@@ -867,6 +867,12 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             scheduler_id=self.organisation.id,
             priority=1,
             task=task,
+        )
+
+        self.mock_get_plugin.return_value = PluginFactory(
+            scan_level=0,
+            consumes=[ooi.object_type],
+            cron=cron,
         )
 
         # Act
@@ -959,6 +965,12 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             task=task2,
         )
 
+        self.mock_get_plugin.return_value = PluginFactory(
+            scan_level=0,
+            consumes=[ooi1.object_type],
+            cron=cron,
+        )
+
         # Act
         self.scheduler.push_item_to_queue(item1)
         self.scheduler.push_item_to_queue(item2)
@@ -1015,7 +1027,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(interval=1500),
+            boefje=BoefjeFactory(),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
@@ -1034,6 +1046,12 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             scheduler_id=self.organisation.id,
             priority=1,
             task=task,
+        )
+
+        self.mock_get_plugin.return_value = PluginFactory(
+            scan_level=0,
+            consumes=[ooi.object_type],
+            interval=1500,
         )
 
         # Act

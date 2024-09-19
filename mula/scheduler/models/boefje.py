@@ -11,8 +11,6 @@ class Boefje(BaseModel):
     id: str
     name: str | None = Field(default=None)
     version: str | None = Field(default=None)
-    cron: str | None = Field(default=None)  # FIXME: placeholder
-    interval: int | None = Field(default=None)  # FIXME: placeholder
 
 
 class BoefjeMeta(BaseModel):

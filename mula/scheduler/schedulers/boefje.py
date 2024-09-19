@@ -1000,10 +1000,14 @@ class BoefjeScheduler(Scheduler):
         return boefjes
 
     def post_push(self, item: Task) -> Task:
-        """Override for the post_push when a boefje specifies we schedule for its execution"""
+        """Override Schedule.post_push() when a boefje specifies a schedule for
+        execution (cron expression) we schedule for its execution"""
         # Does a boefje have a schedule defined?
-        schedule = utils.deep_get(item.data, ["boefje", "cron"])  # FIXME: based on implementation
-        if schedule is None:
+        plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+            utils.deep_get(item.data, ["boefje", "id"]),
+            self.organisation.id,
+        )
+        if plugin.cron is None:
             return super().post_push(item)
 
         schedule_db = self.ctx.datastores.schedule_store.get_schedule_by_hash(item.hash)
@@ -1014,7 +1018,7 @@ class BoefjeScheduler(Scheduler):
                 hash=item.hash,
                 deadline_at=self.calculate_deadline(item),
                 data=item.data,
-                schedule=schedule,
+                schedule=plugin.cron,
             )
 
             schedule_db = self.ctx.datastores.schedule_store.create_schedule(schedule)
@@ -1024,23 +1028,20 @@ class BoefjeScheduler(Scheduler):
         else:
             # We update the schedule if it already exists, this makes sure
             # that when a boefje schedule is updated, we also update the schedule.
-            schedule_db.schedule = schedule
+            schedule_db.schedule = plugin.schedule
             self.ctx.datastores.schedule_store.update_schedule(schedule_db)
 
         return super().post_push(item)
 
     def calculate_deadline(self, task: Task) -> datetime:
-        """Calculate the deadline for a task.
-
-        Args:
-            task: The task to calculate the deadline for.
-
-        Returns:
-            The calculated deadline.
-        """
+        """Override Scheduler.calculate_deadline() to calculate the deadline
+        for a task and based on the boefje interval."""
         # Does the boefje have an interval defined?
-        interval = utils.deep_get(task.data, ["boefje", "interval"])  # FIXME: based on implementation
-        if interval is not None:
-            return datetime.now(timezone.utc) + timedelta(minutes=interval)
+        plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+            utils.deep_get(task.data, ["boefje", "id"]),
+            self.organisation.id,
+        )
+        if plugin.interval is not None:
+            return datetime.now(timezone.utc) + timedelta(minutes=plugin.interval)
 
         return super().calculate_deadline(task)

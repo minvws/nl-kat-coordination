@@ -1,4 +1,5 @@
 from factory import Factory, LazyFunction, Sequence, fuzzy
+
 from scheduler.models import Plugin
 
 
@@ -15,3 +16,6 @@ class PluginFactory(Factory):
     produces: list[str] = LazyFunction(lambda: [])
 
     enabled: bool = True
+
+    cron: str | None = None
+    interval: int | None = None
