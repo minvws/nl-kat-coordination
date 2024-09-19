@@ -191,6 +191,9 @@ class OctopoesService:
             self.ooi_repository.save(ooi, valid_time=valid_time, end_valid_time=end_valid_time)
         self.origin_repository.save(origin, valid_time=valid_time)
 
+        if not origin.result and origin.origin_type != OriginType.INFERENCE:
+            self.origin_repository.delete(origin, valid_time=valid_time)
+
     def _run_inference(self, origin: Origin, valid_time: datetime) -> None:
         bit_definition = get_bit_definitions().get(origin.method, None)
 
