@@ -1,6 +1,6 @@
 import unittest
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
@@ -332,11 +332,34 @@ class SchedulerTestCase(unittest.TestCase):
 
         self.assertEqual(1, len(schedules))
 
-    def test_post_push_schedule_is_none(self):
-        self.assertFail("Not implemented yet")
-
     def test_post_push_schedule_is_not_none(self):
-        self.assertFail("Not implemented yet")
+        """When a schedule is provided, it should be used to set the deadline"""
+        # Arrange
+        first_item = functions.create_item(
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+        )
+
+        schedule = models.Schedule(
+            scheduler_id=self.scheduler.scheduler_id,
+            schedule="0 0 * * *",
+            hash=first_item.hash,
+            data=first_item.data,
+        )
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
+
+        first_item.schedule_id = schedule_db.id
+        self.mock_ctx.datastores.task_store.update_task(first_item)
+
+        # Act
+        self.scheduler.push_item_to_queue(first_item)
+
+        # Assert: Check if the deadline_at is set correctly, to the next
+        # day at midnight
+        self.assertEqual(
+            schedule_db.deadline_at,
+            datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1),
+        )
 
     def test_post_pop(self):
         """When a task is popped from the queue, it should be removed from the database"""
