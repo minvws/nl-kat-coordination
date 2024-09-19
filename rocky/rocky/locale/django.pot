@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-18 10:23+0000\n"
+"POT-Creation-Date: 2024-09-19 07:50+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2463,8 +2463,6 @@ msgid "Export"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
-#: rocky/templates/oois/ooi_report.html
-#: rocky/templates/partials/findings_list_toolbar.html
 msgid "Download PDF"
 msgstr ""
 
@@ -5528,31 +5526,6 @@ msgid ""
 "deleted and is no longer available."
 msgstr ""
 
-#: rocky/templates/oois/ooi_report.html
-#, python-format
-msgid "Findings report for %(name)s"
-msgstr ""
-
-#: rocky/templates/oois/ooi_report.html
-#, python-format
-msgid ""
-"These are the findings of a OpenKAT-analysis on %(observed_at)s. Click a "
-"finding for more detailed information about the issue, its origin, severity "
-"and possible solutions."
-msgstr ""
-
-#: rocky/templates/oois/ooi_report_404.html
-#, python-format
-msgid "A report for %(name)s wasn't found."
-msgstr ""
-
-#: rocky/templates/oois/ooi_report_404.html
-#, python-format
-msgid ""
-"Perhaps it never was, perhaps it just didn't exist on %(observed_at)s <br> "
-"Try some other dates!"
-msgstr ""
-
 #: rocky/templates/oois/ooi_summary.html
 msgid "Summary for"
 msgstr ""
@@ -5867,6 +5840,11 @@ msgstr ""
 msgid "Reproduction"
 msgstr ""
 
+#: rocky/templates/partials/findings_list_toolbar.html
+#: rocky/templates/partials/ooi_detail_toolbar.html
+msgid "Generate Findings Report"
+msgstr ""
+
 #: rocky/templates/partials/form/checkbox_group_table_form.html
 msgid "Please enable plugin to start scanning."
 msgstr ""
@@ -6000,10 +5978,6 @@ msgstr ""
 
 #: rocky/templates/partials/ooi_detail_related_object.html
 msgid "Use the button below to add a related object."
-msgstr ""
-
-#: rocky/templates/partials/ooi_detail_toolbar.html
-msgid "Generate findings report"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
@@ -6715,22 +6689,6 @@ msgstr ""
 
 #: rocky/views/ooi_mute.py
 msgid "Finding(s) successfully muted."
-msgstr ""
-
-#: rocky/views/ooi_report.py
-msgid "You can't generate a report for an OOI on a date in the future."
-msgstr ""
-
-#: rocky/views/ooi_report.py
-msgid "Findings report"
-msgstr ""
-
-#: rocky/views/ooi_report.py
-msgid "Generating report failed. See Keiko logs for more information."
-msgstr ""
-
-#: rocky/views/ooi_report.py
-msgid "Timeout reached generating report. See Keiko logs for more information."
 msgstr ""
 
 #: rocky/views/ooi_tree.py
