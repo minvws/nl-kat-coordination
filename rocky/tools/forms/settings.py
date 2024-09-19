@@ -66,6 +66,12 @@ BOEFJE_DESCRIPTION_HELP_TEXT = mark_safe(
     )
 )
 
+BOEFJE_CONSUMES_HELP_TEXT = _(
+    "Select the object type(s) that your Boefje consumes. "
+    "To select multiple objects, press and hold the 'ctrl'/'command' key "
+    "and then click the items you want to select. "
+)
+
 BOEFJE_SCHEMA_HELP_TEXT = mark_safe(
     _(
         "<p>If any other settings are needed for your Boefje, add these as a JSON Schema, "
@@ -78,15 +84,6 @@ BOEFJE_SCHEMA_HELP_TEXT = mark_safe(
         "here</a>.</p> "
     )
 )
-
-BOEFJE_CONSUMES_HELP_TEXT = mark_safe(
-    _(
-        "<p>Select the object type that your Boefje consumes.</p> "
-        "<p>This object type triggers the Boefje to run. Whenever this OOI gets added, "
-        "this Boefje will run with that OOI.</p> "
-    )
-)
-
 
 BOEFJE_PRODUCES_HELP_TEXT = mark_safe(
     _(
