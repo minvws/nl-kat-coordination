@@ -5,6 +5,12 @@
     <a href="{% url "finding_type_add" organization.code %}"
        class="button ghost">{% translate "Add finding type" %}</a>
     <!-- Note that we cannot pass e.g. severity=request.GET.severity explicitly since this is a list parameter -->
-    <a href="{% url "findings_pdf_report" organization.code %}?{{ request.GET.urlencode }}"
-       class="button ghost">{% translate "Download PDF" %}</a>
+    <form method="post"
+          action="{% url 'generate_report_export_setup' organization.code %}"
+          class="inline">
+        {% csrf_token %}
+        <input type="hidden" name="ooi" value="all">
+        <input type="hidden" name="report_type" value="findings-report">
+        <button>{% translate "Generate findings report" %}</button>
+    </form>
 </div>
