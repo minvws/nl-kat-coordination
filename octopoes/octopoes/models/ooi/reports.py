@@ -59,6 +59,3 @@ class ReportRecipe(OOI):
 
     input_recipe: dict[str, Any]  # can contain a query which maintains a live set of OOIs or manually picked OOIs.
     report_types: list[str]
-
-    def format_reference_human_readable(self) -> str:
-        return self.report_name_format
