@@ -2,7 +2,6 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from factory import Factory, Faker, LazyFunction, fuzzy
-
 from scheduler.models import Boefje, BoefjeMeta
 
 

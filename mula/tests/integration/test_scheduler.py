@@ -4,9 +4,9 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
+from scheduler import config, models, queues, storage
 from structlog.testing import capture_logs
 
-from scheduler import config, models, queues, storage
 from tests.mocks import item as mock_item
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
