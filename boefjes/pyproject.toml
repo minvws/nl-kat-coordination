@@ -34,6 +34,7 @@ beautifulsoup4 = "4.11.1"
 censys = "2.1.8"
 # required by kat_dicom boefje
 pynetdicom = "2.0.2"
+pydicom = "2.4.4"
 # required by kat_dns, kat_dns_zone boefjes
 dnspython = "^2.6.1"
 # required by kat_fierce
