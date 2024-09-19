@@ -50,14 +50,15 @@ class Report(OOI):
 
 
 class ReportRecipe(OOI):
+    object_type: Literal["ReportRecipe"] = "ReportRecipe"
+
     recipe_id: UUID
     # object can be the total objects or 1 object, but then the ooi itself.
     report_name_format: str
     subreport_name_format: str
-    object_type: Literal["ReportRecipe"] = "ReportRecipe"
+
     input_recipe: dict[str, Any]  # can contain a query which maintains a live set of OOIs or manually picked OOIs.
     report_types: list[str]
 
-    @classmethod
-    def format_reference_human_readable(cls, reference: Reference) -> str:
-        return f"Report recipe {reference.tokenized.recipe_id}"
+    def human_readable(self) -> str:
+        return f"Report recipe {self.report_name_format}"
