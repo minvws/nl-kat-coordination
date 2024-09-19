@@ -6,13 +6,13 @@ import time
 from queue import Queue
 
 import structlog
+from django.conf import settings
 from httpx import HTTPError
 from pydantic import ValidationError
 
 from reports.runner.local import LocalReportJobRunner
-from reports.runner.runtime_interfaces import WorkerManager, ReportJobRunner
-from rocky import settings
-from rocky.scheduler import SchedulerClient, TaskStatus, Task, scheduler_client
+from reports.runner.runtime_interfaces import ReportJobRunner, WorkerManager
+from rocky.scheduler import SchedulerClient, Task, TaskStatus, scheduler_client
 
 logger = structlog.get_logger(__name__)
 
@@ -43,9 +43,7 @@ class SchedulerWorkerManager(WorkerManager):
     def run(self, queue_type: WorkerManager.Queue) -> None:
         logger.info("Created worker pool for queue '%s'", queue_type.value)
 
-        self.workers = [
-            mp.Process(target=_start_working, args=self._worker_args()) for _ in range(self.pool_size)
-        ]
+        self.workers = [mp.Process(target=_start_working, args=self._worker_args()) for _ in range(self.pool_size)]
         for worker in self.workers:
             worker.start()
 
@@ -264,4 +262,3 @@ def get_runtime_manager() -> WorkerManager:
         settings.POLL_INTERVAL,
         settings.WORKER_HEARTBEAT,
     )
-

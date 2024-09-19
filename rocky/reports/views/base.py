@@ -3,7 +3,6 @@ from collections.abc import Sequence
 from datetime import datetime, timezone
 from operator import attrgetter
 from typing import Any, Literal, cast
-from uuid import uuid4
 
 import structlog
 from account.mixins import OrganizationView
@@ -20,7 +19,6 @@ from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
 from katalogus.client import Boefje, KATalogusError, Plugin, get_katalogus
 from pydantic import RootModel, TypeAdapter
-from tools.ooi_helpers import create_ooi
 from tools.view_helpers import BreadcrumbsMixin, PostRedirect, url_with_querystring
 
 from octopoes.models import OOI, Reference
@@ -237,51 +235,6 @@ class BaseReportView(OOIFilterView):
                     )
 
         return plugin_data
-
-    def save_report_raw(self, data: dict) -> str:
-        report_data_raw_id = self.bytes_client.upload_raw(
-            raw=ReportDataDict(data).model_dump_json().encode(),
-            manual_mime_types={"openkat/report"},
-        )
-
-        return report_data_raw_id
-
-    def save_report_ooi(
-        self,
-        report_data_raw_id: str,
-        report_type: type[BaseReport],
-        input_oois: list[str],
-        parent: Reference | None,
-        has_parent: bool,
-        observed_at: datetime,
-        name: str,
-    ) -> ReportOOI:
-        if not name or name.isspace():
-            name = report_type.name
-        report_ooi = ReportOOI(
-            name=str(name),
-            report_type=str(report_type.id),
-            template=report_type.template_path,
-            report_id=uuid4(),
-            organization_code=self.organization.code,
-            organization_name=self.organization.name,
-            organization_tags=list(self.organization.tags.all()),
-            data_raw_id=report_data_raw_id,
-            date_generated=datetime.now(timezone.utc),
-            input_oois=input_oois,
-            observed_at=observed_at,
-            parent_report=parent,
-            has_parent=has_parent,
-        )
-
-        create_ooi(
-            api_connector=self.octopoes_api_connector,
-            bytes_client=self.bytes_client,
-            ooi=report_ooi,
-            observed_at=observed_at,
-        )
-
-        return report_ooi
 
     def get_observed_at(self):
         return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)

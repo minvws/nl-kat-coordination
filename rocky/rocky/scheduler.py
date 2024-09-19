@@ -12,7 +12,7 @@ import httpx
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from httpx import ConnectError, HTTPError, HTTPStatusError, RequestError, codes
-from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny, ValidationError, TypeAdapter
+from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny, TypeAdapter, ValidationError
 
 from rocky.health import ServiceHealth
 
