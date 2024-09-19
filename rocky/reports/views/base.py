@@ -415,7 +415,7 @@ class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
             return PostRedirect(self.get_next())
         return self.get(request, *args, **kwargs)
 
-    def all_plugins_enabled(self):
+    def all_plugins_enabled(self) -> bool:
         enabled_plugins = self.plugins_enabled()
         return enabled_plugins["required"] and enabled_plugins["optional"]
 
