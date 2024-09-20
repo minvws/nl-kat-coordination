@@ -191,7 +191,7 @@ class OctopoesService:
             self.ooi_repository.save(ooi, valid_time=valid_time, end_valid_time=end_valid_time)
         self.origin_repository.save(origin, valid_time=valid_time)
 
-        # origins that are stale need to be deleted. #3561 
+        # Origins that are stale need to be deleted. #3561
         if not origin.result and origin.origin_type != OriginType.INFERENCE:
             self.origin_repository.delete(origin, valid_time=valid_time)
 
