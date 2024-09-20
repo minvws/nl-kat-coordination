@@ -1,0 +1,19 @@
+{
+  "id": "SSDP",
+  "name": "SSDP discovery",
+  "description": "Scan a local network using SSDP",
+  "properties": {
+    "SEARCHTARGET": {
+      "title": "SEARCHTARGET",
+      "type": "string",
+      "description": "What devices to hail. Defaults to ssdp:all, needs to be a valid ssdp query."
+    },
+    "TIMEOUT": {
+      "title": "TIMEOUT",
+      "maxLength": 3,
+      "type": "string",
+      "description": "How long in seconds should we wait for answers, defaults to 10."
+    }
+  },
+  "scan_level": 2
+}

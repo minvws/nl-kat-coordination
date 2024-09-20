@@ -1,0 +1,19 @@
+{
+  "id": "kat_ssdp_normalize",
+  "consumes": [
+    "ssdp"
+  ],
+  "produces": [
+    "IPAddressV6",
+    "Service",
+    "IPPort",
+    "IPAddressV4",
+    "IPService",
+    "Hostname",
+    "HostnameHTTPURL",
+    "Website",
+    "IPAddressHTTPURL",
+    "HTTPResource",
+    "SSDPService"
+  ]
+}
