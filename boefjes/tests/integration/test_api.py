@@ -72,6 +72,24 @@ def test_add_boefje(test_client, organisation):
     assert response.json() == boefje_dict
 
 
+def test_cannot_add_plugin_with_duplicate_name(test_client, organisation):
+    boefje = Boefje(id="test_plugin", name="My test boefje", static=False)
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.json())
+    assert response.status_code == 201
+
+    boefje = Boefje(id="test_plugin_2", name="My test boefje", static=False)
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.json())
+    assert response.status_code == 400
+
+    normalizer = Normalizer(id="test_normalizer", name="My test normalizer", static=False)
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.json())
+    assert response.status_code == 201
+
+    normalizer = Normalizer(id="test_normalizer_2", name="My test normalizer", static=False)
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.json())
+    assert response.status_code == 400
+
+
 def test_delete_boefje(test_client, organisation):
     boefje = Boefje(id="test_plugin", name="My test boefje", static=False)
     response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.json())
@@ -112,10 +130,12 @@ def test_update_plugins(test_client, organisation):
 
     test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.json())
     test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"description": "4"})
+    test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"scan_level": 3})
     test_client.patch(f"/v1/organisations/{organisation.id}/plugins/{boefje.id}", json={"enabled": True})
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/{boefje.id}")
     assert response.json()["description"] == "4"
+    assert response.json()["scan_level"] == 3
     assert response.json()["enabled"] is True
 
     test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.json())
