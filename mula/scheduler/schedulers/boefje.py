@@ -1007,7 +1007,7 @@ class BoefjeScheduler(Scheduler):
             utils.deep_get(item.data, ["boefje", "id"]),
             self.organisation.id,
         )
-        if plugin.cron is None:
+        if plugin is None or plugin.cron is None:
             return super().post_push(item)
 
         schedule_db = self.ctx.datastores.schedule_store.get_schedule_by_hash(item.hash)
