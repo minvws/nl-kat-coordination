@@ -1,10 +1,14 @@
+from django.conf import settings
+from katalogus.client import get_katalogus
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
+from octopoes.connector.octopoes import OctopoesAPIConnector
 from tools.models import Indemnification, Organization
-from tools.serializers import OrganizationSerializer, OrganizationSerializerReadOnlyCode
+from tools.permissions import CanRecalculateBits, CanSetKatalogusSettings
+from tools.serializers import OrganizationSerializer, OrganizationSerializerReadOnlyCode, ToOrganizationSerializer
 
 
 class OrganizationViewSet(viewsets.ModelViewSet):
@@ -50,3 +54,24 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         indemnification = Indemnification.objects.create(organization=organization, user=self.request.user)
 
         return Response({"indemnification": True, "user": indemnification.user.pk}, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["post"], permission_classes=[CanRecalculateBits])
+    def recalculate_bits(self, request, pk=None):
+        organization = self.get_object()
+        connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization.code)
+        number_of_bits = connector.recalculate_bits()
+
+        return Response({"number_of_bits": number_of_bits})
+
+    @action(detail=True, methods=["post"], permission_classes=[CanSetKatalogusSettings])
+    def clone_katalogus_settings(self, request, pk=None):
+        from_organization = self.get_object()
+
+        serializer = ToOrganizationSerializer(data=request.data)
+        if serializer.is_valid():
+            to_organization = serializer.validated_data["to_organization"]
+            get_katalogus(from_organization.code).clone_all_configuration_to_organization(to_organization.code)
+
+            return Response()
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
