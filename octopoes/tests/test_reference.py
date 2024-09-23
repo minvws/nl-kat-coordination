@@ -26,5 +26,5 @@ class ReferenceTest(TestCase):
         self.assertEqual(a, b)
 
     def test_parse_obj(self):
-        ip = MockIPAddressV4.parse_obj({"address": "1.1.1.1", "network": "MockNetwork|internet"})
+        ip = MockIPAddressV4.model_validate({"address": "1.1.1.1", "network": "MockNetwork|internet"})
         self.assertEqual(Reference("MockNetwork|internet"), ip.network)
