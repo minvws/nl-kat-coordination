@@ -60,6 +60,7 @@ class XTDBOriginRepository(OriginRepository):
         data = origin.model_dump()
         data[cls.pk_prefix] = origin.id
         data["type"] = origin.__class__.__name__
+        data["result"] = list(dict.fromkeys(data["result"]))
         return data
 
     @classmethod

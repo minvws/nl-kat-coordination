@@ -79,3 +79,4 @@ class FilterParameters(BaseModel):
     ids: list[str] | None = None
     state: bool | None = None
     scan_level: int = 0
+    oci_image: str | None = None
