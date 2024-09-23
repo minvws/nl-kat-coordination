@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic.edit import FormView
+from httpx import ReadTimeout
 from tools.forms.boefje import BoefjeAddForm
 
 from katalogus.client import Boefje, get_katalogus
@@ -28,7 +29,7 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
 
         try:
             get_katalogus(self.organization.code).create_plugin(plugin)
-        except TimeoutError:
+        except ReadTimeout:
             error_message = ("Boefje with name '%s' does already exist. Please choose another name.") % plugin.name
             messages.error(self.request, error_message)
 
