@@ -1851,6 +1851,15 @@ def drf_admin_client(create_drf_client, admin_user):
 
 
 @pytest.fixture
+def drf_redteam_client(create_drf_client, redteamuser):
+    client = create_drf_client(redteamuser)
+    # We need to set this so that the test client doesn't throw an
+    # exception, but will return error in the API we can test
+    client.raise_request_exception = False
+    return client
+
+
+@pytest.fixture
 def get_aggregate_report_ooi():
     return Report(
         object_type="Report",
