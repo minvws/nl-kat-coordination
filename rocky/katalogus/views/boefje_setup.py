@@ -1,58 +1,22 @@
 import uuid
-from datetime import datetime
 from urllib.parse import urlencode
 
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
-from django.contrib import messages
-from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic.edit import FormView
-from httpx import ReadTimeout
 from tools.forms.boefje import BoefjeAddForm
 
-from katalogus.client import Boefje, get_katalogus
-from octopoes.models.types import type_by_name
+from katalogus.client import get_katalogus
 
 
 class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
     """Setup view for creating new Boefjes and variants"""
 
     template_name = "boefje_setup.html"
-    form_class = BoefjeAddForm
     permission_required = "tools.can_add_boefje"
 
-    def form_valid(self, form):
-        """If the form is valid, redirect to the supplied URL."""
-        form_data = form.cleaned_data
-
-        plugin = create_boefje_with_form_data(form_data, self.plugin_id, str(datetime.now()))
-
-        try:
-            get_katalogus(self.organization.code).create_plugin(plugin)
-        except ReadTimeout:
-            error_message = ("Boefje with name '%s' does already exist. Please choose another name.") % plugin.name
-            messages.error(self.request, error_message)
-
-            if self.kwargs.get("plugin_id"):
-                return redirect(
-                    reverse(
-                        "boefje_variant_setup",
-                        kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id},
-                    )
-                )
-            else:
-                return redirect(reverse("boefje_setup", kwargs={"organization_code": self.organization.code}))
-
-        query_params = urlencode({"new_variant": True})
-
-        return redirect(
-            reverse(
-                "boefje_detail",
-                kwargs={"organization_code": self.organization.code, "plugin_id": self.return_to_plugin_id},
-            )
-            + "?"
-            + query_params
-        )
+    def get_form(self):
+        return BoefjeAddForm(get_katalogus(self.organization.code), self.plugin_id, **self.get_form_kwargs())
 
 
 class AddBoefjeView(BoefjeSetupView):
@@ -63,6 +27,17 @@ class AddBoefjeView(BoefjeSetupView):
 
         self.plugin_id = str(uuid.uuid4())
         self.return_to_plugin_id = self.plugin_id
+
+    def get_success_url(self) -> str:
+        query_params = urlencode({"new_variant": True})
+        return (
+            reverse(
+                "boefje_detail",
+                kwargs={"organization_code": self.organization.code, "plugin_id": self.return_to_plugin_id},
+            )
+            + "?"
+            + query_params
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -105,6 +80,15 @@ class AddBoefjeVariantView(BoefjeSetupView):
         initial["scan_level"] = self.plugin.scan_level
 
         return initial
+
+    def get_success_url(self) -> str:
+        if self.kwargs.get("plugin_id"):
+            return reverse(
+                "boefje_variant_setup",
+                kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin_id},
+            )
+        else:
+            return reverse("boefje_setup", kwargs={"organization_code": self.organization.code})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -161,15 +145,9 @@ class EditBoefjeView(BoefjeSetupView):
 
         return initial
 
-    def form_valid(self, form):
-        """If the form is valid, redirect to the supplied URL."""
-        form_data = form.cleaned_data
-        plugin = create_boefje_with_form_data(form_data, self.kwargs.get("plugin_id"), self.plugin.created)
-
-        get_katalogus(self.organization.code).edit_plugin(plugin)
-
-        return redirect(
-            reverse("boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": plugin.id})
+    def get_success_url(self) -> str:
+        return reverse(
+            "boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id}
         )
 
     def get_context_data(self, **kwargs):
@@ -205,29 +183,3 @@ class EditBoefjeView(BoefjeSetupView):
         ]
 
         return context
-
-
-def create_boefje_with_form_data(form_data, plugin_id: str, created: str):
-    arguments = [] if form_data["oci_arguments"] == "" else form_data["oci_arguments"].split()
-    consumes = [] if form_data["consumes"] == "" else form_data["consumes"].strip("[]").replace("'", "").split(", ")
-    produces = [] if form_data["produces"] == "" else form_data["produces"].split(",")
-    produces = [p.strip() for p in produces]
-    input_objects = []
-
-    for input_object in consumes:
-        input_objects.append(type_by_name(input_object))
-
-    return Boefje(
-        id=plugin_id,
-        name=form_data.get("name"),
-        created=created,
-        description=form_data.get("description"),
-        enabled=False,
-        type="boefje",
-        scan_level=form_data["scan_level"],
-        consumes=input_objects,
-        produces=produces,
-        schema=form_data["schema"],
-        oci_image=form_data.get("oci_image"),
-        oci_arguments=arguments,
-    )
