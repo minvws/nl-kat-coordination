@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
@@ -55,30 +55,6 @@ class ReportScheduleForm(BaseRockyForm):
         ],
     )
 
-    def is_valid_day_for_monthly_recurrence(self, start_date: date, recurrence: str) -> bool:
-        day = start_date.day
-        if recurrence == "monthly":
-            if day == 29:
-                self.add_error("start_date", _("Warning: Recurrence is set in February only for leap years."))
-                return False
-            if day == 30:
-                self.add_error("start_date", _("Warning: Recurrence is not set for February."))
-                return False
-            if day == 31:
-                self.add_error("start_date", _("Warning: Recurrence will skip months that does not have 31 days."))
-                return False
-        return True
-
-    def clean(self):
-        cleaned_data = super().clean()
-        start_date = cleaned_data.get("start_date")
-        recurrence = cleaned_data.get("recurrence")
-
-        if start_date and recurrence:
-            self.is_valid_day_for_monthly_recurrence(start_date, recurrence)
-
-        return cleaned_data
-
 
 class CustomReportScheduleForm(BaseRockyForm):
     start_date = forms.DateField(
@@ -124,3 +100,19 @@ class CustomReportScheduleForm(BaseRockyForm):
         initial=lambda: datetime.now(tz=timezone.utc).date(),
         required=False,
     )
+
+
+class ParentReportNameForm(BaseRockyForm):
+    parent_report_name = forms.CharField(
+        label=_("Report name format"), required=True, initial="{report type} for {ooi}"
+    )
+
+
+class ChildReportNameForm(BaseRockyForm):
+    child_report_name = forms.CharField(
+        label=_("Subreports name format"), required=True, initial="{report type} for {ooi}"
+    )
+
+
+class ReportNameForm(ParentReportNameForm, ChildReportNameForm):
+    pass

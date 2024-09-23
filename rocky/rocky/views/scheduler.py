@@ -260,8 +260,12 @@ class SchedulerView(OctopoesView):
             "no_repeat": f"0 0 0 {day} {month} ? {year}",  # Run once on this date
             "daily": "0 0 0 ? * * *",  # Recurres every day at 00:00
             "weekly": f"0 0 0 ? * {weekday} *",  # Recurres on every {weekday} at 00:00
-            "monthly": f"0 0 0 {day} * ? *",  # Recurres on the {day} of the month at 00:00
             "yearly": f"0 0 0 {day} {month_3L} ? *",  # Recurres every year on the {day} of the {month} at 00:00
         }
+
+        if 28 <= day <= 31:
+            cron_expr["monthly"] = "0 0 0 28-31 * * *"
+        else:
+            cron_expr["monthly"] = f"0 0 0 {day} * ? *"  # Recurres on the exact {day} of the month at 00:00
 
         return cron_expr.get(recurrence, "")
