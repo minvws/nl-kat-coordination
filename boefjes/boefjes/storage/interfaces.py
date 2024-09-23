@@ -60,6 +60,11 @@ class ExistingPluginId(NotAllowed):
         super().__init__(f"Plugin id '{plugin_id}' is already used")
 
 
+class ExistingPluginName(NotAllowed):
+    def __init__(self, plugin_name: str):
+        super().__init__(f"Plugin name '{plugin_name}' is already used")
+
+
 class OrganisationStorage(ABC):
     def __enter__(self):
         return self
