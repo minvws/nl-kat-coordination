@@ -92,7 +92,7 @@ def generate_report(
 
     # load data shape and validate
     data_shape_class = get_data_shape(template_name, settings)
-    data = data_shape_class.parse_obj(report_data.dict())
+    data = data_shape_class.model_validate(report_data.model_dump())
     current_span.add_event("Data shape validation successful")
     logger.info(
         "Data shape validation successful. [report_id=%s] [template=%s]",
@@ -136,7 +136,7 @@ def generate_report(
                 if bare_word in glossary_entries:
                     found_entries.add(bare_word)
 
-    context = data.dict()
+    context = data.model_dump()
 
     # build and merge glossary
     glossary_items = []

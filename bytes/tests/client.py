@@ -91,7 +91,7 @@ class BytesAPIClient:
         self._verify_response(response)
 
         boefje_meta_json = response.json()
-        return BoefjeMeta.parse_obj(boefje_meta_json)
+        return BoefjeMeta.model_validate(boefje_meta_json)
 
     @retry_with_login
     def get_boefje_meta(self, query_filter: BoefjeMetaFilter) -> list[BoefjeMeta]:
@@ -99,7 +99,7 @@ class BytesAPIClient:
         self._verify_response(response)
 
         boefje_meta_json = response.json()
-        return [BoefjeMeta.parse_obj(boefje_meta) for boefje_meta in boefje_meta_json]
+        return [BoefjeMeta.model_validate(boefje_meta) for boefje_meta in boefje_meta_json]
 
     @retry_with_login
     def save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
@@ -113,7 +113,7 @@ class BytesAPIClient:
         self._verify_response(response)
 
         normalizer_meta_json = response.json()
-        return NormalizerMeta.parse_obj(normalizer_meta_json)
+        return NormalizerMeta.model_validate(normalizer_meta_json)
 
     @retry_with_login
     def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> list[NormalizerMeta]:
@@ -121,7 +121,7 @@ class BytesAPIClient:
         self._verify_response(response)
 
         normalizer_meta_json = response.json()
-        return [NormalizerMeta.parse_obj(normalizer_meta) for normalizer_meta in normalizer_meta_json]
+        return [NormalizerMeta.model_validate(normalizer_meta) for normalizer_meta in normalizer_meta_json]
 
     @retry_with_login
     def save_raw(self, boefje_meta_id: UUID, raw: bytes, mime_types: list[str] | None = None) -> str:

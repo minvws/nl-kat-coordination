@@ -43,7 +43,7 @@ class Boefje(Plugin):
     produces: set[str] = Field(default_factory=set)
     options: list[str] | None = None
     runnable_hash: str | None = None
-    schema: dict | None = None
+    boefje_schema: dict | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
 
@@ -243,7 +243,7 @@ def parse_boefje(boefje: dict) -> Boefje:
         scan_level=scan_level,
         consumes=consumes,
         produces=boefje["produces"],
-        schema=boefje.get("schema"),
+        boefje_schema=boefje.get("schema"),
         oci_image=boefje.get("oci_image"),
         oci_arguments=boefje.get("oci_arguments", []),
     )
