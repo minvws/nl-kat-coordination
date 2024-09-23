@@ -130,10 +130,12 @@ def test_update_plugins(test_client, organisation):
 
     test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.json())
     test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"description": "4"})
+    test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"scan_level": 3})
     test_client.patch(f"/v1/organisations/{organisation.id}/plugins/{boefje.id}", json={"enabled": True})
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/{boefje.id}")
     assert response.json()["description"] == "4"
+    assert response.json()["scan_level"] == 3
     assert response.json()["enabled"] is True
 
     test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.json())
