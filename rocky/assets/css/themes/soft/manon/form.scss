@@ -2,6 +2,10 @@
 
 :root {
   --form-base-text-color: var(--application-base-text-color);
+  --form-base-background-color: transparent;
+  --form-base-padding-top: 0;
+  --form-base-padding-bottom: 0;
+  --form-base-padding-left: 0;
 
   /* Accent color */
   --form-accent-color-color: var(--branding-color-2);
@@ -33,4 +37,8 @@
 
 form fieldset .checkbox input[type="checkbox"] + label {
   max-width: 40rem;
+}
+
+form label {
+  font-weight: bold;
 }
