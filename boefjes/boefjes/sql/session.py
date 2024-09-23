@@ -1,4 +1,5 @@
 import structlog
+from psycopg2 import errors
 from sqlalchemy import exc
 from sqlalchemy.orm import Session
 from typing_extensions import Self
@@ -38,7 +39,9 @@ class SessionMixin:
             logger.debug("Committing session")
             self.session.commit()
         except exc.IntegrityError as e:
-            raise IntegrityError("A storage error occurred") from e
+            if isinstance(e.orig, errors.UniqueViolation):
+                raise IntegrityError(str(e.orig))
+            raise IntegrityError("An integrity error occurred") from e
         except exc.DatabaseError as e:
             raise StorageError("A storage error occurred") from e
         finally:
