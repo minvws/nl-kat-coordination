@@ -156,7 +156,7 @@ class PluginService:
         try:
             boefje = self.plugin_storage.boefje_by_id(plugin_id)
 
-            return boefje.schema
+            return boefje.boefje_schema
         except PluginNotFound:
             return self.local_repo.schema(plugin_id)
 

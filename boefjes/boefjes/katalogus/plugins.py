@@ -130,11 +130,11 @@ class BoefjeIn(BaseModel):
     scan_level: int = 1
     consumes: set[str] = Field(default_factory=set)
     produces: set[str] = Field(default_factory=set)
-    schema: dict | None = None
+    boefje_schema: dict | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
 
-    @field_validator("schema")
+    @field_validator("boefje_schema")
     @classmethod
     def json_schema_valid(cls, schema: dict | None) -> dict | None:
         if schema is not None:
