@@ -29,12 +29,12 @@ class Boefje(Plugin):
     scan_level: int = 1
     consumes: set[str] = Field(default_factory=set)
     produces: set[str] = Field(default_factory=set)
-    schema: dict | None = None
+    boefje_schema: dict | None = None
     runnable_hash: str | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
 
-    @field_validator("schema")
+    @field_validator("boefje_schema")
     @classmethod
     def json_schema_valid(cls, schema: dict) -> dict:
         if schema is not None:
@@ -79,3 +79,4 @@ class FilterParameters(BaseModel):
     ids: list[str] | None = None
     state: bool | None = None
     scan_level: int = 0
+    oci_image: str | None = None
