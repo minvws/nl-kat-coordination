@@ -74,7 +74,7 @@ class BytesAPIClient:
 
     @retry_with_login
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
-        response = self._session.post("/bytes/boefje_meta", content=boefje_meta.json(), headers=self.headers)
+        response = self._session.post("/bytes/boefje_meta", content=boefje_meta.model_dump_json(), headers=self.headers)
 
         self._verify_response(response)
 
@@ -87,7 +87,9 @@ class BytesAPIClient:
 
     @retry_with_login
     def save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
-        response = self._session.post("/bytes/normalizer_meta", content=normalizer_meta.json(), headers=self.headers)
+        response = self._session.post(
+            "/bytes/normalizer_meta", content=normalizer_meta.model_dump_json(), headers=self.headers
+        )
 
         self._verify_response(response)
 

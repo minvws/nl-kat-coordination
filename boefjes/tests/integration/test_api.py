@@ -64,7 +64,7 @@ def test_add_boefje(test_client, organisation):
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/?plugin_type=boefje")
     assert len(response.json()) == 45
 
-    boefje_dict = boefje.dict()
+    boefje_dict = boefje.model_dump()
     boefje_dict["consumes"] = list(boefje_dict["consumes"])
     boefje_dict["produces"] = list(boefje_dict["produces"])
 
@@ -125,7 +125,7 @@ def test_add_normalizer(test_client, organisation):
     assert len(response.json()) == 56
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/test_normalizer")
-    assert response.json() == normalizer.dict()
+    assert response.json() == normalizer.model_dump()
 
 
 def test_delete_normalizer(test_client, organisation):
@@ -160,7 +160,7 @@ def test_update_plugins(test_client, organisation):
 
 def test_cannot_create_boefje_with_invalid_schema(test_client, organisation):
     boefje = Boefje(id="test_plugin", name="My test boefje", description="123").model_dump(mode="json")
-    boefje["schema"] = {"$schema": 3}
+    boefje["boefje_schema"] = {"$schema": 3}
 
     r = test_client.post(f"/v1/organisations/{organisation.id}/plugins", json=boefje)
     assert r.status_code == 400
@@ -170,7 +170,9 @@ def test_update_boefje_schema(test_client, organisation):
     boefje = Boefje(id="test_plugin", name="My test boefje", description="123")
     test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
 
-    r = test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"schema": {"$schema": 3}})
+    r = test_client.patch(
+        f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"boefje_schema": {"$schema": 3}}
+    )
     assert r.status_code == 400
 
     valid_schema = {
@@ -184,16 +186,20 @@ def test_update_boefje_schema(test_client, organisation):
         },
         "required": [],
     }
-    r = test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"schema": valid_schema})
+    r = test_client.patch(
+        f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"boefje_schema": valid_schema}
+    )
     assert r.status_code == 204
 
     schema = test_client.get(f"/v1/organisations/{organisation.id}/plugins/{boefje.id}/schema.json").json()
     assert schema == valid_schema
 
     api_boefje = test_client.get(f"/v1/organisations/{organisation.id}/plugins/{boefje.id}").json()
-    assert api_boefje["schema"] == valid_schema
+    assert api_boefje["boefje_schema"] == valid_schema
 
-    r = test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/dns-records", json={"schema": valid_schema})
+    r = test_client.patch(
+        f"/v1/organisations/{organisation.id}/boefjes/dns-records", json={"boefje_schema": valid_schema}
+    )
     assert r.status_code == 404
 
 
@@ -254,7 +260,7 @@ def test_clone_settings(test_client, organisation):
     # Add the second organisation
     new_org_id = "org2"
     org2 = Organisation(id=new_org_id, name="Second test Organisation")
-    test_client.post("/v1/organisations/", content=org2.json())
+    test_client.post("/v1/organisations/", content=org2.model_dump_json())
     test_client.put(f"/v1/organisations/{new_org_id}/{plug}/settings", json={"test_key": "second value"})
 
     # Show that the second organisation has no settings and dns-records is not enabled
