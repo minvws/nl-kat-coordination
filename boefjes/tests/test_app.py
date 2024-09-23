@@ -93,16 +93,19 @@ def test_two_processes_handler_exception(manager: SchedulerWorkerManager, item_h
     # by the other process in parallel, and completes before the crash of the other task. Since one process completes,
     # it pops the same crashing task 9071c9fd-2b9f-440f-a524-ef1ca4824fd4 from the queue to simplify the test.
 
-    # We expect the first two patches to set the task status to running of both task.
-    assert sorted(patched_tasks[:2]) == [
-        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),  # Process 1
-        ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running"),  # Process 2
-    ]
+    # We expect the first two patches to set the task status to running of both task and then process 1 to finish, as
+    # the exception has been set up with a small delay.
+    assert sorted(patched_tasks[:3]) == sorted(
+        [
+            ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),  # Process 1
+            ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),  # Process 1
+            ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running"),  # Process 2
+        ]
+    )
 
     # The process completing status then to be set to completed/failed for both tasks.
-    assert sorted(patched_tasks[2:]) == sorted(
+    assert sorted(patched_tasks[3:]) == sorted(
         [
-            ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),  # Process 1
             ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running"),  # Process 1
             ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed"),  # Process 2
             ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed"),  # Process 1
