@@ -1,4 +1,3 @@
-import structlog
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from httpx import ReadTimeout
@@ -17,8 +16,6 @@ from tools.forms.settings import (
 )
 
 OOI_TYPE_CHOICES = sorted((ooi_type.get_object_type(), ooi_type.get_object_type()) for ooi_type in ALL_TYPES)
-
-logger = structlog.get_logger(__name__)
 
 
 class BoefjeSetupForm(BaseRockyForm):
@@ -108,9 +105,7 @@ class BoefjeAddForm(BoefjeSetupForm):
         try:
             self.katalogus_client.create_plugin(plugin)
         except ReadTimeout:
-            self.add_error(
-                "name", _("Boefje with name '%s' does already exist. Please choose another name.") % plugin.name
-            )
+            handle_existing_name(self, plugin.name)
 
         return cleaned_data
 
@@ -124,8 +119,10 @@ class BoefjeEditForm(BoefjeSetupForm):
         try:
             self.katalogus_client.edit_plugin(plugin)
         except ReadTimeout:
-            self.add_error(
-                "name", _("Boefje with name '%s' does already exist. Please choose another name.") % plugin.name
-            )
+            handle_existing_name(self, plugin.name)
 
         return cleaned_data
+
+
+def handle_existing_name(self, plugin_name):
+    self.add_error("name", _("Boefje with name '%s' does already exist. Please choose another name.") % plugin_name)
