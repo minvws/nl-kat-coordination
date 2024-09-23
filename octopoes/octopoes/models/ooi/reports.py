@@ -53,7 +53,7 @@ class ReportRecipe(OOI):
     object_type: Literal["ReportRecipe"] = "ReportRecipe"
 
     recipe_id: UUID
-    # object can be the total objects or 1 object, but then the ooi itself.
+
     report_name_format: str
     subreport_name_format: str
 
