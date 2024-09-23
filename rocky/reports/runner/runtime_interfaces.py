@@ -4,7 +4,7 @@ from octopoes.models.ooi.reports import ReportRecipe
 
 
 class ReportJobRunner:
-    def run(self, recipe: ReportRecipe) -> list[tuple[set, bytes | str]]:
+    def run(self, recipe: ReportRecipe) -> None:
         raise NotImplementedError()
 
 

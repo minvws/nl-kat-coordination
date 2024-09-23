@@ -125,6 +125,18 @@ class ReportsLandingView(ReportBreadcrumbs, TemplateView):
         return redirect(reverse("report_history", kwargs=self.get_kwargs()))
 
 
+def get_report_plugins_from_katalogus(plugins: dict[str, set[str]], organization_code: str) -> dict[str, list[Plugin]]:
+    katalogus_plugins: dict[str, Any] = {"required": [], "optional": []}
+
+    for required_optional, plugin_ids in plugins.items():
+        if plugin_ids:
+            katalogus_plugins[required_optional] = sorted(
+                get_katalogus(organization_code).get_plugins(ids=list(plugin_ids)), key=attrgetter("name")
+            )
+
+    return katalogus_plugins
+
+
 class BaseReportView(OOIFilterView):
     """
     This view is the base for the report creation wizard.
@@ -179,17 +191,6 @@ class BaseReportView(OOIFilterView):
     def get_report_types(self) -> list[type[BaseReport]]:
         return [get_report_by_id(report_type_id) for report_type_id in self.selected_report_types]
 
-    def get_report_plugins_from_katalogus(self, plugins: dict[str, set[str]]) -> dict[str, list[Plugin]]:
-        katalogus_plugins: dict[str, Any] = {"required": [], "optional": []}
-
-        for required_optional, plugin_ids in plugins.items():
-            if plugin_ids:
-                katalogus_plugins[required_optional] = sorted(
-                    get_katalogus(self.organization.code).get_plugins(ids=list(plugin_ids)), key=attrgetter("name")
-                )
-
-        return katalogus_plugins
-
     def get_plugins_from_report_type(self) -> dict[str, list[Plugin]] | None:
         """
         Returns plugins from KAT-alogus from the selected report types.
@@ -207,7 +208,7 @@ class BaseReportView(OOIFilterView):
             if plugin_id in plugins["optional"]:
                 plugins["optional"].remove(plugin_id)
         try:
-            return self.get_report_plugins_from_katalogus(plugins)
+            return get_report_plugins_from_katalogus(plugins, self.organization.code)
         except KATalogusError as error:
             return messages.error(self.request, error.message)
 
