@@ -627,6 +627,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_latest_task_by_hash.return_value = None
         self.mock_get_last_run_boefje.return_value = None
+        self.mock_get_plugin.return_value = PluginFactory(
+            scan_level=0,
+            consumes=[ooi.object_type],
+        )
 
         # Act
         self.scheduler.push_boefje_task(boefje_task)
@@ -647,6 +651,9 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_latest_task_by_hash.return_value = None
         self.mock_get_last_run_boefje.return_value = None
+        self.mock_get_plugin.return_value = PluginFactory(
+            scan_level=0,
+        )
 
         # Act
         self.scheduler.push_boefje_task(boefje_task)
@@ -688,6 +695,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         mock_has_boefje_task_grace_period_passed.return_value = True
         mock_is_item_on_queue_by_hash.return_value = False
         mock_get_tasks_by_hash.return_value = None
+        self.mock_get_plugin.return_value = PluginFactory(
+            scan_level=0,
+            consumes=[ooi.object_type],
+        )
 
         # Act
         self.scheduler.push_boefje_task(boefje_task)
@@ -742,6 +753,12 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             scheduler_id=self.organisation.id,
             priority=1,
             task=task,
+        )
+
+        # Mocks
+        self.mock_get_plugin.return_value = PluginFactory(
+            scan_level=0,
+            consumes=[ooi.object_type],
         )
 
         # Act
@@ -814,6 +831,11 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             scheduler_id=self.organisation.id,
             priority=1,
             task=task,
+        )
+
+        self.mock_get_plugin.return_value = PluginFactory(
+            scan_level=0,
+            consumes=[ooi.object_type],
         )
 
         # Act
@@ -1113,6 +1135,12 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             task=task,
         )
 
+        # Mocks
+        self.mock_get_plugin.return_value = PluginFactory(
+            scan_level=0,
+            consumes=[ooi.object_type],
+        )
+
         # Act
         self.scheduler.push_item_to_queue(item)
 
@@ -1147,6 +1175,14 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
+
+        # Mocks
+        self.mock_get_plugin.return_value = PluginFactory(
+            scan_level=0,
+            consumes=[ooi.object_type],
+        )
+
+        # Act
         task = functions.create_task(
             scheduler_id=self.scheduler.scheduler_id,
             data=boefje_task,
