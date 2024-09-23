@@ -263,7 +263,7 @@ class OctopoesService:
         # Adding the nibble part of inferring
         # FIXME: save origins and origins of origins etc.
         resulting_nibble_oois = self.nibbles.infer([source], valid_time)
-        resulting_oois += list(set.union(*resulting_nibble_oois[source].values()))
+        resulting_oois += list(set().union(*resulting_nibble_oois[source].values()))
 
         self.save_origin(origin, resulting_oois, valid_time)
 

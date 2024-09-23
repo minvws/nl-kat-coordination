@@ -17,7 +17,7 @@ def otype(ooi: OOI) -> type[OOI]:
 
 
 def mergewith(func: Callable[[set[T], set[T]], set[T]], d1: dict[U, set[T]], d2: dict[U, set[T]]) -> dict[U, set[T]]:
-    return {k: func(d1[k], d2[k]) for k in set(d1) | set(d2)}
+    return {k: func(d1.get(k, set()), d2.get(k, set())) for k in set(d1) | set(d2)}
 
 
 class NibblesRunner:
