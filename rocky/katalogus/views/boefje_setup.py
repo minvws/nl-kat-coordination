@@ -1,10 +1,11 @@
 import uuid
+from datetime import datetime
 from urllib.parse import urlencode
 
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.urls import reverse
 from django.views.generic.edit import FormView
-from tools.forms.boefje import BoefjeAddForm
+from tools.forms.boefje import BoefjeAddForm, BoefjeEditForm
 
 from katalogus.client import get_katalogus
 
@@ -16,7 +17,19 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
     permission_required = "tools.can_add_boefje"
 
     def get_form(self):
-        return BoefjeAddForm(get_katalogus(self.organization.code), self.plugin_id, **self.get_form_kwargs())
+        return BoefjeAddForm(
+            get_katalogus(self.organization.code), self.plugin_id, self.created, **self.get_form_kwargs()
+        )
+
+    def get_success_url(self) -> str:
+        return (
+            reverse(
+                "boefje_detail",
+                kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin_id},
+            )
+            + "?"
+            + self.query_params
+        )
 
 
 class AddBoefjeView(BoefjeSetupView):
@@ -26,18 +39,8 @@ class AddBoefjeView(BoefjeSetupView):
         super().setup(request, *args, **kwargs)
 
         self.plugin_id = str(uuid.uuid4())
-        self.return_to_plugin_id = self.plugin_id
-
-    def get_success_url(self) -> str:
-        query_params = urlencode({"new_variant": True})
-        return (
-            reverse(
-                "boefje_detail",
-                kwargs={"organization_code": self.organization.code, "plugin_id": self.return_to_plugin_id},
-            )
-            + "?"
-            + query_params
-        )
+        self.created = str(datetime.now())
+        self.query_params = urlencode({"new_variant": True})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -60,9 +63,12 @@ class AddBoefjeVariantView(BoefjeSetupView):
         super().setup(request, *args, **kwargs)
 
         self.plugin_id = str(uuid.uuid4())
-        self.return_to_plugin_id = self.kwargs.get("plugin_id")
+        self.based_on_plugin_id = self.kwargs.get("plugin_id")
+        self.created = str(datetime.now())
+        self.query_params = urlencode({"new_variant": True})
+
         katalogus = get_katalogus(self.organization.code)
-        self.plugin = katalogus.get_plugin(self.return_to_plugin_id)
+        self.plugin = katalogus.get_plugin(self.based_on_plugin_id)
 
     def get_initial(self):
         initial = super().get_initial()
@@ -81,33 +87,24 @@ class AddBoefjeVariantView(BoefjeSetupView):
 
         return initial
 
-    def get_success_url(self) -> str:
-        if self.kwargs.get("plugin_id"):
-            return reverse(
-                "boefje_variant_setup",
-                kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin_id},
-            )
-        else:
-            return reverse("boefje_setup", kwargs={"organization_code": self.organization.code})
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["boefje_variant"] = True
-        context["return_to_plugin_id"] = self.return_to_plugin_id
+        context["return_to_plugin_id"] = self.based_on_plugin_id
 
         context["breadcrumbs"] = [
             {"url": reverse("katalogus", kwargs={"organization_code": self.organization.code}), "text": "KAT-alogus"},
             {
                 "url": reverse(
                     "boefje_detail",
-                    kwargs={"organization_code": self.organization.code, "plugin_id": self.return_to_plugin_id},
+                    kwargs={"organization_code": self.organization.code, "plugin_id": self.based_on_plugin_id},
                 ),
                 "text": "Boefje detail page",
             },
             {
                 "url": reverse(
                     "boefje_variant_setup",
-                    kwargs={"organization_code": self.organization.code, "plugin_id": self.return_to_plugin_id},
+                    kwargs={"organization_code": self.organization.code, "plugin_id": self.based_on_plugin_id},
                 ),
                 "text": "Boefje variant setup",
             },
@@ -122,9 +119,16 @@ class EditBoefjeView(BoefjeSetupView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        plugin_id = self.kwargs.get("plugin_id")
+        self.plugin_id = self.kwargs.get("plugin_id")
+        self.query_params = urlencode({"new_variant": False})
         katalogus = get_katalogus(self.organization.code)
-        self.plugin = katalogus.get_plugin(plugin_id)
+        self.plugin = katalogus.get_plugin(self.plugin_id)
+        self.created = self.plugin.created
+
+    def get_form(self):
+        return BoefjeEditForm(
+            get_katalogus(self.organization.code), self.plugin_id, self.created, **self.get_form_kwargs()
+        )
 
     def get_initial(self):
         initial = super().get_initial()
@@ -144,11 +148,6 @@ class EditBoefjeView(BoefjeSetupView):
         initial["scan_level"] = self.plugin.scan_level
 
         return initial
-
-    def get_success_url(self) -> str:
-        return reverse(
-            "boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id}
-        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

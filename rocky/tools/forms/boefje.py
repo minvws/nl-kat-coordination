@@ -1,5 +1,4 @@
-from datetime import datetime
-
+import structlog
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from httpx import ReadTimeout
@@ -19,8 +18,10 @@ from tools.forms.settings import (
 
 OOI_TYPE_CHOICES = sorted((ooi_type.get_object_type(), ooi_type.get_object_type()) for ooi_type in ALL_TYPES)
 
+logger = structlog.get_logger(__name__)
 
-class BoefjeAddForm(BaseRockyForm):
+
+class BoefjeSetupForm(BaseRockyForm):
     oci_image = forms.CharField(
         required=True,
         label=_("Container image"),
@@ -66,24 +67,11 @@ class BoefjeAddForm(BaseRockyForm):
         help_text=BOEFJE_SCAN_LEVEL_HELP_TEXT,
     )
 
-    def __init__(self, katalogus_client: KATalogusClientV1, plugin_id: str, *args, **kwargs):
+    def __init__(self, katalogus_client: KATalogusClientV1, plugin_id: str, created: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.katalogus_client = katalogus_client
         self.plugin_id = plugin_id
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        plugin = self.create_boefje_with_form_data(cleaned_data, self.plugin_id, str(datetime.now()))
-
-        try:
-            self.katalogus_client.create_plugin(plugin)
-        except ReadTimeout:
-            self.add_error(
-                "name", _("Boefje with name '%s' does already exist. Please choose another name.") % plugin.name
-            )
-
-        return cleaned_data
+        self.created = created
 
     def create_boefje_with_form_data(self, form_data, plugin_id: str, created: str):
         arguments = [] if form_data["oci_arguments"] == "" else form_data["oci_arguments"].split()
@@ -97,15 +85,47 @@ class BoefjeAddForm(BaseRockyForm):
 
         return Boefje(
             id=plugin_id,
-            name=form_data.get("name"),
+            name=form_data["name"],
             created=created,
-            description=form_data.get("description"),
+            description=form_data["description"],
             enabled=False,
             type="boefje",
             scan_level=form_data["scan_level"],
             consumes=input_objects,
             produces=produces,
             schema=form_data["schema"],
-            oci_image=form_data.get("oci_image"),
+            oci_image=form_data["oci_image"],
             oci_arguments=arguments,
         )
+
+
+class BoefjeAddForm(BoefjeSetupForm):
+    def clean(self):
+        cleaned_data = super().clean()
+
+        plugin = self.create_boefje_with_form_data(cleaned_data, self.plugin_id, self.created)
+
+        try:
+            self.katalogus_client.create_plugin(plugin)
+        except ReadTimeout:
+            self.add_error(
+                "name", _("Boefje with name '%s' does already exist. Please choose another name.") % plugin.name
+            )
+
+        return cleaned_data
+
+
+class BoefjeEditForm(BoefjeSetupForm):
+    def clean(self):
+        cleaned_data = super().clean()
+
+        plugin = self.create_boefje_with_form_data(cleaned_data, self.plugin_id, self.created)
+
+        try:
+            self.katalogus_client.edit_plugin(plugin)
+        except ReadTimeout:
+            self.add_error(
+                "name", _("Boefje with name '%s' does already exist. Please choose another name.") % plugin.name
+            )
+
+        return cleaned_data
