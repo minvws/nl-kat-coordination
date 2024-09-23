@@ -3,6 +3,7 @@ from datetime import datetime
 from urllib.parse import urlencode
 
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
+from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic.edit import FormView
@@ -25,7 +26,22 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
 
         plugin = create_boefje_with_form_data(form_data, self.plugin_id, str(datetime.now()))
 
-        get_katalogus(self.organization.code).create_plugin(plugin)
+        try:
+            get_katalogus(self.organization.code).create_plugin(plugin)
+        except TimeoutError:
+            error_message = ("Boefje with name '%s' does already exist. Please choose another name.") % plugin.name
+            messages.error(self.request, error_message)
+
+            if self.kwargs.get("plugin_id"):
+                return redirect(
+                    reverse(
+                        "boefje_variant_setup",
+                        kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id},
+                    )
+                )
+            else:
+                return redirect(reverse("boefje_setup", kwargs={"organization_code": self.organization.code}))
+
         query_params = urlencode({"new_variant": True})
 
         return redirect(
