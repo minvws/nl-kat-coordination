@@ -68,7 +68,7 @@ class BoefjeInDB(SQL_BASE):
     static = Column(Boolean, nullable=False, server_default="false")
 
     # Metadata
-    name = Column(String(length=64), nullable=False)
+    name = Column(String(length=64), nullable=False, unique=True)
     description = Column(types.Text, nullable=True)
     scan_level = Column(types.Enum(*[str(x.value) for x in ScanLevel], name="scan_level"), nullable=False, default="4")
 
@@ -94,7 +94,7 @@ class NormalizerInDB(SQL_BASE):
     static = Column(Boolean, nullable=False, server_default="false")
 
     # Metadata
-    name = Column(String(length=64), nullable=False)
+    name = Column(String(length=64), nullable=False, unique=True)
     description = Column(types.Text, nullable=True)
 
     # Job specifications

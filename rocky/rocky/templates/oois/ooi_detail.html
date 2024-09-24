@@ -45,7 +45,7 @@
                 {% if enabled_boefjes_available %}
                     <div class="horizontal-view">
                         <div>
-                            {% if member.acknowledged_clearance_level > 0 and organization_indemnification %}
+                            {% if member.max_clearance_level > 0 and organization_indemnification %}
                                 <form id="show_all_boefjes"
                                       method="get"
                                       action="#show_all_boefjes"

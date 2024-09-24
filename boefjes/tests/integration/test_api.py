@@ -72,6 +72,39 @@ def test_add_boefje(test_client, organisation):
     assert response.json() == boefje_dict
 
 
+def test_cannot_add_static_plugin_with_duplicate_name(test_client, organisation):
+    boefje = Boefje(id="test_plugin", name="DNS records", static=False)
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
+    assert response.status_code == 400
+
+    boefje = Boefje(id="test_plugin", name="DNS records", static=False)
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
+    assert response.status_code == 400
+    assert response.json() == {"message": "Plugin name 'DNS records' is already used"}
+
+
+def test_cannot_add_plugin_with_duplicate_name(test_client, organisation):
+    boefje = Boefje(id="test_plugin", name="My test boefje", static=False)
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
+    assert response.status_code == 201
+
+    boefje = Boefje(id="test_plugin_2", name="My test boefje", static=False)
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
+    assert response.status_code == 400
+    assert response.json() == {
+        "message": 'duplicate key value violates unique constraint "unique_boefje_name"\n'
+        "DETAIL:  Key (name)=(My test boefje) already exists.\n"
+    }
+
+    normalizer = Normalizer(id="test_normalizer", name="My test normalizer", static=False)
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.model_dump_json())
+    assert response.status_code == 201
+
+    normalizer = Normalizer(id="test_normalizer_2", name="My test normalizer", static=False)
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.model_dump_json())
+    assert response.status_code == 400
+
+
 def test_delete_boefje(test_client, organisation):
     boefje = Boefje(id="test_plugin", name="My test boefje", static=False)
     response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
