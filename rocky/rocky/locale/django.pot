@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-19 08:10+0000\n"
+"POT-Creation-Date: 2024-09-24 13:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5841,11 +5841,6 @@ msgstr ""
 msgid "Reproduction"
 msgstr ""
 
-#: rocky/templates/partials/findings_list_toolbar.html
-#: rocky/templates/partials/ooi_detail_toolbar.html
-msgid "Generate Findings Report"
-msgstr ""
-
 #: rocky/templates/partials/form/checkbox_group_table_form.html
 msgid "Please enable plugin to start scanning."
 msgstr ""
@@ -5979,6 +5974,10 @@ msgstr ""
 
 #: rocky/templates/partials/ooi_detail_related_object.html
 msgid "Use the button below to add a related object."
+msgstr ""
+
+#: rocky/templates/partials/ooi_detail_toolbar.html
+msgid "Generate Findings Report"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
