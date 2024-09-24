@@ -19,7 +19,6 @@ from scheduler.models import (
     Organisation,
     Plugin,
     ScanProfileMutation,
-    Schedule,
     Task,
     TaskStatus,
 )
@@ -999,7 +998,7 @@ class BoefjeScheduler(Scheduler):
 
         return boefjes
 
-    def post_push(self, item: Task) -> Task:
+    def set_cron(self, item: Task) -> str | None:
         """Override Schedule.post_push() when a boefje specifies a schedule for
         execution (cron expression) we schedule for its execution"""
         # Does a boefje have a schedule defined?
@@ -1008,30 +1007,9 @@ class BoefjeScheduler(Scheduler):
             self.organisation.id,
         )
         if plugin is None or plugin.cron is None:
-            return super().post_push(item)
+            return super().set_cron(item)
 
-        schedule_db = self.ctx.datastores.schedule_store.get_schedule_by_hash(item.hash)
-        if schedule_db is None:
-            # Create schedule when not found
-            schedule = Schedule(
-                scheduler_id=self.scheduler_id,
-                hash=item.hash,
-                deadline_at=self.calculate_deadline(item),
-                data=item.data,
-                schedule=plugin.cron,
-            )
-
-            schedule_db = self.ctx.datastores.schedule_store.create_schedule(schedule)
-
-            item.schedule_id = schedule_db.id
-            self.ctx.datastores.task_store.update_task(item)
-        else:
-            # We update the schedule if it already exists, this makes sure
-            # that when a boefje schedule is updated, we also update the schedule.
-            schedule_db.schedule = plugin.schedule
-            self.ctx.datastores.schedule_store.update_schedule(schedule_db)
-
-        return super().post_push(item)
+        return plugin.cron
 
     def calculate_deadline(self, task: Task) -> datetime:
         """Override Scheduler.calculate_deadline() to calculate the deadline
