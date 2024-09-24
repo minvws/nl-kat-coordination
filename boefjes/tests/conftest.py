@@ -118,10 +118,12 @@ class MockHandler(Handler):
         self.exception = exception
 
     def handle(self, item: BoefjeMeta | NormalizerMeta):
+        time.sleep(self.sleep_time)
+
         if str(item.id) == "9071c9fd-2b9f-440f-a524-ef1ca4824fd4":
+            time.sleep(0.1)
             raise self.exception()
 
-        time.sleep(self.sleep_time)
         self.queue.put(item)
 
     def get_all(self) -> list[BoefjeMeta | NormalizerMeta]:
