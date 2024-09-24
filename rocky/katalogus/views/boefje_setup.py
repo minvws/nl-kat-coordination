@@ -72,7 +72,7 @@ class AddBoefjeVariantView(BoefjeSetupView):
 
     def get_initial(self):
         initial = super().get_initial()
-
+        
         consumes = []
 
         for input_object in self.plugin.consumes:
