@@ -999,7 +999,7 @@ class BoefjeScheduler(Scheduler):
         return boefjes
 
     def set_cron(self, item: Task) -> str | None:
-        """Override Schedule.post_push() when a boefje specifies a schedule for
+        """Override Schedule.set_cron() when a boefje specifies a schedule for
         execution (cron expression) we schedule for its execution"""
         # Does a boefje have a schedule defined?
         plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
