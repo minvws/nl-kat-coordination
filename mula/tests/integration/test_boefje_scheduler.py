@@ -619,7 +619,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         boefje = BoefjeFactory()
 
         boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.parse_obj(boefje.dict()),
+            boefje=models.Boefje.model_validate(boefje.dict()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
@@ -639,7 +639,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         boefje = BoefjeFactory()
 
         boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.parse_obj(boefje.dict()),
+            boefje=models.Boefje.model_validate(boefje.dict()),
             input_ooi=None,
             organization=self.organisation.id,
         )
@@ -674,7 +674,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.parse_obj(plugin.dict()),
+            boefje=models.Boefje.model_validate(plugin.dict()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
@@ -1524,7 +1524,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.parse_obj(plugin.model_dump()),
+            boefje=models.Boefje.model_validate(plugin.model_dump()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
@@ -1567,7 +1567,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.parse_obj(plugin.model_dump()),
+            boefje=models.Boefje.model_validate(plugin.model_dump()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
@@ -1608,7 +1608,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.parse_obj(plugin.model_dump()),
+            boefje=models.Boefje.model_validate(plugin.model_dump()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
@@ -1644,7 +1644,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.parse_obj(plugin.model_dump()),
+            boefje=models.Boefje.model_validate(plugin.model_dump()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
@@ -1680,7 +1680,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type], enabled=False)
 
         boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.parse_obj(plugin.model_dump()),
+            boefje=models.Boefje.model_validate(plugin.model_dump()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
@@ -1716,7 +1716,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         plugin = PluginFactory(scan_level=0, consumes=[])
 
         boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.parse_obj(plugin.model_dump()),
+            boefje=models.Boefje.model_validate(plugin.model_dump()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
@@ -1752,7 +1752,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         plugin = PluginFactory(scan_level=1, consumes=[ooi.object_type])
 
         boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.parse_obj(plugin.model_dump()),
+            boefje=models.Boefje.model_validate(plugin.model_dump()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )

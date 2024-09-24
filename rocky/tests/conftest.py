@@ -1098,7 +1098,7 @@ def plugin_details():
             "consumes": ["Network"],
             "produces": ["Network"],
             "enabled": True,
-            "schema": {},
+            "boefje_schema": {},
             "oci_image": None,
             "oci_arguments": ["-test", "-arg"],
         }
@@ -1118,7 +1118,7 @@ def plugin_details_with_container():
             "consumes": ["Network"],
             "produces": ["Network"],
             "enabled": True,
-            "schema": {},
+            "boefje_schema": {},
             "oci_image": "ghcr.io/test/image:123",
             "oci_arguments": ["-test", "-arg"],
         }
@@ -1806,7 +1806,7 @@ def boefje_dns_records():
         options=None,
         runnable_hash=None,
         produces={"boefje/dns-records"},
-        schema={},
+        boefje_schema={},
         oci_image="ghcr.io/test/image:123",
         oci_arguments=["-test", "-arg"],
     )
@@ -1830,7 +1830,7 @@ def boefje_nmap_tcp():
         options=None,
         runnable_hash=None,
         produces={"boefje/nmap"},
-        schema={},
+        boefje_schema={},
         oci_image="ghcr.io/test/image:123",
         oci_arguments=["-test", "-arg"],
     )
