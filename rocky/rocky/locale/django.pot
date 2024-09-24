@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-18 10:23+0000\n"
+"POT-Creation-Date: 2024-09-24 08:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4162,6 +4162,11 @@ msgstr ""
 
 #: tools/forms/boefje.py
 msgid "Output mime types"
+msgstr ""
+
+#: tools/forms/boefje.py
+#, python-format
+msgid "Boefje with name '%s' does already exist. Please choose another name."
 msgstr ""
 
 #: tools/forms/finding_type.py
