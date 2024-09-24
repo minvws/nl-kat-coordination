@@ -43,7 +43,7 @@ class BoefjeAddForm(BaseRockyForm):
             attrs={"description": "For example: -sTU --top-ports 1000", "aria-describedby": "input-description"}
         ),
     )
-    schema = forms.JSONField(
+    boefje_schema = forms.JSONField(
         required=False,
         label=_("JSON Schema"),
         help_text=BOEFJE_SCHEMA_HELP_TEXT,
@@ -51,7 +51,7 @@ class BoefjeAddForm(BaseRockyForm):
     consumes = forms.CharField(
         required=False,
         label=_("Input object type"),
-        widget=forms.Select(choices=OOI_TYPE_CHOICES),
+        widget=forms.SelectMultiple(choices=OOI_TYPE_CHOICES),
         help_text=BOEFJE_CONSUMES_HELP_TEXT,
     )
     produces = forms.CharField(

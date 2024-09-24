@@ -38,7 +38,6 @@ def upgrade() -> None:
 
         for plugin in local_repo.get_all():
             schema = local_repo.schema(plugin.id)
-
             if schema:
                 try:
                     # This way we avoid the safeguard that updating static boefjes is not allowed

@@ -27,6 +27,7 @@ from octopoes.models.pagination import Paginated
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
+from octopoes.types import DECLARATION_CREATED, OBJECT_DELETED, OBSERVATION_CREATED, ORIGIN_DELETED
 
 
 class OctopoesAPIConnector:
@@ -176,6 +177,8 @@ class OctopoesAPIConnector:
 
         self.session.delete(f"/{self.client}/origins", params=params)
 
+        self.logger.info("Deleted origin", origin_id=origin_id, valid_time=valid_time, event_code=ORIGIN_DELETED)
+
     def save_observation(self, observation: Observation) -> None:
         self.session.post(
             f"/{self.client}/observations",
@@ -183,7 +186,7 @@ class OctopoesAPIConnector:
             content=observation.model_dump_json(),
         )
 
-        self.logger.info("Saved observation", observation=observation)
+        self.logger.info("Saved observation", observation=observation, event_code=OBSERVATION_CREATED)
 
     def save_declaration(self, declaration: Declaration) -> None:
         self.session.post(
@@ -192,7 +195,7 @@ class OctopoesAPIConnector:
             content=declaration.model_dump_json(),
         )
 
-        self.logger.info("Saved declaration", declaration=declaration)
+        self.logger.info("Saved declaration", declaration=declaration, event_code=DECLARATION_CREATED)
 
     def save_affirmation(self, affirmation: Affirmation) -> None:
         self.session.post(
@@ -201,7 +204,7 @@ class OctopoesAPIConnector:
             content=affirmation.model_dump_json(),
         )
 
-        self.logger.info("Saved affirmation", affirmation=affirmation)
+        self.logger.info("Saved affirmation", affirmation=affirmation, event_code=DECLARATION_CREATED)
 
     def save_scan_profile(self, scan_profile: ScanProfile, valid_time: datetime):
         params = {"valid_time": str(valid_time)}
@@ -224,7 +227,7 @@ class OctopoesAPIConnector:
         params = {"reference": str(reference), "valid_time": str(valid_time)}
         self.session.delete(f"/{self.client}/", params=params)
 
-        self.logger.info("Deleted object", reference=reference, valid_time=valid_time)
+        self.logger.info("Deleted object", reference=reference, valid_time=valid_time, event_code=OBJECT_DELETED)
 
     def delete_many(self, references: list[Reference], valid_time: datetime) -> None:
         params = {"valid_time": str(valid_time)}

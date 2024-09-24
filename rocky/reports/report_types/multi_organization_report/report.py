@@ -257,6 +257,6 @@ def collect_report_data(
 ):
     report_data = {}
     for ooi in [x for x in input_ooi_references if Reference.from_str(x).class_type == ReportData]:
-        report_data[ooi] = connector.get(Reference.from_str(ooi), observed_at).dict()
+        report_data[ooi] = connector.get(Reference.from_str(ooi), observed_at).model_dump()
 
     return report_data

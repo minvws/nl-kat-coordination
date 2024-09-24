@@ -9,7 +9,11 @@
     <main id="main-content">
         <section>
             <div class="layout-form">
-                <h1>{% translate "Boefje setup" %}</h1>
+                {% if boefje_variant %}
+                    <h1>{% translate "Boefje variant setup" %}</h1>
+                {% else %}
+                    <h1>{% translate "Boefje setup" %}</h1>
+                {% endif %}
                 <p>
                     {% blocktranslate %}
                         You can create a new Boefje. If you want more information on this,
