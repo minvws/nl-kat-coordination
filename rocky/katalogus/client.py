@@ -73,6 +73,15 @@ class KATalogusError(Exception):
         return str(self.message)
 
 
+class DuplicateNameError(KATalogusError):
+    def __init__(self, *args: object, status_code: str | None = None) -> None:
+        super().__init__(*args)
+        status_message = ""
+        if status_code is not None:
+            status_message = f"{status_code}: "
+        self.message = status_message + _("Boefje with this name already exists.")
+
+
 class KATalogusHTTPStatusError(KATalogusError):
     def __init__(self, *args: object, status_code: str | None = None) -> None:
         super().__init__(*args)
@@ -209,29 +218,33 @@ class KATalogusClientV1:
         return BytesIO(response.content)
 
     def create_plugin(self, plugin: Plugin) -> None:
-        response = self.session.post(
-            f"{self.organization_uri}/plugins",
-            headers={"Content-Type": "application/json"},
-            content=plugin.model_dump_json(exclude_none=True),
-        )
-        response.raise_for_status()
-
-        if response.status_code == codes.CREATED:
-            logger.info("Plugin %s", plugin.name)
-        else:
-            logger.info("Plugin %s could not be created", plugin.name)
+        try:
+            response = self.session.post(
+                f"{self.organization_uri}/plugins",
+                headers={"Content-Type": "application/json"},
+                content=plugin.model_dump_json(exclude_none=True),
+            )
+            response.raise_for_status()
+        except httpx.HTTPStatusError as error:
+            if response.status_code == codes.CREATED:
+                logger.info("Plugin %s created", plugin.name)
+            else:
+                logger.info("Plugin %s could not be created", plugin.name)
+            raise DuplicateNameError(status_code=str(error.response.status_code))
 
     def edit_plugin(self, plugin: Plugin) -> None:
-        response = self.session.patch(
-            f"{self.organization_uri}/boefjes/{plugin.id}",
-            content=plugin.model_dump_json(exclude_none=True),
-        )
-        response.raise_for_status()
-
-        if response.status_code == codes.CREATED:
-            logger.info("Plugin %s", plugin.name)
-        else:
-            logger.info("Plugin %s could not be created", plugin.name)
+        try:
+            response = self.session.patch(
+                f"{self.organization_uri}/boefjes/{plugin.id}",
+                content=plugin.model_dump_json(exclude_none=True),
+            )
+            response.raise_for_status()
+        except httpx.HTTPStatusError as error:
+            if response.status_code == codes.CREATED:
+                logger.info("Plugin %s updated", plugin.name)
+            else:
+                logger.info("Plugin %s could not be updated", plugin.name)
+            raise DuplicateNameError(status_code=str(error.response.status_code))
 
 
 def parse_boefje(boefje: dict) -> Boefje:
