@@ -342,7 +342,7 @@ class Scheduler(abc.ABC):
         # a schedule already has a cron expression, this will not be updated
         # unless this is specifically overridden in a subclass.
         cron_expr = self.set_cron(item)
-        if cron_expr != "":
+        if cron_expr is not None:
             schedule_db.schedule = cron_expr
 
         # If the schedule has a cron schedule, we calculate the next run
