@@ -1,4 +1,3 @@
-from ipaddress import IPv4Address, IPv6Address
 from pathlib import Path
 
 from pydantic_core import Url
@@ -97,25 +96,25 @@ def test_parse_manual_ip_csv(normalizer_runner):
     meta, output, runner = check_network_created(normalizer_runner, 2)
     assert len(output.declarations) == 6
     assert {
-        "address": IPv4Address("1.1.1.1"),
+        "address": "1.1.1.1",
         "netblock": None,
         "network": Reference("Network|internet"),
         "object_type": "IPAddressV4",
         "primary_key": "IPAddressV4|internet|1.1.1.1",
         "scan_profile": None,
         "user_id": None,
-    } == output.declarations[1].ooi.dict()
+    } == output.declarations[1].ooi.model_dump()
 
     meta, output, runner = check_network_created(normalizer_runner, 3)
     assert {
-        "address": IPv6Address("fe80:cd00:0:cde:1257:0:211e:729c"),
+        "address": "fe80:cd00:0:cde:1257:0:211e:729c",
         "netblock": None,
         "network": Reference("Network|internet"),
         "object_type": "IPAddressV6",
         "primary_key": "IPAddressV6|internet|fe80:cd00:0:cde:1257:0:211e:729c",
         "scan_profile": None,
         "user_id": None,
-    } == output.declarations[1].ooi.dict()
+    } == output.declarations[1].ooi.model_dump()
 
 
 def test_parse_url_csv(normalizer_runner):

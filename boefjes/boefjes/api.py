@@ -59,7 +59,7 @@ class StatusEnum(str, Enum):
 
 class File(BaseModel):
     name: str | None = None
-    content: str = Field(..., contentEncoding="base64")
+    content: str = Field(json_schema_extra={"contentEncoding": "base64"})
     tags: list[str] | None = None
 
 
@@ -171,6 +171,6 @@ def create_boefje_meta(task, plugin: PluginType) -> BoefjeMeta:
         input_ooi=input_ooi,
         arguments=arguments,
         organization=organization,
-        environment=get_environment_settings(task.data, plugin.schema),
+        environment=get_environment_settings(task.data, plugin.boefje_schema),
     )
     return boefje_meta

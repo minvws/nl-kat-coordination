@@ -98,7 +98,7 @@ class ReportSchedulerTestCase(ReportSchedulerBaseTestCase):
         schedule = models.Schedule(
             scheduler_id=self.scheduler.scheduler_id,
             hash=report_task.hash,
-            data=report_task.dict(),
+            data=report_task.model_dump(),
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
@@ -132,7 +132,7 @@ class ReportSchedulerTestCase(ReportSchedulerBaseTestCase):
         schedule = models.Schedule(
             scheduler_id=self.scheduler.scheduler_id,
             hash=report_task.hash,
-            data=report_task.dict(),
+            data=report_task.model_dump(),
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)

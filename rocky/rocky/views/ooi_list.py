@@ -114,7 +114,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
                 )
                 % (
                     level.value,
-                    self.organization_member.trusted_clearance_level,
+                    self.organization_member.max_clearance_level,
                 ),
             )
             return self.get(request, status=403, *args, **kwargs)

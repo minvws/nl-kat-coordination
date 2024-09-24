@@ -255,7 +255,7 @@ class SchedulerClient:
             queue_name = f"{item.data.type}-{self.organization_code}"
             res = self._client.post(
                 f"/queues/{queue_name}/push",
-                content=item.json(exclude_none=True),
+                content=item.model_dump_json(exclude_none=True),
                 headers={"Content-Type": "application/json"},
             )
             res.raise_for_status()
