@@ -17,6 +17,7 @@ from boefjes.sql.plugin_storage import create_plugin_storage
 from boefjes.storage.interfaces import (
     ConfigStorage,
     ExistingPluginId,
+    ExistingPluginName,
     NotFound,
     PluginNotFound,
     PluginStorage,
@@ -108,14 +109,30 @@ class PluginService:
             self.local_repo.by_id(boefje.id)
             raise ExistingPluginId(boefje.id)
         except KeyError:
-            self.plugin_storage.create_boefje(boefje)
+            try:
+                plugin = self.local_repo.by_name(boefje.name)
+
+                if plugin.type == "boefje":
+                    raise ExistingPluginName(boefje.name)
+                else:
+                    self.plugin_storage.create_boefje(boefje)
+            except KeyError:
+                self.plugin_storage.create_boefje(boefje)
 
     def create_normalizer(self, normalizer: Normalizer) -> None:
         try:
             self.local_repo.by_id(normalizer.id)
             raise ExistingPluginId(normalizer.id)
         except KeyError:
-            self.plugin_storage.create_normalizer(normalizer)
+            try:
+                plugin = self.local_repo.by_name(normalizer.name)
+
+                if plugin.types == "normalizer":
+                    raise ExistingPluginName(normalizer.name)
+                else:
+                    self.plugin_storage.create_normalizer(normalizer)
+            except KeyError:
+                self.plugin_storage.create_normalizer(normalizer)
 
     def _put_boefje(self, boefje_id: str) -> None:
         """Check existence of a boefje, and insert a database entry if it concerns a local boefje"""
