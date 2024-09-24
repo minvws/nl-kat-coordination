@@ -1,6 +1,6 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from httpx import ReadTimeout
+from httpx import HTTPStatusError
 from katalogus.client import Boefje, KATalogusClientV1
 
 from octopoes.models.types import ALL_TYPES, type_by_name
@@ -104,7 +104,7 @@ class BoefjeAddForm(BoefjeSetupForm):
 
         try:
             self.katalogus_client.create_plugin(plugin)
-        except ReadTimeout:
+        except HTTPStatusError:
             handle_existing_name(self, plugin.name)
 
         return cleaned_data
@@ -118,7 +118,7 @@ class BoefjeEditForm(BoefjeSetupForm):
 
         try:
             self.katalogus_client.edit_plugin(plugin)
-        except ReadTimeout:
+        except HTTPStatusError:
             handle_existing_name(self, plugin.name)
 
         return cleaned_data
