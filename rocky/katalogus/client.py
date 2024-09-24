@@ -243,7 +243,7 @@ def parse_boefje(boefje: dict) -> Boefje:
         scan_level=scan_level,
         consumes=consumes,
         produces=boefje["produces"],
-        boefje_schema=boefje.get("schema"),
+        boefje_schema=boefje.get("boefje_schema"),
         oci_image=boefje.get("oci_image"),
         oci_arguments=boefje.get("oci_arguments", []),
     )
