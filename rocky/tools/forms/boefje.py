@@ -89,7 +89,7 @@ class BoefjeSetupForm(BaseRockyForm):
             scan_level=form_data["scan_level"],
             consumes=input_objects,
             produces=produces,
-            schema=form_data["schema"],
+            boefje_schema=form_data["boefje_schema"],
             oci_image=form_data["oci_image"],
             oci_arguments=arguments,
         )

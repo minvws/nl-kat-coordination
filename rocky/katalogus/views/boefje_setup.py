@@ -72,7 +72,7 @@ class AddBoefjeVariantView(BoefjeSetupView):
 
     def get_initial(self):
         initial = super().get_initial()
-        
+
         consumes = []
 
         for input_object in self.plugin.consumes:
@@ -80,7 +80,7 @@ class AddBoefjeVariantView(BoefjeSetupView):
 
         initial["oci_image"] = self.plugin.oci_image
         initial["oci_arguments"] = " ".join(self.plugin.oci_arguments)
-        initial["schema"] = self.plugin.schema
+        initial["boefje_schema"] = self.plugin.boefje_schema
         initial["consumes"] = consumes
         initial["produces"] = ", ".join(self.plugin.produces)
         initial["scan_level"] = self.plugin.scan_level
@@ -142,7 +142,7 @@ class EditBoefjeView(BoefjeSetupView):
         initial["description"] = self.plugin.description
         initial["oci_image"] = self.plugin.oci_image
         initial["oci_arguments"] = " ".join(self.plugin.oci_arguments)
-        initial["schema"] = self.plugin.schema
+        initial["boefje_schema"] = self.plugin.boefje_schema
         initial["consumes"] = consumes
         initial["produces"] = ", ".join(self.plugin.produces)
         initial["scan_level"] = self.plugin.scan_level
