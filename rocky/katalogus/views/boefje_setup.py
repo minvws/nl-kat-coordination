@@ -82,7 +82,7 @@ class AddBoefjeVariantView(BoefjeSetupView):
 
         initial["oci_image"] = self.plugin.oci_image
         initial["oci_arguments"] = " ".join(self.plugin.oci_arguments)
-        initial["schema"] = self.plugin.schema
+        initial["boefje_schema"] = self.plugin.boefje_schema
         initial["consumes"] = consumes
         initial["produces"] = ", ".join(self.plugin.produces)
         initial["scan_level"] = self.plugin.scan_level
@@ -137,7 +137,7 @@ class EditBoefjeView(BoefjeSetupView):
         initial["description"] = self.plugin.description
         initial["oci_image"] = self.plugin.oci_image
         initial["oci_arguments"] = " ".join(self.plugin.oci_arguments)
-        initial["schema"] = self.plugin.schema
+        initial["boefje_schema"] = self.plugin.boefje_schema
         initial["consumes"] = consumes
         initial["produces"] = ", ".join(self.plugin.produces)
         initial["scan_level"] = self.plugin.scan_level
@@ -210,7 +210,7 @@ def create_boefje_with_form_data(form_data, plugin_id: str, created: str):
         scan_level=form_data["scan_level"],
         consumes=input_objects,
         produces=produces,
-        schema=form_data["schema"],
+        boefje_schema=form_data["boefje_schema"],
         oci_image=form_data.get("oci_image"),
         oci_arguments=arguments,
     )
