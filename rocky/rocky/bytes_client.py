@@ -28,11 +28,11 @@ class BytesClient:
         response = self.session.get("/health")
         response.raise_for_status()
 
-        return ServiceHealth.parse_obj(response.json())
+        return ServiceHealth.model_validate(response.json())
 
     @staticmethod
     def raw_from_declarations(declarations: list[Declaration]):
-        json_string = f"[{','.join([declaration.json() for declaration in declarations])}]"
+        json_string = f"[{','.join([declaration.model_dump_json() for declaration in declarations])}]"
 
         return json_string.encode("utf-8")
 
