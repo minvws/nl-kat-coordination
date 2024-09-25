@@ -10,70 +10,60 @@ export function initDialogs(element) {
 }
 
 export function initDialog(modal) {
-  let input_elements = [];
+  let id = window.location.toString().split("#")[1];
   let dialog_element = modal.querySelector("dialog");
+  if (!dialog_element) return;
+
   let trigger = document.querySelector(
     "[data-modal-id='" + dialog_element.id + "']",
   );
+  if (!trigger) return;
 
-  trigger.addEventListener("click", (event) => {
-    // Get and clone input elements to be able to "reset" them on "cancel".
-    input_elements = modal.querySelectorAll("input, textarea");
+  // If ID is present in the URL on init, open the dialog immediately.
+  if (id) {
+    ShowModalBasedOnAnchor(id);
+  }
 
-    // Store the initial value in a data attribute
-    input_elements.forEach((element) => {
-      element.defaultvalue = element.value;
+  // Check if trigger element is <a>, if not, on click,
+  // alter the URL to open the dialog using the onhaschange event.
+  if (trigger.nodeName !== "A") {
+    trigger.addEventListener("click", (event) => {
+      let url = window.location.toString();
+      window.location = url + "#" + dialog_element.id;
     });
-
-    // Show modal, selected by ID
-    modal.querySelector("#" + dialog_element.id).showModal();
-  });
+  }
 
   modal.querySelector("dialog").addEventListener("click", (event) => {
     // The actual handling (like posting) of the input values should be done when implementing the component.
-    if (event.target.classList.contains("confirm-modal-button")) {
-      if (input_elements) {
-        // Closing is only allowed when the inputs are 'valid'.
-        if (checkValidity(input_elements)) {
-          event.target
-            .closest(".modal-wrapper")
-            .querySelector("dialog")
-            .close();
-        }
-        return;
-      }
-    }
     // event.target.nodeName === 'DIALOG' is needed to check if the ::backdrop is clicked.
     if (
+      event.target.classList.contains("confirm-modal-button") ||
       event.target.classList.contains("close-modal-button") ||
       event.target.nodeName === "DIALOG"
     ) {
-      // When canceling or closing using the 'x' remove the "error" styles.
-      input_elements.forEach((element) => {
-        element.classList.remove("error");
-      });
-
-      // When canceling or closing the modal, the inputs get reset to their initial value.
-      input_elements.forEach((element) => {
-        element.value = element.defaultvalue;
-      });
-
       event.target.closest(".modal-wrapper").querySelector("dialog").close();
     }
   });
-}
 
-export function checkValidity(elements) {
-  let valid = true;
-
-  elements.forEach((element) => {
-    if (!element.checkValidity()) {
-      valid = false;
-      element.classList.add("error");
-    } else {
-      element.classList.remove("error");
-    }
+  modal.querySelector("dialog").addEventListener("close", (event) => {
+    removeDialogAnchor();
   });
-
-  return valid;
 }
+
+export function removeDialogAnchor() {
+  // Remove the anchor from the URL when closing the modal
+  let baseUrl = window.location.toString().split("#")[0];
+  window.history.pushState("", "Base URL", baseUrl);
+}
+
+export function ShowModalBasedOnAnchor(id) {
+  if (id && document.querySelector("#" + id).nodeName === "DIALOG") {
+    // Show modal, selected by ID
+    document.querySelector("#" + id).showModal();
+  }
+}
+
+window.onhashchange = function () {
+  let id = window.location.toString().split("#")[1];
+  ShowModalBasedOnAnchor(id);
+};
