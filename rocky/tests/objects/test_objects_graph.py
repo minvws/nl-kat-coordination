@@ -27,7 +27,7 @@ TREE_DATA = {
 
 
 def test_ooi_graph(rf, client_member, mock_organization_view_octopoes):
-    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
 
     request = setup_request(rf.get("ooi_graph", {"ooi_id": "Network|testnetwork"}), client_member.user)
     request.resolver_match = resolve(

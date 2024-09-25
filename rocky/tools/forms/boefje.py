@@ -43,7 +43,7 @@ class BoefjeAddForm(BaseRockyForm):
             attrs={"description": "For example: -sTU --top-ports 1000", "aria-describedby": "input-description"}
         ),
     )
-    schema = forms.JSONField(
+    boefje_schema = forms.JSONField(
         required=False,
         label=_("JSON Schema"),
         help_text=BOEFJE_SCHEMA_HELP_TEXT,

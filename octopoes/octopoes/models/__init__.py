@@ -203,7 +203,7 @@ class OOI(BaseModel):
                     node[key] = natural_key_parts.pop(0)
             return node
 
-        return PrimaryKeyToken.parse_obj(hydrate(token_tree))
+        return PrimaryKeyToken.model_validate(hydrate(token_tree))
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
