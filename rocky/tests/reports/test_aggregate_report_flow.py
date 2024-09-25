@@ -1,3 +1,5 @@
+import json
+
 from pytest_django.asserts import assertContains
 from reports.views.aggregate_report import (
     OOISelectionAggregateReportView,
@@ -5,10 +7,11 @@ from reports.views.aggregate_report import (
     SaveAggregateReportView,
     SetupScanAggregateReportView,
 )
+from reports.views.base import ViewReportView
 
 from octopoes.models.pagination import Paginated
 from octopoes.models.types import OOIType
-from tests.conftest import setup_request
+from tests.conftest import get_aggregate_report_data, setup_request
 
 
 def test_select_all_oois_post_to_select_report_types(
@@ -177,7 +180,7 @@ def test_report_types_selection_nothing_selected(
 
     response = SetupScanAggregateReportView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 302
+    assert response.status_code == 307
     assert list(request._messages)[0].message == "Select at least one report type to proceed."
 
 
@@ -189,6 +192,7 @@ def test_report_types_selection(
     listed_hostnames,
     mocker,
     boefje_dns_records,
+    boefje_nmap_tcp,
     rocky_health,
     mock_bytes_client,
 ):
@@ -197,7 +201,7 @@ def test_report_types_selection(
     """
 
     katalogus_mocker = mocker.patch("reports.views.base.get_katalogus")()
-    katalogus_mocker.get_plugins.return_value = [boefje_dns_records]
+    katalogus_mocker.get_plugins.return_value = [boefje_dns_records, boefje_nmap_tcp]
 
     rocky_health_mocker = mocker.patch("reports.report_types.aggregate_organisation_report.report.get_rocky_health")()
     rocky_health_mocker.return_value = rocky_health
@@ -211,16 +215,17 @@ def test_report_types_selection(
     request = setup_request(
         rf.post(
             "aggregate_report_setup_scan",
-            {"observed_at": valid_time.strftime("%Y-%m-%d"), "report_type": "dns-report"},
+            {"observed_at": valid_time.strftime("%Y-%m-%d"), "report_type": ["dns-report", "systems-report"]},
         ),
         client_member.user,
     )
 
     response = SetupScanAggregateReportView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 200  # if all plugins are enabled the view will auto redirect to generate report
+    assert response.status_code == 307  # if all plugins are enabled the view will auto redirect to generate report
 
-    assertContains(response, '<input type="hidden" name="report_type" value="dns-report">', html=True)
+    # Redirect to export setup
+    assert response.headers["Location"] == "/en/test/reports/aggregate-report/export-setup/?"
 
 
 def test_save_aggregate_report_view(
@@ -268,3 +273,33 @@ def test_save_aggregate_report_view(
 
     assert response.status_code == 302  # after post follows redirect, this to first create report ID
     assert "report_id=Report" in response.url
+
+
+def test_json_download_aggregate_report(
+    rf,
+    client_member,
+    get_aggregate_report_ooi,
+    get_aggregate_report_from_bytes,
+    mock_organization_view_octopoes,
+    mock_bytes_client,
+):
+    mock_organization_view_octopoes().get.return_value = get_aggregate_report_ooi
+    mock_bytes_client().get_raw.return_value = get_aggregate_report_from_bytes
+    mock_organization_view_octopoes().query.return_value = []
+
+    request = setup_request(
+        rf.get(
+            "view_report_json",
+            {"json": "true", "report_id": f"{get_aggregate_report_ooi.primary_key}"},
+        ),
+        client_member.user,
+    )
+
+    json_response = ViewReportView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert json_response.status_code == 200
+
+    json_response_data = json.dumps(json.loads(json_response.content))
+    json_compare_data = json.dumps(get_aggregate_report_data())
+
+    assert json_response_data == json_compare_data

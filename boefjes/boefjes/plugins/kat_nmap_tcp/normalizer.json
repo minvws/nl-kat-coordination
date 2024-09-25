@@ -1,5 +1,6 @@
 {
   "id": "kat_nmap_normalize",
+  "name": "nmap",
   "consumes": [
     "boefje/nmap",
     "boefje/nmap-udp",

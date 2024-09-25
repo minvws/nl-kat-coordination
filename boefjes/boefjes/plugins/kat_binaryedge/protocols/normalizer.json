@@ -1,5 +1,6 @@
 {
   "id": "kat_binaryedge_protocols",
+  "name": "BinaryEdge protocols",
   "consumes": [
     "boefje/binaryedge"
   ],

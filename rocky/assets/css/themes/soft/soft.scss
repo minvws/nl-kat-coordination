@@ -4,9 +4,11 @@
 @import "fonts/fonts";
 
 /* Styling sets. E.g color sets */
-@import "colors/colors";
-@import "colors/tag-colors";
-@import "manon/body-text-set";
+@import "fundamentals/body-text-set";
+@import "fundamentals/border-radii";
+@import "fundamentals/colors";
+@import "fundamentals/tag-colors";
+@import "fundamentals/tags-6-3";
 @import "manon/spot-large";
 @import "manon/headings-base-set";
 @import "manon/text-colors";

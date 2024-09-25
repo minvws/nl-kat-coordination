@@ -1,6 +1,7 @@
 import json
 from collections.abc import Sequence, Set
 from datetime import datetime
+from typing import Literal
 from uuid import UUID
 
 import httpx
@@ -26,6 +27,7 @@ from octopoes.models.pagination import Paginated
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
+from octopoes.types import DECLARATION_CREATED, OBJECT_DELETED, OBSERVATION_CREATED, ORIGIN_DELETED
 
 
 class OctopoesAPIConnector:
@@ -72,15 +74,22 @@ class OctopoesAPIConnector:
         limit: int = DEFAULT_LIMIT,
         scan_level: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_type: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+        search_string: str | None = None,
+        order_by: Literal["scan_level", "object_type"] = "object_type",
+        asc_desc: Literal["asc", "desc"] = "asc",
     ) -> Paginated[OOIType]:
-        params: dict[str, str | int | list[str | int]] = {
+        params: dict[str, str | int | list[str | int] | None] = {
             "types": [t.__name__ for t in types],
             "valid_time": str(valid_time),
             "offset": offset,
             "limit": limit,
             "scan_level": [s.value for s in scan_level],
             "scan_profile_type": [s.value for s in scan_profile_type],
+            "search_string": search_string,
+            "order_by": order_by,
+            "asc_desc": asc_desc,
         }
+        params = {k: v for k, v in params.items() if v is not None}  # filter out None values
         res = self.session.get(f"/{self.client}/objects", params=params)
         return TypeAdapter(Paginated[OOIType]).validate_json(res.content)
 
@@ -168,6 +177,8 @@ class OctopoesAPIConnector:
 
         self.session.delete(f"/{self.client}/origins", params=params)
 
+        self.logger.info("Deleted origin", origin_id=origin_id, valid_time=valid_time, event_code=ORIGIN_DELETED)
+
     def save_observation(self, observation: Observation) -> None:
         self.session.post(
             f"/{self.client}/observations",
@@ -175,7 +186,7 @@ class OctopoesAPIConnector:
             content=observation.model_dump_json(),
         )
 
-        self.logger.info("Saved observation", observation=observation)
+        self.logger.info("Saved observation", observation=observation, event_code=OBSERVATION_CREATED)
 
     def save_declaration(self, declaration: Declaration) -> None:
         self.session.post(
@@ -184,7 +195,7 @@ class OctopoesAPIConnector:
             content=declaration.model_dump_json(),
         )
 
-        self.logger.info("Saved declaration", declaration=declaration)
+        self.logger.info("Saved declaration", declaration=declaration, event_code=DECLARATION_CREATED)
 
     def save_affirmation(self, affirmation: Affirmation) -> None:
         self.session.post(
@@ -193,7 +204,7 @@ class OctopoesAPIConnector:
             content=affirmation.model_dump_json(),
         )
 
-        self.logger.info("Saved affirmation", affirmation=affirmation)
+        self.logger.info("Saved affirmation", affirmation=affirmation, event_code=DECLARATION_CREATED)
 
     def save_scan_profile(self, scan_profile: ScanProfile, valid_time: datetime):
         params = {"valid_time": str(valid_time)}
@@ -216,7 +227,7 @@ class OctopoesAPIConnector:
         params = {"reference": str(reference), "valid_time": str(valid_time)}
         self.session.delete(f"/{self.client}/", params=params)
 
-        self.logger.info("Deleted object", reference=reference, valid_time=valid_time)
+        self.logger.info("Deleted object", reference=reference, valid_time=valid_time, event_code=OBJECT_DELETED)
 
     def delete_many(self, references: list[Reference], valid_time: datetime) -> None:
         params = {"valid_time": str(valid_time)}
@@ -257,15 +268,23 @@ class OctopoesAPIConnector:
         only_muted: bool = False,
         offset: int = DEFAULT_OFFSET,
         limit: int = DEFAULT_LIMIT,
+        search_string: str | None = None,
+        order_by: Literal["score", "finding_type"] = "score",
+        asc_desc: Literal["asc", "desc"] = "desc",
     ) -> Paginated[Finding]:
-        params: dict[str, str | int | list[str]] = {
+        params: dict[str, str | int | list[str] | None] = {
             "valid_time": str(valid_time),
             "offset": offset,
             "limit": limit,
             "severities": [s.value for s in severities],
             "exclude_muted": exclude_muted,
             "only_muted": only_muted,
+            "search_string": search_string,
+            "order_by": order_by,
+            "asc_desc": asc_desc,
         }
+
+        params = {k: v for k, v in params.items() if v is not None}  # filter out None values
         res = self.session.get(f"/{self.client}/findings", params=params)
         return TypeAdapter(Paginated[Finding]).validate_json(res.content)
 

@@ -1,5 +1,7 @@
 import threading
 
+import httpx
+
 from scheduler.connectors.errors import exception_handler
 from scheduler.models import Boefje, Organisation, Plugin
 from scheduler.utils import dict_utils
@@ -140,32 +142,57 @@ class Katalogus(HTTPService):
     @exception_handler
     def get_boefjes(self) -> list[Boefje]:
         url = f"{self.host}/boefjes"
-        response = self.get(url)
-        return [Boefje(**boefje) for boefje in response.json()]
+        try:
+            response = self.get(url)
+            return [Boefje(**boefje) for boefje in response.json()]
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == httpx.codes.NOT_FOUND:
+                return []
+            raise
 
     @exception_handler
-    def get_boefje(self, boefje_id: str) -> Boefje:
+    def get_boefje(self, boefje_id: str) -> Boefje | None:
         url = f"{self.host}/boefjes/{boefje_id}"
-        response = self.get(url)
-        return Boefje(**response.json())
+        try:
+            response = self.get(url)
+            return Boefje(**response.json())
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == httpx.codes.NOT_FOUND:
+                return None
+            raise
 
     @exception_handler
-    def get_organisation(self, organisation_id) -> Organisation:
+    def get_organisation(self, organisation_id) -> Organisation | None:
         url = f"{self.host}/v1/organisations/{organisation_id}"
-        response = self.get(url)
-        return Organisation(**response.json())
+        try:
+            response = self.get(url)
+            return Organisation(**response.json())
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == httpx.codes.NOT_FOUND:
+                return None
+            raise
 
     @exception_handler
     def get_organisations(self) -> list[Organisation]:
         url = f"{self.host}/v1/organisations"
-        response = self.get(url)
-        return [Organisation(**organisation) for organisation in response.json().values()]
+        try:
+            response = self.get(url)
+            return [Organisation(**organisation) for organisation in response.json().values()]
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == httpx.codes.NOT_FOUND:
+                return []
+            raise
 
     @exception_handler
     def get_plugins_by_organisation(self, organisation_id: str) -> list[Plugin]:
         url = f"{self.host}/v1/organisations/{organisation_id}/plugins"
-        response = self.get(url)
-        return [Plugin(**plugin) for plugin in response.json()]
+        try:
+            response = self.get(url)
+            return [Plugin(**plugin) for plugin in response.json()]
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == httpx.codes.NOT_FOUND:
+                return []
+            raise
 
     def get_plugins_by_org_id(self, organisation_id: str) -> list[Plugin]:
         def _get_from_cache() -> list[Plugin]:

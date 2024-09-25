@@ -1,5 +1,6 @@
 {
   "id": "kat_ssl_test_ciphers_normalize",
+  "name": "SSL test ciphers",
   "consumes": [
     "boefje/testssl-sh-ciphers"
   ],

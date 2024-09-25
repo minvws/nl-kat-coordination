@@ -15,7 +15,7 @@ class DownloadTaskDetail(SchedulerView):
         filename = "task_" + task_id + ".json"
         task_details = self.get_task_details(task_id)
         if task_details is not None:
-            response = HttpResponse(FileResponse(task_details.json()), content_type="application/json")
+            response = HttpResponse(FileResponse(task_details.model_dump_json()), content_type="application/json")
             response["Content-Disposition"] = "attachment; filename=" + filename
             return response
 
@@ -48,9 +48,12 @@ class BoefjeTaskDetailView(TaskDetailView):
             {
                 "url": reverse(
                     "boefje_task_view",
-                    kwargs={"organization_code": self.organization.code, "task_id": context["task_id"]},
+                    kwargs={
+                        "organization_code": self.organization.code,
+                        "task_id": context["task_id"],
+                    },
                 ),
-                "text": context["task"].p_item.data.boefje.id,
+                "text": context["task"].data.boefje.id,
             },
         ]
 

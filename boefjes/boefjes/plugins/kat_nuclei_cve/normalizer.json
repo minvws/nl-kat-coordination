@@ -1,5 +1,6 @@
 {
   "id": "kat_nuclei_cve_normalize",
+  "name": "Nuclei CVE",
   "consumes": [
     "boefje/nuclei-cve"
   ],

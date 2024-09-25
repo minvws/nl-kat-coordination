@@ -1,5 +1,6 @@
 {
   "id": "kat_binaryedge_remote_desktop",
+  "name": "Binary Edge remote desktop",
   "consumes": [
     "boefje/binaryedge"
   ],

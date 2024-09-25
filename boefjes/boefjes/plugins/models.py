@@ -1,15 +1,20 @@
 import hashlib
+import json
 from enum import Enum
 from importlib import import_module
 from inspect import isfunction, signature
+from json import JSONDecodeError
 from pathlib import Path
 from typing import Protocol
+
+from jsonschema.exceptions import SchemaError
 
 from boefjes.models import Boefje, Normalizer
 
 BOEFJES_DIR = Path(__file__).parent
 
 BOEFJE_DEFINITION_FILE = "boefje.json"
+SCHEMA_FILE = "schema.json"
 NORMALIZER_DEFINITION_FILE = "normalizer.json"
 ENTRYPOINT_BOEFJES = "main.py"
 ENTRYPOINT_NORMALIZERS = "normalize.py"
@@ -54,7 +59,7 @@ class BoefjeResource:
 
     def __init__(self, path: Path, package: str):
         self.path = path
-        self.boefje: Boefje = Boefje.parse_file(path / BOEFJE_DEFINITION_FILE)
+        self.boefje: Boefje = Boefje.model_validate_json(path.joinpath(BOEFJE_DEFINITION_FILE).read_text())
         self.boefje.runnable_hash = get_runnable_hash(self.path)
         self.boefje.produces = self.boefje.produces.union(set(_default_mime_types(self.boefje)))
         self.module: Runnable | None = None
@@ -62,13 +67,21 @@ class BoefjeResource:
         if (path / ENTRYPOINT_BOEFJES).exists():
             self.module = get_runnable_module_from_package(package, ENTRYPOINT_BOEFJES, parameter_count=1)
 
+        if (path / SCHEMA_FILE).exists():
+            try:
+                self.boefje.boefje_schema = json.load((path / SCHEMA_FILE).open())
+            except JSONDecodeError as e:
+                raise ModuleException("Invalid schema file") from e
+            except SchemaError as e:
+                raise ModuleException("Invalid schema") from e
+
 
 class NormalizerResource:
     """Represents a Normalizer package that we can run. Throws a ModuleException if any validation fails."""
 
     def __init__(self, path: Path, package: str):
         self.path = path
-        self.normalizer = Normalizer.parse_file(path / NORMALIZER_DEFINITION_FILE)
+        self.normalizer = Normalizer.model_validate_json(path.joinpath(NORMALIZER_DEFINITION_FILE).read_text())
         self.normalizer.consumes.append(f"normalizer/{self.normalizer.id}")
         self.module = get_runnable_module_from_package(package, ENTRYPOINT_NORMALIZERS, parameter_count=2)
 

@@ -1,5 +1,6 @@
 {
   "id": "kat_ssl_certificates_normalize",
+  "name": "SSL certificates",
   "consumes": [
     "boefje/ssl-certificates"
   ],

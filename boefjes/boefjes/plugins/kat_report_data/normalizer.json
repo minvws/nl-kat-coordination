@@ -1,5 +1,6 @@
 {
   "id": "kat_report_data",
+  "name": "Report data",
   "consumes": [
     "openkat/report-data"
   ],

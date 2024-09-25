@@ -12,7 +12,6 @@ class Plugin(BaseModel):
     authors: list[str] | None = None
     created: datetime.datetime | None = None
     description: str | None = None
-    environment_keys: list[str] | None = None
     related: list[str] | None = None
     scan_level: int | None = None
     consumes: str | list[str]

@@ -1,22 +1,25 @@
 /* Form - Variables */
 
 :root {
+  --form-base-text-color: var(--application-base-text-color);
+
   /* Accent color */
   --form-accent-color-color: var(--branding-color-2);
 
   /* Input */
-  --form-base-input-text-color: var(--colors-black);
+  --form-base-input-text-color: var(--form-base-text-color);
   --form-input-border-width: 1px;
   --form-input-border-style: solid;
   --form-input-border-color: var(--colors-grey-200);
   --form-inline-gap: 1rem;
+  --form-input-border-radius: var(--border-radius-s);
 
   /* Help */
   --form-help-button-icon-content: "\ec9d";
   --form-help-button-icon-font-family: var(--icon-font-family);
 
   /* Textarea */
-  --form-textarea-text-color: var(--form-base-input-text-color);
+  --form-textarea-text-color: var(--form-base-text-color);
   --form-textarea-border-color: var(--colors-grey-200);
 
   /* Fieldset */

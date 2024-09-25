@@ -1,3 +1,5 @@
+import datetime
+
 from sqlalchemy.sql.elements import BinaryExpression
 
 
@@ -58,7 +60,20 @@ class Comparator:
     def compare(
         self,
         x: BinaryExpression,
-        y: str | int | float | bool | None | list[str] | list[int] | list[float] | list[bool] | list[None],
+        y: (
+            str
+            | int
+            | float
+            | bool
+            | datetime.datetime
+            | None
+            | list[str]
+            | list[int]
+            | list[float]
+            | list[bool]
+            | list[datetime.datetime]
+            | list[None]
+        ),
     ) -> BinaryExpression:
         """Compare two values using the operator specified in the constructor.
 

@@ -1,9 +1,9 @@
 {
   "id": "fierce",
   "name": "Fierce",
-  "description": "Use a Fierce scan to find subdomains (with their ip)",
+  "description": "Perform DNS reconnaissance using Fierce, to help locate non-contiguous IP space and hostnames against specified hostnames. No exploitation is performed.",
   "consumes": [
     "Hostname"
   ],
-  "scan_level": 3
+  "scan_level": 1
 }

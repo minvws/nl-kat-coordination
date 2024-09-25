@@ -71,7 +71,7 @@ def test_ooi_detail(
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
     assertContains(response, "Object")
     assertContains(response, "Network|testnetwork")
 
@@ -109,7 +109,7 @@ def test_question_detail(
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
 
     assertContains(response, "Question")
     assertContains(response, "Rendered Question Form")
@@ -142,7 +142,7 @@ def test_answer_question(
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
     assertContains(response, "Question has been answered.", status_code=200)
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
 
 
 def test_answer_question_bad_schema(
@@ -217,7 +217,7 @@ def test_ooi_detail_start_scan(
     )
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
 
     assert response.status_code == 200
 
@@ -263,7 +263,7 @@ def test_ooi_detail_start_scan_no_indemnification(
     )
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
     assertContains(response, "Object details")
     assertContains(response, "Indemnification not present")
 
@@ -295,7 +295,7 @@ def test_ooi_detail_start_scan_no_action(
     )
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
     assertContains(response, "Object details")
 
 

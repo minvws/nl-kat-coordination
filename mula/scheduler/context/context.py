@@ -153,7 +153,10 @@ class AppContext:
 
         # Database connection
         try:
-            dbconn = storage.DBConn(str(self.config.db_uri))
+            dbconn = storage.DBConn(
+                dsn=str(self.config.db_uri),
+                pool_size=self.config.db_connection_pool_size,
+            )
             dbconn.connect()
         except storage.errors.StorageError:
             self.logger.exception("Failed to connect to database")
@@ -165,6 +168,7 @@ class AppContext:
         # Datastores, SimpleNamespace allows us to use dot notation
         self.datastores: SimpleNamespace = SimpleNamespace(
             **{
+                storage.ScheduleStore.name: storage.ScheduleStore(dbconn),
                 storage.TaskStore.name: storage.TaskStore(dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(dbconn),
             }

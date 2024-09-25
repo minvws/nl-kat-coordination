@@ -1,5 +1,6 @@
 {
   "id": "kat_rpki_normalize",
+  "name": "RPKI",
   "consumes": [
     "rpki/results"
   ],

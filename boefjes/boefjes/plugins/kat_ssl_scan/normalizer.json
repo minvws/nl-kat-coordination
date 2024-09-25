@@ -1,5 +1,6 @@
 {
   "id": "kat_ssl_scan_normalize",
+  "name": "SSL scan",
   "consumes": [
     "boefje/ssl-version"
   ],

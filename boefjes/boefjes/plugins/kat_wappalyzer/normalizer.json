@@ -1,5 +1,6 @@
 {
   "id": "kat_wappalyzer_normalize",
+  "name": "Wappalyzer",
   "consumes": [
     "openkat-http/response"
   ],

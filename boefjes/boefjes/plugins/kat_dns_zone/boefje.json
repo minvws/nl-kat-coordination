@@ -1,6 +1,6 @@
 {
   "id": "dns-zone",
-  "name": "DnsZone",
+  "name": "DNS zone",
   "description": "Fetch the parent DNS zone of a DNS zone",
   "consumes": [
     "DNSZone"

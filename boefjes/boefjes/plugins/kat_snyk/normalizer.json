@@ -1,5 +1,6 @@
 {
   "id": "kat_snyk_normalize",
+  "name": "Snyk.io",
   "consumes": [
     "boefje/snyk"
   ],

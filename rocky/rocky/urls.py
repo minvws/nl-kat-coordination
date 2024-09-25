@@ -40,7 +40,12 @@ from rocky.views.privacy_statement import PrivacyStatementView
 from rocky.views.scan_profile import ScanProfileDetailView, ScanProfileResetView
 from rocky.views.scans import ScanListView
 from rocky.views.task_detail import BoefjeTaskDetailView, DownloadTaskDetail, NormalizerTaskJSONView
-from rocky.views.tasks import BoefjesTaskListView, NormalizersTaskListView
+from rocky.views.tasks import (
+    AllBoefjesTaskListView,
+    AllNormalizersTaskListView,
+    BoefjesTaskListView,
+    NormalizersTaskListView,
+)
 from rocky.views.upload_csv import UploadCSV
 from rocky.views.upload_raw import UploadRaw
 
@@ -72,6 +77,9 @@ urlpatterns += i18n_patterns(
         PrivacyStatementView.as_view(),
         name="privacy_statement",
     ),
+    path("tasks/", AllBoefjesTaskListView.as_view(), name="all_task_list"),
+    path("tasks/boefjes", AllBoefjesTaskListView.as_view(), name="all_boefjes_task_list"),
+    path("tasks/normalizers", AllNormalizersTaskListView.as_view(), name="all_normalizers_task_list"),
     path(
         "<organization_code>/settings/indemnifications/",
         IndemnificationAddView.as_view(),

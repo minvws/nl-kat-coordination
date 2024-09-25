@@ -22,7 +22,12 @@ def get_engine() -> Engine:
     db_uri_redacted = db_uri.render_as_string(hide_password=True)
     logger.info("Connecting to database %s with pool size %s...", db_uri_redacted, settings.db_connection_pool_size)
 
-    engine = create_engine(url=db_uri, pool_pre_ping=True, pool_size=settings.db_connection_pool_size)
+    engine = create_engine(
+        url=db_uri,
+        pool_pre_ping=True,
+        pool_size=settings.db_connection_pool_size,
+        connect_args={"options": "-c timezone=utc"},
+    )
 
     logger.info("Connected to database %s", db_uri_redacted)
 

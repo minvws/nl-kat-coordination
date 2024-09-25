@@ -3,11 +3,9 @@
 <div class="horizontal-scroll">
     <h2>{% translate "Tasks" %}</h2>
     {% if not task_list %}
-        <p class="emphasized">{% translate "There are no tasks for" %} {{ plugin.name }}</p>
-        {% include "tasks/partials/task_filter.html" %}
-
+        <p>{% translate "There are no tasks for" %} {{ plugin.name }}.</p>
     {% else %}
-        <p class="emphasized">{% translate "List of tasks for" %} {{ plugin.name }}</p>
+        <p>{% translate "List of tasks for" %} {{ plugin.name }}:</p>
         {% include "tasks/partials/task_filter.html" %}
 
         <table rf-selector="table-scan-history">
@@ -28,11 +26,11 @@
                         <td>{{ task.created_at }}</td>
                         <td>
                             {% if task.type == "boefje" %}
-                                {% with ooi=task.p_item.data.input_ooi %}
+                                {% with ooi=task.data.input_ooi %}
                                     <a href="{% ooi_url "ooi_detail" ooi organization.code observed_at=task.created_at|date:'c' %}">{{ ooi }}</a>
                                 {% endwith %}
                             {% elif task.type == "normalizer" %}
-                                {% with ooi=task.p_item.data.raw_data.boefje_meta.input_ooi %}
+                                {% with ooi=task.data.raw_data.boefje_meta.input_ooi %}
                                     <a href="{% ooi_url "ooi_detail" ooi organization.code observed_at=task.created_at|date:'c' %}">{{ ooi }}</a>
                                 {% endwith %}
                             {% endif %}

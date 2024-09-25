@@ -10,13 +10,7 @@ import structlog
 
 from scheduler import models, storage
 
-from .errors import (
-    InvalidPrioritizedItemError,
-    NotAllowedError,
-    PrioritizedItemNotFoundError,
-    QueueEmptyError,
-    QueueFullError,
-)
+from .errors import InvalidItemError, ItemNotFoundError, NotAllowedError, QueueEmptyError, QueueFullError
 
 
 def with_lock(method):
@@ -54,6 +48,9 @@ class PriorityQueue(abc.ABC):
         pq_store:
             A PriorityQueueStore instance that will be used to store the items
             in a persistent way.
+        lock:
+            A threading.Lock instance that will be used to lock the queue
+            operations.
     """
 
     def __init__(
@@ -100,7 +97,7 @@ class PriorityQueue(abc.ABC):
         self.pq_store: storage.PriorityQueueStore = pq_store
         self.lock: threading.Lock = threading.Lock()
 
-    def pop(self, filters: storage.filters.FilterRequest | None = None) -> models.PrioritizedItem | None:
+    def pop(self, filters: storage.filters.FilterRequest | None = None) -> models.Task | None:
         """Remove and return the highest priority item from the queue.
         Optionally apply filters to the queue.
 
@@ -120,15 +117,16 @@ class PriorityQueue(abc.ABC):
         if item is None:
             return None
 
-        self.remove(item)
+        item.status = models.TaskStatus.DISPATCHED
+        self.pq_store.update(self.pq_id, item)
 
         return item
 
-    def push(self, p_item: models.PrioritizedItem) -> models.PrioritizedItem | None:
+    def push(self, task: models.Task) -> models.Task:
         """Push an item onto the queue.
 
         Args:
-            p_item: The item to be pushed onto the queue.
+            task: The item to be pushed onto the queue.
 
         Returns:
             The item that was pushed onto the queue.
@@ -136,35 +134,35 @@ class PriorityQueue(abc.ABC):
         Raises:
             NotAllowedError: If the item is not allowed to be pushed.
 
-            InvalidPrioritizedItemError: If the item is not valid.
+            InvalidItemError: If the item is not valid.
 
             QueueFullError: If the queue is full.
 
-            PrioritizedItemNotFoundError: If the item is not found on the queue.
+            ItemNotFoundError: If the item is not found on the queue.
         """
-        if not isinstance(p_item, models.PrioritizedItem):
-            raise InvalidPrioritizedItemError("The item is not a PrioritizedItem")
+        if not isinstance(task, models.Task):
+            raise InvalidItemError("The item is not of type Task")
 
-        if not self._is_valid_item(p_item.data):
-            raise InvalidPrioritizedItemError(f"PrioritizedItem must be of type {self.item_type}")
+        if not self._is_valid_item(task.data):
+            raise InvalidItemError(f"Task must be of type {self.item_type}")
 
-        if not p_item.priority:
-            raise InvalidPrioritizedItemError("PrioritizedItem must have a priority")
+        if not task.priority:
+            raise InvalidItemError("Task must have a priority")
 
-        if self.full() and p_item.priority > 1:
+        if self.full() and task.priority > 1:
             raise QueueFullError(f"Queue {self.pq_id} is full.")
 
         # We try to get the item from the queue by a specified identifier of
         # that item by the implementation of the queue. We don't do this by
         # the item itself or its hash because this might have been changed
         # and we might need to update that.
-        item_on_queue = self.get_p_item_by_identifier(p_item)
+        item_on_queue = self.get_item_by_identifier(task)
 
         # Item on queue and data changed
-        item_changed = item_on_queue and p_item.data != item_on_queue.data
+        item_changed = item_on_queue and task.data != item_on_queue.data
 
         # Item on queue and priority changed
-        priority_changed = item_on_queue and p_item.priority != item_on_queue.priority
+        priority_changed = item_on_queue and task.priority != item_on_queue.priority
 
         allowed = any(
             (
@@ -176,7 +174,7 @@ class PriorityQueue(abc.ABC):
         )
 
         if not allowed:
-            message = f"Item {p_item} already on queue {self.pq_id}."
+            message = f"Item {task} already on queue {self.pq_id}."
 
             if item_on_queue and not self.allow_replace:
                 message = "Item already on queue, we're not allowed to replace the item that is already on the queue."
@@ -199,20 +197,21 @@ class PriorityQueue(abc.ABC):
         # If already on queue update the item, else create a new one
         item_db = None
         if not item_on_queue:
-            identifier = self.create_hash(p_item)
-            p_item.hash = identifier
-            item_db = self.pq_store.push(self.pq_id, p_item)
+            identifier = self.create_hash(task)
+            task.hash = identifier
+            task.status = models.TaskStatus.QUEUED
+            item_db = self.pq_store.push(task)
         else:
-            self.pq_store.update(self.pq_id, p_item)
-            item_db = self.get_p_item_by_identifier(p_item)
+            self.pq_store.update(self.pq_id, task)
+            item_db = self.get_item_by_identifier(task)
 
         if not item_db:
-            raise PrioritizedItemNotFoundError(f"Item {p_item} not found in datastore {self.pq_id}")
+            raise ItemNotFoundError(f"Item {task} not found in datastore {self.pq_id}")
 
         return item_db
 
     @with_lock
-    def peek(self, index: int) -> models.PrioritizedItem | None:
+    def peek(self, index: int) -> models.Task | None:
         """Return the item at index without removing it.
 
         Args:
@@ -224,16 +223,16 @@ class PriorityQueue(abc.ABC):
         return self.pq_store.peek(self.pq_id, index)
 
     @with_lock
-    def remove(self, p_item: models.PrioritizedItem) -> None:
+    def remove(self, task: models.Task) -> None:
         """Remove an item from the queue.
 
         Args:
-            p_item: The item to be removed from the queue.
+            task: The item to be removed from the queue.
 
         Returns:
             The item that was removed from the queue.
         """
-        self.pq_store.remove(self.pq_id, p_item.id)
+        self.pq_store.remove(self.pq_id, task.id)
 
     @with_lock
     def clear(self) -> None:
@@ -258,16 +257,16 @@ class PriorityQueue(abc.ABC):
 
         return current_size >= self.maxsize
 
-    def is_item_on_queue(self, p_item: models.PrioritizedItem) -> bool:
+    def is_item_on_queue(self, task: models.Task) -> bool:
         """Check if an item is on the queue.
 
         Args:
-            p_item: The item to be checked.
+            task: The item to be checked.
 
         Returns:
             True if the item is on the queue, False otherwise.
         """
-        identifier = self.create_hash(p_item)
+        identifier = self.create_hash(task)
         item = self.pq_store.get_item_by_hash(self.pq_id, identifier)
         if item is None:
             return False
@@ -288,16 +287,16 @@ class PriorityQueue(abc.ABC):
         return item is not None
 
     @with_lock
-    def get_p_item_by_identifier(self, p_item: models.PrioritizedItem) -> models.PrioritizedItem | None:
+    def get_item_by_identifier(self, task: models.Task) -> models.Task | None:
         """Get an item from the queue by its identifier.
 
         Args:
-            p_item: The item to be checked.
+            task: The item to be checked.
 
         Returns:
             The item if found, None otherwise.
         """
-        identifier = self.create_hash(p_item)
+        identifier = self.create_hash(task)
         item = self.pq_store.get_item_by_hash(self.pq_id, identifier)
         return item
 
@@ -334,8 +333,7 @@ class PriorityQueue(abc.ABC):
 
         return response
 
-    @abc.abstractmethod
-    def create_hash(self, p_item: models.PrioritizedItem) -> str:
+    def create_hash(self, task: models.Task) -> str:
         """Create a hash for the given item. This hash is used to determine if
         the item is already in the queue.
 
@@ -344,9 +342,10 @@ class PriorityQueue(abc.ABC):
         the queue.
 
         Args:
-            p_item: The item to be hashed.
+            task: The item to be hashed.
 
         Returns:
             A string representing the hash of the item.
         """
-        raise NotImplementedError
+        item = self.item_type(**task.data)
+        return item.hash
