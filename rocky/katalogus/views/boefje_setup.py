@@ -193,9 +193,9 @@ class EditBoefjeView(BoefjeSetupView):
 
 
 def create_boefje_with_form_data(form_data, plugin_id: str, created: str):
-    arguments = [] if form_data["oci_arguments"] == "" else form_data["oci_arguments"].split()
-    consumes = [] if form_data["consumes"] == "" else form_data["consumes"].strip("[]").replace("'", "").split(", ")
-    produces = [] if form_data["produces"] == "" else form_data["produces"].split(",")
+    arguments = [] if not form_data["oci_arguments"] else form_data["oci_arguments"].split()
+    consumes = [] if not form_data["consumes"] else form_data["consumes"].strip("[]").replace("'", "").split(", ")
+    produces = [] not if form_data["produces"] else form_data["produces"].split(",")
     produces = [p.strip() for p in produces]
     interval = int(form_data.get("interval") or 0) or None
     input_objects = []
