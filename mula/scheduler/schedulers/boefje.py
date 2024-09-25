@@ -139,7 +139,7 @@ class BoefjeScheduler(Scheduler):
             mutation: The mutation that was received.
         """
         # Convert body into a ScanProfileMutation
-        mutation = ScanProfileMutation.parse_raw(body)
+        mutation = ScanProfileMutation.model_validate_json(body)
 
         self.logger.debug(
             "Received scan level mutation %s for: %s",
@@ -215,7 +215,7 @@ class BoefjeScheduler(Scheduler):
                     continue
 
                 boefje_task = BoefjeTask(
-                    boefje=Boefje.parse_obj(boefje.dict()),
+                    boefje=Boefje.model_validate(boefje.model_dump()),
                     input_ooi=ooi.primary_key if ooi else None,
                     organization=self.organisation.id,
                 )
@@ -301,7 +301,7 @@ class BoefjeScheduler(Scheduler):
                         continue
 
                     boefje_task = BoefjeTask(
-                        boefje=Boefje.parse_obj(boefje.dict()),
+                        boefje=Boefje.model_validate(boefje.dict()),
                         input_ooi=ooi.primary_key,
                         organization=self.organisation.id,
                     )
@@ -368,7 +368,7 @@ class BoefjeScheduler(Scheduler):
             thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-rescheduling"
         ) as executor:
             for schedule in schedules:
-                boefje_task = BoefjeTask.parse_obj(schedule.data)
+                boefje_task = BoefjeTask.model_validate(schedule.data)
 
                 # Plugin still exists?
                 try:
@@ -486,7 +486,7 @@ class BoefjeScheduler(Scheduler):
                         continue
 
                 new_boefje_task = BoefjeTask(
-                    boefje=Boefje.parse_obj(plugin.dict()),
+                    boefje=Boefje.model_validate(plugin.dict()),
                     input_ooi=ooi.primary_key if ooi else None,
                     organization=self.organisation.id,
                 )
@@ -659,7 +659,7 @@ class BoefjeScheduler(Scheduler):
     def push_item_to_queue(self, item: Task) -> Task:
         """Some boefje scheduler specific logic before pushing the item to the
         queue."""
-        boefje_task = BoefjeTask.parse_obj(item.data)
+        boefje_task = BoefjeTask.model_validate(item.data)
 
         # Check if id's are unique and correctly set. Same id's are necessary
         # for the task runner.

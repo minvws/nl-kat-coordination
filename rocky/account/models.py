@@ -2,6 +2,7 @@ from functools import cached_property
 
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models.functions import Lower
 from django.utils import timezone
@@ -9,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from knox import crypto
 from knox.models import AbstractAuthToken
 from knox.settings import CONSTANTS
+from tools.enums import MAX_SCAN_LEVEL
 from tools.models import Organization, OrganizationMember
 
 
@@ -78,6 +80,11 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
+    clearance_level = models.IntegerField(
+        default=-1,
+        help_text=_("The clearance level of the user for all organizations."),
+        validators=[MinValueValidator(-1), MaxValueValidator(MAX_SCAN_LEVEL)],
+    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["full_name"]
@@ -105,9 +112,10 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
         """
         Lists all organizations a user is a member of, excluding organizations to which access is blocked.
 
-        Superusers are considered to be members of all organizations.
+        Superusers and users with the permission can_access_all_organizations are considered to be members
+        of all organizations.
         """
-        if self.is_superuser:
+        if self.has_perm("tools.can_access_all_organizations"):
             return self.all_organizations
         return [m.organization for m in self.organization_members if not m.blocked]
 
@@ -116,9 +124,10 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
         """
         Lists all organizations a user is a member of, including organizations to which access is blocked.
 
-        Superusers are considered to be members of all organizations.
+        Superusers and users with the permission can_access_all_organizations are considered to be members
+        of all organizations.
         """
-        if self.is_superuser:
+        if self.has_perm("tools.can_access_all_organizations"):
             return self.all_organizations
         return [m.organization for m in self.organization_members]
 

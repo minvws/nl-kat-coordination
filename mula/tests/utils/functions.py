@@ -57,7 +57,7 @@ def create_item(scheduler_id: str, priority: int, task: models.Task | None = Non
         task = create_task(scheduler_id)
 
     item = models.Task(
-        **task.dict(),
+        **task.model_dump(),
     )
 
     if priority is not None:

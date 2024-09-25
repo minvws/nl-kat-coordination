@@ -10,11 +10,9 @@ import logging
 
 import sqlalchemy as sa
 from alembic import op
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import text
 
 from boefjes.local_repository import get_local_repository
-from boefjes.sql.plugin_storage import create_plugin_storage
-from boefjes.storage.interfaces import PluginNotFound
 
 # revision identifiers, used by Alembic.
 revision = "5be152459a7b"
@@ -30,28 +28,21 @@ def upgrade() -> None:
     op.add_column("boefje", sa.Column("schema", sa.JSON(), nullable=True))
 
     local_repo = get_local_repository()
-    session = sessionmaker(bind=op.get_bind())()
+    connection = op.get_bind()
 
-    with create_plugin_storage(session) as storage:
+    with connection.begin():
         plugins = local_repo.get_all()
         logger.info("Found %s plugins", len(plugins))
 
         for plugin in local_repo.get_all():
             schema = local_repo.schema(plugin.id)
             if schema:
-                try:
-                    # This way we avoid the safeguard that updating static boefjes is not allowed
-                    instance = storage._db_boefje_instance_by_id(plugin.id)
-                    instance.schema = schema
-                    storage.session.add(instance)
-                    logger.info("Updated database entry for plugin %s", plugin.id)
-                except PluginNotFound:
-                    logger.info("No database entry for plugin %s", plugin.id)
-                    continue
+                query = text("UPDATE boefje SET schema = :schema WHERE plugin_id = :plugin_id")  # noqa: S608
+                connection.execute(query, {"schema": schema, "plugin_id": plugin.id})
+                logger.info("Updated any database entries for plugin %s", plugin.id)
             else:
                 logger.info("No schema present for plugin %s", plugin.id)
 
-    session.close()
     # ### end Alembic commands ###
 
 
