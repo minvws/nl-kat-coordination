@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 11:11+0000\n"
+"POT-Creation-Date: 2024-09-25 11:45+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4178,10 +4178,6 @@ msgid "The selected date is in the future. Please select a different date."
 msgstr ""
 
 #: tools/forms/boefje.py
-msgid "Specify the timeout interval for tasks using this Boefje in minutes"
-msgstr ""
-
-#: tools/forms/boefje.py
 msgid "JSON Schema"
 msgstr ""
 
@@ -4191,6 +4187,10 @@ msgstr ""
 
 #: tools/forms/boefje.py
 msgid "Output mime types"
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid "Specify the timeout interval for tasks using this Boefje in minutes"
 msgstr ""
 
 #: tools/forms/finding_type.py
