@@ -9,12 +9,15 @@ from functools import cached_property
 from typing import Any
 
 import httpx
+import structlog
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from httpx import ConnectError, HTTPError, HTTPStatusError, RequestError, codes
 from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny, ValidationError
 
 from rocky.health import ServiceHealth
+
+logger = structlog.get_logger(__name__)
 
 
 class Boefje(BaseModel):
@@ -309,6 +312,15 @@ class SchedulerClient:
         if return_type == "content":
             return res.content
         return res.json()
+
+    def get_scheduled_reports(self, **params) -> dict:
+        try:
+            response = self._client.get("/schedules", params=params)
+            response.raise_for_status()
+        except HTTPStatusError:
+            logger.error("A HTTPStatusError occurred. Check logs for more info.")
+
+        return response.json()["results"]
 
 
 def scheduler_client(organization_code: str | None) -> SchedulerClient:
