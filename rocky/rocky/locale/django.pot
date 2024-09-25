@@ -4178,6 +4178,10 @@ msgid "The selected date is in the future. Please select a different date."
 msgstr ""
 
 #: tools/forms/boefje.py
+msgid "Specify the timeout interval for tasks using this Boefje in minutes"
+msgstr ""
+
+#: tools/forms/boefje.py
 msgid "JSON Schema"
 msgstr ""
 
