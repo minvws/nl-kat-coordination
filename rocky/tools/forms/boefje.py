@@ -80,7 +80,7 @@ class BoefjeSetupForm(BaseRockyForm):
             input_objects.append(type_by_name(input_object))
 
         return Boefje(
-            id=plugin_id,
+            id=str(plugin_id),
             name=form_data["name"],
             created=created,
             description=form_data["description"],
