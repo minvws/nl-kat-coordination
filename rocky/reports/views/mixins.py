@@ -95,10 +95,10 @@ def save_report_data(
 
         create_ooi(octopoes_api_connector, bytes_client, parent_report_ooi, observed_at)
 
-        for report_type, ooi_data in report_data.items():
+        for report_type_id, ooi_data in report_data.items():
             for ooi, data in ooi_data.items():
                 name_to_save = ""
-                report_type = get_report_by_id(report_type)
+                report_type = get_report_by_id(report_type_id)
                 report_type_name = str(report_type.name)
 
                 ooi_name = Reference.from_str(ooi).human_readable
@@ -116,7 +116,7 @@ def save_report_data(
 
                 sub_report_ooi = Report(
                     name=str(name),
-                    report_type=report_type,
+                    report_type=report_type_id,
                     template=report_type.template_path,
                     report_id=uuid4(),
                     organization_code=organization.code,
@@ -146,7 +146,7 @@ def save_report_data(
 
         parent_report_ooi = Report(
             name=str(name),
-            report_type=report_type,
+            report_type=report_type_id,
             template=report_type.template_path,
             report_id=uuid4(),
             organization_code=organization.code,
@@ -257,7 +257,7 @@ class SaveAggregateReportMixin(BaseReportView):
 
         report_ooi = Report(
             name=str(name),
-            report_type=report_type,
+            report_type=str(report_type.id),
             template=report_type.template_path,
             report_id=uuid4(),
             organization_code=organization.code,

@@ -158,6 +158,7 @@ def test_report_types_selection_nothing_selected(
     valid_time,
     mock_organization_view_octopoes,
     listed_hostnames,
+    mock_katalogus_client,
 ):
     """
     Will send the selected report types to the configuration page (set plugins).

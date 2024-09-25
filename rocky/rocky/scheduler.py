@@ -118,7 +118,7 @@ class TaskStatus(Enum):
 class Task(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: uuid.UUID | None = None
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
     scheduler_id: str
     schedule_id: str | None = None
     priority: int
