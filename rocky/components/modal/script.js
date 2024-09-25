@@ -1,6 +1,12 @@
 import { onDomReady } from "../js/imports/utils.js";
 
-onDomReady(initDialogs);
+onDomReady(initDialogs, function () {
+  // If ID is present in the URL on DomReady, open the dialog immediately.
+  let id = window.location.hash.slice(1);
+  if (id) {
+    showModalBasedOnAnchor(id);
+  }
+});
 
 export function initDialogs(element) {
   let root = element || document;
@@ -10,7 +16,6 @@ export function initDialogs(element) {
 }
 
 export function initDialog(modal) {
-  let id = window.location.toString().split("#")[1];
   let dialog_element = modal.querySelector("dialog");
   if (!dialog_element) return;
 
@@ -18,18 +23,11 @@ export function initDialog(modal) {
     "[data-modal-id='" + dialog_element.id + "']",
   );
   if (!trigger) return;
-
-  // If ID is present in the URL on init, open the dialog immediately.
-  if (id) {
-    ShowModalBasedOnAnchor(id);
-  }
-
   // Check if trigger element is <a>, if not, on click,
   // alter the URL to open the dialog using the onhaschange event.
   if (trigger.nodeName !== "A") {
     trigger.addEventListener("click", (event) => {
-      let url = window.location.toString();
-      window.location = url + "#" + dialog_element.id;
+      window.location.hash = "#" + dialog_element.id;
     });
   }
 
@@ -56,14 +54,14 @@ export function removeDialogAnchor() {
   window.history.pushState("", "Base URL", baseUrl);
 }
 
-export function ShowModalBasedOnAnchor(id) {
+export function showModalBasedOnAnchor(id) {
   if (id && document.querySelector("#" + id).nodeName === "DIALOG") {
     // Show modal, selected by ID
     document.querySelector("#" + id).showModal();
   }
 }
 
-window.onhashchange = function () {
+addEventListener("hashchange", function () {
   let id = window.location.toString().split("#")[1];
-  ShowModalBasedOnAnchor(id);
-};
+  showModalBasedOnAnchor(id);
+});
