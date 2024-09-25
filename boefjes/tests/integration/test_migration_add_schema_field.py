@@ -50,13 +50,10 @@ def migration_f9de6eb7824b(local_repository) -> Session:
 
     yield session
     session.commit()
-    session.close()
 
     alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"])
 
-    session.execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables]))
-    session.commit()
-    session.close()
+    engine.execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables]))
 
 
 def test_fail_on_wrong_plugin_ids(migration_f9de6eb7824b):
