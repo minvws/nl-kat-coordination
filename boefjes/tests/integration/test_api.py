@@ -141,15 +141,20 @@ def test_delete_normalizer(test_client, organisation):
 
 def test_update_plugins(test_client, organisation):
     normalizer = Normalizer(id="norm_id", name="My test normalizer")
-    boefje = Boefje(id="test_plugin", name="My test boefje", description="123")
+    boefje = Boefje(id="test_plugin", name="My test boefje", description="123", interval=20)
 
     test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
-    test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"description": "4"})
     test_client.patch(f"/v1/organisations/{organisation.id}/plugins/{boefje.id}", json={"enabled": True})
+    test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"scan_level": 3})
+    test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"description": "4"})
+    test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"cron": "5 0 * 8 *"})
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/{boefje.id}")
     assert response.json()["description"] == "4"
     assert response.json()["enabled"] is True
+    assert response.json()["scan_level"] == 3
+    assert response.json()["interval"] == 20
+    assert response.json()["cron"] == "5 0 * 8 *"
 
     test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.model_dump_json())
     test_client.patch(f"/v1/organisations/{organisation.id}/normalizers/{normalizer.id}", json={"version": "v1.2"})
@@ -163,7 +168,20 @@ def test_cannot_create_boefje_with_invalid_schema(test_client, organisation):
     boefje["boefje_schema"] = {"$schema": 3}
 
     r = test_client.post(f"/v1/organisations/{organisation.id}/plugins", json=boefje)
-    assert r.status_code == 400
+    assert r.status_code == 422
+
+
+def test_cannot_set_invalid_cron(test_client, organisation):
+    boefje = Boefje(id="test_plugin", name="My test boefje", description="123").model_dump(mode="json")
+    boefje["cron"] = "bad format"
+
+    res = test_client.post(f"/v1/organisations/{organisation.id}/plugins", json=boefje)
+    assert res.status_code == 422
+
+    boefje = Boefje(id="test_plugin", name="My test boefje")
+    test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.json())
+    res = test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"cron": "bad format"})
+    assert res.status_code == 422
 
 
 def test_update_boefje_schema(test_client, organisation):
@@ -173,7 +191,7 @@ def test_update_boefje_schema(test_client, organisation):
     r = test_client.patch(
         f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"boefje_schema": {"$schema": 3}}
     )
-    assert r.status_code == 400
+    assert r.status_code == 422
 
     valid_schema = {
         "title": "Arguments",
