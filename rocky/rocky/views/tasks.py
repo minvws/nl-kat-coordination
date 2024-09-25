@@ -80,10 +80,11 @@ class NormalizersTaskListView(TaskListView):
         plugin_dict = {p.id: p.name for p in plugins}
 
         for task in task_list:
-            if task.data.raw_data.boefje_meta.boefje.id == "manual":
+            boefje_id = task.data.raw_data.boefje_meta.boefje.id
+            if boefje_id == "manual":
                 task_list.remove(task)
             else:
-                task.data.raw_data.boefje_meta.boefje.name = plugin_dict[task.data.raw_data.boefje_meta.boefje.id]
+                task.data.raw_data.boefje_meta.boefje.name = plugin_dict[boefje_id]
 
         return context
 
