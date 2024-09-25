@@ -5,7 +5,6 @@ from typing import Any
 import structlog
 from fastapi import APIRouter, FastAPI, Request, status
 from fastapi.responses import JSONResponse, RedirectResponse
-from jsonschema.exceptions import SchemaError
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
@@ -102,14 +101,6 @@ def storage_error_handler(request: Request, exc: StorageError):
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={"message": exc.message},
-    )
-
-
-@app.exception_handler(SchemaError)
-def schema_error_handler(request: Request, exc: StorageError):
-    return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        content={"message": "Invalid jsonschema provided"},
     )
 
 
