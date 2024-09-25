@@ -16,6 +16,12 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
     template_name = "boefje_setup.html"
     permission_required = "tools.can_add_boefje"
 
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.plugin_id = str(uuid.uuid4())
+        self.created = str(datetime.now())
+        self.query_params = urlencode({"new_variant": True})
+
     def get_form(self):
         return BoefjeAddForm(
             get_katalogus(self.organization.code), self.plugin_id, self.created, **self.get_form_kwargs()
@@ -34,13 +40,6 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
 
 class AddBoefjeView(BoefjeSetupView):
     """View where the user can create a new Boefje"""
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-
-        self.plugin_id = str(uuid.uuid4())
-        self.created = str(datetime.now())
-        self.query_params = urlencode({"new_variant": True})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -62,10 +61,7 @@ class AddBoefjeVariantView(BoefjeSetupView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        self.plugin_id = str(uuid.uuid4())
         self.based_on_plugin_id = self.kwargs.get("plugin_id")
-        self.created = str(datetime.now())
-        self.query_params = urlencode({"new_variant": True})
 
         katalogus = get_katalogus(self.organization.code)
         self.plugin = katalogus.get_plugin(self.based_on_plugin_id)
