@@ -123,6 +123,29 @@ class BytesAPIClient:
         return UUID(response.json()[file_name])
 
     @retry_with_login
+    def save_raw_files(self, boefje_meta_id: str, boefje_results: list[tuple[set, bytes | str]]) -> UUID:
+        file_name = "raw"  # The name provides a key for all ids returned, so this is arbitrary as we only upload 1 file
+
+        response = self._session.post(
+            "/bytes/raw",
+            json={
+                "files": [
+                    {
+                        "name": file_name,
+                        "content": b64encode(raw if isinstance(raw, bytes) else raw.encode()).decode(),
+                        "tags": list(mime_types),
+                    }
+                    for mime_types, raw in boefje_results
+                ]
+            },
+            headers=self.headers,
+            params={"boefje_meta_id": str(boefje_meta_id)},
+        )
+        self._verify_response(response)
+
+        return UUID(response.json()[file_name])
+
+    @retry_with_login
     def get_raw(self, raw_data_id: str) -> bytes:
         response = self._session.get(f"/bytes/raw/{raw_data_id}", headers=self.headers)
         self._verify_response(response)

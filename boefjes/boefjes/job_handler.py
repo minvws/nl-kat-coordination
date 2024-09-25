@@ -141,6 +141,7 @@ class BoefjeHandler(Handler):
             self.bytes_client.save_boefje_meta(boefje_meta)
 
             if boefje_results:
+                boefje_results_with_updated_mime_types = []
                 for boefje_added_mime_types, output in boefje_results:
                     valid_mimetypes = set()
                     for mimetype in boefje_added_mime_types:
@@ -152,10 +153,9 @@ class BoefjeHandler(Handler):
                             )
                         else:
                             valid_mimetypes.add(mimetype)
-                    raw_file_id = self.bytes_client.save_raw(boefje_meta.id, output, mime_types.union(valid_mimetypes))
-                    logger.info(
-                        "Saved raw file %s for boefje %s[%s]", raw_file_id, boefje_meta.boefje.id, boefje_meta.id
-                    )
+                    boefje_results_with_updated_mime_types.append((mime_types.union(valid_mimetypes), output))
+                self.bytes_client.save_raw_files(boefje_meta.id, boefje_results)
+                logger.info("Saved raw file for boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
             else:
                 logger.info("No results for boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
 
