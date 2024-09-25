@@ -16,7 +16,7 @@ TREE_DEPTH = 9
 SEVERITY_OPTIONS = [severity.value for severity in RiskLevelSeverity]
 
 _EXCLUDE_OOI_TYPES = [Question, RESTAPI, Incident, ImageMetadata, report_models.ReportData, report_models.Report]
-_INPUT_OOI_TYPES = [ooi_type for ooi_type in ALL_TYPES if ooi_type not in _EXCLUDE_OOI_TYPES]
+_INPUT_OOI_TYPES = {ooi_type for ooi_type in ALL_TYPES if ooi_type not in _EXCLUDE_OOI_TYPES}
 
 
 class FindingsReport(Report):
