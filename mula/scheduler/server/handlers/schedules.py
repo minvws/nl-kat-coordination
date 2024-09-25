@@ -118,7 +118,7 @@ class ScheduleAPI:
 
     def create(self, schedule: serializers.ScheduleCreate) -> Any:
         try:
-            new_schedule = models.Schedule(**schedule.dict())
+            new_schedule = models.Schedule(**schedule.model_dump())
         except pydantic.ValidationError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
