@@ -36,7 +36,7 @@ class BoefjeAddForm(BaseRockyForm):
         required=False,
         label=_("Interval"),
         widget=forms.TextInput(
-            attrs={"description": "Specify the timeout interval for tasks using this Boefje in minutes"}
+            attrs={"description": _("Specify the timeout interval for tasks using this Boefje in minutes")}
         ),
     )
     oci_arguments = forms.CharField(
