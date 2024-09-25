@@ -9,7 +9,6 @@ import structlog
 from account.mixins import OrganizationView
 from django.conf import settings
 from django.contrib import messages
-from django.core.exceptions import SuspiciousOperation
 from django.forms import Form
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect
@@ -116,6 +115,7 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
         context["breadcrumbs"] = self.get_breadcrumbs()
         context["next"] = self.get_next()
         context["previous"] = self.get_previous()
+        context["current"] = self.get_current()
         return context
 
 
@@ -238,6 +238,20 @@ class BaseReportView(OOIFilterView):
                     )
 
         return plugin_data
+
+    def show_report_names(self) -> bool:
+        date_choice = self.request.POST.get("choose_date", "today")
+        recurrence_choice = self.request.POST.get("choose_recurrence", "once")
+
+        return date_choice == "today" and recurrence_choice == "once"
+
+    def is_scheduled_report(self) -> bool:
+        date_choice = self.request.POST.get("choose_date", "schedule")
+        recurrence_choice = self.request.POST.get("choose_recurrence", "repeat")
+
+        return (recurrence_choice in ["once", "repeat"] and date_choice == "schedule") or (
+            date_choice == "today" and recurrence_choice == "repeat"
+        )
 
     def save_report_raw(self, data: dict) -> str:
         report_data_raw_id = self.bytes_client.upload_raw(
@@ -493,11 +507,17 @@ class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
 class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, SchedulerView, TemplateView):
     report_type: type[BaseReport] | None = None
     task_type = "report"
+    is_a_scheduled_report = False
+    show_listes_report_names = False
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.get_report_type_ids():
             messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
             return PostRedirect(self.get_previous())
+
+        self.is_a_scheduled_report = self.is_scheduled_report()
+        self.show_listes_report_names = self.show_report_names()
+
         return super().get(request, *args, **kwargs)
 
     @staticmethod
@@ -541,20 +561,31 @@ class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, SchedulerView, 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["reports"] = self.get_report_names()
+
+        context["report_reference_date_form"] = self.get_report_reference_date_form()
+        context["report_recurrence_form"] = self.get_report_recurrence_form()
+
+        context["report_parent_name_form"] = self.get_report_parent_name_form()
+        context["report_child_name_form"] = self.get_report_child_name_form()
+
+        context["show_listed_report_names"] = self.show_listes_report_names
+        context["is_scheduled_report"] = self.is_a_scheduled_report
+
         context["report_schedule_form"] = self.get_report_schedule_form()
+
         context["created_at"] = datetime.now()
         return context
 
 
-class SaveReportView(BaseReportView):
+class SaveReportView(BaseReportView, ReportBreadcrumbs, SchedulerView):
+    task_type = "report"
+
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         old_report_names = request.POST.getlist("old_report_name")
-        report_names = request.POST.getlist("report_name")
+        report_names = request.POST.getlist("report_name", [])
         reference_dates = request.POST.getlist("reference_date")
 
-        if "" in report_names:
-            raise SuspiciousOperation(_("Empty name should not be possible."))
-        else:
+        if self.show_report_names() and report_names:
             final_report_names = list(zip(old_report_names, self.finalise_report_names(report_names, reference_dates)))
             report_ooi = self.save_report(final_report_names)
 
@@ -563,6 +594,13 @@ class SaveReportView(BaseReportView):
                 + "?"
                 + urlencode({"report_id": report_ooi.reference})
             )
+        elif self.is_scheduled_report():
+            self.schedule_report()
+
+            return redirect(reverse("report_history", kwargs={"organization_code": self.organization.code}))
+
+        messages.error(request, _("Empty name should not be possible."))
+        return PostRedirect(self.get_previous())
 
     @staticmethod
     def finalise_report_names(report_names: list[str], reference_dates: list[str]) -> list[str]:

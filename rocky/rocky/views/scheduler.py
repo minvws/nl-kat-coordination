@@ -1,12 +1,18 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from django.contrib import messages
 from django.http import JsonResponse
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import Boefje, Normalizer
-from reports.forms import ReportScheduleForm
+from reports.forms import (
+    ChildReportNameForm,
+    ParentReportNameForm,
+    ReportRecurrenceForm,
+    ReportReferenceDateForm,
+    ReportScheduleForm,
+)
 from tools.forms.scheduler import TaskFilterForm
 
 from octopoes.models import OOI
@@ -36,6 +42,13 @@ def get_date_time(date: str | None) -> datetime | None:
 class SchedulerView(OctopoesView):
     task_type: str
     task_filter_form = TaskFilterForm
+
+    report_reference_date_form = ReportReferenceDateForm
+    report_recurrence_form = ReportRecurrenceForm
+
+    report_parent_name_form = ParentReportNameForm
+    report_child_name_form = ChildReportNameForm
+
     report_schedule_form = ReportScheduleForm
 
     def setup(self, request, *args, **kwargs):
@@ -75,11 +88,24 @@ class SchedulerView(OctopoesView):
             messages.error(self.request, error.message)
         return []
 
-    def get_report_schedule_form(self) -> ReportScheduleForm:
+    def get_report_schedule_form(self):
         return self.report_schedule_form(self.request.POST)
 
+    def get_report_reference_date_form(self):
+        return self.report_reference_date_form(self.request.POST)
+
+    def get_report_recurrence_form(self):
+        return self.report_recurrence_form(self.request.POST)
+
+    def get_report_parent_name_form(self):
+        return self.report_parent_name_form()
+
+    def get_report_child_name_form(self):
+        return self.report_child_name_form()
+
     def get_report_schedule_form_data(self):
-        form_data = self.get_report_schedule_form().data.dict()
+        form_data = self.get_report_schedule_form().data
+
         return {k: v for k, v in form_data.items() if v}
 
     def get_task_details(self, task_id: str) -> Task | None:
@@ -88,9 +114,8 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
-    def create_report_schedule(self, report_ooi, start_date: str, recurrence: str) -> ScheduleResponse | None:
+    def create_report_schedule(self, start_date: str, recurrence: str) -> ScheduleResponse | None:
         try:
-            self.bytes_client.get_raw(report_ooi.data_raw_id)
             schedule = self.convert_recurrence_to_cron_expressions(start_date, recurrence)
             schedule_request = ScheduleRequest(
                 scheduler_id=self.scheduler_id,
@@ -104,18 +129,24 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
-    def schedule_report(self, report_ooi: type[OOI]) -> bool:
+    def schedule_report(self) -> bool:
         form_data = self.get_report_schedule_form_data()
-        # A schedule must be set or skip.
-        if "start_date" in form_data and "recurrence" in form_data:
-            start_date = form_data.get("start_date", "")
-            recurrence = form_data.get("recurrence", "")
-            self.create_report_schedule(report_ooi, start_date, recurrence)
-            messages.success(
-                self.request, _("Success! Your report has been successfully added to the queue for scheduling.")
-            )
-            return True
-        messages.warning(self.request, _("No schedule set for this report."))
+        start_date = None
+        recurrence = None
+        if form_data.get("choose_date") == "today":
+            start_date = datetime.now(tz=timezone.utc).date().strftime("%Y-%m-%d")
+        if form_data.get("choose_date") == "schedule":
+            start_date = form_data.get("start_date")
+
+        if form_data.get("choose_recurrence") == "once":
+            recurrence = "no-repeat"
+
+        if form_data.get("choose_recurrence") == "repeat":
+            recurrence = form_data.get("recurrence")
+
+        if start_date is not None and recurrence is not None:
+            return False
+
         return False
 
     def get_task_statistics(self) -> dict[Any, Any]:
