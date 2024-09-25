@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-24 08:17+0000\n"
+"POT-Creation-Date: 2024-09-25 09:03+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -592,6 +592,10 @@ msgstr ""
 #: katalogus/client.py
 msgid ""
 "The KATalogus has an unexpected error. Check the logs for further details."
+msgstr ""
+
+#: katalogus/client.py
+msgid "Boefje with this name already exists."
 msgstr ""
 
 #: katalogus/client.py
