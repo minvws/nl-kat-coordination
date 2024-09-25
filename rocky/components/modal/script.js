@@ -1,12 +1,17 @@
 import { onDomReady } from "../js/imports/utils.js";
 
-onDomReady(initDialogs, function () {
+onDomReady(function () {
+  initDialogs();
+  openDialogFromUrl();
+});
+
+export function openDialogFromUrl() {
   // If ID is present in the URL on DomReady, open the dialog immediately.
   let id = window.location.hash.slice(1);
   if (id) {
     showModalBasedOnAnchor(id);
   }
-});
+}
 
 export function initDialogs(element) {
   let root = element || document;
