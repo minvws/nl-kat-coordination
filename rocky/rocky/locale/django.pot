@@ -318,6 +318,10 @@ msgid "date joined"
 msgstr ""
 
 #: account/models.py
+msgid "The clearance level of the user for all organizations."
+msgstr ""
+
+#: account/models.py
 msgid "name"
 msgstr ""
 
@@ -1384,8 +1388,20 @@ msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py
 msgid ""
+"You have not acknowledged your clearance level. Go to your profile page to "
+"acknowledge your clearance level."
+msgstr ""
+
+#: katalogus/views/plugin_enable_disable.py
+msgid ""
 "Your clearance level is not set. Go to your profile page to see your "
 "clearance or contact the administrator to set a clearance level."
+msgstr ""
+
+#: katalogus/views/plugin_enable_disable.py
+msgid ""
+"Your clearance level is L{}. Contact your administrator to get a higher "
+"clearance level."
 msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py
