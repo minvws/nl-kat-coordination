@@ -32,6 +32,13 @@ class BoefjeAddForm(BaseRockyForm):
         widget=forms.Textarea(attrs={"rows": 3}),
         help_text=BOEFJE_DESCRIPTION_HELP_TEXT,
     )
+    interval = forms.CharField(
+        required=False,
+        label=_("Interval"),
+        widget=forms.TextInput(
+            attrs={"description": "Specify the timeout interval for tasks using this Boefje in minutes"}
+        ),
+    )
     oci_arguments = forms.CharField(
         required=False,
         label=_("Arguments"),
