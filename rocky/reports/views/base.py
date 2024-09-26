@@ -296,8 +296,8 @@ class BaseReportView(OOIFilterView):
     def get_observed_at(self):
         return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
 
-    def create_report_recipe(self, report_name_format: str, subreport_name_format: str, schedule: str):
-        return ReportRecipe(
+    def create_report_recipe(self, report_name_format: str, subreport_name_format: str, schedule: str) -> ReportRecipe:
+        report_recipe = ReportRecipe(
             recipe_id=uuid4(),
             report_name_format=report_name_format,
             subreport_name_format=subreport_name_format,
@@ -305,6 +305,13 @@ class BaseReportView(OOIFilterView):
             report_types=self.get_report_type_ids(),
             cron_expression=schedule,
         )
+        create_ooi(
+            api_connector=self.octopoes_api_connector,
+            bytes_client=self.bytes_client,
+            ooi=report_recipe,
+            observed_at=datetime.now(timezone.utc),
+        )
+        return report_recipe
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

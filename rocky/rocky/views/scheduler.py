@@ -118,15 +118,20 @@ class SchedulerView(OctopoesView):
 
     def create_report_schedule(self, report_recipe: ReportRecipe) -> ScheduleResponse | None:
         try:
+            report_task = ReportTask(
+                organisation_id=self.organization.code,
+                report_recipe_id=str(report_recipe.recipe_id),
+            ).model_dump()
+
             schedule_request = ScheduleRequest(
                 scheduler_id=self.scheduler_id,
-                data=ReportTask(
-                    organization=self.organization.code,
-                    report_recipe_id=str(report_recipe.recipe_id),
-                ).model_dump(),
+                data=report_task,
                 schedule=report_recipe.cron_expression,
             )
-            return self.scheduler_client.post_schedule(schedule=schedule_request)
+
+            submit_schedule = self.scheduler_client.post_schedule(schedule=schedule_request)
+            messages.success(self.request, _("Your report has been scheduled."))
+            return submit_schedule
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
@@ -265,22 +270,18 @@ class SchedulerView(OctopoesView):
         if start_date and recurrence:
             day = start_date.day
             month = start_date.month
-            year = start_date.year
-
-            weekday = start_date.strftime("%a").upper()  # ex. THU
-            month_3L = start_date.strftime("%b").upper()  # ex. AUG
+            week = start_date.strftime("%w").upper()  # ex. 4
 
             cron_expr = {
-                "no_repeat": f"0 0 0 {day} {month} ? {year}",  # Run once on this date
-                "daily": "0 0 0 ? * * *",  # Recurres every day at 00:00
-                "weekly": f"0 0 0 ? * {weekday} *",  # Recurres on every {weekday} at 00:00
-                "yearly": f"0 0 0 {day} {month_3L} ? *",  # Recurres every year on the {day} of the {month} at 00:00
+                "daily": "0 0 * * *",  # Recurres every day at 00:00
+                "weekly": f"0 0 * * {week}",  # Recurres every week on the {week} at 00:00
+                "yearly": f"0 0 {day} {month} *",  # Recurres every year on the {day} of the {month} at 00:00
             }
 
             if 28 <= day <= 31:
-                cron_expr["monthly"] = "0 0 0 28-31 * * *"
+                cron_expr["monthly"] = "0 0 28-31 * *"
             else:
-                cron_expr["monthly"] = f"0 0 0 {day} * ? *"  # Recurres on the exact {day} of the month at 00:00
+                cron_expr["monthly"] = f"0 0 {day} * *"  # Recurres on the exact {day} of the month at 00:00
 
             return cron_expr.get(recurrence, "")
         return ""

@@ -31,9 +31,6 @@
                 {% csrf_token %}
                 {% include "forms/report_form_fields.html" %}
 
-                <input type="hidden"
-                       name="choose_recurrence"
-                       value="{{ request.POST.choose_recurrence }}">
                 {% if show_listed_report_names %}
                     {% include "partials/report_names_header.html" %}
                     {% include "partials/report_names_form.html" %}

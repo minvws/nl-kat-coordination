@@ -85,7 +85,7 @@ class BoefjeTask(BaseModel):
 class ReportTask(BaseModel):
     type: str = "report"
 
-    organization: str
+    organisation_id: str
     report_recipe_id: str
 
 
