@@ -1,7 +1,7 @@
 {
   "id": "fierce",
   "name": "Fierce",
-  "description": "Perform DNS reconnaissance using Fierce, to help locate non-contiguous IP space and hostnames against specified hostnames. No exploitation is performed.",
+  "description": "Perform DNS reconnaissance using Fierce. Helps to locate non-contiguous IP space and hostnames against specified hostnames. No exploitation is performed.",
   "consumes": [
     "Hostname"
   ],
