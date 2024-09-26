@@ -283,12 +283,8 @@ class SchedulerClient:
             )
             res.raise_for_status()
             return ScheduleResponse.model_validate_json(res.content)
-        except ValidationError:
+        except (ValidationError, HTTPStatusError, ConnectError):
             raise SchedulerValidationError(extra_message="Report schedule failed: ")
-        except HTTPStatusError:
-            raise SchedulerValidationError(extra_message="Report schedule failed: ")
-        except ConnectError:
-            raise SchedulerConnectError(extra_message="Report schedule failed: ")
 
     def list_tasks(
         self,
