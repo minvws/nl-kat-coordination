@@ -43,17 +43,15 @@
                         the process of creating them manually.
                     {% endblocktranslate %}
                 </p>
-                <form novalidate method="post" class="horizontal-view help layout-form">
+                <form novalidate method="post" class="help layout-form">
                     {% csrf_token %}
                     {% translate type as fieldset_legend %}
                     {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
 
                     <div class="button-container">
                         <button type="submit">{% translate "Create object" %}</button>
-                        <div class="button-container">
-                            <a href="{% url "complete_onboarding" organization.code %}"
-                               class="button ghost">{% translate "Skip onboarding" %}</a>
-                        </div>
+                        <a href="{% url "complete_onboarding" organization.code %}"
+                           class="button ghost">{% translate "Skip onboarding" %}</a>
                     </div>
                 </form>
             </div>

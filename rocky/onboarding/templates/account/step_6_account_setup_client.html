@@ -20,7 +20,7 @@
                         Adding a client account to the organization is optional.
                     {% endblocktranslate %}
                 </p>
-                <form novalidate method="post" class="horizontal-view help">
+                <form novalidate method="post" class="help">
                     {% csrf_token %}
                     {% translate "User details" as fieldset_legend %}
                     {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
