@@ -6,6 +6,7 @@ from tools.enums import SCAN_LEVEL
 from tools.forms.base import BaseRockyForm
 from tools.forms.settings import (
     BOEFJE_CONSUMES_HELP_TEXT,
+    BOEFJE_CONTAINER_IMAGE_HELP_TEXT,
     BOEFJE_DESCRIPTION_HELP_TEXT,
     BOEFJE_PRODUCES_HELP_TEXT,
     BOEFJE_SCAN_LEVEL_HELP_TEXT,
@@ -19,12 +20,7 @@ class BoefjeAddForm(BaseRockyForm):
     oci_image = forms.CharField(
         required=True,
         label=_("Container image"),
-        widget=forms.TextInput(
-            attrs={
-                "description": "The name of the Docker image. For example: ghcr.io/minvws/openkat/nmap",
-                "aria-describedby": "input-description",
-            }
-        ),
+        help_text=BOEFJE_CONTAINER_IMAGE_HELP_TEXT,
     )
     name = forms.CharField(
         required=True,
@@ -43,7 +39,7 @@ class BoefjeAddForm(BaseRockyForm):
             attrs={"description": "For example: -sTU --top-ports 1000", "aria-describedby": "input-description"}
         ),
     )
-    schema = forms.JSONField(
+    boefje_schema = forms.JSONField(
         required=False,
         label=_("JSON Schema"),
         help_text=BOEFJE_SCHEMA_HELP_TEXT,
@@ -51,7 +47,7 @@ class BoefjeAddForm(BaseRockyForm):
     consumes = forms.CharField(
         required=False,
         label=_("Input object type"),
-        widget=forms.Select(choices=OOI_TYPE_CHOICES),
+        widget=forms.SelectMultiple(choices=OOI_TYPE_CHOICES),
         help_text=BOEFJE_CONSUMES_HELP_TEXT,
     )
     produces = forms.CharField(

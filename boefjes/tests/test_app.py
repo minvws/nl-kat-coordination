@@ -88,11 +88,29 @@ def test_two_processes_handler_exception(manager: SchedulerWorkerManager, item_h
 
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
 
-    assert len(patched_tasks) == 6
-    # Handler starts raising an Exception from the second call onward,
-    # so we have 2 completed tasks and 4 failed tasks.
-    assert patched_tasks.count(("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")) == 1
-    assert patched_tasks.count(("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed")) == 2
+    # Handler starts raising an Exception from the second call onward. So each process picks up a task, of which the one
+    # with id 9071c9fd-2b9f-440f-a524-ef1ca4824fd4 crashes. Task 70da7d4f-f41f-4940-901b-d98a92e9014b will be picked up
+    # by the other process in parallel, and completes before the crash of the other task. Since one process completes,
+    # it pops the same crashing task 9071c9fd-2b9f-440f-a524-ef1ca4824fd4 from the queue to simplify the test.
+
+    # We expect the first two patches to set the task status to running of both task and then process 1 to finish, as
+    # the exception has been set up with a small delay.
+    assert sorted(patched_tasks[:3]) == sorted(
+        [
+            ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),  # Process 1
+            ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),  # Process 1
+            ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running"),  # Process 2
+        ]
+    )
+
+    # The process completing status then to be set to completed/failed for both tasks.
+    assert sorted(patched_tasks[3:]) == sorted(
+        [
+            ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running"),  # Process 1
+            ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed"),  # Process 2
+            ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed"),  # Process 1
+        ]
+    )
 
 
 def test_two_processes_cleanup_unfinished_tasks(

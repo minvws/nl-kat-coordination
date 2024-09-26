@@ -1,4 +1,4 @@
-from pydantic import parse_obj_as
+from pydantic import TypeAdapter
 
 from boefjes.plugins.kat_leakix.normalize import run
 from octopoes.models.types import OOIType
@@ -6,8 +6,7 @@ from tests.loading import get_dummy_data
 
 
 def test_output():
-    input_ooi = parse_obj_as(
-        OOIType,
+    input_ooi = TypeAdapter(OOIType).validate_python(
         {
             "object_type": "HostnameHTTPURL",
             "network": "Network|internet",

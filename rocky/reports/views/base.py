@@ -348,7 +348,7 @@ class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
             return PostRedirect(self.get_next())
         return self.get(request, *args, **kwargs)
 
-    def all_plugins_enabled(self):
+    def all_plugins_enabled(self) -> bool:
         return all(self.plugins_enabled().values())
 
     def plugins_enabled(self) -> dict[str, bool]:
