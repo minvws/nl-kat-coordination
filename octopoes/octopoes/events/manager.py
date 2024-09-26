@@ -108,7 +108,7 @@ class EventManager:
                 {
                     "primary_key": event.reference,
                     "object_type": event.reference.class_,
-                    "scan_profile": event.new_data.dict(),  # type: ignore[union-attr]
+                    "scan_profile": event.new_data.model_dump(),  # type: ignore[union-attr]
                 }
             )
 
