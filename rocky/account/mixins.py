@@ -86,15 +86,20 @@ class OrganizationView(View):
                 user=self.request.user, organization=self.organization
             )
         except OrganizationMember.DoesNotExist:
-            if not self.request.user.is_superuser:
+            if self.request.user.is_superuser:
+                clearance_level = 4
+            elif self.request.user.has_perm("tools.can_access_all_organizations"):
+                clearance_level = -1
+            else:
                 raise Http404()
 
+            # Only the Python object is created, it is not saved to the database.
             self.organization_member = OrganizationMember(
                 user=self.request.user,
                 organization=self.organization,
                 status=OrganizationMember.STATUSES.ACTIVE,
-                trusted_clearance_level=4,
-                acknowledged_clearance_level=0,
+                trusted_clearance_level=clearance_level,
+                acknowledged_clearance_level=clearance_level,
             )
 
         if self.organization_member.blocked:
@@ -122,20 +127,20 @@ class OrganizationView(View):
     def may_update_clearance_level(self) -> bool:
         if not self.indemnification_present:
             return False
-        if self.organization_member.acknowledged_clearance_level < 0:
-            return False
-        if self.organization_member.trusted_clearance_level < 0:
-            return False
-        return True
+
+        return self.organization_member.has_clearance_level(0)
 
     def verify_raise_clearance_level(self, level: int) -> bool:
         if not self.indemnification_present:
             raise IndemnificationNotPresentException()
-        if self.organization_member.trusted_clearance_level < level:
-            raise TrustedClearanceLevelTooLowException()
-        if self.organization_member.acknowledged_clearance_level < level:
-            raise AcknowledgedClearanceLevelTooLowException()
-        return True
+
+        if self.organization_member.has_clearance_level(level):
+            return True
+        else:
+            if self.organization_member.trusted_clearance_level < level:
+                raise TrustedClearanceLevelTooLowException()
+            else:
+                raise AcknowledgedClearanceLevelTooLowException()
 
     def raise_clearance_level(self, ooi_reference: Reference, level: int) -> bool:
         self.verify_raise_clearance_level(level)
@@ -185,7 +190,7 @@ class OrganizationView(View):
                 % (
                     ooi.reference.human_readable,
                     level,
-                    self.organization_member.acknowledged_clearance_level,
+                    self.organization_member.max_clearance_level,
                 ),
             )
         except AcknowledgedClearanceLevelTooLowException:

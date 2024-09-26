@@ -5,7 +5,6 @@
     "version": null,
     "created": null,
     "description": null,
-    "environment_keys": [],
     "enabled": true,
     "type": "normalizer",
     "consumes": [
@@ -22,7 +21,6 @@
     "version": null,
     "created": null,
     "description": null,
-    "environment_keys": [],
     "enabled": true,
     "type": "normalizer",
     "consumes": [
@@ -42,7 +40,6 @@
     "version": null,
     "created": null,
     "description": null,
-    "environment_keys": [],
     "enabled": true,
     "type": "normalizer",
     "consumes": [
@@ -59,7 +56,6 @@
     "version": null,
     "created": null,
     "description": null,
-    "environment_keys": [],
     "enabled": true,
     "type": "normalizer",
     "consumes": [
@@ -83,7 +79,6 @@
     "version": null,
     "created": null,
     "description": null,
-    "environment_keys": [],
     "enabled": true,
     "type": "normalizer",
     "consumes": [

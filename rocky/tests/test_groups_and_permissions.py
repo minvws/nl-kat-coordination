@@ -52,6 +52,8 @@ def test_plugin_settings_list_perms(
     mock_mixins_katalogus,
     plugin_details,
     plugin_schema,
+    boefje_dns_records,
+    boefje_nmap_tcp,
     mock_scheduler,
     mock_organization_view_octopoes,
     network,
@@ -63,7 +65,8 @@ def test_plugin_settings_list_perms(
     mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](count=1, items=[network])
     mock_mixins_katalogus().get_plugin.return_value = plugin_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
-
+    katalogus_mocker1 = mocker.patch("katalogus.client.KATalogusClientV1")()
+    katalogus_mocker1.get_plugins.return_value = [boefje_dns_records, boefje_nmap_tcp]
     member = request.getfixturevalue(member)
 
     response = BoefjeDetailView.as_view()(
@@ -86,6 +89,8 @@ def test_plugin_settings_list_perms_2(
     mock_mixins_katalogus,
     plugin_details,
     plugin_schema,
+    boefje_dns_records,
+    boefje_nmap_tcp,
     mock_scheduler,
     mock_organization_view_octopoes,
     network,
@@ -97,7 +102,8 @@ def test_plugin_settings_list_perms_2(
     mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](count=1, items=[network])
     mock_mixins_katalogus().get_plugin.return_value = plugin_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
-
+    katalogus_mocker1 = mocker.patch("katalogus.client.KATalogusClientV1")()
+    katalogus_mocker1.get_plugins.return_value = [boefje_dns_records, boefje_nmap_tcp]
     member = request.getfixturevalue(member)
 
     response = BoefjeDetailView.as_view()(

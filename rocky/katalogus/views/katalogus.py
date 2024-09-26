@@ -1,12 +1,28 @@
 from typing import Any
 
 from account.mixins import OrganizationView
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, ListView, TemplateView
 
 from katalogus.client import get_katalogus
 from katalogus.forms import KATalogusFilter
+
+
+class KATalogusLandingView(OrganizationView):
+    """
+    Landing page for KAT-alogus.
+    """
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        return redirect(
+            reverse(
+                "boefjes_list",
+                kwargs={"organization_code": self.organization.code, "view_type": self.kwargs.get("view_type", "grid")},
+            )
+        )
 
 
 class BaseKATalogusView(OrganizationView, ListView, FormView):

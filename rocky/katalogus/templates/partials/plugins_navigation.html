@@ -10,7 +10,7 @@
                 <a href="{% url 'normalizers_list' organization.code view_type %}">{% translate "Normalizers" %}</a>
             </li>
             <li {% if active == "all" %}aria-current="page"{% endif %}>
-                <a href="{% url 'katalogus' organization.code view_type %}">{% translate "All" %}</a>
+                <a href="{% url 'all_plugins_list' organization.code view_type %}">{% translate "All" %}</a>
             </li>
             <li {% if active == "about-plugins" %}aria-current="page"{% endif %}>
                 <a href="{% url 'about_plugins' organization.code %}">{% translate "About plugins" %}</a>

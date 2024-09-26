@@ -8,7 +8,9 @@
             <thead>
                 <tr>
                     <th>{% translate "Plugin name" %}</th>
-                    <th>{% translate "Plugin type" %}</th>
+                    {% if active == "all" %}
+                        <th>{% translate "Plugin type" %}</th>
+                    {% endif %}
                     <th>{% translate "Plugin description" %}</th>
                     <th colspan="2">{% translate "Actions" %}</th>
                 </tr>
@@ -21,11 +23,13 @@
                                 <strong>{{ plugin.name }}</strong>
                             </span>
                         </td>
-                        <td scope="row">
-                            <p class="plugin-title">
-                                <span class="label-plugin-type {{ plugin.type }}">{{ plugin.type|title }}</span>
-                            </p>
-                        </td>
+                        {% if active == "all" %}
+                            <td scope="row">
+                                <p class="plugin-title">
+                                    <span class="label-plugin-type {{ plugin.type }}">{{ plugin.type|title }}</span>
+                                </p>
+                            </td>
+                        {% endif %}
                         <td>
                             {% if plugin.description %}<span class="plugin-description">{{ plugin.description }}</span>{% endif %}
                         </td>

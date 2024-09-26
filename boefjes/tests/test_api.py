@@ -1,7 +1,10 @@
 from pathlib import Path
+from unittest import mock
 
 import boefjes.api
 from boefjes.clients.scheduler_client import TaskStatus
+from boefjes.dependencies.plugins import PluginService
+from boefjes.local_repository import get_local_repository
 from tests.conftest import MockSchedulerClient
 from tests.loading import get_dummy_data
 
@@ -26,6 +29,11 @@ def test_boefje_input_running(api, tmp_path):
     task = scheduler_client.pop_item("boefje")
     scheduler_client.patch_task(task.id, TaskStatus.RUNNING)
     api.app.dependency_overrides[boefjes.api.get_scheduler_client] = lambda: scheduler_client
+    api.app.dependency_overrides[boefjes.api.get_plugin_service] = lambda: PluginService(
+        mock.MagicMock(),
+        mock.MagicMock(),
+        get_local_repository(),
+    )
 
     boefjes.api.get_environment_settings = lambda *_: {}
     response = api.get("/api/v0/tasks/70da7d4f-f41f-4940-901b-d98a92e9014b")

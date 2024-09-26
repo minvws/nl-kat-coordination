@@ -255,20 +255,20 @@ class SchedulerClient:
             queue_name = f"{item.data.type}-{self.organization_code}"
             res = self._client.post(
                 f"/queues/{queue_name}/push",
-                content=item.json(exclude_none=True),
+                content=item.model_dump_json(exclude_none=True),
                 headers={"Content-Type": "application/json"},
             )
             res.raise_for_status()
         except HTTPStatusError as http_error:
             code = http_error.response.status_code
             if code == codes.TOO_MANY_REQUESTS:
-                raise SchedulerTooManyRequestError()
+                raise SchedulerTooManyRequestError() from http_error
             elif code == codes.BAD_REQUEST:
-                raise SchedulerBadRequestError()
+                raise SchedulerBadRequestError() from http_error
             elif code == codes.CONFLICT:
-                raise SchedulerConflictError()
-        except RequestError:
-            raise SchedulerError()
+                raise SchedulerConflictError() from http_error
+        except RequestError as request_error:
+            raise SchedulerError() from request_error
 
     def health(self) -> ServiceHealth:
         return ServiceHealth.model_validate_json(self._get("/health", return_type="content"))

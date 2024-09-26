@@ -1,8 +1,10 @@
 import datetime
 from functools import partial
 
+from croniter import croniter
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.responses import FileResponse, JSONResponse, Response
+from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import BaseModel, Field, field_validator
 
@@ -65,6 +67,10 @@ def list_plugins(
     if filter_params.state is not None:
         plugins = filter(lambda x: x.enabled is filter_params.state, plugins)
 
+    # filter plugins by oci_image
+    if filter_params.oci_image is not None:
+        plugins = filter(lambda x: x.type == "boefje" and x.oci_image == filter_params.oci_image, plugins)
+
     # filter plugins by scan level for boefje plugins
     plugins = list(filter(lambda x: x.type != "boefje" or x.scan_level >= filter_params.scan_level, plugins))
 
@@ -123,22 +129,33 @@ class BoefjeIn(BaseModel):
     version: str | None = None
     created: datetime.datetime | None = None
     description: str | None = None
-    environment_keys: list[str] = Field(default_factory=list)
     scan_level: int = 1
     consumes: set[str] = Field(default_factory=set)
     produces: set[str] = Field(default_factory=set)
-    schema: dict | None = None
+    boefje_schema: dict | None = None
+    cron: str | None = None
+    interval: int | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
 
-    @field_validator("schema")
+    @field_validator("boefje_schema")
     @classmethod
     def json_schema_valid(cls, schema: dict | None) -> dict | None:
         if schema is not None:
-            Draft202012Validator.check_schema(schema)
-            return schema
+            try:
+                Draft202012Validator.check_schema(schema)
+            except SchemaError as e:
+                raise ValueError("The schema field is not a valid JSON schema") from e
 
-        return None
+        return schema
+
+    @field_validator("cron")
+    @classmethod
+    def cron_valid(cls, cron: str | None) -> str | None:
+        if cron is not None:
+            croniter(cron)  # Raises a ValueError
+
+        return cron
 
 
 @router.patch("/boefjes/{boefje_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -167,7 +184,6 @@ class NormalizerIn(BaseModel):
     version: str | None = None
     created: datetime.datetime | None = None
     description: str | None = None
-    environment_keys: list[str] = Field(default_factory=list)
     consumes: list[str] = Field(default_factory=list)  # mime types (and/ or boefjes)
     produces: list[str] = Field(default_factory=list)  # oois
 

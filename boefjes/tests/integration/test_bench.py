@@ -19,7 +19,7 @@ from tests.loading import get_boefje_meta, get_normalizer_meta
 def test_migration(
     octopoes_api_connector: OctopoesAPIConnector,
     bytes_client: BytesAPIClient,
-    organisation_repository: SQLOrganisationStorage,
+    organisation_storage: SQLOrganisationStorage,
     valid_time,
 ):
     octopoes_api_connector.session._timeout.connect = 60
@@ -87,7 +87,7 @@ def test_migration(
             bytes_client.save_normalizer_meta(normalizer_meta)
 
     total_oois = octopoes_api_connector.list_objects(set(), valid_time).count
-    total_processed, total_failed = upgrade(organisation_repository, valid_time)
+    total_processed, total_failed = upgrade(organisation_storage, valid_time)
 
     assert total_processed == len(hostname_range)
     assert total_failed == 0

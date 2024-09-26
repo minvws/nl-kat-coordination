@@ -3,10 +3,10 @@ import uuid
 from collections import Counter
 from collections.abc import Generator
 from datetime import datetime
-from logging import getLogger
 from operator import itemgetter
 from typing import Any, Literal
 
+import structlog
 from asgiref.sync import sync_to_async
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
 from httpx import HTTPError
@@ -41,7 +41,7 @@ from octopoes.xtdb.exceptions import XTDBException
 from octopoes.xtdb.query import Aliased
 from octopoes.xtdb.query import Query as XTDBQuery
 
-logger = getLogger(__name__)
+logger = structlog.get_logger(__name__)
 router = APIRouter(prefix="/{client}")
 
 
@@ -459,6 +459,9 @@ def list_findings(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     severities: set[RiskLevelSeverity] = Query(DEFAULT_SEVERITY_FILTER),
+    search_string: str | None = None,
+    order_by: Literal["score", "finding_type"] = "score",
+    asc_desc: Literal["asc", "desc"] = "desc",
 ) -> Paginated[Finding]:
     return octopoes.ooi_repository.list_findings(
         severities,
@@ -467,6 +470,9 @@ def list_findings(
         only_muted,
         offset,
         limit,
+        search_string,
+        order_by,
+        asc_desc,
     )
 
 

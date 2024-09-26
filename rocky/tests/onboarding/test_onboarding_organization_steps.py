@@ -133,7 +133,7 @@ def test_onboarding_clearance_level_introduction(rf, redteam_member, mock_organi
 
     assert response.status_code == 200
     assertContains(response, "OpenKAT introduction")
-    assertContains(response, "OOI clearance for " + url.primary_key)
+    assertContains(response, "OOI clearance for " + url.human_readable)
     assertContains(response, "Introduction")
     assertContains(response, "How to know required clearance level")
     assertContains(response, "Fierce")
@@ -152,7 +152,7 @@ def test_onboarding_acknowledge_clearance_level(rf, redteam_member, mock_organiz
 
     assert response.status_code == 200
     assertContains(response, "OpenKAT introduction")
-    assertContains(response, "Setup scan - OOI clearance for " + url.primary_key)
+    assertContains(response, "Setup scan - OOI clearance for " + url.human_readable)
     assertContains(response, "Trusted clearance level")
     assertContains(response, "Acknowledge clearance level")
     assertContains(response, "What is my clearance level?")
@@ -239,7 +239,7 @@ def test_onboarding_set_clearance_level(
     assert response_superuser.status_code == 200
 
     assertContains(response_redteam, "OpenKAT introduction")
-    assertContains(response_redteam, "Setup scan - Set clearance level for " + str(url.primary_key))
+    assertContains(response_redteam, "Setup scan - Set clearance level for " + str(url.human_readable))
     assertContains(response_redteam, "Set clearance level")
     assertContains(response_redteam, "Skip onboarding")
 
