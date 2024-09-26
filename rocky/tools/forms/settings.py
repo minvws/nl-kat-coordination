@@ -59,11 +59,25 @@ OBSERVED_AT_HELP_TEXT = _(
     "Select a datetime to change the view to represent that moment in time."
 )
 
+BOEFJE_CONTAINER_IMAGE_HELP_TEXT = mark_safe(
+    _(
+        "<p>The name of the Docker image. For example: <i>'ghcr.io/minvws/openkat/nmap'</i>. "
+        "In OpenKAT, all Boefjes with the same container image will be seen as 'variants' and will be "
+        "shown together on the Boefje detail page. </p> "
+    )
+)
+
 BOEFJE_DESCRIPTION_HELP_TEXT = mark_safe(
     _(
-        "<p>A description of the boefje explaining in short what it can do. "
+        "<p>A description of the Boefje explaining in short what it can do. "
         "This will both be displayed inside the KAT-alogus and on the Boefje details page.</p> "
     )
+)
+
+BOEFJE_CONSUMES_HELP_TEXT = _(
+    "Select the object type(s) that your Boefje consumes. "
+    "To select multiple objects, press and hold the 'ctrl'/'command' key "
+    "and then click the items you want to select. "
 )
 
 BOEFJE_SCHEMA_HELP_TEXT = mark_safe(
@@ -78,15 +92,6 @@ BOEFJE_SCHEMA_HELP_TEXT = mark_safe(
         "here</a>.</p> "
     )
 )
-
-BOEFJE_CONSUMES_HELP_TEXT = mark_safe(
-    _(
-        "<p>Select the object type that your Boefje consumes.</p> "
-        "<p>This object type triggers the Boefje to run. Whenever this OOI gets added, "
-        "this Boefje will run with that OOI.</p> "
-    )
-)
-
 
 BOEFJE_PRODUCES_HELP_TEXT = mark_safe(
     _(

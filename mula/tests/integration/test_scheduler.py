@@ -288,7 +288,7 @@ class SchedulerTestCase(unittest.TestCase):
         )
 
         # Act
-        second_item = first_item_db.copy()
+        second_item = first_item_db.model_copy()
         second_item.id = uuid.uuid4()
         second_item_db = self.scheduler.push_item_to_queue(second_item)
 
@@ -313,7 +313,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.scheduler.pop_item_from_queue()
 
         # Act
-        second_item = first_item_db.copy()
+        second_item = first_item_db.model_copy()
         second_item.id = uuid.uuid4()
         second_item_db = self.scheduler.push_item_to_queue(second_item)
 

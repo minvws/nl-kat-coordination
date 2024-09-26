@@ -47,6 +47,19 @@ class LocalPluginRepository:
 
         raise KeyError(f"Can't find plugin {plugin_id}")
 
+    def by_name(self, plugin_name: str) -> PluginType:
+        boefjes = {resource.boefje.name: resource for resource in self.resolve_boefjes().values()}
+
+        if plugin_name in boefjes:
+            return boefjes[plugin_name].boefje
+
+        normalizers = {resource.normalizer.name: resource for resource in self.resolve_normalizers().values()}
+
+        if plugin_name in normalizers:
+            return normalizers[plugin_name].normalizer
+
+        raise KeyError(f"Can't find plugin {plugin_name}")
+
     def schema(self, id_: str) -> dict | None:
         boefjes = self.resolve_boefjes()
 
