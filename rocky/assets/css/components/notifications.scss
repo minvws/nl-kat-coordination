@@ -51,7 +51,9 @@ span {
 p,
 span,
 section,
-div {
+div,
+form div,
+form section {
   &.error {
     &::before {
       content: "\eac5";
