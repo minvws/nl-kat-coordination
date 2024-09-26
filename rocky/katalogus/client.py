@@ -43,7 +43,7 @@ class Boefje(Plugin):
     produces: set[str] = Field(default_factory=set)
     options: list[str] | None = None
     runnable_hash: str | None = None
-    schema: dict | None = None
+    boefje_schema: dict | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
 
@@ -53,7 +53,7 @@ class Boefje(Plugin):
         return {ooi_class.get_ooi_type() for ooi_class in consumes}
 
     def can_scan(self, member) -> bool:
-        return super().can_scan(member) and member.acknowledged_clearance_level >= self.scan_level.value
+        return super().can_scan(member) and member.has_clearance_level(self.scan_level.value)
 
 
 class Normalizer(Plugin):
@@ -221,6 +221,18 @@ class KATalogusClientV1:
         else:
             logger.info("Plugin %s could not be created", plugin.name)
 
+    def edit_plugin(self, plugin: Plugin) -> None:
+        response = self.session.patch(
+            f"{self.organization_uri}/boefjes/{plugin.id}",
+            content=plugin.model_dump_json(exclude_none=True),
+        )
+        response.raise_for_status()
+
+        if response.status_code == codes.CREATED:
+            logger.info("Plugin %s", plugin.name)
+        else:
+            logger.info("Plugin %s could not be created", plugin.name)
+
 
 def parse_boefje(boefje: dict) -> Boefje:
     scan_level = SCAN_LEVEL(boefje["scan_level"])
@@ -243,7 +255,7 @@ def parse_boefje(boefje: dict) -> Boefje:
         scan_level=scan_level,
         consumes=consumes,
         produces=boefje["produces"],
-        schema=boefje.get("schema"),
+        boefje_schema=boefje.get("boefje_schema"),
         oci_image=boefje.get("oci_image"),
         oci_arguments=boefje.get("oci_arguments", []),
     )

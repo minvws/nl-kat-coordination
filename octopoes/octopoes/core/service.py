@@ -178,18 +178,25 @@ class OctopoesService:
         origin.result = [ooi.reference for ooi in oois]
 
         # When an Origin is saved while the source OOI does not exist, reject saving the results
-        if (
-            origin.origin_type not in [OriginType.DECLARATION, OriginType.AFFIRMATION]
-            and origin.source not in origin.result
-        ):
-            try:
-                self.ooi_repository.get(origin.source, valid_time)
-            except ObjectNotFoundException:
+        try:
+            self.ooi_repository.get(origin.source, valid_time)
+        except ObjectNotFoundException:
+            if (
+                origin.origin_type not in [OriginType.DECLARATION, OriginType.AFFIRMATION]
+                and origin.source not in origin.result
+            ):
                 raise ValueError("Origin source of observation does not exist")
+            elif origin.origin_type == OriginType.AFFIRMATION:
+                logger.debug("Affirmation source %s already deleted", origin.source)
+                return
 
         for ooi in oois:
             self.ooi_repository.save(ooi, valid_time=valid_time, end_valid_time=end_valid_time)
         self.origin_repository.save(origin, valid_time=valid_time)
+
+        # Origins that are stale need to be deleted. #3561
+        if not origin.result and origin.origin_type != OriginType.INFERENCE:
+            self.origin_repository.delete(origin, valid_time=valid_time)
 
     def _run_inference(self, origin: Origin, valid_time: datetime) -> None:
         bit_definition = get_bit_definitions().get(origin.method, None)

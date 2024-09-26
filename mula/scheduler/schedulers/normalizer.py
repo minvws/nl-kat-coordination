@@ -101,7 +101,7 @@ class NormalizerScheduler(Scheduler):
             message queue.
         """
         # Convert body into a RawDataReceivedEvent
-        latest_raw_data = RawDataReceivedEvent.parse_raw(body)
+        latest_raw_data = RawDataReceivedEvent.model_validate_json(body)
 
         self.logger.debug(
             "Received raw data %s",
@@ -158,7 +158,7 @@ class NormalizerScheduler(Scheduler):
                     continue
 
                 normalizer_task = NormalizerTask(
-                    normalizer=Normalizer.parse_obj(normalizer.dict()),
+                    normalizer=Normalizer.model_validate(normalizer.model_dump()),
                     raw_data=latest_raw_data.raw_data,
                 )
 
@@ -292,7 +292,7 @@ class NormalizerScheduler(Scheduler):
     def push_item_to_queue(self, item: Task) -> Task:
         """Some normalizer scheduler specific logic before pushing the item to the
         queue."""
-        normalizer_task = NormalizerTask.parse_obj(item.data)
+        normalizer_task = NormalizerTask.model_validate(item.data)
 
         # Check if id's are unique and correctly set. Same id's are necessary
         # for the task runner.

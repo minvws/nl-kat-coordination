@@ -2,6 +2,7 @@ import base64
 import multiprocessing
 from datetime import datetime, timezone
 from enum import Enum
+from multiprocessing.context import ForkContext, ForkProcess
 from uuid import UUID
 
 import structlog
@@ -23,9 +24,10 @@ from octopoes.models.exception import ObjectNotFoundException
 
 app = FastAPI(title="Boefje API")
 logger = structlog.get_logger(__name__)
+ctx: ForkContext = multiprocessing.get_context("fork")
 
 
-class UvicornServer(multiprocessing.Process):
+class UvicornServer(ForkProcess):
     def __init__(self, config: Config):
         super().__init__()
         self.server = Server(config=config)
@@ -59,7 +61,7 @@ class StatusEnum(str, Enum):
 
 class File(BaseModel):
     name: str | None = None
-    content: str = Field(..., contentEncoding="base64")
+    content: str = Field(json_schema_extra={"contentEncoding": "base64"})
     tags: list[str] | None = None
 
 
@@ -171,6 +173,6 @@ def create_boefje_meta(task, plugin: PluginType) -> BoefjeMeta:
         input_ooi=input_ooi,
         arguments=arguments,
         organization=organization,
-        environment=get_environment_settings(task.data, plugin.schema),
+        environment=get_environment_settings(task.data, plugin.boefje_schema),
     )
     return boefje_meta
