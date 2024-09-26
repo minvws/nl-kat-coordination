@@ -230,7 +230,10 @@ class KATalogusClientV1:
                 logger.info("Plugin %s created", plugin.name)
             else:
                 logger.info("Plugin %s could not be created", plugin.name)
-            raise DuplicateNameError(status_code=str(error.response.status_code))
+            if response.status_code == 400:
+                raise DuplicateNameError(status_code=str(error.response.status_code))
+            else:
+                raise error
 
     def edit_plugin(self, plugin: Plugin) -> None:
         try:

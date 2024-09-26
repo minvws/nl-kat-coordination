@@ -3,6 +3,7 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import Literal
 
+import psycopg2
 import structlog
 from fastapi import Query
 from jsonschema.exceptions import ValidationError
@@ -115,7 +116,10 @@ class PluginService:
                 if plugin.type == "boefje":
                     raise ExistingPluginName(boefje.name)
                 else:
-                    self.plugin_storage.create_boefje(boefje)
+                    try:
+                        self.plugin_storage.create_boefje(boefje)
+                    except psycopg2.errors.UniqueViolation:
+                        raise ExistingPluginName(boefje.name)
             except KeyError:
                 self.plugin_storage.create_boefje(boefje)
 

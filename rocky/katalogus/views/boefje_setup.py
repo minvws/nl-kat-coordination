@@ -5,27 +5,25 @@ from urllib.parse import urlencode
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.urls import reverse
 from django.views.generic.edit import FormView
-from tools.forms.boefje import BoefjeAddForm, BoefjeEditForm
+from tools.forms.boefje import BoefjeSetupForm
 
-from katalogus.client import get_katalogus
+from katalogus.client import Boefje, DuplicateNameError, get_katalogus
+from octopoes.models.types import type_by_name
 
 
 class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
     """Setup view for creating new Boefjes and variants"""
 
     template_name = "boefje_setup.html"
+    form_class = BoefjeSetupForm
     permission_required = "tools.can_add_boefje"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+        self.katalogus = get_katalogus(self.organization.code)
         self.plugin_id = uuid.uuid4()
         self.created = str(datetime.now())
         self.query_params = urlencode({"new_variant": True})
-
-    def get_form(self):
-        return BoefjeAddForm(
-            get_katalogus(self.organization.code), self.plugin_id, self.created, **self.get_form_kwargs()
-        )
 
     def get_success_url(self) -> str:
         return (
@@ -40,6 +38,19 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
 
 class AddBoefjeView(BoefjeSetupView):
     """View where the user can create a new Boefje"""
+
+    def form_valid(self, form):
+        form_data = form.cleaned_data
+        plugin = _create_boefje_with_form_data(form_data, self.plugin_id, self.created)
+
+        try:
+            self.katalogus.create_plugin(plugin)
+            return super().form_valid(form)
+        except DuplicateNameError:
+            form.add_error(
+                "name", ("Boefje with name '%s' does already exist. Please choose another name.") % plugin.name
+            )
+            return self.form_invalid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -63,8 +74,7 @@ class AddBoefjeVariantView(BoefjeSetupView):
 
         self.based_on_plugin_id = self.kwargs.get("plugin_id")
 
-        katalogus = get_katalogus(self.organization.code)
-        self.plugin = katalogus.get_plugin(self.based_on_plugin_id)
+        self.plugin = self.katalogus.get_plugin(self.based_on_plugin_id)
 
     def get_initial(self):
         initial = super().get_initial()
@@ -82,6 +92,19 @@ class AddBoefjeVariantView(BoefjeSetupView):
         initial["scan_level"] = self.plugin.scan_level
 
         return initial
+
+    def form_valid(self, form):
+        form_data = form.cleaned_data
+        plugin = _create_boefje_with_form_data(form_data, self.plugin_id, self.created)
+
+        try:
+            self.katalogus.create_plugin(plugin)
+            return super().form_valid(form)
+        except DuplicateNameError:
+            form.add_error(
+                "name", ("Boefje with name '%s' does already exist. Please choose another name.") % plugin.name
+            )
+            return self.form_invalid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -117,14 +140,8 @@ class EditBoefjeView(BoefjeSetupView):
 
         self.plugin_id = self.kwargs.get("plugin_id")
         self.query_params = urlencode({"new_variant": False})
-        katalogus = get_katalogus(self.organization.code)
-        self.plugin = katalogus.get_plugin(self.plugin_id)
+        self.plugin = self.katalogus.get_plugin(self.plugin_id)
         self.created = self.plugin.created
-
-    def get_form(self):
-        return BoefjeEditForm(
-            get_katalogus(self.organization.code), self.plugin_id, self.created, **self.get_form_kwargs()
-        )
 
     def get_initial(self):
         initial = super().get_initial()
@@ -144,6 +161,19 @@ class EditBoefjeView(BoefjeSetupView):
         initial["scan_level"] = self.plugin.scan_level
 
         return initial
+
+    def form_valid(self, form):
+        form_data = form.cleaned_data
+        plugin = _create_boefje_with_form_data(form_data, self.plugin_id, self.created)
+
+        try:
+            self.katalogus.edit_plugin(plugin)
+            return super().form_valid(form)
+        except DuplicateNameError:
+            form.add_error(
+                "name", ("Boefje with name '%s' does already exist. Please choose another name.") % plugin.name
+            )
+            return self.form_invalid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -178,3 +208,29 @@ class EditBoefjeView(BoefjeSetupView):
         ]
 
         return context
+
+
+def _create_boefje_with_form_data(form_data, plugin_id: str, created: str):
+    arguments = [] if not form_data["oci_arguments"] else form_data["oci_arguments"].split()
+    consumes = [] if not form_data["consumes"] else form_data["consumes"].strip("[]").replace("'", "").split(", ")
+    produces = [] if not form_data["produces"] else form_data["produces"].split(",")
+    produces = [p.strip() for p in produces]
+    input_objects = []
+
+    for input_object in consumes:
+        input_objects.append(type_by_name(input_object))
+
+    return Boefje(
+        id=str(plugin_id),
+        name=form_data["name"],
+        created=created,
+        description=form_data["description"],
+        enabled=False,
+        type="boefje",
+        scan_level=form_data["scan_level"],
+        consumes=input_objects,
+        produces=produces,
+        boefje_schema=form_data["boefje_schema"],
+        oci_image=form_data["oci_image"],
+        oci_arguments=arguments,
+    )
