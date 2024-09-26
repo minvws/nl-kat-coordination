@@ -5,7 +5,7 @@ SEARCHTARGET_DEFAULT = "ssdp:all"
 TIMEOUT_DEFAULT = 10
 
 
-def run_ssdp(search_targets: str, timeout: int) -> list:
+def run_ssdp(search_targets: str, timeout: int) -> list[dict[str, str]]:
     from ssdpy import SSDPClient
 
     client = SSDPClient()
