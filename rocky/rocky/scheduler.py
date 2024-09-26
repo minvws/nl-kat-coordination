@@ -285,6 +285,8 @@ class SchedulerClient:
             return ScheduleResponse.model_validate_json(res.content)
         except ValidationError:
             raise SchedulerValidationError(extra_message="Report schedule failed: ")
+        except HTTPStatusError:
+            raise SchedulerValidationError(extra_message="Report schedule failed: ")
         except ConnectError:
             raise SchedulerConnectError(extra_message="Report schedule failed: ")
 

@@ -24,6 +24,7 @@ from tools.view_helpers import BreadcrumbsMixin, PostRedirect, url_with_querystr
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.reports import Report as ReportOOI
+from octopoes.models.ooi.reports import ReportRecipe
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.concatenated_report.report import ConcatenatedReport
@@ -240,18 +241,12 @@ class BaseReportView(OOIFilterView):
         return plugin_data
 
     def show_report_names(self) -> bool:
-        date_choice = self.request.POST.get("choose_date", "today")
         recurrence_choice = self.request.POST.get("choose_recurrence", "once")
-
-        return date_choice == "today" and recurrence_choice == "once"
+        return recurrence_choice == "once"
 
     def is_scheduled_report(self) -> bool:
-        date_choice = self.request.POST.get("choose_date", "schedule")
-        recurrence_choice = self.request.POST.get("choose_recurrence", "repeat")
-
-        return (recurrence_choice in ["once", "repeat"] and date_choice == "schedule") or (
-            date_choice == "today" and recurrence_choice == "repeat"
-        )
+        recurrence_choice = self.request.POST.get("choose_recurrence", "")
+        return recurrence_choice == "repeat"
 
     def save_report_raw(self, data: dict) -> str:
         report_data_raw_id = self.bytes_client.upload_raw(
@@ -300,6 +295,16 @@ class BaseReportView(OOIFilterView):
 
     def get_observed_at(self):
         return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
+
+    def create_report_recipe(self, report_name_format: str, subreport_name_format: str, schedule: str):
+        return ReportRecipe(
+            recipe_id=uuid4(),
+            report_name_format=report_name_format,
+            subreport_name_format=subreport_name_format,
+            input_recipe={"input_oois": self.get_ooi_pks()},
+            report_types=self.get_report_type_ids(),
+            cron_expression=schedule,
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -562,16 +567,14 @@ class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, SchedulerView, 
         context = super().get_context_data(**kwargs)
         context["reports"] = self.get_report_names()
 
-        context["report_reference_date_form"] = self.get_report_reference_date_form()
-        context["report_recurrence_form"] = self.get_report_recurrence_form()
+        context["report_schedule_form_recurrence_choice"] = self.get_report_schedule_form_recurrence_choice()
+        context["report_schedule_form_recurrence"] = self.get_report_schedule_form_recurrence()
 
         context["report_parent_name_form"] = self.get_report_parent_name_form()
         context["report_child_name_form"] = self.get_report_child_name_form()
 
         context["show_listed_report_names"] = self.show_listes_report_names
         context["is_scheduled_report"] = self.is_a_scheduled_report
-
-        context["report_schedule_form"] = self.get_report_schedule_form()
 
         context["created_at"] = datetime.now()
         return context
@@ -595,7 +598,16 @@ class SaveReportView(BaseReportView, ReportBreadcrumbs, SchedulerView):
                 + urlencode({"report_id": report_ooi.reference})
             )
         elif self.is_scheduled_report():
-            self.schedule_report()
+            report_name_format = request.POST.get("parent_report_name", "")
+            subreport_name_format = request.POST.get("child_report_name", "")
+
+            recurrence = request.POST.get("recurrence", "")
+
+            schedule = self.convert_recurrence_to_cron_expressions(recurrence)
+
+            report_recipe = self.create_report_recipe(report_name_format, subreport_name_format, schedule)
+
+            self.create_report_schedule(report_recipe)
 
             return redirect(reverse("report_history", kwargs={"organization_code": self.organization.code}))
 

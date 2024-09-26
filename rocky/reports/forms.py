@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from typing import Any
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
@@ -33,7 +32,7 @@ class ReportTypeMultiselectForm(BaseRockyForm):
         self.fields["report_type"].choices = report_types_choices
 
 
-class ReportReferenceDateForm(BaseRockyForm):
+class ReportScheduleStartDateChoiceForm(BaseRockyForm):
     choose_date = forms.ChoiceField(
         label="",
         required=False,
@@ -41,21 +40,18 @@ class ReportReferenceDateForm(BaseRockyForm):
         choices=(("today", _("Today")), ("schedule", _("Different date"))),
         initial="today",
     )
+
+
+class ReportScheduleStartDateForm(BaseRockyForm):
     start_date = forms.DateField(
         label="",
-        widget=forms.HiddenInput(),
+        widget=DateInput(format="%Y-%m-%d"),
         initial=lambda: datetime.now(tz=timezone.utc).date(),
-        required=False,
+        required=True,
     )
 
-    def clean(self) -> dict[str, Any]:
-        cleaned_data = super().clean()
-        if cleaned_data.get("choose_date") == "schedule":
-            self.fields["start_date"].widget = DateInput(format="%Y-%m-%d")
-        return cleaned_data
 
-
-class ReportRecurrenceForm(BaseRockyForm):
+class ReportRecurrenceChoiceForm(BaseRockyForm):
     choose_recurrence = forms.ChoiceField(
         label="",
         required=False,
@@ -63,10 +59,13 @@ class ReportRecurrenceForm(BaseRockyForm):
         choices=(("once", _("No, just once")), ("repeat", _("Yes, repeat"))),
         initial="once",
     )
+
+
+class ReportScheduleRecurrenceForm(BaseRockyForm):
     recurrence = forms.ChoiceField(
         label="",
         required=False,
-        widget=forms.Select,
+        widget=forms.Select(attrs={"form": "generate_report"}),
         choices=[
             ("daily", _("Daily")),
             ("weekly", _("Weekly")),
@@ -74,20 +73,6 @@ class ReportRecurrenceForm(BaseRockyForm):
             ("yearly", _("Yearly")),
         ],
     )
-
-    def clean(self) -> dict[str, Any]:
-        cleaned_data = super().clean()
-        if cleaned_data.get("choose_recurrence") == "once":
-            self.fields["recurrence"].widget = forms.HiddenInput()
-            self.fields["recurrence"].choices = [("no_repeat", _("No Repeat"))]
-        return cleaned_data
-
-
-class ReportScheduleForm(ReportReferenceDateForm, ReportRecurrenceForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields:
-            self.fields[field].widget = forms.HiddenInput()
 
 
 class CustomReportScheduleForm(BaseRockyForm):
