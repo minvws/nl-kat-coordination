@@ -53,7 +53,7 @@ class Boefje(Plugin):
         return {ooi_class.get_ooi_type() for ooi_class in consumes}
 
     def can_scan(self, member) -> bool:
-        return super().can_scan(member) and member.acknowledged_clearance_level >= self.scan_level.value
+        return super().can_scan(member) and member.has_clearance_level(self.scan_level.value)
 
 
 class Normalizer(Plugin):
@@ -243,7 +243,7 @@ def parse_boefje(boefje: dict) -> Boefje:
         scan_level=scan_level,
         consumes=consumes,
         produces=boefje["produces"],
-        boefje_schema=boefje.get("schema"),
+        boefje_schema=boefje.get("boefje_schema"),
         oci_image=boefje.get("oci_image"),
         oci_arguments=boefje.get("oci_arguments", []),
     )

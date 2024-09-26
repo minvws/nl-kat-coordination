@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-18 10:23+0000\n"
+"POT-Creation-Date: 2024-09-25 14:37+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -315,6 +315,10 @@ msgstr ""
 
 #: account/models.py
 msgid "date joined"
+msgstr ""
+
+#: account/models.py
+msgid "The clearance level of the user for all organizations."
 msgstr ""
 
 #: account/models.py
@@ -1345,8 +1349,20 @@ msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py
 msgid ""
+"You have not acknowledged your clearance level. Go to your profile page to "
+"acknowledge your clearance level."
+msgstr ""
+
+#: katalogus/views/plugin_enable_disable.py
+msgid ""
 "Your clearance level is not set. Go to your profile page to see your "
 "clearance or contact the administrator to set a clearance level."
+msgstr ""
+
+#: katalogus/views/plugin_enable_disable.py
+msgid ""
+"Your clearance level is L{}. Contact your administrator to get a higher "
+"clearance level."
 msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py
@@ -6288,6 +6304,10 @@ msgstr ""
 
 #: rocky/templates/tasks/normalizers.html
 msgid "Boefje input OOI"
+msgstr ""
+
+#: rocky/templates/tasks/normalizers.html
+msgid "Manually added"
 msgstr ""
 
 #: rocky/templates/tasks/ooi_detail_task_list.html
