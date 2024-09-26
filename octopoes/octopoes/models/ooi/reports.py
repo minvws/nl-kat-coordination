@@ -61,3 +61,5 @@ class ReportRecipe(OOI):
     report_types: list[str]
 
     cron_expression: str
+
+    _natural_key_attrs = ["recipe_id"]
