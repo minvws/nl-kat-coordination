@@ -1,7 +1,8 @@
 {
   "id": "kat_ssdp_normalize",
+  "name": "SSDP normalizer",
   "consumes": [
-    "ssdp"
+    "boefje/ssdp"
   ],
   "produces": [
     "IPAddressV6",
