@@ -9,7 +9,7 @@ import httpx
 from httpx import HTTPError, HTTPStatusError
 
 from bytes.api.models import BoefjeOutput
-from bytes.models import BoefjeMeta, NormalizerMeta
+from bytes.models import BoefjeMeta, NormalizerMeta, RawDataMeta
 from bytes.repositories.meta_repository import BoefjeMetaFilter, NormalizerMetaFilter, RawDataFilter
 
 BYTES_API_CLIENT_VERSION = "0.2"
@@ -163,6 +163,13 @@ class BytesAPIClient:
         self._verify_response(response)
 
         return response.content
+
+    @retry_with_login
+    def get_raw_meta(self, raw_id: UUID) -> RawDataMeta:
+        response = self.client.get(f"/bytes/raw/{raw_id}/meta")
+        self._verify_response(response)
+
+        return RawDataMeta.model_validate(response.json())
 
     @retry_with_login
     def get_raws(self, query_filter: RawDataFilter) -> dict[str, str]:

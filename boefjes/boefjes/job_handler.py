@@ -119,13 +119,11 @@ class BoefjeHandler(Handler):
         boefje_meta.runnable_hash = plugin.runnable_hash
         boefje_meta.environment = get_environment_settings(boefje_meta, plugin.boefje_schema)
 
-        mime_types = _default_mime_types(boefje_meta.boefje).union(plugin.produces)
-
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
         boefje_meta.started_at = datetime.now(timezone.utc)
 
-        boefje_results: list[tuple[set, bytes | str]]
+        boefje_results: list[tuple[set, bytes | str]] = []
 
         try:
             boefje_results = self.job_runner.run(boefje_meta, boefje_meta.environment)
@@ -152,7 +150,9 @@ class BoefjeHandler(Handler):
                             )
                         else:
                             valid_mimetypes.add(mimetype)
-                    raw_file_id = self.bytes_client.save_raw(boefje_meta.id, output, mime_types.union(valid_mimetypes))
+                    raw_file_id = self.bytes_client.save_raw(
+                        boefje_meta.id, output, _default_mime_types(boefje_meta.boefje).union(valid_mimetypes)
+                    )
                     logger.info(
                         "Saved raw file %s for boefje %s[%s]", raw_file_id, boefje_meta.boefje.id, boefje_meta.id
                     )
