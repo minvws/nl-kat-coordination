@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 
-from katalogus.views.boefje_setup import AddBoefjeVariantView, AddBoefjeView
+from katalogus.views.boefje_setup import AddBoefjeVariantView, AddBoefjeView, EditBoefjeView
 from katalogus.views.change_clearance_level import ChangeClearanceLevel
 from katalogus.views.katalogus import (
     AboutPluginsView,
@@ -62,6 +62,11 @@ urlpatterns = [
         "plugins/boefje/<plugin_id>/",
         BoefjeDetailView.as_view(),
         name="boefje_detail",
+    ),
+    path(
+        "plugins/boefje/<plugin_id>/edit/",
+        EditBoefjeView.as_view(),
+        name="edit_boefje",
     ),
     path(
         "plugins/normalizer/<plugin_id>/",

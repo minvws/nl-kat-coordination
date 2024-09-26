@@ -1,7 +1,7 @@
 {
   "id": "service_banner",
   "name": "Service banner download",
-  "description": "Downloads service banners from the target hosts",
+  "description": "Downloads service banners from the target hosts.",
   "consumes": [
     "IPPort"
   ],
