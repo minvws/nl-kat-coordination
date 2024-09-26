@@ -1019,7 +1019,7 @@ class BoefjeScheduler(Scheduler):
             utils.deep_get(task.data, ["boefje", "id"]),
             self.organisation.id,
         )
-        if plugin is not None and plugin.interval is not None:
+        if plugin is not None and plugin.interval is not None and plugin.interval > 0:
             return datetime.now(timezone.utc) + timedelta(minutes=plugin.interval)
 
         return super().calculate_deadline(task)
