@@ -1,6 +1,7 @@
 {
   "id": "kat_rdns_normalize",
-  "name": "RDNS",
+  "name": "Reverse DNS",
+  "description": "Parses reverse DNS data into PTR records.",
   "consumes": [
     "boefje/rdns"
   ],
