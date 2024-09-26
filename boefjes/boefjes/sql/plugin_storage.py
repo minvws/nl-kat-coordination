@@ -49,11 +49,8 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
         if instance.static:
             raise NotAllowed(f"Plugin with id '{boefje_id}' is static, so updating it is not allowed")
 
-        field_mapping = {"boefje_schema": "schema"}  # since Boefje.boefje_schema is the same as BoefjeInDB.schema
-        for key, value in data.items():
-            setattr(instance, field_mapping.get(key, key), value)
-
-        self.session.add(instance)
+        boefje = self.to_boefje(instance).copy(update=data)
+        self.session.merge(self.to_boefje_in_db(boefje, instance.id))
 
     def create_normalizer(self, normalizer: Normalizer) -> None:
         logger.info("Saving plugin: %s", normalizer.model_dump_json())
@@ -70,10 +67,8 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
         if instance.static:
             raise NotAllowed(f"Plugin with id '{normalizer_id}' is static, so updating it is not allowed")
 
-        for key, value in data.items():
-            setattr(instance, key, value)
-
-        self.session.add(instance)
+        normalizer = self.to_normalizer(instance).copy(update=data)
+        self.session.merge(self.to_normalizer_in_db(normalizer, instance.id))
 
     def delete_boefje_by_id(self, boefje_id: str) -> None:
         instance = self._db_boefje_instance_by_id(boefje_id)
@@ -102,8 +97,8 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
         return instance
 
     @staticmethod
-    def to_boefje_in_db(boefje: Boefje) -> BoefjeInDB:
-        return BoefjeInDB(
+    def to_boefje_in_db(boefje: Boefje, pk: int | None = None) -> BoefjeInDB:
+        boefje = BoefjeInDB(
             plugin_id=boefje.id,
             created=boefje.created,
             name=boefje.name,
@@ -112,15 +107,22 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             consumes=boefje.consumes,
             produces=boefje.produces,
             schema=boefje.boefje_schema,
+            cron=boefje.cron,
+            interval=boefje.interval,
             oci_image=boefje.oci_image,
             oci_arguments=boefje.oci_arguments,
             version=boefje.version,
             static=boefje.static,
         )
 
+        if pk is not None:
+            boefje.id = pk
+
+        return boefje
+
     @staticmethod
-    def to_normalizer_in_db(normalizer: Normalizer) -> NormalizerInDB:
-        return NormalizerInDB(
+    def to_normalizer_in_db(normalizer: Normalizer, pk: int | None = None) -> NormalizerInDB:
+        normalizer = NormalizerInDB(
             plugin_id=normalizer.id,
             created=normalizer.created,
             name=normalizer.name,
@@ -130,6 +132,11 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             version=normalizer.version,
             static=normalizer.static,
         )
+
+        if pk is not None:
+            normalizer.id = pk
+
+        return normalizer
 
     @staticmethod
     def to_boefje(boefje_in_db: BoefjeInDB) -> Boefje:
@@ -143,6 +150,8 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             consumes=boefje_in_db.consumes,
             produces=boefje_in_db.produces,
             boefje_schema=boefje_in_db.schema,
+            cron=boefje_in_db.cron,
+            interval=boefje_in_db.interval,
             oci_image=boefje_in_db.oci_image,
             oci_arguments=boefje_in_db.oci_arguments,
             version=boefje_in_db.version,

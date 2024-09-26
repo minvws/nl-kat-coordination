@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-18 08:49+0000\n"
+"POT-Creation-Date: 2024-09-26 12:37+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,7 +31,7 @@ msgstr ""
 #: katalogus/templates/plugin_container_image.html
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/tls_report/report.html
-#: reports/templates/partials/export_report_settings.html
+#: reports/templates/partials/report_names_form.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/subreports_table.html
 #: tools/forms/boefje.py rocky/templates/organizations/organization_list.html
@@ -316,6 +316,10 @@ msgstr ""
 
 #: account/models.py
 msgid "date joined"
+msgstr ""
+
+#: account/models.py
+msgid "The clearance level of the user for all organizations."
 msgstr ""
 
 #: account/models.py
@@ -712,6 +716,13 @@ msgid "Boefje variant setup"
 msgstr ""
 
 #: katalogus/templates/boefje_setup.html
+#: rocky/templates/organizations/organization_member_list.html
+#: rocky/templates/organizations/organization_settings.html
+#: rocky/views/ooi_edit.py rocky/views/organization_edit.py
+msgid "Edit"
+msgstr ""
+
+#: katalogus/templates/boefje_setup.html
 msgid "Boefje setup"
 msgstr ""
 
@@ -727,11 +738,27 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/boefje_setup.html
+msgid "Save changes"
+msgstr ""
+
+#: katalogus/templates/boefje_setup.html
+msgid "Discard changes"
+msgstr ""
+
+#: katalogus/templates/boefje_setup.html
 msgid "Create variant"
 msgstr ""
 
 #: katalogus/templates/boefje_setup.html
 msgid "Discard variant"
+msgstr ""
+
+#: katalogus/templates/boefje_setup.html
+msgid "Create new Boefje"
+msgstr ""
+
+#: katalogus/templates/boefje_setup.html
+msgid "Discard new Boefje"
 msgstr ""
 
 #: katalogus/templates/boefjes.html katalogus/templates/normalizers.html
@@ -1158,6 +1185,10 @@ msgid "Status"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
+msgid "Age"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
 msgid "current"
 msgstr ""
 
@@ -1188,6 +1219,10 @@ msgid "Open details"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
+msgid "Boefje ID"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/subreports_table.html
 msgid "Creation date"
@@ -1210,6 +1245,10 @@ msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
 msgid "There are no arguments used for this Boefje variant."
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "Edit variant"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
@@ -1346,8 +1385,20 @@ msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py
 msgid ""
+"You have not acknowledged your clearance level. Go to your profile page to "
+"acknowledge your clearance level."
+msgstr ""
+
+#: katalogus/views/plugin_enable_disable.py
+msgid ""
 "Your clearance level is not set. Go to your profile page to see your "
 "clearance or contact the administrator to set a clearance level."
+msgstr ""
+
+#: katalogus/views/plugin_enable_disable.py
+msgid ""
+"Your clearance level is L{}. Contact your administrator to get a higher "
+"clearance level."
 msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py
@@ -2301,15 +2352,19 @@ msgid "Filter by OOI types"
 msgstr ""
 
 #: reports/forms.py
-msgid "Start date"
+msgid "Today"
 msgstr ""
 
 #: reports/forms.py
-msgid "Recurrence"
+msgid "Different date"
 msgstr ""
 
 #: reports/forms.py
-msgid "Does not repeat"
+msgid "No, just once"
+msgstr ""
+
+#: reports/forms.py
+msgid "Yes, repeat"
 msgstr ""
 
 #: reports/forms.py
@@ -2329,15 +2384,7 @@ msgid "Yearly"
 msgstr ""
 
 #: reports/forms.py
-msgid "Warning: Recurrence is set in February only for leap years."
-msgstr ""
-
-#: reports/forms.py
-msgid "Warning: Recurrence is not set for February."
-msgstr ""
-
-#: reports/forms.py
-msgid "Warning: Recurrence will skip months that does not have 31 days."
+msgid "Start date"
 msgstr ""
 
 #: reports/forms.py
@@ -2366,6 +2413,14 @@ msgstr ""
 
 #: reports/forms.py
 msgid "After"
+msgstr ""
+
+#: reports/forms.py
+msgid "Report name format"
+msgstr ""
+
+#: reports/forms.py
+msgid "Subreports name format"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -3580,56 +3635,11 @@ msgstr ""
 #: reports/templates/partials/export_report_settings.html
 msgid ""
 "The date you select will be the reference date for the data set for your "
-"report. Please allow for up to 24 hours for your report to be ready."
+"report."
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-msgid "Report name"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid ""
-"Give your report a custom name and optionally add the reports' reference "
-"date to the name. To do so you can select a standard option or use a <a "
-"href=\"https://strftime.org/\" target=\"_blank\">Python strftime code</a> in "
-"the report name."
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Report names:"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "(Required)"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Add reference date"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-#: rocky/views/scan_profile.py
-msgid "Reset"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "No reference date"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Day"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Week"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Month"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Year"
+msgid "Recurrence"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -3693,6 +3703,55 @@ msgid ""
 "organisation for the selected date. The summary section provides an overview "
 "of the selected systems (objects), plugins and reports. This is followed "
 "with the findings for each report."
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "Report names:"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "(Required)"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "Add reference date"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+#: rocky/views/scan_profile.py
+msgid "Reset"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "No reference date"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "Day"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "Week"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "Month"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "Year"
+msgstr ""
+
+#: reports/templates/partials/report_names_header.html
+msgid "Report name"
+msgstr ""
+
+#: reports/templates/partials/report_names_header.html
+msgid ""
+"Give your report a custom name and optionally add the reports' reference "
+"date to the name. To do so you can select a standard option or use a <a "
+"href=\"https://strftime.org/\" target=\"_blank\">Python strftime code</a> in "
+"the report name."
 msgstr ""
 
 #: reports/templates/partials/report_navigation.html
@@ -4497,7 +4556,15 @@ msgstr ""
 
 #: tools/forms/settings.py
 msgid ""
-"<p>A description of the boefje explaining in short what it can do. This will "
+"<p>The name of the Docker image. For example: <i>'ghcr.io/minvws/openkat/"
+"nmap'</i>. In OpenKAT, all Boefjes with the same container image will be "
+"seen as 'variants' and will be shown together on the Boefje detail page. </"
+"p> "
+msgstr ""
+
+#: tools/forms/settings.py
+msgid ""
+"<p>A description of the Boefje explaining in short what it can do. This will "
 "both be displayed inside the KAT-alogus and on the Boefje details page.</p> "
 msgstr ""
 
@@ -5801,12 +5868,6 @@ msgid "Assigned clearance level"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/organizations/organization_settings.html
-#: rocky/views/ooi_edit.py rocky/views/organization_edit.py
-msgid "Edit"
-msgstr ""
-
-#: rocky/templates/organizations/organization_member_list.html
 msgid "Super user"
 msgstr ""
 
@@ -6372,6 +6433,10 @@ msgstr ""
 
 #: rocky/templates/tasks/normalizers.html
 msgid "Boefje input OOI"
+msgstr ""
+
+#: rocky/templates/tasks/normalizers.html
+msgid "Manually added"
 msgstr ""
 
 #: rocky/templates/tasks/ooi_detail_task_list.html
@@ -6959,15 +7024,6 @@ msgstr ""
 #: rocky/views/scan_profile.py
 #, python-brace-format
 msgid "Can not reset scan level. Scan level of {ooi_name} not declared"
-msgstr ""
-
-#: rocky/views/scheduler.py
-msgid ""
-"Success! Your report has been successfully added to the queue for scheduling."
-msgstr ""
-
-#: rocky/views/scheduler.py
-msgid "No schedule set for this report."
 msgstr ""
 
 #: rocky/views/scheduler.py
