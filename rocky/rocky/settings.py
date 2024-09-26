@@ -535,6 +535,9 @@ structlog.configure(
     cache_logger_on_first_use=True,
 )
 
+# Number of workers to run for the report queue
 POOL_SIZE = env.int("POOL_SIZE", default=2)
-POLL_INTERVAL = env.int("POLL_INTERVAL", default=2)
-WORKER_HEARTBEAT = env.int("WORKER_HEARTBEAT", default=2)
+# Time to wait before polling for tasks when the queue is empty
+POLL_INTERVAL = env.int("POLL_INTERVAL", default=10)
+# Seconds to wait before checking the workers when queues are full
+WORKER_HEARTBEAT = env.int("WORKER_HEARTBEAT", default=5)
