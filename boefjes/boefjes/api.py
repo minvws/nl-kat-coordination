@@ -2,6 +2,7 @@ import base64
 import multiprocessing
 from datetime import datetime, timezone
 from enum import Enum
+from multiprocessing.context import ForkContext, ForkProcess
 from uuid import UUID
 
 import structlog
@@ -23,9 +24,10 @@ from octopoes.models.exception import ObjectNotFoundException
 
 app = FastAPI(title="Boefje API")
 logger = structlog.get_logger(__name__)
+ctx: ForkContext = multiprocessing.get_context("fork")
 
 
-class UvicornServer(multiprocessing.Process):
+class UvicornServer(ForkProcess):
     def __init__(self, config: Config):
         super().__init__()
         self.server = Server(config=config)
