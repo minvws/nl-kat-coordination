@@ -151,6 +151,7 @@ def test_update_plugins(test_client, organisation):
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/{boefje.id}")
     assert response.json()["description"] == "4"
+    assert response.json()["scan_level"] == 3
     assert response.json()["enabled"] is True
     assert response.json()["scan_level"] == 3
     assert response.json()["interval"] == 20
