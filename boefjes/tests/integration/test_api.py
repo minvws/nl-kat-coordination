@@ -32,7 +32,7 @@ def test_filter_plugins(test_client, organisation):
     boefje = Boefje(
         id="test_plugin", name="My test boefje", static=False, oci_image="ghcr.io/minvws/openkat/nmap:latest"
     )
-    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.json())
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
     assert response.status_code == 201
 
     response = test_client.get(
@@ -43,19 +43,19 @@ def test_filter_plugins(test_client, organisation):
 
 def test_cannot_add_plugin_reserved_id(test_client, organisation):
     boefje = Boefje(id="dns-records", name="My test boefje", static=False)
-    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.json())
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
     assert response.status_code == 400
     assert response.json() == {"message": "Plugin id 'dns-records' is already used"}
 
     normalizer = Normalizer(id="kat_nmap_normalize", name="My test normalizer")
-    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.json())
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.model_dump_json())
     assert response.status_code == 400
     assert response.json() == {"message": "Plugin id 'kat_nmap_normalize' is already used"}
 
 
 def test_add_boefje(test_client, organisation):
     boefje = Boefje(id="test_plugin", name="My test boefje", static=False)
-    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.json())
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
     assert response.status_code == 201
 
     response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", json={"a": "b"})
@@ -64,7 +64,7 @@ def test_add_boefje(test_client, organisation):
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/?plugin_type=boefje")
     assert len(response.json()) == 45
 
-    boefje_dict = boefje.dict()
+    boefje_dict = boefje.model_dump()
     boefje_dict["consumes"] = list(boefje_dict["consumes"])
     boefje_dict["produces"] = list(boefje_dict["produces"])
 
@@ -72,9 +72,42 @@ def test_add_boefje(test_client, organisation):
     assert response.json() == boefje_dict
 
 
+def test_cannot_add_static_plugin_with_duplicate_name(test_client, organisation):
+    boefje = Boefje(id="test_plugin", name="DNS records", static=False)
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
+    assert response.status_code == 400
+
+    boefje = Boefje(id="test_plugin", name="DNS records", static=False)
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
+    assert response.status_code == 400
+    assert response.json() == {"message": "Plugin name 'DNS records' is already used"}
+
+
+def test_cannot_add_plugin_with_duplicate_name(test_client, organisation):
+    boefje = Boefje(id="test_plugin", name="My test boefje", static=False)
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
+    assert response.status_code == 201
+
+    boefje = Boefje(id="test_plugin_2", name="My test boefje", static=False)
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
+    assert response.status_code == 400
+    assert response.json() == {
+        "message": 'duplicate key value violates unique constraint "unique_boefje_name"\n'
+        "DETAIL:  Key (name)=(My test boefje) already exists.\n"
+    }
+
+    normalizer = Normalizer(id="test_normalizer", name="My test normalizer", static=False)
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.model_dump_json())
+    assert response.status_code == 201
+
+    normalizer = Normalizer(id="test_normalizer_2", name="My test normalizer", static=False)
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.model_dump_json())
+    assert response.status_code == 400
+
+
 def test_delete_boefje(test_client, organisation):
     boefje = Boefje(id="test_plugin", name="My test boefje", static=False)
-    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.json())
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
     assert response.status_code == 201
 
     response = test_client.delete(f"/v1/organisations/{organisation.id}/boefjes/test_plugin")
@@ -85,19 +118,19 @@ def test_delete_boefje(test_client, organisation):
 
 def test_add_normalizer(test_client, organisation):
     normalizer = Normalizer(id="test_normalizer", name="My test normalizer", static=False)
-    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.json())
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.model_dump_json())
     assert response.status_code == 201
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/?plugin_type=normalizer")
     assert len(response.json()) == 56
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/test_normalizer")
-    assert response.json() == normalizer.dict()
+    assert response.json() == normalizer.model_dump()
 
 
 def test_delete_normalizer(test_client, organisation):
     normalizer = Normalizer(id="test_normalizer", name="My test normalizer", static=False)
-    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.json())
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.model_dump_json())
     assert response.status_code == 201
 
     response = test_client.delete(f"/v1/organisations/{organisation.id}/normalizers/test_normalizer")
@@ -108,17 +141,22 @@ def test_delete_normalizer(test_client, organisation):
 
 def test_update_plugins(test_client, organisation):
     normalizer = Normalizer(id="norm_id", name="My test normalizer")
-    boefje = Boefje(id="test_plugin", name="My test boefje", description="123")
+    boefje = Boefje(id="test_plugin", name="My test boefje", description="123", interval=20)
 
-    test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.json())
-    test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"description": "4"})
+    test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
     test_client.patch(f"/v1/organisations/{organisation.id}/plugins/{boefje.id}", json={"enabled": True})
+    test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"scan_level": 3})
+    test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"description": "4"})
+    test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"cron": "5 0 * 8 *"})
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/{boefje.id}")
     assert response.json()["description"] == "4"
     assert response.json()["enabled"] is True
+    assert response.json()["scan_level"] == 3
+    assert response.json()["interval"] == 20
+    assert response.json()["cron"] == "5 0 * 8 *"
 
-    test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.json())
+    test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.model_dump_json())
     test_client.patch(f"/v1/organisations/{organisation.id}/normalizers/{normalizer.id}", json={"version": "v1.2"})
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/{normalizer.id}")
@@ -127,18 +165,33 @@ def test_update_plugins(test_client, organisation):
 
 def test_cannot_create_boefje_with_invalid_schema(test_client, organisation):
     boefje = Boefje(id="test_plugin", name="My test boefje", description="123").model_dump(mode="json")
-    boefje["schema"] = {"$schema": 3}
+    boefje["boefje_schema"] = {"$schema": 3}
 
     r = test_client.post(f"/v1/organisations/{organisation.id}/plugins", json=boefje)
-    assert r.status_code == 400
+    assert r.status_code == 422
+
+
+def test_cannot_set_invalid_cron(test_client, organisation):
+    boefje = Boefje(id="test_plugin", name="My test boefje", description="123").model_dump(mode="json")
+    boefje["cron"] = "bad format"
+
+    res = test_client.post(f"/v1/organisations/{organisation.id}/plugins", json=boefje)
+    assert res.status_code == 422
+
+    boefje = Boefje(id="test_plugin", name="My test boefje")
+    test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.json())
+    res = test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"cron": "bad format"})
+    assert res.status_code == 422
 
 
 def test_update_boefje_schema(test_client, organisation):
     boefje = Boefje(id="test_plugin", name="My test boefje", description="123")
-    test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.json())
+    test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
 
-    r = test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"schema": {"$schema": 3}})
-    assert r.status_code == 400
+    r = test_client.patch(
+        f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"boefje_schema": {"$schema": 3}}
+    )
+    assert r.status_code == 422
 
     valid_schema = {
         "title": "Arguments",
@@ -151,16 +204,20 @@ def test_update_boefje_schema(test_client, organisation):
         },
         "required": [],
     }
-    r = test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"schema": valid_schema})
+    r = test_client.patch(
+        f"/v1/organisations/{organisation.id}/boefjes/{boefje.id}", json={"boefje_schema": valid_schema}
+    )
     assert r.status_code == 204
 
     schema = test_client.get(f"/v1/organisations/{organisation.id}/plugins/{boefje.id}/schema.json").json()
     assert schema == valid_schema
 
     api_boefje = test_client.get(f"/v1/organisations/{organisation.id}/plugins/{boefje.id}").json()
-    assert api_boefje["schema"] == valid_schema
+    assert api_boefje["boefje_schema"] == valid_schema
 
-    r = test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/dns-records", json={"schema": valid_schema})
+    r = test_client.patch(
+        f"/v1/organisations/{organisation.id}/boefjes/dns-records", json={"boefje_schema": valid_schema}
+    )
     assert r.status_code == 404
 
 
@@ -221,7 +278,7 @@ def test_clone_settings(test_client, organisation):
     # Add the second organisation
     new_org_id = "org2"
     org2 = Organisation(id=new_org_id, name="Second test Organisation")
-    test_client.post("/v1/organisations/", content=org2.json())
+    test_client.post("/v1/organisations/", content=org2.model_dump_json())
     test_client.put(f"/v1/organisations/{new_org_id}/{plug}/settings", json={"test_key": "second value"})
 
     # Show that the second organisation has no settings and dns-records is not enabled

@@ -76,7 +76,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         return TypeAdapter(Task | None).validate_json(response.content)
 
     def push_item(self, queue_id: str, p_item: Task) -> None:
-        response = self._session.post(f"/queues/{queue_id}/push", content=p_item.json())
+        response = self._session.post(f"/queues/{queue_id}/push", content=p_item.model_dump_json())
         self._verify_response(response)
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
