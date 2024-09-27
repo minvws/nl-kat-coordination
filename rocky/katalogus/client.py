@@ -80,6 +80,13 @@ class DuplicateNameError(KATalogusError):
         self.message = status_message + _("Boefje with this name already exists.")
 
 
+class DuplicateIdError(KATalogusError):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+        status_message = ""
+        self.message = status_message + _("Boefje with this ID already exists.")
+
+
 class KATalogusNotAllowedError(KATalogusError):
     def __init__(self, *args: object, status_code: str | None = None, status_message: str | None = None) -> None:
         super().__init__(*args)
@@ -239,6 +246,8 @@ class KATalogusClientV1:
                 logger.info("Plugin %s could not be created", plugin.name)
             if response.status_code == codes.BAD_REQUEST and "Duplicate plugin name" in error.response.text:
                 raise DuplicateNameError
+            if response.status_code == codes.BAD_REQUEST and "Duplicate plugin id" in error.response.text:
+                raise DuplicateIdError
             else:
                 raise error
 
