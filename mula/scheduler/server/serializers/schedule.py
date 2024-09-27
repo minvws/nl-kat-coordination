@@ -12,6 +12,8 @@ class ScheduleCreate(BaseModel):
 
     schedule: str
 
+    deadline_at: datetime | None = None
+
 
 # NOTE: model added for support of partial updates
 class SchedulePatch(BaseModel):

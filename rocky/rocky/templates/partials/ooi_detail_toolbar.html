@@ -8,7 +8,7 @@
         {% csrf_token %}
         <input type="hidden" name="ooi" value="{{ ooi_id }}">
         <input type="hidden" name="report_type" value="findings-report">
-        <button>{% translate "Generate findings report" %}</button>
+        <button>{% translate "Generate Findings Report" %}</button>
     </form>
     {% if not ooi_past_due %}
         {% if ooi|is_finding and perms.tools.can_mute_findings %}
