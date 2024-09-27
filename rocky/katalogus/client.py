@@ -256,7 +256,7 @@ class KATalogusClientV1:
                 logger.info("Plugin %s updated", plugin.name)
             else:
                 logger.info("Plugin %s could not be updated", plugin.name)
-            if response.status_code == 400:
+            if response.status_code == codes.BAD_REQUEST:
                 raise DuplicateNameError(status_code=str(error.response.status_code))
             if response.status_code in [codes.FORBIDDEN, codes.NOT_FOUND]:
                 raise KATalogusNotAllowedError(status_code=str(error.response.status_code))
