@@ -25,7 +25,7 @@ class SSDPResponse(OOI):
 
     object_type: Literal["SSDPService"] = "SSDPService"
 
-    _natural_key_attrs = ["network", "nt"]  # TODO: SOUF see best options
+    _natural_key_attrs = ["network", "server", "usn"]
 
     web_url: Reference | None = ReferenceField(WebURL, default=None)
     network: Reference = ReferenceField(Network)
