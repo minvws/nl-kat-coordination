@@ -238,7 +238,7 @@ def test_cannot_update_static_plugins(test_client, organisation):
     assert response.json()["enabled"] is True
 
     response = test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/dns-records", json={"version": "v1.2"})
-    assert response.status_code == 400
+    assert response.status_code == 403
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/dns-records")
     assert response.json()["version"] != "v1.2"
