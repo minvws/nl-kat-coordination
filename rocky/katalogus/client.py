@@ -74,11 +74,9 @@ class KATalogusError(Exception):
 
 
 class DuplicateNameError(KATalogusError):
-    def __init__(self, *args: object, status_code: str | None = None) -> None:
+    def __init__(self, *args: object) -> None:
         super().__init__(*args)
         status_message = ""
-        if status_code is not None:
-            status_message = f"{status_code}: "
         self.message = status_message + _("Boefje with this name already exists.")
 
 
