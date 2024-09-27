@@ -3,7 +3,8 @@
   "name": "DNS records",
   "description": "Parses DNSSEC data into findings.",
   "consumes": [
-    "boefje/dns-sec"
+    "boefje/dns-sec",
+    "openkat/dnssec-output"
   ],
   "produces": [
     "KATFindingType",
