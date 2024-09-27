@@ -21,7 +21,6 @@ from rocky.views.ooi_edit import OOIEditView
 from rocky.views.ooi_findings import OOIFindingListView
 from rocky.views.ooi_list import OOIListExportView, OOIListView
 from rocky.views.ooi_mute import MuteFindingsBulkView, MuteFindingView
-from rocky.views.ooi_report import FindingReportPDFView, OOIReportPDFView, OOIReportView
 from rocky.views.ooi_tree import OOIGraphView, OOISummaryView, OOITreeView
 from rocky.views.organization_add import OrganizationAddView
 from rocky.views.organization_crisis_room import OrganizationCrisisRoomView
@@ -90,10 +89,7 @@ urlpatterns += i18n_patterns(
     path("<organization_code>/findings/mute/", MuteFindingView.as_view(), name="finding_mute"),
     path("<organization_code>/findings/mute/bulk/", MuteFindingsBulkView.as_view(), name="finding_mute_bulk"),
     path("<organization_code>/findings/finding_type/add/", FindingTypeAddView.as_view(), name="finding_type_add"),
-    path("<organization_code>/findings/report/pdf", FindingReportPDFView.as_view(), name="findings_pdf_report"),
     path("<organization_code>/objects/graph/", OOIGraphView.as_view(), name="ooi_graph"),
-    path("<organization_code>/objects/report/", OOIReportView.as_view(), name="ooi_report"),
-    path("<organization_code>/objects/report/pdf/", OOIReportPDFView.as_view(), name="ooi_pdf_report"),
     path("<organization_code>/objects/summary/", OOISummaryView.as_view(), name="ooi_summary"),
     path("<organization_code>/objects/tree/", OOITreeView.as_view(), name="ooi_tree"),
     path("<organization_code>/objects/findings/", OOIFindingListView.as_view(), name="ooi_findings"),

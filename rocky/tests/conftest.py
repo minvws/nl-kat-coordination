@@ -375,11 +375,6 @@ def mock_models_katalogus(mocker):
 
 
 @pytest.fixture
-def mock_views_katalogus(mocker):
-    return mocker.patch("rocky.views.ooi_report.get_katalogus")
-
-
-@pytest.fixture
 def mock_bytes_client(mocker):
     return mocker.patch("rocky.bytes_client.BytesClient")
 
