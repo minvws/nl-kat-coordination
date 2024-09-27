@@ -96,19 +96,19 @@ def get_plugin(
 
 @router.post("/plugins", status_code=status.HTTP_201_CREATED)
 def add_plugin(plugin: PluginType, plugin_service: PluginService = Depends(get_plugin_service)):
-    with plugin_service as service:
-        plugin.static = False  # Creation through the API implies that these cannot be static
+    try:
+        with plugin_service as service:
+            plugin.static = False  # Creation through the API implies that these cannot be static
 
-        try:
             if plugin.type == "boefje":
                 return service.create_boefje(plugin)
 
             if plugin.type == "normalizer":
                 return service.create_normalizer(plugin)
-        except ExistingPluginId:
-            raise HTTPException(status.HTTP_400_BAD_REQUEST, "Duplicate plugin id")
-        except ExistingPluginName:
-            raise HTTPException(status.HTTP_400_BAD_REQUEST, "Duplicate plugin name")
+    except ExistingPluginId:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Duplicate plugin id")
+    except ExistingPluginName:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Duplicate plugin name")
 
     raise HTTPException(status.HTTP_400_BAD_REQUEST, "Creation of Bits is not supported")
 
