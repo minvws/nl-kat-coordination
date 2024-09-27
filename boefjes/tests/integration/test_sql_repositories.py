@@ -161,9 +161,17 @@ def test_bare_boefje_storage(plugin_storage):
 
     boefje.description = "4"
     boefje.scan_level = 3
+
     assert storage.boefje_by_id(boefje.id).description == "4"
     boefje.description = "4"
 
+    with plugin_storage as storage:
+        storage.update_boefje(boefje.id, {"scan_level": 3})
+
+    assert storage.boefje_by_id(boefje.id).scan_level == 3
+
+    boefje.description = "4"
+    boefje.scan_level = 3
     all_plugins = storage.get_all()
     assert all_plugins == [boefje]
 

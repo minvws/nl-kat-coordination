@@ -315,8 +315,18 @@ def test_raw_mimes(bytes_api_client: BytesAPIClient) -> None:
 
     raw = b"test 123456"
     second_raw = b"second test 200"
-    bytes_api_client.save_raw(boefje_meta.id, raw, mime_types)
-    bytes_api_client.save_raw(boefje_meta.id, second_raw, second_mime_types)
+    first_id = bytes_api_client.save_raw(boefje_meta.id, raw, mime_types)
+    second_id = bytes_api_client.save_raw(boefje_meta.id, second_raw, second_mime_types)
+
+    first_meta = bytes_api_client.get_raw_meta(first_id)
+    second_meta = bytes_api_client.get_raw_meta(second_id)
+
+    assert first_meta.id != second_meta.id
+    assert {x.value for x in first_meta.mime_types} == set(mime_types)
+    assert {x.value for x in second_meta.mime_types} == set(second_mime_types)
+
+    assert bytes_api_client.get_raw(first_id) == raw
+    assert bytes_api_client.get_raw(second_id) == second_raw
 
     retrieved_raws = bytes_api_client.get_raws(
         RawDataFilter(
@@ -386,3 +396,6 @@ def test_save_multiple_raw_files(bytes_api_client: BytesAPIClient) -> None:
 
     assert bytes_api_client.get_raw(ids["first"]) == first_raw
     assert bytes_api_client.get_raw(ids["second"]) == second_raw
+
+    assert bytes_api_client.get_raw_meta(ids["first"]).mime_types == set()
+    assert {x.value for x in bytes_api_client.get_raw_meta(ids["second"]).mime_types} == {"mime", "type"}
