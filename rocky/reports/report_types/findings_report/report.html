@@ -49,6 +49,8 @@
                             <td colspan="5">
                                 <h4 class="heading-normal">{% translate "Description" %}</h4>
                                 <p>{{ info.finding_type.description }}</p>
+                                <h4 class="heading-normal">{% translate "Source" %}</h4>
+                                <a href="{{ info.finding_type.source }}">{{ info.finding_type.source }}</a>
                                 <h4 class="heading-normal">{% translate "Impact" %}</h4>
                                 <p>{{ info.finding_type.impact }}</p>
                                 <h4 class="heading-normal">{% translate "Recommendation" %}</h4>

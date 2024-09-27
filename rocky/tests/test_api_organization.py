@@ -2,6 +2,7 @@ from typing import Any
 from unittest.mock import patch
 
 import pytest
+from django.contrib.auth.models import Permission
 from django.urls import reverse
 from httpx import HTTPError
 from pytest_assert_utils import assert_model_attrs
@@ -11,6 +12,7 @@ from pytest_drf import (
     Returns200,
     Returns201,
     Returns204,
+    Returns403,
     Returns409,
     Returns500,
     UsesDeleteMethod,
@@ -278,6 +280,34 @@ class TestOrganizationViewSet(ViewSetTest):
             }
             assert json == expected
 
+    class TestListNoPermission(
+        UsesGetMethod,
+        UsesListEndpoint,
+        Returns403,
+    ):
+        client = lambda_fixture("drf_redteam_client")
+
+    class TestCreateNoPermission(
+        UsesPostMethod,
+        UsesListEndpoint,
+        Returns403,
+    ):
+        client = lambda_fixture("drf_redteam_client")
+
+    class TestRetrieveNoPermission(
+        UsesGetMethod,
+        UsesDetailEndpoint,
+        Returns403,
+    ):
+        client = lambda_fixture("drf_redteam_client")
+
+    class TestDestroyNoPermission(
+        UsesDeleteMethod,
+        UsesDetailEndpoint,
+        Returns403,
+    ):
+        client = lambda_fixture("drf_redteam_client")
+
 
 class TestGetIndemnification(APIViewTest, UsesGetMethod, Returns200):
     # The superuser_member fixture creates the indemnification
@@ -300,13 +330,27 @@ class TestIndemnificationDoesNotExist(APIViewTest, UsesGetMethod, Returns200):
         assert json == expected
 
 
+class TestGetIndemnificationNoPermission(APIViewTest, UsesGetMethod, Returns403):
+    url = lambda_fixture(lambda organization: reverse("organization-indemnification", args=[organization.pk]))
+    client = lambda_fixture("drf_redteam_client")
+
+
 class TestSetIndemnification(APIViewTest, UsesPostMethod, Returns201):
     url = lambda_fixture(lambda organization: reverse("organization-indemnification", args=[organization.pk]))
-    client = lambda_fixture("drf_admin_client")
 
-    def test_it_sets_indemnification(self, json, admin_user):
-        expected = {"indemnification": True, "user": admin_user.id}
+    @pytest.fixture
+    def client(self, drf_redteam_client, redteamuser):
+        redteamuser.user_permissions.set([Permission.objects.get(codename="add_indemnification")])
+        return drf_redteam_client
+
+    def test_it_sets_indemnification(self, json, redteamuser):
+        expected = {"indemnification": True, "user": redteamuser.id}
         assert json == expected
+
+
+class TestSetIndemnificationNoPermission(APIViewTest, UsesPostMethod, Returns403):
+    url = lambda_fixture(lambda organization: reverse("organization-indemnification", args=[organization.pk]))
+    client = lambda_fixture("drf_redteam_client")
 
 
 class TestIndemnificationAlreadyExists(APIViewTest, UsesPostMethod, Returns409):
