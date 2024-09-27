@@ -230,7 +230,7 @@ class KATalogusClientV1:
                 logger.info("Plugin %s created", plugin.name)
             else:
                 logger.info("Plugin %s could not be created", plugin.name)
-            if response.status_code == 400:
+            if response.status_code == 400 and "Duplicate plugin name" in error.response.text:
                 raise DuplicateNameError(status_code=str(error.response.status_code))
             else:
                 raise error
@@ -247,7 +247,10 @@ class KATalogusClientV1:
                 logger.info("Plugin %s updated", plugin.name)
             else:
                 logger.info("Plugin %s could not be updated", plugin.name)
-            raise DuplicateNameError(status_code=str(error.response.status_code))
+            if response.status_code == 400 and "Duplicate plugin name" in error.response.text:
+                raise DuplicateNameError(status_code=str(error.response.status_code))
+            else:
+                raise error
 
 
 def parse_boefje(boefje: dict) -> Boefje:
