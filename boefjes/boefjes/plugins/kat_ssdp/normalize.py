@@ -2,15 +2,14 @@ import json
 import logging
 from collections.abc import Iterator
 from ipaddress import ip_address
-from typing import Literal
 from urllib.parse import urlparse
 
-from octopoes.models import OOI, Reference
+from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
+from octopoes.models.ooi.scans import SSDPResponse
 from octopoes.models.ooi.service import IPService, Service
-from octopoes.models.ooi.web import HostnameHTTPURL, HTTPResource, IPAddressHTTPURL, WebScheme, Website, WebURL
-from octopoes.models.persistence import ReferenceField
+from octopoes.models.ooi.web import HostnameHTTPURL, HTTPResource, IPAddressHTTPURL, WebScheme, Website
 
 
 def run(input_ooi: dict, raw: bytes | str) -> Iterator[OOI]:
@@ -70,8 +69,8 @@ def run(input_ooi: dict, raw: bytes | str) -> Iterator[OOI]:
             ip_service = IPService(ip_port=ip_port.reference, service=service.reference)
             yield ip_service
 
-        except ValueError:
-            logging.info("Response probably contains a hostname instead of an ip")
+        except ValueError as e:
+            logging.info("Response probably contains a hostname instead of an ip. %s", e)
 
             hostname = Hostname(name=url.netloc, network=network_reference)
             yield hostname
@@ -117,20 +116,6 @@ def run(input_ooi: dict, raw: bytes | str) -> Iterator[OOI]:
             server=response["host"],
             usn=response["usn"],
         )
-
-
-class SSDPResponse(OOI):
-    """OOI holding information about a found response from SSDP. Example response https://wiki.wireshark.org/SSDP"""
-
-    object_type: Literal["SSDPService"] = "SSDPService"
-
-    web_url: Reference | None = ReferenceField(WebURL, default=None)
-    network: Reference = ReferenceField(Network)
-
-    nt: str
-    nts: str
-    server: str
-    usn: str
 
 
 if __name__ == "__main__":

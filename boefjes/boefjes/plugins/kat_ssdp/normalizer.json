@@ -5,16 +5,15 @@
     "boefje/ssdp"
   ],
   "produces": [
-    "IPAddressV6",
+    "Network",
+    "SSDPResponse",
     "Service",
-    "IPPort",
     "IPAddressV4",
+    "IPAddressV6",
     "IPService",
     "Hostname",
-    "HostnameHTTPURL",
     "Website",
-    "IPAddressHTTPURL",
     "HTTPResource",
-    "SSDPService"
+    "HostnameHTTPURL"
   ]
 }
