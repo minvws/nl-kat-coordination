@@ -50,7 +50,7 @@ def test_cannot_add_plugin_reserved_id(test_client, organisation):
     normalizer = Normalizer(id="kat_nmap_normalize", name="My test normalizer")
     response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.model_dump_json())
     assert response.status_code == 400
-    assert response.json() == {"detail": "Duplicate plugin name"}
+    assert response.json() == {"detail": "Duplicate plugin id"}
 
 
 def test_add_boefje(test_client, organisation):
