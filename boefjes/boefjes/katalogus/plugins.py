@@ -17,7 +17,7 @@ from boefjes.dependencies.plugins import (
 from boefjes.katalogus.organisations import check_organisation_exists
 from boefjes.models import FilterParameters, PaginationParameters, PluginType
 from boefjes.sql.plugin_storage import get_plugin_storage
-from boefjes.storage.interfaces import ExistingPluginId, ExistingPluginName, PluginStorage
+from boefjes.storage.interfaces import ExistingPluginId, ExistingPluginName, NotAllowed, PluginStorage
 
 router = APIRouter(
     prefix="/organisations/{organisation_id}",
@@ -170,7 +170,10 @@ def update_boefje(
     storage: PluginStorage = Depends(get_plugin_storage),
 ):
     with storage as p:
-        p.update_boefje(boefje_id, boefje.model_dump(exclude_unset=True))
+        try:
+            p.update_boefje(boefje_id, boefje.model_dump(exclude_unset=True))
+        except NotAllowed:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "Updating a static plugin is not allowed")
 
 
 @router.delete("/boefjes/{boefje_id}", status_code=status.HTTP_204_NO_CONTENT)

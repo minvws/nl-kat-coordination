@@ -82,6 +82,15 @@ class DuplicateNameError(KATalogusError):
         self.message = status_message + _("Boefje with this name already exists.")
 
 
+class KATalogusNotAllowedError(KATalogusError):
+    def __init__(self, *args: object, status_code: str | None = None, status_message: str | None = None) -> None:
+        super().__init__(*args)
+        status_message = ""
+        if status_code is not None:
+            status_message = f"{status_code}: "
+        self.message = status_message + _("Editing this boefje is not allowed because it is static.")
+
+
 class KATalogusHTTPStatusError(KATalogusError):
     def __init__(self, *args: object, status_code: str | None = None) -> None:
         super().__init__(*args)
@@ -249,6 +258,8 @@ class KATalogusClientV1:
                 logger.info("Plugin %s could not be updated", plugin.name)
             if response.status_code == 400 and "Duplicate plugin name" in error.response.text:
                 raise DuplicateNameError(status_code=str(error.response.status_code))
+            if response.status_code in [403, 404]:
+                raise KATalogusNotAllowedError(status_code=str(error.response.status_code))
             else:
                 raise error
 

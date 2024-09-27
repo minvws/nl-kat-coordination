@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.views.generic.edit import FormView
 from tools.forms.boefje import BoefjeSetupForm
 
-from katalogus.client import Boefje, DuplicateNameError, get_katalogus
+from katalogus.client import Boefje, DuplicateNameError, KATalogusNotAllowedError, get_katalogus
 from octopoes.models.types import type_by_name
 
 
@@ -172,6 +172,15 @@ class EditBoefjeView(BoefjeSetupView):
         except DuplicateNameError:
             form.add_error(
                 "name", ("Boefje with name '%s' does already exist. Please choose another name.") % plugin.name
+            )
+            return self.form_invalid(form)
+        except KATalogusNotAllowedError:
+            form.add_error(
+                "name",
+                (
+                    "Editing this Boefje is not allowed because it is static. "
+                    "Please create a new variant of this static Boefje."
+                ),
             )
             return self.form_invalid(form)
 
