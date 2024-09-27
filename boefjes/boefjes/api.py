@@ -127,7 +127,7 @@ def boefje_output(
     bytes_client.save_boefje_meta(boefje_meta)
 
     if boefje_output.files:
-        mime_types = _default_mime_types(boefje_meta.boefje).union(plugin.produces)
+        mime_types = _default_mime_types(boefje_meta.boefje)
         for file in boefje_output.files:
             raw = base64.b64decode(file.content)
             # when supported, also save file.name to Bytes
