@@ -45,12 +45,12 @@ def test_cannot_add_plugin_reserved_id(test_client, organisation):
     boefje = Boefje(id="dns-records", name="My test boefje", static=False)
     response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
     assert response.status_code == 400
-    assert response.json() == {"message": "Plugin id 'dns-records' is already used"}
+    assert response.json() == {"datail": "Duplicate plugin name"}
 
     normalizer = Normalizer(id="kat_nmap_normalize", name="My test normalizer")
     response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.model_dump_json())
     assert response.status_code == 400
-    assert response.json() == {"message": "Plugin id 'kat_nmap_normalize' is already used"}
+    assert response.json() == {"detail": "Duplicate plugin name"}
 
 
 def test_add_boefje(test_client, organisation):
