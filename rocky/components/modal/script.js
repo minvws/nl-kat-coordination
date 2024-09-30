@@ -27,10 +27,10 @@ export function initDialog(modal) {
   let trigger = document.querySelector(
     "[data-modal-id='" + dialog_element.id + "']",
   );
-  if (!trigger) return;
+
   // Check if trigger element is <a>, if not, on click,
   // alter the URL to open the dialog using the onhaschange event.
-  if (trigger.nodeName !== "A") {
+  if (trigger && trigger.nodeName !== "A") {
     trigger.addEventListener("click", (event) => {
       window.location.hash = "#" + dialog_element.id;
     });
@@ -56,6 +56,7 @@ export function initDialog(modal) {
 export function removeDialogAnchor() {
   // Remove the anchor from the URL when closing the modal
   let baseUrl = window.location.toString().split("#")[0];
+  console.log(baseUrl);
   window.history.pushState("", "Base URL", baseUrl);
 }
 
