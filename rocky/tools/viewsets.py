@@ -77,7 +77,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
             logger.info(
                 "Cloning organization settings",
                 event_code=910000,
-                organization_code=self.organization.code,
+                organization_code=from_organization.code,
                 to_organization_code=to_organization.code,
             )
             get_katalogus(from_organization.code).clone_all_configuration_to_organization(to_organization.code)
