@@ -9,7 +9,6 @@ import structlog
 from account.mixins import OrganizationView
 from django.conf import settings
 from django.contrib import messages
-from django.core.exceptions import SuspiciousOperation
 from django.forms import Form
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect
@@ -40,6 +39,7 @@ from reports.report_types.multi_organization_report.report import MultiOrganizat
 from reports.utils import JSONEncoder, debug_json_keys
 from rocky.views.mixins import ObservedAtMixin, OOIList
 from rocky.views.ooi_view import BaseOOIListView, OOIFilterView
+from rocky.views.scheduler import SchedulerView
 
 REPORTS_PRE_SELECTION = {
     "clearance_level": ["2", "3", "4"],
@@ -447,13 +447,20 @@ class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
         return context
 
 
-class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, TemplateView):
+class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, SchedulerView, TemplateView):
     report_type: type[BaseReport] | None = None
+    task_type = "report"
+    is_a_scheduled_report = False
+    show_listes_report_names = False
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.get_report_type_ids():
             messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
             return PostRedirect(self.get_previous())
+
+        self.is_a_scheduled_report = self.is_scheduled_report()
+        self.show_listes_report_names = self.show_report_names()
+
         return super().get(request, *args, **kwargs)
 
     @staticmethod
@@ -497,19 +504,29 @@ class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["reports"] = self.get_report_names()
+
+        context["report_schedule_form_recurrence_choice"] = self.get_report_schedule_form_recurrence_choice()
+        context["report_schedule_form_recurrence"] = self.get_report_schedule_form_recurrence()
+
+        context["report_parent_name_form"] = self.get_report_parent_name_form()
+        context["report_child_name_form"] = self.get_report_child_name_form()
+
+        context["show_listed_report_names"] = self.show_listes_report_names
+        context["is_scheduled_report"] = self.is_a_scheduled_report
+
         context["created_at"] = datetime.now()
         return context
 
 
-class SaveReportView(BaseReportView):
+class SaveReportView(BaseReportView, ReportBreadcrumbs, SchedulerView):
+    task_type = "report"
+
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         old_report_names = request.POST.getlist("old_report_name")
-        report_names = request.POST.getlist("report_name")
+        report_names = request.POST.getlist("report_name", [])
         reference_dates = request.POST.getlist("reference_date")
 
-        if "" in report_names:
-            raise SuspiciousOperation(_("Empty name should not be possible."))
-        else:
+        if self.show_report_names() and report_names:
             final_report_names = list(zip(old_report_names, self.finalise_report_names(report_names, reference_dates)))
             report_ooi = self.save_report(final_report_names)
 
@@ -518,6 +535,22 @@ class SaveReportView(BaseReportView):
                 + "?"
                 + urlencode({"report_id": report_ooi.reference})
             )
+        elif self.is_scheduled_report():
+            report_name_format = request.POST.get("parent_report_name", "")
+            subreport_name_format = request.POST.get("child_report_name", "")
+
+            recurrence = request.POST.get("recurrence", "")
+
+            schedule = self.convert_recurrence_to_cron_expressions(recurrence)
+
+            report_recipe = self.create_report_recipe(report_name_format, subreport_name_format, schedule)
+
+            self.create_report_schedule(report_recipe)
+
+            return redirect(reverse("report_history", kwargs={"organization_code": self.organization.code}))
+
+        messages.error(request, _("Empty name should not be possible."))
+        return PostRedirect(self.get_previous())
 
     @staticmethod
     def finalise_report_names(report_names: list[str], reference_dates: list[str]) -> list[str]:
