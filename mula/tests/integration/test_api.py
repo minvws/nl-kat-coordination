@@ -1,3 +1,4 @@
+import json
 import unittest
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -6,9 +7,9 @@ from unittest import mock
 from urllib.parse import quote
 
 from fastapi.testclient import TestClient
+
 from scheduler import config, models, server, storage, utils
 from scheduler.server import serializers
-
 from tests.factories import OrganisationFactory
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
@@ -513,7 +514,16 @@ class APITestCase(APITemplateTestCase):
         # Should not return any items
         response = self.client.post(
             f"/queues/{self.scheduler.scheduler_id}/pop",
-            json={"filters": [{"column": "data", "field": "id", "operator": "eq", "value": "123"}]},
+            json={
+                "filters": [
+                    {
+                        "column": "data",
+                        "field": "id",
+                        "operator": "eq",
+                        "value": "123",
+                    }
+                ]
+            },
         )
         self.assertEqual(404, response.status_code)
         self.assertEqual(
@@ -532,6 +542,82 @@ class APITestCase(APITemplateTestCase):
                         "field": "name",
                         "operator": "eq",
                         "value": "test",
+                    }
+                ]
+            },
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(second_item_id, response.json().get("id"))
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+    def test_pop_queue_filters_nested(self):
+        # Add one task to the queue
+        first_item = create_task_in(1, data=functions.TestModel(id="123", name="test", categories=["foo", "bar"]))
+        response = self.client.post(
+            f"/queues/{self.scheduler.scheduler_id}/push",
+            data=first_item,
+        )
+        first_item_id = response.json().get("id")
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+        # Add second item to the queue
+        second_item = create_task_in(2, data=functions.TestModel(id="456", name="test", categories=["baz", "bat"]))
+        response = self.client.post(
+            f"/queues/{self.scheduler.scheduler_id}/push",
+            data=second_item,
+        )
+        second_item_id = response.json().get("id")
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(2, self.scheduler.queue.qsize())
+
+        # Should get the first item
+        response = self.client.post(
+            f"/queues/{self.scheduler.scheduler_id}/pop",
+            json={
+                "filters": [
+                    {
+                        "column": "data",
+                        "operator": "@>",
+                        "value": json.dumps({"categories": ["foo", "bar"]}),
+                    }
+                ]
+            },
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(first_item_id, response.json().get("id"))
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+        # Should not return any items
+        response = self.client.post(
+            f"/queues/{self.scheduler.scheduler_id}/pop",
+            json={
+                "filters": [
+                    {
+                        "column": "data",
+                        "operator": "@>",
+                        "value": json.dumps({"categories": ["foo", "bar"]}),
+                    }
+                ]
+            },
+        )
+
+        self.assertEqual(404, response.status_code)
+        self.assertEqual(
+            {"detail": "could not pop item from queue, check your filters"},
+            response.json(),
+        )
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+        # Should get the second item
+        response = self.client.post(
+            f"/queues/{self.scheduler.scheduler_id}/pop",
+            json={
+                "filters": [
+                    {
+                        "column": "data",
+                        "operator": "@>",
+                        "value": json.dumps({"categories": ["baz", "bat"]}),
                     }
                 ]
             },

@@ -2,11 +2,12 @@ import json
 import os
 import unittest
 
-from scheduler.storage.filters import Filter, FilterRequest, apply_filter
 from sqlalchemy import Boolean, Column, Float, Integer, String, create_engine
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+
+from scheduler.storage.filters import Filter, FilterRequest, apply_filter
 
 Base = declarative_base()
 
@@ -38,21 +39,21 @@ class FilteringTestCase(unittest.TestCase):
                     age=25,
                     height=1.8,
                     is_active=True,
-                    data={"foo": "bar", "score": 15, "nested": {"bar": "baz"}},
+                    data={"foo": "bar", "score": 15, "nested": {"bar": "baz"}, "list": ["foo", "bar"]},
                 ),
                 TestModel(
                     name="Bob",
                     age=30,
                     height=1.7,
                     is_active=False,
-                    data={"foo": "baz", "score": 25, "nested": {"bar": "baz"}},
+                    data={"foo": "baz", "score": 25, "nested": {"bar": "baz"}, "list": ["bar", "baz"]},
                 ),
                 TestModel(
                     name="Charlie",
                     age=28,
                     height=1.6,
                     is_active=True,
-                    data={"foo": "bar", "score": 35, "nested": {"bar": "baz"}},
+                    data={"foo": "bar", "score": 35, "nested": {"bar": "baz"}, "list": ["foo", "bar"]},
                 ),
             ]
         )
@@ -910,6 +911,21 @@ class FilteringTestCase(unittest.TestCase):
         filter_request = FilterRequest(
             filters=[
                 Filter(column="data", operator="@>", value=json.dumps({"foo": "bar"})),
+            ]
+        )
+
+        query = session.query(TestModel)
+        filtered_query = apply_filter(TestModel, query, filter_request)
+
+        results = filtered_query.order_by(TestModel.name).all()
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0].name, "Alice")
+        self.assertEqual(results[1].name, "Charlie")
+
+    def test_apply_filter_jsonb_in_list(self):
+        filter_request = FilterRequest(
+            filters=[
+                Filter(column="data", operator="@>", value=json.dumps({"list": ["foo"]})),
             ]
         )
 
