@@ -43,6 +43,7 @@ class Boefje(Plugin):
     produces: set[str] = Field(default_factory=set)
     options: list[str] | None = None
     runnable_hash: str | None = None
+    interval: int | None = None
     boefje_schema: dict | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
@@ -221,6 +222,18 @@ class KATalogusClientV1:
         else:
             logger.info("Plugin %s could not be created", plugin.name)
 
+    def edit_plugin(self, plugin: Plugin) -> None:
+        response = self.session.patch(
+            f"{self.organization_uri}/boefjes/{plugin.id}",
+            content=plugin.model_dump_json(exclude_none=True),
+        )
+        response.raise_for_status()
+
+        if response.status_code == codes.CREATED:
+            logger.info("Plugin %s", plugin.name)
+        else:
+            logger.info("Plugin %s could not be created", plugin.name)
+
 
 def parse_boefje(boefje: dict) -> Boefje:
     scan_level = SCAN_LEVEL(boefje["scan_level"])
@@ -238,6 +251,7 @@ def parse_boefje(boefje: dict) -> Boefje:
         name=boefje.get("name") or boefje["id"],
         created=boefje.get("created"),
         description=boefje.get("description"),
+        interval=boefje.get("interval"),
         enabled=boefje["enabled"],
         type=boefje["type"],
         scan_level=scan_level,

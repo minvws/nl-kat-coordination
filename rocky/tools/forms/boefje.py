@@ -6,6 +6,7 @@ from tools.enums import SCAN_LEVEL
 from tools.forms.base import BaseRockyForm
 from tools.forms.settings import (
     BOEFJE_CONSUMES_HELP_TEXT,
+    BOEFJE_CONTAINER_IMAGE_HELP_TEXT,
     BOEFJE_DESCRIPTION_HELP_TEXT,
     BOEFJE_PRODUCES_HELP_TEXT,
     BOEFJE_SCAN_LEVEL_HELP_TEXT,
@@ -19,12 +20,7 @@ class BoefjeAddForm(BaseRockyForm):
     oci_image = forms.CharField(
         required=True,
         label=_("Container image"),
-        widget=forms.TextInput(
-            attrs={
-                "description": "The name of the Docker image. For example: ghcr.io/minvws/openkat/nmap",
-                "aria-describedby": "input-description",
-            }
-        ),
+        help_text=BOEFJE_CONTAINER_IMAGE_HELP_TEXT,
     )
     name = forms.CharField(
         required=True,
@@ -40,7 +36,7 @@ class BoefjeAddForm(BaseRockyForm):
         required=False,
         label=_("Arguments"),
         widget=forms.TextInput(
-            attrs={"description": "For example: -sTU --top-ports 1000", "aria-describedby": "input-description"}
+            attrs={"description": _("For example: -sTU --top-ports 1000"), "aria-describedby": "input-description"}
         ),
     )
     boefje_schema = forms.JSONField(
@@ -64,4 +60,15 @@ class BoefjeAddForm(BaseRockyForm):
         label=_("Clearance level"),
         widget=forms.Select(choices=SCAN_LEVEL.choices),
         help_text=BOEFJE_SCAN_LEVEL_HELP_TEXT,
+    )
+    interval = forms.CharField(
+        required=False,
+        label=_("Time-out interval"),
+        widget=forms.TextInput(
+            attrs={
+                "description": _(
+                    "Specify the time-out interval for tasks using this Boefje in minutes. The default is 24 hours."
+                )
+            }
+        ),
     )
