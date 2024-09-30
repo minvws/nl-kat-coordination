@@ -112,7 +112,7 @@ class SchedulerWorkerManager(WorkerManager):
                 task_queue.put(p_item)
                 logger.info("Dispatched task[%s]", p_item.data.id)
             except:  # noqa
-                logger.exception("Exiting worker...")
+                logger.error("Exiting worker...")
                 logger.info("Patching scheduler task[id=%s] to %s", p_item.data.id, TaskStatus.FAILED.value)
 
                 try:
@@ -121,7 +121,7 @@ class SchedulerWorkerManager(WorkerManager):
                         "Set task status to %s in the scheduler for task[id=%s]", TaskStatus.FAILED, p_item.data.id
                     )
                 except HTTPError:
-                    logger.exception("Could not patch scheduler task to %s", TaskStatus.FAILED.value)
+                    logger.error("Could not patch scheduler task to %s", TaskStatus.FAILED.value)
 
                 raise
 
