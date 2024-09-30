@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 11:45+0000\n"
+"POT-Creation-Date: 2024-09-30 09:42+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1188,7 +1188,7 @@ msgid "Age"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html tools/forms/boefje.py
-msgid "Interval"
+msgid "Time-out interval"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
@@ -4178,6 +4178,10 @@ msgid "The selected date is in the future. Please select a different date."
 msgstr ""
 
 #: tools/forms/boefje.py
+msgid "For example: -sTU --top-ports 1000"
+msgstr ""
+
+#: tools/forms/boefje.py
 msgid "JSON Schema"
 msgstr ""
 
@@ -4190,7 +4194,9 @@ msgid "Output mime types"
 msgstr ""
 
 #: tools/forms/boefje.py
-msgid "Specify the timeout interval for tasks using this Boefje in minutes"
+msgid ""
+"Specify the time-out interval for tasks using this Boefje in minutes. The "
+"default is 24 hours."
 msgstr ""
 
 #: tools/forms/finding_type.py

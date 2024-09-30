@@ -36,7 +36,7 @@ class BoefjeAddForm(BaseRockyForm):
         required=False,
         label=_("Arguments"),
         widget=forms.TextInput(
-            attrs={"description": "For example: -sTU --top-ports 1000", "aria-describedby": "input-description"}
+            attrs={"description": _("For example: -sTU --top-ports 1000"), "aria-describedby": "input-description"}
         ),
     )
     boefje_schema = forms.JSONField(
@@ -63,8 +63,12 @@ class BoefjeAddForm(BaseRockyForm):
     )
     interval = forms.CharField(
         required=False,
-        label=_("Interval"),
+        label=_("Time-out interval"),
         widget=forms.TextInput(
-            attrs={"description": _("Specify the timeout interval for tasks using this Boefje in minutes")}
+            attrs={
+                "description": _(
+                    "Specify the time-out interval for tasks using this Boefje in minutes. The default is 24 hours."
+                )
+            }
         ),
     )
