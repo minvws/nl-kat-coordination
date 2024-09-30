@@ -160,6 +160,7 @@ def test_report_types_selection_nothing_selected(
     client_member,
     valid_time,
     mock_organization_view_octopoes,
+    mock_katalogus_client,
     listed_hostnames,
 ):
     """
