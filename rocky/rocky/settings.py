@@ -469,9 +469,7 @@ else:
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": DEFAULT_AUTHENTICATION_CLASSES,
     "DEFAULT_PERMISSION_CLASSES": [
-        # For now this will provide a safe default, but non-admin users will
-        # need to be able to use the API in the future..
-        "rest_framework.permissions.IsAdminUser",
+        "rocky.permissions.KATModelPermissions",
     ],
     "DEFAULT_RENDERER_CLASSES": DEFAULT_RENDERER_CLASSES,
     "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler",
