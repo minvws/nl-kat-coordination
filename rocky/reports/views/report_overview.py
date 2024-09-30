@@ -4,6 +4,7 @@ from django.views.generic import ListView
 
 from reports.views.base import ReportBreadcrumbs, get_selection
 from rocky.paginator import RockyPaginator
+from rocky.scheduler import scheduler_client
 from rocky.views.mixins import OctopoesView, ReportList
 
 
@@ -25,6 +26,32 @@ class BreadcrumbsReportOverviewView(ReportBreadcrumbs):
         return breadcrumbs
 
 
+class ScheduledReportsView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
+    """
+    Shows all the reports that have ever been generated for the organization.
+    """
+
+    paginate_by = 20
+    breadcrumbs_step = 2
+    context_object_name = "reports"
+    paginator = RockyPaginator
+    template_name = "report_overview/scheduled_reports.html"
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.client = scheduler_client(self.organization.code)
+
+    def get_queryset(self):
+        scheduler_id = f"report-{self.organization.code}"
+        self.scheduled_reports = self.client.get_scheduled_reports(scheduler_id=scheduler_id)
+        return self.scheduled_reports
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["scheduled_reports"] = self.scheduled_reports
+        return context
+
+
 class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     """
     Shows all the reports that have ever been generated for the organization.
@@ -34,7 +61,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     breadcrumbs_step = 2
     context_object_name = "reports"
     paginator = RockyPaginator
-    template_name = "report_overview/report_overview.html"
+    template_name = "report_overview/report_history.html"
 
     def get_queryset(self) -> ReportList:
         return ReportList(
