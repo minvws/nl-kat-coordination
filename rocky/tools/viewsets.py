@@ -4,11 +4,14 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
+from structlog import get_logger
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from tools.models import Indemnification, Organization
 from tools.permissions import CanRecalculateBits, CanSetKatalogusSettings
 from tools.serializers import OrganizationSerializer, OrganizationSerializerReadOnlyCode, ToOrganizationSerializer
+
+logger = get_logger(__name__)
 
 
 class OrganizationViewSet(viewsets.ModelViewSet):
@@ -58,6 +61,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"], permission_classes=[CanRecalculateBits])
     def recalculate_bits(self, request, pk=None):
         organization = self.get_object()
+        logger.info("Recalculating bits", event_code=920000, organization_code=self.organization.code)
         connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization.code)
         number_of_bits = connector.recalculate_bits()
 
@@ -70,6 +74,12 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         serializer = ToOrganizationSerializer(data=request.data)
         if serializer.is_valid():
             to_organization = serializer.validated_data["to_organization"]
+            logger.info(
+                "Cloning organization settings",
+                event_code=910000,
+                organization_code=self.organization.code,
+                to_organization_code=to_organization.code,
+            )
             get_katalogus(from_organization.code).clone_all_configuration_to_organization(to_organization.code)
 
             return Response()
