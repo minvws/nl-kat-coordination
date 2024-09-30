@@ -23,7 +23,7 @@ class MultiOrganizationReport(MultiReport):
     id = "multi-organization-report"
     name = _("Multi Organization Report")
     description = _("Multi Organization Report")
-    plugins: ReportPlugins = {"required": [], "optional": []}
+    plugins: ReportPlugins = {"required": set(), "optional": set()}
     input_ooi_types = {ReportData}
     template_path = "multi_organization_report/report.html"
 

@@ -105,7 +105,7 @@ class KATalogusClientV1:
 
         logger.info("Deleted organization", organization_code=self.organization)
 
-    def get_plugins(self, **params):
+    def get_plugins(self, **params) -> list[Plugin]:
         try:
             response = self.session.get(f"{self.organization_uri}/plugins", params=params)
             response.raise_for_status()

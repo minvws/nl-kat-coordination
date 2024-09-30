@@ -3,7 +3,6 @@ from collections.abc import Sequence
 from datetime import datetime, timezone
 from operator import attrgetter
 from typing import Any, Literal, cast
-from uuid import uuid4
 
 import structlog
 from account.mixins import OrganizationView
@@ -18,9 +17,8 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
-from katalogus.client import Boefje, KATalogusError, Plugin, get_katalogus
+from katalogus.client import Boefje, KATalogusClientV1, KATalogusError, Plugin, get_katalogus
 from pydantic import RootModel, TypeAdapter
-from tools.ooi_helpers import create_ooi
 from tools.view_helpers import BreadcrumbsMixin, PostRedirect, url_with_querystring
 
 from octopoes.models import OOI, Reference
@@ -28,7 +26,7 @@ from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.concatenated_report.report import ConcatenatedReport
-from reports.report_types.definitions import AggregateReport, BaseReport, Report
+from reports.report_types.definitions import AggregateReport, BaseReport, Report, report_plugins_union
 from reports.report_types.helpers import (
     REPORTS,
     get_report_by_id,
@@ -127,6 +125,30 @@ class ReportsLandingView(ReportBreadcrumbs, TemplateView):
         return redirect(reverse("report_history", kwargs=self.get_kwargs()))
 
 
+def hydrate_plugins(report_types: list[type["BaseReport"]], katalogus: KATalogusClientV1) -> dict[str, list[Plugin]]:
+    merged_plugins = report_plugins_union(report_types)
+
+    return {
+        "required": sorted(katalogus.get_plugins(ids=list(merged_plugins["required"])), key=attrgetter("name")),
+        "optional": sorted(katalogus.get_plugins(ids=list(merged_plugins["optional"])), key=attrgetter("name")),
+    }
+
+
+def format_plugin_data(report_type_plugins: dict[str, list[Plugin]]):
+    return [
+        {
+            "required": required_optional == "required",
+            "enabled": plugin.enabled,
+            "name": plugin.name,
+            "scan_level": plugin.scan_level.value if isinstance(plugin, Boefje) else 0,
+            "type": plugin.type,
+            "description": plugin.description,
+        }
+        for required_optional, plugins in report_type_plugins.items()
+        for plugin in plugins
+    ]
+
+
 class BaseReportView(OOIFilterView):
     """
     This view is the base for the report creation wizard.
@@ -181,107 +203,13 @@ class BaseReportView(OOIFilterView):
     def get_report_types(self) -> list[type[BaseReport]]:
         return [get_report_by_id(report_type_id) for report_type_id in self.selected_report_types]
 
-    def get_report_plugins_from_katalogus(self, plugins: dict[str, set[str]]) -> dict[str, list[Plugin]]:
-        katalogus_plugins: dict[str, Any] = {"required": [], "optional": []}
-
-        for required_optional, plugin_ids in plugins.items():
-            if plugin_ids:
-                katalogus_plugins[required_optional] = sorted(
-                    get_katalogus(self.organization.code).get_plugins(ids=list(plugin_ids)), key=attrgetter("name")
-                )
-
-        return katalogus_plugins
-
-    def get_plugins_from_report_type(self) -> dict[str, list[Plugin]] | None:
-        """
-        Returns plugins from KAT-alogus from the selected report types.
-        """
-
-        report_types = self.get_report_types()
-        plugins: dict[str, Any] = {"required": set(), "optional": set()}
-
-        for report_type in report_types:
-            for required_optional, report_type_plugin_ids in report_type.plugins.items():
-                plugins[required_optional].update(report_type_plugin_ids)  # also removes duplicates
-
-        # remove optional plugins that is also in the set of required plugins
-        for plugin_id in plugins["required"]:
-            if plugin_id in plugins["optional"]:
-                plugins["optional"].remove(plugin_id)
+    def get_plugin_data_for_saving(self) -> list[dict]:
         try:
-            return self.get_report_plugins_from_katalogus(plugins)
+            report_type_plugins = hydrate_plugins(self.get_report_types(), get_katalogus(self.organization.code))
         except KATalogusError as error:
             return messages.error(self.request, error.message)
 
-    def get_plugin_ids(self, report_type_plugins: dict[str, list[Plugin]]) -> dict[str, list[str]]:
-        plugin_ids: dict[str, list[str]] = {"required": [], "optional": []}
-        for required_optional, plugins in report_type_plugins.items():
-            plugin_ids[required_optional] = [plugin.id for plugin in plugins]
-        return plugin_ids
-
-    def get_plugin_data_for_saving(self) -> list[dict]:
-        plugin_data = []
-        report_type_plugins = self.get_plugins_from_report_type()
-        if report_type_plugins is not None:
-            for required_optional, plugins in report_type_plugins.items():
-                for plugin in plugins:
-                    plugin_data.append(
-                        {
-                            "required": required_optional == "required",
-                            "enabled": plugin.enabled,
-                            "name": plugin.name,
-                            "scan_level": plugin.scan_level.value if isinstance(plugin, Boefje) else 0,
-                            "type": plugin.type,
-                            "description": plugin.description,
-                        }
-                    )
-
-        return plugin_data
-
-    def save_report_raw(self, data: dict) -> str:
-        report_data_raw_id = self.bytes_client.upload_raw(
-            raw=ReportDataDict(data).model_dump_json().encode(),
-            manual_mime_types={"openkat/report"},
-        )
-
-        return report_data_raw_id
-
-    def save_report_ooi(
-        self,
-        report_data_raw_id: str,
-        report_type: type[BaseReport],
-        input_oois: list[str],
-        parent: Reference | None,
-        has_parent: bool,
-        observed_at: datetime,
-        name: str,
-    ) -> ReportOOI:
-        if not name or name.isspace():
-            name = report_type.name
-        report_ooi = ReportOOI(
-            name=str(name),
-            report_type=str(report_type.id),
-            template=report_type.template_path,
-            report_id=uuid4(),
-            organization_code=self.organization.code,
-            organization_name=self.organization.name,
-            organization_tags=list(self.organization.tags.all()),
-            data_raw_id=report_data_raw_id,
-            date_generated=datetime.now(timezone.utc),
-            input_oois=input_oois,
-            observed_at=observed_at,
-            parent_report=parent,
-            has_parent=has_parent,
-        )
-
-        create_ooi(
-            api_connector=self.octopoes_api_connector,
-            bytes_client=self.bytes_client,
-            ooi=report_ooi,
-            observed_at=observed_at,
-        )
-
-        return report_ooi
+        return format_plugin_data(report_type_plugins)
 
     def get_observed_at(self):
         return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
@@ -396,7 +324,12 @@ class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.plugins = self.get_plugins_from_report_type()
+        self.plugins = None
+
+        try:
+            self.plugins = hydrate_plugins(self.get_report_types(), get_katalogus(self.organization.code))
+        except KATalogusError as error:
+            messages.error(self.request, error.message)
 
     def post(self, request, *args, **kwargs):
         if self.plugins is None:
@@ -416,19 +349,16 @@ class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
         return self.get(request, *args, **kwargs)
 
     def all_plugins_enabled(self) -> bool:
-        enabled_plugins = self.plugins_enabled()
-        return enabled_plugins["required"] and enabled_plugins["optional"]
+        return all(self.plugins_enabled().values())
 
     def plugins_enabled(self) -> dict[str, bool]:
-        enabled_plugins_data: dict[str, bool] = {"required": False, "optional": False}
-        enabled_plugins = []
         if self.plugins is not None:
-            for required_optional, plugins in self.plugins.items():
-                if plugins:
-                    for plugin in plugins:
-                        enabled_plugins.append(plugin.enabled)
-                    enabled_plugins_data[required_optional] = all(enabled_plugins)
-        return enabled_plugins_data
+            return {
+                "required": all([plugin.enabled for plugin in self.plugins["required"]]),
+                "optional": all([plugin.enabled for plugin in self.plugins["optional"]]),
+            }
+
+        return {"required": False, "optional": False}
 
     def get_plugins_data(self):
         report_types: dict[str, Any] = {}
