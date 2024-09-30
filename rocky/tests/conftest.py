@@ -375,11 +375,6 @@ def mock_models_katalogus(mocker):
 
 
 @pytest.fixture
-def mock_views_katalogus(mocker):
-    return mocker.patch("rocky.views.ooi_report.get_katalogus")
-
-
-@pytest.fixture
 def mock_bytes_client(mocker):
     return mocker.patch("rocky.bytes_client.BytesClient")
 
@@ -1450,6 +1445,11 @@ def mock_mixins_katalogus(mocker):
     return mocker.patch("katalogus.views.mixins.get_katalogus")
 
 
+@pytest.fixture()
+def mock_katalogus_client(mocker):
+    return mocker.patch("katalogus.client.KATalogusClientV1")
+
+
 @pytest.fixture
 def mock_scheduler_client_task_list(mock_scheduler):
     mock_scheduler_session = mock_scheduler._client
@@ -1844,6 +1844,15 @@ def boefje_nmap_tcp():
 @pytest.fixture
 def drf_admin_client(create_drf_client, admin_user):
     client = create_drf_client(admin_user)
+    # We need to set this so that the test client doesn't throw an
+    # exception, but will return error in the API we can test
+    client.raise_request_exception = False
+    return client
+
+
+@pytest.fixture
+def drf_redteam_client(create_drf_client, redteamuser):
+    client = create_drf_client(redteamuser)
     # We need to set this so that the test client doesn't throw an
     # exception, but will return error in the API we can test
     client.raise_request_exception = False

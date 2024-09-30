@@ -86,6 +86,7 @@ class AddBoefjeVariantView(BoefjeSetupView):
         initial["consumes"] = consumes
         initial["produces"] = ", ".join(self.plugin.produces)
         initial["scan_level"] = self.plugin.scan_level
+        initial["interval"] = self.plugin.interval
 
         return initial
 
@@ -141,6 +142,7 @@ class EditBoefjeView(BoefjeSetupView):
         initial["consumes"] = consumes
         initial["produces"] = ", ".join(self.plugin.produces)
         initial["scan_level"] = self.plugin.scan_level
+        initial["interval"] = self.plugin.interval
 
         return initial
 
@@ -191,10 +193,11 @@ class EditBoefjeView(BoefjeSetupView):
 
 
 def create_boefje_with_form_data(form_data, plugin_id: str, created: str):
-    arguments = [] if form_data["oci_arguments"] == "" else form_data["oci_arguments"].split()
-    consumes = [] if form_data["consumes"] == "" else form_data["consumes"].strip("[]").replace("'", "").split(", ")
-    produces = [] if form_data["produces"] == "" else form_data["produces"].split(",")
+    arguments = [] if not form_data["oci_arguments"] else form_data["oci_arguments"].split()
+    consumes = [] if not form_data["consumes"] else form_data["consumes"].strip("[]").replace("'", "").split(", ")
+    produces = [] if not form_data["produces"] else form_data["produces"].split(",")
     produces = [p.strip() for p in produces]
+    interval = int(form_data.get("interval") or 0) or None
     input_objects = []
 
     for input_object in consumes:
@@ -205,6 +208,7 @@ def create_boefje_with_form_data(form_data, plugin_id: str, created: str):
         name=form_data.get("name"),
         created=created,
         description=form_data.get("description"),
+        interval=interval,
         enabled=False,
         type="boefje",
         scan_level=form_data["scan_level"],

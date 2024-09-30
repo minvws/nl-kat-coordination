@@ -1188,8 +1188,21 @@ msgstr ""
 msgid "Age"
 msgstr ""
 
+#: katalogus/templates/plugin_container_image.html tools/forms/boefje.py
+msgid "Time-out interval"
+msgstr ""
+
 #: katalogus/templates/plugin_container_image.html
 msgid "current"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+#: reports/report_types/dns_report/report.html
+msgid "minutes"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "Default system interval"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
@@ -2587,8 +2600,6 @@ msgid "Export"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
-#: rocky/templates/oois/ooi_report.html
-#: rocky/templates/partials/findings_list_toolbar.html
 msgid "Download PDF"
 msgstr ""
 
@@ -2942,10 +2953,6 @@ msgid "TTL"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "minutes"
-msgstr ""
-
-#: reports/report_types/dns_report/report.html
 msgid "No records have been found."
 msgstr ""
 
@@ -3032,6 +3039,14 @@ msgid ""
 "occurrences of the finding. Under the 'Details' section a description, "
 "impact, recommendation and location of the finding can be found. The risk "
 "level may be different for your specific environment."
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.py
+#: rocky/templates/oois/ooi_detail_origins_inference.html
+#: rocky/templates/oois/ooi_detail_origins_observations.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Source"
 msgstr ""
 
 #: reports/report_types/findings_report/report.html
@@ -3549,13 +3564,6 @@ msgstr ""
 
 #: reports/report_types/vulnerability_report/report.py
 msgid "Vulnerabilities found are grouped for each system."
-msgstr ""
-
-#: reports/report_types/vulnerability_report/report.py
-#: rocky/templates/oois/ooi_detail_origins_inference.html
-#: rocky/templates/oois/ooi_detail_origins_observations.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Source"
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.py
@@ -4257,6 +4265,10 @@ msgid "The selected date is in the future. Please select a different date."
 msgstr ""
 
 #: tools/forms/boefje.py
+msgid "For example: -sTU --top-ports 1000"
+msgstr ""
+
+#: tools/forms/boefje.py
 msgid "JSON Schema"
 msgstr ""
 
@@ -4266,6 +4278,12 @@ msgstr ""
 
 #: tools/forms/boefje.py
 msgid "Output mime types"
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid ""
+"Specify the time-out interval for tasks using this Boefje in minutes. The "
+"default is 24 hours."
 msgstr ""
 
 #: tools/forms/finding_type.py
@@ -5679,31 +5697,6 @@ msgid ""
 "deleted and is no longer available."
 msgstr ""
 
-#: rocky/templates/oois/ooi_report.html
-#, python-format
-msgid "Findings report for %(name)s"
-msgstr ""
-
-#: rocky/templates/oois/ooi_report.html
-#, python-format
-msgid ""
-"These are the findings of a OpenKAT-analysis on %(observed_at)s. Click a "
-"finding for more detailed information about the issue, its origin, severity "
-"and possible solutions."
-msgstr ""
-
-#: rocky/templates/oois/ooi_report_404.html
-#, python-format
-msgid "A report for %(name)s wasn't found."
-msgstr ""
-
-#: rocky/templates/oois/ooi_report_404.html
-#, python-format
-msgid ""
-"Perhaps it never was, perhaps it just didn't exist on %(observed_at)s <br> "
-"Try some other dates!"
-msgstr ""
-
 #: rocky/templates/oois/ooi_summary.html
 msgid "Summary for"
 msgstr ""
@@ -6148,7 +6141,7 @@ msgid "Use the button below to add a related object."
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
-msgid "Generate findings report"
+msgid "Generate Findings Report"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
@@ -6864,22 +6857,6 @@ msgstr ""
 
 #: rocky/views/ooi_mute.py
 msgid "Finding(s) successfully muted."
-msgstr ""
-
-#: rocky/views/ooi_report.py
-msgid "You can't generate a report for an OOI on a date in the future."
-msgstr ""
-
-#: rocky/views/ooi_report.py
-msgid "Findings report"
-msgstr ""
-
-#: rocky/views/ooi_report.py
-msgid "Generating report failed. See Keiko logs for more information."
-msgstr ""
-
-#: rocky/views/ooi_report.py
-msgid "Timeout reached generating report. See Keiko logs for more information."
 msgstr ""
 
 #: rocky/views/ooi_tree.py

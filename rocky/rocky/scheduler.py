@@ -12,7 +12,7 @@ import httpx
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from httpx import ConnectError, HTTPError, HTTPStatusError, RequestError, codes
-from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny, TypeAdapter, ValidationError
 
 from rocky.health import ServiceHealth
 
@@ -83,6 +83,8 @@ class BoefjeTask(BaseModel):
 
 
 class ReportTask(BaseModel):
+    """ReportTask represent data needed for a Report to run."""
+
     type: str = "report"
 
     organisation_id: str
@@ -116,14 +118,14 @@ class TaskStatus(Enum):
 class Task(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: uuid.UUID | None = None
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
     scheduler_id: str
     schedule_id: str | None = None
     priority: int
     status: TaskStatus | None = TaskStatus.PENDING
     type: str | None = None
     hash: str | None = None
-    data: SerializeAsAny[BoefjeTask | NormalizerTask]
+    data: SerializeAsAny[BoefjeTask | NormalizerTask | ReportTask]
     created_at: datetime.datetime | None = None
     modified_at: datetime.datetime | None = None
 
@@ -148,6 +150,11 @@ class ScheduleResponse(BaseModel):
     deadline_at: datetime.datetime
     created_at: datetime.datetime
     modified_at: datetime.datetime
+
+
+class Queue(BaseModel):
+    id: str
+    size: int
 
 
 class PaginatedTasksResponse(BaseModel):
@@ -316,9 +323,10 @@ class SchedulerClient:
 
         return task_details
 
-    def push_task(self, item: Task) -> None:
+    def push_task(self, item: Task, queue_name: str | None = None) -> None:
         try:
-            queue_name = f"{item.data.type}-{self.organization_code}"
+            if queue_name is None:
+                queue_name = f"{item.data.type}-{self.organization_code}"
             res = self._client.post(
                 f"/queues/{queue_name}/push",
                 content=item.model_dump_json(exclude_none=True),
@@ -335,6 +343,22 @@ class SchedulerClient:
                 raise SchedulerConflictError() from http_error
         except RequestError as request_error:
             raise SchedulerError() from request_error
+
+    def get_queues(self) -> list[Queue]:
+        response = self._client.get("/queues")
+        response.raise_for_status()
+
+        return TypeAdapter(list[Queue]).validate_json(response.content)
+
+    def pop_item(self, queue: str) -> Task | None:
+        response = self._client.post(f"/queues/{queue}/pop")
+        response.raise_for_status()
+
+        return TypeAdapter(Task | None).validate_json(response.content)
+
+    def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
+        response = self._client.patch(f"/tasks/{task_id}", json={"status": status.value})
+        response.raise_for_status()
 
     def health(self) -> ServiceHealth:
         return ServiceHealth.model_validate_json(self._get("/health", return_type="content"))

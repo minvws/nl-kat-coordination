@@ -114,7 +114,7 @@ class SetupScanMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if self.plugins_enabled():
+        if self.all_plugins_enabled():
             return redirect(self.get_next())
         return super().get(request, *args, **kwargs)
 

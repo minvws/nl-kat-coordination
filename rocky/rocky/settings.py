@@ -469,9 +469,7 @@ else:
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": DEFAULT_AUTHENTICATION_CLASSES,
     "DEFAULT_PERMISSION_CLASSES": [
-        # For now this will provide a safe default, but non-admin users will
-        # need to be able to use the API in the future..
-        "rest_framework.permissions.IsAdminUser",
+        "rocky.permissions.KATModelPermissions",
     ],
     "DEFAULT_RENDERER_CLASSES": DEFAULT_RENDERER_CLASSES,
     "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler",
@@ -534,3 +532,10 @@ structlog.configure(
     wrapper_class=structlog.stdlib.BoundLogger,
     cache_logger_on_first_use=True,
 )
+
+# Number of workers to run for the report queue
+POOL_SIZE = env.int("POOL_SIZE", default=2)
+# Time to wait before polling for tasks when the queue is empty
+POLL_INTERVAL = env.int("POLL_INTERVAL", default=10)
+# Seconds to wait before checking the workers when queues are full
+WORKER_HEARTBEAT = env.int("WORKER_HEARTBEAT", default=5)
