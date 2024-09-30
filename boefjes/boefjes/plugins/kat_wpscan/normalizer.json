@@ -1,6 +1,7 @@
 {
   "id": "kat_wpscan_normalize",
   "name": "WPscan",
+  "description": "Creates findings from WPscan data.",
   "consumes": [
     "boefje/wp-scan"
   ],

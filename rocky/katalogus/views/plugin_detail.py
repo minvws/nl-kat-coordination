@@ -130,6 +130,11 @@ class BoefjeDetailView(PluginDetailView):
         context = super().get_context_data(**kwargs)
         context["new_variant"] = self.request.GET.get("new_variant")
         context["variants"] = get_katalogus(self.organization.code).get_plugins(oci_image=self.plugin.oci_image)
+
+        for variant in context["variants"]:
+            if variant.created:
+                variant.created = datetime.fromisoformat(variant.created)
+
         context["select_ooi_filter_form"] = SelectOOIFilterForm
         if "show_all" in self.request.GET:
             context["select_oois_form"] = SelectOOIForm(
