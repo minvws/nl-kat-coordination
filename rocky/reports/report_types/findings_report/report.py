@@ -3,13 +3,20 @@ from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
+import octopoes.models.ooi.reports as report_models
 from octopoes.models import Reference
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
+from octopoes.models.ooi.monitoring import Incident
+from octopoes.models.ooi.question import Question
+from octopoes.models.ooi.web import RESTAPI, ImageMetadata
 from octopoes.models.types import ALL_TYPES
 from reports.report_types.definitions import Report, ReportPlugins
 
 TREE_DEPTH = 9
 SEVERITY_OPTIONS = [severity.value for severity in RiskLevelSeverity]
+
+_EXCLUDE_OOI_TYPES = [Question, RESTAPI, Incident, ImageMetadata, report_models.ReportData, report_models.Report]
+_INPUT_OOI_TYPES = {ooi_type for ooi_type in ALL_TYPES if ooi_type not in _EXCLUDE_OOI_TYPES}
 
 
 class FindingsReport(Report):

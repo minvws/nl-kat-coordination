@@ -1,8 +1,10 @@
-import multiprocessing as mp
+import multiprocessing
 import os
 import signal
 import sys
 import time
+from multiprocessing.context import ForkContext
+from multiprocessing.process import BaseProcess
 from queue import Queue
 
 import structlog
@@ -22,6 +24,7 @@ from boefjes.sql.db import get_engine
 from boefjes.sql.plugin_storage import create_plugin_storage
 
 logger = structlog.get_logger(__name__)
+ctx: ForkContext = multiprocessing.get_context("fork")
 
 
 class SchedulerWorkerManager(WorkerManager):
@@ -36,11 +39,11 @@ class SchedulerWorkerManager(WorkerManager):
         self.scheduler_client = scheduler_client
         self.settings = settings
 
-        manager = mp.Manager()
+        manager = ctx.Manager()
 
         self.task_queue = manager.Queue()  # multiprocessing.Queue() will not work on macOS, see mp.Queue.qsize()
         self.handling_tasks = manager.dict()
-        self.workers: list[mp.Process] = []
+        self.workers: list[BaseProcess] = []
 
         logger.setLevel(log_level)
 
@@ -50,7 +53,7 @@ class SchedulerWorkerManager(WorkerManager):
         logger.info("Created worker pool for queue '%s'", queue_type.value)
 
         self.workers = [
-            mp.Process(target=_start_working, args=self._worker_args()) for _ in range(self.settings.pool_size)
+            ctx.Process(target=_start_working, args=self._worker_args()) for _ in range(self.settings.pool_size)
         ]
         for worker in self.workers:
             worker.start()
@@ -158,13 +161,13 @@ class SchedulerWorkerManager(WorkerManager):
                 self._cleanup_pending_worker_task(worker)
                 worker.close()
 
-            new_worker = mp.Process(target=_start_working, args=self._worker_args())
+            new_worker = ctx.Process(target=_start_working, args=self._worker_args())
             new_worker.start()
             new_workers.append(new_worker)
 
         self.workers = new_workers
 
-    def _cleanup_pending_worker_task(self, worker: mp.Process) -> None:
+    def _cleanup_pending_worker_task(self, worker: BaseProcess) -> None:
         if worker.pid not in self.handling_tasks:
             logger.debug("No pending task found for Worker[pid=%s, %s]", worker.pid, _format_exit_code(worker.exitcode))
             return
@@ -231,7 +234,7 @@ def _format_exit_code(exitcode: int | None) -> str:
 
 
 def _start_working(
-    task_queue: mp.Queue,
+    task_queue: multiprocessing.Queue,
     handler: Handler,
     scheduler_client: SchedulerClientInterface,
     handling_tasks: dict[int, str],

@@ -130,6 +130,28 @@ class Task(BaseModel):
     modified_at: datetime.datetime | None = None
 
 
+class ScheduleRequest(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    scheduler_id: str
+    data: dict
+    schedule: str
+
+
+class ScheduleResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    hash: str
+    data: dict
+    enabled: bool
+    schedule: str
+    tasks: list[Task]
+    deadline_at: datetime.datetime
+    created_at: datetime.datetime
+    modified_at: datetime.datetime
+
+
 class Queue(BaseModel):
     id: str
     size: int
@@ -140,6 +162,13 @@ class PaginatedTasksResponse(BaseModel):
     next: str | None = None
     previous: str | None = None
     results: list[Task]
+
+
+class PaginatedSchedulesResponse(BaseModel):
+    count: int
+    next: str | None = None
+    previous: str | None = None
+    results: list[ScheduleResponse]
 
 
 class LazyTaskList:
@@ -233,6 +262,36 @@ class SchedulerClient:
     def __init__(self, base_uri: str, organization_code: str | None):
         self._client = httpx.Client(base_url=base_uri)
         self.organization_code = organization_code
+
+    def list_schedules(self, **kwargs) -> PaginatedSchedulesResponse:
+        try:
+            kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
+            res = self._client.get("/schedules", params=kwargs)
+            res.raise_for_status()
+            return PaginatedSchedulesResponse.model_validate_json(res.content)
+        except ValidationError:
+            raise SchedulerValidationError(extra_message=_("Schedule list: "))
+        except ConnectError:
+            raise SchedulerConnectError(extra_message=_("Schedule list: "))
+
+    def get_schedule_details(self, schedule_id: str) -> ScheduleResponse:
+        try:
+            res = self._client.get(f"/schedules/{schedule_id}")
+            res.raise_for_status()
+            return ScheduleResponse.model_validate_json(res.content)
+        except ConnectError:
+            raise SchedulerConnectError()
+
+    def post_schedule(self, schedule: ScheduleRequest) -> ScheduleResponse:
+        try:
+            res = self._client.post(
+                "/schedules",
+                json=schedule.model_dump(exclude_none=True),
+            )
+            res.raise_for_status()
+            return ScheduleResponse.model_validate_json(res.content)
+        except (ValidationError, HTTPStatusError, ConnectError):
+            raise SchedulerValidationError(extra_message="Report schedule failed: ")
 
     def list_tasks(
         self,

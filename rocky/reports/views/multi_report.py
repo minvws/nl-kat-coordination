@@ -85,10 +85,7 @@ class OOISelectionMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportV
 
 
 class ReportTypesSelectionMultiReportView(
-    MultiReportStepsMixin,
-    BreadcrumbsMultiReportView,
-    OOISelectionView,
-    ReportTypeSelectionView,
+    MultiReportStepsMixin, BreadcrumbsMultiReportView, OOISelectionView, ReportTypeSelectionView
 ):
     """
     Shows all possible report types from a list of OOIs.
