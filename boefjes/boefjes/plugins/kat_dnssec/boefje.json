@@ -1,7 +1,7 @@
 {
   "id": "dns-sec",
   "name": "DNSSEC",
-  "description": "Validates DNSSec of a hostname",
+  "description": "Validates DNSSEC of a hostname by checking the cryptographic signatures.",
   "consumes": [
     "Hostname"
   ],

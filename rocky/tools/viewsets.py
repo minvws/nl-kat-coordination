@@ -1,5 +1,6 @@
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from tools.models import Indemnification, Organization
@@ -19,8 +20,14 @@ class OrganizationViewSet(viewsets.ModelViewSet):
             serializer_class = OrganizationSerializerReadOnlyCode
         return serializer_class
 
-    @action(detail=True)
+    @action(detail=True, permission_classes=[])
     def indemnification(self, request, pk=None):
+        # DRF does not support different arguments when mapping POST/GET of the
+        # same endpoind to a different method, so we can't use the
+        # permission_classes argument here.
+        if not request.user.has_perm("tools.view_organization"):
+            raise PermissionDenied()
+
         organization = self.get_object()
         indemnification = Indemnification.objects.filter(organization=organization).first()
 
@@ -31,6 +38,9 @@ class OrganizationViewSet(viewsets.ModelViewSet):
 
     @indemnification.mapping.post
     def set_indemnification(self, request, pk=None):
+        if not request.user.has_perm("tools.add_indemnification"):
+            raise PermissionDenied()
+
         organization = self.get_object()
 
         indemnification = Indemnification.objects.filter(organization=organization).first()
