@@ -28,3 +28,17 @@
   --button-ghost-focus-border-color: var(--button-ghost-hover-border-color);
   --button-ghost-focus-text-color: var(--button-ghost-hover-text-color);
 }
+
+button,
+a.button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  &.ghost {
+    --link-icon-text-color: var(--button-ghost-text-color);
+
+    &:hover {
+      --link-icon-text-color: var(--button-ghost-hover-text-color);
+    }
+  }
+}
