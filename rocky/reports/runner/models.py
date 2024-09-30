@@ -1,5 +1,3 @@
-from enum import Enum
-
 from octopoes.models.ooi.reports import ReportRecipe
 
 
@@ -9,10 +7,7 @@ class ReportJobRunner:
 
 
 class WorkerManager:
-    class Queue(Enum):
-        REPORTS = "report"
-
-    def run(self, queue: Queue) -> None:
+    def run(self) -> None:
         raise NotImplementedError()
 
 

@@ -11,7 +11,7 @@ from httpx import HTTPError
 from pydantic import ValidationError
 
 from reports.runner.local import LocalReportJobRunner
-from reports.runner.runtime_interfaces import ReportJobRunner, WorkerManager
+from reports.runner.models import ReportJobRunner, WorkerManager
 from rocky.scheduler import SchedulerClient, Task, TaskStatus, scheduler_client
 
 logger = structlog.get_logger(__name__)
@@ -40,20 +40,20 @@ class SchedulerWorkerManager(WorkerManager):
 
         self.exited = False
 
-    def run(self, queue_type: WorkerManager.Queue) -> None:
-        logger.info("Created worker pool for queue '%s'", queue_type.value)
+    def run(self) -> None:
+        logger.info("Created worker pool for queue 'report'")
 
         self.workers = [mp.Process(target=_start_working, args=self._worker_args()) for _ in range(self.pool_size)]
         for worker in self.workers:
             worker.start()
 
-        signal.signal(signal.SIGINT, lambda signum, _: self.exit(queue_type, signum))
-        signal.signal(signal.SIGTERM, lambda signum, _: self.exit(queue_type, signum))
+        signal.signal(signal.SIGINT, lambda signum, _: self.exit(signum))
+        signal.signal(signal.SIGTERM, lambda signum, _: self.exit(signum))
 
         while True:
             try:
                 self._check_workers()
-                self._fill_queue(self.task_queue, queue_type)
+                self._fill_queue(self.task_queue)
             except Exception as e:  # noqa
                 logger.exception("Unhandled Exception:")
                 logger.info("Continuing worker...")
@@ -65,11 +65,11 @@ class SchedulerWorkerManager(WorkerManager):
                 # been called yet.
                 if not self.exited:
                     logger.exception("Exiting worker...")
-                    self.exit(queue_type)
+                    self.exit()
 
                 raise
 
-    def _fill_queue(self, task_queue: Queue, queue_type: WorkerManager.Queue):
+    def _fill_queue(self, task_queue: Queue):
         if task_queue.qsize() > self.pool_size:
             time.sleep(self.worker_heartbeat)
             return
@@ -84,24 +84,24 @@ class SchedulerWorkerManager(WorkerManager):
 
         # We do not target a specific queue since we start one runtime for all organisations
         # and queue ids contain the organisation_id
-        queues = [q for q in queues if q.id.startswith(queue_type.value)]
+        queues = [q for q in queues if q.id.startswith("report")]
 
         logger.debug("Found queues: %s", [queue.id for queue in queues])
 
         all_queues_empty = True
 
-        for queue_type in queues:
-            logger.debug("Popping from queue %s", queue_type.id)
+        for queue in queues:
+            logger.debug("Popping from queue %s", queue.id)
 
             try:
-                p_item = self.scheduler.pop_item(queue_type.id)
+                p_item = self.scheduler.pop_item(queue.id)
             except (HTTPError, ValidationError):
-                logger.exception("Popping task from scheduler failed, sleeping 10 seconds")
-                time.sleep(10)
+                logger.error("Popping task from scheduler failed")
+                time.sleep(self.poll_interval)
                 continue
 
             if not p_item:
-                logger.debug("Queue %s empty", queue_type.id)
+                logger.debug("Queue %s empty", queue.id)
                 continue
 
             all_queues_empty = False
@@ -178,7 +178,7 @@ class SchedulerWorkerManager(WorkerManager):
     def _worker_args(self) -> tuple:
         return self.task_queue, self.runner, self.scheduler, self.handling_tasks
 
-    def exit(self, queue_type: WorkerManager.Queue, signum: int | None = None):
+    def exit(self, signum: int | None = None):
         try:
             if signum:
                 logger.info("Received %s, exiting", signal.Signals(signum).name)
@@ -188,7 +188,7 @@ class SchedulerWorkerManager(WorkerManager):
 
                 for task in tasks:
                     try:
-                        self.scheduler.push_task(task, queue_type.value)
+                        self.scheduler.push_task(task)
                     except HTTPError:
                         logger.exception("Rescheduling task failed[id=%s]", task.id)
 

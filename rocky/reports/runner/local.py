@@ -39,5 +39,5 @@ class LocalReportJobRunner(ReportJobRunner):
             Organization.objects.get(code=recipe.organization_code),
             plugins,
             report_data,
-            recipe.report_names,
+            recipe.report_name_format,
         )

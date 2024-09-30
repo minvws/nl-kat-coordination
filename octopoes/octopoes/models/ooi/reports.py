@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Literal
+from typing import Literal
 from uuid import UUID
 
 from octopoes.models import OOI, Reference
@@ -57,7 +57,7 @@ class ReportRecipe(OOI):
     report_name_format: str
     subreport_name_format: str
 
-    input_recipe: dict[str, Any]  # can contain a query which maintains a live set of OOIs or manually picked OOIs.
+    input_recipe: list[str]  # Contains a list of manually picked OOIs.
     report_types: list[str]
 
     cron_expression: str
