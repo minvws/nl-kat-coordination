@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-30 09:42+0000\n"
+"POT-Creation-Date: 2024-09-30 10:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1201,7 +1201,7 @@ msgid "minutes"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
-msgid "No interval"
+msgid "Default system interval"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
