@@ -2,6 +2,11 @@
 
 :root {
   --form-base-text-color: var(--application-base-text-color);
+  --form-base-background-color: transparent;
+  --form-base-padding-top: 0;
+  --form-base-padding-bottom: 0;
+  --form-base-padding-left: 0;
+  --form-base-max-width: 40rem;
 
   /* Accent color */
   --form-accent-color-color: var(--branding-color-2);
@@ -32,5 +37,33 @@
 }
 
 form fieldset .checkbox input[type="checkbox"] + label {
-  max-width: 40rem;
+  max-width: var(--form-base-max-width);
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+form label {
+  font-weight: bold;
+}
+
+form.help fieldset {
+  &.column-2 {
+    gap: var(--layout-column-2-gap);
+  }
+
+  &.column-3 {
+    gap: var(--layout-column-3-gap);
+  }
+
+  &.column-4 {
+    gap: var(--layout-column-4-gap);
+  }
+}
+
+.checkbox-list {
+  row-gap: 0;
+}
+
+form textarea {
+  border-radius: var(--form-input-border-radius);
 }
