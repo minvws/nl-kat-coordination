@@ -28,7 +28,6 @@ from rocky.scheduler import (
     ScheduleRequest,
     SchedulerError,
     ScheduleResponse,
-    SchedulerTaskNotFound,
     Task,
     scheduler_client,
 )
@@ -194,14 +193,6 @@ class SchedulerView(OctopoesView):
     def reschedule_task(self, task_id: str) -> None:
         try:
             task = self.scheduler_client.get_task_details(task_id)
-
-            if task.type == "normalizer":
-                organization = task.data.raw_data.boefje_meta.organization
-            else:
-                organization = task.data.organization
-
-            if organization != self.organization.code:
-                raise SchedulerTaskNotFound()
 
             new_id = uuid.uuid4()
             task.data.id = new_id
