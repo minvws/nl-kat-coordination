@@ -3,7 +3,6 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import Literal
 
-import psycopg2
 import structlog
 from fastapi import Query
 from jsonschema.exceptions import ValidationError
@@ -19,6 +18,7 @@ from boefjes.storage.interfaces import (
     ConfigStorage,
     ExistingPluginId,
     ExistingPluginName,
+    IntegrityError,
     NotFound,
     PluginNotFound,
     PluginStorage,
@@ -117,11 +117,16 @@ class PluginService:
                     raise ExistingPluginName(boefje.name)
                 else:
                     try:
-                        self.plugin_storage.create_boefje(boefje)
-                    except psycopg2.errors.UniqueViolation:
+                        with self.plugin_storage as storage:
+                            storage.create_boefje(boefje)
+                    except IntegrityError:
                         raise ExistingPluginName(boefje.name)
             except KeyError:
-                self.plugin_storage.create_boefje(boefje)
+                try:
+                    with self.plugin_storage as storage:
+                        storage.create_boefje(boefje)
+                except IntegrityError:
+                    raise ExistingPluginName(boefje.name)
 
     def create_normalizer(self, normalizer: Normalizer) -> None:
         try:
