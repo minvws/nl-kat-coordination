@@ -117,9 +117,7 @@ class SchedulerWorkerManager(WorkerManager):
 
                 try:
                     self.scheduler.patch_task(p_item.id, TaskStatus.FAILED)
-                    logger.info(
-                        "Set task status to %s in the scheduler for task[id=%s]", TaskStatus.FAILED, p_item.id
-                    )
+                    logger.info("Set task status to %s in the scheduler for task[id=%s]", TaskStatus.FAILED, p_item.id)
                 except HTTPError:
                     logger.error("Could not patch scheduler task to %s", TaskStatus.FAILED.value)
 
