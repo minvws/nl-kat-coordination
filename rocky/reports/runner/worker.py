@@ -106,19 +106,19 @@ class SchedulerWorkerManager(WorkerManager):
 
             all_queues_empty = False
 
-            logger.info("Handling task[%s]", p_item.data.id)
+            logger.info("Handling task[%s]", p_item.id)
 
             try:
                 task_queue.put(p_item)
-                logger.info("Dispatched task[%s]", p_item.data.id)
+                logger.info("Dispatched task[%s]", p_item.id)
             except:  # noqa
                 logger.error("Exiting worker...")
-                logger.info("Patching scheduler task[id=%s] to %s", p_item.data.id, TaskStatus.FAILED.value)
+                logger.info("Patching scheduler task[id=%s] to %s", p_item.id, TaskStatus.FAILED.value)
 
                 try:
                     self.scheduler.patch_task(p_item.id, TaskStatus.FAILED)
                     logger.info(
-                        "Set task status to %s in the scheduler for task[id=%s]", TaskStatus.FAILED, p_item.data.id
+                        "Set task status to %s in the scheduler for task[id=%s]", TaskStatus.FAILED, p_item.id
                     )
                 except HTTPError:
                     logger.error("Could not patch scheduler task to %s", TaskStatus.FAILED.value)
@@ -240,16 +240,16 @@ def _start_working(
             runner.run(p_item.data)
             status = TaskStatus.COMPLETED
         except Exception:  # noqa
-            logger.exception("An error occurred handling scheduler item[id=%s]", p_item.data.id)
+            logger.exception("An error occurred handling scheduler item[id=%s]", p_item.id)
         except:  # noqa
-            logger.exception("An unhandled error occurred handling scheduler item[id=%s]", p_item.data.id)
+            logger.exception("An unhandled error occurred handling scheduler item[id=%s]", p_item.id)
             raise
         finally:
             try:
                 # The docker runner could have handled this already
                 if scheduler.get_task_details(p_item.id).status == TaskStatus.RUNNING:
                     scheduler.patch_task(p_item.id, status)  # Note that implicitly, we have p_item.id == task_id
-                    logger.info("Set status to %s in the scheduler for task[id=%s]", status, p_item.data.id)
+                    logger.info("Set status to %s in the scheduler for task[id=%s]", status, p_item.id)
             except HTTPError:
                 logger.exception("Could not patch scheduler task to %s", status.value)
 
