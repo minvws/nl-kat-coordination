@@ -12,7 +12,7 @@
                 <th scope="col">{% translate "Report types" %}</th>
                 <th scope="col">{% translate "Scheduled for" %}</th>
                 <th scope="col">{% translate "Recurrence" %}</th>
-                {% if reports %}<th scope="col"></th>{% endif %}
+                <th scope="col"></th>
             </tr>
         </thead>
         <tbody>
@@ -28,7 +28,7 @@
                         </td>
                         <td>{{ schedule.deadline_at }}</td>
                         <td>{{ schedule.cron }}</td>
-                        {% if reports %}
+                        {% if schedule.reports %}
                             <td class="actions">
                                 <button class="expando-button"
                                         data-icon-open-class="icon ti-chevron-down"
@@ -39,12 +39,12 @@
                             </td>
                         {% endif %}
                     </tr>
-                    {% if reports %}
+                    {% if schedule.reports %}
                         <tr class="expando-row">
                             <td colspan="6">
                                 <table>
                                     <tbody>
-                                        {% for report in reports %}
+                                        {% for report in schedule.reports %}
                                             <tr>
                                                 <td>{{ report }}</td>
                                             </tr>
