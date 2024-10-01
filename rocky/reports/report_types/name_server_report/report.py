@@ -52,12 +52,12 @@ class NameServerSystemReport(Report):
     name = _("Name Server Report")
     description = _("Name Server Report checks name servers on basic security standards.")
     plugins = {
-        "required": [
+        "required": {
             "nmap",
             "dns-records",
             "dns-sec",
-        ],
-        "optional": [],
+        },
+        "optional": set(),
     }
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "name_server_report/report.html"
