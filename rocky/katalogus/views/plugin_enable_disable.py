@@ -1,5 +1,7 @@
 from django.contrib import messages
 from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
+from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 
 from katalogus.views.mixins import SinglePluginView
@@ -55,4 +57,4 @@ class PluginEnableDisableView(SinglePluginView):
                 ),
             )
 
-        return HttpResponseRedirect(request.POST.get("current_url"))
+        return redirect(reverse("katalogus", kwargs={"organization_code": self.organization.code}))

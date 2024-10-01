@@ -41,7 +41,7 @@ class AddBoefjeView(BoefjeSetupView):
 
     def form_valid(self, form):
         form_data = form.cleaned_data
-        plugin = _create_boefje_with_form_data(form_data, self.plugin_id, self.created)
+        plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
 
         try:
             self.katalogus.create_plugin(plugin)
@@ -90,12 +90,13 @@ class AddBoefjeVariantView(BoefjeSetupView):
         initial["consumes"] = consumes
         initial["produces"] = ", ".join(self.plugin.produces)
         initial["scan_level"] = self.plugin.scan_level
+        initial["interval"] = self.plugin.interval
 
         return initial
 
     def form_valid(self, form):
         form_data = form.cleaned_data
-        plugin = _create_boefje_with_form_data(form_data, self.plugin_id, self.created)
+        plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
 
         try:
             self.katalogus.create_plugin(plugin)
@@ -159,12 +160,13 @@ class EditBoefjeView(BoefjeSetupView):
         initial["consumes"] = consumes
         initial["produces"] = ", ".join(self.plugin.produces)
         initial["scan_level"] = self.plugin.scan_level
+        initial["interval"] = self.plugin.interval
 
         return initial
 
     def form_valid(self, form):
         form_data = form.cleaned_data
-        plugin = _create_boefje_with_form_data(form_data, self.plugin_id, self.created)
+        plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
 
         try:
             self.katalogus.edit_plugin(plugin)
@@ -219,11 +221,12 @@ class EditBoefjeView(BoefjeSetupView):
         return context
 
 
-def _create_boefje_with_form_data(form_data, plugin_id: str, created: str):
+def create_boefje_with_form_data(form_data, plugin_id: str, created: str):
     arguments = [] if not form_data["oci_arguments"] else form_data["oci_arguments"].split()
     consumes = [] if not form_data["consumes"] else form_data["consumes"].strip("[]").replace("'", "").split(", ")
     produces = [] if not form_data["produces"] else form_data["produces"].split(",")
     produces = [p.strip() for p in produces]
+    interval = int(form_data.get("interval") or 0) or None
     input_objects = []
 
     for input_object in consumes:
@@ -234,6 +237,7 @@ def _create_boefje_with_form_data(form_data, plugin_id: str, created: str):
         name=form_data["name"],
         created=created,
         description=form_data["description"],
+        interval=interval,
         enabled=False,
         type="boefje",
         scan_level=form_data["scan_level"],

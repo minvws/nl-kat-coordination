@@ -1200,8 +1200,21 @@ msgstr ""
 msgid "Age"
 msgstr ""
 
+#: katalogus/templates/plugin_container_image.html tools/forms/boefje.py
+msgid "Time-out interval"
+msgstr ""
+
 #: katalogus/templates/plugin_container_image.html
 msgid "current"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+#: reports/report_types/dns_report/report.html
+msgid "minutes"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "Default system interval"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
@@ -2880,10 +2893,6 @@ msgid "TTL"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "minutes"
-msgstr ""
-
-#: reports/report_types/dns_report/report.html
 msgid "No records have been found."
 msgstr ""
 
@@ -4181,6 +4190,10 @@ msgid "The selected date is in the future. Please select a different date."
 msgstr ""
 
 #: tools/forms/boefje.py
+msgid "For example: -sTU --top-ports 1000"
+msgstr ""
+
+#: tools/forms/boefje.py
 msgid "JSON Schema"
 msgstr ""
 
@@ -4190,6 +4203,12 @@ msgstr ""
 
 #: tools/forms/boefje.py
 msgid "Output mime types"
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid ""
+"Specify the time-out interval for tasks using this Boefje in minutes. The "
+"default is 24 hours."
 msgstr ""
 
 #: tools/forms/finding_type.py
