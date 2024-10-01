@@ -104,7 +104,7 @@ def test_history(octopoes_api_connector: OctopoesAPIConnector):
     assert len(octopoes_api_connector.get_history(network.reference, offset=1)) == 2
     assert len(octopoes_api_connector.get_history(network.reference, limit=2)) == 2
 
-    first_and_last = octopoes_api_connector.get_history(network.reference, has_doc=True, indices=[1, -1])
+    first_and_last = octopoes_api_connector.get_history(network.reference, has_doc=True, indices=[0, -1])
     assert len(first_and_last) == 2
     assert first_and_last[0].valid_time == first_seen
     assert first_and_last[1].valid_time == last_seen

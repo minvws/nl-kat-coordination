@@ -1,7 +1,7 @@
 {% load i18n %}
 
 <div {% if field.field.required %}class="required"{% endif %}>
-    <p class="de-emphasized">{{ field.label_tag }}</p>
+    {{ field.label_tag }}
     <p id="input-description" class="nota-bene">{{ field.field.widget.attrs.description }}</p>
     {% if form_view != "vertical" %}
         <div>

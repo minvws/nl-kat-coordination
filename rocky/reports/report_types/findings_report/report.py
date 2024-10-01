@@ -23,8 +23,8 @@ class FindingsReport(Report):
     id = "findings-report"
     name = _("Findings Report")
     description = _("Shows all the finding types and their occurrences.")
-    plugins: ReportPlugins = {"required": [], "optional": []}
-    input_ooi_types = _INPUT_OOI_TYPES
+    plugins: ReportPlugins = {"required": set(), "optional": set()}
+    input_ooi_types = ALL_TYPES
     template_path = "findings_report/report.html"
     label_style = "3-light"
 
