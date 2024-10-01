@@ -8,6 +8,7 @@ class Modal(component.Component):
     def get_context_data(self, **kwargs):
         return {
             "size": kwargs["size"],
+            "modal_id": kwargs["modal_id"],
         }
 
     class Media:
