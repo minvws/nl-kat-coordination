@@ -36,7 +36,7 @@ export function initDialog(modal) {
     });
   }
 
-  modal.querySelector("dialog").addEventListener("click", (event) => {
+  dialog_element.addEventListener("click", (event) => {
     // The actual handling (like posting) of the input values should be done when implementing the component.
     // event.target.nodeName === 'DIALOG' is needed to check if the ::backdrop is clicked.
     if (
@@ -48,7 +48,7 @@ export function initDialog(modal) {
     }
   });
 
-  modal.querySelector("dialog").addEventListener("close", (event) => {
+  dialog_element.addEventListener("close", (event) => {
     removeDialogAnchor();
   });
 }
