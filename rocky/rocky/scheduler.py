@@ -129,6 +129,18 @@ class Task(BaseModel):
     created_at: datetime.datetime | None = None
     modified_at: datetime.datetime | None = None
 
+    def organization_id(self) -> str:
+        if isinstance(self.data, BoefjeTask):
+            return self.data.organization
+
+        if isinstance(self.data, NormalizerTask):
+            return self.data.raw_data.boefje_meta.organization
+
+        if isinstance(self.data, ReportTask):
+            return self.data.organisation_id
+
+        raise ValueError("No organization found related to task")
+
 
 class ScheduleRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True)
