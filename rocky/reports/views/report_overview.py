@@ -1,11 +1,16 @@
+from datetime import datetime
+
+from django.contrib import messages
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 
+from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.ooi.reports import ReportRecipe
 from reports.views.base import ReportBreadcrumbs, get_selection
 from rocky.paginator import RockyPaginator
-from rocky.scheduler import scheduler_client
 from rocky.views.mixins import OctopoesView, ReportList
+from rocky.views.scheduler import SchedulerView
 
 
 class BreadcrumbsReportOverviewView(ReportBreadcrumbs):
@@ -26,7 +31,7 @@ class BreadcrumbsReportOverviewView(ReportBreadcrumbs):
         return breadcrumbs
 
 
-class ScheduledReportsView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
+class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListView):
     """
     Shows all the reports that have ever been generated for the organization.
     """
@@ -36,20 +41,26 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, OctopoesView, ListView
     context_object_name = "reports"
     paginator = RockyPaginator
     template_name = "report_overview/scheduled_reports.html"
+    task_type = "report"
+    context_object_name = "scheduled_reports"
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.client = scheduler_client(self.organization.code)
+    def get_recipe_ooi(self, ooi_pk: str) -> ReportRecipe:
+        try:
+            return self.octopoes_api_connector.get(f"ReportRecipe|{ooi_pk}", valid_time=self.observed_at)
+        except ObjectNotFoundException:
+            messages.error(self.request, f"Report recipe with id {ooi_pk} not found.")
 
     def get_queryset(self):
-        scheduler_id = f"report-{self.organization.code}"
-        self.scheduled_reports = self.client.get_scheduled_reports(scheduler_id=scheduler_id)
-        return self.scheduled_reports
+        report_schedules = self.get_report_schedules()
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["scheduled_reports"] = self.scheduled_reports
-        return context
+        return [
+            {
+                "recipe": self.get_recipe_ooi(schedule["data"]["report_recipe_id"]),
+                "cron": schedule["schedule"],
+                "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
+            }
+            for schedule in report_schedules
+        ]
 
 
 class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):

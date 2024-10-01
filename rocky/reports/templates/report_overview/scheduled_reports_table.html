@@ -7,8 +7,9 @@
         <caption class="visually-hidden">{% translate "Scheduled reports:" %}</caption>
         <thead>
             <tr>
-                <th scope="col">{% translate "Name" %}</th>
-                <th scope="col">{% translate "Report type" %}</th>
+                <th scope="col">{% translate "Report Name" %}</th>
+                <th scope="col">{% translate "Subreport Name" %}</th>
+                <th scope="col">{% translate "Report types" %}</th>
                 <th scope="col">{% translate "Scheduled for" %}</th>
                 <th scope="col">{% translate "Recurrence" %}</th>
                 <th scope="col"></th>
@@ -16,52 +17,19 @@
         </thead>
         <tbody>
             {% for schedule in scheduled_reports %}
-                {% with report=schedule.data %}
+                {% if schedule.recipe %}
                     <tr>
+                        <td>{{ schedule.recipe.report_name_format }}</td>
+                        <td>{{ schedule.recipe.subreport_name_format }}</td>
                         <td>
-                            <a href="{% url "view_report" organization.code %}?report_id={{ report.reference }}&observed_at={{ report.observed_at|date:"Y-m-d H:i:s:u" }}"
-                               title="{% translate "Show report details" %}">{{ report.name }}</a>
+                            {% for report_type in schedule.recipe.report_types %}
+                                <span class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</span>
+                            {% endfor %}
                         </td>
-                        <td>
-                            <span class="label tags-color-{{ report.report_type|get_report_type_label_style }}">{{ report.report_type|get_report_type_name }}</span>
-                        </td>
-                        <td>{{ schedule.deadline_at }} scheduled_for_date</td>
-                        <td class="nowrap">recurrence</td>
-                        <td>
-                            <button type="button"
-                                    class="expando-button icon ti-chevron-down"
-                                    data-icon-open-class="icon ti-chevron-down"
-                                    data-icon-close-class="icon ti-chevron-up"
-                                    data-close-label="{% translate "Close children report object details" %}"
-                                    aria-expanded="false"></button>
-                        </td>
+                        <td>{{ schedule.deadline_at }}</td>
+                        <td>{{ schedule.cron }}</td>
                     </tr>
-                {% endwith %}
-                <tr class="expando-row">
-                    <td colspan="6">
-                        <table>
-                            <caption class="visually-hidden">{% translate "Scheduled report details:" %}</caption>
-                            <thead>
-                                <tr>
-                                    <th scope="col">{% translate "Creation date" %}</th>
-                                    <th scope="col">{% translate "Reference date" %}</th>
-                                    <th scope="col">{% translate "Status" %}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for task in schedule.tasks %}
-                                    <tr>
-                                        <td>{{ task.created_at }} created_at</td>
-                                        <td>reference_date</td>
-                                        <td class="nowrap">
-                                            <span class="icon {{ task.status.value }}"></span>{{ task.status.value|capfirst }}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
+                {% endif %}
             {% endfor %}
         </tbody>
     </table>
