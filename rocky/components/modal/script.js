@@ -56,7 +56,6 @@ export function initDialog(modal) {
 export function removeDialogAnchor() {
   // Remove the anchor from the URL when closing the modal
   let baseUrl = window.location.toString().split("#")[0];
-  console.log(baseUrl);
   window.history.pushState("", "Base URL", baseUrl);
 }
 
