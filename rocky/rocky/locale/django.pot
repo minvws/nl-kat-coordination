@@ -3826,9 +3826,8 @@ msgstr[1] ""
 #: tools/view_helpers.py rocky/templates/admin/delete_confirmation.html
 #: rocky/templates/admin/delete_selected_confirmation.html
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html rocky/templates/indemnification_present.html
-#: rocky/views/ooi_add.py rocky/views/ooi_list.py rocky/views/ooi_view.py
-#: rocky/views/upload_csv.py rocky/views/upload_raw.py
+#: rocky/templates/header.html rocky/views/ooi_add.py rocky/views/ooi_list.py
+#: rocky/views/ooi_view.py rocky/views/upload_csv.py rocky/views/upload_raw.py
 msgid "Objects"
 msgstr ""
 
@@ -5311,6 +5310,10 @@ msgstr ""
 msgid ""
 "Indemnification on the organization present. You may now add objects and "
 "start scans."
+msgstr ""
+
+#: rocky/templates/indemnification_present.html
+msgid "Go to Objects"
 msgstr ""
 
 #: rocky/templates/indemnification_present.html
