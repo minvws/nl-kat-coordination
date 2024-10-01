@@ -16,8 +16,7 @@ from boefjes.sql.db import session_managed_iterator
 from boefjes.sql.plugin_storage import create_plugin_storage
 from boefjes.storage.interfaces import (
     ConfigStorage,
-    ExistingPluginId,
-    ExistingPluginName,
+    DuplicatePlugin,
     IntegrityError,
     NotFound,
     PluginNotFound,
@@ -108,36 +107,40 @@ class PluginService:
     def create_boefje(self, boefje: Boefje) -> None:
         try:
             self.local_repo.by_id(boefje.id)
-            raise ExistingPluginId(boefje.id)
+            raise DuplicatePlugin("id")
         except KeyError:
             try:
                 plugin = self.local_repo.by_name(boefje.name)
 
                 if plugin.type == "boefje":
-                    raise ExistingPluginName(boefje.name)
+                    raise DuplicatePlugin("name")
                 else:
                     try:
                         with self.plugin_storage as storage:
                             storage.create_boefje(boefje)
-                    except IntegrityError:
-                        raise ExistingPluginName(boefje.name)
+                    except IntegrityError as error:
+                        raise DuplicatePlugin(self._translate_duplicate_plugin(error.message))
             except KeyError:
                 try:
                     with self.plugin_storage as storage:
                         storage.create_boefje(boefje)
-                except IntegrityError:
-                    raise ExistingPluginName(boefje.name)
+                except IntegrityError as error:
+                    raise DuplicatePlugin(self._translate_duplicate_plugin(error.message))
+
+    def _translate_duplicate_plugin(self, error_message):
+        translations = {"boefje_plugin_id": "id", "boefje_name": "name"}
+        return next((value for key, value in translations.items() if key in error_message), None)
 
     def create_normalizer(self, normalizer: Normalizer) -> None:
         try:
             self.local_repo.by_id(normalizer.id)
-            raise ExistingPluginId(normalizer.id)
+            raise DuplicatePlugin("id")
         except KeyError:
             try:
                 plugin = self.local_repo.by_name(normalizer.name)
 
                 if plugin.types == "normalizer":
-                    raise ExistingPluginName(normalizer.name)
+                    raise DuplicatePlugin("name")
                 else:
                     self.plugin_storage.create_normalizer(normalizer)
             except KeyError:

@@ -1,6 +1,7 @@
 import datetime
 from functools import partial
 
+import structlog
 from croniter import croniter
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.responses import FileResponse, JSONResponse, Response
@@ -17,13 +18,15 @@ from boefjes.dependencies.plugins import (
 from boefjes.katalogus.organisations import check_organisation_exists
 from boefjes.models import FilterParameters, PaginationParameters, PluginType
 from boefjes.sql.plugin_storage import get_plugin_storage
-from boefjes.storage.interfaces import ExistingPluginId, ExistingPluginName, NotAllowed, PluginStorage
+from boefjes.storage.interfaces import DuplicatePlugin, NotAllowed, PluginStorage
 
 router = APIRouter(
     prefix="/organisations/{organisation_id}",
     tags=["plugins"],
     dependencies=[Depends(check_organisation_exists)],
 )
+
+logger = structlog.get_logger(__name__)
 
 
 # check if query matches plugin id, name or description
@@ -105,10 +108,8 @@ def add_plugin(plugin: PluginType, plugin_service: PluginService = Depends(get_p
 
             if plugin.type == "normalizer":
                 return service.create_normalizer(plugin)
-    except ExistingPluginId:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Duplicate plugin id")
-    except ExistingPluginName:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Duplicate plugin name")
+    except DuplicatePlugin as error:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, error.message)
 
     raise HTTPException(status.HTTP_400_BAD_REQUEST, "Creation of Bits is not supported")
 

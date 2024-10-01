@@ -1,3 +1,4 @@
+import json
 from io import BytesIO
 
 import httpx
@@ -82,6 +83,11 @@ class KATalogusError(Exception):
 
     def __str__(self):
         return self._message
+
+
+class DuplicatePluginError(KATalogusError):
+    def __init__(self, error_message: str):
+        super().__init__(error_message)
 
 
 class DuplicateNameError(KATalogusError):
@@ -245,10 +251,9 @@ class KATalogusClientV1:
                 logger.info("Plugin %s created", plugin.name)
             else:
                 logger.info("Plugin %s could not be created", plugin.name)
-            if error.response.status_code == codes.BAD_REQUEST and "Duplicate plugin name" in error.response.text:
-                raise DuplicateNameError
-            if error.response.status_code == codes.BAD_REQUEST and "Duplicate plugin id" in error.response.text:
-                raise DuplicateIdError
+            error_message = json.loads(error.response.text).get("detail")
+            if error.response.status_code == codes.BAD_REQUEST and "Duplicate plugin" in error_message:
+                raise DuplicatePluginError(error_message)
             else:
                 raise error
 
@@ -265,7 +270,7 @@ class KATalogusClientV1:
             else:
                 logger.info("Plugin %s could not be updated", plugin.name)
             if error.response.status_code == codes.BAD_REQUEST:
-                raise DuplicateNameError
+                raise DuplicatePluginError("Duplicate plugin name")
             if error.response.status_code in [codes.FORBIDDEN, codes.NOT_FOUND]:
                 raise KATalogusNotAllowedError
             else:

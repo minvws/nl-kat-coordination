@@ -4,11 +4,10 @@ from urllib.parse import urlencode
 
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import FormView
 from tools.forms.boefje import BoefjeSetupForm
 
-from katalogus.client import Boefje, DuplicateNameError, KATalogusNotAllowedError, get_katalogus
+from katalogus.client import Boefje, DuplicatePluginError, KATalogusNotAllowedError, get_katalogus
 from octopoes.models.types import type_by_name
 
 
@@ -42,15 +41,14 @@ class AddBoefjeView(BoefjeSetupView):
 
     def form_valid(self, form):
         form_data = form.cleaned_data
-        plugin = create_boefje_with_form_data(form_data, str(self.plugin_id), self.created)
+        plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
 
         try:
             self.katalogus.create_plugin(plugin)
             return super().form_valid(form)
-        except DuplicateNameError:
-            form.add_error(
-                "name", _("Boefje with name '%s' does already exist. Please choose another name.").format(plugin.name)
-            )
+        except DuplicatePluginError as error:
+            if "name" in error.message:
+                form.add_error("name", ("Boefje with this name does already exist. Please choose another name."))
             return self.form_invalid(form)
 
     def get_context_data(self, **kwargs):
@@ -97,15 +95,14 @@ class AddBoefjeVariantView(BoefjeSetupView):
 
     def form_valid(self, form):
         form_data = form.cleaned_data
-        plugin = create_boefje_with_form_data(form_data, str(self.plugin_id), self.created)
+        plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
 
         try:
             self.katalogus.create_plugin(plugin)
             return super().form_valid(form)
-        except DuplicateNameError:
-            form.add_error(
-                "name", ("Boefje with name '%s' does already exist. Please choose another name.") % plugin.name
-            )
+        except DuplicatePluginError as error:
+            if "name" in error.message:
+                form.add_error("name", ("Boefje with this name does already exist. Please choose another name."))
             return self.form_invalid(form)
 
     def get_context_data(self, **kwargs):
@@ -167,15 +164,14 @@ class EditBoefjeView(BoefjeSetupView):
 
     def form_valid(self, form):
         form_data = form.cleaned_data
-        plugin = create_boefje_with_form_data(form_data, str(self.plugin_id), self.created)
+        plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
 
         try:
             self.katalogus.edit_plugin(plugin)
             return super().form_valid(form)
-        except DuplicateNameError:
-            form.add_error(
-                "name", ("Boefje with name '%s' does already exist. Please choose another name.") % plugin.name
-            )
+        except DuplicatePluginError as error:
+            if "name" in error.message:
+                form.add_error("name", ("Boefje with this name does already exist. Please choose another name."))
             return self.form_invalid(form)
         except KATalogusNotAllowedError:
             form.add_error(
