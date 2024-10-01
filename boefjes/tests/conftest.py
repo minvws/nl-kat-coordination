@@ -65,7 +65,7 @@ class MockSchedulerClient(SchedulerClientInterface):
         self._iterations = 0
         self._tasks: dict[str, Task] = multiprocessing.Manager().dict()
         self._popped_items: dict[str, Task] = multiprocessing.Manager().dict()
-        self._pushed_items: dict[str, tuple[str, Task]] = multiprocessing.Manager().dict()
+        self._pushed_items: dict[str, Task] = multiprocessing.Manager().dict()
 
     def get_queues(self) -> list[Queue]:
         time.sleep(self.sleep_time)
@@ -107,8 +107,8 @@ class MockSchedulerClient(SchedulerClientInterface):
     def _task_from_id(self, task_id: UUID):
         return self._popped_items[str(task_id)]
 
-    def push_item(self, queue_id: str, p_item: Task) -> None:
-        self._pushed_items[str(p_item.id)] = (queue_id, p_item)
+    def push_item(self, p_item: Task) -> None:
+        self._pushed_items[str(p_item.id)] = p_item
 
 
 class MockHandler(Handler):
