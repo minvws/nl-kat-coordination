@@ -60,7 +60,7 @@ export function removeDialogAnchor() {
 }
 
 export function showModalBasedOnAnchor(id) {
-  if (id && document.querySelector("#" + id).nodeName === "DIALOG") {
+  if (id && document.querySelector("dialog#" + id + ".modal")) {
     // Show modal, selected by ID
     document.querySelector("#" + id).showModal();
   }
