@@ -7,7 +7,10 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
+from structlog import get_logger
 from tools.view_helpers import OrganizationDetailBreadcrumbsMixin
+
+logger = get_logger(__name__)
 
 
 class PageActions(Enum):
@@ -26,6 +29,7 @@ class OrganizationSettingsView(
         if not self.request.user.has_perm("tools.can_recalculate_bits"):
             raise PermissionDenied()
         if action == PageActions.RECALCULATE.value:
+            logger.info("Recalculating bits", event_code=920000)
             connector = self.octopoes_api_connector
 
             start_time = datetime.now()
