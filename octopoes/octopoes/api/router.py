@@ -224,7 +224,7 @@ def get_object_history(
     has_doc: bool | None = None,
     offset: int = 0,
     limit: int | None = None,
-    indices: list[int] | None = None,
+    indices: list[int] | None = Query(None),
     octopoes: OctopoesService = Depends(octopoes_service),
 ) -> list[TransactionRecord]:
     return octopoes.get_ooi_history(
