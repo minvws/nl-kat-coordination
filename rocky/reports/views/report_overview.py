@@ -50,7 +50,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
     def get_recipe_ooi_tree(self, ooi_pk: str) -> ReportRecipe:
         try:
             return self.octopoes_api_connector.get_tree(
-                f"ReportRecipe|{ooi_pk}", valid_time=self.observed_at, depth=2, types={ReportRecipe, Report}
+                f"ReportRecipe|{ooi_pk}", valid_time=self.observed_at, depth=1, types={ReportRecipe, Report}
             )
         except ObjectNotFoundException:
             messages.error(self.request, f"Report recipe with id {ooi_pk} not found.")
@@ -60,10 +60,10 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
 
         recipes = []
         for schedule in report_schedules:
-            schedule_id = schedule["data"]["report_recipe_id"]
+            recipe_id = schedule["data"]["report_recipe_id"]
             # TODO: This is a workaround to get the recipes and reports.
             #  We should create an endpoint for this in octopoes
-            recipe_tree = self.get_recipe_ooi_tree(schedule_id).store.values()
+            recipe_tree = self.get_recipe_ooi_tree(recipe_id).store.values()
             recipe_ooi = [ooi for ooi in recipe_tree if isinstance(ooi, ReportRecipe)][0]
             report_oois = [ooi for ooi in recipe_tree if isinstance(ooi, Report)]
             recipes.append(
