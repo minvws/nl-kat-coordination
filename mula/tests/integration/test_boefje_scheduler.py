@@ -375,6 +375,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Mock
         self.mock_get_latest_task_by_hash.return_value = task_db
         self.mock_get_last_run_boefje.return_value = None
+        self.mock_get_plugin.return_value = None
 
         # Act
         self.assertFalse(self.scheduler.has_boefje_task_stalled(boefje_task))
@@ -403,6 +404,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Mock
         self.mock_get_latest_task_by_hash.return_value = task_db
         self.mock_get_last_run_boefje.return_value = None
+        self.mock_get_plugin.return_value = None
 
         # Act
         self.assertTrue(self.scheduler.has_boefje_task_stalled(boefje_task))
@@ -434,6 +436,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Mock
         self.mock_get_latest_task_by_hash.return_value = task_db
         self.mock_get_last_run_boefje.return_value = None
+        self.mock_get_plugin.return_value = None
 
         # Act
         with self.assertRaises(RuntimeError):
@@ -468,6 +471,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Mock
         self.mock_get_latest_task_by_hash.return_value = task_db
         self.mock_get_last_run_boefje.return_value = None
+        self.mock_get_plugin.return_value = None
 
         # Act
         self.assertFalse(self.scheduler.has_boefje_task_started_running(boefje_task))
@@ -497,6 +501,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Mock
         self.mock_get_latest_task_by_hash.return_value = task_db
         self.mock_get_last_run_boefje.return_value = None
+        self.mock_get_plugin.return_value = None
 
         # Act
         has_passed = self.scheduler.has_boefje_task_grace_period_passed(boefje_task)
@@ -529,6 +534,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Mock
         self.mock_get_latest_task_by_hash.return_value = task_db
         self.mock_get_last_run_boefje.return_value = None
+        self.mock_get_plugin.return_value = None
 
         # Act
         has_passed = self.scheduler.has_boefje_task_grace_period_passed(boefje_task)
@@ -567,6 +573,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Mock
         self.mock_get_latest_task_by_hash.return_value = task_db
         self.mock_get_last_run_boefje.return_value = last_run_boefje
+        self.mock_get_plugin.return_value = None
 
         # Act
         has_passed = self.scheduler.has_boefje_task_grace_period_passed(boefje_task)
@@ -605,6 +612,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Mock
         self.mock_get_latest_task_by_hash.return_value = task_db
         self.mock_get_last_run_boefje.return_value = last_run_boefje
+        self.mock_get_plugin.return_value = None
 
         # Act
         has_passed = self.scheduler.has_boefje_task_grace_period_passed(boefje_task)
