@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 14:37+0000\n"
+"POT-Creation-Date: 2024-10-01 06:47+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1187,8 +1187,21 @@ msgstr ""
 msgid "Age"
 msgstr ""
 
+#: katalogus/templates/plugin_container_image.html tools/forms/boefje.py
+msgid "Time-out interval"
+msgstr ""
+
 #: katalogus/templates/plugin_container_image.html
 msgid "current"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+#: reports/report_types/dns_report/report.html
+msgid "minutes"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "Default system interval"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
@@ -2867,10 +2880,6 @@ msgid "TTL"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "minutes"
-msgstr ""
-
-#: reports/report_types/dns_report/report.html
 msgid "No records have been found."
 msgstr ""
 
@@ -3730,9 +3739,8 @@ msgstr[1] ""
 #: tools/view_helpers.py rocky/templates/admin/delete_confirmation.html
 #: rocky/templates/admin/delete_selected_confirmation.html
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html rocky/templates/indemnification_present.html
-#: rocky/views/ooi_add.py rocky/views/ooi_list.py rocky/views/ooi_view.py
-#: rocky/views/upload_csv.py rocky/views/upload_raw.py
+#: rocky/templates/header.html rocky/views/ooi_add.py rocky/views/ooi_list.py
+#: rocky/views/ooi_view.py rocky/views/upload_csv.py rocky/views/upload_raw.py
 msgid "Objects"
 msgstr ""
 
@@ -4168,6 +4176,10 @@ msgid "The selected date is in the future. Please select a different date."
 msgstr ""
 
 #: tools/forms/boefje.py
+msgid "For example: -sTU --top-ports 1000"
+msgstr ""
+
+#: tools/forms/boefje.py
 msgid "JSON Schema"
 msgstr ""
 
@@ -4177,6 +4189,12 @@ msgstr ""
 
 #: tools/forms/boefje.py
 msgid "Output mime types"
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid ""
+"Specify the time-out interval for tasks using this Boefje in minutes. The "
+"default is 24 hours."
 msgstr ""
 
 #: tools/forms/finding_type.py
@@ -5198,6 +5216,10 @@ msgstr ""
 msgid ""
 "Indemnification on the organization present. You may now add objects and "
 "start scans."
+msgstr ""
+
+#: rocky/templates/indemnification_present.html
+msgid "Go to Objects"
 msgstr ""
 
 #: rocky/templates/indemnification_present.html
