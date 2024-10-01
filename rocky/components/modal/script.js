@@ -25,12 +25,12 @@ export function initDialog(modal) {
   if (!dialog_element) return;
 
   let trigger = document.querySelector(
-    "[data-modal-id='" + dialog_element.id + "']",
+    "[data-modal-id='" + dialog_element.id + "']:not(a)",
   );
 
   // Check if trigger element is <a>, if not, on click,
   // alter the URL to open the dialog using the onhaschange event.
-  if (trigger && trigger.nodeName !== "A") {
+  if (trigger) {
     trigger.addEventListener("click", (event) => {
       window.location.hash = "#" + dialog_element.id;
     });
