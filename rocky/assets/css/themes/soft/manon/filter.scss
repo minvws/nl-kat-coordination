@@ -16,10 +16,12 @@
   --filter-button-icon-before-close-content: "\ea62";
 }
 
-.filter form {
-  background-color: transparent;
-  padding: 1.5rem 2rem 2rem;
+.filter:has(form:not([hidden])) {
   border-bottom: 1px solid var(--colors-grey-200);
+}
+
+.filter form {
+  padding: 1.5rem 2rem 2rem;
 }
 
 /* Temporary fix, this needs to be updated after this issue has been solved in Manon */
