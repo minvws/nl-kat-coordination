@@ -1,16 +1,19 @@
 from datetime import datetime
 
+import structlog
 from django.contrib import messages
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.ooi.reports import ReportRecipe
+from octopoes.models.ooi.reports import Report, ReportRecipe
 from reports.views.base import ReportBreadcrumbs, get_selection
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import OctopoesView, ReportList
 from rocky.views.scheduler import SchedulerView
+
+logger = structlog.get_logger(__name__)
 
 
 class BreadcrumbsReportOverviewView(ReportBreadcrumbs):
@@ -44,23 +47,35 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
     task_type = "report"
     context_object_name = "scheduled_reports"
 
-    def get_recipe_ooi(self, ooi_pk: str) -> ReportRecipe:
+    def get_recipe_ooi_tree(self, ooi_pk: str) -> ReportRecipe:
         try:
-            return self.octopoes_api_connector.get(f"ReportRecipe|{ooi_pk}", valid_time=self.observed_at)
+            return self.octopoes_api_connector.get_tree(
+                f"ReportRecipe|{ooi_pk}", valid_time=self.observed_at, depth=2, types={ReportRecipe, Report}
+            )
         except ObjectNotFoundException:
             messages.error(self.request, f"Report recipe with id {ooi_pk} not found.")
 
     def get_queryset(self):
         report_schedules = self.get_report_schedules()
 
-        return [
-            {
-                "recipe": self.get_recipe_ooi(schedule["data"]["report_recipe_id"]),
-                "cron": schedule["schedule"],
-                "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
-            }
-            for schedule in report_schedules
-        ]
+        recipes = []
+        for schedule in report_schedules:
+            schedule_id = schedule["data"]["report_recipe_id"]
+            # TODO: This is a workaround to get the recipes and reports.
+            #  We should create an endpoint for this in octopoes
+            recipe_tree = self.get_recipe_ooi_tree(schedule_id).store.values()
+            recipe_ooi = [ooi for ooi in recipe_tree if isinstance(ooi, ReportRecipe)][0]
+            report_oois = [ooi for ooi in recipe_tree if isinstance(ooi, Report)]
+            recipes.append(
+                {
+                    "recipe": recipe_ooi,
+                    "cron": schedule["schedule"],
+                    "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
+                    "reports": report_oois,
+                }
+            )
+
+        return recipes
 
 
 class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
