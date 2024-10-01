@@ -67,42 +67,42 @@ class Normalizer(Plugin):
 
 
 class KATalogusError(Exception):
-    message: str = _("The KATalogus has an unexpected error. Check the logs for further details.")
+    @property
+    def message(self):
+        return self._message
+
+    def __init__(self, message: str | None = None):
+        if message is None:
+            message = _("The KATalogus has an unexpected error. Check the logs for further details.")
+
+        self._message = message
+
+        super().__init__(message)
 
     def __str__(self):
-        return str(self.message)
+        return self._message
 
 
 class DuplicateNameError(KATalogusError):
-    def __init__(self, *args: object) -> None:
-        super().__init__(*args)
-        status_message = ""
-        self.message = status_message + _("Boefje with this name already exists.")
+    def __init__(self):
+        super().__init__(_("Boefje with this name already exists."))
 
 
 class DuplicateIdError(KATalogusError):
-    def __init__(self, *args: object) -> None:
-        super().__init__(*args)
-        status_message = ""
-        self.message = status_message + _("Boefje with this ID already exists.")
+    def __init__(self):
+        super().__init__(_("Boefje with this ID already exists."))
 
 
 class KATalogusNotAllowedError(KATalogusError):
-    def __init__(self, *args: object, status_code: str | None = None, status_message: str | None = None) -> None:
-        super().__init__(*args)
-        status_message = ""
-        if status_code is not None:
-            status_message = f"{status_code}: "
-        self.message = status_message + _("Editing this boefje is not allowed because it is static.")
+    def __init__(self):
+        super().__init__(_("Editing this boefje is not allowed because it is static."))
 
 
 class KATalogusHTTPStatusError(KATalogusError):
-    def __init__(self, *args: object, status_code: str | None = None) -> None:
-        super().__init__(*args)
-        status_message = ""
-        if status_code is not None:
-            status_message = f"{status_code}: "
-        self.message = status_message + _("A HTTP error occurred. Check logs for more info.")
+    def __init__(self, error: httpx.HTTPStatusError):
+        self.error = error
+
+        super.__init__(_("An HTTP %d error occurred. Check logs for more info.").format(error.response.status_code))
 
 
 class KATalogusClientV1:
@@ -133,7 +133,7 @@ class KATalogusClientV1:
             response = self.session.get(f"{self.organization_uri}/plugins", params=params)
             response.raise_for_status()
         except httpx.HTTPStatusError as error:
-            raise KATalogusHTTPStatusError(status_code=str(error.response.status_code))
+            raise KATalogusHTTPStatusError(error)
         return [parse_plugin(plugin) for plugin in response.json()]
 
     def get_plugin(self, plugin_id: str) -> Plugin:
@@ -240,13 +240,13 @@ class KATalogusClientV1:
             )
             response.raise_for_status()
         except httpx.HTTPStatusError as error:
-            if response.status_code == codes.CREATED:
+            if error.response.status_code == codes.CREATED:
                 logger.info("Plugin %s created", plugin.name)
             else:
                 logger.info("Plugin %s could not be created", plugin.name)
-            if response.status_code == codes.BAD_REQUEST and "Duplicate plugin name" in error.response.text:
+            if error.response.status_code == codes.BAD_REQUEST and "Duplicate plugin name" in error.response.text:
                 raise DuplicateNameError
-            if response.status_code == codes.BAD_REQUEST and "Duplicate plugin id" in error.response.text:
+            if error.response.status_code == codes.BAD_REQUEST and "Duplicate plugin id" in error.response.text:
                 raise DuplicateIdError
             else:
                 raise error
@@ -259,13 +259,13 @@ class KATalogusClientV1:
             )
             response.raise_for_status()
         except httpx.HTTPStatusError as error:
-            if response.status_code == codes.CREATED:
+            if error.response.status_code == codes.CREATED:
                 logger.info("Plugin %s updated", plugin.name)
             else:
                 logger.info("Plugin %s could not be updated", plugin.name)
-            if response.status_code == codes.BAD_REQUEST:
+            if error.response.status_code == codes.BAD_REQUEST:
                 raise DuplicateNameError
-            if response.status_code in [codes.FORBIDDEN, codes.NOT_FOUND]:
+            if error.response.status_code in [codes.FORBIDDEN, codes.NOT_FOUND]:
                 raise KATalogusNotAllowedError
             else:
                 raise error
