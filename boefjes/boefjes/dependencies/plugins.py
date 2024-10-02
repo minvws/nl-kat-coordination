@@ -17,6 +17,7 @@ from boefjes.sql.plugin_storage import create_plugin_storage
 from boefjes.storage.interfaces import (
     ConfigStorage,
     ExistingPluginId,
+    ExistingPluginName,
     NotFound,
     PluginNotFound,
     PluginStorage,
@@ -108,14 +109,30 @@ class PluginService:
             self.local_repo.by_id(boefje.id)
             raise ExistingPluginId(boefje.id)
         except KeyError:
-            self.plugin_storage.create_boefje(boefje)
+            try:
+                plugin = self.local_repo.by_name(boefje.name)
+
+                if plugin.type == "boefje":
+                    raise ExistingPluginName(boefje.name)
+                else:
+                    self.plugin_storage.create_boefje(boefje)
+            except KeyError:
+                self.plugin_storage.create_boefje(boefje)
 
     def create_normalizer(self, normalizer: Normalizer) -> None:
         try:
             self.local_repo.by_id(normalizer.id)
             raise ExistingPluginId(normalizer.id)
         except KeyError:
-            self.plugin_storage.create_normalizer(normalizer)
+            try:
+                plugin = self.local_repo.by_name(normalizer.name)
+
+                if plugin.types == "normalizer":
+                    raise ExistingPluginName(normalizer.name)
+                else:
+                    self.plugin_storage.create_normalizer(normalizer)
+            except KeyError:
+                self.plugin_storage.create_normalizer(normalizer)
 
     def _put_boefje(self, boefje_id: str) -> None:
         """Check existence of a boefje, and insert a database entry if it concerns a local boefje"""
@@ -156,7 +173,7 @@ class PluginService:
         try:
             boefje = self.plugin_storage.boefje_by_id(plugin_id)
 
-            return boefje.schema
+            return boefje.boefje_schema
         except PluginNotFound:
             return self.local_repo.schema(plugin_id)
 
@@ -204,7 +221,7 @@ class PluginService:
         return plugin
 
 
-def get_plugin_service(organisation_id: str) -> Iterator[PluginService]:
+def get_plugin_service() -> Iterator[PluginService]:
     def closure(session: Session):
         return PluginService(
             create_plugin_storage(session),
@@ -224,5 +241,6 @@ def get_plugins_filter_parameters(
     ids: list[str] | None = Query(None),
     plugin_type: Literal["boefje", "normalizer", "bit"] | None = None,
     state: bool | None = None,
+    oci_image: str | None = None,
 ) -> FilterParameters:
-    return FilterParameters(q=q, ids=ids, type=plugin_type, state=state)
+    return FilterParameters(q=q, ids=ids, type=plugin_type, state=state, oci_image=oci_image)

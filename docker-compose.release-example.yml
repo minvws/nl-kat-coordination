@@ -31,7 +31,7 @@ services:
       APPS: "ROCKY BYTES KATALOGUS SCHEDULER"
 
   crux:
-    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.8"
+    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.1.0"
     restart: on-failure
     ports:
       - "127.0.0.1:3000:3000"

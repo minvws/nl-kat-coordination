@@ -9,10 +9,13 @@ from django.db.models import Count
 from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
+from structlog import get_logger
 from tools.models import Organization
 from tools.view_helpers import OrganizationBreadcrumbsMixin
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
+
+logger = get_logger(__name__)
 
 
 class OrganizationListView(
@@ -40,6 +43,7 @@ class OrganizationListView(
             start_time = datetime.now()
             for organization in organizations:
                 try:
+                    logger.info("Recalculating bits", event_code=920000, organization_code=organization.code)
                     number_of_bits += OctopoesAPIConnector(settings.OCTOPOES_API, organization.code).recalculate_bits()
                 except Exception as exc:
                     failed.append(f"{organization}, ({str(exc)})")

@@ -11,7 +11,7 @@
         </p>
         <form action="{% url "katalogus_settings" organization.code %}"
               method="post"
-              class="horizontal-view help"
+              class="help"
               novalidate>
             {% csrf_token %}
             {% include "partials/form/fieldset.html" with legend=name fields=form %}

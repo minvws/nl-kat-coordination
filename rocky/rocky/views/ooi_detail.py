@@ -86,7 +86,7 @@ class OOIDetailView(
         if boefjes:
             context["enabled_boefjes_available"] = True
 
-        max_level = self.organization_member.acknowledged_clearance_level
+        max_level = self.organization_member.max_clearance_level
         if self.ooi.scan_profile and filter_form.is_valid() and not filter_form.cleaned_data["show_all"]:
             max_level = min(max_level, self.ooi.scan_profile.level)
 

@@ -375,11 +375,6 @@ def mock_models_katalogus(mocker):
 
 
 @pytest.fixture
-def mock_views_katalogus(mocker):
-    return mocker.patch("rocky.views.ooi_report.get_katalogus")
-
-
-@pytest.fixture
 def mock_bytes_client(mocker):
     return mocker.patch("rocky.bytes_client.BytesClient")
 
@@ -1097,11 +1092,35 @@ def plugin_details():
             "id": "test-boefje",
             "type": "boefje",
             "name": "TestBoefje",
+            "created": "2023-05-09T09:37:20.909069+00:00",
             "description": "Meows to the moon",
             "scan_level": 1,
             "consumes": ["Network"],
             "produces": ["Network"],
             "enabled": True,
+            "boefje_schema": {},
+            "oci_image": None,
+            "oci_arguments": ["-test", "-arg"],
+        }
+    )
+
+
+@pytest.fixture
+def plugin_details_with_container():
+    return parse_plugin(
+        {
+            "id": "test-boefje",
+            "type": "boefje",
+            "name": "TestBoefje",
+            "created": "2023-05-09T09:37:20.909069+00:00",
+            "description": "Meows to the moon",
+            "scan_level": 1,
+            "consumes": ["Network"],
+            "produces": ["Network"],
+            "enabled": True,
+            "boefje_schema": {},
+            "oci_image": "ghcr.io/test/image:123",
+            "oci_arguments": ["-test", "-arg"],
         }
     )
 
@@ -1424,6 +1443,11 @@ def get_plugins_data() -> list[dict]:
 @pytest.fixture()
 def mock_mixins_katalogus(mocker):
     return mocker.patch("katalogus.views.mixins.get_katalogus")
+
+
+@pytest.fixture()
+def mock_katalogus_client(mocker):
+    return mocker.patch("katalogus.client.KATalogusClientV1")
 
 
 @pytest.fixture
@@ -1787,6 +1811,9 @@ def boefje_dns_records():
         options=None,
         runnable_hash=None,
         produces={"boefje/dns-records"},
+        boefje_schema={},
+        oci_image="ghcr.io/test/image:123",
+        oci_arguments=["-test", "-arg"],
     )
 
 
@@ -1808,12 +1835,24 @@ def boefje_nmap_tcp():
         options=None,
         runnable_hash=None,
         produces={"boefje/nmap"},
+        boefje_schema={},
+        oci_image="ghcr.io/test/image:123",
+        oci_arguments=["-test", "-arg"],
     )
 
 
 @pytest.fixture
 def drf_admin_client(create_drf_client, admin_user):
     client = create_drf_client(admin_user)
+    # We need to set this so that the test client doesn't throw an
+    # exception, but will return error in the API we can test
+    client.raise_request_exception = False
+    return client
+
+
+@pytest.fixture
+def drf_redteam_client(create_drf_client, redteamuser):
+    client = create_drf_client(redteamuser)
     # We need to set this so that the test client doesn't throw an
     # exception, but will return error in the API we can test
     client.raise_request_exception = False

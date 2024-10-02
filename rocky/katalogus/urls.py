@@ -1,5 +1,6 @@
-from django.urls import path
+from django.urls import path, re_path
 
+from katalogus.views.boefje_setup import AddBoefjeVariantView, AddBoefjeView, EditBoefjeView
 from katalogus.views.change_clearance_level import ChangeClearanceLevel
 from katalogus.views.katalogus import (
     AboutPluginsView,
@@ -32,7 +33,17 @@ urlpatterns = [
         name="confirm_clone_settings",
     ),
     path(
-        "plugins/boefjes/<view_type>/",
+        "plugins/boefjes/add/",
+        AddBoefjeView.as_view(),
+        name="boefje_setup",
+    ),
+    path(
+        "plugins/boefjes/add-variant/<plugin_id>/",
+        AddBoefjeVariantView.as_view(),
+        name="boefje_variant_setup",
+    ),
+    re_path(
+        r"^plugins/boefjes/(?P<view_type>(grid|table))/$",
         BoefjeListView.as_view(),
         name="boefjes_list",
     ),
@@ -51,6 +62,11 @@ urlpatterns = [
         "plugins/boefje/<plugin_id>/",
         BoefjeDetailView.as_view(),
         name="boefje_detail",
+    ),
+    path(
+        "plugins/boefje/<plugin_id>/edit/",
+        EditBoefjeView.as_view(),
+        name="edit_boefje",
     ),
     path(
         "plugins/normalizer/<plugin_id>/",

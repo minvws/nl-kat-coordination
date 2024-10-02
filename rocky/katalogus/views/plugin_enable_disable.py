@@ -1,5 +1,7 @@
 from django.contrib import messages
 from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
+from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 
 from katalogus.views.mixins import SinglePluginView
@@ -26,19 +28,25 @@ class PluginEnableDisableView(SinglePluginView):
                 _("{} '{}' enabled.").format(self.plugin.type.title(), self.plugin.name),
             )
         else:
-            member_clearance_level_text = (
-                f"Your clearance level is L{self.organization_member.acknowledged_clearance_level}. Contact your "
-                f"administrator to get a higher clearance level."
-            )
-
             if (
-                self.organization_member.trusted_clearance_level < 0
-                or self.organization_member.acknowledged_clearance_level < 0
+                self.organization_member.trusted_clearance_level
+                != self.organization_member.acknowledged_clearance_level
             ):
+                member_clearance_level_text = _(
+                    "You have not acknowledged your clearance level. "
+                    "Go to your profile page to acknowledge your clearance level."
+                )
+            elif self.organization_member.max_clearance_level < 0:
                 member_clearance_level_text = _(
                     "Your clearance level is not set. Go to your profile page to see your clearance "
                     "or contact the administrator to set a clearance level."
                 )
+            else:
+                clearance_level = self.organization_member.max_clearance_level
+
+                member_clearance_level_text = _(
+                    "Your clearance level is L{}. Contact your administrator to get a higher clearance level."
+                ).format(clearance_level)
 
             messages.add_message(
                 self.request,
@@ -49,4 +57,4 @@ class PluginEnableDisableView(SinglePluginView):
                 ),
             )
 
-        return HttpResponseRedirect(request.POST.get("current_url"))
+        return redirect(reverse("katalogus", kwargs={"organization_code": self.organization.code}))
