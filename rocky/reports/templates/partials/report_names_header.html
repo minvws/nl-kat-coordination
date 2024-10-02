@@ -1,0 +1,11 @@
+{% load i18n %}
+{% load static %}
+
+<h2>{% translate "Report name" %}</h2>
+<p>
+    {% blocktranslate trimmed %}
+        Give your report a custom name and optionally add the reports' reference date
+        to the name. To do so you can select a standard option or use a <a href="https://strftime.org/" target="_blank">Python
+        strftime code</a> in the report name.
+    {% endblocktranslate %}
+</p>

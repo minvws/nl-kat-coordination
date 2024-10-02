@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#: reports/forms.py
 #, fuzzy
 msgid ""
 msgstr ""
@@ -30,7 +31,7 @@ msgstr ""
 #: katalogus/templates/plugin_container_image.html
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/tls_report/report.html
-#: reports/templates/partials/export_report_settings.html
+#: reports/templates/partials/report_names_form.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/subreports_table.html
 #: tools/forms/boefje.py rocky/templates/organizations/organization_list.html
@@ -2376,6 +2377,78 @@ msgstr ""
 msgid "Filter by OOI types"
 msgstr ""
 
+#: reports/forms.py
+msgid "Today"
+msgstr ""
+
+#: reports/forms.py
+msgid "Different date"
+msgstr ""
+
+#: reports/forms.py
+msgid "No, just once"
+msgstr ""
+
+#: reports/forms.py
+msgid "Yes, repeat"
+msgstr ""
+
+#: reports/forms.py
+msgid "Daily"
+msgstr ""
+
+#: reports/forms.py
+msgid "Weekly"
+msgstr ""
+
+#: reports/forms.py
+msgid "Monthly"
+msgstr ""
+
+#: reports/forms.py
+msgid "Yearly"
+msgstr ""
+
+#: reports/forms.py
+msgid "Start date"
+msgstr ""
+
+#: reports/forms.py
+msgid "day"
+msgstr ""
+
+#: reports/forms.py
+msgid "week"
+msgstr ""
+
+#: reports/forms.py
+msgid "month"
+msgstr ""
+
+#: reports/forms.py
+msgid "year"
+msgstr ""
+
+#: reports/forms.py
+msgid "Never"
+msgstr ""
+
+#: reports/forms.py
+msgid "On"
+msgstr ""
+
+#: reports/forms.py
+msgid "After"
+msgstr ""
+
+#: reports/forms.py
+msgid "Report name format"
+msgstr ""
+
+#: reports/forms.py
+msgid "Subreports name format"
+msgstr ""
+
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/report_types/multi_organization_report/appendix.html
 #: reports/templates/partials/report_sidemenu.html
@@ -3577,52 +3650,19 @@ msgid "Web System Reports check web systems on basic security standards."
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-msgid "Report name"
+msgid "Report schedule"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
 msgid ""
-"Give your report a custom name and optionally add the reports' reference "
-"date to the name. To do so you can select a standard option or use a <a "
-"href=\"https://strftime.org/\" target=\"_blank\">Python strftime code</a> in "
-"the report name."
+"When scheduling your report, you have two options. You can either choose to "
+"generate it just once now, or set it to run automatically at regular "
+"intervals, like daily, weekly, or monthly. If you need the report just for a "
+"single occasion, select the one-time option."
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-msgid "Report names:"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "(Required)"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Add reference date"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-#: rocky/views/scan_profile.py
-msgid "Reset"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "No reference date"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Day"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Week"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Month"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Year"
+msgid "Recurrence"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -3688,6 +3728,55 @@ msgid ""
 "with the findings for each report."
 msgstr ""
 
+#: reports/templates/partials/report_names_form.html
+msgid "Report names:"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "(Required)"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "Add reference date"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+#: rocky/views/scan_profile.py
+msgid "Reset"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "No reference date"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "Day"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "Week"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "Month"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "Year"
+msgstr ""
+
+#: reports/templates/partials/report_names_header.html
+msgid "Report name"
+msgstr ""
+
+#: reports/templates/partials/report_names_header.html
+msgid ""
+"Give your report a custom name and optionally add the reports' reference "
+"date to the name. To do so you can select a standard option or use a <a "
+"href=\"https://strftime.org/\" target=\"_blank\">Python strftime code</a> in "
+"the report name."
+msgstr ""
+
 #: reports/templates/partials/report_navigation.html
 msgid "Report Navigation"
 msgstr ""
@@ -3696,13 +3785,11 @@ msgstr ""
 msgid "Generate Report"
 msgstr ""
 
-#: reports/templates/partials/report_navigation.html
-#: reports/views/aggregate_report.py
+#: reports/templates/partials/report_navigation.html reports/views/base.py
 msgid "Aggregate Report"
 msgstr ""
 
-#: reports/templates/partials/report_navigation.html
-#: reports/views/multi_report.py
+#: reports/templates/partials/report_navigation.html reports/views/base.py
 msgid "Multi Report"
 msgstr ""
 
@@ -3778,6 +3865,7 @@ msgid "Set up the required plugins for this report."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
+#: reports/templates/summary/selected_plugins.html
 msgid "Plugins"
 msgstr ""
 
@@ -3815,15 +3903,23 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-msgid "This report type requires the following plugins to be enabled:"
-msgstr ""
-
-#: reports/templates/partials/report_setup_scan.html
 msgid "Good job! All required plugins are enabled."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
+msgid "This report type requires the following plugins to be enabled:"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
 msgid "Show enabled plugins"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "There are no required plugins."
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "Good job! All suggested plugins are enabled"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -3833,15 +3929,15 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-msgid "Good job! All suggested plugins are enabled"
-msgstr ""
-
-#: reports/templates/partials/report_setup_scan.html
 msgid "Hide suggested plugins"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Show more suggested plugins"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "There are no optional plugins."
 msgstr ""
 
 #: reports/templates/partials/report_severity_totals.html
@@ -3859,7 +3955,6 @@ msgid "Selected Objects"
 msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
-#: reports/templates/summary/selected_plugins.html
 msgid "Selected Plugins"
 msgstr ""
 
@@ -4109,41 +4204,36 @@ msgstr ""
 msgid "Select at least one OOI to proceed."
 msgstr ""
 
-#: reports/views/base.py reports/views/multi_report.py
+#: reports/views/base.py
 msgid "Select at least one report type to proceed."
 msgstr ""
 
 #: reports/views/base.py
-#, python-format
-msgid "Report type '%s' does not exist."
-msgstr ""
-
-#: reports/views/base.py
-msgid "Week %W, %Y"
-msgstr ""
-
-#: reports/views/generate_report.py
-msgid "Empty name should not be possible."
-msgstr ""
-
-#: reports/views/generate_report.py
 #, python-brace-format
 msgid "Concatenated Report for {oois_count} objects"
 msgstr ""
 
-#: reports/views/generate_report.py
+#: reports/views/base.py
 #, python-brace-format
 msgid "Concatenated Report for {ooi}"
 msgstr ""
 
-#: reports/views/generate_report.py
+#: reports/views/base.py
 #, python-brace-format
 msgid "{report_type} for {oois_count} objects"
 msgstr ""
 
-#: reports/views/generate_report.py
+#: reports/views/base.py
 #, python-brace-format
 msgid "{report_type} for {ooi}"
+msgstr ""
+
+#: reports/views/base.py
+msgid "Empty name should not be possible."
+msgstr ""
+
+#: reports/views/base.py
+msgid "Week %W, %Y"
 msgstr ""
 
 #: reports/views/mixins.py
@@ -4699,6 +4789,10 @@ msgstr ""
 
 #: rocky/scheduler.py
 msgid "A HTTPError occurred. See Scheduler logs for more info."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "Schedule list: "
 msgstr ""
 
 #: rocky/scheduler.py
@@ -6925,6 +7019,10 @@ msgstr ""
 #: rocky/views/scan_profile.py
 #, python-brace-format
 msgid "Can not reset scan level. Scan level of {ooi_name} not declared"
+msgstr ""
+
+#: rocky/views/scheduler.py
+msgid "Your report has been scheduled."
 msgstr ""
 
 #: rocky/views/scheduler.py

@@ -13,8 +13,21 @@ REPORTS_DIR = Path(__file__).parent
 
 
 class ReportPlugins(TypedDict):
-    required: list[str]
-    optional: list[str]
+    required: set[str]
+    optional: set[str]
+
+
+def report_plugins_union(report_types: list[type["BaseReport"]]) -> ReportPlugins:
+    """Take the union of the required and optional plugin sets and remove optional plugins that are required"""
+
+    plugins: ReportPlugins = {"required": set(), "optional": set()}
+
+    for report_type in report_types:
+        plugins["required"].update(report_type.plugins["required"])
+        plugins["optional"].update(report_type.plugins["optional"])
+        plugins["optional"].difference_update(report_type.plugins["required"])
+
+    return plugins
 
 
 class BaseReport:

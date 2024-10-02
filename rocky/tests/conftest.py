@@ -1445,6 +1445,11 @@ def mock_mixins_katalogus(mocker):
     return mocker.patch("katalogus.views.mixins.get_katalogus")
 
 
+@pytest.fixture()
+def mock_katalogus_client(mocker):
+    return mocker.patch("katalogus.client.KATalogusClientV1")
+
+
 @pytest.fixture
 def mock_scheduler_client_task_list(mock_scheduler):
     mock_scheduler_session = mock_scheduler._client
