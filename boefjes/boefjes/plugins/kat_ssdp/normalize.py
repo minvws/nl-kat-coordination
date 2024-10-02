@@ -116,13 +116,3 @@ def run(input_ooi: dict, raw: bytes | str) -> Iterator[OOI]:
             server=response["host"],
             usn=response["usn"],
         )
-
-
-if __name__ == "__main__":
-    logging.basicConfig(
-        level=logging.INFO,
-        format="[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s",
-    )
-
-    for x in run({"name": "aa"}, "{}"):
-        logging.info("Yielded: %s", x)
