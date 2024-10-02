@@ -16,7 +16,7 @@ from tools.forms.settings import (
 OOI_TYPE_CHOICES = sorted((ooi_type.get_object_type(), ooi_type.get_object_type()) for ooi_type in ALL_TYPES)
 
 
-class BoefjeAddForm(BaseRockyForm):
+class BoefjeSetupForm(BaseRockyForm):
     oci_image = forms.CharField(
         required=True,
         label=_("Container image"),

@@ -1,6 +1,7 @@
 import datetime
 from functools import partial
 
+import structlog
 from croniter import croniter
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.responses import FileResponse, JSONResponse, Response
@@ -17,13 +18,15 @@ from boefjes.dependencies.plugins import (
 from boefjes.katalogus.organisations import check_organisation_exists
 from boefjes.models import FilterParameters, PaginationParameters, PluginType
 from boefjes.sql.plugin_storage import get_plugin_storage
-from boefjes.storage.interfaces import PluginStorage
+from boefjes.storage.interfaces import DuplicatePlugin, IntegrityError, NotAllowed, PluginStorage
 
 router = APIRouter(
     prefix="/organisations/{organisation_id}",
     tags=["plugins"],
     dependencies=[Depends(check_organisation_exists)],
 )
+
+logger = structlog.get_logger(__name__)
 
 
 # check if query matches plugin id, name or description
@@ -96,14 +99,17 @@ def get_plugin(
 
 @router.post("/plugins", status_code=status.HTTP_201_CREATED)
 def add_plugin(plugin: PluginType, plugin_service: PluginService = Depends(get_plugin_service)):
-    with plugin_service as service:
-        plugin.static = False  # Creation through the API implies that these cannot be static
+    try:
+        with plugin_service as service:
+            plugin.static = False  # Creation through the API implies that these cannot be static
 
-        if plugin.type == "boefje":
-            return service.create_boefje(plugin)
+            if plugin.type == "boefje":
+                return service.create_boefje(plugin)
 
-        if plugin.type == "normalizer":
-            return service.create_normalizer(plugin)
+            if plugin.type == "normalizer":
+                return service.create_normalizer(plugin)
+    except DuplicatePlugin as error:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, error.message)
 
     raise HTTPException(status.HTTP_400_BAD_REQUEST, "Creation of Bits is not supported")
 
@@ -164,8 +170,15 @@ def update_boefje(
     boefje: BoefjeIn,
     storage: PluginStorage = Depends(get_plugin_storage),
 ):
-    with storage as p:
-        p.update_boefje(boefje_id, boefje.model_dump(exclude_unset=True))
+    # todo: update boefje should be done in the plugin service
+    try:
+        with storage as p:
+            try:
+                p.update_boefje(boefje_id, boefje.model_dump(exclude_unset=True))
+            except NotAllowed:
+                raise HTTPException(status.HTTP_403_FORBIDDEN, "Updating a static plugin is not allowed")
+    except IntegrityError as error:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, error.message)
 
 
 @router.delete("/boefjes/{boefje_id}", status_code=status.HTTP_204_NO_CONTENT)

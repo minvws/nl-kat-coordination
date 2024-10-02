@@ -30,7 +30,7 @@ class SessionMixin:
 
     def __exit__(self, exc_type: type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
         if exc_type is not None:
-            logger.error("An error occurred: %s. Rolling back session", exc_value, exc_info=True)
+            logger.error("An error occurred: %s. Rolling back session", exc_value)
             self.session.rollback()
 
             return
@@ -45,5 +45,6 @@ class SessionMixin:
         except exc.DatabaseError as e:
             raise StorageError("A storage error occurred") from e
         finally:
-            logger.exception("Committing failed, rolling back")
-            self.session.rollback()
+            if exc_type is not None or self.session.is_active:
+                logger.debug("Committing failed, rolling back")
+                self.session.rollback()
