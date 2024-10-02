@@ -63,11 +63,12 @@ class BoefjeSetupForm(BaseRockyForm):
     )
     interval = forms.CharField(
         required=False,
-        label=_("Time-out interval"),
+        label=_("Scan frequency"),
         widget=forms.TextInput(
             attrs={
                 "description": _(
-                    "Specify the time-out interval for tasks using this Boefje in minutes. The default is 24 hours."
+                    "Specify the scanning frequency for this Boefje in minutes. The default is 24 hours. "
+                    "For example: 5 minutes will let the boefje scan every 5 minutes."
                 )
             }
         ),
