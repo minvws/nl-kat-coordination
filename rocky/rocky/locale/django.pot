@@ -1189,7 +1189,7 @@ msgid "Age"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html tools/forms/boefje.py
-msgid "Time-out interval"
+msgid "Scan frequency"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
@@ -1202,7 +1202,7 @@ msgid "minutes"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
-msgid "Default system interval"
+msgid "Default system scan frequency"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
@@ -4283,8 +4283,8 @@ msgstr ""
 
 #: tools/forms/boefje.py
 msgid ""
-"Specify the time-out interval for tasks using this Boefje in minutes. The "
-"default is 24 hours."
+"Specify the scanning frequency for this Boefje in minutes. The default is 24 hours."
+"For example: 5 minutes will let the boefje scan every 5 minutes."
 msgstr ""
 
 #: tools/forms/finding_type.py
