@@ -16,7 +16,7 @@ from tools.forms.settings import (
 OOI_TYPE_CHOICES = sorted((ooi_type.get_object_type(), ooi_type.get_object_type()) for ooi_type in ALL_TYPES)
 
 
-class BoefjeAddForm(BaseRockyForm):
+class BoefjeSetupForm(BaseRockyForm):
     oci_image = forms.CharField(
         required=True,
         label=_("Container image"),
@@ -63,11 +63,12 @@ class BoefjeAddForm(BaseRockyForm):
     )
     interval = forms.CharField(
         required=False,
-        label=_("Time-out interval"),
+        label=_("Scan frequency"),
         widget=forms.TextInput(
             attrs={
                 "description": _(
-                    "Specify the time-out interval for tasks using this Boefje in minutes. The default is 24 hours."
+                    "Specify the scanning frequency for this Boefje in minutes. The default is 24 hours. "
+                    "For example: 5 minutes will let the boefje scan every 5 minutes."
                 )
             }
         ),

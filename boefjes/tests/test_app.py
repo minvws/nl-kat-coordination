@@ -95,6 +95,7 @@ def test_two_processes_handler_exception(manager: SchedulerWorkerManager, item_h
 
     # We expect the first two patches to set the task status to running of both task and then process 1 to finish, as
     # the exception has been set up with a small delay.
+    assert len(patched_tasks) == 6
     assert sorted(patched_tasks[:3]) == sorted(
         [
             ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),  # Process 1
