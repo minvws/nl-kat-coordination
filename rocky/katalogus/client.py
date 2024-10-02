@@ -109,7 +109,7 @@ class KATalogusHTTPStatusError(KATalogusError):
     def __init__(self, error: httpx.HTTPStatusError):
         self.error = error
 
-        super.__init__(_("An HTTP %d error occurred. Check logs for more info.").format(error.response.status_code))
+        super().__init__(_("An HTTP %d error occurred. Check logs for more info.").format(error.response.status_code))
 
 
 class KATalogusClientV1:
