@@ -121,7 +121,6 @@ class MockHandler(Handler):
         time.sleep(self.sleep_time)
 
         if str(item.id) == "9071c9fd-2b9f-440f-a524-ef1ca4824fd4":
-            time.sleep(0.1)
             raise self.exception()
 
         self.queue.put(item)
