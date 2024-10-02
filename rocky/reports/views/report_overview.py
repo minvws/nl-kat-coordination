@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 
+from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.reports import Report, ReportRecipe
 from reports.views.base import ReportBreadcrumbs, get_selection
@@ -50,7 +51,10 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
     def get_recipe_ooi_tree(self, ooi_pk: str) -> ReportRecipe:
         try:
             return self.octopoes_api_connector.get_tree(
-                f"ReportRecipe|{ooi_pk}", valid_time=self.observed_at, depth=1, types={ReportRecipe, Report}
+                Reference.from_str(f"ReportRecipe|{ooi_pk}"),
+                valid_time=self.observed_at,
+                depth=1,
+                types={ReportRecipe, Report},
             )
         except ObjectNotFoundException:
             messages.error(self.request, f"Report recipe with id {ooi_pk} not found.")
