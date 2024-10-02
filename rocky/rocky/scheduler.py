@@ -403,13 +403,12 @@ class SchedulerClient:
             return res.content
         return res.json()
 
-    def get_scheduled_reports(self, **params) -> dict:
+    def get_scheduled_reports(self, **params) -> list[dict[str, Any]]:
         try:
             response = self._client.get("/schedules", params=params)
             response.raise_for_status()
         except HTTPStatusError:
             logger.error("A HTTPStatusError occurred. Check logs for more info.")
-
         return response.json()["results"]
 
 
