@@ -129,12 +129,18 @@ class ReportsLandingView(ReportBreadcrumbs, TemplateView):
 
 
 def hydrate_plugins(report_types: list[type["BaseReport"]], katalogus: KATalogusClientV1) -> dict[str, list[Plugin]]:
+    plugins: dict[str, list[Plugin]] = {"required": [], "optional": []}
     merged_plugins = report_plugins_union(report_types)
 
-    return {
-        "required": sorted(katalogus.get_plugins(ids=list(merged_plugins["required"])), key=attrgetter("name")),
-        "optional": sorted(katalogus.get_plugins(ids=list(merged_plugins["optional"])), key=attrgetter("name")),
-    }
+    required_plugins_ids = list(merged_plugins["required"])
+    optional_plugins_ids = list(merged_plugins["optional"])
+
+    if required_plugins_ids:
+        plugins["required"] = sorted(katalogus.get_plugins(ids=required_plugins_ids), key=attrgetter("name"))
+    if optional_plugins_ids:
+        plugins["optional"] = sorted(katalogus.get_plugins(ids=optional_plugins_ids), key=attrgetter("name"))
+
+    return plugins
 
 
 def format_plugin_data(report_type_plugins: dict[str, list[Plugin]]):
