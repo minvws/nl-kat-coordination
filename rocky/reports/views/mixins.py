@@ -247,7 +247,7 @@ class SaveAggregateReportMixin(BaseReportView):
         now = datetime.utcnow()
         bytes_client = self.bytes_client
 
-        # Create the report
+        # Save report data into bytes
         report_data_raw_id = save_report_raw(bytes_client, data=post_processed_data)
 
         report_type = type(aggregate_report)
@@ -270,6 +270,7 @@ class SaveAggregateReportMixin(BaseReportView):
             parent_report=None,
             has_parent=False,
         )
+        create_ooi(self.octopoes_api_connector, bytes_client, report_ooi, observed_at)
 
         # Save the child reports to bytes
         for ooi, types in report_data.items():
