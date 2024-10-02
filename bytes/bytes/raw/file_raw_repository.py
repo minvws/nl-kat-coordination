@@ -1,7 +1,9 @@
+import logging
 from pathlib import Path
 from uuid import UUID
 
 import structlog
+from boto3 import set_stream_logger as set_boto3_stream_logger
 from boto3.session import Session as BotoSession
 
 from bytes.config import Settings
@@ -86,6 +88,7 @@ class S3RawRepository(RawRepository):
         self.s3_bucket_prefix = s3_bucket_prefix
         self.s3_bucket_name = s3_bucket_name
 
+        set_boto3_stream_logger("boto3.resources", logging.WARNING)
         self._s3resource = BotoSession().resource("s3")
 
     def get_or_create_bucket(self, organization: str):
