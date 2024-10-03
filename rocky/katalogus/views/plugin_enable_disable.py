@@ -1,3 +1,4 @@
+import structlog
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
@@ -6,12 +7,15 @@ from django.utils.translation import gettext_lazy as _
 
 from katalogus.views.mixins import SinglePluginView
 
+logger = structlog.get_logger(__name__)
+
 
 class PluginEnableDisableView(SinglePluginView):
     def post(self, request, *args, **kwargs):
         plugin_state = kwargs["plugin_state"]
 
         if plugin_state == "True":
+            logger.info("Disabling plugin", event_code=800022, plugin=self.plugin.name)
             self.katalogus_client.disable_plugin(self.plugin)
             messages.add_message(
                 self.request,
@@ -21,6 +25,7 @@ class PluginEnableDisableView(SinglePluginView):
             return HttpResponseRedirect(request.POST.get("current_url"))
 
         if self.plugin.can_scan(self.organization_member):
+            logger.info("Enabling plugin", event_code=800021, plugin=self.plugin.name)
             self.katalogus_client.enable_plugin(self.plugin)
             messages.add_message(
                 self.request,
