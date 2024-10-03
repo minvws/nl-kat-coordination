@@ -46,7 +46,7 @@
                                     <th scope="col">{% translate "Scan level" %}</th>
                                     <th scope="col">{% translate "Status" %}</th>
                                     <th scope="col">{% translate "Age" %}</th>
-                                    <th scope="col">{% translate "Time-out interval" %}</th>
+                                    <th scope="col">{% translate "Scan frequency" %}</th>
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
@@ -81,7 +81,7 @@
                                                 {% if variant.interval %}
                                                     {{ variant.interval }} {% translate "minutes" %}
                                                 {% else %}
-                                                    {% translate "Default system interval" %}
+                                                    {% translate "Default system scan frequency" %}
                                                 {% endif %}
                                             </span>
                                         </td>

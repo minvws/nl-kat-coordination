@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-30 13:09+0000\n"
+"POT-Creation-Date: 2024-10-01 14:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -600,7 +600,20 @@ msgid ""
 msgstr ""
 
 #: katalogus/client.py
-msgid "A HTTP error occurred. Check logs for more info."
+msgid "Boefje with this name already exists."
+msgstr ""
+
+#: katalogus/client.py
+msgid "Boefje with this ID already exists."
+msgstr ""
+
+#: katalogus/client.py
+msgid "Editing this boefje is not allowed because it is static."
+msgstr ""
+
+#: katalogus/client.py
+#, python-format
+msgid "An HTTP %d error occurred. Check logs for more info."
 msgstr ""
 
 #: katalogus/forms/katalogus_filter.py
@@ -1189,7 +1202,7 @@ msgid "Age"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html tools/forms/boefje.py
-msgid "Time-out interval"
+msgid "Scan frequency"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
@@ -1202,7 +1215,7 @@ msgid "minutes"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
-msgid "Default system interval"
+msgid "Default system scan frequency"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
@@ -4283,8 +4296,8 @@ msgstr ""
 
 #: tools/forms/boefje.py
 msgid ""
-"Specify the time-out interval for tasks using this Boefje in minutes. The "
-"default is 24 hours."
+"Specify the scanning frequency for this Boefje in minutes. The default is 24 hours."
+"For example: 5 minutes will let the boefje scan every 5 minutes."
 msgstr ""
 
 #: tools/forms/finding_type.py
