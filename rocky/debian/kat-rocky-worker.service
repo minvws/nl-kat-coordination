@@ -1,16 +1,15 @@
 [Unit]
-Description=kat-rocky daemon
-Requires=kat-rocky-worker.service
+Description=kat-rocky worker
 After=network.target
 
 [Service]
 User=kat
 Group=kat
-SyslogIdentifier=kat-rocky
+SyslogIdentifier=kat-rocky-worker
 WorkingDirectory=/opt/venvs/kat-rocky/
 EnvironmentFile=/usr/lib/kat/rocky.defaults
 EnvironmentFile=/etc/kat/rocky.conf
-ExecStart=/opt/venvs/kat-rocky/bin/granian --interface wsgi rocky.wsgi:application
+ExecStart=/opt/venvs/kat-rocky/bin/python manage.py worker
 Restart=on-failure
 RestartSec=3s
 KillSignal=SIGQUIT
