@@ -9,12 +9,15 @@ from functools import cached_property
 from typing import Any
 
 import httpx
+import structlog
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from httpx import ConnectError, HTTPError, HTTPStatusError, RequestError, codes
 from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny, TypeAdapter, ValidationError
 
 from rocky.health import ServiceHealth
+
+logger = structlog.get_logger(__name__)
 
 
 class Boefje(BaseModel):
@@ -128,6 +131,18 @@ class Task(BaseModel):
     data: SerializeAsAny[BoefjeTask | NormalizerTask | ReportTask]
     created_at: datetime.datetime | None = None
     modified_at: datetime.datetime | None = None
+
+    def organization_id(self) -> str:
+        if isinstance(self.data, BoefjeTask):
+            return self.data.organization
+
+        if isinstance(self.data, NormalizerTask):
+            return self.data.raw_data.boefje_meta.organization
+
+        if isinstance(self.data, ReportTask):
+            return self.data.organisation_id
+
+        raise ValueError("No organization found related to task")
 
 
 class ScheduleRequest(BaseModel):
@@ -309,26 +324,12 @@ class SchedulerClient:
             raise SchedulerConnectError(extra_message=_("Task list: "))
 
     def get_task_details(self, task_id: str) -> Task:
-        if self.organization_code is None:
-            raise SchedulerTaskNotFound("No organization defined in client.")
-        task_details = Task.model_validate_json(self._get(f"/tasks/{task_id}", "content"))
+        return Task.model_validate_json(self._get(f"/tasks/{task_id}", "content"))
 
-        if task_details.type == "normalizer":
-            organization = task_details.data.raw_data.boefje_meta.organization
-        else:
-            organization = task_details.data.organization
-
-        if organization != self.organization_code:
-            raise SchedulerTaskNotFound()
-
-        return task_details
-
-    def push_task(self, item: Task, queue_name: str | None = None) -> None:
+    def push_task(self, item: Task) -> None:
         try:
-            if queue_name is None:
-                queue_name = f"{item.data.type}-{self.organization_code}"
             res = self._client.post(
-                f"/queues/{queue_name}/push",
+                f"/queues/{item.scheduler_id}/push",
                 content=item.model_dump_json(exclude_none=True),
                 headers={"Content-Type": "application/json"},
             )
@@ -399,6 +400,14 @@ class SchedulerClient:
         if return_type == "content":
             return res.content
         return res.json()
+
+    def get_scheduled_reports(self, **params) -> list[dict[str, Any]]:
+        try:
+            response = self._client.get("/schedules", params=params)
+            response.raise_for_status()
+        except HTTPStatusError:
+            logger.error("A HTTPStatusError occurred. Check logs for more info.")
+        return response.json()["results"]
 
 
 def scheduler_client(organization_code: str | None) -> SchedulerClient:

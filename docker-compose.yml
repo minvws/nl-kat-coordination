@@ -154,6 +154,27 @@ services:
       - GITPOD_WORKSPACE_URL=${GITPOD_WORKSPACE_URL:-}
       - GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN=${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:-}
 
+  rocky_worker:
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    build:
+      context: .
+      dockerfile: rocky/Dockerfile
+      target: dev
+      args:
+        ENVIRONMENT: dev
+    command: python3 manage.py worker
+    volumes:
+      - ./rocky:/app/rocky
+      - ./octopoes/octopoes:/app/rocky/octopoes
+    env_file:
+      - .env-defaults
+      - .env
+    environment:
+      - GITPOD_WORKSPACE_URL=${GITPOD_WORKSPACE_URL:-}
+      - GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN=${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:-}
+
   bytes:
     restart: unless-stopped
     depends_on:
