@@ -28,6 +28,7 @@ from rocky.scheduler import (
     ScheduleRequest,
     SchedulerError,
     ScheduleResponse,
+    SchedulerTaskNotFound,
     Task,
     scheduler_client,
 )
@@ -111,10 +112,13 @@ class SchedulerView(OctopoesView):
         return self.report_child_name_form()
 
     def get_task_details(self, task_id: str) -> Task | None:
-        try:
-            return self.scheduler_client.get_task_details(task_id)
-        except SchedulerError as error:
-            return messages.error(self.request, error.message)
+        task = self.scheduler_client.get_task_details(task_id)
+
+        if task.organization_id() != self.organization.code:
+            messages.error(self.request, SchedulerTaskNotFound.message)
+            return None
+
+        return task
 
     def create_report_schedule(self, report_recipe: ReportRecipe) -> ScheduleResponse | None:
         try:
@@ -191,22 +195,23 @@ class SchedulerView(OctopoesView):
     # task info from the scheduler. Task data should be available from the context
     # from which the task is created.
     def reschedule_task(self, task_id: str) -> None:
-        try:
-            task = self.scheduler_client.get_task_details(task_id)
+        task = self.scheduler_client.get_task_details(task_id)
 
-            new_id = uuid.uuid4()
-            task.data.id = new_id
+        if task.organization_id() != self.organization.code:
+            messages.error(self.request, SchedulerTaskNotFound.message)
+            return
 
-            new_task = Task(
-                id=new_id,
-                scheduler_id=task.scheduler_id,
-                priority=1,
-                data=task.data,
-            )
+        new_id = uuid.uuid4()
+        task.data.id = new_id
 
-            self.schedule_task(new_task)
-        except SchedulerError as error:
-            messages.error(self.request, error.message)
+        new_task = Task(
+            id=new_id,
+            scheduler_id=task.scheduler_id,
+            priority=1,
+            data=task.data,
+        )
+
+        self.schedule_task(new_task)
 
     def run_normalizer(self, katalogus_normalizer: Normalizer, raw_data: RawData) -> None:
         try:
