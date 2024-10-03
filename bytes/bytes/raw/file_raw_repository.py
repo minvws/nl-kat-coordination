@@ -19,8 +19,8 @@ def create_raw_repository(settings: Settings) -> RawRepository:
         return S3RawRepository(
             make_middleware(),
             settings.bucket_per_org,
-            settings.s3_bucket_prefix,
-            settings.s3_bucket_name,
+            settings.s3_bucket_prefix or "OpenKAT-",
+            settings.s3_bucket_name or "OpenKAT",
         )
     else:
         return FileRawRepository(
@@ -80,8 +80,8 @@ class S3RawRepository(RawRepository):
         self,
         file_middleware: FileMiddleware,
         bucket_per_org: bool,
-        s3_bucket_prefix: str = "OpenKAT-",
-        s3_bucket_name: str = "OpenKAT",
+        s3_bucket_prefix: str,
+        s3_bucket_name: str,
     ) -> None:
         self._file_middleware = file_middleware
         self.bucket_per_org = bucket_per_org
