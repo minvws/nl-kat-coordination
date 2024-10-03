@@ -67,7 +67,7 @@ def test_add_organization_page(rf, superuser_member):
     assertContains(response, "Organization setup")
 
 
-def test_add_organization_submit_success(rf, superuser_member, mocker, mock_models_octopoes):
+def test_add_organization_submit_success(rf, superuser_member, mocker, mock_models_octopoes, log_output):
     mocker.patch("katalogus.client.KATalogusClientV1")
     request = setup_request(
         rf.post(
@@ -81,6 +81,15 @@ def test_add_organization_submit_success(rf, superuser_member, mocker, mock_mode
 
     messages = list(request._messages)
     assert "Organization added successfully" in messages[0].message
+
+    organization_created_log = log_output.entries[-3]
+    organization_member_created_log = log_output.entries[-2]
+    assert organization_created_log["event"] == "%s %s created"
+    assert organization_created_log["object"] == "neworg"
+    assert organization_created_log["object_type"] == "Organization"
+    assert organization_member_created_log["event"] == "%s %s created"
+    assert organization_member_created_log["object"] == "superuser@openkat.nl"
+    assert organization_member_created_log["object_type"] == "OrganizationMember"
 
 
 def test_add_organization_submit_katalogus_down(rf, superuser_member, mocker):

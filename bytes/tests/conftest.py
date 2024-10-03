@@ -60,7 +60,7 @@ def pastebin_hash_repository(settings: Settings) -> HashRepository:
 @pytest.fixture
 def mock_hash_repository(settings: Settings) -> HashRepository:
     if settings.rfc3161_cert_file and settings.rfc3161_provider:
-        return RFC3161HashRepository(settings.rfc3161_cert_file.read_bytes(), settings.rfc3161_provider)
+        return RFC3161HashRepository(settings.rfc3161_cert_file.read_bytes(), str(settings.rfc3161_provider))
 
     return InMemoryHashRepository(signing_provider_url="https://test")
 

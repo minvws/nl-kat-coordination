@@ -1,8 +1,8 @@
 import json
-import logging
 import zipfile
 from io import BytesIO
 
+import structlog
 from account.mixins import OrganizationView
 from django.contrib import messages
 from django.http import FileResponse, Http404
@@ -10,7 +10,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class BytesRawView(OrganizationView):

@@ -1,6 +1,5 @@
 from collections.abc import Iterable
 from datetime import datetime
-from logging import getLogger
 from typing import Any
 
 from django.utils.translation import gettext_lazy as _
@@ -15,16 +14,14 @@ CIPHER_FINDINGS = [
     "KAT-CRITICAL-BAD-CIPHER",
 ]
 
-logger = getLogger(__name__)
-
 
 class SafeConnectionsReport(Report):
     id = "safe-connections-report"
     name = _("Safe Connections Report")
     description: str = _("Shows whether the IPService contains safe ciphers.")
     plugins = {
-        "required": ["dns-records", "testssl-sh-ciphers", "nmap"],
-        "optional": [],
+        "required": {"dns-records", "testssl-sh-ciphers", "nmap"},
+        "optional": set(),
     }
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "safe_connections_report/report.html"

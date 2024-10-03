@@ -133,7 +133,7 @@ def test_admin_edits_client_different_orgs(rf, admin_member, client_member_b):
         )
 
 
-def test_admin_edits_redteamer(rf, admin_member, redteam_member):
+def test_admin_edits_redteamer(rf, admin_member, redteam_member, log_output):
     request = setup_request(
         rf.post(
             "organization_member_edit",
@@ -148,6 +148,11 @@ def test_admin_edits_redteamer(rf, admin_member, redteam_member):
     redteam_member.refresh_from_db()
     assert redteam_member.status == "active"
     assert redteam_member.trusted_clearance_level == 4
+
+    organization_member_updated_log = log_output.entries[-1]
+    assert organization_member_updated_log["event"] == "%s %s updated"
+    assert organization_member_updated_log["object"] == "redteamer@openkat.nl"
+    assert organization_member_updated_log["object_type"] == "OrganizationMember"
 
 
 def test_admin_edits_redteamer_to_block(rf, admin_member, redteam_member):
@@ -184,16 +189,19 @@ def test_check_add_redteamer_form(rf, admin_member):
 
     assert response.status_code == 200
     assertContains(response, "Redteam member")
+    print(response.content)
 
     # Check first and last radio input of trusted clearance level form input
     assertContains(
         response,
-        '<input type="radio" name="trusted_clearance_level" value="-1" id="id_trusted_clearance_level_0" checked="">',
+        '<input type="radio" name="trusted_clearance_level" value="-1" radio_paws="True" '
+        'id="id_trusted_clearance_level_0" required="True" checked="True" checked="True">',
         html=True,
     )
     assertContains(
         response,
-        '<input type="radio" name="trusted_clearance_level" value="4" id="id_trusted_clearance_level_5">',
+        '<input type="radio" name="trusted_clearance_level" value="4" radio_paws="True" '
+        'id="id_trusted_clearance_level_5" required="True">',
         html=True,
     )
 

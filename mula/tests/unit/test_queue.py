@@ -18,6 +18,7 @@ class PriorityQueueTestCase(unittest.TestCase):
 
         # Database
         self.dbconn = storage.DBConn(str(cfg.db_uri))
+        self.dbconn.connect()
         models.Base.metadata.drop_all(self.dbconn.engine)
         models.Base.metadata.create_all(self.dbconn.engine)
 
@@ -43,8 +44,8 @@ class PriorityQueueTestCase(unittest.TestCase):
     def test_push(self):
         """When adding an item to the priority queue, the item should be
         added"""
-        item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        self.pq.push(p_item=item)
+        item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(item)
 
         item_db = self.pq_store.get(self.pq.pq_id, item.id)
         self.assertIsNotNone(item_db)
@@ -57,37 +58,41 @@ class PriorityQueueTestCase(unittest.TestCase):
         """When adding an item to the priority queue, but the item is not
         found in the database, the item shouldn't be added.
         """
-        item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+        item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
 
         mock_push.return_value = None
 
-        with self.assertRaises(queues.errors.PrioritizedItemNotFoundError):
-            self.pq.push(p_item=item)
+        with self.assertRaises(queues.errors.ItemNotFoundError):
+            self.pq.push(item)
 
         self.assertEqual(0, self.pq.qsize())
+
         item_db = self.pq_store.get(self.pq.pq_id, item.id)
         self.assertIsNone(item_db)
 
-    def test_push_incorrect_p_item_type(self):
+    def test_push_incorrect_item_type(self):
         """When pushing an item that is not of the correct type, the item
         shouldn't be pushed.
         """
-        p_item = {"priority": 1, "data": functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex)}
+        item = {
+            "priority": 1,
+            "data": functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex),
+        }
 
-        with self.assertRaises(queues.errors.InvalidPrioritizedItemError):
-            self.pq.push(p_item=p_item)
+        with self.assertRaises(queues.errors.InvalidItemError):
+            self.pq.push(item)
 
         self.assertEqual(0, self.pq.qsize())
 
-    def test_push_invalid_p_item(self):
+    def test_push_invalid_item(self):
         """When pushing an item that can not be validated, the item shouldn't
         be pushed.
         """
-        p_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        p_item.data = {"invalid": "data"}
+        item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        item.data = {"invalid": "data"}
 
-        with self.assertRaises(queues.errors.InvalidPrioritizedItemError):
-            self.pq.push(p_item=p_item)
+        with self.assertRaises(queues.errors.InvalidItemError):
+            self.pq.push(item)
 
         self.assertEqual(0, self.pq.qsize())
 
@@ -99,14 +104,14 @@ class PriorityQueueTestCase(unittest.TestCase):
         self.pq.allow_replace = False
 
         # Add an item to the queue
-        initial_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        self.pq.push(p_item=initial_item)
+        initial_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(initial_item)
 
         self.assertEqual(1, self.pq.qsize())
 
         # Add the same item again
         with self.assertRaises(queues.errors.NotAllowedError):
-            self.pq.push(p_item=initial_item)
+            self.pq.push(initial_item)
 
         self.assertEqual(1, self.pq.qsize())
 
@@ -118,12 +123,12 @@ class PriorityQueueTestCase(unittest.TestCase):
         self.pq.allow_replace = True
 
         # Add an item to the queue
-        initial_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        self.pq.push(p_item=initial_item)
+        initial_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(initial_item)
         self.assertEqual(1, self.pq.qsize())
 
         # Add the same item again
-        self.pq.push(p_item=initial_item)
+        self.pq.push(initial_item)
         self.assertEqual(1, self.pq.qsize())
 
         # Check if the item on the queue is the replaced item
@@ -138,8 +143,8 @@ class PriorityQueueTestCase(unittest.TestCase):
         self.pq.allow_updates = False
 
         # Add an item to the queue
-        initial_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        self.pq.push(p_item=initial_item)
+        initial_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(initial_item)
         self.assertEqual(1, self.pq.qsize())
 
         # Update the item
@@ -148,7 +153,7 @@ class PriorityQueueTestCase(unittest.TestCase):
 
         # Add the same item again
         with self.assertRaises(queues.errors.NotAllowedError):
-            self.pq.push(p_item=updated_item)
+            self.pq.push(updated_item)
 
         self.assertEqual(1, self.pq.qsize())
 
@@ -163,8 +168,8 @@ class PriorityQueueTestCase(unittest.TestCase):
         self.pq.allow_updates = True
 
         # Add an item to the queue
-        initial_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        self.pq.push(p_item=initial_item)
+        initial_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(initial_item)
 
         self.assertEqual(1, self.pq.qsize())
 
@@ -173,7 +178,7 @@ class PriorityQueueTestCase(unittest.TestCase):
         updated_item.data["name"] = "updated-name"
 
         # Add the same item again
-        self.pq.push(p_item=updated_item)
+        self.pq.push(updated_item)
 
         self.assertEqual(1, self.pq.qsize())
 
@@ -188,8 +193,8 @@ class PriorityQueueTestCase(unittest.TestCase):
         self.pq.allow_priority_updates = False
 
         # Add an item to the queue
-        initial_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        self.pq.push(p_item=initial_item)
+        initial_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(initial_item)
 
         self.assertEqual(1, self.pq.qsize())
 
@@ -199,7 +204,7 @@ class PriorityQueueTestCase(unittest.TestCase):
 
         # Add the same item again
         with self.assertRaises(queues.errors.NotAllowedError):
-            self.pq.push(p_item=updated_item)
+            self.pq.push(updated_item)
 
         self.assertEqual(1, self.pq.qsize())
 
@@ -214,8 +219,8 @@ class PriorityQueueTestCase(unittest.TestCase):
         self.pq.allow_priority_updates = True
 
         # Add an item to the queue
-        initial_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        self.pq.push(p_item=initial_item)
+        initial_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(initial_item)
 
         self.assertEqual(1, self.pq.qsize())
 
@@ -224,7 +229,7 @@ class PriorityQueueTestCase(unittest.TestCase):
         updated_item.priority = 100
 
         # Add the same item again
-        self.pq.push(p_item=updated_item)
+        self.pq.push(updated_item)
 
         self.assertEqual(1, self.pq.qsize())
 
@@ -236,8 +241,8 @@ class PriorityQueueTestCase(unittest.TestCase):
         removed, and the item should be removed from the entry_finder.
         """
         # Add an item to the queue
-        item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        self.pq.push(p_item=item)
+        item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(item)
 
         self.assertEqual(1, self.pq.qsize())
 
@@ -254,13 +259,13 @@ class PriorityQueueTestCase(unittest.TestCase):
         self.pq.maxsize = 1
 
         # Add an item to the queue
-        first_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        self.pq.push(p_item=first_item)
+        first_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(first_item)
 
         # Add another item to the queue
-        second_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=2)
+        second_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=2)
         with self.assertRaises(_queue.Full):
-            self.pq.push(p_item=second_item)
+            self.pq.push(second_item)
 
         # The queue should now have 1 item
         self.assertEqual(1, self.pq.qsize())
@@ -279,12 +284,12 @@ class PriorityQueueTestCase(unittest.TestCase):
         self.pq.maxsize = 0
 
         # Add an item to the queue
-        first_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        self.pq.push(p_item=first_item)
+        first_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(first_item)
 
         # Add another item to the queue
-        second_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=2)
-        self.pq.push(p_item=second_item)
+        second_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=2)
+        self.pq.push(second_item)
 
         # The queue should now have 2 items
         self.assertEqual(2, self.pq.qsize())
@@ -309,12 +314,12 @@ class PriorityQueueTestCase(unittest.TestCase):
         self.pq.maxsize = 1
 
         # Add an item to the queue
-        first_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        self.pq.push(p_item=first_item)
+        first_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(first_item)
 
         # Add another item to the queue
-        second_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        self.pq.push(p_item=second_item)
+        second_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(second_item)
 
         # The queue should now have 2 items
         self.assertEqual(2, self.pq.qsize())
@@ -339,13 +344,13 @@ class PriorityQueueTestCase(unittest.TestCase):
         self.pq.maxsize = 1
 
         # Add an item to the queue
-        first_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        self.pq.push(p_item=first_item)
+        first_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(first_item)
 
         # Add another item to the queue
-        second_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=2)
+        second_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=2)
         with self.assertRaises(_queue.Full):
-            self.pq.push(p_item=second_item)
+            self.pq.push(second_item)
 
         # The queue should now have 1 item
         self.assertEqual(1, self.pq.qsize())
@@ -361,8 +366,8 @@ class PriorityQueueTestCase(unittest.TestCase):
         it from the queue.
         """
         # Add an item to the queue
-        first_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        self.pq.push(p_item=first_item)
+        first_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(first_item)
 
         # The queue should now have 1 item
         self.assertEqual(1, self.pq.qsize())
@@ -379,10 +384,10 @@ class PriorityQueueTestCase(unittest.TestCase):
         thread to pop an item.
         """
         # Arrange
-        first_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        second_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        self.pq.push(p_item=first_item)
-        self.pq.push(p_item=second_item)
+        first_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        second_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(first_item)
+        self.pq.push(second_item)
 
         event = threading.Event()
         queue = _queue.Queue()
@@ -429,10 +434,10 @@ class PriorityQueueTestCase(unittest.TestCase):
         NOTE: Here we test the procedure when a lock isn't set.
         """
         # Arrange
-        first_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        second_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        self.pq.push(p_item=first_item)
-        self.pq.push(p_item=second_item)
+        first_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        second_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(first_item)
+        self.pq.push(second_item)
 
         event = threading.Event()
         queue = _queue.Queue()
@@ -483,12 +488,12 @@ class PriorityQueueTestCase(unittest.TestCase):
         priority
         """
         # Add an item to the queue
-        first_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        self.pq.push(p_item=first_item)
+        first_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(first_item)
 
         # Add another item to the queue
-        second_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=2)
-        self.pq.push(p_item=second_item)
+        second_item = functions.create_item(scheduler_id=self.pq.pq_id, priority=2)
+        self.pq.push(second_item)
 
         # The queue should now have 2 items
         self.assertEqual(2, self.pq.qsize())
@@ -502,8 +507,8 @@ class PriorityQueueTestCase(unittest.TestCase):
         the item is on the queue, and False if it isn't.
         """
         # Add an item to the queue
-        item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
-        self.pq.push(p_item=item)
+        item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(item)
 
         # Check if the item is on the queue
         self.assertTrue(self.pq.is_item_on_queue(item))
@@ -513,7 +518,7 @@ class PriorityQueueTestCase(unittest.TestCase):
         the item is on the queue, and False if it isn't.
         """
         # Add an item to the queue
-        item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+        item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
 
         # Check if the item is on the queue
         self.assertFalse(self.pq.is_item_on_queue(item))

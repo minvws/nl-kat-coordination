@@ -1,5 +1,4 @@
-import logging
-
+import structlog
 from account.mixins import OrganizationView
 from django.http import JsonResponse
 from django.urls.base import reverse
@@ -12,16 +11,16 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from rocky.bytes_client import get_bytes_client
 from rocky.health import ServiceHealth
 from rocky.keiko import keiko_client
-from rocky.scheduler import client
+from rocky.scheduler import SchedulerError, scheduler_client
 from rocky.version import __version__
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class Health(OrganizationView, View):
     def get(self, request, *args, **kwargs) -> JsonResponse:
         octopoes_connector = self.octopoes_api_connector
-        rocky_health = get_rocky_health(octopoes_connector)
+        rocky_health = get_rocky_health(self.organization.code, octopoes_connector)
         return JsonResponse(rocky_health.model_dump())
 
 
@@ -52,10 +51,10 @@ def get_octopoes_health(octopoes_api_connector: OctopoesAPIConnector) -> Service
     return octopoes_health
 
 
-def get_scheduler_health() -> ServiceHealth:
+def get_scheduler_health(organization_code: str) -> ServiceHealth:
     try:
-        scheduler_health = client.health()
-    except HTTPError:
+        scheduler_health = scheduler_client(organization_code).health()
+    except SchedulerError:
         logger.exception("Error while retrieving Scheduler health state")
         scheduler_health = ServiceHealth(
             service="scheduler",
@@ -77,11 +76,11 @@ def get_keiko_health() -> ServiceHealth:
         )
 
 
-def get_rocky_health(octopoes_api_connector: OctopoesAPIConnector) -> ServiceHealth:
+def get_rocky_health(organization_code: str, octopoes_api_connector: OctopoesAPIConnector) -> ServiceHealth:
     services = [
         get_octopoes_health(octopoes_api_connector),
         get_katalogus_health(),
-        get_scheduler_health(),
+        get_scheduler_health(organization_code),
         get_bytes_health(),
         get_keiko_health(),
     ]
@@ -120,6 +119,8 @@ class HealthChecks(OrganizationView, TemplateView):
                 "text": _("Beautified"),
             },
         ]
-        rocky_health = get_rocky_health(self.octopoes_api_connector)
+
+        rocky_health = get_rocky_health(self.organization.code, self.octopoes_api_connector)
         context["health_checks"] = flatten_health(rocky_health)
+
         return context

@@ -21,7 +21,6 @@ from rocky.views.ooi_edit import OOIEditView
 from rocky.views.ooi_findings import OOIFindingListView
 from rocky.views.ooi_list import OOIListExportView, OOIListView
 from rocky.views.ooi_mute import MuteFindingsBulkView, MuteFindingView
-from rocky.views.ooi_report import FindingReportPDFView, OOIReportPDFView, OOIReportView
 from rocky.views.ooi_tree import OOIGraphView, OOISummaryView, OOITreeView
 from rocky.views.organization_add import OrganizationAddView
 from rocky.views.organization_crisis_room import OrganizationCrisisRoomView
@@ -39,8 +38,13 @@ from rocky.views.organization_settings import OrganizationSettingsView
 from rocky.views.privacy_statement import PrivacyStatementView
 from rocky.views.scan_profile import ScanProfileDetailView, ScanProfileResetView
 from rocky.views.scans import ScanListView
-from rocky.views.task_detail import BoefjeTaskDetailView, NormalizerTaskJSONView
-from rocky.views.tasks import BoefjesTaskListView, DownloadTaskDetail, NormalizersTaskListView
+from rocky.views.task_detail import BoefjeTaskDetailView, DownloadTaskDetail, NormalizerTaskJSONView
+from rocky.views.tasks import (
+    AllBoefjesTaskListView,
+    AllNormalizersTaskListView,
+    BoefjesTaskListView,
+    NormalizersTaskListView,
+)
 from rocky.views.upload_csv import UploadCSV
 from rocky.views.upload_raw import UploadRaw
 
@@ -72,6 +76,9 @@ urlpatterns += i18n_patterns(
         PrivacyStatementView.as_view(),
         name="privacy_statement",
     ),
+    path("tasks/", AllBoefjesTaskListView.as_view(), name="all_task_list"),
+    path("tasks/boefjes", AllBoefjesTaskListView.as_view(), name="all_boefjes_task_list"),
+    path("tasks/normalizers", AllNormalizersTaskListView.as_view(), name="all_normalizers_task_list"),
     path(
         "<organization_code>/settings/indemnifications/",
         IndemnificationAddView.as_view(),
@@ -82,10 +89,7 @@ urlpatterns += i18n_patterns(
     path("<organization_code>/findings/mute/", MuteFindingView.as_view(), name="finding_mute"),
     path("<organization_code>/findings/mute/bulk/", MuteFindingsBulkView.as_view(), name="finding_mute_bulk"),
     path("<organization_code>/findings/finding_type/add/", FindingTypeAddView.as_view(), name="finding_type_add"),
-    path("<organization_code>/findings/report/pdf", FindingReportPDFView.as_view(), name="findings_pdf_report"),
     path("<organization_code>/objects/graph/", OOIGraphView.as_view(), name="ooi_graph"),
-    path("<organization_code>/objects/report/", OOIReportView.as_view(), name="ooi_report"),
-    path("<organization_code>/objects/report/pdf/", OOIReportPDFView.as_view(), name="ooi_pdf_report"),
     path("<organization_code>/objects/summary/", OOISummaryView.as_view(), name="ooi_summary"),
     path("<organization_code>/objects/tree/", OOITreeView.as_view(), name="ooi_tree"),
     path("<organization_code>/objects/findings/", OOIFindingListView.as_view(), name="ooi_findings"),

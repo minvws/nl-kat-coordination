@@ -1,11 +1,11 @@
 import dataclasses
-import logging
 
+import structlog
 from django.core.serializers.json import DjangoJSONEncoder
 
 from octopoes.models import OOI
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def debug_json_keys(data: dict, path: list) -> None:

@@ -3,6 +3,26 @@ import datetime
 import httpx
 from pydantic import JsonValue
 
+PutTransaction = (
+    tuple[str, dict]
+    | tuple[str, dict, str | datetime.datetime]
+    | tuple[str, dict, str | datetime.datetime, str | datetime.datetime]
+)
+
+DeleteTransaction = (
+    tuple[str] | tuple[str, str | datetime.datetime] | tuple[str, str | datetime.datetime, str | datetime.datetime]
+)
+
+EvictTransaction = DeleteTransaction
+
+SimpleTransactions = list[PutTransaction | DeleteTransaction | EvictTransaction]
+
+MatchTransaction = (
+    tuple[str, str, dict, SimpleTransactions] | tuple[str, str, dict, str | datetime.datetime, SimpleTransactions]
+)
+
+TransactionType = PutTransaction | DeleteTransaction | EvictTransaction | MatchTransaction
+
 
 class XTDBClient:
     def __init__(self, base_url: str, node: str, timeout: int | None = None):
@@ -17,8 +37,22 @@ class XTDBClient:
 
         return res.json()
 
-    def query(self, query: str = "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}") -> JsonValue:
-        res = self._client.post("/query", content=query, headers={"Content-Type": "application/edn"})
+    def query(
+        self,
+        query: str = "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}",
+        valid_time: datetime.datetime | None = None,
+        tx_time: datetime.datetime | None = None,
+        tx_id: int | None = None,
+    ) -> JsonValue:
+        params = {}
+        if valid_time is not None:
+            params["valid-time"] = valid_time.isoformat()
+        if tx_time is not None:
+            params["tx-time"] = tx_time.isoformat()
+        if tx_id is not None:
+            params["tx-id"] = str(tx_id)
+
+        res = self._client.post("/query", params=params, content=query, headers={"Content-Type": "application/edn"})
 
         return res.json()
 
@@ -118,8 +152,9 @@ class XTDBClient:
 
         return res.json()
 
-    def submit_tx(self, transactions: list[str]) -> JsonValue:
-        res = self._client.post("/submit-tx", json={"tx-ops": transactions})
+    def submit_tx(self, transactions: list[TransactionType]) -> JsonValue:
+        data = {"tx-ops": transactions}
+        res = self._client.post("/submit-tx", json=data)
 
         return res.json()
 

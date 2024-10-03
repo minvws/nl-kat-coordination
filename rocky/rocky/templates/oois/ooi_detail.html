@@ -31,7 +31,7 @@
                 {% include "oois/ooi_detail_origins_observations.html" %}
                 {% include "oois/ooi_detail_origins_inference.html" %}
                 {% include "partials/ooi_detail_related_object.html" with query=mandatory_fields ooi_past_due=ooi_past_due related=related ooi=ooi %}
-                {% include "partials/task_history.html" %}
+                {% include "tasks/ooi_detail_task_list.html" %}
 
             </div>
             <div>
@@ -45,7 +45,7 @@
                 {% if enabled_boefjes_available %}
                     <div class="horizontal-view">
                         <div>
-                            {% if member.acknowledged_clearance_level > 0 and organization_indemnification %}
+                            {% if member.max_clearance_level > 0 and organization_indemnification %}
                                 <form id="show_all_boefjes"
                                       method="get"
                                       action="#show_all_boefjes"

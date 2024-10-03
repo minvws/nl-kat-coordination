@@ -20,6 +20,10 @@
                             <label for="ooi_type">Type</label>
                             <input id="ooi_type" type="text" name="ooi_type" value="{{ type }}" readonly>
                         </div>
+                        <div>
+                            <label for="user">Owner</label>
+                            <input id="user" type="text" name="user" value="{{ user }}" readonly>
+                        </div>
                         {% for field in form %}
                             {% include "partials/form/field_input_wrapper.html" %}
 

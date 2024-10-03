@@ -69,6 +69,13 @@
         "console"
       ],
       "propagate": 0
+    },
+    "httpcore": {
+      "level": "CRITICAL",
+      "handlers": [
+        "console"
+      ],
+      "propagate": 0
     }
   }
 }

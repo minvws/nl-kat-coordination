@@ -1,18 +1,19 @@
-import logging
 from collections.abc import Iterable
+from datetime import datetime, timezone
 from typing import Any
 
+import structlog
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 from tools.forms.base import ObservedAtForm
-from tools.forms.findings import FindingSeverityMultiSelectForm, MutedFindingSelectionForm
+from tools.forms.findings import FindingSearchForm, FindingSeverityMultiSelectForm, MutedFindingSelectionForm
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models.ooi.findings import RiskLevelSeverity
 from rocky.views.mixins import ConnectorFormMixin, FindingList, OctopoesView, SeveritiesMixin
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def sort_by_severity_desc(findings) -> list[dict[str, Any]]:
@@ -60,6 +61,14 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         self.exclude_muted = self.muted_findings == "non-muted"
         self.only_muted = self.muted_findings == "muted"
 
+        self.search_string = request.GET.get("search", "")
+
+    def count_observed_at_filter(self) -> int:
+        return 1 if datetime.now(timezone.utc).date() != self.observed_at.date() else 0
+
+    def count_active_filters(self):
+        return len(self.severities) + 1 if self.muted_findings else 0 + self.count_observed_at_filter()
+
     def get_queryset(self) -> FindingList:
         return FindingList(
             octopoes_connector=self.octopoes_api_connector,
@@ -67,21 +76,24 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
             severities=self.severities,
             exclude_muted=self.exclude_muted,
             only_muted=self.only_muted,
+            search_string=self.search_string,
         )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["observed_at_form"] = self.get_connector_form()
-        context["valid_time"] = self.observed_at
+        context["observed_at"] = self.observed_at
         context["severity_filter"] = FindingSeverityMultiSelectForm({"severity": list(self.severities)})
         context["muted_findings_filter"] = MutedFindingSelectionForm({"muted_findings": self.muted_findings})
+        context["finding_search_form"] = FindingSearchForm(self.request.GET)
         context["only_muted"] = self.only_muted
+        context["active_filters_counter"] = self.count_active_filters()
         return context
 
 
 class FindingListView(BreadcrumbsMixin, FindingListFilter):
     template_name = "findings/finding_list.html"
-    paginate_by = 20
+    paginate_by = 150
 
     def build_breadcrumbs(self):
         return [

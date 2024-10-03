@@ -43,7 +43,7 @@ class AppContext:
             logging.config.dictConfig(json.load(f))
 
         # Check if we enabled structured logging in the configuration
-        if self.config.json_logging:
+        if self.config.logging_format == "json":
             structlog.configure(
                 processors=[
                     # If log level is too low, abort pipeline and throw away log entry.
@@ -55,7 +55,7 @@ class AppContext:
                     # Perform %-style formatting.
                     structlog.stdlib.PositionalArgumentsFormatter(),
                     # Add a timestamp in ISO 8601 format.
-                    structlog.processors.TimeStamper(fmt="iso"),
+                    structlog.processors.TimeStamper(fmt="iso", utc=False),
                     # If the "stack_info" key in the event dict is true, remove it
                     # and render the current stack trace in the "stack" key.
                     structlog.processors.StackInfoRenderer(),
@@ -98,7 +98,7 @@ class AppContext:
                     structlog.processors.StackInfoRenderer(),
                     structlog.dev.set_exc_info,
                     structlog.stdlib.PositionalArgumentsFormatter(),
-                    structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S", utc=False),
+                    structlog.processors.TimeStamper("iso", utc=False),
                     structlog.dev.ConsoleRenderer(),
                 ],
                 context_class=dict,
@@ -112,6 +112,8 @@ class AppContext:
                 # logger.
                 cache_logger_on_first_use=True,
             )
+
+        self.logger: structlog.BoundLogger = structlog.get_logger(__name__)
 
         # Services
         katalogus_service = services.Katalogus(
@@ -149,10 +151,24 @@ class AppContext:
             }
         )
 
+        # Database connection
+        try:
+            dbconn = storage.DBConn(
+                dsn=str(self.config.db_uri),
+                pool_size=self.config.db_connection_pool_size,
+            )
+            dbconn.connect()
+        except storage.errors.StorageError:
+            self.logger.exception("Failed to connect to database")
+            raise
+        except Exception:
+            self.logger.exception("Failed to connect to database")
+            raise
+
         # Datastores, SimpleNamespace allows us to use dot notation
-        dbconn = storage.DBConn(str(self.config.db_uri))
         self.datastores: SimpleNamespace = SimpleNamespace(
             **{
+                storage.ScheduleStore.name: storage.ScheduleStore(dbconn),
                 storage.TaskStore.name: storage.TaskStore(dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(dbconn),
             }

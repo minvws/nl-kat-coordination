@@ -141,8 +141,5 @@
     "video/x-msvideo",
     "video/x-sgi-movie"
   ],
-  "environment_keys": [
-    "USERAGENT"
-  ],
   "scan_level": 2
 }

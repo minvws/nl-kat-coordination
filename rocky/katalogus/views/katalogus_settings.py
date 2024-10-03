@@ -9,9 +9,12 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, TemplateView
 from httpx import HTTPError
+from structlog import get_logger
 from tools.models import Organization
 
 from katalogus.client import get_katalogus
+
+logger = get_logger(__name__)
 
 
 class ConfirmCloneSettingsView(
@@ -35,6 +38,7 @@ class ConfirmCloneSettingsView(
 
     def post(self, request, *args, **kwargs):
         to_organization = Organization.objects.get(code=kwargs["to_organization"])
+        logger.info("Cloning organization settings", event_code=910000, to_organization_code=to_organization.code)
         get_katalogus(self.organization.code).clone_all_configuration_to_organization(to_organization.code)
         messages.add_message(
             self.request,

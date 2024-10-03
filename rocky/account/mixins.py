@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+import structlog.contextvars
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -70,6 +71,9 @@ class OrganizationView(View):
         super().setup(request, *args, **kwargs)
 
         organization_code = kwargs["organization_code"]
+        # bind organization_code to log context
+        structlog.contextvars.bind_contextvars(organization_code=organization_code)
+
         try:
             self.organization = Organization.objects.get(code=organization_code)
         except Organization.DoesNotExist:
@@ -82,15 +86,20 @@ class OrganizationView(View):
                 user=self.request.user, organization=self.organization
             )
         except OrganizationMember.DoesNotExist:
-            if not self.request.user.is_superuser:
+            if self.request.user.is_superuser:
+                clearance_level = 4
+            elif self.request.user.has_perm("tools.can_access_all_organizations"):
+                clearance_level = -1
+            else:
                 raise Http404()
 
+            # Only the Python object is created, it is not saved to the database.
             self.organization_member = OrganizationMember(
                 user=self.request.user,
                 organization=self.organization,
                 status=OrganizationMember.STATUSES.ACTIVE,
-                trusted_clearance_level=4,
-                acknowledged_clearance_level=0,
+                trusted_clearance_level=clearance_level,
+                acknowledged_clearance_level=clearance_level,
             )
 
         if self.organization_member.blocked:
@@ -108,29 +117,35 @@ class OrganizationView(View):
         context["perms"] = OrganizationPermWrapper(self.organization_member)
         return context
 
+    def indemnification_error(self):
+        return messages.error(
+            self.request,
+            f"Indemnification not present at organization {self.organization}.",
+        )
+
     @property
     def may_update_clearance_level(self) -> bool:
         if not self.indemnification_present:
             return False
-        if self.organization_member.acknowledged_clearance_level < 0:
-            return False
-        if self.organization_member.trusted_clearance_level < 0:
-            return False
-        return True
+
+        return self.organization_member.has_clearance_level(0)
 
     def verify_raise_clearance_level(self, level: int) -> bool:
         if not self.indemnification_present:
             raise IndemnificationNotPresentException()
-        if self.organization_member.trusted_clearance_level < level:
-            raise TrustedClearanceLevelTooLowException()
-        if self.organization_member.acknowledged_clearance_level < level:
-            raise AcknowledgedClearanceLevelTooLowException()
-        return True
+
+        if self.organization_member.has_clearance_level(level):
+            return True
+        else:
+            if self.organization_member.trusted_clearance_level < level:
+                raise TrustedClearanceLevelTooLowException()
+            else:
+                raise AcknowledgedClearanceLevelTooLowException()
 
     def raise_clearance_level(self, ooi_reference: Reference, level: int) -> bool:
         self.verify_raise_clearance_level(level)
         self.octopoes_api_connector.save_scan_profile(
-            DeclaredScanProfile(reference=ooi_reference, level=ScanLevel(level)),
+            DeclaredScanProfile(reference=ooi_reference, level=ScanLevel(level), user_id=self.request.user.id),
             datetime.now(timezone.utc),
         )
 
@@ -139,7 +154,10 @@ class OrganizationView(View):
     def raise_clearance_levels(self, ooi_references: list[Reference], level: int) -> bool:
         self.verify_raise_clearance_level(level)
         self.octopoes_api_connector.save_many_scan_profiles(
-            [DeclaredScanProfile(reference=reference, level=ScanLevel(level)) for reference in ooi_references],
+            [
+                DeclaredScanProfile(reference=reference, level=ScanLevel(level), user_id=self.request.user.id)
+                for reference in ooi_references
+            ],
             datetime.now(timezone.utc),
         )
 
@@ -172,7 +190,7 @@ class OrganizationView(View):
                 % (
                     ooi.reference.human_readable,
                     level,
-                    self.organization_member.acknowledged_clearance_level,
+                    self.organization_member.max_clearance_level,
                 ),
             )
         except AcknowledgedClearanceLevelTooLowException:

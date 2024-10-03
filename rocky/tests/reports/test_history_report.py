@@ -84,7 +84,7 @@ def test_report_history_less_than_five_subreports_two_input_objects(
 
     # Check table rows
     parent_report = report_list_two_subreports[0][0]
-    assertContains(response, parent_report)
+    assertContains(response, parent_report.name)
     assertContains(response, "<td>2</td>", html=True)
     assertContains(response, "Close children report object details")
 
@@ -143,7 +143,7 @@ def test_report_history_more_than_five_subreports_one_input_object(
 
     # Check table rows
     parent_report = report_list_six_subreports[0][0]
-    assertContains(response, parent_report)
+    assertContains(response, parent_report.name)
     assertContains(
         response,
         '<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7Cexample.com">example.com</a>',

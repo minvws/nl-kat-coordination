@@ -1,7 +1,7 @@
 import logging
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath, IPvAnyAddress, PostgresDsn, conint
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
@@ -140,6 +140,8 @@ class Settings(BaseSettings):
         ],
         validation_alias="NETWORK_SCOPES",
     )
+
+    logging_format: Literal["text", "json"] = Field("text", description="Logging format")
 
     model_config = SettingsConfigDict(env_prefix="BOEFJES_")
 

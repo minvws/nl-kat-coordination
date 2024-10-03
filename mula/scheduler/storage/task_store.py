@@ -6,7 +6,8 @@ from scheduler import models
 
 from .errors import StorageError, exception_handler
 from .filters import FilterRequest, apply_filter
-from .storage import DBConn, retry
+from .storage import DBConn
+from .utils import retry
 
 
 class TaskStore:
@@ -61,7 +62,7 @@ class TaskStore:
 
     @retry()
     @exception_handler
-    def get_task_by_id(self, task_id: str) -> models.Task | None:
+    def get_task(self, task_id: str) -> models.Task | None:
         with self.dbconn.session.begin() as session:
             task_orm = session.query(models.TaskDB).filter(models.TaskDB.id == task_id).first()
             if task_orm is None:
@@ -77,7 +78,7 @@ class TaskStore:
         with self.dbconn.session.begin() as session:
             tasks_orm = (
                 session.query(models.TaskDB)
-                .filter(models.TaskDB.p_item["hash"].as_string() == task_hash)
+                .filter(models.TaskDB.hash == task_hash)
                 .order_by(models.TaskDB.created_at.desc())
                 .all()
             )
@@ -95,7 +96,7 @@ class TaskStore:
         with self.dbconn.session.begin() as session:
             task_orm = (
                 session.query(models.TaskDB)
-                .filter(models.TaskDB.p_item["hash"].as_string() == task_hash)
+                .filter(models.TaskDB.hash == task_hash)
                 .order_by(models.TaskDB.created_at.desc())
                 .first()
             )

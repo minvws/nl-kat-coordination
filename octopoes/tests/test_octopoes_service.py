@@ -133,5 +133,5 @@ def test_on_create_scan_profile(octopoes_service, new_data, old_data, bit_runner
     octopoes_service.process_event(event)
 
     assert octopoes_service.ooi_repository.save.call_count == 2
-    octopoes_service.ooi_repository.save.assert_any_call(mock_oois[0], valid_time=valid_time)
-    octopoes_service.ooi_repository.save.assert_any_call(mock_oois[1], valid_time=valid_time)
+    octopoes_service.ooi_repository.save.assert_any_call(mock_oois[0], valid_time=valid_time, end_valid_time=None)
+    octopoes_service.ooi_repository.save.assert_any_call(mock_oois[1], valid_time=valid_time, end_valid_time=None)

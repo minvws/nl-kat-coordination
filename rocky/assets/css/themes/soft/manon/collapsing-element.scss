@@ -55,7 +55,7 @@ body header nav.collapsible {
               li:first-child {
                 border-width: 1px 0;
                 border-style: solid;
-                border-color: #d3d3d3;
+                border-color: var(--colors-grey-200);
               }
             }
           }

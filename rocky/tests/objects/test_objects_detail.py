@@ -1,7 +1,6 @@
 from urllib.parse import urlencode
 
 import pytest
-from django.http import HttpResponseRedirect
 from katalogus.client import Boefje
 from pytest_django.asserts import assertContains, assertNotContains
 from tools.enums import SCAN_LEVEL
@@ -56,29 +55,31 @@ QUESTION_DATA = {
 def test_ooi_detail(
     rf,
     client_member,
-    mock_scheduler,
     mock_organization_view_octopoes,
-    lazy_task_list_with_boefje,
+    mock_scheduler,
+    paginated_task_list,
     mocker,
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
 
-    request = setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), client_member.user)
-
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
-    mock_scheduler.get_lazy_task_list.return_value = lazy_task_list_with_boefje
+
+    mock_scheduler.list_tasks.return_value = paginated_task_list
+
+    request = setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), client_member.user)
 
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
     assertContains(response, "Object")
-    assertContains(response, "Hostname|internet|mispo.es")
+    assertContains(response, "Network|testnetwork")
 
     assertContains(response, "Plugin")
-    assertContains(response, "test-boefje")
+    assertContains(response, "TestBoefje")
     assertContains(
-        response, f'href="/en/{client_member.organization.code}/kat-alogus/plugins/boefje/test-boefje/">TestBoefje</a>'
+        response,
+        f'href="/en/{client_member.organization.code}/kat-alogus/plugins/boefje/test-boefje/">TestBoefje</a>',
     )
     assertContains(response, "Status")
     assertContains(response, "Completed")
@@ -91,22 +92,24 @@ def test_ooi_detail(
 def test_question_detail(
     rf,
     client_member,
-    mock_scheduler,
     mock_organization_view_octopoes,
-    lazy_task_list_with_boefje,
+    mock_scheduler,
+    paginated_task_list,
     mocker,
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
 
-    request = setup_request(rf.get("ooi_detail", {"ooi_id": "Question|/test|Network|testnetwork"}), client_member.user)
+    request = setup_request(
+        rf.get("ooi_detail", {"ooi_id": "Question|/test|Network|testnetwork"}),
+        client_member.user,
+    )
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(QUESTION_DATA)
-    mock_scheduler.get_lazy_task_list.return_value = lazy_task_list_with_boefje
 
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
 
     assertContains(response, "Question")
     assertContains(response, "Rendered Question Form")
@@ -124,7 +127,6 @@ def test_answer_question(
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(QUESTION_DATA)
-    mock_scheduler.get_lazy_task_list.return_value = lazy_task_list_with_boefje
 
     query_string = urlencode({"ooi_id": "Question|/test|Network|testnetwork"}, doseq=True)
     request = setup_request(
@@ -139,8 +141,8 @@ def test_answer_question(
     )
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
-    assertContains(response, "Question has been answered.", status_code=201)
-    assert mock_organization_view_octopoes().get_tree.call_count == 3
+    assertContains(response, "Question has been answered.", status_code=200)
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
 
 
 def test_answer_question_bad_schema(
@@ -154,7 +156,6 @@ def test_answer_question_bad_schema(
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(QUESTION_DATA)
-    mock_scheduler.get_lazy_task_list.return_value = lazy_task_list_with_boefje
 
     query_string = urlencode({"ooi_id": "Question|/test|Network|testnetwork"}, doseq=True)
 
@@ -170,24 +171,26 @@ def test_answer_question_bad_schema(
     )
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 422
+    assert response.status_code == 200
 
     quote_enc = "&#x27;"
-    assertContains(response, f"314159 is not of type {quote_enc}string{quote_enc}", status_code=422)
+    assertContains(response, f"314159 is not of type {quote_enc}string{quote_enc}", status_code=200)
 
 
 def test_ooi_detail_start_scan(
     rf,
     client_member,
     mock_organization_view_octopoes,
+    mock_scheduler,
+    paginated_task_list,
     mocker,
     network,
 ):
     mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
-    mocker.patch("katalogus.views.mixins.schedule_task")
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
     mock_organization_view_octopoes().get.return_value = network
+
     mock_katalogus().get_plugin.return_value = Boefje(
         id="nmap",
         name="",
@@ -215,17 +218,16 @@ def test_ooi_detail_start_scan(
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
     assert mock_organization_view_octopoes().get_tree.call_count == 1
-    assert isinstance(response, HttpResponseRedirect)
-    assert response.status_code == 302
-    assert response.url == f"/en/{client_member.organization.code}/tasks/"
+
+    assert response.status_code == 200
 
 
 def test_ooi_detail_start_scan_no_indemnification(
     rf,
     client_member,
-    mock_scheduler,
     mock_organization_view_octopoes,
-    lazy_task_list_with_boefje,
+    mock_scheduler,
+    paginated_task_list,
     mocker,
     network,
 ):
@@ -233,6 +235,17 @@ def test_ooi_detail_start_scan_no_indemnification(
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
     mock_organization_view_octopoes().get.return_value = network
+    mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
+    mock_katalogus().get_plugin.return_value = Boefje(
+        id="nmap",
+        name="",
+        description="",
+        enabled=True,
+        type="boefje",
+        scan_level=SCAN_LEVEL.L2,
+        consumes=[],
+        produces=[],
+    )
 
     Indemnification.objects.get(user=client_member.user).delete()
 
@@ -242,7 +255,7 @@ def test_ooi_detail_start_scan_no_indemnification(
         rf.post(
             f"/en/{client_member.organization.code}/objects/details/?{query_string}",
             data={
-                "boefje_id": "nmap",
+                "boefje_id": "test-boefje",
                 "action": "start_scan",
             },
         ),
@@ -250,9 +263,9 @@ def test_ooi_detail_start_scan_no_indemnification(
     )
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
-    assertContains(response, "Object details", status_code=403)
-    assertContains(response, "Indemnification not present", status_code=403)
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
+    assertContains(response, "Object details")
+    assertContains(response, "Indemnification not present")
 
 
 def test_ooi_detail_start_scan_no_action(
@@ -282,8 +295,8 @@ def test_ooi_detail_start_scan_no_action(
     )
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
-    assertContains(response, "Object details", status_code=404)
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
+    assertContains(response, "Object details")
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member"])

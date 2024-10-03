@@ -1,14 +1,14 @@
 import datetime
-import logging
 from dataclasses import dataclass
 from itertools import product
 
 import httpx
+import structlog
 from bs4 import BeautifulSoup
 
 SEPARATOR = "|"
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 @dataclass

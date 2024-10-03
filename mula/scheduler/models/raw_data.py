@@ -9,5 +9,5 @@ class RawData(BaseModel):
     id: uuid.UUID
     boefje_meta: BoefjeMeta
     mime_types: list[dict[str, str]]
-    secure_hash: str | None
-    hash_retrieval_link: str | None
+    secure_hash: str | None = None
+    hash_retrieval_link: str | None = None

@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath
 from pydantic_settings import BaseSettings, EnvSettingsSource, PydanticBaseSettingsSource, SettingsConfigDict
@@ -34,7 +34,11 @@ class BackwardsCompatibleEnvSettings(EnvSettingsSource):
             # New variable not explicitly set through env,
             # ...but old variable has been explicitly set through env
             if new_name not in env_vars and old_name in env_vars:
-                logging.warning("Deprecation: %s is deprecated, use %s instead", old_name.upper(), new_name.upper())
+                logging.warning(
+                    "Deprecation: %s is deprecated, use %s instead",
+                    old_name.upper(),
+                    new_name.upper(),
+                )
                 d[new_name[len(env_prefix) :]] = env_vars[old_name]
 
         return d
@@ -47,26 +51,44 @@ class Settings(BaseSettings):
     log_cfg: FilePath = Field(BASE_DIR / "logging.yml", description="Path to the logging configuration file")
 
     # External services settings
-    queue_uri: AmqpDsn = Field(..., examples=["amqp://"], description="KAT queue URI", validation_alias="QUEUE_URI")
+    queue_uri: AmqpDsn = Field(
+        ...,
+        examples=["amqp://"],
+        description="KAT queue URI",
+        validation_alias="QUEUE_URI",
+    )
     xtdb_uri: AnyHttpUrl = Field(
-        ..., examples=["http://xtdb:3000"], description="XTDB API", validation_alias="XTDB_URI"
+        ...,
+        examples=["http://xtdb:3000"],
+        description="XTDB API",
+        validation_alias="XTDB_URI",
     )
 
     katalogus_api: AnyHttpUrl = Field(
-        ..., examples=["http://localhost:8003"], description="Katalogus API URL", validation_alias="KATALOGUS_API"
+        ...,
+        examples=["http://localhost:8003"],
+        description="Katalogus API URL",
+        validation_alias="KATALOGUS_API",
     )
 
     scan_level_recalculation_interval: int = Field(
-        60, description="Interval in seconds of the periodic task that recalculates scan levels"
+        60,
+        description="Interval in seconds of the periodic task that recalculates scan levels",
     )
     bits_enabled: set[str] = Field(set(), examples=['["port-common"]'], description="Explicitly enabled bits")
     bits_disabled: set[str] = Field(
-        set(), examples=['["port-classification-ip"]'], description="Explicitly disabled bits"
+        set(),
+        examples=['["port-classification-ip"]'],
+        description="Explicitly disabled bits",
     )
 
     span_export_grpc_endpoint: AnyHttpUrl | None = Field(
-        None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
+        None,
+        description="OpenTelemetry endpoint",
+        validation_alias="SPAN_EXPORT_GRPC_ENDPOINT",
     )
+
+    logging_format: Literal["text", "json"] = Field("text", description="Logging format")
 
     model_config = SettingsConfigDict(env_prefix="OCTOPOES_")
 
@@ -80,7 +102,12 @@ class Settings(BaseSettings):
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
         backwards_compatible_settings = BackwardsCompatibleEnvSettings(settings_cls)
-        return env_settings, init_settings, file_secret_settings, backwards_compatible_settings
+        return (
+            env_settings,
+            init_settings,
+            file_secret_settings,
+            backwards_compatible_settings,
+        )
 
 
 DEFAULT_SCAN_LEVEL_FILTER = {scan_level for scan_level in ScanLevel}

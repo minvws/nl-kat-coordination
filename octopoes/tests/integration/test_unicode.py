@@ -54,6 +54,7 @@ def test_unicode_hostname(octopoes_api_connector: OctopoesAPIConnector, valid_ti
         Observation(
             method=NAMES[2],
             source=network.reference,
+            source_method="test",
             task_id=task_id,
             valid_time=valid_time,
             result=[hostname],
@@ -80,6 +81,7 @@ def test_unicode_hostname(octopoes_api_connector: OctopoesAPIConnector, valid_ti
         "method": NAMES[2],
         "origin_type": OriginType.OBSERVATION,
         "source": network.reference,
+        "source_method": "test",
         "result": [hostname.reference],
         "task_id": task_id,
     }

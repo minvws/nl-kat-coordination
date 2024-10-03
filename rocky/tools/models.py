@@ -1,10 +1,8 @@
 import datetime
-import logging
 from collections.abc import Iterable
-from enum import Enum
 from functools import cached_property
-from typing import cast
 
+import structlog
 import tagulous.models
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission
@@ -23,14 +21,14 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.ooi.web import Network
 from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesUnhealthyException
 from tools.add_ooi_information import SEPARATOR, get_info
-from tools.enums import SCAN_LEVEL
+from tools.enums import MAX_SCAN_LEVEL
 from tools.fields import LowerCaseSlugField
 
 GROUP_ADMIN = "admin"
 GROUP_REDTEAM = "redteam"
 GROUP_CLIENT = "clients"
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 ORGANIZATION_CODE_LENGTH = 32
 DENY_ORGANIZATION_CODES = [
@@ -91,6 +89,8 @@ class Organization(models.Model):
     )
     tags = tagulous.models.TagField(to=OrganizationTag, blank=True)
 
+    EVENT_CODES = {"created": 900201, "updated": 900202, "deleted": 900203}
+
     def __str__(self):
         return str(self.name)
 
@@ -99,12 +99,14 @@ class Organization(models.Model):
             ("can_switch_organization", "Can switch organization"),
             ("can_scan_organization", "Can scan organization"),
             ("can_enable_disable_boefje", "Can enable or disable boefje"),
+            ("can_add_boefje", "Can add new or duplicate boefjes"),
             ("can_set_clearance_level", "Can set clearance level"),
             ("can_delete_oois", "Can delete oois"),
             ("can_mute_findings", "Can mute findings"),
             ("can_view_katalogus_settings", "Can view KAT-alogus settings"),
             ("can_set_katalogus_settings", "Can set KAT-alogus settings"),
             ("can_recalculate_bits", "Can recalculate bits"),
+            ("can_access_all_organizations", "Can access all organizations"),
         )
 
     def get_absolute_url(self):
@@ -214,8 +216,6 @@ class OrganizationMember(models.Model):
         ACTIVE = "active", _("active")
         NEW = "new", _("new")
 
-    scan_levels = [scan_level.value for scan_level in cast(type[Enum], SCAN_LEVEL)]
-
     user = models.ForeignKey("account.KATUser", on_delete=models.PROTECT, related_name="members")
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="members")
     groups = models.ManyToManyField(Group, blank=True)
@@ -223,11 +223,13 @@ class OrganizationMember(models.Model):
     blocked = models.BooleanField(default=False)
     onboarded = models.BooleanField(default=False)
     trusted_clearance_level = models.IntegerField(
-        default=-1, validators=[MinValueValidator(-1), MaxValueValidator(max(scan_levels))]
+        default=-1, validators=[MinValueValidator(-1), MaxValueValidator(MAX_SCAN_LEVEL)]
     )
     acknowledged_clearance_level = models.IntegerField(
-        default=-1, validators=[MinValueValidator(-1), MaxValueValidator(max(scan_levels))]
+        default=-1, validators=[MinValueValidator(-1), MaxValueValidator(MAX_SCAN_LEVEL)]
     )
+
+    EVENT_CODES = {"created": 900211, "updated": 900212, "deleted": 900213}
 
     @cached_property
     def all_permissions(self) -> set[str]:
@@ -255,6 +257,29 @@ class OrganizationMember(models.Model):
     def has_perms(self, perm_list: Iterable[str]) -> bool:
         return all(self.has_perm(perm) for perm in perm_list)
 
+    @property
+    def max_clearance_level(self) -> int:
+        """The maximum clearance level the user has for this organization.
+
+        When the user has an organization specific clearance level that is lower
+        than the global clearance level this will overrule the global clearance
+        level.
+
+        For the organization specific clearance level we take the minimum
+        of the trusted clearance level and acknowledged clearance level. If the
+        user did not acknowledge a changed clearance level, we need to use the
+        level that was previously. If an admin lowered the users clearance
+        level, we also need to use that level instead of the previously
+        acknowledged level.
+        """
+        if self.trusted_clearance_level == -1 and self.acknowledged_clearance_level == -1:
+            return self.user.clearance_level
+        else:
+            return min(self.trusted_clearance_level, self.acknowledged_clearance_level)
+
+    def has_clearance_level(self, level: int) -> bool:
+        return level <= self.max_clearance_level
+
     class Meta:
         unique_together = ["user", "organization"]
 
@@ -266,12 +291,16 @@ class Indemnification(models.Model):
     user = models.ForeignKey("account.KATUser", on_delete=models.SET_NULL, null=True)
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
 
+    EVENT_CODES = {"created": 900221, "updated": 900222, "deleted": 900223}
+
 
 class OOIInformation(models.Model):
     id = models.CharField(max_length=256, primary_key=True)
     last_updated = models.DateTimeField(auto_now=True)
     data = models.JSONField(null=True)
     consult_api = models.BooleanField(default=False)
+
+    EVENT_CODES = {"created": 900231, "updated": 900232, "deleted": 900233}
 
     def save(self, *args, **kwargs):
         if self.data is None:

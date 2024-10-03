@@ -77,6 +77,12 @@ itest: ## Run the integration tests.
 	$(ci-docker-compose) run --rm katalogus_integration
 	$(ci-docker-compose) down
 
+bench:  ## Run the report benchmark.
+	$(ci-docker-compose) build
+	$(ci-docker-compose) down --remove-orphans
+	$(ci-docker-compose) run --rm migration_bench
+	$(ci-docker-compose) stop
+
 debian12:
 	docker run --rm \
 	--env PKG_NAME=kat-boefjes \

@@ -1,8 +1,9 @@
 import json
-import logging
 import pkgutil
 from pathlib import Path
 from typing import Any
+
+import structlog
 
 from boefjes.models import PluginType
 from boefjes.plugins.models import (
@@ -10,12 +11,13 @@ from boefjes.plugins.models import (
     BOEFJES_DIR,
     ENTRYPOINT_NORMALIZERS,
     NORMALIZER_DEFINITION_FILE,
+    SCHEMA_FILE,
     BoefjeResource,
     ModuleException,
     NormalizerResource,
 )
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class LocalPluginRepository:
@@ -45,16 +47,29 @@ class LocalPluginRepository:
 
         raise KeyError(f"Can't find plugin {plugin_id}")
 
+    def by_name(self, plugin_name: str) -> PluginType:
+        boefjes = {resource.boefje.name: resource for resource in self.resolve_boefjes().values()}
+
+        if plugin_name in boefjes:
+            return boefjes[plugin_name].boefje
+
+        normalizers = {resource.normalizer.name: resource for resource in self.resolve_normalizers().values()}
+
+        if plugin_name in normalizers:
+            return normalizers[plugin_name].normalizer
+
+        raise KeyError(f"Can't find plugin {plugin_name}")
+
     def schema(self, id_: str) -> dict | None:
         boefjes = self.resolve_boefjes()
 
         if id_ not in boefjes:
             return None
 
-        path = boefjes[id_].path / "schema.json"
+        path = boefjes[id_].path / SCHEMA_FILE
 
         if not path.exists():
-            logger.debug("Did not find schema for boefje %s", boefjes[id_])
+            logger.debug("Did not find schema for boefje %s", id_)
             return None
 
         return json.loads(path.read_text())
@@ -133,14 +148,14 @@ class LocalPluginRepository:
 
         for package in pkgutil.walk_packages([str(self.path)], prefix):
             if not package.ispkg:
-                logging.debug("%s is not a package", package.name)
+                logger.debug("%s is not a package", package.name)
                 continue
 
             path = self.path / package.name.replace(prefix, "").replace(".", "/")
             missing_files = [file for file in required_files if not (path / file).exists()]
 
             if missing_files:
-                logging.debug("Files %s not found for %s", missing_files, package.name)
+                logger.debug("Files %s not found for %s", missing_files, package.name)
                 continue
 
             paths.append((path, package.name))

@@ -1,7 +1,7 @@
 import logging
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import AmqpDsn, AnyHttpUrl, Field, PostgresDsn, fields
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
@@ -64,10 +64,7 @@ class Settings(BaseSettings):
         description="Enables/disables the collection of metrics to be used with tools like Prometheus",
     )
 
-    json_logging: bool = Field(
-        False,
-        description="Enables/disables structured logging in json format",
-    )
+    logging_format: Literal["text", "json"] = Field("text", description="Logging format")
 
     # Server settings
     api_host: str = Field(

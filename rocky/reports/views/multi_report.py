@@ -6,21 +6,20 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
 from tools.view_helpers import url_with_querystring
 
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
+    OOISelectionView,
     ReportBreadcrumbs,
-    ReportOOIView,
+    ReportFinalSettingsView,
     ReportPluginView,
-    ReportTypeView,
+    ReportTypeSelectionView,
     get_selection,
 )
 from reports.views.view_helpers import MultiReportStepsMixin
-from rocky.views.ooi_view import BaseOOIListView
 
 
 class BreadcrumbsMultiReportView(ReportBreadcrumbs):
@@ -35,7 +34,7 @@ class BreadcrumbsMultiReportView(ReportBreadcrumbs):
             },
             {
                 "url": reverse("multi_report_select_oois", kwargs=kwargs) + selection,
-                "text": _("Select OOIs"),
+                "text": _("Select objects"),
             },
             {
                 "url": reverse("multi_report_select_report_types", kwargs=kwargs) + selection,
@@ -44,6 +43,10 @@ class BreadcrumbsMultiReportView(ReportBreadcrumbs):
             {
                 "url": reverse("multi_report_setup_scan", kwargs=kwargs) + selection,
                 "text": _("Configuration"),
+            },
+            {
+                "url": reverse("multi_report_export_setup", kwargs=kwargs) + selection,
+                "text": _("Export setup"),
             },
             {
                 "url": reverse("multi_report_view", kwargs=kwargs) + selection,
@@ -65,7 +68,7 @@ class LandingMultiReportView(BreadcrumbsMultiReportView):
         )
 
 
-class OOISelectionMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView, ReportOOIView, BaseOOIListView):
+class OOISelectionMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView, OOISelectionView):
     """
     Select OOIs for the 'Multi Report' flow.
     """
@@ -75,18 +78,14 @@ class OOISelectionMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportV
     current_step = 1
     ooi_types = MultiOrganizationReport.input_ooi_types
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(self.get_ooi_filter_forms(self.ooi_types))
-        return context
+    def get(self, request, *args, **kwargs):
+        if not self.get_ooi_selection():
+            messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
+        return self.get(request, *args, **kwargs)
 
 
 class ReportTypesSelectionMultiReportView(
-    MultiReportStepsMixin,
-    BreadcrumbsMultiReportView,
-    ReportOOIView,
-    ReportTypeView,
-    TemplateView,
+    MultiReportStepsMixin, BreadcrumbsMultiReportView, OOISelectionView, ReportTypeSelectionView
 ):
     """
     Shows all possible report types from a list of OOIs.
@@ -96,20 +95,16 @@ class ReportTypesSelectionMultiReportView(
     template_name = "generate_report/select_report_types.html"
     breadcrumbs_step = 4
     current_step = 2
+    report_type = MultiOrganizationReport
 
     def get(self, request, *args, **kwargs):
-        if not self.selected_oois:
-            messages.error(self.request, _("Select at least one OOI to proceed."))
-        return super().get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["available_report_types"] = self.get_report_types({MultiOrganizationReport})
-        context["total_oois"] = self.get_total_objects()
-        return context
+        if not self.get_ooi_selection():
+            messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
+            return redirect(self.get_previous())
+        return self.get(request, *args, **kwargs)
 
 
-class SetupScanMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView, ReportPluginView, TemplateView):
+class SetupScanMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView, ReportPluginView):
     """
     Show required and optional plugins to start scans to multi OOIs to include in report.
     """
@@ -119,34 +114,51 @@ class SetupScanMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if self.plugins_enabled():
+        if self.all_plugins_enabled():
             return redirect(self.get_next())
         return super().get(request, *args, **kwargs)
 
 
-class MultiReportView(BreadcrumbsMultiReportView, ReportPluginView, TemplateView):
+class ExportSetupMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView, ReportFinalSettingsView):
+    """
+    Shows the export setup page where users can set their export preferences.
+    """
+
+    template_name = "generate_report/export_setup.html"
+    breadcrumbs_step = 6
+    current_step = 4
+    report_type = MultiOrganizationReport
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.get_report_type_ids():
+            messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
+            return redirect(self.get_previous())
+
+        return super().get(request, *args, **kwargs)
+
+
+class MultiReportView(BreadcrumbsMultiReportView, ReportPluginView):
     """
     Shows the multi report from OOIS and report types.
     """
 
     template_name = "multi_report.html"
-    current_step = 6
+    current_step = 5
 
     def multi_reports_for_oois(self) -> dict[str, dict[str, Any]]:
         report = MultiOrganizationReport(self.octopoes_api_connector)
 
         return report.post_process_data(
-            collect_report_data(self.octopoes_api_connector, self.selected_oois, self.observed_at)
+            collect_report_data(self.octopoes_api_connector, self.get_ooi_pks(), self.observed_at)
         )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["created_at"] = datetime.now()
-        context["total_oois"] = self.get_total_objects()
+        context["total_oois"] = len(self.get_ooi_pks())
         context["report_types"] = [MultiOrganizationReport]
-        report_data = self.multi_reports_for_oois()
         context["template"] = MultiOrganizationReport.template_path
-        context["report_data"] = report_data
+        context["report_data"] = self.multi_reports_for_oois()
         context["report_download_url"] = url_with_querystring(
             reverse("multi_report_pdf", kwargs={"organization_code": self.organization.code}),
             True,

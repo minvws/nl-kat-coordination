@@ -1,7 +1,6 @@
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import datetime
-from logging import getLogger
 from typing import Any, cast
 
 from django.utils.translation import gettext_lazy as _
@@ -10,8 +9,6 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
-
-logger = getLogger(__name__)
 
 
 @dataclass
@@ -95,7 +92,7 @@ class WebSystemReport(Report):
     name = _("Web System Report")
     description = _("Web System Reports check web systems on basic security standards.")
     plugins = {
-        "required": [
+        "required": {
             "nmap",
             "dns-records",
             "security_txt_downloader",
@@ -103,8 +100,8 @@ class WebSystemReport(Report):
             "ssl-version",
             "ssl-certificates",
             "webpage-analysis",
-        ],
-        "optional": [],
+        },
+        "optional": set(),
     }
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "web_system_report/report.html"

@@ -1,12 +1,12 @@
-from logging import getLogger
 from pathlib import Path
 
+import structlog
 from django.core.management import BaseCommand, CommandParser
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 
-logger = getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class Command(BaseCommand):

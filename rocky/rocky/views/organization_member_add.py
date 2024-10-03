@@ -1,8 +1,8 @@
 import csv
 import io
-import logging
 from typing import Any
 
+import structlog
 from account.forms import AccountTypeSelectForm, MemberRegistrationForm, PasswordResetForm
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
@@ -23,7 +23,7 @@ from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
 
 from rocky.messaging import clearance_level_warning_dns_report
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 User = get_user_model()
 

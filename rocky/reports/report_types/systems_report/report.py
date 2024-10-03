@@ -1,7 +1,6 @@
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
-from logging import getLogger
 from typing import Any
 
 from django.utils.translation import gettext_lazy as _
@@ -10,8 +9,6 @@ from strenum import StrEnum
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
-
-logger = getLogger(__name__)
 
 
 class SystemType(StrEnum):
@@ -56,7 +53,7 @@ class SystemReport(Report):
     id = "systems-report"
     name = _("System Report")
     description = _("Combine IP addresses, hostnames and services into systems.")
-    plugins = {"required": ["dns-records", "nmap"], "optional": ["nmap-udp"]}
+    plugins = {"required": {"dns-records", "nmap"}, "optional": {"nmap-udp"}}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "systems_report/report.html"
     label_style = "6-light"

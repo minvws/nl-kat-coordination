@@ -1,0 +1,40 @@
+{
+  "title": "Arguments",
+  "type": "object",
+  "properties": {
+    "MAXMIND_USER_ID": {
+      "title": "User ID",
+      "type": "integer",
+      "maxLength": 48,
+      "description": "Numeric user id for MaxMind"
+    },
+    "MAXMIND_LICENCE_KEY": {
+      "title": "Licence Key",
+      "maxLength": 48,
+      "type": "string",
+      "description": "Licence key for MaxMind"
+    },
+    "GEOIP_CACHE_TIMEOUT": {
+      "title": "Cache Timeout",
+      "type": "integer",
+      "description": "Cache timeout in seconds"
+    },
+    "GEOIP_SOURCE_URL": {
+      "title": "Source URL",
+      "type": "string",
+      "description": "URL to download the GeoIP database from"
+    },
+    "REQUEST_TIMEOUT": {
+      "title": "Request Timeout",
+      "type": "integer",
+      "description": "Request timeout in seconds"
+    }
+  },
+  "required": [
+    "MAXMIND_USER_ID",
+    "MAXMIND_LICENCE_KEY"
+  ],
+  "secret": [
+    "MAXMIND_LICENCE_KEY"
+  ]
+}

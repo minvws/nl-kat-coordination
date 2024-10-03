@@ -71,6 +71,9 @@ class SQLConfigStorage(SessionMixin, ConfigStorage):
         except ConfigNotFound:
             return {}
 
+        if not instance.settings or instance.settings == "{}":  # Handle empty settings and the server default of "{}"
+            return {}
+
         return json.loads(self.encryption.decode(instance.settings))
 
     def delete(self, organisation_id: str, plugin_id: str) -> None:

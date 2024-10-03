@@ -1,6 +1,5 @@
 from datetime import datetime
 from http import HTTPStatus
-from logging import getLogger
 from typing import Any
 from uuid import UUID
 
@@ -16,8 +15,6 @@ from octopoes.xtdb import FieldSet
 from octopoes.xtdb.client import OperationType as XTDBOperationType
 from octopoes.xtdb.client import XTDBSession
 from octopoes.xtdb.query_builder import generate_pull_query
-
-logger = getLogger(__name__)
 
 
 class OriginRepository(Repository):
@@ -35,6 +32,8 @@ class OriginRepository(Repository):
         valid_time: datetime,
         *,
         task_id: UUID | None = None,
+        offset: int = 0,
+        limit: int | None = None,
         source: Reference | None = None,
         result: Reference | None = None,
         method: str | list[str] | None = None,
@@ -58,20 +57,23 @@ class XTDBOriginRepository(OriginRepository):
 
     @classmethod
     def serialize(cls, origin: Origin) -> dict[str, Any]:
-        data = origin.dict()
+        data = origin.model_dump()
         data[cls.pk_prefix] = origin.id
         data["type"] = origin.__class__.__name__
+        data["result"] = list(dict.fromkeys(data["result"]))
         return data
 
     @classmethod
     def deserialize(cls, data: dict[str, Any]) -> Origin:
-        return Origin.parse_obj(data)
+        return Origin.model_validate(data)
 
     def list_origins(
         self,
         valid_time: datetime,
         *,
         task_id: UUID | None = None,
+        offset: int = 0,
+        limit: int | None = None,
         source: Reference | None = None,
         result: Reference | None = None,
         method: str | list[str] | None = None,
@@ -97,6 +99,8 @@ class XTDBOriginRepository(OriginRepository):
         query = generate_pull_query(
             FieldSet.ALL_FIELDS,
             where_parameters,
+            offset=offset,
+            limit=limit,
         )
 
         results = self.session.client.query(query, valid_time=valid_time)

@@ -93,14 +93,14 @@ def test_system_report(octopoes_api_connector: OctopoesAPIConnector, valid_time)
     }
 
 
-def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_time, hostname_oois):
+def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_time, hostname_oois, organization):
     seed_system(octopoes_api_connector, valid_time)
 
     reports: list[type[Report] | type[MultiReport]] = (
         AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
     )
     report_ids = [report_type.id for report_type in reports]
-    _, data, _, _ = aggregate_reports(octopoes_api_connector, hostname_oois, report_ids, valid_time)
+    _, data, _, _ = aggregate_reports(octopoes_api_connector, hostname_oois, report_ids, valid_time, organization.code)
 
     v4_test_hostnames = [
         "Hostname|test|a.example.com",
@@ -245,14 +245,19 @@ def test_multi_report(
     octopoes_api_connector_2: OctopoesAPIConnector,
     valid_time,
     hostname_oois,
+    organization,
 ):
     seed_system(octopoes_api_connector, valid_time)
     seed_system(octopoes_api_connector_2, valid_time)
 
     reports = AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
     report_ids = [report_type.id for report_type in reports]
-    _, data, report_data, _ = aggregate_reports(octopoes_api_connector, hostname_oois, report_ids, valid_time)
-    _, data_2, report_data_2, _ = aggregate_reports(octopoes_api_connector_2, hostname_oois, report_ids, valid_time)
+    _, data, report_data, _ = aggregate_reports(
+        octopoes_api_connector, hostname_oois, report_ids, valid_time, organization.code
+    )
+    _, data_2, report_data_2, _ = aggregate_reports(
+        octopoes_api_connector_2, hostname_oois, report_ids, valid_time, organization.code
+    )
 
     report_data_object = ReportData(
         organization_code=octopoes_api_connector.client,
@@ -305,9 +310,9 @@ def test_multi_report(
         {
             "asset": "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
             "vulnerabilities": {
-                "CVE-2018-20677": None,
-                "CVE-2019-8331": None,
-                "RetireJS-jquerymigrate-f3a3": None,
+                "CVE-2018-20677": 0.0,
+                "CVE-2019-8331": 0.0,
+                "RetireJS-jquerymigrate-f3a3": 0.0,
             },
             "organisation": "test-test_multi_report",
             "services": ["Web"],
@@ -315,9 +320,9 @@ def test_multi_report(
         {
             "asset": "IPAddressV4|test|192.0.2.3",
             "vulnerabilities": {
-                "CVE-2018-20677": None,
-                "CVE-2019-8331": None,
-                "RetireJS-jquerymigrate-f3a3": None,
+                "CVE-2018-20677": 0.0,
+                "CVE-2019-8331": 0.0,
+                "RetireJS-jquerymigrate-f3a3": 0.0,
             },
             "organisation": "test-test_multi_report",
             "services": ["Dicom", "Mail", "Other", "Web"],
@@ -325,9 +330,9 @@ def test_multi_report(
         {
             "asset": "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
             "vulnerabilities": {
-                "CVE-2018-20677": None,
-                "CVE-2019-8331": None,
-                "RetireJS-jquerymigrate-f3a3": None,
+                "CVE-2018-20677": 0.0,
+                "CVE-2019-8331": 0.0,
+                "RetireJS-jquerymigrate-f3a3": 0.0,
             },
             "organisation": "test-test_multi_report-2",
             "services": ["Web"],
@@ -335,9 +340,9 @@ def test_multi_report(
         {
             "asset": "IPAddressV4|test|192.0.2.3",
             "vulnerabilities": {
-                "CVE-2018-20677": None,
-                "CVE-2019-8331": None,
-                "RetireJS-jquerymigrate-f3a3": None,
+                "CVE-2018-20677": 0.0,
+                "CVE-2019-8331": 0.0,
+                "RetireJS-jquerymigrate-f3a3": 0.0,
             },
             "organisation": "test-test_multi_report-2",
             "services": ["Dicom", "Mail", "Other", "Web"],
@@ -426,9 +431,9 @@ def test_multi_report(
         },
     }
     assert multi_data["system_vulnerabilities"] == {
-        "CVE-2018-20677": {"cvss": None, "Web": 4, "Dicom": 2, "Mail": 2, "Other": 2},
-        "CVE-2019-8331": {"cvss": None, "Web": 4, "Dicom": 2, "Mail": 2, "Other": 2},
-        "RetireJS-jquerymigrate-f3a3": {"cvss": None, "Web": 4, "Dicom": 2, "Mail": 2, "Other": 2},
+        "CVE-2018-20677": {"cvss": 0.0, "Web": 4, "Dicom": 2, "Mail": 2, "Other": 2},
+        "CVE-2019-8331": {"cvss": 0.0, "Web": 4, "Dicom": 2, "Mail": 2, "Other": 2},
+        "RetireJS-jquerymigrate-f3a3": {"cvss": 0.0, "Web": 4, "Dicom": 2, "Mail": 2, "Other": 2},
     }
     assert multi_data["ipv6"] == {
         "Dicom": {"total": 2, "enabled": 2},

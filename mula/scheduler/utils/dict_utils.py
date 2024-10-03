@@ -95,3 +95,7 @@ class ExpiringDict:
     def __iter__(self) -> Iterator[str]:
         with self.lock:
             return iter(self.cache)
+
+    def setdefault(self, key: str, default: Any) -> Any:
+        with self.lock:
+            return self.cache.setdefault(key, default)

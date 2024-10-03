@@ -1,5 +1,4 @@
 from datetime import datetime
-from logging import getLogger
 from typing import Any, TypedDict
 
 from django.utils.translation import gettext_lazy as _
@@ -8,8 +7,6 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.reports import ReportData
 from reports.report_types.definitions import MultiReport, ReportPlugins
-
-logger = getLogger(__name__)
 
 
 class OpenPortsDict(TypedDict):
@@ -26,7 +23,7 @@ class MultiOrganizationReport(MultiReport):
     id = "multi-organization-report"
     name = _("Multi Organization Report")
     description = _("Multi Organization Report")
-    plugins: ReportPlugins = {"required": [], "optional": []}
+    plugins: ReportPlugins = {"required": set(), "optional": set()}
     input_ooi_types = {ReportData}
     template_path = "multi_organization_report/report.html"
 
@@ -260,6 +257,6 @@ def collect_report_data(
 ):
     report_data = {}
     for ooi in [x for x in input_ooi_references if Reference.from_str(x).class_type == ReportData]:
-        report_data[ooi] = connector.get(Reference.from_str(ooi), observed_at).dict()
+        report_data[ooi] = connector.get(Reference.from_str(ooi), observed_at).model_dump()
 
     return report_data

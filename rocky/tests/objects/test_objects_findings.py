@@ -109,7 +109,10 @@ def test_mute_finding_button_is_not_visible_without_perms(
 def test_mute_finding_form_view(request, member, rf, mock_organization_view_octopoes):
     member = request.getfixturevalue(member)
     response = MuteFindingView.as_view()(
-        setup_request(rf.get("finding_mute", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), member.user),
+        setup_request(
+            rf.get("finding_mute", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}),
+            member.user,
+        ),
         organization_code=member.organization.code,
     )
 
@@ -126,12 +129,11 @@ def test_mute_finding_form_view_no_perms(request, member, rf, mock_organization_
     member = request.getfixturevalue(member)
     with pytest.raises(PermissionDenied):
         MuteFindingView.as_view()(
-            setup_request(rf.get("finding_mute", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), member.user),
+            setup_request(
+                rf.get("finding_mute", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}),
+                member.user,
+            ),
             organization_code=member.organization.code,
-        )
-    with pytest.raises(PermissionDenied):
-        MuteFindingView.as_view()(
-            setup_request(rf.post("finding_mute"), member.user), organization_code=member.organization.code
         )
 
 
@@ -159,7 +161,9 @@ def test_mute_finding_post(
     )
     # Uses same ooi_add post request to add a MuteFinding object
     response = OOIAddView.as_view()(
-        request, organization_code=redteam_member.organization.code, ooi_type="MutedFinding"
+        request,
+        organization_code=redteam_member.organization.code,
+        ooi_type="MutedFinding",
     )
 
     # Redirects to ooi_detail
@@ -253,8 +257,16 @@ def test_muted_finding_button_presence_more_findings_and_post(
     )
 
     assert response.status_code == 200
-    assertContains(response, '<input class="toggle-all" data-toggle-target="finding" type="checkbox">', html=True)
-    assertContains(response, '<input type="checkbox" name="finding" value="' + finding_1.primary_key + '">', html=True)
+    assertContains(
+        response,
+        '<input class="toggle-all" data-toggle-target="finding" type="checkbox">',
+        html=True,
+    )
+    assertContains(
+        response,
+        '<input type="checkbox" name="finding" value="' + finding_1.primary_key + '">',
+        html=True,
+    )
     assertContains(response, '<button type="submit">Mute Findings</button>')
 
     request = setup_request(

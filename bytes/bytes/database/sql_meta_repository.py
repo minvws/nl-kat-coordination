@@ -1,7 +1,7 @@
-import logging
 import uuid
 from collections.abc import Iterator
 
+import structlog
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
@@ -17,7 +17,7 @@ from bytes.repositories.raw_repository import RawRepository
 from bytes.timestamping.hashing import hash_data
 from bytes.timestamping.provider import create_hash_repository
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class SQLMetaDataRepository(MetaDataRepository):
@@ -56,7 +56,7 @@ class SQLMetaDataRepository(MetaDataRepository):
         return to_boefje_meta(boefje_meta_in_db)
 
     def get_boefje_meta(self, query_filter: BoefjeMetaFilter) -> list[BoefjeMeta]:
-        logger.debug("Querying boefje meta: %s", query_filter.json())
+        logger.debug("Querying boefje meta: %s", query_filter.model_dump_json())
 
         query = self.session.query(BoefjeMetaInDB).filter(BoefjeMetaInDB.organization == query_filter.organization)
 
@@ -86,7 +86,7 @@ class SQLMetaDataRepository(MetaDataRepository):
         return to_normalizer_meta(normalizer_meta_in_db)
 
     def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> list[NormalizerMeta]:
-        logger.debug("Querying normalizer meta: %s", query_filter.json())
+        logger.debug("Querying normalizer meta: %s", query_filter.model_dump_json())
 
         query = self.session.query(NormalizerMetaInDB)
 
@@ -134,7 +134,7 @@ class SQLMetaDataRepository(MetaDataRepository):
         return raw_file_in_db.id
 
     def get_raw(self, query_filter: RawDataFilter) -> list[RawDataMeta]:
-        logger.debug("Querying raw data: %s", query_filter.json())
+        logger.debug("Querying raw data: %s", query_filter.model_dump_json())
         query = self.session.query(RawFileInDB)
         query = query_filter.apply(query)
 
@@ -177,7 +177,7 @@ class SQLMetaDataRepository(MetaDataRepository):
         return {organization_id: count for organization_id, count in query}
 
     def get_raw_file_count_per_mime_type(self, query_filter: RawDataFilter) -> dict[str, int]:
-        logger.debug("Querying count raw data per mime type: %s", query_filter.json())
+        logger.debug("Querying count raw data per mime type: %s", query_filter.model_dump_json())
         query = self.session.query(func.unnest(RawFileInDB.mime_types), func.count()).group_by(
             func.unnest(RawFileInDB.mime_types)
         )

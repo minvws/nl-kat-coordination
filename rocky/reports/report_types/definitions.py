@@ -1,6 +1,5 @@
 from collections.abc import Callable, Iterable
 from datetime import datetime
-from logging import getLogger
 from pathlib import Path
 from typing import Any, TypedDict, TypeVar
 
@@ -11,12 +10,24 @@ from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from octopoes.models.types import OOIType
 
 REPORTS_DIR = Path(__file__).parent
-logger = getLogger(__name__)
 
 
 class ReportPlugins(TypedDict):
-    required: list[str]
-    optional: list[str]
+    required: set[str]
+    optional: set[str]
+
+
+def report_plugins_union(report_types: list[type["BaseReport"]]) -> ReportPlugins:
+    """Take the union of the required and optional plugin sets and remove optional plugins that are required"""
+
+    plugins: ReportPlugins = {"required": set(), "optional": set()}
+
+    for report_type in report_types:
+        plugins["required"].update(report_type.plugins["required"])
+        plugins["optional"].update(report_type.plugins["optional"])
+        plugins["optional"].difference_update(report_type.plugins["required"])
+
+    return plugins
 
 
 class BaseReport:
@@ -161,7 +172,7 @@ class AggregateReportSubReports(TypedDict):
 class AggregateReport(BaseReport):
     reports: AggregateReportSubReports
 
-    def post_process_data(self, data: dict[str, Any], valid_time: datetime) -> dict[str, Any]:
+    def post_process_data(self, data: dict[str, Any], valid_time: datetime, organization_code: str) -> dict[str, Any]:
         raise NotImplementedError
 
 

@@ -6,6 +6,7 @@ WORKDIR /app
 
 COPY rocky/package.json rocky/yarn.lock .
 COPY rocky/assets assets
+COPY rocky/components components
 
 RUN yarn --ignore-engines && yarn build
 
@@ -41,10 +42,10 @@ RUN --mount=type=cache,target=/root/.cache \
     pip install --upgrade pip \
     && if [ "$ENVIRONMENT" = "dev" ]; \
     then \
-    grep -v git+https:// requirements-dev.txt | pip install -r /dev/stdin ; \
+    grep -v git+https:// requirements-dev.txt | pip install -r /dev/stdin && \
     grep git+https:// requirements-dev.txt | pip install -r /dev/stdin ; \
     else \
-    grep -v git+https:// requirements.txt | pip install -r /dev/stdin ;\
+    grep -v git+https:// requirements.txt | pip install -r /dev/stdin && \
     grep git+https:// requirements.txt | pip install -r /dev/stdin ; \
     fi
 

@@ -246,8 +246,8 @@ After the CSV file has been uploaded the users receive a welcome email on their 
  The OpenKAT team
 
 
-Token authentication
---------------------
+API token authentication
+------------------------
 
 Authentication tokens can be created in the admin interface (/admin). The token is created for an user account and will have the same permissions as the user. After creating a token it will display the newly created token once. You need to copy the token immediately, because the token are stored hashed in the database and won't be visible anymore.
 
