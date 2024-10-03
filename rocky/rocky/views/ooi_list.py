@@ -10,7 +10,6 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from httpx import HTTPError
 from tools.enums import CUSTOM_SCAN_LEVEL
-from tools.forms.ooi import SelectOOIForm
 from tools.forms.ooi_form import OOISearchForm, OOITypeMultiCheckboxForm
 from tools.models import Indemnification
 from tools.view_helpers import get_mandatory_fields
@@ -42,11 +41,6 @@ class OOIListView(BaseOOIListView, OctopoesView):
         context["ooi_type_form"] = OOITypeMultiCheckboxForm(self.request.GET)
         context["ooi_search_form"] = OOISearchForm(self.request.GET)
         context["mandatory_fields"] = get_mandatory_fields(self.request, params=["observed_at"])
-        context["select_oois_form"] = SelectOOIForm(
-            context.get("ooi_list", []),
-            organization_code=self.organization.code,
-            mandatory_fields=context["mandatory_fields"],
-        )
         context["member"] = self.organization_member
         context["scan_levels"] = [alias for _, alias in CUSTOM_SCAN_LEVEL.choices]
         context["organization_indemnification"] = self.get_organization_indemnification
