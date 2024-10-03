@@ -16,12 +16,7 @@ input_ooi = {
 
 
 def test_cipherless_service():
-    oois = list(
-        run(
-            input_ooi,
-            get_dummy_data("inputs/testssl-sh-cipherless.json"),
-        )
-    )
+    oois = list(run(input_ooi, get_dummy_data("inputs/testssl-sh-cipherless.json")))
 
     # noinspection PyTypeChecker
     expected = []
@@ -30,12 +25,7 @@ def test_cipherless_service():
 
 
 def test_ciphered_service():
-    oois = list(
-        run(
-            input_ooi,
-            get_dummy_data("inputs/testssl-sh-ciphered.json"),
-        )
-    )
+    oois = list(run(input_ooi, get_dummy_data("inputs/testssl-sh-ciphered.json")))
 
     # noinspection PyTypeChecker
     expected_suites = {

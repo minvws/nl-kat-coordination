@@ -8,12 +8,7 @@ from tests.loading import get_dummy_data
 def test_cve_with_cvss():
     input_ooi = {"id": "CVE-2021-46882"}
 
-    oois = list(
-        run(
-            input_ooi,
-            get_dummy_data("inputs/cve-result-with-cvss.json"),
-        )
-    )
+    oois = list(run(input_ooi, get_dummy_data("inputs/cve-result-with-cvss.json")))
 
     expected = [
         NormalizerAffirmation(
@@ -34,12 +29,7 @@ def test_cve_with_cvss():
 def test_cve_with_cvss2():
     input_ooi = {"id": "CVE-2016-0616"}
 
-    oois = list(
-        run(
-            input_ooi,
-            get_dummy_data("inputs/cve-result-with-cvss2.json"),
-        )
-    )
+    oois = list(run(input_ooi, get_dummy_data("inputs/cve-result-with-cvss2.json")))
 
     expected = [
         NormalizerAffirmation(
@@ -61,12 +51,7 @@ def test_cve_with_cvss2():
 def test_cve_without_cvss():
     input_ooi = {"id": "CVE-2021-46882"}
 
-    oois = list(
-        run(
-            input_ooi,
-            get_dummy_data("inputs/cve-result-without-cvss.json"),
-        )
-    )
+    oois = list(run(input_ooi, get_dummy_data("inputs/cve-result-without-cvss.json")))
 
     expected = [
         NormalizerAffirmation(
@@ -80,7 +65,7 @@ def test_cve_without_cvss():
                 source="https://cve.circl.lu/cve/CVE-2021-46882",
                 risk_severity=RiskLevelSeverity.UNKNOWN,
                 risk_score=None,
-            ),
+            )
         )
     ]
 

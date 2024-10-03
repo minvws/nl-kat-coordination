@@ -68,10 +68,7 @@ class XTDBScanProfileRepository(ScanProfileRepository):
         where = {"type": self.object_type}
         if scan_profile_type is not None:
             where["scan_profile_type"] = scan_profile_type
-        query = generate_pull_query(
-            FieldSet.ALL_FIELDS,
-            where,
-        )
+        query = generate_pull_query(FieldSet.ALL_FIELDS, where)
         results = self.session.client.query(query, valid_time=valid_time)
         return [self.deserialize(r[0]) for r in results]
 

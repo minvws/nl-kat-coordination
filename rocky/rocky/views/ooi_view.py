@@ -203,10 +203,7 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
         return form
 
     def get_form_kwargs(self):
-        kwargs = {
-            "ooi_class": self.get_ooi_class(),
-            "connector": self.octopoes_api_connector,
-        }
+        kwargs = {"ooi_class": self.get_ooi_class(), "connector": self.octopoes_api_connector}
         kwargs.update(super().get_form_kwargs())
 
         return kwargs
@@ -219,11 +216,7 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
                 end_valid_time = end_valid_time.replace(tzinfo=timezone.utc)
             new_ooi = self.ooi_class.model_validate(form.cleaned_data)
             create_ooi(
-                self.octopoes_api_connector,
-                self.bytes_client,
-                new_ooi,
-                datetime.now(timezone.utc),
-                end_valid_time,
+                self.octopoes_api_connector, self.bytes_client, new_ooi, datetime.now(timezone.utc), end_valid_time
             )
             sleep(1)
             return redirect(self.get_ooi_success_url(new_ooi))

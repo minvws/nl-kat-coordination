@@ -55,10 +55,7 @@ def test_observed_at_future_date(rf, client_member, mock_organization_view_octop
     url = reverse("ooi_list", kwargs=kwargs)
 
     day_plus_1_in_future = (datetime.now(tz=timezone.utc) + timedelta(days=1)).strftime("%Y-%m-%d")
-    request = rf.get(
-        url,
-        {"observed_at": day_plus_1_in_future},
-    )
+    request = rf.get(url, {"observed_at": day_plus_1_in_future})
     request.resolver_match = resolve(url)
 
     setup_request(request, client_member.user)

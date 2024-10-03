@@ -12,11 +12,7 @@ from tests.conftest import setup_request
 
 
 def test_select_all_oois_post_to_select_report_types(
-    rf,
-    client_member,
-    valid_time,
-    mock_organization_view_octopoes,
-    listed_hostnames,
+    rf, client_member, valid_time, mock_organization_view_octopoes, listed_hostnames
 ):
     """
     Will send the selected oois to the report type selection page.
@@ -29,10 +25,7 @@ def test_select_all_oois_post_to_select_report_types(
     request = setup_request(
         rf.post(
             "generate_report_select_report_types",
-            {
-                "observed_at": valid_time.strftime("%Y-%m-%d"),
-                "ooi": listed_hostnames,
-            },
+            {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": listed_hostnames},
         ),
         client_member.user,
     )
@@ -47,11 +40,7 @@ def test_select_all_oois_post_to_select_report_types(
 
 
 def test_select_some_oois_post_to_select_report_types(
-    rf,
-    client_member,
-    valid_time,
-    mock_organization_view_octopoes,
-    listed_hostnames,
+    rf, client_member, valid_time, mock_organization_view_octopoes, listed_hostnames
 ):
     """
     Will send the selected oois to the report type selection page.
@@ -66,11 +55,7 @@ def test_select_some_oois_post_to_select_report_types(
 
     request = setup_request(
         rf.post(
-            "generate_report_select_report_types",
-            {
-                "observed_at": valid_time.strftime("%Y-%m-%d"),
-                "ooi": selection,
-            },
+            "generate_report_select_report_types", {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": selection}
         ),
         client_member.user,
     )
@@ -87,11 +72,7 @@ def test_select_some_oois_post_to_select_report_types(
 
 
 def test_change_ooi_selection_for_none_selection(
-    rf,
-    client_member,
-    valid_time,
-    mock_organization_view_octopoes,
-    listed_hostnames,
+    rf, client_member, valid_time, mock_organization_view_octopoes, listed_hostnames
 ):
     """
     Will send the selected oois to the report type selection page.
@@ -102,13 +83,7 @@ def test_change_ooi_selection_for_none_selection(
     )
 
     request = setup_request(
-        rf.post(
-            "generate_report_select_oois",
-            {
-                "observed_at": valid_time.strftime("%Y-%m-%d"),
-            },
-        ),
-        client_member.user,
+        rf.post("generate_report_select_oois", {"observed_at": valid_time.strftime("%Y-%m-%d")}), client_member.user
     )
 
     response = OOISelectionGenerateReportView.as_view()(request, organization_code=client_member.organization.code)
@@ -118,11 +93,7 @@ def test_change_ooi_selection_for_none_selection(
 
 
 def test_change_ooi_selection_with_ooi_selection(
-    rf,
-    client_member,
-    valid_time,
-    mock_organization_view_octopoes,
-    listed_hostnames,
+    rf, client_member, valid_time, mock_organization_view_octopoes, listed_hostnames
 ):
     """
     Will send the selected oois to the report type selection page.
@@ -136,10 +107,7 @@ def test_change_ooi_selection_with_ooi_selection(
     selection = ooi_pks[0:2]
 
     request = setup_request(
-        rf.post(
-            "generate_report_select_oois",
-            {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": selection},
-        ),
+        rf.post("generate_report_select_oois", {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": selection}),
         client_member.user,
     )
 
@@ -153,12 +121,7 @@ def test_change_ooi_selection_with_ooi_selection(
 
 
 def test_report_types_selection_nothing_selected(
-    rf,
-    client_member,
-    valid_time,
-    mock_organization_view_octopoes,
-    listed_hostnames,
-    mock_katalogus_client,
+    rf, client_member, valid_time, mock_organization_view_octopoes, listed_hostnames, mock_katalogus_client
 ):
     """
     Will send the selected report types to the configuration page (set plugins).
@@ -169,11 +132,7 @@ def test_report_types_selection_nothing_selected(
     )
 
     request = setup_request(
-        rf.post(
-            "generate_report_setup_scan",
-            {"observed_at": valid_time.strftime("%Y-%m-%d")},
-        ),
-        client_member.user,
+        rf.post("generate_report_setup_scan", {"observed_at": valid_time.strftime("%Y-%m-%d")}), client_member.user
     )
 
     response = SetupScanGenerateReportView.as_view()(request, organization_code=client_member.organization.code)

@@ -25,10 +25,7 @@ class LocalReportJobRunner(ReportJobRunner):
         parsed_report_types = [get_report_by_id(report_type_id) for report_type_id in recipe.report_types]
 
         error_reports, report_data = collect_reports(
-            now,
-            connector,
-            list(recipe.input_recipe["input_oois"]),
-            parsed_report_types,
+            now, connector, list(recipe.input_recipe["input_oois"]), parsed_report_types
         )
 
         try:

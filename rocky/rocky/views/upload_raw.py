@@ -82,10 +82,7 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
             self.add_success_notification(_("Raw file successfully added."))
 
     def get_form_kwargs(self):
-        kwargs = {
-            "connector": self.octopoes_api_connector,
-            "ooi_list": self.get_ooi_options(),
-        }
+        kwargs = {"connector": self.octopoes_api_connector, "ooi_list": self.get_ooi_options()}
         kwargs.update(super().get_form_kwargs())
 
         if "ooi_class" in kwargs:
