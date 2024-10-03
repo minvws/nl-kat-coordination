@@ -88,7 +88,7 @@ class S3RawRepository(RawRepository):
         self.s3_bucket_prefix = s3_bucket_prefix
         self.s3_bucket_name = s3_bucket_name
 
-        set_boto3_stream_logger("boto3.resources", logging.WARNING)
+        set_boto3_stream_logger("", logging.WARNING)
         self._s3resource = BotoSession().resource("s3")
 
     def get_or_create_bucket(self, organization: str):
