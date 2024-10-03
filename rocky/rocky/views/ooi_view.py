@@ -116,7 +116,7 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
         context["active_filters"] = self.get_active_filters()
         context["active_filters_counter"] = self.count_active_filters()
 
-  return context
+        return context
 
 
 class BaseOOIListView(OOIFilterView, ListView):

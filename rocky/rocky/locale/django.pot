@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-01 14:17+0000\n"
+"POT-Creation-Date: 2024-10-03 09:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -823,10 +823,9 @@ msgstr ""
 
 #: katalogus/templates/change_clearance_level.html onboarding/forms.py
 #: reports/templates/partials/report_ooi_list.html
-#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
-#: rocky/templates/oois/ooi_list.html rocky/templates/oois/ooi_page_tabs.html
 #: reports/templates/summary/ooi_selection.html tools/forms/boefje.py
-#: tools/forms/ooi.py rocky/templates/oois/ooi_page_tabs.html
+#: tools/forms/ooi.py rocky/templates/oois/ooi_list.html
+#: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/explanations.html
 msgid "Clearance level"
 msgstr ""
@@ -4301,8 +4300,8 @@ msgstr ""
 
 #: tools/forms/boefje.py
 msgid ""
-"Specify the scanning frequency for this Boefje in minutes. The default is 24 hours."
-"For example: 5 minutes will let the boefje scan every 5 minutes."
+"Specify the scanning frequency for this Boefje in minutes. The default is 24 "
+"hours. For example: 5 minutes will let the boefje scan every 5 minutes."
 msgstr ""
 
 #: tools/forms/finding_type.py
