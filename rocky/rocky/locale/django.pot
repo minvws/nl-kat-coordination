@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-01 14:17+0000\n"
+"POT-Creation-Date: 2024-10-03 09:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -817,13 +817,15 @@ msgstr ""
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/summary/ooi_selection.html
+#: rocky/templates/oois/ooi_list.html
 msgid "Object"
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html onboarding/forms.py
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/boefje.py
-#: tools/forms/ooi.py rocky/templates/oois/ooi_page_tabs.html
+#: tools/forms/ooi.py rocky/templates/oois/ooi_list.html
+#: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/explanations.html
 msgid "Clearance level"
 msgstr ""
@@ -2014,6 +2016,7 @@ msgstr ""
 #: reports/report_types/dns_report/report.html
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
+#: rocky/templates/oois/ooi_list.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/explanations.html
 #: rocky/templates/partials/ooi_detail_related_object.html
@@ -3846,6 +3849,7 @@ msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html
+#: rocky/templates/oois/ooi_list.html
 msgid "Clearance type"
 msgstr ""
 
@@ -4296,8 +4300,8 @@ msgstr ""
 
 #: tools/forms/boefje.py
 msgid ""
-"Specify the scanning frequency for this Boefje in minutes. The default is 24 hours."
-"For example: 5 minutes will let the boefje scan every 5 minutes."
+"Specify the scanning frequency for this Boefje in minutes. The default is 24 "
+"hours. For example: 5 minutes will let the boefje scan every 5 minutes."
 msgstr ""
 
 #: tools/forms/finding_type.py
@@ -5658,6 +5662,14 @@ msgid ""
 msgstr ""
 
 #: rocky/templates/oois/ooi_list.html
+msgid "Objects "
+msgstr ""
+
+#: rocky/templates/oois/ooi_list.html
+msgid "column headers with buttons are sortable"
+msgstr ""
+
+#: rocky/templates/oois/ooi_list.html
 msgid "Delete object(s)"
 msgstr ""
 
@@ -6899,6 +6911,10 @@ msgstr ""
 
 #: rocky/views/ooi_view.py
 msgid "Clearance type: "
+msgstr ""
+
+#: rocky/views/ooi_view.py
+msgid "Searching for: "
 msgstr ""
 
 #: rocky/views/organization_add.py
