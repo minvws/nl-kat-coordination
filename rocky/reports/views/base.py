@@ -547,7 +547,7 @@ class SaveReportView(BaseReportView, ReportBreadcrumbs, SchedulerView):
 
             self.create_report_schedule(report_recipe)
 
-            return redirect(reverse("report_history", kwargs={"organization_code": self.organization.code}))
+            return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 
         messages.error(request, _("Empty name should not be possible."))
         return PostRedirect(self.get_previous())

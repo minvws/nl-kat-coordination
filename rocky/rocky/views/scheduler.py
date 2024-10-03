@@ -139,6 +139,13 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
+    def get_report_schedules(self) -> list[dict[str, Any]]:
+        try:
+            return self.scheduler_client.get_scheduled_reports(scheduler_id=self.scheduler_id)
+        except SchedulerError as error:
+            messages.error(self.request, error.message)
+        return []
+
     def get_task_statistics(self) -> dict[Any, Any]:
         stats = {}
         try:
