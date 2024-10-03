@@ -218,3 +218,7 @@ class OOITypeMultiCheckboxForm(BaseRockyForm):
 
 class OOISearchForm(BaseRockyForm):
     search = forms.CharField(label=_("Search"), required=False, max_length=256, help_text="Object ID contains")
+
+
+class OrderByObjectTypeForm(BaseRockyForm):
+    order_by = forms.CharField(widget=forms.HiddenInput(attrs={"value": "object_type"}), required=False)
