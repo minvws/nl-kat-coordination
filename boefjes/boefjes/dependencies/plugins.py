@@ -16,7 +16,8 @@ from boefjes.sql.db import session_managed_iterator
 from boefjes.sql.plugin_storage import create_plugin_storage
 from boefjes.storage.interfaces import (
     ConfigStorage,
-    ExistingPluginId,
+    DuplicatePlugin,
+    IntegrityError,
     NotFound,
     PluginNotFound,
     PluginStorage,
@@ -98,7 +99,7 @@ class PluginService:
             self.set_enabled_by_id(plugin_id, to_organisation, enabled=True)
 
     def upsert_settings(self, settings: dict, organisation_id: str, plugin_id: str):
-        self._assert_settings_match_schema(settings, organisation_id, plugin_id)
+        self._assert_settings_match_schema(settings, plugin_id)
         self._put_boefje(plugin_id)
 
         return self.config_storage.upsert(organisation_id, plugin_id, settings=settings)
@@ -106,30 +107,58 @@ class PluginService:
     def create_boefje(self, boefje: Boefje) -> None:
         try:
             self.local_repo.by_id(boefje.id)
-            raise ExistingPluginId(boefje.id)
+            raise DuplicatePlugin("id")
         except KeyError:
-            self.plugin_storage.create_boefje(boefje)
+            try:
+                plugin = self.local_repo.by_name(boefje.name)
+
+                if plugin.type == "boefje":
+                    raise DuplicatePlugin("name")
+                else:
+                    try:
+                        with self.plugin_storage as storage:
+                            storage.create_boefje(boefje)
+                    except IntegrityError as error:
+                        raise DuplicatePlugin(self._translate_duplicate_plugin(error.message))
+            except KeyError:
+                try:
+                    with self.plugin_storage as storage:
+                        storage.create_boefje(boefje)
+                except IntegrityError as error:
+                    raise DuplicatePlugin(self._translate_duplicate_plugin(error.message))
+
+    def _translate_duplicate_plugin(self, error_message):
+        translations = {"boefje_plugin_id": "id", "boefje_name": "name"}
+        return next((value for key, value in translations.items() if key in error_message), None)
 
     def create_normalizer(self, normalizer: Normalizer) -> None:
         try:
             self.local_repo.by_id(normalizer.id)
-            raise ExistingPluginId(normalizer.id)
+            raise DuplicatePlugin("id")
         except KeyError:
-            self.plugin_storage.create_normalizer(normalizer)
+            try:
+                plugin = self.local_repo.by_name(normalizer.name)
+
+                if plugin.types == "normalizer":
+                    raise DuplicatePlugin("name")
+                else:
+                    self.plugin_storage.create_normalizer(normalizer)
+            except KeyError:
+                self.plugin_storage.create_normalizer(normalizer)
 
     def _put_boefje(self, boefje_id: str) -> None:
         """Check existence of a boefje, and insert a database entry if it concerns a local boefje"""
 
         try:
             self.plugin_storage.boefje_by_id(boefje_id)
-        except PluginNotFound:
+        except PluginNotFound as e:
             try:
                 plugin = self.local_repo.by_id(boefje_id)
             except KeyError:
-                raise
+                raise e
 
             if plugin.type != "boefje":
-                raise
+                raise e
             self.plugin_storage.create_boefje(plugin)
 
     def _put_normalizer(self, normalizer_id: str) -> None:
@@ -150,18 +179,13 @@ class PluginService:
     def delete_settings(self, organisation_id: str, plugin_id: str):
         self.config_storage.delete(organisation_id, plugin_id)
 
-        try:
-            self._assert_settings_match_schema({}, organisation_id, plugin_id)
-        except SettingsNotConformingToSchema:
-            logger.warning("Making sure %s is disabled for %s because settings are deleted", plugin_id, organisation_id)
-
-            self.set_enabled_by_id(plugin_id, organisation_id, False)
+        # We don't check the schema anymore because we can provide entries through the global environment as well
 
     def schema(self, plugin_id: str) -> dict | None:
         try:
             boefje = self.plugin_storage.boefje_by_id(plugin_id)
 
-            return boefje.schema
+            return boefje.boefje_schema
         except PluginNotFound:
             return self.local_repo.schema(plugin_id)
 
@@ -184,9 +208,7 @@ class PluginService:
             return ""
 
     def set_enabled_by_id(self, plugin_id: str, organisation_id: str, enabled: bool):
-        if enabled:
-            all_settings = self.get_all_settings(organisation_id, plugin_id)
-            self._assert_settings_match_schema(all_settings, organisation_id, plugin_id)
+        # We don't check the schema anymore because we can provide entries through the global environment as well
 
         try:
             self._put_boefje(plugin_id)
@@ -195,14 +217,14 @@ class PluginService:
 
         self.config_storage.upsert(organisation_id, plugin_id, enabled=enabled)
 
-    def _assert_settings_match_schema(self, all_settings: dict, organisation_id: str, plugin_id: str):
+    def _assert_settings_match_schema(self, all_settings: dict, plugin_id: str):
         schema = self.schema(plugin_id)
 
         if schema:  # No schema means that there is nothing to assert
             try:
                 validate(instance=all_settings, schema=schema)
             except ValidationError as e:
-                raise SettingsNotConformingToSchema(organisation_id, plugin_id, e.message) from e
+                raise SettingsNotConformingToSchema(plugin_id, e.message) from e
 
     def _set_plugin_enabled(self, plugin: PluginType, organisation_id: str) -> PluginType:
         with contextlib.suppress(KeyError, NotFound):
@@ -211,7 +233,7 @@ class PluginService:
         return plugin
 
 
-def get_plugin_service(organisation_id: str) -> Iterator[PluginService]:
+def get_plugin_service() -> Iterator[PluginService]:
     def closure(session: Session):
         return PluginService(
             create_plugin_storage(session),
@@ -231,5 +253,6 @@ def get_plugins_filter_parameters(
     ids: list[str] | None = Query(None),
     plugin_type: Literal["boefje", "normalizer", "bit"] | None = None,
     state: bool | None = None,
+    oci_image: str | None = None,
 ) -> FilterParameters:
-    return FilterParameters(q=q, ids=ids, type=plugin_type, state=state)
+    return FilterParameters(q=q, ids=ids, type=plugin_type, state=state, oci_image=oci_image)

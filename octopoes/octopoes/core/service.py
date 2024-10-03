@@ -2,10 +2,10 @@ import json
 from collections import Counter
 from collections.abc import Callable, ValuesView
 from datetime import datetime, timezone
-from logging import getLogger
 from time import perf_counter
 from typing import Literal, overload
 
+import structlog
 from bits.definitions import get_bit_definitions
 from bits.runner import BitRunner
 from pydantic import TypeAdapter
@@ -47,7 +47,7 @@ from octopoes.repositories.origin_repository import OriginRepository
 from octopoes.repositories.scan_profile_repository import ScanProfileRepository
 from octopoes.xtdb.client import Operation, OperationType, XTDBSession
 
-logger = getLogger(__name__)
+logger = structlog.get_logger("octopoes-core-service")
 settings = Settings()
 
 
@@ -162,7 +162,14 @@ class OctopoesService:
 
     def _delete_ooi(self, reference: Reference, valid_time: datetime) -> None:
         referencing_origins = self.origin_repository.list_origins(valid_time, result=reference)
-        if not referencing_origins:
+        if not any(
+            origin
+            for origin in referencing_origins
+            if not (
+                origin.origin_type == OriginType.AFFIRMATION
+                or (origin.origin_type == OriginType.INFERENCE and origin.source == reference)
+            )
+        ):
             self.ooi_repository.delete(reference, valid_time)
 
     def save_origin(
@@ -171,18 +178,25 @@ class OctopoesService:
         origin.result = [ooi.reference for ooi in oois]
 
         # When an Origin is saved while the source OOI does not exist, reject saving the results
-        if (
-            origin.origin_type not in [OriginType.DECLARATION, OriginType.AFFIRMATION]
-            and origin.source not in origin.result
-        ):
-            try:
-                self.ooi_repository.get(origin.source, valid_time)
-            except ObjectNotFoundException:
+        try:
+            self.ooi_repository.get(origin.source, valid_time)
+        except ObjectNotFoundException:
+            if (
+                origin.origin_type not in [OriginType.DECLARATION, OriginType.AFFIRMATION]
+                and origin.source not in origin.result
+            ):
                 raise ValueError("Origin source of observation does not exist")
+            elif origin.origin_type == OriginType.AFFIRMATION:
+                logger.debug("Affirmation source %s already deleted", origin.source)
+                return
 
         for ooi in oois:
             self.ooi_repository.save(ooi, valid_time=valid_time, end_valid_time=end_valid_time)
         self.origin_repository.save(origin, valid_time=valid_time)
+
+        # Origins that are stale need to be deleted. #3561
+        if not origin.result and origin.origin_type != OriginType.INFERENCE:
+            self.origin_repository.delete(origin, valid_time=valid_time)
 
     def _run_inference(self, origin: Origin, valid_time: datetime) -> None:
         bit_definition = get_bit_definitions().get(origin.method, None)

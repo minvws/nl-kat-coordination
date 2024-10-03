@@ -8,7 +8,7 @@ from typing import Any
 import structlog
 from opentelemetry import trace
 
-from scheduler import context, queues, rankers, storage
+from scheduler import context, queues, rankers, storage, utils
 from scheduler.connectors import listeners
 from scheduler.connectors.errors import ExternalServiceError
 from scheduler.models import (
@@ -139,7 +139,7 @@ class BoefjeScheduler(Scheduler):
             mutation: The mutation that was received.
         """
         # Convert body into a ScanProfileMutation
-        mutation = ScanProfileMutation.parse_raw(body)
+        mutation = ScanProfileMutation.model_validate_json(body)
 
         self.logger.debug(
             "Received scan level mutation %s for: %s",
@@ -215,7 +215,7 @@ class BoefjeScheduler(Scheduler):
                     continue
 
                 boefje_task = BoefjeTask(
-                    boefje=Boefje.parse_obj(boefje.dict()),
+                    boefje=Boefje.model_validate(boefje.model_dump()),
                     input_ooi=ooi.primary_key if ooi else None,
                     organization=self.organisation.id,
                 )
@@ -301,7 +301,7 @@ class BoefjeScheduler(Scheduler):
                         continue
 
                     boefje_task = BoefjeTask(
-                        boefje=Boefje.parse_obj(boefje.dict()),
+                        boefje=Boefje.model_validate(boefje.dict()),
                         input_ooi=ooi.primary_key,
                         organization=self.organisation.id,
                     )
@@ -368,7 +368,7 @@ class BoefjeScheduler(Scheduler):
             thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-rescheduling"
         ) as executor:
             for schedule in schedules:
-                boefje_task = BoefjeTask.parse_obj(schedule.data)
+                boefje_task = BoefjeTask.model_validate(schedule.data)
 
                 # Plugin still exists?
                 try:
@@ -486,7 +486,7 @@ class BoefjeScheduler(Scheduler):
                         continue
 
                 new_boefje_task = BoefjeTask(
-                    boefje=Boefje.parse_obj(plugin.dict()),
+                    boefje=Boefje.model_validate(plugin.dict()),
                     input_ooi=ooi.primary_key if ooi else None,
                     organization=self.organisation.id,
                 )
@@ -659,7 +659,7 @@ class BoefjeScheduler(Scheduler):
     def push_item_to_queue(self, item: Task) -> Task:
         """Some boefje scheduler specific logic before pushing the item to the
         queue."""
-        boefje_task = BoefjeTask.parse_obj(item.data)
+        boefje_task = BoefjeTask.model_validate(item.data)
 
         # Check if id's are unique and correctly set. Same id's are necessary
         # for the task runner.
@@ -893,6 +893,16 @@ class BoefjeScheduler(Scheduler):
         Returns:
             True if the grace period has passed, False otherwise.
         """
+        # Does boefje have an interval specified?
+        plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+            task.boefje.id,
+            self.organisation.id,
+        )
+        if plugin is not None and plugin.interval is not None and plugin.interval > 0:
+            timeout = timedelta(minutes=plugin.interval)
+        else:
+            timeout = timedelta(seconds=self.ctx.config.pq_grace_period)
+
         try:
             task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
         except Exception as exc_db:
@@ -907,9 +917,7 @@ class BoefjeScheduler(Scheduler):
             raise exc_db
 
         # Has grace period passed according to datastore?
-        if task_db is not None and datetime.now(timezone.utc) - task_db.modified_at < timedelta(
-            seconds=self.ctx.config.pq_grace_period
-        ):
+        if task_db is not None and datetime.now(timezone.utc) - task_db.modified_at < timeout:
             self.logger.debug(
                 "Task has not passed grace period, according to the datastore",
                 task_id=task_db.id,
@@ -939,7 +947,7 @@ class BoefjeScheduler(Scheduler):
         if (
             task_bytes is not None
             and task_bytes.ended_at is not None
-            and datetime.now(timezone.utc) - task_bytes.ended_at < timedelta(seconds=self.ctx.config.pq_grace_period)
+            and datetime.now(timezone.utc) - task_bytes.ended_at < timeout
         ):
             self.logger.debug(
                 "Task has not passed grace period, according to bytes",
@@ -997,3 +1005,29 @@ class BoefjeScheduler(Scheduler):
         )
 
         return boefjes
+
+    def set_cron(self, item: Task) -> str | None:
+        """Override Schedule.set_cron() when a boefje specifies a schedule for
+        execution (cron expression) we schedule for its execution"""
+        # Does a boefje have a schedule defined?
+        plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+            utils.deep_get(item.data, ["boefje", "id"]),
+            self.organisation.id,
+        )
+        if plugin is None or plugin.cron is None:
+            return super().set_cron(item)
+
+        return plugin.cron
+
+    def calculate_deadline(self, task: Task) -> datetime:
+        """Override Scheduler.calculate_deadline() to calculate the deadline
+        for a task and based on the boefje interval."""
+        # Does the boefje have an interval defined?
+        plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+            utils.deep_get(task.data, ["boefje", "id"]),
+            self.organisation.id,
+        )
+        if plugin is not None and plugin.interval is not None and plugin.interval > 0:
+            return datetime.now(timezone.utc) + timedelta(minutes=plugin.interval)
+
+        return super().calculate_deadline(task)

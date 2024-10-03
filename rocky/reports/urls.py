@@ -39,6 +39,7 @@ urlpatterns = [
 urlpatterns += [
     path("view", ViewReportView.as_view(), name="view_report"),
     path("view/pdf/", ViewReportPDFView.as_view(), name="view_report_pdf"),
+    path("view/json/", ViewReportView.as_view(), name="view_report_json"),
 ]
 
 # Generate report urls

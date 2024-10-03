@@ -40,8 +40,13 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
         self.clearance_types = request.GET.getlist("clearance_type", [])
         self.search_string = request.GET.get("search", "")
 
+    def count_observed_at_filter(self) -> int:
+        return 1 if datetime.now(timezone.utc).date() != self.observed_at.date() else 0
+
     def get_active_filters(self) -> dict[str, str]:
         active_filters = {}
+        if self.count_observed_at_filter() > 0:
+            active_filters[_("Observed_at: ")] = self.observed_at.strftime("%Y-%m-%d")
         if self.filtered_ooi_types:
             active_filters[_("OOI types: ")] = ", ".join(self.filtered_ooi_types)
         if self.clearance_levels:
@@ -52,6 +57,14 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
         if self.search_string:
             active_filters[_("Searching for: ")] = self.search_string
         return active_filters
+
+    def count_active_filters(self):
+        return (
+            len(self.filtered_ooi_types)
+            + len(self.clearance_levels)
+            + len(self.clearance_types)
+            + self.count_observed_at_filter()
+        )
 
     def get_ooi_scan_levels(self) -> set[ScanLevel]:
         if not self.clearance_levels:
@@ -96,17 +109,14 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
 
         context["sorting_order"] = self.sorting_order
         context["sorting_order_class"] = "ascending" if self.sorting_order == "asc" else "descending"
-
         context["ooi_types_selection"] = self.filtered_ooi_types
-
         context["clearance_levels_selection"] = self.clearance_levels
         context["clearance_level_filter_form"] = ClearanceFilterForm(self.request.GET)
-
         context["clearance_types_selection"] = self.clearance_types
-
         context["active_filters"] = self.get_active_filters()
+        context["active_filters_counter"] = self.count_active_filters()
 
-        return context
+  return context
 
 
 class BaseOOIListView(OOIFilterView, ListView):

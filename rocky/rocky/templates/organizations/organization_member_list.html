@@ -14,7 +14,14 @@
                 {% blocktranslate with organization_name=organization.name %}
                     An overview of "{{ organization_name }}" its members.
                 {% endblocktranslate %}
-                <h2>{% translate "Members" %}</h2>
+                <h2>
+                    {% translate "Members" %}
+                    {% if members.count %}
+                        ({{ members.count }})
+                    {% else %}
+                        (0)
+                    {% endif %}
+                </h2>
                 {% if perms.tools.add_organizationmember %}
                     <div class="horizontal-view toolbar">
                         <div class="dropdown">
