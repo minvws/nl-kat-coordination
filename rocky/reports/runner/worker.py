@@ -79,7 +79,7 @@ class SchedulerWorkerManager(WorkerManager):
         except HTTPError:
             # Scheduler is having issues, so make note of it and try again
             logger.exception("Getting the queues from the scheduler failed")
-            time.sleep(10 * self.poll_interval)  # But not immediately
+            time.sleep(self.poll_interval)  # But not immediately
             return
 
         # We do not target a specific queue since we start one runtime for all organisations

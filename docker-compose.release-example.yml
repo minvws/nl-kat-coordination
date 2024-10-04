@@ -98,6 +98,7 @@ services:
   rocky:
     restart: on-failure
     depends_on:
+      - rocky_worker
       - octopoes_api_worker
       - octopoes_api
       - postgres
@@ -108,6 +109,27 @@ services:
     ports:
       - "127.0.0.1:8000:8000"
     image: "ghcr.io/minvws/nl-kat-rocky:${KAT_VERSION}"
+    command: web
+    env_file:
+      - .env-prod
+      - .env
+    environment:
+      - DATABASE_MIGRATION=true
+
+  rocky_worker:
+    restart: on-failure
+    depends_on:
+      - octopoes_api_worker
+      - octopoes_api
+      - postgres
+      - boefje
+      - normalizer
+      - katalogus
+      - scheduler
+    ports:
+      - "127.0.0.1:8000:8000"
+    image: "ghcr.io/minvws/nl-kat-rocky:${KAT_VERSION}"
+    command: worker
     env_file:
       - .env-prod
       - .env
