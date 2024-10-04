@@ -33,14 +33,14 @@ jobs:
     strategy:
       matrix:
         module:
-          # - name: octopoes
-          #   prefix_path: "."
-          # - name: mula
-          #   prefix_path: "mula/scheduler/"
-          # - name: bytes
-          #   prefix_path: "bytes/"
-          # - name: rocky
-          #   prefix_path: "rocky/"
+          - name: octopoes
+            prefix_path: "."
+          - name: mula
+            prefix_path: "mula/scheduler/"
+          - name: bytes
+            prefix_path: "bytes/"
+          - name: rocky
+            prefix_path: "rocky/"
           - name: boefjes
             prefix_path: "boefjes/"
 
