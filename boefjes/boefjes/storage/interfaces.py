@@ -55,14 +55,9 @@ class CannotUpdateStaticPlugin(NotAllowed):
         super().__init__(f"Plugin with id '{plugin_id}' is static, so updating it is not allowed")
 
 
-class ExistingPluginId(NotAllowed):
-    def __init__(self, plugin_id: str):
-        super().__init__(f"Plugin id '{plugin_id}' is already used")
-
-
-class ExistingPluginName(NotAllowed):
-    def __init__(self, plugin_name: str):
-        super().__init__(f"Plugin name '{plugin_name}' is already used")
+class DuplicatePlugin(NotAllowed):
+    def __init__(self, key: str):
+        super().__init__(f"Duplicate plugin {key}")
 
 
 class OrganisationStorage(ABC):
