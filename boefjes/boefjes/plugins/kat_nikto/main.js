@@ -6,7 +6,7 @@ import { execSync } from "node:child_process";
  * @returns {string}
  */
 function get_config_content(scheme) {
-  const IS_USING_PROXY = !!process.env.PROXYHOST;
+  const IS_USING_PROXY = !!process.env.HTTP_PROXY;
 
   // Setup config file
   try {
@@ -18,10 +18,11 @@ function get_config_content(scheme) {
     config_contents += "\n";
 
     if (IS_USING_PROXY) {
-      const PROXY_HOST = process.env.PROXYHOST;
-      const PROXY_PORT = process.env.PROXYPORT || "8080";
-      const PROXY_USER = process.env.PROXYUSER || "";
-      const PROXY_PASS = process.env.PROXYPASS || "";
+      const PROXY = new URL(process.env.HTTP_PROXY);
+      const PROXY_HOST = PROXY.hostname;
+      const PROXY_PORT = PROXY.port || "8080";
+      const PROXY_USER = PROXY.username || "";
+      const PROXY_PASS = PROXY.password || "";
 
       config_contents += `PROXYHOST=${PROXY_HOST}\n`;
       config_contents += `PROXYPORT=${PROXY_PORT}\n`;
