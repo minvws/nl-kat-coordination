@@ -45,7 +45,7 @@ jobs:
           #   prefix_path: "rocky/"
           - name: boefjes
             prefix_path: "boefjes/"
-            
+
     steps:
       - name: Checkout coverage file fix script
         uses: actions/checkout@v4
