@@ -707,9 +707,7 @@ class FilteringTestCase(unittest.TestCase):
 
     def test_apply_filter_jsonb_in_list(self):
         filter_request = FilterRequest(
-            filters=[
-                Filter(column="data", operator="@>", value=json.dumps({"list": ["foo"]})),
-            ]
+            filters=[Filter(column="data", operator="@>", value=json.dumps({"list": ["foo"]}))]
         )
 
         query = session.query(TestModel)

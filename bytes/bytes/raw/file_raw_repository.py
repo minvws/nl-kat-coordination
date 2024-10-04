@@ -77,11 +77,7 @@ class FileRawRepository(RawRepository):
 
 class S3RawRepository(RawRepository):
     def __init__(
-        self,
-        file_middleware: FileMiddleware,
-        bucket_per_org: bool,
-        s3_bucket_prefix: str,
-        s3_bucket_name: str,
+        self, file_middleware: FileMiddleware, bucket_per_org: bool, s3_bucket_prefix: str, s3_bucket_name: str
     ) -> None:
         self._file_middleware = file_middleware
         self.bucket_per_org = bucket_per_org
