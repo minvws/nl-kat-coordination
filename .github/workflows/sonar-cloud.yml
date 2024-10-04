@@ -10,15 +10,15 @@ on:
 
 jobs:
   octopoes-tests:
-    uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@feature/sonar-cloud
+    uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@main
   bytes-tests:
-    uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@feature/sonar-cloud
+    uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@main
   mula-tests:
-    uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@feature/sonar-cloud
+    uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@main
   rocky-tests:
-    uses: minvws/nl-kat-coordination/.github/workflows/rocky-tests.yml@feature/sonar-cloud
+    uses: minvws/nl-kat-coordination/.github/workflows/rocky-tests.yml@main
   boefjes-tests:
-    uses: minvws/nl-kat-coordination/.github/workflows/boefjes-tests.yml@feature/sonar-cloud
+    uses: minvws/nl-kat-coordination/.github/workflows/boefjes-tests.yml@main
 
   fix-coverage-reports:
     runs-on: ubuntu-latest
