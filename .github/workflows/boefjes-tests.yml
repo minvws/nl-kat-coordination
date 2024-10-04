@@ -23,7 +23,7 @@ jobs:
         working-directory: boefjes/
 
       - name: Install plugin requirements
-        run: find boefjes/plugins/ -name requirements.txt | xargs -L 1 pip install -r
+        run: find boefjes/plugins/ -name requirements.txt -execdir pip install -r requirements.txt \;
         working-directory: boefjes/
 
       - name: Install Octopoes
