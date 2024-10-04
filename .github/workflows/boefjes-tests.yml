@@ -30,7 +30,7 @@ jobs:
         run: cd octopoes && python setup.py bdist_wheel && pip install dist/octopoes*.whl
 
       - name: Run pytests
-        run: python3 -m pytest --cov boefjes/ boefjes/tests
+        run: python3 -m pytest --cov boefjes/ --cov-reort xml --cov-branch boefjes/tests
 
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
