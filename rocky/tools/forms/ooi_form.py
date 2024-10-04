@@ -13,9 +13,9 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
 from octopoes.models.ooi.question import Question
 from octopoes.models.types import get_collapsed_types, get_relations
+from tools.enums import SCAN_LEVEL
 from tools.forms.base import BaseRockyForm, CheckboxGroup
 from tools.forms.settings import CLEARANCE_TYPE_CHOICES
-from tools.models import SCAN_LEVEL
 
 
 class OOIForm(BaseRockyForm):
@@ -218,3 +218,7 @@ class OOITypeMultiCheckboxForm(BaseRockyForm):
 
 class OOISearchForm(BaseRockyForm):
     search = forms.CharField(label=_("Search"), required=False, max_length=256, help_text="Object ID contains")
+
+
+class OrderByObjectTypeForm(BaseRockyForm):
+    order_by = forms.CharField(widget=forms.HiddenInput(attrs={"value": "object_type"}), required=False)

@@ -1,13 +1,15 @@
 import typing
+from base64 import b64encode
 from collections.abc import Callable
 from functools import wraps
 from typing import Any
 from uuid import UUID
 
 import httpx
-from httpx import HTTPError
+from httpx import HTTPError, HTTPStatusError
 
-from bytes.models import BoefjeMeta, NormalizerMeta
+from bytes.api.models import BoefjeOutput
+from bytes.models import BoefjeMeta, NormalizerMeta, RawDataMeta
 from bytes.repositories.meta_repository import BoefjeMetaFilter, NormalizerMetaFilter, RawDataFilter
 
 BYTES_API_CLIENT_VERSION = "0.2"
@@ -21,7 +23,7 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
         try:
             return function(self, *args, **kwargs)
         except HTTPError as error:
-            if error.response.status_code != 401:
+            if not isinstance(error, HTTPStatusError) or error.response.status_code != 401:
                 raise
 
             self.login()
@@ -89,7 +91,7 @@ class BytesAPIClient:
         self._verify_response(response)
 
         boefje_meta_json = response.json()
-        return BoefjeMeta.parse_obj(boefje_meta_json)
+        return BoefjeMeta.model_validate(boefje_meta_json)
 
     @retry_with_login
     def get_boefje_meta(self, query_filter: BoefjeMetaFilter) -> list[BoefjeMeta]:
@@ -97,7 +99,7 @@ class BytesAPIClient:
         self._verify_response(response)
 
         boefje_meta_json = response.json()
-        return [BoefjeMeta.parse_obj(boefje_meta) for boefje_meta in boefje_meta_json]
+        return [BoefjeMeta.model_validate(boefje_meta) for boefje_meta in boefje_meta_json]
 
     @retry_with_login
     def save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
@@ -111,7 +113,7 @@ class BytesAPIClient:
         self._verify_response(response)
 
         normalizer_meta_json = response.json()
-        return NormalizerMeta.parse_obj(normalizer_meta_json)
+        return NormalizerMeta.model_validate(normalizer_meta_json)
 
     @retry_with_login
     def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> list[NormalizerMeta]:
@@ -119,26 +121,41 @@ class BytesAPIClient:
         self._verify_response(response)
 
         normalizer_meta_json = response.json()
-        return [NormalizerMeta.parse_obj(normalizer_meta) for normalizer_meta in normalizer_meta_json]
+        return [NormalizerMeta.model_validate(normalizer_meta) for normalizer_meta in normalizer_meta_json]
 
     @retry_with_login
     def save_raw(self, boefje_meta_id: UUID, raw: bytes, mime_types: list[str] | None = None) -> str:
         if not mime_types:
             mime_types = []
 
-        headers = {"content-type": "application/octet-stream"}
-
+        file_name = "raw"  # The name provides a key for all ids returned, so this is arbitrary as we only upload 1 file
         response = self.client.post(
             "/bytes/raw",
-            content=raw,
-            headers=headers,
-            params={"mime_types": mime_types, "boefje_meta_id": str(boefje_meta_id)},
+            json={
+                "files": [
+                    {
+                        "name": file_name,
+                        "content": b64encode(raw).decode(),
+                        "tags": mime_types,
+                    }
+                ],
+            },
+            params={"boefje_meta_id": str(boefje_meta_id)},
         )
-
         self._verify_response(response)
-        raw_id = response.json()["id"]
 
-        return str(raw_id)
+        return response.json()[file_name]
+
+    @retry_with_login
+    def save_raws(self, boefje_meta_id: UUID, boefje_output: BoefjeOutput) -> dict[str, str]:
+        response = self.client.post(
+            "/bytes/raw",
+            content=boefje_output.model_dump_json(),
+            params={"boefje_meta_id": str(boefje_meta_id)},
+        )
+        self._verify_response(response)
+
+        return response.json()
 
     @retry_with_login
     def get_raw(self, raw_id: UUID) -> bytes:
@@ -146,6 +163,13 @@ class BytesAPIClient:
         self._verify_response(response)
 
         return response.content
+
+    @retry_with_login
+    def get_raw_meta(self, raw_id: UUID) -> RawDataMeta:
+        response = self.client.get(f"/bytes/raw/{raw_id}/meta")
+        self._verify_response(response)
+
+        return RawDataMeta.model_validate(response.json())
 
     @retry_with_login
     def get_raws(self, query_filter: RawDataFilter) -> dict[str, str]:

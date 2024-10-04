@@ -189,16 +189,19 @@ def test_check_add_redteamer_form(rf, admin_member):
 
     assert response.status_code == 200
     assertContains(response, "Redteam member")
+    print(response.content)
 
     # Check first and last radio input of trusted clearance level form input
     assertContains(
         response,
-        '<input type="radio" name="trusted_clearance_level" value="-1" id="id_trusted_clearance_level_0" checked="">',
+        '<input type="radio" name="trusted_clearance_level" value="-1" radio_paws="True" '
+        'id="id_trusted_clearance_level_0" required="True" checked="True" checked="True">',
         html=True,
     )
     assertContains(
         response,
-        '<input type="radio" name="trusted_clearance_level" value="4" id="id_trusted_clearance_level_5">',
+        '<input type="radio" name="trusted_clearance_level" value="4" radio_paws="True" '
+        'id="id_trusted_clearance_level_5" required="True">',
         html=True,
     )
 

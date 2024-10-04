@@ -41,8 +41,8 @@ logger = structlog.get_logger(__name__)
 
 
 def merge_ooi(ooi_new: OOI, ooi_old: OOI) -> tuple[OOI, bool]:
-    data_old = ooi_old.dict()
-    data_new = ooi_new.dict()
+    data_old = ooi_old.model_dump()
+    data_new = ooi_new.model_dump()
 
     # Trim new None values
     clean_new = {key: val for key, val in data_new.items() if val is not None}
@@ -54,7 +54,7 @@ def merge_ooi(ooi_new: OOI, ooi_old: OOI) -> tuple[OOI, bool]:
             break
 
     data_old.update(clean_new)
-    return ooi_new.__class__.parse_obj(data_old), changed
+    return ooi_new.__class__.model_validate(data_old), changed
 
 
 class OOIRepository(Repository):
@@ -146,6 +146,9 @@ class OOIRepository(Repository):
         only_muted,
         offset,
         limit,
+        search_string,
+        order_by,
+        asc_desc,
     ) -> Paginated[Finding]:
         raise NotImplementedError
 
@@ -729,6 +732,9 @@ class XTDBOOIRepository(OOIRepository):
         only_muted=False,
         offset=DEFAULT_OFFSET,
         limit=DEFAULT_LIMIT,
+        search_string: str | None = None,
+        order_by: Literal["score", "finding_type"] = "score",
+        asc_desc: Literal["asc", "desc"] = "desc",
     ) -> Paginated[Finding]:
         # clause to find risk_severity
         concrete_finding_types = to_concrete({FindingType})
@@ -751,6 +757,15 @@ class XTDBOOIRepository(OOIRepository):
         elif only_muted:
             muted_clause = "[?muted_finding :MutedFinding/finding ?finding]"
 
+        search_statement = (
+            f"""[?finding :xt/id ?id]
+                                [(clojure.string/includes? ?id \"{escape_string(search_string)}\")]"""
+            if search_string
+            else ""
+        )
+
+        order_statement = f":order-by [[?{order_by} :{asc_desc}]]"
+
         severity_values = ", ".join([str_val(severity.value) for severity in severities])
 
         count_query = f"""
@@ -760,6 +775,7 @@ class XTDBOOIRepository(OOIRepository):
                     :in [[severities_ ...]]
                     :where [[?finding :object_type "Finding"]
                             [?finding :Finding/finding_type ?finding_type]
+                            {search_statement}
                             [(== ?severity severities_)]
                             {or_severities}
                             {muted_clause}]
@@ -776,17 +792,18 @@ class XTDBOOIRepository(OOIRepository):
         finding_query = f"""
             {{
                 :query {{
-                    :find [(pull ?finding [*]) ?score]
+                    :find [(pull ?finding [*]) ?score ?finding_type]
                     :in [[severities_ ...]]
                     :where [[?finding :object_type "Finding"]
                             [?finding :Finding/finding_type ?finding_type]
                             [(== ?severity severities_)]
                             {or_severities}
                             {or_scores}
-                            {muted_clause}]
+                            {muted_clause}
+                            {search_statement}]
                     :limit {limit}
                     :offset {offset}
-                    :order-by [[?score :desc]]
+                    {order_statement}
                 }}
                :in-args [[{severity_values}]]
             }}
@@ -840,9 +857,11 @@ class XTDBOOIRepository(OOIRepository):
         results = [
             (
                 self.simplify_keys(x[0]),
-                [self.simplify_keys(y) for y in x[0]["Report/_parent_report"]]
-                if "Report/_parent_report" in x[0]
-                else [],
+                (
+                    [self.simplify_keys(y) for y in x[0]["Report/_parent_report"]]
+                    if "Report/_parent_report" in x[0]
+                    else []
+                ),
             )
             for x in self.session.client.query(query)
         ]

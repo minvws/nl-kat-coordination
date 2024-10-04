@@ -11,11 +11,22 @@
         <section>
             <div>
                 <h1>{% translate "Organizations" %}</h1>
-                {% if perms.tools.add_organization %}
-                    <div class="horizontal-view toolbar">
+                <div class="horizontal-view toolbar">
+                    {% if perms.tools.can_recalculate_bits %}
+                        <form method="post" class="inline">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="dropdown-button"
+                                    name="action"
+                                    value="recalculate">
+                                {% translate "Rerun all bits for all my organizations" %}
+                            </button>
+                        </form>
+                    {% endif %}
+                    {% if perms.tools.add_organization %}
                         <a href="{% url 'organization_add' %}" class="button">{% translate "Add new organization" %}</a>
-                    </div>
-                {% endif %}
+                    {% endif %}
+                </div>
                 <div class="horizontal-scroll">
                     {% if object_list %}
                         <table>
@@ -32,10 +43,10 @@
                                 {% for organization in object_list %}
                                     <tr>
                                         <td>
-                                            <a href="{% url "organization_crisis_room" organization_code=organization.code %}">{{ organization.name }}</a>
+                                            <a href="{% url 'organization_crisis_room' organization_code=organization.code %}">{{ organization.name }}</a>
                                         </td>
                                         <td>
-                                            <a href="{% url "organization_crisis_room" organization_code=organization.code %}">{{ organization.code }}</a>
+                                            <a href="{% url 'organization_crisis_room' organization_code=organization.code %}">{{ organization.code }}</a>
                                         </td>
                                         <td>
                                             {% include "organizations/organization_tags.html" %}

@@ -5,7 +5,6 @@ from typing import Any
 import structlog
 from fastapi import APIRouter, FastAPI, Request, status
 from fastapi.responses import JSONResponse, RedirectResponse
-from jsonschema.exceptions import SchemaError
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
@@ -20,7 +19,7 @@ from boefjes.config import settings
 from boefjes.katalogus import organisations, plugins
 from boefjes.katalogus import settings as settings_router
 from boefjes.katalogus.version import __version__
-from boefjes.storage.interfaces import NotAllowed, NotFound, StorageError
+from boefjes.storage.interfaces import IntegrityError, NotAllowed, NotFound, StorageError
 
 with settings.log_cfg.open() as f:
     logging.config.dictConfig(json.load(f))
@@ -89,19 +88,19 @@ def not_allowed_handler(request: Request, exc: NotAllowed):
     )
 
 
+@app.exception_handler(IntegrityError)
+def integrity_error_handler(request: Request, exc: IntegrityError):
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={"message": exc.message},
+    )
+
+
 @app.exception_handler(StorageError)
 def storage_error_handler(request: Request, exc: StorageError):
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={"message": exc.message},
-    )
-
-
-@app.exception_handler(SchemaError)
-def schema_error_handler(request: Request, exc: StorageError):
-    return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        content={"message": "Invalid jsonschema provided"},
     )
 
 

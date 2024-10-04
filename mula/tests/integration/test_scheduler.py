@@ -1,6 +1,6 @@
 import unittest
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
@@ -221,7 +221,9 @@ class SchedulerTestCase(unittest.TestCase):
 
         # Assert: schedule should have a deadline
         self.assertIsNotNone(schedule_db.deadline_at)
-        self.assertIsNotNone(schedule_db.schedule)
+
+        # Assert Schedule cron should NOT be set
+        self.assertIsNone(schedule_db.schedule)
 
         # Assert: deadline should be in the future, at least later than the
         # grace period
@@ -257,7 +259,9 @@ class SchedulerTestCase(unittest.TestCase):
 
         # Assert: schedule should have a deadline
         self.assertIsNotNone(schedule_db.deadline_at)
-        self.assertIsNotNone(schedule_db.schedule)
+
+        # Assert Schedule cron should NOT be set
+        self.assertIsNone(schedule_db.schedule)
 
         # Assert: deadline should be in the future, at least later than the
         # grace period
@@ -288,7 +292,7 @@ class SchedulerTestCase(unittest.TestCase):
         )
 
         # Act
-        second_item = first_item_db.copy()
+        second_item = first_item_db.model_copy()
         second_item.id = uuid.uuid4()
         second_item_db = self.scheduler.push_item_to_queue(second_item)
 
@@ -313,7 +317,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.scheduler.pop_item_from_queue()
 
         # Act
-        second_item = first_item_db.copy()
+        second_item = first_item_db.model_copy()
         second_item.id = uuid.uuid4()
         second_item_db = self.scheduler.push_item_to_queue(second_item)
 
@@ -327,6 +331,35 @@ class SchedulerTestCase(unittest.TestCase):
         schedules, _ = self.mock_ctx.datastores.schedule_store.get_schedules(scheduler_id=self.scheduler.scheduler_id)
 
         self.assertEqual(1, len(schedules))
+
+    def test_post_push_schedule_is_not_none(self):
+        """When a schedule is provided, it should be used to set the deadline"""
+        # Arrange
+        first_item = functions.create_item(
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+        )
+
+        schedule = models.Schedule(
+            scheduler_id=self.scheduler.scheduler_id,
+            schedule="0 0 * * *",
+            hash=first_item.hash,
+            data=first_item.data,
+        )
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
+
+        first_item.schedule_id = schedule_db.id
+        self.mock_ctx.datastores.task_store.update_task(first_item)
+
+        # Act
+        self.scheduler.push_item_to_queue(first_item)
+
+        # Assert: Check if the deadline_at is set correctly, to the next
+        # day at midnight
+        self.assertEqual(
+            schedule_db.deadline_at,
+            datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1),
+        )
 
     def test_post_pop(self):
         """When a task is popped from the queue, it should be removed from the database"""

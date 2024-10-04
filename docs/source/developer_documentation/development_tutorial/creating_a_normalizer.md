@@ -29,6 +29,7 @@ Here is an example of how our `normalizer.json` can look like:
 ```json
 {
   "id": "hello-katty-normalize",
+  "name": "hello katty normalizer",
   "consumes": ["boefje/hello-katty"],
   "produces": ["IPAddressV6", "IPAddressV4", "Network", "Greeting"]
 }
@@ -45,7 +46,6 @@ import json
 from collections.abc import Iterable
 from ipaddress import AddressValueError, IPv4Network, NetmaskValueError
 
-from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 from octopoes.models.ooi.greeting import Greeting
@@ -58,13 +58,13 @@ def is_ipv4(string: str) -> bool:
     except (AddressValueError, NetmaskValueError, ValueError) as e:
         return False
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[OOI]:
     """Function that gets run to produce OOIs from the boefje it consumes"""
 
     data_string = str(raw, "utf-8")
     data: dict = json.loads(data_string)
 
-    network = Network(name=normalizer_meta.raw_data.boefje_meta.arguments["input"]["network"]["name"])
+    network = Network(name=input_ooi["network"]["name"])
     yield network
 
     ip = None

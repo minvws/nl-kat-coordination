@@ -42,7 +42,7 @@ class SchedulerClientInterface:
     def get_queues(self) -> list[Queue]:
         raise NotImplementedError()
 
-    def pop_item(self, queue: str) -> Task | None:
+    def pop_item(self, queue_id: str) -> Task | None:
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
@@ -51,7 +51,7 @@ class SchedulerClientInterface:
     def get_task(self, task_id: uuid.UUID) -> Task:
         raise NotImplementedError()
 
-    def push_item(self, queue_id: str, p_item: Task) -> None:
+    def push_item(self, p_item: Task) -> None:
         raise NotImplementedError()
 
 
@@ -69,14 +69,14 @@ class SchedulerAPIClient(SchedulerClientInterface):
 
         return TypeAdapter(list[Queue]).validate_json(response.content)
 
-    def pop_item(self, queue: str) -> Task | None:
-        response = self._session.post(f"/queues/{queue}/pop")
+    def pop_item(self, queue_id: str) -> Task | None:
+        response = self._session.post(f"/queues/{queue_id}/pop")
         self._verify_response(response)
 
         return TypeAdapter(Task | None).validate_json(response.content)
 
-    def push_item(self, queue_id: str, p_item: Task) -> None:
-        response = self._session.post(f"/queues/{queue_id}/push", content=p_item.json())
+    def push_item(self, p_item: Task) -> None:
+        response = self._session.post(f"/queues/{p_item.scheduler_id}/push", content=p_item.model_dump_json())
         self._verify_response(response)
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
