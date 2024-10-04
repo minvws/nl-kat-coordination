@@ -1,4 +1,4 @@
-name: Octopoes Tests
+name: Octopoes Tests (with coverage)
 
 on:
   workflow_call:

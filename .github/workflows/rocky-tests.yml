@@ -1,4 +1,4 @@
-name: Rocky Tests
+name: Rocky Tests (with coverage)
 
 on:
   workflow_call:

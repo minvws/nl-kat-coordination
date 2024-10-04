@@ -1,4 +1,4 @@
-name: Mula Tests
+name: Mula Tests (with coverage)
 
 on:
   workflow_call:

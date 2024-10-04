@@ -1,4 +1,4 @@
-name: Bytes Tests
+name: Bytes Tests (with coverage)
 
 on:
   workflow_call:

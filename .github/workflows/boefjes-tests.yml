@@ -1,4 +1,4 @@
-name: Boefjes Test
+name: Boefjes Test (with coverage)
 
 on:
   workflow_call:
