@@ -25,7 +25,7 @@ services:
       - ".ci/ci.env"
 
   xtdb:
-    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.8"
+    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.1.0"
     ports:
       - "127.0.0.1:29002:3000"
 

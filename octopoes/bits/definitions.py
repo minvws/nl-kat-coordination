@@ -1,17 +1,17 @@
 import importlib
 import pkgutil
 from functools import cache
-from logging import getLogger
 from pathlib import Path
 from types import ModuleType
 
+import structlog
 from pydantic import BaseModel
 
 from octopoes.models.types import OOIType
 
 BITS_DIR = Path(__file__).parent
 BIT_ATTR_NAME = "BIT"
-logger = getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class BitParameterDefinition(BaseModel):

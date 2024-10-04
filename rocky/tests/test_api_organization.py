@@ -2,6 +2,7 @@ from typing import Any
 from unittest.mock import patch
 
 import pytest
+from django.contrib.auth.models import Permission
 from django.urls import reverse
 from httpx import HTTPError
 from pytest_assert_utils import assert_model_attrs
@@ -11,6 +12,8 @@ from pytest_drf import (
     Returns200,
     Returns201,
     Returns204,
+    Returns400,
+    Returns403,
     Returns409,
     Returns500,
     UsesDeleteMethod,
@@ -278,6 +281,34 @@ class TestOrganizationViewSet(ViewSetTest):
             }
             assert json == expected
 
+    class TestListNoPermission(
+        UsesGetMethod,
+        UsesListEndpoint,
+        Returns403,
+    ):
+        client = lambda_fixture("drf_redteam_client")
+
+    class TestCreateNoPermission(
+        UsesPostMethod,
+        UsesListEndpoint,
+        Returns403,
+    ):
+        client = lambda_fixture("drf_redteam_client")
+
+    class TestRetrieveNoPermission(
+        UsesGetMethod,
+        UsesDetailEndpoint,
+        Returns403,
+    ):
+        client = lambda_fixture("drf_redteam_client")
+
+    class TestDestroyNoPermission(
+        UsesDeleteMethod,
+        UsesDetailEndpoint,
+        Returns403,
+    ):
+        client = lambda_fixture("drf_redteam_client")
+
 
 class TestGetIndemnification(APIViewTest, UsesGetMethod, Returns200):
     # The superuser_member fixture creates the indemnification
@@ -300,13 +331,27 @@ class TestIndemnificationDoesNotExist(APIViewTest, UsesGetMethod, Returns200):
         assert json == expected
 
 
+class TestGetIndemnificationNoPermission(APIViewTest, UsesGetMethod, Returns403):
+    url = lambda_fixture(lambda organization: reverse("organization-indemnification", args=[organization.pk]))
+    client = lambda_fixture("drf_redteam_client")
+
+
 class TestSetIndemnification(APIViewTest, UsesPostMethod, Returns201):
     url = lambda_fixture(lambda organization: reverse("organization-indemnification", args=[organization.pk]))
-    client = lambda_fixture("drf_admin_client")
 
-    def test_it_sets_indemnification(self, json, admin_user):
-        expected = {"indemnification": True, "user": admin_user.id}
+    @pytest.fixture
+    def client(self, drf_redteam_client, redteamuser):
+        redteamuser.user_permissions.set([Permission.objects.get(codename="add_indemnification")])
+        return drf_redteam_client
+
+    def test_it_sets_indemnification(self, json, redteamuser):
+        expected = {"indemnification": True, "user": redteamuser.id}
         assert json == expected
+
+
+class TestSetIndemnificationNoPermission(APIViewTest, UsesPostMethod, Returns403):
+    url = lambda_fixture(lambda organization: reverse("organization-indemnification", args=[organization.pk]))
+    client = lambda_fixture("drf_redteam_client")
 
 
 class TestIndemnificationAlreadyExists(APIViewTest, UsesPostMethod, Returns409):
@@ -319,3 +364,57 @@ class TestIndemnificationAlreadyExists(APIViewTest, UsesPostMethod, Returns409):
     def test_it_returns_indemnification(self, json, superuser_member):
         expected = {"indemnification": True, "user": superuser_member.user.id}
         assert json == expected
+
+
+class TestRecalculateBits(APIViewTest, UsesPostMethod, Returns200):
+    url = lambda_fixture(lambda organization: reverse("organization-recalculate-bits", args=[organization.pk]))
+
+    @pytest.fixture
+    def client(self, drf_redteam_client, redteamuser):
+        redteamuser.user_permissions.set([Permission.objects.get(codename="can_recalculate_bits")])
+        return drf_redteam_client
+
+    @pytest.fixture(autouse=True)
+    def mock_octopoes(self, mocker):
+        return mocker.patch("tools.viewsets.OctopoesAPIConnector.recalculate_bits", return_value=42)
+
+    def test_it_recalculates_bits(self, json):
+        expected = {"number_of_bits": 42}
+        assert json == expected
+
+
+class TestRecalculateBitsNoPermission(APIViewTest, UsesPostMethod, Returns403):
+    url = lambda_fixture(lambda organization: reverse("organization-recalculate-bits", args=[organization.pk]))
+    client = lambda_fixture("drf_redteam_client")
+
+
+class TestKatalogusCloneSettings(APIViewTest, UsesPostMethod, Returns200):
+    url = lambda_fixture(lambda organization: reverse("organization-clone-katalogus-settings", args=[organization.pk]))
+    data = lambda_fixture(lambda organization_b: {"to_organization": organization_b.id})
+
+    @pytest.fixture
+    def client(self, drf_redteam_client, redteamuser):
+        redteamuser.user_permissions.set([Permission.objects.get(codename="can_set_katalogus_settings")])
+        return drf_redteam_client
+
+    @pytest.fixture(autouse=True)
+    def mock_katalogus(self, mocker):
+        return mocker.patch("katalogus.client.KATalogusClientV1")
+
+    def test_it_clones_settings(self, mock_katalogus, organization_b):
+        mock_katalogus().clone_all_configuration_to_organization.assert_called_once_with(organization_b.code)
+
+
+class TestCloneKatalogusSettingsNoPermission(APIViewTest, UsesPostMethod, Returns403):
+    url = lambda_fixture(lambda organization: reverse("organization-clone-katalogus-settings", args=[organization.pk]))
+    client = lambda_fixture("drf_redteam_client")
+
+
+class TestCloneKatalogusSettingsInvalidData(APIViewTest, UsesPostMethod, Returns400):
+    url = lambda_fixture(lambda organization: reverse("organization-clone-katalogus-settings", args=[organization.pk]))
+    data = lambda_fixture(lambda organization_b: {"wrong_field": organization_b.id})
+
+    @pytest.fixture
+    def client(self, drf_redteam_client, redteamuser):
+        redteamuser.user_permissions.set([Permission.objects.get(codename="can_set_katalogus_settings")])
+        return drf_redteam_client

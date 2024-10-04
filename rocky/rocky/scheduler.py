@@ -9,12 +9,15 @@ from functools import cached_property
 from typing import Any
 
 import httpx
+import structlog
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from httpx import ConnectError, HTTPError, HTTPStatusError, RequestError, codes
-from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny, TypeAdapter, ValidationError
 
 from rocky.health import ServiceHealth
+
+logger = structlog.get_logger(__name__)
 
 
 class Boefje(BaseModel):
@@ -82,6 +85,15 @@ class BoefjeTask(BaseModel):
     organization: str
 
 
+class ReportTask(BaseModel):
+    """ReportTask represent data needed for a Report to run."""
+
+    type: str = "report"
+
+    organisation_id: str
+    report_recipe_id: str
+
+
 class TaskStatus(Enum):
     # Task has been created but not yet queued
     PENDING = "pending"
@@ -109,16 +121,55 @@ class TaskStatus(Enum):
 class Task(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: uuid.UUID | None = None
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
     scheduler_id: str
     schedule_id: str | None = None
     priority: int
     status: TaskStatus | None = TaskStatus.PENDING
     type: str | None = None
     hash: str | None = None
-    data: SerializeAsAny[BoefjeTask | NormalizerTask]
+    data: SerializeAsAny[BoefjeTask | NormalizerTask | ReportTask]
     created_at: datetime.datetime | None = None
     modified_at: datetime.datetime | None = None
+
+    def organization_id(self) -> str:
+        if isinstance(self.data, BoefjeTask):
+            return self.data.organization
+
+        if isinstance(self.data, NormalizerTask):
+            return self.data.raw_data.boefje_meta.organization
+
+        if isinstance(self.data, ReportTask):
+            return self.data.organisation_id
+
+        raise ValueError("No organization found related to task")
+
+
+class ScheduleRequest(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    scheduler_id: str
+    data: dict
+    schedule: str
+
+
+class ScheduleResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    hash: str
+    data: dict
+    enabled: bool
+    schedule: str
+    tasks: list[Task]
+    deadline_at: datetime.datetime
+    created_at: datetime.datetime
+    modified_at: datetime.datetime
+
+
+class Queue(BaseModel):
+    id: str
+    size: int
 
 
 class PaginatedTasksResponse(BaseModel):
@@ -126,6 +177,13 @@ class PaginatedTasksResponse(BaseModel):
     next: str | None = None
     previous: str | None = None
     results: list[Task]
+
+
+class PaginatedSchedulesResponse(BaseModel):
+    count: int
+    next: str | None = None
+    previous: str | None = None
+    results: list[ScheduleResponse]
 
 
 class LazyTaskList:
@@ -220,6 +278,36 @@ class SchedulerClient:
         self._client = httpx.Client(base_url=base_uri)
         self.organization_code = organization_code
 
+    def list_schedules(self, **kwargs) -> PaginatedSchedulesResponse:
+        try:
+            kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
+            res = self._client.get("/schedules", params=kwargs)
+            res.raise_for_status()
+            return PaginatedSchedulesResponse.model_validate_json(res.content)
+        except ValidationError:
+            raise SchedulerValidationError(extra_message=_("Schedule list: "))
+        except ConnectError:
+            raise SchedulerConnectError(extra_message=_("Schedule list: "))
+
+    def get_schedule_details(self, schedule_id: str) -> ScheduleResponse:
+        try:
+            res = self._client.get(f"/schedules/{schedule_id}")
+            res.raise_for_status()
+            return ScheduleResponse.model_validate_json(res.content)
+        except ConnectError:
+            raise SchedulerConnectError()
+
+    def post_schedule(self, schedule: ScheduleRequest) -> ScheduleResponse:
+        try:
+            res = self._client.post(
+                "/schedules",
+                json=schedule.model_dump(exclude_none=True),
+            )
+            res.raise_for_status()
+            return ScheduleResponse.model_validate_json(res.content)
+        except (ValidationError, HTTPStatusError, ConnectError):
+            raise SchedulerValidationError(extra_message="Report schedule failed: ")
+
     def list_tasks(
         self,
         **kwargs,
@@ -236,39 +324,42 @@ class SchedulerClient:
             raise SchedulerConnectError(extra_message=_("Task list: "))
 
     def get_task_details(self, task_id: str) -> Task:
-        if self.organization_code is None:
-            raise SchedulerTaskNotFound("No organization defined in client.")
-        task_details = Task.model_validate_json(self._get(f"/tasks/{task_id}", "content"))
-
-        if task_details.type == "normalizer":
-            organization = task_details.data.raw_data.boefje_meta.organization
-        else:
-            organization = task_details.data.organization
-
-        if organization != self.organization_code:
-            raise SchedulerTaskNotFound()
-
-        return task_details
+        return Task.model_validate_json(self._get(f"/tasks/{task_id}", "content"))
 
     def push_task(self, item: Task) -> None:
         try:
-            queue_name = f"{item.data.type}-{self.organization_code}"
             res = self._client.post(
-                f"/queues/{queue_name}/push",
-                content=item.json(exclude_none=True),
+                f"/queues/{item.scheduler_id}/push",
+                content=item.model_dump_json(exclude_none=True),
                 headers={"Content-Type": "application/json"},
             )
             res.raise_for_status()
         except HTTPStatusError as http_error:
             code = http_error.response.status_code
             if code == codes.TOO_MANY_REQUESTS:
-                raise SchedulerTooManyRequestError()
+                raise SchedulerTooManyRequestError() from http_error
             elif code == codes.BAD_REQUEST:
-                raise SchedulerBadRequestError()
+                raise SchedulerBadRequestError() from http_error
             elif code == codes.CONFLICT:
-                raise SchedulerConflictError()
-        except RequestError:
-            raise SchedulerError()
+                raise SchedulerConflictError() from http_error
+        except RequestError as request_error:
+            raise SchedulerError() from request_error
+
+    def get_queues(self) -> list[Queue]:
+        response = self._client.get("/queues")
+        response.raise_for_status()
+
+        return TypeAdapter(list[Queue]).validate_json(response.content)
+
+    def pop_item(self, queue: str) -> Task | None:
+        response = self._client.post(f"/queues/{queue}/pop")
+        response.raise_for_status()
+
+        return TypeAdapter(Task | None).validate_json(response.content)
+
+    def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
+        response = self._client.patch(f"/tasks/{task_id}", json={"status": status.value})
+        response.raise_for_status()
 
     def health(self) -> ServiceHealth:
         return ServiceHealth.model_validate_json(self._get("/health", return_type="content"))
@@ -309,6 +400,14 @@ class SchedulerClient:
         if return_type == "content":
             return res.content
         return res.json()
+
+    def get_scheduled_reports(self, **params) -> list[dict[str, Any]]:
+        try:
+            response = self._client.get("/schedules", params=params)
+            response.raise_for_status()
+        except HTTPStatusError:
+            logger.error("A HTTPStatusError occurred. Check logs for more info.")
+        return response.json()["results"]
 
 
 def scheduler_client(organization_code: str | None) -> SchedulerClient:

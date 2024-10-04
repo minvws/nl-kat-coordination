@@ -41,8 +41,8 @@ logger = structlog.get_logger(__name__)
 
 
 def merge_ooi(ooi_new: OOI, ooi_old: OOI) -> tuple[OOI, bool]:
-    data_old = ooi_old.dict()
-    data_new = ooi_new.dict()
+    data_old = ooi_old.model_dump()
+    data_new = ooi_new.model_dump()
 
     # Trim new None values
     clean_new = {key: val for key, val in data_new.items() if val is not None}
@@ -54,7 +54,7 @@ def merge_ooi(ooi_new: OOI, ooi_old: OOI) -> tuple[OOI, bool]:
             break
 
     data_old.update(clean_new)
-    return ooi_new.__class__.parse_obj(data_old), changed
+    return ooi_new.__class__.model_validate(data_old), changed
 
 
 class OOIRepository(Repository):
@@ -857,9 +857,11 @@ class XTDBOOIRepository(OOIRepository):
         results = [
             (
                 self.simplify_keys(x[0]),
-                [self.simplify_keys(y) for y in x[0]["Report/_parent_report"]]
-                if "Report/_parent_report" in x[0]
-                else [],
+                (
+                    [self.simplify_keys(y) for y in x[0]["Report/_parent_report"]]
+                    if "Report/_parent_report" in x[0]
+                    else []
+                ),
             )
             for x in self.session.client.query(query)
         ]

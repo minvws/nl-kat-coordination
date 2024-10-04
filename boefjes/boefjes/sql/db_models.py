@@ -68,15 +68,16 @@ class BoefjeInDB(SQL_BASE):
     static = Column(Boolean, nullable=False, server_default="false")
 
     # Metadata
-    name = Column(String(length=64), nullable=False)
+    name = Column(String(length=64), nullable=False, unique=True)
     description = Column(types.Text, nullable=True)
     scan_level = Column(types.Enum(*[str(x.value) for x in ScanLevel], name="scan_level"), nullable=False, default="4")
 
     # Job specifications
     consumes = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
     produces = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
-    environment_keys = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
     schema = Column(types.JSON(), nullable=True)
+    cron = Column(types.String(length=128), nullable=True)
+    interval = Column(types.Integer, nullable=True)
 
     # Image specifications
     oci_image = Column(types.String(length=256), nullable=True)
@@ -93,11 +94,10 @@ class NormalizerInDB(SQL_BASE):
     static = Column(Boolean, nullable=False, server_default="false")
 
     # Metadata
-    name = Column(String(length=64), nullable=False)
+    name = Column(String(length=64), nullable=False, unique=True)
     description = Column(types.Text, nullable=True)
 
     # Job specifications
     consumes = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
     produces = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
-    environment_keys = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
     version = Column(types.String(length=16), nullable=True)

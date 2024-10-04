@@ -1,7 +1,7 @@
 {
   "id": "snyk-finding-types",
   "name": "SNYK Finding Types",
-  "description": "Hydrate information of SNYK finding types",
+  "description": "Hydrate information of SNYK finding types.",
   "consumes": [
     "SnykFindingType"
   ],

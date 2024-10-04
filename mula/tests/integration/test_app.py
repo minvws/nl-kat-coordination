@@ -50,9 +50,9 @@ class AppTestCase(unittest.TestCase):
         # Act
         self.app.monitor_organisations()
 
-        # Assert: four schedulers should have been created for two organisations
-        self.assertEqual(4, len(self.app.schedulers.keys()))
-        self.assertEqual(4, len(self.app.server.schedulers.keys()))
+        # Assert: six schedulers should have been created for two organisations
+        self.assertEqual(6, len(self.app.schedulers.keys()))
+        self.assertEqual(6, len(self.app.server.schedulers.keys()))
 
         scheduler_org_ids = {s.organisation.id for s in self.app.schedulers.values()}
         self.assertEqual({"org-1", "org-2"}, scheduler_org_ids)
@@ -68,9 +68,9 @@ class AppTestCase(unittest.TestCase):
         # Act
         self.app.monitor_organisations()
 
-        # Assert: four schedulers should have been created for two organisations
-        self.assertEqual(4, len(self.app.schedulers.keys()))
-        self.assertEqual(4, len(self.app.server.schedulers.keys()))
+        # Assert: six schedulers should have been created for two organisations
+        self.assertEqual(6, len(self.app.schedulers.keys()))
+        self.assertEqual(6, len(self.app.server.schedulers.keys()))
 
         scheduler_org_ids = {s.organisation.id for s in self.app.schedulers.values()}
         self.assertEqual({"org-1", "org-2"}, scheduler_org_ids)
@@ -100,9 +100,9 @@ class AppTestCase(unittest.TestCase):
         # Act
         self.app.monitor_organisations()
 
-        # Assert: four schedulers should have been created for two organisations
-        self.assertEqual(4, len(self.app.schedulers.keys()))
-        self.assertEqual(4, len(self.app.server.schedulers.keys()))
+        # Assert: six schedulers should have been created for two organisations
+        self.assertEqual(6, len(self.app.schedulers.keys()))
+        self.assertEqual(6, len(self.app.server.schedulers.keys()))
 
         scheduler_org_ids = {s.organisation.id for s in self.app.schedulers.values()}
         self.assertEqual({"org-1", "org-2"}, scheduler_org_ids)
@@ -117,8 +117,8 @@ class AppTestCase(unittest.TestCase):
         self.app.monitor_organisations()
 
         # Assert
-        self.assertEqual(4, len(self.app.schedulers.keys()))
-        self.assertEqual(4, len(self.app.server.schedulers.keys()))
+        self.assertEqual(6, len(self.app.schedulers.keys()))
+        self.assertEqual(6, len(self.app.server.schedulers.keys()))
 
         scheduler_org_ids = {s.organisation.id for s in self.app.schedulers.values()}
         self.assertEqual({"org-1", "org-3"}, scheduler_org_ids)

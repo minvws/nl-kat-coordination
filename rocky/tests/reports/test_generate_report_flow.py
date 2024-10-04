@@ -31,7 +31,7 @@ def test_select_all_oois_post_to_select_report_types(
             "generate_report_select_report_types",
             {
                 "observed_at": valid_time.strftime("%Y-%m-%d"),
-                "ooi": "all",
+                "ooi": listed_hostnames,
             },
         ),
         client_member.user,
@@ -158,6 +158,7 @@ def test_report_types_selection_nothing_selected(
     valid_time,
     mock_organization_view_octopoes,
     listed_hostnames,
+    mock_katalogus_client,
 ):
     """
     Will send the selected report types to the configuration page (set plugins).
@@ -251,7 +252,7 @@ def test_save_generate_report_view(
             "generate_report_view",
             {
                 "observed_at": valid_time.strftime("%Y-%m-%d"),
-                "ooi": "all",
+                "ooi": listed_hostnames,
                 "report_type": "dns-report",
                 "old_report_name": old_report_names,
                 "report_name": [f"DNS report for {len(listed_hostnames)} objects"],

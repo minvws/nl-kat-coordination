@@ -7,6 +7,7 @@ from multiprocessing import Manager
 from pathlib import Path
 from uuid import UUID
 
+import alembic.config
 import pytest
 from fastapi.testclient import TestClient
 from pydantic import TypeAdapter
@@ -16,12 +17,21 @@ from boefjes.app import SchedulerWorkerManager
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import Queue, SchedulerClientInterface, Task, TaskStatus
 from boefjes.config import Settings, settings
+from boefjes.dependencies.plugins import PluginService, get_plugin_service
 from boefjes.job_handler import bytes_api_client
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
+from boefjes.katalogus.organisations import check_organisation_exists
+from boefjes.katalogus.root import app
+from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
+from boefjes.local_repository import LocalPluginRepository, get_local_repository
 from boefjes.models import Organisation
 from boefjes.runtime_interfaces import Handler, WorkerManager
+from boefjes.sql.config_storage import SQLConfigStorage, create_encrypter
 from boefjes.sql.db import SQL_BASE, get_engine
-from boefjes.sql.organisation_storage import SQLOrganisationStorage
+from boefjes.sql.organisation_storage import SQLOrganisationStorage, get_organisations_store
+from boefjes.sql.plugin_storage import SQLPluginStorage
+from boefjes.storage.interfaces import OrganisationNotFound
+from boefjes.storage.memory import ConfigStorageMemory, OrganisationStorageMemory, PluginStorageMemory
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
@@ -40,11 +50,13 @@ class MockSchedulerClient(SchedulerClientInterface):
         log_path: Path,
         raise_on_empty_queue: Exception = KeyboardInterrupt,
         iterations_to_wait_for_exception: int = 0,
-        sleep_time: int = 0.1,
+        sleep_time: float = 0.1,
     ):
         self.queue_response = queue_response
         self.boefje_responses = boefje_responses
         self.normalizer_responses = normalizer_responses
+
+        log_path.touch(exist_ok=True)
         self.log_path = log_path
         self.raise_on_empty_queue = raise_on_empty_queue
         self.iterations_to_wait_for_exception = iterations_to_wait_for_exception
@@ -53,7 +65,7 @@ class MockSchedulerClient(SchedulerClientInterface):
         self._iterations = 0
         self._tasks: dict[str, Task] = multiprocessing.Manager().dict()
         self._popped_items: dict[str, Task] = multiprocessing.Manager().dict()
-        self._pushed_items: dict[str, tuple[str, Task]] = multiprocessing.Manager().dict()
+        self._pushed_items: dict[str, Task] = multiprocessing.Manager().dict()
 
     def get_queues(self) -> list[Queue]:
         time.sleep(self.sleep_time)
@@ -72,6 +84,7 @@ class MockSchedulerClient(SchedulerClientInterface):
             if WorkerManager.Queue.NORMALIZERS.value in queue:
                 p_item = TypeAdapter(Task).validate_json(self.normalizer_responses.pop(0))
                 self._popped_items[str(p_item.id)] = p_item
+                self._tasks[str(p_item.id)] = self._task_from_id(p_item.id)
                 return p_item
         except IndexError:
             raise self.raise_on_empty_queue
@@ -94,8 +107,8 @@ class MockSchedulerClient(SchedulerClientInterface):
     def _task_from_id(self, task_id: UUID):
         return self._popped_items[str(task_id)]
 
-    def push_item(self, queue_id: str, p_item: Task) -> None:
-        self._pushed_items[str(p_item.id)] = (queue_id, p_item)
+    def push_item(self, p_item: Task) -> None:
+        self._pushed_items[str(p_item.id)] = p_item
 
 
 class MockHandler(Handler):
@@ -105,10 +118,11 @@ class MockHandler(Handler):
         self.exception = exception
 
     def handle(self, item: BoefjeMeta | NormalizerMeta):
+        time.sleep(self.sleep_time)
+
         if str(item.id) == "9071c9fd-2b9f-440f-a524-ef1ca4824fd4":
             raise self.exception()
 
-        time.sleep(self.sleep_time)
         self.queue.put(item)
 
     def get_all(self) -> list[BoefjeMeta | NormalizerMeta]:
@@ -124,9 +138,11 @@ def item_handler(tmp_path: Path):
 def manager(item_handler: MockHandler, tmp_path: Path) -> SchedulerWorkerManager:
     scheduler_client = MockSchedulerClient(
         queue_response=get_dummy_data("scheduler/queues_response.json"),
-        boefje_responses=(
-            2 * [get_dummy_data("scheduler/pop_response_boefje.json")] + [get_dummy_data("scheduler/should_crash.json")]
-        ),
+        boefje_responses=[
+            get_dummy_data("scheduler/pop_response_boefje.json"),
+            get_dummy_data("scheduler/pop_response_boefje_2.json"),
+            get_dummy_data("scheduler/should_crash.json"),
+        ],
         normalizer_responses=[get_dummy_data("scheduler/pop_response_normalizer.json")],
         log_path=tmp_path / "patch_task_log",
     )
@@ -142,24 +158,115 @@ def api(tmp_path):
 
 
 @pytest.fixture
-def organisation_repository():
+def session():
+    alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"])
     engine = get_engine()
     session = sessionmaker(bind=engine)()
 
-    yield SQLOrganisationStorage(session, settings)
+    yield session
 
-    session.execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables]))
-    session.close()
+    session.commit()
+    engine.execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables]))
 
 
 @pytest.fixture
-def organisation(organisation_repository) -> Organisation:
-    organisation = Organisation(id="test", name="Test org")
+def organisation_storage(session):
+    return SQLOrganisationStorage(session, settings)
 
-    with organisation_repository as repo:
-        repo.create(organisation)
 
-    return organisation
+@pytest.fixture
+def config_storage(session):
+    return SQLConfigStorage(session, create_encrypter())
+
+
+@pytest.fixture
+def plugin_storage(session):
+    return SQLPluginStorage(session, settings)
+
+
+@pytest.fixture
+def local_repository():
+    return get_local_repository()
+
+
+@pytest.fixture
+def mock_local_repository():
+    return LocalPluginRepository(Path(__file__).parent / "modules")
+
+
+@pytest.fixture
+def normalizer_runner(local_repository: LocalPluginRepository):
+    return LocalNormalizerJobRunner(local_repository)
+
+
+@pytest.fixture
+def boefje_runner(local_repository: LocalPluginRepository):
+    return LocalBoefjeJobRunner(local_repository)
+
+
+@pytest.fixture
+def mock_normalizer_runner(mock_local_repository: LocalPluginRepository):
+    return LocalNormalizerJobRunner(mock_local_repository)
+
+
+@pytest.fixture
+def mock_boefje_runner(mock_local_repository: LocalPluginRepository):
+    return LocalBoefjeJobRunner(mock_local_repository)
+
+
+@pytest.fixture
+def plugin_service(plugin_storage, config_storage, local_repository):
+    return PluginService(plugin_storage, config_storage, local_repository)
+
+
+@pytest.fixture
+def test_organisation():
+    return Organisation(id="test", name="Test org")
+
+
+@pytest.fixture
+def mock_plugin_service(mock_local_repository, test_organisation) -> PluginService:
+    storage = ConfigStorageMemory()
+    storage.upsert(test_organisation.id, "test_plugin", {"DUMMY_VAR": "123"})
+
+    return PluginService(PluginStorageMemory(), storage, mock_local_repository)
+
+
+@pytest.fixture
+def organisation(organisation_storage, test_organisation) -> Organisation:
+    with organisation_storage as repo:
+        repo.create(test_organisation)
+
+    return test_organisation
+
+
+@pytest.fixture
+def unit_test_client(mock_plugin_service) -> TestClient:
+    client = TestClient(app)
+    _store = OrganisationStorageMemory({"test": Organisation(id="test", name="Test")})
+
+    services = {
+        "test": mock_plugin_service,
+    }
+
+    def get_service(organisation_id: str):
+        if organisation_id in services:
+            return services.get(organisation_id)
+
+        raise OrganisationNotFound(organisation_id)
+
+    app.dependency_overrides[get_organisations_store] = lambda: _store
+    app.dependency_overrides[get_plugin_service] = get_service
+    app.dependency_overrides[check_organisation_exists] = lambda: None
+
+    yield client
+
+    app.dependency_overrides = {}
+
+
+@pytest.fixture
+def test_client() -> TestClient:
+    return TestClient(app)
 
 
 @pytest.fixture

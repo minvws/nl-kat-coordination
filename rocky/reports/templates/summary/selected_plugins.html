@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<h3>{% translate "Selected Plugins" %}</h3>
+<h3>{% translate "Plugins" %} ({{ data.plugins|length }})</h3>
 {% if data.plugins %}
     <p>
         {% blocktranslate trimmed %}

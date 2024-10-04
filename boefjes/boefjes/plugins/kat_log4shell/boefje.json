@@ -5,8 +5,5 @@
   "consumes": [
     "Hostname"
   ],
-  "environment_keys": [
-    "REPLY_FQDN"
-  ],
   "scan_level": 4
 }

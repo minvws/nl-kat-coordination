@@ -6,9 +6,5 @@
     "IPAddressV4",
     "IPAddressV6"
   ],
-  "scan_level": 1,
-  "environment_keys": [
-    "MAXMIND_USER_ID",
-    "MAXMIND_LICENCE_KEY"
-  ]
+  "scan_level": 1
 }

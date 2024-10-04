@@ -1,13 +1,9 @@
 {
   "id": "masscan",
   "name": "masscan",
-  "description": "Quickly scan large amounts of IPs.",
+  "description": "Quickly scan large amounts of IPs. Due to the quick scanning it may not always show accurate results.",
   "consumes": [
     "IPV4NetBlock"
-  ],
-  "environment_keys": [
-    "PORTS",
-    "MAX_RATE"
   ],
   "scan_level": 2
 }

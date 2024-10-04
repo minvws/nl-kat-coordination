@@ -1,9 +1,11 @@
+import json
 from io import BytesIO
 
 import httpx
 import structlog
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from httpx import codes
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import BaseModel, Field, field_serializer
@@ -24,7 +26,6 @@ class Plugin(BaseModel):
     authors: str | None = None
     created: str | None = None
     description: str | None = None
-    environment_keys: list[str] | None = None
     related: list[str] = Field(default_factory=list)
     enabled: bool
     type: str
@@ -39,10 +40,14 @@ class Plugin(BaseModel):
 
 class Boefje(Plugin):
     scan_level: SCAN_LEVEL
-    consumes: set[type[OOI]]
+    consumes: set[type[OOI]] = Field(default_factory=set)
+    produces: set[str] = Field(default_factory=set)
     options: list[str] | None = None
     runnable_hash: str | None = None
-    produces: set[str]
+    interval: int | None = None
+    boefje_schema: dict | None = None
+    oci_image: str | None = None
+    oci_arguments: list[str] = Field(default_factory=list)
 
     # use a custom field_serializer for `consumes`
     @field_serializer("consumes")
@@ -50,7 +55,7 @@ class Boefje(Plugin):
         return {ooi_class.get_ooi_type() for ooi_class in consumes}
 
     def can_scan(self, member) -> bool:
-        return super().can_scan(member) and member.acknowledged_clearance_level >= self.scan_level.value
+        return super().can_scan(member) and member.has_clearance_level(self.scan_level.value)
 
 
 class Normalizer(Plugin):
@@ -64,19 +69,47 @@ class Normalizer(Plugin):
 
 
 class KATalogusError(Exception):
-    message: str = _("The KATalogus has an unexpected error. Check the logs for further details.")
+    @property
+    def message(self):
+        return self._message
+
+    def __init__(self, message: str | None = None):
+        if message is None:
+            message = _("The KATalogus has an unexpected error. Check the logs for further details.")
+
+        self._message = message
+
+        super().__init__(message)
 
     def __str__(self):
-        return str(self.message)
+        return self._message
+
+
+class DuplicatePluginError(KATalogusError):
+    def __init__(self, error_message: str):
+        super().__init__(error_message)
+
+
+class DuplicateNameError(KATalogusError):
+    def __init__(self):
+        super().__init__(_("Boefje with this name already exists."))
+
+
+class DuplicateIdError(KATalogusError):
+    def __init__(self):
+        super().__init__(_("Boefje with this ID already exists."))
+
+
+class KATalogusNotAllowedError(KATalogusError):
+    def __init__(self):
+        super().__init__(_("Editing this boefje is not allowed because it is static."))
 
 
 class KATalogusHTTPStatusError(KATalogusError):
-    def __init__(self, *args: object, status_code: str | None = None) -> None:
-        super().__init__(*args)
-        status_message = ""
-        if status_code is not None:
-            status_message = f"{status_code}: "
-        self.message = status_message + _("A HTTP error occurred. Check logs for more info.")
+    def __init__(self, error: httpx.HTTPStatusError):
+        self.error = error
+
+        super().__init__(_("An HTTP %d error occurred. Check logs for more info.").format(error.response.status_code))
 
 
 class KATalogusClientV1:
@@ -102,12 +135,12 @@ class KATalogusClientV1:
 
         logger.info("Deleted organization", organization_code=self.organization)
 
-    def get_plugins(self, **params):
+    def get_plugins(self, **params) -> list[Plugin]:
         try:
             response = self.session.get(f"{self.organization_uri}/plugins", params=params)
             response.raise_for_status()
         except httpx.HTTPStatusError as error:
-            raise KATalogusHTTPStatusError(status_code=str(error.response.status_code))
+            raise KATalogusHTTPStatusError(error)
         return [parse_plugin(plugin) for plugin in response.json()]
 
     def get_plugin(self, plugin_id: str) -> Plugin:
@@ -170,14 +203,14 @@ class KATalogusClientV1:
     def get_boefjes(self) -> list[Plugin]:
         return self.get_plugins(plugin_type="boefje")
 
-    def enable_boefje(self, plugin: Plugin) -> None:
-        self._patch_boefje_state(plugin.id, True)
+    def enable_plugin(self, plugin: Plugin) -> None:
+        self._patch_plugin_state(plugin.id, True)
 
     def enable_boefje_by_id(self, boefje_id: str) -> None:
-        self.enable_boefje(self.get_plugin(boefje_id))
+        self.enable_plugin(self.get_plugin(boefje_id))
 
-    def disable_boefje(self, plugin: Plugin) -> None:
-        self._patch_boefje_state(plugin.id, False)
+    def disable_plugin(self, plugin: Plugin) -> None:
+        self._patch_plugin_state(plugin.id, False)
 
     def get_enabled_boefjes(self) -> list[Plugin]:
         return [plugin for plugin in self.get_boefjes() if plugin.enabled]
@@ -185,7 +218,7 @@ class KATalogusClientV1:
     def get_enabled_normalizers(self) -> list[Plugin]:
         return [plugin for plugin in self.get_normalizers() if plugin.enabled]
 
-    def _patch_boefje_state(self, boefje_id: str, enabled: bool) -> None:
+    def _patch_plugin_state(self, boefje_id: str, enabled: bool) -> None:
         logger.info("Toggle plugin state", plugin_id=boefje_id, enabled=enabled)
 
         response = self.session.patch(
@@ -205,6 +238,44 @@ class KATalogusClientV1:
         response.raise_for_status()
         return BytesIO(response.content)
 
+    def create_plugin(self, plugin: Plugin) -> None:
+        try:
+            response = self.session.post(
+                f"{self.organization_uri}/plugins",
+                headers={"Content-Type": "application/json"},
+                content=plugin.model_dump_json(exclude_none=True),
+            )
+            response.raise_for_status()
+        except httpx.HTTPStatusError as error:
+            if error.response.status_code == codes.CREATED:
+                logger.info("Plugin %s created", plugin.name)
+            else:
+                logger.info("Plugin %s could not be created", plugin.name)
+            error_message = json.loads(error.response.text).get("detail")
+            if error.response.status_code == codes.BAD_REQUEST and "Duplicate plugin" in error_message:
+                raise DuplicatePluginError(error_message)
+            else:
+                raise error
+
+    def edit_plugin(self, plugin: Plugin) -> None:
+        try:
+            response = self.session.patch(
+                f"{self.organization_uri}/boefjes/{plugin.id}",
+                content=plugin.model_dump_json(exclude_none=True),
+            )
+            response.raise_for_status()
+        except httpx.HTTPStatusError as error:
+            if error.response.status_code == codes.CREATED:
+                logger.info("Plugin %s updated", plugin.name)
+            else:
+                logger.info("Plugin %s could not be updated", plugin.name)
+            if error.response.status_code == codes.BAD_REQUEST and "duplicate key" in error.response.text:
+                raise DuplicatePluginError("Duplicate plugin name")
+            if error.response.status_code in [codes.FORBIDDEN, codes.NOT_FOUND]:
+                raise KATalogusNotAllowedError
+            else:
+                raise error
+
 
 def parse_boefje(boefje: dict) -> Boefje:
     scan_level = SCAN_LEVEL(boefje["scan_level"])
@@ -220,12 +291,17 @@ def parse_boefje(boefje: dict) -> Boefje:
     return Boefje(
         id=boefje["id"],
         name=boefje.get("name") or boefje["id"],
-        description=boefje["description"],
+        created=boefje.get("created"),
+        description=boefje.get("description"),
+        interval=boefje.get("interval"),
         enabled=boefje["enabled"],
         type=boefje["type"],
         scan_level=scan_level,
         consumes=consumes,
         produces=boefje["produces"],
+        boefje_schema=boefje.get("boefje_schema"),
+        oci_image=boefje.get("oci_image"),
+        oci_arguments=boefje.get("oci_arguments", []),
     )
 
 
