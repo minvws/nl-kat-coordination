@@ -9,9 +9,7 @@ from reports.report_types.definitions import Report
 
 class OOITypeMultiCheckboxForReportForm(BaseRockyForm):
     ooi_type = forms.MultipleChoiceField(
-        label=_("Filter by OOI types"),
-        required=False,
-        widget=forms.CheckboxSelectMultiple,
+        label=_("Filter by OOI types"), required=False, widget=forms.CheckboxSelectMultiple
     )
 
     def __init__(self, ooi_types: list[str], *args, **kwargs):
@@ -21,9 +19,7 @@ class OOITypeMultiCheckboxForReportForm(BaseRockyForm):
 
 class ReportTypeMultiselectForm(BaseRockyForm):
     report_type = forms.MultipleChoiceField(
-        label=_("Report types"),
-        required=False,
-        widget=forms.CheckboxSelectMultiple,
+        label=_("Report types"), required=False, widget=forms.CheckboxSelectMultiple
     )
 
     def __init__(self, report_types: set[Report], *args, **kwargs):
@@ -66,12 +62,7 @@ class ReportScheduleRecurrenceForm(BaseRockyForm):
         label="",
         required=False,
         widget=forms.Select(attrs={"form": "generate_report"}),
-        choices=[
-            ("daily", _("Daily")),
-            ("weekly", _("Weekly")),
-            ("monthly", _("Monthly")),
-            ("yearly", _("Yearly")),
-        ],
+        choices=[("daily", _("Daily")), ("weekly", _("Weekly")), ("monthly", _("Monthly")), ("yearly", _("Yearly"))],
     )
 
 
@@ -85,12 +76,7 @@ class CustomReportScheduleForm(BaseRockyForm):
     repeating_number = forms.IntegerField(initial=1, required=False, min_value=1, max_value=100)
     repeating_term = forms.ChoiceField(
         widget=forms.Select,
-        choices=[
-            ("day", _("day")),
-            ("week", _("week")),
-            ("month", _("month")),
-            ("year", _("year")),
-        ],
+        choices=[("day", _("day")), ("week", _("week")), ("month", _("month")), ("year", _("year"))],
     )
     on_weekdays = forms.ChoiceField(
         widget=forms.RadioSelect,
@@ -114,10 +100,7 @@ class CustomReportScheduleForm(BaseRockyForm):
     )
 
     end_date = forms.DateField(
-        label=_(""),
-        widget=forms.HiddenInput(),
-        initial=lambda: datetime.now(tz=timezone.utc).date(),
-        required=False,
+        label=_(""), widget=forms.HiddenInput(), initial=lambda: datetime.now(tz=timezone.utc).date(), required=False
     )
 
 

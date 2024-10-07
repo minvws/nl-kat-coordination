@@ -48,16 +48,9 @@ class NormalizerScheduler(Scheduler):
             pq_store=ctx.datastores.pq_store,
         )
 
-        super().__init__(
-            ctx=ctx,
-            queue=self.queue,
-            scheduler_id=scheduler_id,
-            callback=callback,
-        )
+        super().__init__(ctx=ctx, queue=self.queue, scheduler_id=scheduler_id, callback=callback)
 
-        self.ranker = rankers.NormalizerRanker(
-            ctx=self.ctx,
-        )
+        self.ranker = rankers.NormalizerRanker(ctx=self.ctx)
 
     def run(self) -> None:
         """The run method is called when the scheduler is started. It will
@@ -158,14 +151,11 @@ class NormalizerScheduler(Scheduler):
                     continue
 
                 normalizer_task = NormalizerTask(
-                    normalizer=Normalizer.model_validate(normalizer.model_dump()),
-                    raw_data=latest_raw_data.raw_data,
+                    normalizer=Normalizer.model_validate(normalizer.model_dump()), raw_data=latest_raw_data.raw_data
                 )
 
                 executor.submit(
-                    self.push_normalizer_task,
-                    normalizer_task,
-                    self.push_tasks_for_received_raw_data.__name__,
+                    self.push_normalizer_task, normalizer_task, self.push_tasks_for_received_raw_data.__name__
                 )
 
     @tracer.start_as_current_span("normalizer_push_task")
@@ -189,8 +179,7 @@ class NormalizerScheduler(Scheduler):
 
         try:
             plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
-                normalizer_task.normalizer.id,
-                self.organisation.id,
+                normalizer_task.normalizer.id, self.organisation.id
             )
             if not self.has_normalizer_permission_to_run(plugin):
                 self.logger.debug(
@@ -247,12 +236,7 @@ class NormalizerScheduler(Scheduler):
             )
             return
 
-        score = self.ranker.rank(
-            SimpleNamespace(
-                raw_data=normalizer_task.raw_data,
-                task=normalizer_task,
-            ),
-        )
+        score = self.ranker.rank(SimpleNamespace(raw_data=normalizer_task.raw_data, task=normalizer_task))
 
         task = Task(
             id=normalizer_task.id,
@@ -305,10 +289,7 @@ class NormalizerScheduler(Scheduler):
         return super().push_item_to_queue(item)
 
     @tracer.start_as_current_span("normalizer_has_normalizer_permission_to_run")
-    def has_normalizer_permission_to_run(
-        self,
-        normalizer: Plugin,
-    ) -> bool:
+    def has_normalizer_permission_to_run(self, normalizer: Plugin) -> bool:
         """Check if the task is allowed to run.
 
         Args:
@@ -355,10 +336,7 @@ class NormalizerScheduler(Scheduler):
             raise exc_db
 
         # Is task still running according to the datastore?
-        if task_db is not None and task_db.status not in [
-            TaskStatus.COMPLETED,
-            TaskStatus.FAILED,
-        ]:
+        if task_db is not None and task_db.status not in [TaskStatus.COMPLETED, TaskStatus.FAILED]:
             self.logger.debug(
                 "Task is still running, according to the datastore",
                 task_id=task_db.id,
@@ -381,8 +359,7 @@ class NormalizerScheduler(Scheduler):
         """
         try:
             normalizers = self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(
-                self.organisation.id,
-                mime_type,
+                self.organisation.id, mime_type
             )
         except ExternalServiceError:
             self.logger.warning(

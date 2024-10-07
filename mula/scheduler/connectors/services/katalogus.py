@@ -14,14 +14,7 @@ class Katalogus(HTTPService):
 
     name = "katalogus"
 
-    def __init__(
-        self,
-        host: str,
-        source: str,
-        timeout: int,
-        pool_connections: int,
-        cache_ttl: int = 30,
-    ):
+    def __init__(self, host: str, source: str, timeout: int, pool_connections: int, cache_ttl: int = 30):
         super().__init__(host, source, timeout, pool_connections)
 
         # For every organisation we cache its plugins, it references the
@@ -230,10 +223,7 @@ class Katalogus(HTTPService):
     def get_normalizers_by_org_id_and_type(self, organisation_id: str, normalizer_type: str) -> list[Plugin]:
         def _get_from_cache() -> list[Plugin]:
             with self.normalizer_cache_lock:
-                return dict_utils.deep_get(
-                    self.normalizer_cache,
-                    [organisation_id, normalizer_type],
-                )
+                return dict_utils.deep_get(self.normalizer_cache, [organisation_id, normalizer_type])
 
         try:
             return _get_from_cache()

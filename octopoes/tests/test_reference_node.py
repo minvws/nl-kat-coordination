@@ -32,16 +32,8 @@ xtdb_sample_2 = {
     ],
     "xt/id": "DNSZone|internet|nl",
     "name_servers": [
-        {
-            "xt/id": "Hostname|internet|ns3.dns.nl",
-            "dns_zone": {},
-            "network": {"xt/id": "Network|internet"},
-        },
-        {
-            "xt/id": "Hostname|internet|ns2.dns.nl",
-            "dns_zone": {},
-            "network": {"xt/id": "Network|internet"},
-        },
+        {"xt/id": "Hostname|internet|ns3.dns.nl", "dns_zone": {}, "network": {"xt/id": "Network|internet"}},
+        {"xt/id": "Hostname|internet|ns2.dns.nl", "dns_zone": {}, "network": {"xt/id": "Network|internet"}},
         {
             "xt/id": "Hostname|internet|ns1.dns.nl",
             "dns_zone": {},

@@ -68,9 +68,7 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
     full_name = models.CharField(_("full name"), max_length=150)
     email = LowercaseEmailField(_("email"), max_length=254, unique=True)
     is_staff = models.BooleanField(
-        _("staff status"),
-        default=False,
-        help_text=_("Designates whether the user can log into this admin site."),
+        _("staff status"), default=False, help_text=_("Designates whether the user can log into this admin site.")
     )
     is_active = models.BooleanField(
         _("active"),
@@ -136,9 +134,7 @@ class AuthToken(AbstractAuthToken):
     name = models.CharField(_("name"), max_length=150)
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint("user", Lower("name"), name="unique name"),
-        ]
+        constraints = [models.UniqueConstraint("user", Lower("name"), name="unique name")]
 
     EVENT_CODES = {"created": 900111, "updated": 900122, "deleted": 900123}
 

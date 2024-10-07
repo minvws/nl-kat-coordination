@@ -42,9 +42,7 @@ class NormalizerSchedulerBaseTestCase(unittest.TestCase):
         # Scheduler
         self.organisation = OrganisationFactory()
         self.scheduler = schedulers.NormalizerScheduler(
-            ctx=self.mock_ctx,
-            scheduler_id=self.organisation.id,
-            organisation=self.organisation,
+            ctx=self.mock_ctx, scheduler_id=self.organisation.id, organisation=self.organisation
         )
 
     def tearDown(self):
@@ -62,7 +60,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         ).start()
 
         self.mock_get_plugin = mock.patch(
-            "scheduler.context.AppContext.services.katalogus.get_plugin_by_id_and_org_id",
+            "scheduler.context.AppContext.services.katalogus.get_plugin_by_id_and_org_id"
         ).start()
 
     def test_disable_scheduler(self):
@@ -189,13 +187,11 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         super().setUp()
 
         self.mock_has_normalizer_task_started_running = mock.patch(
-            "scheduler.schedulers.NormalizerScheduler.has_normalizer_task_started_running",
-            return_value=False,
+            "scheduler.schedulers.NormalizerScheduler.has_normalizer_task_started_running", return_value=False
         ).start()
 
         self.mock_has_normalizer_permission_to_run = mock.patch(
-            "scheduler.schedulers.NormalizerScheduler.has_normalizer_permission_to_run",
-            return_value=True,
+            "scheduler.schedulers.NormalizerScheduler.has_normalizer_permission_to_run", return_value=True
         ).start()
 
         self.mock_get_normalizers_for_mime_type = mock.patch(
@@ -206,17 +202,11 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         # Arrange
         ooi = OOIFactory(scan_profile=ScanProfileFactory(level=0))
         boefje = BoefjeFactory()
-        boefje_meta = BoefjeMetaFactory(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-        )
+        boefje_meta = BoefjeMetaFactory(boefje=boefje, input_ooi=ooi.primary_key)
 
         # Arrange: create the RawDataReceivedEvent
         raw_data_event = models.RawDataReceivedEvent(
-            raw_data=RawDataFactory(
-                boefje_meta=boefje_meta,
-                mime_types=[{"value": "text/plain"}],
-            ),
+            raw_data=RawDataFactory(boefje_meta=boefje_meta, mime_types=[{"value": "text/plain"}]),
             organization=self.organisation.name,
             created_at=datetime.datetime.now(),
         ).model_dump_json()
@@ -241,16 +231,10 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         # Arrange
         ooi = OOIFactory(scan_profile=ScanProfileFactory(level=0))
         boefje = BoefjeFactory()
-        boefje_meta = BoefjeMetaFactory(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-        )
+        boefje_meta = BoefjeMetaFactory(boefje=boefje, input_ooi=ooi.primary_key)
 
         raw_data_event = models.RawDataReceivedEvent(
-            raw_data=RawDataFactory(
-                boefje_meta=boefje_meta,
-                mime_types=[{"value": "text/plain"}],
-            ),
+            raw_data=RawDataFactory(boefje_meta=boefje_meta, mime_types=[{"value": "text/plain"}]),
             organization=self.organisation.name,
             created_at=datetime.datetime.now(),
         ).model_dump_json()
@@ -269,36 +253,21 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
-        boefje_task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
+        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
-        task = functions.create_task(
-            scheduler_id=self.scheduler.scheduler_id,
-            data=boefje_task,
-        )
+        task = functions.create_task(scheduler_id=self.scheduler.scheduler_id, data=boefje_task)
         self.mock_ctx.datastores.task_store.create_task(task)
 
-        boefje_meta = BoefjeMetaFactory(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-        )
+        boefje_meta = BoefjeMetaFactory(boefje=boefje, input_ooi=ooi.primary_key)
 
         # Mocks
         raw_data_event = models.RawDataReceivedEvent(
-            raw_data=RawDataFactory(
-                boefje_meta=boefje_meta,
-                mime_types=[{"value": "text/plain"}],
-            ),
+            raw_data=RawDataFactory(boefje_meta=boefje_meta, mime_types=[{"value": "text/plain"}]),
             organization=self.organisation.name,
             created_at=datetime.datetime.now(),
         ).model_dump_json()
 
-        self.mock_get_normalizers_for_mime_type.return_value = [
-            NormalizerFactory(),
-        ]
+        self.mock_get_normalizers_for_mime_type.return_value = [NormalizerFactory()]
         self.mock_has_normalizer_permission_to_run.return_value = False
 
         # Act
@@ -312,36 +281,21 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
-        boefje_task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
+        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
-        task = functions.create_task(
-            scheduler_id=self.scheduler.scheduler_id,
-            data=boefje_task,
-        )
+        task = functions.create_task(scheduler_id=self.scheduler.scheduler_id, data=boefje_task)
         self.mock_ctx.datastores.task_store.create_task(task)
 
-        boefje_meta = BoefjeMetaFactory(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-        )
+        boefje_meta = BoefjeMetaFactory(boefje=boefje, input_ooi=ooi.primary_key)
 
         # Mocks
         raw_data_event = models.RawDataReceivedEvent(
-            raw_data=RawDataFactory(
-                boefje_meta=boefje_meta,
-                mime_types=[{"value": "text/plain"}],
-            ),
+            raw_data=RawDataFactory(boefje_meta=boefje_meta, mime_types=[{"value": "text/plain"}]),
             organization=self.organisation.name,
             created_at=datetime.datetime.now(),
         ).model_dump_json()
 
-        self.mock_get_normalizers_for_mime_type.return_value = [
-            NormalizerFactory(),
-        ]
+        self.mock_get_normalizers_for_mime_type.return_value = [NormalizerFactory()]
         self.mock_has_normalizer_permission_to_run.return_value = True
         self.mock_has_normalizer_task_started_running.return_value = True
 
@@ -356,36 +310,21 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
-        boefje_task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
+        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
-        task = functions.create_task(
-            scheduler_id=self.scheduler.scheduler_id,
-            data=boefje_task,
-        )
+        task = functions.create_task(scheduler_id=self.scheduler.scheduler_id, data=boefje_task)
         self.mock_ctx.datastores.task_store.create_task(task)
 
-        boefje_meta = BoefjeMetaFactory(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-        )
+        boefje_meta = BoefjeMetaFactory(boefje=boefje, input_ooi=ooi.primary_key)
 
         # Mocks
         raw_data_event = models.RawDataReceivedEvent(
-            raw_data=RawDataFactory(
-                boefje_meta=boefje_meta,
-                mime_types=[{"value": "text/plain"}],
-            ),
+            raw_data=RawDataFactory(boefje_meta=boefje_meta, mime_types=[{"value": "text/plain"}]),
             organization=self.organisation.name,
             created_at=datetime.datetime.now(),
         ).model_dump_json()
 
-        self.mock_get_normalizers_for_mime_type.return_value = [
-            NormalizerFactory(),
-        ]
+        self.mock_get_normalizers_for_mime_type.return_value = [NormalizerFactory()]
         self.mock_has_normalizer_permission_to_run.return_value = True
         self.mock_has_normalizer_task_started_running.side_effect = Exception("Something went wrong")
 
@@ -399,33 +338,22 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         # Arrange
         ooi = OOIFactory(scan_profile=ScanProfileFactory(level=0))
         boefje = BoefjeFactory()
-        boefje_meta = BoefjeMetaFactory(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-        )
+        boefje_meta = BoefjeMetaFactory(boefje=boefje, input_ooi=ooi.primary_key)
 
         raw_data_event1 = models.RawDataReceivedEvent(
-            raw_data=RawDataFactory(
-                boefje_meta=boefje_meta,
-                mime_types=[{"value": "text/plain"}],
-            ),
+            raw_data=RawDataFactory(boefje_meta=boefje_meta, mime_types=[{"value": "text/plain"}]),
             organization=self.organisation.name,
             created_at=datetime.datetime.now(),
         ).model_dump_json()
 
         raw_data_event2 = models.RawDataReceivedEvent(
-            raw_data=RawDataFactory(
-                boefje_meta=boefje_meta,
-                mime_types=[{"value": "text/plain"}],
-            ),
+            raw_data=RawDataFactory(boefje_meta=boefje_meta, mime_types=[{"value": "text/plain"}]),
             organization=self.organisation.name,
             created_at=datetime.datetime.now(),
         ).model_dump_json()
 
         # Mocks
-        self.mock_get_normalizers_for_mime_type.return_value = [
-            NormalizerFactory(),
-        ]
+        self.mock_get_normalizers_for_mime_type.return_value = [NormalizerFactory()]
 
         # Act
         self.scheduler.push_tasks_for_received_raw_data(raw_data_event1)
@@ -445,28 +373,15 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
-        boefje_task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
+        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
-        task = functions.create_task(
-            scheduler_id=self.scheduler.scheduler_id,
-            data=boefje_task,
-        )
+        task = functions.create_task(scheduler_id=self.scheduler.scheduler_id, data=boefje_task)
         self.mock_ctx.datastores.task_store.create_task(task)
 
-        boefje_meta = BoefjeMetaFactory(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-        )
+        boefje_meta = BoefjeMetaFactory(boefje=boefje, input_ooi=ooi.primary_key)
 
         raw_data_event = models.RawDataReceivedEvent(
-            raw_data=RawDataFactory(
-                boefje_meta=boefje_meta,
-                mime_types=[{"value": "error/unknown"}],
-            ),
+            raw_data=RawDataFactory(boefje_meta=boefje_meta, mime_types=[{"value": "error/unknown"}]),
             organization=self.organisation.name,
             created_at=datetime.datetime.now(),
         ).model_dump_json()
@@ -484,27 +399,14 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             scan_profile = ScanProfileFactory(level=0)
             ooi = OOIFactory(scan_profile=scan_profile)
             boefje = BoefjeFactory()
-            boefje_task = models.BoefjeTask(
-                boefje=boefje,
-                input_ooi=ooi.primary_key,
-                organization=self.organisation.id,
-            )
-            task = functions.create_task(
-                scheduler_id=self.scheduler.scheduler_id,
-                data=boefje_task,
-            )
+            boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
+            task = functions.create_task(scheduler_id=self.scheduler.scheduler_id, data=boefje_task)
             self.mock_ctx.datastores.task_store.create_task(task)
 
-            boefje_meta = BoefjeMetaFactory(
-                boefje=boefje,
-                input_ooi=ooi.primary_key,
-            )
+            boefje_meta = BoefjeMetaFactory(boefje=boefje, input_ooi=ooi.primary_key)
 
             raw_data_event = models.RawDataReceivedEvent(
-                raw_data=RawDataFactory(
-                    boefje_meta=boefje_meta,
-                    mime_types=[{"value": "text/plain"}],
-                ),
+                raw_data=RawDataFactory(boefje_meta=boefje_meta, mime_types=[{"value": "text/plain"}]),
                 organization=self.organisation.name,
                 created_at=datetime.datetime.now(),
             ).model_dump_json()
@@ -515,9 +417,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.scheduler.max_tries = 1
 
         # Mocks
-        self.mock_get_normalizers_for_mime_type.return_value = [
-            NormalizerFactory(),
-        ]
+        self.mock_get_normalizers_for_mime_type.return_value = [NormalizerFactory()]
 
         # Act
         self.scheduler.push_tasks_for_received_raw_data(events[0])

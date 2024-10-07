@@ -221,10 +221,7 @@ def _format_exit_code(exitcode: int | None) -> str:
 
 
 def _start_working(
-    task_queue: mp.Queue,
-    runner: ReportJobRunner,
-    scheduler: SchedulerClient,
-    handling_tasks: dict[int, str],
+    task_queue: mp.Queue, runner: ReportJobRunner, scheduler: SchedulerClient, handling_tasks: dict[int, str]
 ):
     logger.info("Started listening for tasks from worker[pid=%s]", os.getpid())
 
