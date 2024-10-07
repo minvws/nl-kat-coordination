@@ -64,7 +64,7 @@ class BoefjeResource:
         self.boefje.produces = self.boefje.produces.union(set(_default_mime_types(self.boefje)))
         self.module: Runnable | None = None
 
-        if (path / ENTRYPOINT_BOEFJES).exists() and self.boefje.oci_image is None:
+        if self.boefje.oci_image is None and (path / ENTRYPOINT_BOEFJES).exists():
             self.module = get_runnable_module_from_package(package, ENTRYPOINT_BOEFJES, parameter_count=1)
 
         if (path / SCHEMA_FILE).exists():
