@@ -13,21 +13,16 @@ def test_fierce():
 
     expected = {
         ResolvedHostname(
-            hostname=Reference("Hostname|internet|www.example.com"),
-            address=Reference("IPAddressV4|internet|192.0.2.2"),
+            hostname=Reference("Hostname|internet|www.example.com"), address=Reference("IPAddressV4|internet|192.0.2.2")
         ),
         ResolvedHostname(
             hostname=Reference("Hostname|internet|subdomain.example.com"),
             address=Reference("IPAddressV4|internet|192.0.2.3"),
         ),
         ResolvedHostname(
-            hostname=Reference("Hostname|internet|ipv6.example.com"),
-            address=Reference("IPAddressV6|internet|ff02::1"),
+            hostname=Reference("Hostname|internet|ipv6.example.com"), address=Reference("IPAddressV6|internet|ff02::1")
         ),
-        Hostname(
-            network=Reference("Network|internet"),
-            name="example.com",
-        ),
+        Hostname(network=Reference("Network|internet"), name="example.com"),
         Hostname(
             registered_domain=Reference("Hostname|internet|example.com"),
             network=Reference("Network|internet"),
@@ -43,18 +38,9 @@ def test_fierce():
             network=Reference("Network|internet"),
             name="ipv6.example.com",
         ),
-        IPAddressV4(
-            address=IPv4Address("192.0.2.3"),
-            network=Reference("Network|internet"),
-        ),
-        IPAddressV4(
-            address=IPv4Address("192.0.2.2"),
-            network=Reference("Network|internet"),
-        ),
-        IPAddressV6(
-            address=IPv6Address("ff02::1"),
-            network=Reference("Network|internet"),
-        ),
+        IPAddressV4(address=IPv4Address("192.0.2.3"), network=Reference("Network|internet")),
+        IPAddressV4(address=IPv4Address("192.0.2.2"), network=Reference("Network|internet")),
+        IPAddressV6(address=IPv6Address("ff02::1"), network=Reference("Network|internet")),
         Network(name="internet"),
     }
 

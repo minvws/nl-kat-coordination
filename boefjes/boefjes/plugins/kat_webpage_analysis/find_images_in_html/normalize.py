@@ -23,7 +23,4 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         if not validators.url(img):
             img = urljoin(url, img)
 
-        yield URL(
-            network=Network(name=network_name).reference,
-            raw=img,
-        )
+        yield URL(network=Network(name=network_name).reference, raw=img)

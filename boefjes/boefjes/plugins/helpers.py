@@ -51,12 +51,7 @@ def get_file_from_container(container: docker.models.containers.Container, path:
     try:
         stream, _ = container.get_archive(path)
     except docker.errors.NotFound:
-        logging.warning(
-            "%s not found in container %s %s",
-            path,
-            container.short_id,
-            container.image.tags,
-        )
+        logging.warning("%s not found in container %s %s", path, container.short_id, container.image.tags)
         return None
 
     f = tarfile.open(mode="r|", fileobj=TarStream(stream).reader())

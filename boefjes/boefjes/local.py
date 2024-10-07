@@ -112,17 +112,12 @@ class LocalNormalizerJobRunner(NormalizerJobRunner):
 
             observations = [
                 NormalizerObservation(
-                    type="observation",
-                    input_ooi=normalizer_meta.raw_data.boefje_meta.input_ooi,
-                    results=oois,
+                    type="observation", input_ooi=normalizer_meta.raw_data.boefje_meta.input_ooi, results=oois
                 )
             ]
         else:
             observations = []
 
         return NormalizerResults(
-            observations=observations,
-            declarations=declarations,
-            affirmations=affirmations,
-            scan_profiles=scan_profiles,
+            observations=observations, declarations=declarations, affirmations=affirmations, scan_profiles=scan_profiles
         )

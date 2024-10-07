@@ -17,10 +17,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     lines = section.split("\n")
     message: Message = from_text("\n".join(lines[1:]))
 
-    input_zone_hostname = Hostname(
-        network=internet.reference,
-        name=input_ooi["hostname"]["name"],
-    )
+    input_zone_hostname = Hostname(network=internet.reference, name=input_ooi["hostname"]["name"])
 
     input_zone = DNSZone(hostname=input_zone_hostname.reference)
 

@@ -136,25 +136,13 @@ class OctopoesService:
         asc_desc: Literal["asc", "desc"] = "asc",
     ) -> Paginated[OOI]:
         paginated = self.ooi_repository.list_oois(
-            types,
-            valid_time,
-            limit,
-            offset,
-            scan_levels,
-            scan_profile_types,
-            search_string,
-            order_by,
-            asc_desc,
+            types, valid_time, limit, offset, scan_levels, scan_profile_types, search_string, order_by, asc_desc
         )
         self._populate_scan_profiles(paginated.items, valid_time)
         return paginated
 
     def get_ooi_tree(
-        self,
-        reference: Reference,
-        valid_time: datetime,
-        search_types: set[type[OOI]] | None = None,
-        depth: int = 1,
+        self, reference: Reference, valid_time: datetime, search_types: set[type[OOI]] | None = None, depth: int = 1
     ):
         tree = self.ooi_repository.get_tree(reference, valid_time, search_types, depth)
         self._populate_scan_profiles(tree.store.values(), valid_time)
@@ -405,9 +393,7 @@ class OctopoesService:
             self.scan_profile_repository.get(ooi.reference, event.valid_time)
         except ObjectNotFoundException:
             self.scan_profile_repository.save(
-                None,
-                EmptyScanProfile(reference=ooi.reference),
-                valid_time=event.valid_time,
+                None, EmptyScanProfile(reference=ooi.reference), valid_time=event.valid_time
             )
 
         # analyze bit definitions
@@ -415,11 +401,7 @@ class OctopoesService:
         for bit_id, bit_definition in bit_definitions.items():
             # attach bit instances
             if isinstance(ooi, bit_definition.consumes):
-                bit_instance = Origin(
-                    origin_type=OriginType.INFERENCE,
-                    method=bit_id,
-                    source=ooi.reference,
-                )
+                bit_instance = Origin(origin_type=OriginType.INFERENCE, method=bit_id, source=ooi.reference)
                 self.origin_repository.save(bit_instance, event.valid_time)
 
             # attach bit parameters
@@ -437,14 +419,9 @@ class OctopoesService:
 
                     if bit_ancestor:
                         origin = Origin(
-                            origin_type=OriginType.INFERENCE,
-                            method=bit_id,
-                            source=bit_ancestor[0].reference,
+                            origin_type=OriginType.INFERENCE, method=bit_id, source=bit_ancestor[0].reference
                         )
-                        origin_parameter = OriginParameter(
-                            origin_id=origin.id,
-                            reference=ooi.reference,
-                        )
+                        origin_parameter = OriginParameter(origin_id=origin.id, reference=ooi.reference)
                         self.origin_parameter_repository.save(origin_parameter, event.valid_time)
 
     def _on_update_ooi(self, event: OOIDBEvent) -> None:
@@ -639,20 +616,13 @@ class OctopoesService:
         bit_definitions = get_bit_definitions()
         for bit_id, bit_definition in bit_definitions.items():
             # loop over all oois that are consumed by the bit
-            for ooi in self.ooi_repository.list_oois_by_object_types(
-                {bit_definition.consumes},
-                valid_time=valid_time,
-            ):
+            for ooi in self.ooi_repository.list_oois_by_object_types({bit_definition.consumes}, valid_time=valid_time):
                 if not isinstance(ooi, bit_definition.consumes):
                     logger.exception("Requested OOI type not met")
                     raise ObjectNotFoundException("Requested OOI type not met")
 
                 # insert, if not exists
-                bit_instance = Origin(
-                    origin_type=OriginType.INFERENCE,
-                    method=bit_id,
-                    source=ooi.reference,
-                )
+                bit_instance = Origin(origin_type=OriginType.INFERENCE, method=bit_id, source=ooi.reference)
                 try:
                     self.origin_repository.get(bit_instance.id, valid_time)
                 except ObjectNotFoundException:

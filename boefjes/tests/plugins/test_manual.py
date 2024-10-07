@@ -125,9 +125,7 @@ def test_parse_url_csv(normalizer_runner):
         "network": Reference("Network|internet"),
         "object_type": "URL",
         "primary_key": "URL|internet|https://example.com/",
-        "raw": Url(
-            "https://example.com/",
-        ),
+        "raw": Url("https://example.com/"),
         "scan_profile": None,
         "user_id": None,
         "web_url": None,
@@ -139,9 +137,7 @@ def test_parse_url_csv(normalizer_runner):
         "network": Reference("Network|internet"),
         "object_type": "URL",
         "primary_key": "URL|internet|https://example.com/",
-        "raw": Url(
-            "https://example.com/",
-        ),
+        "raw": Url("https://example.com/"),
         "scan_profile": None,
         "user_id": None,
         "web_url": None,

@@ -28,9 +28,7 @@ class PluginEnableDisableView(SinglePluginView):
             logger.info("Enabling plugin", event_code=800021, plugin=self.plugin.name)
             self.katalogus_client.enable_plugin(self.plugin)
             messages.add_message(
-                self.request,
-                messages.SUCCESS,
-                _("{} '{}' enabled.").format(self.plugin.type.title(), self.plugin.name),
+                self.request, messages.SUCCESS, _("{} '{}' enabled.").format(self.plugin.type.title(), self.plugin.name)
             )
         else:
             if (
@@ -57,8 +55,7 @@ class PluginEnableDisableView(SinglePluginView):
                 self.request,
                 messages.ERROR,
                 _("To enable {} you need at least a clearance level of L{}. " + member_clearance_level_text).format(
-                    self.plugin.name.title(),
-                    self.plugin.scan_level.value,
+                    self.plugin.name.title(), self.plugin.scan_level.value
                 ),
             )
 

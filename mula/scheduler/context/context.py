@@ -153,10 +153,7 @@ class AppContext:
 
         # Database connection
         try:
-            dbconn = storage.DBConn(
-                dsn=str(self.config.db_uri),
-                pool_size=self.config.db_connection_pool_size,
-            )
+            dbconn = storage.DBConn(dsn=str(self.config.db_uri), pool_size=self.config.db_connection_pool_size)
             dbconn.connect()
         except storage.errors.StorageError:
             self.logger.exception("Failed to connect to database")
@@ -178,9 +175,7 @@ class AppContext:
         self.metrics_registry: CollectorRegistry = CollectorRegistry()
 
         Info(
-            name="app_settings",
-            documentation="Scheduler configuration settings",
-            registry=self.metrics_registry,
+            name="app_settings", documentation="Scheduler configuration settings", registry=self.metrics_registry
         ).info(
             {
                 "pq_maxsize": str(self.config.pq_maxsize),

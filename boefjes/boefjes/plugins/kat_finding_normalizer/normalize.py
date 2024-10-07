@@ -30,9 +30,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
             finding_type = finding_type_mapping[prefix](id=finding_id)
             finding = Finding(
-                finding_type=finding_type.reference,
-                ooi=ooi,
-                description=f"{finding_id} is found on this OOI",
+                finding_type=finding_type.reference, ooi=ooi, description=f"{finding_id} is found on this OOI"
             )
             yield finding_type
             yield finding

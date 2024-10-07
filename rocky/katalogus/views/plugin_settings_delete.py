@@ -29,11 +29,7 @@ class PluginSettingsDeleteView(OrganizationPermissionRequiredMixin, SinglePlugin
             },
             {
                 "url": reverse(
-                    "boefje_detail",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "plugin_id": self.plugin.id,
-                    },
+                    "boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id}
                 ),
                 "text": self.plugin.name,
             },
@@ -57,11 +53,7 @@ class PluginSettingsDeleteView(OrganizationPermissionRequiredMixin, SinglePlugin
 
     def get_success_url(self):
         return reverse(
-            "boefje_detail",
-            kwargs={
-                "organization_code": self.organization.code,
-                "plugin_id": self.plugin.id,
-            },
+            "boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id}
         )
 
     def delete(self, request, *args, **kwargs):
@@ -69,16 +61,12 @@ class PluginSettingsDeleteView(OrganizationPermissionRequiredMixin, SinglePlugin
             logger.info("Deleting plugin settings", event_code=800024, plugin=self.plugin.name)
             self.katalogus_client.delete_plugin_settings(self.plugin.id)
             messages.add_message(
-                request,
-                messages.SUCCESS,
-                _("Settings for plugin {} successfully deleted.").format(self.plugin.name),
+                request, messages.SUCCESS, _("Settings for plugin {} successfully deleted.").format(self.plugin.name)
             )
         except HTTPError as e:
             if isinstance(e, HTTPStatusError) and e.response.status_code == codes.NOT_FOUND:
                 messages.add_message(
-                    request,
-                    messages.WARNING,
-                    _("Plugin {} has no settings.").format(self.plugin.name),
+                    request, messages.WARNING, _("Plugin {} has no settings.").format(self.plugin.name)
                 )
             else:
                 messages.add_message(
