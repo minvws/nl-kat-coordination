@@ -28,8 +28,6 @@ class ReportScheduler(Scheduler):
     ):
         self.logger: structlog.BoundLogger = structlog.get_logger(__name__)
         self.organisation = organisation
-        self.create_schedule = False
-
         self.queue = queue or queues.PriorityQueue(
             pq_id=scheduler_id,
             maxsize=ctx.config.pq_maxsize,
@@ -43,6 +41,7 @@ class ReportScheduler(Scheduler):
             queue=self.queue,
             scheduler_id=scheduler_id,
             callback=callback,
+            create_schedule=True,
         )
 
     def run(self) -> None:

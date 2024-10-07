@@ -33,6 +33,7 @@ msgstr ""
 #: reports/report_types/tls_report/report.html
 #: reports/templates/partials/report_names_form.html
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/report_overview/subreports_table.html
 #: tools/forms/boefje.py rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
@@ -1088,6 +1089,7 @@ msgstr ""
 
 #: katalogus/templates/partials/plugin_tile_modal.html reports/forms.py
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Report types"
 msgstr ""
 
@@ -1224,6 +1226,7 @@ msgstr ""
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -1237,6 +1240,7 @@ msgstr ""
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -1252,6 +1256,7 @@ msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/report_overview/subreports_table.html
 msgid "Creation date"
 msgstr ""
@@ -2475,6 +2480,7 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/plugin_overview_table.html
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/report_overview/subreports_table.html
 #: reports/templates/summary/report_asset_overview.html
 msgid "Report type"
@@ -3665,6 +3671,7 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Recurrence"
 msgstr ""
 
@@ -4060,6 +4067,7 @@ msgid "Input Objects"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/report_overview/subreports_table.html
 msgid "Reference date"
 msgstr ""
@@ -4114,23 +4122,55 @@ msgid "Overview of reports"
 msgstr ""
 
 #: reports/templates/report_overview/report_overview_navigation.html
-msgid "Recent"
-msgstr ""
-
-#: reports/templates/report_overview/report_overview_navigation.html
-msgid "Presets"
-msgstr ""
-
-#: reports/templates/report_overview/report_overview_navigation.html
 msgid "Scheduled"
 msgstr ""
 
 #: reports/templates/report_overview/report_overview_navigation.html
-msgid "Folders"
+msgid "History"
 msgstr ""
 
-#: reports/templates/report_overview/report_overview_navigation.html
-msgid "History"
+#: reports/templates/report_overview/scheduled_reports.html
+msgid "Scheduled reports"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports.html
+msgid "View your scheduled reports."
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports.html
+#, python-format
+msgid "Showing %(length)s scheduled reports"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Scheduled reports:"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Report Name"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Subreport Name"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Scheduled for"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Scheduled Reports:"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/report_overview/subreports_table.html
+#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "Input Object"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Show report details"
 msgstr ""
 
 #: reports/templates/report_overview/subreports.html
@@ -4153,12 +4193,6 @@ msgstr ""
 
 #: reports/templates/report_overview/subreports_table.html
 msgid "Subreports:"
-msgstr ""
-
-#: reports/templates/report_overview/subreports_table.html
-#: rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "Input Object"
 msgstr ""
 
 #: reports/templates/summary/report_asset_overview.html
