@@ -31,7 +31,6 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     """
 
     paginate_by = 30
-    breadcrumbs_step = 2
     context_object_name = "reports"
     paginator = RockyPaginator
     template_name = "report_overview/report_overview.html"
@@ -54,7 +53,6 @@ class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     """
 
     paginate_by = 150
-    breadcrumbs_step = 3
     context_object_name = "subreports"
     paginator = RockyPaginator
     template_name = "report_overview/subreports.html"

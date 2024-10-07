@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from tools.ooi_helpers import create_ooi
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import Reference, ScanProfileType
+from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
 from octopoes.models.ooi.reports import Report
 from reports.report_types.aggregate_organisation_report.report import aggregate_reports
@@ -65,13 +65,14 @@ def save_report_raw(bytes_client: BytesClient, data: dict) -> str:
 
 
 def save_report_data(
-    bytes_client, observed_at, octopoes_api_connector, organization, plugin_data, report_data, report_names
+    bytes_client, observed_at, octopoes_api_connector, organization, input_data, report_data, report_names
 ):
     now = datetime.now(timezone.utc)
 
     # if it's not a single report, we need a parent
+
     if len(report_data) > 1 or len(list(report_data.values())[0]) > 1:
-        raw_id = save_report_raw(bytes_client, data={"plugins": plugin_data})
+        raw_id = save_report_raw(bytes_client, data=input_data)
         name = now.strftime(report_names[0][1])
 
         if not name or name.isspace():
@@ -87,7 +88,7 @@ def save_report_data(
             organization_tags=list(organization.tags.all()),
             data_raw_id=raw_id,
             date_generated=datetime.now(timezone.utc),
-            input_oois=[],
+            input_oois=input_data["input_data"]["input_oois"],
             observed_at=observed_at,
             parent_report=None,
             has_parent=False,
@@ -137,7 +138,9 @@ def save_report_data(
         report_type_id = next(iter(report_data))
         ooi = next(iter(report_data[report_type_id]))
         data = report_data[report_type_id][ooi]
-        raw_id = save_report_raw(bytes_client, data={"report_data": data["data"], "plugins": plugin_data})
+        report_data = {"report_data": data["data"]} | input_data
+
+        raw_id = save_report_raw(bytes_client, data=report_data)
         report_type = get_report_by_id(report_type_id)
         name = now.strftime(report_names[0][1])
 
@@ -178,7 +181,7 @@ class SaveGenerateReportMixin(BaseReportView):
             self.observed_at,
             self.octopoes_api_connector,
             self.organization,
-            self.get_plugin_data_for_saving(),
+            self.get_input_data(),
             report_data,
             report_names,
         )
@@ -198,11 +201,10 @@ class SaveGenerateReportMixin(BaseReportView):
 
 class SaveAggregateReportMixin(BaseReportView):
     def save_report(self, report_names: list) -> Report:
-        input_oois = self.get_oois()
         organization = self.organization
         aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
             self.octopoes_api_connector,
-            input_oois,
+            self.get_oois(),
             self.get_report_type_ids(),
             self.observed_at,
             self.organization.code,
@@ -220,35 +222,12 @@ class SaveAggregateReportMixin(BaseReportView):
 
         observed_at = self.get_observed_at()
 
-        post_processed_data["plugins"] = self.get_plugin_data_for_saving()
-        post_processed_data["oois"] = []
-        for input_ooi in input_oois:
-            post_processed_data["oois"].append(
-                {
-                    "name": input_ooi.human_readable,
-                    "type": input_ooi.object_type,
-                    "scan_profile_level": input_ooi.scan_profile.level.value if input_ooi.scan_profile else 0,
-                    "scan_profile_type": (
-                        input_ooi.scan_profile.scan_profile_type if input_ooi.scan_profile else ScanProfileType.EMPTY
-                    ),
-                }
-            )
-
-        post_processed_data["report_types"] = []
-        for report_type in self.get_report_types():
-            post_processed_data["report_types"].append(
-                {
-                    "name": str(report_type.name),
-                    "description": str(report_type.description),
-                    "label_style": report_type.label_style,
-                }
-            )
-
         now = datetime.utcnow()
         bytes_client = self.bytes_client
 
         # Save report data into bytes
-        report_data_raw_id = save_report_raw(bytes_client, data=post_processed_data)
+        data = post_processed_data | self.get_input_data()
+        report_data_raw_id = save_report_raw(bytes_client, data=data)
 
         report_type = type(aggregate_report)
         name = now.strftime(report_names[0][1])
