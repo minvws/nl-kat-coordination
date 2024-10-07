@@ -1,7 +1,7 @@
 import json
 from collections import Counter
 from collections.abc import Callable, ValuesView
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from time import perf_counter
 from typing import Literal, overload
 
@@ -177,6 +177,10 @@ class OctopoesService:
             elif origin.origin_type == OriginType.AFFIRMATION:
                 logger.debug("Affirmation source %s already deleted", origin.source)
                 return
+
+        # An affirmation only updates the OOI but barely changes detection time #3585
+        if origin.origin_type == OriginType.AFFIRMATION:
+            valid_time = self.ooi_repository.get_history(origin.source)[-1].valid_time + timedelta(seconds=1)
 
         for ooi in oois:
             self.ooi_repository.save(ooi, valid_time=valid_time, end_valid_time=end_valid_time)
