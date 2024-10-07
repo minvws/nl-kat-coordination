@@ -10,20 +10,12 @@ from tools.forms.settings import DEPTH_DEFAULT, DEPTH_HELP_TEXT, DEPTH_MAX, SCAN
 
 class OOIReportSettingsForm(ObservedAtForm):
     depth = forms.IntegerField(
-        initial=DEPTH_DEFAULT,
-        min_value=1,
-        max_value=DEPTH_MAX,
-        required=False,
-        help_text=DEPTH_HELP_TEXT,
+        initial=DEPTH_DEFAULT, min_value=1, max_value=DEPTH_MAX, required=False, help_text=DEPTH_HELP_TEXT
     )
 
 
 class OoiTreeSettingsForm(OOIReportSettingsForm):
-    ooi_type = forms.MultipleChoiceField(
-        label=_("Filter types"),
-        widget=forms.CheckboxSelectMultiple(),
-        required=False,
-    )
+    ooi_type = forms.MultipleChoiceField(label=_("Filter types"), widget=forms.CheckboxSelectMultiple(), required=False)
 
     def __init__(self, ooi_types: list[str], *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -50,14 +42,7 @@ class SelectOOIForm(BaseRockyForm):
         ),
     )
 
-    def __init__(
-        self,
-        oois: list[OOI],
-        organization_code: str,
-        mandatory_fields: list | None = None,
-        *args,
-        **kwargs,
-    ):
+    def __init__(self, oois: list[OOI], organization_code: str, mandatory_fields: list | None = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["ooi"].widget.attrs["organization_code"] = organization_code
         if mandatory_fields:
@@ -68,28 +53,19 @@ class SelectOOIForm(BaseRockyForm):
 
     @staticmethod
     def _to_choice(ooi: OOI) -> tuple[str, Any]:
-        return str(ooi), (
-            ooi,
-            ooi,
-            ooi.scan_profile.level if ooi.scan_profile else 0,
-        )
+        return str(ooi), (ooi, ooi, ooi.scan_profile.level if ooi.scan_profile else 0)
 
 
 class SelectOOIFilterForm(BaseRockyForm):
     show_all = forms.NullBooleanField(
         label=_("Show objects that don't meet the Boefjes scan level."),
-        widget=forms.CheckboxInput(
-            attrs={"class": "submit-on-click"},
-        ),
+        widget=forms.CheckboxInput(attrs={"class": "submit-on-click"}),
     )
 
 
 class PossibleBoefjesFilterForm(BaseRockyForm):
     show_all = forms.NullBooleanField(
-        widget=LabeledCheckboxInput(
-            label=_("Show Boefjes that exceed the objects clearance level."),
-            autosubmit=True,
-        ),
+        widget=LabeledCheckboxInput(label=_("Show Boefjes that exceed the objects clearance level."), autosubmit=True)
     )
 
 
@@ -99,17 +75,8 @@ class SetClearanceLevelForm(forms.Form):
         help_text=_(
             "Boefjes that has a scan level below or equal to the clearance level, is permitted to scan an object."
         ),
-        error_messages={
-            "level": {
-                "required": _("Please select a clearance level to proceed."),
-            },
-        },
-        widget=forms.Select(
-            choices=SCAN_LEVEL_CHOICES,
-            attrs={
-                "aria-describedby": _("explanation-clearance-level"),
-            },
-        ),
+        error_messages={"level": {"required": _("Please select a clearance level to proceed.")}},
+        widget=forms.Select(choices=SCAN_LEVEL_CHOICES, attrs={"aria-describedby": _("explanation-clearance-level")}),
     )
 
 

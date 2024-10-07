@@ -46,11 +46,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
             elif "subject" in certificate["leaf_data"]:
                 so = certificate["leaf_data"]["subject_dn"]
                 cert_subject = "C={}, ST={}, O={}, OU={}, CN={}".format(
-                    so["country"],
-                    so["province"],
-                    so["organization"],
-                    so["organizational_unit"],
-                    so["common_name"],
+                    so["country"], so["province"], so["organization"], so["organizational_unit"], so["common_name"]
                 )
             else:
                 cert_subject = "n/a"
@@ -89,9 +85,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
                         url = urllib.parse.urlparse(scan["http"]["request"]["uri"])
                         port = 443 if url.scheme == "https" else 80
                         ip_port = IPPort(
-                            address=ip_ooi_reference,
-                            protocol=Protocol[scan["transport_protocol"]],
-                            port=port,
+                            address=ip_ooi_reference, protocol=Protocol[scan["transport_protocol"]], port=port
                         )
                         yield ip_port
 
@@ -111,19 +105,12 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
                         # todo: implement `HTTPResource.redirects_to` if available
                         http_resource = HTTPResource(
                             website=Website(
-                                ip_service=IPService(
-                                    ip_port=ip_port.reference,
-                                    service=service.reference,
-                                ).reference,
+                                ip_service=IPService(ip_port=ip_port.reference, service=service.reference).reference,
                                 hostname=hostname.reference,
                             ).reference,
                             web_url=web_url.reference,
                         )
                         yield http_resource
 
-                        http_header = HTTPHeader(
-                            resource=http_resource.reference,
-                            key=header_field,
-                            value=value,
-                        )
+                        http_header = HTTPHeader(resource=http_resource.reference, key=header_field, value=value)
                         yield http_header

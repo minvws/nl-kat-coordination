@@ -17,10 +17,7 @@ logger = structlog.get_logger("bytes_client")
 
 class BytesClient:
     def __init__(self, base_url: str, username: str, password: str, organization: str):
-        self.credentials = {
-            "username": username,
-            "password": password,
-        }
+        self.credentials = {"username": username, "password": password}
         self.session = httpx.Client(base_url=base_url)
         self.organization = organization
 
@@ -68,7 +65,7 @@ class BytesClient:
                 normalizer=Normalizer(id="normalizer/manual"),
                 started_at=datetime.now(timezone.utc),
                 ended_at=datetime.now(timezone.utc),
-            ),
+            )
         )
 
     def upload_raw(
@@ -118,15 +115,7 @@ class BytesClient:
 
         response = self.session.post(
             "/bytes/raw",
-            json={
-                "files": [
-                    {
-                        "name": file_name,
-                        "content": b64encode(raw).decode(),
-                        "tags": list(mime_types),
-                    }
-                ]
-            },
+            json={"files": [{"name": file_name, "content": b64encode(raw).decode(), "tags": list(mime_types)}]},
             params={"boefje_meta_id": str(boefje_meta_id)},
         )
 
@@ -179,9 +168,7 @@ class BytesClient:
 
     def _get_token(self) -> str:
         response = self.session.post(
-            "/token",
-            data=self.credentials,
-            headers={"content-type": "application/x-www-form-urlencoded"},
+            "/token", data=self.credentials, headers={"content-type": "application/x-www-form-urlencoded"}
         )
 
         return response.json()["access_token"]

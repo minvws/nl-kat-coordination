@@ -76,8 +76,7 @@ class TaskAPI:
     ) -> Any:
         if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail="min_date must be less than max_date",
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail="min_date must be less than max_date"
             )
 
         # FIXME: deprecated; backwards compatibility for rocky that uses the
@@ -86,40 +85,22 @@ class TaskAPI:
         if input_ooi is not None:
             if task_type == "boefje":
                 f_ooi = {
-                    "and": [
-                        storage.filters.Filter(
-                            column="data",
-                            field="input_ooi",
-                            operator="eq",
-                            value=input_ooi,
-                        )
-                    ]
+                    "and": [storage.filters.Filter(column="data", field="input_ooi", operator="eq", value=input_ooi)]
                 }
             elif task_type == "normalizer":
                 f_ooi = {
                     "and": [
                         storage.filters.Filter(
-                            column="data",
-                            field="raw_data__boefje_meta__input_ooi",
-                            operator="eq",
-                            value=input_ooi,
+                            column="data", field="raw_data__boefje_meta__input_ooi", operator="eq", value=input_ooi
                         )
                     ]
                 }
             else:
                 f_ooi = {
                     "or": [
+                        storage.filters.Filter(column="data", field="input_ooi", operator="eq", value=input_ooi),
                         storage.filters.Filter(
-                            column="data",
-                            field="input_ooi",
-                            operator="eq",
-                            value=input_ooi,
-                        ),
-                        storage.filters.Filter(
-                            column="data",
-                            field="raw_data__boefje_meta__input_ooi",
-                            operator="eq",
-                            value=input_ooi,
+                            column="data", field="raw_data__boefje_meta__input_ooi", operator="eq", value=input_ooi
                         ),
                     ]
                 }
@@ -129,41 +110,19 @@ class TaskAPI:
         if plugin_id is not None:
             if task_type == "boefje":
                 f_plugin = {
-                    "and": [
-                        storage.filters.Filter(
-                            column="data",
-                            field="boefje__id",
-                            operator="eq",
-                            value=plugin_id,
-                        )
-                    ]
+                    "and": [storage.filters.Filter(column="data", field="boefje__id", operator="eq", value=plugin_id)]
                 }
             elif task_type == "normalizer":
                 f_plugin = {
                     "and": [
-                        storage.filters.Filter(
-                            column="data",
-                            field="normalizer__id",
-                            operator="eq",
-                            value=plugin_id,
-                        )
+                        storage.filters.Filter(column="data", field="normalizer__id", operator="eq", value=plugin_id)
                     ]
                 }
             else:
                 f_plugin = {
                     "or": [
-                        storage.filters.Filter(
-                            column="data",
-                            field="boefje__id",
-                            operator="eq",
-                            value=plugin_id,
-                        ),
-                        storage.filters.Filter(
-                            column="data",
-                            field="normalizer__id",
-                            operator="eq",
-                            value=plugin_id,
-                        ),
+                        storage.filters.Filter(column="data", field="boefje__id", operator="eq", value=plugin_id),
+                        storage.filters.Filter(column="data", field="normalizer__id", operator="eq", value=plugin_id),
                     ]
                 }
 
@@ -182,8 +141,7 @@ class TaskAPI:
             )
         except storage.filters.errors.FilterError as exc:
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail=f"invalid filter(s) [exception: {exc}]",
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"invalid filter(s) [exception: {exc}]"
             ) from exc
         except storage.errors.StorageError as exc:
             self.logger.exception(exc)
@@ -194,8 +152,7 @@ class TaskAPI:
         except Exception as exc:
             self.logger.exception(exc)
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="failed to get tasks",
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail="failed to get tasks"
             ) from exc
 
         return utils.paginate(request, results, count, offset, limit)
@@ -216,10 +173,7 @@ class TaskAPI:
             ) from exc
 
         if task is None:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_404_NOT_FOUND,
-                detail="task not found",
-            )
+            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="task not found")
 
         return task
 
@@ -239,17 +193,11 @@ class TaskAPI:
             ) from exc
 
         if task_db is None:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_404_NOT_FOUND,
-                detail="task not found",
-            )
+            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="task not found")
 
         patch_data = item.model_dump(exclude_unset=True)
         if len(patch_data) == 0:
-            raise fastapi.HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="no data to patch",
-            )
+            raise fastapi.HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="no data to patch")
 
         # Update task
         updated_task = task_db.model_copy(update=patch_data)
@@ -264,8 +212,7 @@ class TaskAPI:
         except Exception as exc:
             self.logger.exception(exc)
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="failed to update task",
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail="failed to update task"
             ) from exc
 
         return updated_task
@@ -277,8 +224,7 @@ class TaskAPI:
             self.logger.exception(exc)
             self.logger.exception(exc)
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="failed to get task stats",
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail="failed to get task stats"
             ) from exc
 
         return stats

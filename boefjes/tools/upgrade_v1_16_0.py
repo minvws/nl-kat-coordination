@@ -152,9 +152,7 @@ def collect_boefjes_per_normalizer() -> dict[str, list[Boefje]]:
     session = sessionmaker(bind=get_engine())()
 
     all_plugins = PluginService(
-        create_plugin_storage(session),
-        create_config_storage(session),
-        get_local_repository(),
+        create_plugin_storage(session), create_config_storage(session), get_local_repository()
     )._get_all_without_enabled()
 
     normalizers = {}

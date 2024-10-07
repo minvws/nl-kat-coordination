@@ -39,15 +39,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
             else:
                 url_parts = url_parts._replace(netloc=f"[{ip}]") if addr.version == 6 else url_parts._replace(netloc=ip)
 
-            uri = urlunsplit(
-                [
-                    url_parts.scheme,
-                    url_parts.netloc,
-                    url_parts.path,
-                    url_parts.query,
-                    url_parts.fragment,
-                ]
-            )
+            uri = urlunsplit([url_parts.scheme, url_parts.netloc, url_parts.path, url_parts.query, url_parts.fragment])
 
     body_mimetypes = {"openkat-http/body"}
     try:
@@ -97,10 +89,7 @@ def create_response_object(response: requests.Response) -> dict:
 
 def do_request(hostname: str, session: Session, uri: str, useragent: str):
     response = session.get(
-        uri,
-        headers={"Host": hostname, "User-Agent": useragent},
-        verify=False,
-        allow_redirects=False,
+        uri, headers={"Host": hostname, "User-Agent": useragent}, verify=False, allow_redirects=False
     )
 
     return response

@@ -39,14 +39,7 @@ class HTTPService(Connector):
     name: str | None = None
     health_endpoint: str | None = "health"
 
-    def __init__(
-        self,
-        host: str,
-        source: str,
-        timeout: int = 10,
-        pool_connections: int = 10,
-        retries: int = 5,
-    ):
+    def __init__(self, host: str, source: str, timeout: int = 10, pool_connections: int = 10, retries: int = 5):
         """Initializer of the HTTPService class. During initialization the
         host will be checked if it is available and healthy.
 
@@ -81,11 +74,7 @@ class HTTPService(Connector):
 
         self._do_checks()
 
-    def get(
-        self,
-        url: str,
-        params: dict[str, Any] | None = None,
-    ) -> httpx.Response:
+    def get(self, url: str, params: dict[str, Any] | None = None) -> httpx.Response:
         """Execute a HTTP GET request
 
         Args:
@@ -97,29 +86,14 @@ class HTTPService(Connector):
         Returns:
             A request.Response object
         """
-        response = self.session.get(
-            url,
-            headers=self.headers,
-            params=params,
-            timeout=self.timeout,
-        )
-        self.logger.debug(
-            "Made GET request to %s.",
-            url,
-            name=self.name,
-            url=url,
-        )
+        response = self.session.get(url, headers=self.headers, params=params, timeout=self.timeout)
+        self.logger.debug("Made GET request to %s.", url, name=self.name, url=url)
 
         response.raise_for_status()
 
         return response
 
-    def post(
-        self,
-        url: str,
-        payload: dict[str, Any],
-        params: dict[str, Any] | None = None,
-    ) -> httpx.Response:
+    def post(self, url: str, payload: dict[str, Any], params: dict[str, Any] | None = None) -> httpx.Response:
         """Execute a HTTP POST request
 
         Args:
@@ -131,20 +105,8 @@ class HTTPService(Connector):
         Returns:
             A request.Response object
         """
-        response = self.session.post(
-            url,
-            headers=self.headers,
-            params=params,
-            data=payload,
-            timeout=self.timeout,
-        )
-        self.logger.debug(
-            "Made POST request to %s.",
-            url,
-            name=self.name,
-            url=url,
-            payload=payload,
-        )
+        response = self.session.post(url, headers=self.headers, params=params, data=payload, timeout=self.timeout)
+        self.logger.debug("Made POST request to %s.", url, name=self.name, url=url, payload=payload)
 
         response.raise_for_status()
 
@@ -167,11 +129,7 @@ class HTTPService(Connector):
             port = 80 if parsed_url.scheme == "http" else 443
 
         if hostname is None or port is None:
-            self.logger.warning(
-                "Not able to parse hostname and port from %s",
-                self.host,
-                host=self.host,
-            )
+            self.logger.warning("Not able to parse hostname and port from %s", self.host, host=self.host)
             return
 
         if self.host is not None and self.retry(self.is_host_available, hostname, port) is False:

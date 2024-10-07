@@ -37,8 +37,7 @@ def test_spf_discovery_simple_success():
 
 def test_spf_discovery_invalid_():
     dnstxt_record = DNSTXTRecord(
-        hostname=Reference.from_str("Hostname|internet|example.com"),
-        value="v=spf1 assdfsdf w rgw",
+        hostname=Reference.from_str("Hostname|internet|example.com"), value="v=spf1 assdfsdf w rgw"
     )
 
     results = list(run(dnstxt_record, [], {}))
