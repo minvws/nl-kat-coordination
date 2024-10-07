@@ -70,11 +70,10 @@ class OrganizationMemberAddAccountTypeView(
         breadcrumbs.append(
             {
                 "url": reverse(
-                    "organization_member_add_account_type",
-                    kwargs={"organization_code": self.organization.code},
+                    "organization_member_add_account_type", kwargs={"organization_code": self.organization.code}
                 ),
                 "text": _("Add Account Type"),
-            },
+            }
         )
         return breadcrumbs
 
@@ -116,8 +115,7 @@ class OrganizationMemberAddView(
             [
                 {
                     "url": reverse(
-                        "organization_member_add_account_type",
-                        kwargs={"organization_code": self.organization.code},
+                        "organization_member_add_account_type", kwargs={"organization_code": self.organization.code}
                     ),
                     "text": _("Add Account Type"),
                 },
@@ -193,16 +191,12 @@ class MembersUploadView(OrganizationPermissionRequiredMixin, OrganizationView, F
                     logger.exception("Invalid group")
                 except ValidationError:
                     messages.add_message(
-                        self.request,
-                        messages.WARNING,
-                        _("Invalid data for: '{email}'").format(email=email),
+                        self.request, messages.WARNING, _("Invalid data for: '{email}'").format(email=email)
                     )
                     logger.warning("Invalid data", exc_info=True)
                 except ValueError:
                     messages.add_message(
-                        self.request,
-                        messages.WARNING,
-                        _("Invalid email address: '{email}'").format(email=email),
+                        self.request, messages.WARNING, _("Invalid email address: '{email}'").format(email=email)
                     )
                     logger.warning("Invalid email address: %s", email)
 
@@ -227,9 +221,7 @@ class MembersUploadView(OrganizationPermissionRequiredMixin, OrganizationView, F
         OrganizationMember(user=user, **member_kwargs).full_clean()  # Do validation before saving the model
 
         member, member_created = OrganizationMember.objects.get_or_create(
-            user=user,
-            organization=self.organization,
-            defaults=member_kwargs,
+            user=user, organization=self.organization, defaults=member_kwargs
         )
         member.groups.add(Group.objects.get(name=account_type))
 

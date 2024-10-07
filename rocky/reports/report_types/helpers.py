@@ -92,9 +92,7 @@ def get_plugins_for_report_ids(reports: list[str]) -> dict[str, set[str]]:
     return {"required": required_boefjes, "optional": optional_boefjes}
 
 
-def get_report_types_from_aggregate_report(
-    aggregate_report: type[AggregateReport],
-) -> dict[str, set[type[Report]]]:
+def get_report_types_from_aggregate_report(aggregate_report: type[AggregateReport]) -> dict[str, set[type[Report]]]:
     required_reports = set()
     optional_reports = set()
 

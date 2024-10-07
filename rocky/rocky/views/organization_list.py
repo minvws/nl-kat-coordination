@@ -18,10 +18,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 logger = get_logger(__name__)
 
 
-class OrganizationListView(
-    OrganizationBreadcrumbsMixin,
-    ListView,
-):
+class OrganizationListView(OrganizationBreadcrumbsMixin, ListView):
     template_name = "organizations/organization_list.html"
 
     def get_queryset(self) -> list[Organization]:
@@ -54,11 +51,7 @@ class OrganizationListView(
             message += f" Duration: {duration}."
             if failed:
                 message += f"\nFailed for {n_failed} organisations: {', '.join(failed)}"
-            messages.add_message(
-                request,
-                messages.INFO,
-                _(message),
-            )
+            messages.add_message(request, messages.INFO, _(message))
             return self.get(request, *args, **kwargs)
         else:
             raise HttpResponseBadRequest("Unknown action")

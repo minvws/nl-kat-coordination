@@ -9,12 +9,7 @@ from scheduler.server import serializers
 
 
 class QueueAPI:
-    def __init__(
-        self,
-        api: fastapi.FastAPI,
-        ctx: context.AppContext,
-        s: dict[str, schedulers.Scheduler],
-    ) -> None:
+    def __init__(self, api: fastapi.FastAPI, ctx: context.AppContext, s: dict[str, schedulers.Scheduler]) -> None:
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.api: fastapi.FastAPI = api
         self.ctx: context.AppContext = ctx
@@ -64,26 +59,19 @@ class QueueAPI:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_404_NOT_FOUND,
-                detail="scheduler not found, by queue_id",
+                status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="scheduler not found, by queue_id"
             )
 
         q = s.queue
         if q is None:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_404_NOT_FOUND,
-                detail="queue not found",
-            )
+            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="queue not found")
 
         return models.Queue(**q.dict())
 
     def pop(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_404_NOT_FOUND,
-                detail="queue not found",
-            )
+            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="queue not found")
 
         try:
             p_item = s.pop_item_from_queue(filters)
@@ -101,10 +89,7 @@ class QueueAPI:
     def push(self, queue_id: str, item_in: serializers.Task) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_404_NOT_FOUND,
-                detail="queue not found",
-            )
+            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="queue not found")
 
         try:
             # Load default values
@@ -116,33 +101,27 @@ class QueueAPI:
         except Exception as exc:
             self.logger.exception(exc)
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=str(exc),
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
             ) from exc
 
         try:
             pushed_item = s.push_item_to_queue(new_item)
         except ValueError as exc_value:
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail=f"malformed item: {exc_value}",
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"malformed item: {exc_value}"
             ) from exc_value
         except queues.QueueFullError as exc_full:
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_429_TOO_MANY_REQUESTS,
-                detail="queue is full",
+                status_code=fastapi.status.HTTP_429_TOO_MANY_REQUESTS, detail="queue is full"
             ) from exc_full
         except queues.errors.NotAllowedError as exc_not_allowed:
             raise fastapi.HTTPException(
-                headers={"Retry-After": "60"},
-                status_code=fastapi.status.HTTP_409_CONFLICT,
-                detail=str(exc_not_allowed),
+                headers={"Retry-After": "60"}, status_code=fastapi.status.HTTP_409_CONFLICT, detail=str(exc_not_allowed)
             ) from exc_not_allowed
         except Exception as exc:
             self.logger.exception(exc)
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=str(exc),
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
             ) from exc
 
         return pushed_item

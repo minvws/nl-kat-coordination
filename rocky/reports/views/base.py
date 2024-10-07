@@ -41,10 +41,7 @@ from rocky.views.mixins import ObservedAtMixin, OOIList
 from rocky.views.ooi_view import BaseOOIListView, OOIFilterView
 from rocky.views.scheduler import SchedulerView
 
-REPORTS_PRE_SELECTION = {
-    "clearance_level": ["2", "3", "4"],
-    "clearance_type": "declared",
-}
+REPORTS_PRE_SELECTION = {"clearance_level": ["2", "3", "4"], "clearance_type": "declared"}
 
 
 def get_selection(request: HttpRequest, pre_selection: dict[str, str | Sequence[str]] | None = None) -> str:
@@ -84,12 +81,7 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
 
-        breadcrumbs = [
-            {
-                "url": reverse("reports", kwargs=kwargs) + selection,
-                "text": _("Reports"),
-            },
-        ]
+        breadcrumbs = [{"url": reverse("reports", kwargs=kwargs) + selection, "text": _("Reports")}]
 
         return breadcrumbs
 
@@ -195,8 +187,7 @@ class BaseReportView(OOIFilterView):
     def get_ooi_filter_forms(self) -> dict[str, Form]:
         return {
             "ooi_type_form": OOITypeMultiCheckboxForReportForm(
-                sorted([ooi_class.get_ooi_type() for ooi_class in self.ooi_types]),
-                self.request.GET,
+                sorted([ooi_class.get_ooi_type() for ooi_class in self.ooi_types]), self.request.GET
             )
         }
 
@@ -313,9 +304,7 @@ class ReportTypeSelectionView(BaseReportView, ReportBreadcrumbs, TemplateView):
             report_types[option] = self.get_report_types_from_ooi_selelection(reports)
         return report_types
 
-    def get_available_report_types(
-        self,
-    ) -> tuple[list[dict[str, str]] | dict[str, list[dict[str, str]]], int]:
+    def get_available_report_types(self) -> tuple[list[dict[str, str]] | dict[str, list[dict[str, str]]], int]:
         report_types: list[dict[str, str]] | dict[str, list[dict[str, str]]] = {}
         if self.report_type is not None:
             if self.report_type == AggregateOrganisationReport:
@@ -408,17 +397,11 @@ class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
                     for plugin in report_plugins:
                         if plugin not in plugin_report_types:
                             plugin_report_types[plugin] = [
-                                {
-                                    "name": report_type.name,
-                                    "label_style": report_type.label_style,
-                                }
+                                {"name": report_type.name, "label_style": report_type.label_style}
                             ]
                         else:
                             plugin_report_types[plugin].append(
-                                {
-                                    "name": report_type.name,
-                                    "label_style": report_type.label_style,
-                                }
+                                {"name": report_type.name, "label_style": report_type.label_style}
                             )
 
                     total_enabled_plugins[plugin_type] += number_of_enabled
@@ -611,22 +594,16 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
     def get_template_names(self):
         if self.report_ooi.report_type and issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
-            return [
-                "aggregate_report.html",
-            ]
+            return ["aggregate_report.html"]
         else:
-            return [
-                "generate_report.html",
-            ]
+            return ["generate_report.html"]
 
     def get_children_reports(self) -> list[ReportOOI]:
         return [
             child
             for x in REPORTS
             for child in self.octopoes_api_connector.query(
-                "Report.<parent_report[is Report]",
-                valid_time=self.observed_at,
-                source=self.report_ooi.reference,
+                "Report.<parent_report[is Report]", valid_time=self.observed_at, source=self.report_ooi.reference
             )
             if child.report_type == x.id
         ]
@@ -711,18 +688,10 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         context["report_ooi"] = self.report_ooi
 
         context["report_download_pdf_url"] = url_with_querystring(
-            reverse(
-                "view_report_pdf",
-                kwargs={"organization_code": self.organization.code},
-            ),
-            True,
-            **self.request.GET,
+            reverse("view_report_pdf", kwargs={"organization_code": self.organization.code}), True, **self.request.GET
         )
         context["report_download_json_url"] = url_with_querystring(
-            reverse(
-                "view_report",
-                kwargs={"organization_code": self.organization.code},
-            ),
+            reverse("view_report", kwargs={"organization_code": self.organization.code}),
             True,
             **dict(json="true", **self.request.GET),
         )
@@ -733,16 +702,10 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 class ViewReportPDFView(ViewReportView, WeasyTemplateResponseMixin):
     pdf_filename = "report.pdf"
     pdf_attachment = False
-    pdf_options = {
-        "pdf_variant": "pdf/ua-1",
-    }
+    pdf_options = {"pdf_variant": "pdf/ua-1"}
 
     def get_template_names(self):
         if self.report_ooi.report_type and issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
-            return [
-                "aggregate_report_pdf.html",
-            ]
+            return ["aggregate_report_pdf.html"]
         else:
-            return [
-                "generate_report_pdf.html",
-            ]
+            return ["generate_report_pdf.html"]

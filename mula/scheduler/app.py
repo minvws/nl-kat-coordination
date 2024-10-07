@@ -111,11 +111,7 @@ class App:
             self.schedulers[scheduler_id].stop()
 
         if removals:
-            self.logger.debug(
-                "Removed %s organisations from scheduler",
-                len(removals),
-                removals=sorted(removals),
-            )
+            self.logger.debug("Removed %s organisations from scheduler", len(removals), removals=sorted(removals))
 
         # Add schedulers for organisation
         for org_id in additions:
@@ -126,24 +122,15 @@ class App:
                 continue
 
             scheduler_boefje = schedulers.BoefjeScheduler(
-                ctx=self.ctx,
-                scheduler_id=f"boefje-{org.id}",
-                organisation=org,
-                callback=self.remove_scheduler,
+                ctx=self.ctx, scheduler_id=f"boefje-{org.id}", organisation=org, callback=self.remove_scheduler
             )
 
             scheduler_normalizer = schedulers.NormalizerScheduler(
-                ctx=self.ctx,
-                scheduler_id=f"normalizer-{org.id}",
-                organisation=org,
-                callback=self.remove_scheduler,
+                ctx=self.ctx, scheduler_id=f"normalizer-{org.id}", organisation=org, callback=self.remove_scheduler
             )
 
             scheduler_report = schedulers.ReportScheduler(
-                ctx=self.ctx,
-                scheduler_id=f"report-{org.id}",
-                organisation=org,
-                callback=self.remove_scheduler,
+                ctx=self.ctx, scheduler_id=f"report-{org.id}", organisation=org, callback=self.remove_scheduler
             )
 
             with self.lock:
@@ -159,11 +146,7 @@ class App:
             # Flush katalogus caches when new organisations are added
             self.ctx.services.katalogus.flush_caches()
 
-            self.logger.debug(
-                "Added %s organisations to scheduler",
-                len(additions),
-                additions=sorted(additions),
-            )
+            self.logger.debug("Added %s organisations to scheduler", len(additions), additions=sorted(additions))
 
     @tracer.start_as_current_span("collect_metrics")
     def collect_metrics(self) -> None:
@@ -173,20 +156,11 @@ class App:
         """
         with self.lock:
             for s in self.schedulers.copy().values():
-                self.ctx.metrics_qsize.labels(
-                    scheduler_id=s.scheduler_id,
-                ).set(
-                    s.queue.qsize(),
-                )
+                self.ctx.metrics_qsize.labels(scheduler_id=s.scheduler_id).set(s.queue.qsize())
 
                 status_counts = self.ctx.datastores.task_store.get_status_counts(s.scheduler_id)
                 for status, count in status_counts.items():
-                    self.ctx.metrics_task_status_counts.labels(
-                        scheduler_id=s.scheduler_id,
-                        status=status,
-                    ).set(
-                        count,
-                    )
+                    self.ctx.metrics_task_status_counts.labels(scheduler_id=s.scheduler_id, status=status).set(count)
 
     def start_schedulers(self) -> None:
         # Initialize the schedulers
@@ -198,26 +172,17 @@ class App:
 
         for org in orgs:
             boefje_scheduler = schedulers.BoefjeScheduler(
-                ctx=self.ctx,
-                scheduler_id=f"boefje-{org.id}",
-                organisation=org,
-                callback=self.remove_scheduler,
+                ctx=self.ctx, scheduler_id=f"boefje-{org.id}", organisation=org, callback=self.remove_scheduler
             )
             self.schedulers[boefje_scheduler.scheduler_id] = boefje_scheduler
 
             normalizer_scheduler = schedulers.NormalizerScheduler(
-                ctx=self.ctx,
-                scheduler_id=f"normalizer-{org.id}",
-                organisation=org,
-                callback=self.remove_scheduler,
+                ctx=self.ctx, scheduler_id=f"normalizer-{org.id}", organisation=org, callback=self.remove_scheduler
             )
             self.schedulers[normalizer_scheduler.scheduler_id] = normalizer_scheduler
 
             report_scheduler = schedulers.ReportScheduler(
-                ctx=self.ctx,
-                scheduler_id=f"report-{org.id}",
-                organisation=org,
-                callback=self.remove_scheduler,
+                ctx=self.ctx, scheduler_id=f"report-{org.id}", organisation=org, callback=self.remove_scheduler
             )
             self.schedulers[report_scheduler.scheduler_id] = report_scheduler
 
@@ -235,20 +200,12 @@ class App:
 
     def start_collectors(self) -> None:
         thread.ThreadRunner(
-            name="App-metrics_collector",
-            target=self.collect_metrics,
-            stop_event=self.stop_event,
-            interval=10,
+            name="App-metrics_collector", target=self.collect_metrics, stop_event=self.stop_event, interval=10
         ).start()
 
     def start_server(self) -> None:
         self.server = server.Server(self.ctx, self.schedulers)
-        thread.ThreadRunner(
-            name="App-server",
-            target=self.server.run,
-            stop_event=self.stop_event,
-            loop=False,
-        ).start()
+        thread.ThreadRunner(name="App-server", target=self.server.run, stop_event=self.stop_event, loop=False).start()
 
     def run(self) -> None:
         """Start the main scheduler application, and run in threads the

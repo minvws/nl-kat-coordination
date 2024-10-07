@@ -8,13 +8,7 @@ from octopoes.models.ooi.findings import SnykFindingType
 from octopoes.models.types import CVEFindingType, Finding, Software
 from tests.loading import get_dummy_data
 
-input_ooi = {
-    "primary_key": "Software|lodash|1.1.0|",
-    "software": {
-        "name": "lodash",
-        "version": "1.1.0",
-    },
-}
+input_ooi = {"primary_key": "Software|lodash|1.1.0|", "software": {"name": "lodash", "version": "1.1.0"}}
 
 
 def test_snyk_no_findings():
@@ -47,24 +41,12 @@ def test_snyk_findings():
     for finding in snyk_finding_data:
         snyk_ft = SnykFindingType(id=finding[0])
         snyk_findingtypes.append(snyk_ft)
-        snyk_findings.append(
-            Finding(
-                finding_type=snyk_ft.reference,
-                ooi=software.reference,
-                description=finding[1],
-            )
-        )
+        snyk_findings.append(Finding(finding_type=snyk_ft.reference, ooi=software.reference, description=finding[1]))
 
     for finding in cve_finding_data:
         cve_ft = CVEFindingType(id=finding[0])
         cve_findingtypes.append(cve_ft)
-        cve_findings.append(
-            Finding(
-                finding_type=cve_ft.reference,
-                ooi=software.reference,
-                description=finding[1],
-            )
-        )
+        cve_findings.append(Finding(finding_type=cve_ft.reference, ooi=software.reference, description=finding[1]))
 
     # noinspection PyTypeChecker
     expected = snyk_findingtypes + snyk_findings + cve_findingtypes + cve_findings
