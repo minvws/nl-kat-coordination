@@ -234,7 +234,7 @@ def txs(ctx: click.Context):
 def submit_tx(ctx: click.Context, txs):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(json.dumps(client.submit_tx(txs)))
+    click.echo(json.dumps(client.submit_tx([json.loads(tx) for tx in txs])))
 
 
 @cli.command(
