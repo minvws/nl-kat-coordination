@@ -39,9 +39,7 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
     def form_valid(self, form):
         if form.cleaned_data == {}:
             messages.add_message(
-                self.request,
-                messages.WARNING,
-                _("No changes to the settings added: no form data present"),
+                self.request, messages.WARNING, _("No changes to the settings added: no form data present")
             )
             return redirect(self.get_success_url())
 
@@ -72,11 +70,7 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
             },
             {
                 "url": reverse(
-                    "boefje_detail",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "plugin_id": self.plugin.id,
-                    },
+                    "boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id}
                 ),
                 "text": self.plugin.name,
             },
@@ -99,11 +93,7 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
 
     def get_success_url(self):
         return reverse(
-            "boefje_detail",
-            kwargs={
-                "organization_code": self.organization.code,
-                "plugin_id": self.plugin.id,
-            },
+            "boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id}
         )
 
     def add_error_notification(self, message):

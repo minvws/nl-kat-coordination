@@ -28,12 +28,7 @@ logger = structlog.get_logger(__name__)
 
 
 class PluginService:
-    def __init__(
-        self,
-        plugin_storage: PluginStorage,
-        config_storage: ConfigStorage,
-        local_repo: LocalPluginRepository,
-    ):
+    def __init__(self, plugin_storage: PluginStorage, config_storage: ConfigStorage, local_repo: LocalPluginRepository):
         self.plugin_storage = plugin_storage
         self.config_storage = config_storage
         self.local_repo = local_repo
@@ -235,11 +230,7 @@ class PluginService:
 
 def get_plugin_service() -> Iterator[PluginService]:
     def closure(session: Session):
-        return PluginService(
-            create_plugin_storage(session),
-            create_config_storage(session),
-            get_local_repository(),
-        )
+        return PluginService(create_plugin_storage(session), create_config_storage(session), get_local_repository())
 
     yield from session_managed_iterator(closure)
 

@@ -4,9 +4,7 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("tools", "0043_alter_organization_options"),
-    ]
+    dependencies = [("tools", "0043_alter_organization_options")]
 
     operations = [
         migrations.AlterModelOptions(
@@ -26,5 +24,5 @@ class Migration(migrations.Migration):
                     ("can_access_all_organizations", "Can access all organizations"),
                 )
             },
-        ),
+        )
     ]

@@ -287,18 +287,14 @@ def test_query_for_system_report(
             "hostnames": [
                 str(x.name)
                 for x in octopoes_api_connector.query(
-                    "IPAddress.<address[is ResolvedHostname].hostname",
-                    valid_time,
-                    ip.reference,
+                    "IPAddress.<address[is ResolvedHostname].hostname", valid_time, ip.reference
                 )
             ],
             "services": list(
                 {
                     str(x.name)
                     for x in octopoes_api_connector.query(
-                        "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
-                        valid_time,
-                        ip.reference,
+                        "IPAddress.<address[is IPPort].<ip_port [is IPService].service", valid_time, ip.reference
                     )
                 }.union(
                     {

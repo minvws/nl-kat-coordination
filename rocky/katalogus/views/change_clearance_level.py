@@ -28,10 +28,7 @@ class ChangeClearanceLevel(OrganizationPermissionRequiredMixin, SchedulerView, S
             return redirect(
                 reverse(
                     "boefje_detail",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "plugin_id": kwargs["plugin_id"],
-                    },
+                    kwargs={"organization_code": self.organization.code, "plugin_id": kwargs["plugin_id"]},
                 )
             )
         return super().get(request, *args, **kwargs)
@@ -60,11 +57,7 @@ class ChangeClearanceLevel(OrganizationPermissionRequiredMixin, SchedulerView, S
             },
             {
                 "url": reverse(
-                    "boefje_detail",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "plugin_id": self.plugin.id,
-                    },
+                    "boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id}
                 ),
                 "text": self.plugin.name,
             },

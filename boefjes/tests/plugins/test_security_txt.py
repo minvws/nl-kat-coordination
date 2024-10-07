@@ -25,12 +25,7 @@ input_ooi = {
 
 
 def test_security_txt_same_website():
-    oois = list(
-        run(
-            input_ooi,
-            get_dummy_data("inputs/security_txt_result_same_website.json"),
-        )
-    )
+    oois = list(run(input_ooi, get_dummy_data("inputs/security_txt_result_same_website.json")))
 
     expected = []
     expected.append(URL(raw="https://example.com/.well-known/security.txt", network=Network(name="internet").reference))
@@ -49,12 +44,7 @@ def test_security_txt_same_website():
 
 
 def test_security_txt_different_website():
-    oois = list(
-        run(
-            input_ooi,
-            get_dummy_data("inputs/security_txt_result_different_website.json"),
-        )
-    )
+    oois = list(run(input_ooi, get_dummy_data("inputs/security_txt_result_different_website.json")))
 
     expected = []
     url_original = URL(raw="https://example.com/.well-known/security.txt", network=Network(name="internet").reference)

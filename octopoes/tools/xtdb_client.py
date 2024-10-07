@@ -27,9 +27,7 @@ TransactionType = PutTransaction | DeleteTransaction | EvictTransaction | MatchT
 class XTDBClient:
     def __init__(self, base_url: str, node: str, timeout: int | None = None):
         self._client = httpx.Client(
-            base_url=f"{base_url}/_xtdb/{node}",
-            headers={"Accept": "application/json"},
-            timeout=timeout,
+            base_url=f"{base_url}/_xtdb/{node}", headers={"Accept": "application/json"}, timeout=timeout
         )
 
     def status(self) -> JsonValue:
@@ -125,11 +123,7 @@ class XTDBClient:
 
         return res.json()
 
-    def await_tx_time(
-        self,
-        transaction_time: datetime.datetime,
-        timeout: int | None,
-    ) -> JsonValue:
+    def await_tx_time(self, transaction_time: datetime.datetime, timeout: int | None) -> JsonValue:
         params = {"tx-time": transaction_time.isoformat()}
         if timeout is not None:
             params["timeout"] = str(timeout)
@@ -137,11 +131,7 @@ class XTDBClient:
 
         return res.json()
 
-    def tx_log(
-        self,
-        after_tx_id: int | None,
-        with_ops: bool,
-    ) -> JsonValue:
+    def tx_log(self, after_tx_id: int | None, with_ops: bool) -> JsonValue:
         params = {}
         if after_tx_id is not None:
             params["after-tx-id"] = after_tx_id

@@ -121,11 +121,7 @@ def test_edit_admins_from_different_organizations(rf, admin_member, admin_member
 
 def test_admin_edits_client_different_orgs(rf, admin_member, client_member_b):
     request = setup_request(
-        rf.post(
-            "organization_member_edit",
-            {"status": "blocked", "trusted_clearance_level": 4},
-        ),
-        admin_member.user,
+        rf.post("organization_member_edit", {"status": "blocked", "trusted_clearance_level": 4}), admin_member.user
     )
     with pytest.raises(Http404):
         OrganizationMemberEditView.as_view()(
@@ -135,11 +131,7 @@ def test_admin_edits_client_different_orgs(rf, admin_member, client_member_b):
 
 def test_admin_edits_redteamer(rf, admin_member, redteam_member, log_output):
     request = setup_request(
-        rf.post(
-            "organization_member_edit",
-            {"status": "active", "trusted_clearance_level": 4},
-        ),
-        admin_member.user,
+        rf.post("organization_member_edit", {"status": "active", "trusted_clearance_level": 4}), admin_member.user
     )
     OrganizationMemberEditView.as_view()(
         request, organization_code=redteam_member.organization.code, pk=redteam_member.id
@@ -157,11 +149,7 @@ def test_admin_edits_redteamer(rf, admin_member, redteam_member, log_output):
 
 def test_admin_edits_redteamer_to_block(rf, admin_member, redteam_member):
     request = setup_request(
-        rf.post(
-            "organization_member_edit",
-            {"blocked": True, "trusted_clearance_level": 4},
-        ),
-        admin_member.user,
+        rf.post("organization_member_edit", {"blocked": True, "trusted_clearance_level": 4}), admin_member.user
     )
     OrganizationMemberEditView.as_view()(
         request, organization_code=redteam_member.organization.code, pk=redteam_member.id

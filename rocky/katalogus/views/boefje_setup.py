@@ -27,10 +27,7 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
 
     def get_success_url(self) -> str:
         return (
-            reverse(
-                "boefje_detail",
-                kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin_id},
-            )
+            reverse("boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin_id})
             + "?"
             + self.query_params
         )
@@ -189,27 +186,16 @@ class EditBoefjeView(BoefjeSetupView):
         context["return_to_plugin_id"] = self.plugin.id
 
         context["breadcrumbs"] = [
-            {
-                "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
-                "text": "KAT-alogus",
-            },
+            {"url": reverse("katalogus", kwargs={"organization_code": self.organization.code}), "text": "KAT-alogus"},
             {
                 "url": reverse(
-                    "boefje_detail",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "plugin_id": self.plugin.id,
-                    },
+                    "boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id}
                 ),
                 "text": self.plugin.name,
             },
             {
                 "url": reverse(
-                    "edit_boefje",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "plugin_id": self.plugin.id,
-                    },
+                    "edit_boefje", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id}
                 ),
                 "text": 'Edit "' + self.plugin.name + '"',
             },

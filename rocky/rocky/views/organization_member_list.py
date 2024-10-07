@@ -24,10 +24,7 @@ class PageActions(Enum):
 
 
 class OrganizationMemberListView(
-    OrganizationPermissionRequiredMixin,
-    OrganizationMemberBreadcrumbsMixin,
-    OrganizationView,
-    ListView,
+    OrganizationPermissionRequiredMixin, OrganizationMemberBreadcrumbsMixin, OrganizationView, ListView
 ):
     model = OrganizationMember
     context_object_name = "members"
