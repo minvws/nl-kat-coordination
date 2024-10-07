@@ -39,8 +39,8 @@ class FindingType(OOI):
     impact: str | None = None
     recommendation: str | None = None
 
-    risk_score: float | None = 0.0
-    risk_severity: RiskLevelSeverity | None = RiskLevelSeverity.PENDING
+    risk_score: float | None = None
+    risk_severity: RiskLevelSeverity | None = None
 
     _natural_key_attrs = ["id"]
     _traversable = False

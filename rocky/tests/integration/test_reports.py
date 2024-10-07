@@ -294,25 +294,41 @@ def test_multi_report(
     assert multi_data["asset_vulnerabilities"] == [
         {
             "asset": "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
-            "vulnerabilities": {"CVE-2018-20677": 0.0, "CVE-2019-8331": 0.0, "RetireJS-jquerymigrate-f3a3": 0.0},
+            "vulnerabilities": {
+                "CVE-2018-20677": None,
+                "CVE-2019-8331": None,
+                "RetireJS-jquerymigrate-f3a3": None,
+            },
             "organisation": "test-test_multi_report",
             "services": ["Web"],
         },
         {
             "asset": "IPAddressV4|test|192.0.2.3",
-            "vulnerabilities": {"CVE-2018-20677": 0.0, "CVE-2019-8331": 0.0, "RetireJS-jquerymigrate-f3a3": 0.0},
+            "vulnerabilities": {
+                "CVE-2018-20677": None,
+                "CVE-2019-8331": None,
+                "RetireJS-jquerymigrate-f3a3": None,
+            },
             "organisation": "test-test_multi_report",
             "services": ["Dicom", "Mail", "Other", "Web"],
         },
         {
             "asset": "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
-            "vulnerabilities": {"CVE-2018-20677": 0.0, "CVE-2019-8331": 0.0, "RetireJS-jquerymigrate-f3a3": 0.0},
+            "vulnerabilities": {
+                "CVE-2018-20677": None,
+                "CVE-2019-8331": None,
+                "RetireJS-jquerymigrate-f3a3": None,
+            },
             "organisation": "test-test_multi_report-2",
             "services": ["Web"],
         },
         {
             "asset": "IPAddressV4|test|192.0.2.3",
-            "vulnerabilities": {"CVE-2018-20677": 0.0, "CVE-2019-8331": 0.0, "RetireJS-jquerymigrate-f3a3": 0.0},
+            "vulnerabilities": {
+                "CVE-2018-20677": None,
+                "CVE-2019-8331": None,
+                "RetireJS-jquerymigrate-f3a3": None,
+            },
             "organisation": "test-test_multi_report-2",
             "services": ["Dicom", "Mail", "Other", "Web"],
         },
@@ -377,9 +393,9 @@ def test_multi_report(
         "Web": {"number_of_available": 4, "number_of_ips": 4, "number_of_valid": 4, "rpki_ips": True},
     }
     assert multi_data["system_vulnerabilities"] == {
-        "CVE-2018-20677": {"cvss": 0.0, "Web": 4, "Dicom": 2, "Mail": 2, "Other": 2},
-        "CVE-2019-8331": {"cvss": 0.0, "Web": 4, "Dicom": 2, "Mail": 2, "Other": 2},
-        "RetireJS-jquerymigrate-f3a3": {"cvss": 0.0, "Web": 4, "Dicom": 2, "Mail": 2, "Other": 2},
+        "CVE-2018-20677": {"cvss": None, "Web": 4, "Dicom": 2, "Mail": 2, "Other": 2},
+        "CVE-2019-8331": {"cvss": None, "Web": 4, "Dicom": 2, "Mail": 2, "Other": 2},
+        "RetireJS-jquerymigrate-f3a3": {"cvss": None, "Web": 4, "Dicom": 2, "Mail": 2, "Other": 2},
     }
     assert multi_data["ipv6"] == {
         "Dicom": {"total": 2, "enabled": 2},
