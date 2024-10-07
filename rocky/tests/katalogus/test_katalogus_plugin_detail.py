@@ -21,9 +21,7 @@ def test_plugin_detail_view(
 
     request = setup_request(rf.get("boefje_detail"), superuser_member.user)
     response = BoefjeDetailView.as_view()(
-        request,
-        organization_code=superuser_member.organization.code,
-        plugin_id="test-plugin",
+        request, organization_code=superuser_member.organization.code, plugin_id="test-plugin"
     )
 
     assertContains(response, "TestBoefje")
@@ -53,9 +51,7 @@ def test_plugin_detail_view_with_container_image(
 
     request = setup_request(rf.get("boefje_detail"), superuser_member.user)
     response = BoefjeDetailView.as_view()(
-        request,
-        organization_code=superuser_member.organization.code,
-        plugin_id="test-plugin",
+        request, organization_code=superuser_member.organization.code, plugin_id="test-plugin"
     )
 
     assertContains(response, "TestBoefje")
@@ -93,9 +89,7 @@ def test_plugin_detail_view_no_consumes(
 
     request = setup_request(rf.get("boefje_detail"), superuser_member.user)
     response = BoefjeDetailView.as_view()(
-        request,
-        organization_code=superuser_member.organization.code,
-        plugin_id="test-plugin",
+        request, organization_code=superuser_member.organization.code, plugin_id="test-plugin"
     )
 
     assertContains(response, "TestBoefje does not need any input objects.")

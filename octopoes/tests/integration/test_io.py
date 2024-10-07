@@ -17,12 +17,7 @@ if os.environ.get("CI") != "1":
 
 def test_io(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     network = Network(name="internet")
-    octopoes_api_connector.save_declaration(
-        Declaration(
-            ooi=network,
-            valid_time=valid_time,
-        )
-    )
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
     time.sleep(2)
 
     assert octopoes_api_connector.list_objects(types={Network}, valid_time=valid_time).count == 1
@@ -91,12 +86,7 @@ def test_duplicate_origin_result_filter(octopoes_api_connector: OctopoesAPIConne
             source_method=None,
             task_id=uuid.uuid4(),
             valid_time=valid_time,
-            result=[
-                network1,
-                network1,
-                network2,
-                network2,
-            ],
+            result=[network1, network1, network2, network2],
         )
     )
     origin = octopoes_api_connector.list_origins(task_id={}, valid_time=valid_time)

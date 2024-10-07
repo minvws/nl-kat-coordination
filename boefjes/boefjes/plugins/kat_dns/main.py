@@ -13,20 +13,7 @@ from dns.resolver import Answer
 from boefjes.job_models import BoefjeMeta
 
 logger = logging.getLogger(__name__)
-DEFAULT_RECORD_TYPES = {
-    "A",
-    "AAAA",
-    "CAA",
-    "CERT",
-    "RP",
-    "SRV",
-    "TXT",
-    "MX",
-    "NS",
-    "CNAME",
-    "DNAME",
-    "SOA",
-}
+DEFAULT_RECORD_TYPES = {"A", "AAAA", "CAA", "CERT", "RP", "SRV", "TXT", "MX", "NS", "CNAME", "DNAME", "SOA"}
 
 
 class TimeoutException(Exception):
@@ -42,8 +29,7 @@ def get_record_types() -> set[str]:
     if not requested_record_types:
         return DEFAULT_RECORD_TYPES
     parsed_requested_record_types = map(
-        lambda x: re.sub(r"[^A-Za-z]", "", x),
-        requested_record_types.upper().split(","),
+        lambda x: re.sub(r"[^A-Za-z]", "", x), requested_record_types.upper().split(",")
     )
     return set(parsed_requested_record_types).intersection(DEFAULT_RECORD_TYPES)
 
@@ -60,13 +46,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     resolver.nameservers = [nameserver]
 
     record_types = get_record_types()
-    answers = (
-        [
-            get_parent_zone_soa(resolver, requested_dns_name),
-        ]
-        if "SOA" in record_types
-        else []
-    )
+    answers = [get_parent_zone_soa(resolver, requested_dns_name)] if "SOA" in record_types else []
 
     for type_ in record_types:
         try:

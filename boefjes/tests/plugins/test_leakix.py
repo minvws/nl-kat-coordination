@@ -14,7 +14,7 @@ def test_output():
             "port": 443,
             "path": "/",
             "netloc": "Hostname|internet|example.com",
-        },
+        }
     )
 
     output = [x for x in run(input_ooi.serialize(), get_dummy_data("raw/leakix-example.com.json"))]

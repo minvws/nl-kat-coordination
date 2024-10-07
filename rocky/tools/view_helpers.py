@@ -134,7 +134,7 @@ class OrganizationDetailBreadcrumbsMixin(BreadcrumbsMixin):
             {
                 "url": reverse("organization_settings", kwargs={"organization_code": self.organization.code}),
                 "text": _("Settings"),
-            },
+            }
         ]
 
         return breadcrumbs
@@ -148,7 +148,7 @@ class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin):
             {
                 "url": reverse("organization_member_list", kwargs={"organization_code": self.organization.code}),
                 "text": _("Members"),
-            },
+            }
         ]
 
         return breadcrumbs

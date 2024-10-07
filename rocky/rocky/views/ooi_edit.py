@@ -42,10 +42,7 @@ class OOIEditView(BaseOOIFormView):
         # Construct breadcrumbs
         breadcrumb_list = self.get_breadcrumb_list()
         breadcrumb_list.append(
-            {
-                "url": get_ooi_url("ooi_edit", self.ooi.primary_key, self.organization.code),
-                "text": _("Edit"),
-            }
+            {"url": get_ooi_url("ooi_edit", self.ooi.primary_key, self.organization.code), "text": _("Edit")}
         )
 
         context["type"] = self.ooi_class.get_ooi_type()

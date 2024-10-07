@@ -12,12 +12,7 @@ def test_report_data(normalizer_runner):
     ooi_dict = json.loads(raw)
 
     declaration = NormalizerDeclaration(
-        ooi={
-            "object_type": "ReportData",
-            "scan_profile": None,
-            "primary_key": "ReportData|test",
-            **ooi_dict,
-        }
+        ooi={"object_type": "ReportData", "scan_profile": None, "primary_key": "ReportData|test", **ooi_dict}
     )
 
     assert output.observations == []

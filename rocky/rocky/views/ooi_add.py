@@ -34,10 +34,7 @@ class OOIAddTypeSelectView(OrganizationView, TemplateView):
             return redirect(
                 reverse(
                     "ooi_add",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "ooi_type": request.GET["add_ooi_type"],
-                    },
+                    kwargs={"organization_code": self.organization.code, "ooi_type": request.GET["add_ooi_type"]},
                 )
             )
 
@@ -48,15 +45,9 @@ class OOIAddTypeSelectView(OrganizationView, TemplateView):
 
         context["ooi_types"] = ooi_type_input_choices()
         context["breadcrumbs"] = [
+            {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": _("Objects")},
             {
-                "url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}),
-                "text": _("Objects"),
-            },
-            {
-                "url": reverse(
-                    "ooi_add_type_select",
-                    kwargs={"organization_code": self.organization.code},
-                ),
+                "url": reverse("ooi_add_type_select", kwargs={"organization_code": self.organization.code}),
                 "text": _("Add object"),
             },
         ]
@@ -92,24 +83,15 @@ class OOIAddView(BaseOOIFormView):
 
         context["type"] = self.ooi_class.get_ooi_type()
         context["breadcrumbs"] = [
+            {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": _("Objects")},
             {
-                "url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}),
-                "text": _("Objects"),
-            },
-            {
-                "url": reverse(
-                    "ooi_add_type_select",
-                    kwargs={"organization_code": self.organization.code},
-                ),
+                "url": reverse("ooi_add_type_select", kwargs={"organization_code": self.organization.code}),
                 "text": _("Type select"),
             },
             {
                 "url": reverse(
                     "ooi_add",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "ooi_type": self.ooi_class.get_ooi_type(),
-                    },
+                    kwargs={"organization_code": self.organization.code, "ooi_type": self.ooi_class.get_ooi_type()},
                 ),
                 "text": _("Add %(ooi_type)s") % {"ooi_type": self.ooi_class.get_ooi_type()},
             },

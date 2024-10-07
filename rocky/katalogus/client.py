@@ -221,10 +221,7 @@ class KATalogusClientV1:
     def _patch_plugin_state(self, boefje_id: str, enabled: bool) -> None:
         logger.info("Toggle plugin state", plugin_id=boefje_id, enabled=enabled)
 
-        response = self.session.patch(
-            f"{self.organization_uri}/plugins/{boefje_id}",
-            json={"enabled": enabled},
-        )
+        response = self.session.patch(f"{self.organization_uri}/plugins/{boefje_id}", json={"enabled": enabled})
         response.raise_for_status()
 
     def get_description(self, boefje_id: str) -> str:
@@ -260,8 +257,7 @@ class KATalogusClientV1:
     def edit_plugin(self, plugin: Plugin) -> None:
         try:
             response = self.session.patch(
-                f"{self.organization_uri}/boefjes/{plugin.id}",
-                content=plugin.model_dump_json(exclude_none=True),
+                f"{self.organization_uri}/boefjes/{plugin.id}", content=plugin.model_dump_json(exclude_none=True)
             )
             response.raise_for_status()
         except httpx.HTTPStatusError as error:
