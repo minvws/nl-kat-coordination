@@ -291,18 +291,6 @@ class BaseReportView(OOIFilterView):
         )
         return report_recipe
 
-    def get_oois_for_saving(self):
-        oois = self.get_oois()
-        return [
-            {
-                "primary_key": ooi.primary_key,
-                "object_type": ooi.object_type,
-                "clearance_level": ooi.scan_profile.level.value,
-                "clearance_type": ooi.scan_profile.scan_profile_type,
-            }
-            for ooi in oois
-        ]
-
     def get_input_data(self) -> dict[str, Any]:
         return {
             "input_data": {

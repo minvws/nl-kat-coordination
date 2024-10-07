@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-02 08:05+0000\n"
+"POT-Creation-Date: 2024-10-07 15:55+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3815,6 +3815,7 @@ msgid "Select which objects you want to include in your report."
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "No objects found."
 msgstr ""
 
@@ -4185,6 +4186,10 @@ msgstr ""
 msgid ""
 "The table below shows which reports were chosen to generate this report, "
 "including a report description."
+msgstr ""
+
+#: reports/templates/summary/report_asset_overview.html
+msgid "No report types found."
 msgstr ""
 
 #: reports/templates/summary/selected_plugins.html
