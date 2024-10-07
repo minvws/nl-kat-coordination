@@ -16,8 +16,8 @@ from boefjes.sql.db import session_managed_iterator
 from boefjes.sql.plugin_storage import create_plugin_storage
 from boefjes.storage.interfaces import (
     ConfigStorage,
-    ExistingPluginId,
-    ExistingPluginName,
+    DuplicatePlugin,
+    IntegrityError,
     NotFound,
     PluginNotFound,
     PluginStorage,
@@ -28,12 +28,7 @@ logger = structlog.get_logger(__name__)
 
 
 class PluginService:
-    def __init__(
-        self,
-        plugin_storage: PluginStorage,
-        config_storage: ConfigStorage,
-        local_repo: LocalPluginRepository,
-    ):
+    def __init__(self, plugin_storage: PluginStorage, config_storage: ConfigStorage, local_repo: LocalPluginRepository):
         self.plugin_storage = plugin_storage
         self.config_storage = config_storage
         self.local_repo = local_repo
@@ -107,28 +102,40 @@ class PluginService:
     def create_boefje(self, boefje: Boefje) -> None:
         try:
             self.local_repo.by_id(boefje.id)
-            raise ExistingPluginId(boefje.id)
+            raise DuplicatePlugin("id")
         except KeyError:
             try:
                 plugin = self.local_repo.by_name(boefje.name)
 
                 if plugin.type == "boefje":
-                    raise ExistingPluginName(boefje.name)
+                    raise DuplicatePlugin("name")
                 else:
-                    self.plugin_storage.create_boefje(boefje)
+                    try:
+                        with self.plugin_storage as storage:
+                            storage.create_boefje(boefje)
+                    except IntegrityError as error:
+                        raise DuplicatePlugin(self._translate_duplicate_plugin(error.message))
             except KeyError:
-                self.plugin_storage.create_boefje(boefje)
+                try:
+                    with self.plugin_storage as storage:
+                        storage.create_boefje(boefje)
+                except IntegrityError as error:
+                    raise DuplicatePlugin(self._translate_duplicate_plugin(error.message))
+
+    def _translate_duplicate_plugin(self, error_message):
+        translations = {"boefje_plugin_id": "id", "boefje_name": "name"}
+        return next((value for key, value in translations.items() if key in error_message), None)
 
     def create_normalizer(self, normalizer: Normalizer) -> None:
         try:
             self.local_repo.by_id(normalizer.id)
-            raise ExistingPluginId(normalizer.id)
+            raise DuplicatePlugin("id")
         except KeyError:
             try:
                 plugin = self.local_repo.by_name(normalizer.name)
 
                 if plugin.types == "normalizer":
-                    raise ExistingPluginName(normalizer.name)
+                    raise DuplicatePlugin("name")
                 else:
                     self.plugin_storage.create_normalizer(normalizer)
             except KeyError:
@@ -223,11 +230,7 @@ class PluginService:
 
 def get_plugin_service() -> Iterator[PluginService]:
     def closure(session: Session):
-        return PluginService(
-            create_plugin_storage(session),
-            create_config_storage(session),
-            get_local_repository(),
-        )
+        return PluginService(create_plugin_storage(session), create_config_storage(session), get_local_repository())
 
     yield from session_managed_iterator(closure)
 

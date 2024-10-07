@@ -11,7 +11,7 @@ from httpx import HTTPError
 from pydantic import ValidationError
 
 from reports.runner.local import LocalReportJobRunner
-from reports.runner.runtime_interfaces import ReportJobRunner, WorkerManager
+from reports.runner.models import ReportJobRunner, WorkerManager
 from rocky.scheduler import SchedulerClient, Task, TaskStatus, scheduler_client
 
 logger = structlog.get_logger(__name__)
@@ -40,20 +40,20 @@ class SchedulerWorkerManager(WorkerManager):
 
         self.exited = False
 
-    def run(self, queue_type: WorkerManager.Queue) -> None:
-        logger.info("Created worker pool for queue '%s'", queue_type.value)
+    def run(self) -> None:
+        logger.info("Created worker pool for queue 'report'")
 
         self.workers = [mp.Process(target=_start_working, args=self._worker_args()) for _ in range(self.pool_size)]
         for worker in self.workers:
             worker.start()
 
-        signal.signal(signal.SIGINT, lambda signum, _: self.exit(queue_type, signum))
-        signal.signal(signal.SIGTERM, lambda signum, _: self.exit(queue_type, signum))
+        signal.signal(signal.SIGINT, lambda signum, _: self.exit(signum))
+        signal.signal(signal.SIGTERM, lambda signum, _: self.exit(signum))
 
         while True:
             try:
                 self._check_workers()
-                self._fill_queue(self.task_queue, queue_type)
+                self._fill_queue(self.task_queue)
             except Exception as e:  # noqa
                 logger.exception("Unhandled Exception:")
                 logger.info("Continuing worker...")
@@ -65,11 +65,11 @@ class SchedulerWorkerManager(WorkerManager):
                 # been called yet.
                 if not self.exited:
                     logger.exception("Exiting worker...")
-                    self.exit(queue_type)
+                    self.exit()
 
                 raise
 
-    def _fill_queue(self, task_queue: Queue, queue_type: WorkerManager.Queue):
+    def _fill_queue(self, task_queue: Queue):
         if task_queue.qsize() > self.pool_size:
             time.sleep(self.worker_heartbeat)
             return
@@ -84,42 +84,40 @@ class SchedulerWorkerManager(WorkerManager):
 
         # We do not target a specific queue since we start one runtime for all organisations
         # and queue ids contain the organisation_id
-        queues = [q for q in queues if q.id.startswith(queue_type.value)]
+        queues = [q for q in queues if q.id.startswith("report")]
 
         logger.debug("Found queues: %s", [queue.id for queue in queues])
 
         all_queues_empty = True
 
-        for queue_type in queues:
-            logger.debug("Popping from queue %s", queue_type.id)
+        for queue in queues:
+            logger.debug("Popping from queue %s", queue.id)
 
             try:
-                p_item = self.scheduler.pop_item(queue_type.id)
+                p_item = self.scheduler.pop_item(queue.id)
             except (HTTPError, ValidationError):
-                logger.exception("Popping task from scheduler failed, sleeping 10 seconds")
-                time.sleep(10)
+                logger.error("Popping task from scheduler failed")
+                time.sleep(self.poll_interval)
                 continue
 
             if not p_item:
-                logger.debug("Queue %s empty", queue_type.id)
+                logger.debug("Queue %s empty", queue.id)
                 continue
 
             all_queues_empty = False
 
-            logger.info("Handling task[%s]", p_item.data.id)
+            logger.info("Handling task[%s]", p_item.id)
 
             try:
                 task_queue.put(p_item)
-                logger.info("Dispatched task[%s]", p_item.data.id)
+                logger.info("Dispatched task[%s]", p_item.id)
             except:  # noqa
                 logger.error("Exiting worker...")
-                logger.info("Patching scheduler task[id=%s] to %s", p_item.data.id, TaskStatus.FAILED.value)
+                logger.info("Patching scheduler task[id=%s] to %s", p_item.id, TaskStatus.FAILED.value)
 
                 try:
                     self.scheduler.patch_task(p_item.id, TaskStatus.FAILED)
-                    logger.info(
-                        "Set task status to %s in the scheduler for task[id=%s]", TaskStatus.FAILED, p_item.data.id
-                    )
+                    logger.info("Set task status to %s in the scheduler for task[id=%s]", TaskStatus.FAILED, p_item.id)
                 except HTTPError:
                     logger.error("Could not patch scheduler task to %s", TaskStatus.FAILED.value)
 
@@ -178,7 +176,7 @@ class SchedulerWorkerManager(WorkerManager):
     def _worker_args(self) -> tuple:
         return self.task_queue, self.runner, self.scheduler, self.handling_tasks
 
-    def exit(self, queue_type: WorkerManager.Queue, signum: int | None = None):
+    def exit(self, signum: int | None = None):
         try:
             if signum:
                 logger.info("Received %s, exiting", signal.Signals(signum).name)
@@ -188,7 +186,7 @@ class SchedulerWorkerManager(WorkerManager):
 
                 for task in tasks:
                     try:
-                        self.scheduler.push_task(task, queue_type.value)
+                        self.scheduler.push_task(task)
                     except HTTPError:
                         logger.exception("Rescheduling task failed[id=%s]", task.id)
 
@@ -223,10 +221,7 @@ def _format_exit_code(exitcode: int | None) -> str:
 
 
 def _start_working(
-    task_queue: mp.Queue,
-    runner: ReportJobRunner,
-    scheduler: SchedulerClient,
-    handling_tasks: dict[int, str],
+    task_queue: mp.Queue, runner: ReportJobRunner, scheduler: SchedulerClient, handling_tasks: dict[int, str]
 ):
     logger.info("Started listening for tasks from worker[pid=%s]", os.getpid())
 
@@ -240,16 +235,16 @@ def _start_working(
             runner.run(p_item.data)
             status = TaskStatus.COMPLETED
         except Exception:  # noqa
-            logger.exception("An error occurred handling scheduler item[id=%s]", p_item.data.id)
+            logger.exception("An error occurred handling scheduler item[id=%s]", p_item.id)
         except:  # noqa
-            logger.exception("An unhandled error occurred handling scheduler item[id=%s]", p_item.data.id)
+            logger.exception("An unhandled error occurred handling scheduler item[id=%s]", p_item.id)
             raise
         finally:
             try:
                 # The docker runner could have handled this already
                 if scheduler.get_task_details(p_item.id).status == TaskStatus.RUNNING:
                     scheduler.patch_task(p_item.id, status)  # Note that implicitly, we have p_item.id == task_id
-                    logger.info("Set status to %s in the scheduler for task[id=%s]", status, p_item.data.id)
+                    logger.info("Set status to %s in the scheduler for task[id=%s]", status, p_item.id)
             except HTTPError:
                 logger.exception("Could not patch scheduler task to %s", status.value)
 

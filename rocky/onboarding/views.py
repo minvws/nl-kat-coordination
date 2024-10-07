@@ -59,10 +59,7 @@ class OnboardingStart(OrganizationView):
 
 
 class OnboardingIntroductionView(
-    OrganizationPermissionRequiredMixin,
-    IntroductionStepsMixin,
-    OrganizationView,
-    TemplateView,
+    OrganizationPermissionRequiredMixin, IntroductionStepsMixin, OrganizationView, TemplateView
 ):
     """
     1. Start the onboarding wizard. What is OpenKAT and what it does.
@@ -74,10 +71,7 @@ class OnboardingIntroductionView(
 
 
 class OnboardingChooseReportInfoView(
-    OrganizationPermissionRequiredMixin,
-    IntroductionStepsMixin,
-    OrganizationView,
-    TemplateView,
+    OrganizationPermissionRequiredMixin, IntroductionStepsMixin, OrganizationView, TemplateView
 ):
     """
     2. Introduction into reporting. All the necessities to generate a report.
@@ -89,10 +83,7 @@ class OnboardingChooseReportInfoView(
 
 
 class OnboardingChooseReportTypeView(
-    OrganizationPermissionRequiredMixin,
-    IntroductionStepsMixin,
-    OrganizationView,
-    TemplateView,
+    OrganizationPermissionRequiredMixin, IntroductionStepsMixin, OrganizationView, TemplateView
 ):
     """
     3. Choose a report type. Gives the user a choice of many report types. Ex. DNS report
@@ -104,10 +95,7 @@ class OnboardingChooseReportTypeView(
 
 
 class OnboardingSetupScanOOIInfoView(
-    OrganizationPermissionRequiredMixin,
-    IntroductionStepsMixin,
-    OrganizationView,
-    TemplateView,
+    OrganizationPermissionRequiredMixin, IntroductionStepsMixin, OrganizationView, TemplateView
 ):
     """
     4. Explanation that an object is needed to make scans.
@@ -119,10 +107,7 @@ class OnboardingSetupScanOOIInfoView(
 
 
 class OnboardingSetupScanOOIAddView(
-    OrganizationPermissionRequiredMixin,
-    IntroductionStepsMixin,
-    SingleOOITreeMixin,
-    FormView,
+    OrganizationPermissionRequiredMixin, IntroductionStepsMixin, SingleOOITreeMixin, FormView
 ):
     """
     5. The user will create a URL object. Shows a form and validation to create object.
@@ -159,7 +144,7 @@ class OnboardingSetupScanOOIAddView(
                 "url": reverse("ooi_add_type_select", kwargs={"organization_code": self.organization.code})
                 + get_selection(self.request),
                 "text": _("Creating an object"),
-            },
+            }
         ]
 
 
@@ -270,10 +255,7 @@ class OnboardingSetClearanceLevelView(
 
 
 class OnboardingSetupScanSelectPluginsView(
-    OrganizationPermissionRequiredMixin,
-    IntroductionStepsMixin,
-    OrganizationView,
-    TemplateView,
+    OrganizationPermissionRequiredMixin, IntroductionStepsMixin, OrganizationView, TemplateView
 ):
     """
     9. Shows the user all required and optional plugins to select from. Required plugins are mandatory to continue.
@@ -347,11 +329,7 @@ class OnboardingSetupScanOOIDetailView(
 
 
 class OnboardingReportView(
-    OrganizationPermissionRequiredMixin,
-    SaveGenerateReportMixin,
-    IntroductionStepsMixin,
-    SingleOOIMixin,
-    TemplateView,
+    OrganizationPermissionRequiredMixin, SaveGenerateReportMixin, IntroductionStepsMixin, SingleOOIMixin, TemplateView
 ):
     """
     10. The user already started the scan and is now waiting till scans are finished to generate the report.
@@ -406,11 +384,7 @@ class OnboardingIntroductionRegistrationView(PermissionRequiredMixin, Introducti
     permission_required = "tools.add_organizationmember"
 
 
-class OnboardingOrganizationSetupView(
-    PermissionRequiredMixin,
-    IntroductionRegistrationStepsMixin,
-    CreateView,
-):
+class OnboardingOrganizationSetupView(PermissionRequiredMixin, IntroductionRegistrationStepsMixin, CreateView):
     """
     Step 2: Create a new organization
     """
@@ -448,10 +422,7 @@ class OnboardingOrganizationSetupView(
         return result
 
     def create_first_member(self, organization):
-        member = OrganizationMember.objects.create(
-            user=self.request.user,
-            organization=organization,
-        )
+        member = OrganizationMember.objects.create(user=self.request.user, organization=organization)
         if member.user.is_superuser:
             member.trusted_clearance_level = 4
             member.acknowledged_clearance_level = 4
@@ -463,10 +434,7 @@ class OnboardingOrganizationSetupView(
 
 
 class OnboardingOrganizationUpdateView(
-    OrganizationPermissionRequiredMixin,
-    IntroductionAdminStepsMixin,
-    OrganizationView,
-    UpdateView,
+    OrganizationPermissionRequiredMixin, IntroductionAdminStepsMixin, OrganizationView, UpdateView
 ):
     """
     Step 2: Update an existing organization (only name not code)
@@ -494,10 +462,7 @@ class OnboardingOrganizationUpdateView(
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
-class OnboardingIndemnificationSetupView(
-    IntroductionAdminStepsMixin,
-    IndemnificationAddView,
-):
+class OnboardingIndemnificationSetupView(IntroductionAdminStepsMixin, IndemnificationAddView):
     """
     Step 3: Agree to idemnification to scan oois
     """
@@ -549,10 +514,7 @@ class OnboardingChooseUserTypeView(
     permission_required = "tools.add_organizationmember"
 
 
-class OnboardingAccountSetupAdminView(
-    RegistrationBreadcrumbsMixin,
-    OnboardingAccountCreationMixin,
-):
+class OnboardingAccountSetupAdminView(RegistrationBreadcrumbsMixin, OnboardingAccountCreationMixin):
     """
     Step 1: Create an admin account with admin rights
     """
@@ -575,10 +537,7 @@ class OnboardingAccountSetupAdminView(
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
-class OnboardingAccountSetupRedTeamerView(
-    RegistrationBreadcrumbsMixin,
-    OnboardingAccountCreationMixin,
-):
+class OnboardingAccountSetupRedTeamerView(RegistrationBreadcrumbsMixin, OnboardingAccountCreationMixin):
     """
     Step 2: Create an redteamer account with redteam rights
     """

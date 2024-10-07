@@ -28,6 +28,7 @@ from rocky.scheduler import (
     ScheduleRequest,
     SchedulerError,
     ScheduleResponse,
+    SchedulerTaskNotFound,
     Task,
     scheduler_client,
 )
@@ -111,22 +112,22 @@ class SchedulerView(OctopoesView):
         return self.report_child_name_form()
 
     def get_task_details(self, task_id: str) -> Task | None:
-        try:
-            return self.scheduler_client.get_task_details(task_id)
-        except SchedulerError as error:
-            return messages.error(self.request, error.message)
+        task = self.scheduler_client.get_task_details(task_id)
+
+        if task.organization_id() != self.organization.code:
+            messages.error(self.request, SchedulerTaskNotFound.message)
+            return None
+
+        return task
 
     def create_report_schedule(self, report_recipe: ReportRecipe) -> ScheduleResponse | None:
         try:
             report_task = ReportTask(
-                organisation_id=self.organization.code,
-                report_recipe_id=str(report_recipe.recipe_id),
+                organisation_id=self.organization.code, report_recipe_id=str(report_recipe.recipe_id)
             ).model_dump()
 
             schedule_request = ScheduleRequest(
-                scheduler_id=self.scheduler_id,
-                data=report_task,
-                schedule=report_recipe.cron_expression,
+                scheduler_id=self.scheduler_id, data=report_task, schedule=report_recipe.cron_expression
             )
 
             submit_schedule = self.scheduler_client.post_schedule(schedule=schedule_request)
@@ -134,6 +135,13 @@ class SchedulerView(OctopoesView):
             return submit_schedule
         except SchedulerError as error:
             return messages.error(self.request, error.message)
+
+    def get_report_schedules(self) -> list[dict[str, Any]]:
+        try:
+            return self.scheduler_client.get_scheduled_reports(scheduler_id=self.scheduler_id)
+        except SchedulerError as error:
+            messages.error(self.request, error.message)
+        return []
 
     def get_task_statistics(self) -> dict[Any, Any]:
         stats = {}
@@ -146,8 +154,7 @@ class SchedulerView(OctopoesView):
     def get_output_oois(self, task):
         try:
             return self.octopoes_api_connector.list_origins(
-                valid_time=task.data.raw_data.boefje_meta.ended_at,
-                task_id=task.id,
+                valid_time=task.data.raw_data.boefje_meta.ended_at, task_id=task.id
             )[0].result
         except IndexError:
             return []
@@ -191,35 +198,26 @@ class SchedulerView(OctopoesView):
     # task info from the scheduler. Task data should be available from the context
     # from which the task is created.
     def reschedule_task(self, task_id: str) -> None:
-        try:
-            task = self.scheduler_client.get_task_details(task_id)
+        task = self.scheduler_client.get_task_details(task_id)
 
-            new_id = uuid.uuid4()
-            task.data.id = new_id
+        if task.organization_id() != self.organization.code:
+            messages.error(self.request, SchedulerTaskNotFound.message)
+            return
 
-            new_task = Task(
-                id=new_id,
-                scheduler_id=task.scheduler_id,
-                priority=1,
-                data=task.data,
-            )
+        new_id = uuid.uuid4()
+        task.data.id = new_id
 
-            self.schedule_task(new_task)
-        except SchedulerError as error:
-            messages.error(self.request, error.message)
+        new_task = Task(id=new_id, scheduler_id=task.scheduler_id, priority=1, data=task.data)
+
+        self.schedule_task(new_task)
 
     def run_normalizer(self, katalogus_normalizer: Normalizer, raw_data: RawData) -> None:
         try:
             normalizer_task = NormalizerTask(
-                normalizer=SchedulerNormalizer.model_validate(katalogus_normalizer.model_dump()),
-                raw_data=raw_data,
+                normalizer=SchedulerNormalizer.model_validate(katalogus_normalizer.model_dump()), raw_data=raw_data
             )
 
-            new_task = Task(
-                priority=1,
-                data=normalizer_task,
-                scheduler_id=f"normalizer-{self.organization.code}",
-            )
+            new_task = Task(priority=1, data=normalizer_task, scheduler_id=f"normalizer-{self.organization.code}")
 
             self.schedule_task(new_task)
         except SchedulerError as error:
@@ -233,22 +231,14 @@ class SchedulerView(OctopoesView):
                 organization=self.organization.code,
             )
 
-            new_task = Task(
-                priority=1,
-                data=boefje_task,
-                scheduler_id=f"boefje-{self.organization.code}",
-            )
+            new_task = Task(priority=1, data=boefje_task, scheduler_id=f"boefje-{self.organization.code}")
 
             self.schedule_task(new_task)
 
         except SchedulerError as error:
             messages.error(self.request, error.message)
 
-    def run_boefje_for_oois(
-        self,
-        boefje: Boefje,
-        oois: list[OOI],
-    ) -> None:
+    def run_boefje_for_oois(self, boefje: Boefje, oois: list[OOI]) -> None:
         try:
             if not oois and not boefje.consumes:
                 self.run_boefje(boefje, None)

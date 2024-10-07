@@ -62,10 +62,7 @@ class OOISummaryView(OOITreeView):
     template_name = "oois/ooi_summary.html"
 
     def get_last_breadcrumb(self):
-        return {
-            "url": get_ooi_url("ooi_summary", self.ooi.primary_key, self.organization.code),
-            "text": _("Summary"),
-        }
+        return {"url": get_ooi_url("ooi_summary", self.ooi.primary_key, self.organization.code), "text": _("Summary")}
 
 
 class OOIGraphView(OOITreeView):

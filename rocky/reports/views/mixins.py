@@ -57,8 +57,7 @@ def collect_reports(observed_at: datetime, octopoes_connector: OctopoesAPIConnec
 
 def save_report_raw(bytes_client: BytesClient, data: dict) -> str:
     report_data_raw_id = bytes_client.upload_raw(
-        raw=ReportDataDict(data).model_dump_json().encode(),
-        manual_mime_types={"openkat/report"},
+        raw=ReportDataDict(data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
     )
 
     return report_data_raw_id

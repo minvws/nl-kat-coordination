@@ -45,12 +45,12 @@ def test_cannot_add_plugin_reserved_id(test_client, organisation):
     boefje = Boefje(id="dns-records", name="My test boefje", static=False)
     response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
     assert response.status_code == 400
-    assert response.json() == {"message": "Plugin id 'dns-records' is already used"}
+    assert response.json() == {"detail": "Duplicate plugin id"}
 
     normalizer = Normalizer(id="kat_nmap_normalize", name="My test normalizer")
     response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.model_dump_json())
     assert response.status_code == 400
-    assert response.json() == {"message": "Plugin id 'kat_nmap_normalize' is already used"}
+    assert response.json() == {"detail": "Duplicate plugin id"}
 
 
 def test_add_boefje(test_client, organisation):
@@ -80,7 +80,7 @@ def test_cannot_add_static_plugin_with_duplicate_name(test_client, organisation)
     boefje = Boefje(id="test_plugin", name="DNS records", static=False)
     response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
     assert response.status_code == 400
-    assert response.json() == {"message": "Plugin name 'DNS records' is already used"}
+    assert response.json() == {"detail": "Duplicate plugin name"}
 
 
 def test_cannot_add_plugin_with_duplicate_name(test_client, organisation):
@@ -91,10 +91,7 @@ def test_cannot_add_plugin_with_duplicate_name(test_client, organisation):
     boefje = Boefje(id="test_plugin_2", name="My test boefje", static=False)
     response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
     assert response.status_code == 400
-    assert response.json() == {
-        "message": 'duplicate key value violates unique constraint "unique_boefje_name"\n'
-        "DETAIL:  Key (name)=(My test boefje) already exists.\n"
-    }
+    assert response.json() == {"detail": "Duplicate plugin name"}
 
     normalizer = Normalizer(id="test_normalizer", name="My test normalizer", static=False)
     response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.model_dump_json())
@@ -197,12 +194,7 @@ def test_update_boefje_schema(test_client, organisation):
     valid_schema = {
         "title": "Arguments",
         "type": "object",
-        "properties": {
-            "MY_KEY": {
-                "title": "MY_KEY",
-                "type": "integer",
-            }
-        },
+        "properties": {"MY_KEY": {"title": "MY_KEY", "type": "integer"}},
         "required": [],
     }
     r = test_client.patch(
@@ -238,7 +230,7 @@ def test_cannot_update_static_plugins(test_client, organisation):
     assert response.json()["enabled"] is True
 
     response = test_client.patch(f"/v1/organisations/{organisation.id}/boefjes/dns-records", json={"version": "v1.2"})
-    assert response.status_code == 400
+    assert response.status_code == 403
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/dns-records")
     assert response.json()["version"] != "v1.2"

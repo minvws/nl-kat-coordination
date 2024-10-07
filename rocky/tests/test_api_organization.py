@@ -59,21 +59,13 @@ class TestOrganizationViewSet(ViewSetTest):
 
     client = lambda_fixture("drf_admin_client")
 
-    class TestList(
-        UsesGetMethod,
-        UsesListEndpoint,
-        Returns200,
-    ):
+    class TestList(UsesGetMethod, UsesListEndpoint, Returns200):
         def test_it_returns_values(self, organizations, json):
             expected = express_organizations(organizations)
             actual = json
             assert actual == expected
 
-    class TestCreate(
-        UsesPostMethod,
-        UsesListEndpoint,
-        Returns201,
-    ):
+    class TestCreate(UsesPostMethod, UsesListEndpoint, Returns201):
         data = static_fixture({"name": "Test Org 3", "code": "test3", "tags": ["tag2", "tag3"]})
 
         initial_ids = precondition_fixture(
@@ -101,11 +93,7 @@ class TestOrganizationViewSet(ViewSetTest):
             actual = json
             assert actual == expected
 
-    class TestCreateKatalogusError(
-        UsesPostMethod,
-        UsesListEndpoint,
-        Returns500,
-    ):
+    class TestCreateKatalogusError(UsesPostMethod, UsesListEndpoint, Returns500):
         data = static_fixture({"name": "Test Org 3", "code": "test3", "tags": ["tag2", "tag3"]})
 
         @pytest.fixture(autouse=True)
@@ -119,21 +107,11 @@ class TestOrganizationViewSet(ViewSetTest):
         def test_it_returns_error(self, json):
             expected = {
                 "type": "server_error",
-                "errors": [
-                    {
-                        "code": "error",
-                        "detail": "Failed creating organization in the Katalogus",
-                        "attr": None,
-                    }
-                ],
+                "errors": [{"code": "error", "detail": "Failed creating organization in the Katalogus", "attr": None}],
             }
             assert json == expected
 
-    class TestCreateOctopoesError(
-        UsesPostMethod,
-        UsesListEndpoint,
-        Returns500,
-    ):
+    class TestCreateOctopoesError(UsesPostMethod, UsesListEndpoint, Returns500):
         data = static_fixture({"name": "Test Org 3", "code": "test3", "tags": ["tag2", "tag3"]})
 
         @pytest.fixture(autouse=True)
@@ -148,44 +126,21 @@ class TestOrganizationViewSet(ViewSetTest):
         def test_it_returns_error(self, json):
             expected = {
                 "type": "server_error",
-                "errors": [
-                    {
-                        "code": "error",
-                        "detail": "Failed creating organization in Octopoes",
-                        "attr": None,
-                    }
-                ],
+                "errors": [{"code": "error", "detail": "Failed creating organization in Octopoes", "attr": None}],
             }
             assert json == expected
 
-    class TestRetrieve(
-        UsesGetMethod,
-        UsesDetailEndpoint,
-        Returns200,
-    ):
+    class TestRetrieve(UsesGetMethod, UsesDetailEndpoint, Returns200):
         def test_it_returns_organization(self, organization, json):
             expected = express_organization(organization)
             actual = json
             assert actual == expected
 
-    class TestUpdate(
-        UsesPatchMethod,
-        UsesDetailEndpoint,
-        Returns200,
-    ):
-        data = static_fixture(
-            {
-                "name": "Changed Organization",
-                "code": "test4",
-                "tags": ["tag3", "tag4"],
-            }
-        )
+    class TestUpdate(UsesPatchMethod, UsesDetailEndpoint, Returns200):
+        data = static_fixture({"name": "Changed Organization", "code": "test4", "tags": ["tag3", "tag4"]})
 
         # Code is read only so shouldn't change
-        expected_data = {
-            "name": "Changed Organization",
-            "code": "test1",
-        }
+        expected_data = {"name": "Changed Organization", "code": "test1"}
 
         @pytest.fixture(autouse=True)
         def mock_services(self, mocker):
@@ -210,11 +165,7 @@ class TestOrganizationViewSet(ViewSetTest):
             actual = json
             assert actual == expected
 
-    class TestDestroy(
-        UsesDeleteMethod,
-        UsesDetailEndpoint,
-        Returns204,
-    ):
+    class TestDestroy(UsesDeleteMethod, UsesDetailEndpoint, Returns204):
         initial_ids = precondition_fixture(
             lambda mock_models_katalogus, mock_models_octopoes, organizations: set(
                 Organization.objects.values_list("id", flat=True)
@@ -232,11 +183,7 @@ class TestOrganizationViewSet(ViewSetTest):
             assert organization_created_log["object"] == "Test Organization 1"
             assert organization_created_log["object_type"] == "Organization"
 
-    class TestDestroyKatalogusError(
-        UsesDeleteMethod,
-        UsesDetailEndpoint,
-        Returns500,
-    ):
+    class TestDestroyKatalogusError(UsesDeleteMethod, UsesDetailEndpoint, Returns500):
         @pytest.fixture(autouse=True)
         def mock_services(self, mocker):
             mocker.patch("tools.models.KATalogusClientV1.health")
@@ -246,21 +193,11 @@ class TestOrganizationViewSet(ViewSetTest):
         def test_it_returns_error(self, json):
             expected = {
                 "type": "server_error",
-                "errors": [
-                    {
-                        "code": "error",
-                        "detail": "Failed deleting organization in the Katalogus",
-                        "attr": None,
-                    }
-                ],
+                "errors": [{"code": "error", "detail": "Failed deleting organization in the Katalogus", "attr": None}],
             }
             assert json == expected
 
-    class TestDestroyOctopoesError(
-        UsesDeleteMethod,
-        UsesDetailEndpoint,
-        Returns500,
-    ):
+    class TestDestroyOctopoesError(UsesDeleteMethod, UsesDetailEndpoint, Returns500):
         @pytest.fixture(autouse=True)
         def mock_services(self, mocker):
             mocker.patch("tools.models.KATalogusClientV1.health")
@@ -271,42 +208,20 @@ class TestOrganizationViewSet(ViewSetTest):
         def test_it_returns_error(self, json):
             expected = {
                 "type": "server_error",
-                "errors": [
-                    {
-                        "code": "error",
-                        "detail": "Failed deleting organization in Octopoes",
-                        "attr": None,
-                    }
-                ],
+                "errors": [{"code": "error", "detail": "Failed deleting organization in Octopoes", "attr": None}],
             }
             assert json == expected
 
-    class TestListNoPermission(
-        UsesGetMethod,
-        UsesListEndpoint,
-        Returns403,
-    ):
+    class TestListNoPermission(UsesGetMethod, UsesListEndpoint, Returns403):
         client = lambda_fixture("drf_redteam_client")
 
-    class TestCreateNoPermission(
-        UsesPostMethod,
-        UsesListEndpoint,
-        Returns403,
-    ):
+    class TestCreateNoPermission(UsesPostMethod, UsesListEndpoint, Returns403):
         client = lambda_fixture("drf_redteam_client")
 
-    class TestRetrieveNoPermission(
-        UsesGetMethod,
-        UsesDetailEndpoint,
-        Returns403,
-    ):
+    class TestRetrieveNoPermission(UsesGetMethod, UsesDetailEndpoint, Returns403):
         client = lambda_fixture("drf_redteam_client")
 
-    class TestDestroyNoPermission(
-        UsesDeleteMethod,
-        UsesDetailEndpoint,
-        Returns403,
-    ):
+    class TestDestroyNoPermission(UsesDeleteMethod, UsesDetailEndpoint, Returns403):
         client = lambda_fixture("drf_redteam_client")
 
 

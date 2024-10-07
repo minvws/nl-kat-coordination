@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-30 13:09+0000\n"
+"POT-Creation-Date: 2024-10-02 08:05+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,6 +33,7 @@ msgstr ""
 #: reports/report_types/tls_report/report.html
 #: reports/templates/partials/report_names_form.html
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/report_overview/subreports_table.html
 #: tools/forms/boefje.py rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
@@ -600,7 +601,20 @@ msgid ""
 msgstr ""
 
 #: katalogus/client.py
-msgid "A HTTP error occurred. Check logs for more info."
+msgid "Boefje with this name already exists."
+msgstr ""
+
+#: katalogus/client.py
+msgid "Boefje with this ID already exists."
+msgstr ""
+
+#: katalogus/client.py
+msgid "Editing this boefje is not allowed because it is static."
+msgstr ""
+
+#: katalogus/client.py
+#, python-format
+msgid "An HTTP %d error occurred. Check logs for more info."
 msgstr ""
 
 #: katalogus/forms/katalogus_filter.py
@@ -804,13 +818,15 @@ msgstr ""
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/summary/ooi_selection.html
+#: rocky/templates/oois/ooi_list.html
 msgid "Object"
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html onboarding/forms.py
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/boefje.py
-#: tools/forms/ooi.py rocky/templates/oois/ooi_page_tabs.html
+#: tools/forms/ooi.py rocky/templates/oois/ooi_list.html
+#: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/explanations.html
 msgid "Clearance level"
 msgstr ""
@@ -1073,6 +1089,7 @@ msgstr ""
 
 #: katalogus/templates/partials/plugin_tile_modal.html reports/forms.py
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Report types"
 msgstr ""
 
@@ -1189,7 +1206,7 @@ msgid "Age"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html tools/forms/boefje.py
-msgid "Time-out interval"
+msgid "Scan frequency"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
@@ -1202,13 +1219,14 @@ msgid "minutes"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
-msgid "Default system interval"
+msgid "Default system scan frequency"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -1222,6 +1240,7 @@ msgstr ""
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -1237,6 +1256,7 @@ msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/report_overview/subreports_table.html
 msgid "Creation date"
 msgstr ""
@@ -2001,6 +2021,7 @@ msgstr ""
 #: reports/report_types/dns_report/report.html
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
+#: rocky/templates/oois/ooi_list.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/explanations.html
 #: rocky/templates/partials/ooi_detail_related_object.html
@@ -2459,6 +2480,7 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/plugin_overview_table.html
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/report_overview/subreports_table.html
 #: reports/templates/summary/report_asset_overview.html
 msgid "Report type"
@@ -3649,6 +3671,7 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Recurrence"
 msgstr ""
 
@@ -3833,6 +3856,7 @@ msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html
+#: rocky/templates/oois/ooi_list.html
 msgid "Clearance type"
 msgstr ""
 
@@ -4021,6 +4045,7 @@ msgid "Input Objects"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/report_overview/subreports_table.html
 msgid "Reference date"
 msgstr ""
@@ -4075,23 +4100,55 @@ msgid "Overview of reports"
 msgstr ""
 
 #: reports/templates/report_overview/report_overview_navigation.html
-msgid "Recent"
-msgstr ""
-
-#: reports/templates/report_overview/report_overview_navigation.html
-msgid "Presets"
-msgstr ""
-
-#: reports/templates/report_overview/report_overview_navigation.html
 msgid "Scheduled"
 msgstr ""
 
 #: reports/templates/report_overview/report_overview_navigation.html
-msgid "Folders"
+msgid "History"
 msgstr ""
 
-#: reports/templates/report_overview/report_overview_navigation.html
-msgid "History"
+#: reports/templates/report_overview/scheduled_reports.html
+msgid "Scheduled reports"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports.html
+msgid "View your scheduled reports."
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports.html
+#, python-format
+msgid "Showing %(length)s scheduled reports"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Scheduled reports:"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Report Name"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Subreport Name"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Scheduled for"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Scheduled Reports:"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/report_overview/subreports_table.html
+#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "Input Object"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Show report details"
 msgstr ""
 
 #: reports/templates/report_overview/subreports.html
@@ -4114,12 +4171,6 @@ msgstr ""
 
 #: reports/templates/report_overview/subreports_table.html
 msgid "Subreports:"
-msgstr ""
-
-#: reports/templates/report_overview/subreports_table.html
-#: rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "Input Object"
 msgstr ""
 
 #: reports/templates/summary/report_asset_overview.html
@@ -4283,8 +4334,8 @@ msgstr ""
 
 #: tools/forms/boefje.py
 msgid ""
-"Specify the time-out interval for tasks using this Boefje in minutes. The "
-"default is 24 hours."
+"Specify the scanning frequency for this Boefje in minutes. The default is 24 "
+"hours. For example: 5 minutes will let the boefje scan every 5 minutes."
 msgstr ""
 
 #: tools/forms/finding_type.py
@@ -5645,6 +5696,14 @@ msgid ""
 msgstr ""
 
 #: rocky/templates/oois/ooi_list.html
+msgid "Objects "
+msgstr ""
+
+#: rocky/templates/oois/ooi_list.html
+msgid "column headers with buttons are sortable"
+msgstr ""
+
+#: rocky/templates/oois/ooi_list.html
 msgid "Delete object(s)"
 msgstr ""
 
@@ -6886,6 +6945,10 @@ msgstr ""
 
 #: rocky/views/ooi_view.py
 msgid "Clearance type: "
+msgstr ""
+
+#: rocky/views/ooi_view.py
+msgid "Searching for: "
 msgstr ""
 
 #: rocky/views/organization_add.py

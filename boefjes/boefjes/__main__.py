@@ -36,12 +36,7 @@ logger = structlog.get_logger(__name__)
 
 @click.command()
 @click.argument("worker_type", type=click.Choice([q.value for q in WorkerManager.Queue]))
-@click.option(
-    "--log-level",
-    type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"]),
-    help="Log level",
-    default="INFO",
-)
+@click.option("--log-level", type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"]), help="Log level", default="INFO")
 def cli(worker_type: str, log_level: str):
     logger.setLevel(log_level)
     logger.info("Starting runtime for %s", worker_type)

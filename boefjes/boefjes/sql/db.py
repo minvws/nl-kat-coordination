@@ -43,7 +43,7 @@ def session_managed_iterator(service_factory: Callable[[Session], Any]) -> Itera
     try:
         yield service
     except Exception as error:
-        logger.exception("An error occurred: %s. Rolling back session", error)
+        logger.error("An error occurred: %s. Rolling back session", error)
         session.rollback()
         raise error
     finally:
