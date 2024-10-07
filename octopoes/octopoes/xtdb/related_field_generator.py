@@ -2,12 +2,7 @@ from octopoes.xtdb import Datamodel, FieldSet, ForeignKey
 
 
 class RelatedFieldNode:
-    def __init__(
-        self,
-        data_model: Datamodel,
-        object_types: set[str],
-        path: tuple[ForeignKey, ...] = (),
-    ):
+    def __init__(self, data_model: Datamodel, object_types: set[str], path: tuple[ForeignKey, ...] = ()):
         self.data_model = data_model
         self.object_types = object_types
 
@@ -35,9 +30,7 @@ class RelatedFieldNode:
                 # Don't traverse the same relation back
                 if not self.path or foreign_key != self.path[-1]:
                     self.relations_out[(object_type, foreign_key.attr_name)] = RelatedFieldNode(
-                        self.data_model,
-                        foreign_key.related_entities,
-                        self.path + (foreign_key,),
+                        self.data_model, foreign_key.related_entities, self.path + (foreign_key,)
                     )
 
     def construct_incoming_relations(self):
@@ -46,10 +39,7 @@ class RelatedFieldNode:
             types = types - {"Network"}
 
         # Loop all object types
-        for (
-            foreign_object_type,
-            foreign_object_relations,
-        ) in self.data_model.entities.items():
+        for foreign_object_type, foreign_object_relations in self.data_model.entities.items():
             # Loop all attributes
             for foreign_key in foreign_object_relations:
                 # Other object points to one of the types in this QueryNode (i.e. sets are NOT disjoint)
@@ -57,16 +47,8 @@ class RelatedFieldNode:
                 if not foreign_key.related_entities.isdisjoint(types) and (
                     not self.path or foreign_key != self.path[-1]
                 ):
-                    self.relations_in[
-                        (
-                            foreign_key.source_entity,
-                            foreign_key.attr_name,
-                            foreign_key.reverse_name,
-                        )
-                    ] = RelatedFieldNode(
-                        self.data_model,
-                        {foreign_object_type},
-                        self.path + (foreign_key,),
+                    self.relations_in[(foreign_key.source_entity, foreign_key.attr_name, foreign_key.reverse_name)] = (
+                        RelatedFieldNode(self.data_model, {foreign_object_type}, self.path + (foreign_key,))
                     )
 
     def build_tree(self, depth: int):

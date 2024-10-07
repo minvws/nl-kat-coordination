@@ -37,10 +37,7 @@ def test_aggregate_report_choose_report_types(
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("aggregate_report_select_oois", kwargs=kwargs)
 
-    request = rf.get(
-        url,
-        {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": "all"},
-    )
+    request = rf.get(url, {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": "all"})
     request.resolver_match = resolve(url)
 
     setup_request(request, client_member.user)

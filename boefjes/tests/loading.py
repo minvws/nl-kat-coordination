@@ -28,8 +28,7 @@ def get_boefje_meta(
 
 
 def get_normalizer_meta(
-    boefje_meta: BoefjeMeta = get_boefje_meta(),
-    raw_file_id: UUID = UUID("2c9f47db-dfca-4928-b29f-368e64b3c779"),
+    boefje_meta: BoefjeMeta = get_boefje_meta(), raw_file_id: UUID = UUID("2c9f47db-dfca-4928-b29f-368e64b3c779")
 ) -> NormalizerMeta:
     return NormalizerMeta(
         id=UUID("203eedee-a590-43e1-8f80-6d18ffe529f5"),
@@ -41,11 +40,8 @@ def get_normalizer_meta(
 
 
 def get_raw_data_meta(
-    raw_file_id: UUID = UUID("2c9f47db-dfca-4928-b29f-368e64b3c779"),
-    boefje_meta: BoefjeMeta = get_boefje_meta(),
+    raw_file_id: UUID = UUID("2c9f47db-dfca-4928-b29f-368e64b3c779"), boefje_meta: BoefjeMeta = get_boefje_meta()
 ) -> RawDataMeta:
     return RawDataMeta(
-        id=raw_file_id,
-        boefje_meta=boefje_meta,
-        mime_types=[{"value": "boefje_id/test"}, {"value": "text/plain"}],
+        id=raw_file_id, boefje_meta=boefje_meta, mime_types=[{"value": "boefje_id/test"}, {"value": "text/plain"}]
     )

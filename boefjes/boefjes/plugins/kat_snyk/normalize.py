@@ -27,19 +27,11 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         for vuln in results["table_vulnerabilities"]:
             snyk_ft = SnykFindingType(id=vuln.get("Vuln_href"))
             yield snyk_ft
-            yield Finding(
-                finding_type=snyk_ft.reference,
-                ooi=pk_ooi,
-                description=vuln.get("Vuln_text"),
-            )
+            yield Finding(finding_type=snyk_ft.reference, ooi=pk_ooi, description=vuln.get("Vuln_text"))
         for vuln in results["cve_vulnerabilities"]:
             cve_ft = CVEFindingType(id=vuln.get("cve_code"))
             yield cve_ft
-            yield Finding(
-                finding_type=cve_ft.reference,
-                ooi=pk_ooi,
-                description=vuln.get("Vuln_text"),
-            )
+            yield Finding(finding_type=cve_ft.reference, ooi=pk_ooi, description=vuln.get("Vuln_text"))
     if not software_version and (results["table_vulnerabilities"] or results["cve_vulnerabilities"]):
         kat_ooi = KATFindingType(id="KAT-SOFTWARE-VERSION-NOT-FOUND")
         yield kat_ooi

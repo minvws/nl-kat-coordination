@@ -267,12 +267,7 @@ def test_enable_disable_plugin_no_clearance(rf, redteam_member, mocker):
     mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = plugin
 
-    request = setup_request(
-        rf.post(
-            "plugin_enable_disable",
-        ),
-        redteam_member.user,
-    )
+    request = setup_request(rf.post("plugin_enable_disable"), redteam_member.user)
 
     response = PluginEnableDisableView.as_view()(
         setup_request(request, redteam_member.user),
@@ -308,12 +303,7 @@ def test_enable_disable_plugin_no_clearance_other_text(rf, redteam_member, mocke
     mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = plugin
 
-    request = setup_request(
-        rf.post(
-            "plugin_enable_disable",
-        ),
-        redteam_member.user,
-    )
+    request = setup_request(rf.post("plugin_enable_disable"), redteam_member.user)
 
     response = PluginEnableDisableView.as_view()(
         setup_request(request, redteam_member.user),
@@ -345,12 +335,7 @@ def test_enable_disable_plugin_has_clearance(rf, redteam_member, mocker):
     mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = plugin
 
-    request = setup_request(
-        rf.post(
-            "plugin_enable_disable",
-        ),
-        redteam_member.user,
-    )
+    request = setup_request(rf.post("plugin_enable_disable"), redteam_member.user)
 
     response = PluginEnableDisableView.as_view()(
         setup_request(request, redteam_member.user),
@@ -373,12 +358,7 @@ def test_enable_disable_normalizer(rf, redteam_member, mocker):
     mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = plugin
 
-    request = setup_request(
-        rf.post(
-            "plugin_enable_disable",
-        ),
-        redteam_member.user,
-    )
+    request = setup_request(rf.post("plugin_enable_disable"), redteam_member.user)
 
     response = PluginEnableDisableView.as_view()(
         setup_request(request, redteam_member.user),

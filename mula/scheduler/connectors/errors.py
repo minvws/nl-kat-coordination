@@ -29,8 +29,7 @@ def exception_handler(func):
             return func(*args, **kwargs)
         except httpx.HTTPStatusError as exc:
             raise ExternalServiceResponseError(
-                f"External service returned an error: {str(exc)}",
-                response=exc.response,
+                f"External service returned an error: {str(exc)}", response=exc.response
             ) from exc
         except httpx.ConnectError as exc:
             raise ExternalServiceConnectionError("External service is not available.") from exc

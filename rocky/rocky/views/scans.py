@@ -10,9 +10,7 @@ class ScanListView(ObjectsBreadcrumbsMixin, OrganizationView, TemplateView):
     def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
 
-        breadcrumbs.append(
-            {"url": "", "text": "Scans"},
-        )
+        breadcrumbs.append({"url": "", "text": "Scans"})
 
         return breadcrumbs
 

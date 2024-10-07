@@ -49,10 +49,7 @@ class TaskListView(SchedulerView, SchedulerListView, PageActionsView):
         context["active_filters_counter"] = self.count_active_task_filters()
         context["stats"] = self.get_task_statistics()
         context["breadcrumbs"] = [
-            {
-                "url": reverse("task_list", kwargs={"organization_code": self.organization.code}),
-                "text": _("Tasks"),
-            },
+            {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")}
         ]
         return context
 
@@ -119,9 +116,7 @@ class AllTaskListView(SchedulerListView, PageActionsView):
         context = super().get_context_data(**kwargs)
         context["task_filter_form"] = self.task_filter_form(self.request.GET)
         context["stats"] = self.client.get_combined_schedulers_stats(scheduler_ids=self.schedulers)
-        context["breadcrumbs"] = [
-            {"url": reverse("all_task_list", kwargs={}), "text": _("All Tasks")},
-        ]
+        context["breadcrumbs"] = [{"url": reverse("all_task_list", kwargs={}), "text": _("All Tasks")}]
         return context
 
 

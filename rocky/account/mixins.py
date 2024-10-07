@@ -118,10 +118,7 @@ class OrganizationView(View):
         return context
 
     def indemnification_error(self):
-        return messages.error(
-            self.request,
-            f"Indemnification not present at organization {self.organization}.",
-        )
+        return messages.error(self.request, f"Indemnification not present at organization {self.organization}.")
 
     @property
     def may_update_clearance_level(self) -> bool:
@@ -172,11 +169,7 @@ class OrganizationView(View):
             messages.error(
                 self.request,
                 _("Could not raise clearance level of %s to L%s. Indemnification not present at organization %s.")
-                % (
-                    ooi.reference.human_readable,
-                    level,
-                    self.organization.name,
-                ),
+                % (ooi.reference.human_readable, level, self.organization.name),
             )
 
         except TrustedClearanceLevelTooLowException:
@@ -187,11 +180,7 @@ class OrganizationView(View):
                     "You were trusted a clearance level of L%s. "
                     "Contact your administrator to receive a higher clearance."
                 )
-                % (
-                    ooi.reference.human_readable,
-                    level,
-                    self.organization_member.max_clearance_level,
-                ),
+                % (ooi.reference.human_readable, level, self.organization_member.max_clearance_level),
             )
         except AcknowledgedClearanceLevelTooLowException:
             messages.error(
@@ -201,11 +190,7 @@ class OrganizationView(View):
                     "You acknowledged a clearance level of L%s. "
                     "Please accept the clearance level first on your profile page to proceed."
                 )
-                % (
-                    ooi.reference.human_readable,
-                    level,
-                    self.organization_member.acknowledged_clearance_level,
-                ),
+                % (ooi.reference.human_readable, level, self.organization_member.acknowledged_clearance_level),
             )
         return False
 

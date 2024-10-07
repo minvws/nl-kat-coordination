@@ -18,10 +18,7 @@ def setup_loggers(settings: Settings) -> None:
     except FileNotFoundError:
         logger.error("Logging configuration file not found. [log_cfg=%s]", settings.log_cfg)
     except JSONDecodeError:
-        logger.error(
-            "Logging configuration file is not a valid JSON file. [log_cfg=%s]",
-            settings.log_cfg,
-        )
+        logger.error("Logging configuration file is not a valid JSON file. [log_cfg=%s]", settings.log_cfg)
 
     if settings.debug:
         # pylint fails on "Instance of 'RootLogger' has no 'loggerDict' member (no-member)"

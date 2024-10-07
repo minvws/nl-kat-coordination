@@ -10,25 +10,14 @@ from tests.conftest import setup_request
 TREE_DATA = {
     "root": {
         "reference": "Network|testnetwork",
-        "children": {
-            "urls": [
-                {
-                    "reference": "HostnameHTTPURL|https|internet|scanme.org|443|/",
-                    "children": {},
-                }
-            ]
-        },
+        "children": {"urls": [{"reference": "HostnameHTTPURL|https|internet|scanme.org|443|/", "children": {}}]},
     },
     "store": {
         "Network|testnetwork": {
             "object_type": "Network",
             "primary_key": "Network|testnetwork",
             "name": "testnetwork",
-            "scan_profile": {
-                "scan_profile_type": "declared",
-                "reference": "Network|testnetwork",
-                "level": 1,
-            },
+            "scan_profile": {"scan_profile_type": "declared", "reference": "Network|testnetwork", "level": 1},
         },
         "HostnameHTTPURL|https|internet|scanme.org|443|/": {
             "object_type": "HostnameHTTPURL",
@@ -52,10 +41,7 @@ def test_scan_profile(rf, redteam_member, mock_scheduler, mock_organization_view
     mocker.patch("katalogus.utils.get_katalogus")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
 
-    request = setup_request(
-        rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}),
-        redteam_member.user,
-    )
+    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
     response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 200
@@ -103,10 +89,7 @@ def test_scan_profile_submit_no_indemnification(
     response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 200
-    assertContains(
-        response,
-        "Indemnification not present at organization " + redteam_member.organization.name,
-    )
+    assertContains(response, "Indemnification not present at organization " + redteam_member.organization.name)
 
 
 def test_scan_profile_no_permissions_acknowledged(
@@ -118,10 +101,7 @@ def test_scan_profile_no_permissions_acknowledged(
     redteam_member.acknowledged_clearance_level = -1
     redteam_member.save()
 
-    request = setup_request(
-        rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}),
-        redteam_member.user,
-    )
+    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
     response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 200
@@ -139,10 +119,7 @@ def test_scan_profile_no_permissions_trusted(
     redteam_member.trusted_clearance_level = -1
     redteam_member.save()
 
-    request = setup_request(
-        rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}),
-        redteam_member.user,
-    )
+    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
     response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 200
@@ -155,10 +132,7 @@ def test_scan_profile_reset_view(rf, redteam_member, mock_scheduler, mock_organi
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
     mocker.patch("katalogus.utils.get_katalogus")
 
-    request = setup_request(
-        rf.get("scan_profile_reset", {"ooi_id": "Network|testnetwork"}),
-        redteam_member.user,
-    )
+    request = setup_request(rf.get("scan_profile_reset", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
     response = ScanProfileResetView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 200

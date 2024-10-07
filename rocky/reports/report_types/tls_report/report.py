@@ -8,11 +8,7 @@ from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.service import IPService, TLSCipher
 from reports.report_types.definitions import Report
 
-CIPHER_FINDINGS = [
-    "KAT-RECOMMENDATION-BAD-CIPHER",
-    "KAT-MEDIUM-BAD-CIPHER",
-    "KAT-CRITICAL-BAD-CIPHER",
-]
+CIPHER_FINDINGS = ["KAT-RECOMMENDATION-BAD-CIPHER", "KAT-MEDIUM-BAD-CIPHER", "KAT-CRITICAL-BAD-CIPHER"]
 TREE_DEPTH = 3
 
 

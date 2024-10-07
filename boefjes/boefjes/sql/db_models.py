@@ -25,11 +25,7 @@ class OrganisationInDB(SQL_BASE):
 class BoefjeConfigInDB(SQL_BASE):
     __tablename__ = "boefje_config"
     __table_args__ = (
-        UniqueConstraint(
-            "organisation_pk",
-            "boefje_id",
-            name="unique_boefje_config_per_organisation_per_boefje",
-        ),
+        UniqueConstraint("organisation_pk", "boefje_id", name="unique_boefje_config_per_organisation_per_boefje"),
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -45,9 +41,7 @@ class NormalizerConfigInDB(SQL_BASE):
     __tablename__ = "normalizer_config"
     __table_args__ = (
         UniqueConstraint(
-            "organisation_pk",
-            "normalizer_id",
-            name="unique_normalizer_config_per_organisation_per_normalizer",
+            "organisation_pk", "normalizer_id", name="unique_normalizer_config_per_organisation_per_normalizer"
         ),
     )
 

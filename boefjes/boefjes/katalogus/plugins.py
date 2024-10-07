@@ -21,9 +21,7 @@ from boefjes.sql.plugin_storage import get_plugin_storage
 from boefjes.storage.interfaces import DuplicatePlugin, IntegrityError, NotAllowed, PluginStorage
 
 router = APIRouter(
-    prefix="/organisations/{organisation_id}",
-    tags=["plugins"],
-    dependencies=[Depends(check_organisation_exists)],
+    prefix="/organisations/{organisation_id}", tags=["plugins"], dependencies=[Depends(check_organisation_exists)]
 )
 
 logger = structlog.get_logger(__name__)
@@ -57,10 +55,7 @@ def list_plugins(
 
     # filter plugins by id, name or description
     if filter_params.q is not None:
-        plugins = filter(
-            partial(_plugin_matches_query, query=filter_params.q),
-            plugins,
-        )
+        plugins = filter(partial(_plugin_matches_query, query=filter_params.q), plugins)
 
     # filter plugins by type
     if filter_params.type is not None:
@@ -86,9 +81,7 @@ def list_plugins(
 
 @router.get("/plugins/{plugin_id}", response_model=PluginType)
 def get_plugin(
-    plugin_id: str,
-    organisation_id: str,
-    plugin_service: PluginService = Depends(get_plugin_service),
+    plugin_id: str, organisation_id: str, plugin_service: PluginService = Depends(get_plugin_service)
 ) -> PluginType:
     try:
         with plugin_service as p:
@@ -165,11 +158,7 @@ class BoefjeIn(BaseModel):
 
 
 @router.patch("/boefjes/{boefje_id}", status_code=status.HTTP_204_NO_CONTENT)
-def update_boefje(
-    boefje_id: str,
-    boefje: BoefjeIn,
-    storage: PluginStorage = Depends(get_plugin_storage),
-):
+def update_boefje(boefje_id: str, boefje: BoefjeIn, storage: PluginStorage = Depends(get_plugin_storage)):
     # todo: update boefje should be done in the plugin service
     try:
         with storage as p:
@@ -203,9 +192,7 @@ class NormalizerIn(BaseModel):
 
 @router.patch("/normalizers/{normalizer_id}", status_code=status.HTTP_204_NO_CONTENT)
 def update_normalizer(
-    normalizer_id: str,
-    normalizer: NormalizerIn,
-    storage: PluginStorage = Depends(get_plugin_storage),
+    normalizer_id: str, normalizer: NormalizerIn, storage: PluginStorage = Depends(get_plugin_storage)
 ):
     with storage as p:
         p.update_normalizer(normalizer_id, normalizer.model_dump(exclude_unset=True))
@@ -223,18 +210,13 @@ def get_plugin_schema(plugin_id: str, plugin_service: PluginService = Depends(ge
 
 
 @router.get("/plugins/{plugin_id}/cover.jpg", include_in_schema=False)
-def get_plugin_cover(
-    plugin_id: str,
-    plugin_service: PluginService = Depends(get_plugin_service),
-) -> FileResponse:
+def get_plugin_cover(plugin_id: str, plugin_service: PluginService = Depends(get_plugin_service)) -> FileResponse:
     return FileResponse(plugin_service.cover(plugin_id))
 
 
 @router.get("/plugins/{plugin_id}/description.md", include_in_schema=False)
 def get_plugin_description(
-    plugin_id: str,
-    organisation_id: str,
-    plugin_service: PluginService = Depends(get_plugin_service),
+    plugin_id: str, organisation_id: str, plugin_service: PluginService = Depends(get_plugin_service)
 ) -> Response:
     return Response(plugin_service.description(plugin_id, organisation_id))
 

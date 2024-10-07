@@ -38,11 +38,7 @@ def run_boefje(start_pdb, organization_code, boefje_id, input_ooi):
     local_repository = get_local_repository()
 
     session = sessionmaker(bind=get_engine())()
-    plugin_service = PluginService(
-        create_plugin_storage(session),
-        create_config_storage(session),
-        local_repository,
-    )
+    plugin_service = PluginService(create_plugin_storage(session), create_config_storage(session), local_repository)
 
     handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), plugin_service, bytes_api_client)
     try:
