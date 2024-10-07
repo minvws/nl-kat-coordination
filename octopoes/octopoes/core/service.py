@@ -180,7 +180,7 @@ class OctopoesService:
 
         # An affirmation only updates the OOI but barely changes detection time #3585
         if origin.origin_type == OriginType.AFFIRMATION:
-            valid_time = self.ooi_repository.get_history(origin.source)[-1].valid_time + timedelta(seconds=1)
+            valid_time = self.ooi_repository.get_history(origin.source)[-1].valid_time + timedelta(seconds=3)
 
         for ooi in oois:
             self.ooi_repository.save(ooi, valid_time=valid_time, end_valid_time=end_valid_time)
