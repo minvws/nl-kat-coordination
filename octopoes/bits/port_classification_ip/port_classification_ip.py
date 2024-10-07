@@ -19,7 +19,7 @@ COMMON_TCP_PORTS = [
 ]
 
 COMMON_UDP_PORTS = [
-    53,  # DNS
+    53  # DNS
 ]
 
 SA_TCP_PORTS = [
@@ -93,9 +93,7 @@ def run(input_ooi: IPPort, additional_oois: list, config: dict[str, Any]) -> Ite
                     description=f"Port {port}/{protocol.value} is not a common port and should possibly not be open.",
                 )
     if aggregate_findings and open_ports:
-        ft = KATFindingType(
-            id="KAT-UNCOMMON-OPEN-PORT",
-        )
+        ft = KATFindingType(id="KAT-UNCOMMON-OPEN-PORT")
         yield ft
         yield Finding(
             finding_type=ft.reference,

@@ -37,10 +37,7 @@ class OOIInformationAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         if obj is not None:  # editing an existing object
             if not obj.value:
-                return self.readonly_fields + (
-                    "id",
-                    "consult_api",
-                )
+                return self.readonly_fields + ("id", "consult_api")
             return self.readonly_fields + ("id",)
         return self.readonly_fields
 

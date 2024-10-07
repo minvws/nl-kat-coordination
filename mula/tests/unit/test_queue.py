@@ -26,10 +26,7 @@ class PriorityQueueTestCase(unittest.TestCase):
 
         # Priority Queue
         self.pq = mock_queue.MockPriorityQueue(
-            pq_id="test",
-            maxsize=10,
-            item_type=functions.TestModel,
-            pq_store=self.pq_store,
+            pq_id="test", maxsize=10, item_type=functions.TestModel, pq_store=self.pq_store
         )
 
         self._check_queue_empty()
@@ -74,10 +71,7 @@ class PriorityQueueTestCase(unittest.TestCase):
         """When pushing an item that is not of the correct type, the item
         shouldn't be pushed.
         """
-        item = {
-            "priority": 1,
-            "data": functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex),
-        }
+        item = {"priority": 1, "data": functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex)}
 
         with self.assertRaises(queues.errors.InvalidItemError):
             self.pq.push(item)

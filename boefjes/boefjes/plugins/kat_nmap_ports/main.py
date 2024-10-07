@@ -29,9 +29,7 @@ def build_nmap_arguments(host: str, ports: str | None) -> list[str]:
     return args
 
 
-def validate_ports(
-    ports: str | None,
-) -> str:
+def validate_ports(ports: str | None) -> str:
     """Returns ports argument if valid. Double slashes are for flake8 W605.
 
     A valid port is:

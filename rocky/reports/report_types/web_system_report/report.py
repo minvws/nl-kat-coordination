@@ -113,26 +113,22 @@ class WebSystemReport(Report):
 
         query = "Hostname.<hostname[is Website].<website[is HTTPResource].<ooi[is Finding].finding_type"
         csp_finding_types = self.group_finding_types_by_source(
-            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
-            ["KAT-NO-CSP"],
+            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames), ["KAT-NO-CSP"]
         )
         query = (
             "Hostname.<hostname[is Website].<website[is HTTPResource].<resource[is HTTPHeader]"
             ".<ooi[is Finding].finding_type"
         )
         csp_vulnerabilities_finding_types = self.group_finding_types_by_source(
-            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
-            ["KAT-CSP-VULNERABILITIES"],
+            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames), ["KAT-CSP-VULNERABILITIES"]
         )
         query = "Hostname.<netloc[is HostnameHTTPURL].<ooi[is Finding].finding_type"
         url_finding_types = self.group_finding_types_by_source(
-            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
-            ["KAT-NO-HTTPS-REDIRECT"],
+            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames), ["KAT-NO-HTTPS-REDIRECT"]
         )
         query = "Hostname.<hostname[is Website].<ooi[is Finding].finding_type"
         no_certificate_finding_types = self.group_finding_types_by_source(
-            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
-            ["KAT-NO-CERTIFICATE"],
+            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames), ["KAT-NO-CERTIFICATE"]
         )
         query = "Hostname.<hostname[is Website].<website[is SecurityTXT]"
         has_security_txt_finding_types = self.group_finding_types_by_source(
@@ -141,11 +137,7 @@ class WebSystemReport(Report):
         query = "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort].<ooi[is Finding].finding_type"
         port_finding_types = self.group_finding_types_by_source(
             self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
-            [
-                "KAT-UNCOMMON-OPEN-PORT",
-                "KAT-OPEN-SYSADMIN-PORT",
-                "KAT-OPEN-DATABASE-PORT",
-            ],
+            ["KAT-UNCOMMON-OPEN-PORT", "KAT-OPEN-SYSADMIN-PORT", "KAT-OPEN-DATABASE-PORT"],
         )
         query = "Hostname.<hostname[is Website].certificate.<ooi[is Finding].finding_type"
         certificate_finding_types = self.group_finding_types_by_source(
@@ -209,9 +201,7 @@ class WebSystemReport(Report):
                 # We need cast here because mypy doesn't understand that we only add finding_types
                 # when risk level severity isn't None
                 "finding_types": sorted(
-                    finding_types.values(),
-                    reverse=True,
-                    key=lambda x: cast(RiskLevelSeverity, x.risk_severity),
+                    finding_types.values(), reverse=True, key=lambda x: cast(RiskLevelSeverity, x.risk_severity)
                 ),
             }
 

@@ -81,10 +81,7 @@ class BaseKATalogusView(OrganizationView, ListView, FormView):
         context["url_name"] = self.request.resolver_match.url_name
         context["active_filters_counter"] = self.count_active_filters()
         context["breadcrumbs"] = [
-            {
-                "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
-                "text": _("KAT-alogus"),
-            },
+            {"url": reverse("katalogus", kwargs={"organization_code": self.organization.code}), "text": _("KAT-alogus")}
         ]
         return context
 
@@ -126,9 +123,6 @@ class AboutPluginsView(OrganizationView, TemplateView):
         context = super().get_context_data(**kwargs)
         context["view_type"] = self.kwargs.get("view_type", "grid")
         context["breadcrumbs"] = [
-            {
-                "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
-                "text": _("KAT-alogus"),
-            },
+            {"url": reverse("katalogus", kwargs={"organization_code": self.organization.code}), "text": _("KAT-alogus")}
         ]
         return context

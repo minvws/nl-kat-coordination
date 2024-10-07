@@ -4,9 +4,7 @@ from octopoes.models.tree import ReferenceTree
 
 
 def test_tls_report_no_suites_no_findings(mock_octopoes_api_connector, valid_time, ip_service, tree_data_no_findings):
-    mock_octopoes_api_connector.tree = {
-        ip_service.reference: ReferenceTree.model_validate(tree_data_no_findings),
-    }
+    mock_octopoes_api_connector.tree = {ip_service.reference: ReferenceTree.model_validate(tree_data_no_findings)}
 
     report = TLSReport(mock_octopoes_api_connector)
     data = report.generate_data(str(ip_service.reference), valid_time)
@@ -17,13 +15,10 @@ def test_tls_report_no_suites_no_findings(mock_octopoes_api_connector, valid_tim
 
 
 def test_tls_report_multiple_findings_and_suites(
-    mock_octopoes_api_connector,
-    valid_time,
-    ip_service,
-    tree_data_tls_findings_and_suites,
+    mock_octopoes_api_connector, valid_time, ip_service, tree_data_tls_findings_and_suites
 ):
     mock_octopoes_api_connector.tree = {
-        ip_service.reference: ReferenceTree.model_validate(tree_data_tls_findings_and_suites),
+        ip_service.reference: ReferenceTree.model_validate(tree_data_tls_findings_and_suites)
     }
 
     report = TLSReport(mock_octopoes_api_connector)

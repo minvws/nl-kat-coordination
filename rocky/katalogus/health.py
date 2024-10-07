@@ -14,8 +14,6 @@ def get_katalogus_health() -> ServiceHealth:
     except HTTPError:
         logger.exception("Error while retrieving KATalogus health state")
         katalogus_health = ServiceHealth(
-            service="katalogus",
-            healthy=False,
-            additional="Could not connect to KATalogus. Service is possibly down",
+            service="katalogus", healthy=False, additional="Could not connect to KATalogus. Service is possibly down"
         )
     return katalogus_health

@@ -69,11 +69,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         addresses_count += 1
 
         if mask < interface.ip.max_prefixlen:
-            block = block_type(
-                start_ip=ip_address.reference,
-                mask=mask,
-                network=network.reference,
-            )
+            block = block_type(start_ip=ip_address.reference, mask=mask, network=network.reference)
             yield block
             yield DeclaredScanProfile(reference=block.reference, level=indemnification_level)
             blocks_count += 1

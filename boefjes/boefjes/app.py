@@ -269,11 +269,7 @@ def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_leve
     local_repository = get_local_repository()
 
     session = sessionmaker(bind=get_engine())()
-    plugin_service = PluginService(
-        create_plugin_storage(session),
-        create_config_storage(session),
-        local_repository,
-    )
+    plugin_service = PluginService(create_plugin_storage(session), create_config_storage(session), local_repository)
 
     item_handler: Handler
     if queue is WorkerManager.Queue.BOEFJES:

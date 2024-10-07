@@ -95,12 +95,7 @@ class CheckboxGroup(forms.CheckboxSelectMultiple):
     required_options: list[str]
     wrap_label = True
 
-    def __init__(
-        self,
-        required_options: list[str] | None = None,
-        *args,
-        **kwargs,
-    ) -> None:
+    def __init__(self, required_options: list[str] | None = None, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.required_options = required_options or []
 
@@ -142,14 +137,7 @@ class CheckboxTable(Widget):
         for index, (choice_value, choice_label) in enumerate(self.choices):
             selected = str(choice_value) in value if value is not None else False
             context["widget"]["options"].append(
-                self.create_option(
-                    name,
-                    choice_value,
-                    choice_label,
-                    selected,
-                    index,
-                    attrs=attrs,
-                )
+                self.create_option(name, choice_value, choice_label, selected, index, attrs=attrs)
             )
 
         context["widget"]["column_names"] = self.column_names

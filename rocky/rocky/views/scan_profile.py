@@ -56,8 +56,7 @@ class ScanProfileResetView(OOIDetailView):
     def post(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
         self.octopoes_api_connector.save_scan_profile(
-            EmptyScanProfile(reference=self.ooi.reference),
-            valid_time=datetime.now(timezone.utc),
+            EmptyScanProfile(reference=self.ooi.reference), valid_time=datetime.now(timezone.utc)
         )
         return redirect(get_ooi_url("scan_profile_detail", self.ooi.primary_key, self.organization.code))
 

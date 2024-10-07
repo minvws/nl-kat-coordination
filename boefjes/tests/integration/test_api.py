@@ -194,12 +194,7 @@ def test_update_boefje_schema(test_client, organisation):
     valid_schema = {
         "title": "Arguments",
         "type": "object",
-        "properties": {
-            "MY_KEY": {
-                "title": "MY_KEY",
-                "type": "integer",
-            }
-        },
+        "properties": {"MY_KEY": {"title": "MY_KEY", "type": "integer"}},
         "required": [],
     }
     r = test_client.patch(
