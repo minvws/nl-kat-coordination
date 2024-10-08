@@ -1,5 +1,5 @@
 from collections import defaultdict
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from datetime import datetime, timezone
 from operator import attrgetter
 from typing import Any, Literal, cast
@@ -241,16 +241,16 @@ class BaseReportView(OOIFilterView):
 
     def get_available_report_types(self) -> tuple[list[dict[str, str]] | dict[str, list[dict[str, str]]], int]:
         report_types: list[dict[str, str]] | dict[str, list[dict[str, str]]] = {}
-        if self.report_type is not None:
-            if self.report_type == AggregateOrganisationReport:
-                report_types = self.get_report_types_for_aggregate_report()
-                return report_types, len(
-                    [report_type for report_type_list in report_types.values() for report_type in report_type_list]
-                )
 
-            elif self.report_type == MultiOrganizationReport:
-                report_types = self.get_report_types_from_ooi_selelection({MultiOrganizationReport})
-                return report_types, len(report_types)
+        if self.report_type == AggregateOrganisationReport:
+            report_types = self.get_report_types_for_aggregate_report()
+            return report_types, len(
+                [report_type for report_type_list in report_types.values() for report_type in report_type_list]
+            )
+
+        elif self.report_type == MultiOrganizationReport:
+            report_types = self.get_report_types_from_ooi_selelection({MultiOrganizationReport})
+            return report_types, len(report_types)
 
         report_types = self.get_report_types_for_generate_report()
         return report_types, len(report_types)
@@ -609,7 +609,8 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         return super().get(request, *args, **kwargs)
 
-    def get_observed_at(self):
+    @property
+    def custom_observed_at(self):
         return (
             self.observed_at.replace(hour=23, minute=59, second=59, microsecond=999999)
             if self.observed_at < datetime.now(timezone.utc)
@@ -617,7 +618,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         )
 
     def get_report_ooi(self, ooi_pk: str) -> ReportOOI:
-        return self.octopoes_api_connector.get(Reference.from_str(f"{ooi_pk}"), valid_time=self.get_observed_at())
+        return self.octopoes_api_connector.get(Reference.from_str(f"{ooi_pk}"), valid_time=self.custom_observed_at)
 
     def get_template_names(self):
         if self.report_ooi.report_type and issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
@@ -646,13 +647,16 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         plugin_ids_required = plugins_dict["required"]
         plugin_ids_optional = plugins_dict["optional"]
 
-        if plugin_ids_required:
-            plugins["required"] = get_katalogus(self.organization.code).get_plugins(ids=plugin_ids_required)
-        if plugin_ids_optional:
-            plugins["optional"] = get_katalogus(self.organization.code).get_plugins(ids=plugin_ids_optional)
+        katalogus_plugins = get_katalogus(self.organization.code).get_plugins(
+            ids=plugin_ids_required + plugin_ids_optional
+        )
+
+        plugins["required"] = [plugin for plugin in katalogus_plugins if plugin.id in plugin_ids_required]
+        plugins["optional"] = [plugin for plugin in katalogus_plugins if plugin.id in plugin_ids_optional]
+
         return format_plugin_data(plugins)
 
-    def get_report_types(self, report_type_ids: list[str]) -> list[dict[str, str]]:
+    def get_report_types(self, report_type_ids: Iterable[str]) -> list[dict[str, str]]:
         report_types = []
         for report_type_id in report_type_ids:
             report_type = get_report_by_id(report_type_id)
@@ -666,6 +670,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         return report_types
 
     def get_report_data_from_bytes(self, report: ReportOOI) -> dict[str, Any]:
+        self.bytes_client.login()
         return TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
             self.bytes_client.get_raw(raw_id=report.data_raw_id)
         )
@@ -675,8 +680,6 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     ) -> tuple[
         dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]], list[dict[str, list[Plugin]]]
     ]:
-        self.bytes_client.login()
-
         report_data: dict[str, Any] = self.get_report_data_from_bytes(self.report_ooi)
         report_types = self.get_report_types(report_data["input_data"]["report_types"])
         plugins = self.get_plugins(report_data["input_data"]["plugins"])
@@ -698,8 +701,6 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     ) -> tuple[
         dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]], list[dict[str, list[Plugin]]]
     ]:
-        self.bytes_client.login()
-
         report_data = self.get_report_data_from_bytes(self.report_ooi)
 
         oois = self.get_input_oois(self.report_ooi.input_oois)
@@ -713,7 +714,6 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     ) -> tuple[
         dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]], list[dict[str, list[Plugin]]]
     ]:
-        self.bytes_client.login()
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
 
         children_reports = self.get_children_reports()
@@ -726,7 +726,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                     "report_name": report.name,
                 }
         oois = self.get_input_oois(self.report_ooi.input_oois)
-        report_type_ids = [child_report.report_type for child_report in children_reports]
+        report_type_ids = {child_report.report_type for child_report in children_reports}
         report_types = self.get_report_types(report_type_ids)
         plugins = self.get_plugins(self.get_report_data_from_bytes(self.report_ooi)["input_data"]["plugins"])
 
