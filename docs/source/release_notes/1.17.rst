@@ -9,7 +9,7 @@ of user actions. Searching and Sorting of object lists has been implemented, and
 a cross-organization task-list has been included for users who have access to
 multiple organizations.
 
-Support for adding custom boefjes is continously improving and the same holds true for
+Support for adding custom boefjes is continuously improving and the same holds true for
 Report generation.
 
 We also migrated to Django 5, and upgraded various dependencies to keep in line with
@@ -68,7 +68,7 @@ New Features
 * Feature: Render human readable ooi names in onboarding flow by @TwistMeister in https://github.com/minvws/nl-kat-coordination/pull/3454
 * feat: :boom: recalculate all bits by @zcrt in https://github.com/minvws/nl-kat-coordination/pull/3451
 * Add raw SQL migrations by @Donnype in https://github.com/minvws/nl-kat-coordination/pull/3457
-  
+
 Bug fixes
 =========
 
