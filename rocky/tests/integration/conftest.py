@@ -16,6 +16,8 @@ from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import URL, HostnameHTTPURL, HTTPHeader, HTTPResource, SecurityTXT, Website
 
+from reports.runner.local import LocalReportJobRunner
+
 
 @pytest.fixture
 def valid_time():
@@ -42,6 +44,11 @@ def octopoes_api_connector_2(request) -> OctopoesAPIConnector:
     connector.create_node()
     yield connector
     connector.delete_node()
+
+
+@pytest.fixture
+def report_runner(valid_time, mocker) -> LocalReportJobRunner:
+    return LocalReportJobRunner(mocker.MagicMock(), valid_time)
 
 
 def seed_system(
