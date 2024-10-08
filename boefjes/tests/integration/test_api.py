@@ -17,7 +17,7 @@ def test_get_local_plugin(test_client, organisation):
 
 def test_filter_plugins(test_client, organisation):
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/")
-    assert len(response.json()) == 99
+    assert len(response.json()) == 100
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins?plugin_type=boefje")
     assert len(response.json()) == 44
 
@@ -62,7 +62,7 @@ def test_add_boefje(test_client, organisation):
     assert response.status_code == 422
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/?plugin_type=boefje")
-    assert len(response.json()) == 45
+    assert len(response.json()) == 46
 
     boefje_dict = boefje.model_dump()
     boefje_dict["consumes"] = list(boefje_dict["consumes"])
