@@ -10,6 +10,13 @@ class StorageError(Exception):
         self.message = message
 
 
+class IntegrityError(StorageError):
+    """Integrity error during persistence of an entity"""
+
+    def __init__(self, message: str):
+        self.message = message
+
+
 class SettingsNotConformingToSchema(StorageError):
     def __init__(self, plugin_id: str, validation_error: str):
         super().__init__(f"Settings for plugin {plugin_id} are not conform the plugin schema: {validation_error}")
@@ -48,9 +55,9 @@ class CannotUpdateStaticPlugin(NotAllowed):
         super().__init__(f"Plugin with id '{plugin_id}' is static, so updating it is not allowed")
 
 
-class ExistingPluginId(NotAllowed):
-    def __init__(self, plugin_id: str):
-        super().__init__(f"Plugin id '{plugin_id}' is already used")
+class DuplicatePlugin(NotAllowed):
+    def __init__(self, key: str):
+        super().__init__(f"Duplicate plugin {key}")
 
 
 class OrganisationStorage(ABC):

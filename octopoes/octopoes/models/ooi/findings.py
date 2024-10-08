@@ -7,15 +7,7 @@ from pydantic import AnyUrl, StringConstraints
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
 
-severity_order = [
-    "unknown",
-    "pending",
-    "recommendation",
-    "low",
-    "medium",
-    "high",
-    "critical",
-]
+severity_order = ["unknown", "pending", "recommendation", "low", "medium", "high", "critical"]
 
 
 @total_ordering
@@ -47,8 +39,8 @@ class FindingType(OOI):
     impact: str | None = None
     recommendation: str | None = None
 
-    risk_score: float | None = None
-    risk_severity: RiskLevelSeverity | None = None
+    risk_score: float | None = 0.0
+    risk_severity: RiskLevelSeverity | None = RiskLevelSeverity.PENDING
 
     _natural_key_attrs = ["id"]
     _traversable = False

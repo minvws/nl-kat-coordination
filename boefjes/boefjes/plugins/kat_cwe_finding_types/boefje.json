@@ -1,7 +1,7 @@
 {
   "id": "cwe-finding-types",
   "name": "CWE Finding Types",
-  "description": "Hydrate information of Common Weakness Enumeration (CWE) finding types",
+  "description": "Hydrate information of Common Weakness Enumeration (CWE) finding types.",
   "consumes": [
     "CWEFindingType"
   ],

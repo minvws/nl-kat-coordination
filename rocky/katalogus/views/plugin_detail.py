@@ -36,10 +36,7 @@ class PluginDetailView(TaskListView, PluginSettingsListView):
                 oois_without_clearance_level = oois["oois_without_clearance"]
 
                 if oois_with_clearance_level:
-                    self.run_boefje_for_oois(
-                        boefje=boefje,
-                        oois=oois_with_clearance_level,
-                    )
+                    self.run_boefje_for_oois(boefje=boefje, oois=oois_with_clearance_level)
 
                 if oois_without_clearance_level:
                     if not self.organization_member.has_perm("tools.can_set_clearance_level"):
@@ -79,10 +76,7 @@ class PluginDetailView(TaskListView, PluginSettingsListView):
                 oois_with_clearance.append(ooi_object)
             else:
                 oois_without_clearance.append(ooi_object.primary_key)
-        return {
-            "oois_with_clearance": oois_with_clearance,
-            "oois_without_clearance": oois_without_clearance,
-        }
+        return {"oois_with_clearance": oois_with_clearance, "oois_without_clearance": oois_without_clearance}
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -106,10 +100,7 @@ class NormalizerDetailView(PluginDetailView):
             {
                 "url": reverse(
                     "normalizer_detail",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "plugin_id": self.plugin.id,
-                    },
+                    kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id},
                 ),
                 "text": self.plugin.name,
             },
@@ -128,17 +119,21 @@ class BoefjeDetailView(PluginDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["new_variant"] = self.request.GET.get("new_variant")
+        context["variants"] = get_katalogus(self.organization.code).get_plugins(oci_image=self.plugin.oci_image)
+
+        for variant in context["variants"]:
+            if variant.created:
+                variant.created = datetime.fromisoformat(variant.created)
 
         context["select_ooi_filter_form"] = SelectOOIFilterForm
         if "show_all" in self.request.GET:
             context["select_oois_form"] = SelectOOIForm(
-                oois=self.get_form_consumable_oois(),
-                organization_code=self.organization.code,
+                oois=self.get_form_consumable_oois(), organization_code=self.organization.code
             )
         else:
             context["select_oois_form"] = SelectOOIForm(
-                oois=self.get_form_filtered_consumable_oois(),
-                organization_code=self.organization.code,
+                oois=self.get_form_filtered_consumable_oois(), organization_code=self.organization.code
             )
 
         context["breadcrumbs"] = [
@@ -148,11 +143,7 @@ class BoefjeDetailView(PluginDetailView):
             },
             {
                 "url": reverse(
-                    "boefje_detail",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "plugin_id": self.plugin.id,
-                    },
+                    "boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id}
                 ),
                 "text": self.plugin.name,
             },
@@ -163,9 +154,7 @@ class BoefjeDetailView(PluginDetailView):
     def get_form_consumable_oois(self):
         """Get all available OOIS that plugin can consume."""
         return self.octopoes_api_connector.list_objects(
-            self.plugin.consumes,
-            valid_time=datetime.now(timezone.utc),
-            limit=self.limit_ooi_list,
+            self.plugin.consumes, valid_time=datetime.now(timezone.utc), limit=self.limit_ooi_list
         ).items
 
     def get_form_filtered_consumable_oois(self):

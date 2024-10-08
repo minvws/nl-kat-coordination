@@ -18,12 +18,7 @@ from rocky.views.ooi_view import BaseOOIDetailView
 from rocky.views.tasks import TaskListView
 
 
-class OOIDetailView(
-    BaseOOIDetailView,
-    OOIRelatedObjectManager,
-    OOIFindingManager,
-    TaskListView,
-):
+class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManager, TaskListView):
     template_name = "oois/ooi_detail.html"
     task_filter_form = OOIDetailTaskFilterForm
     task_type = "boefje"
@@ -86,7 +81,7 @@ class OOIDetailView(
         if boefjes:
             context["enabled_boefjes_available"] = True
 
-        max_level = self.organization_member.acknowledged_clearance_level
+        max_level = self.organization_member.max_clearance_level
         if self.ooi.scan_profile and filter_form.is_valid() and not filter_form.cleaned_data["show_all"]:
             max_level = min(max_level, self.ooi.scan_profile.level)
 
@@ -96,8 +91,7 @@ class OOIDetailView(
         context.update(self.get_origins(self.ooi.reference, self.organization))
 
         inference_params = self.octopoes_api_connector.list_origin_parameters(
-            {inference.origin.id for inference in context["inferences"]},
-            self.observed_at,
+            {inference.origin.id for inference in context["inferences"]}, self.observed_at
         )
         inference_params_per_inference = defaultdict(list)
         for inference_param in inference_params:

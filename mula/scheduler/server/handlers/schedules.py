@@ -13,10 +13,7 @@ from scheduler.server import serializers, utils
 
 class ScheduleAPI:
     def __init__(
-        self,
-        api: fastapi.FastAPI,
-        ctx: context.AppContext,
-        schedulers: dict[str, schedulers.Scheduler],
+        self, api: fastapi.FastAPI, ctx: context.AppContext, schedulers: dict[str, schedulers.Scheduler]
     ) -> None:
         self.logger: structlog.BoundLogger = structlog.get_logger(__name__)
         self.api = api
@@ -99,8 +96,7 @@ class ScheduleAPI:
             )
         except storage.filters.errors.FilterError as exc:
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail=f"invalid filter(s) [exception: {exc}]",
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"invalid filter(s) [exception: {exc}]"
             ) from exc
         except storage.errors.StorageError as exc:
             raise fastapi.HTTPException(
@@ -110,40 +106,33 @@ class ScheduleAPI:
         except Exception as exc:
             self.logger.exception(exc)
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="failed to get schedules",
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail="failed to get schedules"
             ) from exc
 
         return utils.paginate(request, results, count, offset, limit)
 
     def create(self, schedule: serializers.ScheduleCreate) -> Any:
         try:
-            new_schedule = models.Schedule(**schedule.dict())
+            new_schedule = models.Schedule(**schedule.model_dump())
         except pydantic.ValidationError as exc:
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail=f"invalid schedule [exception: {exc}]",
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"invalid schedule [exception: {exc}]"
             ) from exc
         except Exception as exc:
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail=f"failed to create schedule [exception: {exc}]",
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"failed to create schedule [exception: {exc}]"
             ) from exc
 
         s = self.schedulers.get(new_schedule.scheduler_id)
         if s is None:
-            raise fastapi.HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="scheduler not found",
-            )
+            raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="scheduler not found")
 
         # Validate data with task type of the scheduler
         try:
             instance = s.ITEM_TYPE.model_validate(new_schedule.data)
         except pydantic.ValidationError as exc:
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail=f"invalid task data [exception: {exc}]",
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"invalid task data [exception: {exc}]"
             ) from exc
 
         # Create hash for schedule with task type
@@ -160,8 +149,7 @@ class ScheduleAPI:
             schedule = self.ctx.datastores.schedule_store.get_schedule_by_hash(new_schedule.hash)
             if schedule is not None:
                 raise fastapi.HTTPException(
-                    status_code=fastapi.status.HTTP_409_CONFLICT,
-                    detail="schedule with the same hash already exists",
+                    status_code=fastapi.status.HTTP_409_CONFLICT, detail="schedule with the same hash already exists"
                 )
         except storage.errors.StorageError as exc:
             raise fastapi.HTTPException(
@@ -201,10 +189,7 @@ class ScheduleAPI:
             ) from exc
 
         if schedule is None:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_404_NOT_FOUND,
-                detail="schedule not found",
-            )
+            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="schedule not found")
 
         return schedule
 
@@ -224,17 +209,11 @@ class ScheduleAPI:
             ) from exc
 
         if schedule_db is None:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_404_NOT_FOUND,
-                detail="schedule not found",
-            )
+            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="schedule not found")
 
         patch_data = schedule.model_dump(exclude_unset=True)
         if len(patch_data) == 0:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail="no data to patch",
-            )
+            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail="no data to patch")
 
         # Update schedule
         updated_schedule = schedule_db.model_copy(update=patch_data)
@@ -244,13 +223,11 @@ class ScheduleAPI:
             models.Schedule(**updated_schedule.dict())
         except pydantic.ValidationError as exc:
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail=f"invalid schedule [exception: {exc}]",
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"invalid schedule [exception: {exc}]"
             ) from exc
         except Exception as exc:
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail=f"failed to update schedule [exception: {exc}]",
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"failed to update schedule [exception: {exc}]"
             ) from exc
 
         # Update schedule in database

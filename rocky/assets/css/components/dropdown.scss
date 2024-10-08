@@ -25,6 +25,9 @@
     margin-block-start: 0;
     padding-inline-start: 0;
     gap: 0;
+    border-radius: var(--border-radius-s);
+    border: 1px solid var(--colors-grey-200);
+    background-color: var(--colors-white);
 
     &[aria-expanded="true"] {
       display: flex;
@@ -37,6 +40,7 @@
         background-color: var(--colors-white);
         list-style-type: disc;
         gap: 0;
+        border-radius: var(--border-radius-s);
 
         &:not(:last-child) {
           border-bottom: 1px solid var(--colors-grey-200);

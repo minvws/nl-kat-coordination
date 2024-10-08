@@ -41,11 +41,7 @@ class Hostname(OOI):
 
     _natural_key_attrs = ["network", "name"]
 
-    _reverse_relation_names = {
-        "network": "hostnames",
-        "dns_zone": "hostnames",
-        "registered_domain": "subdomains",
-    }
+    _reverse_relation_names = {"network": "hostnames", "dns_zone": "hostnames", "registered_domain": "subdomains"}
 
     @field_validator("name")
     @classmethod

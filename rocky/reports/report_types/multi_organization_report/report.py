@@ -23,7 +23,7 @@ class MultiOrganizationReport(MultiReport):
     id = "multi-organization-report"
     name = _("Multi Organization Report")
     description = _("Multi Organization Report")
-    plugins: ReportPlugins = {"required": [], "optional": []}
+    plugins: ReportPlugins = {"required": set(), "optional": set()}
     input_ooi_types = {ReportData}
     template_path = "multi_organization_report/report.html"
 
@@ -250,13 +250,9 @@ class MultiOrganizationReport(MultiReport):
         }
 
 
-def collect_report_data(
-    connector: OctopoesAPIConnector,
-    input_ooi_references: list[str],
-    observed_at: datetime,
-):
+def collect_report_data(connector: OctopoesAPIConnector, input_ooi_references: list[str], observed_at: datetime):
     report_data = {}
     for ooi in [x for x in input_ooi_references if Reference.from_str(x).class_type == ReportData]:
-        report_data[ooi] = connector.get(Reference.from_str(ooi), observed_at).dict()
+        report_data[ooi] = connector.get(Reference.from_str(ooi), observed_at).model_dump()
 
     return report_data

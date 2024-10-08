@@ -30,9 +30,7 @@ class ReportSchedulerBaseTestCase(unittest.TestCase):
         # Scheduler
         self.organisation = OrganisationFactory()
         self.scheduler = schedulers.ReportScheduler(
-            ctx=self.mock_ctx,
-            scheduler_id=self.organisation.id,
-            organisation=self.organisation,
+            ctx=self.mock_ctx, scheduler_id=self.organisation.id, organisation=self.organisation
         )
 
     def tearDown(self):
@@ -46,7 +44,7 @@ class ReportSchedulerTestCase(ReportSchedulerBaseTestCase):
         super().setUp()
 
         self.mock_get_schedules = mock.patch(
-            "scheduler.context.AppContext.datastores.schedule_store.get_schedules",
+            "scheduler.context.AppContext.datastores.schedule_store.get_schedules"
         ).start()
 
     def tearDown(self):
@@ -90,15 +88,10 @@ class ReportSchedulerTestCase(ReportSchedulerBaseTestCase):
     def test_push_tasks_for_rescheduling(self):
         """When the deadline of schedules have passed, the resulting task should be added to the queue"""
         # Arrange
-        report_task = models.ReportTask(
-            organisation_id=self.organisation.id,
-            report_recipe_id="123",
-        )
+        report_task = models.ReportTask(organisation_id=self.organisation.id, report_recipe_id="123")
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id,
-            hash=report_task.hash,
-            data=report_task.dict(),
+            scheduler_id=self.scheduler.scheduler_id, hash=report_task.hash, data=report_task.model_dump()
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
@@ -124,15 +117,10 @@ class ReportSchedulerTestCase(ReportSchedulerBaseTestCase):
     def test_push_tasks_for_rescheduling_item_on_queue(self):
         """When the deadline of schedules have passed, the resulting task should be added to the queue"""
         # Arrange
-        report_task = models.ReportTask(
-            organisation_id=self.organisation.id,
-            report_recipe_id="123",
-        )
+        report_task = models.ReportTask(organisation_id=self.organisation.id, report_recipe_id="123")
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id,
-            hash=report_task.hash,
-            data=report_task.dict(),
+            scheduler_id=self.scheduler.scheduler_id, hash=report_task.hash, data=report_task.model_dump()
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)

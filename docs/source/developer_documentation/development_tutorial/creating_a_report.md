@@ -50,7 +50,7 @@ class GreetingsReport(Report):
     id = "greetings-report"
     name = _("Greetings report")
     description = _("Makes a nice report about the selected greeting objects")
-    plugins = {"required": [], "optional": []}
+    plugins = {"required": set(), "optional": set()}
     input_ooi_types = {Greeting, IPAddressV4, IPAddressV6}
     template_path = "greetings_report/report.html"
 

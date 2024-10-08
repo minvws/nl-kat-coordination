@@ -20,20 +20,17 @@
                         For the onboarding we will suggest to set the clearance level to L{{ dns_report_least_clearance_level }}.
                     {% endblocktranslate %}
                 </p>
-                <form novalidate
-                      action=""
-                      method="post"
-                      class="horizontal-view help layout-form">
+                <form novalidate action="" method="post" class="help layout-form">
                     {% csrf_token %}
                     {% translate "Set clearance level" as fieldset_legend %}
                     {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
 
-                    <button type="submit">{% translate "Set clearance level" %}</button>
+                    <div class="button-container">
+                        <button type="submit">{% translate "Set clearance level" %}</button>
+                        <a href="{% url "complete_onboarding" organization.code %}"
+                           class="button ghost">{% translate "Skip onboarding" %}</a>
+                    </div>
                 </form>
-                <div class="button-container">
-                    <a href="{% url "complete_onboarding" organization.code %}"
-                       class="button ghost">{% translate "Skip onboarding" %}</a>
-                </div>
             </div>
         </section>
     </main>

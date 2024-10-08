@@ -81,10 +81,7 @@ def test_get_mime_type_count(bytes_api_client: BytesAPIClient) -> None:
     normalizer_meta = get_normalizer_meta(raw_id)
     bytes_api_client.save_normalizer_meta(normalizer_meta)
 
-    assert bytes_api_client.get_mime_type_count(RawDataFilter(organization="test")) == {
-        "boefje": 2,
-        "text/boefje": 1,
-    }
+    assert bytes_api_client.get_mime_type_count(RawDataFilter(organization="test")) == {"boefje": 2, "text/boefje": 1}
 
     assert bytes_api_client.get_mime_type_count(RawDataFilter(organization="test", normalized=True)) == {
         "boefje": 1,
@@ -236,6 +233,23 @@ def test_raw(bytes_api_client: BytesAPIClient, event_manager: RabbitMQEventManag
     assert str(boefje_meta.id) in body.decode()
 
 
+def test_raw_big(bytes_api_client: BytesAPIClient, event_manager: RabbitMQEventManager) -> None:
+    boefje_meta = get_boefje_meta()
+    bytes_api_client.save_boefje_meta(boefje_meta)
+
+    raw = b"test 123" * 100000
+    raw_id = bytes_api_client.save_raw(boefje_meta.id, raw)
+
+    retrieved_raw = bytes_api_client.get_raw(raw_id)
+
+    assert retrieved_raw == raw
+
+    method, properties, body = event_manager.connection.channel().basic_get("test__raw_file_received")
+    event_manager.connection.channel().basic_ack(method.delivery_tag)
+
+    assert str(boefje_meta.id) in body.decode()
+
+
 def test_save_raw_with_one_mime_type(bytes_api_client: BytesAPIClient) -> None:
     boefje_meta = get_boefje_meta(meta_id=uuid.uuid4())
     bytes_api_client.save_boefje_meta(boefje_meta)
@@ -268,15 +282,7 @@ def test_save_raw_no_mime_types(bytes_api_client: BytesAPIClient) -> None:
     file_name = "raw"
     response = httpx.post(
         raw_url,
-        json={
-            "files": [
-                {
-                    "name": file_name,
-                    "content": b64encode(raw).decode(),
-                    "tags": [],
-                }
-            ]
-        },
+        json={"files": [{"name": file_name, "content": b64encode(raw).decode(), "tags": []}]},
         headers=bytes_api_client.client.headers,
         params={"boefje_meta_id": str(boefje_meta.id)},
     )
@@ -298,8 +304,18 @@ def test_raw_mimes(bytes_api_client: BytesAPIClient) -> None:
 
     raw = b"test 123456"
     second_raw = b"second test 200"
-    bytes_api_client.save_raw(boefje_meta.id, raw, mime_types)
-    bytes_api_client.save_raw(boefje_meta.id, second_raw, second_mime_types)
+    first_id = bytes_api_client.save_raw(boefje_meta.id, raw, mime_types)
+    second_id = bytes_api_client.save_raw(boefje_meta.id, second_raw, second_mime_types)
+
+    first_meta = bytes_api_client.get_raw_meta(first_id)
+    second_meta = bytes_api_client.get_raw_meta(second_id)
+
+    assert first_meta.id != second_meta.id
+    assert {x.value for x in first_meta.mime_types} == set(mime_types)
+    assert {x.value for x in second_meta.mime_types} == set(second_mime_types)
+
+    assert bytes_api_client.get_raw(first_id) == raw
+    assert bytes_api_client.get_raw(second_id) == second_raw
 
     retrieved_raws = bytes_api_client.get_raws(
         RawDataFilter(
@@ -369,3 +385,6 @@ def test_save_multiple_raw_files(bytes_api_client: BytesAPIClient) -> None:
 
     assert bytes_api_client.get_raw(ids["first"]) == first_raw
     assert bytes_api_client.get_raw(ids["second"]) == second_raw
+
+    assert bytes_api_client.get_raw_meta(ids["first"]).mime_types == set()
+    assert {x.value for x in bytes_api_client.get_raw_meta(ids["second"]).mime_types} == {"mime", "type"}
