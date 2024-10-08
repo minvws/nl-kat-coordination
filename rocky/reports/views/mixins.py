@@ -108,7 +108,23 @@ def save_report_data(
                         name_to_save = updated_name
                         break
 
-                raw_id = save_report_raw(bytes_client, data={"report_data": data["data"]})
+                required_plugins = list(input_data["input_data"]["plugins"]["required"])
+                optional_plugins = list(input_data["input_data"]["plugins"]["optional"])
+
+                child_plugins: dict[str, list[str]] = {"required": [], "optional": []}
+
+                child_plugins["required"] = [
+                    plugin_id for plugin_id in required_plugins if plugin_id in report_type.plugins["required"]
+                ]
+                child_plugins["optional"] = [
+                    plugin_id for plugin_id in optional_plugins if plugin_id in report_type.plugins["optional"]
+                ]
+
+                child_input_data = {
+                    "input_data": {"input_oois": [ooi], "report_types": [report_type_id], "plugins": child_plugins}
+                }
+
+                raw_id = save_report_raw(bytes_client, data={"report_data": data["data"]} | child_input_data)
 
                 name = now.strftime(name_to_save)
                 if not name or name.isspace():
@@ -137,9 +153,8 @@ def save_report_data(
         report_type_id = next(iter(report_data))
         ooi = next(iter(report_data[report_type_id]))
         data = report_data[report_type_id][ooi]
-        report_data = {"report_data": data["data"]} | input_data
 
-        raw_id = save_report_raw(bytes_client, data=report_data)
+        raw_id = save_report_raw(bytes_client, data={"report_data": data["data"]} | input_data)
         report_type = get_report_by_id(report_type_id)
         name = now.strftime(report_names[0][1])
 
@@ -225,8 +240,8 @@ class SaveAggregateReportMixin(BaseReportView):
         bytes_client = self.bytes_client
 
         # Save report data into bytes
-        data = post_processed_data | self.get_input_data()
-        report_data_raw_id = save_report_raw(bytes_client, data=data)
+
+        report_data_raw_id = save_report_raw(bytes_client, data=post_processed_data | self.get_input_data())
 
         report_type = type(aggregate_report)
         name = now.strftime(report_names[0][1])
@@ -253,6 +268,6 @@ class SaveAggregateReportMixin(BaseReportView):
         # Save the child reports to bytes
         for ooi, types in report_data.items():
             for report_type, data in types.items():
-                save_report_raw(bytes_client, data=data)
+                save_report_raw(bytes_client, data=data | self.get_input_data())
 
         return report_ooi

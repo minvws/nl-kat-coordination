@@ -85,7 +85,9 @@
                                     {% for report_type, total_objects in report.report_type_summary.items %}
                                         <tr>
                                             <td>
-                                                <span class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</span>
+                                                <ul class="tags horizontal-view">
+                                                    <li class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</li>
+                                                </ul>
                                             </td>
                                             <td>{{ total_objects }}</td>
                                         </tr>
@@ -101,21 +103,25 @@
                                     <tr>
                                         <th scope="col">{% translate "Report type" %}</th>
                                         <th scope="col">{% translate "Object" %}</th>
-                                        <th scope="col">{% translate "Report ID" %}</th>
+                                        <th scope="col">{% translate "Report name" %}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for child_report in report.children_reports %}
                                         <tr>
                                             <td>
-                                                <span class="label tags-color-{{ child_report.report_type|get_report_type_label_style }}">{{ child_report.report_type|get_report_type_name }}</span>
+                                                <ul class="tags horizontal-view">
+                                                    <li class="label tags-color-{{ child_report.report_type|get_report_type_label_style }}">
+                                                        {{ child_report.report_type|get_report_type_name }}
+                                                    </li>
+                                                </ul>
                                             </td>
                                             <td>
                                                 <a href="{% ooi_url 'ooi_detail' child_report.input_oois.0 organization.code %}">{{ child_report.input_oois.0|human_readable }}</a>
                                             </td>
                                             <td>
                                                 <a href="{% url "view_report" organization.code %}?report_id={{ child_report }}&observed_at={{ child_report.observed_at|date:"Y-m-d H:i:s:u" }}"
-                                                   title="{% translate "Shows subreport details" %}">{{ child_report }}</a>
+                                                   title="{% translate "Shows subreport details" %}">{{ child_report.name }}</a>
                                             </td>
                                         </tr>
                                     {% endfor %}

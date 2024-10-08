@@ -681,6 +681,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]], list[dict[str, list[Plugin]]]
     ]:
         report_data: dict[str, Any] = self.get_report_data_from_bytes(self.report_ooi)
+
         report_types = self.get_report_types(report_data["input_data"]["report_types"])
         plugins = self.get_plugins(report_data["input_data"]["plugins"])
         oois = self.get_input_oois(self.report_ooi.input_oois)
@@ -692,7 +693,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                 "data": report_data["report_data"],
                 "template": self.report_ooi.template,
                 "report_name": self.report_ooi.name,
-            }
+            } | report_data["input_data"]
 
         return report_data, oois, report_types, plugins
 
@@ -719,12 +720,13 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         children_reports = self.get_children_reports()
 
         for report in children_reports:
+            bytes_data = self.get_report_data_from_bytes(report)
             for ooi in report.input_oois:
                 report_data.setdefault(report.report_type, {})[ooi] = {
-                    "data": self.get_report_data_from_bytes(report)["report_data"],
+                    "data": bytes_data["report_data"],
                     "template": report.template,
                     "report_name": report.name,
-                }
+                } | bytes_data["input_data"]
         oois = self.get_input_oois(self.report_ooi.input_oois)
         report_type_ids = {child_report.report_type for child_report in children_reports}
         report_types = self.get_report_types(report_type_ids)
