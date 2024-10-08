@@ -12,8 +12,8 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
     recipe = ReportRecipe(
         recipe_id="8aa4e52b-812c-4cc2-8196-35fb8efc63ca",
         report_name_format="{report_type} for {ooi} in %Y",
-        sub_report_name_format="{report_type} for {ooi} in %Y",
-        input_recipe={"input_oois": "Network|internet"},
+        subreport_name_format="{report_type} for {ooi} in %Y",
+        input_recipe={"input_oois": ["Network|internet"]},
         report_types=["dns-report"],
         cron_expression="* * * * *"
     )
