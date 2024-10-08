@@ -61,9 +61,7 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
     def process_raw(self, form):
         missing = {"raw_file", "mime_types", "ooi", "date"} - set(form.cleaned_data.keys())
         if missing:
-            return self.add_error_notification(
-                _("Missing fields: %s") % (", ".join(missing))
-            )
+            return self.add_error_notification(_("Missing fields: %s") % (", ".join(missing)))
 
         raw_file = form.cleaned_data["raw_file"]
         mime_types = form.cleaned_data["mime_types"]
