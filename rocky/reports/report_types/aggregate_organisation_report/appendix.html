@@ -30,7 +30,9 @@
             {% for report_type in report_types %}
                 <tr>
                     <td>
-                        <span class="label tags-color-{{ report_type.label_style }}">{{ report_type.name }}</span>
+                        <ul class="tags horizontal-view">
+                            <li class="label tags-color-{{ report_type.label_style }}">{{ report_type.name }}</li>
+                        </ul>
                     </td>
                     <td>{{ report_type.description }}</td>
                 </tr>
