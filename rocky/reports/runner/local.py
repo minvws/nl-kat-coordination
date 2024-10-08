@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from django.conf import settings
-from katalogus.client import KATalogusError, get_katalogus
+from katalogus.client import KATalogusError, KATalogusClientV1
 from tools.models import Organization
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -10,12 +10,13 @@ from reports.report_types.helpers import get_report_by_id
 from reports.runner.models import JobRuntimeError, ReportJobRunner
 from reports.views.base import format_plugin_data, hydrate_plugins
 from reports.views.mixins import collect_reports, save_report_data
-from rocky.bytes_client import get_bytes_client, BytesClient
+from rocky.bytes_client import BytesClient
 from rocky.scheduler import ReportTask
 
 
 class LocalReportJobRunner(ReportJobRunner):
-    def __init__(self, bytes_client: BytesClient, valid_time: datetime | None):
+    def __init__(self, katalogus_client: KATalogusClientV1, bytes_client: BytesClient, valid_time: datetime | None = None):
+        self.katalogus_client = katalogus_client
         self.bytes_client = bytes_client
         self.valid_time = valid_time
 
@@ -30,14 +31,22 @@ class LocalReportJobRunner(ReportJobRunner):
             valid_time, connector, recipe.input_recipe["input_oois"], report_types
         )
 
+        self.katalogus_client.organization = report_task.organisation_id
+        self.katalogus_client.organization_uri = f"/v1/organisations/{report_task.organisation_id}"
+
         try:
-            report_type_plugins = hydrate_plugins(report_types, get_katalogus(report_task.organisation_id))
+            report_type_plugins = hydrate_plugins(report_types, self.katalogus_client)
             plugins = format_plugin_data(report_type_plugins)
         except KATalogusError as e:
             raise JobRuntimeError("Failed to hydrate plugins from KATalogus") from e
 
+        self.katalogus_client.organization = None
+        self.katalogus_client.organization_uri = None
+
+        self.bytes_client.organization = report_task.organisation_id
+
         save_report_data(
-            get_bytes_client(report_task.organisation_id),
+            self.bytes_client,
             valid_time,
             connector,
             Organization.objects.get(code=report_task.organisation_id),
@@ -45,3 +54,5 @@ class LocalReportJobRunner(ReportJobRunner):
             report_data,
             [(recipe.report_name_format, recipe.report_name_format)],
         )
+
+        self.bytes_client.organization = None

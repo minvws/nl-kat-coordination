@@ -17,6 +17,7 @@ from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import URL, HostnameHTTPURL, HTTPHeader, HTTPResource, SecurityTXT, Website
 
 from reports.runner.local import LocalReportJobRunner
+from tools.models import Organization
 
 
 @pytest.fixture
@@ -25,10 +26,22 @@ def valid_time():
 
 
 @pytest.fixture
-def octopoes_api_connector(request) -> OctopoesAPIConnector:
+def integration_organization(request) -> Organization:
     test_node = f"test-{request.node.originalname}"
 
-    connector = OctopoesAPIConnector(settings.OCTOPOES_API, test_node)
+    return Organization.objects.create(name="Test", code=test_node)
+
+
+@pytest.fixture
+def integration_organization_2(request) -> Organization:
+    test_node = f"test-{request.node.originalname}-2"
+
+    return Organization.objects.create(name="Test 2", code=test_node)
+
+
+@pytest.fixture
+def octopoes_api_connector(integration_organization) -> OctopoesAPIConnector:
+    connector = OctopoesAPIConnector(settings.OCTOPOES_API, integration_organization.code)
 
     connector.create_node()
     yield connector
@@ -36,10 +49,8 @@ def octopoes_api_connector(request) -> OctopoesAPIConnector:
 
 
 @pytest.fixture
-def octopoes_api_connector_2(request) -> OctopoesAPIConnector:
-    test_node = f"test-{request.node.originalname}-2"
-
-    connector = OctopoesAPIConnector(settings.OCTOPOES_API, test_node)
+def octopoes_api_connector_2(integration_organization_2) -> OctopoesAPIConnector:
+    connector = OctopoesAPIConnector(settings.OCTOPOES_API, integration_organization_2.code)
 
     connector.create_node()
     yield connector
@@ -48,7 +59,7 @@ def octopoes_api_connector_2(request) -> OctopoesAPIConnector:
 
 @pytest.fixture
 def report_runner(valid_time, mocker) -> LocalReportJobRunner:
-    return LocalReportJobRunner(mocker.MagicMock(), valid_time)
+    return LocalReportJobRunner(mocker.MagicMock(), mocker.MagicMock(), valid_time)
 
 
 def seed_system(
