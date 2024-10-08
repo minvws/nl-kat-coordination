@@ -25,7 +25,7 @@ class UploadRawForm(BaseRockyForm):
         required=True,
         widget=forms.TextInput(attrs={"placeholder": "text/html, image/jpeg, ..."}),
     )
-    raw_file = forms.FileField(label=_("Upload raw file"), allow_empty_file=False, required=True,)
+    raw_file = forms.FileField(label=_("Upload raw file"), allow_empty_file=False, required=True)
 
     ooi_id = forms.CharField(
         label="Input or Scan OOI",
