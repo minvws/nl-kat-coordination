@@ -5,7 +5,7 @@ OpenKAT 1.17
 This release adds flexible scheduling, which will allow us to schedule periodic report
 generation next to running Boefjes on custom intervals. We also added structured
 JSON logging and audit trails to various user actions allowing for precise monitoring
-of user actions. Searching and Sorting of object lists has been implemented, and
+of user actions. Searching and sorting of object lists has been implemented, and
 a cross-organization task-list has been included for users who have access to
 multiple organizations.
 
