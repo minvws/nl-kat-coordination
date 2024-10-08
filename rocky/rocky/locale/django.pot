@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-07 15:55+0000\n"
+"POT-Creation-Date: 2024-10-08 16:07+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3776,6 +3776,7 @@ msgid "Year"
 msgstr ""
 
 #: reports/templates/partials/report_names_header.html
+#: reports/templates/report_overview/report_history_table.html
 msgid "Report name"
 msgstr ""
 
@@ -4082,10 +4083,6 @@ msgstr[1] ""
 #: reports/templates/report_overview/subreports_header.html
 #: reports/views/report_overview.py
 msgid "Subreports"
-msgstr ""
-
-#: reports/templates/report_overview/report_history_table.html
-msgid "Report ID"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
