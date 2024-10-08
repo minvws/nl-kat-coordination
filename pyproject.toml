@@ -39,6 +39,9 @@ line-length = 120
 # Support Python 3.10 and higher
 target-version = "py310"
 
+[tool.ruff.format]
+skip-magic-trailing-comma = true
+
 [tool.ruff.lint]
 # Enable classic flake8, pyflakes, eradicate, and tidyimport
 # To be extended with DJ, PT, RUF, C90, D, PL, RET

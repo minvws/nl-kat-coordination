@@ -5,9 +5,7 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("account", "0001_squashed_0004_authtoken_authtoken_unique_name"),
-    ]
+    dependencies = [("account", "0001_squashed_0004_authtoken_authtoken_unique_name")]
 
     operations = [
         migrations.AddField(
@@ -18,5 +16,5 @@ class Migration(migrations.Migration):
                 help_text="The clearance level of the user for all organizations.",
                 validators=[django.core.validators.MinValueValidator(-1), django.core.validators.MaxValueValidator(4)],
             ),
-        ),
+        )
     ]

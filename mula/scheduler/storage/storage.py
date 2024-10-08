@@ -17,9 +17,7 @@ class DBConn:
         self.pool_size = pool_size
 
     def connect(self) -> None:
-        db_uri_redacted = sqlalchemy.engine.make_url(
-            name_or_url=self.dsn,
-        ).render_as_string(hide_password=True)
+        db_uri_redacted = sqlalchemy.engine.make_url(name_or_url=self.dsn).render_as_string(hide_password=True)
 
         pool_size = settings.Settings().db_connection_pool_size
 
@@ -42,27 +40,13 @@ class DBConn:
                 connect_args={"options": "-c timezone=utc"},
             )
         except sqlalchemy.exc.SQLAlchemyError as e:
-            self.logger.error(
-                "Failed to connect to database %s: %s",
-                self.dsn,
-                e,
-                dsn=db_uri_redacted,
-            )
+            self.logger.error("Failed to connect to database %s: %s", self.dsn, e, dsn=db_uri_redacted)
             raise StorageError("Failed to connect to database.")
 
-        self.logger.debug(
-            "Connected to database %s.",
-            db_uri_redacted,
-            dsn=db_uri_redacted,
-        )
+        self.logger.debug("Connected to database %s.", db_uri_redacted, dsn=db_uri_redacted)
 
         try:
-            self.session = sqlalchemy.orm.sessionmaker(
-                bind=self.engine,
-            )
+            self.session = sqlalchemy.orm.sessionmaker(bind=self.engine)
         except sqlalchemy.exc.SQLAlchemyError as e:
-            self.logger.error(
-                "Failed to create session: %s",
-                e,
-            )
+            self.logger.error("Failed to create session: %s", e)
             raise StorageError("Failed to create session.")

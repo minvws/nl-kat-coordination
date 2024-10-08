@@ -111,12 +111,7 @@ class Scheduler(abc.ABC):
         raise NotImplementedError
 
     def run_in_thread(
-        self,
-        name: str,
-        target: Callable[[], Any],
-        interval: float = 0.01,
-        daemon: bool = False,
-        loop: bool = True,
+        self, name: str, target: Callable[[], Any], interval: float = 0.01, daemon: bool = False, loop: bool = True
     ) -> None:
         """Make a function run in a thread, and add it to the dict of threads.
 
@@ -128,12 +123,7 @@ class Scheduler(abc.ABC):
             loop: Whether the thread should loop.
         """
         t = utils.ThreadRunner(
-            name=name,
-            target=target,
-            stop_event=self.stop_event_threads,
-            interval=interval,
-            daemon=daemon,
-            loop=loop,
+            name=name, target=target, stop_event=self.stop_event_threads, interval=interval, daemon=daemon, loop=loop
         )
         t.start()
 
@@ -149,11 +139,7 @@ class Scheduler(abc.ABC):
         for item in items:
             try:
                 self.push_item_to_queue(item)
-            except (
-                queues.errors.NotAllowedError,
-                queues.errors.QueueFullError,
-                queues.errors.InvalidItemError,
-            ) as exc:
+            except (queues.errors.NotAllowedError, queues.errors.QueueFullError, queues.errors.InvalidItemError) as exc:
                 self.logger.debug(
                     "Unable to push item %s to queue %s (%s)",
                     item.id,
@@ -177,12 +163,7 @@ class Scheduler(abc.ABC):
 
             count += 1
 
-    def push_item_to_queue_with_timeout(
-        self,
-        item: models.Task,
-        max_tries: int = 5,
-        timeout: int = 1,
-    ) -> None:
+    def push_item_to_queue_with_timeout(self, item: models.Task, max_tries: int = 5, timeout: int = 1) -> None:
         """Push an item to the queue, with a timeout.
 
         Args:
@@ -307,11 +288,7 @@ class Scheduler(abc.ABC):
             schedule_db = self.ctx.datastores.schedule_store.get_schedule_by_hash(item.hash)
 
         if schedule_db is None:
-            schedule = models.Schedule(
-                scheduler_id=self.scheduler_id,
-                hash=item.hash,
-                data=item.data,
-            )
+            schedule = models.Schedule(scheduler_id=self.scheduler_id, hash=item.hash, data=item.data)
             schedule_db = self.ctx.datastores.schedule_store.create_schedule(schedule)
 
         if schedule_db is None:
@@ -436,20 +413,12 @@ class Scheduler(abc.ABC):
             self.logger.debug("Scheduler is already enabled")
             return
 
-        self.logger.info(
-            "Enabling scheduler: %s",
-            self.scheduler_id,
-            scheduler_id=self.scheduler_id,
-        )
+        self.logger.info("Enabling scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
         self.enabled = True
         self.stop_event_threads.clear()
         self.run()
 
-        self.logger.info(
-            "Enabled scheduler: %s",
-            self.scheduler_id,
-            scheduler_id=self.scheduler_id,
-        )
+        self.logger.info("Enabled scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
 
     def disable(self) -> None:
         """Disable the scheduler.
@@ -458,11 +427,7 @@ class Scheduler(abc.ABC):
         tasks that were on the queue will be set to CANCELLED.
         """
         if not self.is_enabled():
-            self.logger.warning(
-                "Scheduler already disabled: %s",
-                self.scheduler_id,
-                scheduler_id=self.scheduler_id,
-            )
+            self.logger.warning("Scheduler already disabled: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
             return
 
         self.logger.info("Disabling scheduler: %s", self.scheduler_id)
@@ -474,17 +439,12 @@ class Scheduler(abc.ABC):
 
         # Get all tasks that were on the queue and set them to CANCELLED
         tasks, _ = self.ctx.datastores.task_store.get_tasks(
-            scheduler_id=self.scheduler_id,
-            status=models.TaskStatus.QUEUED,
+            scheduler_id=self.scheduler_id, status=models.TaskStatus.QUEUED
         )
         task_ids = [task.id for task in tasks]
         self.ctx.datastores.task_store.cancel_tasks(scheduler_id=self.scheduler_id, task_ids=task_ids)
 
-        self.logger.info(
-            "Disabled scheduler: %s",
-            self.scheduler_id,
-            scheduler_id=self.scheduler_id,
-        )
+        self.logger.info("Disabled scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
 
     def stop(self, callback: bool = True) -> None:
         """Stop the scheduler.
@@ -492,11 +452,7 @@ class Scheduler(abc.ABC):
         Args:
             callback: Whether to call the callback function.
         """
-        self.logger.info(
-            "Stopping scheduler: %s",
-            self.scheduler_id,
-            scheduler_id=self.scheduler_id,
-        )
+        self.logger.info("Stopping scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
 
         # First, stop the listeners, when those are running in a thread and
         # they're using rabbitmq, they will block. Setting the stop event
@@ -507,11 +463,7 @@ class Scheduler(abc.ABC):
         if self.callback and callback:
             self.callback(self.scheduler_id)  # type: ignore [call-arg]
 
-        self.logger.info(
-            "Stopped scheduler: %s",
-            self.scheduler_id,
-            scheduler_id=self.scheduler_id,
-        )
+        self.logger.info("Stopped scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
 
     def stop_listeners(self) -> None:
         """Stop the listeners."""

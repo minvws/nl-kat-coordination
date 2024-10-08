@@ -28,10 +28,7 @@ def test_health(httpx_mock, patch_pika):
     }
 
     httpx_mock.add_response(
-        method="GET",
-        url="http://testxtdb:3000/_xtdb/_dev/status",
-        json=xtdb_status,
-        status_code=200,
+        method="GET", url="http://testxtdb:3000/_xtdb/_dev/status", json=xtdb_status, status_code=200
     )
     response = client.get("/_dev/health")
     assert response.json() == {
@@ -40,13 +37,7 @@ def test_health(httpx_mock, patch_pika):
         "version": __version__,
         "additional": None,
         "results": [
-            {
-                "healthy": True,
-                "service": "xtdb",
-                "version": "1.24.1",
-                "additional": xtdb_status,
-                "results": [],
-            },
+            {"healthy": True, "service": "xtdb", "version": "1.24.1", "additional": xtdb_status, "results": []}
         ],
     }
     assert response.status_code == 200
@@ -54,9 +45,7 @@ def test_health(httpx_mock, patch_pika):
 
 def test_health_no_xtdb_connection(httpx_mock, patch_pika):
     httpx_mock.add_exception(
-        httpx.ConnectTimeout("Connection timed out"),
-        method="GET",
-        url="http://testxtdb:3000/_xtdb/_dev/status",
+        httpx.ConnectTimeout("Connection timed out"), method="GET", url="http://testxtdb:3000/_xtdb/_dev/status"
     )
     response = client.get("/_dev/health")
     assert response.json() == {
@@ -71,7 +60,7 @@ def test_health_no_xtdb_connection(httpx_mock, patch_pika):
                 "version": None,
                 "additional": "Cannot connect to XTDB at. Service possibly down",
                 "results": [],
-            },
+            }
         ],
     }
     assert response.status_code == 200
@@ -100,21 +89,13 @@ def test_get_scan_profiles(httpx_mock, patch_pika, valid_time):
     response = client.get("/_dev/scan_profiles", params={"valid_time": str(valid_time)})
     assert response.status_code == 200
     assert response.json() == [
-        {
-            "level": 0,
-            "reference": "Hostname|internet|mispo.es",
-            "scan_profile_type": "empty",
-            "user_id": None,
-        }
+        {"level": 0, "reference": "Hostname|internet|mispo.es", "scan_profile_type": "empty", "user_id": None}
     ]
 
 
 def test_create_node(httpx_mock):
     httpx_mock.add_response(
-        method="POST",
-        url="http://testxtdb:3000/_xtdb/create-node",
-        json={"created": "true"},
-        status_code=200,
+        method="POST", url="http://testxtdb:3000/_xtdb/create-node", json={"created": "true"}, status_code=200
     )
     response = client.post("/_dev/node")
     assert response.status_code == 200
@@ -122,10 +103,7 @@ def test_create_node(httpx_mock):
 
 def test_delete_node(httpx_mock):
     httpx_mock.add_response(
-        method="POST",
-        url="http://testxtdb:3000/_xtdb/delete-node",
-        json={"deleted": "true"},
-        status_code=200,
+        method="POST", url="http://testxtdb:3000/_xtdb/delete-node", json={"deleted": "true"}, status_code=200
     )
     response = client.delete("/_dev/node")
     assert response.status_code == 200
@@ -149,11 +127,7 @@ def test_count_findings_by_severity(httpx_mock, patch_pika, caplog, valid_time):
             },
             1,
         ],
-        [
-            "KATFindingType|KAT-NO-FINDING-TYPE",
-            None,
-            2,
-        ],
+        ["KATFindingType|KAT-NO-FINDING-TYPE", None, 2],
     ]
 
     httpx_mock.add_response(

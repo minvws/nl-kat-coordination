@@ -36,9 +36,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 
     # if the address is private, we do not need a ROA
     if not ip_address(ip).is_global:
-        return [
-            (set(), json.dumps("IP address is private, no need for RPKI validation")),
-        ]
+        return [(set(), json.dumps("IP address is private, no need for RPKI validation"))]
 
     # RPKI cache check and refresh
     if not RPKI_PATH.exists() or cache_out_of_date(RPKI_META_PATH):
@@ -94,14 +92,8 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 
     return [
         ({"rpki/results"}, json.dumps(results)),
-        (
-            {"rpki/cache-meta"},
-            json.dumps(rpki_meta),
-        ),
-        (
-            {"rpki/bgp-cache-meta"},
-            json.dumps(bgp_meta),
-        ),
+        ({"rpki/cache-meta"}, json.dumps(rpki_meta)),
+        ({"rpki/bgp-cache-meta"}, json.dumps(bgp_meta)),
     ]
 
 

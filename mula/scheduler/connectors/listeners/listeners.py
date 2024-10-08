@@ -70,14 +70,7 @@ class RabbitMQ(Listener):
             A pika.BlockingConnection.channel instance.
     """
 
-    def __init__(
-        self,
-        dsn: str,
-        queue: str,
-        func: Callable,
-        durable: bool = True,
-        prefetch_count: int = 1,
-    ) -> None:
+    def __init__(self, dsn: str, queue: str, func: Callable, durable: bool = True, prefetch_count: int = 1) -> None:
         """Initialize the RabbitMQ Listener
 
         Args:
@@ -112,12 +105,7 @@ class RabbitMQ(Listener):
     def listen(self) -> None:
         self.basic_consume(self.queue, self.durable, self.prefetch_count)
 
-    @retry(
-        (pika.exceptions.AMQPConnectionError, socket.gaierror),
-        delay=5,
-        jitter=(1, 3),
-        tries=5,
-    )
+    @retry((pika.exceptions.AMQPConnectionError, socket.gaierror), delay=5, jitter=(1, 3), tries=5)
     def connect(self, queue: str, durable: bool, prefetch_count: int) -> None:
         """Connect to the RabbitMQ host and declare the queue."""
         try:
@@ -187,10 +175,7 @@ class RabbitMQ(Listener):
         queue.
         """
         self.logger.debug(
-            "Received message on queue %s",
-            method.routing_key,
-            routing_key=method.routing_key,
-            message=body,
+            "Received message on queue %s", method.routing_key, routing_key=method.routing_key, message=body
         )
 
         # Submit the message to the thread pool executor
