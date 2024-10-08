@@ -22,14 +22,16 @@
                         <td class="nowrap">{{ schedule.recipe.report_name_format }}</td>
                         <td class="nowrap">{{ schedule.recipe.subreport_name_format }}</td>
                         <td>
-                            {% for report_type in schedule.recipe.report_types %}
-                                {% if forloop.counter0 < 2 %}
-                                    <span class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</span>
-                                {% endif %}
-                                {% if forloop.counter0 == 2 %}
-                                    <span class="label tags-color-grey-2">+ {{ schedule.recipe.report_types|length|add:"-2" }}</span>
-                                {% endif %}
-                            {% endfor %}
+                            <ul class="tags horizontal-view">
+                                {% for report_type in schedule.recipe.report_types %}
+                                    {% if forloop.counter0 < 2 %}
+                                        <li class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</li>
+                                    {% endif %}
+                                    {% if forloop.counter0 == 2 %}
+                                        <li class="label tags-color-grey-2">+ {{ schedule.recipe.report_types|length|add:"-2" }}</li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
                         </td>
                         <td class="nowrap">{{ schedule.deadline_at }}</td>
                         <td class="nowrap">{{ schedule.cron }}</td>
