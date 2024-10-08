@@ -73,7 +73,7 @@ There are several options to contact the OpenKAT team:
 Privacy
 =======
 
-OpenKAT is not designed to collect private information and it does not act on any private information that it finds. Some information considered to be personal, may be collected through one or more of OpenKAT's plugins and subsequently stored, but only if that information has been accessible to OpenKAT. For example, a phone number or email address listed on a website might end up being collected as part of OpenKAT normal data collection. These data might then be stored for a long period of time, because OpenKAT stores evidence of its actions. No email or phone number models are present and as such they won't be processed into objects by OpenKAT.
+OpenKAT is not designed to collect private information and it does not act on any private information that it finds. Some information considered to be personally identifiable information, may be collected through one or more of OpenKAT's plugins and subsequently stored, but only if that information has been accessible to OpenKAT. For example, a phone number or email address listed on a website might end up being collected as part of OpenKAT normal data collection. These data might then be stored for a long period of time, because OpenKAT stores evidence of its actions. No email or phone number models are present and as such they won't be processed into objects by OpenKAT.
 An OpenKAT installation requires user accounts for users to be able to log in. These accounts (and all data OpenKAT works with) are stored only on the OpenKAT installation itself, and are not shared with any other parties or outside of your OpenKAT install.
 
 Security
