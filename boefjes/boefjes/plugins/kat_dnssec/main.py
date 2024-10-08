@@ -19,6 +19,6 @@ def run(boefje_meta: dict):
 
     results = [({"openkat/dnssec-output"}, output.stdout)]
     if output.stderr:
-        return results.append(({"error/boefje"}, output.stderr))
+        return [({"error/boefje"}, output.stderr)]
 
     return results

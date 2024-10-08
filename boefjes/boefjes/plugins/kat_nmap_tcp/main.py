@@ -23,6 +23,6 @@ def run(boefje_meta: dict):
     results = [({"openkat/nmap-output"}, output.stdout.decode())]
 
     if output.stderr:
-        return results.append(({"error/boefje"}, output.stderr.decode()))
+        return [({"error/boefje"}, output.stderr.decode())]
 
     return results
