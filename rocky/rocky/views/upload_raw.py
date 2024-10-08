@@ -59,14 +59,16 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         return True
 
     def process_raw(self, form):
-        missing = {"raw_file", "mime_types", "ooi", "date"} - set(form.cleaned_data.keys())
+        missing = {"raw_file", "mime_types", "ooi"} - set(form.cleaned_data.keys())
         if missing:
             return self.add_error_notification(_("Missing fields: %s") % (", ".join(missing)))
 
         raw_file = form.cleaned_data["raw_file"]
         mime_types = form.cleaned_data["mime_types"]
         input_ooi = form.cleaned_data["ooi"]
-        valid_time = form.cleaned_data["date"].replace(tzinfo=timezone.utc)
+        valid_time = None
+        if "date" in form.cleaned_data:
+            valid_time = form.cleaned_data["date"].replace(tzinfo=timezone.utc)
 
         try:
             get_bytes_client(self.organization.code).upload_raw(
