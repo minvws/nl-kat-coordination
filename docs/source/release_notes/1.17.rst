@@ -54,7 +54,7 @@ New Features
 * Search and sorting OOIs by @noamblitz in https://github.com/minvws/nl-kat-coordination/pull/3262
 * Generic Finding normalizer by @noamblitz in https://github.com/minvws/nl-kat-coordination/pull/3383
 * feat: :chart_with_upwards_trend: default katalogus view to boefje by @zcrt in https://github.com/minvws/nl-kat-coordination/pull/3394
-* :pushpin: add subfinder settings by @zcrt in https://github.com/minvws/nl-kat-coordination/pull/3385
+* feat: :pushpin: add subfinder settings by @zcrt in https://github.com/minvws/nl-kat-coordination/pull/3385
 * Use better paginator for finding list by @noamblitz in https://github.com/minvws/nl-kat-coordination/pull/3407
 * Generic tasks view refactor by @zcrt in https://github.com/minvws/nl-kat-coordination/pull/3389
 * feat: :memo: improve pagination by @zcrt in https://github.com/minvws/nl-kat-coordination/pull/3393
