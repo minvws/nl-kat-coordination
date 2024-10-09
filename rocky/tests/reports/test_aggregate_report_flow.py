@@ -242,6 +242,7 @@ def test_json_download_aggregate_report(
     get_aggregate_report_from_bytes,
     mock_organization_view_octopoes,
     mock_bytes_client,
+    mock_katalogus_client,
 ):
     mock_organization_view_octopoes().get.return_value = get_aggregate_report_ooi
     mock_bytes_client().get_raw.return_value = get_aggregate_report_from_bytes

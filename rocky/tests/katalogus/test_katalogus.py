@@ -1,7 +1,7 @@
 import pytest
 from django.core.exceptions import PermissionDenied
 from django.urls import resolve
-from katalogus.client import KATalogusClientV1, parse_plugin
+from katalogus.client import KATalogusClientV1, parse_plugin, valid_organization_code, valid_plugin_id
 from katalogus.views.katalogus import AboutPluginsView, BoefjeListView, KATalogusView, NormalizerListView
 from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
 from katalogus.views.plugin_enable_disable import PluginEnableDisableView
@@ -9,6 +9,22 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from rocky.health import ServiceHealth
 from tests.conftest import create_member, get_boefjes_data, get_normalizers_data, get_plugins_data, setup_request
+
+
+def test_valid_plugin_id():
+    with pytest.raises(ValueError):
+        valid_plugin_id("123")
+        valid_plugin_id("test test")
+        valid_plugin_id("test$test")
+
+    assert valid_plugin_id("test-test") == "test-test"
+
+
+def test_valid_organization_code():
+    with pytest.raises(ValueError):
+        valid_organization_code("123 123")
+
+    assert valid_organization_code("test-test") == "test-test"
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
@@ -242,6 +258,11 @@ def test_katalogus_client_organization_exists(mocker):
     client = KATalogusClientV1("test", "test")
 
     assert client.organization_exists() is True
+
+
+def test_katalogus_client_invalid_organization():
+    with pytest.raises(ValueError):
+        KATalogusClientV1("test", "test$$$1123")
 
 
 def test_katalogus_client(httpx_mock):
