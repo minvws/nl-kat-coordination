@@ -650,9 +650,16 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         katalogus_plugins = get_katalogus(self.organization.code).get_plugins(
             ids=plugin_ids_required + plugin_ids_optional
         )
+        for plugin in katalogus_plugins:
+            if plugin.id in plugin_ids_required:
+                plugins["required"].append(plugin)
+            if plugin.id in plugin_ids_optional:
+                plugins["optional"].append(plugin)
 
-        plugins["required"] = [plugin for plugin in katalogus_plugins if plugin.id in plugin_ids_required]
-        plugins["optional"] = [plugin for plugin in katalogus_plugins if plugin.id in plugin_ids_optional]
+        plugins["required"] = sorted(plugins["required"], key=attrgetter("enabled"))
+        sorted_optional_plugins = sorted(plugins["optional"], key=attrgetter("enabled"))
+        sorted_optional_plugins.reverse()
+        plugins["optional"] = sorted_optional_plugins
 
         return format_plugin_data(plugins)
 
