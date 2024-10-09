@@ -42,7 +42,7 @@
                     </button>
                 {% endif %}
                 {% if is_scheduled_report %}
-                    {% include "partials/report_names_header.html" %}
+                    {% include "partials/report_names_header.html" with recurrence=True %}
                     {% include "partials/form/fieldset.html" with fields=report_parent_name_form %}
 
                     {% if reports|length > 1 %}
