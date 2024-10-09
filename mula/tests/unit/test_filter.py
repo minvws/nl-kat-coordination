@@ -38,12 +38,7 @@ class FilteringTestCase(unittest.TestCase):
                     age=25,
                     height=1.8,
                     is_active=True,
-                    data={
-                        "foo": "bar",
-                        "score": 15,
-                        "nested": {"bar": "baz"},
-                        "list": ["ipv4", "network/local"],
-                    },
+                    data={"foo": "bar", "score": 15, "nested": {"bar": "baz"}, "list": ["ipv4", "network/local"]},
                 ),
                 TestModel(
                     name="Bob",
@@ -722,9 +717,7 @@ class FilteringTestCase(unittest.TestCase):
 
     def test_apply_filter_jsonb_contains_list(self):
         filter_request = FilterRequest(
-            filters=[
-                Filter(column="data", field="list", operator="@>", value=json.dumps(["ipv4"])),
-            ]
+            filters=[Filter(column="data", field="list", operator="@>", value=json.dumps(["ipv4"]))]
         )
 
         query = session.query(TestModel)
@@ -739,14 +732,7 @@ class FilteringTestCase(unittest.TestCase):
     def test_apply_filter_jsonb_contained_by_list(self):
         filter_request = FilterRequest(
             filters=[
-                Filter(
-                    column="data",
-                    field="list",
-                    operator="<@",
-                    value=json.dumps(
-                        ["ipv4", "ipv6", "network/local"],
-                    ),
-                ),
+                Filter(column="data", field="list", operator="<@", value=json.dumps(["ipv4", "ipv6", "network/local"]))
             ]
         )
 
