@@ -27,30 +27,15 @@ class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
         breadcrumbs += [
-            {
-                "url": reverse("aggregate_report_landing", kwargs=kwargs) + selection,
-                "text": _("Aggregate report"),
-            },
-            {
-                "url": reverse("aggregate_report_select_oois", kwargs=kwargs) + selection,
-                "text": _("Select objects"),
-            },
+            {"url": reverse("aggregate_report_landing", kwargs=kwargs) + selection, "text": _("Aggregate report")},
+            {"url": reverse("aggregate_report_select_oois", kwargs=kwargs) + selection, "text": _("Select objects")},
             {
                 "url": reverse("aggregate_report_select_report_types", kwargs=kwargs) + selection,
                 "text": _("Select report types"),
             },
-            {
-                "url": reverse("aggregate_report_setup_scan", kwargs=kwargs) + selection,
-                "text": _("Configuration"),
-            },
-            {
-                "url": reverse("aggregate_report_export_setup", kwargs=kwargs) + selection,
-                "text": _("Export setup"),
-            },
-            {
-                "url": reverse("aggregate_report_save", kwargs=kwargs) + selection,
-                "text": _("Save report"),
-            },
+            {"url": reverse("aggregate_report_setup_scan", kwargs=kwargs) + selection, "text": _("Configuration")},
+            {"url": reverse("aggregate_report_export_setup", kwargs=kwargs) + selection, "text": _("Export setup")},
+            {"url": reverse("aggregate_report_save", kwargs=kwargs) + selection, "text": _("Save report")},
         ]
         return breadcrumbs
 

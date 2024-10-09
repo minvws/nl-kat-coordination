@@ -12,7 +12,5 @@ def run(input_ooi: Hostname, additional_oois: list[NXDOMAIN], config: dict[str, 
         nxdomain = KATFindingType(id="KAT-NXDOMAIN")
         yield nxdomain
         yield Finding(
-            finding_type=nxdomain.reference,
-            ooi=input_ooi.reference,
-            description="The domain does not exist.",
+            finding_type=nxdomain.reference, ooi=input_ooi.reference, description="The domain does not exist."
         )

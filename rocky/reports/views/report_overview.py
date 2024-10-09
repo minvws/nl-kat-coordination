@@ -24,14 +24,8 @@ class BreadcrumbsReportOverviewView(ReportBreadcrumbs):
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
         breadcrumbs += [
-            {
-                "url": reverse("report_history", kwargs=kwargs) + selection,
-                "text": _("Reports history"),
-            },
-            {
-                "url": reverse("subreports", kwargs=kwargs) + selection,
-                "text": _("Subreports"),
-            },
+            {"url": reverse("report_history", kwargs=kwargs) + selection, "text": _("Reports history")},
+            {"url": reverse("subreports", kwargs=kwargs) + selection, "text": _("Subreports")},
         ]
         return breadcrumbs
 
@@ -92,16 +86,12 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     """
 
     paginate_by = 30
-    breadcrumbs_step = 2
     context_object_name = "reports"
     paginator = RockyPaginator
     template_name = "report_overview/report_history.html"
 
     def get_queryset(self) -> ReportList:
-        return ReportList(
-            self.octopoes_api_connector,
-            valid_time=self.observed_at,
-        )
+        return ReportList(self.octopoes_api_connector, valid_time=self.observed_at)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -115,7 +105,6 @@ class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     """
 
     paginate_by = 150
-    breadcrumbs_step = 3
     context_object_name = "subreports"
     paginator = RockyPaginator
     template_name = "report_overview/subreports.html"
@@ -125,11 +114,7 @@ class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
         self.report_id = self.request.GET.get("report_id")
 
     def get_queryset(self) -> ReportList:
-        return ReportList(
-            self.octopoes_api_connector,
-            valid_time=self.observed_at,
-            parent_report_id=self.report_id,
-        )
+        return ReportList(self.octopoes_api_connector, valid_time=self.observed_at, parent_report_id=self.report_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -30,9 +30,7 @@ def test_boefje_input_running(api, tmp_path):
     scheduler_client.patch_task(task.id, TaskStatus.RUNNING)
     api.app.dependency_overrides[boefjes.api.get_scheduler_client] = lambda: scheduler_client
     api.app.dependency_overrides[boefjes.api.get_plugin_service] = lambda: PluginService(
-        mock.MagicMock(),
-        mock.MagicMock(),
-        get_local_repository(),
+        mock.MagicMock(), mock.MagicMock(), get_local_repository()
     )
 
     boefjes.api.get_environment_settings = lambda *_: {}

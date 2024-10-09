@@ -25,10 +25,7 @@ class UploadRawForm(BaseRockyForm):
         required=True,
         widget=forms.TextInput(attrs={"placeholder": "text/html, image/jpeg, ..."}),
     )
-    raw_file = forms.FileField(
-        label=_("Upload raw file"),
-        allow_empty_file=False,
-    )
+    raw_file = forms.FileField(label=_("Upload raw file"), allow_empty_file=False)
 
     ooi_id = forms.CharField(
         label="Input or Scan OOI",
@@ -38,18 +35,10 @@ class UploadRawForm(BaseRockyForm):
     )
 
     date = forms.DateTimeField(
-        label=_("Date/Time (UTC)"),
-        widget=DateTimeInput(format="%Y-%m-%dT%H:%M"),
-        help_text=RAW_FILE_DATETIME_HELP_TEXT,
+        label=_("Date/Time (UTC)"), widget=DateTimeInput(format="%Y-%m-%dT%H:%M"), help_text=RAW_FILE_DATETIME_HELP_TEXT
     )
 
-    def __init__(
-        self,
-        connector: OctopoesAPIConnector,
-        ooi_list: list[tuple[str, str]],
-        *args,
-        **kwargs,
-    ):
+    def __init__(self, connector: OctopoesAPIConnector, ooi_list: list[tuple[str, str]], *args, **kwargs):
         observed_at = kwargs.pop("observed_at", None)
         super().__init__(*args, **kwargs)
         self.octopoes_connector = connector

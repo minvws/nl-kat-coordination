@@ -18,12 +18,7 @@ from rocky.views.ooi_view import BaseOOIDetailView
 from rocky.views.tasks import TaskListView
 
 
-class OOIDetailView(
-    BaseOOIDetailView,
-    OOIRelatedObjectManager,
-    OOIFindingManager,
-    TaskListView,
-):
+class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManager, TaskListView):
     template_name = "oois/ooi_detail.html"
     task_filter_form = OOIDetailTaskFilterForm
     task_type = "boefje"
@@ -96,8 +91,7 @@ class OOIDetailView(
         context.update(self.get_origins(self.ooi.reference, self.organization))
 
         inference_params = self.octopoes_api_connector.list_origin_parameters(
-            {inference.origin.id for inference in context["inferences"]},
-            self.observed_at,
+            {inference.origin.id for inference in context["inferences"]}, self.observed_at
         )
         inference_params_per_inference = defaultdict(list)
         for inference_param in inference_params:

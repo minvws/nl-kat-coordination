@@ -75,11 +75,7 @@ def get_scheduler_client():
 
 
 def get_bytes_client():
-    return BytesAPIClient(
-        str(settings.bytes_api),
-        username=settings.bytes_username,
-        password=settings.bytes_password,
-    )
+    return BytesAPIClient(str(settings.bytes_api), username=settings.bytes_username, password=settings.bytes_password)
 
 
 @app.get("/healthz")

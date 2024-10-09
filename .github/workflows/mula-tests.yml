@@ -1,0 +1,20 @@
+name: Mula Tests (with coverage)
+
+on:
+  workflow_call:
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run unit tests
+        run: make utest
+        working-directory: mula/
+
+      - name: Upload coverage as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mula-coverage-unit
+          path: mula/coverage.xml

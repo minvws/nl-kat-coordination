@@ -88,10 +88,7 @@ class TypeSystemTest(TestCase):
         )
 
     def test_concrete_to_concrete(self):
-        self.assertSetEqual(
-            {MockIPAddressV4},
-            to_concrete({MockIPAddressV4}),
-        )
+        self.assertSetEqual({MockIPAddressV4}, to_concrete({MockIPAddressV4}))
 
     def test_type_by_name(self):
         self.assertEqual(MockIPAddressV4, type_by_name("MockIPAddressV4"))

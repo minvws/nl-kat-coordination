@@ -26,10 +26,10 @@
                 {% translate "All selected report types for the selected objects are displayed one below the other." %}
             </p>
             <p>
-                {% translate "Created with data from:" %} <strong>{{ report_ooi.observed_at }} {{ TIME_ZONE }}</strong>
+                {% translate "Created with data from:" %} <strong>{{ report_ooi.observed_at|date }}</strong>
             </p>
             <p>
-                {% translate "Created on:" %} <strong>{{ report_ooi.date_generated }}</strong>
+                {% translate "Created on:" %} <strong>{{ report_ooi.date_generated|date }}</strong>
             </p>
             <p>
                 {% translate "Created by:" %} <strong>{{ organization_member.user.full_name }}</strong>

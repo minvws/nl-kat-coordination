@@ -24,8 +24,6 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
                         ft = CVEFindingType(id=id_)
                         yield ft
                         finding = Finding(
-                            finding_type=ft.reference,
-                            ooi=url_reference,
-                            description=alert.splitlines()[0],
+                            finding_type=ft.reference, ooi=url_reference, description=alert.splitlines()[0]
                         )
                         yield finding
