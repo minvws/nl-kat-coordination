@@ -657,9 +657,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                 plugins["optional"].append(plugin)
 
         plugins["required"] = sorted(plugins["required"], key=attrgetter("enabled"))
-        sorted_optional_plugins = sorted(plugins["optional"], key=attrgetter("enabled"))
-        sorted_optional_plugins.reverse()
-        plugins["optional"] = sorted_optional_plugins
+        plugins["optional"] = sorted(plugins["optional"], key=attrgetter("enabled"), reverse=True)
 
         return format_plugin_data(plugins)
 
