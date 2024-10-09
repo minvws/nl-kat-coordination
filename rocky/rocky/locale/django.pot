@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-02 08:05+0000\n"
+"POT-Creation-Date: 2024-10-09 14:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3565,6 +3565,10 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
+msgid "No vulnerabilities have been found on this system."
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.html
 msgid ""
 "The Vulnerability Report provides an overview of all identified CVE "
 "vulnerabilities that were identified on the selected systems. For each CVE "
@@ -3574,10 +3578,6 @@ msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
 msgid "Advice"
-msgstr ""
-
-#: reports/report_types/vulnerability_report/report.html
-msgid "No vulnerabilities have been found on this system."
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.py
