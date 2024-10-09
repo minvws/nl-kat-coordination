@@ -24,16 +24,20 @@
                 <tr>
                     <td>
                         {% if plugin.enabled %}
-                            <span class="icon positive"></span>
+                            <span class="icon positive">{% translate "Enabled." %}</span>
                         {% else %}
-                            <span class="icon incomplete"></span>
+                            {% if plugin.required %}
+                                <span class="icon failed">{% translate "Disabled" %} {% translate "required" %}</span>
+                            {% else %}
+                                <span class="icon incomplete">{% translate "Disabled" %} {% translate "optional" %}</span>
+                            {% endif %}
                         {% endif %}
                     </td>
                     <td>
                         {% if plugin.required %}
-                            required
+                            {% translate "required" %}
                         {% else %}
-                            optional
+                            {% translate "optional" %}
                         {% endif %}
                     </td>
                     <td>{{ plugin.name }}</td>
