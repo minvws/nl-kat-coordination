@@ -17,7 +17,7 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
 
     recipe = ReportRecipe(
         recipe_id="abc4e52b-812c-4cc2-8196-35fb8efc63ca",
-        report_name_format="{report_type} for {ooi} in %Y",
+        report_name_format="Concatenated report for {oois_count} objects",
         subreport_name_format="{report_type} for {ooi} in %Y",
         input_recipe={"input_oois": [oois["hostnames"][0].reference, oois["hostnames"][1].reference]},
         report_types=["dns-report"],
@@ -53,3 +53,13 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
             "finding_types":[]
         }
     }]
+
+    reports = octopoes_api_connector.list_reports(valid_time)
+    assert reports.count == 1
+
+    report, subreports = reports.items[0]
+    assert len(subreports) == 2
+
+    assert report.name == 'Concatenated report for 2 objects'
+    assert subreports[0].name == 'Concatenated Report'
+    assert subreports[1].name == 'Concatenated Report'

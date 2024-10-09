@@ -46,6 +46,15 @@ class LocalReportJobRunner(ReportJobRunner):
         self.katalogus_client.organization_uri = None
 
         self.bytes_client.organization = report_task.organisation_id
+        report_names = []
+        oois_count = 0
+
+        for report_type, data in report_data.items():
+            oois_count += len(data)
+
+            for ooi in data:
+                report_name = recipe.subreport_name_format.format(ooi=ooi, report_type=report_type)
+                report_names.append((report_name, report_name))
 
         save_report_data(
             self.bytes_client,
@@ -54,7 +63,8 @@ class LocalReportJobRunner(ReportJobRunner):
             Organization.objects.get(code=report_task.organisation_id),
             plugins,
             report_data,
-            [(recipe.report_name_format, recipe.report_name_format)],
+            report_names,
+            recipe.report_name_format.format(oois_count=oois_count),
         )
 
         self.bytes_client.organization = None
