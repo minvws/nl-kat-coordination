@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 from urllib.parse import urlencode
 
+import structlog
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.urls import reverse
 from django.views.generic.edit import FormView
@@ -9,6 +10,8 @@ from tools.forms.boefje import BoefjeSetupForm
 
 from katalogus.client import Boefje, DuplicatePluginError, KATalogusNotAllowedError, get_katalogus
 from octopoes.models.types import type_by_name
+
+logger = structlog.get_logger(__name__)
 
 
 class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
@@ -41,6 +44,7 @@ class AddBoefjeView(BoefjeSetupView):
         plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
 
         try:
+            logger.info("Creating boefje", event_code=800025, boefje=plugin)
             self.katalogus.create_plugin(plugin)
             return super().form_valid(form)
         except DuplicatePluginError as error:
@@ -95,6 +99,7 @@ class AddBoefjeVariantView(BoefjeSetupView):
         plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
 
         try:
+            logger.info("Creating boefje", event_code=800025, boefje=plugin)
             self.katalogus.create_plugin(plugin)
             return super().form_valid(form)
         except DuplicatePluginError as error:
@@ -164,6 +169,7 @@ class EditBoefjeView(BoefjeSetupView):
         plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
 
         try:
+            logger.info("Editing boefje", event_code=800026, boefje=plugin)
             self.katalogus.edit_plugin(plugin)
             return super().form_valid(form)
         except DuplicatePluginError as error:
