@@ -1,6 +1,7 @@
-import functools
+import json
 from io import BytesIO
 from typing import Annotated
+from urllib.parse import quote
 
 import httpx
 import structlog
@@ -13,7 +14,6 @@ from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import AfterValidator, BaseModel, Field, field_serializer
 from tools.enums import SCAN_LEVEL
-from urllib.parse import urlencode
 
 from octopoes.models import OOI
 from octopoes.models.exception import TypeNotFound
@@ -128,21 +128,6 @@ class KATalogusHTTPStatusError(KATalogusError):
         super().__init__(_("An HTTP %d error occurred. Check logs for more info.").format(error.response.status_code))
 
 
-def validate_organization_code(func):
-    @functools.wraps(func)
-    def wrapper(self, organization_code):
-        try:
-            validate_unicode_slug(organization_code)
-        except ValidationError as error:
-            raise KATalogusError(error)
-        return func(
-            self,
-            organization_code,
-        )
-
-    return wrapper
-
-
 class KATalogusClientV1:
     def __init__(self, base_uri: str, organization: str):
         self.session = httpx.Client(base_url=base_uri)
@@ -175,15 +160,15 @@ class KATalogusClientV1:
         return [parse_plugin(plugin) for plugin in response.json()]
 
     def get_plugin(self, plugin_id: str) -> Plugin:
-        safe_plugin_id = urlencode(plugin_id)
-        response = self.session.get(f"{self.organization_uri}/plugins/{safe_plugin_id}")
+        plugin_id = quote(plugin_id)
+        response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}")
         response.raise_for_status()
 
         return parse_plugin(response.json())
 
     def get_plugin_schema(self, plugin_id: str) -> dict | None:
-        safe_plugin_id = urlencode(plugin_id)
-        response = self.session.get(f"{self.organization_uri}/plugins/{safe_plugin_id}/schema.json")
+        plugin_id = quote(plugin_id)
+        response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}/schema.json")
         response.raise_for_status()
 
         schema = response.json()
@@ -200,21 +185,21 @@ class KATalogusClientV1:
         return None
 
     def get_plugin_settings(self, plugin_id: str) -> dict:
-        safe_plugin_id = urlencode(plugin_id)
-        response = self.session.get(f"{self.organization_uri}/{safe_plugin_id}/settings")
+        plugin_id = quote(plugin_id)
+        response = self.session.get(f"{self.organization_uri}/{plugin_id}/settings")
         response.raise_for_status()
         return response.json()
 
     def upsert_plugin_settings(self, plugin_id: str, values: dict) -> None:
-        safe_plugin_id = urlencode(plugin_id)
-        response = self.session.put(f"{self.organization_uri}/{safe_plugin_id}/settings", json=values)
+        plugin_id = quote(plugin_id)
+        response = self.session.put(f"{self.organization_uri}/{plugin_id}/settings", json=values)
         response.raise_for_status()
 
         logger.info("Upsert plugin settings", plugin_id=plugin_id)
 
     def delete_plugin_settings(self, plugin_id: str):
-        safe_plugin_id = urlencode(plugin_id)
-        response = self.session.delete(f"{self.organization_uri}/{safe_plugin_id}/settings")
+        plugin_id = quote(plugin_id)
+        response = self.session.delete(f"{self.organization_uri}/{plugin_id}/settings")
         response.raise_for_status()
 
         logger.info("Delete plugin settings", plugin_id=plugin_id)
@@ -222,8 +207,8 @@ class KATalogusClientV1:
         return response
 
     def clone_all_configuration_to_organization(self, to_organization: str):
-        safe_to_organization = urlencode(to_organization)
-        response = self.session.post(f"{self.organization_uri}/settings/clone/{safe_to_organization}")
+        to_organization = quote(to_organization)
+        response = self.session.post(f"{self.organization_uri}/settings/clone/{to_organization}")
         response.raise_for_status()
 
         return response
@@ -257,23 +242,20 @@ class KATalogusClientV1:
 
     def _patch_plugin_state(self, plugin_id: str, enabled: bool) -> None:
         logger.info("Toggle plugin state", plugin_id=plugin_id, enabled=enabled)
-        safe_plugin_id = urlencode(plugin_id)
-        
-        response = self.session.patch(
-            f"{self.organization_uri}/plugins/{safe_plugin_id}",
-            json={"enabled": enabled},
-        )
+        plugin_id = quote(plugin_id)
+
+        response = self.session.patch(f"{self.organization_uri}/plugins/{plugin_id}", json={"enabled": enabled})
         response.raise_for_status()
 
     def get_description(self, plugin_id: str) -> str:
-        safe_plugin_id = urlencode(plugin_id)        
-        response = self.session.get(f"{self.organization_uri}/plugins/{safe_plugin_id}/description.md")
+        plugin_id = quote(plugin_id)
+        response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}/description.md")
         response.raise_for_status()
 
         return response.content.decode("utf-8")
 
     def get_cover(self, plugin_id: str) -> BytesIO:
-        safe_plugin_id = urlencode(plugin_id)        
+        plugin_id = quote(plugin_id)
         response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}/cover.jpg")
         response.raise_for_status()
         return BytesIO(response.content)
