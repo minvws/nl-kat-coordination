@@ -936,7 +936,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(results[0].name, "Alice")
         self.assertEqual(results[1].name, "Charlie")
 
-    def test_apply_filter_jsonb_contains(self):
+    def test_apply_filter_jsonb_contains_list(self):
         filter_request = FilterRequest(
             filters=[
                 Filter(column="data", field="list", operator="@>", value=json.dumps(["ipv4"])),
@@ -952,7 +952,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(results[1].name, "Bob")
         self.assertEqual(results[2].name, "Charlie")
 
-    def test_apply_filter_jsonb_contained_by(self):
+    def test_apply_filter_jsonb_contained_by_list(self):
         filter_request = FilterRequest(
             filters=[
                 Filter(
