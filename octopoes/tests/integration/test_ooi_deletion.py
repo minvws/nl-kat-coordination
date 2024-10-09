@@ -47,11 +47,7 @@ def test_hostname_nxd_ooi(octopoes_api_connector: OctopoesAPIConnector, valid_ti
     nxd = NXDOMAIN(hostname=hostname.reference)
     octopoes_api_connector.save_observation(
         Observation(
-            method="normalizer_id",
-            source=hostname.reference,
-            task_id=uuid.uuid4(),
-            valid_time=valid_time,
-            result=[nxd],
+            method="normalizer_id", source=hostname.reference, task_id=uuid.uuid4(), valid_time=valid_time, result=[nxd]
         )
     )
     octopoes_api_connector.recalculate_bits()
@@ -464,12 +460,7 @@ def test_affirming_ooi_delete(octopoes_api_connector: OctopoesAPIConnector, vali
 
     # Affirm object B
     octopoes_api_connector.save_affirmation(
-        Affirmation(
-            ooi=hostname,
-            source_method=None,
-            task_id=uuid.uuid4(),
-            valid_time=valid_time,
-        )
+        Affirmation(ooi=hostname, source_method=None, task_id=uuid.uuid4(), valid_time=valid_time)
     )
     time.sleep(1)
 
@@ -512,12 +503,7 @@ def test_delecration_ooi_delete(octopoes_api_connector: OctopoesAPIConnector, va
 
     # Infer object B
     octopoes_api_connector.save_declaration(
-        Declaration(
-            ooi=hostname,
-            source_method=None,
-            task_id=uuid.uuid4(),
-            valid_time=valid_time,
-        )
+        Declaration(ooi=hostname, source_method=None, task_id=uuid.uuid4(), valid_time=valid_time)
     )
     time.sleep(1)
 

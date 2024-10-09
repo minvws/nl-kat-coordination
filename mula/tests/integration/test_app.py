@@ -126,9 +126,7 @@ class AppTestCase(unittest.TestCase):
     def test_shutdown(self):
         """Test that the app shuts down gracefully"""
         # Arrange
-        self.mock_ctx.services.katalogus.organisations = {
-            "org-1": OrganisationFactory(id="org-1"),
-        }
+        self.mock_ctx.services.katalogus.organisations = {"org-1": OrganisationFactory(id="org-1")}
 
         self.app.start_schedulers()
         self.app.start_monitors()

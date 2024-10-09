@@ -43,10 +43,7 @@ class IPAddressV4(IPAddress):
         "IPV4NetBlock", optional=True, max_issue_scan_level=0, max_inherit_scan_level=4, default=None
     )
 
-    _reverse_relation_names = {
-        "network": "ip_v4_addresses",
-        "netblock": "ip_v4_addresses",
-    }
+    _reverse_relation_names = {"network": "ip_v4_addresses", "netblock": "ip_v4_addresses"}
 
 
 class IPAddressV6(IPAddress):
@@ -57,10 +54,7 @@ class IPAddressV6(IPAddress):
         "IPV6NetBlock", optional=True, max_issue_scan_level=0, max_inherit_scan_level=4, default=None
     )
 
-    _reverse_relation_names = {
-        "network": "ip_v6_addresses",
-        "netblock": "ip_v6_addresses",
-    }
+    _reverse_relation_names = {"network": "ip_v6_addresses", "netblock": "ip_v6_addresses"}
 
 
 class Protocol(Enum):
@@ -114,10 +108,7 @@ class NetBlock(OOI):
 
     _natural_key_attrs = ["network", "start_ip", "mask"]
 
-    _reverse_relation_names = {
-        "announced_by": "announced_netblocks",
-        "parent": "child_netblocks",
-    }
+    _reverse_relation_names = {"announced_by": "announced_netblocks", "parent": "child_netblocks"}
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
@@ -132,10 +123,7 @@ class IPV6NetBlock(NetBlock):
     start_ip: Reference = ReferenceField(IPAddressV6, max_issue_scan_level=4)
     mask: Annotated[int, Field(ge=0, lt=128)]
 
-    _reverse_relation_names = {
-        "parent": "child_netblocks",
-        "announced_by": "announced_ipv6_netblocks",
-    }
+    _reverse_relation_names = {"parent": "child_netblocks", "announced_by": "announced_ipv6_netblocks"}
 
 
 class IPV4NetBlock(NetBlock):
@@ -146,10 +134,7 @@ class IPV4NetBlock(NetBlock):
     start_ip: Reference = ReferenceField(IPAddressV4, max_issue_scan_level=4)
     mask: Annotated[int, Field(ge=0, lt=32)]
 
-    _reverse_relation_names = {
-        "parent": "child_netblocks",
-        "announced_by": "announced_ipv4_netblocks",
-    }
+    _reverse_relation_names = {"parent": "child_netblocks", "announced_by": "announced_ipv4_netblocks"}
 
 
 IPAddressV4.model_rebuild()

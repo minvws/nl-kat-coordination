@@ -18,11 +18,7 @@ class Server:
         api: A fastapi.FastAPI object used for exposing API endpoints.
     """
 
-    def __init__(
-        self,
-        ctx: context.AppContext,
-        s: dict[str, schedulers.Scheduler],
-    ):
+    def __init__(self, ctx: context.AppContext, s: dict[str, schedulers.Scheduler]):
         """Initializer of the Server class.
 
         Args:
@@ -32,10 +28,7 @@ class Server:
 
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
-        self.api: fastapi.FastAPI = fastapi.FastAPI(
-            title="Scheduler",
-            description="Scheduler API",
-        )
+        self.api: fastapi.FastAPI = fastapi.FastAPI(title="Scheduler", description="Scheduler API")
         self.schedulers: dict[str, schedulers.Scheduler] = s
 
         # Set up API endpoints
@@ -48,9 +41,4 @@ class Server:
         handlers.RootAPI(self.api, self.ctx)
 
     def run(self) -> None:
-        uvicorn.run(
-            self.api,
-            host=str(self.ctx.config.api_host),
-            port=self.ctx.config.api_port,
-            log_config=None,
-        )
+        uvicorn.run(self.api, host=str(self.ctx.config.api_host), port=self.ctx.config.api_port, log_config=None)
