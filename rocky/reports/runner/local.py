@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from django.conf import settings
-from katalogus.client import KATalogusError, KATalogusClientV1
+from katalogus.client import KATalogusClientV1, KATalogusError
 from tools.models import Organization
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -15,7 +15,9 @@ from rocky.scheduler import ReportTask
 
 
 class LocalReportJobRunner(ReportJobRunner):
-    def __init__(self, katalogus_client: KATalogusClientV1, bytes_client: BytesClient, valid_time: datetime | None = None):
+    def __init__(
+        self, katalogus_client: KATalogusClientV1, bytes_client: BytesClient, valid_time: datetime | None = None
+    ):
         self.katalogus_client = katalogus_client
         self.bytes_client = bytes_client
         self.valid_time = valid_time

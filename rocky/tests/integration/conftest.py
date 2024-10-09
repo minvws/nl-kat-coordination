@@ -4,8 +4,10 @@ from ipaddress import ip_address
 
 import pytest
 from django.conf import settings
+from reports.runner.local import LocalReportJobRunner
+from tools.models import Organization
 
-from octopoes.api.models import Declaration, Observation
+from octopoes.api.models import Declaration, Observation, ServiceHealth
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, DeclaredScanProfile, Reference
 from octopoes.models.ooi.certificate import X509Certificate
@@ -16,9 +18,6 @@ from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import URL, HostnameHTTPURL, HTTPHeader, HTTPResource, SecurityTXT, Website
 
-from reports.runner.local import LocalReportJobRunner
-from tools.models import Organization
-
 
 @pytest.fixture
 def valid_time():
@@ -26,7 +25,15 @@ def valid_time():
 
 
 @pytest.fixture
-def integration_organization(request) -> Organization:
+def katalogus_mock(mocker):
+    katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
+    katalogus().health.return_value = ServiceHealth(service="katalogus", healthy=True)
+
+    return katalogus
+
+
+@pytest.fixture
+def integration_organization(katalogus_mock, request) -> Organization:
     test_node = f"test-{request.node.originalname}"
 
     return Organization.objects.create(name="Test", code=test_node)
@@ -58,8 +65,8 @@ def octopoes_api_connector_2(integration_organization_2) -> OctopoesAPIConnector
 
 
 @pytest.fixture
-def report_runner(valid_time, mocker) -> LocalReportJobRunner:
-    return LocalReportJobRunner(mocker.MagicMock(), mocker.MagicMock(), valid_time)
+def report_runner(valid_time, katalogus_mock, mocker) -> LocalReportJobRunner:
+    return LocalReportJobRunner(katalogus_mock, mocker.MagicMock(), valid_time)
 
 
 def seed_system(

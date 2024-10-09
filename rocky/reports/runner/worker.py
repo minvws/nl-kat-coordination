@@ -8,9 +8,9 @@ from queue import Queue
 import structlog
 from django.conf import settings
 from httpx import HTTPError
+from katalogus.client import get_katalogus
 from pydantic import ValidationError
 
-from katalogus.client import get_katalogus
 from reports.runner.local import LocalReportJobRunner
 from reports.runner.models import ReportJobRunner, WorkerManager
 from rocky.bytes_client import get_bytes_client

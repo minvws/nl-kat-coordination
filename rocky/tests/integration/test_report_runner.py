@@ -1,31 +1,55 @@
+import json
+
+from reports.runner.local import LocalReportJobRunner
+
 from octopoes.api.models import Declaration
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.ooi.reports import ReportRecipe
-
-from reports.runner.local import LocalReportJobRunner
 from rocky.health import ServiceHealth
 from rocky.scheduler import ReportTask
-from rocky.views.health import Health
 from tests.integration.conftest import seed_system
 
 
 def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_runner: LocalReportJobRunner, valid_time):
-    seed_system(octopoes_api_connector, valid_time)
-    report_runner.katalogus_client.health.return_value = ServiceHealth(healthy=True)
-    report_runner.bytes_client.health.return_value = ServiceHealth(healthy=True)
+    oois = seed_system(octopoes_api_connector, valid_time)
+    report_runner.bytes_client.health.return_value = ServiceHealth(service="bytes", healthy=True)
+    report_runner.bytes_client.upload_raw.return_value = "abcdabcd-f8ab-4bdf-9b1b-58cd98ef6342"
 
     recipe = ReportRecipe(
-        recipe_id="8aa4e52b-812c-4cc2-8196-35fb8efc63ca",
+        recipe_id="abc4e52b-812c-4cc2-8196-35fb8efc63ca",
         report_name_format="{report_type} for {ooi} in %Y",
         subreport_name_format="{report_type} for {ooi} in %Y",
-        input_recipe={"input_oois": ["Network|internet"]},
+        input_recipe={"input_oois": [oois["hostnames"][0].reference, oois["hostnames"][1].reference]},
         report_types=["dns-report"],
-        cron_expression="* * * * *"
+        cron_expression="* * * * *",
     )
     octopoes_api_connector.save_declaration(Declaration(ooi=recipe, valid_time=valid_time))
 
-    task = ReportTask(
-        organisation_id=octopoes_api_connector.client, report_recipe_id="8aa4e52b-812c-4cc2-8196-35fb8efc63ca"
-    )
-
+    task = ReportTask(organisation_id=octopoes_api_connector.client, report_recipe_id=str(recipe.recipe_id))
     report_runner.run(task)
+
+    assert len(report_runner.bytes_client.upload_raw.mock_calls) == 3
+
+    assert report_runner.bytes_client.upload_raw.mock_calls[0].kwargs["manual_mime_types"] == {"openkat/report"}
+    assert report_runner.bytes_client.upload_raw.mock_calls[1].kwargs["manual_mime_types"] == {"openkat/report"}
+    assert report_runner.bytes_client.upload_raw.mock_calls[2].kwargs["manual_mime_types"] == {"openkat/report"}
+
+    assert report_runner.bytes_client.upload_raw.mock_calls[0].kwargs["raw"] ==  b'{"plugins":[]}'
+    assert [  # The order of oois is quite random so we assert on the union of last two calls
+        json.loads(report_runner.bytes_client.upload_raw.mock_calls[1].kwargs["raw"]),
+        json.loads(report_runner.bytes_client.upload_raw.mock_calls[2].kwargs["raw"]),
+    ] == [{
+        "report_data": {
+            "input_ooi":"Hostname|test|example.com",
+            "records":[],
+            "security":{"spf":True, "dkim":True, "dmarc":True, "dnssec":True, "caa":True},
+            "finding_types":[]
+        }
+    }, {
+        "report_data":{
+            "input_ooi":"Hostname|test|a.example.com",
+            "records":[],
+            "security":{"spf":True, "dkim":True, "dmarc":True, "dnssec":True, "caa":True},
+            "finding_types":[]
+        }
+    }]
