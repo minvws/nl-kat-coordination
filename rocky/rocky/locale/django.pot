@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-02 08:05+0000\n"
+"POT-Creation-Date: 2024-10-09 09:15+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -631,6 +631,7 @@ msgstr ""
 #: katalogus/forms/katalogus_filter.py
 #: katalogus/templates/partials/plugin_tile_modal.html
 #: katalogus/templates/plugin_container_image.html
+#: reports/templates/summary/selected_plugins.html
 msgid "Disabled"
 msgstr ""
 
@@ -3776,6 +3777,7 @@ msgid "Year"
 msgstr ""
 
 #: reports/templates/partials/report_names_header.html
+#: reports/templates/report_overview/report_history_table.html
 msgid "Report name"
 msgstr ""
 
@@ -3815,6 +3817,7 @@ msgid "Select which objects you want to include in your report."
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "No objects found."
 msgstr ""
 
@@ -4084,10 +4087,6 @@ msgid "Subreports"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "Report ID"
-msgstr ""
-
-#: reports/templates/report_overview/report_history_table.html
 msgid "Shows subreport details"
 msgstr ""
 
@@ -4187,6 +4186,10 @@ msgid ""
 "including a report description."
 msgstr ""
 
+#: reports/templates/summary/report_asset_overview.html
+msgid "No report types found."
+msgstr ""
+
 #: reports/templates/summary/selected_plugins.html
 msgid ""
 "The table below shows all required or optional plugins for the selected "
@@ -4207,6 +4210,18 @@ msgstr ""
 
 #: reports/templates/summary/selected_plugins.html
 msgid "Plugin scan level"
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid "Enabled."
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid "required"
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid "optional"
 msgstr ""
 
 #: reports/templates/summary/selected_plugins.html
