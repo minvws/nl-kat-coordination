@@ -17,7 +17,7 @@ def get_sock(ip, port, timeout):
 
 def get_banner(sock):
     if not sock:
-        return [({"boefje/error"}, "Unable to connect to the service")]
+        return [({"error/boefje"}, "Unable to connect to the service")]
     try:
         sock.settimeout(TIMEOUT)
         banner = sock.recv(1024)
@@ -28,7 +28,7 @@ def get_banner(sock):
         sock.close()
         return [({"openkat/service-banner"}, banner)]
     except Exception as e:
-        return [({"boefje/error"}, f"Unable to get banner. {str(e)}")]
+        return [({"error/boefje"}, f"Unable to get banner. {str(e)}")]
 
 
 def run(boefje_meta: BoefjeMeta) -> list[tuple[set, str | bytes]]:
