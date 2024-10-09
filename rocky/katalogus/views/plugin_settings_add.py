@@ -1,3 +1,4 @@
+import structlog
 from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -8,6 +9,8 @@ from httpx import HTTPError
 
 from katalogus.forms import PluginSchemaForm
 from katalogus.views.mixins import SinglePluginView
+
+logger = structlog.get_logger(__name__)
 
 
 class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginView, FormView):
@@ -44,6 +47,7 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
             return redirect(self.get_success_url())
 
         try:
+            logger.info("Adding plugin settings", event_code=800023, plugin=self.plugin.name)
             self.katalogus_client.upsert_plugin_settings(self.plugin.id, form.cleaned_data)
             messages.add_message(self.request, messages.SUCCESS, _("Added settings for '{}'").format(self.plugin.name))
         except HTTPError:
@@ -52,6 +56,7 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
 
         if "add-enable" in self.request.POST:
             try:
+                logger.info("Enabling plugin", event_code=800021, plugin=self.plugin.name)
                 self.katalogus_client.enable_plugin(self.plugin)
             except HTTPError:
                 messages.add_message(self.request, messages.ERROR, _("Enabling {} failed").format(self.plugin.name))
