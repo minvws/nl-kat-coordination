@@ -120,6 +120,15 @@ class Settings(BaseSettings):
         None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
     )
 
+    task_capabilities: list[str] = Field(
+        ["network/internet", "ipv6", "ipv4", "internet"],
+        description="List of networks the boefje ",
+        examples=[
+            ["network/internet", "network/dentist", "network/remote-location", "ipv6"],
+            ["network/dentist", "ipv4"],
+        ],
+    )
+
     logging_format: Literal["text", "json"] = Field("text", description="Logging format")
 
     model_config = SettingsConfigDict(env_prefix="BOEFJES_")

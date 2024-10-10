@@ -1,6 +1,8 @@
 import datetime
+import json
 import uuid
 from enum import Enum
+from typing import Any
 
 from httpx import Client, HTTPTransport, Response
 from pydantic import BaseModel, TypeAdapter
@@ -38,6 +40,17 @@ class Task(BaseModel):
     modified_at: datetime.datetime
 
 
+class Filter(BaseModel):
+    column: str
+    field: str
+    operator: str
+    value: Any
+
+
+class QueuePopRequest(BaseModel):
+    filters: list[Filter]
+
+
 class SchedulerClientInterface:
     def get_queues(self) -> list[Queue]:
         raise NotImplementedError()
@@ -56,8 +69,9 @@ class SchedulerClientInterface:
 
 
 class SchedulerAPIClient(SchedulerClientInterface):
-    def __init__(self, base_url: str):
+    def __init__(self, base_url: str, task_capabilities: list[str] | None = None):
         self._session = Client(base_url=base_url, transport=HTTPTransport(retries=6))
+        self.task_capabilities = task_capabilities
 
     @staticmethod
     def _verify_response(response: Response) -> None:
@@ -70,7 +84,14 @@ class SchedulerAPIClient(SchedulerClientInterface):
         return TypeAdapter(list[Queue]).validate_json(response.content)
 
     def pop_item(self, queue_id: str) -> Task | None:
-        response = self._session.post(f"/queues/{queue_id}/pop")
+        response = self._session.post(
+            f"/queues/{queue_id}/pop",
+            data=QueuePopRequest(
+                filters=[
+                    Filter(column="data", field="requirements", operator="<@", value=json.dumps(self.task_capabilities))
+                ]
+            ).model_dump_json(),
+        )
         self._verify_response(response)
 
         return TypeAdapter(Task | None).validate_json(response.content)
