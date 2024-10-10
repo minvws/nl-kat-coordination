@@ -3958,13 +3958,11 @@ msgid "There are no required plugins."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-msgid "Good job! All suggested plugins are enabled"
+msgid "Good job! All suggested plugins are enabled."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-msgid ""
-"This report requires at least one of the following plugins to be enabled to "
-"generate the report:"
+msgid "The following plugins are optional to generate the report:"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html

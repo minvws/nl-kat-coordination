@@ -444,7 +444,7 @@ class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["enabled_plugins"] = self.all_plugins_enabled()
+        context["enabled_plugins"] = self.plugins_enabled()
         context["plugin_data"] = self.get_plugins_data()
         context["plugins"] = self.plugins
         return context
@@ -650,9 +650,14 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         katalogus_plugins = get_katalogus(self.organization.code).get_plugins(
             ids=plugin_ids_required + plugin_ids_optional
         )
+        for plugin in katalogus_plugins:
+            if plugin.id in plugin_ids_required:
+                plugins["required"].append(plugin)
+            if plugin.id in plugin_ids_optional:
+                plugins["optional"].append(plugin)
 
-        plugins["required"] = [plugin for plugin in katalogus_plugins if plugin.id in plugin_ids_required]
-        plugins["optional"] = [plugin for plugin in katalogus_plugins if plugin.id in plugin_ids_optional]
+        plugins["required"] = sorted(plugins["required"], key=attrgetter("enabled"))
+        plugins["optional"] = sorted(plugins["optional"], key=attrgetter("enabled"), reverse=True)
 
         return format_plugin_data(plugins)
 
