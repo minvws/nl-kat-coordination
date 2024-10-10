@@ -631,6 +631,7 @@ msgstr ""
 #: katalogus/forms/katalogus_filter.py
 #: katalogus/templates/partials/plugin_tile_modal.html
 #: katalogus/templates/plugin_container_image.html
+#: reports/templates/summary/selected_plugins.html
 msgid "Disabled"
 msgstr ""
 
@@ -3776,12 +3777,35 @@ msgid "Year"
 msgstr ""
 
 #: reports/templates/partials/report_names_header.html
+#: reports/templates/report_overview/report_history_table.html
 msgid "Report name"
 msgstr ""
 
 #: reports/templates/partials/report_names_header.html
 msgid ""
-"Give your report a custom name and optionally add the reports' reference "
+"Define a custom name format for your report(s). This format will be applied "
+"to all generated (sub)reports."
+msgstr ""
+
+#: reports/templates/partials/report_names_header.html
+msgid ""
+"To make the report names more descriptive, you can include placeholders for "
+"the object name, the report type and/or the reference date. Use the "
+"placeholder \"{ooi}\" for the object name, \"{report type}\" for the report "
+"type and use a <a href=\"https://strftime.org/\" target=\"_blank\">Python "
+"strftime code</a> for the reference date."
+msgstr ""
+
+#: reports/templates/partials/report_names_header.html
+#, python-format
+msgid ""
+"For example, the format \"{report type} for {ooi} at %%x\" could generate: "
+"\"DNS Report for example.com at 01/01/25\"."
+msgstr ""
+
+#: reports/templates/partials/report_names_header.html
+msgid ""
+"Give your report(s) a custom name and optionally add the reports' reference "
 "date to the name. To do so you can select a standard option or use a <a "
 "href=\"https://strftime.org/\" target=\"_blank\">Python strftime code</a> in "
 "the report name."
@@ -3815,6 +3839,7 @@ msgid "Select which objects you want to include in your report."
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "No objects found."
 msgstr ""
 
@@ -4084,10 +4109,6 @@ msgid "Subreports"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "Report ID"
-msgstr ""
-
-#: reports/templates/report_overview/report_history_table.html
 msgid "Shows subreport details"
 msgstr ""
 
@@ -4187,6 +4208,10 @@ msgid ""
 "including a report description."
 msgstr ""
 
+#: reports/templates/summary/report_asset_overview.html
+msgid "No report types found."
+msgstr ""
+
 #: reports/templates/summary/selected_plugins.html
 msgid ""
 "The table below shows all required or optional plugins for the selected "
@@ -4207,6 +4232,18 @@ msgstr ""
 
 #: reports/templates/summary/selected_plugins.html
 msgid "Plugin scan level"
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid "Enabled."
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid "required"
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid "optional"
 msgstr ""
 
 #: reports/templates/summary/selected_plugins.html
