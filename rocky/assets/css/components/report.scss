@@ -39,6 +39,11 @@
   article {
     gap: var(--spacing-grid-500);
 
+    @media screen and (width >= 90rem) {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
     h2,
     h3,
     h4,
