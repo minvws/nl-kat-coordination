@@ -44,10 +44,7 @@ class SchedulerTestCase(unittest.TestCase):
         )
 
         self.scheduler = mock_scheduler.MockScheduler(
-            ctx=self.mock_ctx,
-            scheduler_id=identifier,
-            queue=queue,
-            create_schedule=True,
+            ctx=self.mock_ctx, scheduler_id=identifier, queue=queue, create_schedule=True
         )
 
     def tearDown(self):
@@ -59,10 +56,7 @@ class SchedulerTestCase(unittest.TestCase):
         # Arrange
         items = []
         for i in range(10):
-            item = functions.create_item(
-                scheduler_id=self.scheduler.scheduler_id,
-                priority=i + 1,
-            )
+            item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=i + 1)
             items.append(item)
 
         # Act
@@ -88,10 +82,7 @@ class SchedulerTestCase(unittest.TestCase):
 
     def test_push_item_to_queue(self):
         # Arrange
-        item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-        )
+        item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
 
         # Act
         self.scheduler.push_item_to_queue(item)
@@ -115,10 +106,7 @@ class SchedulerTestCase(unittest.TestCase):
         # Arrange
         self.scheduler.create_schedule = False
 
-        item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-        )
+        item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
 
         # Act
         self.scheduler.push_item_to_queue(item)
@@ -135,17 +123,12 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertIsNone(task_db.schedule_id)
 
         # Schedule should not be in datastore
-        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_hash(
-            task_db.hash,
-        )
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_hash(task_db.hash)
         self.assertIsNone(schedule_db)
 
     def test_push_item_to_queue_full(self):
         # Arrange
-        item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-        )
+        item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
 
         self.scheduler.queue.maxsize = 1
 
@@ -162,10 +145,7 @@ class SchedulerTestCase(unittest.TestCase):
 
     def test_push_item_to_queue_invalid(self):
         # Arrange
-        item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-        )
+        item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
         item.data = {"invalid": "data"}
 
         # Assert
@@ -174,10 +154,7 @@ class SchedulerTestCase(unittest.TestCase):
 
     def test_pop_item_from_queue(self):
         # Arrange
-        item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-        )
+        item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
 
         self.scheduler.push_item_to_queue(item)
 
@@ -196,10 +173,7 @@ class SchedulerTestCase(unittest.TestCase):
     def test_post_push(self):
         """When a task is added to the queue, it should be added to the database"""
         # Arrange
-        item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-        )
+        item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
 
         # Act
         self.scheduler.push_item_to_queue(item)
@@ -227,17 +201,11 @@ class SchedulerTestCase(unittest.TestCase):
 
         # Assert: deadline should be in the future, at least later than the
         # grace period
-        self.assertGreater(
-            schedule_db.deadline_at,
-            datetime.now(timezone.utc),
-        )
+        self.assertGreater(schedule_db.deadline_at, datetime.now(timezone.utc))
 
     def test_post_push_schedule_enabled(self):
         # Arrange
-        item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-        )
+        item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
 
         # Act
         self.scheduler.push_item_to_queue(item)
@@ -265,17 +233,11 @@ class SchedulerTestCase(unittest.TestCase):
 
         # Assert: deadline should be in the future, at least later than the
         # grace period
-        self.assertGreater(
-            schedule_db.deadline_at,
-            datetime.now(timezone.utc),
-        )
+        self.assertGreater(schedule_db.deadline_at, datetime.now(timezone.utc))
 
     def test_post_push_schedule_disabled(self):
         # Arrange
-        first_item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-        )
+        first_item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
 
         # Act
         first_item_db = self.scheduler.push_item_to_queue(first_item)
@@ -287,9 +249,7 @@ class SchedulerTestCase(unittest.TestCase):
 
         # Disable this schedule
         initial_schedule_db.enabled = False
-        self.mock_ctx.datastores.schedule_store.update_schedule(
-            initial_schedule_db,
-        )
+        self.mock_ctx.datastores.schedule_store.update_schedule(initial_schedule_db)
 
         # Act
         second_item = first_item_db.model_copy()
@@ -303,10 +263,7 @@ class SchedulerTestCase(unittest.TestCase):
 
     def test_post_push_schedule_update_schedule(self):
         # Arrange
-        first_item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-        )
+        first_item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
 
         # Act
         first_item_db = self.scheduler.push_item_to_queue(first_item)
@@ -335,16 +292,10 @@ class SchedulerTestCase(unittest.TestCase):
     def test_post_push_schedule_is_not_none(self):
         """When a schedule is provided, it should be used to set the deadline"""
         # Arrange
-        first_item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-        )
+        first_item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id,
-            schedule="0 0 * * *",
-            hash=first_item.hash,
-            data=first_item.data,
+            scheduler_id=self.scheduler.scheduler_id, schedule="0 0 * * *", hash=first_item.hash, data=first_item.data
         )
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
@@ -397,10 +348,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.scheduler.run()
 
         # Arrange: add tasks
-        item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-        )
+        item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
         self.scheduler.push_item_to_queue(item)
 
         # Assert: task should be on priority queue
@@ -447,10 +395,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.scheduler.run()
 
         # Arrange: add tasks
-        item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-        )
+        item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
         self.scheduler.push_item_to_queue(item)
 
         # Assert: listeners should be running

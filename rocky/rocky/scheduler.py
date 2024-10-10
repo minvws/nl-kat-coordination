@@ -9,12 +9,15 @@ from functools import cached_property
 from typing import Any
 
 import httpx
+import structlog
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from httpx import ConnectError, HTTPError, HTTPStatusError, RequestError, codes
 from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny, TypeAdapter, ValidationError
 
 from rocky.health import ServiceHealth
+
+logger = structlog.get_logger(__name__)
 
 
 class Boefje(BaseModel):
@@ -186,11 +189,7 @@ class PaginatedSchedulesResponse(BaseModel):
 class LazyTaskList:
     HARD_LIMIT = 500
 
-    def __init__(
-        self,
-        scheduler_client: SchedulerClient,
-        **kwargs,
-    ):
+    def __init__(self, scheduler_client: SchedulerClient, **kwargs):
         self.scheduler_client = scheduler_client
         self.kwargs = kwargs
         self._count: int | None = None
@@ -198,10 +197,7 @@ class LazyTaskList:
     @cached_property
     def count(self) -> int:
         if self._count is None:
-            self._count = self.scheduler_client.list_tasks(
-                limit=0,
-                **self.kwargs,
-            ).count
+            self._count = self.scheduler_client.list_tasks(limit=0, **self.kwargs).count
         return self._count
 
     def __len__(self):
@@ -219,11 +215,7 @@ class LazyTaskList:
             raise TypeError("Invalid slice argument type.")
 
         logging.info("Getting max %s lazy items at offset %s with filter %s", limit, offset, self.kwargs)
-        res = self.scheduler_client.list_tasks(
-            limit=limit,
-            offset=offset,
-            **self.kwargs,
-        )
+        res = self.scheduler_client.list_tasks(limit=limit, offset=offset, **self.kwargs)
 
         self._count = res.count
 
@@ -296,19 +288,13 @@ class SchedulerClient:
 
     def post_schedule(self, schedule: ScheduleRequest) -> ScheduleResponse:
         try:
-            res = self._client.post(
-                "/schedules",
-                json=schedule.model_dump(exclude_none=True),
-            )
+            res = self._client.post("/schedules", json=schedule.model_dump(exclude_none=True))
             res.raise_for_status()
             return ScheduleResponse.model_validate_json(res.content)
         except (ValidationError, HTTPStatusError, ConnectError):
             raise SchedulerValidationError(extra_message="Report schedule failed: ")
 
-    def list_tasks(
-        self,
-        **kwargs,
-    ) -> PaginatedTasksResponse:
+    def list_tasks(self, **kwargs) -> PaginatedTasksResponse:
         try:
             filter_key = "filters"
             params = {k: v for k, v in kwargs.items() if v is not None if k != filter_key}  # filter Nones from kwargs
@@ -397,6 +383,14 @@ class SchedulerClient:
         if return_type == "content":
             return res.content
         return res.json()
+
+    def get_scheduled_reports(self, **params) -> list[dict[str, Any]]:
+        try:
+            response = self._client.get("/schedules", params=params)
+            response.raise_for_status()
+        except HTTPStatusError:
+            logger.error("A HTTPStatusError occurred. Check logs for more info.")
+        return response.json()["results"]
 
 
 def scheduler_client(organization_code: str | None) -> SchedulerClient:

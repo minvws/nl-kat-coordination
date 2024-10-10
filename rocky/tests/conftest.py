@@ -97,10 +97,7 @@ def create_organization(name, organization_code):
 
 
 def create_member(user, organization):
-    Indemnification.objects.create(
-        user=user,
-        organization=organization,
-    )
+    Indemnification.objects.create(user=user, organization=organization)
 
     return OrganizationMember.objects.create(
         user=user,
@@ -147,9 +144,7 @@ def add_redteam_group_permissions(member):
 def add_client_group_permissions(member):
     group = Group.objects.get(name=GROUP_CLIENT)
     member.groups.add(group)
-    client_permissions = [
-        Permission.objects.get(codename="can_scan_organization").id,
-    ]
+    client_permissions = [Permission.objects.get(codename="can_scan_organization").id]
     group.permissions.set(client_permissions)
 
 
@@ -173,24 +168,14 @@ def organization_b():
 @pytest.fixture
 def superuser(django_user_model):
     return create_user(
-        django_user_model,
-        "superuser@openkat.nl",
-        "SuperSuper123!!",
-        "Superuser name",
-        "default",
-        superuser=True,
+        django_user_model, "superuser@openkat.nl", "SuperSuper123!!", "Superuser name", "default", superuser=True
     )
 
 
 @pytest.fixture
 def superuser_b(django_user_model):
     return create_user(
-        django_user_model,
-        "superuserB@openkat.nl",
-        "SuperBSuperB123!!",
-        "Superuser B name",
-        "default_b",
-        superuser=True,
+        django_user_model, "superuserB@openkat.nl", "SuperBSuperB123!!", "Superuser B name", "default_b", superuser=True
     )
 
 
@@ -206,24 +191,12 @@ def superuser_member_b(superuser_b, organization_b):
 
 @pytest.fixture
 def adminuser(django_user_model):
-    return create_user(
-        django_user_model,
-        "admin@openkat.nl",
-        "AdminAdmin123!!",
-        "Admin name",
-        "default_admin",
-    )
+    return create_user(django_user_model, "admin@openkat.nl", "AdminAdmin123!!", "Admin name", "default_admin")
 
 
 @pytest.fixture
 def adminuser_b(django_user_model):
-    return create_user(
-        django_user_model,
-        "adminB@openkat.nl",
-        "AdminBAdminB123!!",
-        "Admin B name",
-        "default_admin_b",
-    )
+    return create_user(django_user_model, "adminB@openkat.nl", "AdminBAdminB123!!", "Admin B name", "default_admin_b")
 
 
 @pytest.fixture
@@ -245,22 +218,14 @@ def admin_member_b(adminuser_b, organization_b):
 @pytest.fixture
 def redteamuser(django_user_model):
     return create_user(
-        django_user_model,
-        "redteamer@openkat.nl",
-        "RedteamRedteam123!!",
-        "Redteam name",
-        "default_redteam",
+        django_user_model, "redteamer@openkat.nl", "RedteamRedteam123!!", "Redteam name", "default_redteam"
     )
 
 
 @pytest.fixture
 def redteamuser_b(django_user_model):
     return create_user(
-        django_user_model,
-        "redteamerB@openkat.nl",
-        "RedteamBRedteamB123!!",
-        "Redteam B name",
-        "default_redteam_b",
+        django_user_model, "redteamerB@openkat.nl", "RedteamBRedteamB123!!", "Redteam B name", "default_redteam_b"
     )
 
 
@@ -280,23 +245,13 @@ def redteam_member_b(redteamuser_b, organization_b):
 
 @pytest.fixture
 def clientuser(django_user_model):
-    return create_user(
-        django_user_model,
-        "client@openkat.nl",
-        "ClientClient123!!",
-        "Client name",
-        "default_client",
-    )
+    return create_user(django_user_model, "client@openkat.nl", "ClientClient123!!", "Client name", "default_client")
 
 
 @pytest.fixture
 def clientuser_b(django_user_model):
     return create_user(
-        django_user_model,
-        "clientB@openkat.nl",
-        "ClientBClientB123!!",
-        "Client B name",
-        "default_client_b",
+        django_user_model, "clientB@openkat.nl", "ClientBClientB123!!", "Client B name", "default_client_b"
     )
 
 
@@ -325,13 +280,7 @@ def client_user_two_organizations(clientuser, organization, organization_b):
 
 @pytest.fixture
 def new_member(django_user_model, organization):
-    user = create_user(
-        django_user_model,
-        "cl1@openkat.nl",
-        "TestTest123!!",
-        "New user",
-        "default_new_user",
-    )
+    user = create_user(django_user_model, "cl1@openkat.nl", "TestTest123!!", "New user", "default_new_user")
     member = create_member(user, organization)
     member.status = OrganizationMember.STATUSES.NEW
     member.save()
@@ -340,13 +289,7 @@ def new_member(django_user_model, organization):
 
 @pytest.fixture
 def active_member(django_user_model, organization):
-    user = create_user(
-        django_user_model,
-        "cl2@openkat.nl",
-        "TestTest123!!",
-        "Active user",
-        "default_active_user",
-    )
+    user = create_user(django_user_model, "cl2@openkat.nl", "TestTest123!!", "Active user", "default_active_user")
     member = create_member(user, organization)
     member.status = OrganizationMember.STATUSES.ACTIVE
     member.save()
@@ -355,13 +298,7 @@ def active_member(django_user_model, organization):
 
 @pytest.fixture
 def blocked_member(django_user_model, organization):
-    user = create_user(
-        django_user_model,
-        "cl3@openkat.nl",
-        "TestTest123!!",
-        "Blocked user",
-        "default_blocked_user",
-    )
+    user = create_user(django_user_model, "cl3@openkat.nl", "TestTest123!!", "Blocked user", "default_blocked_user")
     member = create_member(user, organization)
     member.status = OrganizationMember.STATUSES.ACTIVE
     member.blocked = True
@@ -510,9 +447,7 @@ def network() -> Network:
 def url(network) -> URL:
     return URL(
         scan_profile=DeclaredScanProfile(
-            scan_profile_type="declared",
-            reference=Reference("URL|testnetwork|http://example.com/"),
-            level=ScanLevel.L1,
+            scan_profile_type="declared", reference=Reference("URL|testnetwork|http://example.com/"), level=ScanLevel.L1
         ),
         user_id=None,
         primary_key="URL|testnetwork|http://example.com/",
@@ -549,10 +484,7 @@ def hostname(network) -> Hostname:
 
 @pytest.fixture
 def website(ip_service: IPService, hostname: Hostname):
-    return Website(
-        ip_service=ip_service.reference,
-        hostname=hostname.reference,
-    )
+    return Website(ip_service=ip_service.reference, hostname=hostname.reference)
 
 
 @pytest.fixture
@@ -1027,10 +959,7 @@ def finding_type_kat_invalid_dnssec() -> KATFindingType:
 @pytest.fixture
 def tree_data_tls_findings_and_suites():
     return {
-        "root": {
-            "reference": "",
-            "children": {"ooi": [{"reference": "", "children": {}}]},
-        },
+        "root": {"reference": "", "children": {"ooi": [{"reference": "", "children": {}}]}},
         "store": {
             "Finding|Network|testnetwork|KAT-0001": {
                 "object_type": "Finding",
@@ -1078,7 +1007,7 @@ def tree_data_tls_findings_and_suites():
                             "key_exchange_algorithm": "ECDH",
                             "cipher_suite_code": "xc014",
                         },
-                    ],
+                    ]
                 },
             },
         },
@@ -1191,7 +1120,7 @@ parent_report = [
         observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
         parent_report=None,
         has_parent=False,
-    ),
+    )
 ]
 
 subreports = [
@@ -1348,47 +1277,24 @@ dns_report = [
         observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
         parent_report=None,
         has_parent=False,
-    ),
+    )
 ]
 
 
 @pytest.fixture
 def report_list_one_subreport():
-    return [
-        (
-            subreports[0],
-            [],
-        )
-    ]
+    return [(subreports[0], [])]
 
 
 @pytest.fixture
 def report_list_two_subreports():
-    return [
-        (
-            parent_report[0],
-            [
-                subreports[5],
-                subreports[6],
-            ],
-        )
-    ]
+    return [(parent_report[0], [subreports[5], subreports[6]])]
 
 
 @pytest.fixture
 def report_list_six_subreports():
     return [
-        (
-            parent_report[0],
-            [
-                subreports[0],
-                subreports[1],
-                subreports[2],
-                subreports[3],
-                subreports[4],
-                subreports[5],
-            ],
-        )
+        (parent_report[0], [subreports[0], subreports[1], subreports[2], subreports[3], subreports[4], subreports[5]])
     ]
 
 
@@ -1503,29 +1409,17 @@ class MockOctopoesAPIConnector:
         return self.oois[reference]
 
     def get_tree(
-        self,
-        reference: Reference,
-        valid_time: datetime,
-        types: set = frozenset(),
-        depth: int = 1,
+        self, reference: Reference, valid_time: datetime, types: set = frozenset(), depth: int = 1
     ) -> ReferenceTree:
         return self.tree[reference]
 
     def query(
-        self,
-        path: str,
-        valid_time: datetime,
-        source: Reference | str | None = None,
-        offset: int = 0,
-        limit: int = 50,
+        self, path: str, valid_time: datetime, source: Reference | str | None = None, offset: int = 0, limit: int = 50
     ) -> list[OOI]:
         return self.queries[path][source]
 
     def query_many(
-        self,
-        path: str,
-        valid_time: datetime,
-        sources: list[OOI | Reference | str],
+        self, path: str, valid_time: datetime, sources: list[OOI | Reference | str]
     ) -> list[tuple[str, OOIType]]:
         result = []
 
@@ -1587,12 +1481,7 @@ def listed_hostnames(network) -> list[Hostname]:
 
 @pytest.fixture
 def paginated_task_list(task):
-    return PaginatedTasksResponse(
-        count=1,
-        next="",
-        previous=None,
-        results=[task],
-    )
+    return PaginatedTasksResponse(count=1, next="", previous=None, results=[task])
 
 
 @pytest.fixture
@@ -1712,36 +1601,11 @@ def onboarding_collect_data():
         "Hostname|internet|mispo.es": {
             "input_ooi": "Hostname|internet|mispo.es",
             "records": [
-                {
-                    "type": "A",
-                    "ttl": 480,
-                    "name": "mispo.es",
-                    "content": "134.209.85.72",
-                },
-                {
-                    "type": "MX",
-                    "ttl": 480,
-                    "name": "mispo.es",
-                    "content": "10 mx.wijmailenveilig.nl.",
-                },
-                {
-                    "type": "NS",
-                    "ttl": 480,
-                    "name": "mispo.es",
-                    "content": "ns1.domaindiscount24.net.",
-                },
-                {
-                    "type": "NS",
-                    "ttl": 480,
-                    "name": "mispo.es",
-                    "content": "ns2.domaindiscount24.net.",
-                },
-                {
-                    "type": "NS",
-                    "ttl": 480,
-                    "name": "mispo.es",
-                    "content": "ns3.domaindiscount24.net.",
-                },
+                {"type": "A", "ttl": 480, "name": "mispo.es", "content": "134.209.85.72"},
+                {"type": "MX", "ttl": 480, "name": "mispo.es", "content": "10 mx.wijmailenveilig.nl."},
+                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns1.domaindiscount24.net."},
+                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns2.domaindiscount24.net."},
+                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns3.domaindiscount24.net."},
                 {
                     "type": "SOA",
                     "ttl": 480,
@@ -1948,165 +1812,20 @@ def get_aggregate_report_from_bytes():
             {"service": "keiko", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
         ],
         "config_oois": [],
-        "plugins": [
-            {
-                "required": True,
-                "enabled": False,
-                "name": "SSLCertificates",
-                "scan_level": 1,
-                "type": "boefje",
-                "description": "Scan SSL certificates of websites",
-            },
-            {
-                "required": True,
-                "enabled": False,
-                "name": "Security.txt downloader",
-                "scan_level": 2,
-                "type": "boefje",
-                "description": "Downloads the security.txt file from the target host.",
-            },
-            {
-                "required": True,
-                "enabled": False,
-                "name": "WebpageAnalysis",
-                "scan_level": 2,
-                "type": "boefje",
-                "description": "Downloads a resource and uses several different normalizers to analyze",
-            },
-            {
-                "required": True,
-                "enabled": False,
-                "name": "SSLScan",
-                "scan_level": 2,
-                "type": "boefje",
-                "description": "Scan SSL/TLS versions of websites",
-            },
-            {
-                "required": True,
-                "enabled": False,
-                "name": "RPKI",
-                "scan_level": 1,
-                "type": "boefje",
-                "description": "Check if an IPv4 or IPv6 address has a valid VRPS record.",
-            },
-            {
-                "required": True,
-                "enabled": False,
-                "name": "Nmap TCP",
-                "scan_level": 2,
-                "type": "boefje",
-                "description": "Defaults to top 250 TCP ports. Includes service detection.",
-            },
-            {
-                "required": True,
-                "enabled": True,
-                "name": "DnsRecords",
-                "scan_level": 1,
-                "type": "boefje",
-                "description": "Fetch the DNS record(s) of a hostname",
-            },
-            {
-                "required": True,
-                "enabled": False,
-                "name": "Testssl.sh Ciphers",
-                "scan_level": 2,
-                "type": "boefje",
-                "description": "Run testssl.sh Docker container and check ciphers",
-            },
-            {
-                "required": True,
-                "enabled": True,
-                "name": "Dnssec",
-                "scan_level": 1,
-                "type": "boefje",
-                "description": "Validates DNSSec of a hostname",
-            },
-            {
-                "required": False,
-                "enabled": False,
-                "name": "masscan",
-                "scan_level": 2,
-                "type": "boefje",
-                "description": "Quickly scan large amounts of IPs.",
-            },
-            {
-                "required": False,
-                "enabled": False,
-                "name": "Nmap IP range",
-                "scan_level": 2,
-                "type": "boefje",
-                "description": "Scan an IP range and store found IPs. Defaults to top-250 TCP and top-10 UDP on ranges "
-                "with 1024 addresses or less. Larger ranges are skipped by default.",
-            },
-            {
-                "required": False,
-                "enabled": False,
-                "name": "Shodan",
-                "scan_level": 1,
-                "type": "boefje",
-                "description": "Use Shodan to find open ports with vulnerabilities that are found on that port",
-            },
-            {
-                "required": False,
-                "enabled": False,
-                "name": "Nmap UDP",
-                "scan_level": 2,
-                "type": "boefje",
-                "description": "Defaults to top 250 UDP ports. Includes service detection.",
-            },
-            {
-                "required": False,
-                "enabled": False,
-                "name": "Nmap Ports",
-                "scan_level": 2,
-                "type": "boefje",
-                "description": "Scan a specific set of ports including service detection",
-            },
-        ],
-        "oois": [{"name": "mispo.es", "type": "Hostname", "scan_profile_level": 1, "scan_profile_type": "declared"}],
-        "report_types": [
-            {
-                "name": "IPv6 Report",
-                "description": "Check whether hostnames point to IPv6 addresses.",
-                "label_style": "4-light",
-            },
-            {
-                "name": "Mail Report",
-                "description": "System specific Mail Report that focusses on IP addresses and hostnames.",
-                "label_style": "2-light",
-            },
-            {
-                "name": "Name Server Report",
-                "description": "Name Server Report checks name servers on basic security standards.",
-                "label_style": "1-light",
-            },
-            {"name": "Open Ports Report", "description": "Find open ports of IP addresses", "label_style": "5-light"},
-            {
-                "name": "RPKI Report",
-                "description": "Shows whether the IP is covered by a valid RPKI ROA. For a hostname it shows the IP "
-                "addresses and whether they are covered by a valid RPKI ROA.",
-                "label_style": "4-light",
-            },
-            {
-                "name": "Safe Connections Report",
-                "description": "Shows whether the IPService contains safe ciphers.",
-                "label_style": "2-light",
-            },
-            {
-                "name": "System Report",
-                "description": "Combine IP addresses, hostnames and services into systems.",
-                "label_style": "6-light",
-            },
-            {
-                "name": "Vulnerability Report",
-                "description": "Vulnerabilities found are grouped for each system.",
-                "label_style": "5-light",
-            },
-            {
-                "name": "Web System Report",
-                "description": "Web System Reports check web systems on basic security standards.",
-                "label_style": "3-light",
-            },
-        ],
+        "input_data": {
+            "input_oois": ["Hostname|internet|mispo.es"],
+            "report_types": [
+                "ipv6-report",
+                "mail-report",
+                "name-server-report",
+                "open-ports-report",
+                "rpki-report",
+                "safe-connections-report",
+                "systems-report",
+                "vulnerability-report",
+                "web-system-report",
+            ],
+            "plugins": {"required": [], "optional": []},
+        },
     }
     return json.dumps(data).encode("utf-8")

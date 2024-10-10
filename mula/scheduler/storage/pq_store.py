@@ -138,11 +138,7 @@ class PriorityQueueStore:
 
     @retry()
     @exception_handler
-    def get_items(
-        self,
-        scheduler_id: str,
-        filters: FilterRequest | None,
-    ) -> tuple[list[models.Task], int]:
+    def get_items(self, scheduler_id: str, filters: FilterRequest | None) -> tuple[list[models.Task], int]:
         with self.dbconn.session.begin() as session:
             query = (
                 session.query(models.TaskDB)
@@ -156,10 +152,7 @@ class PriorityQueueStore:
             count = query.count()
             items_orm = query.all()
 
-            return (
-                [models.Task.model_validate(item_orm) for item_orm in items_orm],
-                count,
-            )
+            return ([models.Task.model_validate(item_orm) for item_orm in items_orm], count)
 
     @retry()
     @exception_handler

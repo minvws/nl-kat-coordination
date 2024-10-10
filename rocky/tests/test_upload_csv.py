@@ -102,8 +102,7 @@ def test_upload_bad_decoding(rf, redteam_member, mock_bytes_client):
 
 
 @pytest.mark.parametrize(
-    "example_input, input_type, expected_ooi_counts",
-    zip(CSV_EXAMPLES, INPUT_TYPES, EXPECTED_OOI_COUNTS),
+    "example_input, input_type, expected_ooi_counts", zip(CSV_EXAMPLES, INPUT_TYPES, EXPECTED_OOI_COUNTS)
 )
 def test_upload_csv(
     rf,

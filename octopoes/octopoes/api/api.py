@@ -131,11 +131,7 @@ def uncaught_exception_handler(_: Request, exc: Exception) -> None:
 
 @app.get("/health")
 def root_health() -> ServiceHealth:
-    return ServiceHealth(
-        service="octopoes",
-        healthy=True,
-        version=__version__,
-    )
+    return ServiceHealth(service="octopoes", healthy=True, version=__version__)
 
 
 @app.on_event("shutdown")

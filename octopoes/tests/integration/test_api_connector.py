@@ -22,12 +22,7 @@ if os.environ.get("CI") != "1":
 
 def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     network = Network(name="test")
-    octopoes_api_connector.save_declaration(
-        Declaration(
-            ooi=network,
-            valid_time=valid_time,
-        )
-    )
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
     hostnames = [Hostname(network=network.reference, name=f"test{i}") for i in range(10)]
     task_id = uuid.uuid4()
 
@@ -74,20 +69,10 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
 def test_history(octopoes_api_connector: OctopoesAPIConnector):
     network = Network(name="test")
     first_seen = datetime(year=2020, month=10, day=10, tzinfo=timezone.utc)  # XTDB only returns a precision of seconds
-    octopoes_api_connector.save_declaration(
-        Declaration(
-            ooi=network,
-            valid_time=first_seen,
-        )
-    )
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=first_seen))
     octopoes_api_connector.delete(network.reference, datetime(year=2020, month=10, day=11, tzinfo=timezone.utc))
     last_seen = datetime(year=2020, month=10, day=12, tzinfo=timezone.utc)
-    octopoes_api_connector.save_declaration(
-        Declaration(
-            ooi=network,
-            valid_time=last_seen,
-        )
-    )
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=last_seen))
 
     history = octopoes_api_connector.get_history(network.reference, with_docs=True)
     assert len(history) == 3
@@ -112,12 +97,7 @@ def test_history(octopoes_api_connector: OctopoesAPIConnector):
 
 def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     network = Network(name="test")
-    octopoes_api_connector.save_declaration(
-        Declaration(
-            ooi=network,
-            valid_time=valid_time,
-        )
-    )
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
 
     hostnames: list[OOI] = [Hostname(network=network.reference, name=f"test{i}") for i in range(10)]
 
@@ -164,13 +144,7 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
     )
 
     octopoes_api_connector.save_many_scan_profiles(
-        [
-            DeclaredScanProfile(
-                reference=ooi.reference,
-                level=ScanLevel.L2,
-            )
-            for ooi in all_new_oois + [network]
-        ],
+        [DeclaredScanProfile(reference=ooi.reference, level=ScanLevel.L2) for ooi in all_new_oois + [network]],
         valid_time,
     )
 
@@ -218,9 +192,7 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
     assert len(octopoes_api_connector.query(query, valid_time, hostnames[3])) == 0
 
     result = octopoes_api_connector.query_many(
-        query,
-        valid_time,
-        [hostnames[0], hostnames[1], hostnames[2], hostnames[3]],
+        query, valid_time, [hostnames[0], hostnames[1], hostnames[2], hostnames[3]]
     )
     assert len(result) == 3
     assert result[0][0] == hostnames[0].reference
@@ -232,20 +204,10 @@ def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector):
     import time
 
     network = Network(name="test")
-    octopoes_api_connector.save_declaration(
-        Declaration(
-            ooi=network,
-            valid_time=first_valid_time,
-        )
-    )
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=first_valid_time))
 
     ip = IPAddressV4(network=network.reference, address="10.10.10.10")
-    tcp_port = IPPort(
-        address=ip.reference,
-        protocol=Protocol.TCP,
-        port=3306,
-        state=PortState.OPEN,
-    )
+    tcp_port = IPPort(address=ip.reference, protocol=Protocol.TCP, port=3306, state=PortState.OPEN)
 
     octopoes_api_connector.save_observation(
         Observation(
@@ -278,12 +240,7 @@ def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector):
         )
     ]
 
-    udp_port = IPPort(
-        address=ip.reference,
-        protocol=Protocol.UDP,
-        port=53,
-        state=PortState.OPEN,
-    )
+    udp_port = IPPort(address=ip.reference, protocol=Protocol.UDP, port=53, state=PortState.OPEN)
 
     octopoes_api_connector.save_observation(
         Observation(
@@ -297,8 +254,7 @@ def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector):
     )
 
     octopoes_api_connector.save_scan_profile(
-        DeclaredScanProfile(reference=udp_port.reference, level=ScanLevel.L2),
-        second_valid_time,
+        DeclaredScanProfile(reference=udp_port.reference, level=ScanLevel.L2), second_valid_time
     )
 
     assert octopoes_api_connector.get(udp_port.reference, second_valid_time)

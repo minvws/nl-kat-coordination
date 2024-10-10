@@ -52,17 +52,11 @@ class SQLOrganisationStorage(SessionMixin, OrganisationStorage):
 
     @staticmethod
     def to_organisation_in_db(organisation: Organisation) -> OrganisationInDB:
-        return OrganisationInDB(
-            id=organisation.id,
-            name=organisation.name,
-        )
+        return OrganisationInDB(id=organisation.id, name=organisation.name)
 
     @staticmethod
     def to_organisation(organisation_in_db: OrganisationInDB) -> Organisation:
-        return Organisation(
-            id=organisation_in_db.id,
-            name=organisation_in_db.name,
-        )
+        return Organisation(id=organisation_in_db.id, name=organisation_in_db.name)
 
 
 def create_organisation_storage(session) -> SQLOrganisationStorage:

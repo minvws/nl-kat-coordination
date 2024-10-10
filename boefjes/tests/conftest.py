@@ -245,9 +245,7 @@ def unit_test_client(mock_plugin_service) -> TestClient:
     client = TestClient(app)
     _store = OrganisationStorageMemory({"test": Organisation(id="test", name="Test")})
 
-    services = {
-        "test": mock_plugin_service,
-    }
+    services = {"test": mock_plugin_service}
 
     def get_service(organisation_id: str):
         if organisation_id in services:

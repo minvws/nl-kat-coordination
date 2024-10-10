@@ -10,10 +10,7 @@ def test_crisis_room(rf, client_member, mock_crisis_room_octopoes):
     request = setup_request(rf.get("crisis_room"), client_member.user)
     request.resolver_match = resolve(reverse("crisis_room"))
 
-    mock_crisis_room_octopoes().count_findings_by_severity.return_value = {
-        "medium": 1,
-        "critical": 0,
-    }
+    mock_crisis_room_octopoes().count_findings_by_severity.return_value = {"medium": 1, "critical": 0}
 
     response = CrisisRoomView.as_view()(request)
 
@@ -51,10 +48,7 @@ def test_crisis_room_error(rf, client_user_two_organizations, mock_crisis_room_o
     request.resolver_match = resolve(reverse("crisis_room"))
 
     mock_crisis_room_octopoes().count_findings_by_severity.side_effect = [
-        {
-            "medium": 1,
-            "critical": 0,
-        },
+        {"medium": 1, "critical": 0},
         ConnectorException("error"),
     ]
 

@@ -282,10 +282,7 @@ def to_normalizer_meta(normalizer_meta_in_db: NormalizerMetaInDB) -> NormalizerM
 
     return NormalizerMeta(
         id=normalizer_meta_in_db.id,
-        normalizer=Normalizer(
-            id=normalizer_meta_in_db.normalizer_id,
-            version=normalizer_meta_in_db.normalizer_version,
-        ),
+        normalizer=Normalizer(id=normalizer_meta_in_db.normalizer_id, version=normalizer_meta_in_db.normalizer_version),
         started_at=normalizer_meta_in_db.started_at,
         ended_at=normalizer_meta_in_db.ended_at,
         raw_data=raw_meta,

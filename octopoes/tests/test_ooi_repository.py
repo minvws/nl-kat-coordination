@@ -40,9 +40,7 @@ class OOIRepositoryTest(TestCase):
 
         internet = Network(name="internet")
         internet2 = Network(name="internet2")
-        test = TestOOIClass(
-            multiple_refs=[internet.reference, internet2.reference],
-        )
+        test = TestOOIClass(multiple_refs=[internet.reference, internet2.reference])
         serial = self.repository.serialize(test)
         self.assertEqual(["Network|internet", "Network|internet2"], serial["TestOOIClass/multiple_refs"])
         self.assertEqual("TestOOIClass|test_id", serial["xt/id"])

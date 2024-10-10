@@ -87,23 +87,12 @@ class Settings(BaseSettings):
         ..., examples=["http://localhost:8001"], description="Octopoes API URL", validation_alias="OCTOPOES_API"
     )
     api: AnyHttpUrl = Field(
-        ...,
-        examples=["http://boefje:8000"],
-        description="The URL on which the boefjes API is available",
+        ..., examples=["http://boefje:8000"], description="The URL on which the boefjes API is available"
     )
     # Boefje server settings
-    api_host: str = Field(
-        "0.0.0.0",
-        description="Host address of the Boefje API server",
-    )
-    api_port: int = Field(
-        8000,
-        description="Host port of the Boefje API server",
-    )
-    docker_network: str = Field(
-        "bridge",
-        description="Docker network to run Boefjes in",
-    )
+    api_host: str = Field("0.0.0.0", description="Host address of the Boefje API server")
+    api_port: int = Field(8000, description="Host port of the Boefje API server")
+    docker_network: str = Field("bridge", description="Docker network to run Boefjes in")
     bytes_api: AnyHttpUrl = Field(
         ..., examples=["http://localhost:8002"], description="Bytes API URL", validation_alias="BYTES_API"
     )

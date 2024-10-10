@@ -28,8 +28,7 @@ def sort_by_severity_desc(findings) -> list[dict[str, Any]]:
 
 
 def generate_findings_metadata(
-    findings: FindingList,
-    severity_filter: Iterable[RiskLevelSeverity] | None = None,
+    findings: FindingList, severity_filter: Iterable[RiskLevelSeverity] | None = None
 ) -> list[dict[str, Any]]:
     findings_meta = []
 
