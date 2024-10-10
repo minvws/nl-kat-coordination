@@ -43,7 +43,7 @@ class LocalReportJobRunner(ReportJobRunner):
             raise JobRuntimeError("Failed to hydrate plugins from KATalogus") from e
 
         self.katalogus_client.organization = None
-        self.katalogus_client.organization_uri = None
+        self.katalogus_client.organization_uri = ""
 
         self.bytes_client.organization = report_task.organisation_id
         report_names = []

@@ -34,25 +34,30 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
     assert report_runner.bytes_client.upload_raw.mock_calls[1].kwargs["manual_mime_types"] == {"openkat/report"}
     assert report_runner.bytes_client.upload_raw.mock_calls[2].kwargs["manual_mime_types"] == {"openkat/report"}
 
-    assert report_runner.bytes_client.upload_raw.mock_calls[0].kwargs["raw"] ==  b'{"plugins":[]}'
-    assert [  # The order of oois is quite random so we assert on the union of last two calls
-        json.loads(report_runner.bytes_client.upload_raw.mock_calls[1].kwargs["raw"]),
-        json.loads(report_runner.bytes_client.upload_raw.mock_calls[2].kwargs["raw"]),
-    ] == [{
-        "report_data": {
-            "input_ooi":"Hostname|test|example.com",
-            "records":[],
-            "security":{"spf":True, "dkim":True, "dmarc":True, "dnssec":True, "caa":True},
-            "finding_types":[]
-        }
-    }, {
-        "report_data":{
-            "input_ooi":"Hostname|test|a.example.com",
-            "records":[],
-            "security":{"spf":True, "dkim":True, "dmarc":True, "dnssec":True, "caa":True},
-            "finding_types":[]
-        }
-    }]
+    assert report_runner.bytes_client.upload_raw.mock_calls[0].kwargs["raw"] == b'{"plugins":[]}'
+
+    # The order of the OOIs being processed is not guaranteed, so this is a simple workaround
+    both_calls = [
+        {
+            "report_data": {
+                "input_ooi": "Hostname|test|example.com",
+                "records": [],
+                "security": {"spf": True, "dkim": True, "dmarc": True, "dnssec": True, "caa": True},
+                "finding_types": [],
+            }
+        },
+        {
+            "report_data": {
+                "input_ooi": "Hostname|test|a.example.com",
+                "records": [],
+                "security": {"spf": True, "dkim": True, "dmarc": True, "dnssec": True, "caa": True},
+                "finding_types": [],
+            }
+        },
+    ]
+
+    assert json.loads(report_runner.bytes_client.upload_raw.mock_calls[1].kwargs["raw"]) in both_calls
+    assert json.loads(report_runner.bytes_client.upload_raw.mock_calls[2].kwargs["raw"]) in both_calls
 
     reports = octopoes_api_connector.list_reports(valid_time)
     assert reports.count == 1
@@ -60,6 +65,6 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
     report, subreports = reports.items[0]
     assert len(subreports) == 2
 
-    assert report.name == 'Concatenated report for 2 objects'
-    assert subreports[0].name == 'Concatenated Report'
-    assert subreports[1].name == 'Concatenated Report'
+    assert report.name == "Concatenated report for 2 objects"
+    assert subreports[0].name == "Concatenated Report"
+    assert subreports[1].name == "Concatenated Report"

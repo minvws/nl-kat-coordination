@@ -7,7 +7,7 @@ from django.conf import settings
 from reports.runner.local import LocalReportJobRunner
 from tools.models import Organization
 
-from octopoes.api.models import Declaration, Observation, ServiceHealth
+from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, DeclaredScanProfile, Reference
 from octopoes.models.ooi.certificate import X509Certificate
@@ -17,6 +17,7 @@ from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Networ
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import URL, HostnameHTTPURL, HTTPHeader, HTTPResource, SecurityTXT, Website
+from rocky.health import ServiceHealth
 
 
 @pytest.fixture
