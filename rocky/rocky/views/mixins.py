@@ -391,26 +391,27 @@ class ReportList:
 
         return subreports
 
-    def hydrate_report_list(self, reports: list[Report]) -> list[HydratedReport]:
+    def hydrate_report_list(self, reports: list[tuple[Report, list[Report | None]]]) -> list[HydratedReport]:
         hydrated_reports: list[HydratedReport] = []
 
         for report in reports:
             hydrated_report: HydratedReport = HydratedReport()
 
             parent_report, children_reports = report
+            filtered_children_reports = list(filter(None, children_reports))
 
-            hydrated_report.total_children_reports = len(children_reports)
+            hydrated_report.total_children_reports = len(filtered_children_reports)
 
             if len(parent_report.input_oois) > 0:
                 hydrated_report.total_objects = len(parent_report.input_oois)
             else:
-                hydrated_report.total_objects = len(self.get_children_input_oois(children_reports))
+                hydrated_report.total_objects = len(self.get_children_input_oois(filtered_children_reports))
 
-            hydrated_report.report_type_summary = self.report_type_summary(children_reports)
+            hydrated_report.report_type_summary = self.report_type_summary(filtered_children_reports)
 
             if not parent_report.has_parent:
                 hydrated_children_reports: list[Report] = []
-                for child_report in children_reports:
+                for child_report in filtered_children_reports:
                     if str(child_report.parent_report) == str(parent_report):
                         hydrated_children_reports.append(child_report)
                     if len(hydrated_children_reports) >= 5:  # We want to show only 5 children reports

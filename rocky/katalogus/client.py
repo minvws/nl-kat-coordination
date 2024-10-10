@@ -129,7 +129,7 @@ class KATalogusHTTPStatusError(KATalogusError):
 
 
 class KATalogusClientV1:
-    def __init__(self, base_uri: str, organization: str):
+    def __init__(self, base_uri: str, organization: str | None):
         self.session = httpx.Client(base_url=base_uri)
         self.organization = valid_organization_code(organization) if organization else organization
         self.organization_uri = f"/v1/organisations/{organization}"

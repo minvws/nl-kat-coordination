@@ -8,10 +8,12 @@ from queue import Queue
 import structlog
 from django.conf import settings
 from httpx import HTTPError
+from katalogus.client import get_katalogus
 from pydantic import ValidationError
 
 from reports.runner.local import LocalReportJobRunner
 from reports.runner.models import ReportJobRunner, WorkerManager
+from rocky.bytes_client import get_bytes_client
 from rocky.scheduler import SchedulerClient, Task, TaskStatus, scheduler_client
 
 logger = structlog.get_logger(__name__)
@@ -251,7 +253,7 @@ def _start_working(
 
 def get_runtime_manager() -> WorkerManager:
     return SchedulerWorkerManager(
-        LocalReportJobRunner(),
+        LocalReportJobRunner(get_katalogus(""), get_bytes_client("")),  # These are set dynamically. Needs a refactor.
         scheduler_client(None),
         settings.POOL_SIZE,
         settings.POLL_INTERVAL,

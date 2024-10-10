@@ -279,7 +279,7 @@ class OctopoesAPIConnector:
 
     def list_reports(
         self, valid_time: datetime, offset: int = DEFAULT_OFFSET, limit: int = DEFAULT_LIMIT
-    ) -> Paginated[Report]:
+    ) -> Paginated[tuple[Report, list[Report | None]]]:
         params: dict[str, str | int | list[str]] = {"valid_time": str(valid_time), "offset": offset, "limit": limit}
         res = self.session.get(f"/{self.client}/reports", params=params)
 

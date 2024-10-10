@@ -35,6 +35,7 @@ test:
 	python3 manage.py test
 
 testclean:
+	docker compose -f .ci/docker-compose.yml kill
 	docker compose -f .ci/docker-compose.yml down --remove-orphans
 	docker compose -f .ci/docker-compose.yml build
 

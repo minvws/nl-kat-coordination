@@ -16,7 +16,7 @@ logger = structlog.get_logger("bytes_client")
 
 
 class BytesClient:
-    def __init__(self, base_url: str, username: str, password: str, organization: str):
+    def __init__(self, base_url: str, username: str, password: str, organization: str | None):
         self.credentials = {"username": username, "password": password}
         self.session = httpx.Client(base_url=base_url)
         self.organization = organization
