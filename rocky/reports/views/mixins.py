@@ -73,8 +73,7 @@ def save_report_data(
 
     if len(report_data) > 1 or len(list(report_data.values())[0]) > 1:
         raw_id = bytes_client.upload_raw(
-            raw=ReportDataDict(input_data).model_dump_json().encode(),
-            manual_mime_types={"openkat/report"},
+            raw=ReportDataDict(input_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
         )
         name = now.strftime(parent_report_name)
         if not name or name.isspace():
@@ -249,7 +248,8 @@ class SaveAggregateReportMixin(BaseReportView):
 
         # Create the report
         report_data_raw_id = bytes_client.upload_raw(
-            raw=ReportDataDict(post_processed_data | self.get_input_data()).model_dump_json().encode(), manual_mime_types={"openkat/report"}
+            raw=ReportDataDict(post_processed_data | self.get_input_data()).model_dump_json().encode(),
+            manual_mime_types={"openkat/report"},
         )
         report_type = type(aggregate_report)
         name = now.strftime(report_names[0][1])
@@ -277,7 +277,8 @@ class SaveAggregateReportMixin(BaseReportView):
         for ooi, types in report_data.items():
             for report_type, data in types.items():
                 bytes_client.upload_raw(
-                    raw=ReportDataDict(data | self.get_input_data()).model_dump_json().encode(), manual_mime_types={"openkat/report"}
+                    raw=ReportDataDict(data | self.get_input_data()).model_dump_json().encode(),
+                    manual_mime_types={"openkat/report"},
                 )
 
         return report_ooi
