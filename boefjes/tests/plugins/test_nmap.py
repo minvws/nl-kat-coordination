@@ -26,7 +26,7 @@ def test_normalizer():
 
 
 def get_pattern():
-    max_65535 = r"(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|[1-5]\d{0,4}|\d)"
+    max_65535 = r"(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|[1-5]\d{4}|\d{1,4})"
     max_65535_or_port_range = f"({max_65535}|{max_65535}-{max_65535})"
     one_or_comma_separated = f"^{max_65535_or_port_range}$|^{max_65535_or_port_range}(,{max_65535_or_port_range})+$"
 
@@ -35,7 +35,7 @@ def get_pattern():
 
 def test_single_port_pattern(local_repository):
     schema = local_repository.schema("nmap-ports")
-    for single_port in ["1", "2", "20", "200", "2000", "20000", "65535"]:
+    for single_port in ["1", "2", "20", "80", "200", "2000", "20000", "65535"]:
         assert get_pattern().search(single_port) is not None
         validate(instance={"PORTS": single_port}, schema=schema)
 
@@ -64,7 +64,7 @@ def test_port_range_pattern(local_repository):
 
 def test_combined(local_repository):
     schema = local_repository.schema("nmap-ports")
-    for port_range in ["1,1-65000", "1,2,234,4300-5999,1"]:
+    for port_range in ["1,1-65000", "1,2,234,4300-5999,1", "22,111,137,80-100"]:
         assert get_pattern().search(port_range) is not None
         validate(instance={"PORTS": port_range}, schema=schema)
 
