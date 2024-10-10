@@ -444,7 +444,7 @@ class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["enabled_plugins"] = self.all_plugins_enabled()
+        context["enabled_plugins"] = self.plugins_enabled()
         context["plugin_data"] = self.get_plugins_data()
         context["plugins"] = self.plugins
         return context
