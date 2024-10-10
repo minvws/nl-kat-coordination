@@ -23,7 +23,18 @@ class FindingsReport(Report):
     id = "findings-report"
     name = _("Findings Report")
     description = _("Shows all the finding types and their occurrences.")
-    plugins: ReportPlugins = {"required": set(), "optional": set()}
+    plugins: ReportPlugins = {
+        "required": {
+            "dns-records",
+            "nmap",
+            "nmap-udp",
+            "webpage-analysis",
+            "ssl-version",
+            "ssl-certificates",
+            "testssl-sh-ciphers",
+        },
+        "optional": {"snyk", "service_banner", "shodan", "leakix"},
+    }
     input_ooi_types = ALL_TYPES
     template_path = "findings_report/report.html"
     label_style = "3-light"
