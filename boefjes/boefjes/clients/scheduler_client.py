@@ -1,6 +1,8 @@
 import datetime
+import json
 import uuid
 from enum import Enum
+from typing import Any
 
 from httpx import Client, HTTPTransport, Response
 from pydantic import BaseModel, TypeAdapter
@@ -40,9 +42,8 @@ class Task(BaseModel):
 
 class Filter(BaseModel):
     column: str
-    field: str
     operator: str
-    value: list[str]
+    value: Any
 
 
 class QueuePopRequest(BaseModel):
@@ -82,7 +83,18 @@ class SchedulerAPIClient(SchedulerClientInterface):
         return TypeAdapter(list[Queue]).validate_json(response.content)
 
     def pop_item(self, queue_id: str) -> Task | None:
-        response = self._session.post(f"/queues/{queue_id}/pop")
+        response = self._session.post(
+            f"/queues/{queue_id}/pop",
+            data=QueuePopRequest(
+                filters=[
+                    Filter(
+                        column="data",
+                        operator="<@",
+                        value=json.dumps({"requirements": self.task_capabilities}),
+                    ),
+                ],
+            ).model_dump_json(),
+        )
         self._verify_response(response)
 
         return TypeAdapter(Task | None).validate_json(response.content)

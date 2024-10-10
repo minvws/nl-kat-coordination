@@ -371,6 +371,7 @@ class Scheduler(abc.ABC):
             NotAllowedError: When the scheduler is disabled.
             QueueEmptyError: When the queue is empty.
         """
+        self.logger.info("SOUF Popping item from queue!")
         if not self.is_enabled():
             self.logger.warning(
                 "Scheduler is disabled, not popping item from queue",
