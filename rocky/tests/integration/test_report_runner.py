@@ -66,5 +66,6 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
     assert len(subreports) == 2
 
     assert report.name == "Concatenated report for 2 objects"
-    assert subreports[0].name == "Concatenated Report"
-    assert subreports[1].name == "Concatenated Report"
+    assert {x.name for x in subreports} == {
+        "DNS Report for Hostname|test|a.example.com in 2024" ,"DNS Report for Hostname|test|example.com in 2024"
+    }

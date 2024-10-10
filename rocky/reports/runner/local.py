@@ -49,11 +49,12 @@ class LocalReportJobRunner(ReportJobRunner):
         report_names = []
         oois_count = 0
 
-        for report_type, data in report_data.items():
+        for report_type_id, data in report_data.items():
             oois_count += len(data)
+            report_type = get_report_by_id(report_type_id)
 
             for ooi in data:
-                report_name = recipe.subreport_name_format.format(ooi=ooi, report_type=report_type)
+                report_name = recipe.subreport_name_format.format(ooi=ooi, report_type=str(report_type.name))
                 report_names.append((report_name, report_name))
 
         save_report_data(
