@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-09 14:37+0000\n"
+"POT-Creation-Date: 2024-10-10 09:50+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3792,8 +3792,8 @@ msgid ""
 "To make the report names more descriptive, you can include placeholders for "
 "the object name, the report type and/or the reference date. Use the "
 "placeholder \"{ooi}\" for the object name, \"{report type}\" for the report "
-"type and use a <a href=\"https://strftime.org/\" target=\"_blank\">Python "
-"strftime code</a> for the reference date."
+"type and use a <a href=\"https://strftime.org/\" target=\"_blank\" "
+"rel=\"noopener\">Python strftime code</a> for the reference date."
 msgstr ""
 
 #: reports/templates/partials/report_names_header.html
@@ -3807,8 +3807,8 @@ msgstr ""
 msgid ""
 "Give your report(s) a custom name and optionally add the reports' reference "
 "date to the name. To do so you can select a standard option or use a <a "
-"href=\"https://strftime.org/\" target=\"_blank\">Python strftime code</a> in "
-"the report name."
+"href=\"https://strftime.org/\" target=\"_blank\" rel=\"noopener\">Python "
+"strftime code</a> in the report name."
 msgstr ""
 
 #: reports/templates/partials/report_navigation.html
@@ -3955,7 +3955,7 @@ msgid "There are no required plugins."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-msgid "Good job! All suggested plugins are enabled"
+msgid "Good job! All suggested plugins are enabled."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
