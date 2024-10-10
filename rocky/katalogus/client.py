@@ -24,7 +24,7 @@ logger = structlog.get_logger("katalogus_client")
 
 
 def valid_plugin_id(plugin_id: str) -> str:
-    # plugin IDs should alphanumeric, including dashed, underscores and dots. 
+    # plugin IDs should alphanumeric, including dashes, underscores and dots.
     if not plugin_id.replace("-", "").replace("_", "").replace(".", "").isalnum():
         raise ValueError("Plugin ID is not valid")
 
