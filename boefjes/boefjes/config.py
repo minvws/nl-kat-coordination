@@ -127,7 +127,6 @@ class Settings(BaseSettings):
             ["network/internet", "network/dentist", "network/remote-location", "ipv6"],
             ["network/dentist", "ipv4"],
         ],
-        validation_alias="TASK_CAPABILITIES",
     )
 
     logging_format: Literal["text", "json"] = Field("text", description="Logging format")

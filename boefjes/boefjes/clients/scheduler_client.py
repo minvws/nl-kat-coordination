@@ -42,6 +42,7 @@ class Task(BaseModel):
 
 class Filter(BaseModel):
     column: str
+    field: str
     operator: str
     value: Any
 
@@ -87,12 +88,8 @@ class SchedulerAPIClient(SchedulerClientInterface):
             f"/queues/{queue_id}/pop",
             data=QueuePopRequest(
                 filters=[
-                    Filter(
-                        column="data",
-                        operator="<@",
-                        value=json.dumps({"requirements": self.task_capabilities}),
-                    ),
-                ],
+                    Filter(column="data", field="requirements", operator="<@", value=json.dumps(self.task_capabilities))
+                ]
             ).model_dump_json(),
         )
         self._verify_response(response)
