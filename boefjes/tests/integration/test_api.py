@@ -251,6 +251,11 @@ def test_basic_settings_api(test_client, organisation):
     response = test_client.get(f"/v1/organisations/{organisation.id}/{plug}/settings")
     assert response.json() == {}
 
+    nmap_ports = "nmap-ports"
+    response = test_client.put(f"/v1/organisations/{organisation.id}/{nmap_ports}/settings", json={"PORTS": "80"})
+    assert response.status_code == 200
+    assert test_client.get(f"/v1/organisations/{organisation.id}/{nmap_ports}/settings").json() == {"PORTS": "80"}
+
 
 def test_clone_settings(test_client, organisation):
     plug = "dns-records"

@@ -1,3 +1,4 @@
+import structlog
 from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
 from django.http import HttpResponseRedirect
@@ -7,6 +8,8 @@ from django.views.generic import TemplateView
 from httpx import HTTPError, HTTPStatusError, codes
 
 from katalogus.views.mixins import SinglePluginView
+
+logger = structlog.get_logger(__name__)
 
 
 class PluginSettingsDeleteView(OrganizationPermissionRequiredMixin, SinglePluginView, TemplateView):
@@ -55,6 +58,7 @@ class PluginSettingsDeleteView(OrganizationPermissionRequiredMixin, SinglePlugin
 
     def delete(self, request, *args, **kwargs):
         try:
+            logger.info("Deleting plugin settings", event_code=800024, plugin=self.plugin.name)
             self.katalogus_client.delete_plugin_settings(self.plugin.id)
             messages.add_message(
                 request, messages.SUCCESS, _("Settings for plugin {} successfully deleted.").format(self.plugin.name)

@@ -62,11 +62,9 @@
             {% endif %}
             <h3>{% translate "Suggested plugins" %}</h3>
             {% if enabled_plugins.optional %}
-                <p>{% translate "Good job! All suggested plugins are enabled" %}</p>
+                <p>{% translate "Good job! All suggested plugins are enabled." %}</p>
             {% elif plugins.optional %}
-                <p>
-                    {% translate "This report requires at least one of the following plugins to be enabled to generate the report:" %}
-                </p>
+                <p>{% translate "The following plugins are optional to generate the report:" %}</p>
                 <div class="optional-plugin-container hide-overflow">
                     <div class="toolbar">
                         <div class="checkbox">
