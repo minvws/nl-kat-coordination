@@ -38,7 +38,8 @@ override_dh_virtualenv:
 	&& $(DH_VENV_DIR)/bin/python manage.py collectstatic --noinput --clear \
 	&& $(DH_VENV_DIR)/bin/python manage.py compress \
 	&& $(DH_VENV_DIR)/bin/python manage.py compilemessages
-	find static -type f -exec install -D "{}" "$(DESTDIR)/usr/share/kat-rocky/{}" \;
+	find static -type f -exec install -m 644 -D "{}" "$(DESTDIR)/usr/share/kat-rocky/{}" \;
+	find components -type f -name *.html -exec install -m 644 -D "{}" "$(DH_VENV_DIR)/lib/`py3versions -d`/site-packages/{}" \;
 
 
 # remove pip to prevent mutation of venv
