@@ -24,8 +24,16 @@ class FindingsReport(Report):
     name = _("Findings Report")
     description = _("Shows all the finding types and their occurrences.")
     plugins: ReportPlugins = {
-        "required": {"nmap", "nmap-udp", "webpage-analysis", "ssl-version", "ssl-certificates", "testssl-sh-ciphers"},
-        "optional": {"snyk", "service_banner"},
+        "required": {
+            "dns-records",
+            "nmap",
+            "nmap-udp",
+            "webpage-analysis",
+            "ssl-version",
+            "ssl-certificates",
+            "testssl-sh-ciphers",
+        },
+        "optional": {"snyk", "service_banner", "shodan", "leakix"},
     }
     input_ooi_types = ALL_TYPES
     template_path = "findings_report/report.html"
