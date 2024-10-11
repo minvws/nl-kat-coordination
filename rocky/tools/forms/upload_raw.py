@@ -65,7 +65,7 @@ class UploadRawForm(BaseRockyForm):
         cleaned_data = super().clean()
 
         date = self.cleaned_data["date"]
-        ooi_id = self.cleaned_data["ooi_id"]
+        ooi_id = self.data["ooi_id"]
 
         # date should not be in the future
         if date > datetime.now(tz=timezone.utc):
