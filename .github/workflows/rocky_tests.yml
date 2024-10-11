@@ -10,10 +10,12 @@ on:
     paths:
       - octopoes/**
       - rocky/**
+      - .github/workflows/rocky_test.yml
   pull_request:
     paths:
       - octopoes/**
       - rocky/**
+      - .github/workflows/rocky_test.yml
 
 jobs:
   test:
