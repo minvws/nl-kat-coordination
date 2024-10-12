@@ -164,7 +164,7 @@ services:
       target: dev
       args:
         ENVIRONMENT: dev
-    command: python3 manage.py worker
+    command: worker
     volumes:
       - ./rocky:/app/rocky
       - ./octopoes/octopoes:/app/rocky/octopoes
