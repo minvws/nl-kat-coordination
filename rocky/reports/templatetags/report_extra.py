@@ -1,3 +1,5 @@
+from typing import Any
+
 from django import template
 
 from reports.report_types.helpers import get_report_by_id
@@ -8,6 +10,11 @@ register = template.Library()
 @register.filter
 def sum_attribute(checks, attribute):
     return sum(int(check[attribute]) for check in checks)
+
+
+@register.filter
+def sum_findings(data: dict[str, Any]) -> int:
+    return sum(int(ip["summary"]["total_findings"]) for ip in data.values())
 
 
 @register.filter
