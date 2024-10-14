@@ -6,7 +6,6 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
-from reports.report_types.helpers import get_ooi_types_from_aggregate_report
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
     OOISelectionView,
@@ -60,7 +59,7 @@ class OOISelectionAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggr
     template_name = "aggregate_report/select_oois.html"
     breadcrumbs_step = 3
     current_step = 1
-    ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
+    report_type = AggregateOrganisationReport
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -80,7 +79,6 @@ class ReportTypesSelectionAggregateReportView(
     breadcrumbs_step = 4
     current_step = 2
     report_type = AggregateOrganisationReport
-    ooi_types = get_ooi_types_from_aggregate_report(report_type)
 
 
 class SetupScanAggregateReportView(
@@ -93,6 +91,7 @@ class SetupScanAggregateReportView(
     template_name = "aggregate_report/setup_scan.html"
     breadcrumbs_step = 5
     current_step = 3
+    report_type = AggregateOrganisationReport
 
 
 class ExportSetupAggregateReportView(

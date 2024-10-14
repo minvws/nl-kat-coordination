@@ -31,6 +31,8 @@ from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import AggregateReport, BaseReport, Report, report_plugins_union
 from reports.report_types.helpers import (
     REPORTS,
+    get_ooi_types_from_aggregate_report,
+    get_ooi_types_with_report,
     get_report_by_id,
     get_report_types_for_oois,
     get_report_types_from_aggregate_report,
@@ -184,6 +186,13 @@ class BaseReportView(OOIFilterView):
 
     def get_total_oois(self):
         return len(self.selected_oois)
+
+    def get_ooi_types(self):
+        if self.report_type == AggregateOrganisationReport:
+            return get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
+        if self.report_type == MultiOrganizationReport:
+            return MultiOrganizationReport.input_ooi_types
+        return get_ooi_types_with_report()
 
     def get_oois(self) -> list[OOI]:
         if self.all_oois_selected():
@@ -623,8 +632,11 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     def get_template_names(self):
         if self.report_ooi.report_type and issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
             return ["aggregate_report.html"]
-        else:
-            return ["generate_report.html"]
+        if self.report_ooi.report_type and issubclass(
+            get_report_by_id(self.report_ooi.report_type), MultiOrganizationReport
+        ):
+            return ["multi_report.html"]
+        return ["generate_report.html"]
 
     def get_children_reports(self) -> list[ReportOOI]:
         return [
@@ -737,10 +749,12 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     def get_report_data(self):
         if issubclass(get_report_by_id(self.report_ooi.report_type), ConcatenatedReport):
             return self.get_report_data_concatenated_report()
-        elif issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
+        if issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
             return self.get_report_data_aggregate_report()
-        else:
-            return self.get_report_data_single_report()
+        if issubclass(get_report_by_id(self.report_ooi.report_type), MultiOrganizationReport):
+            return self.get_report_data_aggregate_report()
+
+        return self.get_report_data_single_report()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -772,5 +786,8 @@ class ViewReportPDFView(ViewReportView, WeasyTemplateResponseMixin):
     def get_template_names(self):
         if self.report_ooi.report_type and issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
             return ["aggregate_report_pdf.html"]
-        else:
-            return ["generate_report_pdf.html"]
+        if self.report_ooi.report_type and issubclass(
+            get_report_by_id(self.report_ooi.report_type), MultiOrganizationReport
+        ):
+            return ["multi_report_pdf.html"]
+        return ["generate_report_pdf.html"]

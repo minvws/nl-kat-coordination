@@ -63,13 +63,13 @@ class MultiOrganizationReport(MultiReport):
 
                 tags[tag].append(report_data["organization_code"])
 
-            aggregate_data = report_data["data"]["post_processed_data"]
+            aggregate_data = report_data["data"]
             total_critical_vulnerabilities += aggregate_data["summary"]["Critical vulnerabilities"]
             total_findings += aggregate_data["total_findings"]
             total_systems += aggregate_data["total_systems"]
             total_hostnames += aggregate_data["total_hostnames"]
 
-            for compliance in report_data["data"]["post_processed_data"]["basic_security"]["summary"].values():
+            for compliance in report_data["data"]["basic_security"]["summary"].values():
                 for counts in compliance.values():
                     basic_security["total"] += counts["total"]
                     basic_security["compliant"] += counts["number_of_compliant"]
