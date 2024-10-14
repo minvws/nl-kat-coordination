@@ -22,6 +22,7 @@ from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference, ScanLevel
 from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.ooi.findings import KATFindingType
 
 MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought to be reasonable
 
@@ -104,7 +105,11 @@ class BoefjeHandler(Handler):
                     reference, valid_time=datetime.now(timezone.utc)
                 )
             except ObjectNotFoundException as e:
-                raise ObjectNotFoundException(f"Object {reference} not found in Octopoes") from e
+                if reference.class_type == KATFindingType:
+                    logger.exception("Object {%s} not found in Octopoes", e)
+                    return
+                else:
+                    raise ObjectNotFoundException(f"Object {reference} not found in Octopoes") from e
 
             boefje_meta.arguments["input"] = ooi.serialize()
 
