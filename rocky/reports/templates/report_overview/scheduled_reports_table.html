@@ -48,9 +48,9 @@
                             <td></td>
                         {% endif %}
                     </tr>
-                    {% if schedule.reports %}
-                        <tr class="expando-row">
-                            <td colspan="6">
+                    <tr class="expando-row">
+                        <td colspan="6">
+                            {% if schedule.reports %}
                                 <table>
                                     <caption class="visually-hidden">{% translate "Scheduled Reports:" %}</caption>
                                     <thead>
@@ -81,9 +81,13 @@
                                         {% endfor %}
                                     </tbody>
                                 </table>
-                            </td>
-                        </tr>
-                    {% endif %}
+                            {% endif %}
+                            <div class="horizontal-view toolbar">
+                                <a class="button ghost"
+                                   href="{% ooi_url "ooi_edit" schedule.recipe organization.code %}"><span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit report recipe" %}</a>
+                            </div>
+                        </td>
+                    </tr>
                 {% endif %}
             {% endfor %}
         </tbody>
