@@ -4,9 +4,7 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("tools", "0001_squashed_0041_merge_20230731_1131"),
-    ]
+    dependencies = [("tools", "0001_squashed_0041_merge_20230731_1131")]
 
     operations = [
         migrations.AlterModelOptions(
@@ -25,5 +23,5 @@ class Migration(migrations.Migration):
                     ("can_recalculate_bits", "Can recalculate bits"),
                 )
             },
-        ),
+        )
     ]

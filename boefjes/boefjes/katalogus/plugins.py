@@ -1,8 +1,11 @@
 import datetime
 from functools import partial
 
+import structlog
+from croniter import croniter
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.responses import FileResponse, JSONResponse, Response
+from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import BaseModel, Field, field_validator
 
@@ -15,13 +18,13 @@ from boefjes.dependencies.plugins import (
 from boefjes.katalogus.organisations import check_organisation_exists
 from boefjes.models import FilterParameters, PaginationParameters, PluginType
 from boefjes.sql.plugin_storage import get_plugin_storage
-from boefjes.storage.interfaces import PluginStorage
+from boefjes.storage.interfaces import DuplicatePlugin, IntegrityError, NotAllowed, PluginStorage
 
 router = APIRouter(
-    prefix="/organisations/{organisation_id}",
-    tags=["plugins"],
-    dependencies=[Depends(check_organisation_exists)],
+    prefix="/organisations/{organisation_id}", tags=["plugins"], dependencies=[Depends(check_organisation_exists)]
 )
+
+logger = structlog.get_logger(__name__)
 
 
 # check if query matches plugin id, name or description
@@ -52,10 +55,7 @@ def list_plugins(
 
     # filter plugins by id, name or description
     if filter_params.q is not None:
-        plugins = filter(
-            partial(_plugin_matches_query, query=filter_params.q),
-            plugins,
-        )
+        plugins = filter(partial(_plugin_matches_query, query=filter_params.q), plugins)
 
     # filter plugins by type
     if filter_params.type is not None:
@@ -81,9 +81,7 @@ def list_plugins(
 
 @router.get("/plugins/{plugin_id}", response_model=PluginType)
 def get_plugin(
-    plugin_id: str,
-    organisation_id: str,
-    plugin_service: PluginService = Depends(get_plugin_service),
+    plugin_id: str, organisation_id: str, plugin_service: PluginService = Depends(get_plugin_service)
 ) -> PluginType:
     try:
         with plugin_service as p:
@@ -94,14 +92,17 @@ def get_plugin(
 
 @router.post("/plugins", status_code=status.HTTP_201_CREATED)
 def add_plugin(plugin: PluginType, plugin_service: PluginService = Depends(get_plugin_service)):
-    with plugin_service as service:
-        plugin.static = False  # Creation through the API implies that these cannot be static
+    try:
+        with plugin_service as service:
+            plugin.static = False  # Creation through the API implies that these cannot be static
 
-        if plugin.type == "boefje":
-            return service.create_boefje(plugin)
+            if plugin.type == "boefje":
+                return service.create_boefje(plugin)
 
-        if plugin.type == "normalizer":
-            return service.create_normalizer(plugin)
+            if plugin.type == "normalizer":
+                return service.create_normalizer(plugin)
+    except DuplicatePlugin as error:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, error.message)
 
     raise HTTPException(status.HTTP_400_BAD_REQUEST, "Creation of Bits is not supported")
 
@@ -131,6 +132,8 @@ class BoefjeIn(BaseModel):
     consumes: set[str] = Field(default_factory=set)
     produces: set[str] = Field(default_factory=set)
     boefje_schema: dict | None = None
+    cron: str | None = None
+    interval: int | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
 
@@ -138,20 +141,33 @@ class BoefjeIn(BaseModel):
     @classmethod
     def json_schema_valid(cls, schema: dict | None) -> dict | None:
         if schema is not None:
-            Draft202012Validator.check_schema(schema)
-            return schema
+            try:
+                Draft202012Validator.check_schema(schema)
+            except SchemaError as e:
+                raise ValueError("The schema field is not a valid JSON schema") from e
 
-        return None
+        return schema
+
+    @field_validator("cron")
+    @classmethod
+    def cron_valid(cls, cron: str | None) -> str | None:
+        if cron is not None:
+            croniter(cron)  # Raises a ValueError
+
+        return cron
 
 
 @router.patch("/boefjes/{boefje_id}", status_code=status.HTTP_204_NO_CONTENT)
-def update_boefje(
-    boefje_id: str,
-    boefje: BoefjeIn,
-    storage: PluginStorage = Depends(get_plugin_storage),
-):
-    with storage as p:
-        p.update_boefje(boefje_id, boefje.model_dump(exclude_unset=True))
+def update_boefje(boefje_id: str, boefje: BoefjeIn, storage: PluginStorage = Depends(get_plugin_storage)):
+    # todo: update boefje should be done in the plugin service
+    try:
+        with storage as p:
+            try:
+                p.update_boefje(boefje_id, boefje.model_dump(exclude_unset=True))
+            except NotAllowed:
+                raise HTTPException(status.HTTP_403_FORBIDDEN, "Updating a static plugin is not allowed")
+    except IntegrityError as error:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, error.message)
 
 
 @router.delete("/boefjes/{boefje_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -176,9 +192,7 @@ class NormalizerIn(BaseModel):
 
 @router.patch("/normalizers/{normalizer_id}", status_code=status.HTTP_204_NO_CONTENT)
 def update_normalizer(
-    normalizer_id: str,
-    normalizer: NormalizerIn,
-    storage: PluginStorage = Depends(get_plugin_storage),
+    normalizer_id: str, normalizer: NormalizerIn, storage: PluginStorage = Depends(get_plugin_storage)
 ):
     with storage as p:
         p.update_normalizer(normalizer_id, normalizer.model_dump(exclude_unset=True))
@@ -196,18 +210,13 @@ def get_plugin_schema(plugin_id: str, plugin_service: PluginService = Depends(ge
 
 
 @router.get("/plugins/{plugin_id}/cover.jpg", include_in_schema=False)
-def get_plugin_cover(
-    plugin_id: str,
-    plugin_service: PluginService = Depends(get_plugin_service),
-) -> FileResponse:
+def get_plugin_cover(plugin_id: str, plugin_service: PluginService = Depends(get_plugin_service)) -> FileResponse:
     return FileResponse(plugin_service.cover(plugin_id))
 
 
 @router.get("/plugins/{plugin_id}/description.md", include_in_schema=False)
 def get_plugin_description(
-    plugin_id: str,
-    organisation_id: str,
-    plugin_service: PluginService = Depends(get_plugin_service),
+    plugin_id: str, organisation_id: str, plugin_service: PluginService = Depends(get_plugin_service)
 ) -> Response:
     return Response(plugin_service.description(plugin_id, organisation_id))
 

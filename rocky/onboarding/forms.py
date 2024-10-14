@@ -24,16 +24,9 @@ class OnboardingSetClearanceLevelForm(forms.Form):
         help_text=_(
             "Boefjes that has a scan level below or equal to the clearance level, is permitted to scan an object."
         ),
-        error_messages={
-            "level": {
-                "required": _("Please select a clearance level to proceed."),
-            },
-        },
+        error_messages={"level": {"required": _("Please select a clearance level to proceed.")}},
         widget=ClearanceLevelSelect(
-            choices=SCAN_LEVEL_CHOICES,
-            attrs={
-                "aria-describedby": _("explanation-clearance-level"),
-            },
+            choices=SCAN_LEVEL_CHOICES, attrs={"aria-describedby": _("explanation-clearance-level")}
         ),
     )
 

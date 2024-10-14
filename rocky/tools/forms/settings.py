@@ -31,18 +31,9 @@ PIE_SCALE_EFFORT_CHOICES: Choices = [
     ("high", _("high")),
 ]
 
-PIE_SCALE_CHOICES: Choices = [
-    BLANK_CHOICE,
-    ("low", _("low")),
-    ("medium", _("medium")),
-    ("high", _("high")),
-]
+PIE_SCALE_CHOICES: Choices = [BLANK_CHOICE, ("low", _("low")), ("medium", _("medium")), ("high", _("high"))]
 
-CLEARANCE_TYPE_CHOICES = [
-    ("declared", _("Declared")),
-    ("inherited", _("Inherited")),
-    ("empty", _("Empty")),
-]
+CLEARANCE_TYPE_CHOICES = [("declared", _("Declared")), ("inherited", _("Inherited")), ("empty", _("Empty"))]
 SCAN_LEVEL_CHOICES = [BLANK_CHOICE] + SCAN_LEVEL.choices
 
 MANUAL_FINDING_ID_PREFIX = "KAT-"
@@ -59,9 +50,17 @@ OBSERVED_AT_HELP_TEXT = _(
     "Select a datetime to change the view to represent that moment in time."
 )
 
+BOEFJE_CONTAINER_IMAGE_HELP_TEXT = mark_safe(
+    _(
+        "<p>The name of the Docker image. For example: <i>'ghcr.io/minvws/openkat/nmap'</i>. "
+        "In OpenKAT, all Boefjes with the same container image will be seen as 'variants' and will be "
+        "shown together on the Boefje detail page. </p> "
+    )
+)
+
 BOEFJE_DESCRIPTION_HELP_TEXT = mark_safe(
     _(
-        "<p>A description of the boefje explaining in short what it can do. "
+        "<p>A description of the Boefje explaining in short what it can do. "
         "This will both be displayed inside the KAT-alogus and on the Boefje details page.</p> "
     )
 )

@@ -1,8 +1,10 @@
-import multiprocessing as mp
+import multiprocessing
 import os
 import signal
 import sys
 import time
+from multiprocessing.context import ForkContext
+from multiprocessing.process import BaseProcess
 from queue import Queue
 
 import structlog
@@ -22,6 +24,7 @@ from boefjes.sql.db import get_engine
 from boefjes.sql.plugin_storage import create_plugin_storage
 
 logger = structlog.get_logger(__name__)
+ctx: ForkContext = multiprocessing.get_context("fork")
 
 
 class SchedulerWorkerManager(WorkerManager):
@@ -36,11 +39,11 @@ class SchedulerWorkerManager(WorkerManager):
         self.scheduler_client = scheduler_client
         self.settings = settings
 
-        manager = mp.Manager()
+        manager = ctx.Manager()
 
         self.task_queue = manager.Queue()  # multiprocessing.Queue() will not work on macOS, see mp.Queue.qsize()
         self.handling_tasks = manager.dict()
-        self.workers: list[mp.Process] = []
+        self.workers: list[BaseProcess] = []
 
         logger.setLevel(log_level)
 
@@ -50,13 +53,13 @@ class SchedulerWorkerManager(WorkerManager):
         logger.info("Created worker pool for queue '%s'", queue_type.value)
 
         self.workers = [
-            mp.Process(target=_start_working, args=self._worker_args()) for _ in range(self.settings.pool_size)
+            ctx.Process(target=_start_working, args=self._worker_args()) for _ in range(self.settings.pool_size)
         ]
         for worker in self.workers:
             worker.start()
 
-        signal.signal(signal.SIGINT, lambda signum, _: self.exit(queue_type, signum))
-        signal.signal(signal.SIGTERM, lambda signum, _: self.exit(queue_type, signum))
+        signal.signal(signal.SIGINT, lambda signum, _: self.exit(signum))
+        signal.signal(signal.SIGTERM, lambda signum, _: self.exit(signum))
 
         while True:
             try:
@@ -73,7 +76,7 @@ class SchedulerWorkerManager(WorkerManager):
                 # been called yet.
                 if not self.exited:
                     logger.exception("Exiting worker...")
-                    self.exit(queue_type)
+                    self.exit()
 
                 raise
 
@@ -87,7 +90,7 @@ class SchedulerWorkerManager(WorkerManager):
         except HTTPError:
             # Scheduler is having issues, so make note of it and try again
             logger.exception("Getting the queues from the scheduler failed")
-            time.sleep(10 * self.settings.poll_interval)  # But not immediately
+            time.sleep(self.settings.poll_interval)  # But not immediately
             return
 
         # We do not target a specific queue since we start one runtime for all organisations
@@ -98,18 +101,18 @@ class SchedulerWorkerManager(WorkerManager):
 
         all_queues_empty = True
 
-        for queue_type in queues:
-            logger.debug("Popping from queue %s", queue_type.id)
+        for queue in queues:
+            logger.debug("Popping from queue %s", queue.id)
 
             try:
-                p_item = self.scheduler_client.pop_item(queue_type.id)
+                p_item = self.scheduler_client.pop_item(queue.id)
             except (HTTPError, ValidationError):
                 logger.exception("Popping task from scheduler failed, sleeping 10 seconds")
                 time.sleep(10)
                 continue
 
             if not p_item:
-                logger.debug("Queue %s empty", queue_type.id)
+                logger.debug("Queue %s empty", queue.id)
                 continue
 
             all_queues_empty = False
@@ -158,13 +161,13 @@ class SchedulerWorkerManager(WorkerManager):
                 self._cleanup_pending_worker_task(worker)
                 worker.close()
 
-            new_worker = mp.Process(target=_start_working, args=self._worker_args())
+            new_worker = ctx.Process(target=_start_working, args=self._worker_args())
             new_worker.start()
             new_workers.append(new_worker)
 
         self.workers = new_workers
 
-    def _cleanup_pending_worker_task(self, worker: mp.Process) -> None:
+    def _cleanup_pending_worker_task(self, worker: BaseProcess) -> None:
         if worker.pid not in self.handling_tasks:
             logger.debug("No pending task found for Worker[pid=%s, %s]", worker.pid, _format_exit_code(worker.exitcode))
             return
@@ -186,7 +189,7 @@ class SchedulerWorkerManager(WorkerManager):
     def _worker_args(self) -> tuple:
         return self.task_queue, self.item_handler, self.scheduler_client, self.handling_tasks
 
-    def exit(self, queue_type: WorkerManager.Queue, signum: int | None = None):
+    def exit(self, signum: int | None = None):
         try:
             if signum:
                 logger.info("Received %s, exiting", signal.Signals(signum).name)
@@ -196,7 +199,7 @@ class SchedulerWorkerManager(WorkerManager):
 
                 for p_item in items:
                     try:
-                        self.scheduler_client.push_item(queue_type.value, p_item)
+                        self.scheduler_client.push_item(p_item)
                     except HTTPError:
                         logger.exception("Rescheduling task failed[id=%s]", p_item.id)
 
@@ -231,7 +234,7 @@ def _format_exit_code(exitcode: int | None) -> str:
 
 
 def _start_working(
-    task_queue: mp.Queue,
+    task_queue: multiprocessing.Queue,
     handler: Handler,
     scheduler_client: SchedulerClientInterface,
     handling_tasks: dict[int, str],
@@ -266,11 +269,7 @@ def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_leve
     local_repository = get_local_repository()
 
     session = sessionmaker(bind=get_engine())()
-    plugin_service = PluginService(
-        create_plugin_storage(session),
-        create_config_storage(session),
-        local_repository,
-    )
+    plugin_service = PluginService(create_plugin_storage(session), create_config_storage(session), local_repository)
 
     item_handler: Handler
     if queue is WorkerManager.Queue.BOEFJES:

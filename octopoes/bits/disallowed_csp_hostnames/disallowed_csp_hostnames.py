@@ -34,9 +34,6 @@ def run(input_ooi: HTTPHeaderHostname, additional_oois: list, config: dict[str, 
 
     if hostname.lower() in disallowed_domains:
         ft = KATFindingType(id="KAT-DISALLOWED-DOMAIN-IN-CSP")
-        f = Finding(
-            ooi=input_ooi.reference,
-            finding_type=ft.reference,
-        )
+        f = Finding(ooi=input_ooi.reference, finding_type=ft.reference)
         yield ft
         yield f

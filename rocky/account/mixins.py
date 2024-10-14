@@ -86,15 +86,20 @@ class OrganizationView(View):
                 user=self.request.user, organization=self.organization
             )
         except OrganizationMember.DoesNotExist:
-            if not self.request.user.is_superuser:
+            if self.request.user.is_superuser:
+                clearance_level = 4
+            elif self.request.user.has_perm("tools.can_access_all_organizations"):
+                clearance_level = -1
+            else:
                 raise Http404()
 
+            # Only the Python object is created, it is not saved to the database.
             self.organization_member = OrganizationMember(
                 user=self.request.user,
                 organization=self.organization,
                 status=OrganizationMember.STATUSES.ACTIVE,
-                trusted_clearance_level=4,
-                acknowledged_clearance_level=0,
+                trusted_clearance_level=clearance_level,
+                acknowledged_clearance_level=clearance_level,
             )
 
         if self.organization_member.blocked:
@@ -113,29 +118,26 @@ class OrganizationView(View):
         return context
 
     def indemnification_error(self):
-        return messages.error(
-            self.request,
-            f"Indemnification not present at organization {self.organization}.",
-        )
+        return messages.error(self.request, f"Indemnification not present at organization {self.organization}.")
 
     @property
     def may_update_clearance_level(self) -> bool:
         if not self.indemnification_present:
             return False
-        if self.organization_member.acknowledged_clearance_level < 0:
-            return False
-        if self.organization_member.trusted_clearance_level < 0:
-            return False
-        return True
+
+        return self.organization_member.has_clearance_level(0)
 
     def verify_raise_clearance_level(self, level: int) -> bool:
         if not self.indemnification_present:
             raise IndemnificationNotPresentException()
-        if self.organization_member.trusted_clearance_level < level:
-            raise TrustedClearanceLevelTooLowException()
-        if self.organization_member.acknowledged_clearance_level < level:
-            raise AcknowledgedClearanceLevelTooLowException()
-        return True
+
+        if self.organization_member.has_clearance_level(level):
+            return True
+        else:
+            if self.organization_member.trusted_clearance_level < level:
+                raise TrustedClearanceLevelTooLowException()
+            else:
+                raise AcknowledgedClearanceLevelTooLowException()
 
     def raise_clearance_level(self, ooi_reference: Reference, level: int) -> bool:
         self.verify_raise_clearance_level(level)
@@ -167,11 +169,7 @@ class OrganizationView(View):
             messages.error(
                 self.request,
                 _("Could not raise clearance level of %s to L%s. Indemnification not present at organization %s.")
-                % (
-                    ooi.reference.human_readable,
-                    level,
-                    self.organization.name,
-                ),
+                % (ooi.reference.human_readable, level, self.organization.name),
             )
 
         except TrustedClearanceLevelTooLowException:
@@ -182,11 +180,7 @@ class OrganizationView(View):
                     "You were trusted a clearance level of L%s. "
                     "Contact your administrator to receive a higher clearance."
                 )
-                % (
-                    ooi.reference.human_readable,
-                    level,
-                    self.organization_member.acknowledged_clearance_level,
-                ),
+                % (ooi.reference.human_readable, level, self.organization_member.max_clearance_level),
             )
         except AcknowledgedClearanceLevelTooLowException:
             messages.error(
@@ -196,11 +190,7 @@ class OrganizationView(View):
                     "You acknowledged a clearance level of L%s. "
                     "Please accept the clearance level first on your profile page to proceed."
                 )
-                % (
-                    ooi.reference.human_readable,
-                    level,
-                    self.organization_member.acknowledged_clearance_level,
-                ),
+                % (ooi.reference.human_readable, level, self.organization_member.acknowledged_clearance_level),
             )
         return False
 

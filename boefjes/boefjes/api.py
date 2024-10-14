@@ -2,6 +2,7 @@ import base64
 import multiprocessing
 from datetime import datetime, timezone
 from enum import Enum
+from multiprocessing.context import ForkContext, ForkProcess
 from uuid import UUID
 
 import structlog
@@ -23,9 +24,10 @@ from octopoes.models.exception import ObjectNotFoundException
 
 app = FastAPI(title="Boefje API")
 logger = structlog.get_logger(__name__)
+ctx: ForkContext = multiprocessing.get_context("fork")
 
 
-class UvicornServer(multiprocessing.Process):
+class UvicornServer(ForkProcess):
     def __init__(self, config: Config):
         super().__init__()
         self.server = Server(config=config)
@@ -73,11 +75,7 @@ def get_scheduler_client():
 
 
 def get_bytes_client():
-    return BytesAPIClient(
-        str(settings.bytes_api),
-        username=settings.bytes_username,
-        password=settings.bytes_password,
-    )
+    return BytesAPIClient(str(settings.bytes_api), username=settings.bytes_username, password=settings.bytes_password)
 
 
 @app.get("/healthz")
@@ -125,7 +123,7 @@ def boefje_output(
     bytes_client.save_boefje_meta(boefje_meta)
 
     if boefje_output.files:
-        mime_types = _default_mime_types(boefje_meta.boefje).union(plugin.produces)
+        mime_types = _default_mime_types(boefje_meta.boefje)
         for file in boefje_output.files:
             raw = base64.b64decode(file.content)
             # when supported, also save file.name to Bytes

@@ -28,9 +28,7 @@ MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought t
 logger = structlog.get_logger(__name__)
 
 bytes_api_client = BytesAPIClient(
-    str(settings.bytes_api),
-    username=settings.bytes_username,
-    password=settings.bytes_password,
+    str(settings.bytes_api), username=settings.bytes_username, password=settings.bytes_password
 )
 
 
@@ -42,8 +40,7 @@ def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None
     try:
         katalogus_api = str(settings.katalogus_api).rstrip("/")
         response = httpx.get(
-            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings",
-            timeout=30,
+            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings", timeout=30
         )
         response.raise_for_status()
     except HTTPError:
@@ -76,12 +73,7 @@ def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None
 
 
 class BoefjeHandler(Handler):
-    def __init__(
-        self,
-        job_runner: BoefjeJobRunner,
-        plugin_service: PluginService,
-        bytes_client: BytesAPIClient,
-    ):
+    def __init__(self, job_runner: BoefjeJobRunner, plugin_service: PluginService, bytes_client: BytesAPIClient):
         self.job_runner = job_runner
         self.plugin_service = plugin_service
         self.bytes_client = bytes_client
@@ -119,13 +111,11 @@ class BoefjeHandler(Handler):
         boefje_meta.runnable_hash = plugin.runnable_hash
         boefje_meta.environment = get_environment_settings(boefje_meta, plugin.boefje_schema)
 
-        mime_types = _default_mime_types(boefje_meta.boefje).union(plugin.produces)
-
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
         boefje_meta.started_at = datetime.now(timezone.utc)
 
-        boefje_results: list[tuple[set, bytes | str]]
+        boefje_results: list[tuple[set, bytes | str]] = []
 
         try:
             boefje_results = self.job_runner.run(boefje_meta, boefje_meta.environment)
@@ -152,7 +142,9 @@ class BoefjeHandler(Handler):
                             )
                         else:
                             valid_mimetypes.add(mimetype)
-                    raw_file_id = self.bytes_client.save_raw(boefje_meta.id, output, mime_types.union(valid_mimetypes))
+                    raw_file_id = self.bytes_client.save_raw(
+                        boefje_meta.id, output, _default_mime_types(boefje_meta.boefje).union(valid_mimetypes)
+                    )
                     logger.info(
                         "Saved raw file %s for boefje %s[%s]", raw_file_id, boefje_meta.boefje.id, boefje_meta.id
                     )

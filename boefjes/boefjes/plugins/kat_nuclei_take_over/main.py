@@ -22,9 +22,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     # Checks if the url is of object HostnameHTTPURL or Hostname
     url = verify_hostname_meta(boefje_meta.arguments["input"])
     output = client.containers.run(
-        NUCLEI_IMAGE,
-        ["-t", "/root/nuclei-templates/http/takeovers/", "-u", url, "-jsonl"],
-        remove=True,
+        NUCLEI_IMAGE, ["-t", "/root/nuclei-templates/http/takeovers/", "-u", url, "-jsonl"], remove=True
     )
 
     return [(set(), output)]

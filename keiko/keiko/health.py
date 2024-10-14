@@ -22,8 +22,4 @@ ServiceHealth.update_forward_refs()
 
 def get_health() -> ServiceHealth:
     """Determine health of Keiko service."""
-    return ServiceHealth(
-        service="keiko",
-        healthy=True,
-        version=__version__,
-    )
+    return ServiceHealth(service="keiko", healthy=True, version=__version__)

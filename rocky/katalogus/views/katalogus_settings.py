@@ -9,16 +9,16 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, TemplateView
 from httpx import HTTPError
+from structlog import get_logger
 from tools.models import Organization
 
 from katalogus.client import get_katalogus
 
+logger = get_logger(__name__)
+
 
 class ConfirmCloneSettingsView(
-    OrganizationPermissionRequiredMixin,
-    OrganizationView,
-    UserPassesTestMixin,
-    TemplateView,
+    OrganizationPermissionRequiredMixin, OrganizationView, UserPassesTestMixin, TemplateView
 ):
     template_name = "confirmation_clone_settings.html"
     permission_required = "tools.can_set_katalogus_settings"
@@ -35,18 +35,14 @@ class ConfirmCloneSettingsView(
 
     def post(self, request, *args, **kwargs):
         to_organization = Organization.objects.get(code=kwargs["to_organization"])
+        logger.info("Cloning organization settings", event_code=910000, to_organization_code=to_organization.code)
         get_katalogus(self.organization.code).clone_all_configuration_to_organization(to_organization.code)
         messages.add_message(
             self.request,
             messages.SUCCESS,
             _("Settings from {} to {} successfully cloned.").format(self.organization.name, to_organization.name),
         )
-        return HttpResponseRedirect(
-            reverse(
-                "katalogus_settings",
-                kwargs={"organization_code": self.organization.code},
-            )
-        )
+        return HttpResponseRedirect(reverse("katalogus_settings", kwargs={"organization_code": self.organization.code}))
 
 
 class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
@@ -64,10 +60,7 @@ class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationVie
                 "text": _("KAT-alogus"),
             },
             {
-                "url": reverse(
-                    "katalogus_settings",
-                    kwargs={"organization_code": self.organization.code},
-                ),
+                "url": reverse("katalogus_settings", kwargs={"organization_code": self.organization.code}),
                 "text": _("Settings"),
             },
         ]
@@ -85,9 +78,7 @@ class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationVie
                 plugin_setting = katalogus_client.get_plugin_settings(boefje.id)
             except HTTPError:
                 messages.add_message(
-                    self.request,
-                    messages.ERROR,
-                    _("Failed getting settings for boefje {}").format(self.plugin.id),
+                    self.request, messages.ERROR, _("Failed getting settings for boefje {}").format(self.plugin.id)
                 )
                 continue
 
@@ -96,12 +87,7 @@ class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationVie
 
             for key, value in plugin_setting.items():
                 all_plugins_settings.append(
-                    {
-                        "plugin_id": boefje.id,
-                        "plugin_name": boefje.name,
-                        "name": key,
-                        "value": value,
-                    }
+                    {"plugin_id": boefje.id, "plugin_name": boefje.name, "name": key, "value": value}
                 )
 
         return all_plugins_settings
@@ -117,8 +103,5 @@ class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationVie
     def get_success_url(self, **kwargs):
         return reverse_lazy(
             "confirm_clone_settings",
-            kwargs={
-                "organization_code": self.organization.code,
-                "to_organization": kwargs["to_organization"],
-            },
+            kwargs={"organization_code": self.organization.code, "to_organization": kwargs["to_organization"]},
         )
