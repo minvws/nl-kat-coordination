@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-01 14:17+0000\n"
+"POT-Creation-Date: 2024-10-09 14:20+0000\n"
 "PO-Revision-Date: 2024-08-01 11:09+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -40,6 +40,7 @@ msgstr "Belangrijke datums"
 #: reports/report_types/tls_report/report.html
 #: reports/templates/partials/report_names_form.html
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/report_overview/subreports_table.html
 #: tools/forms/boefje.py rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
@@ -693,6 +694,7 @@ msgstr "Ingeschakeld"
 #: katalogus/forms/katalogus_filter.py
 #: katalogus/templates/partials/plugin_tile_modal.html
 #: katalogus/templates/plugin_container_image.html
+#: reports/templates/summary/selected_plugins.html
 msgid "Disabled"
 msgstr "Uitgeschakeld"
 
@@ -893,13 +895,15 @@ msgstr "Geselecteerde objecten"
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/summary/ooi_selection.html
+#: rocky/templates/oois/ooi_list.html
 msgid "Object"
 msgstr "Object"
 
 #: katalogus/templates/change_clearance_level.html onboarding/forms.py
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/boefje.py
-#: tools/forms/ooi.py rocky/templates/oois/ooi_page_tabs.html
+#: tools/forms/ooi.py rocky/templates/oois/ooi_list.html
+#: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/explanations.html
 msgid "Clearance level"
 msgstr "Vrijwaringsniveau"
@@ -1192,6 +1196,7 @@ msgstr ""
 
 #: katalogus/templates/partials/plugin_tile_modal.html reports/forms.py
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Report types"
 msgstr "Rapporttypes"
 
@@ -1328,6 +1333,8 @@ msgstr ""
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/summary/selected_plugins.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -1341,6 +1348,8 @@ msgstr "Details sluiten"
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/summary/selected_plugins.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -1356,6 +1365,7 @@ msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/report_overview/subreports_table.html
 msgid "Creation date"
 msgstr "Aanmaakdatum"
@@ -2261,6 +2271,7 @@ msgstr "URL"
 #: reports/report_types/dns_report/report.html
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
+#: rocky/templates/oois/ooi_list.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/explanations.html
 #: rocky/templates/partials/ooi_detail_related_object.html
@@ -2812,6 +2823,7 @@ msgstr "Geselecteerde rapporttypen"
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/plugin_overview_table.html
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/report_overview/subreports_table.html
 #: reports/templates/summary/report_asset_overview.html
 msgid "Report type"
@@ -3434,6 +3446,7 @@ msgstr "Bevinding"
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/summary/selected_plugins.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -4164,6 +4177,7 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Recurrence"
 msgstr ""
 
@@ -4276,15 +4290,38 @@ msgid "Year"
 msgstr ""
 
 #: reports/templates/partials/report_names_header.html
+#: reports/templates/report_overview/report_history_table.html
 msgid "Report name"
 msgstr ""
 
 #: reports/templates/partials/report_names_header.html
 msgid ""
-"Give your report a custom name and optionally add the reports' reference "
+"Define a custom name format for your report(s). This format will be applied "
+"to all generated (sub)reports."
+msgstr ""
+
+#: reports/templates/partials/report_names_header.html
+msgid ""
+"To make the report names more descriptive, you can include placeholders for "
+"the object name, the report type and/or the reference date. Use the "
+"placeholder \"{ooi}\" for the object name, \"{report type}\" for the report "
+"type and use a <a href=\"https://strftime.org/\" target=\"_blank\" "
+"rel=\"noopener\">Python strftime code</a> for the reference date."
+msgstr ""
+
+#: reports/templates/partials/report_names_header.html
+#, python-format
+msgid ""
+"For example, the format \"{report type} for {ooi} at %%x\" could generate: "
+"\"DNS Report for example.com at 01/01/25\"."
+msgstr ""
+
+#: reports/templates/partials/report_names_header.html
+msgid ""
+"Give your report(s) a custom name and optionally add the reports' reference "
 "date to the name. To do so you can select a standard option or use a <a "
-"href=\"https://strftime.org/\" target=\"_blank\">Python strftime code</a> in "
-"the report name."
+"href=\"https://strftime.org/\" target=\"_blank\" rel=\"noopener\">Python "
+"strftime code</a> in the report name."
 msgstr ""
 
 #: reports/templates/partials/report_navigation.html
@@ -4315,6 +4352,7 @@ msgid "Select which objects you want to include in your report."
 msgstr "Selecteer de objecten die u op wilt nemen in het rapport."
 
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "No objects found."
 msgstr "Geen objecten gevonden."
 
@@ -4356,6 +4394,7 @@ msgstr "Objecten"
 
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html
+#: rocky/templates/oois/ooi_list.html
 msgid "Clearance type"
 msgstr "Vrijwaringstype"
 
@@ -4445,16 +4484,12 @@ msgid "There are no required plugins."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-msgid "Good job! All suggested plugins are enabled"
-msgstr "Goed gedaan! Alle voorgestelde plug-ins zijn ingeschakeld"
+msgid "Good job! All suggested plugins are enabled."
+msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-msgid ""
-"This report requires at least one of the following plugins to be enabled to "
-"generate the report:"
+msgid "The following plugins are optional to generate the report:"
 msgstr ""
-"Dit rapport vereist dat tenminste één van de volgende plug-ins is "
-"geactiveerd om het rapport te genereren:"
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Hide suggested plugins"
@@ -4568,6 +4603,7 @@ msgid "Input Objects"
 msgstr "Input objecten"
 
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/report_overview/subreports_table.html
 msgid "Reference date"
 msgstr "Referentiedatum"
@@ -4614,10 +4650,6 @@ msgid "Subreports"
 msgstr "Subrapporten"
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "Report ID"
-msgstr "Rapport-id"
-
-#: reports/templates/report_overview/report_history_table.html
 msgid "Shows subreport details"
 msgstr "Subrapportdetails tonen"
 
@@ -4630,24 +4662,56 @@ msgid "Overview of reports"
 msgstr "Overzicht van rapporten"
 
 #: reports/templates/report_overview/report_overview_navigation.html
-msgid "Recent"
-msgstr "Recent"
-
-#: reports/templates/report_overview/report_overview_navigation.html
-msgid "Presets"
-msgstr "Voorinstellingen"
-
-#: reports/templates/report_overview/report_overview_navigation.html
 msgid "Scheduled"
 msgstr "Gepland"
 
 #: reports/templates/report_overview/report_overview_navigation.html
-msgid "Folders"
-msgstr "Mappen"
-
-#: reports/templates/report_overview/report_overview_navigation.html
 msgid "History"
 msgstr "Geschiedenis"
+
+#: reports/templates/report_overview/scheduled_reports.html
+msgid "Scheduled reports"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports.html
+msgid "View your scheduled reports."
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports.html
+#, python-format
+msgid "Showing %(length)s scheduled reports"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Scheduled reports:"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Report Name"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Subreport Name"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Scheduled for"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Scheduled Reports:"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/report_overview/subreports_table.html
+#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "Input Object"
+msgstr "Inputobject"
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Show report details"
+msgstr ""
 
 #: reports/templates/report_overview/subreports.html
 #, python-format
@@ -4671,12 +4735,6 @@ msgstr "Rapportdetails tonen"
 msgid "Subreports:"
 msgstr "Subrapporten:"
 
-#: reports/templates/report_overview/subreports_table.html
-#: rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "Input Object"
-msgstr "Inputobject"
-
 #: reports/templates/summary/report_asset_overview.html
 msgid ""
 "The objects listed in the table below were used to generate this report. For "
@@ -4696,6 +4754,10 @@ msgid ""
 msgstr ""
 "De tabel hieronder toont aan welke rapporten zijn gekozen om dit rapport te "
 "genereren, inclusief een rapportomschrijving."
+
+#: reports/templates/summary/report_asset_overview.html
+msgid "No report types found."
+msgstr ""
 
 #: reports/templates/summary/selected_plugins.html
 msgid ""
@@ -4720,6 +4782,22 @@ msgstr "Plug-in-opties"
 #: reports/templates/summary/selected_plugins.html
 msgid "Plugin scan level"
 msgstr "Plug-in-scanniveau"
+
+#: reports/templates/summary/selected_plugins.html
+msgid "Enabled."
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid "required"
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid "optional"
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid "Plugin extra info"
+msgstr ""
 
 #: reports/templates/summary/selected_plugins.html
 msgid ""
@@ -4851,7 +4929,7 @@ msgstr ""
 #: tools/forms/boefje.py
 msgid ""
 "Specify the scanning frequency for this Boefje in minutes. The default is 24 "
-"hours.For example: 5 minutes will let the boefje scan every 5 minutes."
+"hours. For example: 5 minutes will let the boefje scan every 5 minutes."
 msgstr ""
 
 #: tools/forms/finding_type.py
@@ -6295,6 +6373,14 @@ msgstr ""
 "informatie."
 
 #: rocky/templates/oois/ooi_list.html
+msgid "Objects "
+msgstr ""
+
+#: rocky/templates/oois/ooi_list.html
+msgid "column headers with buttons are sortable"
+msgstr ""
+
+#: rocky/templates/oois/ooi_list.html
 msgid "Delete object(s)"
 msgstr "Object(en) verwijderen"
 
@@ -7651,6 +7737,10 @@ msgstr "Vrijwaringsniveau: "
 msgid "Clearance type: "
 msgstr "Vrijwaringstype: "
 
+#: rocky/views/ooi_view.py
+msgid "Searching for: "
+msgstr ""
+
 #: rocky/views/organization_add.py
 msgid "Setup"
 msgstr "Instellingen"
@@ -7858,6 +7948,28 @@ msgstr "Raw-bestand kan niet naar Bytes worden geüpload: %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Raw-bestand met succes toegevoegd."
+
+#~ msgid "Good job! All suggested plugins are enabled"
+#~ msgstr "Goed gedaan! Alle voorgestelde plug-ins zijn ingeschakeld"
+
+#~ msgid ""
+#~ "This report requires at least one of the following plugins to be enabled "
+#~ "to generate the report:"
+#~ msgstr ""
+#~ "Dit rapport vereist dat tenminste één van de volgende plug-ins is "
+#~ "geactiveerd om het rapport te genereren:"
+
+#~ msgid "Report ID"
+#~ msgstr "Rapport-id"
+
+#~ msgid "Recent"
+#~ msgstr "Recent"
+
+#~ msgid "Presets"
+#~ msgstr "Voorinstellingen"
+
+#~ msgid "Folders"
+#~ msgstr "Mappen"
 
 #~ msgid "A HTTP error occurred. Check logs for more info."
 #~ msgstr ""
