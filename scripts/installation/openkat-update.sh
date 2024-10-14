@@ -82,6 +82,6 @@ sudo -u kat update-katalogus-db
 sudo -u kat update-mula-db
 
 echo "Step 7 - Restart OpenKAT"
-sudo systemctl restart xtdb-http-multinode kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
+sudo systemctl restart xtdb-http-multinode kat-rocky kat-rocky-worker kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
 
 echo "End of OpenKAT update script"
