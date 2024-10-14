@@ -7,9 +7,9 @@ from unittest import mock
 from urllib.parse import quote
 
 from fastapi.testclient import TestClient
+
 from scheduler import config, models, server, storage, utils
 from scheduler.server import serializers
-
 from tests.factories import OrganisationFactory
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
@@ -925,3 +925,11 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
         response = self.client.patch(f"/schedules/{str(self.first_schedule.id)}", json={"schedule": "malformed"})
         self.assertEqual(400, response.status_code)
         self.assertIn("validation error", response.json().get("detail"))
+
+    def test_delete_schedule(self):
+        response = self.client.delete(f"/schedules/{str(self.first_schedule.id)}")
+        self.assertEqual(204, response.status_code)
+
+        # Schedule should be deleted
+        response = self.client.get(f"/schedules/{str(self.first_schedule.id)}")
+        self.assertEqual(404, response.status_code)
