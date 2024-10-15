@@ -381,6 +381,38 @@ $ ./xtdb-cli.py -n MyOrganisationName attribute-stats |jq .
  }
 ```
 
+### XTDB analyze bits tool
+
+This guide assumes the following:
+
+- A virtual environment for the octopoes folder is created and the development requirements are installed.
+
+This tooling can be used when you are developing bits (business rules). It outputs the transaction times in the database, the source and bit information, including parameters and how long the running time was.
+
+Enable the `GATHER_BIT_METRICS` setting in the following file. The flag is at the bottom of the file. Change `GATHER_BIT_METRICS=False` to `GATHER_BIT_METRICS=True`.
+
+```
+octopoes/octopoes/config/settings.py
+```
+
+Run a `make reset` in your KAT instance to enable the setting:
+
+`make reset`
+
+Create some data by adding a hostname, enable some boefjes, etc. This will allow the bit metrics to be gathered.
+
+You can query the bit metrics using the following commands. The `node` is the name of your organisation.
+
+```
+python3 octopoes/tools/analyze-bit-metric.py --node "aa" raw |jq
+```
+
+```
+python3 octopoes/tools/xtdb-cli.py -n "aa" history --with-docs "BIT_METRIC" |jq
+```
+
+If you want to query the XTDB database directly, you can use the XTDB-tool. This is explained on the following page: https://docs.openkat.nl/developer_documentation/octopoes.html#xtdb-cli-tool.
+
 ## OOI
 
 OOI objects are instances of relatively simple classes, which inherit from `OOI`.
