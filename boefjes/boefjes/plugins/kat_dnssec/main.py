@@ -17,8 +17,8 @@ def run(boefje_meta: dict):
     cmd = ["/usr/bin/drill", "-DT", domain]
     output = subprocess.run(cmd, capture_output=True)
 
+    output.check_returncode()
+
     results = [({"openkat/dnssec-output"}, output.stdout)]
-    if output.stderr:
-        return [({"error/boefje"}, output.stderr)]
 
     return results
