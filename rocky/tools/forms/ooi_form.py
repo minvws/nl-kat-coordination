@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from enum import Enum
 from inspect import isclass
 from ipaddress import IPv4Address, IPv6Address
-from typing import Literal, Union, get_args, get_origin
+from typing import Any, Literal, Union, get_args, get_origin
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
@@ -75,6 +75,7 @@ class OOIForm(BaseRockyForm):
                 or annotation == dict[str, str]
                 or annotation == list[str]
                 or annotation == dict[str, JsonValue]
+                or annotation == dict[str, Any]
             ):
                 fields[name] = forms.JSONField(**default_attrs)
             elif annotation == int or (hasattr(annotation, "__args__") and int in annotation.__args__):
