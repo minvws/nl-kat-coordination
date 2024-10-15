@@ -10,10 +10,6 @@
                 and its adoption can contribute to a more secure internet.
             {% endblocktranslate %}
         </p>
-        {{ report_data }}
-        {{ report_data.multi_data|linebreaks }}
-        {{ report_data.ipv6|linebreaks }}
-        {% for key, value in report_data.multi_data.items %}{{ value.ipv6 }}{% endfor %}
         <p>
             {% translate "In total " %} {{ report_data.ipv6.values|get_key:"enabled"|sum_list }}{% translate " out of " %}{{ report_data.ipv6.values|get_key:"total"|sum_list }} {% translate " systems have an IPv6 connection." %}
         </p>
@@ -27,18 +23,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for service, compliance in report_data.multi_data.ipv6.items %}
-                        <tr>
-                            <td>{{ service }}</td>
-                            <td>
-                                {% if compliance.enabled != compliance.total %}
-                                    <span class="icon incomplete"></span>
-                                {% else %}
-                                    <span class="icon positive"></span>
-                                {% endif %}
-                                {{ compliance.enabled }}/{{ compliance.total }}
-                            </td>
-                        </tr>
+                    {% for key, value in report_data.multi_data.items %}
+                        {% for service, compliance in value.data.ipv6.items %}
+                            {{ compliance }}
+                            <tr>
+                                <td>{{ service }}</td>
+                                <td>
+                                    {% if compliance.enabled != compliance.total %}
+                                        <span class="icon incomplete"></span>
+                                    {% else %}
+                                        <span class="icon positive"></span>
+                                    {% endif %}
+                                    {{ compliance.enabled }}/{{ compliance.total }}
+                                </td>
+                            </tr>
+                        {% endfor %}
                     {% endfor %}
                 </tbody>
             </table>

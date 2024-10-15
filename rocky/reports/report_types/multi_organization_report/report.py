@@ -55,6 +55,7 @@ class MultiOrganizationReport(MultiReport):
         organization_metrics: dict[str, Any] = {}
 
         for organization, report_data in data.items():
+            aggregate_data = report_data["data"]
             basic_security = {"compliant": 0, "total": 0}
 
             for tag in report_data["organization_tags"]:
@@ -63,7 +64,6 @@ class MultiOrganizationReport(MultiReport):
 
                 tags[tag].append(report_data["organization_code"])
 
-            aggregate_data = report_data["data"]
             total_critical_vulnerabilities += aggregate_data["summary"]["Critical vulnerabilities"]
             total_findings += aggregate_data["total_findings"]
             total_systems += aggregate_data["total_systems"]
