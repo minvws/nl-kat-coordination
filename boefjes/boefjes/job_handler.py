@@ -106,7 +106,7 @@ class BoefjeHandler(Handler):
                 )
             except ObjectNotFoundException as e:
                 if reference.class_type == KATFindingType:
-                    logger.exception("Object {%s} not found in Octopoes", e)
+                    logger.error("Object %s not found in Octopoes", reference)
                     return
                 else:
                     raise ObjectNotFoundException(f"Object {reference} not found in Octopoes") from e
