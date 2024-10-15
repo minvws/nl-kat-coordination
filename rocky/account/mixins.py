@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from functools import cached_property
 
 import structlog.contextvars
 from django.conf import settings
@@ -8,6 +9,8 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.utils.translation import gettext_lazy as _
 from django.views import View
+from rest_framework.exceptions import ValidationError
+from rest_framework.request import Request
 from tools.models import Indemnification, Organization, OrganizationMember
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -203,3 +206,50 @@ class OrganizationPermissionRequiredMixin(PermissionRequiredMixin):
     def has_permission(self) -> bool:
         perms = self.get_permission_required()
         return self.organization_member.has_perms(perms)
+
+
+class OrganizationAPIMixin:
+    request: Request
+
+    @cached_property
+    def organization(self) -> Organization:
+        try:
+            organization_id = self.request.query_params["organization_id"]
+        except KeyError:
+            pass
+        else:
+            try:
+                return Organization.objects.get(id=organization_id)
+            except Organization.DoesNotExist as e:
+                raise Http404(f"Organization with id {organization_id} does not exist") from e
+
+        try:
+            organization_code = self.request.query_params["organization_code"]
+        except KeyError as e:
+            raise ValidationError("Missing organization_id or organization_code query parameter") from e
+        else:
+            try:
+                return Organization.objects.get(code=organization_code)
+            except Organization.DoesNotExist as e:
+                raise Http404(f"Organization with code {organization_code} does not exist") from e
+
+    @cached_property
+    def octopoes_api_connector(self) -> OctopoesAPIConnector:
+        return OctopoesAPIConnector(settings.OCTOPOES_API, self.organization.code)
+
+    @cached_property
+    def valid_time(self) -> datetime:
+        try:
+            valid_time = self.request.query_params["valid_time"]
+        except KeyError:
+            return datetime.now(timezone.utc)
+        else:
+            try:
+                ret = datetime.fromisoformat(valid_time)
+            except ValueError:
+                raise ValidationError(f"Wrong format for valid_time: {valid_time}")
+
+            if not ret.tzinfo:
+                ret = ret.replace(tzinfo=timezone.utc)
+
+            return ret
