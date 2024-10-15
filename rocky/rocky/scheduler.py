@@ -286,6 +286,13 @@ class SchedulerClient:
         except ConnectError:
             raise SchedulerConnectError()
 
+    def patch_schedule(self, schedule_id: str, params: dict[str, Any]) -> None:
+        try:
+            response = self._client.patch(f"/schedules/{schedule_id}", json=params)
+            response.raise_for_status()
+        except (HTTPStatusError, ConnectError):
+            raise SchedulerHTTPError()
+
     def post_schedule(self, schedule: ScheduleRequest) -> ScheduleResponse:
         try:
             res = self._client.post("/schedules", json=schedule.model_dump(exclude_none=True))

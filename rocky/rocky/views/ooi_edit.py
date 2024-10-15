@@ -1,13 +1,16 @@
+from datetime import datetime, timezone
 from enum import Enum
 
 from django.utils.translation import gettext_lazy as _
 from tools.view_helpers import get_ooi_url
 
 from rocky.views.ooi_view import BaseOOIFormView
+from rocky.views.scheduler import SchedulerView
 
 
-class OOIEditView(BaseOOIFormView):
+class OOIEditView(BaseOOIFormView, SchedulerView):
     template_name = "oois/ooi_edit.html"
+    task_type = "report"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -35,6 +38,15 @@ class OOIEditView(BaseOOIFormView):
         kwargs["user_id"] = self.request.user.id
 
         return kwargs
+
+    def form_valid(self, form):
+        form_data = form.cleaned_data
+        if form_data["cron_expression"]:
+            cron_expression = form_data["cron_expression"]
+            deadline_at = datetime.now(timezone.utc).isoformat()
+            self.edit_report_schedule(params={"schedule": cron_expression, "deadline_at": deadline_at})
+
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
