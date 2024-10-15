@@ -22,7 +22,6 @@ from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference, ScanLevel
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.ooi.findings import KATFindingType
 
 MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought to be reasonable
 
@@ -104,12 +103,14 @@ class BoefjeHandler(Handler):
                 ooi = get_octopoes_api_connector(boefje_meta.organization).get(
                     reference, valid_time=datetime.now(timezone.utc)
                 )
-            except ObjectNotFoundException as e:
-                if reference.class_type == KATFindingType:
-                    logger.error("Object %s not found in Octopoes", reference)
-                    return
-                else:
-                    raise ObjectNotFoundException(f"Object {reference} not found in Octopoes") from e
+            except ObjectNotFoundException:
+                logger.info(
+                    "Can't run boefje because OOI does not exist anymore",
+                    boefje_id=boefje_meta.boefje.id,
+                    ooi=reference,
+                    task_id=boefje_meta.id,
+                )
+                return
 
             boefje_meta.arguments["input"] = ooi.serialize()
 
