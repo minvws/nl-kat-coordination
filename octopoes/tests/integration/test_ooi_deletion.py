@@ -514,9 +514,7 @@ def test_delecration_ooi_delete(octopoes_api_connector: OctopoesAPIConnector, va
     assert octopoes_api_connector.list_objects({Hostname}, valid_time).count == 1
 
 
-def test_dangling_affirmation_delete(
-    xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime
-):
+def test_dangling_affirmation_delete(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
     app = Application(name="Acme")
 
     xtdb_octopoes_service.ooi_repository.save(app, valid_time)
