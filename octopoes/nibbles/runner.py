@@ -41,6 +41,7 @@ class NibblesRunner:
         self._retrieve(set(chain.from_iterable(map(lambda x: x.signature, target_nibbles))), valid_time)
         for nibble in target_nibbles:
             radix = [self.objects_by_type_cache[sgn.ooi_type] for sgn in nibble.signature]
+            # TODO: follow path instead of only crossing
             retval |= {nibble.id: nibble(*list(filter(lambda x: ooi in x, product(radix))))}
         return retval
 

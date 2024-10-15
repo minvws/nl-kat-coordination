@@ -1,6 +1,5 @@
 import importlib
 import pkgutil
-from functools import lru_cache
 from logging import getLogger
 from pathlib import Path
 from types import ModuleType
@@ -38,7 +37,6 @@ class NibbleDefinition(BaseModel):
         raise NotImplementedError
 
 
-@lru_cache(maxsize=32)
 def get_nibble_definitions() -> list[NibbleDefinition]:
     nibble_definitions = []
 
