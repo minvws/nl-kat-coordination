@@ -397,11 +397,11 @@ octopoes/octopoes/config/settings.py
 
 Run a `make reset` in your KAT instance to enable the setting:
 
-`make reset`
+```
+make reset
+```
 
-Create some data by adding a hostname, enable some boefjes, etc. This will allow the bit metrics to be gathered.
-
-You can query the bit metrics using the following commands. The `node` is the name of your organisation.
+Create some data by adding a hostname, enable some boefjes, etc. This will allow the bit metrics to be gathered. You can query the bit metrics using the following commands. The `node` is the name of your organisation. In this example the organisation name is 'aa'.
 
 ```
 python3 octopoes/tools/analyze-bit-metric.py --node "aa" raw |jq
