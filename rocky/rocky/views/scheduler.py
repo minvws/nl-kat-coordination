@@ -136,8 +136,8 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
-    def edit_report_schedule(self, params):
-        self.scheduler_client.patch_schedule(schedule_id=self.scheduler_id, params=params)
+    def edit_report_schedule(self, schedule_id: str, params):
+        self.scheduler_client.patch_schedule(schedule_id=schedule_id, params=params)
 
     def get_report_schedules(self) -> list[dict[str, Any]]:
         try:

@@ -41,10 +41,11 @@ class OOIEditView(BaseOOIFormView, SchedulerView):
 
     def form_valid(self, form):
         form_data = form.cleaned_data
-        if form_data["cron_expression"]:
+        schedule_id = self.request.GET.get("schedule_id", "")
+        if form_data["cron_expression"] and schedule_id:
             cron_expression = form_data["cron_expression"]
             deadline_at = datetime.now(timezone.utc).isoformat()
-            self.edit_report_schedule(params={"schedule": cron_expression, "deadline_at": deadline_at})
+            self.edit_report_schedule(schedule_id, {"schedule": cron_expression, "deadline_at": deadline_at})
 
         return super().form_valid(form)
 
