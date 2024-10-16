@@ -256,7 +256,13 @@ class ScheduleAPI:
 
         return updated_schedule
 
-    def search(self, filters: storage.filters.FilterRequest | None = None):
+    def search(
+        self,
+        request: fastapi.Request,
+        offset: int = 0,
+        limit: int = 10,
+        filters: storage.filters.FilterRequest | None = None,
+    ) -> Any:
         if filters is None:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail="missing search filters"
@@ -279,4 +285,4 @@ class ScheduleAPI:
                 status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail="failed to search schedules"
             ) from exc
 
-        return results, count
+        return utils.paginate(request, results, count, offset, limit)
