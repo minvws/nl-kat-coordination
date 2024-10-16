@@ -51,5 +51,9 @@ override_dh_virtualenv:
 override_dh_gencontrol:
 	dh_gencontrol -- -Vpython=`py3versions -d`
 
+override_dh_installsystemd:
+	dh_installsystemd --name=kat-rocky
+	dh_installsystemd --name=kat-rocky-worker
+
 execute_after_dh_install:
 	dh_installsysusers
