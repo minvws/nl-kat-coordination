@@ -37,7 +37,7 @@ class OriginRepository(Repository):
         source: Reference | None = None,
         result: Reference | None = None,
         method: str | list[str] | None = None,
-        origin_type: OriginType | None = None,
+        origin_type: OriginType | list[OriginType] | set[OriginType] | None = None,
     ) -> list[Origin]:
         raise NotImplementedError
 
@@ -77,7 +77,7 @@ class XTDBOriginRepository(OriginRepository):
         source: Reference | None = None,
         result: Reference | None = None,
         method: str | list[str] | None = None,
-        origin_type: OriginType | None = None,
+        origin_type: OriginType | list[OriginType] | set[OriginType] | None = None,
     ) -> list[Origin]:
         where_parameters: dict[str, str | list[str]] = {"type": Origin.__name__}
 
@@ -94,7 +94,10 @@ class XTDBOriginRepository(OriginRepository):
             where_parameters["method"] = method
 
         if origin_type:
-            where_parameters["origin_type"] = origin_type.value
+            if isinstance(origin_type, OriginType):
+                where_parameters["origin_type"] = origin_type.value
+            elif isinstance(origin_type, list | set) and all(isinstance(otype, OriginType) for otype in origin_type):
+                where_parameters["origin_type"] = [otype.value for otype in origin_type]
 
         query = generate_pull_query(FieldSet.ALL_FIELDS, where_parameters, offset=offset, limit=limit)
 
