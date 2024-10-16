@@ -39,8 +39,6 @@ external services. In this overview arrows from external services indicate how
 and why those services communicate with the scheduler. The `Scheduler` system
 combines data from the `Octopoes`, `Katalogus`, `Bytes` and `RabbitMQ` systems.
 
-![scheduler](./img/scheduler.svg)
-
 - Octopoes
 
 - RabbitMQ
@@ -51,19 +49,24 @@ combines data from the `Octopoes`, `Katalogus`, `Bytes` and `RabbitMQ` systems.
 
 ### C3 Component level
 
+![scheduler](./img/scheduler.svg)
+
 When we take a closer look at the `scheduler` system itself we can identify
-several components. The 'Scheduler App' directs the creation and maintenance
-of a multitude of schedulers. Typically in a KAT installation 3 scheduler will
-be created per organisation:
+several components. The `SchedulerApp` directs the creation and maintenance
+of a multitude of schedulers.
+
+![schedulers.svg](./img/schedulers.svg)
+
+Typically in a KAT installation 3 scheduler will be created per organisation:
 
 1. _boefje scheduler_
 2. _normalizer scheduler_
 3. _report scheduler_
 
-![schedulers.svg](./img/schedulers.svg)
-
 Each scheduler type implements it's own priority queue, and can implement it's own
 way of populating, and prioritization of its queue.
+
+![queue.svg](./img/queue.svg)
 
 Interaction with the scheduler and access to the internals of the 'Scheduler
 App' can be accessed by the `Server` which implements a HTTP REST API interface.
@@ -84,15 +87,13 @@ responsible for maintaining a queue of tasks for `Task Runners` to pick up and
 process. A `Scheduler` is responsible for creating `Task` objects and pushing
 them onto the queue.
 
+![tasks.svg](./img/tasks.svg)
+
 The `PriorityQueue` derives its state from the state of the `Task` objects that
 are persisted in the database. In other words, the current state of the
 `PriorityQueue` are the `Task` objects with the status of `QUEUED`.
 
-![queue.svg](./img/queue.svg)
-
 #### `Task`
-
-![tasks.svg](./img/tasks.svg)
 
 A `Task` object contains the following fields:
 
@@ -125,10 +126,10 @@ To keep track of the status of this task throughout the system we update its
 
 - When the `Task` is pushed onto the queue it will get the status of `QUEUED` (2).
 
-- When the 'Task Runner' picks up the task by popping the `Task`
+- When the `Task Runner` picks up the task by popping the `Task`
   from the queue the status will be updated to `DISPATCHED` (3).
 
-- The 'Task Runner' is now able to start executing the `Task` and the status
+- The `Task Runner` is now able to start executing the `Task` and the status
   will be updated to `RUNNING` (4) by the 'Task Runner'.
 
 - Whenever the task has been completed, the 'Task Runner' will update the
@@ -141,6 +142,8 @@ When a `Task` is created for a `Scheduler` it can be defined whether or not
 that `Scheduler` can create `Schedule` objects for its `Task` objects. A
 `Schedule` object is a way to define when a `Task` should be executed
 automatically on a recurring schedule by the `Scheduler`.
+
+![schedules.svg](./img/schedules.svg)
 
 A `Schedule` object contains the following fields:
 
