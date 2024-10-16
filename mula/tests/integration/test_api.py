@@ -7,9 +7,9 @@ from unittest import mock
 from urllib.parse import quote
 
 from fastapi.testclient import TestClient
-
 from scheduler import config, models, server, storage, utils
 from scheduler.server import serializers
+
 from tests.factories import OrganisationFactory
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
@@ -937,4 +937,13 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
         )
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()["count"])
+        self.assertEqual(1, len(response.json()["results"]))
+
+    def test_search_schedule_with_pagination(self):
+        response = self.client.post(
+            "/schedules/search?limit=1",
+            json={"filters": [{"column": "scheduler_id", "operator": "eq", "value": self.scheduler.scheduler_id}]},
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, response.json()["count"])
         self.assertEqual(1, len(response.json()["results"]))

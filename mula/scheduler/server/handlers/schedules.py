@@ -259,9 +259,9 @@ class ScheduleAPI:
     def search(
         self,
         request: fastapi.Request,
-        offset: int = 0,
-        limit: int = 10,
-        filters: storage.filters.FilterRequest | None = None,
+        offset: int = Query(0),
+        limit: int = Query(10),
+        filters: storage.filters.FilterRequest | None = Body(...),
     ) -> Any:
         if filters is None:
             raise fastapi.HTTPException(
@@ -269,7 +269,9 @@ class ScheduleAPI:
             )
 
         try:
-            results, count = self.ctx.datastores.schedule_store.get_schedules(filters=filters)
+            results, count = self.ctx.datastores.schedule_store.get_schedules(
+                offset=offset, limit=limit, filters=filters
+            )
         except storage.filters.errors.FilterError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"invalid filter(s) [exception: {exc}]"
