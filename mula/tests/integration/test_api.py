@@ -929,7 +929,11 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
     def test_search_schedule(self):
         response = self.client.post(
             "/schedules/search",
-            json={"filters": [{"column": "data", "field": "id", "operator": "eq", "value": str(self.first_item.id)}]},
+            json={
+                "filters": [
+                    {"column": "data", "field": "name", "operator": "eq", "value": self.first_item.data.get("name")}
+                ]
+            },
         )
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()["count"])
