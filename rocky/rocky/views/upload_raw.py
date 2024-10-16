@@ -62,7 +62,9 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         raw_file = form.cleaned_data["raw_file"]
         mime_types = form.cleaned_data["mime_types"]
         input_ooi = form.cleaned_data["ooi"]
-        valid_time = form.cleaned_data["date"].replace(tzinfo=timezone.utc)
+        valid_time = None
+        if "date" in form.cleaned_data:
+            valid_time = form.cleaned_data["date"].replace(tzinfo=timezone.utc)
 
         try:
             get_bytes_client(self.organization.code).upload_raw(

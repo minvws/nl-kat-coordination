@@ -285,9 +285,9 @@ echo "Step 6.11 - Set kat permissions in rabbitmq"
 sudo rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
 
 echo "Step 7 - Configure start at system boot"
-sudo systemctl enable kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
+sudo systemctl enable kat-rocky kat-rocky-worker kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
 
 echo "Step 8 - Restart OpenKAT"
-sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
+sudo systemctl restart kat-rocky kat-rocky-worker kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
 
 echo "Step 9 - End of OpenKAT install script"
