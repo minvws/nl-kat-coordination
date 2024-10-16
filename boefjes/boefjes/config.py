@@ -121,11 +121,11 @@ class Settings(BaseSettings):
     )
 
     task_capabilities: list[str] = Field(
-        ["network/internet", "ipv6", "ipv4", "internet"],
+        ["Network|internet", "ipv6", "ipv4"],
         description="List of networks the boefje ",
         examples=[
-            ["network/internet", "network/dentist", "network/remote-location", "ipv6"],
-            ["network/dentist", "ipv4"],
+            ["Network|internet", "Network|dentist", "Network|remote-location", "ipv6"],
+            ["Network|dentist", "ipv4"],
         ],
     )
 

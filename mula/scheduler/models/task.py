@@ -100,7 +100,7 @@ class NormalizerTask(BaseModel):
     raw_data: RawData
 
     # TODO SOUF: maybe make a network scope for the openkat instance where the normalizers get run on
-    requirements: list[str] = ["network/internet"]
+    requirements: list[str] = ["Network|internet"]
 
     @property
     def hash(self) -> str:
@@ -124,7 +124,7 @@ class BoefjeTask(BaseModel):
 
     dispatches: list[Normalizer] = Field(default_factory=list)
 
-    requirements: list[str] = ["network/internet"]
+    requirements: list[str] = ["Network|internet"]
 
     @property
     def hash(self) -> str:
