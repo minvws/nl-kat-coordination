@@ -21,7 +21,7 @@ def main():
 
         module_path, *args = boefje_input["boefje_meta"]["arguments"]["oci_arguments"]
 
-        boefje = import_module(module_path)
+        boefje = import_module(f"boefjes.plugins.{module_path}")
         raws = boefje.run(boefje_input["boefje_meta"])
         out = {
             "status": "COMPLETED",

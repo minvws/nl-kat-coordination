@@ -52,7 +52,8 @@ class PluginService:
         all_plugins = {plugin.id: plugin for plugin in self.local_repo.get_all()}
 
         for plugin in self.plugin_storage.get_all():
-            all_plugins[plugin.id] = plugin
+            if plugin.id not in all_plugins:
+                all_plugins[plugin.id] = plugin
 
         return all_plugins
 
