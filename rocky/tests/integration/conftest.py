@@ -4,7 +4,7 @@ from ipaddress import ip_address
 
 import pytest
 from django.conf import settings
-from reports.runner.local import LocalReportJobRunner
+from reports.runner.report_runner import LocalReportRunner
 from tools.models import Organization
 
 from octopoes.api.models import Declaration, Observation
@@ -66,8 +66,8 @@ def octopoes_api_connector_2(integration_organization_2) -> OctopoesAPIConnector
 
 
 @pytest.fixture
-def report_runner(valid_time, katalogus_mock, mocker) -> LocalReportJobRunner:
-    return LocalReportJobRunner(katalogus_mock, mocker.MagicMock(), valid_time)
+def report_runner(valid_time, mocker) -> LocalReportRunner:
+    return LocalReportRunner(mocker.MagicMock(), valid_time)
 
 
 def seed_system(

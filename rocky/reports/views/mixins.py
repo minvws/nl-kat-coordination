@@ -59,7 +59,7 @@ def save_report_data(
     observed_at,
     octopoes_api_connector,
     organization,
-    input_data,
+    input_data: dict,
     report_data,
     report_names,
     parent_report_name,
@@ -75,7 +75,8 @@ def save_report_data(
         raw_id = bytes_client.upload_raw(
             raw=ReportDataDict(input_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
         )
-        name = now.strftime(parent_report_name)
+        name = now.strftime(parent_report_name.replace("{report type}", str(ConcatenatedReport.name)))
+
         if not name or name.isspace():
             name = ConcatenatedReport.name
 
@@ -123,7 +124,7 @@ def save_report_data(
                 ]
 
                 child_input_data = {
-                    "input_data": {"input_oois": [ooi], "report_types": [report_type_id], "plugins": child_plugins}
+                    "input_data": {"input_oois": [ooi], "report_types": [report_type_id], "plugins": [child_plugins]}
                 }
 
                 raw_id = bytes_client.upload_raw(
@@ -162,7 +163,7 @@ def save_report_data(
             manual_mime_types={"openkat/report"},
         )
         report_type = get_report_by_id(report_type_id)
-        name = now.strftime(report_names[0][1])
+        name = now.strftime(parent_report_name.replace("{report type}", str(report_type.name)))
 
         if not name or name.isspace():
             name = ConcatenatedReport.name
