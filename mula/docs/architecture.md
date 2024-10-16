@@ -68,15 +68,16 @@ way of populating, and prioritization of its queue.
 
 ![queue.svg](./img/queue.svg)
 
-Interaction with the scheduler and access to the internals of the 'Scheduler
-App' can be accessed by the `Server` which implements a HTTP REST API interface.
+Interaction with the scheduler and access to the internals of the `Scheduler
+App` can be accessed by the `Server` which implements a HTTP REST API interface.
 
 ## Dataflows
 
 Within a KAT implementation of the scheduler we can identify several dataflows
 of how tasks are created and pushed onto the priority queue. In the following
-section we review how different dataflows, from the `boefjes` and the
-`normalizers` schedulers are implemented within the `Scheduler` system.
+section we review how different dataflows, from the `boefjes`, the
+`normalizers`, `report` schedulers are implemented within the `Scheduler`
+system.
 
 ### `Scheduler`
 
@@ -165,8 +166,6 @@ of the `Schedule` is calculated using the cron expression defined in the
 
 ### `BoefjeScheduler`
 
-![boefje_scheduler.svg](./img/boefje_scheduler.svg)
-
 #### Design
 
 A `BoefjeScheduler` is tasked with creating tasks that are able to be picked
@@ -207,9 +206,9 @@ Before a `BoefjeTask` and pushed on the queue we will check the following:
 
   - check if the same task is already on the priority queue using the `hash`
 
-![diagram005](./img/diagram005.svg)
-
 #### Processes
+
+![boefje_scheduler.svg](./img/boefje_scheduler.svg)
 
 In order to create a `BoefjeTask` and trigger the dataflow we described above
 we have 4 different processes within a `BoefjeScheduler` that can create boefje
@@ -220,11 +219,7 @@ tasks. Namely:
 3. rescheduling of prior tasks
 4. manual scan job
 
-![diagram006](./img/diagram006.svg)
-
 ##### 1. Scan profile mutations
-
-![diagram007](./img/diagram007.svg)
 
 When a scan level is increased on an OOI
 (`schedulers.boefje.push_tasks_for_scan_profile_mutations`) a message is pushed
@@ -250,8 +245,6 @@ The dataflow is as follows:
 - A `Schedule` is created, or updated for the `Task` (`post_push`).
 
 ##### 2. Enabling of boefjes
-
-![diagram008](./img/diagram008.svg)
 
 When a plugin of type `boefje` is enabled or disabled in Rocky. The dataflow is
 triggered when the plugin cache of an organisation is flushed.
@@ -290,8 +283,6 @@ The dataflow is as follows:
 
 ##### 4. Manual scan job
 
-![diagram010](./img/diagram010.svg)
-
 Scan jobs created by the user in Rocky (`server.push_queue`), will
 get the highest priority of 1. Note, that this will circumvent all the checks
 that are present in the `BoefjeScheduler`.
@@ -308,8 +299,6 @@ The dataflow is as follows:
 
 ### `NormalizerScheduler`
 
-![normalizer_scheduler.svg](./img/normalizer_scheduler.svg)
-
 #### Design
 
 The `NormalizerScheduler` is tasked with creating tasks that are able to be
@@ -320,18 +309,24 @@ namely the instance of a `NormalizerTask`.
 The of queueing and processing a `NormalizerTask` task is the same as for
 the `BoefjeScheduler`. Reference that section for a more in-depth explanation.
 
-Before `NormalizerTask` is wrapped by a `PrioritizedItem`, and pushed to the
+Before `NormalizerTask` is wrapped by a `Task`, and pushed to the
 queue we will check the following:
 
-- `is_task_allowed_to_run()`
+- `has_normalizer_permission_to_run()`
 
   - is the normalizer enabled
 
-- `is_task_running()`
+- `has_normalizer_task_started_running()`
 
   - is task still running according to the datastore (`TaskStore`)?
 
+- `is_item_on_queue_by_hash()`
+
+  - check if the same task is already on the priority queue using the `hash`
+
 #### Processes
+
+![normalizer_scheduler.svg](./img/normalizer_scheduler.svg)
 
 The following processes within a `NormalizerScheduler` will create a
 `NormalizerTask` tasks:
@@ -346,19 +341,66 @@ When a raw file is created (`schedulers.normalizer.create_tasks_for_raw_data`)
   from a message queue.
 
 - For every mime type of the raw file, the `NormalizerScheduler` will retrieve
-  the enabled normalizers for this mime type. (`create_tasks_for_raw_data()`)
+  the enabled normalizers for this mime type.
 
 - For every enabled normalizer, a `NormalizerTask` will be created and added to
   the `PriorityQueue` of the `NormalizerScheduler`.
 
 ### `ReportScheduler`
 
+#### Design
+
+The `ReportScheduler` is tasked with
+
+#### Processes
+
 ![report_scheduler.svg](./img/report_scheduler.svg)
 
-## Class Diagram
+The `ReportScheduler` will create a `ReportTask` for the `Task` that is
+associated with a `Schedule` object.
 
-The following diagram we can explore the code level of the scheduler
-application, and its class structure.
+1. Rescheduling of `ReportTask` based on `Schedule` objects
+
+##### 1. Rescheduling of `ReportTask` based on `Schedule` objects
+
+## Project structure
+
+```
+$ tree -L 3 --dirsfirst
+.
+├── docs/                           # additional documentation
+├── scheduler/                      # scheduler python module
+│   ├── config                      # application settings configuration
+│   ├── connectors                  # external service connectors
+│   │   ├── listeners               # channel/socket listeners
+│   │   ├── services                # rest api connectors
+│   │   └── __init__.py
+│   ├── context/                    # shared application context
+│   ├── models/                     # internal model definitions
+│   ├── queues/                     # priority queue definition
+│   ├── rankers/                    # priority/score calculations
+│   ├── storage/                    # data abstraction layer
+│   ├── schedulers/                 # schedulers
+│   │   ├── boefje.py               # boefje scheduler implementation
+│   │   ├── normalizer.py           # normalizer scheduler implementation
+│   │   ├── report.py               # report scheduler implementation
+│   │   └── scheduler.py            # abstract base class for schedulers
+│   ├── server/                     # http rest api server
+│   ├── utils/                      # common utility functions
+│   ├── __init__.py
+│   ├── __main__.py
+│   ├── app.py                      # openkat scheduler app implementation
+│   └── version.py                  # version information
+└─── tests/
+    ├── factories/
+    ├── integration/
+    ├── mocks/
+    ├── scripts/
+    ├── simulation/
+    ├── unit/
+    ├── utils/
+    └── __init__.py
+```
 
 The following describes the main components of the scheduler application:
 
@@ -380,189 +422,4 @@ The following describes the main components of the scheduler application:
 - `Server` - The server class, which is responsible for handling the HTTP
   requests.
 
-```mermaid
-classDiagram
-    class App {
-        +AppContext ctx
-        +Dict[str, Scheduler] schedulers
-        +Server server
-
-        monitor_organisations()
-        collect_metrics()
-        start_schedulers()
-        start_monitors()
-        start_collectors()
-        start_server()
-        run()
-        shutdown()
-        stop_threads()
-    }
-
-    class Scheduler {
-        <<abstract>>
-        +AppContext ctx
-        +PriorityQueue queue
-        +Dict[str, Listener] listeners
-        +Dict[str, ThreadRunner] threads
-
-        run()
-        run_in_thread()
-
-        push_items_to_queue()
-        push_item_to_queue_with_timeout()
-        push_item_to_queue()
-        post_push()
-
-        pop_item_from_queue()
-        post_pop()
-
-        enable()
-        disable()
-        stop()
-        stop_listeners()
-        stop_threads()
-
-        is_enabled()
-        is_space_on_queue()
-        is_item_on_queue_by_hash()
-
-        last_activity()
-        dict()
-    }
-
-    class Server {
-        +AppContext ctx
-        +Dict[str, Scheduler] schedulers
-
-        health()
-        metrics()
-        get_schedulers()
-        get_scheduler()
-        patch_scheduler()
-        list_tasks()
-        get_task()
-        patch_task()
-        get_task_stats()
-        get_queues()
-        get_queue()
-        pop_queue()
-        push_queue()
-        run()
-    }
-
-    class PriorityQueue{
-        <<abstract>>
-        +PriorityQueueStore pq_store
-        pop()
-        push()
-        peek()
-        remove()
-        empty()
-        qsize()
-        full()
-        is_item_on_queue()
-        is_item_on_queue_by_hash()
-        get_p_item_by_identifier()
-        create_hash()
-        dict()
-        _is_valid_item()
-    }
-
-    class PriorityQueueStore{
-        +Datastore datastore
-        pop()
-        push()
-        peek()
-        update()
-        remove()
-        get()
-        empty()
-        qsize()
-        get_item_by_hash()
-        get_items_by_scheduler_id()
-    }
-
-    class Listener {
-        listen()
-    }
-
-    class ThreadRunner {
-        run_forever()
-        run_once()
-        run()
-        join()
-        stop()
-    }
-
-    App --|> "many" Scheduler : Implements
-    App --|> "one" Server: Has
-    Scheduler --|> "1" PriorityQueue : Has
-    Scheduler --|> "many" ThreadRunner : Has
-    Scheduler --|> "many" Listener : Has
-    PriorityQueue --|> PriorityQueueStore: References
-```
-
 ## Database Entity Relationship Diagram
-
-```mermaid
-erDiagram
-    items {
-        uuid id PK
-        character_varying scheduler_id
-        character_varying hash
-        integer priority
-        jsonb data
-        timestamp_with_time_zone created_at
-        timestamp_with_time_zone modified_at
-    }
-
-    tasks {
-        uuid id PK
-        character_varying scheduler_id
-        taskstatus status
-        timestamp_with_time_zone created_at
-        timestamp_with_time_zone modified_at
-        jsonb p_item
-        character_varying type
-    }
-```
-
-## Project structure
-
-```
-$ tree -L 3 --dirsfirst
-.
-├── docs/                           # additional documentation
-├── scheduler/                      # scheduler python module
-│   ├── config                      # application settings configuration
-│   ├── connectors                  # external service connectors
-│   │   ├── listeners               # channel/socket listeners
-│   │   ├── services                # rest api connectors
-│   │   └── __init__.py
-│   ├── context/                    # shared application context
-│   ├── models/                     # internal model definitions
-│   ├── queues/                     # priority queue
-│   ├── rankers/                    # priority/score calculations
-│   ├── storage/                    # data abstraction layer
-│   ├── schedulers/                 # schedulers
-│   ├── server/                     # http rest api server
-│   ├── utils/                      # common utility functions
-│   ├── __init__.py
-│   ├── __main__.py
-│   ├── app.py                      # kat scheduler app implementation
-│   └── version.py                  # version information
-└─── tests/
-    ├── factories/
-    ├── integration/
-    ├── mocks/
-    ├── scripts/
-    ├── simulation/
-    ├── unit/
-    ├── utils/
-    └── __init__.py
-```
-
-[^1]:
-    As of writing a `TaskRun` is known within the scheduler as a `Task`. In the
-    future the naming of this model will change to accurate describe its role
-    and functionality.
