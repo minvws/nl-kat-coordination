@@ -43,9 +43,9 @@ def cast_expression(expression: BinaryExpression, filter_: Filter) -> BinaryExpr
         # if the value can be decoded.
         try:
             decoded_value = json.loads(filter_.value)
-            if isinstance(decoded_value, dict):
-                # If it's a JSON object, return the expression as is. We don't
-                # need to cast it.
+            # If the string is a JSON object, return the expression as is.
+            # We don't need to cast it.
+            if isinstance(decoded_value, dict | list):
                 return expression
             expression = expression.astext
         except json.JSONDecodeError:

@@ -103,8 +103,14 @@ class BoefjeHandler(Handler):
                 ooi = get_octopoes_api_connector(boefje_meta.organization).get(
                     reference, valid_time=datetime.now(timezone.utc)
                 )
-            except ObjectNotFoundException as e:
-                raise ObjectNotFoundException(f"Object {reference} not found in Octopoes") from e
+            except ObjectNotFoundException:
+                logger.info(
+                    "Can't run boefje because OOI does not exist anymore",
+                    boefje_id=boefje_meta.boefje.id,
+                    ooi=reference,
+                    task_id=boefje_meta.id,
+                )
+                return
 
             boefje_meta.arguments["input"] = ooi.serialize()
 
