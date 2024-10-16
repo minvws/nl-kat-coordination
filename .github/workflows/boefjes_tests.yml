@@ -10,10 +10,12 @@ on:
     paths:
       - boefjes/**
       - octopoes/**
+      - .github/workflows/boefjes_test.yml
   pull_request:
     paths:
       - boefjes/**
       - octopoes/**
+      - .github/workflows/boefjes_test.yml
 
 jobs:
   Tests:
