@@ -179,13 +179,13 @@ class OctopoesService:
                 return
 
         if origin.origin_type == OriginType.AFFIRMATION and not any(
-            origin
-            for origin in self.origin_repository.list_origins(
+            other_origin
+            for other_origin in self.origin_repository.list_origins(
                 origin_type={OriginType.DECLARATION, OriginType.OBSERVATION, OriginType.INFERENCE},
                 valid_time=valid_time,
                 result=origin.source,
             )
-            if not (origin.origin_type == OriginType.INFERENCE and [origin.source] == origin.result)
+            if not (other_origin.origin_type == OriginType.INFERENCE and [other_origin.source] == other_origin.result)
         ):
             logger.debug("Affirmation source %s seems dangling, deleting", origin.source)
             self.ooi_repository.delete(origin.source, valid_time)
