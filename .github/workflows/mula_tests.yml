@@ -9,9 +9,11 @@ on:
       - "*"
     paths:
       - mula/**
+      - .github/workflows/mula_test.yml
   pull_request:
     paths:
       - mula/**
+      - .github/workflows/mula_test.yml
 
 jobs:
   test:
