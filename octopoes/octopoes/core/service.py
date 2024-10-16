@@ -178,6 +178,19 @@ class OctopoesService:
                 logger.debug("Affirmation source %s already deleted", origin.source)
                 return
 
+        if origin.origin_type == OriginType.AFFIRMATION and not any(
+            other_origin
+            for other_origin in self.origin_repository.list_origins(
+                origin_type={OriginType.DECLARATION, OriginType.OBSERVATION, OriginType.INFERENCE},
+                valid_time=valid_time,
+                result=origin.source,
+            )
+            if not (other_origin.origin_type == OriginType.INFERENCE and [other_origin.source] == other_origin.result)
+        ):
+            logger.debug("Affirmation source %s seems dangling, deleting", origin.source)
+            self.ooi_repository.delete(origin.source, valid_time)
+            return
+
         for ooi in oois:
             self.ooi_repository.save(ooi, valid_time=valid_time, end_valid_time=end_valid_time)
         self.origin_repository.save(origin, valid_time=valid_time)

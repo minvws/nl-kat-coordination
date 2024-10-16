@@ -25,10 +25,11 @@ class UploadRawForm(BaseRockyForm):
         required=True,
         widget=forms.TextInput(attrs={"placeholder": "text/html, image/jpeg, ..."}),
     )
-    raw_file = forms.FileField(label=_("Upload raw file"), allow_empty_file=False)
+    raw_file = forms.FileField(label=_("Upload raw file"), allow_empty_file=False, required=True)
 
     ooi_id = forms.CharField(
         label="Input or Scan OOI",
+        required=True,
         widget=DataListInput(
             attrs={"placeholder": _("Click to select one of the available options, or type one yourself")}
         ),
@@ -64,7 +65,7 @@ class UploadRawForm(BaseRockyForm):
         cleaned_data = super().clean()
 
         date = self.cleaned_data["date"]
-        ooi_id = self.cleaned_data["ooi_id"]
+        ooi_id = self.data["ooi_id"]
 
         # date should not be in the future
         if date > datetime.now(tz=timezone.utc):
