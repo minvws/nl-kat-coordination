@@ -7,6 +7,7 @@ from nibbles.definitions import NibbleDefinition, get_nibble_definitions
 from octopoes.models import OOI
 from octopoes.models.types import type_by_name
 from octopoes.repositories.ooi_repository import OOIRepository
+from octopoes.repositories.origin_parameter_repository import OriginParameterRepository
 
 T = TypeVar("T")
 U = TypeVar("U")
@@ -21,8 +22,9 @@ def mergewith(func: Callable[[set[T], set[T]], set[T]], d1: dict[U, set[T]], d2:
 
 
 class NibblesRunner:
-    def __init__(self, ooi_repository: OOIRepository):
+    def __init__(self, ooi_repository: OOIRepository, origin_parameter_repository: OriginParameterRepository):
         self.ooi_repository = ooi_repository
+        self.origin_parameter_repository = origin_parameter_repository
         self.objects_by_type_cache: dict[type[OOI], set[OOI]]
         self.update_nibbles()
 
