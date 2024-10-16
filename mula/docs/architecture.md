@@ -39,7 +39,7 @@ external services. In this overview arrows from external services indicate how
 and why those services communicate with the scheduler. The `Scheduler` system
 combines data from the `Octopoes`, `Katalogus`, `Bytes` and `RabbitMQ` systems.
 
-![diagram001](./img/diagram001.svg)
+![scheduler](./img/scheduler.svg)
 
 - Octopoes
 
@@ -60,7 +60,7 @@ be created per organisation:
 2. _normalizer scheduler_
 3. _report scheduler_
 
-![diagram002](./img/diagram002.svg)
+![schedulers.svg](./img/schedulers.svg)
 
 Each scheduler type implements it's own priority queue, and can implement it's own
 way of populating, and prioritization of its queue.
@@ -88,7 +88,11 @@ The `PriorityQueue` derives its state from the state of the `Task` objects that
 are persisted in the database. In other words, the current state of the
 `PriorityQueue` are the `Task` objects with the status of `QUEUED`.
 
+![queue.svg](./img/queue.svg)
+
 #### `Task`
+
+![tasks.svg](./img/tasks.svg)
 
 A `Task` object contains the following fields:
 
@@ -157,6 +161,8 @@ of the `Schedule` is calculated using the cron expression defined in the
 `schedule` field.
 
 ### `BoefjeScheduler`
+
+![boefje_scheduler.svg](./img/boefje_scheduler.svg)
 
 #### Design
 
@@ -299,6 +305,8 @@ The dataflow is as follows:
 
 ### `NormalizerScheduler`
 
+![normalizer_scheduler.svg](./img/normalizer_scheduler.svg)
+
 #### Design
 
 The `NormalizerScheduler` is tasked with creating tasks that are able to be
@@ -339,6 +347,10 @@ When a raw file is created (`schedulers.normalizer.create_tasks_for_raw_data`)
 
 - For every enabled normalizer, a `NormalizerTask` will be created and added to
   the `PriorityQueue` of the `NormalizerScheduler`.
+
+### `ReportScheduler`
+
+![report_scheduler.svg](./img/report_scheduler.svg)
 
 ## Class Diagram
 
