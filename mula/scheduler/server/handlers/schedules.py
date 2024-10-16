@@ -57,6 +57,14 @@ class ScheduleAPI:
             description="Update a schedule",
         )
 
+        self.api.add_api_route(
+            path="/schedules/{schedule_id}",
+            endpoint=self.delete,
+            methods=["DELETE"],
+            status_code=204,
+            description="Delete a schedule",
+        )
+
     def list(
         self,
         request: fastapi.Request,
@@ -246,3 +254,20 @@ class ScheduleAPI:
             ) from exc
 
         return updated_schedule
+
+    def delete(self, schedule_id: uuid.UUID) -> None:
+        try:
+            self.ctx.datastores.schedule_store.delete_schedule(schedule_id)
+        except storage.errors.StorageError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"error occurred while accessing the database [exception: {exc}]",
+            ) from exc
+        except Exception as exc:
+            self.logger.exception(exc)
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"failed to delete schedule [exception: {exc}]",
+            ) from exc
+
+        return None
