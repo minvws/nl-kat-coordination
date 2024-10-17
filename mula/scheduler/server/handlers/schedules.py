@@ -259,8 +259,8 @@ class ScheduleAPI:
     def search(
         self,
         request: fastapi.Request,
-        offset: int = Query(0),
-        limit: int = Query(10),
+        offset: int = 0,
+        limit: int = 10,
         filters: storage.filters.FilterRequest | None = Body(...),
     ) -> Any:
         if filters is None:
