@@ -365,6 +365,8 @@ class OnboardingReportView(
                 + urlencode({"report_id": report_ooi.reference})
             )
 
+        return self.get(request, *args, **kwargs)
+
     def set_member_onboarded(self):
         member = OrganizationMember.objects.get(user=self.request.user, organization=self.organization)
         member.onboarded = True
