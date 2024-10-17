@@ -34,7 +34,7 @@ Please make sure to link them to the central project board as an incoming featur
 Pull Requests
 =============
 
-Each unit of work shall be submitted as a pull request using a :ref:`Pull Request Template` and reviewed by at least one developer.
+Each unit of work shall be submitted as a pull request using a :ref:`Pull Request template for authors` and reviewed by at least one developer.
 The checklist should be completed by a functional and a code reviewer.
 
 In-depth content discussions
