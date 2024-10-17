@@ -350,7 +350,8 @@ When a raw file is created (`schedulers.normalizer.create_tasks_for_raw_data`)
 
 #### Design
 
-The `ReportScheduler` is tasked with
+The `ReportScheduler` is tasked with creating report tasks that are able to be
+picked up and processed by the 'Report Runner'.
 
 #### Processes
 
@@ -359,9 +360,22 @@ The `ReportScheduler` is tasked with
 The `ReportScheduler` will create a `ReportTask` for the `Task` that is
 associated with a `Schedule` object.
 
-1. Rescheduling of `ReportTask` based on `Schedule` objects
+1. Manual creation of `Schedule` for `ReportTask`
+2. Rescheduling of `ReportTask` based on `Schedule` objects for `ReportTask` for `ReportTask`
 
-##### 1. Rescheduling of `ReportTask` based on `Schedule` objects
+##### 1. Manual creation of `Schedule` for `ReportTask`
+
+A user can create a "Report Recipe" within Rocky, and define a recurrence
+schedule of this report to be executed. A `Schedule` is created for this
+"Report Recipe" and posted to the `Scheduler`. The `ReportScheduler` will
+continuously check for `Schedule` object whose `deadline_at` has passed.
+
+##### 2. Rescheduling of `ReportTask` based on `Schedule` objects
+
+The `ReportScheduler` will create a `ReportTask` for the `Task` that is
+associated with a `Schedule` object. The `ReportScheduler` will continuously
+check for `Schedule` objects whose `deadline_at` has passed and push
+`ReportTask` tasks to the queue.
 
 ## Project structure
 
