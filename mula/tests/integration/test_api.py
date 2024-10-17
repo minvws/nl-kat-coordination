@@ -729,22 +729,22 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
     def setUp(self):
         super().setUp()
 
-        first_item = functions.create_item(self.scheduler.scheduler_id, 1)
+        self.first_item = functions.create_item(self.scheduler.scheduler_id, 1)
         self.first_schedule = self.mock_ctx.datastores.schedule_store.create_schedule(
             models.Schedule(
                 scheduler_id=self.scheduler.scheduler_id,
-                hash=first_item.hash,
-                data=first_item.data,
+                hash=self.first_item.hash,
+                data=self.first_item.data,
                 deadline_at=datetime.now(timezone.utc) + timedelta(days=1),
             )
         )
 
-        second_item = functions.create_item(self.scheduler.scheduler_id, 1)
+        self.second_item = functions.create_item(self.scheduler.scheduler_id, 1)
         self.second_schedule = self.mock_ctx.datastores.schedule_store.create_schedule(
             models.Schedule(
                 scheduler_id=self.scheduler.scheduler_id,
-                hash=second_item.hash,
-                data=second_item.data,
+                hash=self.second_item.hash,
+                data=self.second_item.data,
                 deadline_at=datetime.now(timezone.utc) + timedelta(days=2),
             )
         )
@@ -953,6 +953,28 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
         response = self.client.patch(f"/schedules/{self.first_schedule.id}", json={"schedule": "malformed"})
         self.assertEqual(400, response.status_code)
         self.assertIn("validation error", response.json().get("detail"))
+
+    def test_search_schedule(self):
+        response = self.client.post(
+            "/schedules/search",
+            json={
+                "filters": [
+                    {"column": "data", "field": "name", "operator": "eq", "value": self.first_item.data.get("name")}
+                ]
+            },
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()["count"])
+        self.assertEqual(1, len(response.json()["results"]))
+
+    def test_search_schedule_with_pagination(self):
+        response = self.client.post(
+            "/schedules/search?limit=1",
+            json={"filters": [{"column": "scheduler_id", "operator": "eq", "value": self.scheduler.scheduler_id}]},
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, response.json()["count"])
+        self.assertEqual(1, len(response.json()["results"]))
 
     def test_delete_schedule(self):
         response = self.client.delete(f"/schedules/{self.first_schedule.id}")
