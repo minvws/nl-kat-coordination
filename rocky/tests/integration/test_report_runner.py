@@ -99,8 +99,3 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
     #  `ooi_name in default_name` also passes for 'DNS Report for Hostname|test|a.example.com in %Y'.
     #  We shouldn't have to guess the match in the report_names argument. The name should be overridden on an object
     #  in the report_data list probably. Note that sometimes this does work when the OOIs are ordered differently.
-
-    # assert {x.name for x in subreports} == {
-    # "DNS Report for Hostname|test|a.example.com in 2024"
-    # "DNS Report for Hostname|test|example.com in 2024",
-    # }
