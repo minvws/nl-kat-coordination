@@ -31,7 +31,7 @@ class YourNameReport(Report):
 ```
 
 5. Open `reports/report_types/helpers.py` and add your new class to the `REPORTS` constant list.
-6. Implement a method within `report.py` to gather the required data for report generation. See the [Collecting data](#collecting-data) section for more information.
+6. Implement a method within `report.py` to gather the required data for report generation. See the {ref}`Collecting data` section for more information.
 7. Design the HTML structure for your report within `report.html`. The generated data from `report.py` can be used with Django Template in this file. For example by referring to the returned value like `{{ data }}`.
 8. Save your changes and refresh the page to see the changes you made immediately.
 
@@ -43,7 +43,7 @@ The `generate_data` method only works on single OOIs and should not be used in n
 Use all existing reports as examples to gather data for your report.
 
 - In the file `rocky/reports/report_types/definitions.py` you can find some methods that may be useful.
-- For querying data from Octopoes, consult `octopoes/octopoes/connector/octopoes.py` which contains various useful methods. Additional information on how to write queries can be found [here](https://docs.openkat.nl/developer_documentation/octopoes.html#querying).
+- For querying data from Octopoes, consult `octopoes/octopoes/connector/octopoes.py` which contains various useful methods. Additional information on how to write queries can be found {ref}`here <Querying>`.
 
 ## Writing report unit tests
 
@@ -91,4 +91,4 @@ def test_my_new_report_multiple_results(mock_octopoes_api_connector, valid_time,
 
 ### Executing unit tests
 
-Information about how to execute unit tests can be found [here](https://docs.openkat.nl/developer_documentation/rocky.html#testing).
+Information about how to execute unit tests can be found {ref}`here <rocky-testing>`.

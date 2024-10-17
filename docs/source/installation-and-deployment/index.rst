@@ -1,4 +1,4 @@
-Installation and deployment
+Installation and Deployment
 ###########################
 
 Contains documentation for developers and contributors.
