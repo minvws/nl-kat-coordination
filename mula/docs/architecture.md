@@ -49,13 +49,13 @@ combines data from the `Octopoes`, `Katalogus`, `Bytes` and `RabbitMQ` systems.
 
 ### C3 Component level
 
-![scheduler](./img/scheduler.svg)
-
 When we take a closer look at the `scheduler` system itself we can identify
 several components. The `SchedulerApp` directs the creation and maintenance
 of a multitude of schedulers.
 
-![schedulers.svg](./img/schedulers.svg)
+| Scheduler                         |                              Schedulers |
+| :-------------------------------- | --------------------------------------: |
+| ![scheduler](./img/scheduler.svg) | ![schedulers.svg](./img/schedulers.svg) |
 
 Typically in a KAT installation 3 scheduler will be created per organisation:
 
