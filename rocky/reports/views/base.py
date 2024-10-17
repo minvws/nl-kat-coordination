@@ -508,6 +508,7 @@ class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, SchedulerView, 
         context = super().get_context_data(**kwargs)
         context["reports"] = self.get_report_names()
 
+        context["report_schedule_form_start_date"] = self.get_report_schedule_form_start_date()
         context["report_schedule_form_recurrence_choice"] = self.get_report_schedule_form_recurrence_choice()
         context["report_schedule_form_recurrence"] = self.get_report_schedule_form_recurrence()
 
@@ -543,12 +544,13 @@ class SaveReportView(BaseReportView, ReportBreadcrumbs, SchedulerView):
             subreport_name_format = request.POST.get("child_report_name", "")
 
             recurrence = request.POST.get("recurrence", "")
+            deadline_at = request.POST.get("start_date", datetime.now(timezone.utc).date())
 
             schedule = self.convert_recurrence_to_cron_expressions(recurrence)
 
             report_recipe = self.create_report_recipe(report_name_format, subreport_name_format, schedule)
 
-            self.create_report_schedule(report_recipe)
+            self.create_report_schedule(report_recipe, deadline_at)
 
             return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 
