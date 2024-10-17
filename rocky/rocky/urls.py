@@ -2,6 +2,7 @@ from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic.base import TemplateView
+from reports.viewsets import ReportViewSet
 from rest_framework import routers
 from tools.viewsets import OrganizationViewSet
 from two_factor.urls import urlpatterns as tf_urls
@@ -54,6 +55,7 @@ handler403 = "rocky.views.handler403.handler403"
 
 router = routers.SimpleRouter()
 router.register(r"organization", OrganizationViewSet)
+router.register(r"report", ReportViewSet, basename="report")
 
 urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),
