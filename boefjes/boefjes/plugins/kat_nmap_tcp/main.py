@@ -18,4 +18,10 @@ def run(boefje_meta: dict):
         cmd.append("-6")
 
     cmd.extend(["-oX", "-", str(ip)])
-    return [({"openkat/nmap-output"}, subprocess.run(cmd, capture_output=True).stdout.decode())]
+    output = subprocess.run(cmd, capture_output=True)
+
+    output.check_returncode()
+
+    results = [({"openkat/nmap-output"}, output.stdout.decode())]
+
+    return results
