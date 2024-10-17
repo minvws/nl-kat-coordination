@@ -9,15 +9,15 @@ Contains documentation for developers and contributors.
 
    install
    containers
-   debianinstall
+   debian-install
    scripts
    hardening
-   localinstall
-   windowsinstall
+   local-install
+   windows-install
    gitpod
    nginx
-   debuggingtroubleshooting
+   debugging-troubleshooting
    latex
-   environment_settings/index
-   externalauthentication
+   environment-settings/index
+   external-authentication
    cveapi

@@ -13,11 +13,11 @@ export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
 define build-settings-doc
-	echo "# $(4)" > docs/source/installation_and_deployment/environment_settings/$(3).md
+	echo "# $(4)" > docs/source/installation-and-deployment/environment-settings/$(3).md
 	DOCS=True PYTHONPATH=./$(1) settings-doc generate \
 	-f markdown -m $(2) \
 	--templates docs/settings-doc-templates \
-	>> docs/source/installation_and_deployment/environment_settings/$(3).md
+	>> docs/source/installation-and-deployment/environment-settings/$(3).md
 endef
 
 
