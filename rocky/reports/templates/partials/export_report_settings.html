@@ -15,18 +15,28 @@
                     or monthly. If you need the report just for a single occasion, select the one-time option.
                 {% endblocktranslate %}
             </p>
-            {% include "partials/return_button.html" with btn_text="Change selection" %}
-
             <form class="inline" method="post" action="{{ current }}">
                 {% csrf_token %}
                 {% include "forms/report_form_fields.html" %}
-
-                <h3>{% translate "Recurrence" %}</h3>
                 {% include "partials/form/fieldset.html" with fields=report_schedule_form_recurrence_choice %}
 
                 {% if is_scheduled_report %}
-                    {% include "partials/form/fieldset.html" with fields=report_schedule_form_recurrence %}
+                    <p>
+                        {% blocktranslate trimmed %}
+                            The date you select will be the reference date for the data set for your report.
+                            Please allow for up to 24 hours for your report to be ready.
+                        {% endblocktranslate %}
+                    </p>
+                    <div class="column-2">
+                        <div>
+                            {% include "partials/form/fieldset.html" with fields=report_schedule_form_start_date %}
 
+                        </div>
+                        <div>
+                            {% include "partials/form/fieldset.html" with fields=report_schedule_form_recurrence %}
+
+                        </div>
+                    </div>
                 {% endif %}
             </form>
             <form id="generate_report" class="inline" method="post" action="{{ next }}">
@@ -40,8 +50,7 @@
                     <button type="submit" form="generate_report">
                         {% translate "Generate report" %}<span class="icon ti-chevron-right" aria-hidden="true"></span>
                     </button>
-                {% endif %}
-                {% if is_scheduled_report %}
+                {% elif is_scheduled_report %}
                     {% include "partials/report_names_header.html" with recurrence=True %}
                     {% include "partials/form/fieldset.html" with fields=report_parent_name_form %}
 

@@ -97,13 +97,13 @@ class SchedulerView(OctopoesView):
         return self.report_schedule_form_start_date_choice(self.request.POST)
 
     def get_report_schedule_form_start_date(self):
-        return self.report_schedule_form_start_date(self.request.POST)
+        return self.report_schedule_form_start_date()
 
     def get_report_schedule_form_recurrence_choice(self):
         return self.report_schedule_form_recurrence_choice(self.request.POST)
 
     def get_report_schedule_form_recurrence(self):
-        return self.report_schedule_form_recurrence(self.request.POST)
+        return self.report_schedule_form_recurrence()
 
     def get_report_parent_name_form(self):
         return self.report_parent_name_form()
@@ -120,14 +120,17 @@ class SchedulerView(OctopoesView):
 
         return task
 
-    def create_report_schedule(self, report_recipe: ReportRecipe) -> ScheduleResponse | None:
+    def create_report_schedule(self, report_recipe: ReportRecipe, deadline_at: str) -> ScheduleResponse | None:
         try:
             report_task = ReportTask(
                 organisation_id=self.organization.code, report_recipe_id=str(report_recipe.recipe_id)
             ).model_dump()
 
             schedule_request = ScheduleRequest(
-                scheduler_id=self.scheduler_id, data=report_task, schedule=report_recipe.cron_expression
+                scheduler_id=self.scheduler_id,
+                data=report_task,
+                schedule=report_recipe.cron_expression,
+                deadline_at=deadline_at,
             )
 
             submit_schedule = self.scheduler_client.post_schedule(schedule=schedule_request)
