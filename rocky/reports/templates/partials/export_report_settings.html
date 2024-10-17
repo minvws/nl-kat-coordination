@@ -42,7 +42,7 @@
                     </button>
                 {% endif %}
                 {% if is_scheduled_report %}
-                    {% include "partials/report_names_header.html" %}
+                    {% include "partials/report_names_header.html" with recurrence=True %}
                     {% include "partials/form/fieldset.html" with fields=report_parent_name_form %}
 
                     {% if reports|length > 1 %}
@@ -61,8 +61,6 @@
     </div>
 </section>
 {% block html_at_end_body %}
-    {% compress js %}
-        <script src="{% static "js/renameReports.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
-        <script src="{% static "js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
-    {% endcompress %}
+    <script src="{% static "js/renameReports.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
+    <script src="{% static "js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
 {% endblock html_at_end_body %}

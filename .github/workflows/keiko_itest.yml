@@ -9,9 +9,11 @@ on:
       - "*"
     paths:
       - keiko/**
+      - .github/workflows/keiko_itest.yml
   pull_request:
     paths:
       - keiko/**
+      - .github/workflows/keiko_itest.yml
 
 jobs:
   itest:

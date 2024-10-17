@@ -122,13 +122,9 @@ class ReportsLandingView(ReportBreadcrumbs, TemplateView):
         return redirect(reverse("report_history", kwargs=self.get_kwargs()))
 
 
-def get_plugin_ids(report_types: list[type[BaseReport]]):
-    return report_plugins_union(report_types)
-
-
 def hydrate_plugins(report_types: list[type["BaseReport"]], katalogus: KATalogusClientV1) -> dict[str, list[Plugin]]:
     plugins: dict[str, list[Plugin]] = {"required": [], "optional": []}
-    merged_plugins = get_plugin_ids(report_types)
+    merged_plugins = report_plugins_union(report_types)
 
     required_plugins_ids = list(merged_plugins["required"])
     optional_plugins_ids = list(merged_plugins["optional"])
@@ -264,14 +260,6 @@ class BaseReportView(OOIFilterView):
         report_types = self.get_report_types_for_generate_report()
         return report_types, len(report_types)
 
-    def get_plugin_data_for_saving(self) -> list[dict]:
-        try:
-            report_type_plugins = hydrate_plugins(self.get_report_types(), get_katalogus(self.organization.code))
-        except KATalogusError as error:
-            return messages.error(self.request, error.message)
-
-        return format_plugin_data(report_type_plugins)
-
     def get_observed_at(self):
         return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
 
@@ -305,7 +293,7 @@ class BaseReportView(OOIFilterView):
             "input_data": {
                 "input_oois": self.get_ooi_pks(),
                 "report_types": self.get_report_type_ids(),
-                "plugins": get_plugin_ids(self.get_report_types()),
+                "plugins": report_plugins_union(self.get_report_types()),
             }
         }
 
@@ -453,7 +441,7 @@ class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["enabled_plugins"] = self.all_plugins_enabled()
+        context["enabled_plugins"] = self.plugins_enabled()
         context["plugin_data"] = self.get_plugins_data()
         context["plugins"] = self.plugins
         return context
@@ -662,9 +650,14 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         katalogus_plugins = get_katalogus(self.organization.code).get_plugins(
             ids=plugin_ids_required + plugin_ids_optional
         )
+        for plugin in katalogus_plugins:
+            if plugin.id in plugin_ids_required:
+                plugins["required"].append(plugin)
+            if plugin.id in plugin_ids_optional:
+                plugins["optional"].append(plugin)
 
-        plugins["required"] = [plugin for plugin in katalogus_plugins if plugin.id in plugin_ids_required]
-        plugins["optional"] = [plugin for plugin in katalogus_plugins if plugin.id in plugin_ids_optional]
+        plugins["required"] = sorted(plugins["required"], key=attrgetter("enabled"))
+        plugins["optional"] = sorted(plugins["optional"], key=attrgetter("enabled"), reverse=True)
 
         return format_plugin_data(plugins)
 

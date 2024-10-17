@@ -481,6 +481,34 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(second_item_id, response.json().get("id"))
         self.assertEqual(0, self.scheduler.queue.qsize())
 
+    def test_pop_queue_filters_nested_contained_by(self):
+        # Add one task to the queue
+        first_item = create_task_in(1, data=functions.TestModel(id="123", name="test", categories=["foo", "bar"]))
+        response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", data=first_item)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+        # Add second item to the queue
+        second_item = create_task_in(2, data=functions.TestModel(id="456", name="test", categories=["baz", "bat"]))
+        response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", data=second_item)
+        second_item_id = response.json().get("id")
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(2, self.scheduler.queue.qsize())
+
+        # Test contained by
+        response = self.client.post(
+            f"/queues/{self.scheduler.scheduler_id}/pop",
+            json={
+                "filters": [
+                    {"column": "data", "operator": "<@", "field": "categories", "value": json.dumps(["baz", "bat"])}
+                ]
+            },
+        )
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(second_item_id, response.json().get("id"))
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
     def test_pop_empty(self):
         """When queue is empty it should return an empty response"""
         response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/pop")
@@ -907,21 +935,29 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
         self.assertIn("schedule with the same hash already exists", response.json().get("detail"))
 
     def test_get_schedule(self):
-        response = self.client.get(f"/schedules/{str(self.first_schedule.id)}")
+        response = self.client.get(f"/schedules/{self.first_schedule.id}")
         self.assertEqual(200, response.status_code)
         self.assertEqual(str(self.first_schedule.id), response.json().get("id"))
 
     def test_patch_schedule(self):
-        response = self.client.patch(f"/schedules/{str(self.first_schedule.id)}", json={"enabled": False})
+        response = self.client.patch(f"/schedules/{self.first_schedule.id}", json={"enabled": False})
         self.assertEqual(200, response.status_code)
         self.assertEqual(False, response.json().get("enabled"))
 
     def test_patch_schedule_validate_schedule(self):
-        response = self.client.patch(f"/schedules/{str(self.first_schedule.id)}", json={"schedule": "*/5 * * * *"})
+        response = self.client.patch(f"/schedules/{self.first_schedule.id}", json={"schedule": "*/5 * * * *"})
         self.assertEqual(200, response.status_code)
         self.assertEqual("*/5 * * * *", response.json().get("schedule"))
 
     def test_patch_schedule_validate_malformed_schedule(self):
-        response = self.client.patch(f"/schedules/{str(self.first_schedule.id)}", json={"schedule": "malformed"})
+        response = self.client.patch(f"/schedules/{self.first_schedule.id}", json={"schedule": "malformed"})
         self.assertEqual(400, response.status_code)
         self.assertIn("validation error", response.json().get("detail"))
+
+    def test_delete_schedule(self):
+        response = self.client.delete(f"/schedules/{self.first_schedule.id}")
+        self.assertEqual(204, response.status_code)
+
+        # Schedule should be deleted
+        response = self.client.get(f"/schedules/{self.first_schedule.id}")
+        self.assertEqual(404, response.status_code)

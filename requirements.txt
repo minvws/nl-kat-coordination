@@ -365,9 +365,9 @@ shellingham==1.5.4 ; python_version >= "3.10" and python_version < "4.0" \
 snowballstemmer==2.2.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:09b16deb8547d3412ad7b590689584cd0fe25ec8db3be37788be3810cbf19cb1 \
     --hash=sha256:c8e1716e83cc398ae16824e5572ae04e0d9fc2c6b985fb0f900f5f0c96ecba1a
-sphinx-rtd-theme==2.0.0 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:bd5d7b80622406762073a04ef8fadc5f9151261563d47027de09910ce03afe6b \
-    --hash=sha256:ec93d0856dc280cf3aee9a4c9807c60e027c7f7b461b77aeffed682e68f0e586
+sphinx-rtd-theme==3.0.0 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:1ffe1539957775bfa0a7331370de7dc145b6eac705de23365dc55c5d94bb08e7 \
+    --hash=sha256:905d67de03217fd3d76fbbdd992034ac8e77044ef8063a544dda1af74d409e08
 sphinx==7.4.7 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:242f92a7ea7e6c5b406fdc2615413890ba9f699114a9c09192d7dfead2ee9cfe \
     --hash=sha256:c2419e2135d11f1951cd994d6eb18a1835bd8fdd8429f9ca375dc1f3281bd239
