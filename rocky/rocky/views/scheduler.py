@@ -180,6 +180,12 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
+    def get_schedule_with_filters(self, filters: dict[str, Any]) -> ScheduleResponse:
+        try:
+            return self.scheduler_client.post_schedule_search(filters).results[0]
+        except SchedulerError as error:
+            return messages.error(self.request, error.message)
+
     def schedule_task(self, task: Task) -> None:
         if not self.indemnification_present:
             return self.indemnification_error()
