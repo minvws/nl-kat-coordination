@@ -262,7 +262,7 @@ class ScheduleAPI:
         offset: int = 0,
         limit: int = 10,
         filters: storage.filters.FilterRequest | None = Body(...),
-    ) -> Any:
+    ) -> PaginatedResponse:
         if filters is None:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail="missing search filters"
