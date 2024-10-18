@@ -90,12 +90,16 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     paginator = RockyPaginator
     template_name = "report_overview/report_history.html"
 
+    def post(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
+
     def get_queryset(self) -> ReportList:
         return ReportList(self.octopoes_api_connector, valid_time=self.observed_at)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["total_oois"] = len(self.object_list)
+        context["selected_reports"] = self.request.GET.getlist("report", [])
         return context
 
 

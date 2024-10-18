@@ -1,0 +1,14 @@
+{% component "modal" size="dialog-large" modal_id="delete-modal" %}
+{% fill "header" %}
+Delete
+{% endfill %}
+{% fill "content" %}
+<form id="delete-form" method="post">
+    {% csrf_token %}
+</form>
+{% endfill %}
+{% fill "footer_buttons" %}
+<input type="submit"  form="delete-form"  class="submit"  value="Submit">
+{% endfill %}
+{% endcomponent %}
+{% component_css_dependencies %}

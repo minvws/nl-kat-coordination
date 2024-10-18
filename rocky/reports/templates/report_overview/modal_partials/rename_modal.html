@@ -1,0 +1,14 @@
+{% component "modal" size="dialog-large" modal_id="rename-modal" %}
+{% fill "header" %}
+Rename
+{% endfill %}
+{% fill "content" %}
+<form id="rename-form" method="post">
+    {% csrf_token %}
+</form>
+{% endfill %}
+{% fill "footer_buttons" %}
+<input type="submit" form="rename-form" class="submit" value="Submit">
+{% endfill %}
+{% endcomponent %}
+{% component_css_dependencies %}

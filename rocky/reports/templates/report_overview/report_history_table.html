@@ -1,12 +1,65 @@
 {% load i18n %}
+{% load static %}
 {% load ooi_extra %}
 {% load report_extra %}
+{% load component_tags %}
+{% load compress %}
 
+<div class="horizontal-view toolbar">
+    <div class="dropdown">
+        {% comment %} <p class="visually-hidden" id="language-selector-description">{% translate "Select your language" %}</p> {% endcomment %}
+        <button aria-label="{{ aria_label_current_language }}"
+                type="button"
+                aria-haspopup="listbox"
+                aria-current="true"
+                class="dropdown-button ghost">
+            {% translate "Actions" %}
+            <span class="icon ti-chevron-down"></span>
+        </button>
+        <div class="dropdown-list">
+            <ul role="listbox">
+                {% comment %} <li>
+                <a href="#" role="option" data-value="test"><i class="icon ti-refresh"></i>Rerun</a>
+            </li>
+            <li>
+              <a href="#" role="option" data-value="test"><i class="icon ti-calendar-event"></i>Reschedule</a>
+            </li>
+            <li>
+              <a href="#" role="option" data-value="test"><i class="icon ti-share"></i>Share</a>
+            </li>
+            <li>
+              <a href="#" role="option" data-value="test"><i class="icon ti-layers-difference"></i>Concatenate</a>
+                </li> {% endcomment %}
+                <li>
+                    <a href="#rename-modal" role="option" data-value="test">
+                        <i class="icon ti-edit"></i>{% translate "Rename" %}
+                    </a>
+                </li>
+                <li>
+                    <a href="#delete-modal"
+                       class="plain destructive"
+                       role="option"
+                       data-value="test">
+                        <i class="icon ti-trash"></i>{% translate "Delete" %}
+                    </a>
+                </li>
+            </ul>
+        </div>
+        {% include "report_overview/modal_partials/rename_modal.html" %}
+        {% include "report_overview/modal_partials/delete_modal.html" %}
+
+    </div>
+</div>
 <div class="horizontal-scroll">
     <table>
         <caption class="visually-hidden">{% translate "Reports:" %}</caption>
         <thead>
             <tr>
+                <th>
+                    <input class="select_all_objects_element"
+                           type="checkbox"
+                           {% if "all" in selected_reports %}checked{% endif %}>
+                </th>
                 <th scope="col">{% translate "Name" %}</th>
                 <th scope="col">{% translate "Report type" %}</th>
                 <th scope="col">{% translate "Input Objects" %}</th>
@@ -19,7 +72,15 @@
             {% for report in reports %}
                 <tr>
                     <td>
-                        <a href="{% url "view_report" organization.code %}?report_id={{ report.parent_report.reference }}&observed_at={{ report.parent_report.observed_at|date:"Y-m-d H:i:s:u" }}"
+                        <input type="checkbox"
+                               name="report"
+                               value="{{ report.parent_report.reference }}"
+                               {% if report.id in selected_reports or "all" in selected_reports %}checked{% endif %}
+                               {% if "all" in selected_reports %}disabled{% endif %}>
+                    </td>
+                    <td class="report_name">
+                        <a id="report_name_{{ report.parent_report.reference|slugify }}"
+                           href="{% url "view_report" organization.code %}?report_id={{ report.parent_report.reference }}&observed_at={{ report.parent_report.observed_at|date:"Y-m-d H:i:s:u" }}"
                            title="{% translate "Shows parent report details" %}">{{ report.parent_report.name }}</a>
                     </td>
                     <td>
@@ -140,3 +201,15 @@
         </tbody>
     </table>
 </div>
+<form novalidate id="select_all_objects_form" class="inline" method="get">
+    {% include "forms/report_form_fields.html" with selected_reports=None %}
+
+    {% if "all" not in selected_reports %}<input type="hidden" name="report" value="all">{% endif %}
+</form>
+{% block html_at_end_body %}
+    {% compress js %}
+        <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
+        <script src="{% static "js/grabSelectionOnModalOpen.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
+        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
+{% endblock html_at_end_body %}
