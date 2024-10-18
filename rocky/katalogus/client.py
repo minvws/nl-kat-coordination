@@ -19,6 +19,7 @@ from octopoes.models import OOI
 from octopoes.models.exception import TypeNotFound
 from octopoes.models.types import type_by_name
 from rocky.health import ServiceHealth
+from tools.models import Organization
 
 logger = structlog.get_logger("katalogus_client")
 
@@ -129,46 +130,46 @@ class KATalogusHTTPStatusError(KATalogusError):
 
 
 class KATalogusClient:
-    def __init__(self, base_uri: str, organization: str | None):
+    def __init__(self, base_uri: str):
         self.session = httpx.Client(base_url=base_uri)
-        self.organization = valid_organization_code(organization) if organization else organization
-        self.organization_uri = f"/v1/organisations/{organization}"
+        # self.organization = valid_organization_code(organization) if organization else organization
+        # self.organization_uri = f"/v1/organisations/{organization}"
 
-    def organization_exists(self) -> bool:
-        response = self.session.get(self.organization_uri)
+    def organization_exists(self, organization_code: str) -> bool:
+        response = self.session.get(f"/v1/organisations/{organization_code}")
 
         return response.status_code != 404
 
-    def create_organization(self, name: str):
-        response = self.session.post("/v1/organisations/", json={"id": self.organization, "name": name})
+    def create_organization(self, organization: Organization):
+        response = self.session.post("/v1/organisations/", json={"id": organization.code, "name": organization.name})
         response.raise_for_status()
 
-        logger.info("Created organization", name=name)
+        logger.info("Created organization", name=organization.name)
 
-    def delete_organization(self):
-        response = self.session.delete(self.organization_uri)
+    def delete_organization(self, organization_code: str):
+        response = self.session.delete(f"/v1/organisations/{organization_code}")
         response.raise_for_status()
 
-        logger.info("Deleted organization", organization_code=self.organization)
+        logger.info("Deleted organization", organization_code=organization_code)
 
-    def get_plugins(self, **params) -> list[Plugin]:
+    def get_plugins(self, organization_code: str, **params) -> list[Plugin]:
         try:
-            response = self.session.get(f"{self.organization_uri}/plugins", params=params)
+            response = self.session.get(f"/v1/organisations/{organization_code}/plugins", params=params)
             response.raise_for_status()
         except httpx.HTTPStatusError as error:
             raise KATalogusHTTPStatusError(error)
         return [parse_plugin(plugin) for plugin in response.json()]
 
-    def get_plugin(self, plugin_id: str) -> Plugin:
+    def get_plugin(self, organization_code: str, plugin_id: str) -> Plugin:
         plugin_id = quote(plugin_id)
-        response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}")
+        response = self.session.get(f"/v1/organisations/{organization_code}/plugins/{plugin_id}")
         response.raise_for_status()
 
         return parse_plugin(response.json())
 
-    def get_plugin_schema(self, plugin_id: str) -> dict | None:
+    def get_plugin_schema(self, organization_code: str, plugin_id: str) -> dict | None:
         plugin_id = quote(plugin_id)
-        response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}/schema.json")
+        response = self.session.get(f"/v1/organisations/{organization_code}/plugins/{plugin_id}/schema.json")
         response.raise_for_status()
 
         schema = response.json()
@@ -184,31 +185,31 @@ class KATalogusClient:
 
         return None
 
-    def get_plugin_settings(self, plugin_id: str) -> dict:
+    def get_plugin_settings(self, organization_code: str, plugin_id: str) -> dict:
         plugin_id = quote(plugin_id)
-        response = self.session.get(f"{self.organization_uri}/{plugin_id}/settings")
+        response = self.session.get(f"/v1/organisations/{organization_code}/{plugin_id}/settings")
         response.raise_for_status()
         return response.json()
 
-    def upsert_plugin_settings(self, plugin_id: str, values: dict) -> None:
+    def upsert_plugin_settings(self, organization_code: str, plugin_id: str, values: dict) -> None:
         plugin_id = quote(plugin_id)
-        response = self.session.put(f"{self.organization_uri}/{plugin_id}/settings", json=values)
+        response = self.session.put(f"/v1/organisations/{organization_code}/{plugin_id}/settings", json=values)
         response.raise_for_status()
 
         logger.info("Upsert plugin settings", plugin_id=plugin_id)
 
-    def delete_plugin_settings(self, plugin_id: str):
+    def delete_plugin_settings(self, organization_code: str, plugin_id: str):
         plugin_id = quote(plugin_id)
-        response = self.session.delete(f"{self.organization_uri}/{plugin_id}/settings")
+        response = self.session.delete(f"/v1/organisations/{organization_code}/{plugin_id}/settings")
         response.raise_for_status()
 
         logger.info("Delete plugin settings", plugin_id=plugin_id)
 
         return response
 
-    def clone_all_configuration_to_organization(self, to_organization: str):
+    def clone_all_configuration_to_organization(self, from_organization: str, to_organization: str):
         to_organization = quote(to_organization)
-        response = self.session.post(f"{self.organization_uri}/settings/clone/{to_organization}")
+        response = self.session.post(f"/v1/organisations/{from_organization}/settings/clone/{to_organization}")
         response.raise_for_status()
 
         return response
@@ -219,51 +220,51 @@ class KATalogusClient:
 
         return ServiceHealth.model_validate_json(response.content)
 
-    def get_normalizers(self) -> list[Plugin]:
-        return self.get_plugins(plugin_type="normalizer")
+    def get_normalizers(self, organization_code: str) -> list[Plugin]:
+        return self.get_plugins(organization_code, plugin_type="normalizer")
 
-    def get_boefjes(self) -> list[Plugin]:
-        return self.get_plugins(plugin_type="boefje")
+    def get_boefjes(self, organization_code: str) -> list[Plugin]:
+        return self.get_plugins(organization_code, plugin_type="boefje")
 
-    def enable_plugin(self, plugin: Plugin) -> None:
-        self._patch_plugin_state(plugin.id, True)
+    def enable_plugin(self, organization_code: str, plugin: Plugin) -> None:
+        self._patch_plugin_state(organization_code, plugin.id, True)
 
-    def enable_boefje_by_id(self, boefje_id: str) -> None:
-        self.enable_plugin(self.get_plugin(boefje_id))
+    def enable_boefje_by_id(self, organization_code: str, boefje_id: str) -> None:
+        self.enable_plugin(organization_code, self.get_plugin(organization_code, boefje_id))
 
-    def disable_plugin(self, plugin: Plugin) -> None:
-        self._patch_plugin_state(plugin.id, False)
+    def disable_plugin(self, organization_code: str, plugin: Plugin) -> None:
+        self._patch_plugin_state(organization_code, plugin.id, False)
 
-    def get_enabled_boefjes(self) -> list[Plugin]:
-        return [plugin for plugin in self.get_boefjes() if plugin.enabled]
+    def get_enabled_boefjes(self, organization_code: str) -> list[Plugin]:
+        return [plugin for plugin in self.get_boefjes(organization_code) if plugin.enabled]
 
-    def get_enabled_normalizers(self) -> list[Plugin]:
-        return [plugin for plugin in self.get_normalizers() if plugin.enabled]
+    def get_enabled_normalizers(self, organization_code: str) -> list[Plugin]:
+        return [plugin for plugin in self.get_normalizers(organization_code) if plugin.enabled]
 
-    def _patch_plugin_state(self, plugin_id: str, enabled: bool) -> None:
+    def _patch_plugin_state(self, organization_code: str, plugin_id: str, enabled: bool) -> None:
         logger.info("Toggle plugin state", plugin_id=plugin_id, enabled=enabled)
         plugin_id = quote(plugin_id)
 
-        response = self.session.patch(f"{self.organization_uri}/plugins/{plugin_id}", json={"enabled": enabled})
+        response = self.session.patch(f"/v1/organisations/{organization_code}/plugins/{plugin_id}", json={"enabled": enabled})
         response.raise_for_status()
 
-    def get_description(self, plugin_id: str) -> str:
+    def get_description(self, organization_code: str, plugin_id: str) -> str:
         plugin_id = quote(plugin_id)
-        response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}/description.md")
+        response = self.session.get(f"/v1/organisations/{organization_code}/plugins/{plugin_id}/description.md")
         response.raise_for_status()
 
         return response.content.decode("utf-8")
 
-    def get_cover(self, plugin_id: str) -> BytesIO:
+    def get_cover(self, organization_code: str, plugin_id: str) -> BytesIO:
         plugin_id = quote(plugin_id)
-        response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}/cover.jpg")
+        response = self.session.get(f"/v1/organisations/{organization_code}/plugins/{plugin_id}/cover.jpg")
         response.raise_for_status()
         return BytesIO(response.content)
 
-    def create_plugin(self, plugin: Plugin) -> None:
+    def create_plugin(self, organization_code: str, plugin: Plugin) -> None:
         try:
             response = self.session.post(
-                f"{self.organization_uri}/plugins",
+                f"/v1/organisations/{organization_code}/plugins",
                 headers={"Content-Type": "application/json"},
                 content=plugin.model_dump_json(exclude_none=True),
             )
@@ -279,10 +280,10 @@ class KATalogusClient:
             else:
                 raise error
 
-    def edit_plugin(self, plugin: Plugin) -> None:
+    def edit_plugin(self, organization_code: str, plugin: Plugin) -> None:
         try:
             response = self.session.patch(
-                f"{self.organization_uri}/boefjes/{plugin.id}", content=plugin.model_dump_json(exclude_none=True)
+                f"/v1/organisations/{organization_code}/boefjes/{plugin.id}", content=plugin.model_dump_json(exclude_none=True)
             )
             response.raise_for_status()
         except httpx.HTTPStatusError as error:
@@ -360,4 +361,4 @@ def parse_plugin(plugin: dict) -> Plugin:
 
 
 def get_katalogus(organization: str) -> KATalogusClient:
-    return KATalogusClient(settings.KATALOGUS_API, organization)
+    return KATalogusClient(settings.KATALOGUS_API)

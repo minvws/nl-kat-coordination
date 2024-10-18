@@ -151,7 +151,7 @@ class Organization(models.Model):
         octopoes_client = cls._get_healthy_octopoes(instance.code)
 
         try:
-            if not katalogus_client.organization_exists():
+            if not katalogus_client.organization_exists(instance.code):
                 katalogus_client.create_organization(instance.name)
         except Exception as e:
             raise KATalogusException("Failed creating organization in the Katalogus") from e

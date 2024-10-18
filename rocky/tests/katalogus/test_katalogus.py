@@ -246,29 +246,29 @@ def test_katalogus_client_organization_not_exists(mocker):
     mock_requests = mocker.patch("katalogus.client.httpx")
     mock_requests.Client().get().status_code = 404
 
-    client = KATalogusClient("test", "test")
+    client = KATalogusClient("test")
 
-    assert client.organization_exists() is False
+    assert client.organization_exists("test") is False
 
 
 def test_katalogus_client_organization_exists(mocker):
     mock_requests = mocker.patch("katalogus.client.httpx")
     mock_requests.Client().get().status_code = 200
 
-    client = KATalogusClient("test", "test")
+    client = KATalogusClient("test")
 
-    assert client.organization_exists() is True
+    assert client.organization_exists("test") is True
 
 
 def test_katalogus_client_invalid_organization():
     with pytest.raises(ValueError):
-        KATalogusClient("test", "test$$$1123")
+        KATalogusClient("test")
 
 
 def test_katalogus_client(httpx_mock):
     httpx_mock.add_response(json={"service": "test", "healthy": False, "version": None, "additional": 2, "results": []})
 
-    client = KATalogusClient("http://test", "test")
+    client = KATalogusClient("http://test")
 
     assert isinstance(client.health(), ServiceHealth)
     assert client.health().service == "test"
