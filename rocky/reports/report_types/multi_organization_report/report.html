@@ -7,7 +7,6 @@
     {% include "partials/report_sidemenu.html" with data=report_data %}
 
     <article>
-        {{ report_data }}
         {% include "multi_organization_report/introduction.html" %}
         {% include "multi_organization_report/summary.html" %}
 
@@ -20,7 +19,6 @@
             <section id="basic-security">
                 <div>
                     <div id="basic-security-overview">
-                        {{ report_data.basic_security }}
                         {% include "aggregate_organisation_report/basic_security.html" with data=report_data %}
 
                     </div>

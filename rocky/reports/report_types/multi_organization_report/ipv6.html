@@ -23,21 +23,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for key, value in report_data.multi_data.items %}
-                        {% for service, compliance in value.data.ipv6.items %}
-                            {{ compliance }}
-                            <tr>
-                                <td>{{ service }}</td>
-                                <td>
-                                    {% if compliance.enabled != compliance.total %}
-                                        <span class="icon incomplete"></span>
-                                    {% else %}
-                                        <span class="icon positive"></span>
-                                    {% endif %}
-                                    {{ compliance.enabled }}/{{ compliance.total }}
-                                </td>
-                            </tr>
-                        {% endfor %}
+                    {% for service, compliance in report_data.ipv6.items %}
+                        <tr>
+                            <td>{{ service }}</td>
+                            <td>
+                                {% if compliance.enabled != compliance.total %}
+                                    <span class="icon incomplete"></span>
+                                {% else %}
+                                    <span class="icon positive"></span>
+                                {% endif %}
+                                {{ compliance.enabled }}/{{ compliance.total }}
+                            </td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>

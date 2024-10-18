@@ -3,7 +3,7 @@
 <section class="introduction" id="introduction">
     <div>
         <div class="horizontal-view toolbar">
-            <h1>Sector Report</h1>
+            <h1>{{ report_ooi.name }}</h1>
             <div class="horizontal-view">
                 <a href="{{ report_download_pdf_url }}"
                    target="_blank"
@@ -12,7 +12,7 @@
             </div>
         </div>
         <div>
-            <p>{% translate "This is the OpenKAT Sector rapport." %}</p>
+            <p>{% translate "This is the OpenKAT" %} {{ report_ooi.name }}</p>
             <div>
                 <p>
                     {% translate "Created with date from:" %}<strong>{{ report_ooi.observed_at|date }}</strong>
@@ -27,7 +27,7 @@
             <p>
                 {% translate "This sector contains" %}
                 {{ report_data.organizations|length }}
-                {% translate "Scanned organizations." %}
+                {% translate "scanned organizations." %}
                 {% if report_data.tags %}
                     {% translate "Of these organizations" %}
                     {% for tag, organizations in report_data.tags.items %}

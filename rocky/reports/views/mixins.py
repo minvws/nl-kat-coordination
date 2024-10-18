@@ -319,6 +319,7 @@ class SaveMultiReportMixin(BaseReportView):
             parent_report=None,
             has_parent=False,
         )
+
         create_ooi(self.octopoes_api_connector, self.bytes_client, report_ooi, observed_at)
 
         return report_ooi
