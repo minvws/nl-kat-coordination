@@ -16,7 +16,7 @@ def test_plugin_detail_view(
     mocker,
 ):
     mock_mixins_katalogus().get_plugin.return_value = plugin_details
-    katalogus_mocker = mocker.patch("katalogus.client.KATalogusClientV1")()
+    katalogus_mocker = mocker.patch("katalogus.client.KATalogusClient")()
     katalogus_mocker.get_plugins.return_value = [boefje_dns_records, boefje_nmap_tcp]
 
     request = setup_request(rf.get("boefje_detail"), superuser_member.user)
@@ -46,7 +46,7 @@ def test_plugin_detail_view_with_container_image(
     mock_scheduler_client_task_list,
 ):
     mock_mixins_katalogus().get_plugin.return_value = plugin_details_with_container
-    katalogus_mocker = mocker.patch("katalogus.client.KATalogusClientV1")()
+    katalogus_mocker = mocker.patch("katalogus.client.KATalogusClient")()
     katalogus_mocker.get_plugins.return_value = [boefje_dns_records, boefje_nmap_tcp]
 
     request = setup_request(rf.get("boefje_detail"), superuser_member.user)
@@ -84,7 +84,7 @@ def test_plugin_detail_view_no_consumes(
 ):
     plugin_details.consumes = []
     mock_mixins_katalogus().get_plugin.return_value = plugin_details
-    katalogus_mocker = mocker.patch("katalogus.client.KATalogusClientV1")()
+    katalogus_mocker = mocker.patch("katalogus.client.KATalogusClient")()
     katalogus_mocker.get_plugins.return_value = [boefje_dns_records, boefje_nmap_tcp]
 
     request = setup_request(rf.get("boefje_detail"), superuser_member.user)

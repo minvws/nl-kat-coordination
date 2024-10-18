@@ -8,13 +8,13 @@ from django.utils.translation import gettext_lazy as _
 from httpx import HTTPError, HTTPStatusError
 from rest_framework.status import HTTP_404_NOT_FOUND
 
-from katalogus.client import KATalogusClientV1, Plugin, get_katalogus
+from katalogus.client import KATalogusClient, Plugin, get_katalogus
 
 logger = structlog.get_logger(__name__)
 
 
 class SinglePluginView(OrganizationView):
-    katalogus_client: KATalogusClientV1
+    katalogus_client: KATalogusClient
     plugin: Plugin
 
     def setup(self, request, *args, plugin_id: str, **kwargs):

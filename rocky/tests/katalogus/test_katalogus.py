@@ -1,7 +1,7 @@
 import pytest
 from django.core.exceptions import PermissionDenied
 from django.urls import resolve
-from katalogus.client import KATalogusClientV1, parse_plugin, valid_organization_code, valid_plugin_id
+from katalogus.client import KATalogusClient, parse_plugin, valid_organization_code, valid_plugin_id
 from katalogus.views.katalogus import AboutPluginsView, BoefjeListView, KATalogusView, NormalizerListView
 from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
 from katalogus.views.plugin_enable_disable import PluginEnableDisableView
@@ -148,7 +148,7 @@ def test_katalogus_plugin_listing_no_enable_disable_perm(rf, client_member, mock
 
 def test_katalogus_settings_one_organization(redteam_member, rf, mocker):
     # Mock katalogus calls: return right boefjes and settings
-    mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
+    mock_katalogus = mocker.patch("katalogus.client.KATalogusClient")
     boefjes_data = get_boefjes_data()
     mock_katalogus().get_boefjes.return_value = [parse_plugin(b) for b in boefjes_data if b["type"] == "boefje"]
     mock_katalogus().get_plugin_settings.return_value = {"BINARYEDGE_API": "test", "Second": "value"}
@@ -169,7 +169,7 @@ def test_katalogus_settings_one_organization(redteam_member, rf, mocker):
 
 def test_katalogus_settings_list_multiple_organization(redteam_member, organization_b, rf, mocker):
     # Mock katalogus calls: return right boefjes and settings
-    mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
+    mock_katalogus = mocker.patch("katalogus.client.KATalogusClient")
     boefjes_data = get_boefjes_data()
     mock_katalogus().get_boefjes.return_value = [parse_plugin(b) for b in boefjes_data if b["type"] == "boefje"]
     mock_katalogus().get_plugin_settings.return_value = {"BINARYEDGE_API": "test"}
@@ -193,7 +193,7 @@ def test_katalogus_settings_list_multiple_organization(redteam_member, organizat
 
 
 def test_katalogus_confirm_clone_settings(redteam_member, organization_b, rf, mock_models_octopoes, mocker):
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
 
     create_member(redteam_member.user, organization_b)
 
@@ -214,7 +214,7 @@ def test_katalogus_confirm_clone_settings(redteam_member, organization_b, rf, mo
 
 def test_katalogus_clone_settings(redteam_member, organization_b, rf, mocker, mock_models_octopoes):
     # Mock katalogus calls: return right boefjes and settings
-    mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
+    mock_katalogus = mocker.patch("katalogus.client.KATalogusClient")
 
     create_member(redteam_member.user, organization_b)
 
@@ -231,7 +231,7 @@ def test_katalogus_clone_settings_not_accessible_without_perms(
     client_member, organization_b, rf, mocker, mock_models_octopoes
 ):
     # Mock katalogus calls: return right boefjes and settings
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
 
     create_member(client_member.user, organization_b)
 
@@ -246,7 +246,7 @@ def test_katalogus_client_organization_not_exists(mocker):
     mock_requests = mocker.patch("katalogus.client.httpx")
     mock_requests.Client().get().status_code = 404
 
-    client = KATalogusClientV1("test", "test")
+    client = KATalogusClient("test", "test")
 
     assert client.organization_exists() is False
 
@@ -255,20 +255,20 @@ def test_katalogus_client_organization_exists(mocker):
     mock_requests = mocker.patch("katalogus.client.httpx")
     mock_requests.Client().get().status_code = 200
 
-    client = KATalogusClientV1("test", "test")
+    client = KATalogusClient("test", "test")
 
     assert client.organization_exists() is True
 
 
 def test_katalogus_client_invalid_organization():
     with pytest.raises(ValueError):
-        KATalogusClientV1("test", "test$$$1123")
+        KATalogusClient("test", "test$$$1123")
 
 
 def test_katalogus_client(httpx_mock):
     httpx_mock.add_response(json={"service": "test", "healthy": False, "version": None, "additional": 2, "results": []})
 
-    client = KATalogusClientV1("http://test", "test")
+    client = KATalogusClient("http://test", "test")
 
     assert isinstance(client.health(), ServiceHealth)
     assert client.health().service == "test"

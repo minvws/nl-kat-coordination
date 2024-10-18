@@ -128,7 +128,7 @@ class KATalogusHTTPStatusError(KATalogusError):
         super().__init__(_("An HTTP %d error occurred. Check logs for more info.").format(error.response.status_code))
 
 
-class KATalogusClientV1:
+class KATalogusClient:
     def __init__(self, base_uri: str, organization: str | None):
         self.session = httpx.Client(base_url=base_uri)
         self.organization = valid_organization_code(organization) if organization else organization
@@ -359,5 +359,5 @@ def parse_plugin(plugin: dict) -> Plugin:
         raise Exception(f"Unknown plugin type: {plugin['type']}")
 
 
-def get_katalogus(organization: str) -> KATalogusClientV1:
-    return KATalogusClientV1(settings.KATALOGUS_API, organization)
+def get_katalogus(organization: str) -> KATalogusClient:
+    return KATalogusClient(settings.KATALOGUS_API, organization)

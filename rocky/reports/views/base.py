@@ -17,7 +17,7 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
-from katalogus.client import Boefje, KATalogusClientV1, KATalogusError, Plugin, get_katalogus
+from katalogus.client import Boefje, KATalogusClient, KATalogusError, Plugin, get_katalogus
 from pydantic import RootModel, TypeAdapter
 from tools.ooi_helpers import create_ooi
 from tools.view_helpers import BreadcrumbsMixin, PostRedirect, url_with_querystring
@@ -120,7 +120,7 @@ class ReportsLandingView(ReportBreadcrumbs, TemplateView):
         return redirect(reverse("report_history", kwargs=self.get_kwargs()))
 
 
-def hydrate_plugins(report_types: list[type["BaseReport"]], katalogus: KATalogusClientV1) -> dict[str, list[Plugin]]:
+def hydrate_plugins(report_types: list[type["BaseReport"]], katalogus: KATalogusClient) -> dict[str, list[Plugin]]:
     plugins: dict[str, list[Plugin]] = {"required": [], "optional": []}
     merged_plugins = report_plugins_union(report_types)
 

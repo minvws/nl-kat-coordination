@@ -13,7 +13,7 @@ from django.db.models.signals import post_save, pre_save
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from httpx import HTTPError
-from katalogus.client import KATalogusClientV1, get_katalogus
+from katalogus.client import KATalogusClient, get_katalogus
 from katalogus.exceptions import KATalogusDownException, KATalogusException, KATalogusUnhealthyException
 
 from octopoes.api.models import Declaration
@@ -177,7 +177,7 @@ class Organization(models.Model):
             logger.exception("Could not seed internet for organization %s", sender)
 
     @staticmethod
-    def _get_healthy_katalogus(organization_code: str) -> KATalogusClientV1:
+    def _get_healthy_katalogus(organization_code: str) -> KATalogusClient:
         katalogus_client = get_katalogus(organization_code)
 
         try:
