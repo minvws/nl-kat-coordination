@@ -398,7 +398,7 @@ class ReportList:
             hydrated_report: HydratedReport = HydratedReport()
 
             parent_report, children_reports = report
-            filtered_children_reports: list[type[Report]] = list(filter(None, children_reports))
+            filtered_children_reports: list[Report] = list(filter(None, children_reports))
 
             hydrated_report.total_children_reports = len(filtered_children_reports)
 
