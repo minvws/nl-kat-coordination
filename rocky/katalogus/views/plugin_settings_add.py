@@ -20,7 +20,7 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
     permission_required = "tools.can_set_katalogus_settings"
 
     def get_form(self, **kwargs):
-        settings = self.katalogus_client.get_plugin_settings(self.plugin.id)
+        settings = self.katalogus_client.get_plugin_settings(self.organization.code, self.plugin.id)
 
         # This helps mypy understand that self.plugin_schema can't be None
         # because of the check in dispatch()
@@ -48,7 +48,7 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
 
         try:
             logger.info("Adding plugin settings", event_code=800023, plugin=self.plugin.name)
-            self.katalogus_client.upsert_plugin_settings(self.plugin.id, form.cleaned_data)
+            self.katalogus_client.upsert_plugin_settings(self.organization.code, self.plugin.id, form.cleaned_data)
             messages.add_message(self.request, messages.SUCCESS, _("Added settings for '{}'").format(self.plugin.name))
         except HTTPError:
             messages.add_message(self.request, messages.ERROR, _("Failed adding settings"))
@@ -57,7 +57,7 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
         if "add-enable" in self.request.POST:
             try:
                 logger.info("Enabling plugin", event_code=800021, plugin=self.plugin.name)
-                self.katalogus_client.enable_plugin(self.plugin)
+                self.katalogus_client.enable_plugin(self.organization.code, self.plugin)
             except HTTPError:
                 messages.add_message(self.request, messages.ERROR, _("Enabling {} failed").format(self.plugin.name))
                 return redirect(self.get_success_url())

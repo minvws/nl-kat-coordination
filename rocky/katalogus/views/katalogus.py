@@ -92,7 +92,7 @@ class KATalogusView(BaseKATalogusView):
     template_name = "katalogus.html"
 
     def get_queryset(self):
-        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_plugins())
+        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_plugins(self.organization.code))
         return self.filter_katalogus(queryset)
 
 
@@ -102,7 +102,7 @@ class BoefjeListView(BaseKATalogusView):
     template_name = "boefjes.html"
 
     def get_queryset(self):
-        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_boefjes())
+        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_boefjes(self.organization.code))
         return self.filter_katalogus(queryset)
 
 
@@ -112,7 +112,7 @@ class NormalizerListView(BaseKATalogusView):
     template_name = "normalizers.html"
 
     def get_queryset(self):
-        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_normalizers())
+        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_normalizers(self.organization.code))
         return self.filter_katalogus(queryset)
 
 

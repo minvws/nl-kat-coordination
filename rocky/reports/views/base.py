@@ -120,7 +120,7 @@ class ReportsLandingView(ReportBreadcrumbs, TemplateView):
         return redirect(reverse("report_history", kwargs=self.get_kwargs()))
 
 
-def hydrate_plugins(report_types: list[type["BaseReport"]], katalogus: KATalogusClient) -> dict[str, list[Plugin]]:
+def hydrate_plugins(organization_code: str, report_types: list[type["BaseReport"]], katalogus: KATalogusClient) -> dict[str, list[Plugin]]:
     plugins: dict[str, list[Plugin]] = {"required": [], "optional": []}
     merged_plugins = report_plugins_union(report_types)
 
@@ -129,9 +129,9 @@ def hydrate_plugins(report_types: list[type["BaseReport"]], katalogus: KATalogus
 
     # avoid empty list getting all plugins from KATalogus
     if required_plugins_ids:
-        plugins["required"] = sorted(katalogus.get_plugins(ids=required_plugins_ids), key=attrgetter("name"))
+        plugins["required"] = sorted(katalogus.get_plugins(organization_code, ids=required_plugins_ids), key=attrgetter("name"))
     if optional_plugins_ids:
-        plugins["optional"] = sorted(katalogus.get_plugins(ids=optional_plugins_ids), key=attrgetter("name"))
+        plugins["optional"] = sorted(katalogus.get_plugins(organization_code, ids=optional_plugins_ids), key=attrgetter("name"))
 
     return plugins
 
@@ -352,7 +352,7 @@ class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
         self.plugins = None
 
         try:
-            self.plugins = hydrate_plugins(self.get_report_types(), get_katalogus(self.organization.code))
+            self.plugins = hydrate_plugins(self.organization.code, self.get_report_types(), get_katalogus(self.organization.code))
         except KATalogusError as error:
             messages.error(self.request, error.message)
 

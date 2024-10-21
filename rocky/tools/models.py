@@ -122,7 +122,7 @@ class Organization(models.Model):
             raise OctopoesException("Failed deleting organization in Octopoes") from e
 
         try:
-            katalogus_client.delete_organization()
+            katalogus_client.delete_organization(self.code)
         except Exception as e:
             try:
                 octopoes_client.create_node()
@@ -152,7 +152,7 @@ class Organization(models.Model):
 
         try:
             if not katalogus_client.organization_exists(instance.code):
-                katalogus_client.create_organization(instance.name)
+                katalogus_client.create_organization(instance)
         except Exception as e:
             raise KATalogusException("Failed creating organization in the Katalogus") from e
 
@@ -160,7 +160,7 @@ class Organization(models.Model):
             octopoes_client.create_node()
         except Exception as e:
             try:
-                katalogus_client.delete_organization()
+                katalogus_client.delete_organization(instance.code)
             except Exception as second_exception:
                 raise KATalogusException("Failed deleting organization in the Katalogus") from second_exception
 

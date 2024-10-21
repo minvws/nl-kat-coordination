@@ -238,22 +238,12 @@ class KATalogusClient:
     def get_enabled_boefjes(self, organization_code: str) -> list[Plugin]:
         return [plugin for plugin in self.get_boefjes(organization_code) if plugin.enabled]
 
-    def get_enabled_normalizers(self, organization_code: str) -> list[Plugin]:
-        return [plugin for plugin in self.get_normalizers(organization_code) if plugin.enabled]
-
     def _patch_plugin_state(self, organization_code: str, plugin_id: str, enabled: bool) -> None:
         logger.info("Toggle plugin state", plugin_id=plugin_id, enabled=enabled)
         plugin_id = quote(plugin_id)
 
         response = self.session.patch(f"/v1/organisations/{organization_code}/plugins/{plugin_id}", json={"enabled": enabled})
         response.raise_for_status()
-
-    def get_description(self, organization_code: str, plugin_id: str) -> str:
-        plugin_id = quote(plugin_id)
-        response = self.session.get(f"/v1/organisations/{organization_code}/plugins/{plugin_id}/description.md")
-        response.raise_for_status()
-
-        return response.content.decode("utf-8")
 
     def get_cover(self, organization_code: str, plugin_id: str) -> BytesIO:
         plugin_id = quote(plugin_id)
