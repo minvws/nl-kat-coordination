@@ -2,12 +2,11 @@ import dns
 from dns.resolver import Answer
 
 from boefjes.config import settings
-from boefjes.job_models import BoefjeMeta
 
 
-def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
+def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     """return results to normalizer."""
-    ip = boefje_meta.arguments["input"]["address"]
+    ip = boefje_meta["arguments"]["input"]["address"]
 
     try:
         resolver = dns.resolver.Resolver()
