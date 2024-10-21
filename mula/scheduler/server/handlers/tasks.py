@@ -7,7 +7,7 @@ import structlog
 from fastapi import status
 
 from scheduler import context, models, storage
-from scheduler.server import errors, serializers, utils
+from scheduler.server import serializers, utils
 from scheduler.server.errors import exception_handler
 
 
