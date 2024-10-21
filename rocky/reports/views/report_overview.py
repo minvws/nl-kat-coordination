@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 import structlog
@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
+from tools.ooi_helpers import create_ooi
 
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
@@ -91,10 +92,30 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     template_name = "report_overview/report_history.html"
 
     def post(self, request, *args, **kwargs):
+        self.rename_reports()
         return self.get(request, *args, **kwargs)
 
     def get_queryset(self) -> ReportList:
         return ReportList(self.octopoes_api_connector, valid_time=self.observed_at)
+
+    def get_report_ooi(self, ooi_pk: str) -> Report:
+        return self.octopoes_api_connector.get(Reference.from_str(f"{ooi_pk}"), valid_time=datetime.now(timezone.utc))
+
+    def rename_reports(self) -> None:
+        report_references = self.request.POST.getlist("report_reference", [])
+        report_names = self.request.POST.getlist("report_name", [])
+
+        if not report_references or not report_names:
+            messages.error(self.request, _("Renaming failed. Empty report name found."))
+
+        if len(report_references) != len(report_names):
+            messages.error(self.request, _("Report names and reports does not match."))
+
+        for index, report_id in enumerate(report_references):
+            report_ooi = self.get_report_ooi(report_id)
+            report_ooi.name = report_names[index]
+            create_ooi(self.octopoes_api_connector, self.bytes_client, report_ooi, datetime.now(timezone.utc))
+            messages.success(self.request, _("Report names changed successfully."))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
