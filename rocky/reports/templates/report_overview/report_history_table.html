@@ -73,6 +73,7 @@
                 <tr>
                     <td>
                         <input type="checkbox"
+                               class="report-checkbox"
                                name="report"
                                value="{{ report.parent_report.reference }}"
                                {% if report.id in selected_reports or "all" in selected_reports %}checked{% endif %}

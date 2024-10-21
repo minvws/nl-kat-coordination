@@ -4,6 +4,11 @@ export function renderRenameSelection(modal, selection) {
     "input[name='csrfmiddlewaretoken']",
   );
   let report_names = getReportNames(selection);
+  let references = [];
+
+  selection.forEach((input_element) => {
+    references.push(input_element.value);
+  });
 
   let content_element = modal.querySelector(".content");
   content_element.innerHTML = "";
@@ -25,7 +30,7 @@ export function renderRenameSelection(modal, selection) {
   table_heading_row_element.appendChild(th_date_element);
   table_element.appendChild(table_heading_row_element);
 
-  report_names.forEach((report_name) => {
+  for (let i = 0; i < references.length; i++) {
     let table_row_element = document.createElement("tr");
     let td_type_element = document.createElement("td");
     let td_name_element = document.createElement("td");
@@ -33,12 +38,12 @@ export function renderRenameSelection(modal, selection) {
 
     let name_input_element = document.createElement("input");
     name_input_element.setAttribute("type", "text");
-    name_input_element.setAttribute("value", report_name);
+    name_input_element.setAttribute("value", report_names[i]);
     name_input_element.setAttribute("name", "report_name");
 
     let reference_input_element = document.createElement("input");
     reference_input_element.setAttribute("type", "hidden");
-    reference_input_element.setAttribute("value", report_name);
+    reference_input_element.setAttribute("value", references[i]);
     reference_input_element.setAttribute("name", "report_reference");
 
     td_type_element.innerText = "type";
@@ -49,10 +54,10 @@ export function renderRenameSelection(modal, selection) {
     table_row_element.appendChild(td_name_element);
     table_row_element.appendChild(td_date_element);
     table_element.appendChild(table_row_element);
-  });
+  }
 
+  form_element.appendChild(csrf_token_element);
   form_element.appendChild(table_element);
-  content_element.appendChild(csrf_token_element);
   content_element.appendChild(header_element);
   content_element.appendChild(form_element);
 }

@@ -15,8 +15,6 @@ export function openDialogFromUrl(anchor) {
   if (id) {
     let modal = document.querySelector("#" + id);
 
-    console.log(anchor);
-
     if (anchor == "rename-modal") {
       renderRenameSelection(modal, getSelection());
     }
@@ -27,7 +25,7 @@ export function openDialogFromUrl(anchor) {
 }
 
 export function getSelection() {
-  let checkedItems = document.querySelectorAll(":checked");
+  let checkedItems = document.querySelectorAll(".report-checkbox:checked");
   return checkedItems;
 }
 
