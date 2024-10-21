@@ -8,7 +8,6 @@
         <thead>
             <tr>
                 <th scope="col">{% translate "Report Name" %}</th>
-                <th scope="col">{% translate "Subreport Name" %}</th>
                 <th scope="col">{% translate "Report types" %}</th>
                 <th scope="col">{% translate "Scheduled for" %}</th>
                 <th scope="col">{% translate "Recurrence" %}</th>
@@ -20,7 +19,6 @@
                 {% if schedule.recipe %}
                     <tr>
                         <td class="nowrap">{{ schedule.recipe.report_name_format }}</td>
-                        <td class="nowrap">{{ schedule.recipe.subreport_name_format }}</td>
                         <td>
                             <ul class="tags horizontal-view">
                                 {% for report_type in schedule.recipe.report_types %}
