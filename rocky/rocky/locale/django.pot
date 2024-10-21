@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-16 14:17+0000\n"
+"POT-Creation-Date: 2024-10-21 07:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4051,7 +4051,6 @@ msgid "%(btn_text)s"
 msgstr ""
 
 #: reports/templates/report_overview/report_history.html
-#: reports/views/report_overview.py
 msgid "Reports history"
 msgstr ""
 
@@ -4150,10 +4149,6 @@ msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Report Name"
-msgstr ""
-
-#: reports/templates/report_overview/scheduled_reports_table.html
-msgid "Subreport Name"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
