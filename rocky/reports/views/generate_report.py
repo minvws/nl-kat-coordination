@@ -5,7 +5,6 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from reports.report_types.helpers import get_ooi_types_with_report
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
     OOISelectionView,
@@ -59,7 +58,6 @@ class OOISelectionGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenera
     template_name = "generate_report/select_oois.html"
     breadcrumbs_step = 3
     current_step = 1
-    ooi_types = get_ooi_types_with_report()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

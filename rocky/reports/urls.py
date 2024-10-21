@@ -20,7 +20,6 @@ from reports.views.generate_report import (
 from reports.views.multi_report import (
     ExportSetupMultiReportView,
     LandingMultiReportView,
-    MultiReportPDFView,
     MultiReportView,
     OOISelectionMultiReportView,
     ReportTypesSelectionMultiReportView,
@@ -87,5 +86,4 @@ urlpatterns += [
     path("multi-report/setup-scan/", SetupScanMultiReportView.as_view(), name="multi_report_setup_scan"),
     path("multi-report/export-setup/", ExportSetupMultiReportView.as_view(), name="multi_report_export_setup"),
     path("multi-report/view/", MultiReportView.as_view(), name="multi_report_view"),
-    path("multi-report/view/pdf/", MultiReportPDFView.as_view(), name="multi_report_pdf"),
 ]
