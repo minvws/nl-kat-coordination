@@ -250,13 +250,13 @@ def test_multi_report(
         organization_code=octopoes_api_connector.client,
         organization_name="Test name",
         organization_tags=["test1"],
-        data={"post_processed_data": data, "report_data": report_data},
+        data=data,
     )
     report_data_object_2 = ReportData(
         organization_code=octopoes_api_connector_2.client,
         organization_name="Name2",
         organization_tags=["test1", "test2", "test3"],
-        data={"post_processed_data": data_2, "report_data": report_data_2},
+        data=data_2,
     )
 
     # Save second organization info in the first organization
