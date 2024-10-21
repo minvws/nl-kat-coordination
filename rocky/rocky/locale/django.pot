@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-21 07:51+0000\n"
+"POT-Creation-Date: 2024-10-21 12:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4055,10 +4055,13 @@ msgid "Reports history"
 msgstr ""
 
 #: reports/templates/report_overview/report_history.html
-msgid "An overview of all your generated reports."
+msgid ""
+"On this page you can see all the reports that have been generated in the "
+"past. To create a new report, click the 'Generate Report' button."
 msgstr ""
 
-#: reports/templates/report_overview/report_history.html
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #, python-format
 msgid "Showing %(length)s of %(total)s reports"
 msgstr ""
@@ -4093,14 +4096,14 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                                    This report consist of %(counter)s "
+"                                        This report consist of %(counter)s "
 "subreport with the following report type and object.\n"
-"                                "
+"                                    "
 msgid_plural ""
 "\n"
-"                                    This report consist of %(counter)s "
+"                                        This report consist of %(counter)s "
 "subreports with the following report types and objects.\n"
-"                                "
+"                                    "
 msgstr[0] ""
 msgstr[1] ""
 
@@ -4116,6 +4119,10 @@ msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
 msgid "View all subreports"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "No reports have been generated yet."
 msgstr ""
 
 #: reports/templates/report_overview/report_overview_header.html
@@ -4135,12 +4142,10 @@ msgid "Scheduled reports"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports.html
-msgid "View your scheduled reports."
-msgstr ""
-
-#: reports/templates/report_overview/scheduled_reports.html
-#, python-format
-msgid "Showing %(length)s scheduled reports"
+msgid ""
+"On this page you can see all the reports that are or have been scheduled. To "
+"schedule a report, select a start date and recurrence while generating a "
+"report."
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
@@ -4168,6 +4173,10 @@ msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Show report details"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "No scheduled reports have been generated yet."
 msgstr ""
 
 #: reports/templates/report_overview/subreports.html
