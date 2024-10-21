@@ -113,8 +113,8 @@ A `Task` object contains the following fields:
 Important to note is the `data` field contains the object that a `Task Runner`
 will use to execute the task. This field is a JSON field that allows any object
 to be persisted. It's schema is enforced by which scheduler its task is pushed
-on. On `BoefjeScheduler` only `BoefjeTask` objects are allowed to be pushed.
-This is the same for the other schedulers.
+on. For a `BoefjeScheduler` only `BoefjeTask` objects are allowed to be
+pushed. This is the same for the other schedulers.
 
 By doing this, it allows the scheduler to wrap whatever object within a `Task`,
 and as a result we're able to create and extend more types of schedulers that
