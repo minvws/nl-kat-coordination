@@ -317,7 +317,9 @@ class TestKatalogusCloneSettings(APIViewTest, UsesPostMethod, Returns200):
         return mocker.patch("katalogus.client.KATalogusClient")
 
     def test_it_clones_settings(self, mock_katalogus, organization, organization_b):
-        mock_katalogus().clone_all_configuration_to_organization.assert_called_once_with(organization.pk, organization_b.code)
+        mock_katalogus().clone_all_configuration_to_organization.assert_called_once_with(
+            organization.pk, organization_b.code
+        )
 
 
 class TestCloneKatalogusSettingsNoPermission(APIViewTest, UsesPostMethod, Returns403):

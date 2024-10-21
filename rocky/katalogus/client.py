@@ -19,7 +19,6 @@ from octopoes.models import OOI
 from octopoes.models.exception import TypeNotFound
 from octopoes.models.types import type_by_name
 from rocky.health import ServiceHealth
-from tools.models import Organization
 
 logger = structlog.get_logger("katalogus_client")
 
@@ -132,15 +131,14 @@ class KATalogusHTTPStatusError(KATalogusError):
 class KATalogusClient:
     def __init__(self, base_uri: str):
         self.session = httpx.Client(base_url=base_uri)
-        # self.organization = valid_organization_code(organization) if organization else organization
-        # self.organization_uri = f"/v1/organisations/{organization}"
+        # TODO: fix the self.organization = valid_organization_code(organization) if organization else organization
 
     def organization_exists(self, organization_code: str) -> bool:
         response = self.session.get(f"/v1/organisations/{organization_code}")
 
         return response.status_code != 404
 
-    def create_organization(self, organization: Organization):
+    def create_organization(self, organization):
         response = self.session.post("/v1/organisations/", json={"id": organization.code, "name": organization.name})
         response.raise_for_status()
 
@@ -242,7 +240,9 @@ class KATalogusClient:
         logger.info("Toggle plugin state", plugin_id=plugin_id, enabled=enabled)
         plugin_id = quote(plugin_id)
 
-        response = self.session.patch(f"/v1/organisations/{organization_code}/plugins/{plugin_id}", json={"enabled": enabled})
+        response = self.session.patch(
+            f"/v1/organisations/{organization_code}/plugins/{plugin_id}", json={"enabled": enabled}
+        )
         response.raise_for_status()
 
     def get_cover(self, organization_code: str, plugin_id: str) -> BytesIO:
@@ -273,7 +273,8 @@ class KATalogusClient:
     def edit_plugin(self, organization_code: str, plugin: Plugin) -> None:
         try:
             response = self.session.patch(
-                f"/v1/organisations/{organization_code}/boefjes/{plugin.id}", content=plugin.model_dump_json(exclude_none=True)
+                f"/v1/organisations/{organization_code}/boefjes/{plugin.id}",
+                content=plugin.model_dump_json(exclude_none=True),
             )
             response.raise_for_status()
         except httpx.HTTPStatusError as error:
