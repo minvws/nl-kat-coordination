@@ -266,12 +266,8 @@ class BaseReportView(OOIFilterView):
     def get_observed_at(self):
         return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
 
-    def show_report_names(self) -> bool:
-        recurrence_choice = self.request.POST.get("choose_recurrence", "once")
-        return recurrence_choice == "once"
-
     def is_scheduled_report(self) -> bool:
-        recurrence_choice = self.request.POST.get("choose_recurrence", "")
+        recurrence_choice = self.request.POST.get("choose_recurrence", "once")
         return recurrence_choice == "repeat"
 
     def create_report_recipe(self, report_name_format: str, subreport_name_format: str, schedule: str) -> ReportRecipe:
@@ -454,7 +450,6 @@ class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, SchedulerView, 
     report_type: type[BaseReport] | None = None
     task_type = "report"
     is_a_scheduled_report = False
-    show_listes_report_names = False
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.get_report_type_ids():
@@ -462,7 +457,6 @@ class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, SchedulerView, 
             return PostRedirect(self.get_previous())
 
         self.is_a_scheduled_report = self.is_scheduled_report()
-        self.show_listes_report_names = self.show_report_names()
 
         return super().get(request, *args, **kwargs)
 
@@ -515,7 +509,6 @@ class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, SchedulerView, 
         context["report_parent_name_form"] = self.get_report_parent_name_form()
         context["report_child_name_form"] = self.get_report_child_name_form()
 
-        context["show_listed_report_names"] = self.show_listes_report_names
         context["is_scheduled_report"] = self.is_a_scheduled_report
 
         context["created_at"] = datetime.now()
