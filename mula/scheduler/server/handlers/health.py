@@ -5,6 +5,7 @@ import structlog
 from fastapi import status
 
 from scheduler import context, models, version
+from scheduler.server.errors import exception_handler
 
 
 class HealthAPI:
@@ -22,6 +23,7 @@ class HealthAPI:
             description="Health check endpoint",
         )
 
+    @exception_handler
     def health(self, externals: bool = False) -> Any:
         response = models.ServiceHealth(service="scheduler", healthy=True, version=version.__version__)
 

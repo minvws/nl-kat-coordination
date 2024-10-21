@@ -7,7 +7,8 @@ import structlog
 from fastapi import status
 
 from scheduler import context, models, storage
-from scheduler.server import serializers, utils
+from scheduler.server import errors, serializers, utils
+from scheduler.server.errors import exception_handler
 
 
 class TaskAPI:
@@ -60,6 +61,7 @@ class TaskAPI:
             description="Update a task",
         )
 
+    @exception_handler
     def list(
         self,
         request: fastapi.Request,
@@ -128,69 +130,29 @@ class TaskAPI:
 
             f_req.filters.update(f_plugin)  # type: ignore
 
-        try:
-            results, count = self.ctx.datastores.task_store.get_tasks(
-                scheduler_id=scheduler_id,
-                task_type=task_type,
-                status=status,
-                offset=offset,
-                limit=limit,
-                min_created_at=min_created_at,
-                max_created_at=max_created_at,
-                filters=f_req,
-            )
-        except storage.filters.errors.FilterError as exc:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"invalid filter(s) [exception: {exc}]"
-            ) from exc
-        except storage.errors.StorageError as exc:
-            self.logger.exception(exc)
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"error occurred while accessing the database [exception: {exc}]",
-            ) from exc
-        except Exception as exc:
-            self.logger.exception(exc)
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail="failed to get tasks"
-            ) from exc
+        results, count = self.ctx.datastores.task_store.get_tasks(
+            scheduler_id=scheduler_id,
+            task_type=task_type,
+            status=status,
+            offset=offset,
+            limit=limit,
+            min_created_at=min_created_at,
+            max_created_at=max_created_at,
+            filters=f_req,
+        )
 
         return utils.paginate(request, results, count, offset, limit)
 
+    @exception_handler
     def get(self, task_id: uuid.UUID) -> Any:
-        try:
-            task = self.ctx.datastores.task_store.get_task(task_id)
-        except storage.errors.StorageError as exc:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"error occurred while accessing the database [exception: {exc}]",
-            ) from exc
-        except Exception as exc:
-            self.logger.exception(exc)
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"failed to get task [exception: {exc}]",
-            ) from exc
-
+        task = self.ctx.datastores.task_store.get_task(task_id)
         if task is None:
             raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="task not found")
-
         return task
 
+    @exception_handler
     def patch(self, task_id: uuid.UUID, item: serializers.Task) -> Any:
-        try:
-            task_db = self.ctx.datastores.task_store.get_task(task_id)
-        except storage.errors.StorageError as exc:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"error occurred while accessing the database [exception: {exc}]",
-            ) from exc
-        except Exception as exc:
-            self.logger.exception(exc)
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"failed to get task [exception: {exc}]",
-            ) from exc
+        task_db = self.ctx.datastores.task_store.get_task(task_id)
 
         if task_db is None:
             raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="task not found")
@@ -202,29 +164,10 @@ class TaskAPI:
         # Update task
         updated_task = task_db.model_copy(update=patch_data)
 
-        try:
-            self.ctx.datastores.task_store.update_task(updated_task)
-        except storage.errors.StorageError as exc:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"error occurred while accessing the database [exception: {exc}]",
-            ) from exc
-        except Exception as exc:
-            self.logger.exception(exc)
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail="failed to update task"
-            ) from exc
+        self.ctx.datastores.task_store.update_task(updated_task)
 
         return updated_task
 
+    @exception_handler
     def stats(self, scheduler_id: str | None = None) -> dict[str, dict[str, int]] | None:
-        try:
-            stats = self.ctx.datastores.task_store.get_status_count_per_hour(scheduler_id)
-        except Exception as exc:
-            self.logger.exception(exc)
-            self.logger.exception(exc)
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail="failed to get task stats"
-            ) from exc
-
-        return stats
+        return self.ctx.datastores.task_store.get_status_count_per_hour(scheduler_id)

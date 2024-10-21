@@ -6,6 +6,7 @@ from fastapi import status
 
 from scheduler import context, models, queues, schedulers, storage
 from scheduler.server import serializers
+from scheduler.server.errors import exception_handler
 
 
 class QueueAPI:
@@ -52,9 +53,11 @@ class QueueAPI:
             description="Push an item to a queue",
         )
 
+    @exception_handler
     def list(self) -> Any:
         return [models.Queue(**s.queue.dict(include_pq=False)) for s in self.schedulers.copy().values()]
 
+    @exception_handler
     def get(self, queue_id: str) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
@@ -68,6 +71,7 @@ class QueueAPI:
 
         return models.Queue(**q.dict())
 
+    @exception_handler
     def pop(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
@@ -86,23 +90,18 @@ class QueueAPI:
 
         return models.Task(**p_item.model_dump())
 
+    @exception_handler
     def push(self, queue_id: str, item_in: serializers.Task) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="queue not found")
 
-        try:
-            # Load default values
-            new_item = models.Task(**item_in.model_dump(exclude_unset=True))
+        # Load default values
+        new_item = models.Task(**item_in.model_dump(exclude_unset=True))
 
-            # Set values
-            if new_item.scheduler_id is None:
-                new_item.scheduler_id = s.scheduler_id
-        except Exception as exc:
-            self.logger.exception(exc)
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
-            ) from exc
+        # Set values
+        if new_item.scheduler_id is None:
+            new_item.scheduler_id = s.scheduler_id
 
         try:
             pushed_item = s.push_item_to_queue(new_item)
@@ -118,10 +117,5 @@ class QueueAPI:
             raise fastapi.HTTPException(
                 headers={"Retry-After": "60"}, status_code=fastapi.status.HTTP_409_CONFLICT, detail=str(exc_not_allowed)
             ) from exc_not_allowed
-        except Exception as exc:
-            self.logger.exception(exc)
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
-            ) from exc
 
         return pushed_item

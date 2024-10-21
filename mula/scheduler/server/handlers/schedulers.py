@@ -5,6 +5,7 @@ import structlog
 from fastapi import status
 
 from scheduler import context, models, schedulers
+from scheduler.server.errors import exception_handler
 
 
 class SchedulerAPI:
@@ -41,9 +42,11 @@ class SchedulerAPI:
             description="Update a scheduler",
         )
 
+    @exception_handler
     def list(self) -> Any:
         return [models.Scheduler(**s.dict()) for s in self.schedulers.values()]
 
+    @exception_handler
     def get(self, scheduler_id: str) -> Any:
         s = self.schedulers.get(scheduler_id)
         if s is None:
@@ -51,6 +54,7 @@ class SchedulerAPI:
 
         return models.Scheduler(**s.dict())
 
+    @exception_handler
     def patch(self, scheduler_id: str, item: models.Scheduler) -> Any:
         s = self.schedulers.get(scheduler_id)
         if s is None:
