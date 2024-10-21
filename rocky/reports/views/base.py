@@ -702,7 +702,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         return report_data, oois, report_types, plugins
 
-    def get_report_data_aggregate_report(
+    def get_report_data_aggregate_report_and_multi_report(
         self,
     ) -> tuple[
         dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]], list[dict[str, list[Plugin]]]
@@ -739,26 +739,11 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         return report_data, oois, report_types, plugins
 
-    def get_report_data_multi_report(
-        self,
-    ) -> tuple[
-        dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]], list[dict[str, list[Plugin]]]
-    ]:
-        report_data = self.get_report_data_from_bytes(self.report_ooi)
-
-        oois = self.get_input_oois(self.report_ooi.input_oois)
-        report_types = self.get_report_types(report_data["input_data"]["report_types"])
-        plugins = self.get_plugins(report_data["input_data"]["plugins"])
-
-        return report_data, oois, report_types, plugins
-
     def get_report_data(self):
         if issubclass(get_report_by_id(self.report_ooi.report_type), ConcatenatedReport):
             return self.get_report_data_concatenated_report()
-        if issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
-            return self.get_report_data_aggregate_report()
-        if issubclass(get_report_by_id(self.report_ooi.report_type), MultiOrganizationReport):
-            return self.get_report_data_multi_report()
+        if issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport | MultiOrganizationReport):
+            return self.get_report_data_aggregate_report_and_multi_report()
 
         return self.get_report_data_single_report()
 
