@@ -65,30 +65,28 @@ class QueueAPI:
                 status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="scheduler not found, by queue_id"
             )
 
-        q = s.queue
-        if q is None:
-            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="queue not found")
-
-        return models.Queue(**q.dict())
+        return models.Queue(**s.queue.dict())
 
     @exception_handler
     def pop(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
-            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="queue not found")
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="scheduler not found, by queue id"
+            )
 
         try:
-            p_item = s.pop_item_from_queue(filters)
+            item = s.pop_item_from_queue(filters)
         except queues.QueueEmptyError:
             return None
 
-        if p_item is None:
+        if item is None:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_404_NOT_FOUND,
                 detail="could not pop item from queue, check your filters",
             )
 
-        return models.Task(**p_item.model_dump())
+        return models.Task(**item.model_dump())
 
     @exception_handler
     def push(self, queue_id: str, item_in: serializers.Task) -> Any:

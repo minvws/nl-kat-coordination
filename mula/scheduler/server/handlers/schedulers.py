@@ -70,12 +70,7 @@ class SchedulerAPI:
         # We update the patched attributes, since the schedulers are kept
         # in memory.
         for attr, value in patch_data.items():
-            try:
-                setattr(s, attr, value)
-            except AttributeError as exc:
-                raise fastapi.HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST, detail="attribute not found"
-                ) from exc
+            setattr(s, attr, value)
 
         # Enable or disable the scheduler if needed.
         if updated_scheduler.enabled:

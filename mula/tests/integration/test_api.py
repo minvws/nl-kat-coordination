@@ -87,6 +87,12 @@ class APITestCase(APITemplateTestCase):
     def test_patch_scheduler_attr_not_found(self):
         response = self.client.patch(f"/schedulers/{self.scheduler.scheduler_id}", json={"not_found": "not found"})
         self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {"detail": "no data to patch"})
+
+    def test_patch_scheduler_not_found(self):
+        response = self.client.patch(f"/schedulers/{uuid.uuid4()}", json={"enabled": False})
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json(), {"detail": "scheduler not found"})
 
     def test_patch_scheduler_disable(self):
         self.assertTrue(self.scheduler.is_enabled())
@@ -136,7 +142,7 @@ class APITestCase(APITemplateTestCase):
         response = self.client.get("/queues/123.123")
         self.assertEqual(response.status_code, 404)
 
-    def test_push_queue__(self):
+    def test_push_queue(self):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         item = create_task_in(1)
@@ -216,8 +222,8 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(response.status_code, 409)
         self.assertEqual(1, self.scheduler.queue.qsize())
         self.assertEqual(
-            response.json().get("detail"),
-            "Item already on queue, we're not allowed to replace the item that is already on the queue.",
+            response.json(),
+            {"detail": "Item already on queue, we're not allowed to replace the item that is already on the queue."},
         )
 
     def test_push_replace_allowed(self):
@@ -389,6 +395,11 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(initial_item_id, response.json().get("id"))
         self.assertEqual(0, self.scheduler.queue.qsize())
+
+    def test_pop_queue_not_found(self):
+        response = self.client.post(f"/queues/{uuid.uuid4()}/pop")
+        self.assertEqual(404, response.status_code)
+        self.assertEqual({"detail": "scheduler not found, by queue id"}, response.json())
 
     def test_pop_queue_filters(self):
         # Add one task to the queue
@@ -586,7 +597,7 @@ class APITasksEndpointTestCase(APITemplateTestCase):
     def test_get_task_not_found(self):
         response = self.client.get(f"/tasks/{uuid.uuid4()}")
         self.assertEqual(404, response.status_code)
-        self.assertEqual("task not found", response.json().get("detail"))
+        self.assertEqual({"detail": "task not found"}, response.json())
 
     def test_get_tasks_min_and_max_created_at(self):
         # Get tasks based on datetime, both min_created_at and max_created_at, should return 2 items
@@ -644,7 +655,7 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         }
         response = self.client.get("/tasks", params=params)
         self.assertEqual(400, response.status_code)
-        self.assertEqual("min_date must be less than max_date", response.json().get("detail"))
+        self.assertEqual({"detail": "min_date must be less than max_date"}, response.json())
 
     def test_get_tasks_min_created_at_future(self):
         # Get tasks based on datetime for something in the future, should return 0 items
@@ -691,25 +702,25 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         # Patch a task with empty body
         response = self.client.patch(f"/tasks/{self.first_item_api.get('id')}", json={})
         self.assertEqual(400, response.status_code)
-        self.assertEqual("no data to patch", response.json().get("detail"))
+        self.assertEqual({"detail": "no data to patch"}, response.json())
 
     def test_patch_task_invalid_content(self):
         # Patch a task with invalid content
         response = self.client.patch(f"/tasks/{self.first_item_api.get('id')}", json={"invalid": "invalid"})
         self.assertEqual(400, response.status_code)
-        self.assertEqual("no data to patch", response.json().get("detail"))
+        self.assertEqual({"detail": "no data to patch"}, response.json())
 
     def test_patch_task_not_found(self):
         # Patch a task that does not exist
         response = self.client.patch(f"/tasks/{uuid.uuid4()}", json={"status": "completed"})
         self.assertEqual(404, response.status_code)
-        self.assertEqual("task not found", response.json().get("detail"))
+        self.assertEqual({"detail": "task not found"}, response.json())
 
     def test_patch_task_malformed_id(self):
         # Patch a task with malformed id
         response = self.client.patch("/tasks/123.123", json={"status": "completed"})
         self.assertEqual(422, response.status_code)
-        self.assertIn("Input should be a valid UUID", str(response.content))
+        self.assertIn("Input should be a valid UUID", response.content)
 
     def test_patch_task_invalid_status(self):
         # Patch a task with invalid status
