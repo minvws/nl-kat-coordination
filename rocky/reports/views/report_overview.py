@@ -23,10 +23,7 @@ class BreadcrumbsReportOverviewView(ReportBreadcrumbs):
         breadcrumbs = super().build_breadcrumbs()
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
-        breadcrumbs += [
-            {"url": reverse("report_history", kwargs=kwargs) + selection, "text": _("Reports history")},
-            {"url": reverse("subreports", kwargs=kwargs) + selection, "text": _("Subreports")},
-        ]
+        breadcrumbs += [{"url": reverse("subreports", kwargs=kwargs) + selection, "text": _("Subreports")}]
         return breadcrumbs
 
 
@@ -36,7 +33,6 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
     """
 
     paginate_by = 20
-    breadcrumbs_step = 2
     context_object_name = "reports"
     paginator = RockyPaginator
     template_name = "report_overview/scheduled_reports.html"
@@ -105,6 +101,7 @@ class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     """
 
     paginate_by = 150
+    breadcrumbs_step = 2
     context_object_name = "subreports"
     paginator = RockyPaginator
     template_name = "report_overview/subreports.html"
