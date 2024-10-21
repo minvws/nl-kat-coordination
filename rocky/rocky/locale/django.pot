@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-21 12:10+0000\n"
+"POT-Creation-Date: 2024-10-21 16:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4086,6 +4086,10 @@ msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
 msgid "Close children report object details"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Open children report object details"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
