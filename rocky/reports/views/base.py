@@ -511,7 +511,7 @@ class SaveReportView(BaseReportView, ReportBreadcrumbs, SchedulerView):
         report_names = request.POST.getlist("report_name", [])
         reference_dates = request.POST.getlist("reference_date")
 
-        if self.show_report_names() and report_names:
+        if not self.is_scheduled_report() and report_names:
             final_report_names = list(zip(old_report_names, self.finalise_report_names(report_names, reference_dates)))
             report_ooi = self.save_report(final_report_names)
 
