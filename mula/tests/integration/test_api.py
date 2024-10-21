@@ -720,7 +720,7 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         # Patch a task with malformed id
         response = self.client.patch("/tasks/123.123", json={"status": "completed"})
         self.assertEqual(422, response.status_code)
-        self.assertIn("Input should be a valid UUID", response.content)
+        self.assertIn("Input should be a valid UUID", response.text)
 
     def test_patch_task_invalid_status(self):
         # Patch a task with invalid status

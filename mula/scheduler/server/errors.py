@@ -13,7 +13,7 @@ def exception_handler(func):
             return func(*args, **kwargs)
         except storage.filters.errors.FilterError as exc:
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"Invalid filter(s): {exc}]"
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"Invalid filter(s): {exc}"
             ) from exc
         except storage.errors.StorageError as exc:
             raise fastapi.HTTPException(
