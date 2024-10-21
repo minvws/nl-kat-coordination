@@ -58,7 +58,7 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
 
     def start_boefje_scan(self) -> None:
         boefje_id = self.request.POST.get("boefje_id")
-        boefje = get_katalogus(self.organization.code).get_plugin(self.organization.code, boefje_id)
+        boefje = get_katalogus().get_plugin(self.organization.code, boefje_id)
         ooi_id = self.request.GET.get("ooi_id")
         ooi = self.get_single_ooi(pk=ooi_id)
         self.run_boefje(boefje, ooi)

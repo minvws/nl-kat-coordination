@@ -113,7 +113,7 @@ class Organization(models.Model):
         return reverse("organization_settings", args=[self.pk])
 
     def delete(self, *args, **kwargs):
-        katalogus_client = self._get_healthy_katalogus(self.code)
+        katalogus_client = self._get_healthy_katalogus()
         octopoes_client = self._get_healthy_octopoes(self.code)
 
         try:
@@ -147,7 +147,7 @@ class Organization(models.Model):
     @classmethod
     def pre_create(cls, sender, instance, *args, **kwargs):
         instance.clean()
-        katalogus_client = cls._get_healthy_katalogus(instance.code)
+        katalogus_client = cls._get_healthy_katalogus()
         octopoes_client = cls._get_healthy_octopoes(instance.code)
 
         try:
@@ -177,8 +177,8 @@ class Organization(models.Model):
             logger.exception("Could not seed internet for organization %s", sender)
 
     @staticmethod
-    def _get_healthy_katalogus(organization_code: str) -> KATalogusClient:
-        katalogus_client = get_katalogus(organization_code)
+    def _get_healthy_katalogus() -> KATalogusClient:
+        katalogus_client = get_katalogus()
 
         try:
             health = katalogus_client.health()

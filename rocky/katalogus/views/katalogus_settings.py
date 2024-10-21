@@ -36,7 +36,7 @@ class ConfirmCloneSettingsView(
     def post(self, request, *args, **kwargs):
         to_organization = Organization.objects.get(code=kwargs["to_organization"])
         logger.info("Cloning organization settings", event_code=910000, to_organization_code=to_organization.code)
-        get_katalogus(self.organization.code).clone_all_configuration_to_organization(to_organization.code)
+        get_katalogus().clone_all_configuration_to_organization(self.organization.code, to_organization.code)
         messages.add_message(
             self.request,
             messages.SUCCESS,
@@ -71,7 +71,7 @@ class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationVie
 
     def get_settings(self):
         all_plugins_settings = []
-        katalogus_client = get_katalogus(self.organization.code)
+        katalogus_client = get_katalogus()
 
         for boefje in katalogus_client.get_boefjes(self.organization.code):
             try:

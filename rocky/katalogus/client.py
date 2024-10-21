@@ -350,5 +350,5 @@ def parse_plugin(plugin: dict) -> Plugin:
         raise Exception(f"Unknown plugin type: {plugin['type']}")
 
 
-def get_katalogus(organization: str) -> KATalogusClient:
+def get_katalogus() -> KATalogusClient:
     return KATalogusClient(settings.KATALOGUS_API)

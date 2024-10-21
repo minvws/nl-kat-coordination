@@ -224,7 +224,7 @@ def test_katalogus_clone_settings(redteam_member, organization_b, rf, mocker, mo
     )
     assert response.status_code == 302
 
-    mock_katalogus().clone_all_configuration_to_organization.assert_called_once_with(organization_b.code)
+    mock_katalogus().clone_all_configuration_to_organization.assert_called_once_with(redteam_member.organization.code, organization_b.code)
 
 
 def test_katalogus_clone_settings_not_accessible_without_perms(

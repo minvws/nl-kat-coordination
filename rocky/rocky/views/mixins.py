@@ -135,7 +135,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
             logger.error(e)
             return results
 
-        katalogus = get_katalogus(organization.code)
+        katalogus = get_katalogus()
 
         for origin in origins:
             origin = OriginData(origin=origin)

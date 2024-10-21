@@ -352,7 +352,7 @@ class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
         self.plugins = None
 
         try:
-            self.plugins = hydrate_plugins(self.organization.code, self.get_report_types(), get_katalogus(self.organization.code))
+            self.plugins = hydrate_plugins(self.organization.code, self.get_report_types(), get_katalogus())
         except KATalogusError as error:
             messages.error(self.request, error.message)
 
@@ -635,7 +635,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         plugin_ids_required = plugins_dict["required"]
         plugin_ids_optional = plugins_dict["optional"]
 
-        katalogus_plugins = get_katalogus(self.organization.code).get_plugins(
+        katalogus_plugins = get_katalogus().get_plugins(
             ids=plugin_ids_required + plugin_ids_optional
         )
         for plugin in katalogus_plugins:

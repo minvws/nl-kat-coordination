@@ -80,7 +80,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
                 organization_code=from_organization.code,
                 to_organization_code=to_organization.code,
             )
-            get_katalogus(from_organization.code).clone_all_configuration_to_organization(to_organization.code)
+            get_katalogus().clone_all_configuration_to_organization(from_organization.code, to_organization.code)
 
             return Response()
         else:

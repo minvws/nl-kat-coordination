@@ -23,7 +23,7 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.katalogus = get_katalogus(self.organization.code)
+        self.katalogus = get_katalogus()
         self.plugin_id = uuid.uuid4()
         self.created = str(datetime.now())
         self.query_params = urlencode({"new_variant": True})

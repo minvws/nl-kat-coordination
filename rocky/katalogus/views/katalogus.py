@@ -30,7 +30,7 @@ class BaseKATalogusView(OrganizationView, ListView, FormView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.katalogus_client = get_katalogus(self.organization.code)
+        self.katalogus_client = get_katalogus()
 
     def get_initial(self) -> dict[str, Any]:
         initial = super().get_initial()

@@ -18,7 +18,7 @@ class PluginCoverImgView(OrganizationView):
     """Get the cover image of a plugin."""
 
     def get(self, request, *args, **kwargs):
-        file = FileResponse(get_katalogus(self.organization.code).get_cover(self.organization.code, kwargs["plugin_id"]))
+        file = FileResponse(get_katalogus().get_cover(self.organization.code, kwargs["plugin_id"]))
         file.headers["Cache-Control"] = "max-age=604800"
         return file
 
@@ -120,7 +120,7 @@ class BoefjeDetailView(PluginDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["new_variant"] = self.request.GET.get("new_variant")
-        context["variants"] = get_katalogus(self.organization.code).get_plugins(self.organization.code, oci_image=self.plugin.oci_image)
+        context["variants"] = get_katalogus().get_plugins(self.organization.code, oci_image=self.plugin.oci_image)
 
         for variant in context["variants"]:
             if variant.created:
