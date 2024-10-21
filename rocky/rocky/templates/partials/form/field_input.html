@@ -2,7 +2,9 @@
 
 <div {% if field.field.required %}class="required"{% endif %}>
     {% if field.field.required %}
-        <span>{{ field.label_tag }} <span class="nota-bene" aria-hidden>{% translate "(Required)" %}</span></span>
+        <label>
+            {{ field.label_tag }} <span class="nota-bene" aria-hidden>{% translate "(Required)" %}</span>
+        </label>
     {% else %}
         {{ field.label_tag }}
     {% endif %}
