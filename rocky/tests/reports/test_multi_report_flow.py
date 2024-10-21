@@ -1,3 +1,5 @@
+import json
+
 from pytest_django.asserts import assertContains
 from reports.views.base import ViewReportView
 from reports.views.multi_report import (
@@ -140,19 +142,150 @@ def test_save_multi_report(
 def test_view_multi_report(
     rf,
     client_member,
-    get_aggregate_report_ooi,
-    get_aggregate_report_from_bytes,
     mock_organization_view_octopoes,
     mock_bytes_client,
     mock_katalogus_client,
+    multi_report_ooi,
+    get_multi_report_post_processed_data,
 ):
-    mock_organization_view_octopoes().get.return_value = get_aggregate_report_ooi
-    mock_bytes_client().get_raw.return_value = get_aggregate_report_from_bytes
-    mock_organization_view_octopoes().query.return_value = []
+    mock_organization_view_octopoes().get.return_value = multi_report_ooi
+    mock_bytes_client().get_raw.return_value = json.dumps(get_multi_report_post_processed_data).encode("utf-8")
+    mock_organization_view_octopoes().query.return_value = []  # no child reports
 
-    request = setup_request(
-        rf.get("view_report", {"report_id": f"{get_aggregate_report_ooi.primary_key}"}), client_member.user
-    )
+    request = setup_request(rf.get("view_report", {"report_id": f"{multi_report_ooi.primary_key}"}), client_member.user)
 
     response = ViewReportView.as_view()(request, organization_code=client_member.organization.code)
     assert response.status_code == 200
+
+    assertContains(response, "Sector Report")
+    assertContains(response, "This is the OpenKAT Sector Report")
+
+    assertContains(
+        response,
+        f'<p>Created with date from:<strong>{multi_report_ooi.date_generated.strftime("%b. %d, %Y")}</strong></p>',
+        html=True,
+    )
+    assertContains(
+        response,
+        f'<p>Created with date from:<strong>{multi_report_ooi.date_generated.strftime("%b. %d, %Y")}</strong></p>',
+        html=True,
+    )
+    assertContains(response, f"<p>Created by:<strong>{client_member.user.full_name}</strong></p>", html=True)
+    assertContains(
+        response,
+        "<p>This sector contains 2 scanned organizations. The basic security scores are around 71%. "
+        "A total of 0 critical vulnerabilities have been identified.</p>",
+        html=True,
+    )
+
+    assertContains(
+        response,
+        """
+        <section id="summary">
+            <div>
+                <h2>Summary</h2>
+                <dl>
+                    <div>
+                        <dt>Organisations in sector report</dt>
+                        <dd>
+                            2
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>IP addresses scanned</dt>
+                        <dd>
+                            3
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Domains scanned</dt>
+                        <dd>
+                            2
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>General recommendations</dt>
+                        <dd>
+                            7
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Best scoring security check</dt>
+                        <dd>
+                            CSP Present
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Worst scoring security check</dt>
+                        <dd>
+                            DNSSEC Present
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </section>
+        """,
+        html=True,
+    )
+
+    assertContains(
+        response,
+        """
+        <section id="open-ports">
+            <div>
+                <h2>Open ports</h2>
+                <p>See an overview of open ports found over all systems and the services these systems provide.</p>
+
+                    <div class="horizontal-scroll">
+                        <table>
+                            <caption class="visually-hidden">Overview of detected open ports</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Open ports</th>
+                                    <th scope="col">Occurrences (IP addresses)</th>
+                                    <th scope="col">Services</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                    <tr>
+                                        <td>3306</td>
+                                        <td>1/3</td>
+                                        <td>MYSQL</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>53</td>
+                                        <td>1/3</td>
+                                        <td>DOMAIN</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>443</td>
+                                        <td>2/3</td>
+                                        <td>HTTPS</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>22</td>
+                                        <td>1/3</td>
+                                        <td>SSH</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>80</td>
+                                        <td>2/3</td>
+                                        <td>HTTP</td>
+                                    </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+            </div>
+        </section>
+
+        """,
+        html=True,
+    )

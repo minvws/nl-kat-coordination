@@ -1,7 +1,7 @@
 {
   "systems": {
     "services": {
-      "IPAddressV4|internet|134.209.85.72": {
+      "IPAddressV4|internet|1.1.1.1": {
         "hostnames": [
           "Hostname|internet|mispo.es"
         ],
@@ -18,21 +18,21 @@
       "DNS": {
         "number_of_available": 1,
         "sc_ips": {
-          "134.209.85.72": []
+          "1.1.1.1": []
         },
         "number_of_ips": 1
       },
       "Web": {
         "number_of_available": 1,
         "sc_ips": {
-          "134.209.85.72": []
+          "1.1.1.1": []
         },
         "number_of_ips": 1
       },
       "Other": {
         "number_of_available": 1,
         "sc_ips": {
-          "134.209.85.72": []
+          "1.1.1.1": []
         },
         "number_of_ips": 1
       }
@@ -46,7 +46,7 @@
         "system_specific": {
           "number_of_compliant": 0,
           "ips": {
-            "IPAddressV4|internet|134.209.85.72": [
+            "IPAddressV4|internet|1.1.1.1": [
               {
                 "description": "A database port is open.",
                 "object_type": "KATFindingType",
@@ -108,7 +108,7 @@
         "system_specific": {
           "number_of_compliant": 0,
           "ips": {
-            "IPAddressV4|internet|134.209.85.72": [
+            "IPAddressV4|internet|1.1.1.1": [
               {
                 "description": "TLS certificate has expired",
                 "object_type": "KATFindingType",
@@ -334,7 +334,7 @@
       "DNS": {
         "number_of_compliant": 1,
         "rpki_ips": {
-          "134.209.85.72": {
+          "1.1.1.1": {
             "valid": true,
             "exists": true
           }
@@ -346,7 +346,7 @@
       "Web": {
         "number_of_compliant": 1,
         "rpki_ips": {
-          "134.209.85.72": {
+          "1.1.1.1": {
             "valid": true,
             "exists": true
           }
@@ -358,7 +358,7 @@
       "Other": {
         "number_of_compliant": 1,
         "rpki_ips": {
-          "134.209.85.72": {
+          "1.1.1.1": {
             "valid": true,
             "exists": true
           }
@@ -370,7 +370,7 @@
     }
   },
   "open_ports": {
-    "134.209.85.72": {
+    "1.1.1.1": {
       "hostnames": [
         "mispo.es"
       ],
@@ -531,9 +531,9 @@
     "Determine if this port should be reachable from the identified location. Limit access to reduce the attack surface if necessary."
   ],
   "vulnerabilities": {
-    "IPAddressV4|internet|134.209.85.72": {
+    "IPAddressV4|internet|1.1.1.1": {
       "hostnames": "(mispo.es)",
-      "title": "134.209.85.72",
+      "title": "1.1.1.1",
       "summary": {
         "total_criticals": 0,
         "terms": [
@@ -680,7 +680,7 @@
   },
   "services": {
     "DNS": {
-      "IPAddressV4|internet|134.209.85.72": {
+      "IPAddressV4|internet|1.1.1.1": {
         "hostnames": [
           "Hostname|internet|mispo.es"
         ],
@@ -692,7 +692,7 @@
       }
     },
     "Web": {
-      "IPAddressV4|internet|134.209.85.72": {
+      "IPAddressV4|internet|1.1.1.1": {
         "hostnames": [
           "Hostname|internet|mispo.es"
         ],
@@ -704,7 +704,7 @@
       }
     },
     "Other": {
-      "IPAddressV4|internet|134.209.85.72": {
+      "IPAddressV4|internet|1.1.1.1": {
         "hostnames": [
           "Hostname|internet|mispo.es"
         ],

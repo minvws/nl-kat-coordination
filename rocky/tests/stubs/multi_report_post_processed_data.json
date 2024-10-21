@@ -1,7 +1,7 @@
 {
   "organizations": [
-    "_martis",
-    "_rieven"
+    "org_b",
+    "test"
   ],
   "tags": {},
   "basic_security_score": 71,
@@ -16,7 +16,7 @@
   },
   "asset_vulnerabilities": [
     {
-      "asset": "IPAddressV4|internet|134.209.85.72",
+      "asset": "IPAddressV4|internet|1.1.1.1",
       "vulnerabilities": {
         "RetireJS-jquerymigrate-f3a3": 6.9,
         "CVE-2018-14042": 6.1,
@@ -26,7 +26,7 @@
         "CVE-2016-10735": 6.1,
         "CVE-2019-8331": 6.1
       },
-      "organisation": "_martis",
+      "organisation": "org_b",
       "services": [
         "DNS",
         "Other",
@@ -34,17 +34,17 @@
       ]
     },
     {
-      "asset": "IPAddressV4|internet|147.181.98.150",
+      "asset": "IPAddressV4|internet|1.1.1.1",
       "vulnerabilities": {},
-      "organisation": "_rieven",
+      "organisation": "test",
       "services": [
         "Web"
       ]
     },
     {
-      "asset": "IPAddressV6|internet|2a04:9a03:1011:1001::8",
+      "asset": "IPAddressV6|internet|2001:4860:4860::8888",
       "vulnerabilities": {},
-      "organisation": "_rieven",
+      "organisation": "test",
       "services": []
     }
   ],
@@ -232,14 +232,14 @@
   },
   "services": {
     "DNS": [
-      "IPAddressV4|internet|134.209.85.72"
+      "IPAddressV4|internet|1.1.1.1"
     ],
     "Web": [
-      "IPAddressV4|internet|134.209.85.72",
-      "IPAddressV4|internet|147.181.98.150"
+      "IPAddressV4|internet|1.1.1.1",
+      "IPAddressV4|internet|1.1.1.1"
     ],
     "Other": [
-      "IPAddressV4|internet|134.209.85.72"
+      "IPAddressV4|internet|1.1.1.1"
     ]
   },
   "recommendation_counts": {
@@ -268,8 +268,8 @@
   },
   "input_data": {
     "input_oois": [
-      "ReportData|_martis",
-      "ReportData|_rieven"
+      "ReportData|test",
+      "ReportData|org_b"
     ],
     "report_types": [
       "multi-organization-report"

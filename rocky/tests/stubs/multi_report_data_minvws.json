@@ -1,7 +1,7 @@
 {
   "systems": {
     "services": {
-      "IPAddressV4|internet|147.181.98.150": {
+      "IPAddressV4|internet|1.1.1.1": {
         "hostnames": [
           "Hostname|internet|minvws.nl"
         ],
@@ -9,7 +9,7 @@
           "Web"
         ]
       },
-      "IPAddressV6|internet|2a04:9a03:1011:1001::8": {
+      "IPAddressV6|internet|2001:4860:4860::8888": {
         "hostnames": [
           "Hostname|internet|minvws.nl"
         ],
@@ -22,7 +22,7 @@
       "Web": {
         "number_of_available": 0,
         "sc_ips": {
-          "147.181.98.150": [
+          "1.1.1.1": [
             {
               "description": "Ciphers are used that are labeled as bad. These should not be used anymore",
               "object_type": "KATFindingType",
@@ -50,7 +50,7 @@
         "system_specific": {
           "number_of_compliant": 1,
           "ips": {
-            "IPAddressV4|internet|147.181.98.150": [
+            "IPAddressV4|internet|1.1.1.1": [
               {
                 "description": "This hostname does not have a Security.txt file.",
                 "object_type": "KATFindingType",
@@ -128,11 +128,11 @@
       "Web": {
         "number_of_compliant": 2,
         "rpki_ips": {
-          "147.181.98.150": {
+          "1.1.1.1": {
             "valid": true,
             "exists": true
           },
-          "2a04:9a03:1011:1001::8": {
+          "2001:4860:4860::8888": {
             "valid": true,
             "exists": true
           }
@@ -144,7 +144,7 @@
     }
   },
   "open_ports": {
-    "147.181.98.150": {
+    "1.1.1.1": {
       "hostnames": [
         "minvws.nl"
       ],
@@ -161,7 +161,7 @@
         ]
       }
     },
-    "2a04:9a03:1011:1001::8": {
+    "2001:4860:4860::8888": {
       "hostnames": [
         "minvws.nl"
       ],
@@ -292,9 +292,9 @@
     "Make sure there is a security.txt available."
   ],
   "vulnerabilities": {
-    "IPAddressV4|internet|147.181.98.150": {
+    "IPAddressV4|internet|1.1.1.1": {
       "hostnames": "(minvws.nl)",
-      "title": "147.181.98.150",
+      "title": "1.1.1.1",
       "summary": {
         "total_criticals": 0,
         "terms": [],
@@ -303,9 +303,9 @@
       },
       "vulnerabilities": {}
     },
-    "IPAddressV6|internet|2a04:9a03:1011:1001::8": {
+    "IPAddressV6|internet|2001:4860:4860::8888": {
       "hostnames": "(minvws.nl)",
-      "title": "2a04:9a03:1011:1001::8",
+      "title": "2001:4860:4860::8888",
       "summary": {
         "total_criticals": 0,
         "terms": [],
@@ -317,7 +317,7 @@
   },
   "services": {
     "Web": {
-      "IPAddressV4|internet|147.181.98.150": {
+      "IPAddressV4|internet|1.1.1.1": {
         "hostnames": [
           "Hostname|internet|minvws.nl"
         ],
