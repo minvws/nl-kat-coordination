@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_unicode_slug
 from django.utils.translation import gettext_lazy as _
-from httpx import codes
+from httpx import codes, Response, HTTPStatusError
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import AfterValidator, BaseModel, Field, field_serializer
@@ -101,6 +101,13 @@ class KATalogusError(Exception):
         return self._message
 
 
+class KATalogusHTTPStatusError(KATalogusError):
+    def __init__(self, error: httpx.HTTPStatusError):
+        self.error = error
+
+        super().__init__(_("An HTTP %d error occurred. Check logs for more info.").format(error.response.status_code))
+
+
 class DuplicatePluginError(KATalogusError):
     def __init__(self, error_message: str):
         super().__init__(error_message)
@@ -121,54 +128,56 @@ class KATalogusNotAllowedError(KATalogusError):
         super().__init__(_("Editing this boefje is not allowed because it is static."))
 
 
-class KATalogusHTTPStatusError(KATalogusError):
-    def __init__(self, error: httpx.HTTPStatusError):
-        self.error = error
+def verify_response(response: Response) -> None:
+    try:
+        response.raise_for_status()
+    except HTTPStatusError as error:
+        if error.response.status_code == codes.BAD_REQUEST and "duplicate key" in error.response.text:
+            raise DuplicatePluginError("Duplicate plugin name") from error
 
-        super().__init__(_("An HTTP %d error occurred. Check logs for more info.").format(error.response.status_code))
+        error_message = json.loads(error.response.text).get("detail")
+
+        if error.response.status_code == codes.BAD_REQUEST and "Duplicate plugin" in error_message:
+            raise DuplicatePluginError(error_message) from error
+
+        if error.response.status_code in [codes.FORBIDDEN, codes.NOT_FOUND]:
+            raise KATalogusNotAllowedError
+
+        raise KATalogusHTTPStatusError(error) from error
 
 
 class KATalogusClient:
     def __init__(self, base_uri: str):
-        self.session = httpx.Client(base_url=base_uri)
+        self.session = httpx.Client(base_url=base_uri, event_hooks={"response": [verify_response]})
         # TODO: fix the self.organization = valid_organization_code(organization) if organization else organization
 
     def organization_exists(self, organization_code: str) -> bool:
-        response = self.session.get(f"/v1/organisations/{organization_code}")
-
-        return response.status_code != 404
+        return self.session.get(f"/v1/organisations/{organization_code}").status_code != 404
 
     def create_organization(self, organization):
-        response = self.session.post("/v1/organisations/", json={"id": organization.code, "name": organization.name})
-        response.raise_for_status()
+        self.session.post("/v1/organisations/", json={"id": organization.code, "name": organization.name})
 
         logger.info("Created organization", name=organization.name)
 
     def delete_organization(self, organization_code: str):
-        response = self.session.delete(f"/v1/organisations/{organization_code}")
-        response.raise_for_status()
+        self.session.delete(f"/v1/organisations/{organization_code}")
 
         logger.info("Deleted organization", organization_code=organization_code)
 
     def get_plugins(self, organization_code: str, **params) -> list[Plugin]:
-        try:
-            response = self.session.get(f"/v1/organisations/{organization_code}/plugins", params=params)
-            response.raise_for_status()
-        except httpx.HTTPStatusError as error:
-            raise KATalogusHTTPStatusError(error)
+        response = self.session.get(f"/v1/organisations/{organization_code}/plugins", params=params)
+
         return [parse_plugin(plugin) for plugin in response.json()]
 
     def get_plugin(self, organization_code: str, plugin_id: str) -> Plugin:
         plugin_id = quote(plugin_id)
         response = self.session.get(f"/v1/organisations/{organization_code}/plugins/{plugin_id}")
-        response.raise_for_status()
 
         return parse_plugin(response.json())
 
     def get_plugin_schema(self, organization_code: str, plugin_id: str) -> dict | None:
         plugin_id = quote(plugin_id)
         response = self.session.get(f"/v1/organisations/{organization_code}/plugins/{plugin_id}/schema.json")
-        response.raise_for_status()
 
         schema = response.json()
         if not schema:
@@ -186,20 +195,18 @@ class KATalogusClient:
     def get_plugin_settings(self, organization_code: str, plugin_id: str) -> dict:
         plugin_id = quote(plugin_id)
         response = self.session.get(f"/v1/organisations/{organization_code}/{plugin_id}/settings")
-        response.raise_for_status()
+
         return response.json()
 
     def upsert_plugin_settings(self, organization_code: str, plugin_id: str, values: dict) -> None:
         plugin_id = quote(plugin_id)
-        response = self.session.put(f"/v1/organisations/{organization_code}/{plugin_id}/settings", json=values)
-        response.raise_for_status()
+        self.session.put(f"/v1/organisations/{organization_code}/{plugin_id}/settings", json=values)
 
         logger.info("Upsert plugin settings", plugin_id=plugin_id)
 
     def delete_plugin_settings(self, organization_code: str, plugin_id: str):
         plugin_id = quote(plugin_id)
         response = self.session.delete(f"/v1/organisations/{organization_code}/{plugin_id}/settings")
-        response.raise_for_status()
 
         logger.info("Delete plugin settings", plugin_id=plugin_id)
 
@@ -208,13 +215,11 @@ class KATalogusClient:
     def clone_all_configuration_to_organization(self, from_organization: str, to_organization: str):
         to_organization = quote(to_organization)
         response = self.session.post(f"/v1/organisations/{from_organization}/settings/clone/{to_organization}")
-        response.raise_for_status()
 
         return response
 
     def health(self) -> ServiceHealth:
         response = self.session.get("/health")
-        response.raise_for_status()
 
         return ServiceHealth.model_validate_json(response.content)
 
@@ -240,15 +245,14 @@ class KATalogusClient:
         logger.info("Toggle plugin state", plugin_id=plugin_id, enabled=enabled)
         plugin_id = quote(plugin_id)
 
-        response = self.session.patch(
+        self.session.patch(
             f"/v1/organisations/{organization_code}/plugins/{plugin_id}", json={"enabled": enabled}
         )
-        response.raise_for_status()
 
     def get_cover(self, organization_code: str, plugin_id: str) -> BytesIO:
         plugin_id = quote(plugin_id)
         response = self.session.get(f"/v1/organisations/{organization_code}/plugins/{plugin_id}/cover.jpg")
-        response.raise_for_status()
+
         return BytesIO(response.content)
 
     def create_plugin(self, organization_code: str, plugin: Plugin) -> None:
@@ -258,17 +262,13 @@ class KATalogusClient:
                 headers={"Content-Type": "application/json"},
                 content=plugin.model_dump_json(exclude_none=True),
             )
-            response.raise_for_status()
-        except httpx.HTTPStatusError as error:
-            if error.response.status_code == codes.CREATED:
+            if response.status_code == codes.CREATED:
                 logger.info("Plugin %s created", plugin.name)
             else:
                 logger.info("Plugin %s could not be created", plugin.name)
-            error_message = json.loads(error.response.text).get("detail")
-            if error.response.status_code == codes.BAD_REQUEST and "Duplicate plugin" in error_message:
-                raise DuplicatePluginError(error_message)
-            else:
-                raise error
+        except KATalogusHTTPStatusError:
+            logger.info("Plugin %s could not be created", plugin.name)
+            raise
 
     def edit_plugin(self, organization_code: str, plugin: Plugin) -> None:
         try:
@@ -276,18 +276,13 @@ class KATalogusClient:
                 f"/v1/organisations/{organization_code}/boefjes/{plugin.id}",
                 content=plugin.model_dump_json(exclude_none=True),
             )
-            response.raise_for_status()
-        except httpx.HTTPStatusError as error:
-            if error.response.status_code == codes.CREATED:
+            if response.status_code == codes.CREATED:
                 logger.info("Plugin %s updated", plugin.name)
             else:
                 logger.info("Plugin %s could not be updated", plugin.name)
-            if error.response.status_code == codes.BAD_REQUEST and "duplicate key" in error.response.text:
-                raise DuplicatePluginError("Duplicate plugin name")
-            if error.response.status_code in [codes.FORBIDDEN, codes.NOT_FOUND]:
-                raise KATalogusNotAllowedError
-            else:
-                raise error
+        except KATalogusHTTPStatusError:
+            logger.info("Plugin %s could not be updated", plugin.name)
+            raise
 
 
 def parse_boefje(boefje: dict) -> Boefje:
