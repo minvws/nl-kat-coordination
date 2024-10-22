@@ -15,7 +15,9 @@ logger = get_logger(__name__)
 
 
 class ReportViewSet(OrganizationAPIMixin, viewsets.ModelViewSet):
-    # There are no extra permissions needed to view reports, so IsAuthenticated is enough for list/retrieve
+    # There are no extra permissions needed to view reports, so IsAuthenticated
+    # is enough for list/retrieve. OrganizationAPIMixin will check if the user
+    # is a member of the requested organization.
     permission_classes = [IsAuthenticated]
     serializer_class = ReportSerializer
 

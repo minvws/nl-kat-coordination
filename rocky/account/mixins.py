@@ -211,6 +211,26 @@ class OrganizationPermissionRequiredMixin(PermissionRequiredMixin):
 class OrganizationAPIMixin:
     request: Request
 
+    def get_organization(self, field: str, value: str) -> Organization:
+        lookup_param = {field: value}
+        try:
+            organization = Organization.objects.get(**lookup_param)
+        except Organization.DoesNotExist as e:
+            raise Http404(f"Organization with {field} {value} does not exist") from e
+
+        if self.request.user.has_perm("tools.can_access_all_organizations"):
+            return organization
+
+        try:
+            organization_member = OrganizationMember.objects.get(user=self.request.user, organization=organization)
+        except OrganizationMember.DoesNotExist as e:
+            raise Http404(f"Organization with {field} {value} does not exist") from e
+
+        if organization_member.blocked:
+            raise PermissionDenied()
+
+        return organization
+
     @cached_property
     def organization(self) -> Organization:
         try:
@@ -218,20 +238,14 @@ class OrganizationAPIMixin:
         except KeyError:
             pass
         else:
-            try:
-                return Organization.objects.get(id=organization_id)
-            except Organization.DoesNotExist as e:
-                raise Http404(f"Organization with id {organization_id} does not exist") from e
+            return self.get_organization("id", organization_id)
 
         try:
             organization_code = self.request.query_params["organization_code"]
         except KeyError as e:
             raise ValidationError("Missing organization_id or organization_code query parameter") from e
         else:
-            try:
-                return Organization.objects.get(code=organization_code)
-            except Organization.DoesNotExist as e:
-                raise Http404(f"Organization with code {organization_code} does not exist") from e
+            return self.get_organization("code", organization_code)
 
     @cached_property
     def octopoes_api_connector(self) -> OctopoesAPIConnector:
