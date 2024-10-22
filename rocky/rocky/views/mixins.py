@@ -135,7 +135,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
             logger.error(e)
             return results
 
-        katalogus = get_katalogus()
+        katalogus = get_katalogus(organization.code)
 
         for origin in origins:
             origin = OriginData(origin=origin)
@@ -161,7 +161,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
                 origin.normalizer = normalizer_data
                 if boefje_id != "manual":
                     try:
-                        origin.boefje = katalogus.get_plugin(organization.code, boefje_id)
+                        origin.boefje = katalogus.get_plugin(boefje_id)
                     except HTTPError as e:
                         logger.error("Could not load boefje %s from katalogus: %s", boefje_id, e)
             observations.append(origin)

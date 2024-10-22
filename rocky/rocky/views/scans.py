@@ -16,6 +16,6 @@ class ScanListView(ObjectsBreadcrumbsMixin, OrganizationView, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["boefjes"] = get_katalogus().get_enabled_boefjes(self.organization.code)
+        context["boefjes"] = get_katalogus(self.organization.code).get_enabled_boefjes()
 
         return context

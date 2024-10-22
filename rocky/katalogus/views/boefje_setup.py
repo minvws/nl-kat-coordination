@@ -23,7 +23,7 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.katalogus = get_katalogus()
+        self.katalogus = get_katalogus(self.organization.code)
         self.plugin_id = uuid.uuid4()
         self.created = str(datetime.now())
         self.query_params = urlencode({"new_variant": True})
@@ -45,7 +45,7 @@ class AddBoefjeView(BoefjeSetupView):
 
         try:
             logger.info("Creating boefje", event_code=800025, boefje=plugin)
-            self.katalogus.create_plugin(self.organization.code, plugin)
+            self.katalogus.create_plugin(plugin)
             return super().form_valid(form)
         except DuplicatePluginError as error:
             if "name" in error.message:
@@ -100,7 +100,7 @@ class AddBoefjeVariantView(BoefjeSetupView):
 
         try:
             logger.info("Creating boefje", event_code=800025, boefje=plugin)
-            self.katalogus.create_plugin(self.organization.code, plugin)
+            self.katalogus.create_plugin(plugin)
             return super().form_valid(form)
         except DuplicatePluginError as error:
             if "name" in error.message:
@@ -141,7 +141,7 @@ class EditBoefjeView(BoefjeSetupView):
 
         self.plugin_id = self.kwargs.get("plugin_id")
         self.query_params = urlencode({"new_variant": False})
-        self.plugin = self.katalogus.get_plugin(self.organization.code, self.plugin_id)
+        self.plugin = self.katalogus.get_plugin(self.plugin_id)
         self.created = self.plugin.created
 
     def get_initial(self):
@@ -170,7 +170,7 @@ class EditBoefjeView(BoefjeSetupView):
 
         try:
             logger.info("Editing boefje", event_code=800026, boefje=plugin)
-            self.katalogus.edit_plugin(self.organization.code, plugin)
+            self.katalogus.edit_plugin(plugin)
             return super().form_valid(form)
         except DuplicatePluginError as error:
             if "name" in error.message:

@@ -17,7 +17,7 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
-from katalogus.client import Boefje, KATalogusClient, KATalogusError, Plugin, get_katalogus
+from katalogus.client import Boefje, KATalogusError, Plugin, get_katalogus, KATalogus
 from pydantic import RootModel, TypeAdapter
 from tools.ooi_helpers import create_ooi
 from tools.view_helpers import BreadcrumbsMixin, PostRedirect, url_with_querystring
@@ -120,9 +120,7 @@ class ReportsLandingView(ReportBreadcrumbs, TemplateView):
         return redirect(reverse("report_history", kwargs=self.get_kwargs()))
 
 
-def hydrate_plugins(
-    organization_code: str, report_types: list[type["BaseReport"]], katalogus: KATalogusClient
-) -> dict[str, list[Plugin]]:
+def hydrate_plugins(report_types: list[type["BaseReport"]], katalogus: KATalogus) -> dict[str, list[Plugin]]:
     plugins: dict[str, list[Plugin]] = {"required": [], "optional": []}
     merged_plugins = report_plugins_union(report_types)
 
@@ -132,11 +130,11 @@ def hydrate_plugins(
     # avoid empty list getting all plugins from KATalogus
     if required_plugins_ids:
         plugins["required"] = sorted(
-            katalogus.get_plugins(organization_code, ids=required_plugins_ids), key=attrgetter("name")
+            katalogus.get_plugins(ids=required_plugins_ids), key=attrgetter("name")
         )
     if optional_plugins_ids:
         plugins["optional"] = sorted(
-            katalogus.get_plugins(organization_code, ids=optional_plugins_ids), key=attrgetter("name")
+            katalogus.get_plugins(ids=optional_plugins_ids), key=attrgetter("name")
         )
 
     return plugins
@@ -358,7 +356,7 @@ class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
         self.plugins = None
 
         try:
-            self.plugins = hydrate_plugins(self.organization.code, self.get_report_types(), get_katalogus())
+            self.plugins = hydrate_plugins(self.get_report_types(), get_katalogus(self.organization.code))
         except KATalogusError as error:
             messages.error(self.request, error.message)
 
@@ -641,8 +639,8 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         plugin_ids_required = plugins_dict["required"]
         plugin_ids_optional = plugins_dict["optional"]
 
-        katalogus_plugins = get_katalogus().get_plugins(
-            self.organization.code, ids=plugin_ids_required + plugin_ids_optional
+        katalogus_plugins = get_katalogus(self.organization.code).get_plugins(
+            ids=plugin_ids_required + plugin_ids_optional
         )
         for plugin in katalogus_plugins:
             if plugin.id in plugin_ids_required:

@@ -277,9 +277,16 @@ class KATalogusClient:
         )
 
 
-class OrganizationKATalogusClient:
-    def __init__(self, base_uri: str, organization_code: str):
-        self._katalogus_client = KATalogusClient(base_uri)
+class KATalogus:
+    """
+    An adapter between the full KATalogusClient and the organization-specific context of most views. This restricts
+    the set of available methods on the KATalogusClient and simplifies the interface by "currying" the organization
+    into the relevant methods as an argument. We should use this class in the views to avoid making calls exposing
+    information from other organizations users are not allowed to see.
+    """
+
+    def __init__(self, katalogus_client: KATalogusClient, organization_code: str):
+        self._katalogus_client = katalogus_client
         self.organization_code = valid_organization_code(organization_code)
         # TODO: fix the self.organization = valid_organization_code(organization) if organization else organization
 
@@ -387,5 +394,9 @@ def parse_plugin(plugin: dict) -> Plugin:
         raise Exception(f"Unknown plugin type: {plugin['type']}")
 
 
-def get_katalogus() -> KATalogusClient:
+def get_katalogus_client() -> KATalogusClient:
     return KATalogusClient(settings.KATALOGUS_API)
+
+
+def get_katalogus(organization_code: str) -> KATalogus:
+    return KATalogus(get_katalogus_client(), organization_code)

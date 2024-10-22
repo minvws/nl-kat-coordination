@@ -1,7 +1,7 @@
 import structlog
 from httpx import HTTPError
 
-from katalogus.client import get_katalogus
+from katalogus.client import get_katalogus_client
 from rocky.health import ServiceHealth
 
 logger = structlog.get_logger(__name__)
@@ -9,7 +9,7 @@ logger = structlog.get_logger(__name__)
 
 def get_katalogus_health() -> ServiceHealth:
     try:
-        katalogus_client = get_katalogus()  # For the health endpoint the organization has no effect
+        katalogus_client = get_katalogus_client()  # For the health endpoint the organization has no effect
         katalogus_health = katalogus_client.health()
     except HTTPError:
         logger.exception("Error while retrieving KATalogus health state")
