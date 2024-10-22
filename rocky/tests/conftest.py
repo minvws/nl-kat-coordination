@@ -308,7 +308,7 @@ def blocked_member(django_user_model, organization):
 
 @pytest.fixture
 def mock_models_katalogus(mocker):
-    return mocker.patch("tools.models.get_katalogus")
+    return mocker.patch("tools.models.get_katalogus_client")
 
 
 @pytest.fixture

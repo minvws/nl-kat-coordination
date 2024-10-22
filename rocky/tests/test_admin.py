@@ -15,7 +15,7 @@ class OrganizationAdminTestCase(ModelAdminTestCase):
     def setUp(self):
         super().setUp()
 
-        katalogus_patcher = patch("tools.models.get_katalogus")
+        katalogus_patcher = patch("tools.models.get_katalogus_client")
         katalogus_patcher.start()
         self.addCleanup(katalogus_patcher.stop)
 
