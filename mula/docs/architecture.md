@@ -47,6 +47,8 @@ combines data from the `Octopoes`, `Katalogus`, `Bytes` and `RabbitMQ` systems.
 
 - Bytes
 
+![scheduler_system.svg](./img/scheduler_system.svg)
+
 ### C3 Component level
 
 When we take a closer look at the `scheduler` system itself we can identify
@@ -445,5 +447,3 @@ The following describes the main components of the scheduler application:
 
 - `Server` - The server class, which is responsible for handling the HTTP
   requests.
-
-## Database Entity Relationship Diagram
