@@ -1,39 +1,38 @@
 # Boefjes
 
-
 ## `BOEFJES_LOG_CFG`
 
-*Optional*, default value: `../logging.json`
+_Optional_, default value: `../logging.json`
 
 Path to the logging configuration file
 
 ## `BOEFJES_POOL_SIZE`
 
-*Optional*, default value: `2`
+_Optional_, default value: `2`
 
 Number of workers to run per queue
 
 ## `BOEFJES_POLL_INTERVAL`
 
-*Optional*, default value: `10.0`
+_Optional_, default value: `10.0`
 
 Time to wait before polling for tasks when all queues are empty
 
 ## `BOEFJES_WORKER_HEARTBEAT`
 
-*Optional*, default value: `1.0`
+_Optional_, default value: `1.0`
 
 Seconds to wait before checking the workers when queues are full
 
 ## `BOEFJES_REMOTE_NS`
 
-*Optional*, default value: `1.1.1.1`
+_Optional_, default value: `1.1.1.1`
 
 Name server used for remote DNS resolution in the boefje runner
 
 ## `BOEFJES_SCAN_PROFILE_WHITELIST`
 
-*Optional*
+_Optional_
 
 Whitelist for normalizer ids allowed to produce scan profiles, including a maximum level.
 
@@ -63,7 +62,7 @@ Katalogus Postgres DB URI
 
 ## `KATALOGUS_DB_CONNECTION_POOL_SIZE`
 
-*Optional*, default value: `16`
+_Optional_, default value: `16`
 
 Database connection pool size
 
@@ -109,19 +108,19 @@ The URL on which the boefjes API is available
 
 ## `BOEFJES_API_HOST`
 
-*Optional*, default value: `0.0.0.0`
+_Optional_, default value: `0.0.0.0`
 
 Host address of the Boefje API server
 
 ## `BOEFJES_API_PORT`
 
-*Optional*, default value: `8000`
+_Optional_, default value: `8000`
 
 Host port of the Boefje API server
 
 ## `BOEFJES_DOCKER_NETWORK`
 
-*Optional*, default value: `bridge`
+_Optional_, default value: `bridge`
 
 Docker network to run Boefjes in
 
@@ -157,7 +156,7 @@ Bytes JWT login password
 
 ## `BOEFJES_ENCRYPTION_MIDDLEWARE`
 
-*Optional*, default value: `EncryptionMiddleware.IDENTITY`
+_Optional_, default value: `EncryptionMiddleware.IDENTITY`
 
 Toggle used to configure the encryption strategy
 
@@ -167,30 +166,28 @@ Toggle used to configure the encryption strategy
 
 ## `BOEFJES_KATALOGUS_PRIVATE_KEY`
 
-*Optional*, default value: ``
+_Optional_, default value: ``
 
 Base64 encoded private key used for asymmetric encryption of settings
 
 ## `BOEFJES_KATALOGUS_PUBLIC_KEY`
 
-*Optional*, default value: ``
+_Optional_, default value: ``
 
 Base64 encoded public key used for asymmetric encryption of settings
 
 ## `SPAN_EXPORT_GRPC_ENDPOINT`
 
-*Optional*, default value: `None`
+_Optional_, default value: `None`
 
 OpenTelemetry endpoint
 
 ## `BOEFJES_LOGGING_FORMAT`
 
-*Optional*, default value: `text`
+_Optional_, default value: `text`
 
 Logging format
 
 ### Possible values
 
 `text`, `json`
-
-

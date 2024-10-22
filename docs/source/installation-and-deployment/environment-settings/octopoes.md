@@ -1,9 +1,8 @@
 # Octopoes
 
-
 ## `OCTOPOES_LOG_CFG`
 
-*Optional*, default value: `../../../logging.yml`
+_Optional_, default value: `../../../logging.yml`
 
 Path to the logging configuration file
 
@@ -39,13 +38,13 @@ Katalogus API URL
 
 ## `OCTOPOES_SCAN_LEVEL_RECALCULATION_INTERVAL`
 
-*Optional*, default value: `60`
+_Optional_, default value: `60`
 
 Interval in seconds of the periodic task that recalculates scan levels
 
 ## `OCTOPOES_BITS_ENABLED`
 
-*Optional*, default value: `set()`
+_Optional_, default value: `set()`
 
 Explicitly enabled bits
 
@@ -55,7 +54,7 @@ Explicitly enabled bits
 
 ## `OCTOPOES_BITS_DISABLED`
 
-*Optional*, default value: `set()`
+_Optional_, default value: `set()`
 
 Explicitly disabled bits
 
@@ -65,18 +64,16 @@ Explicitly disabled bits
 
 ## `SPAN_EXPORT_GRPC_ENDPOINT`
 
-*Optional*, default value: `None`
+_Optional_, default value: `None`
 
 OpenTelemetry endpoint
 
 ## `OCTOPOES_LOGGING_FORMAT`
 
-*Optional*, default value: `text`
+_Optional_, default value: `text`
 
 Logging format
 
 ### Possible values
 
 `text`, `json`
-
-

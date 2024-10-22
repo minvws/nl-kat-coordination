@@ -1,6 +1,5 @@
 # Bytes
 
-
 ## `BYTES_SECRET`
 
 **Required**
@@ -43,7 +42,7 @@ KAT queue URI
 
 ## `BYTES_LOG_CFG`
 
-*Optional*, default value: `../../dev.logging.conf`
+_Optional_, default value: `../../dev.logging.conf`
 
 Path to the logging configuration file
 
@@ -59,37 +58,37 @@ Bytes Postgres DB URI
 
 ## `BYTES_DATA_DIR`
 
-*Optional*, default value: `/data`
+_Optional_, default value: `/data`
 
 Root for all the data. A change means that you no longer have access to old data unless you move it!
 
 ## `BYTES_LOG_FILE`
 
-*Optional*, default value: `bytes.log`
+_Optional_, default value: `bytes.log`
 
 Optional file with Bytes logs
 
 ## `BYTES_ACCESS_TOKEN_EXPIRE_MINUTES`
 
-*Optional*, default value: `15.0`
+_Optional_, default value: `15.0`
 
 Access token expiration time in minutes
 
 ## `BYTES_FOLDER_PERMISSION`
 
-*Optional*, default value: `740`
+_Optional_, default value: `740`
 
 Unix permission level on the folders Bytes creates to save raw files
 
 ## `BYTES_FILE_PERMISSION`
 
-*Optional*, default value: `640`
+_Optional_, default value: `640`
 
 Unix permission level on the raw files themselves
 
 ## `BYTES_HASHING_ALGORITHM`
 
-*Optional*, default value: `HashingAlgorithm.SHA512`
+_Optional_, default value: `HashingAlgorithm.SHA512`
 
 Hashing algorithm used in Bytes
 
@@ -99,7 +98,7 @@ Hashing algorithm used in Bytes
 
 ## `BYTES_EXT_HASH_REPOSITORY`
 
-*Optional*, default value: `HashingRepositoryReference.IN_MEMORY`
+_Optional_, default value: `HashingRepositoryReference.IN_MEMORY`
 
 Hashing repository used in Bytes (IN_MEMORY is a stub)
 
@@ -109,13 +108,13 @@ Hashing repository used in Bytes (IN_MEMORY is a stub)
 
 ## `BYTES_PASTEBIN_API_DEV_KEY`
 
-*Optional*, default value: `None`
+_Optional_, default value: `None`
 
 API key for Pastebin. Required when using PASTEBIN hashing repository.
 
 ## `BYTES_RFC3161_PROVIDER`
 
-*Optional*, default value: `None`
+_Optional_, default value: `None`
 
 Timestamping. See https://github.com/trbs/rfc3161ng for a list of public providers and their certificates. Required when using RFC3161 hashing repository.
 
@@ -125,7 +124,7 @@ Timestamping. See https://github.com/trbs/rfc3161ng for a list of public provide
 
 ## `BYTES_RFC3161_CERT_FILE`
 
-*Optional*, default value: `None`
+_Optional_, default value: `None`
 
 Path to the certificate of the RFC3161 provider. Required when using RFC3161 hashing repository. `freetsa.crt` is included in the Bytes source code.
 
@@ -135,7 +134,7 @@ Path to the certificate of the RFC3161 provider. Required when using RFC3161 has
 
 ## `BYTES_ENCRYPTION_MIDDLEWARE`
 
-*Optional*, default value: `EncryptionMiddleware.IDENTITY`
+_Optional_, default value: `EncryptionMiddleware.IDENTITY`
 
 Encryption middleware used in Bytes
 
@@ -145,43 +144,43 @@ Encryption middleware used in Bytes
 
 ## `BYTES_PRIVATE_KEY_B64`
 
-*Optional*, default value: `None`
+_Optional_, default value: `None`
 
 KATalogus NaCl Sealbox base-64 private key string. Required when using NACL_SEALBOX encryption middleware.
 
 ## `BYTES_PUBLIC_KEY_B64`
 
-*Optional*, default value: `None`
+_Optional_, default value: `None`
 
 KATalogus NaCl Sealbox base-64 public key string. Required when using NACL_SEALBOX encryption middleware.
 
 ## `BYTES_METRICS_TTL_SECONDS`
 
-*Optional*, default value: `300`
+_Optional_, default value: `300`
 
 The time to cache slow queries performed in the metrics endpoint
 
 ## `BYTES_METRICS_CACHE_SIZE`
 
-*Optional*, default value: `200`
+_Optional_, default value: `200`
 
 The amount of cache entries to keep for metrics endpoints with query parameters.
 
 ## `SPAN_EXPORT_GRPC_ENDPOINT`
 
-*Optional*, default value: `None`
+_Optional_, default value: `None`
 
 OpenTelemetry endpoint
 
 ## `BYTES_DB_CONNECTION_POOL_SIZE`
 
-*Optional*, default value: `16`
+_Optional_, default value: `16`
 
 Database connection pool size
 
 ## `BYTES_LOGGING_FORMAT`
 
-*Optional*, default value: `text`
+_Optional_, default value: `text`
 
 Logging format
 
@@ -191,14 +190,12 @@ Logging format
 
 ## `S3_BUCKET_PREFIX`
 
-*Optional*, default value: `None`
+_Optional_, default value: `None`
 
 ## `S3_BUCKET`
 
-*Optional*, default value: `None`
+_Optional_, default value: `None`
 
 ## `BUCKET_PER_ORG`
 
-*Optional*, default value: `True`
-
-
+_Optional_, default value: `True`

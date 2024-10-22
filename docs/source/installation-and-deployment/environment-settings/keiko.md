@@ -1,46 +1,43 @@
 # Keiko
 
-
 ## `DEBUG`
 
-*Optional*, default value: `False`
+_Optional_, default value: `False`
 
 Enable global debug mode, which increases logging verbosity
 
 ## `KEIKO_LOG_CFG`
 
-*Optional*, default value: `logging.json`
+_Optional_, default value: `logging.json`
 
 Path to the logging configuration file
 
 ## `KEIKO_TEMPLATES_FOLDER`
 
-*Optional*, default value: `templates`
+_Optional_, default value: `templates`
 
 Folder containing the templates
 
 ## `KEIKO_GLOSSARIES_FOLDER`
 
-*Optional*, default value: `glossaries`
+_Optional_, default value: `glossaries`
 
 Folder containing the glossaries
 
 ## `KEIKO_ASSETS_FOLDER`
 
-*Optional*, default value: `assets`
+_Optional_, default value: `assets`
 
 Folder containing the assets
 
 ## `KEIKO_REPORTS_FOLDER`
 
-*Optional*, default value: `/reports`
+_Optional_, default value: `/reports`
 
 Output folder containing the reports
 
 ## `SPAN_EXPORT_GRPC_ENDPOINT`
 
-*Optional*, default value: `None`
+_Optional_, default value: `None`
 
 OpenTelemetry endpoint
-
-
