@@ -13,5 +13,5 @@ app.conf.beat_schedule = {
         "task": "octopoes.tasks.tasks.schedule_scan_profile_recalculations",
         "schedule": settings.scan_level_recalculation_interval,
         "args": tuple(),
-    },
+    }
 }

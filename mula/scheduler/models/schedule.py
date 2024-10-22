@@ -34,10 +34,15 @@ class Schedule(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+    def model_post_init(self, context) -> None:
+        """Post init method to set the deadline_at if it is not set."""
+        if self.deadline_at is None and self.schedule:
+            self.deadline_at = cron.next_run(self.schedule)
+
     @field_validator("schedule")
     @classmethod
     def validate_schedule(cls, value: str) -> str:
-        """Validate the schedule cron expression."""
+        """Custom validation for the schedule cron expression."""
         if value is None:
             return value
 
@@ -65,20 +70,8 @@ class ScheduleDB(Base):
 
     tasks = relationship("TaskDB", back_populates="schedule")
 
-    deadline_at = Column(
-        DateTime(timezone=True),
-        nullable=True,
-    )
+    deadline_at = Column(DateTime(timezone=True), nullable=True)
 
-    created_at = Column(
-        DateTime(timezone=True),
-        nullable=False,
-        server_default=func.now(),
-    )
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
-    modified_at = Column(
-        DateTime(timezone=True),
-        nullable=False,
-        server_default=func.now(),
-        onupdate=func.now(),
-    )
+    modified_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())

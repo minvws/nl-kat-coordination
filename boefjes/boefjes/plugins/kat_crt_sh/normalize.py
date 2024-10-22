@@ -16,7 +16,6 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     current = fqdn.lstrip(".")
 
     network = Network(name="internet")
-    yield network
     network_reference = network.reference
 
     unique_domains = set()

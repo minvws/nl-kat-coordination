@@ -1,6 +1,6 @@
 import logging
 import os
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
 from typing import Any, Literal
 
@@ -140,6 +140,10 @@ class Settings(BaseSettings):
 
     logging_format: Literal["text", "json"] = Field("text", description="Logging format")
 
+    s3_bucket_prefix: str | None = Field(None, validation_alias="S3_BUCKET_PREFIX")
+    s3_bucket_name: str | None = Field(None, validation_alias="S3_BUCKET")
+    bucket_per_org: bool = Field(True, validation_alias="BUCKET_PER_ORG")
+
     model_config = SettingsConfigDict(env_prefix="BYTES_")
 
     @classmethod
@@ -155,7 +159,7 @@ class Settings(BaseSettings):
         return env_settings, init_settings, file_secret_settings, backwards_compatible_settings
 
 
-@lru_cache
+@cache
 def get_settings() -> Settings:
     return Settings()
 

@@ -25,11 +25,7 @@ class OrganisationInDB(SQL_BASE):
 class BoefjeConfigInDB(SQL_BASE):
     __tablename__ = "boefje_config"
     __table_args__ = (
-        UniqueConstraint(
-            "organisation_pk",
-            "boefje_id",
-            name="unique_boefje_config_per_organisation_per_boefje",
-        ),
+        UniqueConstraint("organisation_pk", "boefje_id", name="unique_boefje_config_per_organisation_per_boefje"),
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -45,9 +41,7 @@ class NormalizerConfigInDB(SQL_BASE):
     __tablename__ = "normalizer_config"
     __table_args__ = (
         UniqueConstraint(
-            "organisation_pk",
-            "normalizer_id",
-            name="unique_normalizer_config_per_organisation_per_normalizer",
+            "organisation_pk", "normalizer_id", name="unique_normalizer_config_per_organisation_per_normalizer"
         ),
     )
 
@@ -68,14 +62,16 @@ class BoefjeInDB(SQL_BASE):
     static = Column(Boolean, nullable=False, server_default="false")
 
     # Metadata
-    name = Column(String(length=64), nullable=False)
+    name = Column(String(length=64), nullable=False, unique=True)
     description = Column(types.Text, nullable=True)
     scan_level = Column(types.Enum(*[str(x.value) for x in ScanLevel], name="scan_level"), nullable=False, default="4")
 
     # Job specifications
     consumes = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
     produces = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
-    environment_keys = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
+    schema = Column(types.JSON(), nullable=True)
+    cron = Column(types.String(length=128), nullable=True)
+    interval = Column(types.Integer, nullable=True)
 
     # Image specifications
     oci_image = Column(types.String(length=256), nullable=True)
@@ -92,11 +88,10 @@ class NormalizerInDB(SQL_BASE):
     static = Column(Boolean, nullable=False, server_default="false")
 
     # Metadata
-    name = Column(String(length=64), nullable=False)
+    name = Column(String(length=64), nullable=False, unique=True)
     description = Column(types.Text, nullable=True)
 
     # Job specifications
     consumes = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
     produces = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
-    environment_keys = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
     version = Column(types.String(length=16), nullable=True)

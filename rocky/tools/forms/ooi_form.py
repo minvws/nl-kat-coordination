@@ -13,9 +13,9 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
 from octopoes.models.ooi.question import Question
 from octopoes.models.types import get_collapsed_types, get_relations
+from tools.enums import SCAN_LEVEL
 from tools.forms.base import BaseRockyForm, CheckboxGroup
 from tools.forms.settings import CLEARANCE_TYPE_CHOICES
-from tools.models import SCAN_LEVEL
 
 
 class OOIForm(BaseRockyForm):
@@ -37,10 +37,7 @@ class OOIForm(BaseRockyForm):
     def get_fields(self) -> dict[str, forms.fields.Field]:
         return self.generate_form_fields()
 
-    def generate_form_fields(
-        self,
-        hidden_ooi_fields: dict[str, str] | None = None,
-    ) -> dict[str, forms.fields.Field]:
+    def generate_form_fields(self, hidden_ooi_fields: dict[str, str] | None = None) -> dict[str, forms.fields.Field]:
         fields = {}
         for name, field in self.ooi_class.model_fields.items():
             annotation = field.annotation
@@ -67,11 +64,7 @@ class OOIForm(BaseRockyForm):
                 fields[name] = forms.CharField(widget=forms.HiddenInput())
             elif name in get_relations(self.ooi_class):
                 fields[name] = generate_select_ooi_field(
-                    self.api_connector,
-                    name,
-                    field,
-                    get_relations(self.ooi_class)[name],
-                    self.initial.get(name, None),
+                    self.api_connector, name, field, get_relations(self.ooi_class)[name], self.initial.get(name, None)
                 )
             elif annotation in [IPv4Address, IPv6Address]:
                 fields[name] = generate_ip_field(field)
@@ -174,23 +167,16 @@ def generate_url_field(field: FieldInfo) -> forms.fields.Field:
 
 
 def default_field_options(name: str, field_info: FieldInfo) -> dict[str, str | bool]:
-    return {
-        "label": name,
-        "required": field_info.is_required(),
-    }
+    return {"label": name, "required": field_info.is_required()}
 
 
 class ClearanceFilterForm(BaseRockyForm):
     clearance_level = forms.CharField(
-        label=_("Filter by clearance level"),
-        widget=CheckboxGroup(choices=SCAN_LEVEL.choices),
-        required=False,
+        label=_("Filter by clearance level"), widget=CheckboxGroup(choices=SCAN_LEVEL.choices), required=False
     )
 
     clearance_type = forms.CharField(
-        label=_("Filter by clearance type"),
-        widget=CheckboxGroup(choices=CLEARANCE_TYPE_CHOICES),
-        required=False,
+        label=_("Filter by clearance type"), widget=CheckboxGroup(choices=CLEARANCE_TYPE_CHOICES), required=False
     )
 
 
@@ -209,8 +195,13 @@ OOI_TYPE_CHOICES = ((ooi_type, ooi_type) for ooi_type in SORTED_OOI_TYPES)
 
 class OOITypeMultiCheckboxForm(BaseRockyForm):
     ooi_type = forms.MultipleChoiceField(
-        label=_("Filter by OOI types"),
-        required=False,
-        choices=OOI_TYPE_CHOICES,
-        widget=forms.CheckboxSelectMultiple,
+        label=_("Filter by OOI types"), required=False, choices=OOI_TYPE_CHOICES, widget=forms.CheckboxSelectMultiple
     )
+
+
+class OOISearchForm(BaseRockyForm):
+    search = forms.CharField(label=_("Search"), required=False, max_length=256, help_text="Object ID contains")
+
+
+class OrderByObjectTypeForm(BaseRockyForm):
+    order_by = forms.CharField(widget=forms.HiddenInput(attrs={"value": "object_type"}), required=False)

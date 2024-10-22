@@ -69,12 +69,7 @@ class Connector:
                 return True
 
             self.logger.warning(
-                "Function %s, failed. Retry count: %d",
-                func.__name__,
-                i,
-                name=func.__name__,
-                args=args,
-                kwargs=kwargs,
+                "Function %s, failed. Retry count: %d", func.__name__, i, name=func.__name__, args=args, kwargs=kwargs
             )
 
             time.sleep(10)

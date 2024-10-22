@@ -10,8 +10,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from httpx import HTTPError
 from tools.enums import CUSTOM_SCAN_LEVEL
-from tools.forms.ooi import SelectOOIForm
-from tools.forms.ooi_form import OOITypeMultiCheckboxForm
+from tools.forms.ooi_form import OOISearchForm, OOITypeMultiCheckboxForm
 from tools.models import Indemnification
 from tools.view_helpers import get_mandatory_fields
 
@@ -40,17 +39,13 @@ class OOIListView(BaseOOIListView, OctopoesView):
         context = super().get_context_data(**kwargs)
 
         context["ooi_type_form"] = OOITypeMultiCheckboxForm(self.request.GET)
+        context["ooi_search_form"] = OOISearchForm(self.request.GET)
         context["mandatory_fields"] = get_mandatory_fields(self.request, params=["observed_at"])
-        context["select_oois_form"] = SelectOOIForm(
-            context.get("ooi_list", []),
-            organization_code=self.organization.code,
-            mandatory_fields=context["mandatory_fields"],
-        )
         context["member"] = self.organization_member
         context["scan_levels"] = [alias for _, alias in CUSTOM_SCAN_LEVEL.choices]
         context["organization_indemnification"] = self.get_organization_indemnification
         context["breadcrumbs"] = [
-            {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": _("Objects")},
+            {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": _("Objects")}
         ]
 
         return context
@@ -96,10 +91,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
                 self.request,
                 messages.ERROR,
                 _("Could not raise clearance levels to L%s. Indemnification not present at organization %s.")
-                % (
-                    level.value,
-                    self.organization.name,
-                ),
+                % (level.value, self.organization.name),
             )
             return self.get(request, status=403, *args, **kwargs)
         except TrustedClearanceLevelTooLowException:
@@ -111,10 +103,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
                     "You were trusted a clearance level of L%s. "
                     "Contact your administrator to receive a higher clearance."
                 )
-                % (
-                    level.value,
-                    self.organization_member.trusted_clearance_level,
-                ),
+                % (level.value, self.organization_member.max_clearance_level),
             )
             return self.get(request, status=403, *args, **kwargs)
         except AcknowledgedClearanceLevelTooLowException:
@@ -126,10 +115,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
                     "You acknowledged a clearance level of L%s. "
                     "Please accept the clearance level below to proceed."
                 )
-                % (
-                    level.value,
-                    self.organization_member.acknowledged_clearance_level,
-                ),
+                % (level.value, self.organization_member.acknowledged_clearance_level),
             )
             return redirect(reverse("account_detail", kwargs={"organization_code": self.organization.code}))
 
@@ -161,9 +147,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
             self.octopoes_api_connector.save_many_scan_profiles(scan_profiles, valid_time=datetime.now(timezone.utc))
         except (HTTPError, RemoteException, ConnectionError):
             messages.add_message(
-                request,
-                messages.ERROR,
-                _("An error occurred while setting clearance levels to inherit."),
+                request, messages.ERROR, _("An error occurred while setting clearance levels to inherit.")
             )
             return self.get(request, status=500, *args, **kwargs)
         except ObjectNotFoundException:
@@ -175,9 +159,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
             return self.get(request, status=404, *args, **kwargs)
 
         messages.add_message(
-            request,
-            messages.SUCCESS,
-            _("Successfully set %d ooi(s) clearance level to inherit.") % len(selected_oois),
+            request, messages.SUCCESS, _("Successfully set %d ooi(s) clearance level to inherit.") % len(selected_oois)
         )
         return self.get(request, *args, **kwargs)
 
@@ -216,21 +198,10 @@ class OOIListExportView(BaseOOIListView):
         queryset = self.get_queryset()
         ooi_list = queryset[: OOIList.HARD_LIMIT]
 
-        exports = [
-            {
-                "observed_at": str(self.observed_at),
-                "filters": str(filters),
-            }
-        ]
+        exports = [{"observed_at": str(self.observed_at), "filters": str(filters)}]
 
         for ooi in ooi_list:
-            exports.append(
-                {
-                    "key": ooi.primary_key,
-                    "name": ooi.human_readable,
-                    "ooi_type": ooi.ooi_type,
-                }
-            )
+            exports.append({"key": ooi.primary_key, "name": ooi.human_readable, "ooi_type": ooi.ooi_type})
 
         if file_type == "json":
             response = HttpResponse(
@@ -252,13 +223,7 @@ class OOIListExportView(BaseOOIListView):
             writer.writerow([str(self.observed_at), str(filters)])
             writer.writerow(["key", "name", "ooi_type"])
             for ooi in ooi_list:
-                writer.writerow(
-                    [
-                        ooi.primary_key,
-                        ooi.human_readable,
-                        ooi.ooi_type,
-                    ]
-                )
+                writer.writerow([ooi.primary_key, ooi.human_readable, ooi.ooi_type])
 
             return response
 

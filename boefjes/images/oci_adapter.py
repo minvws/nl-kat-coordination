@@ -9,7 +9,11 @@ from main import run
 
 def main():
     input_url = sys.argv[-1]
-    boefje_input = httpx.get(input_url).json()
+    try:
+        boefje_input = httpx.get(input_url).json()
+    except httpx.HTTPError as e:
+        # sys.exit will print the message on stderr and return with exit code 1
+        sys.exit(f"Failed to get input from boefje API: {e}")
 
     try:
         os.environ.update(boefje_input["boefje_meta"]["environment"])
@@ -32,7 +36,10 @@ def main():
             ],
         }
 
-    httpx.post(boefje_input["output_url"], json=out)
+    try:
+        httpx.post(boefje_input["output_url"], json=out)
+    except httpx.HTTPError as e:
+        sys.exit(f"Failed to post output to boefje API: {e}")
 
 
 if __name__ == "__main__":

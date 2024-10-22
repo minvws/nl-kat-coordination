@@ -16,11 +16,7 @@ TREE_DATA = {
         "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
     },
     "store": {
-        "Network|testnetwork": {
-            "object_type": "Network",
-            "primary_key": "Network|testnetwork",
-            "name": "testnetwork",
-        },
+        "Network|testnetwork": {"object_type": "Network", "primary_key": "Network|testnetwork", "name": "testnetwork"},
         "Finding|Network|testnetwork|KAT-000": {
             "object_type": "Finding",
             "primary_key": "Finding|Network|testnetwork|KAT-000",
@@ -36,11 +32,7 @@ QUESTION_DATA = {
         "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
     },
     "store": {
-        "Network|testnetwork": {
-            "object_type": "Network",
-            "primary_key": "Network|testnetwork",
-            "name": "testnetwork",
-        },
+        "Network|testnetwork": {"object_type": "Network", "primary_key": "Network|testnetwork", "name": "testnetwork"},
         "Question|/test|Network|testnetwork": {
             "ooi": "Question|/test|Network|testnetwork",
             "object_type": "Question",
@@ -52,14 +44,7 @@ QUESTION_DATA = {
 }
 
 
-def test_ooi_detail(
-    rf,
-    client_member,
-    mock_organization_view_octopoes,
-    mock_scheduler,
-    paginated_task_list,
-    mocker,
-):
+def test_ooi_detail(rf, client_member, mock_organization_view_octopoes, mock_scheduler, paginated_task_list, mocker):
     mocker.patch("katalogus.client.KATalogusClientV1")
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
@@ -71,15 +56,14 @@ def test_ooi_detail(
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
     assertContains(response, "Object")
     assertContains(response, "Network|testnetwork")
 
     assertContains(response, "Plugin")
     assertContains(response, "TestBoefje")
     assertContains(
-        response,
-        f'href="/en/{client_member.organization.code}/kat-alogus/plugins/boefje/test-boefje/">TestBoefje</a>',
+        response, f'href="/en/{client_member.organization.code}/kat-alogus/plugins/boefje/test-boefje/">TestBoefje</a>'
     )
     assertContains(response, "Status")
     assertContains(response, "Completed")
@@ -90,26 +74,18 @@ def test_ooi_detail(
 
 
 def test_question_detail(
-    rf,
-    client_member,
-    mock_organization_view_octopoes,
-    mock_scheduler,
-    paginated_task_list,
-    mocker,
+    rf, client_member, mock_organization_view_octopoes, mock_scheduler, paginated_task_list, mocker
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
 
-    request = setup_request(
-        rf.get("ooi_detail", {"ooi_id": "Question|/test|Network|testnetwork"}),
-        client_member.user,
-    )
+    request = setup_request(rf.get("ooi_detail", {"ooi_id": "Question|/test|Network|testnetwork"}), client_member.user)
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(QUESTION_DATA)
 
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
 
     assertContains(response, "Question")
     assertContains(response, "Rendered Question Form")
@@ -132,17 +108,14 @@ def test_answer_question(
     request = setup_request(
         rf.post(
             f"/en/{client_member.organization.code}/objects/details/?{query_string}",
-            data={
-                "schema": '{"key": "value", "sa_tcp_ports": "314159,23"}',
-                "action": "submit_answer",
-            },
+            data={"schema": '{"key": "value", "sa_tcp_ports": "314159,23"}', "action": "submit_answer"},
         ),
         client_member.user,
     )
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
     assertContains(response, "Question has been answered.", status_code=200)
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
 
 
 def test_answer_question_bad_schema(
@@ -162,10 +135,7 @@ def test_answer_question_bad_schema(
     request = setup_request(
         rf.post(
             f"/en/{client_member.organization.code}/objects/details/?{query_string}",
-            data={
-                "schema": '{"key": "value", "sa_tcp_ports": 314159}',
-                "action": "submit_answer",
-            },
+            data={"schema": '{"key": "value", "sa_tcp_ports": 314159}', "action": "submit_answer"},
         ),
         client_member.user,
     )
@@ -178,13 +148,7 @@ def test_answer_question_bad_schema(
 
 
 def test_ooi_detail_start_scan(
-    rf,
-    client_member,
-    mock_organization_view_octopoes,
-    mock_scheduler,
-    paginated_task_list,
-    mocker,
-    network,
+    rf, client_member, mock_organization_view_octopoes, mock_scheduler, paginated_task_list, mocker, network
 ):
     mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
 
@@ -208,28 +172,19 @@ def test_ooi_detail_start_scan(
     request = setup_request(
         rf.post(
             f"/en/{client_member.organization.code}/objects/details/?{query_string}",
-            data={
-                "boefje_id": "nmap",
-                "action": "start_scan",
-            },
+            data={"boefje_id": "nmap", "action": "start_scan"},
         ),
         client_member.user,
     )
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
 
     assert response.status_code == 200
 
 
 def test_ooi_detail_start_scan_no_indemnification(
-    rf,
-    client_member,
-    mock_organization_view_octopoes,
-    mock_scheduler,
-    paginated_task_list,
-    mocker,
-    network,
+    rf, client_member, mock_organization_view_octopoes, mock_scheduler, paginated_task_list, mocker, network
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
 
@@ -254,28 +209,19 @@ def test_ooi_detail_start_scan_no_indemnification(
     request = setup_request(
         rf.post(
             f"/en/{client_member.organization.code}/objects/details/?{query_string}",
-            data={
-                "boefje_id": "test-boefje",
-                "action": "start_scan",
-            },
+            data={"boefje_id": "test-boefje", "action": "start_scan"},
         ),
         client_member.user,
     )
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
     assertContains(response, "Object details")
     assertContains(response, "Indemnification not present")
 
 
 def test_ooi_detail_start_scan_no_action(
-    rf,
-    client_member,
-    mock_scheduler,
-    mock_organization_view_octopoes,
-    lazy_task_list_with_boefje,
-    mocker,
-    network,
+    rf, client_member, mock_scheduler, mock_organization_view_octopoes, lazy_task_list_with_boefje, mocker, network
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
 
@@ -285,29 +231,18 @@ def test_ooi_detail_start_scan_no_action(
     # Passing query params in POST requests is not well-supported for RequestFactory it seems, hence the absolute path
     query_string = urlencode({"ooi_id": network.reference}, doseq=True)
     request = setup_request(
-        rf.post(
-            f"/en/{client_member.organization.code}/objects/details/?{query_string}",
-            data={
-                "boefje_id": "nmap",
-            },
-        ),
+        rf.post(f"/en/{client_member.organization.code}/objects/details/?{query_string}", data={"boefje_id": "nmap"}),
         client_member.user,
     )
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
     assertContains(response, "Object details")
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member"])
 def test_delete_perms_ooi_detail(
-    request,
-    member,
-    rf,
-    mock_scheduler,
-    mock_organization_view_octopoes,
-    lazy_task_list_with_boefje,
-    mocker,
+    request, member, rf, mock_scheduler, mock_organization_view_octopoes, lazy_task_list_with_boefje, mocker
 ):
     member = request.getfixturevalue(member)
     mocker.patch("katalogus.client.KATalogusClientV1")
@@ -324,12 +259,7 @@ def test_delete_perms_ooi_detail(
 
 
 def test_delete_perms_ooi_detail_clients(
-    rf,
-    client_member,
-    mock_scheduler,
-    mock_organization_view_octopoes,
-    lazy_task_list_with_boefje,
-    mocker,
+    rf, client_member, mock_scheduler, mock_organization_view_octopoes, lazy_task_list_with_boefje, mocker
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
@@ -344,12 +274,7 @@ def test_delete_perms_ooi_detail_clients(
 
 
 def test_ooi_detail_start_scan_perms(
-    rf,
-    client_member,
-    mock_scheduler,
-    mock_organization_view_octopoes,
-    lazy_task_list_with_boefje,
-    mocker,
+    rf, client_member, mock_scheduler, mock_organization_view_octopoes, lazy_task_list_with_boefje, mocker
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
     request = setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), client_member.user)

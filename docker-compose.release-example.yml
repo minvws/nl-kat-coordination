@@ -31,7 +31,7 @@ services:
       APPS: "ROCKY BYTES KATALOGUS SCHEDULER"
 
   crux:
-    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.8"
+    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.1.0"
     restart: on-failure
     ports:
       - "127.0.0.1:3000:3000"
@@ -98,6 +98,7 @@ services:
   rocky:
     restart: on-failure
     depends_on:
+      - rocky_worker
       - octopoes_api_worker
       - octopoes_api
       - postgres
@@ -108,11 +109,28 @@ services:
     ports:
       - "127.0.0.1:8000:8000"
     image: "ghcr.io/minvws/nl-kat-rocky:${KAT_VERSION}"
+    command: web
     env_file:
       - .env-prod
       - .env
     environment:
       - DATABASE_MIGRATION=true
+
+  rocky_worker:
+    restart: on-failure
+    depends_on:
+      - octopoes_api_worker
+      - octopoes_api
+      - postgres
+      - boefje
+      - normalizer
+      - katalogus
+      - scheduler
+    image: "ghcr.io/minvws/nl-kat-rocky:${KAT_VERSION}"
+    command: worker
+    env_file:
+      - .env-prod
+      - .env
 
   bytes:
     restart: on-failure

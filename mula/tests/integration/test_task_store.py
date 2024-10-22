@@ -148,13 +148,7 @@ class StoreTestCase(unittest.TestCase):
         twenty_five_hours = datetime.now(timezone.utc) - timedelta(hours=25)
 
         for r, status, modified_at in zip(
-            (
-                range(2),
-                range(2),
-                range(2),
-                range(2),
-                range(2),
-            ),
+            (range(2), range(2), range(2), range(2), range(2)),
             (
                 models.TaskStatus.QUEUED,
                 models.TaskStatus.COMPLETED,
@@ -162,13 +156,7 @@ class StoreTestCase(unittest.TestCase):
                 models.TaskStatus.DISPATCHED,
                 models.TaskStatus.DISPATCHED,
             ),
-            (
-                one_hour,
-                four_hours,
-                one_hour,
-                twenty_five_hours,
-                twenty_three_hours,
-            ),
+            (one_hour, four_hours, one_hour, twenty_five_hours, twenty_three_hours),
         ):
             for _ in r:
                 data = functions.create_test_model()
@@ -200,13 +188,7 @@ class StoreTestCase(unittest.TestCase):
         twenty_five_hours = datetime.now(timezone.utc) - timedelta(hours=25)
 
         for r, status, modified_at in zip(
-            (
-                range(2),
-                range(2),
-                range(2),
-                range(2),
-                range(2),
-            ),
+            (range(2), range(2), range(2), range(2), range(2)),
             (
                 models.TaskStatus.QUEUED,
                 models.TaskStatus.COMPLETED,
@@ -214,13 +196,7 @@ class StoreTestCase(unittest.TestCase):
                 models.TaskStatus.DISPATCHED,
                 models.TaskStatus.DISPATCHED,
             ),
-            (
-                one_hour,
-                four_hours,
-                one_hour,
-                twenty_five_hours,
-                twenty_three_hours,
-            ),
+            (one_hour, four_hours, one_hour, twenty_five_hours, twenty_three_hours),
         ):
             for _ in r:
                 data = functions.create_test_model()

@@ -27,14 +27,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 
     url = f"{scheme}://{hostname}{path}"
 
-    argv = [
-        "--url",
-        url,
-        "--format",
-        "json",
-        "--plugins-version-detection",
-        "aggressive",
-    ]
+    argv = ["--url", url, "--format", "json", "--plugins-version-detection", "aggressive"]
     if wpscan_api_token := getenv("WP_SCAN_API"):
         argv += ["--api-token", wpscan_api_token]
 
@@ -43,11 +36,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     client.images.pull(WPSCAN_IMAGE)
 
     # since WPScan can give positive exit codes on completion, docker-py's run() can fail on this
-    container = client.containers.run(
-        WPSCAN_IMAGE,
-        argv,
-        detach=True,
-    )
+    container = client.containers.run(WPSCAN_IMAGE, argv, detach=True)
 
     try:
         # wait for container to exit, read its output in the logs and remove container

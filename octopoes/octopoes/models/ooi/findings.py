@@ -7,15 +7,7 @@ from pydantic import AnyUrl, StringConstraints
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
 
-severity_order = [
-    "unknown",
-    "pending",
-    "recommendation",
-    "low",
-    "medium",
-    "high",
-    "critical",
-]
+severity_order = ["unknown", "pending", "recommendation", "low", "medium", "high", "critical"]
 
 
 @total_ordering

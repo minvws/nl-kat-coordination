@@ -9,7 +9,7 @@
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate "Crisis room:" %} {{ organization.name }}</h1>
+                <h1>{% translate "Crisis room" %} {{ organization.name }} @ {{ observed_at|date:'M d, Y' }}</h1>
                 {% if not indemnification_present %}
                     <p class="warning"
                        role="group"

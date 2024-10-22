@@ -31,11 +31,7 @@ def parse_cipher(cipher: dict) -> dict[str, Any] | None:
             )
         else:
             cipher_dict[parts[0]].update(
-                {
-                    "encryption_algorithm": parts[4],
-                    "bits": int(parts[5]),
-                    "cipher_suite_alias": parts[6],
-                }
+                {"encryption_algorithm": parts[4], "bits": int(parts[5]), "cipher_suite_alias": parts[6]}
             )
 
         return cipher_dict

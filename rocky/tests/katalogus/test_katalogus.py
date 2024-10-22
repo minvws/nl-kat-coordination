@@ -1,7 +1,7 @@
 import pytest
 from django.core.exceptions import PermissionDenied
 from django.urls import resolve
-from katalogus.client import KATalogusClientV1, parse_plugin
+from katalogus.client import KATalogusClientV1, parse_plugin, valid_organization_code, valid_plugin_id
 from katalogus.views.katalogus import AboutPluginsView, BoefjeListView, KATalogusView, NormalizerListView
 from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
 from katalogus.views.plugin_enable_disable import PluginEnableDisableView
@@ -9,6 +9,22 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from rocky.health import ServiceHealth
 from tests.conftest import create_member, get_boefjes_data, get_normalizers_data, get_plugins_data, setup_request
+
+
+def test_valid_plugin_id():
+    with pytest.raises(ValueError):
+        valid_plugin_id("123")
+        valid_plugin_id("test test")
+        valid_plugin_id("test$test")
+
+    assert valid_plugin_id("test-test") == "test-test"
+
+
+def test_valid_organization_code():
+    with pytest.raises(ValueError):
+        valid_organization_code("123 123")
+
+    assert valid_organization_code("test-test") == "test-test"
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
@@ -118,7 +134,7 @@ def test_katalogus_plugin_listing_no_enable_disable_perm(rf, client_member, mock
     mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = get_plugins_data()
 
-    request = rf.get("/en/test/kat-alogus/")
+    request = rf.get("/en/test/kat-alogus/plugins/all/grid/")
     request.resolver_match = resolve(request.path)
     response = KATalogusView.as_view()(
         setup_request(request, client_member.user), organization_code=client_member.organization.code
@@ -244,6 +260,11 @@ def test_katalogus_client_organization_exists(mocker):
     assert client.organization_exists() is True
 
 
+def test_katalogus_client_invalid_organization():
+    with pytest.raises(ValueError):
+        KATalogusClientV1("test", "test$$$1123")
+
+
 def test_katalogus_client(httpx_mock):
     httpx_mock.add_response(json={"service": "test", "healthy": False, "version": None, "additional": 2, "results": []})
 
@@ -267,12 +288,7 @@ def test_enable_disable_plugin_no_clearance(rf, redteam_member, mocker):
     mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = plugin
 
-    request = setup_request(
-        rf.post(
-            "plugin_enable_disable",
-        ),
-        redteam_member.user,
-    )
+    request = setup_request(rf.post("plugin_enable_disable"), redteam_member.user)
 
     response = PluginEnableDisableView.as_view()(
         setup_request(request, redteam_member.user),
@@ -308,12 +324,7 @@ def test_enable_disable_plugin_no_clearance_other_text(rf, redteam_member, mocke
     mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = plugin
 
-    request = setup_request(
-        rf.post(
-            "plugin_enable_disable",
-        ),
-        redteam_member.user,
-    )
+    request = setup_request(rf.post("plugin_enable_disable"), redteam_member.user)
 
     response = PluginEnableDisableView.as_view()(
         setup_request(request, redteam_member.user),
@@ -345,12 +356,7 @@ def test_enable_disable_plugin_has_clearance(rf, redteam_member, mocker):
     mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = plugin
 
-    request = setup_request(
-        rf.post(
-            "plugin_enable_disable",
-        ),
-        redteam_member.user,
-    )
+    request = setup_request(rf.post("plugin_enable_disable"), redteam_member.user)
 
     response = PluginEnableDisableView.as_view()(
         setup_request(request, redteam_member.user),
@@ -373,12 +379,7 @@ def test_enable_disable_normalizer(rf, redteam_member, mocker):
     mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = plugin
 
-    request = setup_request(
-        rf.post(
-            "plugin_enable_disable",
-        ),
-        redteam_member.user,
-    )
+    request = setup_request(rf.post("plugin_enable_disable"), redteam_member.user)
 
     response = PluginEnableDisableView.as_view()(
         setup_request(request, redteam_member.user),

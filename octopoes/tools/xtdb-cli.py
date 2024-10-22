@@ -10,27 +10,10 @@ from xtdb_client import XTDBClient
 logger = logging.getLogger(__name__)
 
 
-@click.group(
-    context_settings={
-        "help_option_names": ["-h", "--help"],
-        "max_content_width": 120,
-        "show_default": True,
-    }
-)
+@click.group(context_settings={"help_option_names": ["-h", "--help"], "max_content_width": 120, "show_default": True})
 @click.option("-n", "--node", default="0", help="XTDB node")
-@click.option(
-    "-u",
-    "--url",
-    default="http://localhost:3000",
-    help="XTDB server base url",
-)
-@click.option(
-    "-t",
-    "--timeout",
-    type=int,
-    default=5000,
-    help="XTDB request timeout (in ms)",
-)
+@click.option("-u", "--url", default="http://localhost:3000", help="XTDB server base url")
+@click.option("-t", "--timeout", type=int, default=5000, help="XTDB request timeout (in ms)")
 @click.option("-v", "--verbosity", count=True, help="Increase the verbosity level")
 @click.pass_context
 def cli(ctx: click.Context, url: str, node: str, timeout: int, verbosity: int):
@@ -61,15 +44,24 @@ def status(ctx: click.Context):
 
 
 @cli.command(help='EDN Query (default: "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}")')
+@click.option("--tx-id", type=int, help="In UTC, defaulting to latest transaction id (integer)")
+@click.option("--tx-time", type=click.DateTime(), help="In UTC, defaulting to latest transaction time (date)")
+@click.option("--valid-time", type=click.DateTime(), help="In UTC, defaulting to now (date)")
 @click.argument("edn", required=False)
 @click.pass_context
-def query(ctx: click.Context, edn: str):
+def query(
+    ctx: click.Context,
+    edn: str,
+    valid_time: datetime.datetime | None = None,
+    tx_time: datetime.datetime | None = None,
+    tx_id: int | None = None,
+):
     client: XTDBClient = ctx.obj["client"]
 
     if edn:
-        click.echo(json.dumps(client.query(edn)))
+        click.echo(json.dumps(client.query(edn, valid_time, tx_time, tx_id)))
     else:
-        click.echo(json.dumps(client.query()))
+        click.echo(json.dumps(client.query(valid_time=valid_time, tx_time=tx_time, tx_id=tx_id)))
 
 
 @cli.command(help="List all keys in node")
@@ -89,9 +81,9 @@ def list_values(ctx: click.Context):
 
 
 @cli.command(help="Returns the document map for a particular entity.")
-@click.option("--tx-id", type=int, help="Defaulting to latest transaction id (integer)")
-@click.option("--tx-time", type=click.DateTime(), help="Defaulting to latest transaction time (date)")
-@click.option("--valid-time", type=click.DateTime(), help="Defaulting to now (date)")
+@click.option("--tx-id", type=int, help="In UTC, defaulting to latest transaction id (integer)")
+@click.option("--tx-time", type=click.DateTime(), help="In UTC, defaulting to latest transaction time (date)")
+@click.option("--valid-time", type=click.DateTime(), help="In UTC, defaulting to now (date)")
 @click.argument("key")
 @click.pass_context
 def entity(
@@ -116,7 +108,7 @@ def entity(
     "--with-corrections",
     is_flag=True,
     help="""Includes bitemporal corrections in the response, inline,
-    sorted by valid-time then tx-id (boolean, default: false)""",
+    sorted by valid-time (in UTC) then tx-id (boolean, default: false)""",
 )
 @click.argument("key")
 @click.pass_context
@@ -127,9 +119,9 @@ def history(ctx: click.Context, key: str, with_corrections: bool, with_docs: boo
 
 
 @cli.command(help="Returns the transaction details for an entity - returns a map containing the tx-id and tx-time.")
-@click.option("--tx-id", type=int, help="Defaulting to the latest transaction id (integer)")
-@click.option("--tx-time", type=click.DateTime(), help="Defaulting to the latest transaction time (date)")
-@click.option("--valid-time", type=click.DateTime(), help="Defaulting to now (date)")
+@click.option("--tx-id", type=int, help="In UTC, defaulting to the latest transaction id (integer)")
+@click.option("--tx-time", type=click.DateTime(), help="In UTC, defaulting to the latest transaction time (date)")
+@click.option("--valid-time", type=click.DateTime(), help="In UTC, defaulting to now (date)")
 @click.argument("key")
 @click.pass_context
 def entity_tx(
@@ -184,11 +176,7 @@ def await_tx(ctx: click.Context, tx_id: int, timeout: int | None):
 @click.option("--timeout", type=int, help="Specified in milliseconds, defaulting to 10 seconds (integer)")
 @click.argument("tx-time", type=click.DateTime())
 @click.pass_context
-def await_tx_time(
-    ctx: click.Context,
-    tx_time: datetime.datetime,
-    timeout: int | None,
-):
+def await_tx_time(ctx: click.Context, tx_time: datetime.datetime, timeout: int | None):
     client: XTDBClient = ctx.obj["client"]
 
     click.echo(json.dumps(client.await_tx_time(tx_time, timeout)))
@@ -225,7 +213,7 @@ def txs(ctx: click.Context):
 def submit_tx(ctx: click.Context, txs):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(json.dumps(client.submit_tx(txs)))
+    click.echo(json.dumps(client.submit_tx([json.loads(tx) for tx in txs])))
 
 
 @cli.command(

@@ -11,6 +11,7 @@ from boefjes.plugins.models import (
     BOEFJES_DIR,
     ENTRYPOINT_NORMALIZERS,
     NORMALIZER_DEFINITION_FILE,
+    SCHEMA_FILE,
     BoefjeResource,
     ModuleException,
     NormalizerResource,
@@ -46,16 +47,29 @@ class LocalPluginRepository:
 
         raise KeyError(f"Can't find plugin {plugin_id}")
 
+    def by_name(self, plugin_name: str) -> PluginType:
+        boefjes = {resource.boefje.name: resource for resource in self.resolve_boefjes().values()}
+
+        if plugin_name in boefjes:
+            return boefjes[plugin_name].boefje
+
+        normalizers = {resource.normalizer.name: resource for resource in self.resolve_normalizers().values()}
+
+        if plugin_name in normalizers:
+            return normalizers[plugin_name].normalizer
+
+        raise KeyError(f"Can't find plugin {plugin_name}")
+
     def schema(self, id_: str) -> dict | None:
         boefjes = self.resolve_boefjes()
 
         if id_ not in boefjes:
             return None
 
-        path = boefjes[id_].path / "schema.json"
+        path = boefjes[id_].path / SCHEMA_FILE
 
         if not path.exists():
-            logger.debug("Did not find schema for boefje %s", boefjes[id_])
+            logger.debug("Did not find schema for boefje %s", id_)
             return None
 
         return json.loads(path.read_text())
