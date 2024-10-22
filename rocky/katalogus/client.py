@@ -358,9 +358,6 @@ def parse_boefje(boefje: dict) -> Boefje:
 
 
 def parse_normalizer(normalizer: dict) -> Normalizer:
-    # TODO: give normalizers a proper name in backend
-    name = normalizer["id"].replace("_", " ").replace("kat ", "").title()
-
     consumes = set(normalizer["consumes"])
     consumes.add(f"normalizer/{normalizer['id']}")
     produces = set()
@@ -372,7 +369,7 @@ def parse_normalizer(normalizer: dict) -> Normalizer:
 
     return Normalizer(
         id=normalizer["id"],
-        name=name,
+        name=normalizer["name"],
         description=normalizer["description"],
         enabled=normalizer["enabled"],
         type=normalizer["type"],
