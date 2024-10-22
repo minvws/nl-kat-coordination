@@ -20,8 +20,6 @@ from reports.views.base import (
 from reports.views.mixins import SaveGenerateReportMixin
 from reports.views.view_helpers import GenerateReportStepsMixin
 
-TemplateView
-
 
 class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
     def build_breadcrumbs(self):
