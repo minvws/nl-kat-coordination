@@ -59,5 +59,5 @@ html_context = {
 html_static_path = ["_static"]
 html_css_files = ["openkat.css"]
 
-mermaid_version = ""  # Do not fetch from the CDN
-html_js_files = ["mermaid-11.3.0.min.js"]
+# mermaid_version = ""  # Do not fetch from the CDN
+# html_js_files = ["mermaid-11.3.0.min.js"]
