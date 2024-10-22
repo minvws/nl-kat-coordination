@@ -314,7 +314,7 @@ class OOISelectionView(BaseReportView, BaseOOIListView):
         return context
 
 
-class ReportTypeSelectionView(BaseReportView, ReportBreadcrumbs, TemplateView):
+class ReportTypeSelectionView(BaseReportView, ReportBreadcrumbs):
     """
     Shows report types and handles selections and requests.
     """
