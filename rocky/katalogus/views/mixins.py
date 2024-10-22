@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from httpx import HTTPError, HTTPStatusError
 from rest_framework.status import HTTP_404_NOT_FOUND
 
-from katalogus.client import KATalogus, Plugin, get_katalogus, Boefje
+from katalogus.client import Boefje, KATalogus, Plugin, get_katalogus
 
 logger = structlog.get_logger(__name__)
 

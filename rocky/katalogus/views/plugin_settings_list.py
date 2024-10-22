@@ -23,7 +23,7 @@ class PluginSettingsListView(SinglePluginView):
             if self.plugin_schema is None:
                 return []
 
-            settings = self.katalogus_client.get_plugin_settings(self.organization.code, plugin_id=self.plugin.id)
+            settings = self.katalogus_client.get_plugin_settings(plugin_id=self.plugin.id)
             props = self.plugin_schema.get("properties", [])
 
             return [

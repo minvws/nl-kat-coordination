@@ -30,7 +30,7 @@ class BaseKATalogusView(OrganizationView, ListView, FormView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.katalogus_client = get_katalogus()
+        self.katalogus_client = get_katalogus(self.organization.code)
 
     def get_initial(self) -> dict[str, Any]:
         initial = super().get_initial()
@@ -92,7 +92,7 @@ class KATalogusView(BaseKATalogusView):
     template_name = "katalogus.html"
 
     def get_queryset(self):
-        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_plugins(self.organization.code))
+        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_plugins())
         return self.filter_katalogus(queryset)
 
 
@@ -102,7 +102,7 @@ class BoefjeListView(BaseKATalogusView):
     template_name = "boefjes.html"
 
     def get_queryset(self):
-        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_boefjes(self.organization.code))
+        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_boefjes())
         return self.filter_katalogus(queryset)
 
 
@@ -112,7 +112,7 @@ class NormalizerListView(BaseKATalogusView):
     template_name = "normalizers.html"
 
     def get_queryset(self):
-        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_normalizers(self.organization.code))
+        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_normalizers())
         return self.filter_katalogus(queryset)
 
 

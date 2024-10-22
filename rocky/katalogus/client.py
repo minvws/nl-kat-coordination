@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_unicode_slug
 from django.utils.translation import gettext_lazy as _
-from httpx import codes, Response, HTTPStatusError
+from httpx import HTTPStatusError, Response, codes
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import AfterValidator, BaseModel, Field, field_serializer, field_validator
@@ -272,9 +272,7 @@ class KATalogusClient:
         logger.info("Toggle plugin state", plugin_id=plugin_id, enabled=enabled)
         plugin_id = quote(plugin_id)
 
-        self.session.patch(
-            f"/v1/organisations/{organization_code}/plugins/{plugin_id}", json={"enabled": enabled}
-        )
+        self.session.patch(f"/v1/organisations/{organization_code}/plugins/{plugin_id}", json={"enabled": enabled})
 
 
 class KATalogus:
