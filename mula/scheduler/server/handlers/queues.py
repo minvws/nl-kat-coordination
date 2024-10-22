@@ -6,7 +6,6 @@ from fastapi import status
 
 from scheduler import context, models, queues, schedulers, storage
 from scheduler.server import serializers
-from scheduler.server.errors import exception_handler
 
 
 class QueueAPI:
@@ -53,11 +52,9 @@ class QueueAPI:
             description="Push an item to a queue",
         )
 
-    @exception_handler
     def list(self) -> Any:
         return [models.Queue(**s.queue.dict(include_pq=False)) for s in self.schedulers.copy().values()]
 
-    @exception_handler
     def get(self, queue_id: str) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
@@ -67,7 +64,6 @@ class QueueAPI:
 
         return models.Queue(**s.queue.dict())
 
-    @exception_handler
     def pop(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
@@ -88,7 +84,6 @@ class QueueAPI:
 
         return models.Task(**item.model_dump())
 
-    @exception_handler
     def push(self, queue_id: str, item_in: serializers.Task) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:

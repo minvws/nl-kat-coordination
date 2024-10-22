@@ -1,33 +1,28 @@
-import functools
-
 import fastapi
-import pydantic
+from fastapi.responses import JSONResponse
+from pydantic import ValidationError
 
 from scheduler import storage
 
 
-def exception_handler(func):
-    @functools.wraps(func)
-    def inner_function(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except storage.filters.errors.FilterError as exc:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"Invalid filter(s): {exc}"
-            ) from exc
-        except storage.errors.StorageError as exc:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"A database error occurred: {exc}"
-            ) from exc
-        except pydantic.ValidationError as exc:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"Validation error occurred: {exc}"
-            ) from exc
-        except fastapi.HTTPException as exc:
-            raise exc
-        except Exception as exc:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"An error occurred: {exc}"
-            ) from exc
-
-    return inner_function
+def exception_handler(request: fastapi.Request, exc: Exception):
+    if isinstance(exc, storage.filters.errors.FilterError):
+        return JSONResponse(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST, content={"detail": f"Invalid filter(s): {exc}"}
+        )
+    elif isinstance(exc, storage.errors.StorageError):
+        return JSONResponse(
+            status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"detail": f"A database error occurred: {exc}"},
+        )
+    elif isinstance(exc, ValidationError):
+        return JSONResponse(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST, content={"detail": f"Validation error occurred: {exc}"}
+        )
+    elif isinstance(exc, fastapi.HTTPException):
+        return fastapi.responses.JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+    else:
+        return JSONResponse(
+            status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"detail": f"An internal error occurred: {exc}"},
+        )

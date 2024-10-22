@@ -8,7 +8,6 @@ from fastapi import status
 
 from scheduler import context, models, schedulers
 from scheduler.server import serializers, utils
-from scheduler.server.errors import exception_handler
 
 
 class ScheduleAPI:
@@ -65,7 +64,6 @@ class ScheduleAPI:
             description="Delete a schedule",
         )
 
-    @exception_handler
     def list(
         self,
         request: fastapi.Request,
@@ -105,16 +103,21 @@ class ScheduleAPI:
 
         return utils.paginate(request, results, count, offset, limit)
 
-    @exception_handler
     def create(self, schedule: serializers.ScheduleCreate) -> Any:
-        new_schedule = models.Schedule(**schedule.model_dump())
+        try:
+            new_schedule = models.Schedule(**schedule.model_dump())
+        except ValueError:
+            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail="validation error")
 
         s = self.schedulers.get(new_schedule.scheduler_id)
         if s is None:
             raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="scheduler not found")
 
         # Validate data with task type of the scheduler
-        instance = s.ITEM_TYPE.model_validate(new_schedule.data)
+        try:
+            instance = s.ITEM_TYPE.model_validate(new_schedule.data)
+        except ValueError:
+            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail="validation error")
 
         # Create hash for schedule with task type
         new_schedule.hash = instance.hash
@@ -129,7 +132,6 @@ class ScheduleAPI:
         self.ctx.datastores.schedule_store.create_schedule(new_schedule)
         return new_schedule
 
-    @exception_handler
     def get(self, schedule_id: uuid.UUID) -> Any:
         schedule = self.ctx.datastores.schedule_store.get_schedule(schedule_id)
         if schedule is None:
@@ -137,7 +139,6 @@ class ScheduleAPI:
 
         return schedule
 
-    @exception_handler
     def patch(self, schedule_id: uuid.UUID, schedule: serializers.SchedulePatch) -> Any:
         schedule_db = self.ctx.datastores.schedule_store.get_schedule(schedule_id)
         if schedule_db is None:
@@ -151,14 +152,16 @@ class ScheduleAPI:
         updated_schedule = schedule_db.model_copy(update=patch_data)
 
         # Validate schedule, model_copy() does not validate the model
-        models.Schedule(**updated_schedule.dict())
+        try:
+            models.Schedule(**updated_schedule.dict())
+        except ValueError:
+            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail="validation error")
 
         # Update schedule in database
         self.ctx.datastores.schedule_store.update_schedule(updated_schedule)
 
         return updated_schedule
 
-    @exception_handler
     def delete(self, schedule_id: uuid.UUID) -> None:
         self.ctx.datastores.schedule_store.delete_schedule(schedule_id)
         return None

@@ -8,7 +8,6 @@ from fastapi import status
 
 from scheduler import context, models, storage
 from scheduler.server import serializers, utils
-from scheduler.server.errors import exception_handler
 
 
 class TaskAPI:
@@ -61,7 +60,6 @@ class TaskAPI:
             description="Update a task",
         )
 
-    @exception_handler
     def list(
         self,
         request: fastapi.Request,
@@ -143,14 +141,12 @@ class TaskAPI:
 
         return utils.paginate(request, results, count, offset, limit)
 
-    @exception_handler
     def get(self, task_id: uuid.UUID) -> Any:
         task = self.ctx.datastores.task_store.get_task(task_id)
         if task is None:
             raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="task not found")
         return task
 
-    @exception_handler
     def patch(self, task_id: uuid.UUID, item: serializers.Task) -> Any:
         task_db = self.ctx.datastores.task_store.get_task(task_id)
 
@@ -168,6 +164,5 @@ class TaskAPI:
 
         return updated_task
 
-    @exception_handler
     def stats(self, scheduler_id: str | None = None) -> dict[str, dict[str, int]] | None:
         return self.ctx.datastores.task_store.get_status_count_per_hour(scheduler_id)

@@ -4,7 +4,7 @@ import uvicorn
 
 from scheduler import context, schedulers
 
-from . import handlers
+from . import errors, handlers
 
 
 class Server:
@@ -28,8 +28,9 @@ class Server:
 
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
-        self.api: fastapi.FastAPI = fastapi.FastAPI(title="Scheduler", description="Scheduler API")
         self.schedulers: dict[str, schedulers.Scheduler] = s
+        self.api: fastapi.FastAPI = fastapi.FastAPI(title="Scheduler", description="Scheduler API")
+        self.api.add_exception_handler(Exception, errors.exception_handler)
 
         # Set up API endpoints
         handlers.SchedulerAPI(self.api, self.ctx, s)
