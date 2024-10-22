@@ -59,4 +59,6 @@ html_context = {
 html_static_path = ["_static"]
 html_css_files = ["openkat.css"]
 
-mermaid_version = "11.3.0"
+mermaid_use_local = "mermaid.min-11.3.0.js"
+mermaid_include_elk = ""
+d3_use_local = "d3.min-7.9.0.js"
