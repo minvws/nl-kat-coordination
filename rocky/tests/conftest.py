@@ -1792,7 +1792,7 @@ def get_aggregate_report_from_bytes():
             "safe_connections": {},
             "summary": {},
         },
-        "summary": {"Critical vulnerabilities": 0, "IPs scanned": 1, "Hostnames scanned": 1, "Terms in report": ""},
+        "summary": {"critical_vulnerabilities": 0, "ips_scanned": 1, "hostnames_scanned": 1, "terms_in_report": ""},
         "total_findings": 0,
         "total_systems": 1,
         "total_hostnames": 1,
