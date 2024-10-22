@@ -12,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from httpx import codes, Response, HTTPStatusError
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
-from pydantic import AfterValidator, BaseModel, Field, field_serializer
+from pydantic import AfterValidator, BaseModel, Field, field_serializer, field_validator
 from tools.enums import SCAN_LEVEL
 
 from octopoes.models import OOI
@@ -47,8 +47,13 @@ class Plugin(BaseModel):
     created: str | None = None
     description: str | None = None
     related: list[str] = Field(default_factory=list)
-    enabled: bool
     type: str
+    # TODO: this is the only field making a Plugin organization-specific. If we could separate the use of the enabled
+    #  field from other uses, we would be able to drop the organization_code as an argument in a lot of places, hence
+    #  simplifying the usage of the KATalogus for installation-wide operations (as plugins are not specific to an
+    #  organization). One could argue that having this field here should mean we need an organization field as well to
+    #  make sense out of it: for which organization is this plugin in fact enabled?
+    enabled: bool
 
     def can_scan(self, member) -> bool:
         return member.has_perm("tools.can_scan_organization")
@@ -69,6 +74,17 @@ class Boefje(Plugin):
     @field_serializer("consumes")
     def serialize_consumes(self, consumes: set[type[OOI]]):
         return {ooi_class.get_ooi_type() for ooi_class in consumes}
+
+    @field_validator("boefje_schema")
+    @classmethod
+    def json_schema_valid(cls, schema: dict) -> dict:
+        if schema is not None:
+            try:
+                Draft202012Validator.check_schema(schema)
+            except SchemaError as e:
+                raise ValueError("The schema field is not a valid JSON schema") from e
+
+        return schema
 
     def can_scan(self, member) -> bool:
         return super().can_scan(member) and member.has_clearance_level(self.scan_level.value)
@@ -149,7 +165,11 @@ def verify_response(response: Response) -> None:
 class KATalogusClient:
     def __init__(self, base_uri: str):
         self.session = httpx.Client(base_url=base_uri, event_hooks={"response": [verify_response]})
-        # TODO: fix the self.organization = valid_organization_code(organization) if organization else organization
+
+    def health(self) -> ServiceHealth:
+        response = self.session.get("/health")
+
+        return ServiceHealth.model_validate_json(response.content)
 
     def organization_exists(self, organization_code: str) -> bool:
         return self.session.get(f"/v1/organisations/{organization_code}").status_code != 404
@@ -170,58 +190,30 @@ class KATalogusClient:
         return [parse_plugin(plugin) for plugin in response.json()]
 
     def get_plugin(self, organization_code: str, plugin_id: str) -> Plugin:
-        plugin_id = quote(plugin_id)
-        response = self.session.get(f"/v1/organisations/{organization_code}/plugins/{plugin_id}")
+        response = self.session.get(f"/v1/organisations/{organization_code}/plugins/{quote(plugin_id)}")
 
         return parse_plugin(response.json())
 
-    def get_plugin_schema(self, organization_code: str, plugin_id: str) -> dict | None:
-        plugin_id = quote(plugin_id)
-        response = self.session.get(f"/v1/organisations/{organization_code}/plugins/{plugin_id}/schema.json")
-
-        schema = response.json()
-        if not schema:
-            return None
-
-        try:
-            Draft202012Validator.check_schema(schema)
-        except SchemaError as error:
-            logger.warning("Invalid schema found for plugin %s, %s", plugin_id, error)
-        else:
-            return schema
-
-        return None
-
     def get_plugin_settings(self, organization_code: str, plugin_id: str) -> dict:
-        plugin_id = quote(plugin_id)
-        response = self.session.get(f"/v1/organisations/{organization_code}/{plugin_id}/settings")
+        response = self.session.get(f"/v1/organisations/{organization_code}/{quote(plugin_id)}/settings")
 
         return response.json()
 
     def upsert_plugin_settings(self, organization_code: str, plugin_id: str, values: dict) -> None:
-        plugin_id = quote(plugin_id)
-        self.session.put(f"/v1/organisations/{organization_code}/{plugin_id}/settings", json=values)
+        self.session.put(f"/v1/organisations/{organization_code}/{quote(plugin_id)}/settings", json=values)
 
         logger.info("Upsert plugin settings", plugin_id=plugin_id)
 
-    def delete_plugin_settings(self, organization_code: str, plugin_id: str):
-        plugin_id = quote(plugin_id)
-        response = self.session.delete(f"/v1/organisations/{organization_code}/{plugin_id}/settings")
+    def delete_plugin_settings(self, organization_code: str, plugin_id: str) -> None:
+        self.session.delete(f"/v1/organisations/{organization_code}/{quote(plugin_id)}/settings")
 
         logger.info("Delete plugin settings", plugin_id=plugin_id)
-
-        return response
 
     def clone_all_configuration_to_organization(self, from_organization: str, to_organization: str):
         to_organization = quote(to_organization)
         response = self.session.post(f"/v1/organisations/{from_organization}/settings/clone/{to_organization}")
 
         return response
-
-    def health(self) -> ServiceHealth:
-        response = self.session.get("/health")
-
-        return ServiceHealth.model_validate_json(response.content)
 
     def get_normalizers(self, organization_code: str) -> list[Plugin]:
         return self.get_plugins(organization_code, plugin_type="normalizer")
@@ -239,19 +231,11 @@ class KATalogusClient:
         self._patch_plugin_state(organization_code, plugin.id, False)
 
     def get_enabled_boefjes(self, organization_code: str) -> list[Plugin]:
-        return [plugin for plugin in self.get_boefjes(organization_code) if plugin.enabled]
-
-    def _patch_plugin_state(self, organization_code: str, plugin_id: str, enabled: bool) -> None:
-        logger.info("Toggle plugin state", plugin_id=plugin_id, enabled=enabled)
-        plugin_id = quote(plugin_id)
-
-        self.session.patch(
-            f"/v1/organisations/{organization_code}/plugins/{plugin_id}", json={"enabled": enabled}
-        )
+        return self.get_plugins(organization_code, plugin_type="boefje", enabled=True)
 
     def get_cover(self, organization_code: str, plugin_id: str) -> BytesIO:
-        plugin_id = quote(plugin_id)
-        response = self.session.get(f"/v1/organisations/{organization_code}/plugins/{plugin_id}/cover.jpg")
+        # TODO: does not need to be organization-specific
+        response = self.session.get(f"/v1/organisations/{organization_code}/plugins/{quote(plugin_id)}/cover.jpg")
 
         return BytesIO(response.content)
 
@@ -283,6 +267,66 @@ class KATalogusClient:
         except KATalogusHTTPStatusError:
             logger.info("Plugin %s could not be updated", plugin.name)
             raise
+
+    def _patch_plugin_state(self, organization_code: str, plugin_id: str, enabled: bool) -> None:
+        logger.info("Toggle plugin state", plugin_id=plugin_id, enabled=enabled)
+        plugin_id = quote(plugin_id)
+
+        self.session.patch(
+            f"/v1/organisations/{organization_code}/plugins/{plugin_id}", json={"enabled": enabled}
+        )
+
+
+class OrganizationKATalogusClient:
+    def __init__(self, base_uri: str, organization_code: str):
+        self._katalogus_client = KATalogusClient(base_uri)
+        self.organization_code = valid_organization_code(organization_code)
+        # TODO: fix the self.organization = valid_organization_code(organization) if organization else organization
+
+    def get_plugins(self, **params) -> list[Plugin]:
+        return self._katalogus_client.get_plugins(self.organization_code, **params)
+
+    def get_plugin(self, plugin_id: str) -> Plugin:
+        return self._katalogus_client.get_plugin(self.organization_code, plugin_id)
+
+    def get_plugin_settings(self, plugin_id: str) -> dict:
+        return self._katalogus_client.get_plugin_settings(self.organization_code, plugin_id)
+
+    def upsert_plugin_settings(self, plugin_id: str, values: dict) -> None:
+        return self._katalogus_client.upsert_plugin_settings(self.organization_code, plugin_id, values)
+
+    def delete_plugin_settings(self, plugin_id: str) -> None:
+        return self._katalogus_client.delete_plugin_settings(self.organization_code, plugin_id)
+
+    def clone_all_configuration_to_organization(self, to_organization: str):
+        return self._katalogus_client.clone_all_configuration_to_organization(self.organization_code, to_organization)
+
+    def get_normalizers(self) -> list[Plugin]:
+        return self._katalogus_client.get_normalizers(self.organization_code)
+
+    def get_boefjes(self) -> list[Plugin]:
+        return self._katalogus_client.get_boefjes(self.organization_code)
+
+    def enable_plugin(self, plugin: Plugin) -> None:
+        return self._katalogus_client.enable_plugin(self.organization_code, plugin)
+
+    def enable_boefje_by_id(self, boefje_id: str) -> None:
+        return self._katalogus_client.enable_boefje_by_id(self.organization_code, boefje_id)
+
+    def disable_plugin(self, plugin: Plugin) -> None:
+        return self._katalogus_client.disable_plugin(self.organization_code, plugin)
+
+    def get_enabled_boefjes(self) -> list[Plugin]:
+        return self._katalogus_client.get_plugins(self.organization_code, plugin_type="boefje", enabled=True)
+
+    def get_cover(self, plugin_id: str) -> BytesIO:
+        return self._katalogus_client.get_cover(self.organization_code, plugin_id)
+
+    def create_plugin(self, plugin: Plugin) -> None:
+        return self._katalogus_client.create_plugin(self.organization_code, plugin)
+
+    def edit_plugin(self, plugin: Plugin) -> None:
+        return self._katalogus_client.edit_plugin(self.organization_code, plugin)
 
 
 def parse_boefje(boefje: dict) -> Boefje:

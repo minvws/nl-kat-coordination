@@ -1015,7 +1015,7 @@ def tree_data_tls_findings_and_suites():
 
 
 @pytest.fixture
-def plugin_details():
+def plugin_details(plugin_schema):
     return parse_plugin(
         {
             "id": "test-boefje",
@@ -1027,7 +1027,7 @@ def plugin_details():
             "consumes": ["Network"],
             "produces": ["Network"],
             "enabled": True,
-            "boefje_schema": {},
+            "boefje_schema": plugin_schema,
             "oci_image": None,
             "oci_arguments": ["-test", "-arg"],
         }
@@ -1035,7 +1035,7 @@ def plugin_details():
 
 
 @pytest.fixture
-def plugin_details_with_container():
+def plugin_details_with_container(plugin_schema):
     return parse_plugin(
         {
             "id": "test-boefje",
@@ -1047,7 +1047,7 @@ def plugin_details_with_container():
             "consumes": ["Network"],
             "produces": ["Network"],
             "enabled": True,
-            "boefje_schema": {},
+            "boefje_schema": plugin_schema,
             "oci_image": "ghcr.io/test/image:123",
             "oci_arguments": ["-test", "-arg"],
         }
