@@ -205,7 +205,7 @@ class SaveGenerateReportMixin(BaseReportView):
             self.get_input_data(),
             report_data,
             report_names,
-            report_names[0][0],
+            report_names[0][1],
         )
 
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
