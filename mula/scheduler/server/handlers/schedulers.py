@@ -5,6 +5,7 @@ import structlog
 from fastapi import status
 
 from scheduler import context, models, schedulers
+from scheduler.server.errors import BadRequestError, NotFoundError
 
 
 class SchedulerAPI:
@@ -47,19 +48,19 @@ class SchedulerAPI:
     def get(self, scheduler_id: str) -> Any:
         s = self.schedulers.get(scheduler_id)
         if s is None:
-            raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="scheduler not found")
+            raise NotFoundError(f"Scheduler {scheduler_id} not found")
 
         return models.Scheduler(**s.dict())
 
     def patch(self, scheduler_id: str, item: models.Scheduler) -> Any:
         s = self.schedulers.get(scheduler_id)
         if s is None:
-            raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="scheduler not found")
+            raise NotFoundError(f"Scheduler {scheduler_id} not found")
 
         stored_scheduler_model = models.Scheduler(**s.dict())
         patch_data = item.model_dump(exclude_unset=True)
         if len(patch_data) == 0:
-            raise fastapi.HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="no data to patch")
+            raise BadRequestError("no data to patch")
 
         updated_scheduler = stored_scheduler_model.model_copy(update=patch_data)
 

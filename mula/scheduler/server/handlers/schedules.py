@@ -8,6 +8,7 @@ from fastapi import status
 
 from scheduler import context, models, schedulers
 from scheduler.server import serializers, utils
+from scheduler.server.errors import BadRequestError, ConflictError, NotFoundError, ValidationError
 
 
 class ScheduleAPI:
@@ -78,16 +79,10 @@ class ScheduleAPI:
         max_created_at: datetime.datetime | None = None,
     ) -> Any:
         if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail="min_created_at must be less than max_created_at",
-            )
+            raise BadRequestError("min_created_at must be less than max_created_at")
 
         if (min_deadline_at is not None and max_deadline_at is not None) and min_deadline_at > max_deadline_at:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail="min_deadline_at must be less than max_deadline_at",
-            )
+            raise BadRequestError("min_deadline_at must be less than max_deadline_at")
 
         results, count = self.ctx.datastores.schedule_store.get_schedules(
             scheduler_id=scheduler_id,
@@ -107,17 +102,17 @@ class ScheduleAPI:
         try:
             new_schedule = models.Schedule(**schedule.model_dump())
         except ValueError:
-            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail="validation error")
+            raise ValidationError("validation error")
 
         s = self.schedulers.get(new_schedule.scheduler_id)
         if s is None:
-            raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="scheduler not found")
+            raise BadRequestError(f"Scheduler {new_schedule.scheduler_id} not found")
 
         # Validate data with task type of the scheduler
         try:
             instance = s.ITEM_TYPE.model_validate(new_schedule.data)
         except ValueError:
-            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail="validation error")
+            raise BadRequestError("validation error")
 
         # Create hash for schedule with task type
         new_schedule.hash = instance.hash
@@ -125,9 +120,7 @@ class ScheduleAPI:
         # Check if schedule with the same hash already exists
         schedule = self.ctx.datastores.schedule_store.get_schedule_by_hash(new_schedule.hash)
         if schedule is not None:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_409_CONFLICT, detail="schedule with the same hash already exists"
-            )
+            raise ConflictError(f"schedule with the same hash already exists: {new_schedule.hash}")
 
         self.ctx.datastores.schedule_store.create_schedule(new_schedule)
         return new_schedule
@@ -135,18 +128,18 @@ class ScheduleAPI:
     def get(self, schedule_id: uuid.UUID) -> Any:
         schedule = self.ctx.datastores.schedule_store.get_schedule(schedule_id)
         if schedule is None:
-            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="schedule not found")
+            raise NotFoundError(f"schedule not found, by schedule_id: {schedule_id}")
 
         return schedule
 
     def patch(self, schedule_id: uuid.UUID, schedule: serializers.SchedulePatch) -> Any:
         schedule_db = self.ctx.datastores.schedule_store.get_schedule(schedule_id)
         if schedule_db is None:
-            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="schedule not found")
+            raise NotFoundError(f"schedule not found, by schedule_id: {schedule_id}")
 
         patch_data = schedule.model_dump(exclude_unset=True)
         if len(patch_data) == 0:
-            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail="no data to patch")
+            raise BadRequestError("no data to patch")
 
         # Update schedule
         updated_schedule = schedule_db.model_copy(update=patch_data)
@@ -155,7 +148,7 @@ class ScheduleAPI:
         try:
             models.Schedule(**updated_schedule.dict())
         except ValueError:
-            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail="validation error")
+            raise ValidationError("validation error")
 
         # Update schedule in database
         self.ctx.datastores.schedule_store.update_schedule(updated_schedule)

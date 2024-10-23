@@ -6,6 +6,7 @@ from fastapi import status
 
 from scheduler import context, models, queues, schedulers, storage
 from scheduler.server import serializers
+from scheduler.server.errors import BadRequestError, ConflictError, NotFoundError, TooManyRequestsError
 
 
 class QueueAPI:
@@ -58,18 +59,14 @@ class QueueAPI:
     def get(self, queue_id: str) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="scheduler not found, by queue_id"
-            )
+            raise NotFoundError(f"queue not found, by queue_id: {queue_id}")
 
         return models.Queue(**s.queue.dict())
 
     def pop(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="scheduler not found, by queue id"
-            )
+            raise NotFoundError(f"queue not found, by queue_id: {queue_id}")
 
         try:
             item = s.pop_item_from_queue(filters)
@@ -77,17 +74,14 @@ class QueueAPI:
             return None
 
         if item is None:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_404_NOT_FOUND,
-                detail="could not pop item from queue, check your filters",
-            )
+            raise NotFoundError("could not pop item from queue, check your filters")
 
         return models.Task(**item.model_dump())
 
     def push(self, queue_id: str, item_in: serializers.Task) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
-            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="queue not found")
+            raise NotFoundError(f"queue not found, by queue_id: {queue_id}")
 
         # Load default values
         new_item = models.Task(**item_in.model_dump(exclude_unset=True))
@@ -98,17 +92,11 @@ class QueueAPI:
 
         try:
             pushed_item = s.push_item_to_queue(new_item)
-        except ValueError as exc_value:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"malformed item: {exc_value}"
-            ) from exc_value
-        except queues.QueueFullError as exc_full:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_429_TOO_MANY_REQUESTS, detail="queue is full"
-            ) from exc_full
-        except queues.errors.NotAllowedError as exc_not_allowed:
-            raise fastapi.HTTPException(
-                headers={"Retry-After": "60"}, status_code=fastapi.status.HTTP_409_CONFLICT, detail=str(exc_not_allowed)
-            ) from exc_not_allowed
+        except ValueError:
+            raise BadRequestError("malformed item")
+        except queues.QueueFullError:
+            raise TooManyRequestsError("queue is full")
+        except queues.errors.NotAllowedError:
+            raise ConflictError("queue is not allowed to push items")
 
         return pushed_item

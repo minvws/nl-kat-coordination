@@ -7,9 +7,9 @@ from unittest import mock
 from urllib.parse import quote
 
 from fastapi.testclient import TestClient
+
 from scheduler import config, models, server, storage, utils
 from scheduler.server import serializers
-
 from tests.factories import OrganisationFactory
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
@@ -913,7 +913,7 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
         response = self.client.post(
             "/schedules", json={"scheduler_id": "invalid", "schedule": "*/5 * * * *", "data": item.data}
         )
-        self.assertEqual(404, response.status_code)
+        self.assertEqual(400, response.status_code)
         self.assertIn("scheduler not found", response.json().get("detail"))
 
     def test_post_schedule_invalid_data(self):

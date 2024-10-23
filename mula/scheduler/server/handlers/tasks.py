@@ -8,6 +8,7 @@ from fastapi import status
 
 from scheduler import context, models, storage
 from scheduler.server import serializers, utils
+from scheduler.server.errors import BadRequestError, NotFoundError, ValidationError
 
 
 class TaskAPI:
@@ -75,9 +76,7 @@ class TaskAPI:
         filters: storage.filters.FilterRequest | None = None,
     ) -> Any:
         if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail="min_date must be less than max_date"
-            )
+            raise BadRequestError("min_created_at must be less than max_created_at")
 
         # FIXME: deprecated; backwards compatibility for rocky that uses the
         # input_ooi and plugin_id parameters.
@@ -144,18 +143,18 @@ class TaskAPI:
     def get(self, task_id: uuid.UUID) -> Any:
         task = self.ctx.datastores.task_store.get_task(task_id)
         if task is None:
-            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="task not found")
+            raise NotFoundError(f"task not found, by task_id: {task_id}")
         return task
 
     def patch(self, task_id: uuid.UUID, item: serializers.Task) -> Any:
         task_db = self.ctx.datastores.task_store.get_task(task_id)
 
         if task_db is None:
-            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="task not found")
+            raise NotFoundError(f"task not found, by task_id: {task_id}")
 
         patch_data = item.model_dump(exclude_unset=True)
         if len(patch_data) == 0:
-            raise fastapi.HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="no data to patch")
+            raise BadRequestError("no data to patch")
 
         # Update task
         updated_task = task_db.model_copy(update=patch_data)

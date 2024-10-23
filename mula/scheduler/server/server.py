@@ -1,8 +1,9 @@
 import fastapi
+import pydantic
 import structlog
 import uvicorn
 
-from scheduler import context, schedulers
+from scheduler import context, schedulers, storage
 
 from . import errors, handlers
 
@@ -30,6 +31,17 @@ class Server:
         self.ctx: context.AppContext = ctx
         self.schedulers: dict[str, schedulers.Scheduler] = s
         self.api: fastapi.FastAPI = fastapi.FastAPI(title="Scheduler", description="Scheduler API")
+
+        # Set up exception handlers
+        self.api.add_exception_handler(errors.FilterError, errors.filter_error_handler)
+        self.api.add_exception_handler(errors.StorageError, errors.storage_error_handler)
+        self.api.add_exception_handler(pydantic.ValidationError, errors.validation_error_handler)
+        self.api.add_exception_handler(errors.ValidationError, errors.validation_error_handler)
+        self.api.add_exception_handler(errors.NotFoundError, errors.not_found_error_handler)
+        self.api.add_exception_handler(errors.ConflictError, errors.conflict_error_handler)
+        self.api.add_exception_handler(errors.BadRequestError, errors.bad_request_error_handler)
+        self.api.add_exception_handler(errors.TooManyRequestsError, errors.too_many_requests_error_handler)
+        self.api.add_exception_handler(fastapi.HTTPException, errors.http_error_handler)
         self.api.add_exception_handler(Exception, errors.exception_handler)
 
         # Set up API endpoints
