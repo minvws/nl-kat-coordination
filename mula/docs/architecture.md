@@ -2,26 +2,19 @@
 
 ## Purpose
 
-The _scheduler_ is tasked with populating and maintaining a priority queue of
-items that are ranked, and can be popped off through HTTP API calls.
-The scheduler is designed to be extensible, such that you're able to create
-your own rules for the population, scheduling, and prioritization of tasks.
+The _scheduler_ is tasked with populating and maintaining a priority queues of
+ranked tasks, and can be popped off through HTTP API calls. The scheduler is
+designed to be extensible, such that you're able to create your own rules for
+the population, scheduling, and prioritization of tasks.
 
-The _scheduler_ implements a priority queue for prioritization of tasks to be
-performed by the worker(s). In the implementation of the scheduler within KAT
-the scheduler is tasked with populating the priority queue with 'boefje' and
-'normalizer' tasks. Additionally the scheduler is responsible for maintaining
-and updating its internal priority queue.
+In the implementation of the scheduler within OpenKAT is tasked with
+scheduling and populating the priority queues of 'boefje', 'normalizer' and 
+`report` tasks. 
 
-A priority queue is used, in as such, that it allows us to determine what tasks
-should be picked up first, or more regularly. Because of the use of a priority
-queue we can differentiate between tasks that are to be executed first, e.g.
-tasks created by the user get precedence over tasks that are created by the
-internal rescheduling processes within the scheduler.
-
-Calculations in order to determine the priority of a task are performed by the
-`ranker`. The `ranker` can leverage information from multiple (external)
-sources, called `connectors`.
+Because of the use of a priority queue we can differentiate between tasks that
+are to be executed first, e.g. tasks created by the user get precedence over
+tasks that are created by the internal rescheduling processes within the 
+scheduler.
 
 In this document we will outline how the scheduler operates within KAT, how
 internal systems function and how external services use it.
@@ -39,13 +32,18 @@ external services. In this overview arrows from external services indicate how
 and why those services communicate with the scheduler. The `Scheduler` system
 combines data from the `Octopoes`, `Katalogus`, `Bytes` and `RabbitMQ` systems.
 
-- Octopoes
+External services used and for what purpose:
 
-- RabbitMQ
+- Octopoes; retrieval of ooi information
 
-- Katalogus
+- RabbitMQ; messaging queues to notify the scheduler of scan level changes
+  and the creation of raw files from bytes
 
-- Bytes
+- Katalogus; retrieval of plugin and organization information
+
+- Bytes; retrieval of raw file information
+
+- Rocky; interfaces with the scheduler through its rest api
 
 ![scheduler_system.svg](./img/scheduler_system.svg)
 
@@ -59,14 +57,14 @@ of a multitude of schedulers.
 | :-------------------------------- | --------------------------------------: |
 | ![scheduler](./img/scheduler.svg) | ![schedulers.svg](./img/schedulers.svg) |
 
-Typically in a KAT installation 3 scheduler will be created per organisation:
+Typically in a OpenKAT installation 3 scheduler will be created per organisation:
 
 1. _boefje scheduler_
 2. _normalizer scheduler_
 3. _report scheduler_
 
 Each scheduler type implements it's own priority queue, and can implement it's
-own processes of populating, and prioritization of its queue.
+own processes of populating, and prioritization of its tasks.
 
 ![queue.svg](./img/queue.svg)
 
@@ -226,8 +224,8 @@ Before a `BoefjeTask` and pushed on the queue we will check the following:
 ![boefje_scheduler.svg](./img/boefje_scheduler.svg)
 
 In order to create a `BoefjeTask` and trigger the dataflow we described above
-we have 4 different processes within a `BoefjeScheduler` that can create boefje
-tasks. Namely:
+we have 4 different processes running in threads within a `BoefjeScheduler`
+that can create boefje tasks. Namely:
 
 1. scan profile mutations
 2. enabling of boefjes
