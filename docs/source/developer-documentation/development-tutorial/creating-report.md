@@ -77,7 +77,7 @@ After having done all that. The user should be able to create their own Greeting
 
 Let's go to the reports tab, and change our filters again so we can see our Greetings OOI. Check one of their boxes and press the _Continue with selection_ button. Now in the grid of available report types you can make, you should see 2 options. The Findings Report and the Greetings Report. Let's check them both and press once more on the _Continue with selection_ button. Now you will see a report that includes both the Findings Report and the Greetings report inside a single web page. In the top right, you can press the _Export_ button which will make a pdf of your report. Including information about every finding of your project.
 
-If you want to get more information inside your report, make sure to check our documentation about {ref}`Creating reports`.
+If you want to get more information inside your report, make sure to check our documentation about {ref}`developer-documentation/reports:Creating reports`.
 
 ## Conclusion
 

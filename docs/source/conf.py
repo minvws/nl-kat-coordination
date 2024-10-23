@@ -62,3 +62,10 @@ html_css_files = ["openkat.css"]
 mermaid_use_local = "mermaid.min-11.3.0.js"
 mermaid_include_elk = ""
 d3_use_local = "d3.min-7.9.0.js"
+
+autosectionlabel_prefix_document = True
+
+suppress_warnings = [
+    f"autosectionlabel.installation-and-deployment/environment-settings/{document}"
+    for document in ("boefjes", "bytes", "keiko", "mula", "octopoes")
+]
