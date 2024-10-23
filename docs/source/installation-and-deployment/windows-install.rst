@@ -106,4 +106,4 @@ Now you can start OpenKat.
 Troubleshooting
 ================
 
-If you encounter any problems, please check :ref:`Installation and deployment` for more information.
+If you encounter any problems, please check :doc:`/installation-and-deployment/index` for more information.

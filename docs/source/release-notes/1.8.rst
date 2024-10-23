@@ -16,7 +16,7 @@ a hostname objects without a dot instead of both one with and without.
 
 Support for enabling and disabling bits using environment variables has been
 added and a bit can now be disabled by default. More info can be found :ref:`in
-the usermanual <bits>`.
+the usermanual <manual/user-manual:bits>`.
 
 It is possible to mute a finding with a button on the findings page. This will
 create a MuteFinding OOI and results in the finding not being shown anymore in
