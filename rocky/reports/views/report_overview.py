@@ -67,7 +67,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
                     recipe_ooi_tree = self.get_recipe_ooi_tree(recipe_id)
                     if recipe_ooi_tree is not None:
                         recipe_tree = recipe_ooi_tree.store.values()
-                        recipe_ooi = [ooi for ooi in recipe_tree if isinstance(ooi, ReportRecipe)][0]
+                        recipe_ooi = next((ooi for ooi in recipe_tree if isinstance(ooi, ReportRecipe))
                         report_oois = [ooi for ooi in recipe_tree if isinstance(ooi, Report)]
                         recipes.append(
                             {
