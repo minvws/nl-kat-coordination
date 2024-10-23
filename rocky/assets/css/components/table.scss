@@ -69,7 +69,8 @@ table.nowrap {
   th,
   td {
     a {
-      white-space: inherit;
+      // white-space: inherit;
+      white-space: pre-wrap;
     }
   }
 }
@@ -79,5 +80,13 @@ table tr.expando-row td {
   table td {
     background-color: var(--application-base-background-color);
     padding: var(--table-cell-padding);
+  }
+}
+
+table tbody td {
+  a {
+    line-break: break-all;
+    display: inline-block; /* Needed to be able to use max-width */
+    max-width: 20rem;
   }
 }
