@@ -61,8 +61,6 @@
     </div>
 </section>
 {% block html_at_end_body %}
-    {% compress js %}
-        <script src="{% static "js/renameReports.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
-        <script src="{% static "js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
-    {% endcompress %}
+    <script src="{% static "js/renameReports.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
+    <script src="{% static "js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
 {% endblock html_at_end_body %}
