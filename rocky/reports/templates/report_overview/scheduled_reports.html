@@ -13,9 +13,8 @@
 
             <div class="horizontal-scroll">
                 <h2>{% translate "Scheduled reports" %}</h2>
-                <p>{% translate "View your scheduled reports." %}</p>
-                <p class="de-emphasized">
-                    {% blocktranslate with length=scheduled_reports|length total=total_oois %}Showing {{ length }} scheduled reports{% endblocktranslate %}
+                <p>
+                    {% translate "On this page you can see all the reports that are or have been scheduled. To schedule a report, select a start date and recurrence while generating a report." %}
                 </p>
                 {% include "report_overview/scheduled_reports_table.html" %}
                 {% include "partials/list_paginator.html" %}
