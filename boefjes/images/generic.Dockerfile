@@ -30,6 +30,13 @@ COPY boefjes/plugins/kat_service_banner boefjes/plugins/kat_service_banner
 COPY boefjes/plugins/kat_shodan boefjes/plugins/kat_shodan
 COPY boefjes/plugins/kat_webpage_analysis boefjes/plugins/kat_webpage_analysis
 COPY boefjes/plugins/pdio_subfinder boefjes/plugins/pdio_subfinder
+COPY boefjes/plugins/kat_adr_finding_types boefjes/plugins/kat_adr_finding_types
+COPY boefjes/plugins/kat_cve_finding_types boefjes/plugins/kat_cve_finding_types
+COPY boefjes/plugins/kat_cwe_finding_types boefjes/plugins/kat_cwe_finding_types
+COPY boefjes/plugins/kat_kat_finding_types boefjes/plugins/kat_kat_finding_types
+COPY boefjes/plugins/kat_retirejs_finding_types boefjes/plugins/kat_retirejs_finding_types
+COPY boefjes/plugins/kat_snyk_finding_types boefjes/plugins/kat_snyk_finding_types
+
 
 
 RUN find ./boefjes -name 'requirements.txt' -execdir sh -c "cat {} && echo" \; | sort -u > /tmp/boefjes-requirements.txt
