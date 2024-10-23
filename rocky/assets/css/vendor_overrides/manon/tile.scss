@@ -46,6 +46,27 @@ ul.tiles {
 
   &.plugins {
     gap: 1.25rem;
+
+    .dropdown {
+      max-width: 100%;
+      border: none;
+      padding: 0;
+
+      .dropdown-list {
+        li {
+          padding: 0.5rem;
+          font-size: var(--tile-font-size);
+        }
+      }
+
+      button {
+        color: var(--colors-blue-600);
+        border: none;
+        border-radius: 0;
+        padding: 0.25rem 0 1rem;
+        font-size: var(--tile-font-size);
+      }
+    }
   }
 
   @extend %tile-style-overrides;
@@ -80,4 +101,12 @@ ul.tiles {
   flex-direction: row;
   flex-wrap: wrap;
   gap: 0.5rem;
+  border: 0;
+  padding: 0;
+
+  p {
+    vertical-align: middle;
+    color: var(--colors-blue-600);
+    padding-left: 0;
+  }
 }

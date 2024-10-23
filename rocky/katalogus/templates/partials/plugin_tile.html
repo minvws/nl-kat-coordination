@@ -30,18 +30,32 @@
         {% endif %}
         <span class="plugin-author-link de-emphasized"><a target="_blank" href="https://openkat.nl" rel="noopener noreferrer">OpenKAT</a></span>
         {% if show_report_types %}
-            <div class="tags">
-                <p>
-                    <strong>{% translate "Required for:" %}</strong>
-                </p>
-                {% for plugin_id, report_types in plugin_report_types.items %}
-                    {% if plugin_id == plugin.id %}
-                        {% for report_type in report_types %}
-                            <span class="label tags-color-{{ report_type.label_style }}">{{ report_type.name }}</span>
-                        {% endfor %}
+            {% for plugin_id, report_types in plugin_report_types.items %}
+                {% if plugin_id == plugin.id %}
+                    {% if report_types|length >= 2 %}
+                        <div class="dropdown">
+                            <button class="dropdown-button ghost">
+                                {% translate "Required for" %} {{ report_types|length }} {% translate "report types" %}
+                                <span aria-hidden="true" class="icon ti-chevron-right"></span>
+                            </button>
+                            <div aria-expanded="false" class="dropdown-list">
+                                <ul>
+                                    {% for report_type in report_types %}<li>{{ report_type.name }}</li>{% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="tags">
+                            <p>
+                                <strong>{% translate "Required for: " %}</strong>
+                            </p>
+                            {% for report_type in report_types %}
+                                <span class="label tags-color-{{ report_type.label_style }}">{{ report_type.name }}</span>
+                            {% endfor %}
+                        </div>
                     {% endif %}
-                {% endfor %}
-            </div>
+                {% endif %}
+            {% endfor %}
         {% endif %}
         {% if not remove_action_buttons %}
             <div class="action-buttons">
