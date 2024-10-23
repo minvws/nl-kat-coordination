@@ -56,3 +56,6 @@ def test_ooi_edit_report_recipe_post(rf, client_member, mock_organization_view_o
     response = OOIEditView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 302
+
+    response_url = "/en/{}/objects/detail/?ooi_id=ReportRecipe%7C{}"
+    assert response.url == response_url.format(client_member.organization.code, report_recipe.recipe_id)
