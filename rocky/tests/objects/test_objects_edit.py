@@ -1,3 +1,5 @@
+import json
+
 from django.urls import reverse
 from pytest_django.asserts import assertContains
 
@@ -27,7 +29,7 @@ def test_ooi_edit_report_recipe_get(rf, client_member, mock_organization_view_oc
     assertContains(response, "Edit ReportRecipe: " + ooi_id)
 
 
-def test_ooi_edit_report_recipe_post(rf, client_member, mock_organization_view_octopoes, report_recipe):
+def test_ooi_edit_report_recipe_post(rf, client_member, mock_organization_view_octopoes, report_recipe, mock_scheduler):
     mock_organization_view_octopoes().get.return_value = report_recipe
     ooi_id = f"ReportRecipe|{report_recipe.recipe_id}"
 
@@ -44,15 +46,13 @@ def test_ooi_edit_report_recipe_post(rf, client_member, mock_organization_view_o
                 "recipe_id": report_recipe.recipe_id,
                 "report_name_format": report_recipe.report_name_format,
                 "subreport_name_format": report_recipe.subreport_name_format,
-                "input_recipe": report_recipe.input_recipe,
-                "report_types": report_recipe.report_types,
+                "input_recipe": json.dumps(report_recipe.input_recipe),
+                "report_types": json.dumps(report_recipe.report_types),
                 "cron_expression": report_recipe.cron_expression,
             },
         ),
         client_member.user,
     )
     response = OOIEditView.as_view()(request, organization_code=client_member.organization.code)
-    response.render()
-    print(response.content)
 
     assert response.status_code == 302
