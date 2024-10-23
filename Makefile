@@ -12,12 +12,15 @@ UNAME := $(shell uname)
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
+# We can't really return an error here, so if settings-doc fails we delete the
+# file which will result in sphinx-build returning an error later on
 define build-settings-doc
 	echo "# $(4)" > docs/source/installation-and-deployment/environment-settings/$(3).md
 	DOCS=True PYTHONPATH=./$(1) settings-doc generate \
 	-f markdown -m $(2) \
 	--templates docs/settings-doc-templates \
-	>> docs/source/installation-and-deployment/environment-settings/$(3).md
+	>> docs/source/installation-and-deployment/environment-settings/$(3).md \
+	|| rm docs/source/installation-and-deployment/environment-settings/$(3).md
 endef
 
 
