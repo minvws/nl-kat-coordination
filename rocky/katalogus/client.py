@@ -148,12 +148,13 @@ def verify_response(response: Response) -> None:
     try:
         response.raise_for_status()
     except HTTPStatusError as error:
+        response.read()
+
         if error.response.status_code == codes.BAD_REQUEST and "duplicate key" in error.response.text:
             raise DuplicatePluginError("Duplicate plugin name") from error
 
-        error_message = json.loads(error.response.text).get("detail")
-
-        if error.response.status_code == codes.BAD_REQUEST and "Duplicate plugin" in error_message:
+        if error.response.status_code == codes.BAD_REQUEST and "Duplicate plugin" in error.response.text:
+            error_message = json.loads(error.response.text).get("detail")
             raise DuplicatePluginError(error_message) from error
 
         if error.response.status_code in [codes.FORBIDDEN, codes.NOT_FOUND]:
@@ -172,7 +173,12 @@ class KATalogusClient:
         return ServiceHealth.model_validate_json(response.content)
 
     def organization_exists(self, organization_code: str) -> bool:
-        return self.session.get(f"/v1/organisations/{organization_code}").status_code != 404
+        try:
+            self.session.get(f"/v1/organisations/{organization_code}")
+        except KATalogusNotAllowedError:
+            return False
+
+        return True
 
     def create_organization(self, organization):
         self.session.post("/v1/organisations/", json={"id": organization.code, "name": organization.name})

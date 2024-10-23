@@ -318,7 +318,7 @@ class TestKatalogusCloneSettings(APIViewTest, UsesPostMethod, Returns200):
 
     def test_it_clones_settings(self, mock_katalogus, organization, organization_b):
         mock_katalogus().clone_all_configuration_to_organization.assert_called_once_with(
-            organization.pk, organization_b.code
+            organization.code, organization_b.code
         )
 
 

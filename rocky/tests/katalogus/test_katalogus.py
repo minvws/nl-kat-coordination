@@ -1,7 +1,7 @@
 import pytest
 from django.core.exceptions import PermissionDenied
 from django.urls import resolve
-from katalogus.client import KATalogusClient, parse_plugin, valid_organization_code, valid_plugin_id
+from katalogus.client import KATalogus, KATalogusClient, parse_plugin, valid_organization_code, valid_plugin_id
 from katalogus.views.katalogus import AboutPluginsView, BoefjeListView, KATalogusView, NormalizerListView
 from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
 from katalogus.views.plugin_enable_disable import PluginEnableDisableView
@@ -244,13 +244,10 @@ def test_katalogus_clone_settings_not_accessible_without_perms(
         )
 
 
-def test_katalogus_client_organization_not_exists(mocker):
-    mock_requests = mocker.patch("katalogus.client.httpx")
-    mock_requests.Client().get().status_code = 404
+def test_katalogus_client_organization_not_exists(httpx_mock):
+    httpx_mock.add_response(status_code=404)
 
-    client = KATalogusClient("test")
-
-    assert client.organization_exists("test") is False
+    assert KATalogusClient("http://test").organization_exists("test") is False
 
 
 def test_katalogus_client_organization_exists(mocker):
@@ -264,7 +261,7 @@ def test_katalogus_client_organization_exists(mocker):
 
 def test_katalogus_client_invalid_organization():
     with pytest.raises(ValueError):
-        KATalogusClient("test")
+        KATalogus(KATalogusClient("test"), "test$$$1123")
 
 
 def test_katalogus_client(httpx_mock):
