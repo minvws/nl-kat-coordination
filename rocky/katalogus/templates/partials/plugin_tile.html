@@ -34,11 +34,13 @@
                 {% if plugin_id == plugin.id %}
                     {% if report_types|length >= 2 %}
                         <div class="dropdown">
-                            <button class="dropdown-button ghost">
+                            <button aria-controls="plugin-report-types"
+                                    aria-expanded="false"
+                                    class="dropdown-button ghost">
                                 {% translate "Required for" %} {{ report_types|length }} {% translate "report types" %}
                                 <span aria-hidden="true" class="icon ti-chevron-right"></span>
                             </button>
-                            <div aria-expanded="false" class="dropdown-list">
+                            <div class="dropdown-list" id="plugin-report-types">
                                 <ul>
                                     {% for report_type in report_types %}<li>{{ report_type.name }}</li>{% endfor %}
                                 </ul>
