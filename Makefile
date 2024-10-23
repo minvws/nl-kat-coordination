@@ -117,7 +117,7 @@ docs:
 	$(call build-settings-doc,bytes,bytes.config,bytes,Bytes)
 	$(call build-settings-doc,mula/scheduler,config.settings,mula,Mula)
 
-	PYTHONPATH=$(PYTHONPATH):boefjes/:bytes/:keiko/:mula/:octopoes/ sphinx-build -b html docs/source docs/_build
+	PYTHONPATH=$(PYTHONPATH):boefjes/:bytes/:keiko/:mula/:octopoes/ sphinx-build -b html --fail-on-warning docs/source docs/_build
 
 
 poetry-dependencies:
