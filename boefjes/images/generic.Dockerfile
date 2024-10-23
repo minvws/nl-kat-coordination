@@ -1,8 +1,13 @@
 FROM python:3.11-slim
 
-ENV PATH=/home/nonroot/.local/bin:${PATH}
 WORKDIR /app
 RUN adduser --disabled-password --gecos '' nonroot
+
+ENV PATH=/home/nonroot/.local/bin:${PATH}
+ENV OPENKAT_CACHE_PATH=/home/nonroot/openkat_cache
+RUN mkdir "$OPENKAT_CACHE_PATH" && chown nonroot: "$OPENKAT_CACHE_PATH"
+
+VOLUME /home/nonroot/openkat_cache
 
 COPY boefjes/plugins/kat_dns boefjes/plugins/kat_dns
 COPY boefjes/plugins/kat_snyk boefjes/plugins/kat_snyk
@@ -19,12 +24,13 @@ COPY boefjes/plugins/kat_fierce boefjes/plugins/kat_fierce
 COPY boefjes/plugins/kat_green_hosting boefjes/plugins/kat_green_hosting
 COPY boefjes/plugins/kat_leakix boefjes/plugins/kat_leakix
 COPY boefjes/plugins/kat_rdns boefjes/plugins/kat_rdns
+COPY boefjes/plugins/kat_rpki boefjes/plugins/kat_rpki
 COPY boefjes/plugins/kat_security_txt_downloader boefjes/plugins/kat_security_txt_downloader
 COPY boefjes/plugins/kat_service_banner boefjes/plugins/kat_service_banner
 COPY boefjes/plugins/kat_shodan boefjes/plugins/kat_shodan
 COPY boefjes/plugins/kat_webpage_analysis boefjes/plugins/kat_webpage_analysis
 COPY boefjes/plugins/pdio_subfinder boefjes/plugins/pdio_subfinder
-# TODO: etc.
+
 
 RUN find ./boefjes -name 'requirements.txt' -execdir sh -c "cat {} && echo" \; | sort -u > /tmp/boefjes-requirements.txt
 

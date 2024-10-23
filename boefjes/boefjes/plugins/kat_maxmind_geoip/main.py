@@ -15,6 +15,11 @@ import requests
 from boefjes.job_models import BoefjeMeta
 
 BASE_PATH = Path(getenv("OPENKAT_CACHE_PATH", Path(__file__).parent))
+
+if BASE_PATH.name != Path(__file__).parent.name:
+    BASE_PATH = BASE_PATH / Path(__file__).parent.name
+    BASE_PATH.mkdir(exist_ok=True)
+
 GEOIP_PATH_PATTERN = r"GeoLite2-City_\d+/GeoLite2-City.mmdb"
 GEOIP_META_PATH = BASE_PATH / "geoip-meta.json"
 GEOIP_SOURCE_URL = "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz"

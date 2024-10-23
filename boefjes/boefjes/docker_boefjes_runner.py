@@ -15,6 +15,9 @@ logger = structlog.get_logger(__name__)
 
 
 class DockerBoefjesRunner:
+    CACHE_VOLUME_NAME = "openkat_cache"
+    CACHE_VOLUME_TARGET = "/home/nonroot/openkat_cache"
+
     def __init__(self, boefje_resource: Boefje, boefje_meta: BoefjeMeta):
         self.boefje_resource = boefje_resource
         self.boefje_meta = boefje_meta
@@ -46,6 +49,7 @@ class DockerBoefjesRunner:
                 stderr=True,
                 remove=True,
                 network=settings.docker_network,
+                volumes=[f"{self.CACHE_VOLUME_NAME}:{self.CACHE_VOLUME_TARGET}"],
             )
 
             task = self.scheduler_client.get_task(task_id)
