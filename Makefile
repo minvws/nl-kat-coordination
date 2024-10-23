@@ -12,12 +12,14 @@ UNAME := $(shell uname)
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
+# We can't really return an error here, so if settings-doc fails we delete the
+# file which will result in sphinx-build returning an error later on
 define build-settings-doc
 	echo "# $(4)" > docs/source/installation-and-deployment/environment-settings/$(3).md
 	DOCS=True PYTHONPATH=./$(1) settings-doc generate \
 	-f markdown -m $(2) \
 	--templates docs/settings-doc-templates \
-	>> docs/source/installation-and-deployment/environment-settings/$(3).md
+	>> docs/source/installation-and-deployment/environment-settings/$(3).md || exit 1
 endef
 
 
@@ -114,7 +116,12 @@ docs:
 	$(call build-settings-doc,bytes,bytes.config,bytes,Bytes)
 	$(call build-settings-doc,mula/scheduler,config.settings,mula,Mula)
 
-	PYTHONPATH=$(PYTHONPATH):boefjes/:bytes/:keiko/:mula/:octopoes/ sphinx-build -b html docs/source docs/_build
+	curl -sL -o docs/source/_static/mermaid.min.js https://cdn.jsdelivr.net/npm/mermaid@11.3.0/dist/mermaid.min.js
+	curl -sL -o docs/source/_static/d3.min.js https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js
+	echo "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539  docs/source/_static/d3.min.js" | sha256sum --quiet --check || exit 1
+	echo "0d2b6f2361e7e0ce466a6ed458e03daa5584b42ef6926c3beb62eb64670ca261  docs/source/_static/mermaid.min.js" | sha256sum --quiet --check || exit 1
+
+	PYTHONPATH=$(PYTHONPATH):boefjes/:bytes/:keiko/:mula/:octopoes/ sphinx-build -b html --fail-on-warning docs/source docs/_build
 
 
 poetry-dependencies:
