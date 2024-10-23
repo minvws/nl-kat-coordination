@@ -1,10 +1,32 @@
+{% load i18n %}
+
 {% component "modal" size="dialog-large" modal_id="rename-modal" %}
 {% fill "header" %}
-Rename
+{% translate "Rename" %}
 {% endfill %}
 {% fill "content" %}
-<form id="rename-form" method="post">
+<h3>{% translate "Rename the following report(s):" %}</h3>
+<form id="rename-form" class="inline layout-wide" method="post">
     {% csrf_token %}
+    <table id="rename-table">
+        <thead>
+            <tr>
+                <th>{% translate "Report type" %}</th>
+                <th>{% translate "Name" %}</th>
+                <th>{% translate "Reference date" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="rename-table-row">
+                <td class="type"></td>
+                <td class="name">
+                    <input type="text" name="report_name" class="report-name-input">
+                    <input type="hidden" name="report_reference" class="report-reference-input">
+                </td>
+                <td class="date"></td>
+            </tr>
+        </tbody>
+    </table>
 </form>
 {% endfill %}
 {% fill "footer_buttons" %}
