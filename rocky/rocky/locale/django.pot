@@ -4175,6 +4175,10 @@ msgstr ""
 msgid "Show report details"
 msgstr ""
 
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Edit report recipe"
+msgstr ""
+
 #: reports/templates/report_overview/subreports.html
 #, python-format
 msgid "Showing %(length)s of %(total)s subreports"
