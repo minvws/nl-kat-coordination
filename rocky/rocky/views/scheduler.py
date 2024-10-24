@@ -42,22 +42,6 @@ def get_date_time(date: str | None) -> datetime | None:
     return None
 
 
-def get_requirements_from_ooi(ooi: OOI | None) -> list[str]:
-    if ooi is None:
-        return []
-    requirements: list[str] = []
-    if ooi.network:
-        requirements.append(ooi.network)
-
-        ooi_type = ooi.get_object_type()
-        if ooi_type == "IPAddressV4":
-            requirements.append("ipv4")
-        elif ooi_type == "IPAddressV6":
-            requirements.append("ipv6")
-
-    return requirements
-
-
 class SchedulerView(OctopoesView):
     task_type: str
 
@@ -245,7 +229,6 @@ class SchedulerView(OctopoesView):
                 boefje=SchedulerBoefje.model_validate(katalogus_boefje.model_dump()),
                 input_ooi=ooi.reference if ooi else None,
                 organization=self.organization.code,
-                requirements=get_requirements_from_ooi(ooi),
             )
 
             new_task = Task(priority=1, data=boefje_task, scheduler_id=f"boefje-{self.organization.code}")

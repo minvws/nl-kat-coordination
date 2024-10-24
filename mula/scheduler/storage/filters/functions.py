@@ -20,7 +20,6 @@ def apply_filter(entity, query: Query, filter_request: FilterRequest) -> Query:
     Returns:
         A filtered SQLAlchemy query.
     """
-
     if not isinstance(filter_request.filters, dict):
         raise FilterError("Filter request must be a dict")
 

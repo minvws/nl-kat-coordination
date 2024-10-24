@@ -83,7 +83,6 @@ class BoefjeTask(BaseModel):
     boefje: Boefje
     input_ooi: str | None = None
     organization: str
-    requirements: list[str]
 
 
 class ReportTask(BaseModel):
