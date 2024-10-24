@@ -265,7 +265,7 @@ having been implemented in these PRs:
 - https://github.com/minvws/nl-kat-coordination/pull/2709
 - https://github.com/minvws/nl-kat-coordination/pull/2832
 
-#### Summary of decisions
+### Summary of decisions
 
 We decided not to focus on the following:
 
