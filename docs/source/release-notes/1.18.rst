@@ -16,7 +16,7 @@ Upgrading
 Debian packages
 ---------------
 
-If you are using the :ref:`Scripts` we provide to install/upgrade OpenKAT you
+If you are using the :doc:`/installation-and-deployment/scripts` we provide to install/upgrade OpenKAT you
 need to get the latest version that includes the kat-rocky-worker service.
 
 Full Changelog

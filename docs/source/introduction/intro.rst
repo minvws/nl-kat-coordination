@@ -37,14 +37,14 @@ The nicest playground for OpenKAT is a situation where many systems are active. 
 Where do I start with OpenKAT?
 ==============================
 
-The documentation explains how the system works and what the main principles are. This gives an impression, but after reading the documentation, trying it yourself is the best way to find out how OpenKAT works. There are `several options to install OpenKAT <https://docs.openkat.nl/installation_and_deployment/index.html>`_.
+The documentation explains how the system works and what the main principles are. This gives an impression, but after reading the documentation, trying it yourself is the best way to find out how OpenKAT works. There are :doc:`/installation-and-deployment/index`
 
-The easiest way to get to know the system is a local installation. If you don't have a debian or ubuntu machine (yet), try the Gitpod test environment. `The installation chapter <https://docs.openkat.nl/installation_and_deployment/index.html>`_ has a comprehensive roadmap for creating a local installation. In addition to the documentation, read `the readme from the general repository <https://github.com/minvws/nl-kat-coordination>`_.
+The easiest way to get to know the system is a local installation. If you don't have a debian or ubuntu machine (yet), try the Gitpod test environment. :doc:`/installation-and-deployment/install` has a comprehensive roadmap for creating a local installation. In addition to the documentation, read `the readme from the general repository <https://github.com/minvws/nl-kat-coordination>`_.
 
 Where is the software located?
 ==============================
 
-OpenKAT consists of separate modules that each perform a specific task. All modules are located in the `NL-KAT-Coordination <https://github.com/minvws/nl-kat-coordination>`_ repository. The :ref:`Modules of OpenKAT<modules>` section of the documentation goes into detail on each of these modules.
+OpenKAT consists of separate modules that each perform a specific task. All modules are located in the `NL-KAT-Coordination <https://github.com/minvws/nl-kat-coordination>`_ repository. The :doc:`/modules/modules` section of the documentation goes into detail on each of these modules.
 
 Responsible disclosure
 ======================
