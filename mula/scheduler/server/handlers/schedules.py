@@ -4,7 +4,6 @@ from typing import Any
 
 import fastapi
 import structlog
-from fastapi import status
 
 from scheduler import context, models, schedulers
 from scheduler.server import serializers, utils

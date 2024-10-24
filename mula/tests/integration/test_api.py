@@ -7,9 +7,9 @@ from unittest import mock
 from urllib.parse import quote
 
 from fastapi.testclient import TestClient
-
 from scheduler import config, models, server, storage, utils
 from scheduler.server import serializers
+
 from tests.factories import OrganisationFactory
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
@@ -87,12 +87,13 @@ class APITestCase(APITemplateTestCase):
     def test_patch_scheduler_attr_not_found(self):
         response = self.client.patch(f"/schedulers/{self.scheduler.scheduler_id}", json={"not_found": "not found"})
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {"detail": "no data to patch"})
+        self.assertEqual(response.json(), {"detail": "Bad request error occurred: no data to patch"})
 
     def test_patch_scheduler_not_found(self):
-        response = self.client.patch(f"/schedulers/{uuid.uuid4()}", json={"enabled": False})
+        mock_id = uuid.uuid4()
+        response = self.client.patch(f"/schedulers/{mock_id}", json={"enabled": False})
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.json(), {"detail": "scheduler not found"})
+        self.assertEqual(response.json(), {"detail": f"Resource not found: Scheduler {mock_id} not found"})
 
     def test_patch_scheduler_disable(self):
         self.assertTrue(self.scheduler.is_enabled())
@@ -221,10 +222,7 @@ class APITestCase(APITemplateTestCase):
         # The queue should still have one item
         self.assertEqual(response.status_code, 409)
         self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(
-            response.json(),
-            {"detail": "Item already on queue, we're not allowed to replace the item that is already on the queue."},
-        )
+        self.assertEqual(response.json(), {"detail": "Conflict error occurred: queue is not allowed to push items"})
 
     def test_push_replace_allowed(self):
         # Set queue to not allow duplicates
@@ -268,11 +266,7 @@ class APITestCase(APITemplateTestCase):
         # The queue should still have one item
         self.assertEqual(response.status_code, 409)
         self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(
-            response.json().get("detail"),
-            "Item already on queue, and item changed, we're not allowed to "
-            "update the item that is already on the queue.",
-        )
+        self.assertEqual(response.json(), {"detail": "Conflict error occurred: queue is not allowed to push items"})
 
     def test_push_updates_allowed(self):
         # Set queue to allow updates
@@ -321,11 +315,7 @@ class APITestCase(APITemplateTestCase):
         # The queue should still have one item
         self.assertEqual(response.status_code, 409)
         self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(
-            response.json().get("detail"),
-            "Item already on queue, and priority changed, we're not allowed to "
-            "update the priority of the item that is already on the queue.",
-        )
+        self.assertEqual(response.json(), {"detail": "Conflict error occurred: queue is not allowed to push items"})
 
     def test_update_priority_higher(self):
         """When updating the priority of the initial item on the priority queue
@@ -397,9 +387,10 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
     def test_pop_queue_not_found(self):
-        response = self.client.post(f"/queues/{uuid.uuid4()}/pop")
+        mock_id = uuid.uuid4()
+        response = self.client.post(f"/queues/{mock_id}/pop")
         self.assertEqual(404, response.status_code)
-        self.assertEqual({"detail": "scheduler not found, by queue id"}, response.json())
+        self.assertEqual({"detail": f"Resource not found: queue not found, by queue_id: {mock_id}"}, response.json())
 
     def test_pop_queue_filters(self):
         # Add one task to the queue
@@ -431,7 +422,9 @@ class APITestCase(APITemplateTestCase):
             json={"filters": [{"column": "data", "field": "id", "operator": "eq", "value": "123"}]},
         )
         self.assertEqual(404, response.status_code)
-        self.assertEqual({"detail": "could not pop item from queue, check your filters"}, response.json())
+        self.assertEqual(
+            response.json(), {"detail": "Resource not found: could not pop item from queue, check your filters"}
+        )
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Should get the second item
@@ -478,7 +471,9 @@ class APITestCase(APITemplateTestCase):
         )
 
         self.assertEqual(404, response.status_code)
-        self.assertEqual({"detail": "could not pop item from queue, check your filters"}, response.json())
+        self.assertEqual(
+            response.json(), {"detail": "Resource not found: could not pop item from queue, check your filters"}
+        )
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Should get the second item
@@ -595,9 +590,10 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         self.assertIn("Input should be a valid UUID", str(response.content))
 
     def test_get_task_not_found(self):
-        response = self.client.get(f"/tasks/{uuid.uuid4()}")
+        mock_id = uuid.uuid4()
+        response = self.client.get(f"/tasks/{mock_id}")
         self.assertEqual(404, response.status_code)
-        self.assertEqual({"detail": "task not found"}, response.json())
+        self.assertEqual({"detail": f"Resource not found: task not found, by task_id: {mock_id}"}, response.json())
 
     def test_get_tasks_min_and_max_created_at(self):
         # Get tasks based on datetime, both min_created_at and max_created_at, should return 2 items
@@ -655,7 +651,9 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         }
         response = self.client.get("/tasks", params=params)
         self.assertEqual(400, response.status_code)
-        self.assertEqual({"detail": "min_date must be less than max_date"}, response.json())
+        self.assertEqual(
+            {"detail": "Bad request error occurred: min_created_at must be less than max_created_at"}, response.json()
+        )
 
     def test_get_tasks_min_created_at_future(self):
         # Get tasks based on datetime for something in the future, should return 0 items
@@ -702,19 +700,20 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         # Patch a task with empty body
         response = self.client.patch(f"/tasks/{self.first_item_api.get('id')}", json={})
         self.assertEqual(400, response.status_code)
-        self.assertEqual({"detail": "no data to patch"}, response.json())
+        self.assertEqual({"detail": "Bad request error occurred: no data to patch"}, response.json())
 
     def test_patch_task_invalid_content(self):
         # Patch a task with invalid content
         response = self.client.patch(f"/tasks/{self.first_item_api.get('id')}", json={"invalid": "invalid"})
         self.assertEqual(400, response.status_code)
-        self.assertEqual({"detail": "no data to patch"}, response.json())
+        self.assertEqual({"detail": "Bad request error occurred: no data to patch"}, response.json())
 
     def test_patch_task_not_found(self):
         # Patch a task that does not exist
-        response = self.client.patch(f"/tasks/{uuid.uuid4()}", json={"status": "completed"})
+        mock_id = uuid.uuid4()
+        response = self.client.patch(f"/tasks/{mock_id}", json={"status": "completed"})
         self.assertEqual(404, response.status_code)
-        self.assertEqual({"detail": "task not found"}, response.json())
+        self.assertEqual({"detail": f"Resource not found: task not found, by task_id: {mock_id}"}, response.json())
 
     def test_patch_task_malformed_id(self):
         # Patch a task with malformed id
@@ -834,7 +833,9 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
             f"/schedules?min_deadline_at={quote(self.second_schedule.deadline_at.isoformat())}&max_deadline_at={quote(self.first_schedule.deadline_at.isoformat())}"
         )
         self.assertEqual(400, response.status_code)
-        self.assertEqual("min_deadline_at must be less than max_deadline_at", response.json().get("detail"))
+        self.assertEqual(
+            response.json(), {"detail": "Bad request error occurred: min_deadline_at must be less than max_deadline_at"}
+        )
 
     def test_list_schedules_hash(self):
         response = self.client.get(f"/schedules?schedule_hash={self.first_schedule.hash}")
@@ -914,7 +915,7 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
             "/schedules", json={"scheduler_id": "invalid", "schedule": "*/5 * * * *", "data": item.data}
         )
         self.assertEqual(400, response.status_code)
-        self.assertIn("scheduler not found", response.json().get("detail"))
+        self.assertEqual({"detail": "Bad request error occurred: Scheduler invalid not found"}, response.json())
 
     def test_post_schedule_invalid_data(self):
         item = functions.create_item(self.scheduler.scheduler_id, 1)

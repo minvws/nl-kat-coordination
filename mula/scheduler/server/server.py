@@ -3,7 +3,7 @@ import pydantic
 import structlog
 import uvicorn
 
-from scheduler import context, schedulers, storage
+from scheduler import context, schedulers
 
 from . import errors, handlers
 

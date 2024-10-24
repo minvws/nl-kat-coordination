@@ -8,7 +8,7 @@ from fastapi import status
 
 from scheduler import context, models, storage
 from scheduler.server import serializers, utils
-from scheduler.server.errors import BadRequestError, NotFoundError, ValidationError
+from scheduler.server.errors import BadRequestError, NotFoundError
 
 
 class TaskAPI:
