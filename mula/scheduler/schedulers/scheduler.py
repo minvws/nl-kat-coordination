@@ -192,8 +192,6 @@ class Scheduler(abc.ABC):
         self.push_item_to_queue(item)
 
     def _hydrate_task_for_queue(self, hydrated_task: models.Task):
-        self.logger.info("SOUF Hydrating task: %s", hydrated_task.model_dump_json())
-
         hydrated_task.status = models.TaskStatus.QUEUED
 
         if hydrated_task.type is None:
@@ -221,6 +219,10 @@ class Scheduler(abc.ABC):
                 elif ooi.object_type == "IPAddressV6":
                     requirements.append("ipv6")
                 hydrated_task.data["requirements"] = requirements
+        else:
+            # If the task is not of type boefje, we add the type of task to the requirements
+            # e.g. normalizers get "normalizer"
+            hydrated_task.data["requirements"] = [hydrated_task.type]
 
         return hydrated_task
 

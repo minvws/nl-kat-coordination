@@ -274,15 +274,17 @@ def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_leve
     item_handler: Handler
     if queue is WorkerManager.Queue.BOEFJES:
         item_handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), plugin_service, bytes_api_client)
+        capabilities = settings.boefje_task_capabilities
     else:
         item_handler = NormalizerHandler(
             LocalNormalizerJobRunner(local_repository), bytes_api_client, settings.scan_profile_whitelist
         )
+        capabilities = [WorkerManager.Queue.NORMALIZERS.value]
 
     return SchedulerWorkerManager(
         item_handler,
         SchedulerAPIClient(
-            base_url=str(settings.scheduler_api), task_capabilities=settings.task_capabilities
+            base_url=str(settings.scheduler_api), task_capabilities=capabilities
         ),  # Do not share a session between workers
         settings,
         log_level,

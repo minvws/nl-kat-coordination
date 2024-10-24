@@ -120,7 +120,7 @@ class Settings(BaseSettings):
         None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
     )
 
-    task_capabilities: list[str] = Field(
+    boefje_task_capabilities: list[str] = Field(
         ["Network|internet", "ipv6", "ipv4"],
         description="List of networks the boefje ",
         examples=[
