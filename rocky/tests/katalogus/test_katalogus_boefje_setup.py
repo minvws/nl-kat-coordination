@@ -22,7 +22,7 @@ def test_boefje_setup(rf, superuser_member):
 
 
 def test_boefje_variant_setup(rf, superuser_member, boefje_dns_records, mocker):
-    katalogus_mocker = mocker.patch("katalogus.client.KATalogusClientV1")()
+    katalogus_mocker = mocker.patch("katalogus.client.KATalogusClient")()
     katalogus_mocker.get_plugin.return_value = boefje_dns_records
     request = setup_request(rf.get("boefje_variant_setup"), superuser_member.user)
     response = AddBoefjeVariantView.as_view()(
@@ -43,7 +43,7 @@ def test_boefje_variant_setup(rf, superuser_member, boefje_dns_records, mocker):
 
 
 def test_edit_boefje_view(rf, superuser_member, boefje_dns_records, mocker):
-    katalogus_mocker = mocker.patch("katalogus.client.KATalogusClientV1")()
+    katalogus_mocker = mocker.patch("katalogus.client.KATalogusClient")()
     katalogus_mocker.get_plugin.return_value = boefje_dns_records
     request = setup_request(rf.get("edit_boefje"), superuser_member.user)
     response = EditBoefjeView.as_view()(

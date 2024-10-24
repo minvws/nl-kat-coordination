@@ -30,7 +30,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     @action(detail=True, permission_classes=[])
     def indemnification(self, request, pk=None):
         # DRF does not support different arguments when mapping POST/GET of the
-        # same endpoind to a different method, so we can't use the
+        # same endpoint to a different method, so we can't use the
         # permission_classes argument here.
         if not request.user.has_perm("tools.view_organization"):
             raise PermissionDenied()

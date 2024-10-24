@@ -5,4 +5,6 @@ from octopoes.models import OOI
 
 
 def get_enabled_boefjes_for_ooi_class(ooi_class: type[OOI], organization: Organization) -> list[Boefje]:
-    return [boefje for boefje in get_katalogus(organization.code).get_enabled_boefjes() if ooi_class in boefje.consumes]
+    katalogus = get_katalogus(organization.code)
+
+    return [boefje for boefje in katalogus.get_enabled_boefjes() if ooi_class in boefje.consumes]

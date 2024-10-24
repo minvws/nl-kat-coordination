@@ -12,7 +12,7 @@ from httpx import HTTPError
 from pydantic import TypeAdapter
 
 from octopoes.config.settings import QUEUE_NAME_OCTOPOES, Settings
-from octopoes.connector.katalogus import KATalogusClientV1
+from octopoes.connector.katalogus import KATalogusClient
 from octopoes.core.app import bootstrap_octopoes, close_rabbit_channel, get_xtdb_client
 from octopoes.events.events import DBEvent, DBEventType
 from octopoes.events.manager import get_rabbit_channel
@@ -80,7 +80,7 @@ def handle_event(event: dict):
 @app.task(queue=QUEUE_NAME_OCTOPOES)
 def schedule_scan_profile_recalculations():
     try:
-        orgs = KATalogusClientV1(str(settings.katalogus_api)).get_organisations()
+        orgs = KATalogusClient(str(settings.katalogus_api)).get_organisations()
     except HTTPError:
         logger.exception("Failed getting organizations")
         raise

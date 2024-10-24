@@ -90,7 +90,7 @@ def create_user(django_user_model, email, password, name, device_name, superuser
 
 
 def create_organization(name, organization_code):
-    katalogus_client = "katalogus.client.KATalogusClientV1"
+    katalogus_client = "katalogus.client.KATalogusClient"
     octopoes_node = "tools.models.OctopoesAPIConnector"
     with patch(katalogus_client), patch(octopoes_node):
         return Organization.objects.create(name=name, code=organization_code)
@@ -308,7 +308,7 @@ def blocked_member(django_user_model, organization):
 
 @pytest.fixture
 def mock_models_katalogus(mocker):
-    return mocker.patch("tools.models.get_katalogus")
+    return mocker.patch("tools.models.get_katalogus_client")
 
 
 @pytest.fixture
@@ -1015,7 +1015,7 @@ def tree_data_tls_findings_and_suites():
 
 
 @pytest.fixture
-def plugin_details():
+def plugin_details(plugin_schema):
     return parse_plugin(
         {
             "id": "test-boefje",
@@ -1027,7 +1027,7 @@ def plugin_details():
             "consumes": ["Network"],
             "produces": ["Network"],
             "enabled": True,
-            "boefje_schema": {},
+            "boefje_schema": plugin_schema,
             "oci_image": None,
             "oci_arguments": ["-test", "-arg"],
         }
@@ -1035,7 +1035,7 @@ def plugin_details():
 
 
 @pytest.fixture
-def plugin_details_with_container():
+def plugin_details_with_container(plugin_schema):
     return parse_plugin(
         {
             "id": "test-boefje",
@@ -1047,7 +1047,7 @@ def plugin_details_with_container():
             "consumes": ["Network"],
             "produces": ["Network"],
             "enabled": True,
-            "boefje_schema": {},
+            "boefje_schema": plugin_schema,
             "oci_image": "ghcr.io/test/image:123",
             "oci_arguments": ["-test", "-arg"],
         }
@@ -1353,7 +1353,7 @@ def mock_mixins_katalogus(mocker):
 
 @pytest.fixture()
 def mock_katalogus_client(mocker):
-    return mocker.patch("katalogus.client.KATalogusClientV1")
+    return mocker.patch("katalogus.client.KATalogusClient")
 
 
 @pytest.fixture

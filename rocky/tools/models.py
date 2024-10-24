@@ -13,7 +13,7 @@ from django.db.models.signals import post_save, pre_save
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from httpx import HTTPError
-from katalogus.client import KATalogusClientV1, get_katalogus
+from katalogus.client import KATalogusClient, get_katalogus_client
 from katalogus.exceptions import KATalogusDownException, KATalogusException, KATalogusUnhealthyException
 
 from octopoes.api.models import Declaration
@@ -113,7 +113,7 @@ class Organization(models.Model):
         return reverse("organization_settings", args=[self.pk])
 
     def delete(self, *args, **kwargs):
-        katalogus_client = self._get_healthy_katalogus(self.code)
+        katalogus_client = self._get_healthy_katalogus()
         octopoes_client = self._get_healthy_octopoes(self.code)
 
         try:
@@ -122,7 +122,7 @@ class Organization(models.Model):
             raise OctopoesException("Failed deleting organization in Octopoes") from e
 
         try:
-            katalogus_client.delete_organization()
+            katalogus_client.delete_organization(self.code)
         except Exception as e:
             try:
                 octopoes_client.create_node()
@@ -147,12 +147,12 @@ class Organization(models.Model):
     @classmethod
     def pre_create(cls, sender, instance, *args, **kwargs):
         instance.clean()
-        katalogus_client = cls._get_healthy_katalogus(instance.code)
+        katalogus_client = cls._get_healthy_katalogus()
         octopoes_client = cls._get_healthy_octopoes(instance.code)
 
         try:
-            if not katalogus_client.organization_exists():
-                katalogus_client.create_organization(instance.name)
+            if not katalogus_client.organization_exists(instance.code):
+                katalogus_client.create_organization(instance)
         except Exception as e:
             raise KATalogusException("Failed creating organization in the Katalogus") from e
 
@@ -160,7 +160,7 @@ class Organization(models.Model):
             octopoes_client.create_node()
         except Exception as e:
             try:
-                katalogus_client.delete_organization()
+                katalogus_client.delete_organization(instance.code)
             except Exception as second_exception:
                 raise KATalogusException("Failed deleting organization in the Katalogus") from second_exception
 
@@ -177,8 +177,8 @@ class Organization(models.Model):
             logger.exception("Could not seed internet for organization %s", sender)
 
     @staticmethod
-    def _get_healthy_katalogus(organization_code: str) -> KATalogusClientV1:
-        katalogus_client = get_katalogus(organization_code)
+    def _get_healthy_katalogus() -> KATalogusClient:
+        katalogus_client = get_katalogus_client()
 
         try:
             health = katalogus_client.health()
