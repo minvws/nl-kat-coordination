@@ -77,14 +77,16 @@ class Boefje(Plugin):
 
     @field_validator("boefje_schema")
     @classmethod
-    def json_schema_valid(cls, schema: dict) -> dict:
-        if schema is not None:
-            try:
-                Draft202012Validator.check_schema(schema)
-            except SchemaError as e:
-                raise ValueError("The schema field is not a valid JSON schema") from e
+    def json_schema_valid(cls, boefje_schema: dict) -> dict | None:
+        if boefje_schema is None:
+            return None
 
-        return schema
+        try:
+            Draft202012Validator.check_schema(boefje_schema)
+        except SchemaError as e:
+            raise ValueError("The schema field is not a valid JSON schema") from e
+
+        return boefje_schema
 
     def can_scan(self, member) -> bool:
         return super().can_scan(member) and member.has_clearance_level(self.scan_level.value)
