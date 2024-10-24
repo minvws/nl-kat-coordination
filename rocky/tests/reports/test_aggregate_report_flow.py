@@ -200,7 +200,7 @@ def test_save_aggregate_report_view(
     mock_bytes_client,
 ):
     """
-    Will send data through post to aggregate report.
+    Will send data through post to aggregate report and immediately creates a report (not scheduled).
     """
 
     katalogus_mocker = mocker.patch("reports.views.base.get_katalogus")()
@@ -247,7 +247,7 @@ def test_save_aggregate_report_view_scheduled(
     mock_bytes_client,
 ):
     """
-    Will send data through post to aggregate report.
+    Will send data through post to aggregate report and creates a scheduled aggregate report.
     """
 
     katalogus_mocker = mocker.patch("reports.views.base.get_katalogus")()
@@ -256,7 +256,7 @@ def test_save_aggregate_report_view_scheduled(
     rocky_health_mocker = mocker.patch("reports.report_types.aggregate_organisation_report.report.get_rocky_health")()
     rocky_health_mocker.return_value = rocky_health
 
-    mock_bytes_client().upload_raw.return_value = "Report|e821aaeb-a6bd-427f-b064-e46837911a5d"
+    mock_bytes_client().upload_raw.return_value = "Report|1730b72f-b115-412e-ad44-dae6ab3edff9"
 
     mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
         count=len(listed_hostnames), items=listed_hostnames
@@ -268,11 +268,11 @@ def test_save_aggregate_report_view_scheduled(
             {
                 "observed_at": valid_time.strftime("%Y-%m-%d"),
                 "ooi": listed_hostnames,
-                "report_type": ["systems-report", "dns-report"],
+                "report_type": ["systems-report", "vulnerability-report"],
                 "choose_recurrence": "repeat",
                 "start_date": "2024-01-01",
-                "recurrence": "daily",
-                "parent_report_name": ["Testing a new name for Aggregate Report"],
+                "recurrence": "weekly",
+                "parent_report_name": ["Scheduled Aggregate Report %x"],
             },
         ),
         client_member.user,
