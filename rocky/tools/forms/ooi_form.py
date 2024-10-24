@@ -6,7 +6,7 @@ from typing import Any, Literal, Union, get_args, get_origin
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from pydantic import AnyUrl, JsonValue
+from pydantic import AnyUrl
 from pydantic.fields import FieldInfo
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -70,13 +70,7 @@ class OOIForm(BaseRockyForm):
                 fields[name] = generate_ip_field(field)
             elif annotation == AnyUrl:
                 fields[name] = generate_url_field(field)
-            elif (
-                annotation == dict
-                or annotation == dict[str, str]
-                or annotation == list[str]
-                or annotation == dict[str, JsonValue]
-                or annotation == dict[str, Any]
-            ):
+            elif annotation == dict or annotation == list[str] or annotation == dict[str, Any]:
                 fields[name] = forms.JSONField(**default_attrs)
             elif annotation == int or (hasattr(annotation, "__args__") and int in annotation.__args__):
                 fields[name] = forms.IntegerField(**default_attrs)
