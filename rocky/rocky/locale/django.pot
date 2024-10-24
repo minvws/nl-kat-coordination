@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-16 14:17+0000\n"
+"POT-Creation-Date: 2024-10-23 12:12+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1081,7 +1081,15 @@ msgid "Add"
 msgstr ""
 
 #: katalogus/templates/partials/plugin_tile.html
-msgid "Required for:"
+msgid "Required for"
+msgstr ""
+
+#: katalogus/templates/partials/plugin_tile.html
+msgid "report types"
+msgstr ""
+
+#: katalogus/templates/partials/plugin_tile.html
+msgid "Required for: "
 msgstr ""
 
 #: katalogus/templates/partials/plugin_tile_modal.html
