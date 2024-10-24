@@ -2,29 +2,48 @@ const dropdowns = document.querySelectorAll(".dropdown");
 
 dropdowns.forEach((dropdown) => {
   const dropdownButton = dropdown.querySelector(".dropdown-button");
-  const dropdownList = dropdown.querySelector(".dropdown-list");
 
-  const toggle = () => {
-    if (dropdownList.getAttribute("aria-expanded") == "true") {
-      closeDropdown();
+  const toggle = (e) => {
+    const activeButton = document.querySelector(
+      ".dropdown-button[aria-expanded='true']",
+    );
+    const isOpen = dropdownButton.getAttribute("aria-expanded") === "true";
+    const dropdownList = document.getElementById(
+      dropdownButton.getAttribute("aria-controls"),
+    );
+
+    if (activeButton && activeButton !== dropdownButton) {
+      const activeList = document.getElementById(
+        activeButton.getAttribute("aria-controls"),
+      );
+      activeButton.setAttribute("aria-expanded", "false");
+      activeList.classList.remove("open");
+    }
+
+    if (isOpen) {
+      dropdownButton.setAttribute("aria-expanded", "false");
+      dropdownList.classList.remove("open");
     } else {
-      dropdownList.setAttribute("aria-expanded", "true");
-      document.addEventListener("click", handleClose);
-    }
-  };
-
-  const handleClose = (event) => {
-    if (event.target == dropdownButton) {
-      return;
+      dropdownButton.setAttribute("aria-expanded", "true");
+      dropdownList.classList.add("open");
     }
 
-    closeDropdown();
+    e.stopPropagation();
   };
 
-  const closeDropdown = () => {
-    document.removeEventListener("click", handleClose);
-    dropdownList.setAttribute("aria-expanded", "false");
-  };
+  dropdownButton.addEventListener("click", toggle);
+});
 
-  dropdownButton.addEventListener("click", () => toggle());
+document.addEventListener("click", () => {
+  const activeButton = document.querySelector(
+    ".dropdown-button[aria-expanded='true']",
+  );
+
+  if (activeButton) {
+    const activeList = document.getElementById(
+      activeButton.getAttribute("aria-controls"),
+    );
+    activeButton.setAttribute("aria-expanded", "false");
+    activeList.classList.remove("open");
+  }
 });
