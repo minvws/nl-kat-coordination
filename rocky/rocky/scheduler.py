@@ -151,6 +151,7 @@ class ScheduleRequest(BaseModel):
     scheduler_id: str
     data: dict
     schedule: str
+    deadline_at: str
 
 
 class ScheduleResponse(BaseModel):
