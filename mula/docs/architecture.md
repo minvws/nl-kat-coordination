@@ -8,12 +8,12 @@ designed to be extensible, such that you're able to create your own rules for
 the population, scheduling, and prioritization of tasks.
 
 In the implementation of the scheduler within OpenKAT is tasked with
-scheduling and populating the priority queues of 'boefje', 'normalizer' and 
-`report` tasks. 
+scheduling and populating the priority queues of 'boefje', 'normalizer' and
+`report` tasks.
 
 Because of the use of a priority queue we can differentiate between tasks that
 are to be executed first, e.g. tasks created by the user get precedence over
-tasks that are created by the internal rescheduling processes within the 
+tasks that are created by the internal rescheduling processes within the
 scheduler.
 
 In this document we will outline how the scheduler operates within KAT, how
