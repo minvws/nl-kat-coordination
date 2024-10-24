@@ -4,6 +4,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.helpers import get_ooi_types_from_aggregate_report
@@ -69,7 +70,7 @@ class OOISelectionAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggr
 
 
 class ReportTypesSelectionAggregateReportView(
-    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportTypeSelectionView
+    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportTypeSelectionView, TemplateView
 ):
     """
     Shows all possible report types from a list of Objects.

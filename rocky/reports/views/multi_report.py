@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Any
 
-from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -63,11 +62,6 @@ class OOISelectionMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportV
     current_step = 1
     ooi_types = MultiOrganizationReport.input_ooi_types
 
-    def get(self, request, *args, **kwargs):
-        if not self.get_ooi_selection():
-            messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
-        return self.get(request, *args, **kwargs)
-
 
 class ReportTypesSelectionMultiReportView(
     MultiReportStepsMixin, BreadcrumbsMultiReportView, OOISelectionView, ReportTypeSelectionView
@@ -81,12 +75,7 @@ class ReportTypesSelectionMultiReportView(
     breadcrumbs_step = 4
     current_step = 2
     report_type = MultiOrganizationReport
-
-    def get(self, request, *args, **kwargs):
-        if not self.get_ooi_selection():
-            messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
-            return redirect(self.get_previous())
-        return self.get(request, *args, **kwargs)
+    ooi_types = MultiOrganizationReport.input_ooi_types
 
 
 class SetupScanMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView, ReportPluginView):
@@ -97,11 +86,7 @@ class SetupScanMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView
     template_name = "generate_report/setup_scan.html"
     breadcrumbs_step = 5
     current_step = 3
-
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if self.all_plugins_enabled():
-            return redirect(self.get_next())
-        return super().get(request, *args, **kwargs)
+    ooi_types = MultiOrganizationReport.input_ooi_types
 
 
 class ExportSetupMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView, ReportFinalSettingsView):
@@ -113,13 +98,7 @@ class ExportSetupMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportVi
     breadcrumbs_step = 6
     current_step = 4
     report_type = MultiOrganizationReport
-
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.get_report_type_ids():
-            messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
-            return redirect(self.get_previous())
-
-        return super().get(request, *args, **kwargs)
+    ooi_types = MultiOrganizationReport.input_ooi_types
 
 
 class MultiReportView(BreadcrumbsMultiReportView, ReportPluginView):
@@ -129,6 +108,7 @@ class MultiReportView(BreadcrumbsMultiReportView, ReportPluginView):
 
     template_name = "multi_report.html"
     current_step = 5
+    ooi_types = MultiOrganizationReport.input_ooi_types
 
     def multi_reports_for_oois(self) -> dict[str, dict[str, Any]]:
         report = MultiOrganizationReport(self.octopoes_api_connector)
