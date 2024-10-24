@@ -23,7 +23,11 @@
                            title="{% translate "Shows report details" %}">{{ subreport.name }}</a>
                     </td>
                     <td>
-                        <span class="label tags-color-{{ subreport.report_type|get_report_type_label_style }}">{{ subreport.report_type|get_report_type_name }}</span>
+                        <ul class="tags horizontal-view">
+                            <li class="label tags-color-{{ subreport.report_type|get_report_type_label_style }}">
+                                {{ subreport.report_type|get_report_type_name }}
+                            </li>
+                        </ul>
                     </td>
                     <td>
                         <a href="{% ooi_url "ooi_detail" subreport.input_oois.0 organization.code %}">{{ subreport.input_oois.0|human_readable }}</a>

@@ -28,9 +28,7 @@ MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought t
 logger = structlog.get_logger(__name__)
 
 bytes_api_client = BytesAPIClient(
-    str(settings.bytes_api),
-    username=settings.bytes_username,
-    password=settings.bytes_password,
+    str(settings.bytes_api), username=settings.bytes_username, password=settings.bytes_password
 )
 
 
@@ -42,8 +40,7 @@ def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None
     try:
         katalogus_api = str(settings.katalogus_api).rstrip("/")
         response = httpx.get(
-            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings",
-            timeout=30,
+            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings", timeout=30
         )
         response.raise_for_status()
     except HTTPError:
@@ -76,12 +73,7 @@ def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None
 
 
 class BoefjeHandler(Handler):
-    def __init__(
-        self,
-        job_runner: BoefjeJobRunner,
-        plugin_service: PluginService,
-        bytes_client: BytesAPIClient,
-    ):
+    def __init__(self, job_runner: BoefjeJobRunner, plugin_service: PluginService, bytes_client: BytesAPIClient):
         self.job_runner = job_runner
         self.plugin_service = plugin_service
         self.bytes_client = bytes_client
@@ -111,8 +103,14 @@ class BoefjeHandler(Handler):
                 ooi = get_octopoes_api_connector(boefje_meta.organization).get(
                     reference, valid_time=datetime.now(timezone.utc)
                 )
-            except ObjectNotFoundException as e:
-                raise ObjectNotFoundException(f"Object {reference} not found in Octopoes") from e
+            except ObjectNotFoundException:
+                logger.info(
+                    "Can't run boefje because OOI does not exist anymore",
+                    boefje_id=boefje_meta.boefje.id,
+                    ooi=reference,
+                    task_id=boefje_meta.id,
+                )
+                return
 
             boefje_meta.arguments["input"] = ooi.serialize()
 

@@ -20,14 +20,16 @@
             {% include "summary/report_asset_overview.html" %}
 
             {% for ooi, report in report_data.items %}
-                {% for report_type,data in report.items %}
-                    <section>
-                        <div>
-                            <h2>{{ data.report_name }}</h2>
-                            {% include data.template with data=data.data %}
+                {% for report_type, data in report.items %}
+                    {% if data.report_name %}
+                        <section>
+                            <div>
+                                <h2>{{ data.report_name }}</h2>
+                                {% include data.template with data=data.data %}
 
-                        </div>
-                    </section>
+                            </div>
+                        </section>
+                    {% endif %}
                 {% endfor %}
             {% endfor %}
         </main>

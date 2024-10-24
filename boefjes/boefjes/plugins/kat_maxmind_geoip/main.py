@@ -38,13 +38,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     with maxminddb.open_database(geoip_path) as reader:
         results = reader.get(input_["address"])
 
-    return [
-        ({"maxmind-geoip/geo_data"}, json.dumps(results)),
-        (
-            {"maxmind-geoip/cache-meta"},
-            json.dumps(geoip_meta),
-        ),
-    ]
+    return [({"maxmind-geoip/geo_data"}, json.dumps(results)), ({"maxmind-geoip/cache-meta"}, json.dumps(geoip_meta))]
 
 
 def create_hash(data: bytes, algo: str) -> str:

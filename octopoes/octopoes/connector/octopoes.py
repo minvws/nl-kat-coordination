@@ -95,8 +95,7 @@ class OctopoesAPIConnector:
 
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
         res = self.session.get(
-            f"/{self.client}/object",
-            params={"reference": str(reference), "valid_time": str(valid_time)},
+            f"/{self.client}/object", params={"reference": str(reference), "valid_time": str(valid_time)}
         )
         return TypeAdapter(OOIType).validate_json(res.content)
 
@@ -125,11 +124,7 @@ class OctopoesAPIConnector:
         return TypeAdapter(list[TransactionRecord]).validate_json(res.content)
 
     def get_tree(
-        self,
-        reference: Reference,
-        valid_time: datetime,
-        types: Set = frozenset(),
-        depth: int = 1,
+        self, reference: Reference, valid_time: datetime, types: Set = frozenset(), depth: int = 1
     ) -> ReferenceTree:
         params: dict[str, str | int | list[str]] = {
             "reference": str(reference),
@@ -162,18 +157,12 @@ class OctopoesAPIConnector:
             "origin_type": str(origin_type.value) if origin_type else None,
         }
         params = {k: v for k, v in params.items() if v is not None}  # filter out None values
-        res = self.session.get(
-            f"/{self.client}/origins",
-            params=params,
-        )
+        res = self.session.get(f"/{self.client}/origins", params=params)
 
         return TypeAdapter(list[Origin]).validate_json(res.content)
 
     def delete_origin(self, origin_id: str, valid_time: datetime) -> None:
-        params = {
-            "valid_time": str(valid_time),
-            "origin_id": origin_id,
-        }
+        params = {"valid_time": str(valid_time), "origin_id": origin_id}
 
         self.session.delete(f"/{self.client}/origins", params=params)
 
@@ -289,32 +278,20 @@ class OctopoesAPIConnector:
         return TypeAdapter(Paginated[Finding]).validate_json(res.content)
 
     def list_reports(
-        self,
-        valid_time: datetime,
-        offset: int = DEFAULT_OFFSET,
-        limit: int = DEFAULT_LIMIT,
-    ) -> Paginated[Report]:
-        params: dict[str, str | int | list[str]] = {
-            "valid_time": str(valid_time),
-            "offset": offset,
-            "limit": limit,
-        }
+        self, valid_time: datetime, offset: int = DEFAULT_OFFSET, limit: int = DEFAULT_LIMIT
+    ) -> Paginated[tuple[Report, list[Report | None]]]:
+        params: dict[str, str | int | list[str]] = {"valid_time": str(valid_time), "offset": offset, "limit": limit}
         res = self.session.get(f"/{self.client}/reports", params=params)
 
         return TypeAdapter(Paginated[tuple[Report, list[Report | None]]]).validate_json(res.content)
 
-    def get_report(
-        self,
-        report_id: str,
-    ) -> Report:
+    def get_report(self, report_id: str) -> Report:
         res = self.session.get(f"/{self.client}/reports/{report_id}")
 
         return TypeAdapter(Report).validate_json(res.content)
 
     def load_objects_bulk(self, references: set[Reference], valid_time):
-        params = {
-            "valid_time": valid_time,
-        }
+        params = {"valid_time": valid_time}
         res = self.session.post(
             f"/{self.client}/objects/load_bulk", params=params, json=[str(ref) for ref in references]
         )
@@ -346,19 +323,12 @@ class OctopoesAPIConnector:
         ]
 
     def query_many(
-        self,
-        path: str,
-        valid_time: datetime,
-        sources: Sequence[OOI | Reference | str],
+        self, path: str, valid_time: datetime, sources: Sequence[OOI | Reference | str]
     ) -> list[tuple[str, OOIType]]:
         if not sources:
             return []
 
-        params = {
-            "path": path,
-            "sources": [str(ooi) for ooi in sources],
-            "valid_time": str(valid_time),
-        }
+        params = {"path": path, "sources": [str(ooi) for ooi in sources], "valid_time": str(valid_time)}
 
         result = self.session.get(f"/{self.client}/query-many", params=params).json()
 

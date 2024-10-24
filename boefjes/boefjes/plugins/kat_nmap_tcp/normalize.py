@@ -28,10 +28,7 @@ def get_ip_ports_and_service(host: NmapHost, network: Network, netblock: Referen
                 continue
 
             ip_port = IPPort(
-                address=ip.reference,
-                protocol=Protocol(protocol),
-                port=port,
-                state=PortState(service.state),
+                address=ip.reference, protocol=Protocol(protocol), port=port, state=PortState(service.state)
             )
             yield ip_port
 

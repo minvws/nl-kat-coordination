@@ -24,17 +24,7 @@ def build_nmap_arguments(ip_range: IPv6Network | IPv4Network, top_ports: int, pr
     if not TOP_PORTS_MIN <= top_ports <= TOP_PORTS_MAX:
         raise ValueError(f"{TOP_PORTS_MIN} <= TOP_PORTS: {top_ports} <= {TOP_PORTS_MAX} is invalid.")
 
-    args = [
-        "nmap",
-        "--open",
-        "-T4",
-        "-Pn",
-        "-r",
-        "-v10",
-        f"-s{protocol_str}",
-        "--top-ports",
-        str(top_ports),
-    ]
+    args = ["nmap", "--open", "-T4", "-Pn", "-r", "-v10", f"-s{protocol_str}", "--top-ports", str(top_ports)]
     if ip_range.version == 6:
         args.append("-6")
     args.extend(["-oX", "-", str(ip_range)])
@@ -53,11 +43,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
         min_mask = int(getenv("MIN_VLSM_IPV6", 118))
 
     if ip_range.prefixlen < min_mask:
-        logging.info(
-            "Minimum expected VLSM %d > %d, skipping this range.",
-            min_mask,
-            ip_range.prefixlen,
-        )
+        logging.info("Minimum expected VLSM %d > %d, skipping this range.", min_mask, ip_range.prefixlen)
         return [({"info/boefje"}, "Skipping range due to unaccepted VSLM.")]
 
     top_ports_tcp = int(getenv("TOP_PORTS_TCP", 250))

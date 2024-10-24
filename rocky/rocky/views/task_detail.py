@@ -41,17 +41,11 @@ class BoefjeTaskDetailView(TaskDetailView):
         context = super().get_context_data(**kwargs)
 
         context["breadcrumbs"] = [
-            {
-                "url": reverse("task_list", kwargs={"organization_code": self.organization.code}),
-                "text": _("Tasks"),
-            },
+            {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")},
             {
                 "url": reverse(
                     "boefje_task_view",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "task_id": context["task_id"],
-                    },
+                    kwargs={"organization_code": self.organization.code, "task_id": context["task_id"]},
                 ),
                 "text": context["task"].data.boefje.id,
             },
@@ -61,6 +55,7 @@ class BoefjeTaskDetailView(TaskDetailView):
 
 
 class NormalizerTaskJSONView(TaskDetailView):
+    task_type = "normalizer"
     plugin_type = "normalizer"
 
     def get(self, request, *args, **kwargs) -> JsonResponse | HttpResponse:

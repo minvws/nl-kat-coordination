@@ -20,9 +20,7 @@ def test_report_history_one_subreports_one_input_objects(
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("report_history", kwargs=kwargs)
 
-    request = rf.get(
-        url,
-    )
+    request = rf.get(url)
     request.resolver_match = resolve(url)
 
     setup_request(request, client_member.user)
@@ -67,9 +65,7 @@ def test_report_history_less_than_five_subreports_two_input_objects(
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("report_history", kwargs=kwargs)
 
-    request = rf.get(
-        url,
-    )
+    request = rf.get(url)
     request.resolver_match = resolve(url)
 
     setup_request(request, client_member.user)
@@ -126,9 +122,7 @@ def test_report_history_more_than_five_subreports_one_input_object(
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("report_history", kwargs=kwargs)
 
-    request = rf.get(
-        url,
-    )
+    request = rf.get(url)
     request.resolver_match = resolve(url)
 
     setup_request(request, client_member.user)

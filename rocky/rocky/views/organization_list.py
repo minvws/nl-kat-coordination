@@ -9,16 +9,16 @@ from django.db.models import Count
 from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
+from structlog import get_logger
 from tools.models import Organization
 from tools.view_helpers import OrganizationBreadcrumbsMixin
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 
+logger = get_logger(__name__)
 
-class OrganizationListView(
-    OrganizationBreadcrumbsMixin,
-    ListView,
-):
+
+class OrganizationListView(OrganizationBreadcrumbsMixin, ListView):
     template_name = "organizations/organization_list.html"
 
     def get_queryset(self) -> list[Organization]:
@@ -40,6 +40,7 @@ class OrganizationListView(
             start_time = datetime.now()
             for organization in organizations:
                 try:
+                    logger.info("Recalculating bits", event_code=920000, organization_code=organization.code)
                     number_of_bits += OctopoesAPIConnector(settings.OCTOPOES_API, organization.code).recalculate_bits()
                 except Exception as exc:
                     failed.append(f"{organization}, ({str(exc)})")
@@ -50,11 +51,7 @@ class OrganizationListView(
             message += f" Duration: {duration}."
             if failed:
                 message += f"\nFailed for {n_failed} organisations: {', '.join(failed)}"
-            messages.add_message(
-                request,
-                messages.INFO,
-                _(message),
-            )
+            messages.add_message(request, messages.INFO, _(message))
             return self.get(request, *args, **kwargs)
         else:
             raise HttpResponseBadRequest("Unknown action")

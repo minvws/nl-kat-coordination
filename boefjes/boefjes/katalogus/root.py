@@ -74,34 +74,22 @@ app.include_router(router, prefix="/v1")
 
 @app.exception_handler(NotFound)
 def entity_not_found_handler(request: Request, exc: NotFound):
-    return JSONResponse(
-        status_code=status.HTTP_404_NOT_FOUND,
-        content={"message": exc.message},
-    )
+    return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"message": exc.message})
 
 
 @app.exception_handler(NotAllowed)
 def not_allowed_handler(request: Request, exc: NotAllowed):
-    return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        content={"message": exc.message},
-    )
+    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"message": exc.message})
 
 
 @app.exception_handler(IntegrityError)
 def integrity_error_handler(request: Request, exc: IntegrityError):
-    return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        content={"message": exc.message},
-    )
+    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"message": exc.message})
 
 
 @app.exception_handler(StorageError)
 def storage_error_handler(request: Request, exc: StorageError):
-    return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"message": exc.message},
-    )
+    return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"message": exc.message})
 
 
 class ServiceHealth(BaseModel):

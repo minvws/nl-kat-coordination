@@ -15,6 +15,7 @@ from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import NXDOMAIN, DNSARecord
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, KATFindingType
+from octopoes.models.ooi.monitoring import Application
 from octopoes.models.ooi.network import IPAddressV4, Network
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.origin import Origin, OriginType
@@ -47,11 +48,7 @@ def test_hostname_nxd_ooi(octopoes_api_connector: OctopoesAPIConnector, valid_ti
     nxd = NXDOMAIN(hostname=hostname.reference)
     octopoes_api_connector.save_observation(
         Observation(
-            method="normalizer_id",
-            source=hostname.reference,
-            task_id=uuid.uuid4(),
-            valid_time=valid_time,
-            result=[nxd],
+            method="normalizer_id", source=hostname.reference, task_id=uuid.uuid4(), valid_time=valid_time, result=[nxd]
         )
     )
     octopoes_api_connector.recalculate_bits()
@@ -464,12 +461,7 @@ def test_affirming_ooi_delete(octopoes_api_connector: OctopoesAPIConnector, vali
 
     # Affirm object B
     octopoes_api_connector.save_affirmation(
-        Affirmation(
-            ooi=hostname,
-            source_method=None,
-            task_id=uuid.uuid4(),
-            valid_time=valid_time,
-        )
+        Affirmation(ooi=hostname, source_method=None, task_id=uuid.uuid4(), valid_time=valid_time)
     )
     time.sleep(1)
 
@@ -512,12 +504,7 @@ def test_delecration_ooi_delete(octopoes_api_connector: OctopoesAPIConnector, va
 
     # Infer object B
     octopoes_api_connector.save_declaration(
-        Declaration(
-            ooi=hostname,
-            source_method=None,
-            task_id=uuid.uuid4(),
-            valid_time=valid_time,
-        )
+        Declaration(ooi=hostname, source_method=None, task_id=uuid.uuid4(), valid_time=valid_time)
     )
     time.sleep(1)
 
@@ -525,3 +512,75 @@ def test_delecration_ooi_delete(octopoes_api_connector: OctopoesAPIConnector, va
     octopoes_api_connector.delete(network.reference, valid_time)
     time.sleep(1)
     assert octopoes_api_connector.list_objects({Hostname}, valid_time).count == 1
+
+
+def test_dangling_affirmation_delete(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
+    app = Application(name="Acme")
+
+    xtdb_octopoes_service.ooi_repository.save(app, valid_time)
+    time.sleep(1)
+
+    declaration = Origin(
+        origin_type=OriginType.DECLARATION,
+        method="",
+        source=app.reference,
+        result=[app.reference],
+        task_id=uuid.uuid4(),
+    )
+
+    xtdb_octopoes_service.save_origin(declaration, [app], valid_time)
+    time.sleep(1)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+    time.sleep(1)
+
+    assert xtdb_octopoes_service.list_ooi({Application}, valid_time).count == 1
+    assert (
+        len(
+            xtdb_octopoes_service.origin_repository.list_origins(
+                origin_type=OriginType.DECLARATION, valid_time=valid_time
+            )
+        )
+        == 1
+    )
+
+    xtdb_octopoes_service.origin_repository.delete(declaration, valid_time)
+    time.sleep(1)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+    time.sleep(1)
+
+    assert xtdb_octopoes_service.list_ooi({Application}, valid_time).count == 0
+    assert (
+        len(
+            xtdb_octopoes_service.origin_repository.list_origins(
+                origin_type=OriginType.DECLARATION, valid_time=valid_time
+            )
+        )
+        == 0
+    )
+
+    xtdb_octopoes_service.ooi_repository.save(app, valid_time)
+    xtdb_octopoes_service.commit()
+    time.sleep(1)
+
+    affirmation = Origin(
+        origin_type=OriginType.AFFIRMATION,
+        method="",
+        source=app.reference,
+        result=[app.reference],
+        task_id=uuid.uuid4(),
+    )
+
+    xtdb_octopoes_service.save_origin(affirmation, [app], valid_time)
+    time.sleep(1)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+    time.sleep(1)
+
+    assert xtdb_octopoes_service.list_ooi({Application}, valid_time).count == 0
+    assert (
+        len(
+            xtdb_octopoes_service.origin_repository.list_origins(
+                origin_type=OriginType.AFFIRMATION, valid_time=valid_time
+            )
+        )
+        == 0
+    )

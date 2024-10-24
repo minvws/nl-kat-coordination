@@ -11,7 +11,7 @@
         <section>
             <div>
                 <h1>{% translate "Edit organization" %} {{ organization.name }}</h1>
-                <form method="post" class="horizontal-view help">
+                <form method="post" class="help">
                     {% csrf_token %}
                     <fieldset>
                         {% for field in form %}

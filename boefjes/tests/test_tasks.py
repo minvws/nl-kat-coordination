@@ -20,30 +20,10 @@ from boefjes.sql.plugin_storage import create_plugin_storage
 from tests.loading import get_dummy_data
 
 boefjes = [
-    Boefje(
-        id="test-boefje-1",
-        name="test-boefje-1",
-        consumes={"SomeOOI"},
-        produces=["test-boef-1", "test/text"],
-    ),
-    Boefje(
-        id="test-boefje-2",
-        name="test-boefje-2",
-        consumes={"SomeOOI"},
-        produces=["test-boef-2", "test/text"],
-    ),
-    Boefje(
-        id="test-boefje-3",
-        name="test-boefje-3",
-        consumes={"SomeOOI"},
-        produces=["test-boef-3", "test/plain"],
-    ),
-    Boefje(
-        id="test-boefje-4",
-        name="test-boefje-4",
-        consumes={"SomeOOI"},
-        produces=["test-boef-4", "test/and-simple"],
-    ),
+    Boefje(id="test-boefje-1", name="test-boefje-1", consumes={"SomeOOI"}, produces=["test-boef-1", "test/text"]),
+    Boefje(id="test-boefje-2", name="test-boefje-2", consumes={"SomeOOI"}, produces=["test-boef-2", "test/text"]),
+    Boefje(id="test-boefje-3", name="test-boefje-3", consumes={"SomeOOI"}, produces=["test-boef-3", "test/plain"]),
+    Boefje(id="test-boefje-4", name="test-boefje-4", consumes={"SomeOOI"}, produces=["test-boef-4", "test/and-simple"]),
 ]
 normalizers = [
     Normalizer(
@@ -52,28 +32,11 @@ normalizers = [
         consumes=["test-boef-3", "test/text"],
         produces=["SomeOOI", "OtherOOI"],
     ),
-    Normalizer(
-        id="test-normalizer-2",
-        name="test-normalizer-2",
-        consumes=["test/text"],
-        produces=["SomeOtherOOI"],
-    ),
+    Normalizer(id="test-normalizer-2", name="test-normalizer-2", consumes=["test/text"], produces=["SomeOtherOOI"]),
 ]
 bits = [
-    Bit(
-        id="test-bit-1",
-        name="test-bit-1",
-        consumes="SomeOOI",
-        produces=["SomeOOI"],
-        parameters=[],
-    ),
-    Bit(
-        id="test-bit-2",
-        name="test-bit-2",
-        consumes="SomeOOI",
-        produces=["SomeOOI", "SomeOtherOOI"],
-        parameters=[],
-    ),
+    Bit(id="test-bit-1", name="test-bit-1", consumes="SomeOOI", produces=["SomeOOI"], parameters=[]),
+    Bit(id="test-bit-2", name="test-bit-2", consumes="SomeOOI", produces=["SomeOOI", "SomeOtherOOI"], parameters=[]),
 ]
 plugins: list[PluginType] = boefjes + normalizers + bits
 sys.path.append(str(Path(__file__).parent))
@@ -106,9 +69,7 @@ def test_handle_boefje_with_exception(mocker):
     mock_session.query.all.return_value = []
 
     plugin_service = PluginService(
-        create_plugin_storage(mock_session),
-        create_config_storage(mock_session),
-        local_repository,
+        create_plugin_storage(mock_session), create_config_storage(mock_session), local_repository
     )
 
     with pytest.raises(RuntimeError):  # Bytes still saves exceptions before they are reraised
@@ -121,10 +82,7 @@ def test_handle_boefje_with_exception(mocker):
     assert raw_call_args[0][0] == UUID("0dca59db-b339-47c4-bcc9-896fc18e2386")
     assert "Traceback (most recent call last)" in raw_call_args[0][1]
     assert "JobRuntimeError: Boefje failed" in raw_call_args[0][1]
-    assert raw_call_args[0][2] == {
-        "error/boefje",
-        "boefje/dummy_boefje_runtime_exception",
-    }
+    assert raw_call_args[0][2] == {"error/boefje", "boefje/dummy_boefje_runtime_exception"}
 
 
 def test_exception_raised_unsupported_return_type_normalizer(mock_normalizer_runner):

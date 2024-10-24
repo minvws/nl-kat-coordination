@@ -3,8 +3,16 @@ name: Build docs artifact for PR
 on:
   pull_request:
     paths:
+      # We generate documentation for boefje, bytes, keiko, mula and octopoes
+      # from code so the workflow should also depend on it.
+      - "boefje/**"
+      - "bytes/**"
       - "docs/**"
+      - "keiko/**"
+      - "mula/**"
+      - "octopoes/**"
       - "requirements.txt"
+      - ".github/workflows/build_docs_on_pr.yml"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:

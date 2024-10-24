@@ -28,8 +28,6 @@ class ReportScheduler(Scheduler):
     ):
         self.logger: structlog.BoundLogger = structlog.get_logger(__name__)
         self.organisation = organisation
-        self.create_schedule = False
-
         self.queue = queue or queues.PriorityQueue(
             pq_id=scheduler_id,
             maxsize=ctx.config.pq_maxsize,
@@ -38,19 +36,12 @@ class ReportScheduler(Scheduler):
             pq_store=ctx.datastores.pq_store,
         )
 
-        super().__init__(
-            ctx=ctx,
-            queue=self.queue,
-            scheduler_id=scheduler_id,
-            callback=callback,
-        )
+        super().__init__(ctx=ctx, queue=self.queue, scheduler_id=scheduler_id, callback=callback, create_schedule=True)
 
     def run(self) -> None:
         # Rescheduling
         self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-reschedule",
-            target=self.push_tasks_for_rescheduling,
-            interval=60.0,
+            name=f"scheduler-{self.scheduler_id}-reschedule", target=self.push_tasks_for_rescheduling, interval=60.0
         )
 
     @tracer.start_as_current_span(name="report_push_tasks_for_rescheduling")
@@ -68,21 +59,9 @@ class ReportScheduler(Scheduler):
             schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
                 filters=filters.FilterRequest(
                     filters=[
-                        filters.Filter(
-                            column="scheduler_id",
-                            operator="eq",
-                            value=self.scheduler_id,
-                        ),
-                        filters.Filter(
-                            column="deadline_at",
-                            operator="lt",
-                            value=datetime.now(timezone.utc),
-                        ),
-                        filters.Filter(
-                            column="enabled",
-                            operator="eq",
-                            value=True,
-                        ),
+                        filters.Filter(column="scheduler_id", operator="eq", value=self.scheduler_id),
+                        filters.Filter(column="deadline_at", operator="lt", value=datetime.now(timezone.utc)),
+                        filters.Filter(column="enabled", operator="eq", value=True),
                     ]
                 )
             )
@@ -101,11 +80,7 @@ class ReportScheduler(Scheduler):
         ) as executor:
             for schedule in schedules:
                 report_task = ReportTask.model_validate(schedule.data)
-                executor.submit(
-                    self.push_report_task,
-                    report_task,
-                    self.push_tasks_for_rescheduling.__name__,
-                )
+                executor.submit(self.push_report_task, report_task, self.push_tasks_for_rescheduling.__name__)
 
     def push_report_task(self, report_task: ReportTask, caller: str = "") -> None:
         self.logger.debug(
@@ -135,10 +110,7 @@ class ReportScheduler(Scheduler):
         )
 
         try:
-            self.push_item_to_queue_with_timeout(
-                task,
-                self.max_tries,
-            )
+            self.push_item_to_queue_with_timeout(task, self.max_tries)
         except queues.QueueFullError:
             self.logger.warning(
                 "Could not add task %s to queue, queue was full",

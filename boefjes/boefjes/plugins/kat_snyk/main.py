@@ -12,11 +12,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     software_name = input_["name"]
     software_version = input_["version"]
 
-    result: dict[str, list[dict]] = {
-        "table_versions": [],
-        "table_vulnerabilities": [],
-        "cve_vulnerabilities": [],
-    }
+    result: dict[str, list[dict]] = {"table_versions": [], "table_vulnerabilities": [], "cve_vulnerabilities": []}
     url_snyk = f"https://snyk.io/vuln/npm:{software_name.lower().replace(' ', '-')}"
     page = requests.get(url_snyk, timeout=30)
     soup = BeautifulSoup(page.content, "html.parser")
@@ -53,10 +49,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 
                     if cve_code.startswith("CVE-"):
                         result["cve_vulnerabilities"].append(
-                            {
-                                "cve_code": cve_code,
-                                "Vuln_text": parsed_info["Vuln_text"],
-                            }
+                            {"cve_code": cve_code, "Vuln_text": parsed_info["Vuln_text"]}
                         )
                     else:
                         result["table_vulnerabilities"].append(parsed_info)

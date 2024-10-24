@@ -132,16 +132,12 @@ class TaskStore:
     def cancel_tasks(self, scheduler_id: str, task_ids: list[str]) -> None:
         with self.dbconn.session.begin() as session:
             session.query(models.TaskDB).filter(
-                models.TaskDB.scheduler_id == scheduler_id,
-                models.TaskDB.id.in_(task_ids),
+                models.TaskDB.scheduler_id == scheduler_id, models.TaskDB.id.in_(task_ids)
             ).update({"status": models.TaskStatus.CANCELLED.name})
 
     @retry()
     @exception_handler
-    def get_status_count_per_hour(
-        self,
-        scheduler_id: str | None = None,
-    ) -> dict[str, dict[str, int]] | None:
+    def get_status_count_per_hour(self, scheduler_id: str | None = None) -> dict[str, dict[str, int]] | None:
         with self.dbconn.session.begin() as session:
             query = (
                 session.query(
@@ -149,9 +145,7 @@ class TaskStore:
                     models.TaskDB.status,
                     func.count(models.TaskDB.id).label("count"),
                 )
-                .filter(
-                    models.TaskDB.modified_at >= datetime.now(timezone.utc) - timedelta(hours=24),
-                )
+                .filter(models.TaskDB.modified_at >= datetime.now(timezone.utc) - timedelta(hours=24))
                 .group_by("hour", models.TaskDB.status)
                 .order_by("hour", models.TaskDB.status)
             )
