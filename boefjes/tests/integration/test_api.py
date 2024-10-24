@@ -17,9 +17,9 @@ def test_get_local_plugin(test_client, organisation):
 
 def test_filter_plugins(test_client, organisation):
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/")
-    assert len(response.json()) == 99
+    assert len(response.json()) == 101
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins?plugin_type=boefje")
-    assert len(response.json()) == 44
+    assert len(response.json()) == 45
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins?limit=10")
     assert len(response.json()) == 10
@@ -62,7 +62,7 @@ def test_add_boefje(test_client, organisation):
     assert response.status_code == 422
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/?plugin_type=boefje")
-    assert len(response.json()) == 45
+    assert len(response.json()) == 46
 
     boefje_dict = boefje.model_dump()
     boefje_dict["consumes"] = list(boefje_dict["consumes"])
@@ -119,7 +119,7 @@ def test_add_normalizer(test_client, organisation):
     assert response.status_code == 201
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/?plugin_type=normalizer")
-    assert len(response.json()) == 56
+    assert len(response.json()) == 57
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/test_normalizer")
     assert response.json() == normalizer.model_dump()
@@ -250,6 +250,11 @@ def test_basic_settings_api(test_client, organisation):
     test_client.delete(f"/v1/organisations/{organisation.id}/{plug}/settings")
     response = test_client.get(f"/v1/organisations/{organisation.id}/{plug}/settings")
     assert response.json() == {}
+
+    nmap_ports = "nmap-ports"
+    response = test_client.put(f"/v1/organisations/{organisation.id}/{nmap_ports}/settings", json={"PORTS": "80"})
+    assert response.status_code == 200
+    assert test_client.get(f"/v1/organisations/{organisation.id}/{nmap_ports}/settings").json() == {"PORTS": "80"}
 
 
 def test_clone_settings(test_client, organisation):

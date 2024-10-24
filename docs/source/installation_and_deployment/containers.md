@@ -100,10 +100,12 @@ By default OpenKAT has an IPv6 subnet configured. This configuration (step 4 and
 
 ## Container commands
 
-We have two container images that are used to run multiple containers. What the container runs is be specified by overriding the CMD of the container.
+We have three container images that are used to run multiple containers. What the container runs is be specified by overriding the CMD of the container.
 
 | Container image | CMD         | Description                                                                       |
 | --------------- | ----------- | --------------------------------------------------------------------------------- |
+| rocky           | web         | Django web application                                                            |
+| rocky           | worker      | Rocky reports runner                                                              |
 | boefjes         | boefje      | Boefjes runtime                                                                   |
 | boefjes         | normalizer  | Normalizers runtime                                                               |
 | boefjes         | katalogus   | Katalogus API                                                                     |

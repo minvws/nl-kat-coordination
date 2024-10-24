@@ -24,8 +24,8 @@ logger = structlog.get_logger("katalogus_client")
 
 
 def valid_plugin_id(plugin_id: str) -> str:
-    # plugin IDs should be valid Python identifiers but may contain dots and dashes
-    if not plugin_id.replace("-", "").replace(".", "").isidentifier():
+    # plugin IDs should alphanumeric, including dashes, underscores and dots.
+    if not plugin_id.replace("-", "").replace("_", "").replace(".", "").isalnum():
         raise ValueError("Plugin ID is not valid")
 
     return plugin_id
@@ -129,7 +129,7 @@ class KATalogusHTTPStatusError(KATalogusError):
 
 
 class KATalogusClientV1:
-    def __init__(self, base_uri: str, organization: str):
+    def __init__(self, base_uri: str, organization: str | None):
         self.session = httpx.Client(base_url=base_uri)
         self.organization = valid_organization_code(organization) if organization else organization
         self.organization_uri = f"/v1/organisations/{organization}"
