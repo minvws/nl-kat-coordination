@@ -1,6 +1,5 @@
 from datetime import datetime, timezone
 
-import structlog
 from django.conf import settings
 from tools.models import Organization
 
@@ -12,8 +11,6 @@ from reports.runner.models import ReportRunner
 from reports.views.mixins import collect_reports, save_report_data
 from rocky.bytes_client import BytesClient
 from rocky.scheduler import ReportTask
-
-logger = structlog.get_logger(__name__)
 
 
 class LocalReportRunner(ReportRunner):
