@@ -191,7 +191,8 @@ class Scheduler(abc.ABC):
 
         self.push_item_to_queue(item)
 
-    def _hydrate_task_for_queue(self, hydrated_task: models.Task):
+    def _hydrate_task_for_queue(self, task: models.Task):
+        hydrated_task = task.model_copy()
         hydrated_task.status = models.TaskStatus.QUEUED
 
         if hydrated_task.type is None:
