@@ -10,12 +10,11 @@
             {{ lang.name_local|title }}
             <span aria-hidden="true" class="icon ti-chevron-down"></span>
         </button>
-        <div class="dropdown-list" id="language-switcher">
-            <ul role="listbox">
-                {% for language in languages %}
-                    {% get_language_info for language as lang %}
-                    <li lang="{{ language }}"
-                        {% if LANGUAGE_CODE == language %}aria-current="true"{% endif %}>
+        <ul id="language-switcher" role="listbox" class="dropdown-list">
+            {% for language in languages %}
+                {% get_language_info for language as lang %}
+                {% if LANGUAGE_CODE != language %}
+                    <li>
                         <a hreflang="{{ language }}"
                            href="#"
                            role="option"
@@ -26,9 +25,9 @@
                             </button>
                         </a>
                     </li>
-                {% endfor %}
-            </ul>
-        </div>
+                {% endif %}
+            {% endfor %}
+        </ul>
     </div>
     <form id="set-language"
           action="{% url "set_language" %}"
