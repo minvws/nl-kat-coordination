@@ -42,7 +42,6 @@ class Server:
         self.api.add_exception_handler(errors.BadRequestError, errors.bad_request_error_handler)
         self.api.add_exception_handler(errors.TooManyRequestsError, errors.too_many_requests_error_handler)
         self.api.add_exception_handler(fastapi.HTTPException, errors.http_error_handler)
-        self.api.add_exception_handler(Exception, errors.exception_handler)
 
         # Set up API endpoints
         handlers.SchedulerAPI(self.api, self.ctx, s)
