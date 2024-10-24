@@ -124,7 +124,7 @@ class BoefjeTask(BaseModel):
 
     dispatches: list[Normalizer] = Field(default_factory=list)
 
-    requirements: list[str] = ["Network|internet"]
+    requirements: list[str] = []
 
     @property
     def hash(self) -> str:

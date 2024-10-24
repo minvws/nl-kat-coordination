@@ -69,7 +69,6 @@ class QueueAPI:
         return models.Queue(**q.dict())
 
     def pop(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
-        self.logger.info(str(filters))
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="queue not found")
@@ -88,8 +87,6 @@ class QueueAPI:
         return models.Task(**p_item.model_dump())
 
     def push(self, queue_id: str, item_in: serializers.Task) -> Any:
-        self.logger.info("SOUF: PUSHING TASK")
-        self.logger.info("SOUF: %s", item_in.model_dump_json())
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="queue not found")

@@ -1,5 +1,4 @@
 import sqlalchemy
-import structlog
 from sqlalchemy.orm.query import Query
 from sqlalchemy.sql.elements import BinaryExpression
 
@@ -21,9 +20,6 @@ def apply_filter(entity, query: Query, filter_request: FilterRequest) -> Query:
     Returns:
         A filtered SQLAlchemy query.
     """
-
-    logger = structlog.getLogger(__name__)
-    logger.info("Applying filters", filter_request=filter_request)
 
     if not isinstance(filter_request.filters, dict):
         raise FilterError("Filter request must be a dict")

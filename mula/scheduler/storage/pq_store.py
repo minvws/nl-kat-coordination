@@ -1,7 +1,5 @@
 from uuid import UUID
 
-import structlog
-
 from scheduler import models
 
 from .errors import exception_handler
@@ -31,11 +29,7 @@ class PriorityQueueStore:
             if filters is not None:
                 query = apply_filter(models.TaskDB, query, filters)
 
-            logger = structlog.getLogger(__name__)
-            logger.info("Filters: ", filters=filters)
-            logger.info("Query: ", query=query)
             item_orm = query.first()
-            logger.info("item_orm: ", item_orm=item_orm)
 
             if item_orm is None:
                 return None
