@@ -12,6 +12,7 @@
     overflow: hidden;
     min-width: 0;
     display: flex;
+    width: 100%;
   }
 
   .dropdown-list {
@@ -29,7 +30,11 @@
     border: 1px solid var(--colors-grey-200);
     background-color: var(--colors-white);
 
-    &[aria-expanded="true"] {
+    ul {
+      margin: 0;
+    }
+
+    &.open {
       display: flex;
       flex-direction: column;
       min-width: 100%;
