@@ -1,4 +1,5 @@
 import abc
+import contextlib
 import random
 import threading
 import time
@@ -190,6 +191,39 @@ class Scheduler(abc.ABC):
 
         self.push_item_to_queue(item)
 
+    def _hydrate_task_for_queue(self, hydrated_task: models.Task):
+        self.logger.info("SOUF Hydrating task: %s", hydrated_task.model_dump_json())
+
+        hydrated_task.status = models.TaskStatus.QUEUED
+
+        if hydrated_task.type is None:
+            hydrated_task.type = self.ITEM_TYPE.type
+
+        # If the task is a boefjetask, set requirements to see where it is supposed to be ran
+        if (
+            hydrated_task.type == models.BoefjeTask.type
+        ):  # TODO: is it safe to assume `hydrated_task` is of type `BoefjeTask`?
+            ooi: models.OOI | None = None
+            with contextlib.suppress(Exception):  # TODO: is it ok to say httpx.HTTPStatusError here?
+                ooi = self.ctx.services.octopoes.get_object(
+                    hydrated_task.data["organization"], hydrated_task.data["input_ooi"]
+                )
+                self.logger.info("SOUF OOI found: %s", ooi.model_dump_json())
+
+            # If the ooi exists (TODO: ask if it is possible to not exist) and the ooi has
+            # a network attribute. Create boefje requirements
+            if ooi and ooi.network:
+                requirements: list[str] = []
+                requirements.append(ooi.network)
+
+                if ooi.object_type == "IPAddressV4":
+                    requirements.append("ipv4")
+                elif ooi.object_type == "IPAddressV6":
+                    requirements.append("ipv6")
+                hydrated_task.data["requirements"] = requirements
+
+        return hydrated_task
+
     def push_item_to_queue(self, item: models.Task) -> models.Task:
         """Push a Task to the queue.
 
@@ -212,9 +246,7 @@ class Scheduler(abc.ABC):
             raise queues.errors.NotAllowedError("Scheduler is disabled")
 
         try:
-            if item.type is None:
-                item.type = self.ITEM_TYPE.type
-            item.status = models.TaskStatus.QUEUED
+            item = self._hydrate_task_for_queue(item)
             item = self.queue.push(item)
         except queues.errors.NotAllowedError as exc:
             self.logger.warning(
