@@ -24,9 +24,9 @@ Glossary
    :caption: Contents
    :maxdepth: 1
 
-   creating_a_boefje
-   testing_the_boefje
-   creating_a_new_model
-   creating_a_normalizer
-   creating_a_bit
-   creating_a_report
+   creating-boefje
+   testing-boefje
+   creating-model
+   creating-normalizer
+   creating-bit
+   creating-report
