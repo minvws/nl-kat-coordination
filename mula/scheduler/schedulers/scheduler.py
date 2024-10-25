@@ -205,7 +205,6 @@ class Scheduler(abc.ABC):
                 ooi = self.ctx.services.octopoes.get_object(
                     hydrated_task.data["organization"], hydrated_task.data["input_ooi"]
                 )
-                self.logger.info("SOUF OOI found to hydrate task with: %s", ooi.model_dump_json())
 
             # If the ooi exists (TODO: ask if it is possible to not exist) and the ooi has
             # a network attribute. Create boefje requirements

@@ -1,6 +1,5 @@
 import datetime
 import json
-import logging
 import uuid
 from enum import Enum
 from typing import Any
@@ -95,7 +94,6 @@ class SchedulerAPIClient(SchedulerClientInterface):
                 Filter(column="data", field="network", operator="<@", value=json.dumps(self._reachable_networks))
             )
 
-        logging.info(filters)
         response = self._session.post(
             f"/queues/{queue_id}/pop", data=QueuePopRequest(filters=filters).model_dump_json()
         )
