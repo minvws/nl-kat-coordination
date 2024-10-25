@@ -13,7 +13,7 @@ Developers are encouraged to write their code as strictly compliant as possible.
 Tools
 =====
 
-To make development and validation easier, we adopted :ref:`pre-commit` hooks to automate most of this.
+To make development and validation easier, we adopted :ref:`guidelines/development:pre-commit` hooks to automate most of this.
 This will help identify broken/bad code, improve consistency and save time during code reviews.
 Some tools and hooks have been adopted for both local development as well as in our CI/CD pipeline as GitHub actions.
 
@@ -113,7 +113,7 @@ It has a simple syntax and many plugins available that should improve our test c
 Development Environment
 =======================
 
-See :ref:`Installation and deployment` for the overall installation instructions.
+See :doc:`/installation-and-deployment/index` for the overall installation instructions.
 In a development context, we strongly recommend to use the Docker setup to test and make changes in the codebase (and not production packages).
 
 When it comes to development there is no specific IDE that must be used, although many of us would choose PyCharm as the preferred IDE.

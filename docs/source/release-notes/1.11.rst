@@ -6,7 +6,7 @@ This release has a major refactor of the environment variables used to configure
 OpenKAT. Every variables has been reviewed and defaults changed, naming has been
 made more consistent and datatype validation improved. Most importantly, you can
 now find comprehensive documentation about all environment settings at
-:ref:`Environment settings`. This documentation is now automatically generated
+:doc:`/installation-and-deployment/environment-settings/index`. This documentation is now automatically generated
 from the source code itself and should always be fully up-to-date with the main
 branch.
 
@@ -21,7 +21,7 @@ findings created follows the current policy of the Ministry of Health, Welfare
 and Sport.
 
 A few scripts have been added that make it easier to install, upgrade and debug
-OpenKAT on Debian. See :ref:`Scripts` for more information. Thanks to Rob
+OpenKAT on Debian. See :doc:`/installation-and-deployment/scripts` for more information. Thanks to Rob
 Musquetier for contributing the scripts.
 
 New Features
