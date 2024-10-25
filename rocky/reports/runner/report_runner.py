@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from string import Template
 
 from django.conf import settings
 from tools.models import Organization
@@ -38,20 +39,20 @@ class LocalReportRunner(ReportRunner):
 
             for ooi in data:
                 ooi_human_readable = Reference.from_str(ooi).human_readable
-                subreport_name = recipe.subreport_name_format.replace("{ooi}", ooi_human_readable).replace(
-                    "{report type}", str(report_type.name)
+                subreport_name = Template(recipe.subreport_name_format).safe_substitute(
+                    ooi=ooi_human_readable, report_type=str(report_type.name)
                 )
                 subreport_names.append((subreport_name, subreport_name))
 
-        parent_report_name = recipe.report_name_format.replace("{oois_count}", str(oois_count))
+        parent_report_name = Template(recipe.report_name_format).safe_substitute(oois_count=str(oois_count))
 
-        if "{ooi}" in parent_report_name and oois_count == 1:
+        if "${ooi}" in parent_report_name and oois_count == 1:
             ooi = recipe.input_recipe["input_oois"][0]
             ooi_human_readable = Reference.from_str(ooi).human_readable
-            parent_report_name = parent_report_name.replace("{ooi}", ooi_human_readable)
-        if "{report type}" in parent_report_name and len(report_types) == 1:
+            parent_report_name = Template(parent_report_name).safe_substitute(ooi=ooi_human_readable)
+        if "${report_type}" in parent_report_name and len(report_types) == 1:
             report_type = get_report_by_id(recipe.report_types[0])
-            parent_report_name = parent_report_name.replace("{report type}", str(report_type.name))
+            parent_report_name = Template(parent_report_name).safe_substitute(report_type=str(report_type.name))
 
         save_report_data(
             self.bytes_client,
