@@ -13,12 +13,15 @@ from httpx import HTTPStatusError, Response, codes
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import AfterValidator, BaseModel, Field, field_serializer, field_validator
+
+from account.models import KATUser
 from tools.enums import SCAN_LEVEL
 
 from octopoes.models import OOI
 from octopoes.models.exception import TypeNotFound
 from octopoes.models.types import type_by_name
 from rocky.health import ServiceHealth
+from tools.models import OrganizationMember, Organization
 
 logger = structlog.get_logger("katalogus_client")
 
@@ -142,8 +145,8 @@ class DuplicateIdError(KATalogusError):
 
 
 class KATalogusNotAllowedError(KATalogusError):
-    def __init__(self):
-        super().__init__(_("Editing this boefje is not allowed because it is static."))
+    def __init__(self, error_message: str):
+        super().__init__(_(error_message))
 
 
 def verify_response(response: Response) -> None:
@@ -291,55 +294,91 @@ class KATalogus:
     information from other organizations users are not allowed to see.
     """
 
-    def __init__(self, katalogus_client: KATalogusClient, organization_code: str):
+    def __init__(self, katalogus_client: KATalogusClient, member: OrganizationMember):
         self._katalogus_client = katalogus_client
-        self.organization_code = valid_organization_code(organization_code)
-        # TODO: fix the self.organization = valid_organization_code(organization) if organization else organization
+        self._member = member
 
     def get_plugins(self, **params) -> list[Plugin]:
-        return self._katalogus_client.get_plugins(self.organization_code, **params)
+        return self._katalogus_client.get_plugins(self._member.organization.code, **params)
 
     def get_plugin(self, plugin_id: str) -> Plugin:
-        return self._katalogus_client.get_plugin(self.organization_code, plugin_id)
+        return self._katalogus_client.get_plugin(self._member.organization.code, plugin_id)
 
     def get_plugin_settings(self, plugin_id: str) -> dict:
-        return self._katalogus_client.get_plugin_settings(self.organization_code, plugin_id)
+        if not self._member.has_perm("tools.can_view_katalogus_settings"):
+            raise KATalogusNotAllowedError("User is not allowed to see plugin settings")
+
+        return self._katalogus_client.get_plugin_settings(self._member.organization.code, plugin_id)
 
     def upsert_plugin_settings(self, plugin_id: str, values: dict) -> None:
-        return self._katalogus_client.upsert_plugin_settings(self.organization_code, plugin_id, values)
+        if not self._member.has_perm("tools.can_set_katalogus_settings"):
+            raise KATalogusNotAllowedError("User is not allowed to set plugin settings")
+
+        return self._katalogus_client.upsert_plugin_settings(self._member.organization.code, plugin_id, values)
 
     def delete_plugin_settings(self, plugin_id: str) -> None:
-        return self._katalogus_client.delete_plugin_settings(self.organization_code, plugin_id)
+        if not self._member.has_perm("tools.can_set_katalogus_settings"):
+            raise KATalogusNotAllowedError("User is not allowed to delete plugin settings")
+
+        return self._katalogus_client.delete_plugin_settings(self._member.organization.code, plugin_id)
 
     def clone_all_configuration_to_organization(self, to_organization: str):
-        return self._katalogus_client.clone_all_configuration_to_organization(self.organization_code, to_organization)
+        if not self._member.has_perm("tools.can_set_katalogus_settings") or self._member.user.is_superuser:
+            raise KATalogusNotAllowedError("User is not allowed to set plugin settings")
+
+        try:
+            to_member = OrganizationMember.objects.get(user=self._member.user, organization__code=to_organization)
+            if to_member.blocked:
+                raise KATalogusNotAllowedError("User is not allowed to access the other organization")
+        except Organization.DoesNotExist:
+            raise
+        except OrganizationMember.DoesNotExist:
+            if not self._member.user.is_superuser and not self._member.user.has_perm("tools.can_access_all_organizations"):
+                raise KATalogusNotAllowedError("User is not allowed to access the other organization")
+
+        return self._katalogus_client.clone_all_configuration_to_organization(self._member.organization.code, to_organization)
 
     def get_normalizers(self) -> list[Plugin]:
-        return self._katalogus_client.get_normalizers(self.organization_code)
+        return self._katalogus_client.get_normalizers(self._member.organization.code)
 
     def get_boefjes(self) -> list[Plugin]:
-        return self._katalogus_client.get_boefjes(self.organization_code)
+        return self._katalogus_client.get_boefjes(self._member.organization.code)
 
     def enable_plugin(self, plugin: Plugin) -> None:
-        return self._katalogus_client.enable_plugin(self.organization_code, plugin)
+        if not self._member.has_perm("tools.can_enable_disable_boefje"):
+            raise KATalogusNotAllowedError("User is not allowed to enable plugins")
+
+        return self._katalogus_client.enable_plugin(self._member.organization.code, plugin)
 
     def enable_boefje_by_id(self, boefje_id: str) -> None:
-        return self._katalogus_client.enable_boefje_by_id(self.organization_code, boefje_id)
+        if not self._member.has_perm("tools.can_enable_disable_boefje"):
+            raise KATalogusNotAllowedError("User is not allowed to enable plugins")
+
+        return self._katalogus_client.enable_boefje_by_id(self._member.organization.code, boefje_id)
 
     def disable_plugin(self, plugin: Plugin) -> None:
-        return self._katalogus_client.disable_plugin(self.organization_code, plugin)
+        if not self._member.has_perm("tools.can_enable_disable_boefje"):
+            raise KATalogusNotAllowedError("User is not allowed to disable plugins")
+
+        return self._katalogus_client.disable_plugin(self._member.organization.code, plugin)
 
     def get_enabled_boefjes(self) -> list[Plugin]:
-        return self._katalogus_client.get_plugins(self.organization_code, plugin_type="boefje", enabled=True)
+        return self._katalogus_client.get_plugins(self._member.organization.code, plugin_type="boefje", enabled=True)
 
     def get_cover(self, plugin_id: str) -> BytesIO:
-        return self._katalogus_client.get_cover(self.organization_code, plugin_id)
+        return self._katalogus_client.get_cover(self._member.organization.code, plugin_id)
 
     def create_plugin(self, plugin: Plugin) -> None:
-        return self._katalogus_client.create_plugin(self.organization_code, plugin)
+        if not self._member.has_perm("tools.can_add_boefje"):
+            raise KATalogusNotAllowedError("User is not allowed to create plugins")
+
+        return self._katalogus_client.create_plugin(self._member.organization.code, plugin)
 
     def edit_plugin(self, plugin: Plugin) -> None:
-        return self._katalogus_client.edit_plugin(self.organization_code, plugin)
+        if not self._member.has_perm("tools.can_add_boefje"):
+            raise KATalogusNotAllowedError("User is not allowed to edit plugins")
+
+        return self._katalogus_client.edit_plugin(self._member.organization.code, plugin)
 
 
 def parse_boefje(boefje: dict) -> Boefje:
@@ -404,5 +443,5 @@ def get_katalogus_client() -> KATalogusClient:
     return KATalogusClient(settings.KATALOGUS_API)
 
 
-def get_katalogus(organization_code: str) -> KATalogus:
-    return KATalogus(get_katalogus_client(), organization_code)
+def get_katalogus(member: OrganizationMember) -> KATalogus:
+    return KATalogus(get_katalogus_client(), member)

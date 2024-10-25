@@ -8,6 +8,8 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.utils.translation import gettext_lazy as _
 from django.views import View
+
+from katalogus.client import get_katalogus, KATalogus
 from tools.models import Indemnification, Organization, OrganizationMember
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -107,6 +109,9 @@ class OrganizationView(View):
 
         self.octopoes_api_connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization_code)
         self.bytes_client = get_bytes_client(organization_code)
+
+    def get_katalogus(self) -> KATalogus:
+        return get_katalogus(self.organization_member)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
