@@ -1,4 +1,3 @@
-import datetime
 from collections.abc import Iterable
 from functools import cached_property
 
@@ -9,17 +8,9 @@ from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models.signals import post_save, pre_save
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from httpx import HTTPError
-from katalogus.client import KATalogusClient, get_katalogus_client
-from katalogus.exceptions import KATalogusDownException, KATalogusException, KATalogusUnhealthyException
 
-from octopoes.api.models import Declaration
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models.ooi.web import Network
-from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesUnhealthyException
 from tools.add_ooi_information import SEPARATOR, get_info
 from tools.enums import MAX_SCAN_LEVEL
 from tools.fields import LowerCaseSlugField
@@ -112,27 +103,6 @@ class Organization(models.Model):
     def get_absolute_url(self):
         return reverse("organization_settings", args=[self.pk])
 
-    def delete(self, *args, **kwargs):
-        katalogus_client = self._get_healthy_katalogus()
-        octopoes_client = self._get_healthy_octopoes(self.code)
-
-        try:
-            octopoes_client.delete_node()
-        except Exception as e:
-            raise OctopoesException("Failed deleting organization in Octopoes") from e
-
-        try:
-            katalogus_client.delete_organization(self.code)
-        except Exception as e:
-            try:
-                octopoes_client.create_node()
-            except Exception as second_exception:
-                raise OctopoesException("Failed creating organization in Octopoes") from second_exception
-
-            raise KATalogusException("Failed deleting organization in the Katalogus") from e
-
-        super().delete(*args, **kwargs)
-
     def clean(self):
         if self.code in DENY_ORGANIZATION_CODES:
             raise ValidationError(
@@ -143,69 +113,6 @@ class Organization(models.Model):
                     )
                 }
             )
-
-    @classmethod
-    def pre_create(cls, sender, instance, *args, **kwargs):
-        instance.clean()
-        katalogus_client = cls._get_healthy_katalogus()
-        octopoes_client = cls._get_healthy_octopoes(instance.code)
-
-        try:
-            if not katalogus_client.organization_exists(instance.code):
-                katalogus_client.create_organization(instance)
-        except Exception as e:
-            raise KATalogusException("Failed creating organization in the Katalogus") from e
-
-        try:
-            octopoes_client.create_node()
-        except Exception as e:
-            try:
-                katalogus_client.delete_organization(instance.code)
-            except Exception as second_exception:
-                raise KATalogusException("Failed deleting organization in the Katalogus") from second_exception
-
-            raise OctopoesException("Failed creating organization in Octopoes") from e
-
-    @classmethod
-    def post_create(cls, sender, instance, *args, **kwargs):
-        octopoes_client = cls._get_healthy_octopoes(instance.code)
-
-        try:
-            valid_time = datetime.datetime.now(datetime.timezone.utc)
-            octopoes_client.save_declaration(Declaration(ooi=Network(name="internet"), valid_time=valid_time))
-        except Exception:
-            logger.exception("Could not seed internet for organization %s", sender)
-
-    @staticmethod
-    def _get_healthy_katalogus() -> KATalogusClient:
-        katalogus_client = get_katalogus_client()
-
-        try:
-            health = katalogus_client.health()
-        except HTTPError as e:
-            raise KATalogusDownException from e
-
-        if not health.healthy:
-            raise KATalogusUnhealthyException
-
-        return katalogus_client
-
-    @staticmethod
-    def _get_healthy_octopoes(organization_code: str) -> OctopoesAPIConnector:
-        octopoes_client = OctopoesAPIConnector(settings.OCTOPOES_API, client=organization_code)
-        try:
-            health = octopoes_client.root_health()
-        except HTTPError as e:
-            raise OctopoesDownException from e
-
-        if not health.healthy:
-            raise OctopoesUnhealthyException
-
-        return octopoes_client
-
-
-pre_save.connect(Organization.pre_create, sender=Organization)
-post_save.connect(Organization.post_create, sender=Organization)
 
 
 class OrganizationMember(models.Model):

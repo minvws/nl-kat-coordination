@@ -21,7 +21,7 @@ AMOUNT_OF_TEST_ORGANIZATIONS = 50
 
 @pytest.fixture
 def bulk_organizations(active_member, blocked_member):
-    with patch("katalogus.client.KATalogusClient"), patch("tools.models.OctopoesAPIConnector"):
+    with patch("katalogus.client.KATalogusClient"), patch("rocky.signals.OctopoesAPIConnector"):
         organizations = []
         for i in range(1, AMOUNT_OF_TEST_ORGANIZATIONS):
             org = Organization.objects.create(name=f"Test Organization {i}", code=f"test{i}", tags=f"test-tag{i}")
@@ -284,7 +284,7 @@ def test_admin_edits_organization(rf, admin_member, mocker):
         admin_member.user,
     )
     mocker.patch("katalogus.client.KATalogusClient")
-    mocker.patch("tools.models.OctopoesAPIConnector")
+    mocker.patch("rocky.signals.OctopoesAPIConnector")
     response = OrganizationEditView.as_view()(
         request, organization_code=admin_member.organization.code, pk=admin_member.organization.id
     )
