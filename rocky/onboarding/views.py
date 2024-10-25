@@ -15,7 +15,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from httpx import HTTPError
-from katalogus.client import Plugin, get_katalogus
+from katalogus.client import Plugin
 from reports.report_types.definitions import ReportPlugins
 from reports.report_types.dns_report.report import DNSReport
 from reports.views.base import get_selection
@@ -268,7 +268,7 @@ class OnboardingSetupScanSelectPluginsView(
 
     def get_plugins(self) -> dict[str, list[Plugin]]:
         all_plugins = {}
-        katalogus = get_katalogus(self.organization.code)
+        katalogus = self.get_katalogus()
         for required_optional, plugin_ids in self.plugins.items():
             plugins = katalogus.get_plugins(ids=plugin_ids)  # type: ignore
             all_plugins[required_optional] = plugins
@@ -287,7 +287,7 @@ class OnboardingSetupScanSelectPluginsView(
                 return self.get(request, *args, **kwargs)
         for selected_plugin in selected_plugins:
             try:
-                get_katalogus(self.organization.code).enable_boefje_by_id(selected_plugin)
+                self.get_katalogus().enable_boefje_by_id(selected_plugin)
             except HTTPError:
                 messages.error(
                     request,

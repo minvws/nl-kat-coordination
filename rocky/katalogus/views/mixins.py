@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from httpx import HTTPError, HTTPStatusError
 from rest_framework.status import HTTP_404_NOT_FOUND
 
-from katalogus.client import Boefje, KATalogus, Plugin, get_katalogus
+from katalogus.client import Boefje, KATalogus, Plugin
 
 logger = structlog.get_logger(__name__)
 
@@ -22,7 +22,7 @@ class SinglePluginView(OrganizationView):
         Prepare organization info and KAT-alogus API client.
         """
         super().setup(request, *args, plugin_id=plugin_id, **kwargs)
-        self.katalogus_client = get_katalogus(self.organization.code)
+        self.katalogus_client = self.get_katalogus()
 
         try:
             self.plugin = self.katalogus_client.get_plugin(plugin_id)

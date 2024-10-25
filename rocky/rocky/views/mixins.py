@@ -14,7 +14,7 @@ from django.http import Http404, HttpRequest
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from httpx import HTTPError
-from katalogus.client import Boefje, get_katalogus
+from katalogus.client import Boefje
 from pydantic import BaseModel
 from tools.forms.base import ObservedAtForm
 from tools.forms.settings import DEPTH_DEFAULT, DEPTH_MAX
@@ -135,7 +135,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
             logger.error(e)
             return results
 
-        katalogus = get_katalogus(organization.code)
+        katalogus = self.get_katalogus()
 
         for origin in origins:
             origin = OriginData(origin=origin)

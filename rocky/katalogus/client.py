@@ -13,15 +13,13 @@ from httpx import HTTPStatusError, Response, codes
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import AfterValidator, BaseModel, Field, field_serializer, field_validator
-
-from account.models import KATUser
 from tools.enums import SCAN_LEVEL
+from tools.models import Organization, OrganizationMember
 
 from octopoes.models import OOI
 from octopoes.models.exception import TypeNotFound
 from octopoes.models.types import type_by_name
 from rocky.health import ServiceHealth
-from tools.models import OrganizationMember, Organization
 
 logger = structlog.get_logger("katalogus_client")
 
@@ -163,7 +161,7 @@ def verify_response(response: Response) -> None:
             raise DuplicatePluginError(error_message) from error
 
         if error.response.status_code in [codes.FORBIDDEN, codes.NOT_FOUND]:
-            raise KATalogusNotAllowedError
+            raise KATalogusNotAllowedError("Access to resource not allowed")
 
         raise KATalogusHTTPStatusError(error) from error
 
@@ -333,10 +331,14 @@ class KATalogus:
         except Organization.DoesNotExist:
             raise
         except OrganizationMember.DoesNotExist:
-            if not self._member.user.is_superuser and not self._member.user.has_perm("tools.can_access_all_organizations"):
+            if not self._member.user.is_superuser and not self._member.user.has_perm(
+                "tools.can_access_all_organizations"
+            ):
                 raise KATalogusNotAllowedError("User is not allowed to access the other organization")
 
-        return self._katalogus_client.clone_all_configuration_to_organization(self._member.organization.code, to_organization)
+        return self._katalogus_client.clone_all_configuration_to_organization(
+            self._member.organization.code, to_organization
+        )
 
     def get_normalizers(self) -> list[Plugin]:
         return self._katalogus_client.get_normalizers(self._member.organization.code)

@@ -8,8 +8,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.utils.translation import gettext_lazy as _
 from django.views import View
-
-from katalogus.client import get_katalogus, KATalogus
+from katalogus.client import KATalogus, get_katalogus
 from tools.models import Indemnification, Organization, OrganizationMember
 
 from octopoes.connector.octopoes import OctopoesAPIConnector

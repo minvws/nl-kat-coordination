@@ -17,7 +17,7 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
-from katalogus.client import Boefje, KATalogus, KATalogusError, Plugin, get_katalogus
+from katalogus.client import Boefje, KATalogus, KATalogusError, Plugin
 from pydantic import RootModel, TypeAdapter
 from tools.ooi_helpers import create_ooi
 from tools.view_helpers import BreadcrumbsMixin, PostRedirect, url_with_querystring
@@ -352,7 +352,7 @@ class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
         self.plugins = None
 
         try:
-            self.plugins = hydrate_plugins(self.get_report_types(), get_katalogus(self.organization.code))
+            self.plugins = hydrate_plugins(self.get_report_types(), self.get_katalogus())
         except KATalogusError as error:
             messages.error(self.request, error.message)
 
@@ -635,9 +635,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         plugin_ids_required = plugins_dict["required"]
         plugin_ids_optional = plugins_dict["optional"]
 
-        katalogus_plugins = get_katalogus(self.organization.code).get_plugins(
-            ids=plugin_ids_required + plugin_ids_optional
-        )
+        katalogus_plugins = self.get_katalogus().get_plugins(ids=plugin_ids_required + plugin_ids_optional)
         for plugin in katalogus_plugins:
             if plugin.id in plugin_ids_required:
                 plugins["required"].append(plugin)
