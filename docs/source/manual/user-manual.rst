@@ -202,13 +202,13 @@ A user is recognized by their full name and email address.
 
 *User type:*
 
-Through the CSV upload you can add the usertypes client, admin and redteam. Read about users and roles in the `user section of the documentation <https://docs.openkat.nl/manual/usermanual.html#users>`_
+Through the CSV upload you can add the usertypes client, admin and redteam. Read about users and roles in the :ref:`manual/user-manual:Users` section.
 
 * account_type : client, admin or redteam
 
 *User clearance:*
 
-Clearance levels are related to the scan level of the Boefjes a user is able to dispatch. Read about this in the `scan level section of the documentation <https://docs.openkat.nl/manual/usermanual.html#scan-levels-and-indemnities>`_.
+Clearance levels are related to the scan level of the Boefjes a user is able to dispatch. Read about this in the :ref:`manual/user-manual:Scan levels, clearance & indemnities` section.
 
 The trusted_clearance_level is the level a user receives from the organization. It is the maximum level available for this user, based on the decision of the admin or superuser. The acknowledged_clearance_level is the level accepted by the user. Both can be added in the CSV file. The accepted level can be changed by the user.
 
@@ -378,7 +378,7 @@ The premise of the test profile is to verify whether an attacker can exploit vul
 Bits
 ====
 
-Bits are businessrules that assess objects. These can be disabled or enabled using environment variables. The parameters of a Bit can be configured using config objects, which are explained in detail in `the business rule section <https://docs.openkat.nl/introduction/makeyourown.html#bits-businessrules>`_ of the introducion.
+Bits are businessrules that assess objects. These can be disabled or enabled using environment variables. The parameters of a Bit can be configured using config objects, which are explained in detail in :ref:`introduction/make-your-own:Bits: businessrules`.
 
 Almost all bits are enabled by default and be disabled by adding the bit to `BITS_DISABLED`. The disabled bits can be enabled using `BITS_ENABLED`. For example:
 
