@@ -272,9 +272,13 @@ def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_leve
     plugin_service = PluginService(create_plugin_storage(session), create_config_storage(session), local_repository)
 
     item_handler: Handler
+    capabilities: list[str]
+    reachable_networks: list[str] | None = None
+
     if queue is WorkerManager.Queue.BOEFJES:
         item_handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), plugin_service, bytes_api_client)
         capabilities = settings.boefje_task_capabilities
+        reachable_networks = settings.boefje_reachable_networks
     else:
         item_handler = NormalizerHandler(
             LocalNormalizerJobRunner(local_repository), bytes_api_client, settings.scan_profile_whitelist
@@ -284,7 +288,7 @@ def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_leve
     return SchedulerWorkerManager(
         item_handler,
         SchedulerAPIClient(
-            base_url=str(settings.scheduler_api), task_capabilities=capabilities
+            base_url=str(settings.scheduler_api), task_capabilities=capabilities, reachable_networks=reachable_networks
         ),  # Do not share a session between workers
         settings,
         log_level,

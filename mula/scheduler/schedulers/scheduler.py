@@ -198,28 +198,27 @@ class Scheduler(abc.ABC):
         if hydrated_task.type is None:
             hydrated_task.type = self.ITEM_TYPE.type
 
-        # If the task is a boefjetask, set requirements to see where it is supposed to be ran
-        if (
-            hydrated_task.type == models.BoefjeTask.type
-        ):  # TODO: is it safe to assume `hydrated_task` is of type `BoefjeTask`?
+        # If the task is a boefjetask, set requirements and network to see where it is supposed to be ran
+        if hydrated_task.type == models.BoefjeTask.type:
             ooi: models.OOI | None = None
             with contextlib.suppress(Exception):  # TODO: is it ok to say httpx.HTTPStatusError here?
                 ooi = self.ctx.services.octopoes.get_object(
                     hydrated_task.data["organization"], hydrated_task.data["input_ooi"]
                 )
-                self.logger.info("SOUF OOI found: %s", ooi.model_dump_json())
+                self.logger.info("SOUF OOI found to hydrate task with: %s", ooi.model_dump_json())
 
             # If the ooi exists (TODO: ask if it is possible to not exist) and the ooi has
             # a network attribute. Create boefje requirements
             if ooi and ooi.network:
                 requirements: list[str] = []
-                requirements.append(ooi.network)
 
                 if ooi.object_type == "IPAddressV4":
                     requirements.append("ipv4")
                 elif ooi.object_type == "IPAddressV6":
                     requirements.append("ipv6")
+
                 hydrated_task.data["requirements"] = requirements
+                hydrated_task.data["network"] = ooi.network
         else:
             # If the task is not of type boefje, we add the type of task to the requirements
             # e.g. normalizers get "normalizer"
