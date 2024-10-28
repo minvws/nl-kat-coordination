@@ -59,5 +59,13 @@ html_context = {
 html_static_path = ["_static"]
 html_css_files = ["openkat.css"]
 
-mermaid_version = ""  # Do not fetch from the CDN
-html_js_files = ["mermaid-9.4.3.min.js"]
+mermaid_use_local = "mermaid.min.js"
+mermaid_include_elk = ""
+d3_use_local = "d3.min.js"
+
+autosectionlabel_prefix_document = True
+
+suppress_warnings = [
+    f"autosectionlabel.installation-and-deployment/environment-settings/{document}"
+    for document in ("boefjes", "bytes", "keiko", "mula", "octopoes")
+]
