@@ -8,5 +8,5 @@ Contains introduction into OpenKAT
    :caption: Contents
 
    intro
-   howdoesitwork
-   makeyourown
+   how-does-it-work
+   make-your-own
