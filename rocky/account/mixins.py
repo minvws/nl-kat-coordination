@@ -15,12 +15,13 @@ from tools.models import Indemnification, Organization, OrganizationMember
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
-from rocky.bytes_client import get_bytes_client
+from rocky.bytes_client import BytesClient, get_bytes_client
 from rocky.exceptions import (
     AcknowledgedClearanceLevelTooLowException,
     IndemnificationNotPresentException,
     TrustedClearanceLevelTooLowException,
 )
+from rocky.scheduler import SchedulerClient, scheduler_client
 
 
 # There are modified versions of PermLookupDict and PermWrapper from
@@ -250,6 +251,14 @@ class OrganizationAPIMixin:
     @cached_property
     def octopoes_api_connector(self) -> OctopoesAPIConnector:
         return OctopoesAPIConnector(settings.OCTOPOES_API, self.organization.code)
+
+    @cached_property
+    def bytes_client(self) -> BytesClient:
+        return get_bytes_client(self.organization.code)
+
+    @cached_property
+    def scheduler_client(self) -> SchedulerClient:
+        return scheduler_client(self.organization.code)
 
     @cached_property
     def valid_time(self) -> datetime:
