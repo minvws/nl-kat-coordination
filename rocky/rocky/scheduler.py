@@ -151,6 +151,7 @@ class ScheduleRequest(BaseModel):
     scheduler_id: str
     data: dict
     schedule: str
+    deadline_at: str
 
 
 class ScheduleResponse(BaseModel):
@@ -285,6 +286,21 @@ class SchedulerClient:
             return ScheduleResponse.model_validate_json(res.content)
         except ConnectError:
             raise SchedulerConnectError()
+
+    def post_schedule_search(self, filters: dict[str, str]) -> PaginatedSchedulesResponse:
+        try:
+            res = self._client.post("/schedules/search", json=filters)
+            res.raise_for_status()
+            return PaginatedSchedulesResponse.model_validate_json(res.content)
+        except ConnectError:
+            raise SchedulerConnectError()
+
+    def patch_schedule(self, schedule_id: str, params: dict[str, Any]) -> None:
+        try:
+            response = self._client.patch(f"/schedules/{schedule_id}", json=params)
+            response.raise_for_status()
+        except (HTTPStatusError, ConnectError):
+            raise SchedulerHTTPError()
 
     def post_schedule(self, schedule: ScheduleRequest) -> ScheduleResponse:
         try:

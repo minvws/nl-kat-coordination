@@ -32,7 +32,7 @@ from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Referenc
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
-from octopoes.models.ooi.reports import Report, ReportData
+from octopoes.models.ooi.reports import Report, ReportData, ReportRecipe
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
@@ -1308,6 +1308,105 @@ def get_subreports() -> list[tuple[str, Report]]:
         (parent_report[0].primary_key, subreports[4]),
         (parent_report[0].primary_key, subreports[5]),
     ]
+
+
+@pytest.fixture
+def report_recipe():
+    return ReportRecipe(
+        recipe_id="744d054e-9c70-4f18-ad27-122cfc1b7903",
+        report_name_format="Test Report Name Format",
+        subreport_name_format="Test Subreport Name Format",
+        input_recipe={"input_oois": ["Hostname|internet|mispo.es"]},
+        report_types=["dns-report"],
+        cron_expression="0 0 * * *",
+    )
+
+
+@pytest.fixture
+def get_report_schedules():
+    report_schedule = [
+        {
+            "id": "06a783b3-af62-429d-8b48-5934c8702366",
+            "scheduler_id": "report-madelon123",
+            "hash": "f429f60fda539f9017544758163a955e",
+            "data": {
+                "type": "report",
+                "organisation_id": "madelon123",
+                "report_recipe_id": "6a121a53-f795-4bfe-9aea-f410a96fca59",
+            },
+            "enabled": "true",
+            "schedule": "0 * * * *",
+            "tasks": [
+                {
+                    "id": "21ce00b8-57c4-4d65-a53e-275b4e44da6f",
+                    "scheduler_id": "report-madelon123",
+                    "schedule_id": "06a783b3-af62-429d-8b48-5934c8702366",
+                    "priority": 1729520184,
+                    "status": "completed",
+                    "type": "report",
+                    "hash": "f429f60fda539f9017544758163a955e",
+                    "data": {
+                        "organisation_id": "madelon123",
+                        "report_recipe_id": "6a121a53-f795-4bfe-9aea-f410a96fca59",
+                    },
+                    "created_at": "2024-10-21T14:16:24.702759Z",
+                    "modified_at": "2024-10-21T14:16:24.702761Z",
+                },
+                {
+                    "id": "f63c2224-a4b2-4161-9790-9b4d665a4683",
+                    "scheduler_id": "report-madelon123",
+                    "schedule_id": "06a783b3-af62-429d-8b48-5934c8702366",
+                    "priority": 1729580020,
+                    "status": "completed",
+                    "type": "report",
+                    "hash": "f429f60fda539f9017544758163a955e",
+                    "data": {
+                        "organisation_id": "madelon123",
+                        "report_recipe_id": "6a121a53-f795-4bfe-9aea-f410a96fca59",
+                    },
+                    "created_at": "2024-10-22T06:53:40.405185Z",
+                    "modified_at": "2024-10-22T06:53:40.405192Z",
+                },
+            ],
+            "deadline_at": "2024-10-22T12:00:00Z",
+            "created_at": "2024-10-21T14:14:00.359039Z",
+            "modified_at": "2024-10-21T14:14:00.359043Z",
+        },
+        {
+            "id": "e9a00bc1-850a-401a-89d9-252d98823bb3",
+            "scheduler_id": "report-madelon123",
+            "hash": "02e67c8676cb8135681d52ca62a9fe5b",
+            "data": {
+                "type": "report",
+                "organisation_id": "madelon123",
+                "report_recipe_id": "31c79490-fb51-440d-9108-0c388276f655",
+            },
+            "enabled": "true",
+            "schedule": "0 0 * * *",
+            "tasks": [
+                {
+                    "id": "f4f938e0-5f2d-4bcd-9b28-11831b7835e4",
+                    "scheduler_id": "report-madelon123",
+                    "schedule_id": "e9a00bc1-850a-401a-89d9-252d98823bb3",
+                    "priority": 1729521145,
+                    "status": "completed",
+                    "type": "report",
+                    "hash": "02e67c8676cb8135681d52ca62a9fe5b",
+                    "data": {
+                        "organisation_id": "madelon123",
+                        "report_recipe_id": "31c79490-fb51-440d-9108-0c388276f655",
+                    },
+                    "created_at": "2024-10-21T14:32:25.247525Z",
+                    "modified_at": "2024-10-21T14:32:25.247527Z",
+                }
+            ],
+            "deadline_at": "2024-10-23T00:00:00Z",
+            "created_at": "2024-10-21T13:34:42.791561Z",
+            "modified_at": "2024-10-21T13:34:42.791563Z",
+        },
+    ]
+
+    return report_schedule
 
 
 def setup_request(request, user):
