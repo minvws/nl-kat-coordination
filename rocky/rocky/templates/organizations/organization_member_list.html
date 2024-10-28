@@ -28,7 +28,7 @@
                             <button aria-controls="add-member" class="dropdown-button ghost">
                                 {% translate "Add member(s)" %}<span aria-hidden="true" class="icon ti-chevron-down"></span>
                             </button>
-                            <div id="add-member" aria-expanded="false" class="dropdown-list">
+                            <div id="add-member" class="dropdown-list">
                                 <ul>
                                     <li>
                                         <a href="{% url "organization_member_add_account_type" organization.code %}"><span class="icon ti-plus" aria-hidden="true"></span>{% translate "Manually" %}</a>

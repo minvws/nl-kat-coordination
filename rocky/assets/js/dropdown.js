@@ -17,15 +17,12 @@ dropdowns.forEach((dropdown) => {
         activeButton.getAttribute("aria-controls"),
       );
       activeButton.setAttribute("aria-expanded", "false");
-      activeList.classList.remove("open");
     }
 
     if (isOpen) {
       dropdownButton.setAttribute("aria-expanded", "false");
-      dropdownList.classList.remove("open");
     } else {
       dropdownButton.setAttribute("aria-expanded", "true");
-      dropdownList.classList.add("open");
     }
 
     e.stopPropagation();
@@ -44,6 +41,5 @@ document.addEventListener("click", () => {
       activeButton.getAttribute("aria-controls"),
     );
     activeButton.setAttribute("aria-expanded", "false");
-    activeList.classList.remove("open");
   }
 });
