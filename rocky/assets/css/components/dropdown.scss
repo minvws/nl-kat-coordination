@@ -35,7 +35,7 @@
       margin: 0;
     }
 
-    &.open {
+    [aria-expanded=true] + & {
       display: flex;
       flex-direction: column;
       min-width: 100%;
