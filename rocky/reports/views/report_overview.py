@@ -56,22 +56,24 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
         recipes = []
         if report_schedules:
             for schedule in report_schedules:
-                recipe_id = schedule["data"]["report_recipe_id"]
-                # TODO: This is a workaround to get the recipes and reports.
-                #  We should create an endpoint for this in octopoes
-                recipe_ooi_tree = self.get_recipe_ooi_tree(recipe_id)
-                if recipe_ooi_tree is not None:
-                    recipe_tree = recipe_ooi_tree.store.values()
-                    recipe_ooi = [ooi for ooi in recipe_tree if isinstance(ooi, ReportRecipe)][0]
-                    report_oois = [ooi for ooi in recipe_tree if isinstance(ooi, Report)]
-                    recipes.append(
-                        {
-                            "recipe": recipe_ooi,
-                            "cron": schedule["schedule"],
-                            "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
-                            "reports": report_oois,
-                        }
-                    )
+                if schedule["data"]:
+                    recipe_id = schedule["data"]["report_recipe_id"]
+                    # TODO: This is a workaround to get the recipes and reports.
+                    #  We should create an endpoint for this in octopoes
+                    recipe_ooi_tree = self.get_recipe_ooi_tree(recipe_id)
+                    if recipe_ooi_tree is not None:
+                        recipe_tree = recipe_ooi_tree.store.values()
+                        recipe_ooi = next(ooi for ooi in recipe_tree if isinstance(ooi, ReportRecipe))
+                        report_oois = [ooi for ooi in recipe_tree if isinstance(ooi, Report)]
+                        recipes.append(
+                            {
+                                "schedule_id": schedule["id"],
+                                "recipe": recipe_ooi,
+                                "cron": schedule["schedule"],
+                                "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
+                                "reports": report_oois,
+                            }
+                        )
 
         return recipes
 

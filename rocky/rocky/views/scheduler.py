@@ -139,6 +139,9 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
+    def edit_report_schedule(self, schedule_id: str, params):
+        self.scheduler_client.patch_schedule(schedule_id=schedule_id, params=params)
+
     def get_report_schedules(self) -> list[dict[str, Any]]:
         try:
             return self.scheduler_client.get_scheduled_reports(scheduler_id=self.scheduler_id)
@@ -177,6 +180,12 @@ class SchedulerView(OctopoesView):
                     safe=False,
                 )
             return task
+        except SchedulerError as error:
+            return messages.error(self.request, error.message)
+
+    def get_schedule_with_filters(self, filters: dict[str, Any]) -> ScheduleResponse:
+        try:
+            return self.scheduler_client.post_schedule_search(filters).results[0]
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
