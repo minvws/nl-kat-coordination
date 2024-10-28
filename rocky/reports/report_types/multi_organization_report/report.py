@@ -64,7 +64,12 @@ class MultiOrganizationReport(MultiReport):
 
                 tags[tag].append(report_data["organization_code"])
 
-            total_critical_vulnerabilities += aggregate_data["summary"]["critical_vulnerabilities"]
+            # Added for backward compatability issues
+            if "Critical vulnerabilities" in aggregate_data["summary"]:
+                total_critical_vulnerabilities += aggregate_data["summary"]["Critical vulnerabilities"]
+            else:
+                total_critical_vulnerabilities += aggregate_data["summary"]["critical_vulnerabilities"]
+
             total_findings += aggregate_data["total_findings"]
             total_systems += aggregate_data["total_systems"]
             total_hostnames += aggregate_data["total_hostnames"]
