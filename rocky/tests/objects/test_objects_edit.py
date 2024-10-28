@@ -29,8 +29,11 @@ def test_ooi_edit_report_recipe_get(rf, client_member, mock_organization_view_oc
     assertContains(response, "Edit ReportRecipe: " + ooi_id)
 
 
-def test_ooi_edit_report_recipe_post(rf, client_member, mock_organization_view_octopoes, report_recipe, mock_scheduler):
+def test_ooi_edit_report_recipe_post(
+    rf, client_member, mock_organization_view_octopoes, report_recipe, mocker, mock_scheduler
+):
     mock_organization_view_octopoes().get.return_value = report_recipe
+    mocker.patch("rocky.views.ooi_view.create_ooi")
     ooi_id = f"ReportRecipe|{report_recipe.recipe_id}"
 
     request_url = (
