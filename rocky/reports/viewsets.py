@@ -145,6 +145,9 @@ class ReportRecipeViewSet(OrganizationAPIMixin, viewsets.ModelViewSet):
             schedule_id, params={"schedule": report_recipe.cron_expression, "deadline_at": deadline_at}
         )
 
+        # This will make DRF return the new instance
+        serializer.instance = report_recipe
+
     def perform_destroy(self, instance: ReportRecipe) -> None:
         schedule_id = self.get_schedule_id()
 
