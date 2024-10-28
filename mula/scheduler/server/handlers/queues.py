@@ -53,7 +53,7 @@ class QueueAPI:
         )
 
     def list(self) -> Any:
-        return [models.Queue(**s.queue.dict(include_pq=False)) for s in self.schedulers.copy().values()]
+        return [QueueDetail(**s.queue.dict(include_pq=False)) for s in self.schedulers.copy().values()]
 
     def get(self, queue_id: str) -> Any:
         s = self.schedulers.get(queue_id)
@@ -66,7 +66,7 @@ class QueueAPI:
         if q is None:
             raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="queue not found")
 
-        return models.Queue(**q.dict())
+        return QueueDetail(**q.dict())
 
     def pop(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
         s = self.schedulers.get(queue_id)
@@ -84,7 +84,7 @@ class QueueAPI:
                 detail="could not pop item from queue, check your filters",
             )
 
-        return models.Task(**p_item.model_dump())
+        return TaskDetail(**p_item.model_dump())
 
     def push(self, queue_id: str, item_in: TaskCreate) -> Any:
         s = self.schedulers.get(queue_id)

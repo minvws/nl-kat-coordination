@@ -8,8 +8,8 @@ import structlog
 from fastapi import Body, status
 
 from scheduler import context, models, schedulers, storage
-from scheduler.server import models, utils
-from scheduler.server.models import ScheduleCreate, ScheduleDetail
+from scheduler.server import utils
+from scheduler.server.models import ScheduleCreate, ScheduleDetail, SchedulePatch
 
 
 class ScheduleAPI:
@@ -34,7 +34,7 @@ class ScheduleAPI:
             path="/schedules",
             endpoint=self.create,
             methods=["POST"],
-            response_model=ScheduleCreate,
+            response_model=ScheduleDetail,
             status_code=201,
             description="Create a schedule",
         )
@@ -101,6 +101,7 @@ class ScheduleAPI:
             )
 
         try:
+            # TODO: serialize to ScheduleDetail
             results, count = self.ctx.datastores.schedule_store.get_schedules(
                 scheduler_id=scheduler_id,
                 schedule_hash=schedule_hash,
@@ -129,7 +130,7 @@ class ScheduleAPI:
 
         return utils.paginate(request, results, count, offset, limit)
 
-    def create(self, schedule: models.ScheduleCreate) -> Any:
+    def create(self, schedule: ScheduleCreate) -> Any:
         try:
             new_schedule = models.Schedule(**schedule.model_dump())
         except pydantic.ValidationError as exc:
@@ -189,7 +190,7 @@ class ScheduleAPI:
                 detail=f"failed to create schedule [exception: {exc}]",
             ) from exc
 
-        return new_schedule
+        return ScheduleDetail(**new_schedule.model_dump())
 
     def get(self, schedule_id: uuid.UUID) -> Any:
         try:
@@ -209,9 +210,9 @@ class ScheduleAPI:
         if schedule is None:
             raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="schedule not found")
 
-        return schedule
+        return ScheduleDetail(**schedule.model_dump())
 
-    def patch(self, schedule_id: uuid.UUID, schedule: models.SchedulePatch) -> Any:
+    def patch(self, schedule_id: uuid.UUID, schedule: SchedulePatch) -> Any:
         try:
             schedule_db = self.ctx.datastores.schedule_store.get_schedule(schedule_id)
         except storage.errors.StorageError as exc:

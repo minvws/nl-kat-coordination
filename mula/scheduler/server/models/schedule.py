@@ -1,21 +1,25 @@
+import uuid
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
 
 class ScheduleDetail(BaseModel):
-    pass
+    id: uuid.UUID
+    scheduler_id: str
+    hash: str | None
+    data: dict | None
+    enabled: bool
+    schedule: str | None
+    deadline_at: datetime | None
+    created_at: datetime
+    modified_at: datetime
 
 
 class ScheduleCreate(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
     scheduler_id: str
-
     data: dict
-
     schedule: str
-
     deadline_at: datetime | None = None
 
 
