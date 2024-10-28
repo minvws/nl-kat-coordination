@@ -2397,11 +2397,20 @@ msgid "Different date"
 msgstr ""
 
 #: reports/forms.py
+msgid "Start date"
+msgstr ""
+
+#: reports/forms.py
 msgid "No, just once"
 msgstr ""
 
 #: reports/forms.py
 msgid "Yes, repeat"
+msgstr ""
+
+#: reports/forms.py
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Recurrence"
 msgstr ""
 
 #: reports/forms.py
@@ -2418,10 +2427,6 @@ msgstr ""
 
 #: reports/forms.py
 msgid "Yearly"
-msgstr ""
-
-#: reports/forms.py
-msgid "Start date"
 msgstr ""
 
 #: reports/forms.py
@@ -3675,8 +3680,9 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-#: reports/templates/report_overview/scheduled_reports_table.html
-msgid "Recurrence"
+msgid ""
+"The date you select will be the reference date for the data set for your "
+"report. Please allow for up to 24 hours for your report to be ready."
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -3747,6 +3753,7 @@ msgid "Report names:"
 msgstr ""
 
 #: reports/templates/partials/report_names_form.html
+#: rocky/templates/partials/form/field_input.html
 msgid "(Required)"
 msgstr ""
 
@@ -6127,12 +6134,6 @@ msgid "Please enable plugin to start scanning."
 msgstr ""
 
 #: rocky/templates/partials/form/field_input.html
-#: rocky/templates/partials/form/field_input_checkbox.html
-#: rocky/templates/partials/form/field_input_radio.html
-msgid "This field is required"
-msgstr ""
-
-#: rocky/templates/partials/form/field_input.html
 msgid "Not set"
 msgstr ""
 
@@ -6142,6 +6143,12 @@ msgstr ""
 
 #: rocky/templates/partials/form/field_input.html
 msgid "Forgot password"
+msgstr ""
+
+#: rocky/templates/partials/form/field_input.html
+#: rocky/templates/partials/form/field_input_checkbox.html
+#: rocky/templates/partials/form/field_input_radio.html
+msgid "This field is required"
 msgstr ""
 
 #: rocky/templates/partials/form/field_input_errors.html
