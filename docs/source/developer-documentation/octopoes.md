@@ -413,7 +413,7 @@ python3 octopoes/tools/xtdb-cli.py -n "aa" history --with-docs "BIT_METRIC" |jq
 
 If you want to query the XTDB database directly, you can use the XTDB-tool. This is explained on the following page: https://docs.openkat.nl/developer_documentation/octopoes.html#xtdb-cli-tool.
 
-## OOI
+## OOI Objects
 
 OOI objects are instances of relatively simple classes, which inherit from `OOI`.
 

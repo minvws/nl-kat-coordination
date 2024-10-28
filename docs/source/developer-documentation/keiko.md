@@ -49,7 +49,7 @@ template is started. After the report is generated, the PDF is available at `/re
 ## Logging
 
 Keiko logging can be configured through by supplying a `logging.json`, relative to the current working directory of the
-process. See [logging.json](logging.json) for an example.
+process. See `keiko/logging.json` for an example.
 
 ## Building a new template
 

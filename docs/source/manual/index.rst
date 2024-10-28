@@ -7,6 +7,6 @@ An overview of all KAT functionality, from a user perspective.
    :maxdepth: 4
    :caption: Contents
 
-   usermanual
+   user-manual
    reports
    normalizers

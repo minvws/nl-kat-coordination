@@ -15,8 +15,7 @@ user-interfaces and broader support for in future releases but we feel these
 first steps are a good start. Let us know if you have any feedback on what we
 have already implemented.
 
-uWSGI has been replaced by Granian by default. See the :ref:`1.13 release notes
-<OpenKAT 1.13>` release notes for more information. You can still switch back to uWSGI
+uWSGI has been replaced by Granian by default. See the :doc:`/release-notes/1.13` release notes for more information. You can still switch back to uWSGI
 in 1.14 if Granian does not work. uWSGI support will be removed in 1.15.
 
 The pydantic version used by OpenKAT has been updated to version 2. Pydantic v2
@@ -62,7 +61,7 @@ Debian packages
 Because of the switch to Granian, we can't listen on both 8000 and 8443 anymore,
 and we will default listen only on port 8000 on 127.0.0.1. If you were
 previously accessing OpenKAT using https on port 8443 you need to change the
-configuration as described on the :ref:`Debian installation page<Configure
+configuration as described on the :ref:`Debian installation page <installation-and-deployment/debian-install:Configure
 reverse proxy>`.
 
 Full Changelog
