@@ -38,8 +38,9 @@ document.addEventListener("click", () => {
   const activeButton = document.querySelector(
     ".dropdown-button[aria-expanded='true']",
   );
+  const activeDropdown = activeButton?.closest(".dropdown");
 
-  if (activeButton) {
+  if (activeDropdown && !activeDropdown.contains(e.target)) {
     const activeList = document.getElementById(
       activeButton.getAttribute("aria-controls"),
     );
