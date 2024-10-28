@@ -52,7 +52,7 @@
                     </div>
                     <div class="column-4 tiles plugins images-cover">
                         {% for required_plugin in plugins.required|dictsort:"enabled" %}
-                            {% include "partials/plugin_tile.html" with plugin=required_plugin plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types %}
+                            {% include "partials/plugin_tile.html" with form_id="continue-to-configuration" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin=required_plugin remove_action_buttons="yes" add_checkbox="yes" checked="yes" %}
 
                         {% endfor %}
                     </div>
@@ -76,7 +76,7 @@
                     </div>
                     <div class="column-4 tiles plugins images-cover">
                         {% for optional_plugin in plugins.optional|dictsort:"enabled" %}
-                            {% include "partials/plugin_tile.html" with plugin=optional_plugin form_id="continue-to-configurationt" show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types %}
+                            {% include "partials/plugin_tile.html" with form_id="continue-to-configuration" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin=optional_plugin remove_action_buttons="yes" add_checkbox="yes" %}
 
                         {% endfor %}
                     </div>
@@ -98,7 +98,7 @@
                 {% include "forms/report_form_fields.html" %}
 
                 <button type="submit">
-                    {% translate "Continue" %}<span class="icon ti-chevron-right"></span>
+                    {% translate "Enable plugins and continue" %}<span class="icon ti-chevron-right"></span>
                 </button>
             </form>
         {% else %}

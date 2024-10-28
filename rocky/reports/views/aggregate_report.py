@@ -1,9 +1,12 @@
 from typing import Any
 
+from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from httpx import HTTPError
+from katalogus.client import get_katalogus
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.helpers import get_ooi_types_from_aggregate_report
@@ -106,6 +109,20 @@ class ExportSetupAggregateReportView(
     breadcrumbs_step = 6
     current_step = 4
     report_type = AggregateOrganisationReport
+
+    def post(self, request, *args, **kwargs):
+        selected_plugins = request.POST.getlist("plugin", [])
+
+        for selected_plugin in selected_plugins:
+            try:
+                get_katalogus(self.organization.code).enable_boefje_by_id(selected_plugin)
+            except HTTPError:
+                messages.error(
+                    request,
+                    _("An error occurred while enabling {}. The plugin is not available.").format(selected_plugin),
+                )
+                return self.post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
 
 class SaveAggregateReportView(SaveAggregateReportMixin, BreadcrumbsAggregateReportView, SaveReportView):
