@@ -3,7 +3,7 @@
 This module has several entry points discussed below, but let us first consider the prerequisites and scope.
 If you already have a running setup and want to learn where each bit of functionality goes, read the following page:
 
-[Developing Openkat Plugins](../introduction/makeyourown.rst)
+[Developing Openkat Plugins](../introduction/make-your-own.rst)
 
 ## Prerequisites
 
