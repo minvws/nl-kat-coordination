@@ -188,5 +188,6 @@ repos:
           \.json$ |
           \.min\.js$ |
           ^rocky/assets/css/themes/soft/fonts |
-          ^rocky/assets/vendors
+          ^rocky/assets/vendors |
+          ^docs/source/_static
           )
