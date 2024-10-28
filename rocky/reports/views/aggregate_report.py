@@ -116,3 +116,4 @@ class SaveAggregateReportView(SaveAggregateReportMixin, BreadcrumbsAggregateRepo
     template_name = "aggregate_report.html"
     breadcrumbs_step = 6
     current_step = 5
+    report_type = AggregateOrganisationReport

@@ -258,12 +258,15 @@ class BaseReportView(OOIFilterView):
         recurrence_choice = self.request.POST.get("choose_recurrence", "once")
         return recurrence_choice == "repeat"
 
-    def create_report_recipe(self, report_name_format: str, subreport_name_format: str, schedule: str) -> ReportRecipe:
+    def create_report_recipe(
+        self, report_name_format: str, subreport_name_format: str, parent_report_type: str | None, schedule: str
+    ) -> ReportRecipe:
         report_recipe = ReportRecipe(
             recipe_id=uuid4(),
             report_name_format=report_name_format,
             subreport_name_format=subreport_name_format,
             input_recipe={"input_oois": self.get_ooi_pks()},
+            parent_report_type=parent_report_type,
             report_types=self.get_report_type_ids(),
             cron_expression=schedule,
         )
@@ -523,13 +526,20 @@ class SaveReportView(BaseReportView, ReportBreadcrumbs, SchedulerView):
         elif self.is_scheduled_report():
             report_name_format = request.POST.get("parent_report_name", "")
             subreport_name_format = request.POST.get("child_report_name", "")
-
             recurrence = request.POST.get("recurrence", "")
             deadline_at = request.POST.get("start_date", datetime.now(timezone.utc).date())
 
+            parent_report_type = None
+            if self.report_type == AggregateOrganisationReport:
+                parent_report_type = AggregateOrganisationReport.id
+            elif not self.report_type and subreport_name_format:
+                parent_report_type = ConcatenatedReport.id
+
             schedule = self.convert_recurrence_to_cron_expressions(recurrence)
 
-            report_recipe = self.create_report_recipe(report_name_format, subreport_name_format, schedule)
+            report_recipe = self.create_report_recipe(
+                report_name_format, subreport_name_format, parent_report_type, schedule
+            )
 
             self.create_report_schedule(report_recipe, deadline_at)
 
