@@ -5,7 +5,7 @@ import structlog
 from fastapi import status
 
 from scheduler import context, models, queues, schedulers, storage
-from scheduler.server import serializers
+from scheduler.server.models import QueueDetail, TaskCreate, TaskDetail
 
 
 class QueueAPI:
@@ -19,7 +19,7 @@ class QueueAPI:
             path="/queues",
             endpoint=self.list,
             methods=["GET"],
-            response_model=list[models.Queue],
+            response_model=list[QueueDetail],
             response_model_exclude_unset=True,
             status_code=status.HTTP_200_OK,
             description="List all queues",
@@ -29,7 +29,7 @@ class QueueAPI:
             path="/queues/{queue_id}",
             endpoint=self.get,
             methods=["GET"],
-            response_model=models.Queue,
+            response_model=QueueDetail,
             status_code=status.HTTP_200_OK,
             description="Get a queue",
         )
@@ -38,7 +38,7 @@ class QueueAPI:
             path="/queues/{queue_id}/pop",
             endpoint=self.pop,
             methods=["POST"],
-            response_model=models.Task | None,
+            response_model=TaskDetail | None,
             status_code=status.HTTP_200_OK,
             description="Pop an item from a queue",
         )
@@ -47,7 +47,7 @@ class QueueAPI:
             path="/queues/{queue_id}/push",
             endpoint=self.push,
             methods=["POST"],
-            response_model=models.Task | None,
+            response_model=TaskCreate | None,
             status_code=status.HTTP_201_CREATED,
             description="Push an item to a queue",
         )
@@ -86,7 +86,7 @@ class QueueAPI:
 
         return models.Task(**p_item.model_dump())
 
-    def push(self, queue_id: str, item_in: serializers.Task) -> Any:
+    def push(self, queue_id: str, item_in: TaskCreate) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="queue not found")

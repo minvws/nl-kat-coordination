@@ -7,9 +7,9 @@ from unittest import mock
 from urllib.parse import quote
 
 from fastapi.testclient import TestClient
-from scheduler import config, models, server, storage, utils
-from scheduler.server import serializers
 
+from scheduler import config, models, server, storage, utils
+from scheduler.server.models import TaskPatch
 from tests.factories import OrganisationFactory
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
@@ -253,7 +253,7 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Update the item
-        updated_item = serializers.Task(**response.json())
+        updated_item = TaskPatch(**response.json())
         updated_item.data["name"] = "updated-name"
 
         # Try to update the item through the api
@@ -279,7 +279,7 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Update the item
-        updated_item = serializers.Task(**response.json())
+        updated_item = TaskPatch(**response.json())
         updated_item.data["name"] = "updated-name"
 
         # Try to update the item through the api
@@ -306,7 +306,7 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Update the item
-        updated_item = serializers.Task(**response.json())
+        updated_item = TaskPatch(**response.json())
         updated_item.priority = 2
 
         # Try to update the item through the api
@@ -336,7 +336,7 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(response.status_code, 201)
 
         # Update priority of the item
-        updated_item = serializers.Task(**response.json())
+        updated_item = TaskPatch(**response.json())
         updated_item.priority = 1
 
         # Try to update the item through the api
@@ -364,7 +364,7 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(response.status_code, 201)
 
         # Update priority of the item
-        updated_item = serializers.Task(**response.json())
+        updated_item = TaskPatch(**response.json())
         updated_item.priority = 2
 
         # Try to update the item through the api

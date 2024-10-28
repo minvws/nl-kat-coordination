@@ -29,8 +29,37 @@ class TaskStatus(str, enum.Enum):
     CANCELLED = "cancelled"
 
 
+# TODO:
+class TaskDetail(BaseModel):
+    pass
+
+
+class TaskCreate(BaseModel):
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
+
+    id: uuid.UUID | None = None
+
+    scheduler_id: str | None = None
+
+    schedule_id: uuid.UUID | None = None
+
+    priority: int | None = None
+
+    status: TaskStatus | None = None
+
+    type: str | None = None
+
+    hash: str | None = None
+
+    data: dict | None = None
+
+    created_at: datetime | None = None
+
+    modified_at: datetime | None = None
+
+
 # NOTE: model added for support of partial updates
-class Task(BaseModel):
+class TaskPatch(BaseModel):
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
     id: uuid.UUID | None = None

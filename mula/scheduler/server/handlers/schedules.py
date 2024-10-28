@@ -8,7 +8,8 @@ import structlog
 from fastapi import Body, status
 
 from scheduler import context, models, schedulers, storage
-from scheduler.server import serializers, utils
+from scheduler.server import models, utils
+from scheduler.server.models import ScheduleCreate, ScheduleDetail
 
 
 class ScheduleAPI:
@@ -33,7 +34,7 @@ class ScheduleAPI:
             path="/schedules",
             endpoint=self.create,
             methods=["POST"],
-            response_model=models.Schedule,
+            response_model=ScheduleCreate,
             status_code=201,
             description="Create a schedule",
         )
@@ -42,7 +43,7 @@ class ScheduleAPI:
             path="/schedules/{schedule_id}",
             endpoint=self.get,
             methods=["GET"],
-            response_model=models.Schedule,
+            response_model=ScheduleDetail,
             status_code=200,
             description="Get a schedule",
         )
@@ -51,7 +52,7 @@ class ScheduleAPI:
             path="/schedules/{schedule_id}",
             endpoint=self.patch,
             methods=["PATCH"],
-            response_model=models.Schedule,
+            response_model=ScheduleDetail,
             response_model_exclude_unset=True,
             status_code=200,
             description="Update a schedule",
@@ -128,7 +129,7 @@ class ScheduleAPI:
 
         return utils.paginate(request, results, count, offset, limit)
 
-    def create(self, schedule: serializers.ScheduleCreate) -> Any:
+    def create(self, schedule: models.ScheduleCreate) -> Any:
         try:
             new_schedule = models.Schedule(**schedule.model_dump())
         except pydantic.ValidationError as exc:
@@ -210,7 +211,7 @@ class ScheduleAPI:
 
         return schedule
 
-    def patch(self, schedule_id: uuid.UUID, schedule: serializers.SchedulePatch) -> Any:
+    def patch(self, schedule_id: uuid.UUID, schedule: models.SchedulePatch) -> Any:
         try:
             schedule_db = self.ctx.datastores.schedule_store.get_schedule(schedule_id)
         except storage.errors.StorageError as exc:

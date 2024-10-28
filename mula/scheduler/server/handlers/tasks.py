@@ -6,8 +6,9 @@ import fastapi
 import structlog
 from fastapi import status
 
-from scheduler import context, models, storage
-from scheduler.server import serializers, utils
+from scheduler import context, storage
+from scheduler.server import utils
+from scheduler.server.models import TaskDetail, TaskPatch
 
 
 class TaskAPI:
@@ -45,7 +46,7 @@ class TaskAPI:
             path="/tasks/{task_id}",
             endpoint=self.get,
             methods=["GET"],
-            response_model=models.Task,
+            response_model=TaskDetail,
             status_code=status.HTTP_200_OK,
             description="Get a task",
         )
@@ -54,7 +55,7 @@ class TaskAPI:
             path="/tasks/{task_id}",
             endpoint=self.patch,
             methods=["PATCH"],
-            response_model=models.Task,
+            response_model=TaskPatch,
             response_model_exclude_unset=True,
             status_code=status.HTTP_200_OK,
             description="Update a task",
@@ -177,7 +178,7 @@ class TaskAPI:
 
         return task
 
-    def patch(self, task_id: uuid.UUID, item: serializers.Task) -> Any:
+    def patch(self, task_id: uuid.UUID, item: TaskPatch) -> Any:
         try:
             task_db = self.ctx.datastores.task_store.get_task(task_id)
         except storage.errors.StorageError as exc:
