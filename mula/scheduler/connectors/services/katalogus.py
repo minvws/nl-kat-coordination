@@ -52,7 +52,6 @@ class Katalogus(HTTPService):
 
         orgs = self.get_organisations()
         plugin_cache = {}
-        boefjes_cache = {}
         for org in orgs:
             plugin_cache.setdefault(org.id, {})
             plugins = self.get_plugins_by_organisation(org.id)
