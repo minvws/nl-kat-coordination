@@ -188,6 +188,61 @@ def save_report_data(
     return parent_report_ooi
 
 
+def save_aggregate_report_data(
+    bytes_client,
+    octopoes_api_connector,
+    organization,
+    observed_at,
+    get_observed_at,
+    ooi_pks,
+    input_data: dict,
+    parent_report_name,
+    report_data,
+    post_processed_data,
+    aggregate_report,
+) -> Report:
+    observed_at = get_observed_at
+
+    now = datetime.utcnow()
+    bytes_client = bytes_client
+
+    # Create the report
+    report_data_raw_id = bytes_client.upload_raw(
+        raw=ReportDataDict(post_processed_data | input_data).model_dump_json().encode(),
+        manual_mime_types={"openkat/report"},
+    )
+    report_type = type(aggregate_report)
+    name = now.strftime(parent_report_name)
+    if not name or name.isspace():
+        name = report_type.name
+
+    report_ooi = Report(
+        name=str(name),
+        report_type=str(report_type.id),
+        template=report_type.template_path,
+        report_id=uuid4(),
+        organization_code=organization.code,
+        organization_name=organization.name,
+        organization_tags=list(organization.tags.all()),
+        data_raw_id=report_data_raw_id,
+        date_generated=datetime.now(timezone.utc),
+        input_oois=ooi_pks,
+        observed_at=observed_at,
+        parent_report=None,
+        has_parent=False,
+    )
+    create_ooi(octopoes_api_connector, bytes_client, report_ooi, observed_at)
+
+    # Save the child reports to bytes
+    for ooi, types in report_data.items():
+        for report_type, data in types.items():
+            bytes_client.upload_raw(
+                raw=ReportDataDict(data | input_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
+            )
+
+    return report_ooi
+
+
 class SaveGenerateReportMixin(BaseReportView):
     def save_report(self, report_names: list) -> Report | None:
         error_reports, report_data = collect_reports(
@@ -263,58 +318,3 @@ class SaveAggregateReportMixin(BaseReportView):
             post_processed_data,
             aggregate_report,
         )
-
-
-def save_aggregate_report_data(
-    bytes_client,
-    octopoes_api_connector,
-    organization,
-    observed_at,
-    get_observed_at,
-    ooi_pks,
-    input_data: dict,
-    parent_report_name,
-    report_data,
-    post_processed_data,
-    aggregate_report,
-) -> Report:
-    observed_at = get_observed_at
-
-    now = datetime.utcnow()
-    bytes_client = bytes_client
-
-    # Create the report
-    report_data_raw_id = bytes_client.upload_raw(
-        raw=ReportDataDict(post_processed_data | input_data).model_dump_json().encode(),
-        manual_mime_types={"openkat/report"},
-    )
-    report_type = type(aggregate_report)
-    name = now.strftime(parent_report_name)
-    if not name or name.isspace():
-        name = report_type.name
-
-    report_ooi = Report(
-        name=str(name),
-        report_type=str(report_type.id),
-        template=report_type.template_path,
-        report_id=uuid4(),
-        organization_code=organization.code,
-        organization_name=organization.name,
-        organization_tags=list(organization.tags.all()),
-        data_raw_id=report_data_raw_id,
-        date_generated=datetime.now(timezone.utc),
-        input_oois=ooi_pks,
-        observed_at=observed_at,
-        parent_report=None,
-        has_parent=False,
-    )
-    create_ooi(octopoes_api_connector, bytes_client, report_ooi, observed_at)
-
-    # Save the child reports to bytes
-    for ooi, types in report_data.items():
-        for report_type, data in types.items():
-            bytes_client.upload_raw(
-                raw=ReportDataDict(data | input_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
-            )
-
-    return report_ooi
