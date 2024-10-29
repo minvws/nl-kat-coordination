@@ -65,7 +65,7 @@ class Katalogus(HTTPService):
             self.plugin_cache.expiration_enabled = True
         
         self.logger.debug("Flushed the katalogus plugin cache for organisations")
-        return plugins
+        return plugin_cache
 
     def flush_boefje_cache(self, plugins=None) -> None:
         """boefje.consumes -> plugin type boefje"""
