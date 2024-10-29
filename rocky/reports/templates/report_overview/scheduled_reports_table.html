@@ -68,7 +68,11 @@
                                                            title="{% translate "Show report details" %}">{{ report.name }}</a>
                                                     </td>
                                                     <td>
-                                                        <span class="label tags-color-{{ report.report_type|get_report_type_label_style }}">{{ report.report_type|get_report_type_name }}</span>
+                                                        {% if report.parent_report_type == "aggregate-report" %}
+                                                            <span class="label tags-color-{{ report.parent_report_type|get_report_type_label_style }}">{{ report.parent_report_type|get_report_type_name }}</span>
+                                                        {% else %}
+                                                            <span class="label tags-color-{{ report.report_type|get_report_type_label_style }}">{{ report.report_type|get_report_type_name }}</span>
+                                                        {% endif %}
                                                     </td>
                                                     <td>
                                                         {% for ooi in report.input_oois %}<span>{{ ooi|human_readable }}</span>{% endfor %}
