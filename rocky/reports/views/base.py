@@ -151,7 +151,7 @@ def format_plugin_data(report_type_plugins: dict[str, list[Plugin]]):
     ]
 
 
-class BaseReportView(OOIFilterView):
+class BaseReportView(OOIFilterView, ReportBreadcrumbs):
     """
     This view is the base for the report creation wizard.
     All the necessary functions and variables needed.
@@ -314,6 +314,13 @@ class OOISelectionView(BaseReportView, BaseOOIListView):
     Shows a list of OOIs to select from and handles OOIs selection requests.
     """
 
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        object_selection = request.GET.get("object_selection", "")
+
+        if object_selection == "query":
+            return PostRedirect(self.get_next())
+
     def post(self, request, *args, **kwargs):
         if not (self.get_ooi_selection() or self.all_oois_selected()):
             messages.error(request, self.NONE_OOI_SELECTION_MESSAGE)
@@ -325,7 +332,7 @@ class OOISelectionView(BaseReportView, BaseOOIListView):
         return context
 
 
-class ReportTypeSelectionView(BaseReportView, ReportBreadcrumbs, TemplateView):
+class ReportTypeSelectionView(BaseReportView, TemplateView):
     """
     Shows report types and handles selections and requests.
     """
@@ -335,7 +342,8 @@ class ReportTypeSelectionView(BaseReportView, ReportBreadcrumbs, TemplateView):
         self.available_report_types, self.counted_report_types = self.get_available_report_types()
 
     def post(self, request, *args, **kwargs):
-        if not (self.get_ooi_selection() or self.all_oois_selected()):
+        object_selection = request.GET.get("object_selection", "")
+        if not (self.get_ooi_selection() or self.all_oois_selected()) and object_selection != "query":
             return PostRedirect(self.get_previous())
         return self.get(request, *args, **kwargs)
 
@@ -353,7 +361,7 @@ class ReportTypeSelectionView(BaseReportView, ReportBreadcrumbs, TemplateView):
         return context
 
 
-class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
+class ReportPluginView(BaseReportView, TemplateView):
     """
     This view shows the required and optional plugins together with the summary per report type.
     """
@@ -449,7 +457,7 @@ class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
         return context
 
 
-class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, SchedulerView, TemplateView):
+class ReportFinalSettingsView(BaseReportView, SchedulerView, TemplateView):
     report_type: type[BaseReport] | None = None
     task_type = "report"
     is_a_scheduled_report = False
@@ -518,7 +526,7 @@ class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, SchedulerView, 
         return context
 
 
-class SaveReportView(BaseReportView, ReportBreadcrumbs, SchedulerView):
+class SaveReportView(BaseReportView, SchedulerView):
     task_type = "report"
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:

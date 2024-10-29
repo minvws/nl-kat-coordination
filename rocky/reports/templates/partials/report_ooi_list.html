@@ -10,9 +10,22 @@
                 Select objects ({{ total_oois }})
             {% endblocktranslate %}
         </h2>
-        <p>{% translate "Select which objects you want to include in your report." %}</p>
+        <p>
+            {% blocktranslate %}
+                Select which objects you want to include in your report.
+                You can either continue with a live object set based on your selected filter,
+                or you can select the objects manually from the table below.
+            {% endblocktranslate %}
+        </p>
         {% include "partials/ooi_list_filters.html" %}
 
+        <button type="submit"
+                class="button select_all_objects_element"
+                name="object_selection"
+                value="query"
+                form="select_all_objects_form">
+            {% translate "Continue with live set" %}<span class="icon ti-chevron-right"></span>
+        </button>
         {% if not ooi_list %}
             <p>{% translate "No objects found." %}</p>
             <div class="button-container">
@@ -51,7 +64,8 @@
             <form novalidate
                   method="post"
                   action="{{ next }}"
-                  class="inline layout-wide checkboxes_required">
+                  class="inline layout-wide checkboxes_required"
+                  id="object_table_form">
                 {% csrf_token %}
                 {% if all_oois_selected %}
                     {% include "forms/report_form_fields.html" %}
@@ -94,7 +108,10 @@
                         {% endfor %}
                     </tbody>
                 </table>
-                <button type="submit" class="button">
+                <button type="submit"
+                        class="button ghost"
+                        name="object_selection"
+                        value="selection">
                     {% translate "Continue with selection" %}<span class="icon ti-chevron-right"></span>
                 </button>
             </form>
