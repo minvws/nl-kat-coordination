@@ -124,4 +124,4 @@ class QueueAPI:
                 status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
             ) from exc
 
-        return pushed_item
+        return TaskDetail(**pushed_item.model_dump())
