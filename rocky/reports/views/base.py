@@ -120,13 +120,9 @@ class ReportsLandingView(ReportBreadcrumbs, TemplateView):
         return redirect(reverse("report_history", kwargs=self.get_kwargs()))
 
 
-def get_plugin_ids(report_types: list[type[BaseReport]]):
-    return report_plugins_union(report_types)
-
-
 def hydrate_plugins(report_types: list[type["BaseReport"]], katalogus: KATalogusClientV1) -> dict[str, list[Plugin]]:
     plugins: dict[str, list[Plugin]] = {"required": [], "optional": []}
-    merged_plugins = get_plugin_ids(report_types)
+    merged_plugins = report_plugins_union(report_types)
 
     required_plugins_ids = list(merged_plugins["required"])
     optional_plugins_ids = list(merged_plugins["optional"])
@@ -255,23 +251,11 @@ class BaseReportView(OOIFilterView):
         report_types = self.get_report_types_for_generate_report()
         return report_types, len(report_types)
 
-    def get_plugin_data_for_saving(self) -> list[dict]:
-        try:
-            report_type_plugins = hydrate_plugins(self.get_report_types(), get_katalogus(self.organization.code))
-        except KATalogusError as error:
-            return messages.error(self.request, error.message)
-
-        return format_plugin_data(report_type_plugins)
-
     def get_observed_at(self):
         return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
 
-    def show_report_names(self) -> bool:
-        recurrence_choice = self.request.POST.get("choose_recurrence", "once")
-        return recurrence_choice == "once"
-
     def is_scheduled_report(self) -> bool:
-        recurrence_choice = self.request.POST.get("choose_recurrence", "")
+        recurrence_choice = self.request.POST.get("choose_recurrence", "once")
         return recurrence_choice == "repeat"
 
     def create_report_recipe(self, report_name_format: str, subreport_name_format: str, schedule: str) -> ReportRecipe:
@@ -296,7 +280,7 @@ class BaseReportView(OOIFilterView):
             "input_data": {
                 "input_oois": self.get_ooi_pks(),
                 "report_types": self.get_report_type_ids(),
-                "plugins": get_plugin_ids(self.get_report_types()),
+                "plugins": report_plugins_union(self.get_report_types()),
             }
         }
 
@@ -454,7 +438,6 @@ class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, SchedulerView, 
     report_type: type[BaseReport] | None = None
     task_type = "report"
     is_a_scheduled_report = False
-    show_listes_report_names = False
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.get_report_type_ids():
@@ -462,7 +445,6 @@ class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, SchedulerView, 
             return PostRedirect(self.get_previous())
 
         self.is_a_scheduled_report = self.is_scheduled_report()
-        self.show_listes_report_names = self.show_report_names()
 
         return super().get(request, *args, **kwargs)
 
@@ -508,13 +490,13 @@ class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, SchedulerView, 
         context = super().get_context_data(**kwargs)
         context["reports"] = self.get_report_names()
 
+        context["report_schedule_form_start_date"] = self.get_report_schedule_form_start_date()
         context["report_schedule_form_recurrence_choice"] = self.get_report_schedule_form_recurrence_choice()
         context["report_schedule_form_recurrence"] = self.get_report_schedule_form_recurrence()
 
         context["report_parent_name_form"] = self.get_report_parent_name_form()
         context["report_child_name_form"] = self.get_report_child_name_form()
 
-        context["show_listed_report_names"] = self.show_listes_report_names
         context["is_scheduled_report"] = self.is_a_scheduled_report
 
         context["created_at"] = datetime.now()
@@ -529,7 +511,7 @@ class SaveReportView(BaseReportView, ReportBreadcrumbs, SchedulerView):
         report_names = request.POST.getlist("report_name", [])
         reference_dates = request.POST.getlist("reference_date")
 
-        if self.show_report_names() and report_names:
+        if not self.is_scheduled_report() and report_names:
             final_report_names = list(zip(old_report_names, self.finalise_report_names(report_names, reference_dates)))
             report_ooi = self.save_report(final_report_names)
 
@@ -543,12 +525,13 @@ class SaveReportView(BaseReportView, ReportBreadcrumbs, SchedulerView):
             subreport_name_format = request.POST.get("child_report_name", "")
 
             recurrence = request.POST.get("recurrence", "")
+            deadline_at = request.POST.get("start_date", datetime.now(timezone.utc).date())
 
             schedule = self.convert_recurrence_to_cron_expressions(recurrence)
 
             report_recipe = self.create_report_recipe(report_name_format, subreport_name_format, schedule)
 
-            self.create_report_schedule(report_recipe)
+            self.create_report_schedule(report_recipe, deadline_at)
 
             return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 

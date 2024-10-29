@@ -14,7 +14,6 @@ from reports.report_types.aggregate_organisation_report.report import aggregate_
 from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.helpers import REPORTS, get_report_by_id
 from reports.views.base import BaseReportView, ReportDataDict
-from rocky.bytes_client import BytesClient
 
 
 def collect_reports(observed_at: datetime, octopoes_connector: OctopoesAPIConnector, ooi_pks: list[str], report_types):
@@ -55,24 +54,28 @@ def collect_reports(observed_at: datetime, octopoes_connector: OctopoesAPIConnec
     return error_reports, report_data
 
 
-def save_report_raw(bytes_client: BytesClient, data: dict) -> str:
-    report_data_raw_id = bytes_client.upload_raw(
-        raw=ReportDataDict(data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
-    )
-
-    return report_data_raw_id
-
-
 def save_report_data(
-    bytes_client, observed_at, octopoes_api_connector, organization, input_data, report_data, report_names
-):
+    bytes_client,
+    observed_at,
+    octopoes_api_connector,
+    organization,
+    input_data: dict,
+    report_data,
+    report_names,
+    parent_report_name,
+) -> Report | None:
+    if len(report_data) == 0:
+        return None
+
     now = datetime.now(timezone.utc)
 
     # if it's not a single report, we need a parent
 
     if len(report_data) > 1 or len(list(report_data.values())[0]) > 1:
-        raw_id = save_report_raw(bytes_client, data=input_data)
-        name = now.strftime(report_names[0][1])
+        raw_id = bytes_client.upload_raw(
+            raw=ReportDataDict(input_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
+        )
+        name = now.strftime(parent_report_name.replace("{report type}", str(ConcatenatedReport.name)))
 
         if not name or name.isspace():
             name = ConcatenatedReport.name
@@ -121,11 +124,13 @@ def save_report_data(
                 ]
 
                 child_input_data = {
-                    "input_data": {"input_oois": [ooi], "report_types": [report_type_id], "plugins": child_plugins}
+                    "input_data": {"input_oois": [ooi], "report_types": [report_type_id], "plugins": [child_plugins]}
                 }
 
-                raw_id = save_report_raw(bytes_client, data={"report_data": data["data"]} | child_input_data)
-
+                raw_id = bytes_client.upload_raw(
+                    raw=ReportDataDict({"report_data": data["data"]} | child_input_data).model_dump_json().encode(),
+                    manual_mime_types={"openkat/report"},
+                )
                 name = now.strftime(name_to_save)
                 if not name or name.isspace():
                     name = ConcatenatedReport.name
@@ -153,10 +158,12 @@ def save_report_data(
         report_type_id = next(iter(report_data))
         ooi = next(iter(report_data[report_type_id]))
         data = report_data[report_type_id][ooi]
-
-        raw_id = save_report_raw(bytes_client, data={"report_data": data["data"]} | input_data)
+        raw_id = bytes_client.upload_raw(
+            raw=ReportDataDict({"report_data": data["data"]} | input_data).model_dump_json().encode(),
+            manual_mime_types={"openkat/report"},
+        )
         report_type = get_report_by_id(report_type_id)
-        name = now.strftime(report_names[0][1])
+        name = now.strftime(parent_report_name.replace("{report type}", str(report_type.name)))
 
         if not name or name.isspace():
             name = ConcatenatedReport.name
@@ -182,7 +189,7 @@ def save_report_data(
 
 
 class SaveGenerateReportMixin(BaseReportView):
-    def save_report(self, report_names: list) -> Report:
+    def save_report(self, report_names: list) -> Report | None:
         error_reports, report_data = collect_reports(
             self.observed_at,
             self.octopoes_api_connector,
@@ -198,6 +205,7 @@ class SaveGenerateReportMixin(BaseReportView):
             self.get_input_data(),
             report_data,
             report_names,
+            report_names[0][0],
         )
 
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
@@ -239,10 +247,11 @@ class SaveAggregateReportMixin(BaseReportView):
         now = datetime.utcnow()
         bytes_client = self.bytes_client
 
-        # Save report data into bytes
-
-        report_data_raw_id = save_report_raw(bytes_client, data=post_processed_data | self.get_input_data())
-
+        # Create the report
+        report_data_raw_id = bytes_client.upload_raw(
+            raw=ReportDataDict(post_processed_data | self.get_input_data()).model_dump_json().encode(),
+            manual_mime_types={"openkat/report"},
+        )
         report_type = type(aggregate_report)
         name = now.strftime(report_names[0][1])
         if not name or name.isspace():
@@ -268,6 +277,9 @@ class SaveAggregateReportMixin(BaseReportView):
         # Save the child reports to bytes
         for ooi, types in report_data.items():
             for report_type, data in types.items():
-                save_report_raw(bytes_client, data=data | self.get_input_data())
+                bytes_client.upload_raw(
+                    raw=ReportDataDict(data | self.get_input_data()).model_dump_json().encode(),
+                    manual_mime_types={"openkat/report"},
+                )
 
         return report_ooi

@@ -5,7 +5,7 @@ from typing import Any
 import fastapi
 import pydantic
 import structlog
-from fastapi import status
+from fastapi import Body, status
 
 from scheduler import context, models, schedulers, storage
 from scheduler.server import serializers, utils
@@ -55,6 +55,23 @@ class ScheduleAPI:
             response_model_exclude_unset=True,
             status_code=200,
             description="Update a schedule",
+        )
+
+        self.api.add_api_route(
+            path="/schedules/{schedule_id}",
+            endpoint=self.delete,
+            methods=["DELETE"],
+            status_code=204,
+            description="Delete a schedule",
+        )
+
+        self.api.add_api_route(
+            path="/schedules/search",
+            endpoint=self.search,
+            methods=["POST"],
+            response_model=utils.PaginatedResponse,
+            status_code=200,
+            description="Search schedules",
         )
 
     def list(
@@ -246,3 +263,50 @@ class ScheduleAPI:
             ) from exc
 
         return updated_schedule
+
+    def search(
+        self,
+        request: fastapi.Request,
+        offset: int = 0,
+        limit: int = 10,
+        filters: storage.filters.FilterRequest | None = Body(...),
+    ) -> utils.PaginatedResponse:
+        if filters is None:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail="missing search filters"
+            )
+
+        try:
+            results, count = self.ctx.datastores.schedule_store.get_schedules(
+                offset=offset, limit=limit, filters=filters
+            )
+        except storage.filters.errors.FilterError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"invalid filter(s) [exception: {exc}]"
+            ) from exc
+        except storage.errors.StorageError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"error occurred while accessing the database [exception: {exc}]",
+            ) from exc
+        except Exception as exc:
+            self.logger.exception(exc)
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail="failed to search schedules"
+            ) from exc
+
+        return utils.paginate(request, results, count, offset, limit)
+
+    def delete(self, schedule_id: uuid.UUID) -> None:
+        try:
+            self.ctx.datastores.schedule_store.delete_schedule(schedule_id)
+        except storage.errors.StorageError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"error occurred while accessing the database [exception: {exc}]",
+            ) from exc
+        except Exception as exc:
+            self.logger.exception(exc)
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail="failed to search schedules"
+            ) from exc
