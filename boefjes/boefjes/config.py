@@ -122,6 +122,8 @@ class Settings(BaseSettings):
 
     logging_format: Literal["text", "json"] = Field("text", description="Logging format")
 
+    httpx_timeout: int = Field(30, description="httpx timeout")
+
     model_config = SettingsConfigDict(env_prefix="BOEFJES_")
 
     @classmethod
