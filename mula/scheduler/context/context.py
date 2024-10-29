@@ -42,6 +42,12 @@ class AppContext:
         with Path(self.config.log_cfg).open("rt", encoding="utf-8") as f:
             logging.config.dictConfig(json.load(f))
 
+        # Set the logging level to the value specified by the env var
+        level = logging.getLevelName(self.config.log_level.upper())
+        root_logger = logging.getLogger()
+        root_logger.setLevel(level)
+        root_logger.handlers[0].setLevel(level)
+
         # Check if we enabled structured logging in the configuration
         if self.config.logging_format == "json":
             structlog.configure(

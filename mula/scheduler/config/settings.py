@@ -48,6 +48,7 @@ class Settings(BaseSettings):
     debug: bool = Field(False, alias="DEBUG", description="Enables/disables global debugging mode")
 
     log_cfg: Path = Field(BASE_DIR / "logging.json", description="Path to the logging configuration file")
+    log_level: str = Field("INFO", description="Logging level")
 
     collect_metrics: bool = Field(
         False, description="Enables/disables the collection of metrics to be used with tools like Prometheus"
