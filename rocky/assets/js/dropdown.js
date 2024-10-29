@@ -1,46 +1,26 @@
-const dropdowns = document.querySelectorAll(".dropdown");
-
-dropdowns.forEach((dropdown) => {
-  const dropdownButton = dropdown.querySelector(".dropdown-button");
-
-  const toggle = (e) => {
-    const activeButton = document.querySelector(
-      ".dropdown-button[aria-expanded='true']",
-    );
-    const isOpen = dropdownButton.getAttribute("aria-expanded") === "true";
-    const dropdownList = document.getElementById(
-      dropdownButton.getAttribute("aria-controls"),
-    );
-
-    if (activeButton && activeButton !== dropdownButton) {
-      const activeList = document.getElementById(
-        activeButton.getAttribute("aria-controls"),
-      );
-      activeButton.setAttribute("aria-expanded", "false");
-    }
-
-    if (isOpen) {
-      dropdownButton.setAttribute("aria-expanded", "false");
-    } else {
-      dropdownButton.setAttribute("aria-expanded", "true");
-    }
-
-    e.stopPropagation();
-  };
-
-  dropdownButton.addEventListener("click", toggle);
-});
-
-document.addEventListener("click", () => {
+function toggleAriaExpanded(event) {
+  const currentButton = event.target;
+  const isExpanded = currentButton.getAttribute("aria-expanded") === "true";
   const activeButton = document.querySelector(
     ".dropdown-button[aria-expanded='true']",
   );
-  const activeDropdown = activeButton?.closest(".dropdown");
 
-  if (activeDropdown && !activeDropdown.contains(e.target)) {
-    const activeList = document.getElementById(
-      activeButton.getAttribute("aria-controls"),
-    );
+  if (activeButton && currentButton !== activeButton) {
     activeButton.setAttribute("aria-expanded", "false");
+  }
+
+  currentButton.setAttribute("aria-expanded", !isExpanded);
+}
+
+document.addEventListener("click", (event) => {
+  const isDropdownButtonClicked =
+    event.target.classList.contains("dropdown-button");
+
+  if (isDropdownButtonClicked) {
+    toggleAriaExpanded(event);
+  } else {
+    document
+      .querySelector(".dropdown-button[aria-expanded='true']")
+      .setAttribute("aria-expanded", "false");
   }
 });

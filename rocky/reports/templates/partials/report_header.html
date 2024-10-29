@@ -5,10 +5,12 @@
         <div class="horizontal-view toolbar">
             <h1>{{ report_ooi.name }}</h1>
             <div class="dropdown">
-                <button aria-controls="download-report" class="dropdown-button ghost">
+                <button aria-controls="download-report"
+                        aria-expanded="false"
+                        class="dropdown-button ghost">
                     {% translate "Export" %}<span aria-hidden="true" class="icon ti-chevron-down"></span>
                 </button>
-                <div id="download-report" aria-expanded="false" class="dropdown-list">
+                <div id="download-report" class="dropdown-list">
                     <ul>
                         <li>
                             <a href="{{ report_download_pdf_url }}" target="_blank"><span class="icon ti-download" aria-hidden="true"></span>{% translate "Download report" %} (PDF)</a>

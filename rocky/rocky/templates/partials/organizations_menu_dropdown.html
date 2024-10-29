@@ -2,7 +2,9 @@
 
 {% if organizations_including_blocked|length > 0 %}
     <div class="dropdown">
-        <button aria-controls="change-organization" class="dropdown-button ghost">
+        <button aria-controls="change-organization"
+                aria-expanded="false"
+                class="dropdown-button ghost">
             {% if not organization.code %}
                 {% translate "Select organization" %}
             {% else %}
