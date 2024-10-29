@@ -47,6 +47,8 @@ class AppContext:
         root_logger = logging.getLogger()
         root_logger.setLevel(level)
         root_logger.handlers[0].setLevel(level)
+        logging.getLogger("uvicorn.access").setLevel(level)
+        logging.getLogger("uvicorn.error").setLevel(level)
 
         # Check if we enabled structured logging in the configuration
         if self.config.logging_format == "json":
