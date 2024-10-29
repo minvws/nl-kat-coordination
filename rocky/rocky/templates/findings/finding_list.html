@@ -31,8 +31,8 @@
                     <p class="de-emphasized">
                         {% translate "Showing " %}{{ object_list|length }} {% translate "of" %} {{ paginator.count }} {% translate "findings" %}
                     </p>
-                    <div class="horizontal-scroll">
-                        <table class="action-buttons nowrap">
+                    <div class="horizontal-scroll sticky-column">
+                        <table class="action-buttons">
                             <caption class="visually-hidden">{% translate "Findings table" %}</caption>
                             <thead>
                                 <tr>
@@ -45,7 +45,7 @@
                                     <th>{% translate "Finding" %}</th>
                                     <th>{% translate "Tree" %}</th>
                                     <th>{% translate "Graph" %}</th>
-                                    <th class="visually-hidden">{% translate "Details" %}</th>
+                                    <th class="sticky-cell visually-hidden">{% translate "Details" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -75,7 +75,7 @@
                                                class="icon ti-affiliate button"
                                                href="{% ooi_url 'ooi_graph' hydrated_finding.finding.primary_key organization.code query=mandatory_fields %}">{% translate "Graph" %}</a>
                                         </td>
-                                        <td class="actions">
+                                        <td class="actions sticky-cell">
                                             <button type="button"
                                                     class="expando-button"
                                                     data-icon-open-class="icon ti-chevron-down"

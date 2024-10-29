@@ -30,7 +30,7 @@
                 <p class="de-emphasized">
                     {% translate "Showing " %}{{ object_list|length }} {% translate "of" %} {{ paginator.count }} {% translate "findings" %}
                 </p>
-                <div class="horizontal-scroll">
+                <div class="horizontal-scroll sticky-column">
                     <table class="action-buttons nowrap">
                         <caption class="visually-hidden">{% translate "Findings table" %}</caption>
                         <thead>
@@ -51,7 +51,7 @@
                                             <a href="{% ooi_url "ooi_detail" finding.primary_key organization.code query=mandatory_fields %}"
                                                title="{% blocktranslate trimmed with finding=finding.human_readable %} Show details for {{ finding }} {% endblocktranslate %}">{{ finding.human_readable }}</a>
                                         </td>
-                                        <td class="actions">
+                                        <td class="actions sticky-cell">
                                             <button class="expando-button"
                                                     data-icon-open-class="icon ti-chevron-down"
                                                     data-icon-close-class="icon ti-chevron-up"

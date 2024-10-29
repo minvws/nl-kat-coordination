@@ -2,8 +2,8 @@
 {% load ooi_extra %}
 {% load report_extra %}
 
-<div class="horizontal-scroll">
-    <table>
+<div class="horizontal-scroll sticky-column">
+    <table class="nowrap">
         <caption class="visually-hidden">{% translate "Reports:" %}</caption>
         <thead>
             <tr>
@@ -12,7 +12,9 @@
                 <th scope="col">{% translate "Input Objects" %}</th>
                 <th scope="col">{% translate "Reference date" %}</th>
                 <th scope="col">{% translate "Creation date" %}</th>
-                <th scope="col"></th>
+                {% if report.children_reports %}
+                    <th scope="col" class="visually-hidden">{% translate "Details" %}</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
@@ -51,16 +53,16 @@
                     </td>
                     <td class="nowrap">{{ report.parent_report.observed_at|date }}</td>
                     <td class="nowrap">{{ report.parent_report.date_generated }}</td>
-                    <td>
-                        {% if report.children_reports %}
+                    {% if report.children_reports %}
+                        <td class="actions sticky-cell">
                             <button type="button"
                                     class="expando-button icon ti-chevron-down"
                                     data-icon-open-class="icon ti-chevron-down"
                                     data-icon-close-class="icon ti-chevron-up"
                                     data-close-label="{% translate "Close children report object details" %}"
                                     aria-expanded="false"></button>
-                        {% endif %}
-                    </td>
+                        </td>
+                    {% endif %}
                 </tr>
                 {% if report.children_reports %}
                     <tr class="expando-row">

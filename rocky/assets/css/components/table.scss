@@ -2,6 +2,7 @@ td,
 tr {
   .icon {
     margin-right: 0.5rem;
+    float: unset;
   }
 
   &.confirmation {
@@ -65,16 +66,6 @@ tr {
   }
 }
 
-table.nowrap {
-  th,
-  td {
-    a {
-      // white-space: inherit;
-      white-space: pre-wrap;
-    }
-  }
-}
-
 /* table alignment within table expando row */
 table tr.expando-row td {
   table td {
@@ -83,7 +74,7 @@ table tr.expando-row td {
   }
 }
 
-table tbody td {
+table:not(.nowrap) tbody td:not(.nowrap) {
   a {
     line-break: break-all;
     display: inline-block; /* Needed to be able to use max-width */
