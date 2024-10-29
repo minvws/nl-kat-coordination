@@ -6,7 +6,7 @@ _Status: Draft_
 
 The current workflow is as follows:
 
-```mermaid
+```{mermaid}
 graph LR;
     Mula--Tasks-->Boefjes;
     Boefjes--Information-->Bytes;

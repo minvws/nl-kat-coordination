@@ -6,7 +6,7 @@ OpenKAT has Debian packages available. In the near future we will have an apt
 repository that will allow you to keep your installation up-to-date using apt.
 An installation of KAT can be done on a single machine or spread out on several
 machines for a high availability setup. This guide will take you through the
-steps for installing it on a single machine. There are also :ref:`scripts<Scripts>`
+steps for installing it on a single machine. There are also :doc:`/installation-and-deployment/scripts`
 available if you don't want to do this by hand.
 
 Supported distributions

@@ -23,10 +23,7 @@ class BreadcrumbsReportOverviewView(ReportBreadcrumbs):
         breadcrumbs = super().build_breadcrumbs()
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
-        breadcrumbs += [
-            {"url": reverse("report_history", kwargs=kwargs) + selection, "text": _("Reports history")},
-            {"url": reverse("subreports", kwargs=kwargs) + selection, "text": _("Subreports")},
-        ]
+        breadcrumbs += [{"url": reverse("subreports", kwargs=kwargs) + selection, "text": _("Subreports")}]
         return breadcrumbs
 
 
@@ -36,7 +33,6 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
     """
 
     paginate_by = 20
-    breadcrumbs_step = 2
     context_object_name = "reports"
     paginator = RockyPaginator
     template_name = "report_overview/scheduled_reports.html"
@@ -60,24 +56,31 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
         recipes = []
         if report_schedules:
             for schedule in report_schedules:
-                recipe_id = schedule["data"]["report_recipe_id"]
-                # TODO: This is a workaround to get the recipes and reports.
-                #  We should create an endpoint for this in octopoes
-                recipe_ooi_tree = self.get_recipe_ooi_tree(recipe_id)
-                if recipe_ooi_tree is not None:
-                    recipe_tree = recipe_ooi_tree.store.values()
-                    recipe_ooi = [ooi for ooi in recipe_tree if isinstance(ooi, ReportRecipe)][0]
-                    report_oois = [ooi for ooi in recipe_tree if isinstance(ooi, Report)]
-                    recipes.append(
-                        {
-                            "recipe": recipe_ooi,
-                            "cron": schedule["schedule"],
-                            "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
-                            "reports": report_oois,
-                        }
-                    )
+                if schedule["data"]:
+                    recipe_id = schedule["data"]["report_recipe_id"]
+                    # TODO: This is a workaround to get the recipes and reports.
+                    #  We should create an endpoint for this in octopoes
+                    recipe_ooi_tree = self.get_recipe_ooi_tree(recipe_id)
+                    if recipe_ooi_tree is not None:
+                        recipe_tree = recipe_ooi_tree.store.values()
+                        recipe_ooi = next(ooi for ooi in recipe_tree if isinstance(ooi, ReportRecipe))
+                        report_oois = [ooi for ooi in recipe_tree if isinstance(ooi, Report)]
+                        recipes.append(
+                            {
+                                "schedule_id": schedule["id"],
+                                "recipe": recipe_ooi,
+                                "cron": schedule["schedule"],
+                                "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
+                                "reports": report_oois,
+                            }
+                        )
 
         return recipes
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["total_oois"] = len(self.object_list)
+        return context
 
 
 class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
@@ -105,6 +108,7 @@ class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     """
 
     paginate_by = 150
+    breadcrumbs_step = 2
     context_object_name = "subreports"
     paginator = RockyPaginator
     template_name = "report_overview/subreports.html"
