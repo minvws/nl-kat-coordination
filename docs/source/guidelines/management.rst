@@ -26,7 +26,7 @@ When a cycle has been completed, we hold a quick retrospective to evaluate what 
 Bugs and Feature Requests
 =========================
 
-For effective bug reporting and feature requests there are :ref:`GitHub Templates`.
+For effective bug reporting and feature requests there are :doc:`/templates/index`.
 These should be used and submitted in the coordination repository's `issues board <https://github.com/minvws/nl-kat-coordination/issues>`_.
 Please make sure to link them to the central project board as an incoming feature/refinement.
 
@@ -34,7 +34,7 @@ Please make sure to link them to the central project board as an incoming featur
 Pull Requests
 =============
 
-Each unit of work shall be submitted as a pull request using a :ref:`Pull Request Template` and reviewed by at least one developer.
+Each unit of work shall be submitted as a pull request using a :doc:`/templates/pull_request_template_author` and reviewed by at least one developer.
 The checklist should be completed by a functional and a code reviewer.
 
 In-depth content discussions
