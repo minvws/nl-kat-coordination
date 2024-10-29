@@ -113,9 +113,10 @@ class ExportSetupAggregateReportView(
     def post(self, request, *args, **kwargs):
         selected_plugins = request.POST.getlist("plugin", [])
 
+        client = get_katalogus(self.organization.code)
         for selected_plugin in selected_plugins:
             try:
-                get_katalogus(self.organization.code).enable_boefje_by_id(selected_plugin)
+                client.enable_boefje_by_id(selected_plugin)
             except HTTPError:
                 messages.error(
                     request,
