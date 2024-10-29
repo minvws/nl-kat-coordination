@@ -49,7 +49,6 @@ class LocalReportRunner(ReportRunner):
                 connector,
                 Organization.objects.get(code=report_task.organisation_id),
                 valid_time,
-                valid_time,
                 recipe.input_recipe["input_oois"],
                 {
                     "input_data": {

@@ -192,7 +192,6 @@ def save_aggregate_report_data(
     bytes_client,
     octopoes_api_connector,
     organization,
-    observed_at,
     get_observed_at,
     ooi_pks,
     input_data: dict,
@@ -204,7 +203,6 @@ def save_aggregate_report_data(
     observed_at = get_observed_at
 
     now = datetime.utcnow()
-    bytes_client = bytes_client
 
     # Create the report
     report_data_raw_id = bytes_client.upload_raw(
@@ -278,42 +276,32 @@ class SaveGenerateReportMixin(BaseReportView):
 
 class SaveAggregateReportMixin(BaseReportView):
     def save_report(self, report_names: list) -> Report:
-        organization = self.organization
-        octopoes_api_connector = self.octopoes_api_connector
-        oois = self.get_oois()
-        report_type_ids = self.get_report_type_ids()
-        observed_at = self.observed_at
-        get_observed_at = self.get_observed_at()
-        bytes_client = self.bytes_client
-        input_data = self.get_input_data()
-        ooi_pks = self.get_ooi_pks()
-        input_data = self.get_input_data()
-        request = self.request
-        parent_report_name = report_names[0][1]
-
         aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
-            octopoes_api_connector, oois, report_type_ids, observed_at, organization.code
+            self.octopoes_api_connector,
+            self.get_oois(),
+            self.get_report_type_ids(),
+            self.observed_at,
+            self.organization.code,
         )
 
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if report_errors:
             report_types = ", ".join(set(report_errors))
-            date = observed_at.date()
+            date = self.observed_at.date()
             error_message = _("No data could be found for %(report_types). Object(s) did not exist on %(date)s.") % {
                 "report_types": report_types,
                 "date": date,
             }
-            messages.add_message(request, messages.ERROR, error_message)
+            messages.add_message(self.request, messages.ERROR, error_message)
 
         return save_aggregate_report_data(
-            bytes_client,
-            octopoes_api_connector,
-            organization,
-            observed_at,
-            get_observed_at,
-            ooi_pks,
-            input_data,
-            parent_report_name,
+            self.bytes_client,
+            self.octopoes_api_connector,
+            self.organization,
+            self.get_observed_at(),
+            self.get_ooi_pks(),
+            self.get_input_data(),
+            report_names[0][1],
             report_data,
             post_processed_data,
             aggregate_report,
