@@ -259,13 +259,25 @@ class BaseReportView(OOIFilterView):
         return recurrence_choice == "repeat"
 
     def create_report_recipe(
-        self, report_name_format: str, subreport_name_format: str, parent_report_type: str | None, schedule: str
+        self,
+        report_name_format: str,
+        subreport_name_format: str,
+        parent_report_type: str | None,
+        schedule: str,
+        query: dict[str, Any] | None,
     ) -> ReportRecipe:
+        input_recipe: dict[str, Any] = {}
+
+        if query:
+            input_recipe = {"query": query}
+        else:
+            input_recipe = {"input_oois": self.get_ooi_pks()}
+
         report_recipe = ReportRecipe(
             recipe_id=uuid4(),
             report_name_format=report_name_format,
             subreport_name_format=subreport_name_format,
-            input_recipe={"input_oois": self.get_ooi_pks()},
+            input_recipe=input_recipe,
             parent_report_type=parent_report_type,
             report_types=self.get_report_type_ids(),
             cron_expression=schedule,
@@ -528,6 +540,13 @@ class SaveReportView(BaseReportView, ReportBreadcrumbs, SchedulerView):
             subreport_name_format = request.POST.get("child_report_name", "")
             recurrence = request.POST.get("recurrence", "")
             deadline_at = request.POST.get("start_date", datetime.now(timezone.utc).date())
+            object_selection = request.POST.get(
+                "object_selection", ""
+            )  # TO DO: check of de button met "query" is geselecteerd
+
+            query = {}
+            if object_selection == "query":
+                query = self.get_queryset_params()
 
             parent_report_type = None
             if self.report_type == AggregateOrganisationReport:
@@ -538,7 +557,7 @@ class SaveReportView(BaseReportView, ReportBreadcrumbs, SchedulerView):
             schedule = self.convert_recurrence_to_cron_expressions(recurrence)
 
             report_recipe = self.create_report_recipe(
-                report_name_format, subreport_name_format, parent_report_type, schedule
+                report_name_format, subreport_name_format, parent_report_type, schedule, query
             )
 
             self.create_report_schedule(report_recipe, deadline_at)

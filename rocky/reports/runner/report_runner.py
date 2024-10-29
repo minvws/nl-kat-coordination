@@ -27,13 +27,25 @@ class LocalReportRunner(ReportRunner):
         recipe = connector.get(Reference.from_str(f"ReportRecipe|{report_task.report_recipe_id}"), valid_time)
 
         report_types = [get_report_by_id(report_type_id) for report_type_id in recipe.report_types]
-        oois_count = len(recipe.input_recipe["input_oois"])
         oois = []
         now = datetime.now(timezone.utc)
 
-        for ooi_id in recipe.input_recipe["input_oois"]:
-            ooi = connector.get(Reference.from_str(ooi_id), valid_time)
-            oois.append(ooi)
+        if recipe.input_recipe["input_oois"]:
+            for ooi_id in recipe.input_recipe["input_oois"]:
+                ooi = connector.get(Reference.from_str(ooi_id), valid_time)
+                oois.append(ooi)
+        elif recipe.input_recipe["query"]:
+            query = recipe.input_recipe["query"]
+            oois = connector.list_objects(
+                types=query["ooi_types"],
+                valid_time=query["valid_time"],
+                scan_level=query["scan_level"],
+                scan_profile_type=query["scan_type"],
+                search_string=query["search_string"],
+            )
+
+        oois_count = len(oois)
+        ooi_pks = [ooi.primary_key for ooi in oois]
 
         self.bytes_client.organization = report_task.organisation_id
 
@@ -46,9 +58,7 @@ class LocalReportRunner(ReportRunner):
             report_type_ids = [report.id for report in report_types]
 
             if "${ooi}" in parent_report_name and oois_count == 1:
-                ooi = recipe.input_recipe["input_oois"][0]
-                ooi_human_readable = Reference.from_str(ooi).human_readable
-                parent_report_name = Template(parent_report_name).safe_substitute(ooi=ooi_human_readable)
+                parent_report_name = Template(parent_report_name).safe_substitute(ooi=oois[0].human_readable)
 
             aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
                 connector, oois, report_type_ids, valid_time, report_task.organisation_id
@@ -58,7 +68,7 @@ class LocalReportRunner(ReportRunner):
                 connector,
                 Organization.objects.get(code=report_task.organisation_id),
                 valid_time,
-                recipe.input_recipe["input_oois"],
+                ooi_pks,
                 {
                     "input_data": {
                         "input_oois": recipe.input_recipe["input_oois"],
@@ -73,9 +83,7 @@ class LocalReportRunner(ReportRunner):
             )
         else:
             subreport_names = []
-            error_reports, report_data = collect_reports(
-                valid_time, connector, recipe.input_recipe["input_oois"], report_types
-            )
+            error_reports, report_data = collect_reports(valid_time, connector, ooi_pks, report_types)
 
             for report_type_id, data in report_data.items():
                 report_type = get_report_by_id(report_type_id)
@@ -94,9 +102,7 @@ class LocalReportRunner(ReportRunner):
             )
 
             if "${ooi}" in parent_report_name and oois_count == 1:
-                ooi = recipe.input_recipe["input_oois"][0]
-                ooi_human_readable = Reference.from_str(ooi).human_readable
-                parent_report_name = Template(parent_report_name).safe_substitute(ooi=ooi_human_readable)
+                parent_report_name = Template(parent_report_name).safe_substitute(ooi=ooi[0].human_readable)
 
             save_report_data(
                 self.bytes_client,
@@ -105,7 +111,7 @@ class LocalReportRunner(ReportRunner):
                 Organization.objects.get(code=report_task.organisation_id),
                 {
                     "input_data": {
-                        "input_oois": recipe.input_recipe["input_oois"],
+                        "input_oois": ooi_pks,
                         "report_types": recipe.report_types,
                         "plugins": report_plugins_union(report_types),
                     }
