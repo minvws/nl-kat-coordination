@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from string import Template
 
 from django.conf import settings
 from tools.models import Organization
@@ -30,18 +31,28 @@ class LocalReportRunner(ReportRunner):
         )
 
         self.bytes_client.organization = report_task.organisation_id
-        report_names = []
-        oois_count = 0
+        subreport_names = []
+        oois_count = len(recipe.input_recipe["input_oois"])
 
         for report_type_id, data in report_data.items():
-            oois_count += len(data)
             report_type = get_report_by_id(report_type_id)
 
             for ooi in data:
-                report_name = recipe.subreport_name_format.replace("{ooi}", ooi).replace(
-                    "{report type}", str(report_type.name)
+                ooi_human_readable = Reference.from_str(ooi).human_readable
+                subreport_name = Template(recipe.subreport_name_format).safe_substitute(
+                    ooi=ooi_human_readable, report_type=str(report_type.name)
                 )
-                report_names.append((report_name, report_name))
+                subreport_names.append((subreport_name, subreport_name))
+
+        parent_report_name = Template(recipe.report_name_format).safe_substitute(oois_count=str(oois_count))
+
+        if "${ooi}" in parent_report_name and oois_count == 1:
+            ooi = recipe.input_recipe["input_oois"][0]
+            ooi_human_readable = Reference.from_str(ooi).human_readable
+            parent_report_name = Template(parent_report_name).safe_substitute(ooi=ooi_human_readable)
+        if "${report_type}" in parent_report_name and len(report_types) == 1:
+            report_type = get_report_by_id(recipe.report_types[0])
+            parent_report_name = Template(parent_report_name).safe_substitute(report_type=str(report_type.name))
 
         save_report_data(
             self.bytes_client,
@@ -56,8 +67,8 @@ class LocalReportRunner(ReportRunner):
                 }
             },
             report_data,
-            report_names,
-            recipe.report_name_format.replace("{oois_count}", str(oois_count)),
+            subreport_names,
+            parent_report_name,
         )
 
         self.bytes_client.organization = None
