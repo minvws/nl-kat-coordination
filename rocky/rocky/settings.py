@@ -334,7 +334,7 @@ def immutable_file_test(path, url):
 
 
 WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
-WHITENOISE_KEEP_ONLY_HASHED_FILES = True
+WHITENOISE_KEEP_ONLY_HASHED_FILES = False
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "crisis_room"
@@ -431,6 +431,8 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": DEFAULT_AUTHENTICATION_CLASSES,
     "DEFAULT_PERMISSION_CLASSES": ["rocky.permissions.KATModelPermissions"],
     "DEFAULT_RENDERER_CLASSES": DEFAULT_RENDERER_CLASSES,
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 100,
     "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler",
 }
 

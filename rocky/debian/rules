@@ -38,7 +38,8 @@ override_dh_virtualenv:
 	&& $(DH_VENV_DIR)/bin/python manage.py collectstatic --noinput --clear \
 	&& $(DH_VENV_DIR)/bin/python manage.py compress \
 	&& $(DH_VENV_DIR)/bin/python manage.py compilemessages
-	find static -type f -exec install -D "{}" "$(DESTDIR)/usr/share/kat-rocky/{}" \;
+	find static -type f -exec install -m 644 -D "{}" "$(DESTDIR)/usr/share/kat-rocky/{}" \;
+	find components -type f -name *.html -exec install -m 644 -D "{}" "$(DH_VENV_DIR)/lib/`py3versions -d`/site-packages/{}" \;
 
 
 # remove pip to prevent mutation of venv
@@ -50,5 +51,12 @@ override_dh_virtualenv:
 override_dh_gencontrol:
 	dh_gencontrol -- -Vpython=`py3versions -d`
 
+override_dh_installsystemd:
+	dh_installsystemd --name=kat-rocky
+	dh_installsystemd --name=kat-rocky-worker
+
 execute_after_dh_install:
 	dh_installsysusers
+
+# Disables dh_strip_nondeterminism because it very slow and not useful for us
+override_dh_strip_nondeterminism:
