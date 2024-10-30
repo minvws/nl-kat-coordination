@@ -2,6 +2,7 @@ import { onDomReady } from "./imports/utils.js";
 import {
   renderRenameSelection,
   renderDeleteSelection,
+  renderRerunSelection,
 } from "./reportActionForms.js";
 
 onDomReady(function () {
@@ -20,6 +21,9 @@ export function openDialogFromUrl(anchor) {
     }
     if (anchor == "delete-modal") {
       renderDeleteSelection(modal, getSelection());
+    }
+    if (anchor == "rerun-modal") {
+      renderRerunSelection(modal, getSelection());
     }
   }
 }

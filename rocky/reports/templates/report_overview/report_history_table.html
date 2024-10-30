@@ -19,7 +19,7 @@
         <div class="dropdown-list">
             <ul role="listbox">
                 <li>
-                    <a href="#" role="option" data-value="test">
+                    <a href="#rerun-modal" role="option" data-value="test">
                         <i class="icon ti-refresh"></i>{% translate "Rerun" %}
                     </a>
                 </li>
@@ -53,6 +53,7 @@
                 </li>
             </ul>
         </div>
+        {% include "report_overview/modal_partials/rerun_modal.html" %}
         {% include "report_overview/modal_partials/rename_modal.html" %}
         {% include "report_overview/modal_partials/delete_modal.html" %}
 

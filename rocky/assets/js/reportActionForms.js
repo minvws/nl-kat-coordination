@@ -67,6 +67,41 @@ export function renderDeleteSelection(modal, selection) {
   }
 }
 
+export function renderRerunSelection(modal, selection) {
+  let report_names = getReportNames(selection);
+  let references = [];
+
+  selection.forEach((input_element) => {
+    references.push(input_element.value);
+  });
+
+  let table_element = document.getElementById("rerun-table");
+  let table_body = table_element.querySelector("tbody");
+  let table_row = table_element.querySelector("tr.rerun-table-row");
+
+  table_body.innerHTML = "";
+
+  for (let i = 0; i < references.length; i++) {
+    let table_row_copy = table_row.cloneNode(true);
+
+    let reference_input_element = table_row_copy.querySelector(
+      ".report-reference-input",
+    );
+
+    // let type_td = table_row_copy.querySelector("td.type");
+    // let date_td = table_row_copy.querySelector("td.date");
+    let name_span = table_row_copy.querySelector("td.name span.name-holder");
+
+    name_span.innerText += report_names[i];
+    reference_input_element.setAttribute("value", references[i]);
+
+    // type_td.innerText = "type";
+    // date_td.innerText = "date";
+
+    table_body.appendChild(table_row_copy);
+  }
+}
+
 // export function renderDeleteSelection(modal, selection) {
 //   let form_element = document.getElementById("delete-form");
 //   let csrf_token_element = form_element.querySelector(

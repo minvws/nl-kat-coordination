@@ -2,10 +2,9 @@
 
 {% component "modal" size="dialog-large" modal_id="rename-modal" %}
 {% fill "header" %}
-{% translate "Rename" %}
+{% translate "Rename the following report(s):" %}
 {% endfill %}
 {% fill "content" %}
-<h3>{% translate "Rename the following report(s):" %}</h3>
 <form id="rename-form" class="inline layout-wide" method="post">
     {% csrf_token %}
     <table id="rename-table">
