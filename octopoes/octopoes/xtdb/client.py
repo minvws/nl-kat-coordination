@@ -46,7 +46,10 @@ class XTDBStatus(BaseModel):
 @functools.cache
 def _get_xtdb_http_session(base_url: str) -> httpx.Client:
     return httpx.Client(
-        base_url=base_url, headers={"Accept": "application/json"}, transport=(httpx.HTTPTransport(retries=3))
+        base_url=base_url,
+        headers={"Accept": "application/json"},
+        transport=(httpx.HTTPTransport(retries=3)),
+        timeout=60,
     )
 
 
