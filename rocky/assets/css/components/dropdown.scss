@@ -31,19 +31,8 @@
     border: 1px solid var(--colors-grey-200);
     background-color: var(--colors-white);
 
-    ul {
-      margin: 0;
-    }
-  }
-}
-
-.dropdown-list {
-  [aria-expanded="true"] + & {
-    display: flex;
-    flex-direction: column;
-    min-width: 100%;
-
     > ul {
+      margin: 0;
       width: 100%;
       padding: 0;
       background-color: var(--colors-white);
@@ -140,5 +129,13 @@
         }
       }
     }
+  }
+}
+
+.dropdown-list {
+  [aria-expanded="true"] + & {
+    display: flex;
+    flex-direction: column;
+    min-width: 100%;
   }
 }

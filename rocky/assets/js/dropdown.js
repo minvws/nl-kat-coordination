@@ -19,8 +19,11 @@ document.addEventListener("click", (event) => {
   if (isDropdownButtonClicked) {
     toggleAriaExpanded(event);
   } else {
-    document
-      .querySelector(".dropdown-button[aria-expanded='true']")
-      .setAttribute("aria-expanded", "false");
+    activeButton = document.querySelector(
+      ".dropdown-button[aria-expanded='true']",
+    );
+    if (activeButton) {
+      activeButton.setAttribute("aria-expanded", "false");
+    }
   }
 });
