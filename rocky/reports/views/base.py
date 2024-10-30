@@ -530,8 +530,8 @@ class SaveReportView(BaseReportView, ReportBreadcrumbs, SchedulerView):
             deadline_at = request.POST.get("start_date", datetime.now(timezone.utc).date())
 
             parent_report_type = None
-            if self.report_type == AggregateOrganisationReport:
-                parent_report_type = AggregateOrganisationReport.id
+            if self.report_type is not None:
+                parent_report_type = self.report_type.id
             elif not self.report_type and subreport_name_format:
                 parent_report_type = ConcatenatedReport.id
 
