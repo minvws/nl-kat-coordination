@@ -309,7 +309,7 @@ class SaveAggregateReportMixin(BaseReportView):
             post_processed_data,
             aggregate_report,
         )
-      
+
 
 class SaveMultiReportMixin(BaseReportView):
     def save_report(self, report_names: list) -> Report:
