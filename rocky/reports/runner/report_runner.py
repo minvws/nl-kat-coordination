@@ -2,11 +2,10 @@ from datetime import datetime, timezone
 from string import Template
 
 from django.conf import settings
-from tools.enums import SCAN_LEVEL
 from tools.models import Organization
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import Reference, ScanProfileType
+from octopoes.models import Reference, ScanLevel, ScanProfileType
 from octopoes.models.types import type_by_name
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
 from reports.report_types.definitions import report_plugins_union
@@ -39,7 +38,7 @@ class LocalReportRunner(ReportRunner):
         elif recipe.input_recipe.get("query"):
             query = recipe.input_recipe["query"]
             types = {type_by_name(t) for t in query["ooi_types"]}
-            scan_level = {SCAN_LEVEL(cl) for cl in query["scan_level"]}
+            scan_level = {ScanLevel(cl) for cl in query["scan_level"]}
             scan_type = {ScanProfileType(t) for t in query["scan_type"]}
 
             oois = connector.list_objects(
