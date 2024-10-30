@@ -14,6 +14,7 @@ from octopoes.models.ooi.reports import Report
 from reports.report_types.aggregate_organisation_report.report import aggregate_reports
 from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.helpers import REPORTS, get_report_by_id
+from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.views.base import BaseReportView, ReportDataDict
 
 
@@ -308,3 +309,42 @@ class SaveAggregateReportMixin(BaseReportView):
             post_processed_data,
             aggregate_report,
         )
+      
+
+class SaveMultiReportMixin(BaseReportView):
+    def save_report(self, report_names: list) -> Report:
+        now = datetime.now(timezone.utc)
+        observed_at = self.get_observed_at()
+        report_type = MultiOrganizationReport(self.octopoes_api_connector)
+
+        name = now.strftime(report_names[0][1])
+        if not name or name.isspace():
+            name = report_type.name
+
+        report_data = report_type.post_process_data(
+            collect_report_data(self.octopoes_api_connector, self.get_ooi_pks(), self.observed_at)
+        )
+        report_data_raw_id = self.bytes_client.upload_raw(
+            ReportDataDict(report_data | self.get_input_data()).model_dump_json().encode(),
+            manual_mime_types={"openkat/report"},
+        )
+
+        report_ooi = Report(
+            name=str(name),
+            report_type=str(report_type.id),
+            template=report_type.template_path,
+            report_id=uuid4(),
+            organization_code=self.organization.code,
+            organization_name=self.organization.name,
+            organization_tags=list(self.organization.tags.all()),
+            data_raw_id=report_data_raw_id,
+            date_generated=datetime.now(timezone.utc),
+            input_oois=self.get_ooi_pks(),
+            observed_at=observed_at,
+            parent_report=None,
+            has_parent=False,
+        )
+
+        create_ooi(self.octopoes_api_connector, self.bytes_client, report_ooi, observed_at)
+
+        return report_ooi
