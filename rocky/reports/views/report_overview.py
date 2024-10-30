@@ -95,7 +95,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     template_name = "report_overview/report_history.html"
 
     def post(self, request, *args, **kwargs):
-        self.rename_reports()
+        self.run_bulk_actions()
         return self.get(request, *args, **kwargs)
 
     def get_queryset(self) -> ReportList:
@@ -104,8 +104,21 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     def get_report_ooi(self, ooi_pk: str) -> Report:
         return self.octopoes_api_connector.get(Reference.from_str(f"{ooi_pk}"), valid_time=datetime.now(timezone.utc))
 
-    def rename_reports(self) -> None:
+    def run_bulk_actions(self) -> None:
+        action = self.request.POST.get("action", "")
         report_references = self.request.POST.getlist("report_reference", [])
+
+        if action == "rename":
+            self.rename_reports(report_references)
+
+        if action == "delete":
+            self.delete_reports(report_references)
+
+    def delete_reports(self, report_references: list[str]) -> None:
+        self.octopoes_api_connector.delete_many(report_references, datetime.now(timezone.utc))
+        messages.success(self.request, _("Deletion successful."))
+
+    def rename_reports(self, report_references: list[str]) -> None:
         report_names = self.request.POST.getlist("report_name", [])
 
         if not report_references or not report_names:

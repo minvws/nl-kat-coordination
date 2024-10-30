@@ -29,7 +29,11 @@
 </form>
 {% endfill %}
 {% fill "footer_buttons" %}
-<input type="submit" form="rename-form" class="submit" value="Submit">
+<button type="submit"
+        form="rename-form"
+        class="submit"
+        name="action"
+        value="rename">{% translate "Rename" %}</button>
 {% endfill %}
 {% endcomponent %}
 {% component_css_dependencies %}

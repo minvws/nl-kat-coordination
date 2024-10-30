@@ -37,7 +37,11 @@
 </form>
 {% endfill %}
 {% fill "footer_buttons" %}
-<input type="submit" form="delete-form" class="destructive" value="Delete" />
+<button type="submit"
+        form="delete-form"
+        class="destructive"
+        name="action"
+        value="delete">{% translate "Delete" %}</button>
 {% endfill %}
 {% endcomponent %}
 {% component_css_dependencies %}
