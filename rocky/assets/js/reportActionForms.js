@@ -57,7 +57,7 @@ export function renderDeleteSelection(modal, selection) {
     // let date_td = table_row_copy.querySelector("td.date");
     let name_span = table_row_copy.querySelector("td.name span.name-holder");
 
-    name_span.innerText += report_names[i];
+    name_span.innerText = report_names[i];
     reference_input_element.setAttribute("value", references[i]);
 
     // type_td.innerText = "type";
@@ -92,7 +92,7 @@ export function renderRerunSelection(modal, selection) {
     // let date_td = table_row_copy.querySelector("td.date");
     let name_span = table_row_copy.querySelector("td.name span.name-holder");
 
-    name_span.innerText += report_names[i];
+    name_span.innerText = report_names[i];
     reference_input_element.setAttribute("value", references[i]);
 
     // type_td.innerText = "type";
