@@ -4,6 +4,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView
 
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport
 from reports.views.base import (
@@ -58,7 +59,9 @@ class OOISelectionMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportV
     report_type = MultiOrganizationReport
 
 
-class ReportTypesSelectionMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView, ReportTypeSelectionView):
+class ReportTypesSelectionMultiReportView(
+    MultiReportStepsMixin, BreadcrumbsMultiReportView, ReportTypeSelectionView, TemplateView
+):
     """
     Shows all possible report types from a list of OOIs.
     Chooses report types for the 'Multi Report' flow.
