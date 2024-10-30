@@ -113,6 +113,7 @@ class ScheduleAPI:
                 offset=offset,
                 limit=limit,
             )
+            results = [ScheduleDetail(**s.model_dump()) for s in results]
         except storage.filters.errors.FilterError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"invalid filter(s) [exception: {exc}]"
@@ -264,7 +265,7 @@ class ScheduleAPI:
                 detail=f"failed to update schedule [exception: {exc}]",
             ) from exc
 
-        return updated_schedule
+        return ScheduleDetail(**updated_schedule.model_dump())
 
     def search(
         self,
@@ -282,6 +283,7 @@ class ScheduleAPI:
             results, count = self.ctx.datastores.schedule_store.get_schedules(
                 offset=offset, limit=limit, filters=filters
             )
+            results = [ScheduleDetail(**s.model_dump()) for s in results]
         except storage.filters.errors.FilterError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"invalid filter(s) [exception: {exc}]"

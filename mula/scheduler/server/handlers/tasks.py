@@ -140,6 +140,7 @@ class TaskAPI:
                 max_created_at=max_created_at,
                 filters=f_req,
             )
+            results = [TaskDetail(**t.model_dump()) for t in results]
         except storage.filters.errors.FilterError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"invalid filter(s) [exception: {exc}]"
@@ -176,7 +177,7 @@ class TaskAPI:
         if task is None:
             raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="task not found")
 
-        return task
+        return TaskDetail(**task.model_dump())
 
     def patch(self, task_id: uuid.UUID, item: TaskPatch) -> Any:
         try:
@@ -216,7 +217,7 @@ class TaskAPI:
                 status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail="failed to update task"
             ) from exc
 
-        return updated_task
+        return TaskDetail(**updated_task.model_dump())
 
     def stats(self, scheduler_id: str | None = None) -> dict[str, dict[str, int]] | None:
         try:
