@@ -4,6 +4,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView
 
 from reports.report_types.helpers import get_ooi_types_with_report
 from reports.views.base import (
@@ -68,7 +69,7 @@ class OOISelectionGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenera
 
 
 class ReportTypesSelectionGenerateReportView(
-    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportTypeSelectionView
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportTypeSelectionView, TemplateView
 ):
     """
     Shows all possible report types from a list of OOIs.
