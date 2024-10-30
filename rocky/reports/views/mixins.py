@@ -75,7 +75,7 @@ def save_report_data(
         raw_id = bytes_client.upload_raw(
             raw=ReportDataDict(input_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
         )
-        name = now.strftime(parent_report_name.replace("{report type}", str(ConcatenatedReport.name)))
+        name = now.strftime(parent_report_name.replace("${report_type}", str(ConcatenatedReport.name)))
 
         if not name or name.isspace():
             name = ConcatenatedReport.name
@@ -163,7 +163,7 @@ def save_report_data(
             manual_mime_types={"openkat/report"},
         )
         report_type = get_report_by_id(report_type_id)
-        name = now.strftime(parent_report_name.replace("{report type}", str(report_type.name)))
+        name = now.strftime(parent_report_name.replace("${report_type}", str(report_type.name)))
 
         if not name or name.isspace():
             name = ConcatenatedReport.name
