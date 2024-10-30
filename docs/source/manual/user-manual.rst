@@ -2,16 +2,17 @@
 User Guide
 ==========
 
-This manual covers the day-to-day use of OpenKAT via the web interface. The concepts behind OpenKAT are explained in the "How does OpenKAT work" section. When using OpenKAT for the first time, the on-boarding flow is available, see the section in this chapter.
+This manual covers the day-to-day use of OpenKAT via the web interface. The concepts behind OpenKAT are explained in the "How does OpenKAT work" section. When using OpenKAT for the first time, the onboarding flow is available, see the section in this chapter.
 
 Web interface
 =============
 
-The user interface of OpenKAT consists of five screens, which provide access to the information and main functions of the system:
+The web interface of OpenKAT consists of the screens, which provide access to the information and main functions of the system:
 
-- Crisis Room (main)
-- KAT catalog
+- Crisis Room (overview page)
+- KAT-alog (catalog)
 - Findings
+- Reports
 - Objects
 - Tasks
 - Members
@@ -20,37 +21,59 @@ The user interface of OpenKAT consists of five screens, which provide access to 
 Crisis Room
 -----------
 
-The Crisis Room provides the overview of all findings, which can be viewed for different times. The time of day can be selected with the option button after which the findings that were applicable at that time become visible.
+The Crisis Room gives an overview of findings for, which can be viewed for different moments in time. The date can be selected and the crisis room will provide an overview for that moment in time. Crisis rooms are available for:
+
+- all organizations (the user has access to)
+- each single organization (the user has access to)
+
+The crisis room for all organizations shows which organizations you have access to and how many findings per severity are found. The screenshot below shows that there is one organization called Purr.
 
 .. image:: img/crisisroom.png
-  :alt: crisisroom
+  :alt: Crisisroom for all organizations
 
-KAT catalog
+The crisis room for a single organization.
+
+.. image:: img/crisisroom-organization.png
+  :alt: Crisisroom single organization
+
+
+KAT-alog
 -----------
 
-The KAT catalog contains all the tools that this instance of KAT has access to, all the boefjes and normalizers. Click on a boefje for more information, such as the objects it can search for.
+The KAT catalog is the place where you can see which tools are available, enabled and/or disabled. Tools can be common security scanning tools, like nmap (checks which ports are open), or specific tools that check for a CVE vulnerability. The KAT catalog also contains all the normalizers, which parse the data from the tools. Each boefje and normalizer contains more information on how it works and what is required, including the objects it can search for, and which are required for the boefje to work.
 
-Boefjes can be deployed automatically or manually. New boefjes can be added by the administrator, either locally or by adding an external KAT catalog in Rocky's config file.
+Before a boefje or normalizer can run the following two conditions must be met:
+- The boefje and corresponding normalizer are enabled. Note: all normalizers are enabled by default.
+- The clearance level of your object (e.g. hostname or URL) is similar or higher than the required scan level of the enabled boefje.
 
-Automatic deployment of boefjes depends on the safeguard level, which can be set for each object. If no safeguard is set, it can be derived from a logically connected object for which it is.
+New boefjes can be added by an administrator in the web interface, or by manually adding an external KAT catalog in the Rocky's config ile.
 
 .. image:: img/katalogus.png
   :alt: KAT catalog
 
-Each boefje has an info page with information about the tools used, the associated objects and the safeguard level required to use the boefje.
+Each boefje has an details page with information about the tool, the scan level and additional settings that can be given to the boefje. It also gives an overview on the required objects before the boefje can run ("Consumes") and which output objects are created ("Produces"). The details page also gives an overview of all associated tasks and which objects match the clearance level.
 
 .. image:: img/boefjeinfopage.png
-  :alt: Findings
+  :alt: Boefje information page
 
 Findings
 --------
 
-The findings made by KAT can be seen on the Findings page. Use the filters to select the findings. Click on the finding for more information or to generate a report on this finding.
+The findings page gives an overview of all findings found by KAT. The filter section can be used to apply various filters to show specific findings (e.g. critical findings only) and/or hosts. The search bar can be used to search for specific findings or hosts. Clicking on a finding shows more information on this finding. Each finding can be viewed in the tree or graph by clicking the corresponding icons behind the finding.
+
+A finding is also an object in the data model. This simply means that the finding can also be found on the Objects page.
 
 .. image:: img/findings.png
   :alt: Findings
 
-A finding is also an object in the data model, and can also be found on the objects page.
+Muted findings
+--------------
+Findings can be muted until a specific date. This will prevent the finding(s) from showing up in the default view. Using the filters you can show all muted findings, or both muted and non-muted findings.
+
+One or more findings can be selected. The textbox at the bottom allows for a description as to why this finding is muted (e.g. for audit purposes, or for review at a later point in time). Below the textbox the expiry date for the selected findings can be provided. Click the button 'Mute Findings' to mute the selected findings.
+
+.. image:: img/mutedfindings.png
+  :alt: Mute findings
 
 
 Objects
