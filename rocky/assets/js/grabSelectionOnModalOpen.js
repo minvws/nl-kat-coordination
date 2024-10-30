@@ -6,7 +6,11 @@ import {
 } from "./reportActionForms.js";
 
 onDomReady(function () {
-  openDialogFromUrl(getAnchor());
+  if (getSelection().length > 0) {
+    openDialogFromUrl(getAnchor());
+  } else {
+    closeDialog(getAnchor());
+  }
 });
 
 export function openDialogFromUrl(anchor) {
@@ -28,13 +32,30 @@ export function openDialogFromUrl(anchor) {
   }
 }
 
+export function closeDialog(anchor) {
+  // If ID is present in the URL on DomReady, open the dialog immediately.
+  let id = window.location.hash.slice(1);
+
+  if (id) {
+    let modal = document.querySelector("#" + id);
+    modal.close();
+  }
+
+  let baseUrl = window.location.toString().split("#")[0];
+  window.history.pushState("", "Base URL", baseUrl);
+}
+
 export function getSelection() {
   let checkedItems = document.querySelectorAll(".report-checkbox:checked");
   return checkedItems;
 }
 
 addEventListener("hashchange", function () {
-  openDialogFromUrl(getAnchor());
+  if (getSelection().length > 0) {
+    openDialogFromUrl(getAnchor());
+  } else {
+    closeDialog(getAnchor());
+  }
 });
 
 function getAnchor() {
