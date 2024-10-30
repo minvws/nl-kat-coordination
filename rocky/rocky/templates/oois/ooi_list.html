@@ -105,7 +105,10 @@
                                             form="ooi_list_form">{% translate "Set clearance level" %}</button>
                                 {% endif %}
                                 {% if perms.tools.can_delete_oois %}
-                                    <button type="submit" class="dropdown-button" name="action" value="delete">{% translate "Delete object(s)" %}</button>
+                                    <button type="submit"
+                                            class="dropdown-button ghost destructive"
+                                            name="action"
+                                            value="delete">{% translate "Delete object(s)" %}</button>
                                 {% endif %}
                             </div>
                         </fieldset>
