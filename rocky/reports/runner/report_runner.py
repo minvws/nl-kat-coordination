@@ -78,7 +78,7 @@ class LocalReportRunner(ReportRunner):
                 ooi_pks,
                 {
                     "input_data": {
-                        "input_oois": recipe.input_recipe["input_oois"],
+                        "input_oois": ooi_pks,
                         "report_types": recipe.report_types,
                         "plugins": report_plugins_union(report_types),
                     }
