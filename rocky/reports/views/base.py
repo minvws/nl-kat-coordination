@@ -258,6 +258,9 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         recurrence_choice = self.request.POST.get("choose_recurrence", "once")
         return recurrence_choice == "repeat"
 
+    def get_object_selection(self) -> str:
+        return self.request.POST.get("object_selection", "")
+
     def create_report_recipe(
         self,
         report_name_format: str,
@@ -305,6 +308,7 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         context["all_oois_selected"] = self.all_oois_selected()
         context["selected_oois"] = self.selected_oois
         context["selected_report_types"] = self.selected_report_types
+        context["object_selection"] = self.get_object_selection()
 
         return context
 
@@ -359,6 +363,9 @@ class ReportTypeSelectionView(BaseReportView, TemplateView):
         context["all_report_types_checked"] = len(self.get_report_type_ids()) == self.counted_report_types
 
         return context
+
+    def all_oois_selected(self) -> bool:
+        return "all" in self.request.POST.getlist("ooi", [])
 
 
 class ReportPluginView(BaseReportView, TemplateView):
@@ -548,13 +555,18 @@ class SaveReportView(BaseReportView, SchedulerView):
             subreport_name_format = request.POST.get("child_report_name", "")
             recurrence = request.POST.get("recurrence", "")
             deadline_at = request.POST.get("start_date", datetime.now(timezone.utc).date())
-            object_selection = request.POST.get(
-                "object_selection", ""
-            )  # TO DO: check of de button met "query" is geselecteerd
+            object_selection = request.POST.get("object_selection", "")
 
             query = {}
             if object_selection == "query":
-                query = self.get_queryset_params()
+                query = {
+                    "ooi_types": [t.__name__ for t in self.get_ooi_types()],
+                    "scan_level": self.get_ooi_scan_levels(),
+                    "scan_type": self.get_ooi_profile_types(),
+                    "search_string": self.search_string,
+                    "order_by": self.order_by,
+                    "asc_desc": self.sorting_order,
+                }
 
             parent_report_type = None
             if self.report_type == AggregateOrganisationReport:

@@ -19,13 +19,21 @@
         </p>
         {% include "partials/ooi_list_filters.html" %}
 
-        <button type="submit"
-                class="button select_all_objects_element"
-                name="object_selection"
-                value="query"
-                form="select_all_objects_form">
-            {% translate "Continue with live set" %}<span class="icon ti-chevron-right"></span>
-        </button>
+        <form novalidate
+              method="post"
+              action="{{ next }}"
+              class="inline layout-wide checkboxes_required">
+            {% csrf_token %}
+            {% include "forms/report_form_fields.html" %}
+
+            <input type="hidden" name="ooi" value="all">
+            <button type="submit"
+                    class="button select_all_objects_element"
+                    name="object_selection"
+                    value="query">
+                {% translate "Continue with live set" %}<span class="icon ti-chevron-right"></span>
+            </button>
+        </form>
         {% if not ooi_list %}
             <p>{% translate "No objects found." %}</p>
             <div class="button-container">
