@@ -1,17 +1,19 @@
 from datetime import datetime, timezone
 from typing import Any
+from uuid import uuid4
 
 import structlog
 from django.contrib import messages
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
+from pydantic import TypeAdapter
 from tools.ooi_helpers import create_ooi
 
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.reports import Report, ReportRecipe
-from reports.views.base import ReportBreadcrumbs, get_selection
+from reports.views.base import ReportBreadcrumbs, ReportDataDict, get_selection
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import OctopoesView, ReportList
 from rocky.views.scheduler import SchedulerView
@@ -109,14 +111,68 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
         report_references = self.request.POST.getlist("report_reference", [])
 
         if action == "rename":
-            self.rename_reports(report_references)
+            return self.rename_reports(report_references)
 
         if action == "delete":
-            self.delete_reports(report_references)
+            return self.delete_reports(report_references)
+
+        if action == "rerun":
+            return self.rerun_reports(report_references)
 
     def delete_reports(self, report_references: list[str]) -> None:
         self.octopoes_api_connector.delete_many(report_references, datetime.now(timezone.utc))
         messages.success(self.request, _("Deletion successful."))
+
+    def rerun_reports(self, report_references: list[str]) -> None:
+        for report_id in report_references:
+            actual_report_ooi = self.get_report_ooi(report_id)
+
+            # First create new parent report and then create all subreports with new parent reference
+            if not actual_report_ooi.has_parent and actual_report_ooi.report_type == "concatenated-report":
+                parent_report = self.recreate_report(actual_report_ooi)
+                self.recreate_subreports(actual_report_ooi, parent_report)
+
+    def get_report_data_from_bytes(self, report: Report) -> dict[str, Any]:
+        self.bytes_client.login()
+        return TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
+            self.bytes_client.get_raw(raw_id=report.data_raw_id)
+        )
+
+    def recreate_report(self, report_ooi: Report, parent_report: Report | None = None) -> Report:
+        observed_at = datetime.now(timezone.utc)
+
+        bytes_data = self.get_report_data_from_bytes(report_ooi)
+
+        new_bytes_id = self.bytes_client.upload_raw(
+            raw=ReportDataDict(bytes_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
+        )
+
+        new_report_ooi = Report(
+            name=report_ooi.name,
+            report_type=report_ooi.report_type,
+            template=report_ooi.template,
+            report_id=uuid4(),
+            organization_code=report_ooi.organization_code,
+            organization_name=report_ooi.organization_name,
+            organization_tags=report_ooi.organization_tags,
+            data_raw_id=new_bytes_id,
+            date_generated=observed_at,
+            input_oois=report_ooi.input_oois,
+            observed_at=observed_at,
+            parent_report=parent_report.reference if parent_report is not None else None,
+            has_parent=parent_report is not None,
+        )
+
+        create_ooi(self.octopoes_api_connector, self.bytes_client, new_report_ooi, observed_at)
+
+        return new_report_ooi
+
+    def recreate_subreports(self, report_ooi: Report, parent_ooi: Report) -> None:
+        subreports = self.octopoes_api_connector.query(
+            "Report.<parent_report[is Report]", valid_time=self.observed_at, source=report_ooi.reference
+        )
+        for subreport in subreports:
+            self.recreate_report(subreport, parent_ooi)
 
     def rename_reports(self, report_references: list[str]) -> None:
         report_names = self.request.POST.getlist("report_name", [])

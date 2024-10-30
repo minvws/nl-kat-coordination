@@ -32,7 +32,11 @@
 </form>
 {% endfill %}
 {% fill "footer_buttons" %}
-<input type="submit" form="rerun-form" class="submit" value="Rerun" />
+<button type="submit"
+        form="rerun-form"
+        class="submit"
+        name="action"
+        value="rerun">{% translate "Rerun" %}</button>
 {% endfill %}
 {% endcomponent %}
 {% component_css_dependencies %}
