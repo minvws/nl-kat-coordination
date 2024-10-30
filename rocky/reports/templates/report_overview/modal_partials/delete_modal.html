@@ -1,14 +1,33 @@
-{% component "modal" size="dialog-large" modal_id="delete-modal" %}
-{% fill "header" %}
-Delete
-{% endfill %}
-{% fill "content" %}
-<form id="delete-form" method="post">
+{% load i18n %}
+
+{% component 'modal' size='dialog-large' modal_id='delete-modal' %}
+{% fill 'header' %}Delete{% endfill %}
+{% fill 'content' %}
+<h3>{% translate "Rename the following report(s):" %}</h3>
+<form id="delete-form" class="inline layout-wide" method="post">
     {% csrf_token %}
+    <table id="delete-table">
+        <thead>
+            <tr>
+                <th>{% translate "Report type" %}</th>
+                <th>{% translate "Name" %}</th>
+                <th>{% translate "Reference date" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="delete-table-row">
+                <td class="type"></td>
+                <td class="name">
+                    <input type="hidden" name="report_reference" class="report-reference-input" />
+                </td>
+                <td class="date"></td>
+            </tr>
+        </tbody>
+    </table>
 </form>
 {% endfill %}
 {% fill "footer_buttons" %}
-<input type="submit"  form="delete-form"  class="submit"  value="Submit">
+<input type="submit" form="delete-form" class="submit" value="Submit" />
 {% endfill %}
 {% endcomponent %}
 {% component_css_dependencies %}
