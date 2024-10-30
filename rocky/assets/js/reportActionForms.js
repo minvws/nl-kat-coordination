@@ -9,13 +9,11 @@ export function renderRenameSelection(modal, selection) {
   let table_element = document.getElementById("rename-table");
   let table_body = table_element.querySelector("tbody");
   let table_row = table_element.querySelector("tr.rename-table-row");
-  console.log(table_row);
 
   table_body.innerHTML = "";
 
   for (let i = 0; i < references.length; i++) {
     let table_row_copy = table_row.cloneNode(true);
-    console.log(table_row_copy);
 
     let type_td = table_row_copy.querySelector("td.type");
     let name_input_element = table_row_copy.querySelector(".report-name-input");
@@ -45,27 +43,25 @@ export function renderDeleteSelection(modal, selection) {
   let table_element = document.getElementById("delete-table");
   let table_body = table_element.querySelector("tbody");
   let table_row = table_element.querySelector("tr.delete-table-row");
-  console.log(table_row);
 
   table_body.innerHTML = "";
 
   for (let i = 0; i < references.length; i++) {
     let table_row_copy = table_row.cloneNode(true);
-    console.log(table_row_copy);
 
     let reference_input_element = table_row_copy.querySelector(
       ".report-reference-input",
     );
 
-    let type_td = table_row_copy.querySelector("td.type");
-    let name_td = table_row_copy.querySelector("td.name");
-    let date_td = table_row_copy.querySelector("td.date");
+    // let type_td = table_row_copy.querySelector("td.type");
+    // let date_td = table_row_copy.querySelector("td.date");
+    let name_span = table_row_copy.querySelector("td.name span.name-holder");
 
-    name_td.innerText += report_names[i];
+    name_span.innerText += report_names[i];
     reference_input_element.setAttribute("value", references[i]);
 
-    type_td.innerText = "type";
-    date_td.innerText = "date";
+    // type_td.innerText = "type";
+    // date_td.innerText = "date";
 
     table_body.appendChild(table_row_copy);
   }
