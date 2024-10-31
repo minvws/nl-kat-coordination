@@ -218,6 +218,13 @@ class Scheduler(abc.ABC):
 
                 hydrated_task.data["requirements"] = requirements
                 hydrated_task.data["network"] = ooi.network
+
+                if hydrated_task.data["boefje"]["id"] in ["shodan"] and ooi.network != "Network|internet":
+                    raise Exception(
+                        "Attempted to make a Task with an OOI that does not lie on the internet with a boefje that\
+                        only works with internet access"
+                    )
+
         else:
             # If the task is not of type boefje, we add the type of task to the requirements
             # e.g. normalizers get "normalizer"
