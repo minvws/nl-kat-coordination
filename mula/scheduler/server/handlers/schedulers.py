@@ -76,3 +76,9 @@ class SchedulerAPI:
             s.disable()
 
         return updated_scheduler
+
+    def pop(self, scheduler_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
+        pass
+
+    def push(self, queue_id: str, item_in: serializers.Task) -> Any:
+        pass
