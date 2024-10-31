@@ -1,6 +1,7 @@
 from base64 import b64decode
 from uuid import UUID
 
+import pika.exceptions
 import structlog
 from cachetools import TTLCache, cached
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -190,6 +191,11 @@ def create_raw(
                 raw_data=RawDataMeta(id=raw_id, boefje_meta=raw_data.boefje_meta, mime_types=raw_data.mime_types),
             )
             event_manager.publish(event)
+        except pika.exceptions.AMQPError:
+            logger.exception("Error sending 'new raw data' event to RabbitMQ")
+            raise HTTPException(
+                status_code=codes.INTERNAL_SERVER_ERROR, detail="Error sending 'new raw data' event to RabbitMQ"
+            ) from error
         except Exception as error:
             logger.exception("Error saving raw data")
             raise HTTPException(status_code=codes.INTERNAL_SERVER_ERROR, detail="Could not save raw data") from error
