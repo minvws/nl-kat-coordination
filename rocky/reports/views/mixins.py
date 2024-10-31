@@ -125,7 +125,7 @@ def save_report_data(
                 ]
 
                 child_input_data = {
-                    "input_data": {"input_oois": [ooi], "report_types": [report_type_id], "plugins": [child_plugins]}
+                    "input_data": {"input_oois": [ooi], "report_types": [report_type_id], "plugins": child_plugins}
                 }
 
                 raw_id = bytes_client.upload_raw(
