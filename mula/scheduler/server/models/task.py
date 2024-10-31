@@ -29,7 +29,7 @@ class TaskStatus(str, enum.Enum):
     CANCELLED = "cancelled"
 
 
-class TaskDetail(BaseModel):
+class Task(BaseModel):
     id: uuid.UUID
     scheduler_id: str | None
     schedule_id: uuid.UUID | None
@@ -45,8 +45,11 @@ class TaskDetail(BaseModel):
 class TaskCreate(BaseModel):
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
-    # TODO: check if these all need to be nullable
+    # FIXME: pushing the same item with the id will update the item on the
+    # queue. Perhaps TaskCreate is not the right name for this and should
+    # be TaskPush instead
     id: uuid.UUID | None = None
+
     scheduler_id: str | None = None
     schedule_id: uuid.UUID | None = None
     priority: int | None = None
@@ -58,7 +61,7 @@ class TaskCreate(BaseModel):
     modified_at: datetime | None = None
 
 
-class TaskPatch(BaseModel):
+class TaskUpdate(BaseModel):
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
     id: uuid.UUID | None = None

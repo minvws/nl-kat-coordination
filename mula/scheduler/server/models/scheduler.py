@@ -4,7 +4,7 @@ from typing import Any
 from pydantic import BaseModel
 
 
-class SchedulerDetail(BaseModel):
+class Scheduler(BaseModel):
     id: str | None = None
     enabled: bool | None = None
     priority_queue: dict[str, Any] | None = None

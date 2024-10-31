@@ -3,7 +3,7 @@ from pydantic import BaseModel, ConfigDict
 from scheduler.models import Task
 
 
-class QueueDetail(BaseModel):
+class Queue(BaseModel):
     id: str
     size: int
     maxsize: int

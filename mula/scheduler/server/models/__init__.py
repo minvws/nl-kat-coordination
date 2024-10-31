@@ -1,4 +1,4 @@
-from .queue import QueueDetail
-from .schedule import ScheduleCreate, ScheduleDetail, SchedulePatch
-from .scheduler import SchedulerDetail
-from .task import TaskCreate, TaskDetail, TaskPatch, TaskStatus
+from .queue import Queue
+from .schedule import Schedule, ScheduleCreate, ScheduleUpdate
+from .scheduler import Scheduler
+from .task import Task, TaskCreate, TaskStatus, TaskUpdate

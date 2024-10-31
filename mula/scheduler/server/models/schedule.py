@@ -4,7 +4,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class ScheduleDetail(BaseModel):
+class Schedule(BaseModel):
     id: uuid.UUID
     scheduler_id: str
     hash: str | None
@@ -24,7 +24,7 @@ class ScheduleCreate(BaseModel):
 
 
 # NOTE: model added for support of partial updates
-class SchedulePatch(BaseModel):
+class ScheduleUpdate(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     hash: str | None = Field(None, max_length=32)

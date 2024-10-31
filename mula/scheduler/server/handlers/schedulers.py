@@ -5,7 +5,7 @@ import structlog
 from fastapi import status
 
 from scheduler import context, models, schedulers
-from scheduler.server.models import SchedulerDetail
+from scheduler.server.models import Scheduler
 
 
 class SchedulerAPI:
@@ -43,14 +43,14 @@ class SchedulerAPI:
         )
 
     def list(self) -> Any:
-        return [SchedulerDetail(**s.dict()) for s in self.schedulers.values()]
+        return [Scheduler(**s.dict()) for s in self.schedulers.values()]
 
     def get(self, scheduler_id: str) -> Any:
         s = self.schedulers.get(scheduler_id)
         if s is None:
             raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="scheduler not found")
 
-        return SchedulerDetail(**s.dict())
+        return Scheduler(**s.dict())
 
     def patch(self, scheduler_id: str, item: models.Scheduler) -> Any:
         s = self.schedulers.get(scheduler_id)
@@ -80,4 +80,4 @@ class SchedulerAPI:
         elif not updated_scheduler.enabled:
             s.disable()
 
-        return SchedulerDetail(**updated_scheduler.dict())
+        return Scheduler(**updated_scheduler.dict())

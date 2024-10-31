@@ -9,7 +9,7 @@ from fastapi import Body, status
 
 from scheduler import context, models, schedulers, storage
 from scheduler.server import utils
-from scheduler.server.models import ScheduleCreate, ScheduleDetail, SchedulePatch
+from scheduler.server.models import Schedule, ScheduleCreate, ScheduleUpdate
 
 
 class ScheduleAPI:
@@ -34,7 +34,7 @@ class ScheduleAPI:
             path="/schedules",
             endpoint=self.create,
             methods=["POST"],
-            response_model=ScheduleDetail,
+            response_model=Schedule,
             status_code=201,
             description="Create a schedule",
         )
@@ -43,7 +43,7 @@ class ScheduleAPI:
             path="/schedules/{schedule_id}",
             endpoint=self.get,
             methods=["GET"],
-            response_model=ScheduleDetail,
+            response_model=Schedule,
             status_code=200,
             description="Get a schedule",
         )
@@ -52,7 +52,7 @@ class ScheduleAPI:
             path="/schedules/{schedule_id}",
             endpoint=self.patch,
             methods=["PATCH"],
-            response_model=ScheduleDetail,
+            response_model=Schedule,
             response_model_exclude_unset=True,
             status_code=200,
             description="Update a schedule",
@@ -101,7 +101,7 @@ class ScheduleAPI:
             )
 
         try:
-            # TODO: serialize to ScheduleDetail
+            # TODO: serialize to Schedule
             results, count = self.ctx.datastores.schedule_store.get_schedules(
                 scheduler_id=scheduler_id,
                 schedule_hash=schedule_hash,
@@ -113,7 +113,7 @@ class ScheduleAPI:
                 offset=offset,
                 limit=limit,
             )
-            results = [ScheduleDetail(**s.model_dump()) for s in results]
+            results = [Schedule(**s.model_dump()) for s in results]
         except storage.filters.errors.FilterError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"invalid filter(s) [exception: {exc}]"
@@ -191,7 +191,7 @@ class ScheduleAPI:
                 detail=f"failed to create schedule [exception: {exc}]",
             ) from exc
 
-        return ScheduleDetail(**new_schedule.model_dump())
+        return Schedule(**new_schedule.model_dump())
 
     def get(self, schedule_id: uuid.UUID) -> Any:
         try:
@@ -211,9 +211,9 @@ class ScheduleAPI:
         if schedule is None:
             raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="schedule not found")
 
-        return ScheduleDetail(**schedule.model_dump())
+        return Schedule(**schedule.model_dump())
 
-    def patch(self, schedule_id: uuid.UUID, schedule: SchedulePatch) -> Any:
+    def patch(self, schedule_id: uuid.UUID, schedule: ScheduleUpdate) -> Any:
         try:
             schedule_db = self.ctx.datastores.schedule_store.get_schedule(schedule_id)
         except storage.errors.StorageError as exc:
@@ -265,7 +265,7 @@ class ScheduleAPI:
                 detail=f"failed to update schedule [exception: {exc}]",
             ) from exc
 
-        return ScheduleDetail(**updated_schedule.model_dump())
+        return Schedule(**updated_schedule.model_dump())
 
     def search(
         self,
@@ -283,7 +283,7 @@ class ScheduleAPI:
             results, count = self.ctx.datastores.schedule_store.get_schedules(
                 offset=offset, limit=limit, filters=filters
             )
-            results = [ScheduleDetail(**s.model_dump()) for s in results]
+            results = [Schedule(**s.model_dump()) for s in results]
         except storage.filters.errors.FilterError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"invalid filter(s) [exception: {exc}]"

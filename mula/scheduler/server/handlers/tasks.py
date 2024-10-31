@@ -8,7 +8,7 @@ from fastapi import status
 
 from scheduler import context, storage
 from scheduler.server import utils
-from scheduler.server.models import TaskDetail, TaskPatch
+from scheduler.server.models import Task, TaskCreate, TaskUpdate
 
 
 class TaskAPI:
@@ -46,7 +46,7 @@ class TaskAPI:
             path="/tasks/{task_id}",
             endpoint=self.get,
             methods=["GET"],
-            response_model=TaskDetail,
+            response_model=Task,
             status_code=status.HTTP_200_OK,
             description="Get a task",
         )
@@ -55,7 +55,7 @@ class TaskAPI:
             path="/tasks/{task_id}",
             endpoint=self.patch,
             methods=["PATCH"],
-            response_model=TaskPatch,
+            response_model=TaskUpdate,
             response_model_exclude_unset=True,
             status_code=status.HTTP_200_OK,
             description="Update a task",
@@ -140,7 +140,7 @@ class TaskAPI:
                 max_created_at=max_created_at,
                 filters=f_req,
             )
-            results = [TaskDetail(**t.model_dump()) for t in results]
+            results = [Task(**t.model_dump()) for t in results]
         except storage.filters.errors.FilterError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"invalid filter(s) [exception: {exc}]"
@@ -177,9 +177,9 @@ class TaskAPI:
         if task is None:
             raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="task not found")
 
-        return TaskDetail(**task.model_dump())
+        return Task(**task.model_dump())
 
-    def patch(self, task_id: uuid.UUID, item: TaskPatch) -> Any:
+    def patch(self, task_id: uuid.UUID, item: TaskUpdate) -> Any:
         try:
             task_db = self.ctx.datastores.task_store.get_task(task_id)
         except storage.errors.StorageError as exc:
@@ -217,7 +217,7 @@ class TaskAPI:
                 status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail="failed to update task"
             ) from exc
 
-        return TaskDetail(**updated_task.model_dump())
+        return Task(**updated_task.model_dump())
 
     def stats(self, scheduler_id: str | None = None) -> dict[str, dict[str, int]] | None:
         try:

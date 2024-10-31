@@ -5,7 +5,7 @@ import structlog
 from fastapi import status
 
 from scheduler import context, models, queues, schedulers, storage
-from scheduler.server.models import QueueDetail, TaskCreate, TaskDetail
+from scheduler.server.models import Queue, Task, TaskCreate
 
 
 class QueueAPI:
@@ -19,7 +19,7 @@ class QueueAPI:
             path="/queues",
             endpoint=self.list,
             methods=["GET"],
-            response_model=list[QueueDetail],
+            response_model=list[Queue],
             response_model_exclude_unset=True,
             status_code=status.HTTP_200_OK,
             description="List all queues",
@@ -29,7 +29,7 @@ class QueueAPI:
             path="/queues/{queue_id}",
             endpoint=self.get,
             methods=["GET"],
-            response_model=QueueDetail,
+            response_model=Queue,
             status_code=status.HTTP_200_OK,
             description="Get a queue",
         )
@@ -38,7 +38,7 @@ class QueueAPI:
             path="/queues/{queue_id}/pop",
             endpoint=self.pop,
             methods=["POST"],
-            response_model=TaskDetail | None,
+            response_model=Task | None,
             status_code=status.HTTP_200_OK,
             description="Pop an item from a queue",
         )
@@ -47,13 +47,13 @@ class QueueAPI:
             path="/queues/{queue_id}/push",
             endpoint=self.push,
             methods=["POST"],
-            response_model=TaskCreate | None,
+            response_model=Task | None,
             status_code=status.HTTP_201_CREATED,
             description="Push an item to a queue",
         )
 
     def list(self) -> Any:
-        return [QueueDetail(**s.queue.dict(include_pq=False)) for s in self.schedulers.copy().values()]
+        return [Queue(**s.queue.dict(include_pq=False)) for s in self.schedulers.copy().values()]
 
     def get(self, queue_id: str) -> Any:
         s = self.schedulers.get(queue_id)
@@ -66,7 +66,7 @@ class QueueAPI:
         if q is None:
             raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="queue not found")
 
-        return QueueDetail(**q.dict())
+        return Queue(**q.dict())
 
     def pop(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
         s = self.schedulers.get(queue_id)
@@ -84,20 +84,20 @@ class QueueAPI:
                 detail="could not pop item from queue, check your filters",
             )
 
-        return TaskDetail(**p_item.model_dump())
+        return Task(**p_item.model_dump())
 
-    def push(self, queue_id: str, item_in: TaskCreate) -> Any:
+    def push(self, queue_id: str, task: TaskCreate) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="queue not found")
 
         try:
             # Load default values
-            new_item = models.Task(**item_in.model_dump(exclude_unset=True))
+            new_task = models.Task(**task.model_dump(exclude_unset=True))
 
             # Set values
-            if new_item.scheduler_id is None:
-                new_item.scheduler_id = s.scheduler_id
+            if new_task.scheduler_id is None:
+                new_task.scheduler_id = s.scheduler_id
         except Exception as exc:
             self.logger.exception(exc)
             raise fastapi.HTTPException(
@@ -105,7 +105,7 @@ class QueueAPI:
             ) from exc
 
         try:
-            pushed_item = s.push_item_to_queue(new_item)
+            pushed_item = s.push_item_to_queue(new_task)
         except ValueError as exc_value:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"malformed item: {exc_value}"
@@ -124,4 +124,4 @@ class QueueAPI:
                 status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
             ) from exc
 
-        return TaskDetail(**pushed_item.model_dump())
+        return Task(**pushed_item.model_dump())
