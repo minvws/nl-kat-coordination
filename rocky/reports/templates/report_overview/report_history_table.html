@@ -53,11 +53,11 @@
                 </li>
             </ul>
         </div>
-        {% include "report_overview/modal_partials/rerun_modal.html" %}
-        {% include "report_overview/modal_partials/rename_modal.html" %}
-        {% include "report_overview/modal_partials/delete_modal.html" %}
-
     </div>
+    {% include "report_overview/modal_partials/rerun_modal.html" %}
+    {% include "report_overview/modal_partials/rename_modal.html" %}
+    {% include "report_overview/modal_partials/delete_modal.html" %}
+
 </div>
 <div class="horizontal-scroll">
     {% if reports %}
@@ -97,7 +97,7 @@
                                        href="{% url "view_report" organization.code %}?report_id={{ report.parent_report.reference }}&observed_at={{ report.parent_report.observed_at|date:"Y-m-d H:i:s:u" }}"
                                        title="{% translate "Shows parent report details" %}">{{ report.parent_report.name }}</a>
                                 </td>
-                                <td>
+                                <td class="report_types">
                                     <ul class="tags horizontal-view">
                                         {% if report.parent_report.report_type == "concatenated-report" or report.parent_report.report_type is None %}
                                             {% for report_type, total_objects in report.report_type_summary.items %}
@@ -115,7 +115,7 @@
                                         {% endif %}
                                     </ul>
                                 </td>
-                                <td>
+                                <td class="report_oois">
                                     {% if report.parent_report.input_oois|length == 1 %}
                                         <a href="{% ooi_url "ooi_detail" report.parent_report.input_oois.0 organization.code query=ooi.mandatory_fields %}">{{ report.parent_report.input_oois.0|human_readable }}</a>
                                     {% elif report.total_objects == 1 %}
@@ -124,8 +124,8 @@
                                         {{ report.total_objects }}
                                     {% endif %}
                                 </td>
-                                <td class="nowrap">{{ report.parent_report.observed_at|date }}</td>
-                                <td class="nowrap">{{ report.parent_report.date_generated }}</td>
+                                <td class="nowrap report_reference_date">{{ report.parent_report.observed_at|date }}</td>
+                                <td class="nowrap report_creation_date">{{ report.parent_report.date_generated }}</td>
                                 <td>
                                     {% if report.children_reports %}
                                         <button type="button"
