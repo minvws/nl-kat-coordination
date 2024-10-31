@@ -41,7 +41,9 @@ class OrganizationListView(OrganizationBreadcrumbsMixin, ListView):
             for organization in organizations:
                 try:
                     logger.info("Recalculating bits", event_code=920000, organization_code=organization.code)
-                    number_of_bits += OctopoesAPIConnector(settings.OCTOPOES_API, organization.code).recalculate_bits()
+                    number_of_bits += OctopoesAPIConnector(
+                        settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+                    ).recalculate_bits()
                 except Exception as exc:
                     failed.append(f"{organization}, ({str(exc)})")
                     logging.warning("Failed recalculating bits for %s, %s", organization, exc)

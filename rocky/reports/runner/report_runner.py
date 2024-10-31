@@ -22,7 +22,9 @@ class LocalReportRunner(ReportRunner):
     def run(self, report_task: ReportTask) -> None:
         valid_time = self.valid_time or datetime.now(timezone.utc)
 
-        connector = OctopoesAPIConnector(settings.OCTOPOES_API, report_task.organisation_id)
+        connector = OctopoesAPIConnector(
+            settings.OCTOPOES_API, report_task.organisation_id, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+        )
         recipe = connector.get(Reference.from_str(f"ReportRecipe|{report_task.report_recipe_id}"), valid_time)
         report_types = [get_report_by_id(report_type_id) for report_type_id in recipe.report_types]
 

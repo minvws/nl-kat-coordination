@@ -495,3 +495,5 @@ POOL_SIZE = env.int("POOL_SIZE", default=2)
 POLL_INTERVAL = env.int("POLL_INTERVAL", default=10)
 # Seconds to wait before checking the workers when queues are full
 WORKER_HEARTBEAT = env.int("WORKER_HEARTBEAT", default=5)
+
+ROCKY_OUTGOING_REQUEST_TIMEOUT = env.int("ROCKY_OUTGOING_REQUEST_TIMEOUT", default=30)
