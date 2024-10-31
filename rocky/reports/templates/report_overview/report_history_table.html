@@ -71,9 +71,7 @@
                     <thead>
                         <tr>
                             <th>
-                                <input class="select_all_objects_element"
-                                       type="checkbox"
-                                       {% if "all" in selected_reports %}checked{% endif %}>
+                                <input class="toggle-all" data-toggle-target="report" type="checkbox">
                             </th>
                             <th scope="col">{% translate "Name" %}</th>
                             <th scope="col">{% translate "Report type" %}</th>
@@ -224,11 +222,6 @@
         <p>{% translate "No reports have been generated yet." %}</p>
     {% endif %}
 </div>
-<form novalidate id="select_all_objects_form" class="inline" method="get">
-    {% include "forms/report_form_fields.html" with selected_reports=None %}
-
-    {% if "all" not in selected_reports %}<input type="hidden" name="report" value="all">{% endif %}
-</form>
 {% block html_at_end_body %}
     {% compress js %}
         <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>

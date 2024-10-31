@@ -120,18 +120,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
             return self.rerun_reports(report_references)
 
     def delete_reports(self, report_references: list[str]) -> None:
-        reports_selected = self.request.GET.get("report", "")
-        if reports_selected == "all":
-            all_reports = self.get_queryset()[:]  # must be sliced
-
-            all_report_ids = [
-                child_report.primary_key
-                for hydrated_report in all_reports
-                for child_report in hydrated_report.children_reports
-            ] + [hydrated_report.parent_report.primary_key for hydrated_report in all_reports]
-            self.octopoes_api_connector.delete_many(all_report_ids, datetime.now(timezone.utc))
-        else:
-            self.octopoes_api_connector.delete_many(report_references, datetime.now(timezone.utc))
+        self.octopoes_api_connector.delete_many(report_references, datetime.now(timezone.utc))
         messages.success(self.request, _("Deletion successful."))
 
     def rerun_reports(self, report_references: list[str]) -> None:
