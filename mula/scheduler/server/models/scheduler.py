@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 
 class Scheduler(BaseModel):
-    id: str | None = None
+    id: str
     enabled: bool | None = None
     priority_queue: dict[str, Any] | None = None
     last_activity: datetime | None = None

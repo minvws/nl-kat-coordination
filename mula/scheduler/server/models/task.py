@@ -31,11 +31,11 @@ class TaskStatus(str, enum.Enum):
 
 class Task(BaseModel):
     id: uuid.UUID
-    scheduler_id: str | None
+    scheduler_id: str
     schedule_id: uuid.UUID | None
     priority: int | None
     status: TaskStatus | None
-    type: str | None
+    type: str
     hash: str | None
     data: dict | None
     created_at: datetime
@@ -47,7 +47,7 @@ class TaskCreate(BaseModel):
 
     # FIXME: pushing the same item with the id will update the item on the
     # queue. Perhaps TaskCreate is not the right name for this and should
-    # be TaskPush instead
+    # be TaskPush instead, or in both cases TaskUpdate
     id: uuid.UUID | None = None
 
     scheduler_id: str | None = None

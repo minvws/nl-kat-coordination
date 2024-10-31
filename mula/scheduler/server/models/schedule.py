@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class Schedule(BaseModel):
     id: uuid.UUID
     scheduler_id: str
-    hash: str | None
+    hash: str
     data: dict | None
     enabled: bool
     schedule: str | None
