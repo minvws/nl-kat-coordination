@@ -69,7 +69,9 @@ class SchedulerClientInterface:
 
 
 class SchedulerAPIClient(SchedulerClientInterface):
-    def __init__(self, base_url: str, task_capabilities: list[str] = [], reachable_networks: list[str] | None = None):
+    def __init__(
+        self, base_url: str, task_capabilities: list[str] | None = None, reachable_networks: list[str] | None = None
+    ):
         self._session = Client(base_url=base_url, transport=HTTPTransport(retries=6))
         self._task_capabilities = task_capabilities
         self._reachable_networks = reachable_networks
@@ -85,13 +87,19 @@ class SchedulerAPIClient(SchedulerClientInterface):
         return TypeAdapter(list[Queue]).validate_json(response.content)
 
     def pop_item(self, queue_id: str) -> Task | None:
-        filters: list[Filter] = [
-            Filter(column="data", field="requirements", operator="<@", value=json.dumps(self._task_capabilities))
-        ]
+        filters: list[Filter] = []
 
+        # Client should only pop tasks that lie on a network that the runner is capable of reaching (e.g. the internet)
         if self._reachable_networks:
             filters.append(
                 Filter(column="data", field="network", operator="<@", value=json.dumps(self._reachable_networks))
+            )
+
+        # Client should only pop tasks that have requirements that this runner is capable of (e.g. being able
+        # to handle ipv6 requests)
+        if self._task_capabilities:
+            filters.append(
+                Filter(column="data", field="requirements", operator="<@", value=json.dumps(self._task_capabilities))
             )
 
         response = self._session.post(

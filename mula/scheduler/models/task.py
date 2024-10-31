@@ -99,8 +99,6 @@ class NormalizerTask(BaseModel):
     normalizer: Normalizer
     raw_data: RawData
 
-    requirements: list[str] | None = None
-
     @property
     def hash(self) -> str:
         """Make NormalizerTask hashable, so that we can de-duplicate it when

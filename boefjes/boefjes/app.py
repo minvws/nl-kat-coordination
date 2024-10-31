@@ -272,7 +272,7 @@ def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_leve
     plugin_service = PluginService(create_plugin_storage(session), create_config_storage(session), local_repository)
 
     item_handler: Handler
-    capabilities: list[str]
+    capabilities: list[str] | None = None
     reachable_networks: list[str] | None = None
 
     if queue is WorkerManager.Queue.BOEFJES:
@@ -283,7 +283,6 @@ def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_leve
         item_handler = NormalizerHandler(
             LocalNormalizerJobRunner(local_repository), bytes_api_client, settings.scan_profile_whitelist
         )
-        capabilities = [WorkerManager.Queue.NORMALIZERS.value]
 
     return SchedulerWorkerManager(
         item_handler,
