@@ -191,7 +191,7 @@ def create_raw(
                 raw_data=RawDataMeta(id=raw_id, boefje_meta=raw_data.boefje_meta, mime_types=raw_data.mime_types),
             )
             event_manager.publish(event)
-        except pika.exceptions.AMQPError:
+        except pika.exceptions.AMQPError as error:
             logger.exception("Error sending 'new raw data' event to RabbitMQ")
             raise HTTPException(
                 status_code=codes.INTERNAL_SERVER_ERROR, detail="Error sending 'new raw data' event to RabbitMQ"
