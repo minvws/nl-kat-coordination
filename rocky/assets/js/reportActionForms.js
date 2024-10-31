@@ -22,7 +22,7 @@ export function renderRenameSelection(modal, selection) {
     let reference_input_element = table_row_copy.querySelector(
       ".report-reference-input",
     );
-    let date_td = table_row_copy.querySelector("td.date");
+    // let date_td = table_row_copy.querySelector("td.date");
 
     name_input_element.setAttribute("value", report_names[i]);
     reference_input_element.setAttribute("value", references[i]);
@@ -31,7 +31,7 @@ export function renderRenameSelection(modal, selection) {
 
     type_ul.innerHTML = report_types[i];
     console.log(type_ul);
-    date_td.innerText = "date";
+    // date_td.innerText = "date";
 
     table_body.appendChild(table_row_copy);
   }
@@ -83,6 +83,10 @@ export function renderDeleteSelection(modal, selection) {
 export function renderRerunSelection(modal, selection) {
   let report_names = getReportNames(selection);
   let references = [];
+  let report_types = getReportTypes(selection);
+  let reference_dates = getReportReferenceDates(selection);
+  let creation_dates = getReportCreationDates(selection);
+  let report_oois = getReportOOIs(selection);
 
   selection.forEach((input_element) => {
     references.push(input_element.value);
@@ -101,15 +105,19 @@ export function renderRerunSelection(modal, selection) {
       ".report-reference-input",
     );
 
-    // let type_td = table_row_copy.querySelector("td.type");
-    // let date_td = table_row_copy.querySelector("td.date");
+    let type_ul = table_row_copy.querySelector("td.type ul");
+    let reference_date_td = table_row_copy.querySelector("td.reference_date");
+    let creation_date_td = table_row_copy.querySelector("td.creation_date");
+    let ooi_td = table_row_copy.querySelector("td.input_objects");
     let name_span = table_row_copy.querySelector("td.name span.name-holder");
 
     name_span.innerText = report_names[i];
     reference_input_element.setAttribute("value", references[i]);
 
-    // type_td.innerText = "type";
-    // date_td.innerText = "date";
+    type_ul.innerHTML = report_types[i];
+    reference_date_td.innerText = reference_dates[i];
+    creation_date_td.innerText = creation_dates[i];
+    ooi_td.innerHTML = report_oois[i];
 
     table_body.appendChild(table_row_copy);
   }

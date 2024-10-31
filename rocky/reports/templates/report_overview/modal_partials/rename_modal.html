@@ -12,7 +12,7 @@
             <tr>
                 <th>{% translate "Report type" %}</th>
                 <th>{% translate "Name" %}</th>
-                <th>{% translate "Reference date" %}</th>
+                {% comment %} <th>{% translate "Reference date" %}</th> {% endcomment %}
             </tr>
         </thead>
         <tbody>
@@ -25,7 +25,7 @@
                     <input type="text" name="report_name" class="report-name-input">
                     <input type="hidden" name="report_reference" class="report-reference-input">
                 </td>
-                <td class="date"></td>
+                {% comment %} <td class="date"></td> {% endcomment %}
             </tr>
         </tbody>
     </table>
