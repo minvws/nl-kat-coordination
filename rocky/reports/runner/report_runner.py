@@ -31,8 +31,8 @@ class LocalReportRunner(ReportRunner):
         oois = []
         now = datetime.now(timezone.utc)
 
-        if recipe.input_recipe.get("input_oois"):
-            for ooi_id in recipe.input_recipe["input_oois"]:
+        if input_oois := recipe.input_recipe.get("input_oois"):
+            for ooi_id in input_oois:
                 ooi = connector.get(Reference.from_str(ooi_id), valid_time)
                 oois.append(ooi)
         elif recipe.input_recipe.get("query"):
