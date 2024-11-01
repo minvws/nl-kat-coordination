@@ -1,5 +1,6 @@
 import json
 from collections.abc import Iterable
+from pathlib import Path
 
 from Wappalyzer import Wappalyzer, WebPage
 
@@ -32,7 +33,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     headers = response_object["response"]["headers"]
     body = raw_body.decode(response_object.get("encoding") or "utf-8", "replace")
 
-    with open("technologies.json") as f:
+    with Path(__file__).parent.joinpath("technologies.json").open() as f:
         data = json.load(f)
     wappalyzer = Wappalyzer(categories=data["categories"], technologies=data["technologies"])
     web_page = WebPage(url, body, headers)
