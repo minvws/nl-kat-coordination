@@ -25,7 +25,8 @@ class LocalReportRunner(ReportRunner):
         valid_time = self.valid_time or datetime.now(timezone.utc)
 
         connector = OctopoesAPIConnector(settings.OCTOPOES_API, report_task.organisation_id)
-        recipe = connector.get(Reference.from_str(f"ReportRecipe|{report_task.report_recipe_id}"), valid_time)
+        recipe_ref = Reference.from_str(f"ReportRecipe|{report_task.report_recipe_id}")
+        recipe = connector.get(recipe_ref, valid_time)
 
         report_types = [get_report_by_id(report_type_id) for report_type_id in recipe.report_types]
         oois = []
@@ -87,6 +88,7 @@ class LocalReportRunner(ReportRunner):
                 report_data,
                 post_processed_data,
                 aggregate_report,
+                recipe_ref,
             )
         else:
             subreport_names = []
@@ -126,6 +128,7 @@ class LocalReportRunner(ReportRunner):
                 report_data,
                 subreport_names,
                 parent_report_name,
+                recipe_ref,
             )
 
             self.bytes_client.organization = None
