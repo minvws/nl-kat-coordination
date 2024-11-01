@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-28 12:38+0000\n"
+"POT-Creation-Date: 2024-10-29 11:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6164,7 +6164,6 @@ msgstr ""
 msgid "Forgot password"
 msgstr ""
 
-#: rocky/templates/partials/form/field_input.html
 #: rocky/templates/partials/form/field_input_checkbox.html
 #: rocky/templates/partials/form/field_input_radio.html
 msgid "This field is required"
@@ -6214,16 +6213,6 @@ msgstr ""
 #: rocky/templates/partials/hyperlink_ooi_type.html
 #, python-format
 msgid "Only show objects of type %(type)s"
-msgstr ""
-
-#: rocky/templates/partials/language-switcher.html
-msgid "Select your language"
-msgstr ""
-
-#: rocky/templates/partials/language-switcher.html
-#, python-format
-msgid ""
-"Current language is %(current_language)s. Choose your preferred language."
 msgstr ""
 
 #: rocky/templates/partials/list_filters.html
