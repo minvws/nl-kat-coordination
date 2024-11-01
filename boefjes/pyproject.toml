@@ -49,7 +49,6 @@ shodan = "1.25.0"
 cryptography = "^43.0.1"
 # required by kat_webpage_analysis
 forcediphttpsadapter = "1.1.0"
-python-wappalyzer = {git = "https://github.com/chorsley/python-Wappalyzer.git", rev = "0.4.0"}
 # required by kat_webpage_analysis (forcediphttpsadapter)
 urllib3 = "^2.1.0"
 # required by kat_wpscan
@@ -75,6 +74,8 @@ structlog = "^24.2.0"
 # required by kat_maxmind_geoip
 maxminddb = "^2.6.2"
 croniter = "^5.0.1"
+# required by kat_wappalyzer
+python-wappalyzer = {git = "https://github.com/Ali0x2f/python-Wappalyzer.git"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.0"

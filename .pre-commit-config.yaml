@@ -27,6 +27,10 @@ repos:
       - id: fix-byte-order-marker
       - id: pretty-format-json
         args: ["--autofix", "--no-ensure-ascii", "--no-sort-keys"]
+        exclude: |
+          (?x)(
+          ^boefjes/boefjes/plugins/kat_wappalyzer/technologies.json |
+          )
 
   - repo: https://github.com/abravalheri/validate-pyproject
     rev: v0.16
@@ -121,6 +125,7 @@ repos:
           requirements-.*.txt$ |
           retirejs.json$ |
           ^boefjes/boefjes/plugins/kat_fierce/lists |
+          ^boefjes/boefjes/plugins/kat_wappalyzer/technologies.json |
           ^boefjes/tests/examples/inputs/cve-result-without-cvss.json |
           ^boefjes/tests/examples |
           ^keiko/glossaries |

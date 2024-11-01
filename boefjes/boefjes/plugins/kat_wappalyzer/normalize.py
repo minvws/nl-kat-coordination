@@ -32,7 +32,9 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     headers = response_object["response"]["headers"]
     body = raw_body.decode(response_object.get("encoding") or "utf-8", "replace")
 
-    wappalyzer = Wappalyzer.latest()
+    with open("technologies.json") as f:
+        data = json.load(f)
+    wappalyzer = Wappalyzer(categories=data["categories"], technologies=data["technologies"])
     web_page = WebPage(url, body, headers)
     results = wappalyzer.analyze_with_versions_and_categories(web_page)
 
