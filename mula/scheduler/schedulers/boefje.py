@@ -89,6 +89,8 @@ class BoefjeScheduler(Scheduler):
         - Rescheduling; when a task has passed its deadline, we need to
         reschedule it.
         """
+        super().run()
+
         # Scan profile mutations
         self.listeners["scan_profile_mutations"] = listeners.ScanProfileMutation(
             dsn=str(self.ctx.config.host_raw_data),

@@ -8,5 +8,5 @@ from .organisation import Organisation
 from .plugin import Plugin
 from .queue import Queue
 from .schedule import Schedule, ScheduleDB
-from .scheduler import Scheduler
+from .scheduler import Scheduler, SchedulerDB
 from .task import BoefjeTask, NormalizerTask, ReportTask, Task, TaskDB, TaskStatus

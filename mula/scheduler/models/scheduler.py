@@ -9,15 +9,13 @@ from .base import Base
 
 
 class Scheduler(BaseModel):
-    """Representation of a schedulers.Scheduler instance. Used for
-    unmarshalling of schedulers to a JSON representation."""
-
     id: str | None = None
     enabled: bool | None = None
-
     size: int | None = None
     maxsize: int | None = None
-    item_type: str | None = None
+    organisation: str | None = None
+    type: str | None = None  # TODO: enum?
+    item_type: str | None = None  # TODO: necessary when we have type?
     allow_replace: bool | None = None
     allow_updates: bool | None = None
     allow_priority_updates: bool | None = None
@@ -34,6 +32,8 @@ class SchedulerDB(Base):
     enabled = Column(Boolean, default=True)
     size = Column(Integer, nullable=False)
     maxsize = Column(Integer, nullable=False)
+    organisation = Column(String, nullable=False)
+    type = Column(String, nullable=False)
     item_type = Column(String, nullable=False)
     allow_replace = Column(Boolean, default=True)
     allow_updates = Column(Boolean, default=True)

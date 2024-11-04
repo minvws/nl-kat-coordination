@@ -59,3 +59,35 @@ class SchedulerStore:
             schedulers = [models.Scheduler.model_validate(scheduler_orm) for scheduler_orm in schedulers_orm]
 
             return schedulers, count
+
+    @retry()
+    @exception_handler
+    def get_scheduler(self, scheduler_id: str) -> models.Scheduler:
+        with self.dbconn.session.begin() as session:
+            scheduler_orm = session.query(models.SchedulerDB).filter(models.SchedulerDB.id == scheduler_id).one()
+
+        return models.Scheduler.model_validate(scheduler_orm)
+
+    @retry()
+    @exception_handler
+    def create_scheduler(self, scheduler: models.Scheduler) -> models.Scheduler:
+        with self.dbconn.session.begin() as session:
+            scheduler_orm = models.SchedulerDB.model_validate(scheduler)
+            session.add(scheduler_orm)
+
+        return models.Scheduler.model_validate(scheduler_orm)
+
+    @retry()
+    @exception_handler
+    def update_scheduler(self, scheduler: models.Scheduler) -> models.Scheduler:
+        with self.dbconn.session.begin() as session:
+            scheduler_orm = session.query(models.SchedulerDB).filter(models.SchedulerDB.id == scheduler.id).one()
+            scheduler_orm.update(scheduler.dict(exclude_unset=True))
+
+        return models.Scheduler.model_validate(scheduler_orm)
+
+    @retry()
+    @exception_handler
+    def delete_scheduler(self, scheduler_id: str) -> None:
+        with self.dbconn.session.begin() as session:
+            session.query(models.SchedulerDB).filter(models.SchedulerDB.id == scheduler_id).delete()

@@ -121,26 +121,17 @@ class App:
                 self.logger.error("Failed to get organisation from Katalogus", error=e, org_id=org_id)
                 continue
 
-            scheduler_boefje = schedulers.BoefjeScheduler(
+            schedulers.BoefjeScheduler(
                 ctx=self.ctx, scheduler_id=f"boefje-{org.id}", organisation=org, callback=self.remove_scheduler
             )
 
-            scheduler_normalizer = schedulers.NormalizerScheduler(
+            schedulers.NormalizerScheduler(
                 ctx=self.ctx, scheduler_id=f"normalizer-{org.id}", organisation=org, callback=self.remove_scheduler
             )
 
-            scheduler_report = schedulers.ReportScheduler(
+            schedulers.ReportScheduler(
                 ctx=self.ctx, scheduler_id=f"report-{org.id}", organisation=org, callback=self.remove_scheduler
             )
-
-            with self.lock:
-                self.schedulers[scheduler_boefje.scheduler_id] = scheduler_boefje
-                self.schedulers[scheduler_normalizer.scheduler_id] = scheduler_normalizer
-                self.schedulers[scheduler_report.scheduler_id] = scheduler_report
-
-            scheduler_normalizer.run()
-            scheduler_boefje.run()
-            scheduler_report.run()
 
         if additions:
             # Flush katalogus caches when new organisations are added
@@ -165,26 +156,35 @@ class App:
     def start_schedulers(self) -> None:
         # Initialize the schedulers
         try:
-            orgs = self.ctx.services.katalogus.get_organisations()
+            schedulers_db = self.ctx.datastores.scheduler_store.get_schedulers()
         except ExternalServiceError as e:
             self.logger.error("Failed to get organisations from Katalogus", error=e)
             return
 
-        for org in orgs:
-            boefje_scheduler = schedulers.BoefjeScheduler(
-                ctx=self.ctx, scheduler_id=f"boefje-{org.id}", organisation=org, callback=self.remove_scheduler
-            )
-            self.schedulers[boefje_scheduler.scheduler_id] = boefje_scheduler
+        for scheduler in schedulers_db:
+            if scheduler.item_type == "boefje":
+                self.schedulers[scheduler.id] = schedulers.BoefjeScheduler(
+                    ctx=self.ctx,
+                    scheduler_id=scheduler.id,
+                    organisation=scheduler.organisation,
+                    callback=self.remove_scheduler,
+                )
 
-            normalizer_scheduler = schedulers.NormalizerScheduler(
-                ctx=self.ctx, scheduler_id=f"normalizer-{org.id}", organisation=org, callback=self.remove_scheduler
-            )
-            self.schedulers[normalizer_scheduler.scheduler_id] = normalizer_scheduler
+            if scheduler.item_type == "normalizer":
+                self.schedulers[scheduler.id] = schedulers.NormalizerScheduler(
+                    ctx=self.ctx,
+                    scheduler_id=scheduler.id,
+                    organisation=scheduler.organisation,
+                    callback=self.remove_scheduler,
+                )
 
-            report_scheduler = schedulers.ReportScheduler(
-                ctx=self.ctx, scheduler_id=f"report-{org.id}", organisation=org, callback=self.remove_scheduler
-            )
-            self.schedulers[report_scheduler.scheduler_id] = report_scheduler
+            if scheduler.item_type == "report":
+                self.schedulers[scheduler.id] = schedulers.ReportScheduler(
+                    ctx=self.ctx,
+                    scheduler_id=scheduler.id,
+                    organisation=scheduler.organisation,
+                    callback=self.remove_scheduler,
+                )
 
         # Start schedulers
         for scheduler in self.schedulers.values():
@@ -280,6 +280,22 @@ class App:
         self.logger.error("Unhandled exception occurred: %s", args.exc_value)
         self.stop_event.set()
 
+    def create_scheduler(self, scheduler: schedulers.Scheduler) -> None:
+        """Create a new scheduler in the application.
+
+        Args:
+            scheduler: The scheduler to create.
+        """
+        with self.lock:
+            # Add to the schedulers
+            self.schedulers[scheduler.scheduler_id] = scheduler
+
+            # Add to the scheduler store
+            self.ctx.datastores.scheduler_store.create_scheduler(scheduler)
+
+            # Start the scheduler
+            scheduler.run()
+
     def remove_scheduler(self, scheduler_id: str) -> None:
         """Remove a scheduler from the application. This method is passed
         as a callback to the scheduler, so that the scheduler can remove
@@ -292,4 +308,8 @@ class App:
             if scheduler_id not in self.schedulers:
                 return
 
+            # Stop the scheduler
             self.schedulers.pop(scheduler_id)
+
+            # Remove from the scheduler store
+            self.ctx.datastores.scheduler_store.delete_scheduler(scheduler_id)
