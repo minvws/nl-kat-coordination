@@ -267,9 +267,6 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         recurrence_choice = self.request.POST.get("choose_recurrence", "once")
         return recurrence_choice == "repeat"
 
-    def get_object_selection(self) -> str:
-        return self.request.POST.get("object_selection", "")
-
     def create_report_recipe(
         self,
         report_name_format: str,
@@ -317,7 +314,7 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         context["all_oois_selected"] = self.all_oois_selected()
         context["selected_oois"] = self.selected_oois
         context["selected_report_types"] = self.selected_report_types
-        context["object_selection"] = self.get_object_selection()
+        context["object_selection"] = self.request.POST.get("object_selection", "")
 
         return context
 
