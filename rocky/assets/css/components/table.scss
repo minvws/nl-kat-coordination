@@ -80,4 +80,17 @@ table:not(.nowrap) tbody td:not(.nowrap) {
     display: inline-block; /* Needed to be able to use max-width */
     max-width: 20rem;
   }
+
+  vertical-align: top;
+
+  /* Added spacing to align with text */
+  .level-indicator {
+    padding-top: 0.25rem;
+  }
+}
+
+div.horizontal-scroll.nowrap tbody td,
+table.nowrap tbody td,
+table tbody td.nowrap {
+  vertical-align: middle;
 }
