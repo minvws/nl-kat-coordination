@@ -68,6 +68,8 @@ class Settings(BaseSettings):
 
     logging_format: Literal["text", "json"] = Field("text", description="Logging format")
 
+    workers: int = Field(4, description="Number of Octopoes Celery workers")
+
     model_config = SettingsConfigDict(env_prefix="OCTOPOES_")
 
     @classmethod
