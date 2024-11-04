@@ -28,11 +28,9 @@ class NibblesRunner:
         self.objects_by_type_cache: dict[type[OOI], set[OOI]]
         self.update_nibbles()
 
-    # TODO: path query for relation path (in Parameter definitions)
     def _retrieve(self, types: set[type[OOI]], valid_time: datetime) -> None:
         cached_types = set(self.objects_by_type_cache)
         target_types = set(filter(lambda x: x not in cached_types, types))
-        # FIXME: this does not account for type collides
         objects = self.ooi_repository.list_oois_by_object_types(target_types, valid_time)
         objects_by_type = {t: {x for x in objects if isinstance(otype(x), t)} for t in set(map(otype, objects))}
         self.objects_by_type_cache = mergewith(set.union, self.objects_by_type_cache, objects_by_type)
@@ -43,8 +41,8 @@ class NibblesRunner:
         self._retrieve(set(chain.from_iterable(map(lambda x: x.signature, target_nibbles))), valid_time)
         for nibble in target_nibbles:
             radix = [self.objects_by_type_cache[sgn.ooi_type] for sgn in nibble.signature]
-            # TODO: follow path instead of only crossing
-            retval |= {nibble.id: nibble(*list(filter(lambda x: ooi in x, product(radix))))}
+            # TODO: filter OOI not abiding the parameters from radix
+            retval |= {nibble.id: set(map(nibble, filter(lambda x: ooi in x, product(radix))))}
         return retval
 
     def update_nibbles(self):
