@@ -85,12 +85,14 @@
                         {% for report in reports %}
                             <tr>
                                 <td>
-                                    <input type="checkbox"
-                                           class="report-checkbox"
-                                           name="report"
-                                           value="{{ report.parent_report.reference }}"
-                                           {% if report.id in selected_reports or "all" in selected_reports %}checked{% endif %}
-                                           {% if "all" in selected_reports %}disabled{% endif %}>
+                                    {% if report.parent_report.report_type|get_report_type_name != "Multi Organization Report" %}
+                                        <input type="checkbox"
+                                               class="report-checkbox"
+                                               name="report"
+                                               value="{{ report.parent_report.reference }}"
+                                               {% if report.id in selected_reports or "all" in selected_reports %}checked{% endif %}
+                                               {% if "all" in selected_reports %}disabled{% endif %}>
+                                    {% endif %}
                                 </td>
                                 <td class="report_name">
                                     <a id="report_name_{{ report.parent_report.reference|slugify }}"

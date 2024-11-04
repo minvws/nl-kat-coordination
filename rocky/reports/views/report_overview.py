@@ -133,8 +133,20 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
             if actual_report_ooi.report_type == "concatenated-report":
                 self.rerun_concatenated_report(actual_report_ooi)
 
-            if actual_report_ooi.report_type == "aggregate-organisation-report":
+            elif actual_report_ooi.report_type == "aggregate-organisation-report":
                 self.rerun_aggregate_report(actual_report_ooi)
+
+            elif actual_report_ooi.report_type == "multi-organization-report":
+                return messages.warning(
+                    self.request,
+                    _(
+                        "Multiorganization report cannot go through a rerun. "
+                        "It consists of imported data from different organizations and not based on new generated data."
+                    ),
+                )
+
+            else:
+                self.rerun_single_report(actual_report_ooi)
 
     def get_input_data(self, report_ooi: Report) -> dict[str, Any]:
         self.bytes_client.login()
@@ -179,6 +191,18 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
         create_ooi(self.octopoes_api_connector, self.bytes_client, new_report_ooi, observed_at)
 
         return new_report_ooi
+
+    def rerun_single_report(self, report_ooi: Report) -> None:
+        observed_at = datetime.now(timezone.utc)
+        report_input_data = self.get_input_data(report_ooi)
+        report_type = get_report_by_id(report_ooi.report_type)
+
+        report_data = report_type(self.octopoes_api_connector).collect_data(report_ooi.input_oois, observed_at)
+        bytes_id = self.bytes_client.upload_raw(
+            raw=ReportDataDict({"report_data": report_data} | report_input_data).model_dump_json().encode(),
+            manual_mime_types={"openkat/report"},
+        )
+        self.recreate_report(report_ooi, observed_at, bytes_id)
 
     def rerun_aggregate_report(self, report_ooi: Report) -> None:
         observed_at = datetime.now(timezone.utc)
