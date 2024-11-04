@@ -32,7 +32,7 @@ from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Referenc
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
-from octopoes.models.ooi.reports import Report, ReportRecipe
+from octopoes.models.ooi.reports import Report, ReportData, ReportRecipe
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
@@ -1441,6 +1441,21 @@ def get_aggregate_report_data():
     return json.loads(get_stub_path("aggregate_report_data.json").read_text())
 
 
+@pytest.fixture()
+def get_multi_report_data_minvws():
+    return json.loads(get_stub_path("multi_report_data_minvws.json").read_text())
+
+
+@pytest.fixture()
+def get_multi_report_data_mispoes():
+    return json.loads(get_stub_path("multi_report_data_mispoes.json").read_text())
+
+
+@pytest.fixture()
+def get_multi_report_post_processed_data():
+    return json.loads(get_stub_path("multi_report_post_processed_data.json").read_text())
+
+
 def get_plugins_data() -> list[dict]:
     return get_boefjes_data() + get_normalizers_data()
 
@@ -1876,7 +1891,7 @@ def get_aggregate_report_from_bytes():
             "safe_connections": {},
             "summary": {},
         },
-        "summary": {"Critical vulnerabilities": 0, "IPs scanned": 1, "Hostnames scanned": 1, "Terms in report": ""},
+        "summary": {"critical_vulnerabilities": 0, "ips_scanned": 1, "hostnames_scanned": 1, "terms_in_report": ""},
         "total_findings": 0,
         "total_systems": 1,
         "total_hostnames": 1,
@@ -1928,3 +1943,65 @@ def get_aggregate_report_from_bytes():
         },
     }
     return json.dumps(data).encode("utf-8")
+
+
+@pytest.fixture
+def report_data_ooi_org_a(organization, get_multi_report_data_minvws):
+    return ReportData(
+        object_type="ReportData",
+        scan_profile=EmptyScanProfile(
+            scan_profile_type="empty",
+            reference=Reference(f"ReportData|{organization.code}"),
+            level=ScanLevel.L0,
+            user_id=None,
+        ),
+        user_id=None,
+        primary_key=f"ReportData|{organization.code}",
+        organization_code=organization.code,
+        organization_name=organization.name,
+        organization_tags=[],
+        data=get_multi_report_data_minvws,
+    )
+
+
+@pytest.fixture
+def report_data_ooi_org_b(organization_b, get_multi_report_data_mispoes):
+    return ReportData(
+        object_type="ReportData",
+        scan_profile=EmptyScanProfile(
+            scan_profile_type="empty",
+            reference=Reference(f"ReportData|{organization_b.code}"),
+            level=ScanLevel.L0,
+            user_id=None,
+        ),
+        user_id=None,
+        primary_key=f"ReportData|{organization_b.code}",
+        organization_code=organization_b.code,
+        organization_name=organization_b.name,
+        organization_tags=[],
+        data=get_multi_report_data_mispoes,
+    )
+
+
+@pytest.fixture
+def multi_report_ooi(report_data_ooi_org_a, report_data_ooi_org_b):
+    return Report(
+        object_type="Report",
+        scan_profile=None,
+        user_id=None,
+        primary_key="Report|79f43c90-e554-4cb7-a922-82f92b57c3a7",
+        name="Sector Report",
+        report_type="multi-organization-report",
+        template="multi_organization_report/report.html",
+        date_generated=datetime(2024, 10, 18, 14, 14, 46, 999999),
+        input_oois=[report_data_ooi_org_a.primary_key, report_data_ooi_org_b.primary_key],
+        report_id=UUID("79f43c90-e554-4cb7-a922-82f92b57c3a7"),
+        organization_code=report_data_ooi_org_a.organization_code,
+        organization_name=report_data_ooi_org_a.organization_name,
+        organization_tags=[],
+        data_raw_id="bb4d5271-b273-4af4-a25a-83ba0c4fed63",
+        observed_at=datetime(2024, 10, 18, 14, 14, 45, 999999),
+        parent_report=None,
+        report_recipe=None,
+        has_parent=False,
+    )
