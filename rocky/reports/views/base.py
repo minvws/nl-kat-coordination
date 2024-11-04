@@ -580,6 +580,12 @@ class SaveReportView(BaseReportView, SchedulerView):
             elif not self.report_type and subreport_name_format:
                 parent_report_type = ConcatenatedReport.id
 
+            parent_report_type = None
+            if self.report_type is not None:
+                parent_report_type = self.report_type.id
+            elif not self.report_type and subreport_name_format:
+                parent_report_type = ConcatenatedReport.id
+
             schedule = self.convert_recurrence_to_cron_expressions(recurrence)
 
             report_recipe = self.create_report_recipe(
