@@ -146,7 +146,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
 
         observed_at = datetime.now(timezone.utc)
 
-        bytes_data = self.get_report_data_from_bytes(report_ooi)
+        report_data = self.get_report_data_from_bytes(report_ooi)
 
         new_bytes_id = self.bytes_client.upload_raw(
             raw=ReportDataDict(bytes_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
