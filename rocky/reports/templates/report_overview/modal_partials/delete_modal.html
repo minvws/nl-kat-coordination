@@ -20,17 +20,25 @@
             <tr>
                 {% comment %} <th>{% translate "Report type" %}</th> {% endcomment %}
                 <th>{% translate "Name" %}</th>
-                {% comment %} <th>{% translate "Reference date" %}</th> {% endcomment %}
+                <th>{% translate "Type" %}</th>
+                <th>{% translate "Input objects" %}</th>
+                <th>{% translate "Reference date" %}</th>
+                <th>{% translate "Creation date" %}</th>
             </tr>
         </thead>
         <tbody>
             <tr class="delete-table-row">
-                {% comment %} <td class="type"></td> {% endcomment %}
                 <td class="name">
                     <span class="name-holder"></span>
                     <input type="hidden" name="report_reference" class="report-reference-input" />
                 </td>
-                {% comment %} <td class="date"></td> {% endcomment %}
+                <td class="type">
+                    <ul class="tags horizontal-view">
+                    </ul>
+                </td>
+                <td class="input_objects"></td>
+                <td class="reference_date"></td>
+                <td class="creation_date"></td>
             </tr>
         </tbody>
     </table>

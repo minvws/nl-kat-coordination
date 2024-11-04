@@ -12,17 +12,20 @@
             <tr>
                 <th>{% translate "Report type" %}</th>
                 <th>{% translate "Name" %}</th>
-                <th>{% translate "Reference date" %}</th>
+                {% comment %} <th>{% translate "Reference date" %}</th> {% endcomment %}
             </tr>
         </thead>
         <tbody>
             <tr class="rename-table-row">
-                <td class="type"></td>
+                <td class="type">
+                    <ul class="tags horizontal-view">
+                    </ul>
+                </td>
                 <td class="name">
                     <input type="text" name="report_name" class="report-name-input">
                     <input type="hidden" name="report_reference" class="report-reference-input">
                 </td>
-                <td class="date"></td>
+                {% comment %} <td class="date"></td> {% endcomment %}
             </tr>
         </tbody>
     </table>
