@@ -52,10 +52,15 @@ class NibblesRunner:
 
     def infer(self, stack: list[OOI], valid_time: datetime) -> dict[OOI, dict[str, set[OOI]]]:
         retval: dict[OOI, dict[str, set[OOI]]] = {}
+        blocklist = set(stack)
         self.objects_by_type_cache = {}
         while stack:
             ooi = stack.pop()
             self.objects_by_type_cache = mergewith(set.union, self.objects_by_type_cache, {otype(ooi): {ooi}})
-            retval |= {ooi: self._run(ooi, valid_time)}
+            results = self._run(ooi, valid_time)
+            blocks = set.union(*results.values())
+            stack += list(filter(lambda ooi: ooi not in blocklist, blocks))
+            blocklist |= blocks
+            retval |= {ooi: results}
 
         return retval
