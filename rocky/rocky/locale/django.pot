@@ -6227,16 +6227,6 @@ msgstr ""
 msgid "Only show objects of type %(type)s"
 msgstr ""
 
-#: rocky/templates/partials/language-switcher.html
-msgid "Select your language"
-msgstr ""
-
-#: rocky/templates/partials/language-switcher.html
-#, python-format
-msgid ""
-"Current language is %(current_language)s. Choose your preferred language."
-msgstr ""
-
 #: rocky/templates/partials/list_filters.html
 msgid "Hide filter options"
 msgstr ""

@@ -111,5 +111,5 @@ settings-doc = "^4.3.1"
 colorama = "0.4.6" # Required on all platforms, not just win32
 autodoc-pydantic = "^2.2.0"
 # Needed for settings-doc and autodoc
-croniter = "^3.0.3"
+croniter = "^5.0.1"
 jsonschema = "^4.17.0"
