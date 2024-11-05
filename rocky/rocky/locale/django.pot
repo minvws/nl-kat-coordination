@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-05 05:14+0000\n"
+"POT-Creation-Date: 2024-11-05 05:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4440,6 +4440,12 @@ msgstr ""
 
 #: reports/views/report_overview.py
 msgid "Deletion successful."
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid ""
+"Multiorganization report cannot go through a rerun. It consists of imported "
+"data from different organizations and not based on new generated data."
 msgstr ""
 
 #: reports/views/report_overview.py
