@@ -90,11 +90,11 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
 
     @property
     def order_by(self) -> Literal["score", "finding_type"]:
-        return "score" if self.request.GET.get("order_by", "") == "score" else "finding_type"
+        return "finding_type" if self.request.GET.get("order_by", "") == "finding_type" else "score"
 
     @property
     def sorting_order(self) -> Literal["asc", "desc"]:
-        return "desc" if self.request.GET.get("sorting_order", "") == "desc" else "asc"
+        return "asc" if self.request.GET.get("sorting_order", "") == "asc" else "desc"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
