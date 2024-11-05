@@ -78,7 +78,9 @@
                                                     </td>
                                                     <td>
                                                         {% if report.input_oois|length == 1 %}
-                                                            <a href="{% ooi_url 'ooi_detail' ooi organization.code query=ooi.mandatory_fields %}">{{ ooi|human_readable }}</a>
+                                                            {% with ooi=report.input_oois.0 %}
+                                                                <a href="{% ooi_url 'ooi_detail' ooi organization.code query=ooi.mandatory_fields %}">{{ ooi|human_readable }}</a>
+                                                            {% endwith %}
                                                         {% else %}
                                                             {{ report.input_oois|length }}
                                                         {% endif %}
