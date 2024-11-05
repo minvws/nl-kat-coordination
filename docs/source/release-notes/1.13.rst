@@ -37,8 +37,8 @@ New Features
  * Boefje for checking CVE-2023-34039 (authentication bypass in Aria) has been
    added.
  * New CLI tools have been added that allow you to run a boefje, normalizer and
-   bit from the CLI and show the raw file output of a boefje. See :ref:`Manually
-   running a boefje or normalizer` and :ref:`Run bit manually`.
+   bit from the CLI and show the raw file output of a boefje. See :ref:`developer-documentation/boefjes:Manually
+   running a boefje or normalizer` and :ref:`developer-documentation/octopoes:Run bit manually`.
  * Filtering on the object list page has been improved.
  * Tabs have new a visual styling.
  * Descructive button styling has been added.
@@ -93,8 +93,8 @@ those installations use Granian by default. Do not put any other configuration
 in this file because it will be automatically removed when upgrading to 1.14.
 
 If you were previously accessing OpenKAT using https on port 8443 you need to
-change the configuration as described on the :ref:`Debian installation
-page<Configure reverse proxy>`.
+change the configuration as described on the :ref:`Debian installation page <installation-and-deployment/debian-install:Configure
+reverse proxy>`.
 
 
 Full Changelog

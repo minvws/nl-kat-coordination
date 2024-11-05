@@ -18,15 +18,15 @@ Contribute to Codebase
 ======================
 
 
-See :ref:`Development` for our code style, coding conventions, and overall workflow.
+See :doc:`/guidelines/development` for our code style, coding conventions, and overall workflow.
 
 - Fork the right repository in GitHub
 - Create a new branch from either ``main`` or a release tag. Note that ``main`` changes rapidly, and as such may not be a suitable basis for your work.
     - This branch should be in the following format:
     - ``[feature|enhancement|bug|hotfix]/random-cat-popup-on-screen``
 - Commit and push the code
-    - Make sure the code is linted, formatted and has correct typing. Use ``pre-commit`` locally for this, see :ref:`Pre-commit`.
-    - All commits must be signed, see :ref:`Signed commits`.
+    - Make sure the code is linted, formatted and has correct typing. Use ``pre-commit`` locally for this, see :ref:`guidelines/development:Pre-commit`.
+    - All commits must be signed, see :ref:`guidelines/development:Signed commits`.
 - Submit Pull Request
     - Make sure your code is tested and the PR has a good title and description
     - Use the PR template
@@ -98,7 +98,7 @@ The new language should be automatically picked up by both Weblate and Django.
 
 Contributor Social Contract
 ===========================
-All contributors (including, but not limited to, developers and issue reporters) promise to do their best to adhere to the guidelines in :ref:`Project Guidelines`.
+All contributors (including, but not limited to, developers and issue reporters) promise to do their best to adhere to the guidelines in :doc:`/guidelines/index`.
 Everyone is encouraged to politely and constructively point out guidelines violations to others.
 Actively enforcing these guidelines makes that the entire project benefits in quality control.
 
