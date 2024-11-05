@@ -10,9 +10,11 @@ from django.views.generic import ListView
 from pydantic import TypeAdapter
 from tools.ooi_helpers import create_ooi
 
-from octopoes.models import Reference
+from octopoes.models import OOI, Reference
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.reports import Report, ReportRecipe
+from reports.report_types.aggregate_organisation_report.report import aggregate_reports
+from reports.report_types.helpers import get_report_by_id
 from reports.views.base import ReportBreadcrumbs, ReportDataDict, get_selection
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import OctopoesView, ReportList
@@ -128,29 +130,46 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
             actual_report_ooi = self.get_report_ooi(report_id)
 
             # First create new parent report and then create all subreports with new parent reference
-            if not actual_report_ooi.has_parent and actual_report_ooi.report_type == "concatenated-report":
-                new_concatenated_report = self.recreate_report(actual_report_ooi)
-                self.recreate_subreports(actual_report_ooi, new_concatenated_report)
+            if actual_report_ooi.report_type == "concatenated-report":
+                self.rerun_concatenated_report(actual_report_ooi)
 
-    def get_report_data_from_bytes(self, report: Report) -> dict[str, Any]:
+            elif actual_report_ooi.report_type == "aggregate-organisation-report":
+                self.rerun_aggregate_report(actual_report_ooi)
+
+            elif actual_report_ooi.report_type == "multi-organization-report":
+                return messages.warning(
+                    self.request,
+                    _(
+                        "Multiorganization report cannot go through a rerun. "
+                        "It consists of imported data from different organizations and not based on new generated data."
+                    ),
+                )
+
+            else:
+                self.rerun_single_report(actual_report_ooi)
+
+    def get_input_data(self, report_ooi: Report) -> dict[str, Any]:
         self.bytes_client.login()
-        return TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
-            self.bytes_client.get_raw(raw_id=report.data_raw_id)
+        report_data = TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
+            self.bytes_client.get_raw(raw_id=report_ooi.data_raw_id)
         )
+        return {
+            "input_data": {
+                "input_oois": report_data["input_data"]["input_oois"],
+                "report_types": report_data["input_data"]["report_types"],
+                "plugins": report_data["input_data"]["plugins"],
+            }
+        }
 
-    def recreate_report(self, report_ooi: Report, parent_report: Report | None = None) -> Report:
-        """
-        Creates a new report based on data of an old report.
-        If parent report is available then it is a subreport with a reference to the parent report.
-        """
+    def get_input_oois(self, ooi_pks: list[str]) -> list[type[OOI]]:
+        return [
+            self.octopoes_api_connector.get(Reference.from_str(ooi), valid_time=self.observed_at) for ooi in ooi_pks
+        ]
 
-        observed_at = datetime.now(timezone.utc)
-
-        report_data = self.get_report_data_from_bytes(report_ooi)
-
-        raw_id = self.bytes_client.upload_raw(
-            raw=ReportDataDict(bytes_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
-        )
+    def recreate_report(
+        self, report_ooi: Report, observed_at: datetime, bytes_id: str, parent_report_ooi: Report | None = None
+    ) -> Report:
+        """Recreate a report with new observed_at and new (bytes) data."""
 
         new_report_ooi = Report(
             name=report_ooi.name,
@@ -160,24 +179,96 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
             organization_code=report_ooi.organization_code,
             organization_name=report_ooi.organization_name,
             organization_tags=report_ooi.organization_tags,
-            data_raw_id=new_bytes_id,
+            data_raw_id=bytes_id,
             date_generated=observed_at,
             input_oois=report_ooi.input_oois,
             observed_at=observed_at,
-            parent_report=parent_report.reference if parent_report is not None else None,
-            has_parent=parent_report is not None,
+            parent_report=report_ooi.parent_report if parent_report_ooi is None else parent_report_ooi.reference,
+            report_recipe=report_ooi.report_recipe,
+            has_parent=report_ooi.has_parent if parent_report_ooi is None else True,
         )
 
         create_ooi(self.octopoes_api_connector, self.bytes_client, new_report_ooi, observed_at)
 
         return new_report_ooi
 
-    def recreate_subreports(self, report_ooi: Report, parent_ooi: Report) -> None:
-        subreports = self.octopoes_api_connector.query(
-            "Report.<parent_report[is Report]", valid_time=self.observed_at, source=report_ooi.reference
+    def rerun_single_report(self, report_ooi: Report) -> None:
+        observed_at = datetime.now(timezone.utc)
+        report_input_data = self.get_input_data(report_ooi)
+        report_type = get_report_by_id(report_ooi.report_type)
+
+        report_data = report_type(self.octopoes_api_connector).collect_data(report_ooi.input_oois, observed_at)
+        bytes_id = self.bytes_client.upload_raw(
+            raw=ReportDataDict({"report_data": report_data} | report_input_data).model_dump_json().encode(),
+            manual_mime_types={"openkat/report"},
         )
-        for subreport in subreports:
-            self.recreate_report(subreport, parent_ooi)
+        self.recreate_report(report_ooi, observed_at, bytes_id)
+
+    def rerun_aggregate_report(self, report_ooi: Report) -> None:
+        observed_at = datetime.now(timezone.utc)
+        report_input_data = self.get_input_data(report_ooi)
+        report_types = report_input_data["input_data"]["report_types"]
+
+        _, post_processed_data, _, _ = aggregate_reports(
+            self.octopoes_api_connector,
+            self.get_input_oois(report_ooi.input_oois),
+            report_types,
+            observed_at,
+            report_ooi.organization_code,
+        )
+
+        bytes_id = self.bytes_client.upload_raw(
+            raw=ReportDataDict(post_processed_data | report_input_data).model_dump_json().encode(),
+            manual_mime_types={"openkat/report"},
+        )
+
+        self.recreate_report(report_ooi, observed_at, bytes_id)
+
+    def rerun_concatenated_report(self, report_ooi: Report) -> None:
+        observed_at = datetime.now(timezone.utc)
+        report_input_data = self.get_input_data(report_ooi)
+        bytes_id = self.bytes_client.upload_raw(
+            raw=ReportDataDict(report_input_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
+        )
+
+        parent_ooi = self.recreate_report(report_ooi, observed_at, bytes_id)
+
+        subreports = self.octopoes_api_connector.query(
+            "Report.<parent_report[is Report]", valid_time=observed_at, source=report_ooi.reference
+        )
+
+        for subreport_ooi in subreports:
+            sub_report_type = get_report_by_id(subreport_ooi.report_type)
+            sub_report_data = sub_report_type(self.octopoes_api_connector).collect_data(
+                subreport_ooi.input_oois, observed_at
+            )
+            for ooi, data in sub_report_data.items():
+                required_plugins = list(report_input_data["input_data"]["plugins"]["required"])
+                optional_plugins = list(report_input_data["input_data"]["plugins"]["optional"])
+
+                child_plugins: dict[str, list[str]] = {"required": [], "optional": []}
+
+                child_plugins["required"] = [
+                    plugin_id for plugin_id in required_plugins if plugin_id in sub_report_type.plugins["required"]
+                ]
+                child_plugins["optional"] = [
+                    plugin_id for plugin_id in optional_plugins if plugin_id in sub_report_type.plugins["optional"]
+                ]
+
+                child_input_data = {
+                    "input_data": {
+                        "input_oois": [ooi],
+                        "report_types": [subreport_ooi.report_type],
+                        "plugins": child_plugins,
+                    }
+                }
+
+                bytes_id_subreport = self.bytes_client.upload_raw(
+                    raw=ReportDataDict({"report_data": data} | child_input_data).model_dump_json().encode(),
+                    manual_mime_types={"openkat/report"},
+                )
+
+                self.recreate_report(subreport_ooi, observed_at, bytes_id_subreport, parent_ooi)
 
     def rename_reports(self, report_references: list[str]) -> None:
         report_names = self.request.POST.getlist("report_name", [])
