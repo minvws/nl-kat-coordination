@@ -36,11 +36,12 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
 
     data = json.loads(report_runner.bytes_client.upload_raw.mock_calls[0].kwargs["raw"])
     data["input_data"]["plugins"]["required"] = set(data["input_data"]["plugins"]["required"])  # ordering issues
+
     assert data == {
         "input_data": {
             "input_oois": ["Hostname|test|example.com", "Hostname|test|a.example.com"],
             "report_types": ["dns-report"],
-            "plugins": {"required": {"dns-sec", "dns-records"}, "optional": {"dns-zone"}},
+            "plugins": {"required": {"dns-sec", "dns-records"}, "optional": ["dns-zone"]},
         }
     }
 
@@ -56,7 +57,7 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
             "input_data": {
                 "input_oois": ["Hostname|test|example.com"],
                 "report_types": ["dns-report"],
-                "plugins": {"required": {"dns-sec", "dns-records"}, "optional": {"dns-zone"}},
+                "plugins": {"required": {"dns-sec", "dns-records"}, "optional": ["dns-zone"]},
             },
         },
         {
@@ -69,7 +70,7 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
             "input_data": {
                 "input_oois": ["Hostname|test|a.example.com"],
                 "report_types": ["dns-report"],
-                "plugins": {"required": {"dns-sec", "dns-records"}, "optional": {"dns-zone"}},
+                "plugins": {"required": {"dns-sec", "dns-records"}, "optional": ["dns-zone"]},
             },
         },
     ]
