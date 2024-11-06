@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-05 05:22+0000\n"
+"POT-Creation-Date: 2024-11-06 13:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4439,6 +4439,10 @@ msgid "View report"
 msgstr ""
 
 #: reports/views/report_overview.py
+msgid "An unexpected error occurred, please check logs for more info."
+msgstr ""
+
+#: reports/views/report_overview.py
 msgid "Deletion successful."
 msgstr ""
 
@@ -4446,6 +4450,10 @@ msgstr ""
 msgid ""
 "Multiorganization report cannot go through a rerun. It consists of imported "
 "data from different organizations and not based on new generated data."
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid "Rerun successful"
 msgstr ""
 
 #: reports/views/report_overview.py
@@ -4457,7 +4465,11 @@ msgid "Report names and reports does not match."
 msgstr ""
 
 #: reports/views/report_overview.py
-msgid "Report names changed successfully."
+msgid "Reports successfully renamed."
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid "Report {} could not be renamed."
 msgstr ""
 
 #: reports/views/view_helpers.py
