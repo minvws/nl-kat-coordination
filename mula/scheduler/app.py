@@ -6,6 +6,7 @@ from opentelemetry import trace
 
 from scheduler import context, schedulers, server
 from scheduler.connectors.errors import ExternalServiceError
+from scheduler.schedulers import create_scheduler
 from scheduler.utils import thread
 
 tracer = trace.get_tracer(__name__)
@@ -58,6 +59,8 @@ class App:
         self.stop_event: threading.Event = threading.Event()
         self.lock: threading.Lock = threading.Lock()
 
+        # TODO: do we need this now? can we stop the thread from its thread_id?
+        # instead of keeping a reference to the thread object.
         self.schedulers: dict[
             str,
             schedulers.Scheduler
@@ -65,6 +68,7 @@ class App:
             | schedulers.NormalizerScheduler
             | schedulers.ReportScheduler,
         ] = {}
+
         self.server: server.Server | None = None
 
     @tracer.start_as_current_span("monitor_organisations")
@@ -78,6 +82,8 @@ class App:
         # by the schedulers, and the organisation id's that are in the
         # Katalogus service. We will add/remove schedulers based on the
         # difference between these two sets.
+
+        # TODO: use database for this
         scheduler_orgs: set[str] = {
             s.organisation.id for s in current_schedulers.values() if hasattr(s, "organisation")
         }
@@ -162,32 +168,12 @@ class App:
             return
 
         for scheduler in schedulers_db:
-            if scheduler.item_type == "boefje":
-                self.schedulers[scheduler.id] = schedulers.BoefjeScheduler(
-                    ctx=self.ctx,
-                    scheduler_id=scheduler.id,
-                    organisation=scheduler.organisation,
-                    callback=self.remove_scheduler,
-                )
+            scheduler = create_scheduler(self.ctx, scheduler, self.remove_scheduler)
+            if scheduler is None:
+                continue
 
-            if scheduler.item_type == "normalizer":
-                self.schedulers[scheduler.id] = schedulers.NormalizerScheduler(
-                    ctx=self.ctx,
-                    scheduler_id=scheduler.id,
-                    organisation=scheduler.organisation,
-                    callback=self.remove_scheduler,
-                )
+            self.schedulers[scheduler.scheduler_id] = scheduler
 
-            if scheduler.item_type == "report":
-                self.schedulers[scheduler.id] = schedulers.ReportScheduler(
-                    ctx=self.ctx,
-                    scheduler_id=scheduler.id,
-                    organisation=scheduler.organisation,
-                    callback=self.remove_scheduler,
-                )
-
-        # Start schedulers
-        for scheduler in self.schedulers.values():
             scheduler.run()
 
     def start_monitors(self) -> None:

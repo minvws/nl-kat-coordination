@@ -540,7 +540,7 @@ class Scheduler(abc.ABC):
             size=self.queue.maxsize,
             maxsize=self.queue.maxsize,
             organisation=self.ctx.config.organisation,
-            type=self.ITEM_TYPE.type,
+            type=self.ITEM_TYPE.type,  # FIXME
             item_type=self.ITEM_TYPE.type,
             allow_replace=self.queue.allow_replace,
             allow_updates=self.queue.allow_updates,
