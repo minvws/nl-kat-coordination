@@ -110,10 +110,23 @@ span {
     padding: var(--spacing-grid-050) var(--spacing-grid-100);
     font-size: var(--tile-font-size);
     font-weight: var(--list-item-completed-font-weight);
+    margin: var(--spacing-grid-050) var(--spacing-grid-100)
+      var(--spacing-grid-050) 0;
 
     &.tags-color-grey-2 {
       color: var(--colors-grey-800);
       background-color: var(--colors-grey-100);
     }
+  }
+}
+
+.tile-report-types-link {
+  font-size: var(--tag-font-size);
+  text-decoration: none;
+  font-weight: 700;
+
+  .icon {
+    vertical-align: middle;
+    margin-left: 0.5rem;
   }
 }

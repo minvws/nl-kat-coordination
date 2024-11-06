@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-28 12:21+0000\n"
+"POT-Creation-Date: 2024-11-06 09:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1020,6 +1020,18 @@ msgstr ""
 msgid "Tableview"
 msgstr ""
 
+#: katalogus/templates/partials/modal_report_types.html
+msgid "Required for"
+msgstr ""
+
+#: katalogus/templates/partials/modal_report_types.html
+msgid "report types"
+msgstr ""
+
+#: katalogus/templates/partials/modal_report_types.html
+msgid "Report types for "
+msgstr ""
+
 #: katalogus/templates/partials/objects_to_scan.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/forms/widgets/checkbox_group_table.html
@@ -1078,14 +1090,6 @@ msgstr ""
 #: rocky/templates/partials/ooi_detail_related_object.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Add"
-msgstr ""
-
-#: katalogus/templates/partials/plugin_tile.html
-msgid "Required for"
-msgstr ""
-
-#: katalogus/templates/partials/plugin_tile.html
-msgid "report types"
 msgstr ""
 
 #: katalogus/templates/partials/plugin_tile.html
@@ -6156,7 +6160,6 @@ msgstr ""
 msgid "Forgot password"
 msgstr ""
 
-#: rocky/templates/partials/form/field_input.html
 #: rocky/templates/partials/form/field_input_checkbox.html
 #: rocky/templates/partials/form/field_input_radio.html
 msgid "This field is required"
