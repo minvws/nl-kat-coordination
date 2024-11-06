@@ -49,9 +49,7 @@ def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None
 
     allowed_keys = schema.get("properties", []) if schema else []
     new_env = {
-        key.split("BOEFJE_", 1)[1]: value
-        for key, value in os.environ.items()
-        if key.startswith("BOEFJE_") and key in allowed_keys
+        key[7:]: value for key, value in os.environ.items() if key.startswith("BOEFJE_") and key[7:] not in allowed_keys
     }
 
     settings_from_katalogus = response.json()

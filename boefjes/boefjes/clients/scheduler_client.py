@@ -5,6 +5,7 @@ from enum import Enum
 from httpx import Client, HTTPTransport, Response
 from pydantic import BaseModel, TypeAdapter
 
+from boefjes.config import settings
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
 
 
@@ -57,7 +58,7 @@ class SchedulerClientInterface:
 
 class SchedulerAPIClient(SchedulerClientInterface):
     def __init__(self, base_url: str):
-        self._session = Client(base_url=base_url, transport=HTTPTransport(retries=6))
+        self._session = Client(base_url=base_url, transport=HTTPTransport(retries=6), timeout=settings.httpx_timeout)
 
     @staticmethod
     def _verify_response(response: Response) -> None:
