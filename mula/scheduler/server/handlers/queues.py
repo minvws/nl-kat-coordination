@@ -6,7 +6,7 @@ from fastapi import status
 
 from scheduler import context, models, queues, schedulers, storage
 from scheduler.server.errors import BadRequestError, ConflictError, NotFoundError, TooManyRequestsError
-from scheduler.server.models import Queue, Task, TaskCreate
+from scheduler.server.models import Queue, Task, TaskPush
 
 
 class QueueAPI:
@@ -78,7 +78,7 @@ class QueueAPI:
 
         return Task(**item.model_dump())
 
-    def push(self, queue_id: str, item: TaskCreate) -> Task | None:
+    def push(self, queue_id: str, item: TaskPush) -> Task | None:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise NotFoundError(f"queue not found, by queue_id: {queue_id}")
