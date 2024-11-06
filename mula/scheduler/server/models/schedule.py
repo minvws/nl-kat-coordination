@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 
 
 class Schedule(BaseModel):
@@ -23,16 +23,9 @@ class ScheduleCreate(BaseModel):
     deadline_at: datetime | None = None
 
 
-# NOTE: model added for support of partial updates
 class ScheduleUpdate(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
     hash: str | None = Field(None, max_length=32)
-
     data: dict | None = None
-
     enabled: bool | None = None
-
     schedule: str | None = None
-
     deadline_at: datetime | None = None

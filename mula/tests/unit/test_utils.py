@@ -32,3 +32,9 @@ class ExpiringDictTestCase(unittest.TestCase):
 
         with self.assertRaises(utils.ExpiredError):
             ed.get("a")
+
+    def test_key_error(self):
+        ed = utils.ExpiringDict()
+
+        with self.assertRaises(KeyError):
+            ed["a"]
