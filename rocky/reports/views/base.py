@@ -210,14 +210,7 @@ class BaseReportView(OOIFilterView):
     def get_ooi_filter_forms(self) -> dict[str, Form]:
         return {
             "ooi_type_form": OOITypeMultiCheckboxForReportForm(
-                sorted(
-                    [
-                        ooi_class.get_ooi_type()
-                        for ooi_class in self.get_report_ooi_types()
-                        if ooi_class in self.ooi_types
-                    ]
-                ),
-                self.request.GET,
+                sorted([ooi_class.get_ooi_type() for ooi_class in self.get_report_ooi_types()]), self.request.GET
             )
         }
 
