@@ -495,3 +495,10 @@ POOL_SIZE = env.int("POOL_SIZE", default=2)
 POLL_INTERVAL = env.int("POLL_INTERVAL", default=10)
 # Seconds to wait before checking the workers when queues are full
 WORKER_HEARTBEAT = env.int("WORKER_HEARTBEAT", default=5)
+
+# In production deployments the staticfiles are coming from the collected static
+# files in the static directory. We should not ship all those files also in
+# their original location, but Django will complain if a directory in
+# STATICFILES_DIRS does not exist. We silence the warning here to prevent the
+# warning from confusing users.
+SILENCED_SYSTEM_CHECKS = ["staticfiles.W004"]
