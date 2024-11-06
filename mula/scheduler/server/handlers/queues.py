@@ -5,6 +5,7 @@ import structlog
 from fastapi import status
 
 from scheduler import context, models, queues, schedulers, storage
+from scheduler.server.errors import BadRequestError, ConflictError, NotFoundError, TooManyRequestsError
 from scheduler.server.models import Queue, Task, TaskCreate
 
 
@@ -58,70 +59,44 @@ class QueueAPI:
     def get(self, queue_id: str) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="scheduler not found, by queue_id"
-            )
+            raise NotFoundError(f"queue not found, by queue_id: {queue_id}")
 
-        q = s.queue
-        if q is None:
-            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="queue not found")
-
-        return Queue(**q.dict())
+        return Queue(**s.queue.dict())
 
     def pop(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
-            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="queue not found")
+            raise NotFoundError(f"queue not found, by queue_id: {queue_id}")
 
         try:
-            p_item = s.pop_item_from_queue(filters)
+            item = s.pop_item_from_queue(filters)
         except queues.QueueEmptyError:
             return None
 
-        if p_item is None:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_404_NOT_FOUND,
-                detail="could not pop item from queue, check your filters",
-            )
+        if item is None:
+            raise NotFoundError("could not pop item from queue, check your filters")
 
-        return Task(**p_item.model_dump())
+        return Task(**item.model_dump())
 
-    def push(self, queue_id: str, task: TaskCreate) -> Any:
+    def push(self, queue_id: str, item: TaskCreate) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
-            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="queue not found")
+            raise NotFoundError(f"queue not found, by queue_id: {queue_id}")
+
+        # Load default values
+        new_item = models.Task(**item.model_dump(exclude_unset=True))
+
+        # Set values
+        if new_item.scheduler_id is None:
+            new_item.scheduler_id = s.scheduler_id
 
         try:
-            # Load default values
-            new_task = models.Task(**task.model_dump(exclude_unset=True))
-
-            # Set values
-            if new_task.scheduler_id is None:
-                new_task.scheduler_id = s.scheduler_id
-        except Exception as exc:
-            self.logger.exception(exc)
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
-            ) from exc
-
-        try:
-            pushed_item = s.push_item_to_queue(new_task)
-        except ValueError as exc_value:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"malformed item: {exc_value}"
-            ) from exc_value
-        except queues.QueueFullError as exc_full:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_429_TOO_MANY_REQUESTS, detail="queue is full"
-            ) from exc_full
-        except queues.errors.NotAllowedError as exc_not_allowed:
-            raise fastapi.HTTPException(
-                headers={"Retry-After": "60"}, status_code=fastapi.status.HTTP_409_CONFLICT, detail=str(exc_not_allowed)
-            ) from exc_not_allowed
-        except Exception as exc:
-            self.logger.exception(exc)
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
-            ) from exc
+            pushed_item = s.push_item_to_queue(new_item)
+        except ValueError:
+            raise BadRequestError("malformed item")
+        except queues.QueueFullError:
+            raise TooManyRequestsError("queue is full")
+        except queues.errors.NotAllowedError:
+            raise ConflictError("queue is not allowed to push items")
 
         return Task(**pushed_item.model_dump())

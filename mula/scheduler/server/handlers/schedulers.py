@@ -5,6 +5,7 @@ import structlog
 from fastapi import status
 
 from scheduler import context, models, schedulers
+from scheduler.server.errors import BadRequestError, NotFoundError
 from scheduler.server.models import Scheduler
 
 
@@ -19,7 +20,7 @@ class SchedulerAPI:
             path="/schedulers",
             endpoint=self.list,
             methods=["GET"],
-            response_model=list[models.Scheduler],
+            response_model=list[Scheduler],
             status_code=status.HTTP_200_OK,
             description="List all schedulers",
         )
@@ -28,7 +29,7 @@ class SchedulerAPI:
             path="/schedulers/{scheduler_id}",
             endpoint=self.get,
             methods=["GET"],
-            response_model=models.Scheduler,
+            response_model=Scheduler,
             status_code=status.HTTP_200_OK,
             description="Get a scheduler",
         )
@@ -37,7 +38,7 @@ class SchedulerAPI:
             path="/schedulers/{scheduler_id}",
             endpoint=self.patch,
             methods=["PATCH"],
-            response_model=models.Scheduler,
+            response_model=Scheduler,
             status_code=status.HTTP_200_OK,
             description="Update a scheduler",
         )
@@ -48,31 +49,26 @@ class SchedulerAPI:
     def get(self, scheduler_id: str) -> Any:
         s = self.schedulers.get(scheduler_id)
         if s is None:
-            raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="scheduler not found")
+            raise NotFoundError(f"Scheduler {scheduler_id} not found")
 
         return Scheduler(**s.dict())
 
     def patch(self, scheduler_id: str, item: models.Scheduler) -> Any:
         s = self.schedulers.get(scheduler_id)
         if s is None:
-            raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="scheduler not found")
+            raise NotFoundError(f"Scheduler {scheduler_id} not found")
 
         stored_scheduler_model = models.Scheduler(**s.dict())
         patch_data = item.model_dump(exclude_unset=True)
         if len(patch_data) == 0:
-            raise fastapi.HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="no data to patch")
+            raise BadRequestError("no data to patch")
 
         updated_scheduler = stored_scheduler_model.model_copy(update=patch_data)
 
         # We update the patched attributes, since the schedulers are kept
         # in memory.
         for attr, value in patch_data.items():
-            try:
-                setattr(s, attr, value)
-            except AttributeError as exc:
-                raise fastapi.HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST, detail="attribute not found"
-                ) from exc
+            setattr(s, attr, value)
 
         # Enable or disable the scheduler if needed.
         if updated_scheduler.enabled:
