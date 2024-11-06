@@ -183,12 +183,17 @@ class BaseReportView(OOIFilterView):
     def get_total_oois(self):
         return len(self.selected_oois)
 
-    def get_ooi_types(self):
+    def get_report_ooi_types(self):
         if self.report_type == AggregateOrganisationReport:
             return get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
         if self.report_type == MultiOrganizationReport:
             return MultiOrganizationReport.input_ooi_types
         return get_ooi_types_with_report()
+
+    def get_ooi_types(self):
+        if self.filtered_ooi_types:
+            return super().get_ooi_types()
+        return self.get_report_ooi_types()
 
     def get_oois(self) -> list[OOI]:
         if self.all_oois_selected():
@@ -205,7 +210,14 @@ class BaseReportView(OOIFilterView):
     def get_ooi_filter_forms(self) -> dict[str, Form]:
         return {
             "ooi_type_form": OOITypeMultiCheckboxForReportForm(
-                sorted([ooi_class.get_ooi_type() for ooi_class in self.ooi_types]), self.request.GET
+                sorted(
+                    [
+                        ooi_class.get_ooi_type()
+                        for ooi_class in self.get_report_ooi_types()
+                        if ooi_class in self.ooi_types
+                    ]
+                ),
+                self.request.GET,
             )
         }
 
