@@ -2,7 +2,7 @@ import importlib
 import pkgutil
 from logging import getLogger
 from pathlib import Path
-from types import ModuleType
+from types import MethodType, ModuleType
 
 from pydantic import BaseModel
 
@@ -10,6 +10,7 @@ from octopoes.models import OOI
 
 NIBBLES_DIR = Path(__file__).parent
 NIBBLE_ATTR_NAME = "NIBBLE"
+NIBBLE_FUNC_NAME = "nibble"
 logger = getLogger(__name__)
 
 
@@ -25,16 +26,27 @@ class NibbleParameterDefinition(BaseModel):
         else:
             return False
 
+    def __hash__(self):
+        return hash(str(self.ooi_type) + self.relation_path if self.relation_path else "\0")
 
-class NibbleDefinition(BaseModel):
+
+class NibbleDefinition:
     id: str
     signature: list[NibbleParameterDefinition]
     min_scan_level: int = 1
     default_enabled: bool = True
     config_ooi_relation_path: str | None = None
+    payload: MethodType | None = None
+
+    def __init__(self, name: str, signature: list):
+        self.id = name
+        self.signature = signature
 
     def __call__(self, *_):
-        raise NotImplementedError
+        if self.payload is None:
+            raise NotImplementedError
+        else:
+            return self.payload(*_)
 
 
 def get_nibble_definitions() -> list[NibbleDefinition]:
@@ -49,12 +61,25 @@ def get_nibble_definitions() -> list[NibbleDefinition]:
 
             if hasattr(module, NIBBLE_ATTR_NAME):
                 nibble_definition: NibbleDefinition = getattr(module, NIBBLE_ATTR_NAME)
+
+                try:
+                    payload: ModuleType = importlib.import_module(
+                        f".{package.name}", f"{NIBBLES_DIR.name}.{package.name}"
+                    )
+                    if hasattr(payload, NIBBLE_FUNC_NAME):
+                        nibble_definition.payload = getattr(payload, NIBBLE_FUNC_NAME)
+                    else:
+                        logger.warning('module "%s" has no function %s', package.name, NIBBLE_FUNC_NAME)
+
+                except ModuleNotFoundError:
+                    logger.warning('package "%s" has no function nibble', package.name)
+
                 nibble_definitions.append(nibble_definition)
 
             else:
                 logger.warning('module "%s" has no attribute %s', package.name, NIBBLE_ATTR_NAME)
 
         except ModuleNotFoundError:
-            logger.warning('package "%s" has no module %s', package.name, "nibble")
+            logger.warning('package "%s" has no module nibble', package.name)
 
     return nibble_definitions

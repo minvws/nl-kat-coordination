@@ -38,11 +38,20 @@ class NibblesRunner:
     def _run(self, ooi: OOI, valid_time: datetime) -> dict[str, set[OOI]]:
         retval: dict[str, set[OOI]] = {}
         target_nibbles = list(filter(lambda x: type(ooi) in x.signature, self.nibbles))
-        self._retrieve(set(chain.from_iterable(map(lambda x: x.signature, target_nibbles))), valid_time)
+        self._retrieve(
+            set(map(lambda x: x.ooi_type, chain.from_iterable(map(lambda x: x.signature, target_nibbles)))), valid_time
+        )
         for nibble in target_nibbles:
-            radix = [self.objects_by_type_cache[sgn.ooi_type] for sgn in nibble.signature]
             # TODO: filter OOI not abiding the parameters from radix
-            retval |= {nibble.id: set(map(nibble, filter(lambda x: ooi in x, product(radix))))}
+            radix = [self.objects_by_type_cache[sgn.ooi_type] for sgn in nibble.signature]
+            results = set(
+                filter(
+                    lambda ooi: ooi is not None,
+                    chain(map(lambda x: nibble(*x), filter(lambda x: ooi in x, product(*radix)))),
+                )
+            )
+            if results:
+                retval |= {nibble.id: results}
         return retval
 
     def update_nibbles(self):
@@ -50,15 +59,16 @@ class NibblesRunner:
 
     def infer(self, stack: list[OOI], valid_time: datetime) -> dict[OOI, dict[str, set[OOI]]]:
         retval: dict[OOI, dict[str, set[OOI]]] = {}
-        blocklist = set(stack)
+        blockset = set(stack)
         self.objects_by_type_cache = {}
         while stack:
             ooi = stack.pop()
             self.objects_by_type_cache = mergewith(set.union, self.objects_by_type_cache, {otype(ooi): {ooi}})
             results = self._run(ooi, valid_time)
-            blocks = set.union(*results.values())
-            stack += list(filter(lambda ooi: ooi not in blocklist, blocks))
-            blocklist |= blocks
-            retval |= {ooi: results}
+            if results:
+                blocks = set(chain.from_iterable(results.values()))
+                stack += list(filter(lambda ooi: ooi not in blockset, blocks))
+                blockset |= blocks
+                retval |= {ooi: results}
 
         return retval

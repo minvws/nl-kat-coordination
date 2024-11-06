@@ -172,10 +172,10 @@ class OctopoesService:
             self.ooi_repository.get(origin.source, valid_time)
         except ObjectNotFoundException:
             if (
-                origin.origin_type not in [OriginType.DECLARATION, OriginType.AFFIRMATION]
+                origin.origin_type not in [OriginType.DECLARATION, OriginType.AFFIRMATION, OriginType.NIBBLE]
                 and origin.source not in origin.result
             ):
-                raise ValueError("Origin source of observation does not exist")
+                raise ValueError(f"Origin source [{origin.source}] does not exist")
             elif origin.origin_type == OriginType.AFFIRMATION:
                 logger.debug("Affirmation source %s already deleted", origin.source)
                 return
@@ -268,7 +268,7 @@ class OctopoesService:
             for nibble_id, result_oois in results.items():
                 inference_origin = Origin(
                     method=nibble_id,
-                    origin_type=OriginType.INFERENCE,
+                    origin_type=OriginType.NIBBLE,
                     result=[ooi.reference for ooi in result_oois],
                     source=source_ooi.reference,
                 )
