@@ -18,37 +18,6 @@ tracer = trace.get_tracer(__name__)
 class Scheduler(abc.ABC):
     """The Scheduler class combines the priority queue.
     The scheduler is responsible for populating the queue, and ranking tasks.
-
-    Attributes:
-        logger:
-            The logger for the class
-        ctx:
-            Application context of shared data (e.g. configuration, external
-            services connections).
-        queue:
-            A queues.PriorityQueue instance
-        callback:
-            A callback function to call when the scheduler is stopped.
-        scheduler_id:
-             The id of the scheduler.
-        max_tries:
-            The maximum number of retries for an item to be pushed to
-            the queue.
-        enabled:
-            Whether the scheduler is enabled or not.
-        _last_activity:
-            The last activity of the scheduler.
-        listeners:
-            A dict of connector.Listener instances, used for listening to
-            external events.
-        lock:
-            A threading.Lock instance used for locking
-        stop_event_threads:
-            A threading.Event object used for communicating a stop
-            event across threads.
-        threads:
-            A dict of ThreadRunner instances, used for running processes
-            concurrently.
     """
 
     ITEM_TYPE: Any = None
@@ -58,7 +27,6 @@ class Scheduler(abc.ABC):
         ctx: context.AppContext,
         scheduler_id: str,
         queue: queues.PriorityQueue | None = None,
-        callback: Callable[..., None] | None = None,
         max_tries: int = -1,
         create_schedule: bool = False,
     ):
@@ -72,8 +40,6 @@ class Scheduler(abc.ABC):
                 The id of the scheduler.
             queue:
                 A queues.PriorityQueue instance
-            callback:
-                A callback function to call when the scheduler is stopped.
             max_tries:
                 The maximum number of retries for an item to be pushed to
                 the queue.
@@ -81,7 +47,6 @@ class Scheduler(abc.ABC):
 
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
-        self.callback: Callable[[], Any] | None = callback
 
         # Properties
         self.scheduler_id: str = scheduler_id
@@ -446,12 +411,17 @@ class Scheduler(abc.ABC):
 
         self.logger.info("Disabled scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
 
-    def stop(self, callback: bool = True) -> None:
-        """Stop the scheduler.
+    def delete(self) -> None:
+        """Delete the scheduler.
 
-        Args:
-            callback: Whether to call the callback function.
+        This will stop the scheduler, and remove it from the database.
         """
+        self.logger.info("Deleting scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
+        self.stop()
+        self.ctx.datastores.scheduler_store.delete_scheduler(self.scheduler_id)
+        self.logger.info("Deleted scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
+
+    def stop(self) -> None:
         self.logger.info("Stopping scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
 
         # First, stop the listeners, when those are running in a thread and
@@ -459,9 +429,6 @@ class Scheduler(abc.ABC):
         # will not stop the thread. We need to explicitly stop the listener.
         self.stop_listeners()
         self.stop_threads()
-
-        if self.callback and callback:
-            self.callback(self.scheduler_id)  # type: ignore [call-arg]
 
         self.logger.info("Stopped scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
 

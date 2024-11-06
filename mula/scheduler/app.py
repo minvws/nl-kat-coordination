@@ -4,9 +4,8 @@ import threading
 import structlog
 from opentelemetry import trace
 
-from scheduler import context, schedulers, server
-from scheduler.connectors.errors import ExternalServiceError
-from scheduler.schedulers import create_scheduler
+from scheduler import context, server
+from scheduler.schedulers import new_scheduler
 from scheduler.utils import thread
 
 tracer = trace.get_tracer(__name__)
@@ -28,19 +27,6 @@ class App:
         through a REST API.
 
         * Metrics: The collection of application specific metrics.
-
-    Attributes:
-        logger:
-            The logger for the class.
-        ctx:
-            Application context of shared data (e.g. configuration, external
-            services connections).
-        stop_event: A threading.Event object used for communicating a stop
-            event across threads.
-        schedulers:
-            A dict of schedulers, keyed by scheduler id.
-        server:
-            The http rest api server instance.
     """
 
     def __init__(self, ctx: context.AppContext) -> None:
@@ -51,147 +37,15 @@ class App:
                 Application context of shared data (e.g. configuration,
                 external services connections).
         """
+        threading.excepthook = self._unhandled_exception
 
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
+
         self.ctx: context.AppContext = ctx
 
-        threading.excepthook = self.unhandled_exception
         self.stop_event: threading.Event = threading.Event()
-        self.lock: threading.Lock = threading.Lock()
-
-        # TODO: do we need this now? can we stop the thread from its thread_id?
-        # instead of keeping a reference to the thread object.
-        self.schedulers: dict[
-            str,
-            schedulers.Scheduler
-            | schedulers.BoefjeScheduler
-            | schedulers.NormalizerScheduler
-            | schedulers.ReportScheduler,
-        ] = {}
 
         self.server: server.Server | None = None
-
-    @tracer.start_as_current_span("monitor_organisations")
-    def monitor_organisations(self) -> None:
-        """Monitor the organisations from the Katalogus service, and add/remove
-        organisations from the schedulers.
-        """
-        current_schedulers = self.schedulers.copy()
-
-        # We make a difference between the organisation id's that are used
-        # by the schedulers, and the organisation id's that are in the
-        # Katalogus service. We will add/remove schedulers based on the
-        # difference between these two sets.
-
-        # TODO: use database for this
-        scheduler_orgs: set[str] = {
-            s.organisation.id for s in current_schedulers.values() if hasattr(s, "organisation")
-        }
-        try:
-            orgs = self.ctx.services.katalogus.get_organisations()
-        except ExternalServiceError:
-            self.logger.exception("Failed to get organisations from Katalogus")
-            return
-
-        katalogus_orgs = {org.id for org in orgs}
-
-        additions = katalogus_orgs.difference(scheduler_orgs)
-        self.logger.debug("Organisations to add: %s", len(additions), additions=sorted(additions))
-
-        removals = scheduler_orgs.difference(katalogus_orgs)
-        self.logger.debug("Organisations to remove: %s", len(removals), removals=sorted(removals))
-
-        # We need to get scheduler ids of the schedulers that are associated
-        # with the removed organisations
-        removal_scheduler_ids: set[str] = {
-            s.scheduler_id
-            for s in current_schedulers.values()
-            if hasattr(s, "organisation") and s.organisation.id in removals
-        }
-
-        # Remove schedulers for removed organisations
-        for scheduler_id in removal_scheduler_ids:
-            if scheduler_id not in self.schedulers:
-                continue
-
-            self.schedulers[scheduler_id].stop()
-
-        if removals:
-            self.logger.debug("Removed %s organisations from scheduler", len(removals), removals=sorted(removals))
-
-        # Add schedulers for organisation
-        for org_id in additions:
-            try:
-                org = self.ctx.services.katalogus.get_organisation(org_id)
-            except ExternalServiceError as e:
-                self.logger.error("Failed to get organisation from Katalogus", error=e, org_id=org_id)
-                continue
-
-            schedulers.BoefjeScheduler(
-                ctx=self.ctx, scheduler_id=f"boefje-{org.id}", organisation=org, callback=self.remove_scheduler
-            )
-
-            schedulers.NormalizerScheduler(
-                ctx=self.ctx, scheduler_id=f"normalizer-{org.id}", organisation=org, callback=self.remove_scheduler
-            )
-
-            schedulers.ReportScheduler(
-                ctx=self.ctx, scheduler_id=f"report-{org.id}", organisation=org, callback=self.remove_scheduler
-            )
-
-        if additions:
-            # Flush katalogus caches when new organisations are added
-            self.ctx.services.katalogus.flush_caches()
-
-            self.logger.debug("Added %s organisations to scheduler", len(additions), additions=sorted(additions))
-
-    @tracer.start_as_current_span("collect_metrics")
-    def collect_metrics(self) -> None:
-        """Collect application metrics
-
-        This method that allows to collect metrics throughout the application.
-        """
-        with self.lock:
-            for s in self.schedulers.copy().values():
-                self.ctx.metrics_qsize.labels(scheduler_id=s.scheduler_id).set(s.queue.qsize())
-
-                status_counts = self.ctx.datastores.task_store.get_status_counts(s.scheduler_id)
-                for status, count in status_counts.items():
-                    self.ctx.metrics_task_status_counts.labels(scheduler_id=s.scheduler_id, status=status).set(count)
-
-    def start_schedulers(self) -> None:
-        # Initialize the schedulers
-        try:
-            schedulers_db = self.ctx.datastores.scheduler_store.get_schedulers()
-        except ExternalServiceError as e:
-            self.logger.error("Failed to get organisations from Katalogus", error=e)
-            return
-
-        for scheduler in schedulers_db:
-            scheduler = create_scheduler(self.ctx, scheduler, self.remove_scheduler)
-            if scheduler is None:
-                continue
-
-            self.schedulers[scheduler.scheduler_id] = scheduler
-
-            scheduler.run()
-
-    def start_monitors(self) -> None:
-        thread.ThreadRunner(
-            name="App-monitor_organisations",
-            target=self.monitor_organisations,
-            stop_event=self.stop_event,
-            interval=self.ctx.config.monitor_organisations_interval,
-        ).start()
-
-    def start_collectors(self) -> None:
-        thread.ThreadRunner(
-            name="App-metrics_collector", target=self.collect_metrics, stop_event=self.stop_event, interval=10
-        ).start()
-
-    def start_server(self) -> None:
-        self.server = server.Server(self.ctx, self.schedulers)
-        thread.ThreadRunner(name="App-server", target=self.server.run, stop_event=self.stop_event, loop=False).start()
 
     def run(self) -> None:
         """Start the main scheduler application, and run in threads the
@@ -204,9 +58,6 @@ class App:
         """
         # Start schedulers
         self.start_schedulers()
-
-        # Start monitors
-        self.start_monitors()
 
         # Start metrics collecting
         if self.ctx.config.collect_metrics:
@@ -228,15 +79,27 @@ class App:
         # Source: https://stackoverflow.com/a/1489838/1346257
         os._exit(1)
 
+    def start_schedulers(self) -> None:
+        schedulers_db = self.ctx.datastores.scheduler_store.get_schedulers()
+        for scheduler_db in schedulers_db:
+            scheduler = new_scheduler(self.ctx, scheduler_db)
+            scheduler.run()
+
+    def start_collectors(self) -> None:
+        thread.ThreadRunner(
+            name="App-metrics_collector", target=self._collect_metrics, stop_event=self.stop_event, interval=10
+        ).start()
+
+    def start_server(self) -> None:
+        self.server = server.Server(self.ctx)
+        thread.ThreadRunner(name="App-server", target=self.server.run, stop_event=self.stop_event, loop=False).start()
+
     def shutdown(self) -> None:
         """Shutdown the scheduler application, and all threads."""
         self.logger.info("Shutdown initiated")
 
+        # TODO: check if this will stop the scheduler threads
         self.stop_event.set()
-
-        # First stop schedulers
-        for s in self.schedulers.copy().values():
-            s.stop()
 
         # Stop all threads that are still running, except the main thread.
         # These threads likely have a blocking call and as such are not able
@@ -245,7 +108,7 @@ class App:
 
         self.logger.info("Shutdown complete")
 
-    def stop_threads(self) -> None:
+    def _stop_threads(self) -> None:
         """Stop all threads, except the main thread."""
         for t in threading.enumerate():
             if t is threading.current_thread():
@@ -259,43 +122,22 @@ class App:
 
             t.join(5)
 
-    def unhandled_exception(self, args: threading.ExceptHookArgs) -> None:
+    def _unhandled_exception(self, args: threading.ExceptHookArgs) -> None:
         """Gracefully shutdown the scheduler application, and all threads
         when a unhandled exception occurs.
         """
         self.logger.error("Unhandled exception occurred: %s", args.exc_value)
         self.stop_event.set()
 
-    def create_scheduler(self, scheduler: schedulers.Scheduler) -> None:
-        """Create a new scheduler in the application.
+    def _collect_metrics(self) -> None:
+        """Collect application metrics
 
-        Args:
-            scheduler: The scheduler to create.
+        This method that allows to collect metrics throughout the application.
         """
-        with self.lock:
-            # Add to the schedulers
-            self.schedulers[scheduler.scheduler_id] = scheduler
+        schedulers_db = self.ctx.datastores.scheduler_store.get_schedulers()
+        for s in schedulers_db:
+            self.ctx.metrics_qsize.labels(scheduler_id=s.scheduler_id).set(s.queue.qsize())
 
-            # Add to the scheduler store
-            self.ctx.datastores.scheduler_store.create_scheduler(scheduler)
-
-            # Start the scheduler
-            scheduler.run()
-
-    def remove_scheduler(self, scheduler_id: str) -> None:
-        """Remove a scheduler from the application. This method is passed
-        as a callback to the scheduler, so that the scheduler can remove
-        itself from the application.
-
-        Args:
-            scheduler_id: The id of the scheduler to remove.
-        """
-        with self.lock:
-            if scheduler_id not in self.schedulers:
-                return
-
-            # Stop the scheduler
-            self.schedulers.pop(scheduler_id)
-
-            # Remove from the scheduler store
-            self.ctx.datastores.scheduler_store.delete_scheduler(scheduler_id)
+            status_counts = self.ctx.datastores.task_store.get_status_counts(s.scheduler_id)
+            for status, count in status_counts.items():
+                self.ctx.metrics_task_status_counts.labels(scheduler_id=s.scheduler_id, status=status).set(count)
