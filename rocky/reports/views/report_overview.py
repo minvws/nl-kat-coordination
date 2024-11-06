@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
-from pydantic import TypeAdapter
+from pydantic import TypeAdapter, ValidationError
 from tools.ooi_helpers import create_ooi
 
 from octopoes.models import OOI, Reference
@@ -99,7 +99,10 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     template_name = "report_overview/report_history.html"
 
     def post(self, request, *args, **kwargs):
-        self.run_bulk_actions()
+        try:
+            self.run_bulk_actions()
+        except (ObjectNotFoundException, ValidationError):
+            messages.error(request, _("An unexpected error occurred, please check logs for more info."))
         return self.get(request, *args, **kwargs)
 
     def get_queryset(self) -> ReportList:
@@ -147,6 +150,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
 
             else:
                 self.rerun_single_report(actual_report_ooi)
+        messages.success(self.request, _("Rerun successful"))
 
     def get_input_data(self, report_ooi: Report) -> dict[str, Any]:
         self.bytes_client.login()
@@ -272,6 +276,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
 
     def rename_reports(self, report_references: list[str]) -> None:
         report_names = self.request.POST.getlist("report_name", [])
+        error_reports = []
 
         if not report_references or not report_names:
             messages.error(self.request, _("Renaming failed. Empty report name found."))
@@ -282,7 +287,16 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
         for index, report_id in enumerate(report_references):
             report_ooi = self.get_report_ooi(report_id)
             report_ooi.name = report_names[index]
-            create_ooi(self.octopoes_api_connector, self.bytes_client, report_ooi, datetime.now(timezone.utc))
+
+            try:
+                create_ooi(self.octopoes_api_connector, self.bytes_client, report_ooi, datetime.now(timezone.utc))
+            except ValidationError:
+                error_reports.append(f'"{report_ooi.name}"')
+
+        if not error_reports:
+            return messages.success(self.request, _("Reports successfully renamed."))
+
+        return messages.error(self.request, _("Report {} could not be renamed.").format(", ".join(error_reports)))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
