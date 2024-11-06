@@ -6,7 +6,7 @@ import httpx
 import structlog
 
 
-class Connector:
+class Client:
     """A class that provides methods to check if a host is available and healthy."""
 
     def __init__(self):
