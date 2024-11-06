@@ -121,11 +121,11 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
         if action == "rerun":
             return self.rerun_reports(report_references)
 
-    def delete_reports(self, report_references: list[str]) -> None:
+    def delete_reports(self, report_references: list[Reference]) -> None:
         self.octopoes_api_connector.delete_many(report_references, datetime.now(timezone.utc))
         messages.success(self.request, _("Deletion successful."))
 
-    def rerun_reports(self, report_references: list[str]) -> None:
+    def rerun_reports(self, report_references: list[Reference]) -> None:
         for report_id in report_references:
             actual_report_ooi = self.get_report_ooi(report_id)
 
@@ -161,7 +161,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
             }
         }
 
-    def get_input_oois(self, ooi_pks: list[str]) -> list[type[OOI]]:
+    def get_input_oois(self, ooi_pks: list[str]) -> list[OOI]:
         return [
             self.octopoes_api_connector.get(Reference.from_str(ooi), valid_time=self.observed_at) for ooi in ooi_pks
         ]
@@ -283,7 +283,6 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
             report_ooi = self.get_report_ooi(report_id)
             report_ooi.name = report_names[index]
             create_ooi(self.octopoes_api_connector, self.bytes_client, report_ooi, datetime.now(timezone.utc))
-            messages.success(self.request, _("Report names changed successfully."))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
