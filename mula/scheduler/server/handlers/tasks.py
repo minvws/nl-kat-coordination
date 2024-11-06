@@ -162,7 +162,7 @@ class TaskAPI:
 
         self.ctx.datastores.task_store.update_task(updated_task)
 
-        return TaskUpdate(**updated_task.model_dump)
+        return TaskUpdate(**updated_task.model_dump())
 
     def stats(self, scheduler_id: str | None = None) -> dict[str, dict[str, int]] | None:
         return self.ctx.datastores.task_store.get_status_count_per_hour(scheduler_id)
