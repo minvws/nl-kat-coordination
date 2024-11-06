@@ -1,8 +1,7 @@
-import enum
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 
 from scheduler.models import Task, TaskStatus
 
