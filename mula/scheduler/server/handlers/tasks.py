@@ -1,6 +1,5 @@
 import datetime
 import uuid
-from typing import Any
 
 import fastapi
 import structlog
@@ -75,7 +74,7 @@ class TaskAPI:
         input_ooi: str | None = None,  # FIXME: deprecated
         plugin_id: str | None = None,  # FIXME: deprecated
         filters: storage.filters.FilterRequest | None = None,
-    ) -> Any:
+    ) -> utils.PaginatedResponse:
         if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
             raise BadRequestError("min_created_at must be less than max_created_at")
 
@@ -141,13 +140,13 @@ class TaskAPI:
         results = [Task(**t.model_dump()) for t in results]
         return utils.paginate(request, results, count, offset, limit)
 
-    def get(self, task_id: uuid.UUID) -> Any:
+    def get(self, task_id: uuid.UUID) -> Task:
         task = self.ctx.datastores.task_store.get_task(task_id)
         if task is None:
             raise NotFoundError(f"task not found, by task_id: {task_id}")
         return Task(**task.model_dump())
 
-    def patch(self, task_id: uuid.UUID, item: TaskUpdate) -> Any:
+    def patch(self, task_id: uuid.UUID, item: TaskUpdate) -> TaskUpdate:
         task_db = self.ctx.datastores.task_store.get_task(task_id)
 
         if task_db is None:

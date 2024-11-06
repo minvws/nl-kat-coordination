@@ -1,5 +1,3 @@
-from typing import Any
-
 import fastapi
 import structlog
 from fastapi import status
@@ -43,17 +41,17 @@ class SchedulerAPI:
             description="Update a scheduler",
         )
 
-    def list(self) -> Any:
+    def list(self) -> list[Scheduler]:
         return [Scheduler(**s.dict()) for s in self.schedulers.values()]
 
-    def get(self, scheduler_id: str) -> Any:
+    def get(self, scheduler_id: str) -> Scheduler:
         s = self.schedulers.get(scheduler_id)
         if s is None:
             raise NotFoundError(f"Scheduler {scheduler_id} not found")
 
         return Scheduler(**s.dict())
 
-    def patch(self, scheduler_id: str, item: models.Scheduler) -> Any:
+    def patch(self, scheduler_id: str, item: models.Scheduler) -> Scheduler:
         s = self.schedulers.get(scheduler_id)
         if s is None:
             raise NotFoundError(f"Scheduler {scheduler_id} not found")

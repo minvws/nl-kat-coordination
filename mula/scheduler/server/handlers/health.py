@@ -1,5 +1,3 @@
-from typing import Any
-
 import fastapi
 import structlog
 from fastapi import status
@@ -22,7 +20,7 @@ class HealthAPI:
             description="Health check endpoint",
         )
 
-    def health(self, externals: bool = False) -> Any:
+    def health(self, externals: bool = False) -> models.ServiceHealth:
         response = models.ServiceHealth(service="scheduler", healthy=True, version=version.__version__)
 
         if externals:

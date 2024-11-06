@@ -56,14 +56,14 @@ class QueueAPI:
     def list(self) -> Any:
         return [Queue(**s.queue.dict(include_pq=False)) for s in self.schedulers.copy().values()]
 
-    def get(self, queue_id: str) -> Any:
+    def get(self, queue_id: str) -> Queue:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise NotFoundError(f"queue not found, by queue_id: {queue_id}")
 
         return Queue(**s.queue.dict())
 
-    def pop(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
+    def pop(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Task | None:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise NotFoundError(f"queue not found, by queue_id: {queue_id}")
@@ -78,7 +78,7 @@ class QueueAPI:
 
         return Task(**item.model_dump())
 
-    def push(self, queue_id: str, item: TaskCreate) -> Any:
+    def push(self, queue_id: str, item: TaskCreate) -> Task | None:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise NotFoundError(f"queue not found, by queue_id: {queue_id}")

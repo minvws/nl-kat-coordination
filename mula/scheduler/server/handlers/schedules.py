@@ -1,6 +1,5 @@
 import datetime
 import uuid
-from typing import Any
 
 import fastapi
 import structlog
@@ -87,7 +86,7 @@ class ScheduleAPI:
         max_deadline_at: datetime.datetime | None = None,
         min_created_at: datetime.datetime | None = None,
         max_created_at: datetime.datetime | None = None,
-    ) -> Any:
+    ) -> utils.PaginatedResponse:
         if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
             raise BadRequestError("min_created_at must be less than max_created_at")
 
@@ -109,7 +108,7 @@ class ScheduleAPI:
 
         return utils.paginate(request, results, count, offset, limit)
 
-    def create(self, schedule: ScheduleCreate) -> Any:
+    def create(self, schedule: ScheduleCreate) -> Schedule:
         try:
             new_schedule = models.Schedule(**schedule.model_dump())
         except ValueError:
@@ -136,14 +135,14 @@ class ScheduleAPI:
         created_schedule = self.ctx.datastores.schedule_store.create_schedule(new_schedule)
         return Schedule(**created_schedule.model_dump())
 
-    def get(self, schedule_id: uuid.UUID) -> Any:
+    def get(self, schedule_id: uuid.UUID) -> Schedule:
         schedule = self.ctx.datastores.schedule_store.get_schedule(schedule_id)
         if schedule is None:
             raise NotFoundError(f"schedule not found, by schedule_id: {schedule_id}")
 
         return Schedule(**schedule.model_dump())
 
-    def patch(self, schedule_id: uuid.UUID, schedule: ScheduleUpdate) -> Any:
+    def patch(self, schedule_id: uuid.UUID, schedule: ScheduleUpdate) -> Schedule:
         schedule_db = self.ctx.datastores.schedule_store.get_schedule(schedule_id)
         if schedule_db is None:
             raise NotFoundError(f"schedule not found, by schedule_id: {schedule_id}")
