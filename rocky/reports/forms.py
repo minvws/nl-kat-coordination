@@ -48,6 +48,16 @@ class ReportScheduleStartDateForm(BaseRockyForm):
     )
 
 
+class ReportScheduleStartTimeForm(BaseRockyForm):
+    start_time = forms.TimeField(
+        label=_("Start time (UTC)"),
+        widget=forms.TimeInput(format="%H:%M", attrs={"form": "generate_report"}),
+        initial=lambda: datetime.now(tz=timezone.utc).time(),
+        required=True,
+        input_formats=["%H:%M"],
+    )
+
+
 class ReportRecurrenceChoiceForm(BaseRockyForm):
     choose_recurrence = forms.ChoiceField(
         label="",

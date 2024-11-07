@@ -503,6 +503,7 @@ class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, SchedulerView, 
         context["reports"] = self.get_report_names()
 
         context["report_schedule_form_start_date"] = self.get_report_schedule_form_start_date()
+        context["report_schedule_form_start_time"] = self.get_report_schedule_form_start_time()
         context["report_schedule_form_recurrence_choice"] = self.get_report_schedule_form_recurrence_choice()
         context["report_schedule_form_recurrence"] = self.get_report_schedule_form_recurrence()
 
@@ -535,8 +536,12 @@ class SaveReportView(BaseReportView, ReportBreadcrumbs, SchedulerView):
         elif self.is_scheduled_report():
             report_name_format = request.POST.get("parent_report_name", "")
             subreport_name_format = request.POST.get("child_report_name", "")
+            start_date = request.POST.get("start_date", datetime.now(timezone.utc).date())
+            start_time = request.POST.get("start_time", datetime.now(timezone.utc).time())
             recurrence = request.POST.get("recurrence", "")
-            deadline_at = request.POST.get("start_date", datetime.now(timezone.utc).date())
+            start_date_time = datetime.combine(
+                datetime.strptime(start_date, "%Y-%m-%d"), datetime.strptime(start_time, "%H:%M").time()
+            )
 
             parent_report_type = None
             if self.report_type is not None:
@@ -544,13 +549,13 @@ class SaveReportView(BaseReportView, ReportBreadcrumbs, SchedulerView):
             elif not self.report_type and subreport_name_format:
                 parent_report_type = ConcatenatedReport.id
 
-            schedule = self.convert_recurrence_to_cron_expressions(recurrence)
+            schedule = self.convert_recurrence_to_cron_expressions(recurrence, start_date_time)
 
             report_recipe = self.create_report_recipe(
                 report_name_format, subreport_name_format, parent_report_type, schedule
             )
 
-            self.create_report_schedule(report_recipe, deadline_at)
+            self.create_report_schedule(report_recipe, str(start_date_time))
 
             return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 
