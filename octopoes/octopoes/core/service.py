@@ -78,7 +78,7 @@ class OctopoesService:
         self.origin_parameter_repository = origin_parameter_repository
         self.scan_profile_repository = scan_profile_repository
         self.session = session
-        self.nibbles = NibblesRunner(ooi_repository, origin_parameter_repository)
+        self.nibbles = NibblesRunner(ooi_repository, scan_profile_repository, origin_parameter_repository)
 
     @overload
     def _populate_scan_profiles(self, oois: ValuesView[OOI], valid_time: datetime) -> ValuesView[OOI]: ...
