@@ -38,10 +38,12 @@ class OctopoesAPIConnector:
         - connector.RemoteException if an error occurs inside Octopoes API
     """
 
-    def __init__(self, base_uri: str, client: str):
+    def __init__(self, base_uri: str, client: str, timeout: int = 30):
         self.base_uri = base_uri
         self.client = client
-        self.session = httpx.Client(base_url=base_uri, timeout=30, event_hooks={"response": [self._verify_response]})
+        self.session = httpx.Client(
+            base_url=base_uri, timeout=timeout, event_hooks={"response": [self._verify_response]}
+        )
         self.logger = structlog.get_logger("octopoes-connector", organisation_code=client)
 
     @staticmethod
