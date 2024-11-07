@@ -3666,7 +3666,7 @@ msgid "Has a certificate"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.html
-msgid "Certificate is not expired"
+msgid "Certificate is valid"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.html
