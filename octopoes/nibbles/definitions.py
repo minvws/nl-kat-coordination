@@ -38,9 +38,19 @@ class NibbleDefinition:
     config_ooi_relation_path: str | None = None
     payload: MethodType | None = None
 
-    def __init__(self, name: str, signature: list):
+    def __init__(
+        self,
+        name: str,
+        signature: list,
+        min_scan_level: int = 1,
+        default_enabled: bool = True,
+        config_ooi_relation_path: str | None = None,
+    ):
         self.id = name
         self.signature = signature
+        self.min_scan_level = min_scan_level
+        self.default_enabled = default_enabled
+        self.config_ooi_relation_path = config_ooi_relation_path
 
     def __call__(self, *_):
         if self.payload is None:
