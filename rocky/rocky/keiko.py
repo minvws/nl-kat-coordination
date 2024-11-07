@@ -34,7 +34,7 @@ class GeneratingReportFailed(ReportException):
 
 class KeikoClient:
     def __init__(self, base_uri: str, timeout: int = 60):
-        self.session = httpx.Client(base_url=base_uri)
+        self.session = httpx.Client(base_url=base_uri, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT)
         self._timeout = timeout
 
     def generate_report(self, template: str, data: dict, glossary: str) -> str:

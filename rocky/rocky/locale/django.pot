@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-16 14:17+0000\n"
+"POT-Creation-Date: 2024-11-06 09:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -350,6 +350,7 @@ msgstr ""
 
 #: account/templates/account_detail.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/tasks/normalizers.html
 msgid "Organization"
 msgstr ""
 
@@ -941,7 +942,6 @@ msgstr ""
 #: katalogus/templates/partials/boefje_tile.html
 #: katalogus/templates/partials/plugin_tile.html
 #: katalogus/templates/partials/plugin_tile_modal.html
-#: katalogus/templates/partials/plugins.html
 msgid "See details"
 msgstr ""
 
@@ -1124,6 +1124,10 @@ msgstr ""
 #: katalogus/templates/partials/plugins.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Actions"
+msgstr ""
+
+#: katalogus/templates/partials/plugins.html
+msgid "Detail page"
 msgstr ""
 
 #: katalogus/templates/partials/plugins_navigation.html
@@ -2397,11 +2401,20 @@ msgid "Different date"
 msgstr ""
 
 #: reports/forms.py
+msgid "Start date"
+msgstr ""
+
+#: reports/forms.py
 msgid "No, just once"
 msgstr ""
 
 #: reports/forms.py
 msgid "Yes, repeat"
+msgstr ""
+
+#: reports/forms.py
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Recurrence"
 msgstr ""
 
 #: reports/forms.py
@@ -2418,10 +2431,6 @@ msgstr ""
 
 #: reports/forms.py
 msgid "Yearly"
-msgstr ""
-
-#: reports/forms.py
-msgid "Start date"
 msgstr ""
 
 #: reports/forms.py
@@ -2643,14 +2652,12 @@ msgid "Created with data from:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/report_types/multi_organization_report/introduction.html
 #: reports/templates/partials/report_header.html
 msgid "Created on:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
 #: reports/report_types/aggregate_organisation_report/report_design.html
-#: reports/report_types/multi_organization_report/introduction.html
 #: reports/templates/partials/report_header.html
 msgid "Created by:"
 msgstr ""
@@ -2662,7 +2669,6 @@ msgid "Recommendations"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
-#: reports/report_types/multi_organization_report/recommendations.html
 #, python-format
 msgid "There is <i>%(total_findings)s</i> vulnerability"
 msgid_plural "There are <i>%(total_findings)s</i> vulnerabilities"
@@ -2670,7 +2676,6 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
-#: reports/report_types/multi_organization_report/recommendations.html
 #, python-format
 msgid "found on <i>%(total_systems)s</i> system."
 msgid_plural "found on <i>%(total_systems)s</i> systems."
@@ -2742,22 +2747,6 @@ msgstr ""
 msgid "No CVEs have been found."
 msgstr ""
 
-#: reports/report_types/aggregate_organisation_report/report.py
-msgid "Critical vulnerabilities"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report.py
-msgid "IPs scanned"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report.py
-msgid "Hostnames scanned"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report.py
-msgid "Terms in report"
-msgstr ""
-
 #: reports/report_types/aggregate_organisation_report/report_design.html
 msgid "Observed at:"
 msgstr ""
@@ -2773,6 +2762,22 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/report_design.html
 #: reports/report_types/vulnerability_report/report.html
 msgid "vulnerabilities on this system"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/summary.html
+msgid "Critical Vulnerabilities"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/summary.html
+msgid "IPs scanned"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/summary.html
+msgid "Hostnames scanned"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/summary.html
+msgid "Terms in report"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
@@ -3005,7 +3010,6 @@ msgid "Other findings found"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
 #: rocky/templates/oois/ooi_detail_findings_overview.html
@@ -3045,7 +3049,6 @@ msgstr ""
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/templates/partials/report_severity_totals_table.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
@@ -3190,6 +3193,10 @@ msgstr ""
 msgid "Organisation"
 msgstr ""
 
+#: reports/report_types/multi_organization_report/asset_overview.html
+msgid "No vulnerabilities found."
+msgstr ""
+
 #: reports/report_types/multi_organization_report/basic_security_details.html
 msgid "Overview of safe connections"
 msgstr ""
@@ -3210,11 +3217,19 @@ msgid "Download report"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
-msgid "This is the OpenKAT Sector rapport."
+msgid "This is the OpenKAT"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
-msgid "Created with date from:"
+msgid "Created with date from: "
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+msgid "Created on: "
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+msgid "Created by: "
 msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
@@ -3222,7 +3237,7 @@ msgid "This sector contains"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
-msgid "Scanned organizations."
+msgid "scanned organizations."
 msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
@@ -3295,6 +3310,10 @@ msgstr ""
 #: reports/report_types/multi_organization_report/open_ports.html
 #: reports/templates/summary/service_health.html
 msgid "Services"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/open_ports.html
+msgid "No open ports found."
 msgstr ""
 
 #: reports/report_types/multi_organization_report/recommendations.html
@@ -3643,7 +3662,7 @@ msgid "Has a certificate"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.html
-msgid "Certificate is not expired"
+msgid "Certificate is valid"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.html
@@ -3675,8 +3694,9 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-#: reports/templates/report_overview/scheduled_reports_table.html
-msgid "Recurrence"
+msgid ""
+"The date you select will be the reference date for the data set for your "
+"report. Please allow for up to 24 hours for your report to be ready."
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -3747,6 +3767,7 @@ msgid "Report names:"
 msgstr ""
 
 #: reports/templates/partials/report_names_form.html
+#: rocky/templates/partials/form/field_input.html
 msgid "(Required)"
 msgstr ""
 
@@ -3791,20 +3812,21 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_names_header.html
+#, python-brace-format
 msgid ""
 "To make the report names more descriptive, you can include placeholders for "
 "the object name, the report type and/or the reference date. For subreports "
-"and reports over a single object, use the placeholder \"{ooi}\" for the "
-"object name, \"{report type}\" for the report type and use a <a "
+"and reports over a single object, use the placeholder \"${ooi}\" for the "
+"object name, \"${report_type}\" for the report type and use a <a "
 "href=\"https://strftime.org/\" target=\"_blank\" rel=\"noopener\">Python "
 "strftime code</a> for the reference date. For reports over multiple objects, "
-"use \"{oois_count}\" for the number of objects in the report."
+"use \"${oois_count}\" for the number of objects in the report."
 msgstr ""
 
 #: reports/templates/partials/report_names_header.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"For example, the format \"{report type} for {ooi} at %%x\" could generate: "
+"For example, the format \"${report_type} for ${ooi} at %%x\" could generate: "
 "\"DNS Report for example.com at 01/01/25\"."
 msgstr ""
 
@@ -3828,7 +3850,7 @@ msgstr ""
 msgid "Aggregate Report"
 msgstr ""
 
-#: reports/templates/partials/report_navigation.html reports/views/base.py
+#: reports/templates/partials/report_navigation.html
 msgid "Multi Report"
 msgstr ""
 
@@ -4051,15 +4073,17 @@ msgid "%(btn_text)s"
 msgstr ""
 
 #: reports/templates/report_overview/report_history.html
-#: reports/views/report_overview.py
 msgid "Reports history"
 msgstr ""
 
 #: reports/templates/report_overview/report_history.html
-msgid "An overview of all your generated reports."
+msgid ""
+"On this page you can see all the reports that have been generated in the "
+"past. To create a new report, click the 'Generate Report' button."
 msgstr ""
 
-#: reports/templates/report_overview/report_history.html
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #, python-format
 msgid "Showing %(length)s of %(total)s reports"
 msgstr ""
@@ -4087,6 +4111,10 @@ msgid "Close children report object details"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
+msgid "Open children report object details"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
 msgid "Subreports details:"
 msgstr ""
 
@@ -4094,14 +4122,14 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                                    This report consist of %(counter)s "
+"                                        This report consist of %(counter)s "
 "subreport with the following report type and object.\n"
-"                                "
+"                                    "
 msgid_plural ""
 "\n"
-"                                    This report consist of %(counter)s "
+"                                        This report consist of %(counter)s "
 "subreports with the following report types and objects.\n"
-"                                "
+"                                    "
 msgstr[0] ""
 msgstr[1] ""
 
@@ -4117,6 +4145,10 @@ msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
 msgid "View all subreports"
+msgstr ""
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "No reports have been generated yet."
 msgstr ""
 
 #: reports/templates/report_overview/report_overview_header.html
@@ -4136,12 +4168,10 @@ msgid "Scheduled reports"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports.html
-msgid "View your scheduled reports."
-msgstr ""
-
-#: reports/templates/report_overview/scheduled_reports.html
-#, python-format
-msgid "Showing %(length)s scheduled reports"
+msgid ""
+"On this page you can see all the reports that are or have been scheduled. To "
+"schedule a report, select a start date and recurrence while generating a "
+"report."
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
@@ -4150,10 +4180,6 @@ msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Report Name"
-msgstr ""
-
-#: reports/templates/report_overview/scheduled_reports_table.html
-msgid "Subreport Name"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
@@ -4173,6 +4199,14 @@ msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Show report details"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Edit report recipe"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "No scheduled reports have been generated yet."
 msgstr ""
 
 #: reports/templates/report_overview/subreports.html
@@ -4308,6 +4342,10 @@ msgstr ""
 #: reports/views/base.py
 #, python-brace-format
 msgid "{report_type} for {ooi}"
+msgstr ""
+
+#: reports/views/base.py
+msgid "Sector Report"
 msgstr ""
 
 #: reports/views/base.py
@@ -5143,12 +5181,6 @@ msgid " Finding Details"
 msgstr ""
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Finding details"
-msgstr ""
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/organizations/organization_list.html
 msgid "There were no organizations found for your user account"
 msgstr ""
@@ -5645,6 +5677,11 @@ msgstr ""
 msgid "Score"
 msgstr ""
 
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Finding details"
+msgstr ""
+
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 msgid "Overview of the number of findings and their severity found on"
 msgstr ""
@@ -6118,12 +6155,6 @@ msgid "Please enable plugin to start scanning."
 msgstr ""
 
 #: rocky/templates/partials/form/field_input.html
-#: rocky/templates/partials/form/field_input_checkbox.html
-#: rocky/templates/partials/form/field_input_radio.html
-msgid "This field is required"
-msgstr ""
-
-#: rocky/templates/partials/form/field_input.html
 msgid "Not set"
 msgstr ""
 
@@ -6133,6 +6164,11 @@ msgstr ""
 
 #: rocky/templates/partials/form/field_input.html
 msgid "Forgot password"
+msgstr ""
+
+#: rocky/templates/partials/form/field_input_checkbox.html
+#: rocky/templates/partials/form/field_input_radio.html
+msgid "This field is required"
 msgstr ""
 
 #: rocky/templates/partials/form/field_input_errors.html
@@ -6179,16 +6215,6 @@ msgstr ""
 #: rocky/templates/partials/hyperlink_ooi_type.html
 #, python-format
 msgid "Only show objects of type %(type)s"
-msgstr ""
-
-#: rocky/templates/partials/language-switcher.html
-msgid "Select your language"
-msgstr ""
-
-#: rocky/templates/partials/language-switcher.html
-#, python-format
-msgid ""
-"Current language is %(current_language)s. Choose your preferred language."
 msgstr ""
 
 #: rocky/templates/partials/list_filters.html
@@ -6506,7 +6532,7 @@ msgstr ""
 msgid "List of tasks for boefjes"
 msgstr ""
 
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/boefjes.html
 msgid "Organization Code"
 msgstr ""
 

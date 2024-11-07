@@ -168,7 +168,11 @@ def verify_response(response: Response) -> None:
 
 class KATalogusClient:
     def __init__(self, base_uri: str):
-        self.session = httpx.Client(base_url=base_uri, event_hooks={"response": [verify_response]})
+        self.session = httpx.Client(
+            base_url=base_uri,
+            event_hooks={"response": [verify_response]},
+            timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT,
+        )
 
     def health(self) -> ServiceHealth:
         response = self.session.get("/health")
