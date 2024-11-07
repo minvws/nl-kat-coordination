@@ -109,7 +109,9 @@ class OrganizationView(View):
         if self.organization_member.blocked:
             raise PermissionDenied()
 
-        self.octopoes_api_connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization_code)
+        self.octopoes_api_connector = OctopoesAPIConnector(
+            settings.OCTOPOES_API, organization_code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+        )
         self.bytes_client = get_bytes_client(organization_code)
 
     def get_context_data(self, **kwargs):
@@ -250,7 +252,9 @@ class OrganizationAPIMixin:
 
     @cached_property
     def octopoes_api_connector(self) -> OctopoesAPIConnector:
-        return OctopoesAPIConnector(settings.OCTOPOES_API, self.organization.code)
+        return OctopoesAPIConnector(
+            settings.OCTOPOES_API, self.organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+        )
 
     @cached_property
     def bytes_client(self) -> BytesClient:
