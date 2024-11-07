@@ -1,3 +1,4 @@
+import enum
 from datetime import datetime
 from typing import Any
 
@@ -8,14 +9,21 @@ from sqlalchemy.sql import func
 from .base import Base
 
 
+class SchedulerType(str, enum.Enum):
+    """Enum for scheduler types."""
+
+    BOEFJE = "boefje"
+    NORMALIZER = "normalizer"
+    REPORT = "report"
+
+
 class Scheduler(BaseModel):
-    id: str | None = None
+    id: str  # TODO: refactor to uuid?
     enabled: bool | None = None
     size: int | None = None
     maxsize: int | None = None
     organisation: str | None = None
-    type: str | None = None  # TODO: enum?
-    item_type: str | None = None  # TODO: necessary when we have type?
+    type: SchedulerType | None = None
     allow_replace: bool | None = None
     allow_updates: bool | None = None
     allow_priority_updates: bool | None = None
@@ -34,7 +42,6 @@ class SchedulerDB(Base):
     maxsize = Column(Integer, nullable=False)
     organisation = Column(String, nullable=False)
     type = Column(String, nullable=False)
-    item_type = Column(String, nullable=False)
     allow_replace = Column(Boolean, default=True)
     allow_updates = Column(Boolean, default=True)
     allow_priority_updates = Column(Boolean, default=True)

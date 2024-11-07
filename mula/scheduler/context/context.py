@@ -9,6 +9,7 @@ from prometheus_client import CollectorRegistry, Gauge, Info
 import scheduler
 from scheduler import clients, storage
 from scheduler.context import settings
+from scheduler.storage import stores
 from scheduler.utils import remove_trailing_slash
 
 
@@ -164,10 +165,10 @@ class AppContext:
         # Datastores, SimpleNamespace allows us to use dot notation
         self.datastores: SimpleNamespace = SimpleNamespace(
             **{
-                storage.stores.SchedulerStore.name: storage.stores.SchedulerStore(dbconn),
-                storage.stores.ScheduleStore.name: storage.stores.ScheduleStore(dbconn),
-                storage.stores.TaskStore.name: storage.stores.TaskStore(dbconn),
-                storage.stores.PriorityQueueStore.name: storage.stores.PriorityQueueStore(dbconn),
+                stores.SchedulerStore.name: stores.SchedulerStore(dbconn),
+                stores.ScheduleStore.name: stores.ScheduleStore(dbconn),
+                stores.TaskStore.name: stores.TaskStore(dbconn),
+                stores.PriorityQueueStore.name: stores.PriorityQueueStore(dbconn),
             }
         )
 

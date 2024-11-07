@@ -1,3 +1,4 @@
+import datetime
 from typing import Any
 
 import fastapi
@@ -5,16 +6,15 @@ import structlog
 from fastapi import status
 
 from scheduler import context, models, schedulers, storage
-from scheduler.server import serializers
+from scheduler.server import serializers, utils
 from scheduler.server.errors import BadRequestError, NotFoundError
 
 
 class SchedulerAPI:
-    def __init__(self, api: fastapi.FastAPI, ctx: context.AppContext, s: dict[str, schedulers.Scheduler]) -> None:
+    def __init__(self, api: fastapi.FastAPI, ctx: context.AppContext):
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.api: fastapi.FastAPI = api
         self.ctx: context.AppContext = ctx
-        self.schedulers: dict[str, schedulers.Scheduler] = s
 
         self.api.add_api_route(
             path="/schedulers",
@@ -43,8 +43,27 @@ class SchedulerAPI:
             description="Update a scheduler",
         )
 
-    def list(self) -> Any:
-        return [models.Scheduler(**s.dict()) for s in self.schedulers.values()]
+    def list(
+        self,
+        request: fastapi.Request,
+        scheduler_id: str | None = None,
+        offset: int = 0,
+        limit: int = 10,
+        min_created_at: datetime.datetime | None = None,
+        max_created_at: datetime.datetime | None = None,
+    ) -> Any:
+        if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
+            raise BadRequestError("min_created_at must be less than max_created_at")
+
+        results, count = self.ctx.datastores.scheduler_store.get_schedulers(
+            scheduler_id=scheduler_id,
+            offset=offset,
+            limit=limit,
+            min_created_at=min_created_at,
+            max_created_at=max_created_at,
+        )
+
+        return utils.paginate(request, results, count, offset, limit)
 
     def get(self, scheduler_id: str) -> Any:
         s = self.schedulers.get(scheduler_id)

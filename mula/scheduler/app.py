@@ -40,11 +40,8 @@ class App:
         threading.excepthook = self._unhandled_exception
 
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
-
         self.ctx: context.AppContext = ctx
-
         self.stop_event: threading.Event = threading.Event()
-
         self.server: server.Server | None = None
 
     def run(self) -> None:
@@ -80,7 +77,7 @@ class App:
         os._exit(1)
 
     def start_schedulers(self) -> None:
-        schedulers_db = self.ctx.datastores.scheduler_store.get_schedulers()
+        schedulers_db, _ = self.ctx.datastores.scheduler_store.get_schedulers()
         if not schedulers_db:
             self.logger.warning("No schedulers to start")
             return
@@ -138,11 +135,12 @@ class App:
         self.stop_event.set()
 
     def _collect_metrics(self) -> None:
-        """Collect application metrics
-
-        This method that allows to collect metrics throughout the application.
-        """
+        """Collect application metrics throughout the application."""
         schedulers_db = self.ctx.datastores.scheduler_store.get_schedulers()
+        if not schedulers_db:
+            self.logger.warning("No schedulers to collect metrics for")
+            return
+
         for s in schedulers_db:
             self.ctx.metrics_qsize.labels(scheduler_id=s.scheduler_id).set(s.queue.qsize())
 

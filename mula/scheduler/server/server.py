@@ -19,7 +19,7 @@ class Server:
         api: A fastapi.FastAPI object used for exposing API endpoints.
     """
 
-    def __init__(self, ctx: context.AppContext):
+    def __init__(self, ctx: context.AppContext) -> None:
         """Initializer of the Server class.
 
         Args:
@@ -44,7 +44,6 @@ class Server:
 
         # Set up API endpoints
         handlers.SchedulerAPI(self.api, self.ctx)
-        handlers.QueueAPI(self.api, self.ctx)
         handlers.ScheduleAPI(self.api, self.ctx)
         handlers.TaskAPI(self.api, self.ctx)
         handlers.MetricsAPI(self.api, self.ctx)

@@ -1,5 +1,4 @@
 import uuid
-from collections.abc import Callable
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
@@ -8,23 +7,12 @@ from typing import Any
 import structlog
 from opentelemetry import trace
 
-from scheduler import context, queues, rankers, storage, utils
-from scheduler.connectors import listeners
-from scheduler.connectors.errors import ExternalServiceError
-from scheduler.models import (
-    OOI,
-    Boefje,
-    BoefjeTask,
-    MutationOperationType,
-    Organisation,
-    Plugin,
-    ScanProfileMutation,
-    Task,
-    TaskStatus,
-)
+from scheduler import clients, context, models, storage, utils
+from scheduler.clients.errors import ExternalServiceError
+from scheduler.schedulers import Scheduler
+from scheduler.schedulers.queue import PriorityQueue, QueueFullError
+from scheduler.schedulers.rankers import BoefjeRanker
 from scheduler.storage import filters
-
-from .scheduler import Scheduler
 
 tracer = trace.get_tracer(__name__)
 
@@ -32,21 +20,16 @@ tracer = trace.get_tracer(__name__)
 class BoefjeScheduler(Scheduler):
     """A KAT specific implementation of a Boefje scheduler. It extends
     the `Scheduler` class by adding an `organisation` attribute.
-
-    Attributes:
-        logger: A logger instance.
-        organisation: The organisation that this scheduler is for.
     """
 
-    ITEM_TYPE: Any = BoefjeTask
+    ITEM_TYPE: Any = models.BoefjeTask
 
     def __init__(
         self,
         ctx: context.AppContext,
         scheduler_id: str,
-        organisation: Organisation,
-        queue: queues.PriorityQueue | None = None,
-        callback: Callable[..., None] | None = None,
+        organisation: models.Organisation,
+        queue: PriorityQueue | None = None,
     ):
         """Initializes the BoefjeScheduler.
 
@@ -58,9 +41,9 @@ class BoefjeScheduler(Scheduler):
             callback: The callback function to call when a task is completed.
         """
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
-        self.organisation: Organisation = organisation
+        self.organisation: models.Organisation = organisation
 
-        self.queue = queue or queues.PriorityQueue(
+        self.queue = queue or PriorityQueue(
             pq_id=scheduler_id,
             maxsize=ctx.config.pq_maxsize,
             item_type=self.ITEM_TYPE,
@@ -68,10 +51,10 @@ class BoefjeScheduler(Scheduler):
             pq_store=ctx.datastores.pq_store,
         )
 
-        super().__init__(ctx=ctx, queue=self.queue, scheduler_id=scheduler_id, callback=callback, create_schedule=True)
+        super().__init__(ctx=ctx, queue=self.queue, scheduler_id=scheduler_id, create_schedule=True)
 
         # Priority ranker
-        self.priority_ranker = rankers.BoefjeRanker(self.ctx)
+        self.priority_ranker = BoefjeRanker(self.ctx)
 
     def run(self) -> None:
         """The run method is called when the scheduler is started. It will
@@ -92,7 +75,7 @@ class BoefjeScheduler(Scheduler):
         super().run()
 
         # Scan profile mutations
-        self.listeners["scan_profile_mutations"] = listeners.ScanProfileMutation(
+        self.listeners["scan_profile_mutations"] = clients.ScanProfileMutation(
             dsn=str(self.ctx.config.host_raw_data),
             queue=f"{self.organisation.id}__scan_profile_mutations",
             func=self.push_tasks_for_scan_profile_mutations,
@@ -133,7 +116,7 @@ class BoefjeScheduler(Scheduler):
             mutation: The mutation that was received.
         """
         # Convert body into a ScanProfileMutation
-        mutation = ScanProfileMutation.model_validate_json(body)
+        mutation = models.ScanProfileMutation.model_validate_json(body)
 
         self.logger.debug(
             "Received scan level mutation %s for: %s",
@@ -152,7 +135,7 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        if mutation.operation == MutationOperationType.DELETE:
+        if mutation.operation == models.MutationOperationType.DELETE:
             # When there are tasks of the ooi are on the queue, we need to
             # remove them from the queue.
             items, _ = self.ctx.datastores.pq_store.get_items(
@@ -169,7 +152,7 @@ class BoefjeScheduler(Scheduler):
                 if task is None:
                     continue
 
-                task.status = TaskStatus.CANCELLED
+                task.status = models.TaskStatus.CANCELLED
                 self.ctx.datastores.task_store.update_task(task)
 
             return
@@ -199,8 +182,8 @@ class BoefjeScheduler(Scheduler):
                     )
                     continue
 
-                boefje_task = BoefjeTask(
-                    boefje=Boefje.model_validate(boefje.model_dump()),
+                boefje_task = models.BoefjeTask(
+                    boefje=models.Boefje.model_validate(boefje.model_dump()),
                     input_ooi=ooi.primary_key if ooi else None,
                     organization=self.organisation.id,
                 )
@@ -250,7 +233,7 @@ class BoefjeScheduler(Scheduler):
                 )
                 continue
 
-            oois_by_object_type: list[OOI] = []
+            oois_by_object_type: list[models.OOI] = []
             try:
                 oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
                     self.organisation.id, boefje.consumes, list(range(boefje.scan_level, 5))
@@ -279,8 +262,8 @@ class BoefjeScheduler(Scheduler):
                         )
                         continue
 
-                    boefje_task = BoefjeTask(
-                        boefje=Boefje.model_validate(boefje.dict()),
+                    boefje_task = models.BoefjeTask(
+                        boefje=models.Boefje.model_validate(boefje.dict()),
                         input_ooi=ooi.primary_key,
                         organization=self.organisation.id,
                     )
@@ -331,7 +314,7 @@ class BoefjeScheduler(Scheduler):
             thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-rescheduling"
         ) as executor:
             for schedule in schedules:
-                boefje_task = BoefjeTask.model_validate(schedule.data)
+                boefje_task = models.BoefjeTask.model_validate(schedule.data)
 
                 # Plugin still exists?
                 try:
@@ -447,8 +430,8 @@ class BoefjeScheduler(Scheduler):
                         self.ctx.datastores.schedule_store.update_schedule(schedule)
                         continue
 
-                new_boefje_task = BoefjeTask(
-                    boefje=Boefje.model_validate(plugin.dict()),
+                new_boefje_task = models.BoefjeTask(
+                    boefje=models.Boefje.model_validate(plugin.dict()),
                     input_ooi=ooi.primary_key if ooi else None,
                     organization=self.organisation.id,
                 )
@@ -456,7 +439,7 @@ class BoefjeScheduler(Scheduler):
                 executor.submit(self.push_boefje_task, new_boefje_task, self.push_tasks_for_rescheduling.__name__)
 
     @tracer.start_as_current_span("boefje_push_task")
-    def push_boefje_task(self, boefje_task: BoefjeTask, caller: str = "") -> None:
+    def push_boefje_task(self, boefje_task: models.BoefjeTask, caller: str = "") -> None:
         """Given a Boefje and OOI create a BoefjeTask and push it onto
         the queue.
 
@@ -578,7 +561,7 @@ class BoefjeScheduler(Scheduler):
 
         try:
             self.push_item_to_queue_with_timeout(task, self.max_tries)
-        except queues.QueueFullError:
+        except QueueFullError:
             self.logger.warning(
                 "Could not add task to queue, queue was full: %s",
                 boefje_task.hash,
@@ -602,10 +585,10 @@ class BoefjeScheduler(Scheduler):
             caller=caller,
         )
 
-    def push_item_to_queue(self, item: Task) -> Task:
+    def push_item_to_queue(self, item: models.Task) -> models.Task:
         """Some boefje scheduler specific logic before pushing the item to the
         queue."""
-        boefje_task = BoefjeTask.model_validate(item.data)
+        boefje_task = models.BoefjeTask.model_validate(item.data)
 
         # Check if id's are unique and correctly set. Same id's are necessary
         # for the task runner.
@@ -618,7 +601,7 @@ class BoefjeScheduler(Scheduler):
         return super().push_item_to_queue(item)
 
     @tracer.start_as_current_span("boefje_has_boefje_permission_to_run")
-    def has_boefje_permission_to_run(self, boefje: Plugin, ooi: OOI) -> bool:
+    def has_boefje_permission_to_run(self, boefje: models.Plugin, ooi: models.OOI) -> bool:
         """Checks whether a boefje is allowed to run on an ooi.
 
         Args:
@@ -695,7 +678,7 @@ class BoefjeScheduler(Scheduler):
         return True
 
     @tracer.start_as_current_span("boefje_has_boefje_task_started_running")
-    def has_boefje_task_started_running(self, task: BoefjeTask) -> bool:
+    def has_boefje_task_started_running(self, task: models.BoefjeTask) -> bool:
         """Check if the same task is already running.
 
         Args:
@@ -719,7 +702,7 @@ class BoefjeScheduler(Scheduler):
             )
             raise exc_db
 
-        if task_db is not None and task_db.status not in [TaskStatus.FAILED, TaskStatus.COMPLETED]:
+        if task_db is not None and task_db.status not in [models.TaskStatus.FAILED, models.TaskStatus.COMPLETED]:
             self.logger.debug(
                 "Task is still running, according to the datastore",
                 task_id=task_db.id,
@@ -751,7 +734,7 @@ class BoefjeScheduler(Scheduler):
         if (
             task_bytes is None
             and task_db is not None
-            and task_db.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]
+            and task_db.status in [models.TaskStatus.COMPLETED, models.TaskStatus.FAILED]
             and (
                 task_db.modified_at is not None
                 and task_db.modified_at
@@ -780,7 +763,7 @@ class BoefjeScheduler(Scheduler):
         return False
 
     @tracer.start_as_current_span("boefje_is_task_stalled")
-    def has_boefje_task_stalled(self, task: BoefjeTask) -> bool:
+    def has_boefje_task_stalled(self, task: models.BoefjeTask) -> bool:
         """Check if the same task is stalled.
 
         Args:
@@ -817,7 +800,7 @@ class BoefjeScheduler(Scheduler):
         return False
 
     @tracer.start_as_current_span("boefje_has_boefje_task_grace_period_passed")
-    def has_boefje_task_grace_period_passed(self, task: BoefjeTask) -> bool:
+    def has_boefje_task_grace_period_passed(self, task: models.BoefjeTask) -> bool:
         """Check if the grace period has passed for a task in both the
         datastore and bytes.
 
@@ -892,7 +875,7 @@ class BoefjeScheduler(Scheduler):
 
         return True
 
-    def get_boefjes_for_ooi(self, ooi) -> list[Plugin]:
+    def get_boefjes_for_ooi(self, ooi) -> list[models.Plugin]:
         """Get available all boefjes (enabled and disabled) for an ooi.
 
         Args:
@@ -935,7 +918,7 @@ class BoefjeScheduler(Scheduler):
 
         return boefjes
 
-    def set_cron(self, item: Task) -> str | None:
+    def set_cron(self, item: models.Task) -> str | None:
         """Override Schedule.set_cron() when a boefje specifies a schedule for
         execution (cron expression) we schedule for its execution"""
         # Does a boefje have a schedule defined?
@@ -947,7 +930,7 @@ class BoefjeScheduler(Scheduler):
 
         return plugin.cron
 
-    def calculate_deadline(self, task: Task) -> datetime:
+    def calculate_deadline(self, task: models.Task) -> datetime:
         """Override Scheduler.calculate_deadline() to calculate the deadline
         for a task and based on the boefje interval."""
         # Does the boefje have an interval defined?

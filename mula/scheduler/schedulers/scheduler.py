@@ -10,7 +10,8 @@ import structlog
 from opentelemetry import trace
 
 from scheduler import clients, context, models, storage, utils
-from scheduler.schedulers import queue
+from scheduler.schedulers.queue import PriorityQueue
+from scheduler.schedulers.queue.errors import InvalidItemError, NotAllowedError, QueueFullError
 from scheduler.utils import cron, thread
 
 tracer = trace.get_tracer(__name__)
@@ -27,7 +28,7 @@ class Scheduler(abc.ABC):
         self,
         ctx: context.AppContext,
         scheduler_id: str,
-        queue: queue.PriorityQueue | None = None,
+        queue: PriorityQueue | None = None,
         max_tries: int = -1,
         create_schedule: bool = False,
     ):
@@ -57,7 +58,7 @@ class Scheduler(abc.ABC):
         self._last_activity: datetime | None = None
 
         # Queue
-        self.queue = queue or queue.PriorityQueue(
+        self.queue = queue or PriorityQueue(
             pq_id=scheduler_id,
             maxsize=self.ctx.config.pq_maxsize,
             item_type=self.ITEM_TYPE,
@@ -105,7 +106,7 @@ class Scheduler(abc.ABC):
         for item in items:
             try:
                 self.push_item_to_queue(item)
-            except (queues.errors.NotAllowedError, queues.errors.QueueFullError, queues.errors.InvalidItemError) as exc:
+            except (NotAllowedError, QueueFullError, InvalidItemError) as exc:
                 self.logger.debug(
                     "Unable to push item %s to queue %s (%s)",
                     item.id,
@@ -152,7 +153,7 @@ class Scheduler(abc.ABC):
             tries += 1
 
         if tries >= max_tries and max_tries != -1:
-            raise queues.errors.QueueFullError()
+            raise QueueFullError()
 
         self.push_item_to_queue(item)
 

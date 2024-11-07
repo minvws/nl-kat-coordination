@@ -12,13 +12,10 @@ from scheduler.server.errors import BadRequestError, ConflictError, NotFoundErro
 
 
 class ScheduleAPI:
-    def __init__(
-        self, api: fastapi.FastAPI, ctx: context.AppContext, schedulers: dict[str, schedulers.Scheduler]
-    ) -> None:
+    def __init__(self, api: fastapi.FastAPI, ctx: context.AppContext) -> None:
         self.logger: structlog.BoundLogger = structlog.get_logger(__name__)
         self.api = api
         self.ctx = ctx
-        self.schedulers = schedulers
 
         self.api.add_api_route(
             path="/schedules",
