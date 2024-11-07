@@ -536,8 +536,8 @@ class SaveReportView(BaseReportView, ReportBreadcrumbs, SchedulerView):
         elif self.is_scheduled_report():
             report_name_format = request.POST.get("parent_report_name", "")
             subreport_name_format = request.POST.get("child_report_name", "")
-            start_date = request.POST.get("start_date", datetime.now(timezone.utc).date())
-            start_time = request.POST.get("start_time", datetime.now(timezone.utc).time())
+            start_date = request.POST.get("start_date", str(datetime.now(timezone.utc).date()))
+            start_time = request.POST.get("start_time", str(datetime.now(timezone.utc).time()))
             recurrence = request.POST.get("recurrence", "")
             start_date_time = datetime.combine(
                 datetime.strptime(start_date, "%Y-%m-%d"), datetime.strptime(start_time, "%H:%M").time()
