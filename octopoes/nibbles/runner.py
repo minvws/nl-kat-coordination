@@ -77,7 +77,7 @@ class NibblesRunner:
                 results = self._run(ooi, valid_time)
                 if results:
                     blocks = set(chain.from_iterable(results.values()))
-                    stack += list(filter(lambda ooi: ooi not in blockset, blocks))
+                    stack += [ooi for ooi in blocks if ooi not in blockset]
                     blockset |= blocks
                     retval |= {ooi: results}
         return retval
