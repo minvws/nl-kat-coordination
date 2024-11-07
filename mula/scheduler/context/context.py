@@ -7,9 +7,8 @@ import structlog
 from prometheus_client import CollectorRegistry, Gauge, Info
 
 import scheduler
-from scheduler import storage
-from scheduler.config import settings
-from scheduler.connectors import services
+from scheduler import clients, storage
+from scheduler.context import settings
 from scheduler.utils import remove_trailing_slash
 
 
@@ -116,7 +115,7 @@ class AppContext:
         self.logger: structlog.BoundLogger = structlog.get_logger(__name__)
 
         # Services
-        katalogus_service = services.Katalogus(
+        katalogus_service = clients.Katalogus(
             host=remove_trailing_slash(str(self.config.host_katalogus)),
             source=f"scheduler/{scheduler.__version__}",
             timeout=self.config.katalogus_request_timeout,
@@ -124,7 +123,7 @@ class AppContext:
             cache_ttl=self.config.katalogus_cache_ttl,
         )
 
-        bytes_service = services.Bytes(
+        bytes_service = clients.Bytes(
             host=remove_trailing_slash(str(self.config.host_bytes)),
             source=f"scheduler/{scheduler.__version__}",
             user=self.config.host_bytes_user,
@@ -133,7 +132,7 @@ class AppContext:
             pool_connections=self.config.bytes_pool_connections,
         )
 
-        octopoes_service = services.Octopoes(
+        octopoes_service = clients.Octopoes(
             host=remove_trailing_slash(str(self.config.host_octopoes)),
             source=f"scheduler/{scheduler.__version__}",
             timeout=self.config.octopoes_request_timeout,
@@ -145,9 +144,9 @@ class AppContext:
         # notation
         self.services: SimpleNamespace = SimpleNamespace(
             **{
-                services.Katalogus.name: katalogus_service,
-                services.Octopoes.name: octopoes_service,
-                services.Bytes.name: bytes_service,
+                clients.Katalogus.name: katalogus_service,
+                clients.Octopoes.name: octopoes_service,
+                clients.Bytes.name: bytes_service,
             }
         )
 
@@ -165,10 +164,10 @@ class AppContext:
         # Datastores, SimpleNamespace allows us to use dot notation
         self.datastores: SimpleNamespace = SimpleNamespace(
             **{
-                storage.SchedulerStore.name: storage.SchedulerStore(dbconn),
-                storage.ScheduleStore.name: storage.ScheduleStore(dbconn),
-                storage.TaskStore.name: storage.TaskStore(dbconn),
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(dbconn),
+                storage.stores.SchedulerStore.name: storage.stores.SchedulerStore(dbconn),
+                storage.stores.ScheduleStore.name: storage.stores.ScheduleStore(dbconn),
+                storage.stores.TaskStore.name: storage.stores.TaskStore(dbconn),
+                storage.stores.PriorityQueueStore.name: storage.stores.PriorityQueueStore(dbconn),
             }
         )
 

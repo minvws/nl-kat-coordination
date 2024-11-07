@@ -81,8 +81,16 @@ class App:
 
     def start_schedulers(self) -> None:
         schedulers_db = self.ctx.datastores.scheduler_store.get_schedulers()
+        if not schedulers_db:
+            self.logger.warning("No schedulers to start")
+            return
+
         for scheduler_db in schedulers_db:
             scheduler = new_scheduler(self.ctx, scheduler_db)
+            if not scheduler:
+                self.logger.error("Failed to create scheduler", scheduler_id=scheduler_db.scheduler_id)
+                continue
+
             scheduler.run()
 
     def start_collectors(self) -> None:
@@ -104,7 +112,7 @@ class App:
         # Stop all threads that are still running, except the main thread.
         # These threads likely have a blocking call and as such are not able
         # to leverage a stop event.
-        self.stop_threads()
+        self._stop_threads()
 
         self.logger.info("Shutdown complete")
 

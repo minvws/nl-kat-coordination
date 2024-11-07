@@ -9,7 +9,8 @@ from typing import Any
 import structlog
 from opentelemetry import trace
 
-from scheduler import connectors, context, models, queues, storage, utils
+from scheduler import clients, context, models, storage, utils
+from scheduler.schedulers import queue
 from scheduler.utils import cron, thread
 
 tracer = trace.get_tracer(__name__)
@@ -26,7 +27,7 @@ class Scheduler(abc.ABC):
         self,
         ctx: context.AppContext,
         scheduler_id: str,
-        queue: queues.PriorityQueue | None = None,
+        queue: queue.PriorityQueue | None = None,
         max_tries: int = -1,
         create_schedule: bool = False,
     ):
@@ -56,7 +57,7 @@ class Scheduler(abc.ABC):
         self._last_activity: datetime | None = None
 
         # Queue
-        self.queue = queue or queues.PriorityQueue(
+        self.queue = queue or queue.PriorityQueue(
             pq_id=scheduler_id,
             maxsize=self.ctx.config.pq_maxsize,
             item_type=self.ITEM_TYPE,
@@ -64,7 +65,7 @@ class Scheduler(abc.ABC):
         )
 
         # Listeners
-        self.listeners: dict[str, connectors.listeners.Listener] = {}
+        self.listeners: dict[str, clients.amqp.Listener] = {}
 
         # Threads
         self.lock: threading.Lock = threading.Lock()
