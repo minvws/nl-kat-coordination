@@ -52,10 +52,7 @@ class NibblesRunner:
             # TODO: filter OOI not abiding the parameters from radix
             radix = [self.objects_by_type_cache[sgn.ooi_type] for sgn in nibble.signature]
             results = set(
-                filter(
-                    lambda ooi: ooi is not None,
-                    chain(map(lambda x: nibble(*x), filter(lambda x: ooi in x, product(*radix)))),
-                )
+                filter(lambda ooi: ooi is not None, chain(map(nibble, filter(lambda x: ooi in x, product(*radix)))))
             )
             if results:
                 retval |= {nibble.id: results}

@@ -52,11 +52,11 @@ class NibbleDefinition:
         self.default_enabled = default_enabled
         self.config_ooi_relation_path = config_ooi_relation_path
 
-    def __call__(self, *_):
+    def __call__(self, args):
         if self.payload is None:
             raise NotImplementedError
         else:
-            return self.payload(*_)
+            return self.payload(*args)
 
 
 def get_nibble_definitions() -> list[NibbleDefinition]:
