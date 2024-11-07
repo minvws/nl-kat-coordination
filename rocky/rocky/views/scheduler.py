@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any
 
 from django.contrib import messages
@@ -13,6 +13,7 @@ from reports.forms import (
     ReportScheduleRecurrenceForm,
     ReportScheduleStartDateChoiceForm,
     ReportScheduleStartDateForm,
+    ReportScheduleStartTimeForm,
 )
 from tools.forms.scheduler import TaskFilterForm
 
@@ -49,6 +50,7 @@ class SchedulerView(OctopoesView):
 
     report_schedule_form_start_date_choice = ReportScheduleStartDateChoiceForm  # today or different date
     report_schedule_form_start_date = ReportScheduleStartDateForm  # date widget
+    report_schedule_form_start_time = ReportScheduleStartTimeForm  # time widget
 
     report_schedule_form_recurrence_choice = ReportRecurrenceChoiceForm  # once or repeat
     report_schedule_form_recurrence = ReportScheduleRecurrenceForm  # select interval (daily, weekly, etc..)
@@ -98,6 +100,9 @@ class SchedulerView(OctopoesView):
 
     def get_report_schedule_form_start_date(self):
         return self.report_schedule_form_start_date()
+
+    def get_report_schedule_form_start_time(self):
+        return self.report_schedule_form_start_time()
 
     def get_report_schedule_form_recurrence_choice(self):
         return self.report_schedule_form_recurrence_choice(self.request.POST)
@@ -262,28 +267,31 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             messages.error(self.request, error.message)
 
-    def convert_recurrence_to_cron_expressions(self, recurrence: str) -> str:
+    def convert_recurrence_to_cron_expressions(self, recurrence: str, start_date_time: datetime) -> str:
         """
-        Because there is no time defined for the start date, we use midnight 00:00 for all expressions.
+        The user defines the start date and time.
         """
 
-        start_date = datetime.now(tz=timezone.utc).date()  # for now, not set by user
-
-        if start_date and recurrence:
-            day = start_date.day
-            month = start_date.month
-            week = start_date.strftime("%w").upper()  # ex. 4
+        if start_date_time and recurrence:
+            day = start_date_time.day
+            month = start_date_time.month
+            week = start_date_time.strftime("%w").upper()  # ex. 4
+            hour = start_date_time.hour
+            minute = start_date_time.minute
 
             cron_expr = {
-                "daily": "0 0 * * *",  # Recurres every day at 00:00
-                "weekly": f"0 0 * * {week}",  # Recurres every week on the {week} at 00:00
-                "yearly": f"0 0 {day} {month} *",  # Recurres every year on the {day} of the {month} at 00:00
+                "daily": f"{minute} {hour} * * *",  # Recurres every day at the selected time
+                "weekly": f"{minute} {hour} * * {week}",  # Recurres every week on the {week} at the selected time
+                "yearly": f"{minute} {hour} {day} {month} *",
+                # Recurres every year on the {day} of the {month} at the selected time
             }
 
             if 28 <= day <= 31:
-                cron_expr["monthly"] = "0 0 28-31 * *"
+                cron_expr["monthly"] = f"{minute} {hour} 28-31 * *"
             else:
-                cron_expr["monthly"] = f"0 0 {day} * *"  # Recurres on the exact {day} of the month at 00:00
+                cron_expr["monthly"] = (
+                    f"{minute} {hour} {day} * *"  # Recurres on the exact {day} of the month at the selected time
+                )
 
             return cron_expr.get(recurrence, "")
         return ""
