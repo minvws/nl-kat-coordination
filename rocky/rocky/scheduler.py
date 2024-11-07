@@ -265,7 +265,7 @@ class SchedulerHTTPError(SchedulerError):
 
 class SchedulerClient:
     def __init__(self, base_uri: str, organization_code: str | None):
-        self._client = httpx.Client(base_url=base_uri)
+        self._client = httpx.Client(base_url=base_uri, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT)
         self.organization_code = organization_code
 
     def list_schedules(self, **kwargs) -> PaginatedSchedulesResponse:
@@ -287,7 +287,7 @@ class SchedulerClient:
         except ConnectError:
             raise SchedulerConnectError()
 
-    def post_schedule_search(self, filters: dict[str, str]) -> PaginatedSchedulesResponse:
+    def post_schedule_search(self, filters: dict[str, list[dict[str, str]]]) -> PaginatedSchedulesResponse:
         try:
             res = self._client.post("/schedules/search", json=filters)
             res.raise_for_status()
@@ -309,6 +309,13 @@ class SchedulerClient:
             return ScheduleResponse.model_validate_json(res.content)
         except (ValidationError, HTTPStatusError, ConnectError):
             raise SchedulerValidationError(extra_message="Report schedule failed: ")
+
+    def delete_schedule(self, schedule_id: str) -> None:
+        try:
+            response = self._client.delete(f"/schedules/{schedule_id}")
+            response.raise_for_status()
+        except (HTTPStatusError, ConnectError):
+            raise SchedulerHTTPError()
 
     def list_tasks(self, **kwargs) -> PaginatedTasksResponse:
         try:

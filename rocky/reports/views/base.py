@@ -31,6 +31,8 @@ from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import AggregateReport, BaseReport, Report, report_plugins_union
 from reports.report_types.helpers import (
     REPORTS,
+    get_ooi_types_from_aggregate_report,
+    get_ooi_types_with_report,
     get_report_by_id,
     get_report_types_for_oois,
     get_report_types_from_aggregate_report,
@@ -151,7 +153,7 @@ def format_plugin_data(report_type_plugins: dict[str, list[Plugin]]):
     ]
 
 
-class BaseReportView(OOIFilterView):
+class BaseReportView(OOIFilterView, ReportBreadcrumbs):
     """
     This view is the base for the report creation wizard.
     All the necessary functions and variables needed.
@@ -180,6 +182,13 @@ class BaseReportView(OOIFilterView):
 
     def get_total_oois(self):
         return len(self.selected_oois)
+
+    def get_ooi_types(self):
+        if self.report_type == AggregateOrganisationReport:
+            return get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
+        if self.report_type == MultiOrganizationReport:
+            return MultiOrganizationReport.input_ooi_types
+        return get_ooi_types_with_report()
 
     def get_oois(self) -> list[OOI]:
         if self.all_oois_selected():
@@ -258,12 +267,27 @@ class BaseReportView(OOIFilterView):
         recurrence_choice = self.request.POST.get("choose_recurrence", "once")
         return recurrence_choice == "repeat"
 
-    def create_report_recipe(self, report_name_format: str, subreport_name_format: str, schedule: str) -> ReportRecipe:
+    def create_report_recipe(
+        self,
+        report_name_format: str,
+        subreport_name_format: str,
+        parent_report_type: str | None,
+        schedule: str,
+        query: dict[str, Any] | None,
+    ) -> ReportRecipe:
+        input_recipe: dict[str, Any] = {}
+
+        if query:
+            input_recipe = {"query": query}
+        else:
+            input_recipe = {"input_oois": self.get_ooi_pks()}
+
         report_recipe = ReportRecipe(
             recipe_id=uuid4(),
             report_name_format=report_name_format,
             subreport_name_format=subreport_name_format,
-            input_recipe={"input_oois": self.get_ooi_pks()},
+            input_recipe=input_recipe,
+            parent_report_type=parent_report_type,
             report_types=self.get_report_type_ids(),
             cron_expression=schedule,
         )
@@ -290,6 +314,7 @@ class BaseReportView(OOIFilterView):
         context["all_oois_selected"] = self.all_oois_selected()
         context["selected_oois"] = self.selected_oois
         context["selected_report_types"] = self.selected_report_types
+        context["object_selection"] = self.request.POST.get("object_selection", "")
 
         return context
 
@@ -298,6 +323,13 @@ class OOISelectionView(BaseReportView, BaseOOIListView):
     """
     Shows a list of OOIs to select from and handles OOIs selection requests.
     """
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        object_selection = request.GET.get("object_selection", "")
+
+        if object_selection == "query":
+            return PostRedirect(self.get_next())
 
     def post(self, request, *args, **kwargs):
         if not (self.get_ooi_selection() or self.all_oois_selected()):
@@ -310,7 +342,7 @@ class OOISelectionView(BaseReportView, BaseOOIListView):
         return context
 
 
-class ReportTypeSelectionView(BaseReportView, ReportBreadcrumbs, TemplateView):
+class ReportTypeSelectionView(BaseReportView, TemplateView):
     """
     Shows report types and handles selections and requests.
     """
@@ -320,7 +352,8 @@ class ReportTypeSelectionView(BaseReportView, ReportBreadcrumbs, TemplateView):
         self.available_report_types, self.counted_report_types = self.get_available_report_types()
 
     def post(self, request, *args, **kwargs):
-        if not (self.get_ooi_selection() or self.all_oois_selected()):
+        object_selection = request.GET.get("object_selection", "")
+        if not (self.get_ooi_selection() or self.all_oois_selected()) and object_selection != "query":
             return PostRedirect(self.get_previous())
         return self.get(request, *args, **kwargs)
 
@@ -337,8 +370,11 @@ class ReportTypeSelectionView(BaseReportView, ReportBreadcrumbs, TemplateView):
 
         return context
 
+    def all_oois_selected(self) -> bool:
+        return "all" in self.request.POST.getlist("ooi", [])
 
-class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
+
+class ReportPluginView(BaseReportView, TemplateView):
     """
     This view shows the required and optional plugins together with the summary per report type.
     """
@@ -434,7 +470,7 @@ class ReportPluginView(BaseReportView, ReportBreadcrumbs, TemplateView):
         return context
 
 
-class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, SchedulerView, TemplateView):
+class ReportFinalSettingsView(BaseReportView, SchedulerView, TemplateView):
     report_type: type[BaseReport] | None = None
     task_type = "report"
     is_a_scheduled_report = False
@@ -482,7 +518,7 @@ class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, SchedulerView, 
         if self.report_type is not None and self.report_type == AggregateOrganisationReport:
             return [_("Aggregate Report")]
         if self.report_type is not None and self.report_type == MultiOrganizationReport:
-            return [_("Multi Report")]
+            return [_("Sector Report")]
 
         return self.create_report_names(self.get_oois(), self.get_report_types())
 
@@ -503,7 +539,7 @@ class ReportFinalSettingsView(BaseReportView, ReportBreadcrumbs, SchedulerView, 
         return context
 
 
-class SaveReportView(BaseReportView, ReportBreadcrumbs, SchedulerView):
+class SaveReportView(BaseReportView, SchedulerView):
     task_type = "report"
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
@@ -523,13 +559,32 @@ class SaveReportView(BaseReportView, ReportBreadcrumbs, SchedulerView):
         elif self.is_scheduled_report():
             report_name_format = request.POST.get("parent_report_name", "")
             subreport_name_format = request.POST.get("child_report_name", "")
-
             recurrence = request.POST.get("recurrence", "")
             deadline_at = request.POST.get("start_date", datetime.now(timezone.utc).date())
+            object_selection = request.POST.get("object_selection", "")
+
+            query = {}
+            if object_selection == "query":
+                query = {
+                    "ooi_types": [t.__name__ for t in self.get_ooi_types()],
+                    "scan_level": self.get_ooi_scan_levels(),
+                    "scan_type": self.get_ooi_profile_types(),
+                    "search_string": self.search_string,
+                    "order_by": self.order_by,
+                    "asc_desc": self.sorting_order,
+                }
+
+            parent_report_type = None
+            if self.report_type is not None:
+                parent_report_type = self.report_type.id
+            elif not self.report_type and subreport_name_format:
+                parent_report_type = ConcatenatedReport.id
 
             schedule = self.convert_recurrence_to_cron_expressions(recurrence)
 
-            report_recipe = self.create_report_recipe(report_name_format, subreport_name_format, schedule)
+            report_recipe = self.create_report_recipe(
+                report_name_format, subreport_name_format, parent_report_type, schedule, query
+            )
 
             self.create_report_schedule(report_recipe, deadline_at)
 
@@ -606,8 +661,11 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     def get_template_names(self):
         if self.report_ooi.report_type and issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
             return ["aggregate_report.html"]
-        else:
-            return ["generate_report.html"]
+        if self.report_ooi.report_type and issubclass(
+            get_report_by_id(self.report_ooi.report_type), MultiOrganizationReport
+        ):
+            return ["multi_report.html"]
+        return ["generate_report.html"]
 
     def get_children_reports(self) -> list[ReportOOI]:
         return [
@@ -685,7 +743,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         return report_data, oois, report_types, plugins
 
-    def get_report_data_aggregate_report(
+    def get_report_data_aggregate_report_or_multi_report(
         self,
     ) -> tuple[
         dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]], list[dict[str, list[Plugin]]]
@@ -725,10 +783,10 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     def get_report_data(self):
         if issubclass(get_report_by_id(self.report_ooi.report_type), ConcatenatedReport):
             return self.get_report_data_concatenated_report()
-        elif issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
-            return self.get_report_data_aggregate_report()
-        else:
-            return self.get_report_data_single_report()
+        if issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport | MultiOrganizationReport):
+            return self.get_report_data_aggregate_report_or_multi_report()
+
+        return self.get_report_data_single_report()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -760,5 +818,8 @@ class ViewReportPDFView(ViewReportView, WeasyTemplateResponseMixin):
     def get_template_names(self):
         if self.report_ooi.report_type and issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
             return ["aggregate_report_pdf.html"]
-        else:
-            return ["generate_report_pdf.html"]
+        if self.report_ooi.report_type and issubclass(
+            get_report_by_id(self.report_ooi.report_type), MultiOrganizationReport
+        ):
+            return ["multi_report_pdf.html"]
+        return ["generate_report_pdf.html"]
