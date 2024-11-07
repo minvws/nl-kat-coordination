@@ -3,7 +3,7 @@ import datetime
 from django.conf import settings
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
-from django.db.models.signals import post_delete, post_save, pre_delete, pre_save
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 from httpx import HTTPError
 from katalogus.client import KATalogusClient, get_katalogus_client
@@ -121,27 +121,6 @@ def organization_post_save(sender, instance, *args, **kwargs):
         octopoes_client.save_declaration(Declaration(ooi=Network(name="internet"), valid_time=valid_time))
     except Exception:
         logger.exception("Could not seed internet for organization %s", sender)
-
-
-@receiver(pre_delete, sender=Organization)
-def organization_pre_delete(sender, instance, *args, **kwargs):
-    katalogus_client = _get_healthy_katalogus()
-    octopoes_client = _get_healthy_octopoes(instance.code)
-
-    try:
-        octopoes_client.delete_node()
-    except Exception as e:
-        raise OctopoesException("Failed deleting organization in Octopoes") from e
-
-    try:
-        katalogus_client.delete_organization(instance.code)
-    except Exception as e:
-        try:
-            octopoes_client.create_node()
-        except Exception as second_exception:
-            raise OctopoesException("Failed creating organization in Octopoes") from second_exception
-
-        raise KATalogusException("Failed deleting organization in the Katalogus") from e
 
 
 def _get_healthy_katalogus() -> KATalogusClient:

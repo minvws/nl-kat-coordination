@@ -316,10 +316,12 @@ class TestKatalogusCloneSettings(APIViewTest, UsesPostMethod, Returns200):
 
     @pytest.fixture
     def client(self, drf_redteam_client, redteamuser):
-        redteamuser.user_permissions.set([
-            Permission.objects.get(codename="can_set_katalogus_settings"),
-            Permission.objects.get(codename="can_access_all_organizations"),
-        ])
+        redteamuser.user_permissions.set(
+            [
+                Permission.objects.get(codename="can_set_katalogus_settings"),
+                Permission.objects.get(codename="can_access_all_organizations"),
+            ]
+        )
 
         return drf_redteam_client
 

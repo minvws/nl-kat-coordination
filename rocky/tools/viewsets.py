@@ -1,5 +1,6 @@
 from django.conf import settings
-from katalogus.client import get_katalogus, get_katalogus_client
+from katalogus.client import get_katalogus_client
+from katalogus.exceptions import KATalogusException
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -7,6 +8,8 @@ from rest_framework.response import Response
 from structlog import get_logger
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
+from rocky.exceptions import OctopoesException
+from rocky.signals import _get_healthy_katalogus, _get_healthy_octopoes
 from tools.models import Indemnification, Organization
 from tools.permissions import CanRecalculateBits, CanSetKatalogusSettings
 from tools.serializers import OrganizationSerializer, OrganizationSerializerReadOnlyCode, ToOrganizationSerializer
@@ -26,6 +29,28 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         if self.request.method != "POST":
             serializer_class = OrganizationSerializerReadOnlyCode
         return serializer_class
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        katalogus_client = _get_healthy_katalogus()
+        octopoes_client = _get_healthy_octopoes(instance.code)
+
+        try:
+            octopoes_client.delete_node()
+        except Exception as e:
+            raise OctopoesException("Failed deleting organization in Octopoes") from e
+
+        try:
+            katalogus_client.delete_organization(instance.code)
+        except Exception as e:
+            try:
+                octopoes_client.create_node()
+            except Exception as second_exception:
+                raise OctopoesException("Failed creating organization in Octopoes") from second_exception
+
+            raise KATalogusException("Failed deleting organization in the Katalogus") from e
+
+        return super().destroy(request, *args, **kwargs)
 
     @action(detail=True, permission_classes=[])
     def indemnification(self, request, pk=None):
