@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-29 11:51+0000\n"
+"POT-Creation-Date: 2024-11-07 11:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3810,20 +3810,21 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_names_header.html
+#, python-brace-format
 msgid ""
 "To make the report names more descriptive, you can include placeholders for "
 "the object name, the report type and/or the reference date. For subreports "
-"and reports over a single object, use the placeholder \"{ooi}\" for the "
-"object name, \"{report type}\" for the report type and use a <a "
+"and reports over a single object, use the placeholder \"${ooi}\" for the "
+"object name, \"${report_type}\" for the report type and use a <a "
 "href=\"https://strftime.org/\" target=\"_blank\" rel=\"noopener\">Python "
 "strftime code</a> for the reference date. For reports over multiple objects, "
-"use \"{oois_count}\" for the number of objects in the report."
+"use \"${oois_count}\" for the number of objects in the report."
 msgstr ""
 
 #: reports/templates/partials/report_names_header.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"For example, the format \"{report type} for {ooi} at %%x\" could generate: "
+"For example, the format \"${report_type} for ${ooi} at %%x\" could generate: "
 "\"DNS Report for example.com at 01/01/25\"."
 msgstr ""
 
@@ -5291,8 +5292,12 @@ msgid "findings"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "Findings table"
+msgid "Findings table "
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/oois/ooi_list.html
+msgid "column headers with buttons are sortable"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -5779,10 +5784,6 @@ msgid "Objects "
 msgstr ""
 
 #: rocky/templates/oois/ooi_list.html
-msgid "column headers with buttons are sortable"
-msgstr ""
-
-#: rocky/templates/oois/ooi_list.html
 msgid "Delete object(s)"
 msgstr ""
 
@@ -5894,6 +5895,10 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid "Top 10 most severe Findings"
+msgstr ""
+
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "Findings table"
 msgstr ""
 
 #: rocky/templates/organizations/organization_crisis_room.html
