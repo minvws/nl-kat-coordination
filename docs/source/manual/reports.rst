@@ -183,7 +183,7 @@ The table below gives an overview of the elements that can be found in each repo
 
 Report flow
 ===========
-On the Reports page you can generate new reports and get an overview of all generated reports. With the button 'Generate report' you get into the Report flow wizard, which can be used to choose your report, objects and plugins that are required for the report. Please note that enabling plugins during the report flow wizard will result in inaccurate data, as the plugins will take some time before they have gathered and analyzed all data. Check the Tasks page to verify that all tasks have completed.
+On the Reports page you can generate new reports and get an overview of all generated reports. With the button 'Generate report' you get into the Report flow wizard, which can be used to choose your report, objects and plugins that are required for the report. There are two ways to select objects. You can manually select objects, which will be static. Or you can select a live set of objects by continuing with the selected filters. The selected objects will then always be based on the selected filters at the time of generating the report. and  Please note that enabling plugins during the report flow wizard will result in inaccurate data, as the plugins will take some time before they have gathered and analyzed all data. Check the Tasks page to verify that all tasks have completed.
 
 
 Plugins
