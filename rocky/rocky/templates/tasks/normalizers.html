@@ -22,12 +22,12 @@
                     <p class="emphasized">{% translate "List of tasks for normalizers" %}</p>
                     {% include "tasks/partials/task_filter.html" %}
 
-                    <div class="horizontal-scroll">
-                        <table rf-selector="table-scan-history">
+                    <div class="horizontal-scroll sticky-column">
+                        <table rf-selector="table-scan-history" class="nowrap">
                             <thead>
                                 <tr>
                                     {% if not organization.code %}
-                                        <th scope="col">{% translate "Organization Code" %}</th>
+                                        <th scope="col">{% translate "Organization" %}</th>
                                     {% endif %}
                                     <th scope="col">{% translate "Normalizer" %}</th>
                                     <th scope="col">{% translate "Status" %}</th>
@@ -35,7 +35,7 @@
                                     <th scope="col">{% translate "Modified date" %}</th>
                                     <th scope="col">{% translate "Boefje" %}</th>
                                     <th scope="col">{% translate "Boefje input OOI" %}</th>
-                                    <th scope="col" class="visually-hidden">{% translate "Details" %}</th>
+                                    <th scope="col" class="visually-hidden actions">{% translate "Details" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -71,7 +71,7 @@
                                                 <a href="{% ooi_url "ooi_detail" task.data.raw_data.boefje_meta.input_ooi task.data.raw_data.boefje_meta.organization observed_at=task.created_at|date:'c' %}">{{ task.data.raw_data.boefje_meta.input_ooi }}</a>
                                             {% endif %}
                                         </td>
-                                        <td>
+                                        <td class="actions sticky-cell">
                                             <button type="button"
                                                     class="expando-button normalizer-list-table-row"
                                                     data-icon-open-class="icon ti-chevron-down"

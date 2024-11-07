@@ -192,7 +192,9 @@ class Organization(models.Model):
 
     @staticmethod
     def _get_healthy_octopoes(organization_code: str) -> OctopoesAPIConnector:
-        octopoes_client = OctopoesAPIConnector(settings.OCTOPOES_API, client=organization_code)
+        octopoes_client = OctopoesAPIConnector(
+            settings.OCTOPOES_API, client=organization_code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+        )
         try:
             health = octopoes_client.root_health()
         except HTTPError as e:
