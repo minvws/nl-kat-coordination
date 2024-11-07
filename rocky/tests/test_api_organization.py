@@ -75,6 +75,10 @@ class TestOrganizationViewSet(ViewSetTest):
             async_=False,
         )
 
+        @pytest.fixture(autouse=True)
+        def mock_katalogus(self, mocker):
+            mocker.patch("katalogus.client.KATalogusClient")
+
         def test_it_creates_new_organization(self, initial_ids, json):
             expected = initial_ids | {json["id"]}
             actual = set(Organization.objects.values_list("id", flat=True))
@@ -173,6 +177,10 @@ class TestOrganizationViewSet(ViewSetTest):
             async_=False,
         )
 
+        @pytest.fixture(autouse=True)
+        def mock_katalogus(self, mocker):
+            mocker.patch("katalogus.client.KATalogusClient")
+
         def test_it_deletes_organization(self, initial_ids, organization, log_output):
             expected = initial_ids - {organization.id}
             actual = set(Organization.objects.values_list("id", flat=True))
@@ -200,8 +208,7 @@ class TestOrganizationViewSet(ViewSetTest):
     class TestDestroyOctopoesError(UsesDeleteMethod, UsesDetailEndpoint, Returns500):
         @pytest.fixture(autouse=True)
         def mock_services(self, mocker):
-            mocker.patch("katalogus.client.KATalogusClient.health")
-            mocker.patch("katalogus.client.KATalogusClient.delete_organization")
+            mocker.patch("katalogus.client.KATalogusClient")
             mocker.patch("rocky.signals.OctopoesAPIConnector.root_health")
             mocker.patch("rocky.signals.OctopoesAPIConnector.delete_node", side_effect=HTTPError("Test error"))
 
@@ -309,14 +316,16 @@ class TestKatalogusCloneSettings(APIViewTest, UsesPostMethod, Returns200):
 
     @pytest.fixture
     def client(self, drf_redteam_client, redteamuser):
-        redteamuser.user_permissions.set([Permission.objects.get(codename="can_set_katalogus_settings")])
-        redteamuser.user_permissions.set([Permission.objects.get(codename="can_access_all_organizations")])
+        redteamuser.user_permissions.set([
+            Permission.objects.get(codename="can_set_katalogus_settings"),
+            Permission.objects.get(codename="can_access_all_organizations"),
+        ])
 
         return drf_redteam_client
 
     @pytest.fixture(autouse=True)
     def mock_katalogus(self, mocker):
-        return mocker.patch("katalogus.client.KATalogus")
+        return mocker.patch("katalogus.client.KATalogusClient")
 
     def test_it_clones_settings(self, mock_katalogus, organization, organization_b):
         mock_katalogus().clone_all_configuration_to_organization.assert_called_once_with(

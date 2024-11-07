@@ -1,5 +1,5 @@
 from django.conf import settings
-from katalogus.client import get_katalogus
+from katalogus.client import get_katalogus, get_katalogus_client
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from structlog import get_logger
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from tools.models import Indemnification, Organization, OrganizationMember
+from tools.models import Indemnification, Organization
 from tools.permissions import CanRecalculateBits, CanSetKatalogusSettings
 from tools.serializers import OrganizationSerializer, OrganizationSerializerReadOnlyCode, ToOrganizationSerializer
 
@@ -80,9 +80,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
                 organization_code=from_organization.code,
                 to_organization_code=to_organization.code,
             )
-            get_katalogus(
-                OrganizationMember.objects.get(user=request.user, organization=from_organization)
-            ).clone_all_configuration_to_organization(to_organization.code)
+            get_katalogus_client().clone_all_configuration_to_organization(from_organization.code, to_organization.code)
 
             return Response()
         else:
