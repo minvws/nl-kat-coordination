@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-07 11:02+0000\n"
+"POT-Creation-Date: 2024-11-07 11:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4122,7 +4122,7 @@ msgid "Reports:"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "Input Objects"
+msgid "Input objects"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
@@ -4220,10 +4220,8 @@ msgid "Scheduled Reports:"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
-#: reports/templates/report_overview/subreports_table.html
-#: rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "Input Object"
+#: rocky/templates/tasks/boefje_task_detail.html
+msgid "Input object"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
@@ -4258,6 +4256,12 @@ msgstr ""
 
 #: reports/templates/report_overview/subreports_table.html
 msgid "Subreports:"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_table.html
+#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "Input Object"
 msgstr ""
 
 #: reports/templates/summary/report_asset_overview.html
@@ -6540,10 +6544,6 @@ msgstr ""
 
 #: rocky/templates/tasks/boefje_task_detail.html
 msgid "Download meta data"
-msgstr ""
-
-#: rocky/templates/tasks/boefje_task_detail.html
-msgid "Input object"
 msgstr ""
 
 #: rocky/templates/tasks/boefjes.html
