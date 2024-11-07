@@ -10,9 +10,40 @@
                 Select objects ({{ total_oois }})
             {% endblocktranslate %}
         </h2>
-        <p>{% translate "Select which objects you want to include in your report." %}</p>
+        <p>
+            {% blocktranslate %}
+                Select which objects you want to include in your report. You can either continue
+                with a live set or you can select the objects manually from the table below.
+            {% endblocktranslate %}
+        </p>
+        <p>
+            {% blocktranslate %}
+                A live set is a set of objects based on the applied filters.
+                Any object that matches this applied filter (now or in the future) will be used as
+                input for the scheduled report. If your live set filter (e.g. 'hostnames' with
+                'L2 clearance' that are 'declared') shows 2 hostnames that match the filter today,
+                the scheduled report will run for those 2 hostnames. If you add 3 more hostnames
+                tomorrow (with the same filter criteria), your next scheduled report will contain
+                5 hostnames. Your live set will update as you go.
+            {% endblocktranslate %}
+        </p>
         {% include "partials/ooi_list_filters.html" %}
 
+        <form novalidate
+              method="post"
+              action="{{ next }}"
+              class="inline layout-wide checkboxes_required">
+            {% csrf_token %}
+            {% include "forms/report_form_fields.html" %}
+
+            <input type="hidden" name="ooi" value="all">
+            <button type="submit"
+                    class="button select_all_objects_element"
+                    name="object_selection"
+                    value="query">
+                {% translate "Continue with live set" %}<span class="icon ti-chevron-right"></span>
+            </button>
+        </form>
         {% if not ooi_list %}
             <p>{% translate "No objects found." %}</p>
             <div class="button-container">
@@ -51,7 +82,8 @@
             <form novalidate
                   method="post"
                   action="{{ next }}"
-                  class="inline layout-wide checkboxes_required">
+                  class="inline layout-wide checkboxes_required"
+                  id="object_table_form">
                 {% csrf_token %}
                 {% if all_oois_selected %}
                     {% include "forms/report_form_fields.html" %}
@@ -95,10 +127,13 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                    <button type="submit"
+                            class="button ghost"
+                            name="object_selection"
+                            value="selection">
+                        {% translate "Continue with selection" %}<span class="icon ti-chevron-right"></span>
+                    </button>
                 </div>
-                <button type="submit" class="button">
-                    {% translate "Continue with selection" %}<span class="icon ti-chevron-right"></span>
-                </button>
             </form>
             {% include "partials/list_paginator.html" %}
 
