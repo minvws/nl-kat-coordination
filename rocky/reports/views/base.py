@@ -580,12 +580,6 @@ class SaveReportView(BaseReportView, SchedulerView):
                 }
 
             parent_report_type = None
-            if self.report_type == AggregateOrganisationReport:
-                parent_report_type = AggregateOrganisationReport.id
-            elif not self.report_type and subreport_name_format:
-                parent_report_type = ConcatenatedReport.id
-
-            parent_report_type = None
             if self.report_type is not None:
                 parent_report_type = self.report_type.id
             elif not self.report_type and subreport_name_format:
