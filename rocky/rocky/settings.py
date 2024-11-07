@@ -502,3 +502,5 @@ WORKER_HEARTBEAT = env.int("WORKER_HEARTBEAT", default=5)
 # STATICFILES_DIRS does not exist. We silence the warning here to prevent the
 # warning from confusing users.
 SILENCED_SYSTEM_CHECKS = ["staticfiles.W004"]
+
+ROCKY_OUTGOING_REQUEST_TIMEOUT = env.int("ROCKY_OUTGOING_REQUEST_TIMEOUT", default=30)

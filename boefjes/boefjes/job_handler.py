@@ -33,14 +33,15 @@ bytes_api_client = BytesAPIClient(
 
 
 def get_octopoes_api_connector(org_code: str) -> OctopoesAPIConnector:
-    return OctopoesAPIConnector(str(settings.octopoes_api), org_code)
+    return OctopoesAPIConnector(str(settings.octopoes_api), org_code, timeout=settings.outgoing_request_timeout)
 
 
 def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None) -> dict[str, str]:
     try:
         katalogus_api = str(settings.katalogus_api).rstrip("/")
         response = httpx.get(
-            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings", timeout=30
+            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings",
+            timeout=settings.outgoing_request_timeout,
         )
         response.raise_for_status()
     except HTTPError:

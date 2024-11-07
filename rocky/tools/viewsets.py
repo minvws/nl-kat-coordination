@@ -67,7 +67,9 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     def recalculate_bits(self, request, pk=None):
         organization = self.get_object()
         logger.info("Recalculating bits", event_code=920000, organization_code=organization.code)
-        connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization.code)
+        connector = OctopoesAPIConnector(
+            settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+        )
         number_of_bits = connector.recalculate_bits()
 
         return Response({"number_of_bits": number_of_bits})
