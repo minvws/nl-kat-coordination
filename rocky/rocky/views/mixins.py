@@ -205,6 +205,8 @@ class OOIList:
 
     @cached_property
     def count(self) -> int:
+        if not self.ooi_types:
+            return 0
         return self.octopoes_connector.list_objects(
             self.ooi_types,
             valid_time=self.valid_time,
@@ -218,6 +220,8 @@ class OOIList:
         return self.count
 
     def __getitem__(self, key: int | slice) -> list[OOI]:
+        if not self.ooi_types:
+            return []
         if isinstance(key, slice):
             offset = key.start or 0
             limit = OOIList.HARD_LIMIT
