@@ -18,14 +18,11 @@ class ReportScheduler(Scheduler):
     ITEM_TYPE: Any = models.ReportTask
 
     def __init__(
-        self,
-        ctx: context.AppContext,
-        scheduler_id: str,
-        organisation: models.Organisation,
-        queue: PriorityQueue | None = None,
+        self, ctx: context.AppContext, scheduler_id: str, organisation_id: str, queue: PriorityQueue | None = None
     ):
         self.logger: structlog.BoundLogger = structlog.get_logger(__name__)
-        self.organisation = organisation
+        self.organisation_id: str = organisation_id
+
         self.queue = queue or PriorityQueue(
             pq_id=scheduler_id,
             maxsize=ctx.config.pq_maxsize,
@@ -48,7 +45,7 @@ class ReportScheduler(Scheduler):
             self.logger.warning(
                 "Report queue is full, not populating with new tasks",
                 queue_qsize=self.queue.qsize(),
-                organisation_id=self.organisation.id,
+                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
             )
             return
@@ -68,7 +65,7 @@ class ReportScheduler(Scheduler):
                 "Could not get schedules for rescheduling %s",
                 self.scheduler_id,
                 scheduler_id=self.scheduler_id,
-                organisation_id=self.organisation.id,
+                organisation_id=self.organisation_id,
                 exc_info=exc_db,
             )
             raise exc_db
@@ -84,7 +81,7 @@ class ReportScheduler(Scheduler):
         self.logger.debug(
             "Pushing report task",
             task_hash=report_task.hash,
-            organisation_id=self.organisation.id,
+            organisation_id=self.organisation_id,
             scheduler_id=self.scheduler_id,
             caller=caller,
         )
@@ -93,7 +90,7 @@ class ReportScheduler(Scheduler):
             self.logger.debug(
                 "Report task already on queue",
                 task_hash=report_task.hash,
-                organisation_id=self.organisation.id,
+                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
             )
@@ -116,7 +113,7 @@ class ReportScheduler(Scheduler):
                 task_hash=report_task.hash,
                 queue_qsize=self.queue.qsize(),
                 queue_maxsize=self.queue.maxsize,
-                organisation_id=self.organisation.id,
+                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
             )
@@ -126,7 +123,7 @@ class ReportScheduler(Scheduler):
             "Report task pushed to queue",
             task_id=task.id,
             task_hash=report_task.hash,
-            organisation_id=self.organisation.id,
+            organisation_id=self.organisation_id,
             scheduler_id=self.scheduler_id,
             caller=caller,
         )

@@ -19,6 +19,7 @@ class SchedulerStore:
     def get_schedulers(
         self,
         scheduler_id: str | None = None,
+        organisation: str | None = None,
         item_type: str | None = None,
         min_created_at: datetime | None = None,
         max_created_at: datetime | None = None,
@@ -32,6 +33,9 @@ class SchedulerStore:
 
             if scheduler_id is not None:
                 query = query.filter(models.SchedulerDB.id == scheduler_id)
+
+            if organisation is not None:
+                query = query.filter(models.SchedulerDB.organisation == organisation)
 
             if item_type is not None:
                 query = query.filter(models.SchedulerDB.item_type == item_type)
@@ -60,20 +64,24 @@ class SchedulerStore:
 
     @retry()
     @exception_handler
-    def get_scheduler(self, scheduler_id: str) -> models.Scheduler:
+    def get_scheduler(self, scheduler_id: str) -> models.Scheduler | None:
         with self.dbconn.session.begin() as session:
             scheduler_orm = session.query(models.SchedulerDB).filter(models.SchedulerDB.id == scheduler_id).one()
+            if scheduler_orm is None:
+                return None
 
-        return models.Scheduler.model_validate(scheduler_orm)
+            return models.Scheduler.model_validate(scheduler_orm)
 
     @retry()
     @exception_handler
     def create_scheduler(self, scheduler: models.Scheduler) -> models.Scheduler:
         with self.dbconn.session.begin() as session:
-            scheduler_orm = models.SchedulerDB.model_validate(scheduler)
+            scheduler_orm = models.SchedulerDB(**scheduler.model_dump())
             session.add(scheduler_orm)
 
-        return models.Scheduler.model_validate(scheduler_orm)
+            self.dbconn.logger.info(scheduler_orm.__dict__)
+            created_scheduler = models.Scheduler.model_validate(scheduler_orm)
+            return created_scheduler
 
     @retry()
     @exception_handler
@@ -81,8 +89,7 @@ class SchedulerStore:
         with self.dbconn.session.begin() as session:
             scheduler_orm = session.query(models.SchedulerDB).filter(models.SchedulerDB.id == scheduler.id).one()
             scheduler_orm.update(scheduler.dict(exclude_unset=True))
-
-        return models.Scheduler.model_validate(scheduler_orm)
+            return models.Scheduler.model_validate(scheduler_orm)
 
     @retry()
     @exception_handler

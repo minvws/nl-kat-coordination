@@ -1,9 +1,8 @@
 import enum
-from datetime import datetime
-from typing import Any
+from datetime import datetime, timezone
 
-from pydantic import BaseModel
-from sqlalchemy import Boolean, Column, DateTime, Integer, String
+from pydantic import BaseModel, Field
+from sqlalchemy import Boolean, Column, DateTime, Enum, Integer, String
 from sqlalchemy.sql import func
 
 from .base import Base
@@ -18,9 +17,8 @@ class SchedulerType(str, enum.Enum):
 
 
 class Scheduler(BaseModel):
-    id: str  # TODO: refactor to uuid?
+    id: str
     enabled: bool | None = None
-    size: int | None = None
     maxsize: int | None = None
     organisation: str | None = None
     type: SchedulerType | None = None
@@ -29,8 +27,8 @@ class Scheduler(BaseModel):
     allow_priority_updates: bool | None = None
 
     last_activity: datetime | None = None
-    created_at: datetime | None = None
-    modified_at: datetime | None = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class SchedulerDB(Base):
@@ -38,10 +36,9 @@ class SchedulerDB(Base):
 
     id = Column(String, primary_key=True)
     enabled = Column(Boolean, default=True)
-    size = Column(Integer, nullable=False)
     maxsize = Column(Integer, nullable=False)
     organisation = Column(String, nullable=False)
-    type = Column(String, nullable=False)
+    type = Column(Enum(SchedulerType), nullable=False)
     allow_replace = Column(Boolean, default=True)
     allow_updates = Column(Boolean, default=True)
     allow_priority_updates = Column(Boolean, default=True)

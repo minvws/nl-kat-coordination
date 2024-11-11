@@ -27,14 +27,10 @@ class NormalizerScheduler(Scheduler):
     ITEM_TYPE: Any = models.NormalizerTask
 
     def __init__(
-        self,
-        ctx: context.AppContext,
-        scheduler_id: str,
-        organisation: models.Organisation,
-        queue: PriorityQueue | None = None,
+        self, ctx: context.AppContext, scheduler_id: str, organisation_id: str, queue: PriorityQueue | None = None
     ):
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
-        self.organisation: models.Organisation = organisation
+        self.organisation_id: str = organisation_id
         self.create_schedule = False
 
         self.queue = queue or PriorityQueue(
@@ -61,7 +57,7 @@ class NormalizerScheduler(Scheduler):
         """
         listener = clients.RawData(
             dsn=str(self.ctx.config.host_raw_data),
-            queue=f"{self.organisation.id}__raw_file_received",
+            queue=f"{self.organisation_id}__raw_file_received",
             func=self.push_tasks_for_received_raw_data,
             prefetch_count=self.ctx.config.rabbitmq_prefetch_count,
         )
@@ -76,8 +72,8 @@ class NormalizerScheduler(Scheduler):
 
         self.logger.info(
             "Normalizer scheduler started for %s",
-            self.organisation.id,
-            organisation_id=self.organisation.id,
+            self.organisation_id,
+            organisation_id=self.organisation_id,
             scheduler_id=self.scheduler_id,
             item_type=self.queue.item_type.__name__,
         )
@@ -97,7 +93,7 @@ class NormalizerScheduler(Scheduler):
             "Received raw data %s",
             latest_raw_data.raw_data.id,
             raw_data_id=latest_raw_data.raw_data.id,
-            organisation_id=self.organisation.id,
+            organisation_id=self.organisation_id,
             scheduler_id=self.scheduler_id,
         )
 
@@ -111,7 +107,7 @@ class NormalizerScheduler(Scheduler):
                     latest_raw_data.raw_data.id,
                     mime_type=mime_type.get("value"),
                     raw_data_id=latest_raw_data.raw_data.id,
-                    organisation_id=self.organisation.id,
+                    organisation_id=self.organisation_id,
                     scheduler_id=self.scheduler_id,
                 )
                 return
@@ -129,7 +125,7 @@ class NormalizerScheduler(Scheduler):
                 "No normalizers found for raw data %s",
                 latest_raw_data.raw_data.id,
                 raw_data_id=latest_raw_data.raw_data.id,
-                organisation_id=self.organisation.id,
+                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
             )
 
@@ -142,7 +138,7 @@ class NormalizerScheduler(Scheduler):
                         "Normalizer is not allowed to run: %s",
                         normalizer.id,
                         normalizer_id=normalizer.id,
-                        organisation_id=self.organisation.id,
+                        organisation_id=self.organisation_id,
                         scheduler_id=self.scheduler_id,
                     )
                     continue
@@ -170,21 +166,21 @@ class NormalizerScheduler(Scheduler):
             "Pushing normalizer task",
             task_id=normalizer_task.id,
             normalizer_id=normalizer_task.normalizer.id,
-            organisation_id=self.organisation.id,
+            organisation_id=self.organisation_id,
             scheduler_id=self.scheduler_id,
             caller=caller,
         )
 
         try:
             plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
-                normalizer_task.normalizer.id, self.organisation.id
+                normalizer_task.normalizer.id, self.organisation_id
             )
             if not self.has_normalizer_permission_to_run(plugin):
                 self.logger.debug(
                     "Task is not allowed to run: %s",
                     normalizer_task.id,
                     task_id=normalizer_task.id,
-                    organisation_id=self.organisation.id,
+                    organisation_id=self.organisation_id,
                     scheduler_id=self.scheduler_id,
                     caller=caller,
                 )
@@ -194,7 +190,7 @@ class NormalizerScheduler(Scheduler):
                 "Could not get plugin by id: %s",
                 normalizer_task.normalizer.id,
                 task_id=normalizer_task.id,
-                organisation_id=self.organisation.id,
+                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
             )
@@ -206,7 +202,7 @@ class NormalizerScheduler(Scheduler):
                     "Task is still running: %s",
                     normalizer_task.id,
                     task_id=normalizer_task.id,
-                    organisation_id=self.organisation.id,
+                    organisation_id=self.organisation_id,
                     scheduler_id=self.scheduler_id,
                     caller=caller,
                 )
@@ -216,7 +212,7 @@ class NormalizerScheduler(Scheduler):
                 "Could not check if task is running: %s",
                 normalizer_task.id,
                 task_id=normalizer_task.id,
-                organisation_id=self.organisation.id,
+                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
                 exc_info=True,
@@ -228,7 +224,7 @@ class NormalizerScheduler(Scheduler):
                 "Task is already on queue: %s",
                 normalizer_task.id,
                 task_id=normalizer_task.id,
-                organisation_id=self.organisation.id,
+                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
             )
@@ -254,7 +250,7 @@ class NormalizerScheduler(Scheduler):
                 task_id=task.id,
                 queue_qsize=self.queue.qsize(),
                 queue_maxsize=self.queue.maxsize,
-                organisation_id=self.organisation.id,
+                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
             )
@@ -266,7 +262,7 @@ class NormalizerScheduler(Scheduler):
             task_hash=task.hash,
             normalizer_id=normalizer_task.normalizer.id,
             raw_data_id=normalizer_task.raw_data.id,
-            organisation_id=self.organisation.id,
+            organisation_id=self.organisation_id,
             scheduler_id=self.scheduler_id,
             caller=caller,
         )
@@ -301,7 +297,7 @@ class NormalizerScheduler(Scheduler):
                 "Normalizer: %s is disabled",
                 normalizer.id,
                 normalizer_id=normalizer.id,
-                organisation_id=self.organisation.id,
+                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
             )
             return False
@@ -327,7 +323,7 @@ class NormalizerScheduler(Scheduler):
                 "Could not get latest task by hash: %s",
                 task.hash,
                 task_id=task.id,
-                organisation_id=self.organisation.id,
+                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
                 exc_info=exc_db,
             )
@@ -339,7 +335,7 @@ class NormalizerScheduler(Scheduler):
                 "Task is still running, according to the datastore",
                 task_id=task_db.id,
                 task_hash=task.hash,
-                organisation_id=self.organisation.id,
+                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
             )
             return True
@@ -357,14 +353,14 @@ class NormalizerScheduler(Scheduler):
         """
         try:
             normalizers = self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(
-                self.organisation.id, mime_type
+                self.organisation_id, mime_type
             )
         except ExternalServiceError:
             self.logger.warning(
                 "Could not get normalizers for mime_type: %s [mime_type=%s, organisation_id=%s, scheduler_id=%s]",
                 mime_type,
                 mime_type,
-                self.organisation.id,
+                self.organisation_id,
                 self.scheduler_id,
             )
             return []
@@ -374,7 +370,7 @@ class NormalizerScheduler(Scheduler):
                 "No normalizer found for mime_type: %s",
                 mime_type,
                 mime_type=mime_type,
-                organisation_id=self.organisation.id,
+                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
             )
             return []
@@ -385,7 +381,7 @@ class NormalizerScheduler(Scheduler):
             mime_type,
             mime_type=mime_type,
             normalizers=[normalizer.id for normalizer in normalizers],
-            organisation_=self.organisation.id,
+            organisation_=self.organisation_id,
             scheduler_id=self.scheduler_id,
         )
 
