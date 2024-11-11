@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-28 12:38+0000\n"
+"POT-Creation-Date: 2024-11-11 14:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1008,7 +1008,6 @@ msgstr ""
 #: katalogus/templates/plugin_settings_list.html
 #: katalogus/views/katalogus_settings.py tools/view_helpers.py
 #: rocky/templates/header.html
-#: rocky/templates/organizations/organization_settings.html
 msgid "Settings"
 msgstr ""
 
@@ -1122,6 +1121,7 @@ msgid "Plugin description"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
+#: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Actions"
 msgstr ""
@@ -3810,20 +3810,21 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_names_header.html
+#, python-brace-format
 msgid ""
 "To make the report names more descriptive, you can include placeholders for "
 "the object name, the report type and/or the reference date. For subreports "
-"and reports over a single object, use the placeholder \"{ooi}\" for the "
-"object name, \"{report type}\" for the report type and use a <a "
+"and reports over a single object, use the placeholder \"${ooi}\" for the "
+"object name, \"${report_type}\" for the report type and use a <a "
 "href=\"https://strftime.org/\" target=\"_blank\" rel=\"noopener\">Python "
 "strftime code</a> for the reference date. For reports over multiple objects, "
-"use \"{oois_count}\" for the number of objects in the report."
+"use \"${oois_count}\" for the number of objects in the report."
 msgstr ""
 
 #: reports/templates/partials/report_names_header.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"For example, the format \"{report type} for {ooi} at %%x\" could generate: "
+"For example, the format \"${report_type} for ${ooi} at %%x\" could generate: "
 "\"DNS Report for example.com at 01/01/25\"."
 msgstr ""
 
@@ -5917,10 +5918,6 @@ msgid "Save organization"
 msgstr ""
 
 #: rocky/templates/organizations/organization_list.html
-msgid "Rerun all bits for all my organizations"
-msgstr ""
-
-#: rocky/templates/organizations/organization_list.html
 msgid "Add new organization"
 msgstr ""
 
@@ -5931,6 +5928,15 @@ msgstr ""
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Tags"
+msgstr ""
+
+#: rocky/templates/organizations/organization_list.html
+msgid "Actions to perform for all of your organizations."
+msgstr ""
+
+#: rocky/templates/organizations/organization_list.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Rerun all bits"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_add.html
@@ -6058,10 +6064,6 @@ msgstr ""
 msgid "Add indemnification"
 msgstr ""
 
-#: rocky/templates/organizations/organization_settings.html
-msgid "Rerun all bits"
-msgstr ""
-
 #: rocky/templates/partials/elements/ooi_detail_settings.html
 msgid "Observed at"
 msgstr ""
@@ -6164,7 +6166,6 @@ msgstr ""
 msgid "Forgot password"
 msgstr ""
 
-#: rocky/templates/partials/form/field_input.html
 #: rocky/templates/partials/form/field_input_checkbox.html
 #: rocky/templates/partials/form/field_input_radio.html
 msgid "This field is required"
