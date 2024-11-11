@@ -173,7 +173,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     def recreate_report(
         self, report_ooi: Report, observed_at: datetime, bytes_id: str, parent_report_ooi: Report | None = None
     ) -> Report:
-        """Recreate a report with new observed_at and new (bytes) data."""
+        """Recreate a report with new UUID, observed_at and (bytes) data."""
 
         new_report_ooi = Report(
             name=report_ooi.name,
