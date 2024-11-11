@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 13:40+0000\n"
+"POT-Creation-Date: 2024-11-07 11:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -354,6 +354,7 @@ msgstr ""
 
 #: account/templates/account_detail.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/tasks/normalizers.html
 msgid "Organization"
 msgstr ""
 
@@ -945,7 +946,6 @@ msgstr ""
 #: katalogus/templates/partials/boefje_tile.html
 #: katalogus/templates/partials/plugin_tile.html
 #: katalogus/templates/partials/plugin_tile_modal.html
-#: katalogus/templates/partials/plugins.html
 msgid "See details"
 msgstr ""
 
@@ -1129,6 +1129,10 @@ msgstr ""
 #: reports/templates/report_overview/report_history_table.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Actions"
+msgstr ""
+
+#: katalogus/templates/partials/plugins.html
+msgid "Detail page"
 msgstr ""
 
 #: katalogus/templates/partials/plugins_navigation.html
@@ -3018,7 +3022,6 @@ msgid "Other findings found"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
 #: rocky/templates/oois/ooi_detail_findings_overview.html
@@ -3058,7 +3061,6 @@ msgstr ""
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/templates/partials/report_severity_totals_table.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
@@ -3672,7 +3674,7 @@ msgid "Has a certificate"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.html
-msgid "Certificate is not expired"
+msgid "Certificate is valid"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.html
@@ -3872,7 +3874,36 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Select which objects you want to include in your report."
+msgid ""
+"\n"
+"                Select which objects you want to include in your report. You "
+"can either continue\n"
+"                with a live set or you can select the objects manually from "
+"the table below.\n"
+"            "
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid ""
+"\n"
+"                A live set is a set of objects based on the applied "
+"filters.\n"
+"                Any object that matches this applied filter (now or in the "
+"future) will be used as\n"
+"                input for the scheduled report. If your live set filter (e."
+"g. 'hostnames' with\n"
+"                'L2 clearance' that are 'declared') shows 2 hostnames that "
+"match the filter today,\n"
+"                the scheduled report will run for those 2 hostnames. If you "
+"add 3 more hostnames\n"
+"                tomorrow (with the same filter criteria), your next "
+"scheduled report will contain\n"
+"                5 hostnames. Your live set will update as you go.\n"
+"            "
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "Continue with live set"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
@@ -4167,7 +4198,7 @@ msgid "Reports:"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "Input Objects"
+msgid "Input objects"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
@@ -4259,10 +4290,8 @@ msgid "Scheduled Reports:"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
-#: reports/templates/report_overview/subreports_table.html
-#: rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "Input Object"
+#: rocky/templates/tasks/boefje_task_detail.html
+msgid "Input object"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
@@ -4297,6 +4326,12 @@ msgstr ""
 
 #: reports/templates/report_overview/subreports_table.html
 msgid "Subreports:"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_table.html
+#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "Input Object"
 msgstr ""
 
 #: reports/templates/summary/report_asset_overview.html
@@ -5283,12 +5318,6 @@ msgid " Finding Details"
 msgstr ""
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Finding details"
-msgstr ""
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/organizations/organization_list.html
 msgid "There were no organizations found for your user account"
 msgstr ""
@@ -5783,6 +5812,11 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_detail_findings_list.html
 msgid "Score"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Finding details"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_findings_overview.html
@@ -6612,10 +6646,6 @@ msgstr ""
 msgid "Download meta data"
 msgstr ""
 
-#: rocky/templates/tasks/boefje_task_detail.html
-msgid "Input object"
-msgstr ""
-
 #: rocky/templates/tasks/boefjes.html
 #, python-format
 msgid ""
@@ -6635,7 +6665,7 @@ msgstr ""
 msgid "List of tasks for boefjes"
 msgstr ""
 
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/boefjes.html
 msgid "Organization Code"
 msgstr ""
 

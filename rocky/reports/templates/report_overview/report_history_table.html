@@ -64,9 +64,9 @@
         <p class="de-emphasized">
             {% blocktranslate with length=reports|length total=total_oois %}Showing {{ length }} of {{ total }} reports{% endblocktranslate %}
         </p>
-        <div class="horizontal-scroll">
+        <div class="horizontal-scroll sticky-column">
             <form class="inline layout-wide">
-                <table>
+                <table class="nowrap">
                     <caption class="visually-hidden">{% translate "Reports:" %}</caption>
                     <thead>
                         <tr>
@@ -75,10 +75,10 @@
                             </th>
                             <th scope="col">{% translate "Name" %}</th>
                             <th scope="col">{% translate "Report type" %}</th>
-                            <th scope="col">{% translate "Input Objects" %}</th>
-                            <th scope="col">{% translate "Reference date" %}</th>
-                            <th scope="col">{% translate "Creation date" %}</th>
-                            <th scope="col"></th>
+                            <th scope="col" class="nowrap">{% translate "Input Objects" %}</th>
+                            <th scope="col" class="nowrap">{% translate "Reference date" %}</th>
+                            <th scope="col" class="nowrap">{% translate "Creation date" %}</th>
+                            {% if report.children_reports %}<th scope="col"></th>{% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -126,8 +126,8 @@
                                 </td>
                                 <td class="nowrap report_reference_date">{{ report.parent_report.observed_at|date }}</td>
                                 <td class="nowrap report_creation_date">{{ report.parent_report.date_generated }}</td>
-                                <td>
-                                    {% if report.children_reports %}
+                                {% if report.children_reports %}
+                                    <td>
                                         <button type="button"
                                                 class="expando-button icon ti-chevron-down"
                                                 data-icon-open-class="icon ti-chevron-down"
@@ -136,8 +136,8 @@
                                                 aria-expanded="false">
                                             {% translate "Open children report object details" %}
                                         </button>
-                                    {% endif %}
-                                </td>
+                                    </td>
+                                {% endif %}
                             </tr>
                             {% if report.children_reports %}
                                 <tr class="expando-row">

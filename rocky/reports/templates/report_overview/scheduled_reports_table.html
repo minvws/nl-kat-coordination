@@ -15,7 +15,7 @@
                     <th scope="col">{% translate "Report types" %}</th>
                     <th scope="col">{% translate "Scheduled for" %}</th>
                     <th scope="col">{% translate "Recurrence" %}</th>
-                    <th scope="col"></th>
+                    <th scope="col" class="actions"></th>
                 </tr>
             </thead>
             <tbody>
@@ -59,11 +59,11 @@
                                         <caption class="visually-hidden">{% translate "Scheduled Reports:" %}</caption>
                                         <thead>
                                             <tr>
-                                                <th scope="col">{% translate "Name" %}</th>
+                                                <th scope="col" class="nowrap">{% translate "Name" %}</th>
                                                 <th scope="col">{% translate "Report type" %}</th>
-                                                <th scope="col">{% translate "Input Object" %}</th>
-                                                <th scope="col">{% translate "Reference date" %}</th>
-                                                <th scope="col">{% translate "Creation date" %}</th>
+                                                <th scope="col">{% translate "Input object" %}</th>
+                                                <th scope="col" class="nowrap">{% translate "Reference date" %}</th>
+                                                <th scope="col" class="nowrap">{% translate "Creation date" %}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -77,7 +77,13 @@
                                                         <span class="label tags-color-{{ report.report_type|get_report_type_label_style }}">{{ report.report_type|get_report_type_name }}</span>
                                                     </td>
                                                     <td>
-                                                        {% for ooi in report.input_oois %}<span>{{ ooi|human_readable }}</span>{% endfor %}
+                                                        {% if report.input_oois|length == 1 %}
+                                                            {% with ooi=report.input_oois.0 %}
+                                                                <a href="{% ooi_url 'ooi_detail' ooi organization.code query=ooi.mandatory_fields %}">{{ ooi|human_readable }}</a>
+                                                            {% endwith %}
+                                                        {% else %}
+                                                            {{ report.input_oois|length }}
+                                                        {% endif %}
                                                     </td>
                                                     <td class="nowrap">{{ report.observed_at|date }}</td>
                                                     <td class="nowrap">{{ report.date_generated }}</td>
