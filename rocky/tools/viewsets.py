@@ -17,6 +17,11 @@ logger = get_logger(__name__)
 class OrganizationViewSet(viewsets.ModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
+    # When we created this viewset we didn't have pagination enabled in the
+    # django-rest-framework settings. Enabling it afterwards would cause the API
+    # to change in an incompatible way, we should enable this when we introduce
+    # a new API version.
+    pagination_class = None
 
     # Unfortunately django-rest-framework doesn't have support for create only
     # fields so we have to change the serializer class depending on the request
@@ -62,7 +67,9 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     def recalculate_bits(self, request, pk=None):
         organization = self.get_object()
         logger.info("Recalculating bits", event_code=920000, organization_code=organization.code)
-        connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization.code)
+        connector = OctopoesAPIConnector(
+            settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+        )
         number_of_bits = connector.recalculate_bits()
 
         return Response({"number_of_bits": number_of_bits})
