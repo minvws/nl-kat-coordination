@@ -28,18 +28,8 @@
                         {% endblocktranslate %}
                     </p>
                     <div class="column-2">
-                        <div>
-                            {% include "partials/form/fieldset.html" with fields=report_schedule_form_start_date %}
+                        {% include "partials/form/fieldset.html" with fields=report_schedule_form_start_date %}
 
-                        </div>
-                        <div>
-                            {% include "partials/form/fieldset.html" with fields=report_schedule_form_start_time %}
-
-                        </div>
-                        <div>
-                            {% include "partials/form/fieldset.html" with fields=report_schedule_form_recurrence %}
-
-                        </div>
                     </div>
                 {% endif %}
             </form>
