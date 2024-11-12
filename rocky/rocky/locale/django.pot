@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-12 10:36+0000\n"
+"POT-Creation-Date: 2024-11-12 10:48+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4353,6 +4353,10 @@ msgstr ""
 msgid "Save report"
 msgstr ""
 
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+msgid "You do not have the required permissions to enable plugins."
+msgstr ""
+
 #: reports/views/base.py
 msgid "Select at least one OOI to proceed."
 msgstr ""
@@ -4391,10 +4395,6 @@ msgstr ""
 
 #: reports/views/base.py
 msgid "Week %W, %Y"
-msgstr ""
-
-#: reports/views/generate_report.py
-msgid "You do not have the required permissions to enable plugins."
 msgstr ""
 
 #: reports/views/mixins.py
