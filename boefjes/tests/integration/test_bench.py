@@ -7,6 +7,7 @@ from tools.upgrade_v1_16_0 import upgrade
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import BASE_DIR
+from boefjes.models import Organisation
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
@@ -24,6 +25,9 @@ def test_migration(
 ):
     octopoes_api_connector.session._timeout.connect = 60
     octopoes_api_connector.session._timeout.read = 60
+
+    # Create an organisation that does not exist in Octopoes
+    organisation_storage.create(Organisation(id="test2", name="Test 2"))
 
     iterations = 30
     cache_path = Path(BASE_DIR.parent / ".ci" / f".cache_{iterations}.json")
