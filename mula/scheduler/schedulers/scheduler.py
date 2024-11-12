@@ -302,56 +302,6 @@ class Scheduler(abc.ABC):
 
         return item
 
-    def pop_item_from_queue(self, filters: storage.filters.FilterRequest | None = None) -> models.Task | None:
-        """Pop an item from the queue.
-
-        Args:
-            filters: Optional filters to apply when popping an item.
-
-        Returns:
-            An item from the queue
-
-        Raises:
-            NotAllowedError: When the scheduler is disabled.
-            QueueEmptyError: When the queue is empty.
-        """
-        if not self.is_enabled():
-            self.logger.warning(
-                "Scheduler is disabled, not popping item from queue",
-                queue_id=self.queue.pq_id,
-                queue_qsize=self.queue.qsize(),
-                scheduler_id=self.scheduler_id,
-            )
-            raise queues.errors.NotAllowedError("Scheduler is disabled")
-
-        try:
-            item = self.queue.pop(filters)
-        except queues.QueueEmptyError as exc:
-            raise exc
-
-        if item is not None:
-            self.logger.debug(
-                "Popped item %s from queue %s with priority %s",
-                item.id,
-                self.queue.pq_id,
-                item.priority,
-                item_id=item.id,
-                queue_id=self.queue.pq_id,
-                scheduler_id=self.scheduler_id,
-            )
-
-            self.post_pop(item)
-
-        return item
-
-    def post_pop(self, item: models.Task) -> None:
-        """After an item is popped from the queue, we execute this function
-
-        Args:
-            item: An item from the queue
-        """
-        self.last_activity = datetime.now(timezone.utc)
-
     def set_cron(self, task: models.Task) -> str | None:
         """Set the cron schedule for the task."""
         return None

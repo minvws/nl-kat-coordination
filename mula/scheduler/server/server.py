@@ -19,7 +19,7 @@ class Server:
         api: A fastapi.FastAPI object used for exposing API endpoints.
     """
 
-    def __init__(self, ctx: context.AppContext) -> None:
+    def __init__(self, ctx: context.AppContext, s: dict[str, schedulers.Scheduler]) -> None:
         """Initializer of the Server class.
 
         Args:
@@ -29,6 +29,7 @@ class Server:
 
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
+        self.schedulers: dict[str, schedulers.Scheduler] = s
         self.api: fastapi.FastAPI = fastapi.FastAPI(title="Scheduler", description="Scheduler API")
 
         # Set up exception handlers
@@ -43,7 +44,7 @@ class Server:
         self.api.add_exception_handler(fastapi.HTTPException, errors.http_error_handler)
 
         # Set up API endpoints
-        handlers.SchedulerAPI(self.api, self.ctx)
+        handlers.SchedulerAPI(self.api, self.ctx, s)
         handlers.ScheduleAPI(self.api, self.ctx)
         handlers.TaskAPI(self.api, self.ctx)
         handlers.MetricsAPI(self.api, self.ctx)

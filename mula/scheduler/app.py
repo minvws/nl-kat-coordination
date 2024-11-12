@@ -4,7 +4,7 @@ import threading
 import structlog
 from opentelemetry import trace
 
-from scheduler import context, server
+from scheduler import context, schedulers, server
 from scheduler.schedulers import create_schedulers_for_organisation, new_scheduler
 from scheduler.utils import thread
 
@@ -37,12 +37,22 @@ class App:
                 Application context of shared data (e.g. configuration,
                 external services connections).
         """
-        threading.excepthook = self._unhandled_exception
 
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
-        self.stop_event: threading.Event = threading.Event()
         self.server: server.Server | None = None
+
+        threading.excepthook = self._unhandled_exception
+        self.stop_event: threading.Event = threading.Event()
+        self.lock: threading.Lock = threading.Lock()
+
+        self.schedulers: dict[
+            str,
+            schedulers.Scheduler
+            | schedulers.BoefjeScheduler
+            | schedulers.NormalizerScheduler
+            | schedulers.ReportScheduler,
+        ] = {}
 
     def run(self) -> None:
         """Start the main scheduler application, and run in threads the
@@ -107,7 +117,7 @@ class App:
         ).start()
 
     def start_server(self) -> None:
-        self.server = server.Server(self.ctx)
+        self.server = server.Server(self.ctx, self.schedulers)
         thread.ThreadRunner(name="App-server", target=self.server.run, stop_event=self.stop_event, loop=False).start()
 
     def shutdown(self) -> None:
@@ -176,26 +186,29 @@ class App:
         self.logger.debug("Organisations to remove: %s", len(removals), removals=sorted(removals))
 
         for org_id in removals:
-            scheduler = self.ctx.datastores.scheduler_store.get_schedulers(organisation=org_id)
-            if not scheduler:
+            organisation_schedulers = self.ctx.datastores.scheduler_store.get_schedulers(organisation=org_id)
+            if not organisation_schedulers:
                 self.logger.error("Failed to get scheduler", org_id=org_id)
                 continue
 
-            scheduler.stop()
-
-            # TODO: remove scheduler from database
+            for scheduler in organisation_schedulers:
+                with self.lock:
+                    self.schedulers[scheduler.id].stop()
+                    self.ctx.datastores.scheduler_store.delete_scheduler(scheduler.id)
 
         additions = katalogus_orgs.difference(scheduler_orgs)
         self.logger.debug("Organisations to add: %s", len(additions), additions=sorted(additions))
 
         for org_id in additions:
-            schedulers = create_schedulers_for_organisation(self.ctx, org_id)
+            created_schedulers = create_schedulers_for_organisation(self.ctx, org_id)
             if not schedulers:
                 self.logger.error("Failed to create schedulers", org_id=org_id)
                 continue
 
-            for scheduler in schedulers:
-                scheduler.run()
+            for scheduler in created_schedulers:
+                with self.lock:
+                    self.schedulers[scheduler.scheduler_id] = scheduler
+                    scheduler.run()
 
         if additions:
             # TODO: optimize this

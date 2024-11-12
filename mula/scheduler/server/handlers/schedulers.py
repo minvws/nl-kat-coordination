@@ -11,10 +11,11 @@ from scheduler.server.errors import BadRequestError, NotFoundError
 
 
 class SchedulerAPI:
-    def __init__(self, api: fastapi.FastAPI, ctx: context.AppContext):
+    def __init__(self, api: fastapi.FastAPI, ctx: context.AppContext, s: dict[str, schedulers.Scheduler]):
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.api: fastapi.FastAPI = api
         self.ctx: context.AppContext = ctx
+        self.schedulers: dict[str, schedulers.Scheduler] = s
 
         self.api.add_api_route(
             path="/schedulers",
@@ -103,7 +104,7 @@ class SchedulerAPI:
         self,
         request: fastapi.Request,
         offset: int = 0,
-        limit: int = 100,
+        limit: int = 1,
         filters: storage.filters.FilterRequest | None = None,
     ) -> Any:
         results, count = self.ctx.datastores.pq_store.pop(offset=offset, limit=limit, filters=filters)
@@ -115,7 +116,6 @@ class SchedulerAPI:
 
         return utils.paginate(request, results, count, offset, limit)
 
-    # FIXME
     def push(self, queue_id: str, item_in: serializers.Task) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
