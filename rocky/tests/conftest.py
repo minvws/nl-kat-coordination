@@ -2305,3 +2305,38 @@ def report_list():
         ],
     )
     return report_list
+
+
+@pytest.fixture
+def get_report_input_data_from_bytes():
+    input_data = {
+        "input_data": {
+            "input_oois": ["Hostname|internet|minvws.nl"],
+            "report_types": [
+                "ipv6-report",
+                "mail-report",
+                "name-server-report",
+                "open-ports-report",
+                "rpki-report",
+                "safe-connections-report",
+                "systems-report",
+                "vulnerability-report",
+                "web-system-report",
+            ],
+            "plugins": {
+                "required": [
+                    "rpki",
+                    "webpage-analysis",
+                    "ssl-certificates",
+                    "security_txt_downloader",
+                    "testssl-sh-ciphers",
+                    "dns-records",
+                    "dns-sec",
+                    "ssl-version",
+                    "nmap",
+                ],
+                "optional": ["masscan", "shodan", "nmap-ip-range", "nmap-udp", "nmap-ports"],
+            },
+        }
+    }
+    return json.dumps(input_data).encode("utf-8")

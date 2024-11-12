@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from pytest_django.asserts import assertContains
 from reports.views.report_overview import ReportHistoryView
 
@@ -21,7 +23,9 @@ def test_report_overview_show_reports(rf, client_member, mock_organization_view_
     assertContains(response, "Showing 3 of 3 reports")
 
 
-def test_report_overview_rename_reports(rf, client_member, mock_organization_view_octopoes, report_list):
+def test_report_overview_rename_reports(
+    rf, client_member, mock_organization_view_octopoes, mock_bytes_client, report_list
+):
     """
     Renames a report
     """
@@ -102,16 +106,21 @@ def test_report_overview_delete_reports(rf, client_member, mock_organization_vie
     assert list(request._messages)[0].message == "Deletion successful."
 
 
-def test_report_overview_rerun_reports(rf, client_member, mock_organization_view_octopoes, report_list):
+def test_report_overview_rerun_reports(
+    rf, client_member, mock_organization_view_octopoes, mock_bytes_client, get_report_input_data_from_bytes, report_list
+):
     """
     Rerun a report
     """
 
     mock_organization_view_octopoes().list_reports.return_value = report_list
-    concatenated_report, subreports = report_list.items[
-        2
-    ]  # rerun a concat report to also check if subreports are created.
+
+    concatenated_report, subreports = report_list.items[2]  # a concat report
+
     mock_organization_view_octopoes().get.return_value = concatenated_report
+    mock_bytes_client().get_raw.return_value = get_report_input_data_from_bytes
+    mock_bytes_client().upload_raw.return_value = str(uuid4())
+    mock_organization_view_octopoes().query.return_value = subreports
 
     request = setup_request(
         rf.post("report_history", {"action": "rerun", "report_reference": concatenated_report.primary_key}),

@@ -128,7 +128,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
         self.octopoes_api_connector.delete_many(report_references, datetime.now(timezone.utc))
         messages.success(self.request, _("Deletion successful."))
 
-    def rerun_reports(self, report_references: list[Reference]) -> None:
+    def rerun_reports(self, report_references: list[str]) -> None:
         for report_id in report_references:
             actual_report_ooi = self.get_report_ooi(report_id)
 
@@ -154,9 +154,11 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
 
     def get_input_data(self, report_ooi: Report) -> dict[str, Any]:
         self.bytes_client.login()
+
         report_data = TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
             self.bytes_client.get_raw(raw_id=report_ooi.data_raw_id)
         )
+
         return {
             "input_data": {
                 "input_oois": report_data["input_data"]["input_oois"],
@@ -231,6 +233,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     def rerun_concatenated_report(self, report_ooi: Report) -> None:
         observed_at = datetime.now(timezone.utc)
         report_input_data = self.get_input_data(report_ooi)
+
         bytes_id = self.bytes_client.upload_raw(
             raw=ReportDataDict(report_input_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
         )
