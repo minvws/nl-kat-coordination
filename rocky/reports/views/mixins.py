@@ -65,6 +65,7 @@ def save_report_data(
     report_data,
     report_names,
     parent_report_name,
+    report_recipe: Reference | None = None,
 ) -> Report | None:
     if len(report_data) == 0:
         return None
@@ -90,13 +91,14 @@ def save_report_data(
             report_id=uuid4(),
             organization_code=organization.code,
             organization_name=organization.name,
-            organization_tags=list(organization.tags.all()),
+            organization_tags=[tag.name for tag in organization.tags.all()],
             data_raw_id=raw_id,
             date_generated=datetime.now(timezone.utc),
             input_oois=input_data["input_data"]["input_oois"],
             observed_at=observed_at,
             parent_report=None,
             has_parent=False,
+            report_recipe=report_recipe,
         )
 
         create_ooi(octopoes_api_connector, bytes_client, parent_report_ooi, observed_at)
@@ -145,7 +147,7 @@ def save_report_data(
                     report_id=uuid4(),
                     organization_code=organization.code,
                     organization_name=organization.name,
-                    organization_tags=list(organization.tags.all()),
+                    organization_tags=[tag.name for tag in organization.tags.all()],
                     data_raw_id=raw_id,
                     date_generated=datetime.now(timezone.utc),
                     input_oois=[ooi],
@@ -178,13 +180,14 @@ def save_report_data(
             report_id=uuid4(),
             organization_code=organization.code,
             organization_name=organization.name,
-            organization_tags=list(organization.tags.all()),
+            organization_tags=[tag.name for tag in organization.tags.all()],
             data_raw_id=raw_id,
             date_generated=datetime.now(timezone.utc),
             input_oois=[ooi],
             observed_at=observed_at,
             parent_report=None,
             has_parent=False,
+            report_recipe=report_recipe,
         )
 
         create_ooi(octopoes_api_connector, bytes_client, parent_report_ooi, observed_at)
@@ -202,6 +205,7 @@ def save_aggregate_report_data(
     report_data,
     post_processed_data,
     aggregate_report,
+    report_recipe: Reference | None = None,
 ) -> Report:
     observed_at = get_observed_at
 
@@ -224,13 +228,14 @@ def save_aggregate_report_data(
         report_id=uuid4(),
         organization_code=organization.code,
         organization_name=organization.name,
-        organization_tags=list(organization.tags.all()),
+        organization_tags=[tag.name for tag in organization.tags.all()],
         data_raw_id=report_data_raw_id,
         date_generated=datetime.now(timezone.utc),
         input_oois=ooi_pks,
         observed_at=observed_at,
         parent_report=None,
         has_parent=False,
+        report_recipe=report_recipe,
     )
     create_ooi(octopoes_api_connector, bytes_client, report_ooi, observed_at)
 
