@@ -15,7 +15,7 @@ from sqlalchemy.orm import sessionmaker
 
 from boefjes.app import SchedulerWorkerManager
 from boefjes.clients.bytes_client import BytesAPIClient
-from boefjes.clients.scheduler_client import Queue, SchedulerClientInterface, Task, TaskStatus
+from boefjes.clients.scheduler_client import SchedulerClientInterface, Task, TaskStatus
 from boefjes.config import Settings, settings
 from boefjes.dependencies.plugins import PluginService, get_plugin_service
 from boefjes.job_handler import bytes_api_client
@@ -44,7 +44,7 @@ from tests.loading import get_dummy_data
 class MockSchedulerClient(SchedulerClientInterface):
     def __init__(
         self,
-        queue_response: bytes,
+        tasks_responses: bytes,
         boefje_responses: list[bytes],
         normalizer_responses: list[bytes],
         log_path: Path,
@@ -52,7 +52,7 @@ class MockSchedulerClient(SchedulerClientInterface):
         iterations_to_wait_for_exception: int = 0,
         sleep_time: float = 0.1,
     ):
-        self.queue_response = queue_response
+        self.tasks_responses = tasks_responses
         self.boefje_responses = boefje_responses
         self.normalizer_responses = normalizer_responses
 
@@ -66,10 +66,6 @@ class MockSchedulerClient(SchedulerClientInterface):
         self._tasks: dict[str, Task] = multiprocessing.Manager().dict()
         self._popped_items: dict[str, Task] = multiprocessing.Manager().dict()
         self._pushed_items: dict[str, Task] = multiprocessing.Manager().dict()
-
-    def get_queues(self) -> list[Queue]:
-        time.sleep(self.sleep_time)
-        return TypeAdapter(list[Queue]).validate_json(self.queue_response)
 
     def pop_item(self, queue: str) -> Task | None:
         time.sleep(self.sleep_time)
@@ -104,6 +100,10 @@ class MockSchedulerClient(SchedulerClientInterface):
     def get_task(self, task_id: UUID) -> Task:
         return self._task_from_id(task_id) if str(task_id) not in self._tasks else self._tasks[str(task_id)]
 
+    def get_tasks(self, limit: int) -> list[Task]:
+        time.sleep(self.sleep_time)
+        return TypeAdapter(list[Task]).validate_json(self.tasks_responses)
+
     def _task_from_id(self, task_id: UUID):
         return self._popped_items[str(task_id)]
 
@@ -137,7 +137,7 @@ def item_handler(tmp_path: Path):
 @pytest.fixture
 def manager(item_handler: MockHandler, tmp_path: Path) -> SchedulerWorkerManager:
     scheduler_client = MockSchedulerClient(
-        queue_response=get_dummy_data("scheduler/queues_response.json"),
+        tasks_responses=get_dummy_data("scheduler/tasks_response.json"),
         boefje_responses=[
             get_dummy_data("scheduler/pop_response_boefje.json"),
             get_dummy_data("scheduler/pop_response_boefje_2.json"),

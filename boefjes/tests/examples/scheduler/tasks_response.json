@@ -1,0 +1,29 @@
+{
+  "count": 2,
+  "next": null,
+  "previous": null,
+  "restults": [
+    {
+      "id": "3f0e5f91-b44d-488a-8222-dbb5083803c3",
+      "scheduler_id": "boefje-_dev",
+      "schedule_id": null,
+      "priority": 1731418541,
+      "status": "queued",
+      "type": "normalizer",
+      "hash": "950e75fd89e8c3e495a966ffc1926e95",
+      "data": {},
+      "created_at": "2024-11-12T13:35:42.742371Z",
+      "modified_at": "2024-11-12T13:35:42.742372Z"
+    },
+    {
+      "id": "f57a829e-ae55-4519-982a-655b7c9461f5",
+      "scheduler_id": "normalizer-_dev",
+      "schedule_id": null,
+      "priority": 1731418541,
+      "status": "queued",
+      "type": "normalizer",
+      "hash": "dd4e12d0cc1a1a5fda9d10bd1b8896cc",
+      "data": {}
+    }
+  ]
+}

@@ -56,7 +56,7 @@ def test_two_processes(manager: SchedulerWorkerManager, item_handler: MockHandle
 
 def test_two_processes_exception(manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path) -> None:
     manager.scheduler_client = MockSchedulerClient(
-        get_dummy_data("scheduler/queues_response.json"),
+        get_dummy_data("scheduler/tasks_response.json"),
         [get_dummy_data("scheduler/should_crash.json")],
         [get_dummy_data("scheduler/pop_response_normalizer.json")],
         tmp_path / "patch_task_log",
@@ -72,7 +72,7 @@ def test_two_processes_exception(manager: SchedulerWorkerManager, item_handler: 
 
 def test_two_processes_handler_exception(manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path) -> None:
     manager.scheduler_client = MockSchedulerClient(
-        get_dummy_data("scheduler/queues_response.json"),
+        get_dummy_data("scheduler/tasks_response.json"),
         [get_dummy_data("scheduler/pop_response_boefje.json")] + 2 * [get_dummy_data("scheduler/should_crash.json")],
         [get_dummy_data("scheduler/pop_response_normalizer.json")],
         tmp_path / "patch_task_log",
@@ -126,7 +126,7 @@ def test_two_processes_cleanup_unfinished_tasks(
     """
 
     manager.scheduler_client = MockSchedulerClient(
-        get_dummy_data("scheduler/queues_response.json"),
+        get_dummy_data("scheduler/tasks_response.json"),
         3 * [get_dummy_data("scheduler/pop_response_boefje.json")],
         [],
         tmp_path / "patch_task_log",
@@ -170,7 +170,7 @@ def test_normalizer_queue(manager: SchedulerWorkerManager, item_handler: MockHan
 
 def test_null(manager: SchedulerWorkerManager, tmp_path: Path, item_handler: MockHandler):
     manager.scheduler_client = MockSchedulerClient(
-        get_dummy_data("scheduler/queues_response.json"),
+        get_dummy_data("scheduler/tasks_response.json"),
         3 * [get_dummy_data("scheduler/pop_response_boefje.json")],
         [get_dummy_data("scheduler/pop_response_normalizer.json")],
         tmp_path / "patch_task_log",

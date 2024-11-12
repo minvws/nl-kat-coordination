@@ -40,9 +40,6 @@ class Task(BaseModel):
 
 
 class SchedulerClientInterface:
-    def get_queues(self) -> list[Queue]:
-        raise NotImplementedError()
-
     def pop_item(self, queue_id: str) -> Task | None:
         raise NotImplementedError()
 
@@ -50,6 +47,9 @@ class SchedulerClientInterface:
         raise NotImplementedError()
 
     def get_task(self, task_id: uuid.UUID) -> Task:
+        raise NotImplementedError()
+
+    def get_tasks(self, limit: int) -> list[Task]:
         raise NotImplementedError()
 
     def push_item(self, p_item: Task) -> None:
@@ -65,12 +65,6 @@ class SchedulerAPIClient(SchedulerClientInterface):
     @staticmethod
     def _verify_response(response: Response) -> None:
         response.raise_for_status()
-
-    def get_queues(self) -> list[Queue]:
-        response = self._session.get("/queues")
-        self._verify_response(response)
-
-        return TypeAdapter(list[Queue]).validate_json(response.content)
 
     def pop_item(self, queue_id: str) -> Task | None:
         response = self._session.post(f"/queues/{queue_id}/pop")
@@ -91,3 +85,9 @@ class SchedulerAPIClient(SchedulerClientInterface):
         self._verify_response(response)
 
         return Task.model_validate_json(response.content)
+
+    def get_tasks(self, limit: int) -> list[Task]:
+        response = self._session.get("/tasks", params={"limit": limit})
+        self._verify_response(response)
+
+        return TypeAdapter(list[Task]).model_validate_json(response.content)
