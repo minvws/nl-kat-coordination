@@ -75,7 +75,7 @@ class Scheduler(abc.ABC):
 
     @abc.abstractmethod
     def run(self) -> None:
-        self.save()
+        pass
 
     def run_in_thread(
         self, name: str, target: Callable[[], Any], interval: float = 0.01, daemon: bool = False, loop: bool = True
@@ -484,6 +484,7 @@ class Scheduler(abc.ABC):
         with self.lock:
             self._last_activity = value
 
+    # TODO: update
     def dict(self) -> dict[str, Any]:
         """Get a dict representation of the scheduler."""
         return {
@@ -500,27 +501,3 @@ class Scheduler(abc.ABC):
             },
             "last_activity": self.last_activity,
         }
-
-    def to_model(self) -> models.Scheduler:
-        """Convert the scheduler to a model."""
-        return models.Scheduler(
-            id=self.scheduler_id,
-            enabled=self.enabled,
-            size=self.queue.maxsize,
-            maxsize=self.queue.maxsize,
-            organisation=self.ctx.config.organisation,
-            type=self.ITEM_TYPE.type,  # FIXME
-            item_type=self.ITEM_TYPE.type,
-            allow_replace=self.queue.allow_replace,
-            allow_updates=self.queue.allow_updates,
-            allow_priority_updates=self.queue.allow_priority_updates,
-            last_activity=self.last_activity,
-        )
-
-    def save(self) -> None:
-        # When we don't have a scheduler in the database create it
-        if self.ctx.datastores.scheduler_store.get_scheduler(self.scheduler_id) is None:
-            self.ctx.datastores.scheduler_store.create_scheduler(self.to_model())
-            return
-
-        self.ctx.datastores.scheduler_store.update_scheduler(self.to_model())

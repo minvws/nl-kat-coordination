@@ -19,8 +19,8 @@ class SchedulerStore:
     def get_schedulers(
         self,
         scheduler_id: str | None = None,
+        scheduler_type: str | None = None,
         organisation: str | None = None,
-        item_type: str | None = None,
         min_created_at: datetime | None = None,
         max_created_at: datetime | None = None,
         min_modified_at: datetime | None = None,
@@ -37,8 +37,8 @@ class SchedulerStore:
             if organisation is not None:
                 query = query.filter(models.SchedulerDB.organisation == organisation)
 
-            if item_type is not None:
-                query = query.filter(models.SchedulerDB.item_type == item_type)
+            if scheduler_type is not None:
+                query = query.filter(models.SchedulerDB.type == scheduler_type)
 
             if min_created_at is not None:
                 query = query.filter(models.SchedulerDB.created_at >= min_created_at)
@@ -79,9 +79,7 @@ class SchedulerStore:
             scheduler_orm = models.SchedulerDB(**scheduler.model_dump())
             session.add(scheduler_orm)
 
-            self.dbconn.logger.info(scheduler_orm.__dict__)
-            created_scheduler = models.Scheduler.model_validate(scheduler_orm)
-            return created_scheduler
+            return models.Scheduler.model_validate(scheduler_orm)
 
     @retry()
     @exception_handler

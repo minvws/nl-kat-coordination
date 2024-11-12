@@ -2,7 +2,7 @@
 
 Revision ID: 0009
 Revises: 0008
-Create Date: 2024-11-07 11:21:16.528354
+Create Date: 2024-11-12 09:06:29.122136
 
 """
 
@@ -21,13 +21,13 @@ def upgrade():
     op.create_table(
         "schedulers",
         sa.Column("id", sa.String(), nullable=False),
-        sa.Column("enabled", sa.Boolean(), nullable=True),
+        sa.Column("enabled", sa.Boolean(), nullable=False),
         sa.Column("maxsize", sa.Integer(), nullable=False),
         sa.Column("organisation", sa.String(), nullable=False),
         sa.Column("type", sa.Enum("BOEFJE", "NORMALIZER", "REPORT", name="schedulertype"), nullable=False),
-        sa.Column("allow_replace", sa.Boolean(), nullable=True),
-        sa.Column("allow_updates", sa.Boolean(), nullable=True),
-        sa.Column("allow_priority_updates", sa.Boolean(), nullable=True),
+        sa.Column("allow_replace", sa.Boolean(), nullable=False),
+        sa.Column("allow_updates", sa.Boolean(), nullable=False),
+        sa.Column("allow_priority_updates", sa.Boolean(), nullable=False),
         sa.Column("last_activity", sa.DateTime(), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("modified_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),

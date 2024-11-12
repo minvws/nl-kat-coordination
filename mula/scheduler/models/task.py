@@ -72,7 +72,6 @@ class TaskDB(Base):
     status = Column(Enum(TaskStatus), nullable=False, default=TaskStatus.PENDING)
 
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
-
     modified_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
 
 

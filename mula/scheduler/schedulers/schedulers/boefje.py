@@ -205,7 +205,7 @@ class BoefjeScheduler(Scheduler):
         if new_boefjes is None or not new_boefjes:
             self.logger.debug(
                 "No new boefjes for organisation: %s",
-                self.organisation.name,
+                self.organisation_id,
                 organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
             )

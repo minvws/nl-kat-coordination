@@ -153,11 +153,12 @@ class App:
             return
 
         for s in schedulers_db:
-            self.ctx.metrics_qsize.labels(scheduler_id=s.id).set(s.queue.qsize())
+            qsize = self.ctx.datastores.pq_store.qsize(s.id)
+            self.ctx.metrics_qsize.labels(scheduler_id=s.id).set(qsize)
 
-            status_counts = self.ctx.datastores.task_store.get_status_counts(s.scheduler_id)
+            status_counts = self.ctx.datastores.task_store.get_status_counts(s.id)
             for status, count in status_counts.items():
-                self.ctx.metrics_task_status_counts.labels(scheduler_id=s.scheduler_id, status=status).set(count)
+                self.ctx.metrics_task_status_counts.labels(scheduler_id=s.id, status=status).set(count)
 
     # TODO: exception handling
     def _monitor_organisations(self) -> None:

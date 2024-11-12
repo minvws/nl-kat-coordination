@@ -47,6 +47,8 @@ class SchedulerAPI:
         self,
         request: fastapi.Request,
         scheduler_id: str | None = None,
+        scheduler_type: str | None = None,
+        organisation: str | None = None,
         offset: int = 0,
         limit: int = 10,
         min_created_at: datetime.datetime | None = None,
@@ -57,6 +59,8 @@ class SchedulerAPI:
 
         results, count = self.ctx.datastores.scheduler_store.get_schedulers(
             scheduler_id=scheduler_id,
+            scheduler_type=scheduler_type,
+            organisation=organisation,
             offset=offset,
             limit=limit,
             min_created_at=min_created_at,
@@ -65,54 +69,53 @@ class SchedulerAPI:
 
         return utils.paginate(request, results, count, offset, limit)
 
+    def create(self, item: serializers.Scheduler) -> Any:
+        pass
+
     def get(self, scheduler_id: str) -> Any:
-        s = self.schedulers.get(scheduler_id)
-        if s is None:
+        scheduler = self.ctx.datastores.scheduler_store.get_scheduler(scheduler_id)
+        if scheduler is None:
             raise NotFoundError(f"Scheduler {scheduler_id} not found")
 
-        return models.Scheduler(**s.dict())
+        return scheduler
 
     def patch(self, scheduler_id: str, item: models.Scheduler) -> Any:
-        s = self.schedulers.get(scheduler_id)
-        if s is None:
+        scheduler_db = self.ctx.datastores.scheduler_store.get_scheduler(scheduler_id)
+        if scheduler_db is None:
             raise NotFoundError(f"Scheduler {scheduler_id} not found")
 
-        stored_scheduler_model = models.Scheduler(**s.dict())
-        patch_data = item.model_dump(exclude_unset=True)
+        patch_data = scheduler_db.model_dump(exclude_unset=True)
         if len(patch_data) == 0:
             raise BadRequestError("no data to patch")
 
-        updated_scheduler = stored_scheduler_model.model_copy(update=patch_data)
+        updated_scheduler = scheduler_db.model_copy(update=patch_data)
 
-        # We update the patched attributes, since the schedulers are kept
-        # in memory.
-        for attr, value in patch_data.items():
-            setattr(s, attr, value)
+        # TODO: what to do with the running scheduler?
 
-        # Enable or disable the scheduler if needed.
-        if updated_scheduler.enabled:
-            s.enable()
-        elif not updated_scheduler.enabled:
-            s.disable()
+        # TODO: enable or disable the scheduler if needed.
+
+        # Update the scheduler in database
+        self.ctx.datastores.scheduler_store.update_scheduler(updated_scheduler)
 
         return updated_scheduler
 
+    def pop(
+        self,
+        request: fastapi.Request,
+        offset: int = 0,
+        limit: int = 100,
+        filters: storage.filters.FilterRequest | None = None,
+    ) -> Any:
+        results, count = self.ctx.datastores.pq_store.pop(offset=offset, limit=limit, filters=filters)
+
+        # TODO: see if we can batch this
+        # Update status for popped items
+        for item in results:
+            self.ctx.datastores.pq_store.update_item(item)
+
+        return utils.paginate(request, results, count, offset, limit)
+
     # FIXME
-    def pop(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
-        s = self.schedulers.get(queue_id)
-        if s is None:
-            raise NotFoundError(f"queue not found, by queue_id: {queue_id}")
-
-        try:
-            item = s.pop_item_from_queue(filters)
-        except queues.QueueEmptyError:
-            return None
-
-        if item is None:
-            raise NotFoundError("could not pop item from queue, check your filters")
-
-        return models.Task(**item.model_dump())
-
     def push(self, queue_id: str, item_in: serializers.Task) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:

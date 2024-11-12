@@ -38,6 +38,13 @@ class ReportScheduler(Scheduler):
         self.run_in_thread(
             name=f"scheduler-{self.scheduler_id}-reschedule", target=self.push_tasks_for_rescheduling, interval=60.0
         )
+        self.logger.info(
+            "Report started for %s",
+            self.organisation_id,
+            organisation_id=self.organisation_id,
+            scheduler_id=self.scheduler_id,
+            item_type=self.queue.item_type.__name__,
+        )
 
     @tracer.start_as_current_span(name="report_push_tasks_for_rescheduling")
     def push_tasks_for_rescheduling(self):
