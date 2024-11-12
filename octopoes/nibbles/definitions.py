@@ -1,5 +1,6 @@
 import importlib
 import pkgutil
+from collections.abc import Iterable
 from logging import getLogger
 from pathlib import Path
 from types import MethodType, ModuleType
@@ -27,7 +28,7 @@ class NibbleParameterDefinition(BaseModel):
             return False
 
     def __hash__(self):
-        return hash(str(self.ooi_type) + self.relation_path if self.relation_path else "\0")
+        return hash(str(self.ooi_type) + self.relation_path if self.relation_path else "\a")
 
 
 class NibbleDefinition:
@@ -52,7 +53,7 @@ class NibbleDefinition:
         self.default_enabled = default_enabled
         self.config_ooi_relation_path = config_ooi_relation_path
 
-    def __call__(self, args):
+    def __call__(self, args: Iterable[OOI]) -> OOI | Iterable[OOI | None] | None:
         if self.payload is None:
             raise NotImplementedError
         else:

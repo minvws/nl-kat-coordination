@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from datetime import datetime
 from itertools import chain, product
 from typing import TypeVar
@@ -14,12 +14,22 @@ T = TypeVar("T")
 U = TypeVar("U")
 
 
-def otype(ooi: OOI) -> type[OOI]:
+def object_type(ooi: OOI) -> type[OOI]:
     return type_by_name(ooi.get_ooi_type())
 
 
-def mergewith(func: Callable[[set[T], set[T]], set[T]], d1: dict[U, set[T]], d2: dict[U, set[T]]) -> dict[U, set[T]]:
+def merge_with(func: Callable[[set[T], set[T]], set[T]], d1: dict[U, set[T]], d2: dict[U, set[T]]) -> dict[U, set[T]]:
     return {k: func(d1.get(k, set()), d2.get(k, set())) for k in set(d1) | set(d2)}
+
+
+def flatten(items: Iterable[OOI | Iterable[OOI | None] | None]) -> Iterable[OOI]:
+    for item in items:
+        if isinstance(item, OOI):
+            yield item
+        elif item is None:
+            continue
+        else:
+            yield from flatten(item)
 
 
 class NibblesRunner:
@@ -39,21 +49,25 @@ class NibblesRunner:
         cached_types = set(self.objects_by_type_cache)
         target_types = set(filter(lambda x: x not in cached_types, types))
         objects = self.ooi_repository.list_oois_by_object_types(target_types, valid_time)
-        objects_by_type = {t: {x for x in objects if isinstance(otype(x), t)} for t in set(map(otype, objects))}
-        self.objects_by_type_cache = mergewith(set.union, self.objects_by_type_cache, objects_by_type)
+        objects_by_type = {
+            t: {x for x in objects if isinstance(object_type(x), t)} for t in set(map(object_type, objects))
+        }
+        self.objects_by_type_cache = merge_with(set.union, self.objects_by_type_cache, objects_by_type)
 
     def _run(self, ooi: OOI, valid_time: datetime) -> dict[str, set[OOI]]:
         retval: dict[str, set[OOI]] = {}
         target_nibbles = list(filter(lambda x: type(ooi) in x.signature, self.nibbles))
         self._retrieve(
-            set(map(lambda x: x.ooi_type, chain.from_iterable(map(lambda x: x.signature, target_nibbles)))), valid_time
+            set(
+                map(lambda sgn: sgn.ooi_type, chain.from_iterable(map(lambda nibble: nibble.signature, target_nibbles)))
+            ),
+            valid_time,
         )
         for nibble in target_nibbles:
             # TODO: filter OOI not abiding the parameters from radix
-            radix = [self.objects_by_type_cache[sgn.ooi_type] for sgn in nibble.signature]
-            results = set(
-                filter(lambda ooi: ooi is not None, chain(map(nibble, filter(lambda x: ooi in x, product(*radix)))))
-            )
+            radix = (self.objects_by_type_cache[sgn.ooi_type] for sgn in nibble.signature)
+            data = (nibble(arg) for arg in product(*radix) if ooi in arg)
+            results = {obj for obj in flatten(data)}
             if results:
                 retval |= {nibble.id: results}
         return retval
@@ -70,10 +84,12 @@ class NibblesRunner:
         retval: dict[OOI, dict[str, set[OOI]]] = {}
         blockset = set(stack)
         self.objects_by_type_cache = {}
-        if self._cleared(stack[-1], valid_time):
+        if stack and self._cleared(stack[-1], valid_time):
             while stack:
                 ooi = stack.pop()
-                self.objects_by_type_cache = mergewith(set.union, self.objects_by_type_cache, {otype(ooi): {ooi}})
+                self.objects_by_type_cache = merge_with(
+                    set.union, self.objects_by_type_cache, {object_type(ooi): {ooi}}
+                )
                 results = self._run(ooi, valid_time)
                 if results:
                     blocks = set(chain.from_iterable(results.values()))
