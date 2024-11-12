@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-07 11:24+0000\n"
+"POT-Creation-Date: 2024-11-12 15:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2401,19 +2401,19 @@ msgid "Different date"
 msgstr ""
 
 #: reports/forms.py
-msgid "Start date"
-msgstr ""
-
-#: reports/forms.py
-msgid "Start time (UTC)"
-msgstr ""
-
-#: reports/forms.py
 msgid "No, just once"
 msgstr ""
 
 #: reports/forms.py
 msgid "Yes, repeat"
+msgstr ""
+
+#: reports/forms.py
+msgid "Start date"
+msgstr ""
+
+#: reports/forms.py
+msgid "Start time (UTC)"
 msgstr ""
 
 #: reports/forms.py
