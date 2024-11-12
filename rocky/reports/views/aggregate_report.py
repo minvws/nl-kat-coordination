@@ -5,9 +5,9 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView
 from httpx import HTTPError
 from katalogus.client import get_katalogus
-from django.views.generic import TemplateView
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.views.base import (
@@ -112,6 +112,13 @@ class ExportSetupAggregateReportView(
 
     def post(self, request, *args, **kwargs):
         selected_plugins = request.POST.getlist("plugin", [])
+
+        if not selected_plugins:
+            return super().post(request, *args, **kwargs)
+
+        if not self.organization_member.has_perms("tools.can_enable_disable_boefje"):
+            messages.error(request, _("You do not have the required permissions to enable plugins."))
+            super().post(request, *args, **kwargs)
 
         client = get_katalogus(self.organization.code)
         for selected_plugin in selected_plugins:
