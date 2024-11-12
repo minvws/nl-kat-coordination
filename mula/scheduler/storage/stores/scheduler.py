@@ -5,6 +5,7 @@ from sqlalchemy import exc
 from scheduler import models
 from scheduler.storage import DBConn
 from scheduler.storage.errors import StorageError, exception_handler
+from scheduler.storage.filters import FilterRequest, apply_filter
 from scheduler.storage.utils import retry
 
 
@@ -27,6 +28,7 @@ class SchedulerStore:
         max_modified_at: datetime | None = None,
         offset: int = 0,
         limit: int = 100,
+        filters: FilterRequest | None = None,
     ) -> tuple[list[models.Scheduler], int]:
         with self.dbconn.session.begin() as session:
             query = session.query(models.SchedulerDB)
@@ -51,6 +53,9 @@ class SchedulerStore:
 
             if max_modified_at is not None:
                 query = query.filter(models.SchedulerDB.modified_at <= max_modified_at)
+
+            if filters is not None:
+                query = apply_filter(models.SchedulerDB, query, filters)
 
             try:
                 count = query.count()

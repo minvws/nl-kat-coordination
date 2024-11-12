@@ -54,6 +54,7 @@ class SchedulerAPI:
         limit: int = 10,
         min_created_at: datetime.datetime | None = None,
         max_created_at: datetime.datetime | None = None,
+        filters: storage.filters.FilterRequest | None = None,
     ) -> Any:
         if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
             raise BadRequestError("min_created_at must be less than max_created_at")
@@ -66,12 +67,10 @@ class SchedulerAPI:
             limit=limit,
             min_created_at=min_created_at,
             max_created_at=max_created_at,
+            filters=filters,
         )
 
         return utils.paginate(request, results, count, offset, limit)
-
-    def create(self, item: serializers.Scheduler) -> Any:
-        pass
 
     def get(self, scheduler_id: str) -> Any:
         scheduler = self.ctx.datastores.scheduler_store.get_scheduler(scheduler_id)
@@ -91,14 +90,39 @@ class SchedulerAPI:
 
         updated_scheduler = scheduler_db.model_copy(update=patch_data)
 
-        # TODO: what to do with the running scheduler?
-
-        # TODO: enable or disable the scheduler if needed.
-
         # Update the scheduler in database
         self.ctx.datastores.scheduler_store.update_scheduler(updated_scheduler)
 
+        # Update the running scheduler in memory
+        scheduler_mem = self.schedulers.get(scheduler_id)
+        if scheduler_mem is None:
+            raise NotFoundError(f"Scheduler {scheduler_id} not found")
+
+        for attr, value in patch_data.items():
+            setattr(scheduler_mem, attr, value)
+
+        # Enable or disable the scheduler if needed.
+        if scheduler_mem.enabled:
+            scheduler_mem.enable()
+        elif not scheduler_mem.enabled:
+            scheduler_mem.disable()
+
         return updated_scheduler
+
+    def delete(self, scheduler_id: str) -> Any:
+        scheduler_db = self.ctx.datastores.scheduler_store.get_scheduler(scheduler_id)
+        if scheduler_db is None:
+            raise NotFoundError(f"Scheduler {scheduler_id} not found")
+
+        # Delete the scheduler in database
+        self.ctx.datastores.scheduler_store.delete_scheduler(scheduler_id)
+
+        # Delete the running scheduler in memory
+        scheduler_mem = self.schedulers.get(scheduler_id)
+        if scheduler_mem is not None:
+            scheduler_mem.stop()
+
+        return None
 
     def pop(
         self,
@@ -116,13 +140,13 @@ class SchedulerAPI:
 
         return utils.paginate(request, results, count, offset, limit)
 
-    def push(self, queue_id: str, item_in: serializers.Task) -> Any:
+    def push(self, queue_id: str, item: serializers.Task) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise NotFoundError(f"queue not found, by queue_id: {queue_id}")
 
         # Load default values
-        new_item = models.Task(**item_in.model_dump(exclude_unset=True))
+        new_item = models.Task(**item.model_dump(exclude_unset=True))
 
         # Set values
         if new_item.scheduler_id is None:
