@@ -2405,6 +2405,10 @@ msgid "Start date"
 msgstr ""
 
 #: reports/forms.py
+msgid "Start time (UTC)"
+msgstr ""
+
+#: reports/forms.py
 msgid "No, just once"
 msgstr ""
 
