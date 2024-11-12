@@ -181,7 +181,7 @@ class KATalogusClient:
 
     def organization_exists(self, organization_code: str) -> bool:
         try:
-            self.session.get(f"/v1/organisations/{organization_code}")
+            self.session.get(f"/v1/organisations/{quote(organization_code)}")
         except KATalogusNotAllowedError:
             return False
 
@@ -193,37 +193,38 @@ class KATalogusClient:
         logger.info("Created organization", name=organization.name)
 
     def delete_organization(self, organization_code: str):
-        self.session.delete(f"/v1/organisations/{organization_code}")
+        self.session.delete(f"/v1/organisations/{quote(organization_code)}")
 
         logger.info("Deleted organization", organization_code=organization_code)
 
     def get_plugins(self, organization_code: str, **params) -> list[Plugin]:
-        response = self.session.get(f"/v1/organisations/{organization_code}/plugins", params=params)
+        response = self.session.get(f"/v1/organisations/{quote(organization_code)}/plugins", params=params)
 
         return [parse_plugin(plugin) for plugin in response.json()]
 
     def get_plugin(self, organization_code: str, plugin_id: str) -> Plugin:
-        response = self.session.get(f"/v1/organisations/{organization_code}/plugins/{quote(plugin_id)}")
+        response = self.session.get(f"/v1/organisations/{quote(organization_code)}/plugins/{quote(plugin_id)}")
 
         return parse_plugin(response.json())
 
     def get_plugin_settings(self, organization_code: str, plugin_id: str) -> dict:
-        response = self.session.get(f"/v1/organisations/{organization_code}/{quote(plugin_id)}/settings")
+        response = self.session.get(f"/v1/organisations/{quote(organization_code)}/{quote(plugin_id)}/settings")
 
         return response.json()
 
     def upsert_plugin_settings(self, organization_code: str, plugin_id: str, values: dict) -> None:
-        self.session.put(f"/v1/organisations/{organization_code}/{quote(plugin_id)}/settings", json=values)
+        self.session.put(f"/v1/organisations/{quote(organization_code)}/{quote(plugin_id)}/settings", json=values)
 
         logger.info("Upsert plugin settings", plugin_id=plugin_id)
 
     def delete_plugin_settings(self, organization_code: str, plugin_id: str) -> None:
-        self.session.delete(f"/v1/organisations/{organization_code}/{quote(plugin_id)}/settings")
+        self.session.delete(f"/v1/organisations/{quote(organization_code)}/{quote(plugin_id)}/settings")
 
         logger.info("Delete plugin settings", plugin_id=plugin_id)
 
     def clone_all_configuration_to_organization(self, from_organization: str, to_organization: str):
         to_organization = quote(to_organization)
+        from_organization = quote(from_organization)
         response = self.session.post(f"/v1/organisations/{from_organization}/settings/clone/{to_organization}")
 
         return response
@@ -248,14 +249,16 @@ class KATalogusClient:
 
     def get_cover(self, organization_code: str, plugin_id: str) -> BytesIO:
         # TODO: does not need to be organization-specific
-        response = self.session.get(f"/v1/organisations/{organization_code}/plugins/{quote(plugin_id)}/cover.jpg")
+        response = self.session.get(
+            f"/v1/organisations/{quote(organization_code)}/plugins/{quote(plugin_id)}/cover.jpg"
+        )
 
         return BytesIO(response.content)
 
     def create_plugin(self, organization_code: str, plugin: Plugin) -> None:
         try:
             response = self.session.post(
-                f"/v1/organisations/{organization_code}/plugins",
+                f"/v1/organisations/{quote(organization_code)}/plugins",
                 headers={"Content-Type": "application/json"},
                 content=plugin.model_dump_json(exclude_none=True),
             )
@@ -270,7 +273,7 @@ class KATalogusClient:
     def edit_plugin(self, organization_code: str, plugin: Plugin) -> None:
         try:
             response = self.session.patch(
-                f"/v1/organisations/{organization_code}/boefjes/{plugin.id}",
+                f"/v1/organisations/{quote(organization_code)}/boefjes/{plugin.id}",
                 content=plugin.model_dump_json(exclude_none=True),
             )
             if response.status_code == codes.CREATED:
@@ -285,7 +288,9 @@ class KATalogusClient:
         logger.info("Toggle plugin state", plugin_id=plugin_id, enabled=enabled)
         plugin_id = quote(plugin_id)
 
-        self.session.patch(f"/v1/organisations/{organization_code}/plugins/{plugin_id}", json={"enabled": enabled})
+        self.session.patch(
+            f"/v1/organisations/{quote(organization_code)}/plugins/{plugin_id}", json={"enabled": enabled}
+        )
 
 
 class KATalogus:
