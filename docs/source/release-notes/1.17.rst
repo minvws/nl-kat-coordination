@@ -135,6 +135,35 @@ Upgrading
 All bits all need to be rerun because of model changes. This can be done on the
 organization settings page.
 
+Running the Origin Migration
+================================
+Upon upgrading, one migration needs to be triggered manually.
+This is the `boefjes/tools/upgrade_v1_16_0.py` script, which you can run in your ``boefje`` environment using:
+
+.. code-block:: sh
+
+    python -m tools.upgrade_v1_16_0
+
+Or more concretely, using Docker:
+
+.. code-block:: sh
+
+    docker compose exec boefje python -m tools.upgrade_v1_16_0
+
+And using the Debian packages, either as the `kat` user or root depending on your configuration:
+
+.. code-block:: sh
+
+    source /opt/venvs/kat-boefjes/bin/activate
+    export $(cat /usr/lib/kat/boefjes.defaults | grep -v "#") && export $(cat /etc/kat/boefjes.conf | grep -v "#")
+    cd /opt/venvs/kat-boefjes/lib/python3.11/site-packages
+    /opt/venvs/kat-boefjes/bin/python -m tools.upgrade_v1_16_0
+
+Please check the logs for any errors in the migration.
+The script can be run multiple times in case unexpected errors appear, although some warnings are to be expected.
+After running the script (ideally once), the next run should log that `total_processed=0` and `total_failed=0`.
+
+
 Full Changelog
 ==============
 
