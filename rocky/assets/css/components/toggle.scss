@@ -1,70 +1,64 @@
-button,
-a,
-input[type="button"],
-input[type="submit"],
-input[type="reset"] {
-  $breakpoint: 24rem !default;
+/* Toggle */
 
-  &.toggle-button {
-    /* Alignment */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    align-self: flex-start;
-    gap: 0;
-    margin: 0;
+.toggle-switch {
+  display: flex;
+  flex-direction: row;
+  padding: var(--spacing-grid-050);
+  box-sizing: border-box;
+  width: auto;
+  border-radius: var(--border-radius-s);
+  margin-top: 0;
+  line-height: 1.5rem;
+  border: 1px solid var(--colors-purrple-300);
+  gap: var(--spacing-grid-100);
+  max-width: 100%;
+  overflow: auto;
+
+  li {
+    padding: var(--spacing-grid-050) var(--spacing-grid-100);
+    border-radius: var(--border-radius-s);
+    background-color: transparent;
+    cursor: pointer;
+    list-style: none;
     box-sizing: border-box;
+    position: relative;
+    white-space: nowrap;
 
-    /* Styling */
-    border-radius: var(--border-radius-l);
-    padding: var(--spacing-grid-150);
-    width: 2.75rem;
-    height: 2.75rem;
-    border: 1px solid var(--colors-purrple-300);
-
-    /* Text and icon styling */
-    background-color: var(--colors-white);
-    color: var(--colors-purrple-500);
-    text-decoration: none;
-    font-size: 0;
-
-    &::before {
-      color: var(--colors-purrple-500);
-      padding: 0;
+    a {
+      color: var(--colors-grey-900);
+      text-decoration: none;
     }
 
-    /* Behaviour */
-    cursor: pointer;
-    overflow-wrap: break-word;
-
-    /* States */
-    &[aria-current="page"] {
+    &[aria-current="true"] {
       background-color: var(--colors-purrple-200);
-      border-color: var(--colors-purrple-200);
 
-      &::before {
-        color: var(--colors-purrple-700);
+      a {
+        font-weight: bold;
+      }
+
+      &:hover {
+        background-color: var(--colors-purrple-300);
       }
     }
 
-    &:hover,
-    &:active {
-      border-color: var(--colors-purrple-500);
+    &:hover {
+      background-color: var(--colors-purrple-50);
     }
 
-    &:focus {
-      outline: 2px solid var(--colors-purrple-500);
-      outline-offset: 0.125rem;
-      z-index: 2;
-      position: relative;
+    &::after {
+      content: "";
+      border-right: 1px solid var(--colors-purrple-300);
+      margin-left: var(--spacing-grid-100);
+      display: block;
+      position: absolute;
+      height: 60%;
+      top: 20%;
+      right: calc((1px + var(--spacing-grid-050)) * -1);
+      width: 1px;
     }
-  }
-}
 
-a {
-  &.toggle-button {
-    &:visited {
-      color: var(--colors-purrple-500);
+    &:last-child::after {
+      content: none;
     }
   }
 }
