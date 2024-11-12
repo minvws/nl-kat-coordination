@@ -8,18 +8,23 @@
 <div class="horizontal-view toolbar">
     <div class="dropdown">
         {% comment %} <p class="visually-hidden" id="language-selector-description">{% translate "Select your language" %}</p> {% endcomment %}
-        <button aria-label="{{ aria_label_current_language }}"
+        <button id="action-dropdown-button"
                 type="button"
-                aria-haspopup="listbox"
-                aria-current="true"
+                aria-label="{{ aria_label_current_language }}"
+                aria-haspopup="menu"
+                aria-controls="action-dropdown"
+                aria-expanded="false"
                 class="dropdown-button ghost">
             {% translate "Actions" %}
             <span class="icon ti-chevron-down"></span>
         </button>
-        <div class="dropdown-list">
-            <ul role="listbox">
+        <div id="action-dropdown"
+             class="dropdown-list"
+             role="menu"
+             aria-labelledby="action-dropdown-button">
+            <ul role="presentation">
                 <li>
-                    <a href="#rerun-modal" role="option" data-value="test">
+                    <a href="#rerun-modal" role="menuitem" data-value="test">
                         <i class="icon ti-refresh"></i>{% translate "Rerun" %}
                     </a>
                 </li>
@@ -39,14 +44,14 @@
                   </a>
                 </li> {% endcomment %}
                 <li>
-                    <a href="#rename-modal" role="option" data-value="test">
+                    <a href="#rename-modal" role="menuitem" data-value="test">
                         <i class="icon ti-edit"></i>{% translate "Rename" %}
                     </a>
                 </li>
                 <li>
                     <a href="#delete-modal"
                        class="plain destructive"
-                       role="option"
+                       role="menuitem"
                        data-value="test">
                         <i class="icon ti-trash"></i>{% translate "Delete" %}
                     </a>
