@@ -5425,8 +5425,12 @@ msgid "findings"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "Findings table"
+msgid "Findings table "
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/oois/ooi_list.html
+msgid "column headers with buttons are sortable"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -5918,10 +5922,6 @@ msgid "Objects "
 msgstr ""
 
 #: rocky/templates/oois/ooi_list.html
-msgid "column headers with buttons are sortable"
-msgstr ""
-
-#: rocky/templates/oois/ooi_list.html
 msgid "Delete object(s)"
 msgstr ""
 
@@ -6033,6 +6033,10 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid "Top 10 most severe Findings"
+msgstr ""
+
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "Findings table"
 msgstr ""
 
 #: rocky/templates/organizations/organization_crisis_room.html
