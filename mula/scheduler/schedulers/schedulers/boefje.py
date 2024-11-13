@@ -24,20 +24,16 @@ class BoefjeScheduler(Scheduler):
 
     ITEM_TYPE: Any = models.BoefjeTask
 
-    def __init__(
-        self, ctx: context.AppContext, scheduler_id: str, organisation_id: str, queue: PriorityQueue | None = None
-    ):
+    def __init__(self, ctx: context.AppContext, scheduler_id: str, queue: PriorityQueue | None = None):
         """Initializes the BoefjeScheduler.
 
         Args:
             ctx: The application context.
             scheduler_id: The id of the scheduler.
-            organisation: The organisation that this scheduler is for.
             queue: The queue to use for this scheduler.
             callback: The callback function to call when a task is completed.
         """
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
-        self.organisation_id: str = organisation_id
 
         self.queue = queue or PriorityQueue(
             pq_id=scheduler_id,
@@ -68,13 +64,11 @@ class BoefjeScheduler(Scheduler):
         - Rescheduling; when a task has passed its deadline, we need to
         reschedule it.
         """
-        super().run()
-
         # Scan profile mutations
         self.listeners["scan_profile_mutations"] = clients.ScanProfileMutation(
             dsn=str(self.ctx.config.host_raw_data),
-            queue=f"{self.organisation_id}__scan_profile_mutations",
-            func=self.push_tasks_for_scan_profile_mutations,
+            queue="scan_profile_mutations",
+            func=self.push_tasks_for_mutations,
             prefetch_count=self.ctx.config.rabbitmq_prefetch_count,
         )
 
@@ -97,15 +91,11 @@ class BoefjeScheduler(Scheduler):
         )
 
         self.logger.info(
-            "Boefje scheduler started for %s",
-            self.organisation_id,
-            organisation_id=self.organisation_id,
-            scheduler_id=self.scheduler_id,
-            item_type=self.queue.item_type.__name__,
+            "Boefje scheduler started", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
         )
 
     @tracer.start_as_current_span("boefje_push_tasks_for_scan_profile_mutations")
-    def push_tasks_for_scan_profile_mutations(self, body: bytes) -> None:
+    def push_tasks_for_mutations(self, body: bytes) -> None:
         """Create tasks for oois that have a scan level change.
 
         Args:
@@ -119,16 +109,13 @@ class BoefjeScheduler(Scheduler):
             mutation.operation,
             mutation.primary_key,
             ooi_primary_key=mutation.primary_key,
-            organisation_id=self.organisation_id,
             scheduler_id=self.scheduler_id,
         )
 
         # There should be an OOI in value
         ooi = mutation.value
         if ooi is None:
-            self.logger.debug(
-                "Mutation value is None, skipping", organisation_id=self.organisation_id, scheduler_id=self.scheduler_id
-            )
+            self.logger.debug("Mutation value is None, skipping", scheduler_id=self.scheduler_id)
             return
 
         if mutation.operation == models.MutationOperationType.DELETE:
@@ -154,14 +141,9 @@ class BoefjeScheduler(Scheduler):
             return
 
         # What available boefjes do we have for this ooi?
-        boefjes = self.get_boefjes_for_ooi(ooi)
+        boefjes = self.get_boefjes_for_ooi(ooi, mutation.organisation)
         if not boefjes:
-            self.logger.debug(
-                "No boefjes available for %s",
-                ooi.primary_key,
-                organisation_id=self.organisation_id,
-                scheduler_id=self.scheduler_id,
-            )
+            self.logger.debug("No boefjes available for %s", ooi.primary_key, scheduler_id=self.scheduler_id)
             return
 
         with futures.ThreadPoolExecutor(
@@ -173,98 +155,117 @@ class BoefjeScheduler(Scheduler):
                         "Boefje not allowed to run on ooi",
                         boefje_id=boefje.id,
                         ooi_primary_key=ooi.primary_key,
-                        organisation_id=self.organisation_id,
                         scheduler_id=self.scheduler_id,
                     )
                     continue
 
                 boefje_task = models.BoefjeTask(
-                    boefje=models.Boefje.model_validate(boefje.model_dump()),
-                    input_ooi=ooi.primary_key if ooi else None,
-                    organization=self.organisation_id,
+                    boefje=models.Boefje.model_validate(boefje.model_dump()), input_ooi=ooi.primary_key if ooi else None
                 )
 
-                executor.submit(self.push_boefje_task, boefje_task, self.push_tasks_for_scan_profile_mutations.__name__)
+                task = models.Task(
+                    id=boefje_task.id,
+                    scheduler_id=self.scheduler_id,
+                    organisation=mutation.organisation,
+                    type=self.ITEM_TYPE.type,
+                    hash=boefje_task.hash,
+                    data=boefje_task.model_dump(),
+                )
+
+                executor.submit(self.push_task, task, self.push_tasks_for_mutations.__name__)
 
     @tracer.start_as_current_span("boefje_push_tasks_for_new_boefjes")
     def push_tasks_for_new_boefjes(self) -> None:
         """When new boefjes are added or enabled we find the ooi's that
         boefjes can run on, and create tasks for it."""
-        new_boefjes = None
-        try:
-            new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(self.organisation_id)
-        except ExternalServiceError:
-            self.logger.error(
-                "Failed to get new boefjes for organisation: %s from katalogus",
-                self.organisation.name,
-                organisation_id=self.organisation_id,
-                scheduler_id=self.scheduler_id,
-            )
-            return
 
-        if new_boefjes is None or not new_boefjes:
-            self.logger.debug(
-                "No new boefjes for organisation: %s",
-                self.organisation_id,
-                organisation_id=self.organisation_id,
-                scheduler_id=self.scheduler_id,
-            )
-            return
-
-        self.logger.debug(
-            "Received new boefjes",
-            boefjes=[boefje.name for boefje in new_boefjes],
-            organisation_id=self.organisation_id,
-            scheduler_id=self.scheduler_id,
-        )
-
-        for boefje in new_boefjes:
-            if not boefje.consumes:
-                self.logger.debug(
-                    "No consumes found for boefje: %s",
-                    boefje.name,
-                    boefje_id=boefje.id,
-                    organisation_id=self.organisation_id,
-                    scheduler_id=self.scheduler_id,
-                )
-                continue
-
-            oois_by_object_type: list[models.OOI] = []
+        # FIXME: can we optimize this more?
+        orgs = self.ctx.services.katalogus.get_organisations()
+        for organisation in orgs:
+            new_boefjes = None
             try:
-                oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
-                    self.organisation_id, boefje.consumes, list(range(boefje.scan_level, 5))
-                )
-            except ExternalServiceError as exc:
+                new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(organisation.id)
+            except ExternalServiceError:
                 self.logger.error(
-                    "Could not get oois for organisation: %s from octopoes",
-                    self.organisation.name,
-                    organisation_id=self.organisation_id,
+                    "Failed to get new boefjes for organisation: %s from katalogus",
+                    organisation.name,
+                    organisation_id=organisation.id,
                     scheduler_id=self.scheduler_id,
-                    exc_info=exc,
                 )
                 continue
 
-            with futures.ThreadPoolExecutor(
-                thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-new_boefjes"
-            ) as executor:
-                for ooi in oois_by_object_type:
-                    if not self.has_boefje_permission_to_run(boefje, ooi):
-                        self.logger.debug(
-                            "Boefje not allowed to run on ooi",
-                            boefje_id=boefje.id,
-                            ooi_primary_key=ooi.primary_key,
-                            organisation_id=self.organisation_id,
-                            scheduler_id=self.scheduler_id,
-                        )
-                        continue
+            if new_boefjes is None or not new_boefjes:
+                self.logger.debug(
+                    "No new boefjes for organisation: %s",
+                    organisation.id,
+                    organisation_id=organisation.id,
+                    scheduler_id=self.scheduler_id,
+                )
+                continue
 
-                    boefje_task = models.BoefjeTask(
-                        boefje=models.Boefje.model_validate(boefje.dict()),
-                        input_ooi=ooi.primary_key,
-                        organization=self.organisation_id,
+            self.logger.debug(
+                "Received new boefjes",
+                boefjes=[boefje.name for boefje in new_boefjes],
+                organisation_id=organisation.id,
+                scheduler_id=self.scheduler_id,
+            )
+
+            for boefje in new_boefjes:
+                if not boefje.consumes:
+                    self.logger.debug(
+                        "No consumes found for boefje: %s",
+                        boefje.name,
+                        boefje_id=boefje.id,
+                        organisation_id=organisation.id,
+                        scheduler_id=self.scheduler_id,
                     )
+                    continue
 
-                    executor.submit(self.push_boefje_task, boefje_task, self.push_tasks_for_new_boefjes.__name__)
+                oois_by_object_type: list[models.OOI] = []
+                try:
+                    oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
+                        organisation.id, boefje.consumes, list(range(boefje.scan_level, 5))
+                    )
+                except ExternalServiceError as exc:
+                    self.logger.error(
+                        "Could not get oois for organisation: %s from octopoes",
+                        organisation.name,
+                        organisation_id=organisation.id,
+                        scheduler_id=self.scheduler_id,
+                        exc_info=exc,
+                    )
+                    continue
+
+                with futures.ThreadPoolExecutor(
+                    thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-new_boefjes"
+                ) as executor:
+                    for ooi in oois_by_object_type:
+                        if not self.has_boefje_permission_to_run(boefje, ooi):
+                            self.logger.debug(
+                                "Boefje not allowed to run on ooi",
+                                boefje_id=boefje.id,
+                                ooi_primary_key=ooi.primary_key,
+                                organisation_id=organisation.id,
+                                scheduler_id=self.scheduler_id,
+                            )
+                            continue
+
+                        boefje_task = models.BoefjeTask(
+                            boefje=models.Boefje.model_validate(boefje.dict()),
+                            input_ooi=ooi.primary_key,
+                            organization=organisation.id,
+                        )
+
+                        task = models.Task(
+                            id=boefje_task.id,
+                            scheduler_id=self.scheduler_id,
+                            organisation=organisation,
+                            type=self.ITEM_TYPE.type,
+                            hash=boefje_task.hash,
+                            data=boefje_task.model_dump(),
+                        )
+
+                        executor.submit(self.push_task, task, self.push_tasks_for_new_boefjes.__name__)
 
     @tracer.start_as_current_span("boefje_push_tasks_for_rescheduling")
     def push_tasks_for_rescheduling(self):
@@ -272,7 +273,6 @@ class BoefjeScheduler(Scheduler):
             self.logger.warning(
                 "Boefjes queue is full, not populating with new tasks",
                 queue_qsize=self.queue.qsize(),
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
             )
             return
@@ -292,17 +292,13 @@ class BoefjeScheduler(Scheduler):
                 "Could not get schedules for rescheduling %s",
                 self.scheduler_id,
                 scheduler_id=self.scheduler_id,
-                organisation_id=self.organisation_id,
                 exc_info=exc_db,
             )
             raise exc_db
 
         if not schedules:
             self.logger.debug(
-                "No schedules tasks found for scheduler: %s",
-                self.scheduler_id,
-                scheduler_id=self.scheduler_id,
-                organisation_id=self.organisation_id,
+                "No schedules tasks found for scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id
             )
             return
 
@@ -315,14 +311,13 @@ class BoefjeScheduler(Scheduler):
                 # Plugin still exists?
                 try:
                     plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
-                        boefje_task.boefje.id, self.organisation_id
+                        boefje_task.boefje.id, schedule.organisation
                     )
                     if not plugin:
                         self.logger.info(
                             "Boefje does not exist anymore, skipping and disabling schedule",
                             boefje_id=boefje_task.boefje.id,
                             schedule_id=schedule.id,
-                            organisation_id=self.organisation_id,
                             scheduler_id=self.scheduler_id,
                         )
                         schedule.enabled = False
@@ -334,7 +329,6 @@ class BoefjeScheduler(Scheduler):
                         boefje_task.boefje.id,
                         boefje_id=boefje_task.boefje.id,
                         schedule_id=schedule.id,
-                        organisation_id=self.organisation_id,
                         scheduler_id=self.scheduler_id,
                         exc_info=exc_plugin,
                     )
@@ -346,7 +340,6 @@ class BoefjeScheduler(Scheduler):
                         "Boefje is disabled, skipping",
                         boefje_id=boefje_task.boefje.id,
                         schedule_id=schedule.id,
-                        organisation_id=self.organisation_id,
                         scheduler_id=self.scheduler_id,
                     )
                     schedule.enabled = False
@@ -361,7 +354,7 @@ class BoefjeScheduler(Scheduler):
                         "Plugin is not a boefje, skipping",
                         plugin_id=plugin.id,
                         schedule_id=schedule.id,
-                        organisation_id=self.organisation_id,
+                        organisation_id=schedule.organisation,
                         scheduler_id=self.scheduler_id,
                     )
                     continue
@@ -378,7 +371,7 @@ class BoefjeScheduler(Scheduler):
                                 "OOI does not exist anymore, skipping and disabling schedule",
                                 ooi_primary_key=boefje_task.input_ooi,
                                 schedule_id=schedule.id,
-                                organisation_id=self.organisation_id,
+                                organisation_id=schedule.organisation,
                                 scheduler_id=self.scheduler_id,
                             )
                             schedule.enabled = False
@@ -390,7 +383,7 @@ class BoefjeScheduler(Scheduler):
                             boefje_task.input_ooi,
                             ooi_primary_key=boefje_task.input_ooi,
                             schedule_id=schedule.id,
-                            organisation_id=self.organisation_id,
+                            organisation_id=schedule.organisation,
                             scheduler_id=self.scheduler_id,
                             exc_info=exc_ooi,
                         )
@@ -402,7 +395,7 @@ class BoefjeScheduler(Scheduler):
                             "Boefje does not consume ooi anymore, skipping",
                             boefje_id=boefje_task.boefje.id,
                             ooi_primary_key=ooi.primary_key,
-                            organisation_id=self.organisation_id,
+                            organisation_id=schedule.organisation,
                             scheduler_id=self.scheduler_id,
                         )
                         schedule.enabled = False
@@ -419,7 +412,7 @@ class BoefjeScheduler(Scheduler):
                             boefje_id=boefje_task.boefje.id,
                             ooi_primary_key=ooi.primary_key,
                             schedule_id=schedule.id,
-                            organisation_id=self.organisation_id,
+                            organisation_id=schedule.organisation,
                             scheduler_id=self.scheduler_id,
                         )
                         schedule.enabled = False
@@ -429,105 +422,59 @@ class BoefjeScheduler(Scheduler):
                 new_boefje_task = models.BoefjeTask(
                     boefje=models.Boefje.model_validate(plugin.dict()),
                     input_ooi=ooi.primary_key if ooi else None,
-                    organization=self.organisation_id,
+                    organization=schedule.organization,
                 )
 
-                executor.submit(self.push_boefje_task, new_boefje_task, self.push_tasks_for_rescheduling.__name__)
+                task = models.Task(
+                    id=boefje_task.id,
+                    scheduler_id=self.scheduler_id,
+                    organisation=schedule.organisation,
+                    type=self.ITEM_TYPE.type,
+                    hash=boefje_task.hash,
+                    data=boefje_task.model_dump(),
+                )
 
+                executor.submit(self.push_task, task, self.push_tasks_for_rescheduling.__name__)
+
+    # TODO: clean up exceptions -> exception handler
     @tracer.start_as_current_span("boefje_push_task")
-    def push_boefje_task(self, boefje_task: models.BoefjeTask, caller: str = "") -> None:
-        """Given a Boefje and OOI create a BoefjeTask and push it onto
-        the queue.
+    def push_task(self, task: models.Task, caller: str = "") -> None:
+        boefje_task = models.BoefjeTask.model_validate(task.data)
 
-        Args:
-            boefje: Boefje to run.
-            ooi: OOI to run Boefje on.
-            caller: The name of the function that called this function, used for logging.
-
-        """
-        self.logger.debug(
-            "Pushing boefje task",
-            task_hash=boefje_task.hash,
-            boefje_id=boefje_task.boefje.id,
-            ooi_primary_key=boefje_task.input_ooi,
-            organisation_id=self.organisation_id,
-            scheduler_id=self.scheduler_id,
-            caller=caller,
-        )
-
-        try:
-            grace_period_passed = self.has_boefje_task_grace_period_passed(boefje_task)
-            if not grace_period_passed:
-                self.logger.debug(
-                    "Task has not passed grace period: %s",
-                    boefje_task.hash,
-                    task_hash=boefje_task.hash,
-                    organisation_id=self.organisation_id,
-                    scheduler_id=self.scheduler_id,
-                    caller=caller,
-                )
-                return
-        except Exception as exc_grace_period:
-            self.logger.warning(
-                "Could not check if grace period has passed: %s",
+        grace_period_passed = self.has_boefje_task_grace_period_passed(boefje_task)
+        if not grace_period_passed:
+            self.logger.debug(
+                "Task has not passed grace period: %s",
                 boefje_task.hash,
                 task_hash=boefje_task.hash,
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
-                exc_info=exc_grace_period,
             )
             return
 
-        try:
-            is_stalled = self.has_boefje_task_stalled(boefje_task)
-            if is_stalled:
-                self.logger.debug(
-                    "Task is stalled: %s",
-                    boefje_task.hash,
-                    task_hash=boefje_task.hash,
-                    organisation_id=self.organisation_id,
-                    scheduler_id=self.scheduler_id,
-                    caller=caller,
-                )
-
-                # Update task in datastore to be failed
-                task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(boefje_task.hash)
-                task_db.status = TaskStatus.FAILED
-                self.ctx.datastores.task_store.update_task(task_db)
-        except Exception as exc_stalled:
-            self.logger.warning(
-                "Could not check if task is stalled: %s",
-                boefje_task.hash,
-                boefje_task_hash=boefje_task.hash,
-                organisation_id=self.organisation_id,
-                scheduler_id=self.scheduler_id,
-                caller=caller,
-                exc_info=exc_stalled,
-            )
-            return
-
-        try:
-            is_running = self.has_boefje_task_started_running(boefje_task)
-            if is_running:
-                self.logger.debug(
-                    "Task is still running: %s",
-                    boefje_task.hash,
-                    task_hash=boefje_task.hash,
-                    organisation_id=self.organisation_id,
-                    scheduler_id=self.scheduler_id,
-                    caller=caller,
-                )
-                return
-        except Exception as exc_running:
-            self.logger.warning(
-                "Could not check if task is running: %s",
+        is_stalled = self.has_boefje_task_stalled(boefje_task)
+        if is_stalled:
+            self.logger.debug(
+                "Task is stalled: %s",
                 boefje_task.hash,
                 task_hash=boefje_task.hash,
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
-                exc_info=exc_running,
+            )
+
+            # Update task in datastore to be failed
+            task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(boefje_task.hash)
+            task_db.status = models.TaskStatus.FAILED
+            self.ctx.datastores.task_store.update_task(task_db)
+
+        is_running = self.has_boefje_task_started_running(boefje_task)
+        if is_running:
+            self.logger.debug(
+                "Task is still running: %s",
+                boefje_task.hash,
+                task_hash=boefje_task.hash,
+                scheduler_id=self.scheduler_id,
+                caller=caller,
             )
             return
 
@@ -536,7 +483,6 @@ class BoefjeScheduler(Scheduler):
                 "Task is already on queue: %s",
                 boefje_task.hash,
                 task_hash=boefje_task.hash,
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
                 exc_info=True,
@@ -544,31 +490,9 @@ class BoefjeScheduler(Scheduler):
             return
 
         prior_tasks = self.ctx.datastores.task_store.get_tasks_by_hash(boefje_task.hash)
-        score = self.priority_ranker.rank(SimpleNamespace(prior_tasks=prior_tasks, task=boefje_task))
+        task.score = self.priority_ranker.rank(SimpleNamespace(prior_tasks=prior_tasks, task=boefje_task))
 
-        task = Task(
-            id=boefje_task.id,
-            scheduler_id=self.scheduler_id,
-            type=self.ITEM_TYPE.type,
-            priority=score,
-            hash=boefje_task.hash,
-            data=boefje_task.model_dump(),
-        )
-
-        try:
-            self.push_item_to_queue_with_timeout(task, self.max_tries)
-        except QueueFullError:
-            self.logger.warning(
-                "Could not add task to queue, queue was full: %s",
-                boefje_task.hash,
-                task_hash=boefje_task.hash,
-                queue_qsize=self.queue.qsize(),
-                queue_maxsize=self.queue.maxsize,
-                organisation_id=self.organisation_id,
-                scheduler_id=self.scheduler_id,
-                caller=caller,
-            )
-            return
+        self.push_item_to_queue_with_timeout(task, self.max_tries)
 
         self.logger.info(
             "Created boefje task",
@@ -576,7 +500,6 @@ class BoefjeScheduler(Scheduler):
             task_hash=task.hash,
             boefje_id=boefje_task.boefje.id,
             ooi_primary_key=boefje_task.input_ooi,
-            organisation_id=self.organisation_id,
             scheduler_id=self.scheduler_id,
             caller=caller,
         )
@@ -586,6 +509,7 @@ class BoefjeScheduler(Scheduler):
         queue."""
         boefje_task = models.BoefjeTask.model_validate(item.data)
 
+        # TODO: check this
         # Check if id's are unique and correctly set. Same id's are necessary
         # for the task runner.
         if item.id != boefje_task.id or self.ctx.datastores.task_store.get_task(item.id):
@@ -609,22 +533,14 @@ class BoefjeScheduler(Scheduler):
         """
         if boefje.enabled is False:
             self.logger.debug(
-                "Boefje: %s is disabled",
-                boefje.name,
-                boefje_id=boefje.id,
-                organisation_id=self.organisation_id,
-                scheduler_id=self.scheduler_id,
+                "Boefje: %s is disabled", boefje.name, boefje_id=boefje.id, scheduler_id=self.scheduler_id
             )
             return False
 
         boefje_scan_level = boefje.scan_level
         if boefje_scan_level is None:
             self.logger.warning(
-                "No scan level found for boefje: %s",
-                boefje.id,
-                boefje_id=boefje.id,
-                organisation_id=self.organisation_id,
-                scheduler_id=self.scheduler_id,
+                "No scan level found for boefje: %s", boefje.id, boefje_id=boefje.id, scheduler_id=self.scheduler_id
             )
             return False
 
@@ -637,7 +553,6 @@ class BoefjeScheduler(Scheduler):
                 "No scan_profile found for ooi: %s",
                 ooi.primary_key,
                 ooi_primary_key=ooi.primary_key,
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
             )
             return False
@@ -648,7 +563,6 @@ class BoefjeScheduler(Scheduler):
                 "No scan level found for ooi: %s",
                 ooi.primary_key,
                 ooi_primary_key=ooi.primary_key,
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
             )
             return False
@@ -666,7 +580,6 @@ class BoefjeScheduler(Scheduler):
                 ooi_scan_level,
                 boefje_id=boefje.id,
                 ooi_primary_key=ooi.primary_key,
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
             )
             return False
@@ -692,7 +605,6 @@ class BoefjeScheduler(Scheduler):
                 "Could not get latest task by hash: %s",
                 task.hash,
                 task_id=task.id,
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
                 exc_info=exc_db,
             )
@@ -700,10 +612,7 @@ class BoefjeScheduler(Scheduler):
 
         if task_db is not None and task_db.status not in [models.TaskStatus.FAILED, models.TaskStatus.COMPLETED]:
             self.logger.debug(
-                "Task is still running, according to the datastore",
-                task_id=task_db.id,
-                organisation_id=self.organisation_id,
-                scheduler_id=self.scheduler_id,
+                "Task is still running, according to the datastore", task_id=task_db.id, scheduler_id=self.scheduler_id
             )
             return True
 
@@ -717,7 +626,6 @@ class BoefjeScheduler(Scheduler):
                 "Failed to get last run boefje from bytes",
                 boefje_id=task.boefje.id,
                 input_ooi_primary_key=task.input_ooi,
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
                 exc_info=exc,
             )
@@ -742,17 +650,13 @@ class BoefjeScheduler(Scheduler):
                 "please review the bytes logs for more information regarding "
                 "this error.",
                 task_id=task_db.id,
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
             )
             raise RuntimeError("Task has been finished, but no results found in bytes")
 
         if task_bytes is not None and task_bytes.ended_at is None and task_bytes.started_at is not None:
             self.logger.debug(
-                "Task is still running, according to bytes",
-                task_id=task_bytes.id,
-                organisation_id=self.organisation_id,
-                scheduler_id=self.scheduler_id,
+                "Task is still running, according to bytes", task_id=task_bytes.id, scheduler_id=self.scheduler_id
             )
             return True
 
@@ -776,7 +680,6 @@ class BoefjeScheduler(Scheduler):
                 "Could not get latest task by hash: %s",
                 task.hash,
                 task_hash=task.hash,
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
                 exc_info=exc_db,
             )
@@ -810,7 +713,7 @@ class BoefjeScheduler(Scheduler):
             True if the grace period has passed, False otherwise.
         """
         # Does boefje have an interval specified?
-        plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(task.boefje.id, self.organisation_id)
+        plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(task.boefje.id, task.organisation)
         if plugin is not None and plugin.interval is not None and plugin.interval > 0:
             timeout = timedelta(minutes=plugin.interval)
         else:
@@ -823,7 +726,6 @@ class BoefjeScheduler(Scheduler):
                 "Could not get latest task by hash: %s",
                 task.hash,
                 task_hash=task.hash,
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
                 exc_info=exc_db,
             )
@@ -835,7 +737,6 @@ class BoefjeScheduler(Scheduler):
                 "Task has not passed grace period, according to the datastore",
                 task_id=task_db.id,
                 task_hash=task.hash,
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
             )
             return False
@@ -848,7 +749,6 @@ class BoefjeScheduler(Scheduler):
             self.logger.error(
                 "Failed to get last run boefje from bytes",
                 boefje_id=task.boefje.id,
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
                 exc_info=exc_bytes,
             )
@@ -864,14 +764,13 @@ class BoefjeScheduler(Scheduler):
                 "Task has not passed grace period, according to bytes",
                 task_id=task_bytes.id,
                 task_hash=task.hash,
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
             )
             return False
 
         return True
 
-    def get_boefjes_for_ooi(self, ooi) -> list[models.Plugin]:
+    def get_boefjes_for_ooi(self, ooi: models.OOI, organisation: str) -> list[models.Plugin]:
         """Get available all boefjes (enabled and disabled) for an ooi.
 
         Args:
@@ -881,13 +780,12 @@ class BoefjeScheduler(Scheduler):
             A list of Plugin of type Boefje that can be run on the ooi.
         """
         try:
-            boefjes = self.ctx.services.katalogus.get_boefjes_by_type_and_org_id(ooi.object_type, self.organisation_id)
+            boefjes = self.ctx.services.katalogus.get_boefjes_by_type_and_org_id(ooi.object_type, organisation)
         except ExternalServiceError:
             self.logger.error(
                 "Could not get boefjes for object_type: %s",
                 ooi.object_type,
                 object_type=ooi.object_type,
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
             )
             return []
@@ -897,7 +795,6 @@ class BoefjeScheduler(Scheduler):
                 "No boefjes found for type: %s",
                 ooi.object_type,
                 input_ooi_primary_key=ooi.primary_key,
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
             )
             return []
@@ -908,7 +805,6 @@ class BoefjeScheduler(Scheduler):
             ooi,
             input_ooi_primary_key=ooi.primary_key,
             boefjes=[boefje.id for boefje in boefjes],
-            organisation_id=self.organisation_id,
             scheduler_id=self.scheduler_id,
         )
 
@@ -919,7 +815,7 @@ class BoefjeScheduler(Scheduler):
         execution (cron expression) we schedule for its execution"""
         # Does a boefje have a schedule defined?
         plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
-            utils.deep_get(item.data, ["boefje", "id"]), self.organisation_id
+            utils.deep_get(item.data, ["boefje", "id"]), item.organisation
         )
         if plugin is None or plugin.cron is None:
             return super().set_cron(item)
@@ -931,7 +827,7 @@ class BoefjeScheduler(Scheduler):
         for a task and based on the boefje interval."""
         # Does the boefje have an interval defined?
         plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
-            utils.deep_get(task.data, ["boefje", "id"]), self.organisation_id
+            utils.deep_get(task.data, ["boefje", "id"]), task.organisation
         )
         if plugin is not None and plugin.interval is not None and plugin.interval > 0:
             return datetime.now(timezone.utc) + timedelta(minutes=plugin.interval)

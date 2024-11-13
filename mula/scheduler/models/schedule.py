@@ -18,6 +18,7 @@ class Schedule(BaseModel):
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     scheduler_id: str
+    organisation: str
     hash: str | None = Field(None, max_length=32)
     data: dict | None = None
     enabled: bool = True

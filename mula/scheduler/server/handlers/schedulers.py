@@ -140,10 +140,10 @@ class SchedulerAPI:
 
         return utils.paginate(request, results, count, offset, limit)
 
-    def push(self, queue_id: str, item: serializers.Task) -> Any:
-        s = self.schedulers.get(queue_id)
+    def push(self, scheduler_id: str, item: serializers.Task) -> Any:
+        s = self.schedulers.get(scheduler_id)
         if s is None:
-            raise NotFoundError(f"queue not found, by queue_id: {queue_id}")
+            raise NotFoundError(f"Scheduler {scheduler_id} not found")
 
         # Load default values
         new_item = models.Task(**item.model_dump(exclude_unset=True))

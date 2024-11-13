@@ -11,3 +11,4 @@ class RawData(BaseModel):
     mime_types: list[dict[str, str]]
     secure_hash: str | None = None
     hash_retrieval_link: str | None = None
+    organisation: str

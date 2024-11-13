@@ -66,9 +66,6 @@ class App:
         # Start schedulers
         self.start_schedulers()
 
-        # Start monitors
-        self.start_monitors()
-
         # Start metrics collecting
         if self.ctx.config.collect_metrics:
             self.start_collectors()
@@ -106,14 +103,6 @@ class App:
     def start_collectors(self) -> None:
         thread.ThreadRunner(
             name="App-metrics_collector", target=self._collect_metrics, stop_event=self.stop_event, interval=10
-        ).start()
-
-    def start_monitors(self) -> None:
-        thread.ThreadRunner(
-            name="App-monitor_organisations",
-            target=self._monitor_organisations,
-            stop_event=self.stop_event,
-            interval=self.ctx.config.monitor_organisations_interval,
         ).start()
 
     def start_server(self) -> None:
@@ -169,47 +158,3 @@ class App:
             status_counts = self.ctx.datastores.task_store.get_status_counts(s.id)
             for status, count in status_counts.items():
                 self.ctx.metrics_task_status_counts.labels(scheduler_id=s.id, status=status).set(count)
-
-    # TODO: exception handling
-    def _monitor_organisations(self) -> None:
-        """We make a difference between the organisation id's that are used
-        by the schedulers, and the organisation id's that are in the
-        Katalogus service. We will add/remove schedulers based on the
-        difference between these two sets.
-        """
-        current_schedulers, _ = self.ctx.datastores.scheduler_store.get_schedulers()
-
-        scheduler_orgs: set[str] = {s.organisation for s in current_schedulers}
-        katalogus_orgs: set[str] = {org.id for org in self.ctx.services.katalogus.get_organisations()}
-
-        removals = scheduler_orgs.difference(katalogus_orgs)
-        self.logger.debug("Organisations to remove: %s", len(removals), removals=sorted(removals))
-
-        for org_id in removals:
-            organisation_schedulers = self.ctx.datastores.scheduler_store.get_schedulers(organisation=org_id)
-            if not organisation_schedulers:
-                self.logger.error("Failed to get scheduler", org_id=org_id)
-                continue
-
-            for scheduler in organisation_schedulers:
-                with self.lock:
-                    self.schedulers[scheduler.id].stop()
-                    self.ctx.datastores.scheduler_store.delete_scheduler(scheduler.id)
-
-        additions = katalogus_orgs.difference(scheduler_orgs)
-        self.logger.debug("Organisations to add: %s", len(additions), additions=sorted(additions))
-
-        for org_id in additions:
-            created_schedulers = create_schedulers_for_organisation(self.ctx, org_id)
-            if not schedulers:
-                self.logger.error("Failed to create schedulers", org_id=org_id)
-                continue
-
-            for scheduler in created_schedulers:
-                with self.lock:
-                    self.schedulers[scheduler.scheduler_id] = scheduler
-                    scheduler.run()
-
-        if additions:
-            # TODO: optimize this
-            self.ctx.services.katalogus.flush_caches()
