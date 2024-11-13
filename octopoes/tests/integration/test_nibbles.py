@@ -19,12 +19,11 @@ if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
 
 
-NMAX = 13
+MAX_NETWORK_NAME_LENGTH = 13
 
 
 def dummy(network: Network) -> Network | None:
-    global NMAX
-    if len(network.name) < NMAX:
+    if len(network.name) < MAX_NETWORK_NAME_LENGTH:
         new_name = network.name + "I"
         return Network(name=new_name)
 
@@ -48,7 +47,7 @@ def test_dummy_nibble(xtdb_octopoes_service: OctopoesService, event_manager: Moc
     xtdb_octopoes_service.scan_profile_repository.save(sp, new_sp, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
 
-    ctx = 1 + NMAX - len(network.name)
+    ctx = 1 + MAX_NETWORK_NAME_LENGTH - len(network.name)
     assert xtdb_octopoes_service.ooi_repository.list_oois({Network}, valid_time).count == ctx
     assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 3 * ctx
 
