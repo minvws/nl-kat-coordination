@@ -17,7 +17,7 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
-from katalogus.client import Boefje, KATalogusClientV1, KATalogusError, Plugin, get_katalogus
+from katalogus.client import Boefje, KATalogus, KATalogusError, Plugin
 from pydantic import RootModel, TypeAdapter
 from tools.ooi_helpers import create_ooi
 from tools.view_helpers import BreadcrumbsMixin, PostRedirect, url_with_querystring
@@ -122,7 +122,7 @@ class ReportsLandingView(ReportBreadcrumbs, TemplateView):
         return redirect(reverse("report_history", kwargs=self.get_kwargs()))
 
 
-def hydrate_plugins(report_types: list[type["BaseReport"]], katalogus: KATalogusClientV1) -> dict[str, list[Plugin]]:
+def hydrate_plugins(report_types: list[type["BaseReport"]], katalogus: KATalogus) -> dict[str, list[Plugin]]:
     plugins: dict[str, list[Plugin]] = {"required": [], "optional": []}
     merged_plugins = report_plugins_union(report_types)
 
@@ -183,12 +183,17 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
     def get_total_oois(self):
         return len(self.selected_oois)
 
-    def get_ooi_types(self):
+    def get_report_ooi_types(self):
         if self.report_type == AggregateOrganisationReport:
             return get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
         if self.report_type == MultiOrganizationReport:
             return MultiOrganizationReport.input_ooi_types
         return get_ooi_types_with_report()
+
+    def get_ooi_types(self):
+        if self.filtered_ooi_types:
+            return super().get_ooi_types()
+        return self.get_report_ooi_types()
 
     def get_oois(self) -> list[OOI]:
         if self.all_oois_selected():
@@ -205,7 +210,7 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
     def get_ooi_filter_forms(self) -> dict[str, Form]:
         return {
             "ooi_type_form": OOITypeMultiCheckboxForReportForm(
-                sorted([ooi_class.get_ooi_type() for ooi_class in self.ooi_types]), self.request.GET
+                sorted([ooi_class.get_ooi_type() for ooi_class in self.get_report_ooi_types()]), self.request.GET
             )
         }
 
@@ -384,7 +389,7 @@ class ReportPluginView(BaseReportView, TemplateView):
         self.plugins = None
 
         try:
-            self.plugins = hydrate_plugins(self.get_report_types(), get_katalogus(self.organization.code))
+            self.plugins = hydrate_plugins(self.get_report_types(), self.get_katalogus())
         except KATalogusError as error:
             messages.error(self.request, error.message)
 
@@ -688,9 +693,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         plugin_ids_required = plugins_dict["required"]
         plugin_ids_optional = plugins_dict["optional"]
 
-        katalogus_plugins = get_katalogus(self.organization.code).get_plugins(
-            ids=plugin_ids_required + plugin_ids_optional
-        )
+        katalogus_plugins = self.get_katalogus().get_plugins(ids=plugin_ids_required + plugin_ids_optional)
         for plugin in katalogus_plugins:
             if plugin.id in plugin_ids_required:
                 plugins["required"].append(plugin)

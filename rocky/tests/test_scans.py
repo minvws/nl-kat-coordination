@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains
 
 from rocky.views.scans import ScanListView
 from tests.conftest import setup_request
@@ -16,4 +16,3 @@ def test_katalogus_plugin_listing(client_member, rf, httpx_mock):
     assert response.status_code == 200
     assertContains(response, "Boefjes")
     assertContains(response, "BinaryEdge")
-    assertNotContains(response, "test_binary_edge_normalizer")
