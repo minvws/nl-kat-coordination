@@ -17,7 +17,6 @@ export function renderRenameSelection(modal, selection) {
     let table_row_copy = table_row.cloneNode(true);
 
     let type_ul = table_row_copy.querySelector("td.type ul");
-    console.log(type_ul);
     let name_input_element = table_row_copy.querySelector(".report-name-input");
     let reference_input_element = table_row_copy.querySelector(
       ".report-reference-input",
@@ -27,10 +26,7 @@ export function renderRenameSelection(modal, selection) {
     name_input_element.setAttribute("value", report_names[i]);
     reference_input_element.setAttribute("value", references[i]);
 
-    console.log(report_types[i]);
-
     type_ul.innerHTML = report_types[i];
-    console.log(type_ul);
     // date_td.innerText = "date";
 
     table_body.appendChild(table_row_copy);
