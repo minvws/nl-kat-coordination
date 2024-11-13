@@ -917,6 +917,13 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
             now,
         )
 
+    def test_post_schedule_schedule_and_deadline_at_none(self):
+        """When a schedule is created, both schedule and deadline_at should not be None."""
+        item = functions.create_item(self.scheduler.scheduler_id, 1)
+        response = self.client.post("/schedules", json={"scheduler_id": item.scheduler_id, "data": item.data})
+        self.assertEqual(400, response.status_code)
+        self.assertEqual({"detail": "Validation error occurred: validation error"}, response.json())
+
     def test_post_schedule_invalid_schedule(self):
         item = functions.create_item(self.scheduler.scheduler_id, 1)
         response = self.client.post(

@@ -5,7 +5,6 @@ from unittest import mock
 
 from scheduler import config, models, storage
 from scheduler.storage import filters
-
 from tests.utils import functions
 
 
@@ -52,11 +51,10 @@ class ScheduleStoreTestCase(unittest.TestCase):
 
         self.assertEqual(schedule.deadline_at, now)
 
-    def test_create_schedule_not_provided_schedule(self):
-        """When a schedule is created, the deadline_at should be None if schedule is not provided."""
-        schedule = models.Schedule(scheduler_id="test_scheduler_id", data={})
-
-        self.assertIsNone(schedule.deadline_at)
+    def test_create_schedule_schedule_and_deadline_at_none(self):
+        """When a schedule is created, either schedule or deadline_at should be provided."""
+        with self.assertRaises(ValueError):
+            models.Schedule(scheduler_id="test_scheduler_id", data={})
 
     def test_create_schedule(self):
         # Arrange

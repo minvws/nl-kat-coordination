@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from sqlalchemy import Boolean, Column, DateTime, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
@@ -51,6 +51,14 @@ class Schedule(BaseModel):
             return value
         except Exception as exc:
             raise ValueError(f"Invalid cron expression: {value}") from exc
+
+    @model_validator(mode="after")
+    @classmethod
+    def validate_deadline_at_or_schedule(cls, values):
+        """Validate that either deadline_at or schedule is provided."""
+        if not (values.deadline_at or values.schedule):
+            raise ValueError("Either deadline_at or schedule must be provided.")
+        return values
 
 
 class ScheduleDB(Base):
