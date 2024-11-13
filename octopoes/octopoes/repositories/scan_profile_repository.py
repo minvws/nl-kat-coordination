@@ -1,6 +1,5 @@
 from datetime import datetime
 from http import HTTPStatus
-from logging import getLogger
 from typing import Any
 
 from httpx import HTTPStatusError
@@ -15,8 +14,6 @@ from octopoes.xtdb import FieldSet
 from octopoes.xtdb.client import OperationType as XTDBOperationType
 from octopoes.xtdb.client import XTDBSession
 from octopoes.xtdb.query_builder import generate_pull_query
-
-logger = getLogger(__name__)
 
 
 class ScanProfileRepository(Repository):
@@ -71,10 +68,7 @@ class XTDBScanProfileRepository(ScanProfileRepository):
         where = {"type": self.object_type}
         if scan_profile_type is not None:
             where["scan_profile_type"] = scan_profile_type
-        query = generate_pull_query(
-            FieldSet.ALL_FIELDS,
-            where,
-        )
+        query = generate_pull_query(FieldSet.ALL_FIELDS, where)
         results = self.session.client.query(query, valid_time=valid_time)
         return [self.deserialize(r[0]) for r in results]
 

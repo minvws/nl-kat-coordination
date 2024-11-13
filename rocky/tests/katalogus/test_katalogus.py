@@ -1,7 +1,7 @@
 import pytest
 from django.core.exceptions import PermissionDenied
 from django.urls import resolve
-from katalogus.client import KATalogusClientV1, parse_plugin
+from katalogus.client import KATalogusClient, parse_plugin, valid_organization_code, valid_plugin_id
 from katalogus.views.katalogus import AboutPluginsView, BoefjeListView, KATalogusView, NormalizerListView
 from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
 from katalogus.views.plugin_enable_disable import PluginEnableDisableView
@@ -9,6 +9,22 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from rocky.health import ServiceHealth
 from tests.conftest import create_member, get_boefjes_data, get_normalizers_data, get_plugins_data, setup_request
+
+
+def test_valid_plugin_id():
+    with pytest.raises(ValueError):
+        valid_plugin_id("123")
+        valid_plugin_id("test test")
+        valid_plugin_id("test$test")
+
+    assert valid_plugin_id("test-test") == "test-test"
+
+
+def test_valid_organization_code():
+    with pytest.raises(ValueError):
+        valid_organization_code("123 123")
+
+    assert valid_organization_code("test-test") == "test-test"
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
@@ -118,7 +134,7 @@ def test_katalogus_plugin_listing_no_enable_disable_perm(rf, client_member, mock
     mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = get_plugins_data()
 
-    request = rf.get("/en/test/kat-alogus/")
+    request = rf.get("/en/test/kat-alogus/plugins/all/grid/")
     request.resolver_match = resolve(request.path)
     response = KATalogusView.as_view()(
         setup_request(request, client_member.user), organization_code=client_member.organization.code
@@ -126,13 +142,13 @@ def test_katalogus_plugin_listing_no_enable_disable_perm(rf, client_member, mock
     assert response.status_code == 200
 
     assertContains(response, "You don't have permission to enable boefje")
-    assertNotContains(response, '<button type="submit" class="button ghost plugin-enabled">Enable</button>')
-    assertNotContains(response, '<button type="submit" class="button ghost plugin-disabled">Disable</button>')
+    assertNotContains(response, '<button type="submit" class="button ghost">Enable</button>')
+    assertNotContains(response, '<button type="submit" class="button ghost destructive">Disable</button>')
 
 
 def test_katalogus_settings_one_organization(redteam_member, rf, mocker):
     # Mock katalogus calls: return right boefjes and settings
-    mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
+    mock_katalogus = mocker.patch("katalogus.client.KATalogusClient")
     boefjes_data = get_boefjes_data()
     mock_katalogus().get_boefjes.return_value = [parse_plugin(b) for b in boefjes_data if b["type"] == "boefje"]
     mock_katalogus().get_plugin_settings.return_value = {"BINARYEDGE_API": "test", "Second": "value"}
@@ -153,7 +169,7 @@ def test_katalogus_settings_one_organization(redteam_member, rf, mocker):
 
 def test_katalogus_settings_list_multiple_organization(redteam_member, organization_b, rf, mocker):
     # Mock katalogus calls: return right boefjes and settings
-    mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
+    mock_katalogus = mocker.patch("katalogus.client.KATalogusClient")
     boefjes_data = get_boefjes_data()
     mock_katalogus().get_boefjes.return_value = [parse_plugin(b) for b in boefjes_data if b["type"] == "boefje"]
     mock_katalogus().get_plugin_settings.return_value = {"BINARYEDGE_API": "test"}
@@ -177,7 +193,7 @@ def test_katalogus_settings_list_multiple_organization(redteam_member, organizat
 
 
 def test_katalogus_confirm_clone_settings(redteam_member, organization_b, rf, mock_models_octopoes, mocker):
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
 
     create_member(redteam_member.user, organization_b)
 
@@ -198,7 +214,7 @@ def test_katalogus_confirm_clone_settings(redteam_member, organization_b, rf, mo
 
 def test_katalogus_clone_settings(redteam_member, organization_b, rf, mocker, mock_models_octopoes):
     # Mock katalogus calls: return right boefjes and settings
-    mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
+    mock_katalogus = mocker.patch("katalogus.client.KATalogusClient")
 
     create_member(redteam_member.user, organization_b)
 
@@ -208,14 +224,16 @@ def test_katalogus_clone_settings(redteam_member, organization_b, rf, mocker, mo
     )
     assert response.status_code == 302
 
-    mock_katalogus().clone_all_configuration_to_organization.assert_called_once_with(organization_b.code)
+    mock_katalogus().clone_all_configuration_to_organization.assert_called_once_with(
+        redteam_member.organization.code, organization_b.code
+    )
 
 
 def test_katalogus_clone_settings_not_accessible_without_perms(
     client_member, organization_b, rf, mocker, mock_models_octopoes
 ):
     # Mock katalogus calls: return right boefjes and settings
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
 
     create_member(client_member.user, organization_b)
 
@@ -226,28 +244,25 @@ def test_katalogus_clone_settings_not_accessible_without_perms(
         )
 
 
-def test_katalogus_client_organization_not_exists(mocker):
-    mock_requests = mocker.patch("katalogus.client.httpx")
-    mock_requests.Client().get().status_code = 404
+def test_katalogus_client_organization_not_exists(httpx_mock):
+    httpx_mock.add_response(status_code=404)
 
-    client = KATalogusClientV1("test", "test")
-
-    assert client.organization_exists() is False
+    assert KATalogusClient("http://test").organization_exists("test") is False
 
 
 def test_katalogus_client_organization_exists(mocker):
     mock_requests = mocker.patch("katalogus.client.httpx")
     mock_requests.Client().get().status_code = 200
 
-    client = KATalogusClientV1("test", "test")
+    client = KATalogusClient("test")
 
-    assert client.organization_exists() is True
+    assert client.organization_exists("test") is True
 
 
 def test_katalogus_client(httpx_mock):
     httpx_mock.add_response(json={"service": "test", "healthy": False, "version": None, "additional": 2, "results": []})
 
-    client = KATalogusClientV1("http://test", "test")
+    client = KATalogusClient("http://test")
 
     assert isinstance(client.health(), ServiceHealth)
     assert client.health().service == "test"
@@ -267,12 +282,7 @@ def test_enable_disable_plugin_no_clearance(rf, redteam_member, mocker):
     mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = plugin
 
-    request = setup_request(
-        rf.post(
-            "plugin_enable_disable",
-        ),
-        redteam_member.user,
-    )
+    request = setup_request(rf.post("plugin_enable_disable"), redteam_member.user)
 
     response = PluginEnableDisableView.as_view()(
         setup_request(request, redteam_member.user),
@@ -308,12 +318,7 @@ def test_enable_disable_plugin_no_clearance_other_text(rf, redteam_member, mocke
     mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = plugin
 
-    request = setup_request(
-        rf.post(
-            "plugin_enable_disable",
-        ),
-        redteam_member.user,
-    )
+    request = setup_request(rf.post("plugin_enable_disable"), redteam_member.user)
 
     response = PluginEnableDisableView.as_view()(
         setup_request(request, redteam_member.user),
@@ -345,12 +350,7 @@ def test_enable_disable_plugin_has_clearance(rf, redteam_member, mocker):
     mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = plugin
 
-    request = setup_request(
-        rf.post(
-            "plugin_enable_disable",
-        ),
-        redteam_member.user,
-    )
+    request = setup_request(rf.post("plugin_enable_disable"), redteam_member.user)
 
     response = PluginEnableDisableView.as_view()(
         setup_request(request, redteam_member.user),
@@ -373,12 +373,7 @@ def test_enable_disable_normalizer(rf, redteam_member, mocker):
     mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = plugin
 
-    request = setup_request(
-        rf.post(
-            "plugin_enable_disable",
-        ),
-        redteam_member.user,
-    )
+    request = setup_request(rf.post("plugin_enable_disable"), redteam_member.user)
 
     response = PluginEnableDisableView.as_view()(
         setup_request(request, redteam_member.user),

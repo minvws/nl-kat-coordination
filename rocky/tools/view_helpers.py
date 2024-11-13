@@ -4,6 +4,7 @@ from typing import TypedDict
 from urllib.parse import urlencode, urlparse, urlunparse
 
 from django.http import HttpRequest
+from django.http.response import HttpResponseRedirectBase
 from django.urls.base import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
@@ -133,7 +134,7 @@ class OrganizationDetailBreadcrumbsMixin(BreadcrumbsMixin):
             {
                 "url": reverse("organization_settings", kwargs={"organization_code": self.organization.code}),
                 "text": _("Settings"),
-            },
+            }
         ]
 
         return breadcrumbs
@@ -147,7 +148,7 @@ class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin):
             {
                 "url": reverse("organization_member_list", kwargs={"organization_code": self.organization.code}),
                 "text": _("Members"),
-            },
+            }
         ]
 
         return breadcrumbs
@@ -163,3 +164,7 @@ class ObjectsBreadcrumbsMixin(BreadcrumbsMixin):
                 "text": _("Objects"),
             }
         ]
+
+
+class PostRedirect(HttpResponseRedirectBase):
+    status_code = 307

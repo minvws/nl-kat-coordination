@@ -2,4 +2,8 @@
 
 form input[type="radio"] {
   margin: var(--form-radio-margin);
+
+  & + label {
+    font-weight: normal;
+  }
 }

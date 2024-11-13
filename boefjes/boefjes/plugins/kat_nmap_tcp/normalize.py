@@ -28,10 +28,7 @@ def get_ip_ports_and_service(host: NmapHost, network: Network, netblock: Referen
                 continue
 
             ip_port = IPPort(
-                address=ip.reference,
-                protocol=Protocol(protocol),
-                port=port,
-                state=PortState(service.state),
+                address=ip.reference, protocol=Protocol(protocol), port=port, state=PortState(service.state)
             )
             yield ip_port
 
@@ -53,7 +50,6 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
     # Relevant network object is received from the normalizer_meta.
     network = Network(name=input_ooi["network"]["name"])
-    yield network
 
     netblock_ref = None
     if "NetBlock" in input_ooi["object_type"]:

@@ -1,0 +1,20 @@
+name: Bytes Tests (with coverage)
+
+on:
+  workflow_call:
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run unit tests
+        run: make utest
+        working-directory: bytes/
+
+      - name: Upload coverage as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bytes-coverage-unit
+          path: bytes/coverage.xml

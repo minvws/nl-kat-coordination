@@ -1,7 +1,7 @@
 {% load i18n %}
 
 {% spaceless %}
-    <form method="get" class="horizontal-view help">
+    <form method="get" class="help">
         {% if ooi %}<input type="hidden" name="ooi_id" value="{{ ooi.primary_key }}" />{% endif %}
         <fieldset>
             <legend>{% translate "Object details" %}</legend>

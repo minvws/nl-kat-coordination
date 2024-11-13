@@ -16,13 +16,11 @@ def test_report_history_one_subreports_one_input_objects(
         - No chevron down button
         - No "View all subreports" button
     """
-    mocker.patch("reports.views.base.get_katalogus")
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("report_history", kwargs=kwargs)
 
-    request = rf.get(
-        url,
-    )
+    request = rf.get(url)
     request.resolver_match = resolve(url)
 
     setup_request(request, client_member.user)
@@ -63,13 +61,11 @@ def test_report_history_less_than_five_subreports_two_input_objects(
     - No "View all subreports" button
     """
 
-    mocker.patch("reports.views.base.get_katalogus")
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("report_history", kwargs=kwargs)
 
-    request = rf.get(
-        url,
-    )
+    request = rf.get(url)
     request.resolver_match = resolve(url)
 
     setup_request(request, client_member.user)
@@ -122,13 +118,11 @@ def test_report_history_more_than_five_subreports_one_input_object(
     - "View all subreports" button
 
     """
-    mocker.patch("reports.views.base.get_katalogus")
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("report_history", kwargs=kwargs)
 
-    request = rf.get(
-        url,
-    )
+    request = rf.get(url)
     request.resolver_match = resolve(url)
 
     setup_request(request, client_member.user)
@@ -191,7 +185,7 @@ def test_report_history_more_than_five_subreports_one_input_object(
 def test_report_history_subreports_table(
     rf, client_member, mock_organization_view_octopoes, mocker, report_list_six_subreports, get_subreports
 ):
-    mocker.patch("reports.views.base.get_katalogus")
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("subreports", kwargs=kwargs)
     parent_report = report_list_six_subreports[0][0]
@@ -258,7 +252,7 @@ def test_report_history_subreports_table(
 def test_report_history_report_type_summary(
     rf, client_member, mock_organization_view_octopoes, mocker, reports_more_input_oois
 ):
-    mocker.patch("reports.views.base.get_katalogus")
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
     request = setup_request(rf.get("report_history"), client_member.user)
 
     mock_organization_view_octopoes().list_reports.return_value = Paginated[tuple[Report, list[Report | None]]](

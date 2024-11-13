@@ -21,17 +21,17 @@ from reports.views.generate_report import (
 from reports.views.multi_report import (
     ExportSetupMultiReportView,
     LandingMultiReportView,
-    MultiReportPDFView,
     MultiReportView,
     OOISelectionMultiReportView,
     ReportTypesSelectionMultiReportView,
     SetupScanMultiReportView,
 )
-from reports.views.report_overview import ReportHistoryView, SubreportView
+from reports.views.report_overview import ReportHistoryView, ScheduledReportsView, SubreportView
 
 # Report overview urls
 urlpatterns = [
     path("", ReportsLandingView.as_view(), name="reports"),
+    path("scheduled-reports/", ScheduledReportsView.as_view(), name="scheduled_reports"),
     path("report-history/", ReportHistoryView.as_view(), name="report_history"),
     path("report-history/subreports", SubreportView.as_view(), name="subreports"),
 ]
@@ -41,6 +41,7 @@ urlpatterns += [
     path("view", ViewReportView.as_view(), name="view_report"),
     path("view/pdf/", ViewReportPDFView.as_view(), name="view_report_pdf"),
     path("view/location-report/", LocationReportView.as_view(), name="location_report"),
+    path("view/json/", ViewReportView.as_view(), name="view_report_json"),
 ]
 
 # Generate report urls
@@ -87,5 +88,4 @@ urlpatterns += [
     path("multi-report/setup-scan/", SetupScanMultiReportView.as_view(), name="multi_report_setup_scan"),
     path("multi-report/export-setup/", ExportSetupMultiReportView.as_view(), name="multi_report_export_setup"),
     path("multi-report/view/", MultiReportView.as_view(), name="multi_report_view"),
-    path("multi-report/view/pdf/", MultiReportPDFView.as_view(), name="multi_report_pdf"),
 ]

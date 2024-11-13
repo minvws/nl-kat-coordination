@@ -59,17 +59,17 @@ class BoefjeResource:
 
     def __init__(self, path: Path, package: str):
         self.path = path
-        self.boefje: Boefje = Boefje.parse_file(path / BOEFJE_DEFINITION_FILE)
+        self.boefje: Boefje = Boefje.model_validate_json(path.joinpath(BOEFJE_DEFINITION_FILE).read_text())
         self.boefje.runnable_hash = get_runnable_hash(self.path)
         self.boefje.produces = self.boefje.produces.union(set(_default_mime_types(self.boefje)))
         self.module: Runnable | None = None
 
-        if (path / ENTRYPOINT_BOEFJES).exists():
+        if self.boefje.oci_image is None and (path / ENTRYPOINT_BOEFJES).exists():
             self.module = get_runnable_module_from_package(package, ENTRYPOINT_BOEFJES, parameter_count=1)
 
         if (path / SCHEMA_FILE).exists():
             try:
-                self.boefje.schema = json.load((path / SCHEMA_FILE).open())
+                self.boefje.boefje_schema = json.load((path / SCHEMA_FILE).open())
             except JSONDecodeError as e:
                 raise ModuleException("Invalid schema file") from e
             except SchemaError as e:
@@ -81,7 +81,7 @@ class NormalizerResource:
 
     def __init__(self, path: Path, package: str):
         self.path = path
-        self.normalizer = Normalizer.parse_file(path / NORMALIZER_DEFINITION_FILE)
+        self.normalizer = Normalizer.model_validate_json(path.joinpath(NORMALIZER_DEFINITION_FILE).read_text())
         self.normalizer.consumes.append(f"normalizer/{self.normalizer.id}")
         self.module = get_runnable_module_from_package(package, ENTRYPOINT_NORMALIZERS, parameter_count=2)
 

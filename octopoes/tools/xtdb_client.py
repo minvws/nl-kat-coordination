@@ -27,9 +27,7 @@ TransactionType = PutTransaction | DeleteTransaction | EvictTransaction | MatchT
 class XTDBClient:
     def __init__(self, base_url: str, node: str, timeout: int | None = None):
         self._client = httpx.Client(
-            base_url=f"{base_url}/_xtdb/{node}",
-            headers={"Accept": "application/json"},
-            timeout=timeout,
+            base_url=f"{base_url}/_xtdb/{node}", headers={"Accept": "application/json"}, timeout=timeout
         )
 
     def status(self) -> JsonValue:
@@ -37,8 +35,22 @@ class XTDBClient:
 
         return res.json()
 
-    def query(self, query: str = "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}") -> JsonValue:
-        res = self._client.post("/query", content=query, headers={"Content-Type": "application/edn"})
+    def query(
+        self,
+        query: str = "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}",
+        valid_time: datetime.datetime | None = None,
+        tx_time: datetime.datetime | None = None,
+        tx_id: int | None = None,
+    ) -> JsonValue:
+        params = {}
+        if valid_time is not None:
+            params["valid-time"] = valid_time.isoformat()
+        if tx_time is not None:
+            params["tx-time"] = tx_time.isoformat()
+        if tx_id is not None:
+            params["tx-id"] = str(tx_id)
+
+        res = self._client.post("/query", params=params, content=query, headers={"Content-Type": "application/edn"})
 
         return res.json()
 
@@ -111,11 +123,7 @@ class XTDBClient:
 
         return res.json()
 
-    def await_tx_time(
-        self,
-        transaction_time: datetime.datetime,
-        timeout: int | None,
-    ) -> JsonValue:
+    def await_tx_time(self, transaction_time: datetime.datetime, timeout: int | None) -> JsonValue:
         params = {"tx-time": transaction_time.isoformat()}
         if timeout is not None:
             params["timeout"] = str(timeout)
@@ -123,11 +131,7 @@ class XTDBClient:
 
         return res.json()
 
-    def tx_log(
-        self,
-        after_tx_id: int | None,
-        with_ops: bool,
-    ) -> JsonValue:
+    def tx_log(self, after_tx_id: int | None, with_ops: bool) -> JsonValue:
         params = {}
         if after_tx_id is not None:
             params["after-tx-id"] = after_tx_id

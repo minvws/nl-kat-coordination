@@ -75,7 +75,9 @@ class Command(BaseCommand):
     @staticmethod
     def get_findings_metadata(organization, valid_time, severities) -> list[dict[str, Any]]:
         findings = FindingList(
-            OctopoesAPIConnector(settings.OCTOPOES_API, organization.code),
+            OctopoesAPIConnector(
+                settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+            ),
             valid_time,
             severities,
         )

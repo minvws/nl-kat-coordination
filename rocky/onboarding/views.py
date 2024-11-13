@@ -15,7 +15,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from httpx import HTTPError
-from katalogus.client import Plugin, get_katalogus
+from katalogus.client import Plugin
 from reports.report_types.definitions import ReportPlugins
 from reports.report_types.dns_report.report import DNSReport
 from reports.views.base import get_selection
@@ -59,10 +59,7 @@ class OnboardingStart(OrganizationView):
 
 
 class OnboardingIntroductionView(
-    OrganizationPermissionRequiredMixin,
-    IntroductionStepsMixin,
-    OrganizationView,
-    TemplateView,
+    OrganizationPermissionRequiredMixin, IntroductionStepsMixin, OrganizationView, TemplateView
 ):
     """
     1. Start the onboarding wizard. What is OpenKAT and what it does.
@@ -74,10 +71,7 @@ class OnboardingIntroductionView(
 
 
 class OnboardingChooseReportInfoView(
-    OrganizationPermissionRequiredMixin,
-    IntroductionStepsMixin,
-    OrganizationView,
-    TemplateView,
+    OrganizationPermissionRequiredMixin, IntroductionStepsMixin, OrganizationView, TemplateView
 ):
     """
     2. Introduction into reporting. All the necessities to generate a report.
@@ -89,10 +83,7 @@ class OnboardingChooseReportInfoView(
 
 
 class OnboardingChooseReportTypeView(
-    OrganizationPermissionRequiredMixin,
-    IntroductionStepsMixin,
-    OrganizationView,
-    TemplateView,
+    OrganizationPermissionRequiredMixin, IntroductionStepsMixin, OrganizationView, TemplateView
 ):
     """
     3. Choose a report type. Gives the user a choice of many report types. Ex. DNS report
@@ -104,10 +95,7 @@ class OnboardingChooseReportTypeView(
 
 
 class OnboardingSetupScanOOIInfoView(
-    OrganizationPermissionRequiredMixin,
-    IntroductionStepsMixin,
-    OrganizationView,
-    TemplateView,
+    OrganizationPermissionRequiredMixin, IntroductionStepsMixin, OrganizationView, TemplateView
 ):
     """
     4. Explanation that an object is needed to make scans.
@@ -119,10 +107,7 @@ class OnboardingSetupScanOOIInfoView(
 
 
 class OnboardingSetupScanOOIAddView(
-    OrganizationPermissionRequiredMixin,
-    IntroductionStepsMixin,
-    SingleOOITreeMixin,
-    FormView,
+    OrganizationPermissionRequiredMixin, IntroductionStepsMixin, SingleOOITreeMixin, FormView
 ):
     """
     5. The user will create a URL object. Shows a form and validation to create object.
@@ -159,7 +144,7 @@ class OnboardingSetupScanOOIAddView(
                 "url": reverse("ooi_add_type_select", kwargs={"organization_code": self.organization.code})
                 + get_selection(self.request),
                 "text": _("Creating an object"),
-            },
+            }
         ]
 
 
@@ -270,10 +255,7 @@ class OnboardingSetClearanceLevelView(
 
 
 class OnboardingSetupScanSelectPluginsView(
-    OrganizationPermissionRequiredMixin,
-    IntroductionStepsMixin,
-    OrganizationView,
-    TemplateView,
+    OrganizationPermissionRequiredMixin, IntroductionStepsMixin, OrganizationView, TemplateView
 ):
     """
     9. Shows the user all required and optional plugins to select from. Required plugins are mandatory to continue.
@@ -286,8 +268,9 @@ class OnboardingSetupScanSelectPluginsView(
 
     def get_plugins(self) -> dict[str, list[Plugin]]:
         all_plugins = {}
+        katalogus = self.get_katalogus()
         for required_optional, plugin_ids in self.plugins.items():
-            plugins = [get_katalogus(self.organization.code).get_plugin(plugin_id) for plugin_id in plugin_ids]  # type: ignore
+            plugins = katalogus.get_plugins(ids=[plugin_id for plugin_id in plugin_ids])  # type: ignore
             all_plugins[required_optional] = plugins
 
         return all_plugins
@@ -304,7 +287,7 @@ class OnboardingSetupScanSelectPluginsView(
                 return self.get(request, *args, **kwargs)
         for selected_plugin in selected_plugins:
             try:
-                get_katalogus(self.organization.code).enable_boefje_by_id(selected_plugin)
+                self.get_katalogus().enable_boefje_by_id(selected_plugin)
             except HTTPError:
                 messages.error(
                     request,
@@ -347,11 +330,7 @@ class OnboardingSetupScanOOIDetailView(
 
 
 class OnboardingReportView(
-    OrganizationPermissionRequiredMixin,
-    SaveGenerateReportMixin,
-    IntroductionStepsMixin,
-    SingleOOIMixin,
-    TemplateView,
+    OrganizationPermissionRequiredMixin, SaveGenerateReportMixin, IntroductionStepsMixin, SingleOOIMixin, TemplateView
 ):
     """
     10. The user already started the scan and is now waiting till scans are finished to generate the report.
@@ -364,11 +343,15 @@ class OnboardingReportView(
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        ooi = self.get_ooi(self.request.GET.get("ooi", ""))
-        self.oois = [Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network)]
-        self.selected_oois = [self.oois[0].primary_key]
+        self.selected_oois = self.get_ooi_pks()
+        self.selected_report_types = self.get_report_type_ids()
 
-    def get_report_type_selection(self) -> list[str]:
+    def get_ooi_pks(self) -> list[str]:
+        ooi = self.get_ooi(self.request.GET.get("ooi", ""))
+        hostname_ooi = [Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network)]
+        return [hostname_ooi[0].primary_key]
+
+    def get_report_type_ids(self) -> list[str]:
         return [self.request.GET.get("report_type", "")]
 
     def post(self, request, *args, **kwargs):
@@ -376,11 +359,14 @@ class OnboardingReportView(
 
         report_ooi = self.save_report([("Onboarding Report", "Onboarding Report")])
 
-        return redirect(
-            reverse("view_report", kwargs={"organization_code": self.organization.code})
-            + "?"
-            + urlencode({"report_id": report_ooi.reference})
-        )
+        if report_ooi:
+            return redirect(
+                reverse("view_report", kwargs={"organization_code": self.organization.code})
+                + "?"
+                + urlencode({"report_id": report_ooi.reference})
+            )
+
+        return self.get(request, *args, **kwargs)
 
     def set_member_onboarded(self):
         member = OrganizationMember.objects.get(user=self.request.user, organization=self.organization)
@@ -402,11 +388,7 @@ class OnboardingIntroductionRegistrationView(PermissionRequiredMixin, Introducti
     permission_required = "tools.add_organizationmember"
 
 
-class OnboardingOrganizationSetupView(
-    PermissionRequiredMixin,
-    IntroductionRegistrationStepsMixin,
-    CreateView,
-):
+class OnboardingOrganizationSetupView(PermissionRequiredMixin, IntroductionRegistrationStepsMixin, CreateView):
     """
     Step 2: Create a new organization
     """
@@ -444,10 +426,7 @@ class OnboardingOrganizationSetupView(
         return result
 
     def create_first_member(self, organization):
-        member = OrganizationMember.objects.create(
-            user=self.request.user,
-            organization=organization,
-        )
+        member = OrganizationMember.objects.create(user=self.request.user, organization=organization)
         if member.user.is_superuser:
             member.trusted_clearance_level = 4
             member.acknowledged_clearance_level = 4
@@ -459,10 +438,7 @@ class OnboardingOrganizationSetupView(
 
 
 class OnboardingOrganizationUpdateView(
-    OrganizationPermissionRequiredMixin,
-    IntroductionAdminStepsMixin,
-    OrganizationView,
-    UpdateView,
+    OrganizationPermissionRequiredMixin, IntroductionAdminStepsMixin, OrganizationView, UpdateView
 ):
     """
     Step 2: Update an existing organization (only name not code)
@@ -490,10 +466,7 @@ class OnboardingOrganizationUpdateView(
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
-class OnboardingIndemnificationSetupView(
-    IntroductionAdminStepsMixin,
-    IndemnificationAddView,
-):
+class OnboardingIndemnificationSetupView(IntroductionAdminStepsMixin, IndemnificationAddView):
     """
     Step 3: Agree to idemnification to scan oois
     """
@@ -545,10 +518,7 @@ class OnboardingChooseUserTypeView(
     permission_required = "tools.add_organizationmember"
 
 
-class OnboardingAccountSetupAdminView(
-    RegistrationBreadcrumbsMixin,
-    OnboardingAccountCreationMixin,
-):
+class OnboardingAccountSetupAdminView(RegistrationBreadcrumbsMixin, OnboardingAccountCreationMixin):
     """
     Step 1: Create an admin account with admin rights
     """
@@ -571,10 +541,7 @@ class OnboardingAccountSetupAdminView(
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
-class OnboardingAccountSetupRedTeamerView(
-    RegistrationBreadcrumbsMixin,
-    OnboardingAccountCreationMixin,
-):
+class OnboardingAccountSetupRedTeamerView(RegistrationBreadcrumbsMixin, OnboardingAccountCreationMixin):
     """
     Step 2: Create an redteamer account with redteam rights
     """

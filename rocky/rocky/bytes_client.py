@@ -1,4 +1,5 @@
 import uuid
+from base64 import b64encode
 from collections.abc import Set
 from datetime import datetime, timezone
 
@@ -15,23 +16,20 @@ logger = structlog.get_logger("bytes_client")
 
 
 class BytesClient:
-    def __init__(self, base_url: str, username: str, password: str, organization: str):
-        self.credentials = {
-            "username": username,
-            "password": password,
-        }
-        self.session = httpx.Client(base_url=base_url)
+    def __init__(self, base_url: str, username: str, password: str, organization: str | None):
+        self.credentials = {"username": username, "password": password}
+        self.session = httpx.Client(base_url=base_url, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT)
         self.organization = organization
 
     def health(self) -> ServiceHealth:
         response = self.session.get("/health")
         response.raise_for_status()
 
-        return ServiceHealth.parse_obj(response.json())
+        return ServiceHealth.model_validate(response.json())
 
     @staticmethod
     def raw_from_declarations(declarations: list[Declaration]):
-        json_string = f"[{','.join([declaration.json() for declaration in declarations])}]"
+        json_string = f"[{','.join([declaration.model_dump_json() for declaration in declarations])}]"
 
         return json_string.encode("utf-8")
 
@@ -67,7 +65,7 @@ class BytesClient:
                 normalizer=Normalizer(id="normalizer/manual"),
                 started_at=datetime.now(timezone.utc),
                 ended_at=datetime.now(timezone.utc),
-            ),
+            )
         )
 
     def upload_raw(
@@ -113,15 +111,17 @@ class BytesClient:
         response.raise_for_status()
 
     def _save_raw(self, boefje_meta_id: uuid.UUID, raw: bytes, mime_types: Set[str] = frozenset()) -> str:
+        file_name = "raw"  # The name provides a key for all ids returned, so this is arbitrary as we only upload 1 file
+
         response = self.session.post(
             "/bytes/raw",
-            content=raw,
-            headers={"content-type": "application/octet-stream"},
-            params={"mime_types": list(mime_types), "boefje_meta_id": str(boefje_meta_id)},
+            json={"files": [{"name": file_name, "content": b64encode(raw).decode(), "tags": list(mime_types)}]},
+            params={"boefje_meta_id": str(boefje_meta_id)},
         )
 
         response.raise_for_status()
-        return response.json()["id"]
+
+        return response.json()[file_name]
 
     def get_raw(self, raw_id: str) -> bytes:
         # Note: we assume organization permissions are handled before requesting raw data.
@@ -168,9 +168,7 @@ class BytesClient:
 
     def _get_token(self) -> str:
         response = self.session.post(
-            "/token",
-            data=self.credentials,
-            headers={"content-type": "application/x-www-form-urlencoded"},
+            "/token", data=self.credentials, headers={"content-type": "application/x-www-form-urlencoded"}
         )
 
         return response.json()["access_token"]

@@ -28,11 +28,11 @@ from octopoes.config.settings import (
     DEFAULT_SCAN_LEVEL_FILTER,
     DEFAULT_SCAN_PROFILE_TYPE_FILTER,
 )
-from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel, ScanProfileType
+from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Reference, ScanLevel, ScanProfileType
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
-from octopoes.models.ooi.reports import Report
+from octopoes.models.ooi.reports import Report, ReportData, ReportRecipe
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
@@ -90,17 +90,14 @@ def create_user(django_user_model, email, password, name, device_name, superuser
 
 
 def create_organization(name, organization_code):
-    katalogus_client = "katalogus.client.KATalogusClientV1"
-    octopoes_node = "tools.models.OctopoesAPIConnector"
+    katalogus_client = "katalogus.client.KATalogusClient"
+    octopoes_node = "rocky.signals.OctopoesAPIConnector"
     with patch(katalogus_client), patch(octopoes_node):
         return Organization.objects.create(name=name, code=organization_code)
 
 
 def create_member(user, organization):
-    Indemnification.objects.create(
-        user=user,
-        organization=organization,
-    )
+    Indemnification.objects.create(user=user, organization=organization)
 
     return OrganizationMember.objects.create(
         user=user,
@@ -147,9 +144,7 @@ def add_redteam_group_permissions(member):
 def add_client_group_permissions(member):
     group = Group.objects.get(name=GROUP_CLIENT)
     member.groups.add(group)
-    client_permissions = [
-        Permission.objects.get(codename="can_scan_organization").id,
-    ]
+    client_permissions = [Permission.objects.get(codename="can_scan_organization").id]
     group.permissions.set(client_permissions)
 
 
@@ -173,24 +168,14 @@ def organization_b():
 @pytest.fixture
 def superuser(django_user_model):
     return create_user(
-        django_user_model,
-        "superuser@openkat.nl",
-        "SuperSuper123!!",
-        "Superuser name",
-        "default",
-        superuser=True,
+        django_user_model, "superuser@openkat.nl", "SuperSuper123!!", "Superuser name", "default", superuser=True
     )
 
 
 @pytest.fixture
 def superuser_b(django_user_model):
     return create_user(
-        django_user_model,
-        "superuserB@openkat.nl",
-        "SuperBSuperB123!!",
-        "Superuser B name",
-        "default_b",
-        superuser=True,
+        django_user_model, "superuserB@openkat.nl", "SuperBSuperB123!!", "Superuser B name", "default_b", superuser=True
     )
 
 
@@ -206,24 +191,12 @@ def superuser_member_b(superuser_b, organization_b):
 
 @pytest.fixture
 def adminuser(django_user_model):
-    return create_user(
-        django_user_model,
-        "admin@openkat.nl",
-        "AdminAdmin123!!",
-        "Admin name",
-        "default_admin",
-    )
+    return create_user(django_user_model, "admin@openkat.nl", "AdminAdmin123!!", "Admin name", "default_admin")
 
 
 @pytest.fixture
 def adminuser_b(django_user_model):
-    return create_user(
-        django_user_model,
-        "adminB@openkat.nl",
-        "AdminBAdminB123!!",
-        "Admin B name",
-        "default_admin_b",
-    )
+    return create_user(django_user_model, "adminB@openkat.nl", "AdminBAdminB123!!", "Admin B name", "default_admin_b")
 
 
 @pytest.fixture
@@ -245,22 +218,14 @@ def admin_member_b(adminuser_b, organization_b):
 @pytest.fixture
 def redteamuser(django_user_model):
     return create_user(
-        django_user_model,
-        "redteamer@openkat.nl",
-        "RedteamRedteam123!!",
-        "Redteam name",
-        "default_redteam",
+        django_user_model, "redteamer@openkat.nl", "RedteamRedteam123!!", "Redteam name", "default_redteam"
     )
 
 
 @pytest.fixture
 def redteamuser_b(django_user_model):
     return create_user(
-        django_user_model,
-        "redteamerB@openkat.nl",
-        "RedteamBRedteamB123!!",
-        "Redteam B name",
-        "default_redteam_b",
+        django_user_model, "redteamerB@openkat.nl", "RedteamBRedteamB123!!", "Redteam B name", "default_redteam_b"
     )
 
 
@@ -280,23 +245,13 @@ def redteam_member_b(redteamuser_b, organization_b):
 
 @pytest.fixture
 def clientuser(django_user_model):
-    return create_user(
-        django_user_model,
-        "client@openkat.nl",
-        "ClientClient123!!",
-        "Client name",
-        "default_client",
-    )
+    return create_user(django_user_model, "client@openkat.nl", "ClientClient123!!", "Client name", "default_client")
 
 
 @pytest.fixture
 def clientuser_b(django_user_model):
     return create_user(
-        django_user_model,
-        "clientB@openkat.nl",
-        "ClientBClientB123!!",
-        "Client B name",
-        "default_client_b",
+        django_user_model, "clientB@openkat.nl", "ClientBClientB123!!", "Client B name", "default_client_b"
     )
 
 
@@ -325,13 +280,7 @@ def client_user_two_organizations(clientuser, organization, organization_b):
 
 @pytest.fixture
 def new_member(django_user_model, organization):
-    user = create_user(
-        django_user_model,
-        "cl1@openkat.nl",
-        "TestTest123!!",
-        "New user",
-        "default_new_user",
-    )
+    user = create_user(django_user_model, "cl1@openkat.nl", "TestTest123!!", "New user", "default_new_user")
     member = create_member(user, organization)
     member.status = OrganizationMember.STATUSES.NEW
     member.save()
@@ -340,13 +289,7 @@ def new_member(django_user_model, organization):
 
 @pytest.fixture
 def active_member(django_user_model, organization):
-    user = create_user(
-        django_user_model,
-        "cl2@openkat.nl",
-        "TestTest123!!",
-        "Active user",
-        "default_active_user",
-    )
+    user = create_user(django_user_model, "cl2@openkat.nl", "TestTest123!!", "Active user", "default_active_user")
     member = create_member(user, organization)
     member.status = OrganizationMember.STATUSES.ACTIVE
     member.save()
@@ -355,13 +298,7 @@ def active_member(django_user_model, organization):
 
 @pytest.fixture
 def blocked_member(django_user_model, organization):
-    user = create_user(
-        django_user_model,
-        "cl3@openkat.nl",
-        "TestTest123!!",
-        "Blocked user",
-        "default_blocked_user",
-    )
+    user = create_user(django_user_model, "cl3@openkat.nl", "TestTest123!!", "Blocked user", "default_blocked_user")
     member = create_member(user, organization)
     member.status = OrganizationMember.STATUSES.ACTIVE
     member.blocked = True
@@ -371,12 +308,7 @@ def blocked_member(django_user_model, organization):
 
 @pytest.fixture
 def mock_models_katalogus(mocker):
-    return mocker.patch("tools.models.get_katalogus")
-
-
-@pytest.fixture
-def mock_views_katalogus(mocker):
-    return mocker.patch("rocky.views.ooi_report.get_katalogus")
+    return mocker.patch("katalogus.client.get_katalogus_client")
 
 
 @pytest.fixture
@@ -386,7 +318,7 @@ def mock_bytes_client(mocker):
 
 @pytest.fixture
 def mock_models_octopoes(mocker):
-    return mocker.patch("tools.models.OctopoesAPIConnector")
+    return mocker.patch("rocky.signals.OctopoesAPIConnector")
 
 
 @pytest.fixture
@@ -515,9 +447,7 @@ def network() -> Network:
 def url(network) -> URL:
     return URL(
         scan_profile=DeclaredScanProfile(
-            scan_profile_type="declared",
-            reference=Reference("URL|testnetwork|http://example.com/"),
-            level=ScanLevel.L1,
+            scan_profile_type="declared", reference=Reference("URL|testnetwork|http://example.com/"), level=ScanLevel.L1
         ),
         user_id=None,
         primary_key="URL|testnetwork|http://example.com/",
@@ -554,10 +484,7 @@ def hostname(network) -> Hostname:
 
 @pytest.fixture
 def website(ip_service: IPService, hostname: Hostname):
-    return Website(
-        ip_service=ip_service.reference,
-        hostname=hostname.reference,
-    )
+    return Website(ip_service=ip_service.reference, hostname=hostname.reference)
 
 
 @pytest.fixture
@@ -1032,10 +959,7 @@ def finding_type_kat_invalid_dnssec() -> KATFindingType:
 @pytest.fixture
 def tree_data_tls_findings_and_suites():
     return {
-        "root": {
-            "reference": "",
-            "children": {"ooi": [{"reference": "", "children": {}}]},
-        },
+        "root": {"reference": "", "children": {"ooi": [{"reference": "", "children": {}}]}},
         "store": {
             "Finding|Network|testnetwork|KAT-0001": {
                 "object_type": "Finding",
@@ -1083,7 +1007,7 @@ def tree_data_tls_findings_and_suites():
                             "key_exchange_algorithm": "ECDH",
                             "cipher_suite_code": "xc014",
                         },
-                    ],
+                    ]
                 },
             },
         },
@@ -1091,17 +1015,41 @@ def tree_data_tls_findings_and_suites():
 
 
 @pytest.fixture
-def plugin_details():
+def plugin_details(plugin_schema):
     return parse_plugin(
         {
             "id": "test-boefje",
             "type": "boefje",
             "name": "TestBoefje",
+            "created": "2023-05-09T09:37:20.909069+00:00",
             "description": "Meows to the moon",
             "scan_level": 1,
             "consumes": ["Network"],
             "produces": ["Network"],
             "enabled": True,
+            "boefje_schema": plugin_schema,
+            "oci_image": None,
+            "oci_arguments": ["-test", "-arg"],
+        }
+    )
+
+
+@pytest.fixture
+def plugin_details_with_container(plugin_schema):
+    return parse_plugin(
+        {
+            "id": "test-boefje",
+            "type": "boefje",
+            "name": "TestBoefje",
+            "created": "2023-05-09T09:37:20.909069+00:00",
+            "description": "Meows to the moon",
+            "scan_level": 1,
+            "consumes": ["Network"],
+            "produces": ["Network"],
+            "enabled": True,
+            "boefje_schema": plugin_schema,
+            "oci_image": "ghcr.io/test/image:123",
+            "oci_arguments": ["-test", "-arg"],
         }
     )
 
@@ -1172,7 +1120,7 @@ parent_report = [
         observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
         parent_report=None,
         has_parent=False,
-    ),
+    )
 ]
 
 subreports = [
@@ -1329,47 +1277,24 @@ dns_report = [
         observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
         parent_report=None,
         has_parent=False,
-    ),
+    )
 ]
 
 
 @pytest.fixture
 def report_list_one_subreport():
-    return [
-        (
-            subreports[0],
-            [],
-        )
-    ]
+    return [(subreports[0], [])]
 
 
 @pytest.fixture
 def report_list_two_subreports():
-    return [
-        (
-            parent_report[0],
-            [
-                subreports[5],
-                subreports[6],
-            ],
-        )
-    ]
+    return [(parent_report[0], [subreports[5], subreports[6]])]
 
 
 @pytest.fixture
 def report_list_six_subreports():
     return [
-        (
-            parent_report[0],
-            [
-                subreports[0],
-                subreports[1],
-                subreports[2],
-                subreports[3],
-                subreports[4],
-                subreports[5],
-            ],
-        )
+        (parent_report[0], [subreports[0], subreports[1], subreports[2], subreports[3], subreports[4], subreports[5]])
     ]
 
 
@@ -1383,6 +1308,105 @@ def get_subreports() -> list[tuple[str, Report]]:
         (parent_report[0].primary_key, subreports[4]),
         (parent_report[0].primary_key, subreports[5]),
     ]
+
+
+@pytest.fixture
+def report_recipe():
+    return ReportRecipe(
+        recipe_id="744d054e-9c70-4f18-ad27-122cfc1b7903",
+        report_name_format="Test Report Name Format",
+        subreport_name_format="Test Subreport Name Format",
+        input_recipe={"input_oois": ["Hostname|internet|mispo.es"]},
+        report_types=["dns-report"],
+        cron_expression="0 0 * * *",
+    )
+
+
+@pytest.fixture
+def get_report_schedules():
+    report_schedule = [
+        {
+            "id": "06a783b3-af62-429d-8b48-5934c8702366",
+            "scheduler_id": "report-madelon123",
+            "hash": "f429f60fda539f9017544758163a955e",
+            "data": {
+                "type": "report",
+                "organisation_id": "madelon123",
+                "report_recipe_id": "6a121a53-f795-4bfe-9aea-f410a96fca59",
+            },
+            "enabled": "true",
+            "schedule": "0 * * * *",
+            "tasks": [
+                {
+                    "id": "21ce00b8-57c4-4d65-a53e-275b4e44da6f",
+                    "scheduler_id": "report-madelon123",
+                    "schedule_id": "06a783b3-af62-429d-8b48-5934c8702366",
+                    "priority": 1729520184,
+                    "status": "completed",
+                    "type": "report",
+                    "hash": "f429f60fda539f9017544758163a955e",
+                    "data": {
+                        "organisation_id": "madelon123",
+                        "report_recipe_id": "6a121a53-f795-4bfe-9aea-f410a96fca59",
+                    },
+                    "created_at": "2024-10-21T14:16:24.702759Z",
+                    "modified_at": "2024-10-21T14:16:24.702761Z",
+                },
+                {
+                    "id": "f63c2224-a4b2-4161-9790-9b4d665a4683",
+                    "scheduler_id": "report-madelon123",
+                    "schedule_id": "06a783b3-af62-429d-8b48-5934c8702366",
+                    "priority": 1729580020,
+                    "status": "completed",
+                    "type": "report",
+                    "hash": "f429f60fda539f9017544758163a955e",
+                    "data": {
+                        "organisation_id": "madelon123",
+                        "report_recipe_id": "6a121a53-f795-4bfe-9aea-f410a96fca59",
+                    },
+                    "created_at": "2024-10-22T06:53:40.405185Z",
+                    "modified_at": "2024-10-22T06:53:40.405192Z",
+                },
+            ],
+            "deadline_at": "2024-10-22T12:00:00Z",
+            "created_at": "2024-10-21T14:14:00.359039Z",
+            "modified_at": "2024-10-21T14:14:00.359043Z",
+        },
+        {
+            "id": "e9a00bc1-850a-401a-89d9-252d98823bb3",
+            "scheduler_id": "report-madelon123",
+            "hash": "02e67c8676cb8135681d52ca62a9fe5b",
+            "data": {
+                "type": "report",
+                "organisation_id": "madelon123",
+                "report_recipe_id": "31c79490-fb51-440d-9108-0c388276f655",
+            },
+            "enabled": "true",
+            "schedule": "0 0 * * *",
+            "tasks": [
+                {
+                    "id": "f4f938e0-5f2d-4bcd-9b28-11831b7835e4",
+                    "scheduler_id": "report-madelon123",
+                    "schedule_id": "e9a00bc1-850a-401a-89d9-252d98823bb3",
+                    "priority": 1729521145,
+                    "status": "completed",
+                    "type": "report",
+                    "hash": "02e67c8676cb8135681d52ca62a9fe5b",
+                    "data": {
+                        "organisation_id": "madelon123",
+                        "report_recipe_id": "31c79490-fb51-440d-9108-0c388276f655",
+                    },
+                    "created_at": "2024-10-21T14:32:25.247525Z",
+                    "modified_at": "2024-10-21T14:32:25.247527Z",
+                }
+            ],
+            "deadline_at": "2024-10-23T00:00:00Z",
+            "created_at": "2024-10-21T13:34:42.791561Z",
+            "modified_at": "2024-10-21T13:34:42.791563Z",
+        },
+    ]
+
+    return report_schedule
 
 
 def setup_request(request, user):
@@ -1413,13 +1437,37 @@ def get_normalizers_data() -> list[dict]:
     return json.loads(get_stub_path("katalogus_normalizers.json").read_text())
 
 
+def get_aggregate_report_data():
+    return json.loads(get_stub_path("aggregate_report_data.json").read_text())
+
+
+@pytest.fixture()
+def get_multi_report_data_minvws():
+    return json.loads(get_stub_path("multi_report_data_minvws.json").read_text())
+
+
+@pytest.fixture()
+def get_multi_report_data_mispoes():
+    return json.loads(get_stub_path("multi_report_data_mispoes.json").read_text())
+
+
+@pytest.fixture()
+def get_multi_report_post_processed_data():
+    return json.loads(get_stub_path("multi_report_post_processed_data.json").read_text())
+
+
 def get_plugins_data() -> list[dict]:
     return get_boefjes_data() + get_normalizers_data()
 
 
 @pytest.fixture()
 def mock_mixins_katalogus(mocker):
-    return mocker.patch("katalogus.views.mixins.get_katalogus")
+    return mocker.patch("account.mixins.OrganizationView.get_katalogus")
+
+
+@pytest.fixture()
+def mock_katalogus_client(mocker):
+    return mocker.patch("katalogus.client.KATalogusClient")
 
 
 @pytest.fixture
@@ -1475,29 +1523,17 @@ class MockOctopoesAPIConnector:
         return self.oois[reference]
 
     def get_tree(
-        self,
-        reference: Reference,
-        valid_time: datetime,
-        types: set = frozenset(),
-        depth: int = 1,
+        self, reference: Reference, valid_time: datetime, types: set = frozenset(), depth: int = 1
     ) -> ReferenceTree:
         return self.tree[reference]
 
     def query(
-        self,
-        path: str,
-        valid_time: datetime,
-        source: Reference | str | None = None,
-        offset: int = 0,
-        limit: int = 50,
+        self, path: str, valid_time: datetime, source: Reference | str | None = None, offset: int = 0, limit: int = 50
     ) -> list[OOI]:
         return self.queries[path][source]
 
     def query_many(
-        self,
-        path: str,
-        valid_time: datetime,
-        sources: list[OOI | Reference | str],
+        self, path: str, valid_time: datetime, sources: list[OOI | Reference | str]
     ) -> list[tuple[str, OOIType]]:
         result = []
 
@@ -1559,12 +1595,7 @@ def listed_hostnames(network) -> list[Hostname]:
 
 @pytest.fixture
 def paginated_task_list(task):
-    return PaginatedTasksResponse(
-        count=1,
-        next="",
-        previous=None,
-        results=[task],
-    )
+    return PaginatedTasksResponse(count=1, next="", previous=None, results=[task])
 
 
 @pytest.fixture
@@ -1684,36 +1715,11 @@ def onboarding_collect_data():
         "Hostname|internet|mispo.es": {
             "input_ooi": "Hostname|internet|mispo.es",
             "records": [
-                {
-                    "type": "A",
-                    "ttl": 480,
-                    "name": "mispo.es",
-                    "content": "134.209.85.72",
-                },
-                {
-                    "type": "MX",
-                    "ttl": 480,
-                    "name": "mispo.es",
-                    "content": "10 mx.wijmailenveilig.nl.",
-                },
-                {
-                    "type": "NS",
-                    "ttl": 480,
-                    "name": "mispo.es",
-                    "content": "ns1.domaindiscount24.net.",
-                },
-                {
-                    "type": "NS",
-                    "ttl": 480,
-                    "name": "mispo.es",
-                    "content": "ns2.domaindiscount24.net.",
-                },
-                {
-                    "type": "NS",
-                    "ttl": 480,
-                    "name": "mispo.es",
-                    "content": "ns3.domaindiscount24.net.",
-                },
+                {"type": "A", "ttl": 480, "name": "mispo.es", "content": "134.209.85.72"},
+                {"type": "MX", "ttl": 480, "name": "mispo.es", "content": "10 mx.wijmailenveilig.nl."},
+                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns1.domaindiscount24.net."},
+                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns2.domaindiscount24.net."},
+                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns3.domaindiscount24.net."},
                 {
                     "type": "SOA",
                     "ttl": 480,
@@ -1775,7 +1781,6 @@ def boefje_dns_records():
         authors=None,
         created=None,
         description="Fetch the DNS record(s) of a hostname",
-        environment_keys=None,
         related=[],
         enabled=True,
         type="boefje",
@@ -1784,4 +1789,219 @@ def boefje_dns_records():
         options=None,
         runnable_hash=None,
         produces={"boefje/dns-records"},
+        boefje_schema={},
+        oci_image="ghcr.io/test/image:123",
+        oci_arguments=["-test", "-arg"],
+    )
+
+
+@pytest.fixture
+def boefje_nmap_tcp():
+    return Boefje(
+        id="nmap",
+        name="Nmap TCP",
+        version=None,
+        authors=None,
+        created=None,
+        description="Defaults to top 250 TCP ports. Includes service detection.",
+        environment_keys=None,
+        related=[],
+        enabled=True,
+        type="boefje",
+        scan_level=SCAN_LEVEL.L2,
+        consumes={IPAddressV4, IPAddressV6},
+        options=None,
+        runnable_hash=None,
+        produces={"boefje/nmap"},
+        boefje_schema={},
+        oci_image="ghcr.io/test/image:123",
+        oci_arguments=["-test", "-arg"],
+    )
+
+
+@pytest.fixture
+def drf_admin_client(create_drf_client, admin_user):
+    client = create_drf_client(admin_user)
+    # We need to set this so that the test client doesn't throw an
+    # exception, but will return error in the API we can test
+    client.raise_request_exception = False
+    return client
+
+
+@pytest.fixture
+def drf_redteam_client(create_drf_client, redteamuser):
+    client = create_drf_client(redteamuser)
+    # We need to set this so that the test client doesn't throw an
+    # exception, but will return error in the API we can test
+    client.raise_request_exception = False
+    return client
+
+
+@pytest.fixture
+def get_aggregate_report_ooi():
+    return Report(
+        object_type="Report",
+        scan_profile=EmptyScanProfile(
+            scan_profile_type="empty",
+            reference=Reference("Report|6a073ba0-46d3-451c-a7f8-46923c2b841b"),
+            level=ScanLevel.L0,
+            user_id=None,
+        ),
+        primary_key="Report|6a073ba0-46d3-451c-a7f8-46923c2b841b",
+        name="Aggregate Report",
+        report_type="aggregate-organisation-report",
+        template="aggregate_organisation_report/report.html",
+        date_generated=datetime(2024, 9, 3, 14, 14, 46, 999999),
+        input_oois=["Hostname|internet|mispo.es"],
+        report_id=UUID("6a073ba0-46d3-451c-a7f8-46923c2b841b"),
+        organization_code="_test",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="250cf43e-bfe2-4249-b493-a12921cb79f6",
+        observed_at=datetime(2024, 9, 3, 14, 14, 45, 999999),
+        parent_report=None,
+        has_parent=False,
+    )
+
+
+@pytest.fixture
+def get_aggregate_report_from_bytes():
+    data = {
+        "systems": {
+            "services": {
+                "IPAddressV4|internet|134.209.85.72": {"hostnames": ["Hostname|internet|mispo.es"], "services": []}
+            }
+        },
+        "services": {},
+        "recommendations": [],
+        "recommendation_counts": {},
+        "open_ports": {"134.209.85.72": {"ports": {}, "hostnames": ["mispo.es"], "services": {}}},
+        "ipv6": {"mispo.es": {"enabled": False, "systems": []}},
+        "vulnerabilities": {
+            "IPAddressV4|internet|134.209.85.72": {
+                "hostnames": "(mispo.es)",
+                "vulnerabilities": {},
+                "summary": {"total_findings": 0, "total_criticals": 0, "terms": [], "recommendations": []},
+                "title": "134.209.85.72",
+            }
+        },
+        "basic_security": {
+            "rpki": {},
+            "system_specific": {"Mail": [], "Web": [], "DNS": []},
+            "safe_connections": {},
+            "summary": {},
+        },
+        "summary": {"critical_vulnerabilities": 0, "ips_scanned": 1, "hostnames_scanned": 1, "terms_in_report": ""},
+        "total_findings": 0,
+        "total_systems": 1,
+        "total_hostnames": 1,
+        "total_systems_basic_security": 0,
+        "health": [
+            {"service": "rocky", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+            {"service": "octopoes", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+            {
+                "service": "xtdb",
+                "healthy": True,
+                "version": "1.24.1",
+                "additional": {
+                    "version": "1.24.1",
+                    "revision": "1164f9a3c7e36edbc026867945765fd4366c1731",
+                    "indexVersion": 22,
+                    "consumerState": None,
+                    "kvStore": "xtdb.rocksdb.RocksKv",
+                    "estimateNumKeys": 36846,
+                    "size": 33301692,
+                },
+                "results": [],
+            },
+            {
+                "service": "katalogus",
+                "healthy": True,
+                "version": "0.0.1-development",
+                "additional": None,
+                "results": [],
+            },
+            {"service": "scheduler", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+            {"service": "bytes", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+            {"service": "keiko", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+        ],
+        "config_oois": [],
+        "input_data": {
+            "input_oois": ["Hostname|internet|mispo.es"],
+            "report_types": [
+                "ipv6-report",
+                "mail-report",
+                "name-server-report",
+                "open-ports-report",
+                "rpki-report",
+                "safe-connections-report",
+                "systems-report",
+                "vulnerability-report",
+                "web-system-report",
+            ],
+            "plugins": {"required": [], "optional": []},
+        },
+    }
+    return json.dumps(data).encode("utf-8")
+
+
+@pytest.fixture
+def report_data_ooi_org_a(organization, get_multi_report_data_minvws):
+    return ReportData(
+        object_type="ReportData",
+        scan_profile=EmptyScanProfile(
+            scan_profile_type="empty",
+            reference=Reference(f"ReportData|{organization.code}"),
+            level=ScanLevel.L0,
+            user_id=None,
+        ),
+        user_id=None,
+        primary_key=f"ReportData|{organization.code}",
+        organization_code=organization.code,
+        organization_name=organization.name,
+        organization_tags=[],
+        data=get_multi_report_data_minvws,
+    )
+
+
+@pytest.fixture
+def report_data_ooi_org_b(organization_b, get_multi_report_data_mispoes):
+    return ReportData(
+        object_type="ReportData",
+        scan_profile=EmptyScanProfile(
+            scan_profile_type="empty",
+            reference=Reference(f"ReportData|{organization_b.code}"),
+            level=ScanLevel.L0,
+            user_id=None,
+        ),
+        user_id=None,
+        primary_key=f"ReportData|{organization_b.code}",
+        organization_code=organization_b.code,
+        organization_name=organization_b.name,
+        organization_tags=[],
+        data=get_multi_report_data_mispoes,
+    )
+
+
+@pytest.fixture
+def multi_report_ooi(report_data_ooi_org_a, report_data_ooi_org_b):
+    return Report(
+        object_type="Report",
+        scan_profile=None,
+        user_id=None,
+        primary_key="Report|79f43c90-e554-4cb7-a922-82f92b57c3a7",
+        name="Sector Report",
+        report_type="multi-organization-report",
+        template="multi_organization_report/report.html",
+        date_generated=datetime(2024, 10, 18, 14, 14, 46, 999999),
+        input_oois=[report_data_ooi_org_a.primary_key, report_data_ooi_org_b.primary_key],
+        report_id=UUID("79f43c90-e554-4cb7-a922-82f92b57c3a7"),
+        organization_code=report_data_ooi_org_a.organization_code,
+        organization_name=report_data_ooi_org_a.organization_name,
+        organization_tags=[],
+        data_raw_id="bb4d5271-b273-4af4-a25a-83ba0c4fed63",
+        observed_at=datetime(2024, 10, 18, 14, 14, 45, 999999),
+        parent_report=None,
+        report_recipe=None,
+        has_parent=False,
     )

@@ -1,6 +1,7 @@
 name: Pre-commit checks
 
 on:
+  workflow_call:
   push:
     branches:
       - "main"
@@ -23,7 +24,7 @@ jobs:
           cache: pip
 
       - name: Install pre-commit
-        run: pip install pre-commit==3.6.0
+        run: pip install pre-commit==3.8.0
 
       - uses: actions/cache@v4
         with:

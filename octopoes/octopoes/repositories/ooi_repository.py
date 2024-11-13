@@ -41,8 +41,8 @@ logger = structlog.get_logger(__name__)
 
 
 def merge_ooi(ooi_new: OOI, ooi_old: OOI) -> tuple[OOI, bool]:
-    data_old = ooi_old.dict()
-    data_new = ooi_new.dict()
+    data_old = ooi_old.model_dump()
+    data_new = ooi_new.model_dump()
 
     # Trim new None values
     clean_new = {key: val for key, val in data_new.items() if val is not None}
@@ -54,7 +54,7 @@ def merge_ooi(ooi_new: OOI, ooi_old: OOI) -> tuple[OOI, bool]:
             break
 
     data_old.update(clean_new)
-    return ooi_new.__class__.parse_obj(data_old), changed
+    return ooi_new.__class__.model_validate(data_old), changed
 
 
 class OOIRepository(Repository):
@@ -102,11 +102,7 @@ class OOIRepository(Repository):
     ) -> Paginated[OOI]:
         raise NotImplementedError
 
-    def list_oois_by_object_types(
-        self,
-        types: set[type[OOI]],
-        valid_time: datetime,
-    ) -> list[OOI]:
+    def list_oois_by_object_types(self, types: set[type[OOI]], valid_time: datetime) -> list[OOI]:
         raise NotImplementedError
 
     def list_random(
@@ -120,15 +116,14 @@ class OOIRepository(Repository):
     def save(self, ooi: OOI, valid_time: datetime, end_valid_time: datetime | None = None) -> None:
         raise NotImplementedError
 
+    def delete_if_exists(self, reference: Reference, valid_time: datetime) -> None:
+        raise NotImplementedError
+
     def delete(self, reference: Reference, valid_time: datetime) -> None:
         raise NotImplementedError
 
     def get_tree(
-        self,
-        reference: Reference,
-        valid_time: datetime,
-        search_types: set[type[OOI]] | None = None,
-        depth: int = 1,
+        self, reference: Reference, valid_time: datetime, search_types: set[type[OOI]] | None = None, depth: int = 1
     ) -> ReferenceTree:
         raise NotImplementedError
 
@@ -139,13 +134,7 @@ class OOIRepository(Repository):
         raise NotImplementedError
 
     def list_findings(
-        self,
-        severities,
-        valid_time,
-        exclude_muted,
-        only_muted,
-        offset,
-        limit,
+        self, severities, valid_time, exclude_muted, only_muted, offset, limit, search_string, order_by, asc_desc
     ) -> Paginated[Finding]:
         raise NotImplementedError
 
@@ -373,16 +362,9 @@ class XTDBOOIRepository(OOIRepository):
 
         res = self.session.client.query(data_query, valid_time)
         oois = [self.deserialize(x[0]) for x in res]
-        return Paginated(
-            count=count,
-            items=oois,
-        )
+        return Paginated(count=count, items=oois)
 
-    def list_oois_by_object_types(
-        self,
-        types: set[type[OOI]],
-        valid_time: datetime,
-    ) -> list[OOI]:
+    def list_oois_by_object_types(self, types: set[type[OOI]], valid_time: datetime) -> list[OOI]:
         types = to_concrete(types)
         data_query = """
                 {{
@@ -393,9 +375,7 @@ class XTDBOOIRepository(OOIRepository):
                     }}
                     :in-args [[{object_types}]]
                 }}
-        """.format(
-            object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)),
-        )
+        """.format(object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)))
         return [self.deserialize(x[0]) for x in self.session.client.query(data_query, valid_time)]
 
     def list_random(
@@ -416,10 +396,7 @@ class XTDBOOIRepository(OOIRepository):
                 }}
                 :in-args [[{scan_levels}]]
             }}
-            """.format(
-            amount=amount,
-            scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]),
-        )
+            """.format(amount=amount, scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]))
 
         res = self.session.client.query(query, valid_time)
         if not res:
@@ -428,11 +405,7 @@ class XTDBOOIRepository(OOIRepository):
         return list(self.load_bulk(references, valid_time).values())
 
     def get_tree(
-        self,
-        reference: Reference,
-        valid_time: datetime,
-        search_types: set[type[OOI]] | None = None,
-        depth: int = 1,
+        self, reference: Reference, valid_time: datetime, search_types: set[type[OOI]] | None = None, depth: int = 1
     ) -> ReferenceTree:
         if search_types is None:
             search_types = {OOI}
@@ -456,10 +429,7 @@ class XTDBOOIRepository(OOIRepository):
         """
         ooi_classes = {ooi.class_ for ooi in references}
         ooi_ids = [str(reference) for reference in references]
-        field_node = RelatedFieldNode(
-            data_model=datamodel,
-            object_types=ooi_classes,
-        )
+        field_node = RelatedFieldNode(data_model=datamodel, object_types=ooi_classes)
         field_node.build_tree(1)
         query = generate_pull_query(FieldSet.ONLY_ID, {self.pk_prefix: ooi_ids}, field_node=field_node)
         res = self.session.client.query(query, valid_time=valid_time)
@@ -646,20 +616,19 @@ class XTDBOOIRepository(OOIRepository):
         # After transaction, send event
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
-    def delete(self, reference: Reference, valid_time: datetime) -> None:
-        # retrieve old ooi
+    def delete_if_exists(self, reference: Reference, valid_time: datetime) -> None:
         try:
-            ooi = self.get(reference, valid_time=valid_time)
+            self.delete(reference, valid_time)
         except ObjectNotFoundException:
             return
+
+    def delete(self, reference: Reference, valid_time: datetime) -> None:
+        ooi = self.get(reference, valid_time=valid_time)
 
         self.session.add((XTDBOperationType.DELETE, str(reference), valid_time))
 
         event = OOIDBEvent(
-            operation_type=OperationType.DELETE,
-            valid_time=valid_time,
-            old_data=ooi,
-            client=self.event_manager.client,
+            operation_type=OperationType.DELETE, valid_time=valid_time, old_data=ooi, client=self.event_manager.client
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
@@ -729,6 +698,9 @@ class XTDBOOIRepository(OOIRepository):
         only_muted=False,
         offset=DEFAULT_OFFSET,
         limit=DEFAULT_LIMIT,
+        search_string: str | None = None,
+        order_by: Literal["score", "finding_type"] = "score",
+        asc_desc: Literal["asc", "desc"] = "desc",
     ) -> Paginated[Finding]:
         # clause to find risk_severity
         concrete_finding_types = to_concrete({FindingType})
@@ -751,6 +723,15 @@ class XTDBOOIRepository(OOIRepository):
         elif only_muted:
             muted_clause = "[?muted_finding :MutedFinding/finding ?finding]"
 
+        search_statement = (
+            f"""[?finding :xt/id ?id]
+                                [(clojure.string/includes? ?id \"{escape_string(search_string)}\")]"""
+            if search_string
+            else ""
+        )
+
+        order_statement = f":order-by [[?{order_by} :{asc_desc}]]"
+
         severity_values = ", ".join([str_val(severity.value) for severity in severities])
 
         count_query = f"""
@@ -760,6 +741,7 @@ class XTDBOOIRepository(OOIRepository):
                     :in [[severities_ ...]]
                     :where [[?finding :object_type "Finding"]
                             [?finding :Finding/finding_type ?finding_type]
+                            {search_statement}
                             [(== ?severity severities_)]
                             {or_severities}
                             {muted_clause}]
@@ -776,26 +758,24 @@ class XTDBOOIRepository(OOIRepository):
         finding_query = f"""
             {{
                 :query {{
-                    :find [(pull ?finding [*]) ?score]
+                    :find [(pull ?finding [*]) ?score ?finding_type]
                     :in [[severities_ ...]]
                     :where [[?finding :object_type "Finding"]
                             [?finding :Finding/finding_type ?finding_type]
                             [(== ?severity severities_)]
                             {or_severities}
                             {or_scores}
-                            {muted_clause}]
+                            {muted_clause}
+                            {search_statement}]
                     :limit {limit}
                     :offset {offset}
-                    :order-by [[?score :desc]]
+                    {order_statement}
                 }}
                :in-args [[{severity_values}]]
             }}
         """
 
-        return Paginated(
-            count=count,
-            items=[x[0] for x in self.query(finding_query, valid_time)],
-        )
+        return Paginated(count=count, items=[x[0] for x in self.query(finding_query, valid_time)])
 
     def simplify_keys(self, data: dict[str, Any]) -> dict[str, Any]:
         new_data: dict[str, Any] = {}
@@ -840,17 +820,16 @@ class XTDBOOIRepository(OOIRepository):
         results = [
             (
                 self.simplify_keys(x[0]),
-                [self.simplify_keys(y) for y in x[0]["Report/_parent_report"]]
-                if "Report/_parent_report" in x[0]
-                else [],
+                (
+                    [self.simplify_keys(y) for y in x[0]["Report/_parent_report"]]
+                    if "Report/_parent_report" in x[0]
+                    else []
+                ),
             )
             for x in self.session.client.query(query)
         ]
 
-        return Paginated(
-            count=count,
-            items=results,
-        )
+        return Paginated(count=count, items=results)
 
     def query(self, query: str | Query, valid_time: datetime) -> list[OOI | tuple]:
         results = self.session.client.query(query, valid_time=valid_time)

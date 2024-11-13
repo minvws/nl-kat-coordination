@@ -23,7 +23,7 @@ class MultiOrganizationReport(MultiReport):
     id = "multi-organization-report"
     name = _("Multi Organization Report")
     description = _("Multi Organization Report")
-    plugins: ReportPlugins = {"required": [], "optional": []}
+    plugins: ReportPlugins = {"required": set(), "optional": set()}
     input_ooi_types = {ReportData}
     template_path = "multi_organization_report/report.html"
 
@@ -55,6 +55,7 @@ class MultiOrganizationReport(MultiReport):
         organization_metrics: dict[str, Any] = {}
 
         for organization, report_data in data.items():
+            aggregate_data = report_data["data"]
             basic_security = {"compliant": 0, "total": 0}
 
             for tag in report_data["organization_tags"]:
@@ -63,13 +64,17 @@ class MultiOrganizationReport(MultiReport):
 
                 tags[tag].append(report_data["organization_code"])
 
-            aggregate_data = report_data["data"]["post_processed_data"]
-            total_critical_vulnerabilities += aggregate_data["summary"]["Critical vulnerabilities"]
+            # Added for backward compatability issues
+            if "Critical vulnerabilities" in aggregate_data["summary"]:
+                total_critical_vulnerabilities += aggregate_data["summary"]["Critical vulnerabilities"]
+            else:
+                total_critical_vulnerabilities += aggregate_data["summary"]["critical_vulnerabilities"]
+
             total_findings += aggregate_data["total_findings"]
             total_systems += aggregate_data["total_systems"]
             total_hostnames += aggregate_data["total_hostnames"]
 
-            for compliance in report_data["data"]["post_processed_data"]["basic_security"]["summary"].values():
+            for compliance in report_data["data"]["basic_security"]["summary"].values():
                 for counts in compliance.values():
                     basic_security["total"] += counts["total"]
                     basic_security["compliant"] += counts["number_of_compliant"]
@@ -250,13 +255,9 @@ class MultiOrganizationReport(MultiReport):
         }
 
 
-def collect_report_data(
-    connector: OctopoesAPIConnector,
-    input_ooi_references: list[str],
-    observed_at: datetime,
-):
+def collect_report_data(connector: OctopoesAPIConnector, input_ooi_references: list[str], observed_at: datetime):
     report_data = {}
     for ooi in [x for x in input_ooi_references if Reference.from_str(x).class_type == ReportData]:
-        report_data[ooi] = connector.get(Reference.from_str(ooi), observed_at).dict()
+        report_data[ooi] = connector.get(Reference.from_str(ooi), observed_at).model_dump()
 
     return report_data

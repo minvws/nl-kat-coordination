@@ -24,8 +24,7 @@ from tests.conftest import setup_request
 def test_onboarding_introduction(request, member, rf):
     member = request.getfixturevalue(member)
     response = OnboardingIntroductionView.as_view()(
-        setup_request(rf.get("step_introduction"), member.user),
-        organization_code=member.organization.code,
+        setup_request(rf.get("step_introduction"), member.user), organization_code=member.organization.code
     )
 
     assert response.status_code == 200
@@ -38,8 +37,7 @@ def test_onboarding_introduction(request, member, rf):
 def test_onboarding_choose_report_info(request, member, rf):
     member = request.getfixturevalue(member)
     response = OnboardingChooseReportInfoView.as_view()(
-        setup_request(rf.get("step_choose_report_info"), member.user),
-        organization_code=member.organization.code,
+        setup_request(rf.get("step_choose_report_info"), member.user), organization_code=member.organization.code
     )
 
     assert response.status_code == 200
@@ -55,8 +53,7 @@ def test_onboarding_choose_report_info(request, member, rf):
 def test_onboarding_choose_report_type(request, member, rf):
     member = request.getfixturevalue(member)
     response = OnboardingChooseReportTypeView.as_view()(
-        setup_request(rf.get("step_choose_report_type"), member.user),
-        organization_code=member.organization.code,
+        setup_request(rf.get("step_choose_report_type"), member.user), organization_code=member.organization.code
     )
 
     assert response.status_code == 200
@@ -73,8 +70,7 @@ def test_onboarding_choose_report_type(request, member, rf):
 def test_onboarding_setup_scan(request, member, rf):
     member = request.getfixturevalue(member)
     response = OnboardingSetupScanOOIInfoView.as_view()(
-        setup_request(rf.get("step_setup_scan_ooi_info"), member.user),
-        organization_code=member.organization.code,
+        setup_request(rf.get("step_setup_scan_ooi_info"), member.user), organization_code=member.organization.code
     )
 
     assert response.status_code == 200
@@ -114,10 +110,7 @@ def test_onboarding_setup_scan_detail_create_ooi(
     member = request.getfixturevalue(member)
 
     response = OnboardingSetupScanOOIAddView.as_view()(
-        setup_request(
-            rf.post("step_setup_scan_ooi_add", {"url": url.raw}),
-            member.user,
-        ),
+        setup_request(rf.post("step_setup_scan_ooi_add", {"url": url.raw}), member.user),
         ooi_type="URL",
         organization_code=member.organization.code,
     )
@@ -133,7 +126,7 @@ def test_onboarding_clearance_level_introduction(rf, redteam_member, mock_organi
 
     assert response.status_code == 200
     assertContains(response, "OpenKAT introduction")
-    assertContains(response, "OOI clearance for " + url.primary_key)
+    assertContains(response, "OOI clearance for " + url.human_readable)
     assertContains(response, "Introduction")
     assertContains(response, "How to know required clearance level")
     assertContains(response, "Fierce")
@@ -152,7 +145,7 @@ def test_onboarding_acknowledge_clearance_level(rf, redteam_member, mock_organiz
 
     assert response.status_code == 200
     assertContains(response, "OpenKAT introduction")
-    assertContains(response, "Setup scan - OOI clearance for " + url.primary_key)
+    assertContains(response, "Setup scan - OOI clearance for " + url.human_readable)
     assertContains(response, "Trusted clearance level")
     assertContains(response, "Acknowledge clearance level")
     assertContains(response, "What is my clearance level?")
@@ -239,7 +232,7 @@ def test_onboarding_set_clearance_level(
     assert response_superuser.status_code == 200
 
     assertContains(response_redteam, "OpenKAT introduction")
-    assertContains(response_redteam, "Setup scan - Set clearance level for " + str(url.primary_key))
+    assertContains(response_redteam, "Setup scan - Set clearance level for " + str(url.human_readable))
     assertContains(response_redteam, "Set clearance level")
     assertContains(response_redteam, "Skip onboarding")
 
@@ -256,15 +249,8 @@ def test_onboarding_set_clearance_level(
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "redteam_member"])
-def test_onboarding_select_plugins(
-    request,
-    member,
-    rf,
-    mocker,
-    mock_organization_view_octopoes,
-    url,
-):
-    mocker.patch("onboarding.views.get_katalogus")
+def test_onboarding_select_plugins(request, member, rf, mocker, mock_organization_view_octopoes, url):
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
     member = request.getfixturevalue(member)
     request = setup_request(rf.get("step_setup_scan_select_plugins", {"ooi": url.primary_key}), member.user)
 
@@ -283,12 +269,7 @@ def test_onboarding_select_plugins(
 
 
 @pytest.mark.parametrize("member", ["admin_member", "client_member"])
-def test_onboarding_select_plugins_perms(
-    request,
-    member,
-    rf,
-    url,
-):
+def test_onboarding_select_plugins_perms(request, member, rf, url):
     member = request.getfixturevalue(member)
 
     request = setup_request(rf.get("step_setup_scan_select_plugins", {"ooi": url.primary_key}), member.user)
@@ -322,7 +303,7 @@ def test_onboarding_scanning_boefjes(
 ):
     member = request.getfixturevalue(member)
 
-    mocker.patch("reports.views.base.get_katalogus")
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
     mock_organization_view_octopoes().get.return_value = url
     mock_bytes_client().upload_raw.return_value = "raw_id"
 
@@ -332,11 +313,7 @@ def test_onboarding_scanning_boefjes(
     )
 
     response = OnboardingReportView.as_view()(
-        setup_request(
-            rf.post(request_url),
-            member.user,
-        ),
-        organization_code=member.organization.code,
+        setup_request(rf.post(request_url), member.user), organization_code=member.organization.code
     )
 
     assert response.status_code == 302
