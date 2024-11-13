@@ -147,7 +147,7 @@ class OOIRepository(Repository):
     def list_related(self, ooi: OOI, path: Path, valid_time: datetime) -> list[OOI]:
         raise NotImplementedError
 
-    def query(self, query: Query, valid_time: datetime) -> list[OOI | tuple]:
+    def query(self, query: str | Query, valid_time: datetime) -> list[OOI | tuple]:
         raise NotImplementedError
 
 

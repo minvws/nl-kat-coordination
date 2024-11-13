@@ -77,8 +77,8 @@ class OctopoesService:
         self.origin_repository = origin_repository
         self.origin_parameter_repository = origin_parameter_repository
         self.scan_profile_repository = scan_profile_repository
+        self.nibbler = NibblesRunner(ooi_repository, scan_profile_repository)
         self.session = session
-        self.nibbles = NibblesRunner(ooi_repository, scan_profile_repository, origin_parameter_repository)
 
     @overload
     def _populate_scan_profiles(self, oois: ValuesView[OOI], valid_time: datetime) -> ValuesView[OOI]: ...
@@ -262,7 +262,7 @@ class OctopoesService:
         self.save_origin(origin, resulting_oois, valid_time)
 
         # The nibble part of inferring
-        resulting_nibble_oois = self.nibbles.infer([source], valid_time)
+        resulting_nibble_oois = self.nibbler.infer([source], valid_time)
         for source_ooi, results in resulting_nibble_oois.items():
             self.ooi_repository.save(source_ooi, valid_time)
             for nibble_id, result_oois in results.items():

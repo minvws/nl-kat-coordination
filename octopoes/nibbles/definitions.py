@@ -5,8 +5,6 @@ from logging import getLogger
 from pathlib import Path
 from types import MethodType, ModuleType
 
-from pydantic import BaseModel
-
 from octopoes.models import OOI
 
 NIBBLES_DIR = Path(__file__).parent
@@ -15,25 +13,10 @@ NIBBLE_FUNC_NAME = "nibble"
 logger = getLogger(__name__)
 
 
-class NibbleParameterDefinition(BaseModel):
-    ooi_type: type[OOI]
-    relation_path: str | None = None
-
-    def __eq__(self, other):
-        if isinstance(other, NibbleParameterDefinition):
-            return vars(self) == vars(other)
-        elif isinstance(other, type):
-            return self.ooi_type == other
-        else:
-            return False
-
-    def __hash__(self):
-        return hash(str(self.ooi_type) + self.relation_path if self.relation_path else "\a")
-
-
 class NibbleDefinition:
     id: str
-    signature: list[NibbleParameterDefinition]
+    signature: list[type[OOI]]
+    query: str | None = None
     min_scan_level: int = 1
     default_enabled: bool = True
     config_ooi_relation_path: str | None = None
@@ -42,13 +25,15 @@ class NibbleDefinition:
     def __init__(
         self,
         name: str,
-        signature: list,
+        signature: list[type[OOI]],
+        query: str | None = None,
         min_scan_level: int = 1,
         default_enabled: bool = True,
         config_ooi_relation_path: str | None = None,
     ):
         self.id = name
         self.signature = signature
+        self.query = query
         self.min_scan_level = min_scan_level
         self.default_enabled = default_enabled
         self.config_ooi_relation_path = config_ooi_relation_path

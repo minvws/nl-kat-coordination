@@ -6,7 +6,7 @@ from ipaddress import IPv4Address, ip_address
 from unittest.mock import Mock
 
 import pytest
-from nibbles.definitions import NibbleDefinition, NibbleParameterDefinition
+from nibbles.definitions import NibbleDefinition
 from nibbles.runner import NibblesRunner
 
 from octopoes.core.service import OctopoesService
@@ -29,12 +29,12 @@ def dummy(network: Network) -> Network | None:
         return Network(name=new_name)
 
 
-dummy_nibble = NibbleDefinition(name="dummy", signature=[NibbleParameterDefinition(ooi_type=Network)])
+dummy_nibble = NibbleDefinition(name="dummy", signature=[Network])
 dummy_nibble.payload = getattr(sys.modules[__name__], "dummy")
 
 
 def test_dummy_nibble(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
-    xtdb_octopoes_service.nibbles.nibbles = [dummy_nibble]
+    xtdb_octopoes_service.nibbler.nibbles = [dummy_nibble]
     network = Network(name="internet")
     xtdb_octopoes_service.ooi_repository.save(network, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
@@ -91,26 +91,20 @@ def url_classification(url: URL) -> Iterator[OOI]:
                 yield original_url
 
 
-url_classification_nibble = NibbleDefinition(
-    name="url_classification", signature=[NibbleParameterDefinition(ooi_type=URL)], min_scan_level=-1
-)
+url_classification_nibble = NibbleDefinition(name="url_classification", signature=[URL], min_scan_level=-1)
 url_classification_nibble.payload = getattr(sys.modules[__name__], "url_classification")
 
 
 def test_url_classification_nibble(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
-    nibble_runner = NibblesRunner(
-        xtdb_octopoes_service.ooi_repository,
-        xtdb_octopoes_service.scan_profile_repository,
-        xtdb_octopoes_service.origin_parameter_repository,
-    )
-    nibble_runner.nibbles = [url_classification_nibble]
+    nibbler = NibblesRunner(xtdb_octopoes_service.ooi_repository, xtdb_octopoes_service.scan_profile_repository)
+    nibbler.nibbles = [url_classification_nibble]
     network = Network(name="internet")
     xtdb_octopoes_service.ooi_repository.save(network, valid_time)
     url = URL(network=network.reference, raw="https://mispo.es/")
     xtdb_octopoes_service.ooi_repository.save(url, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
 
-    result = nibble_runner.infer([url], valid_time)
+    result = nibbler.infer([url], valid_time)
 
     assert url in result
     assert "url_classification" in result[url]
