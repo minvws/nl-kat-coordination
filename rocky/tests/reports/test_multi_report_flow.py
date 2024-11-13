@@ -74,7 +74,7 @@ def test_multi_report_report_types_selection(
     Will send the selected report types to the configuration page (set plugins).
     """
 
-    mocker.patch("reports.views.base.get_katalogus")()
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")()
 
     oois = [report_data_ooi_org_a, report_data_ooi_org_b]
 
@@ -111,7 +111,7 @@ def test_save_multi_report(
     Will send data through post to multi report.
     """
 
-    mocker.patch("reports.views.base.get_katalogus")()
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")()
     oois = [report_data_ooi_org_a, report_data_ooi_org_b]
     oois_selection = [ooi.primary_key for ooi in oois]
 

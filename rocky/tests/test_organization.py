@@ -21,7 +21,7 @@ AMOUNT_OF_TEST_ORGANIZATIONS = 50
 
 @pytest.fixture
 def bulk_organizations(active_member, blocked_member):
-    with patch("katalogus.client.KATalogusClientV1"), patch("tools.models.OctopoesAPIConnector"):
+    with patch("katalogus.client.KATalogusClient"), patch("rocky.signals.OctopoesAPIConnector"):
         organizations = []
         for i in range(1, AMOUNT_OF_TEST_ORGANIZATIONS):
             org = Organization.objects.create(name=f"Test Organization {i}", code=f"test{i}", tags=f"test-tag{i}")
@@ -68,7 +68,7 @@ def test_add_organization_page(rf, superuser_member):
 
 
 def test_add_organization_submit_success(rf, superuser_member, mocker, mock_models_octopoes, log_output):
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
     request = setup_request(rf.post("organization_add", {"name": "neworg", "code": "norg"}), superuser_member.user)
     response = OrganizationAddView.as_view()(request, organization_code=superuser_member.organization.code)
     assert response.status_code == 302
@@ -283,8 +283,8 @@ def test_admin_edits_organization(rf, admin_member, mocker):
         rf.post("organization_edit", {"name": "This organization name has been edited", "tags": "tag1,tag2"}),
         admin_member.user,
     )
-    mocker.patch("katalogus.client.KATalogusClientV1")
-    mocker.patch("tools.models.OctopoesAPIConnector")
+    mocker.patch("katalogus.client.KATalogusClient")
+    mocker.patch("rocky.signals.OctopoesAPIConnector")
     response = OrganizationEditView.as_view()(
         request, organization_code=admin_member.organization.code, pk=admin_member.organization.id
     )
@@ -305,7 +305,7 @@ def test_admin_edits_organization(rf, admin_member, mocker):
 
 
 def test_organization_code_validator_from_view(rf, superuser_member, mocker, mock_models_octopoes):
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
     request = setup_request(
         rf.post("organization_add", {"name": "DENIED LIST CHECK", "code": DENY_ORGANIZATION_CODES[0]}),
         superuser_member.user,
@@ -322,7 +322,7 @@ def test_organization_code_validator_from_view(rf, superuser_member, mocker, moc
 
 @pytest.mark.django_db
 def test_organization_code_validator_from_model(mocker, mock_models_octopoes):
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
     with pytest.raises(ValidationError):
         Organization.objects.create(name="Test", code=DENY_ORGANIZATION_CODES[0])
 

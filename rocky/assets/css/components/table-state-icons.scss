@@ -17,6 +17,10 @@ table td .icon {
     padding: 0;
     margin: 0;
     width: unset;
+
+    &::before {
+      margin-left: 0;
+    }
   }
 
   &.warning {
