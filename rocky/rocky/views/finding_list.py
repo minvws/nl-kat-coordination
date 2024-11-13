@@ -1,13 +1,19 @@
 from collections.abc import Iterable
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Literal
 
 import structlog
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 from tools.forms.base import ObservedAtForm
-from tools.forms.findings import FindingSearchForm, FindingSeverityMultiSelectForm, MutedFindingSelectionForm
+from tools.forms.findings import (
+    FindingSearchForm,
+    FindingSeverityMultiSelectForm,
+    MutedFindingSelectionForm,
+    OrderByFindingTypeForm,
+    OrderBySeverityForm,
+)
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models.ooi.findings import RiskLevelSeverity
@@ -69,14 +75,26 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         return len(self.severities) + 1 if self.muted_findings else 0 + self.count_observed_at_filter()
 
     def get_queryset(self) -> FindingList:
-        return FindingList(
-            octopoes_connector=self.octopoes_api_connector,
-            valid_time=self.observed_at,
-            severities=self.severities,
-            exclude_muted=self.exclude_muted,
-            only_muted=self.only_muted,
-            search_string=self.search_string,
-        )
+        return FindingList(self.octopoes_api_connector, **self.get_queryset_params())
+
+    def get_queryset_params(self):
+        return {
+            "valid_time": self.observed_at,
+            "severities": self.severities,
+            "exclude_muted": self.exclude_muted,
+            "only_muted": self.only_muted,
+            "search_string": self.search_string,
+            "order_by": self.order_by,
+            "asc_desc": self.sorting_order,
+        }
+
+    @property
+    def order_by(self) -> Literal["score", "finding_type"]:
+        return "finding_type" if self.request.GET.get("order_by", "") == "finding_type" else "score"
+
+    @property
+    def sorting_order(self) -> Literal["asc", "desc"]:
+        return "asc" if self.request.GET.get("sorting_order", "") == "asc" else "desc"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -87,6 +105,11 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         context["finding_search_form"] = FindingSearchForm(self.request.GET)
         context["only_muted"] = self.only_muted
         context["active_filters_counter"] = self.count_active_filters()
+        context["order_by"] = self.order_by
+        context["order_by_severity_form"] = OrderBySeverityForm(self.request.GET)
+        context["order_by_finding_type_form"] = OrderByFindingTypeForm(self.request.GET)
+        context["sorting_order"] = self.sorting_order
+        context["sorting_order_class"] = "ascending" if self.sorting_order == "asc" else "descending"
         return context
 
 

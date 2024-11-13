@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-07 11:24+0000\n"
+"POT-Creation-Date: 2024-11-12 15:31+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -602,20 +602,16 @@ msgid ""
 msgstr ""
 
 #: katalogus/client.py
+#, python-format
+msgid "An HTTP %d error occurred. Check logs for more info."
+msgstr ""
+
+#: katalogus/client.py
 msgid "Boefje with this name already exists."
 msgstr ""
 
 #: katalogus/client.py
 msgid "Boefje with this ID already exists."
-msgstr ""
-
-#: katalogus/client.py
-msgid "Editing this boefje is not allowed because it is static."
-msgstr ""
-
-#: katalogus/client.py
-#, python-format
-msgid "An HTTP %d error occurred. Check logs for more info."
 msgstr ""
 
 #: katalogus/forms/katalogus_filter.py
@@ -1008,7 +1004,6 @@ msgstr ""
 #: katalogus/templates/plugin_settings_list.html
 #: katalogus/views/katalogus_settings.py tools/view_helpers.py
 #: rocky/templates/header.html
-#: rocky/templates/organizations/organization_settings.html
 msgid "Settings"
 msgstr ""
 
@@ -1122,6 +1117,7 @@ msgid "Plugin description"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
+#: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Actions"
 msgstr ""
@@ -5321,8 +5317,12 @@ msgid "findings"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "Findings table"
+msgid "Findings table "
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/oois/ooi_list.html
+msgid "column headers with buttons are sortable"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -5814,10 +5814,6 @@ msgid "Objects "
 msgstr ""
 
 #: rocky/templates/oois/ooi_list.html
-msgid "column headers with buttons are sortable"
-msgstr ""
-
-#: rocky/templates/oois/ooi_list.html
 msgid "Delete object(s)"
 msgstr ""
 
@@ -5932,6 +5928,10 @@ msgid "Top 10 most severe Findings"
 msgstr ""
 
 #: rocky/templates/organizations/organization_crisis_room.html
+msgid "Findings table"
+msgstr ""
+
+#: rocky/templates/organizations/organization_crisis_room.html
 msgid "Finding type:"
 msgstr ""
 
@@ -5952,10 +5952,6 @@ msgid "Save organization"
 msgstr ""
 
 #: rocky/templates/organizations/organization_list.html
-msgid "Rerun all bits for all my organizations"
-msgstr ""
-
-#: rocky/templates/organizations/organization_list.html
 msgid "Add new organization"
 msgstr ""
 
@@ -5966,6 +5962,15 @@ msgstr ""
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Tags"
+msgstr ""
+
+#: rocky/templates/organizations/organization_list.html
+msgid "Actions to perform for all of your organizations."
+msgstr ""
+
+#: rocky/templates/organizations/organization_list.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Rerun all bits"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_add.html
@@ -6091,10 +6096,6 @@ msgstr ""
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/views/indemnification_add.py
 msgid "Add indemnification"
-msgstr ""
-
-#: rocky/templates/organizations/organization_settings.html
-msgid "Rerun all bits"
 msgstr ""
 
 #: rocky/templates/partials/elements/ooi_detail_settings.html
