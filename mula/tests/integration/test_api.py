@@ -7,9 +7,9 @@ from unittest import mock
 from urllib.parse import quote
 
 from fastapi.testclient import TestClient
+
 from scheduler import config, models, server, storage, utils
 from scheduler.server import serializers
-
 from tests.factories import OrganisationFactory
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
@@ -899,6 +899,22 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
             # NOTE: Remove Z from the end of the string. Until 3.11
             # datetime.fromisoformat does not accept Z at the end of the string
             datetime.fromisoformat(response.json().get("deadline_at")[:-1]).astimezone(timezone.utc),
+        )
+
+    def test_post_schedule_explicit_deadline_at(self):
+        """When a schedule is created, the deadline_at should be set if it is provided."""
+        item = functions.create_item(self.scheduler.scheduler_id, 1)
+        now = datetime.now(timezone.utc)
+        response = self.client.post(
+            "/schedules", json={"scheduler_id": item.scheduler_id, "data": item.data, "deadline_at": now.isoformat()}
+        )
+        self.assertEqual(201, response.status_code)
+        self.assertIsNone(response.json().get("schedule"))
+        self.assertEqual(
+            # NOTE: Remove Z from the end of the string. Until 3.11
+            # datetime.fromisoformat does not accept Z at the end of the string
+            datetime.fromisoformat(response.json().get("deadline_at")[:-1]).astimezone(timezone.utc),
+            now,
         )
 
     def test_post_schedule_invalid_schedule(self):
