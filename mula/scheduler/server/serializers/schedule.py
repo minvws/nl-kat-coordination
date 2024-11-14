@@ -10,7 +10,7 @@ class ScheduleCreate(BaseModel):
 
     data: dict
 
-    schedule: str
+    schedule: str | None = None
 
     deadline_at: datetime | None = None
 

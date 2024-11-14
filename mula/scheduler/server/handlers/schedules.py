@@ -108,6 +108,9 @@ class ScheduleAPI:
         return utils.paginate(request, results, count, offset, limit)
 
     def create(self, schedule: serializers.ScheduleCreate) -> Any:
+        if not (schedule.deadline_at or schedule.schedule):
+            raise BadRequestError("Either deadline_at or schedule must be provided")
+
         try:
             new_schedule = models.Schedule(**schedule.model_dump())
         except ValueError:
