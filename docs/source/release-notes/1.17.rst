@@ -148,7 +148,7 @@ Or more concretely, using Docker:
 
 .. code-block:: sh
 
-    docker compose exec boefje python -m tools.upgrade_v1_16_0
+    docker compose run --rm boefje python -m tools.upgrade_v1_16_0
 
 And using the Debian packages, either as the `kat` user or root depending on your configuration:
 
