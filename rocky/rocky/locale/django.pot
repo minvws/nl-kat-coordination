@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-12 15:31+0000\n"
+"POT-Creation-Date: 2024-11-14 20:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2408,7 +2408,7 @@ msgid "Different date"
 msgstr ""
 
 #: reports/forms.py
-msgid "Start date"
+msgid "Start date and time (UTC)"
 msgstr ""
 
 #: reports/forms.py
@@ -2425,6 +2425,10 @@ msgid "Recurrence"
 msgstr ""
 
 #: reports/forms.py
+msgid "No recurrence, just once"
+msgstr ""
+
+#: reports/forms.py
 msgid "Daily"
 msgstr ""
 
@@ -2438,6 +2442,10 @@ msgstr ""
 
 #: reports/forms.py
 msgid "Yearly"
+msgstr ""
+
+#: reports/forms.py
+msgid "Start date"
 msgstr ""
 
 #: reports/forms.py
@@ -2466,14 +2474,6 @@ msgstr ""
 
 #: reports/forms.py
 msgid "After"
-msgstr ""
-
-#: reports/forms.py
-msgid "Report name format"
-msgstr ""
-
-#: reports/forms.py
-msgid "Subreports name format"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -3702,9 +3702,11 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-msgid ""
-"The date you select will be the reference date for the data set for your "
-"report. Please allow for up to 24 hours for your report to be ready."
+msgid "Report name format"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Subreports name format"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -3838,14 +3840,6 @@ msgid ""
 "\"DNS Report for example.com at 01/01/25\"."
 msgstr ""
 
-#: reports/templates/partials/report_names_header.html
-msgid ""
-"Give your report(s) a custom name and optionally add the reports' reference "
-"date to the name. To do so you can select a standard option or use a <a "
-"href=\"https://strftime.org/\" target=\"_blank\" rel=\"noopener\">Python "
-"strftime code</a> in the report name."
-msgstr ""
-
 #: reports/templates/partials/report_navigation.html
 msgid "Report Navigation"
 msgstr ""
@@ -3854,7 +3848,7 @@ msgstr ""
 msgid "Generate Report"
 msgstr ""
 
-#: reports/templates/partials/report_navigation.html reports/views/base.py
+#: reports/templates/partials/report_navigation.html
 msgid "Aggregate Report"
 msgstr ""
 
@@ -4423,38 +4417,6 @@ msgstr ""
 msgid "Select at least one report type to proceed."
 msgstr ""
 
-#: reports/views/base.py
-#, python-brace-format
-msgid "Concatenated Report for {oois_count} objects"
-msgstr ""
-
-#: reports/views/base.py
-#, python-brace-format
-msgid "Concatenated Report for {ooi}"
-msgstr ""
-
-#: reports/views/base.py
-#, python-brace-format
-msgid "{report_type} for {oois_count} objects"
-msgstr ""
-
-#: reports/views/base.py
-#, python-brace-format
-msgid "{report_type} for {ooi}"
-msgstr ""
-
-#: reports/views/base.py
-msgid "Sector Report"
-msgstr ""
-
-#: reports/views/base.py
-msgid "Empty name should not be possible."
-msgstr ""
-
-#: reports/views/base.py
-msgid "Week %W, %Y"
-msgstr ""
-
 #: reports/views/mixins.py
 msgid ""
 "No data could be found for %(report_types). Object(s) did not exist on "
@@ -4479,7 +4441,7 @@ msgstr ""
 
 #: reports/views/report_overview.py
 msgid ""
-"Multiorganization report cannot go through a rerun. It consists of imported "
+"Multi organization reports cannot be rescheduled. It consists of imported "
 "data from different organizations and not based on new generated data."
 msgstr ""
 
