@@ -49,6 +49,10 @@ class Origin(BaseModel):
         return False
 
 
+class NibbleOrigin(Origin):
+    parameters: list[Reference] = Field(default_factory=list)
+
+
 class OriginParameter(BaseModel):
     origin_id: str
     reference: Reference

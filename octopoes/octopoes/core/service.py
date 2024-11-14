@@ -77,7 +77,7 @@ class OctopoesService:
         self.origin_repository = origin_repository
         self.origin_parameter_repository = origin_parameter_repository
         self.scan_profile_repository = scan_profile_repository
-        self.nibbler = NibblesRunner(ooi_repository, scan_profile_repository)
+        self.nibbler = NibblesRunner(ooi_repository, origin_repository, scan_profile_repository)
         self.session = session
 
     @overload
@@ -262,17 +262,7 @@ class OctopoesService:
         self.save_origin(origin, resulting_oois, valid_time)
 
         # The nibble part of inferring
-        resulting_nibble_oois = self.nibbler.infer([source], valid_time)
-        for source_ooi, results in resulting_nibble_oois.items():
-            self.ooi_repository.save(source_ooi, valid_time)
-            for nibble_id, result_oois in results.items():
-                inference_origin = Origin(
-                    method=nibble_id,
-                    origin_type=OriginType.NIBBLE,
-                    result=[ooi.reference for ooi in result_oois],
-                    source=source_ooi.reference,
-                )
-                self.save_origin(inference_origin, list(result_oois), valid_time)
+        self.nibbler.infer([source], valid_time)
 
     @staticmethod
     def check_path_level(path_level: int | None, current_level: int):

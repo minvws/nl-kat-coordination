@@ -1,16 +1,17 @@
 import importlib
 import pkgutil
 from collections.abc import Iterable
-from logging import getLogger
 from pathlib import Path
 from types import MethodType, ModuleType
+
+import structlog
 
 from octopoes.models import OOI
 
 NIBBLES_DIR = Path(__file__).parent
 NIBBLE_ATTR_NAME = "NIBBLE"
 NIBBLE_FUNC_NAME = "nibble"
-logger = getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class NibbleDefinition:
