@@ -45,7 +45,7 @@ QUESTION_DATA = {
 
 
 def test_ooi_detail(rf, client_member, mock_organization_view_octopoes, mock_scheduler, paginated_task_list, mocker):
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
 
@@ -76,7 +76,7 @@ def test_ooi_detail(rf, client_member, mock_organization_view_octopoes, mock_sch
 def test_question_detail(
     rf, client_member, mock_organization_view_octopoes, mock_scheduler, paginated_task_list, mocker
 ):
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
 
     request = setup_request(rf.get("ooi_detail", {"ooi_id": "Question|/test|Network|testnetwork"}), client_member.user)
 
@@ -101,7 +101,7 @@ def test_answer_question(
     lazy_task_list_with_boefje,
     mocker,
 ):
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(QUESTION_DATA)
 
     query_string = urlencode({"ooi_id": "Question|/test|Network|testnetwork"}, doseq=True)
@@ -127,7 +127,7 @@ def test_answer_question_bad_schema(
     lazy_task_list_with_boefje,
     mocker,
 ):
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(QUESTION_DATA)
 
     query_string = urlencode({"ooi_id": "Question|/test|Network|testnetwork"}, doseq=True)
@@ -150,7 +150,7 @@ def test_answer_question_bad_schema(
 def test_ooi_detail_start_scan(
     rf, client_member, mock_organization_view_octopoes, mock_scheduler, paginated_task_list, mocker, network
 ):
-    mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
+    mock_katalogus = mocker.patch("katalogus.client.KATalogusClient")
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
     mock_organization_view_octopoes().get.return_value = network
@@ -186,11 +186,11 @@ def test_ooi_detail_start_scan(
 def test_ooi_detail_start_scan_no_indemnification(
     rf, client_member, mock_organization_view_octopoes, mock_scheduler, paginated_task_list, mocker, network
 ):
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
     mock_organization_view_octopoes().get.return_value = network
-    mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
+    mock_katalogus = mocker.patch("katalogus.client.KATalogusClient")
     mock_katalogus().get_plugin.return_value = Boefje(
         id="nmap",
         name="",
@@ -223,7 +223,7 @@ def test_ooi_detail_start_scan_no_indemnification(
 def test_ooi_detail_start_scan_no_action(
     rf, client_member, mock_scheduler, mock_organization_view_octopoes, lazy_task_list_with_boefje, mocker, network
 ):
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
     mock_organization_view_octopoes().get.return_value = network
@@ -245,7 +245,7 @@ def test_delete_perms_ooi_detail(
     request, member, rf, mock_scheduler, mock_organization_view_octopoes, lazy_task_list_with_boefje, mocker
 ):
     member = request.getfixturevalue(member)
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
     mock_scheduler.get_lazy_task_list.return_value = lazy_task_list_with_boefje
 
@@ -261,7 +261,7 @@ def test_delete_perms_ooi_detail(
 def test_delete_perms_ooi_detail_clients(
     rf, client_member, mock_scheduler, mock_organization_view_octopoes, lazy_task_list_with_boefje, mocker
 ):
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
     mock_scheduler.get_lazy_task_list.return_value = lazy_task_list_with_boefje
 
@@ -276,7 +276,7 @@ def test_delete_perms_ooi_detail_clients(
 def test_ooi_detail_start_scan_perms(
     rf, client_member, mock_scheduler, mock_organization_view_octopoes, lazy_task_list_with_boefje, mocker
 ):
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
     request = setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), client_member.user)
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
