@@ -41,7 +41,7 @@ class ReportScheduleStartDateChoiceForm(BaseRockyForm):
 class ReportScheduleStartDateForm(BaseRockyForm):
     start_date = forms.DateTimeField(
         label=_("Start date and time (UTC)"),
-        widget=forms.DateTimeInput(attrs={"form": "generate_report", "type": "datetime-local"}),
+        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
         required=True,
         initial=lambda: datetime.now().strftime("%Y-%m-%d %H:%M"),
     )
