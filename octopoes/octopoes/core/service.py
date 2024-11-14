@@ -160,7 +160,7 @@ class OctopoesService:
                 or (origin.origin_type == OriginType.INFERENCE and origin.source == reference)
             )
         ):
-            self.ooi_repository.delete(reference, valid_time)
+            self.ooi_repository.delete_if_exists(reference, valid_time)
 
     def save_origin(
         self, origin: Origin, oois: list[OOI], valid_time: datetime, end_valid_time: datetime | None = None
@@ -190,7 +190,7 @@ class OctopoesService:
             if not (other_origin.origin_type == OriginType.INFERENCE and [other_origin.source] == other_origin.result)
         ):
             logger.debug("Affirmation source %s seems dangling, deleting", origin.source)
-            self.ooi_repository.delete(origin.source, valid_time)
+            self.ooi_repository.delete_if_exists(origin.source, valid_time)
             return
 
         for ooi in oois:

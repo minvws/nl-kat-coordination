@@ -5,8 +5,6 @@ from datetime import datetime
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from jsonschema.validators import Draft202012Validator
-from katalogus.client import get_katalogus
-from katalogus.utils import get_enabled_boefjes_for_ooi_class
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.forms.scheduler import OOIDetailTaskFilterForm
 from tools.ooi_helpers import format_display
@@ -58,7 +56,7 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
 
     def start_boefje_scan(self) -> None:
         boefje_id = self.request.POST.get("boefje_id")
-        boefje = get_katalogus(self.organization.code).get_plugin(boefje_id)
+        boefje = self.get_katalogus().get_plugin(boefje_id)
         ooi_id = self.request.GET.get("ooi_id")
         ooi = self.get_single_ooi(pk=ooi_id)
         self.run_boefje(boefje, ooi)
@@ -76,7 +74,8 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
         # List from katalogus
         boefjes = []
         if self.indemnification_present:
-            boefjes = get_enabled_boefjes_for_ooi_class(self.ooi.__class__, self.organization)
+            katalogus = self.get_katalogus()
+            boefjes = [boefje for boefje in katalogus.get_enabled_boefjes() if self.ooi.__class__ in boefje.consumes]
 
         if boefjes:
             context["enabled_boefjes_available"] = True
