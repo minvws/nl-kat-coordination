@@ -143,7 +143,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
                 return messages.warning(
                     self.request,
                     _(
-                        "Multiorganization report cannot go through a rerun. "
+                        "Multi organization reports cannot be rescheduled. "
                         "It consists of imported data from different organizations and not based on new generated data."
                     ),
                 )
