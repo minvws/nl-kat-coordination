@@ -137,7 +137,7 @@
     "source": "https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers",
     "risk": "high",
     "impact": "Databases should never be reachable from the internet, but only from secured internal networks. This will reduce unauthorized access.",
-    "recommendation": "Determine if this port should be reachable from the identified location. Limit access to reduce the attack surface if necessary. "
+    "recommendation": "Determine if this port should be reachable from the identified location. Limit access to reduce the attack surface if necessary."
   },
   "KAT-UNCOMMON-OPEN-PORT": {
     "description": "An uncommon open port was identified. This could introduce security risks.",
