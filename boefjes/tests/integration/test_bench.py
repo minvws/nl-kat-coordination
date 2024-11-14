@@ -3,7 +3,7 @@ import uuid
 from pathlib import Path
 
 import pytest
-from tools.upgrade_v1_16_0 import upgrade
+from tools.upgrade_v1_17_0 import upgrade
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import BASE_DIR
