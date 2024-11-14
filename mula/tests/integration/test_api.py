@@ -922,7 +922,9 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
         item = functions.create_item(self.scheduler.scheduler_id, 1)
         response = self.client.post("/schedules", json={"scheduler_id": item.scheduler_id, "data": item.data})
         self.assertEqual(400, response.status_code)
-        self.assertEqual({"detail": "Validation error occurred: validation error"}, response.json())
+        self.assertEqual(
+            {"detail": "Bad request error occurred: Either deadline_at or schedule must be provided"}, response.json()
+        )
 
     def test_post_schedule_invalid_schedule(self):
         item = functions.create_item(self.scheduler.scheduler_id, 1)

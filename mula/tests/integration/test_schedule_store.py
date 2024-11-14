@@ -52,11 +52,6 @@ class ScheduleStoreTestCase(unittest.TestCase):
 
         self.assertEqual(schedule.deadline_at, now)
 
-    def test_create_schedule_schedule_and_deadline_at_none(self):
-        """When a schedule is created, either schedule or deadline_at should be provided."""
-        with self.assertRaises(ValueError):
-            models.Schedule(scheduler_id="test_scheduler_id", data={})
-
     def test_create_schedule(self):
         # Arrange
         scheduler_id = "test_scheduler_id"
