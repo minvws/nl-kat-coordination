@@ -258,6 +258,7 @@ def test_save_generate_report_view_scheduled(
                 "report_type": "dns-report",
                 "choose_recurrence": "repeat",
                 "start_date": "2024-01-01",
+                "start_time": "10:10",
                 "recurrence": "daily",
                 "parent_report_name": [f"DNS report for {len(listed_hostnames)} objects"],
             },
