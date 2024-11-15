@@ -17,7 +17,7 @@
   },
   {
     "id": "adr-validator",
-    "name": null,
+    "name": "adr-validator",
     "version": null,
     "created": null,
     "description": null,
@@ -36,7 +36,7 @@
   },
   {
     "id": "kat_answer_parser",
-    "name": null,
+    "name": "kat_answer_parser",
     "version": null,
     "created": null,
     "description": null,
@@ -52,7 +52,7 @@
   },
   {
     "id": "kat_binaryedge_containers",
-    "name": null,
+    "name": "kat_binaryedge_containers",
     "version": null,
     "created": null,
     "description": null,
@@ -75,7 +75,7 @@
   },
   {
     "id": "kat_binaryedge_databases",
-    "name": null,
+    "name": "kat_binaryedge_databases",
     "version": null,
     "created": null,
     "description": null,
