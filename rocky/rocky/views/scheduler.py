@@ -9,9 +9,9 @@ from katalogus.client import Boefje, Normalizer
 from reports.forms import (
     ChildReportNameForm,
     ParentReportNameForm,
-    ReportRecurrenceChoiceForm,
+    ReportScheduleRecurrenceForm,
     ReportScheduleStartDateChoiceForm,
-    ReportScheduleStartDateForm,
+    ReportScheduleStartDateTimeForm,
 )
 from tools.forms.scheduler import TaskFilterForm
 
@@ -47,9 +47,8 @@ class SchedulerView(OctopoesView):
     task_filter_form = TaskFilterForm
 
     report_schedule_form_start_date_choice = ReportScheduleStartDateChoiceForm  # today or different date
-    report_schedule_form_start_date_time_recurrence = ReportScheduleStartDateForm  # date, time and recurrence
-
-    report_schedule_form_recurrence_choice = ReportRecurrenceChoiceForm  # once or repeat
+    report_schedule_form_start_date_time = ReportScheduleStartDateTimeForm  # date and time
+    report_schedule_form_recurrence = ReportScheduleRecurrenceForm  # date and time
 
     report_parent_name_form = ParentReportNameForm  # parent name format
     report_child_name_form = ChildReportNameForm  # child name format
@@ -94,11 +93,11 @@ class SchedulerView(OctopoesView):
     def get_report_schedule_form_start_date_choice(self):
         return self.report_schedule_form_start_date_choice(self.request.POST)
 
-    def get_report_schedule_form_start_date_time_recurrence(self):
-        return self.report_schedule_form_start_date_time_recurrence()
+    def get_report_schedule_form_start_date_time(self):
+        return self.report_schedule_form_start_date_time()
 
-    def get_report_schedule_form_recurrence_choice(self):
-        return self.report_schedule_form_recurrence_choice(self.request.POST)
+    def get_report_schedule_form_recurrence(self):
+        return self.report_schedule_form_recurrence()
 
     def get_report_parent_name_form(self):
         return self.report_parent_name_form()

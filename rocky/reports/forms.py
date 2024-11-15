@@ -38,19 +38,9 @@ class ReportScheduleStartDateChoiceForm(BaseRockyForm):
     )
 
 
-class ReportRecurrenceChoiceForm(BaseRockyForm):
-    choose_recurrence = forms.ChoiceField(
-        label="",
-        required=False,
-        widget=forms.RadioSelect(attrs={"class": "submit-on-click"}),
-        choices=(("once", _("No, just once")), ("repeat", _("Yes, repeat"))),
-        initial="once",
-    )
-
-
-class ReportScheduleStartDateForm(BaseRockyForm):
+class ReportScheduleStartDateTimeForm(BaseRockyForm):
     start_date = forms.DateField(
-        label=_("Start date"),
+        label=_("Date"),
         widget=DateInput(format="%Y-%m-%d", attrs={"form": "generate_report"}),
         initial=lambda: datetime.now(tz=timezone.utc).date(),
         required=True,
@@ -58,18 +48,11 @@ class ReportScheduleStartDateForm(BaseRockyForm):
     )
 
     start_time = forms.TimeField(
-        label=_("Start time (UTC)"),
+        label=_("Time (UTC)"),
         widget=forms.TimeInput(format="%H:%M", attrs={"form": "generate_report"}),
         initial=lambda: datetime.now(tz=timezone.utc).time(),
         required=True,
         input_formats=["%H:%M"],
-    )
-
-    recurrence = forms.ChoiceField(
-        label=_("Recurrence"),
-        required=True,
-        widget=forms.Select(attrs={"form": "generate_report"}),
-        choices=[("daily", _("Daily")), ("weekly", _("Weekly")), ("monthly", _("Monthly")), ("yearly", _("Yearly"))],
     )
 
     def clean(self):
@@ -82,6 +65,21 @@ class ReportScheduleStartDateForm(BaseRockyForm):
             cleaned_data["start_datetime"] = start_datetime
 
         return cleaned_data
+
+
+class ReportScheduleRecurrenceForm(BaseRockyForm):
+    recurrence = forms.ChoiceField(
+        label=_("Recurrence"),
+        required=True,
+        widget=forms.Select(attrs={"form": "generate_report"}),
+        choices=[
+            ("once", _("Once")),
+            ("daily", _("Daily")),
+            ("weekly", _("Weekly")),
+            ("monthly", _("Monthly")),
+            ("yearly", _("Yearly")),
+        ],
+    )
 
 
 class CustomReportScheduleForm(BaseRockyForm):

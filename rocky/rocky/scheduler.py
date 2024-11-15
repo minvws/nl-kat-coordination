@@ -150,7 +150,7 @@ class ScheduleRequest(BaseModel):
 
     scheduler_id: str
     data: dict
-    schedule: str
+    schedule: str | None = None
     deadline_at: str
 
 
@@ -161,7 +161,7 @@ class ScheduleResponse(BaseModel):
     hash: str
     data: dict
     enabled: bool
-    schedule: str
+    schedule: str | None = None
     tasks: list[Task]
     deadline_at: datetime.datetime
     created_at: datetime.datetime
