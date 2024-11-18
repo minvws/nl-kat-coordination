@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 09:53+0000\n"
+"POT-Creation-Date: 2024-11-18 15:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1092,7 +1092,7 @@ msgid "Add"
 msgstr ""
 
 #: katalogus/templates/partials/plugin_tile.html
-msgid "Required for: "
+msgid "Required for:"
 msgstr ""
 
 #: katalogus/templates/partials/plugin_tile_modal.html
@@ -4491,7 +4491,7 @@ msgstr ""
 
 #: reports/views/report_overview.py
 msgid ""
-"Multiorganization report cannot go through a rerun. It consists of imported "
+"Multi organization reports cannot be rescheduled. It consists of imported "
 "data from different organizations and not based on new generated data."
 msgstr ""
 
