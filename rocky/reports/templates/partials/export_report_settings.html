@@ -33,8 +33,11 @@
 
                 <fieldset>
                     <div>
-                        <label>{% translate "Report name format" %}</label>
+                        <label for="parent_report_name_format">
+                            {% translate "Report name format" %}
+                        </label>
                         <input type="text"
+                               id="parent_report_name_format"
                                name="parent_report_name_format"
                                value="{{ initial_report_name }}">
                     </div>
