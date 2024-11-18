@@ -58,7 +58,9 @@ class CrisisRoomView(BreadcrumbsMixin, ConnectorFormMixin, ObservedAtMixin, Temp
 
     def get_finding_type_severity_count(self, organization: Organization) -> dict[str, int]:
         try:
-            api_connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization.code)
+            api_connector = OctopoesAPIConnector(
+                settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+            )
             return api_connector.count_findings_by_severity(valid_time=self.observed_at)
         except ConnectorException:
             messages.add_message(
