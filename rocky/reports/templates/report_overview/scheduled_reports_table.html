@@ -41,7 +41,13 @@
                                     {% endif %}
                                 </ul>
                             </td>
-                            <td class="nowrap">{{ schedule.deadline_at }}</td>
+                            <td class="nowrap">
+                                {% if not schedule.enabled %}
+                                    {% translate "Canceled" %}
+                                {% else %}
+                                    {{ schedule.deadline_at }}
+                                {% endif %}
+                            </td>
                             <td class="nowrap">{{ schedule.cron }}</td>
                             <td class="actions">
                                 <button class="expando-button"
@@ -95,6 +101,13 @@
                                 <div class="horizontal-view toolbar">
                                     <a class="button ghost"
                                        href="{% ooi_url "ooi_edit" schedule.recipe organization.code %}"><span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit report recipe" %}</a>
+                                    {% if schedule.enabled %}
+                                        <a class="button ghost destructive"
+                                           href="{% url "enable_disable_scheduled_reports" organization.code %}?schedule_id={{ schedule.schedule_id }}">{% translate "Cancel schedule" %}</a>
+                                    {% else %}
+                                        <a class="button"
+                                           href="{% url "enable_disable_scheduled_reports" organization.code %}?schedule_id={{ schedule.schedule_id }}">{% translate "Restart schedule" %}</a>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>

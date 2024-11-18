@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-12 15:31+0000\n"
+"POT-Creation-Date: 2024-11-18 16:15+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4282,6 +4282,10 @@ msgid "Scheduled for"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Canceled"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Scheduled Reports:"
 msgstr ""
 
@@ -4296,6 +4300,14 @@ msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Edit report recipe"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Cancel schedule"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Restart schedule"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
@@ -4479,7 +4491,7 @@ msgstr ""
 
 #: reports/views/report_overview.py
 msgid ""
-"Multiorganization report cannot go through a rerun. It consists of imported "
+"Multi organization reports cannot be rescheduled. It consists of imported "
 "data from different organizations and not based on new generated data."
 msgstr ""
 

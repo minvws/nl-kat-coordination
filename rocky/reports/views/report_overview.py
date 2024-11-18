@@ -4,6 +4,8 @@ from uuid import uuid4
 
 import structlog
 from django.contrib import messages
+from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
@@ -73,6 +75,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
                         recipes.append(
                             {
                                 "schedule_id": schedule["id"],
+                                "enabled": schedule["enabled"],
                                 "recipe": recipe_ooi,
                                 "cron": schedule["schedule"],
                                 "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
@@ -86,6 +89,26 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
         context = super().get_context_data(**kwargs)
         context["total_oois"] = len(self.object_list)
         return context
+
+
+class ScheduledReportsEnableDisableView(BreadcrumbsReportOverviewView, SchedulerView, ListView):
+    """
+    Cancel the selected report(s)
+    """
+
+    task_type = "report"
+    template_name = "report_overview/scheduled_reports.html"
+
+    def get_queryset(self) -> ReportList:
+        return ReportList(self.octopoes_api_connector, valid_time=self.observed_at)
+
+    def get(self, request, *args, **kwargs) -> HttpResponse:
+        schedule_id = request.GET.get("schedule_id")
+        schedule_enabled = self.get_schedule_details(schedule_id).enabled
+
+        self.edit_report_schedule(schedule_id, {"enabled": not schedule_enabled})
+        # TO DO: add logger
+        return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 
 
 class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
