@@ -5,6 +5,7 @@ from pathlib import Path
 from types import MethodType, ModuleType
 
 import structlog
+from pydantic import BaseModel
 
 from octopoes.models import OOI
 
@@ -14,9 +15,22 @@ NIBBLE_FUNC_NAME = "nibble"
 logger = structlog.get_logger(__name__)
 
 
+class NibbleParameter(BaseModel):
+    object_type: type
+    parser: str = "[]"
+
+    def __eq__(self, other):
+        if isinstance(other, NibbleParameter):
+            return vars(self) == vars(other)
+        elif isinstance(other, type):
+            return self.object_type == other
+        else:
+            return False
+
+
 class NibbleDefinition:
     id: str
-    signature: list[type[OOI]]
+    signature: list[NibbleParameter]
     query: str | None = None
     min_scan_level: int = 1
     default_enabled: bool = True
@@ -26,7 +40,7 @@ class NibbleDefinition:
     def __init__(
         self,
         name: str,
-        signature: list[type[OOI]],
+        signature: list[NibbleParameter],
         query: str | None = None,
         min_scan_level: int = 1,
         default_enabled: bool = True,

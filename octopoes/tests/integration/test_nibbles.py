@@ -6,7 +6,7 @@ from ipaddress import IPv4Address, ip_address
 from unittest.mock import Mock
 
 import pytest
-from nibbles.definitions import NibbleDefinition
+from nibbles.definitions import NibbleDefinition, NibbleParameter
 from nibbles.runner import NibblesRunner
 
 from octopoes.core.service import OctopoesService
@@ -29,7 +29,8 @@ def dummy(network: Network) -> Network | None:
         return Network(name=new_name)
 
 
-dummy_nibble = NibbleDefinition(name="dummy", signature=[Network])
+dummy_params = [NibbleParameter(object_type=Network)]
+dummy_nibble = NibbleDefinition(name="dummy", signature=dummy_params)
 dummy_nibble.payload = getattr(sys.modules[__name__], "dummy")
 
 
@@ -91,7 +92,10 @@ def url_classification(url: URL) -> Iterator[OOI]:
                 yield original_url
 
 
-url_classification_nibble = NibbleDefinition(name="url_classification", signature=[URL], min_scan_level=-1)
+url_classification_params = [NibbleParameter(object_type=URL)]
+url_classification_nibble = NibbleDefinition(
+    name="url_classification", signature=url_classification_params, min_scan_level=-1
+)
 url_classification_nibble.payload = getattr(sys.modules[__name__], "url_classification")
 
 
@@ -118,19 +122,35 @@ def test_url_classification_nibble(xtdb_octopoes_service: OctopoesService, event
     assert len(result[url]["url_classification"][0][1]) == 3
 
 
-def find_network_url(network1: Network, network2: Network) -> Iterator[OOI]:
-    if len(network1.name) == len(network2.name):
+def find_network_url(network: Network, url: URL) -> Iterator[OOI]:
+    if len(network.name) == len(str(url.raw)):
         yield Finding(
-            finding_type=KATFindingType(id="Same Network Name Length").reference,
-            ooi=network1.reference,
-            proof=network2.reference,
+            finding_type=KATFindingType(id="Network and URL have same name length").reference,
+            ooi=network.reference,
+            proof=url.reference,
         )
 
 
+find_network_url_params = [
+    NibbleParameter(object_type=Network, parser="[*][?object_type == 'Network'][]"),
+    NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]"),
+]
 find_network_url_nibble = NibbleDefinition(
     name="find_network_url",
-    signature=[Network, URL],
-    query='{:query {:find [(pull ?var [*])] :where [[?var :object_type "Network"]]}}',
+    signature=find_network_url_params,
+    query="""
+    {
+        :query {
+            :find [(pull ?var [*])]
+            :where [
+                (or
+                    (and [?var :object_type "URL" ] [?var :URL/raw])
+                    (and [?var :object_type "Network" ] [?var :Network/name])
+                )
+            ]
+        }
+    }
+    """,
     min_scan_level=-1,
 )
 find_network_url_nibble.payload = getattr(sys.modules[__name__], "find_network_url")
@@ -143,11 +163,15 @@ def test_find_network_url_nibble(xtdb_octopoes_service: OctopoesService, event_m
         xtdb_octopoes_service.scan_profile_repository,
     )
     nibbler.nibbles = [find_network_url_nibble]
-    network1 = Network(name="internet1")
+    network1 = Network(name="internetverbinding")
     xtdb_octopoes_service.ooi_repository.save(network1, valid_time)
-    network2 = Network(name="internet2")
+    network2 = Network(name="internet")
     xtdb_octopoes_service.ooi_repository.save(network2, valid_time)
+    url1 = URL(network=network1.reference, raw="https://potato.ls/")
+    xtdb_octopoes_service.ooi_repository.save(url1, valid_time)
+    url2 = URL(network=network2.reference, raw="https://mispo.es/")
+    xtdb_octopoes_service.ooi_repository.save(url2, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
 
-    with pytest.raises(NotImplementedError):
-        nibbler.infer([network1], valid_time)
+    result = nibbler.infer([network1], valid_time)
+    assert network1 in result

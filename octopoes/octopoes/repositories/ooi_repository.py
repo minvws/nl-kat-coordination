@@ -153,6 +153,9 @@ class OOIRepository(Repository):
     def query(self, query: str | Query, valid_time: datetime) -> list[OOI | tuple]:
         raise NotImplementedError
 
+    def raw_query(self, query: str, valid_time: datetime) -> list[list[Any]]:
+        raise NotImplementedError
+
 
 class XTDBReferenceNode(RootModel):
     root: dict[str, str | list[XTDBReferenceNode] | XTDBReferenceNode]
@@ -851,3 +854,6 @@ class XTDBOOIRepository(OOIRepository):
             parsed_results.append(tuple(parsed_result))
 
         return parsed_results
+
+    def raw_query(self, query: str, valid_time: datetime) -> list[list[Any]]:
+        return self.session.client.raw_query(query, valid_time)

@@ -1,6 +1,9 @@
 from collections.abc import Callable, Iterable
 from datetime import datetime
+from itertools import product
 from typing import TypeVar
+
+from jmespath import search
 
 from nibbles.definitions import NibbleDefinition, get_nibble_definitions
 from octopoes.models import OOI
@@ -47,13 +50,27 @@ class NibblesRunner:
     def update_nibbles(self):
         self.nibbles: list[NibbleDefinition] = get_nibble_definitions()
 
-    def _arguments(self, nibble: NibbleDefinition, ooi: OOI, valid_time: datetime) -> Iterable[Iterable[OOI]]:
-        if nibble.query is None:
-            args = [[ooi]]
+    def objectify(self, t: type, obj: dict | list):
+        if issubclass(t, OOI):
+            return self.ooi_repository.deserialize(obj)
         else:
-            # TODO:retrieve relevant arguments from XTDB
-            raise NotImplementedError
-        return args
+            if isinstance(obj, dict):
+                return t(**obj)
+            else:
+                return t(*obj)
+
+    def _arguments(self, nibble: NibbleDefinition, ooi: OOI, valid_time: datetime) -> Iterable[Iterable]:
+        if nibble.query is None:
+            return [[ooi]]
+        else:
+            query = self.ooi_repository.raw_query(nibble.query, valid_time)
+            parsed_data = [
+                {ooi, *[self.objectify(sgn.object_type, obj) for obj in search(sgn.parser, query)]}
+                if isinstance(ooi, sgn.object_type)
+                else {self.objectify(sgn.object_type, obj) for obj in search(sgn.parser, query)}
+                for sgn in nibble.signature
+            ]
+            return list(product(*parsed_data))
 
     def _run(self, ooi: OOI, valid_time: datetime) -> dict[str, list[tuple[list[OOI], set[OOI]]]]:
         return_value: dict[str, list[tuple[list[OOI], set[OOI]]]] = {}

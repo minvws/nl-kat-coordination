@@ -134,6 +134,16 @@ class XTDBHTTPClient:
         self._verify_response(res)
         return res.json()
 
+    def raw_query(self, query: str, valid_time: datetime) -> list[list[Any]]:
+        res = self._session.post(
+            f"{self.client_url()}/query",
+            params={"valid-time": valid_time.isoformat()},
+            content=" ".join(str(query).split()),
+            headers={"Content-Type": "application/edn"},
+        )
+        self._verify_response(res)
+        return res.json()
+
     def await_transaction(self, transaction_id: int) -> None:
         self._session.get(f"{self.client_url()}/await-tx", params={"txId": transaction_id})
         logger.info("Transaction completed [txId=%s]", transaction_id)
