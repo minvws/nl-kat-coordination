@@ -5,7 +5,7 @@ import structlog
 from opentelemetry import trace
 
 from scheduler import context, schedulers, server
-from scheduler.schedulers import create_schedulers_for_organisation, new_scheduler
+from scheduler.schedulers import create_schedulers, new_scheduler
 from scheduler.utils import thread
 
 tracer = trace.get_tracer(__name__)
@@ -87,18 +87,14 @@ class App:
         os._exit(1)
 
     def start_schedulers(self) -> None:
-        schedulers_db, _ = self.ctx.datastores.scheduler_store.get_schedulers()
-        if not schedulers_db:
-            self.logger.warning("No schedulers to start")
-            return
+        boefje = schedulers.BoefjeScheduler(ctx=self.ctx)
+        boefje.run()
 
-        for scheduler_db in schedulers_db:
-            scheduler = new_scheduler(self.ctx, scheduler_db)
-            if not scheduler:
-                self.logger.error("Failed to create scheduler", scheduler_id=scheduler_db.scheduler_id)
-                continue
+        normalizer = schedulers.NormalizerScheduler(ctx=self.ctx)
+        normalizer.run()
 
-            scheduler.run()
+        report = schedulers.ReportScheduler(ctx=self.ctx)
+        report.run()
 
     def start_collectors(self) -> None:
         thread.ThreadRunner(

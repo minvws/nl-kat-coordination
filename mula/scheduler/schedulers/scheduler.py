@@ -434,20 +434,11 @@ class Scheduler(abc.ABC):
         with self.lock:
             self._last_activity = value
 
-    # TODO: update
     def dict(self) -> dict[str, Any]:
         """Get a dict representation of the scheduler."""
         return {
             "id": self.scheduler_id,
-            "enabled": self.enabled,
-            "priority_queue": {
-                "id": self.queue.pq_id,
-                "item_type": self.queue.item_type.type,
-                "maxsize": self.queue.maxsize,
-                "qsize": self.queue.qsize(),
-                "allow_replace": self.queue.allow_replace,
-                "allow_updates": self.queue.allow_updates,
-                "allow_priority_updates": self.queue.allow_priority_updates,
-            },
+            "item_type": self.queue.item_type.type,
+            "qsize": self.queue.qsize(),
             "last_activity": self.last_activity,
         }

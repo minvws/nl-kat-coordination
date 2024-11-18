@@ -23,7 +23,6 @@ def upgrade():
         sa.Column("id", sa.String(), nullable=False),
         sa.Column("enabled", sa.Boolean(), nullable=False),
         sa.Column("maxsize", sa.Integer(), nullable=False),
-        sa.Column("organisation", sa.String(), nullable=False),
         sa.Column("type", sa.Enum("BOEFJE", "NORMALIZER", "REPORT", name="schedulertype"), nullable=False),
         sa.Column("allow_replace", sa.Boolean(), nullable=False),
         sa.Column("allow_updates", sa.Boolean(), nullable=False),

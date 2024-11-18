@@ -26,22 +26,19 @@ class NormalizerScheduler(Scheduler):
 
     ITEM_TYPE: Any = models.NormalizerTask
 
-    def __init__(
-        self, ctx: context.AppContext, scheduler_id: str, organisation_id: str, queue: PriorityQueue | None = None
-    ):
+    def __init__(self, ctx: context.AppContext):
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
-        self.organisation_id: str = organisation_id
-        self.create_schedule = False
+        self.scheduler_id = "normalizer"
 
-        self.queue = queue or PriorityQueue(
-            pq_id=scheduler_id,
+        self.queue = PriorityQueue(
+            pq_id=self.scheduler_id,
             maxsize=ctx.config.pq_maxsize,
             item_type=self.ITEM_TYPE,
             allow_priority_updates=True,
             pq_store=ctx.datastores.pq_store,
         )
 
-        super().__init__(ctx=ctx, queue=self.queue, scheduler_id=scheduler_id)
+        super().__init__(ctx=ctx, queue=self.queue, scheduler_id=self.scheduler_id, create_schedule=False)
 
         self.ranker = NormalizerRanker(ctx=self.ctx)
 

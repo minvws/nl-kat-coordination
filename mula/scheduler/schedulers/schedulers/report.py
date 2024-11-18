@@ -17,21 +17,19 @@ tracer = trace.get_tracer(__name__)
 class ReportScheduler(Scheduler):
     ITEM_TYPE: Any = models.ReportTask
 
-    def __init__(
-        self, ctx: context.AppContext, scheduler_id: str, organisation_id: str, queue: PriorityQueue | None = None
-    ):
+    def __init__(self, ctx: context.AppContext):
         self.logger: structlog.BoundLogger = structlog.get_logger(__name__)
-        self.organisation_id: str = organisation_id
+        self.scheduler_id: str = "report"
 
         self.queue = queue or PriorityQueue(
-            pq_id=scheduler_id,
+            pq_id=self.scheduler_id,
             maxsize=ctx.config.pq_maxsize,
             item_type=self.ITEM_TYPE,
             allow_priority_updates=True,
             pq_store=ctx.datastores.pq_store,
         )
 
-        super().__init__(ctx=ctx, queue=self.queue, scheduler_id=scheduler_id, create_schedule=True)
+        super().__init__(ctx=ctx, queue=self.queue, scheduler_id=self.scheduler_id, create_schedule=True)
 
     def run(self) -> None:
         # Rescheduling
