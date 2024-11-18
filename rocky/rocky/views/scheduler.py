@@ -276,7 +276,7 @@ class SchedulerView(OctopoesView):
                 # Recurres every year on the {day} of the {month} at the selected time
             }
 
-            if 28 <= day <= 31:
+            if day >= 28:
                 cron_expr["monthly"] = f"{minute} {hour} L * *"
             else:
                 cron_expr["monthly"] = (
