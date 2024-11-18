@@ -7,7 +7,7 @@
 
 ul {
   &.tags {
-    display: flex;
+    display: inline-flex;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 0.5rem;
