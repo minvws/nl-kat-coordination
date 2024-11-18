@@ -7,7 +7,6 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, ListView, TemplateView
 
-from katalogus.client import get_katalogus
 from katalogus.forms import KATalogusFilter
 
 
@@ -30,7 +29,7 @@ class BaseKATalogusView(OrganizationView, ListView, FormView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.katalogus_client = get_katalogus(self.organization.code)
+        self.katalogus_client = self.get_katalogus()
 
     def get_initial(self) -> dict[str, Any]:
         initial = super().get_initial()
