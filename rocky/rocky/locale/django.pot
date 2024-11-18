@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-12 15:31+0000\n"
+"POT-Creation-Date: 2024-11-18 09:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2408,19 +2408,19 @@ msgid "Different date"
 msgstr ""
 
 #: reports/forms.py
-msgid "Start date"
-msgstr ""
-
-#: reports/forms.py
-msgid "Start time (UTC)"
-msgstr ""
-
-#: reports/forms.py
 msgid "No, just once"
 msgstr ""
 
 #: reports/forms.py
 msgid "Yes, repeat"
+msgstr ""
+
+#: reports/forms.py
+msgid "Start date"
+msgstr ""
+
+#: reports/forms.py
+msgid "Start time (UTC)"
 msgstr ""
 
 #: reports/forms.py
@@ -3707,6 +3707,13 @@ msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
 msgid ""
+"Please choose a start date, time and recurrence for scheduling your "
+"report(s). If you select a date on the 28th-31st of the month, it will "
+"always be scheduled on the last day of the month."
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid ""
 "The date you select will be the reference date for the data set for your "
 "report. Please allow for up to 24 hours for your report to be ready."
 msgstr ""
@@ -4483,7 +4490,7 @@ msgstr ""
 
 #: reports/views/report_overview.py
 msgid ""
-"Multiorganization report cannot go through a rerun. It consists of imported "
+"Multi organization reports cannot be rescheduled. It consists of imported "
 "data from different organizations and not based on new generated data."
 msgstr ""
 
