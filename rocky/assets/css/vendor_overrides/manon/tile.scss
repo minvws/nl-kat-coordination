@@ -34,6 +34,10 @@ ul.tiles {
     box-shadow: 0 8px 16px 0 #11141626;
     gap: 1rem;
 
+    ul {
+      padding: 0;
+    }
+
     .scan-intensity {
       border: 0;
       padding: 0;

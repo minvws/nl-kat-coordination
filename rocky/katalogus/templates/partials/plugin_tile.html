@@ -36,14 +36,14 @@
                         {% include "partials/modal_report_types.html" with plugin=plugin %}
 
                     {% else %}
-                        <div class="tags">
-                            <p>
-                                <strong>{% translate "Required for: " %}</strong>
-                            </p>
+                        <ul class="tags report-types">
                             {% for report_type in report_types %}
-                                <span class="label tags-color-{{ report_type.label_style }}">{{ report_type.name }}</span>
+                                <li>
+                                    <label for="report-types-required-for-plugin">{% translate "Required for:" %}</label>
+                                    <span class="tags-color-{{ report_type.label_style }}">{{ report_type.name }}</span>
+                                </li>
                             {% endfor %}
-                        </div>
+                        </ul>
                     {% endif %}
                 {% endif %}
             {% endfor %}
