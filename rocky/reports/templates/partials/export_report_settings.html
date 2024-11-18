@@ -45,8 +45,11 @@
                 {% if not is_single_report %}
                     <fieldset>
                         <div>
-                            <label>{% translate "Subreports name format" %}</label>
+                            <label for="subreport_name_format">
+                                {% translate "Subreports name format" %}
+                            </label>
                             <input type="text"
+                                   id="subreport_name_format"
                                    name="subreport_name_format"
                                    value="{{ initial_report_name }}">
                         </div>
