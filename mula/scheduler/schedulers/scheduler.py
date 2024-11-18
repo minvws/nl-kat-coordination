@@ -11,7 +11,8 @@ from opentelemetry import trace
 
 from scheduler import clients, context, models, storage, utils
 from scheduler.schedulers.queue import PriorityQueue
-from scheduler.schedulers.queue.errors import InvalidItemError, NotAllowedError, QueueFullError
+from scheduler.schedulers.queue.errors import (InvalidItemError,
+                                               NotAllowedError, QueueFullError)
 from scheduler.utils import cron, thread
 
 tracer = trace.get_tracer(__name__)
@@ -75,7 +76,7 @@ class Scheduler(abc.ABC):
 
     @abc.abstractmethod
     def run(self) -> None:
-        pass
+        raise NotImplementedError
 
     def run_in_thread(
         self, name: str, target: Callable[[], Any], interval: float = 0.01, daemon: bool = False, loop: bool = True
@@ -116,7 +117,7 @@ class Scheduler(abc.ABC):
                     queue_id=self.queue.pq_id,
                     scheduler_id=self.scheduler_id,
                 )
-                continue
+                continue               u
             except Exception as exc:
                 self.logger.error(
                     "Unable to push item %s to queue %s",
