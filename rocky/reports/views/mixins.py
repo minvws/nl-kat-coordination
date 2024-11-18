@@ -249,7 +249,7 @@ def save_aggregate_report_data(
             child_input_data = get_child_input_data(input_data, ooi, report_type)
 
             raw_id = bytes_client.upload_raw(
-                raw=ReportDataDict({"report_data": data["data"]} | child_input_data).model_dump_json().encode(),
+                raw=ReportDataDict({"report_data": data} | child_input_data).model_dump_json().encode(),
                 manual_mime_types={"openkat/report"},
             )
 
