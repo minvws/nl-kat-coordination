@@ -117,9 +117,7 @@ def test_url_classification_nibble(xtdb_octopoes_service: OctopoesService, event
     assert url in result
     assert "url_classification" in result[url]
     assert len(result[url]["url_classification"]) == 1
-    assert len(result[url]["url_classification"][0]) == 2
-    assert result[url]["url_classification"][0][0] == {url}
-    assert len(result[url]["url_classification"][0][1]) == 3
+    assert len(result[url]["url_classification"][frozenset({url.reference})]) == 3
 
 
 def find_network_url(network: Network, url: URL) -> Iterator[OOI]:
@@ -175,3 +173,10 @@ def test_find_network_url_nibble(xtdb_octopoes_service: OctopoesService, event_m
 
     result = nibbler.infer([network1], valid_time)
     assert network1 in result
+    assert len(result[network1]["find_network_url"]) == 4
+    assert result[network1]["find_network_url"][frozenset([network1.reference, url1.reference])] == set(
+        find_network_url(network1, url1)
+    )
+    assert result[network1]["find_network_url"][frozenset([network2.reference, url1.reference])] == set()
+    assert result[network1]["find_network_url"][frozenset([network1.reference, url2.reference])] == set()
+    assert result[network1]["find_network_url"][frozenset([network2.reference, url2.reference])] == set()
