@@ -35,7 +35,6 @@ def create_har_object(response: requests.Response) -> dict:
 def map_request(request: requests.PreparedRequest) -> dict:
     def cookies_from_request(cookies: str | None) -> Sequence[dict]:
         simple_cookie = SimpleCookie(cookies)
-        # requests.cookiejar_from_dict()
         return [{"name": key, "value": value.value} for key, value in simple_cookie.items()]
 
     def query_from_url(url: str) -> list[tuple[AnyStr, AnyStr]]:
