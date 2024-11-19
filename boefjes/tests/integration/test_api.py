@@ -45,12 +45,12 @@ def test_cannot_add_plugin_reserved_id(test_client, organisation):
     boefje = Boefje(id="dns-records", name="My test boefje", static=False)
     response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
     assert response.status_code == 400
-    assert response.json() == {"detail": "Duplicate plugin id"}
+    assert response.json() == {"detail": 'Duplicate plugin "id"'}
 
     normalizer = Normalizer(id="kat_nmap_normalize", name="My test normalizer")
     response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.model_dump_json())
     assert response.status_code == 400
-    assert response.json() == {"detail": "Duplicate plugin id"}
+    assert response.json() == {"detail": 'Duplicate plugin "id"'}
 
 
 def test_add_boefje(test_client, organisation):
@@ -80,7 +80,7 @@ def test_cannot_add_static_plugin_with_duplicate_name(test_client, organisation)
     boefje = Boefje(id="test_plugin", name="DNS records", static=False)
     response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
     assert response.status_code == 400
-    assert response.json() == {"detail": "Duplicate plugin name"}
+    assert response.json() == {"detail": 'Duplicate plugin "name"'}
 
 
 def test_cannot_add_plugin_with_duplicate_name(test_client, organisation):
@@ -91,7 +91,7 @@ def test_cannot_add_plugin_with_duplicate_name(test_client, organisation):
     boefje = Boefje(id="test_plugin_2", name="My test boefje", static=False)
     response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
     assert response.status_code == 400
-    assert response.json() == {"detail": "Duplicate plugin name"}
+    assert response.json() == {"detail": 'Duplicate plugin "name"'}
 
     normalizer = Normalizer(id="test_normalizer", name="My test normalizer", static=False)
     response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=normalizer.model_dump_json())

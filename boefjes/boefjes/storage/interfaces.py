@@ -56,8 +56,17 @@ class CannotUpdateStaticPlugin(NotAllowed):
 
 
 class DuplicatePlugin(NotAllowed):
-    def __init__(self, key: str):
-        super().__init__(f"Duplicate plugin {key}")
+    FIELD_NAMES = {"boefje_plugin_id": "id", "boefje_name": "name"}
+
+    def __init__(self, *, field: str | None = None, error_message: str = ""):
+        if not field:
+            for name, field_name in self.FIELD_NAMES.items():
+                if name not in error_message:
+                    continue
+
+                field = field_name
+
+        super().__init__(f'Duplicate plugin "{field}"')
 
 
 class OrganisationStorage(ABC):
