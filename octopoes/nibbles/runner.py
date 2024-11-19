@@ -1,9 +1,6 @@
 from collections.abc import Callable, Iterable
 from datetime import datetime
-from itertools import product
 from typing import TypeVar
-
-from jmespath import search
 
 from nibbles.definitions import NibbleDefinition, get_nibble_definitions
 from octopoes.models import OOI
@@ -50,33 +47,11 @@ class NibblesRunner:
     def update_nibbles(self):
         self.nibbles: list[NibbleDefinition] = get_nibble_definitions()
 
-    def objectify(self, t: type, obj: dict | list):
-        if issubclass(t, OOI):
-            return self.ooi_repository.deserialize(obj)
-        else:
-            if isinstance(obj, dict):
-                return t(**obj)
-            else:
-                return t(*obj)
-
-    def _arguments(self, nibble: NibbleDefinition, ooi: OOI, valid_time: datetime) -> Iterable[Iterable]:
-        if nibble.query is None:
-            return [[ooi]]
-        else:
-            query = self.ooi_repository.raw_query(nibble.query, valid_time)
-            parsed_data = [
-                {ooi, *[self.objectify(sgn.object_type, obj) for obj in search(sgn.parser, query)]}
-                if isinstance(ooi, sgn.object_type)
-                else {self.objectify(sgn.object_type, obj) for obj in search(sgn.parser, query)}
-                for sgn in nibble.signature
-            ]
-            return list(product(*parsed_data))
-
-    def _run(self, ooi: OOI, valid_time: datetime) -> dict[str, list[tuple[list[OOI], set[OOI]]]]:
-        return_value: dict[str, list[tuple[list[OOI], set[OOI]]]] = {}
+    def _run(self, ooi: OOI, valid_time: datetime) -> dict[str, list[tuple[set[OOI], set[OOI]]]]:
+        return_value: dict[str, list[tuple[set[OOI], set[OOI]]]] = {}
         for nibble in filter(lambda x: type(ooi) in x.signature, self.nibbles):
-            args = self._arguments(nibble, ooi, valid_time)
-            results = [(list(arg), set(flatten([nibble(arg)]))) for arg in args]
+            args = self.ooi_repository.nibble_query(ooi, nibble, valid_time)
+            results = [(set(arg), set(flatten([nibble(arg)]))) for arg in args]
             if results:
                 return_value |= {nibble.id: results}
                 # TODO: we could cache the writes for single OOI nibbles
@@ -88,7 +63,7 @@ class NibblesRunner:
         target_nibbles = filter(lambda x: type(ooi) in x.signature, self.nibbles)
         return any(nibble.min_scan_level < ooi_level for nibble in target_nibbles)
 
-    def _write(self, inferences: dict[OOI, dict[str, list[tuple[list[OOI], set[OOI]]]]], valid_time: datetime):
+    def _write(self, inferences: dict[OOI, dict[str, list[tuple[set[OOI], set[OOI]]]]], valid_time: datetime):
         for source_ooi, results in inferences.items():
             self.ooi_repository.save(source_ooi, valid_time)
             for nibble_id, run_result in results.items():

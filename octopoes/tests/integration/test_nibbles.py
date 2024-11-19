@@ -118,7 +118,7 @@ def test_url_classification_nibble(xtdb_octopoes_service: OctopoesService, event
     assert "url_classification" in result[url]
     assert len(result[url]["url_classification"]) == 1
     assert len(result[url]["url_classification"][0]) == 2
-    assert result[url]["url_classification"][0][0][0] == url
+    assert result[url]["url_classification"][0][0] == {url}
     assert len(result[url]["url_classification"][0][1]) == 3
 
 

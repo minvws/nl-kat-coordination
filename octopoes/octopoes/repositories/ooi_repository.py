@@ -3,12 +3,16 @@ from __future__ import annotations
 import json
 import re
 from collections import Counter
+from collections.abc import Iterable
 from datetime import datetime
+from itertools import product
 from typing import Any, Literal, cast
 
 import structlog
 from bits.definitions import BitDefinition
 from httpx import HTTPStatusError, codes
+from jmespath import search
+from nibbles.definitions import NibbleDefinition
 from pydantic import RootModel, TypeAdapter
 
 from octopoes.config.settings import (
@@ -153,7 +157,7 @@ class OOIRepository(Repository):
     def query(self, query: str | Query, valid_time: datetime) -> list[OOI | tuple]:
         raise NotImplementedError
 
-    def raw_query(self, query: str, valid_time: datetime) -> list[list[Any]]:
+    def nibble_query(self, ooi: OOI, nibble: NibbleDefinition, valid_time: datetime) -> Iterable[Iterable[Any]]:
         raise NotImplementedError
 
 
@@ -855,5 +859,24 @@ class XTDBOOIRepository(OOIRepository):
 
         return parsed_results
 
-    def raw_query(self, query: str, valid_time: datetime) -> list[list[Any]]:
-        return self.session.client.raw_query(query, valid_time)
+    def nibble_query(self, ooi: OOI, nibble: NibbleDefinition, valid_time: datetime) -> Iterable[Iterable[Any]]:
+        def objectify(t: type, obj: dict | list):
+            if isinstance(obj, dict):
+                if issubclass(t, OOI):
+                    return self.deserialize(obj)
+                else:
+                    return t(**obj)
+            else:
+                return t(*obj)
+
+        if nibble.query is None:
+            return [{ooi}]
+        else:
+            query = self.session.client.raw_query(nibble.query, valid_time)
+            arguments = [
+                {ooi, *[objectify(sgn.object_type, obj) for obj in search(sgn.parser, query)]}
+                if isinstance(ooi, sgn.object_type)
+                else {objectify(sgn.object_type, obj) for obj in search(sgn.parser, query)}
+                for sgn in nibble.signature
+            ]
+            return list(product(*arguments))
