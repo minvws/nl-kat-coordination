@@ -72,6 +72,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
                         recipe_tree = recipe_ooi_tree.store.values()
                         recipe_ooi = next(ooi for ooi in recipe_tree if isinstance(ooi, ReportRecipe))
                         report_oois = [ooi for ooi in recipe_tree if isinstance(ooi, Report)]
+                        report_oois.sort(key=lambda ooi: ooi.date_generated, reverse=True)
                         recipes.append(
                             {
                                 "schedule_id": schedule["id"],
