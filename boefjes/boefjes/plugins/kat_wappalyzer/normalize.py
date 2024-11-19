@@ -1,25 +1,18 @@
 import json
 from collections.abc import Iterable
 from datetime import datetime, timezone
-from pathlib import Path
 
-from tanimachi import (
-    Categories,
-    Fingerprints,
-    Groups,
-    Har,
-    Wappalyzer,
-)
-from tanimachi.schemas import Log, Entry
+from tanimachi import Categories, Fingerprints, Groups, Har, Wappalyzer
+from tanimachi.schemas import Entry, Log
 from tanimachi.schemas.har import (
-    Creator,
     Cache,
-    Timings,
-    Request,
-    Header,
-    Response,
-    Cookie,
     Content,
+    Cookie,
+    Creator,
+    Header,
+    Request,
+    Response,
+    Timings,
 )
 
 from boefjes.job_models import NormalizerOutput
@@ -73,63 +66,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     #
 
     # create a Har model based on the response object
-    har = Har(
-        log=Log(
-            version="1.2",
-            creator=Creator(name="OpenKAT", version="0"),
-            entries=[
-                Entry(
-                    pageref=None,
-                    startedDateTime=datetime.now(tz=timezone.utc),
-                    time=0,
-                    request=Request(
-                        method=response_object["request"]["method"],
-                        url=url,
-                        httpVersion="",
-                        cookies=[],
-                        headers=[
-                            Header(name=key, value=value)
-                            for key, value in response_object["request"][
-                                "headers"
-                            ].items()
-                        ],
-                        queryString=[],
-                        headersSize=-1,
-                        bodySize=0,
-                    ),
-                    response=Response(
-                        status=response_object["response"]["status_code"],
-                        statusText="",
-                        httpVersion="",
-                        cookies=[
-                            Cookie(name=key, value=value)
-                            for key, value in response_object["response"][
-                                "cookies"
-                            ].items()
-                        ],
-                        headers=[
-                            Header(name=key, value=value)
-                            for key, value in response_object["response"][
-                                "headers"
-                            ].items()
-                        ],
-                        content=Content(
-                            size=len(body),
-                            mimeType=response_object["response"]["headers"].get(
-                                "Content-Type", "text/html"
-                            ),
-                            text=body,
-                        ),
-                        redirectURL="",
-                        headersSize=-1,
-                        bodySize=0,
-                    ),
-                    cache=Cache(),
-                    timings=Timings(send=0, wait=0, receive=0),
-                )
-            ],
-        )
-    )
+    har = Har.model_validate_json(raw)
 
     wappalyzer = Wappalyzer(fingerprints, categories=categories, groups=groups)
     detections = wappalyzer.analyze(har)
