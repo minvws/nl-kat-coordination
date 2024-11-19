@@ -61,7 +61,7 @@ def get_child_input_data(input_data: dict[str, Any], ooi: str, report_type: type
     required_plugins = list(input_data["input_data"]["plugins"]["required"])
     optional_plugins = list(input_data["input_data"]["plugins"]["optional"])
 
-    child_plugins: dict[str, list[str]] = {"required": [], "optional": []}
+    child_plugins: AggregateReportSubReports = {"required": [], "optional": []}
 
     child_plugins["required"] = [
         plugin_id for plugin_id in required_plugins if plugin_id in report_type.plugins["required"]
