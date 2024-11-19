@@ -75,7 +75,7 @@ structlog = "^24.2.0"
 maxminddb = "^2.6.2"
 croniter = "^5.0.1"
 # required by kat_wappalyzer
-python-wappalyzer = {git = "https://github.com/Ali0x2f/python-Wappalyzer.git"}
+tanimachi = "^0.0.6"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.0"
