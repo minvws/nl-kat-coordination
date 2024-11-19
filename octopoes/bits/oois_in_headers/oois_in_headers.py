@@ -1,7 +1,7 @@
 import re
 from collections.abc import Iterator
 from typing import Any
-from urllib.parse import urljoin, urlparse
+from urllib.parse import parse_qs, urlencode, urljoin, urlparse, urlunparse
 
 from pydantic import ValidationError
 
@@ -16,12 +16,34 @@ def is_url(input_str):
     return bool(result.scheme)
 
 
+def get_ignored_url_params(config, config_key, default):
+    ignored_url_params = config.get(config_key, None)
+    if ignored_url_params is None:
+        return default
+    return [param.strip() for param in ignored_url_params.split(",")] if ignored_url_params else []
+
+
+def remove_ignored_params(url, ignored_params):
+    parsed_url = urlparse(url)
+    query_params = parse_qs(parsed_url.query)
+    filtered_params = {k: v for k, v in query_params.items() if k.lower() not in ignored_params}
+    new_query = urlencode(filtered_params, doseq=True)
+    new_url = urlunparse(
+        (parsed_url.scheme, parsed_url.netloc, parsed_url.path, parsed_url.params, new_query, parsed_url.fragment)
+    )
+    return new_url
+
+
 def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, Any]) -> Iterator[OOI]:
     network = Network(name="internet")
 
     if input_ooi.key.lower() == "location":
+        ignored_url_params = get_ignored_url_params(config, "ignored_url_parameters", [])
         if is_url(input_ooi.value):
-            u = URL(raw=input_ooi.value, network=network.reference)
+            if ignored_url_params:
+                u = URL(raw=remove_ignored_params(input_ooi.value, ignored_url_params), network=network.reference)
+            else:
+                u = URL(raw=input_ooi.value, network=network.reference)
         else:
             # url is not a url but a relative path
             http_url = input_ooi.reference.tokenized.resource.web_url
