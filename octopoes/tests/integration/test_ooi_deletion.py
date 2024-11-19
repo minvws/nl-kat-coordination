@@ -133,7 +133,7 @@ def test_events_created_in_worker_during_handling(
 
     assert len(event_manager.queue) == 8  # Handling OOI delete event triggers Origin delete event
 
-    event = event_manager.queue[6]  # OOID]elete event
+    event = event_manager.queue[7]  # OOID]elete event
 
     assert isinstance(event, OriginDBEvent)
     assert event.operation_type.value == "delete"
@@ -250,7 +250,7 @@ def test_deletion_events_after_nxdomain(
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) >= 3
-    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 5
+    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 6
 
 
 @pytest.mark.xfail(reason="Wappalyzer works on wrong input objects (to be addressed)")
