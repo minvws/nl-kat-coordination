@@ -1,6 +1,7 @@
 import json
 from collections.abc import Iterable
 from datetime import datetime, timezone
+from pathlib import Path
 
 from tanimachi import Categories, Fingerprints, Groups, Har, Wappalyzer
 from tanimachi.schemas import Entry, Log
@@ -37,12 +38,12 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         scheme=tokenized_weburl["scheme"],
         path=tokenized_weburl["path"],
     )
-    raw_respsone, raw_body = raw.split(b"\n\n", 1)
-    response_object = json.loads(raw_respsone)
-    url = response_object["response"]["url"]
-
-    headers = response_object["response"]["headers"]
-    body = raw_body.decode(response_object.get("encoding") or "utf-8", "replace")
+    # raw_respsone, raw_body = raw.split(b"\n\n", 1)
+    # response_object = json.loads(raw_respsone)
+    # url = response_object["response"]["url"]
+    #
+    # headers = response_object["response"]["headers"]
+    # body = raw_body.decode(response_object.get("encoding") or "utf-8", "replace")
 
     # with Path(__file__).parent.joinpath("technologies.json").open() as f:
     #     data = json.load(f)
@@ -52,13 +53,13 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     # results = asyncio.run(wappalyzer.analyze_with_versions_and_categories(web_page))
 
     fingerprints = Fingerprints.model_validate_pattern(
-        "/Users/ammar/Downloads/webappanalyzer/src/technologies/*.json"
+        Path(__file__).parent.joinpath("data/technologies/*.json").as_posix()
     )
     categories = Categories.model_validate_file(
-        "/Users/ammar/Downloads/webappanalyzer/src/categories.json"
+        Path(__file__).parent.joinpath("data/categories.json")
     )
     groups = Groups.model_validate_file(
-        "/Users/ammar/Downloads/webappanalyzer/src/groups.json"
+        Path(__file__).parent.joinpath("data/groups.json")
     )
     # har = Har.model_validate_file(
     #     "/Users/ammar/Downloads/tanimachi/tests/fixtures/har/example.har"
