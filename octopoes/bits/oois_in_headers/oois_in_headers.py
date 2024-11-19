@@ -40,10 +40,7 @@ def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, Any]) ->
     if input_ooi.key.lower() == "location":
         ignored_url_params = get_ignored_url_params(config, "ignored_url_parameters", [])
         if is_url(input_ooi.value):
-            if ignored_url_params:
-                u = URL(raw=remove_ignored_params(input_ooi.value, ignored_url_params), network=network.reference)
-            else:
-                u = URL(raw=input_ooi.value, network=network.reference)
+            u = URL(raw=remove_ignored_params(input_ooi.value, ignored_url_params), network=network.reference)
         else:
             # url is not a url but a relative path
             http_url = input_ooi.reference.tokenized.resource.web_url
