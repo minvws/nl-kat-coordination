@@ -168,6 +168,11 @@ class AggregateReportSubReports(TypedDict):
     optional: list[type[Report]]
 
 
+class SubReportPlugins(TypedDict):
+    required: list[type[Report]]
+    optional: list[type[Report]]
+
+
 class AggregateReport(BaseReport):
     reports: AggregateReportSubReports
 

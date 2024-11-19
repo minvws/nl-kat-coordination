@@ -13,7 +13,7 @@ from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
 from octopoes.models.ooi.reports import Report
 from reports.report_types.aggregate_organisation_report.report import aggregate_reports
 from reports.report_types.concatenated_report.report import ConcatenatedReport
-from reports.report_types.definitions import BaseReport
+from reports.report_types.definitions import BaseReport, SubReportPlugins
 from reports.report_types.helpers import REPORTS, get_report_by_id
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.views.base import BaseReportView, ReportDataDict
@@ -61,7 +61,7 @@ def get_child_input_data(input_data: dict[str, Any], ooi: str, report_type: type
     required_plugins = list(input_data["input_data"]["plugins"]["required"])
     optional_plugins = list(input_data["input_data"]["plugins"]["optional"])
 
-    child_plugins: AggregateReportSubReports = {"required": [], "optional": []}
+    child_plugins: SubReportPlugins = {"required": [], "optional": []}
 
     child_plugins["required"] = [
         plugin_id for plugin_id in required_plugins if plugin_id in report_type.plugins["required"]
