@@ -1,11 +1,10 @@
-from typing import Any
-
 import fastapi
 import structlog
 from fastapi import status
 
 from scheduler import context, models, schedulers
 from scheduler.server.errors import BadRequestError, NotFoundError
+from scheduler.server.models import Scheduler
 
 
 class SchedulerAPI:
@@ -19,7 +18,7 @@ class SchedulerAPI:
             path="/schedulers",
             endpoint=self.list,
             methods=["GET"],
-            response_model=list[models.Scheduler],
+            response_model=list[Scheduler],
             status_code=status.HTTP_200_OK,
             description="List all schedulers",
         )
@@ -28,7 +27,7 @@ class SchedulerAPI:
             path="/schedulers/{scheduler_id}",
             endpoint=self.get,
             methods=["GET"],
-            response_model=models.Scheduler,
+            response_model=Scheduler,
             status_code=status.HTTP_200_OK,
             description="Get a scheduler",
         )
@@ -37,22 +36,22 @@ class SchedulerAPI:
             path="/schedulers/{scheduler_id}",
             endpoint=self.patch,
             methods=["PATCH"],
-            response_model=models.Scheduler,
+            response_model=Scheduler,
             status_code=status.HTTP_200_OK,
             description="Update a scheduler",
         )
 
-    def list(self) -> Any:
-        return [models.Scheduler(**s.dict()) for s in self.schedulers.values()]
+    def list(self) -> list[Scheduler]:
+        return [Scheduler(**s.dict()) for s in self.schedulers.values()]
 
-    def get(self, scheduler_id: str) -> Any:
+    def get(self, scheduler_id: str) -> Scheduler:
         s = self.schedulers.get(scheduler_id)
         if s is None:
             raise NotFoundError(f"Scheduler {scheduler_id} not found")
 
-        return models.Scheduler(**s.dict())
+        return Scheduler(**s.dict())
 
-    def patch(self, scheduler_id: str, item: models.Scheduler) -> Any:
+    def patch(self, scheduler_id: str, item: models.Scheduler) -> Scheduler:
         s = self.schedulers.get(scheduler_id)
         if s is None:
             raise NotFoundError(f"Scheduler {scheduler_id} not found")
@@ -75,4 +74,4 @@ class SchedulerAPI:
         elif not updated_scheduler.enabled:
             s.disable()
 
-        return updated_scheduler
+        return Scheduler(**updated_scheduler.dict())

@@ -5,8 +5,8 @@ import structlog
 from fastapi import status
 
 from scheduler import context, models, queues, schedulers, storage
-from scheduler.server import serializers
 from scheduler.server.errors import BadRequestError, ConflictError, NotFoundError, TooManyRequestsError
+from scheduler.server.models import Queue, Task, TaskPush
 
 
 class QueueAPI:
@@ -20,7 +20,7 @@ class QueueAPI:
             path="/queues",
             endpoint=self.list,
             methods=["GET"],
-            response_model=list[models.Queue],
+            response_model=list[Queue],
             response_model_exclude_unset=True,
             status_code=status.HTTP_200_OK,
             description="List all queues",
@@ -30,7 +30,7 @@ class QueueAPI:
             path="/queues/{queue_id}",
             endpoint=self.get,
             methods=["GET"],
-            response_model=models.Queue,
+            response_model=Queue,
             status_code=status.HTTP_200_OK,
             description="Get a queue",
         )
@@ -39,7 +39,7 @@ class QueueAPI:
             path="/queues/{queue_id}/pop",
             endpoint=self.pop,
             methods=["POST"],
-            response_model=models.Task | None,
+            response_model=Task | None,
             status_code=status.HTTP_200_OK,
             description="Pop an item from a queue",
         )
@@ -48,22 +48,22 @@ class QueueAPI:
             path="/queues/{queue_id}/push",
             endpoint=self.push,
             methods=["POST"],
-            response_model=models.Task | None,
+            response_model=Task | None,
             status_code=status.HTTP_201_CREATED,
             description="Push an item to a queue",
         )
 
     def list(self) -> Any:
-        return [models.Queue(**s.queue.dict(include_pq=False)) for s in self.schedulers.copy().values()]
+        return [Queue(**s.queue.dict(include_pq=False)) for s in self.schedulers.copy().values()]
 
-    def get(self, queue_id: str) -> Any:
+    def get(self, queue_id: str) -> Queue:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise NotFoundError(f"queue not found, by queue_id: {queue_id}")
 
-        return models.Queue(**s.queue.dict())
+        return Queue(**s.queue.dict())
 
-    def pop(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
+    def pop(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Task | None:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise NotFoundError(f"queue not found, by queue_id: {queue_id}")
@@ -76,15 +76,15 @@ class QueueAPI:
         if item is None:
             raise NotFoundError("could not pop item from queue, check your filters")
 
-        return models.Task(**item.model_dump())
+        return Task(**item.model_dump())
 
-    def push(self, queue_id: str, item_in: serializers.Task) -> Any:
+    def push(self, queue_id: str, item: TaskPush) -> Task | None:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise NotFoundError(f"queue not found, by queue_id: {queue_id}")
 
         # Load default values
-        new_item = models.Task(**item_in.model_dump(exclude_unset=True))
+        new_item = models.Task(**item.model_dump(exclude_unset=True))
 
         # Set values
         if new_item.scheduler_id is None:
@@ -99,4 +99,4 @@ class QueueAPI:
         except queues.errors.NotAllowedError:
             raise ConflictError("queue is not allowed to push items")
 
-        return pushed_item
+        return Task(**pushed_item.model_dump())

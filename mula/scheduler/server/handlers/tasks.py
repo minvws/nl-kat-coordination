@@ -1,14 +1,14 @@
 import datetime
 import uuid
-from typing import Any
 
 import fastapi
 import structlog
 from fastapi import status
 
-from scheduler import context, models, storage
-from scheduler.server import serializers, utils
+from scheduler import context, storage
+from scheduler.server import utils
 from scheduler.server.errors import BadRequestError, NotFoundError
+from scheduler.server.models import Task, TaskUpdate
 
 
 class TaskAPI:
@@ -46,7 +46,7 @@ class TaskAPI:
             path="/tasks/{task_id}",
             endpoint=self.get,
             methods=["GET"],
-            response_model=models.Task,
+            response_model=Task,
             status_code=status.HTTP_200_OK,
             description="Get a task",
         )
@@ -55,7 +55,7 @@ class TaskAPI:
             path="/tasks/{task_id}",
             endpoint=self.patch,
             methods=["PATCH"],
-            response_model=models.Task,
+            response_model=TaskUpdate,
             response_model_exclude_unset=True,
             status_code=status.HTTP_200_OK,
             description="Update a task",
@@ -74,7 +74,7 @@ class TaskAPI:
         input_ooi: str | None = None,  # FIXME: deprecated
         plugin_id: str | None = None,  # FIXME: deprecated
         filters: storage.filters.FilterRequest | None = None,
-    ) -> Any:
+    ) -> utils.PaginatedResponse:
         if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
             raise BadRequestError("min_created_at must be less than max_created_at")
 
@@ -137,16 +137,16 @@ class TaskAPI:
             max_created_at=max_created_at,
             filters=f_req,
         )
-
+        results = [Task(**t.model_dump()) for t in results]
         return utils.paginate(request, results, count, offset, limit)
 
-    def get(self, task_id: uuid.UUID) -> Any:
+    def get(self, task_id: uuid.UUID) -> Task:
         task = self.ctx.datastores.task_store.get_task(task_id)
         if task is None:
             raise NotFoundError(f"task not found, by task_id: {task_id}")
-        return task
+        return Task(**task.model_dump())
 
-    def patch(self, task_id: uuid.UUID, item: serializers.Task) -> Any:
+    def patch(self, task_id: uuid.UUID, item: TaskUpdate) -> TaskUpdate:
         task_db = self.ctx.datastores.task_store.get_task(task_id)
 
         if task_db is None:
@@ -161,7 +161,7 @@ class TaskAPI:
 
         self.ctx.datastores.task_store.update_task(updated_task)
 
-        return updated_task
+        return TaskUpdate(**updated_task.model_dump())
 
     def stats(self, scheduler_id: str | None = None) -> dict[str, dict[str, int]] | None:
         return self.ctx.datastores.task_store.get_status_count_per_hour(scheduler_id)

@@ -1,14 +1,14 @@
 import datetime
 import uuid
-from typing import Any
 
 import fastapi
 import structlog
 from fastapi import Body
 
 from scheduler import context, models, schedulers, storage
-from scheduler.server import serializers, utils
+from scheduler.server import utils
 from scheduler.server.errors import BadRequestError, ConflictError, NotFoundError, ValidationError
+from scheduler.server.models import Schedule, ScheduleCreate, ScheduleUpdate
 
 
 class ScheduleAPI:
@@ -33,7 +33,7 @@ class ScheduleAPI:
             path="/schedules",
             endpoint=self.create,
             methods=["POST"],
-            response_model=models.Schedule,
+            response_model=Schedule,
             status_code=201,
             description="Create a schedule",
         )
@@ -42,7 +42,7 @@ class ScheduleAPI:
             path="/schedules/{schedule_id}",
             endpoint=self.get,
             methods=["GET"],
-            response_model=models.Schedule,
+            response_model=Schedule,
             status_code=200,
             description="Get a schedule",
         )
@@ -51,7 +51,7 @@ class ScheduleAPI:
             path="/schedules/{schedule_id}",
             endpoint=self.patch,
             methods=["PATCH"],
-            response_model=models.Schedule,
+            response_model=Schedule,
             response_model_exclude_unset=True,
             status_code=200,
             description="Update a schedule",
@@ -86,7 +86,7 @@ class ScheduleAPI:
         max_deadline_at: datetime.datetime | None = None,
         min_created_at: datetime.datetime | None = None,
         max_created_at: datetime.datetime | None = None,
-    ) -> Any:
+    ) -> utils.PaginatedResponse:
         if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
             raise BadRequestError("min_created_at must be less than max_created_at")
 
@@ -104,10 +104,11 @@ class ScheduleAPI:
             offset=offset,
             limit=limit,
         )
+        results = [Schedule(**s.model_dump()) for s in results]
 
         return utils.paginate(request, results, count, offset, limit)
 
-    def create(self, schedule: serializers.ScheduleCreate) -> Any:
+    def create(self, schedule: ScheduleCreate) -> Schedule:
         try:
             new_schedule = models.Schedule(**schedule.model_dump())
         except ValueError:
@@ -131,17 +132,17 @@ class ScheduleAPI:
         if schedule is not None:
             raise ConflictError(f"schedule with the same hash already exists: {new_schedule.hash}")
 
-        self.ctx.datastores.schedule_store.create_schedule(new_schedule)
-        return new_schedule
+        created_schedule = self.ctx.datastores.schedule_store.create_schedule(new_schedule)
+        return Schedule(**created_schedule.model_dump())
 
-    def get(self, schedule_id: uuid.UUID) -> Any:
+    def get(self, schedule_id: uuid.UUID) -> Schedule:
         schedule = self.ctx.datastores.schedule_store.get_schedule(schedule_id)
         if schedule is None:
             raise NotFoundError(f"schedule not found, by schedule_id: {schedule_id}")
 
-        return schedule
+        return Schedule(**schedule.model_dump())
 
-    def patch(self, schedule_id: uuid.UUID, schedule: serializers.SchedulePatch) -> Any:
+    def patch(self, schedule_id: uuid.UUID, schedule: ScheduleUpdate) -> Schedule:
         schedule_db = self.ctx.datastores.schedule_store.get_schedule(schedule_id)
         if schedule_db is None:
             raise NotFoundError(f"schedule not found, by schedule_id: {schedule_id}")
@@ -162,7 +163,7 @@ class ScheduleAPI:
         # Update schedule in database
         self.ctx.datastores.schedule_store.update_schedule(updated_schedule)
 
-        return updated_schedule
+        return Schedule(**updated_schedule.model_dump())
 
     def search(
         self,
@@ -180,6 +181,7 @@ class ScheduleAPI:
             results, count = self.ctx.datastores.schedule_store.get_schedules(
                 offset=offset, limit=limit, filters=filters
             )
+            results = [Schedule(**s.model_dump()) for s in results]
         except storage.filters.errors.FilterError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=f"invalid filter(s) [exception: {exc}]"
