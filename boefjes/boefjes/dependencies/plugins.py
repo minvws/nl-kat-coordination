@@ -49,9 +49,9 @@ class PluginService:
         return [self._set_plugin_enabled(plugin, organisation_id) for plugin in all_plugins.values()]
 
     def _get_all_without_enabled(self) -> dict[str, PluginType]:
-        all_plugins = {plugin.id: plugin for plugin in self.local_repo.get_all()}
+        all_plugins = {plugin.id: plugin for plugin in self.plugin_storage.get_all()}
 
-        for plugin in self.plugin_storage.get_all():
+        for plugin in self.local_repo.get_all():  # Local plugins take precedence
             all_plugins[plugin.id] = plugin
 
         return all_plugins
@@ -175,7 +175,7 @@ class PluginService:
     def schema(self, plugin_id: str) -> dict | None:
         plugin = self._get_all_without_enabled().get(plugin_id)
 
-        if not plugin or not isinstance(plugin, Boefje):
+        if plugin is None or not isinstance(plugin, Boefje):
             return None
 
         return plugin.boefje_schema

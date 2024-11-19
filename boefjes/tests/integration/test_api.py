@@ -169,6 +169,16 @@ def test_cannot_create_boefje_with_invalid_schema(test_client, organisation):
     assert r.status_code == 422
 
 
+def test_schema_is_taken_from_disk(test_client, organisation, session):
+    # creates a database record of dns-records
+    test_client.patch(f"/v1/organisations/{organisation.id}/plugins/dns-records", json={"enabled": True})
+    session.execute("UPDATE boefje set schema = null where plugin_id = 'dns-records'")
+    session.commit()
+
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/dns-records").json()
+    assert response["boefje_schema"] is not None
+
+
 def test_cannot_set_invalid_cron(test_client, organisation):
     boefje = Boefje(id="test_plugin", name="My test boefje", description="123").model_dump(mode="json")
     boefje["cron"] = "bad format"
