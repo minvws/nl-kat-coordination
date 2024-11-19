@@ -79,8 +79,8 @@ class NibblesRunner:
                         self.ooi_repository.save(ooi, valid_time=valid_time)
                     self.origin_repository.save(nibble_origin, valid_time=valid_time)
 
-    def infer(self, stack: list[OOI], valid_time: datetime) -> dict[OOI, dict[str, list[tuple[list[OOI], set[OOI]]]]]:
-        inferences: dict[OOI, dict[str, list[tuple[list[OOI], set[OOI]]]]] = {}
+    def infer(self, stack: list[OOI], valid_time: datetime) -> dict[OOI, dict[str, list[tuple[set[OOI], set[OOI]]]]]:
+        inferences: dict[OOI, dict[str, list[tuple[set[OOI], set[OOI]]]]] = {}
         blockset = set(stack)
         if stack and self._cleared(stack[-1], valid_time):
             while stack:
