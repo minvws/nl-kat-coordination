@@ -17,11 +17,11 @@ from boefjes.sql.plugin_storage import create_plugin_storage
 from boefjes.storage.interfaces import (
     ConfigStorage,
     DuplicatePlugin,
-    IntegrityError,
     NotFound,
     PluginNotFound,
     PluginStorage,
     SettingsNotConformingToSchema,
+    UniqueViolation,
 )
 
 logger = structlog.get_logger(__name__)
@@ -102,25 +102,25 @@ class PluginService:
     def create_boefje(self, boefje: Boefje) -> None:
         try:
             self.local_repo.by_id(boefje.id)
-            raise DuplicatePlugin(field="id")
+            raise DuplicatePlugin("id")
         except KeyError:
             try:
                 plugin = self.local_repo.by_name(boefje.name)
 
                 if plugin.type == "boefje":
-                    raise DuplicatePlugin(field="name")
+                    raise DuplicatePlugin("name")
                 else:
                     try:
                         with self.plugin_storage as storage:
                             storage.create_boefje(boefje)
-                    except IntegrityError as error:
-                        raise DuplicatePlugin(error_message=error.message)
+                    except UniqueViolation as error:
+                        raise DuplicatePlugin(error.field)
             except KeyError:
                 try:
                     with self.plugin_storage as storage:
                         storage.create_boefje(boefje)
-                except IntegrityError as error:
-                    raise DuplicatePlugin(error_message=error.message)
+                except UniqueViolation as error:
+                    raise DuplicatePlugin(error.field)
 
     def create_normalizer(self, normalizer: Normalizer) -> None:
         try:
