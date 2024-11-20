@@ -36,6 +36,7 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
 
     data = json.loads(report_runner.bytes_client.upload_raw.mock_calls[0].kwargs["raw"])
     data["input_data"]["plugins"]["required"] = set(data["input_data"]["plugins"]["required"])  # ordering issues
+
     assert data == {
         "input_data": {
             "input_oois": ["Hostname|test|example.com", "Hostname|test|a.example.com"],
@@ -56,7 +57,7 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
             "input_data": {
                 "input_oois": ["Hostname|test|example.com"],
                 "report_types": ["dns-report"],
-                "plugins": [{"required": {"dns-sec", "dns-records"}, "optional": ["dns-zone"]}],
+                "plugins": {"required": {"dns-sec", "dns-records"}, "optional": ["dns-zone"]},
             },
         },
         {
@@ -69,19 +70,15 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
             "input_data": {
                 "input_oois": ["Hostname|test|a.example.com"],
                 "report_types": ["dns-report"],
-                "plugins": [{"required": {"dns-sec", "dns-records"}, "optional": ["dns-zone"]}],
+                "plugins": {"required": {"dns-sec", "dns-records"}, "optional": ["dns-zone"]},
             },
         },
     ]
 
     data_1 = json.loads(report_runner.bytes_client.upload_raw.mock_calls[1].kwargs["raw"])
-    data_1["input_data"]["plugins"][0]["required"] = set(
-        data_1["input_data"]["plugins"][0]["required"]
-    )  # ordering issues
+    data_1["input_data"]["plugins"]["required"] = set(data_1["input_data"]["plugins"]["required"])  # ordering issues
     data_2 = json.loads(report_runner.bytes_client.upload_raw.mock_calls[2].kwargs["raw"])
-    data_2["input_data"]["plugins"][0]["required"] = set(
-        data_2["input_data"]["plugins"][0]["required"]
-    )  # ordering issues
+    data_2["input_data"]["plugins"]["required"] = set(data_2["input_data"]["plugins"]["required"])  # ordering issues
 
     assert data_1 in both_calls
     assert data_2 in both_calls
