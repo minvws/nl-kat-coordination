@@ -51,6 +51,10 @@ class LandingGenerateReportView(BreadcrumbsGenerateReportView):
         )
 
 
+class LocationReportView(TemplateView):
+    template_name = "location_report.html"
+
+
 class OOISelectionGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenerateReportView, OOISelectionView):
     """
     Select objects for the 'Generate Report' flow.
