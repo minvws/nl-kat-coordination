@@ -4,9 +4,8 @@ from functools import partial
 import sqlalchemy
 import structlog
 
-from scheduler.config import settings
-
-from .errors import StorageError
+from scheduler.context import settings
+from scheduler.storage.errors import StorageError
 
 
 class DBConn:

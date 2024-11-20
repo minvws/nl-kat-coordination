@@ -6,10 +6,9 @@ from typing import Any
 
 import httpx
 
-from scheduler.connectors.errors import ExternalServiceResponseError, exception_handler
+from scheduler.clients.errors import ExternalServiceResponseError, exception_handler
+from scheduler.clients.http import HTTPService
 from scheduler.models import BoefjeMeta
-
-from .services import HTTPService
 
 ClientSessionMethod = Callable[..., Any]
 

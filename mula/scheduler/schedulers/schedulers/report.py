@@ -6,29 +6,24 @@ from typing import Any
 import structlog
 from opentelemetry import trace
 
-from scheduler import context, queues, storage
-from scheduler.models import Organisation, ReportTask, Task
+from scheduler import context, models, storage
+from scheduler.schedulers import Scheduler
+from scheduler.schedulers.queue import PriorityQueue, QueueFullError
 from scheduler.storage import filters
-
-from .scheduler import Scheduler
 
 tracer = trace.get_tracer(__name__)
 
 
 class ReportScheduler(Scheduler):
-    ITEM_TYPE: Any = ReportTask
+    ITEM_TYPE: Any = models.ReportTask
 
     def __init__(
-        self,
-        ctx: context.AppContext,
-        scheduler_id: str,
-        organisation: Organisation,
-        queue: queues.PriorityQueue | None = None,
-        callback: Callable[..., None] | None = None,
+        self, ctx: context.AppContext, scheduler_id: str, organisation_id: str, queue: PriorityQueue | None = None
     ):
         self.logger: structlog.BoundLogger = structlog.get_logger(__name__)
-        self.organisation = organisation
-        self.queue = queue or queues.PriorityQueue(
+        self.organisation_id: str = organisation_id
+
+        self.queue = queue or PriorityQueue(
             pq_id=scheduler_id,
             maxsize=ctx.config.pq_maxsize,
             item_type=self.ITEM_TYPE,
@@ -36,12 +31,19 @@ class ReportScheduler(Scheduler):
             pq_store=ctx.datastores.pq_store,
         )
 
-        super().__init__(ctx=ctx, queue=self.queue, scheduler_id=scheduler_id, callback=callback, create_schedule=True)
+        super().__init__(ctx=ctx, queue=self.queue, scheduler_id=scheduler_id, create_schedule=True)
 
     def run(self) -> None:
         # Rescheduling
         self.run_in_thread(
             name=f"scheduler-{self.scheduler_id}-reschedule", target=self.push_tasks_for_rescheduling, interval=60.0
+        )
+        self.logger.info(
+            "Report started for %s",
+            self.organisation_id,
+            organisation_id=self.organisation_id,
+            scheduler_id=self.scheduler_id,
+            item_type=self.queue.item_type.__name__,
         )
 
     @tracer.start_as_current_span(name="report_push_tasks_for_rescheduling")
@@ -50,7 +52,7 @@ class ReportScheduler(Scheduler):
             self.logger.warning(
                 "Report queue is full, not populating with new tasks",
                 queue_qsize=self.queue.qsize(),
-                organisation_id=self.organisation.id,
+                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
             )
             return
@@ -70,7 +72,7 @@ class ReportScheduler(Scheduler):
                 "Could not get schedules for rescheduling %s",
                 self.scheduler_id,
                 scheduler_id=self.scheduler_id,
-                organisation_id=self.organisation.id,
+                organisation_id=self.organisation_id,
                 exc_info=exc_db,
             )
             raise exc_db
@@ -79,14 +81,14 @@ class ReportScheduler(Scheduler):
             thread_name_prefix=f"ReportScheduler-TPE-{self.scheduler_id}-rescheduling"
         ) as executor:
             for schedule in schedules:
-                report_task = ReportTask.model_validate(schedule.data)
+                report_task = models.ReportTask.model_validate(schedule.data)
                 executor.submit(self.push_report_task, report_task, self.push_tasks_for_rescheduling.__name__)
 
-    def push_report_task(self, report_task: ReportTask, caller: str = "") -> None:
+    def push_report_task(self, report_task: models.ReportTask, caller: str = "") -> None:
         self.logger.debug(
             "Pushing report task",
             task_hash=report_task.hash,
-            organisation_id=self.organisation.id,
+            organisation_id=self.organisation_id,
             scheduler_id=self.scheduler_id,
             caller=caller,
         )
@@ -95,13 +97,13 @@ class ReportScheduler(Scheduler):
             self.logger.debug(
                 "Report task already on queue",
                 task_hash=report_task.hash,
-                organisation_id=self.organisation.id,
+                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
             )
             return
 
-        task = Task(
+        task = models.Task(
             scheduler_id=self.scheduler_id,
             priority=int(datetime.now().timestamp()),
             type=self.ITEM_TYPE.type,
@@ -111,14 +113,14 @@ class ReportScheduler(Scheduler):
 
         try:
             self.push_item_to_queue_with_timeout(task, self.max_tries)
-        except queues.QueueFullError:
+        except QueueFullError:
             self.logger.warning(
                 "Could not add task %s to queue, queue was full",
                 report_task.hash,
                 task_hash=report_task.hash,
                 queue_qsize=self.queue.qsize(),
                 queue_maxsize=self.queue.maxsize,
-                organisation_id=self.organisation.id,
+                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
             )
@@ -128,7 +130,7 @@ class ReportScheduler(Scheduler):
             "Report task pushed to queue",
             task_id=task.id,
             task_hash=report_task.hash,
-            organisation_id=self.organisation.id,
+            organisation_id=self.organisation_id,
             scheduler_id=self.scheduler_id,
             caller=caller,
         )

@@ -3,10 +3,9 @@ from datetime import datetime, timezone
 import httpx
 from pydantic import BaseModel
 
-from scheduler.connectors.errors import exception_handler
+from scheduler.clients.errors import exception_handler
+from scheduler.clients.http import HTTPService
 from scheduler.models import OOI, Organisation
-
-from .services import HTTPService
 
 
 class ListObjectsResponse(BaseModel):

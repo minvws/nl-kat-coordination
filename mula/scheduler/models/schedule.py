@@ -17,17 +17,11 @@ class Schedule(BaseModel):
     model_config = ConfigDict(from_attributes=True, validate_assignment=True)
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
-
     scheduler_id: str
-
     hash: str | None = Field(None, max_length=32)
-
     data: dict | None = None
-
     enabled: bool = True
-
     schedule: str | None = None
-
     tasks: list[Task] = []
 
     deadline_at: datetime | None = None
@@ -57,21 +51,13 @@ class ScheduleDB(Base):
     __tablename__ = "schedules"
 
     id = Column(GUID, primary_key=True)
-
     scheduler_id = Column(String, nullable=False)
-
     hash = Column(String(32), nullable=True, unique=True)
-
     data = Column(JSONB, nullable=False)
-
     enabled = Column(Boolean, nullable=False, default=True)
-
     schedule = Column(String, nullable=True)
-
     tasks = relationship("TaskDB", back_populates="schedule")
 
     deadline_at = Column(DateTime(timezone=True), nullable=True)
-
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
-
     modified_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())

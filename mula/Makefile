@@ -74,7 +74,7 @@ cov: ## Generate a test coverage report
 
 sql: ## Generate raw sql for the migrations.
 	docker compose run --rm scheduler \
-		alembic --config /app/scheduler/scheduler/alembic.ini \
+		alembic --config /app/scheduler/scheduler/storage/migrations/alembic.ini \
 		upgrade $(rev1):$(rev2) --sql
 
 migrations: ## Create migration.
@@ -84,14 +84,14 @@ else ifeq ($(revid),)
 	$(HIDE) (echo "ERROR: Specify a message with m={message} and a rev-id with revid={revid} (e.g. 0001 etc.)"; exit 1)
 else
 	docker compose run --rm scheduler \
-		alembic --config /app/scheduler/scheduler/alembic.ini \
+		alembic --config /app/scheduler/scheduler/storage/migrations/alembic.ini \
 		revision --autogenerate \
 		-m "$(m)" --rev-id "$(revid)"
 endif
 
 migrate: ## Run migrations using alembic.
 	docker compose run scheduler \
-		alembic --config /app/scheduler/scheduler/alembic.ini \
+		alembic --config /app/scheduler/scheduler/storage/migrations/alembic.ini \
 		upgrade head
 
 ##

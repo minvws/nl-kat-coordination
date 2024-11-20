@@ -2,11 +2,10 @@ import threading
 
 import httpx
 
-from scheduler.connectors.errors import exception_handler
+from scheduler.clients.errors import exception_handler
+from scheduler.clients.http import HTTPService
 from scheduler.models import Boefje, Organisation, Plugin
 from scheduler.utils import dict_utils
-
-from .services import HTTPService
 
 
 class Katalogus(HTTPService):
