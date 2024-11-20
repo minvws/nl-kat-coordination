@@ -115,8 +115,7 @@ class SchedulerView(OctopoesView):
         try:
             task = self.scheduler_client.get_task_details(task_id)
             if task.organization_id() != self.organization.code:
-                messages.error(self.request, SchedulerTaskNotFound.message)
-                return None
+                raise SchedulerTaskNotFound()
 
             return task
         except SchedulerTaskNotFound:
@@ -170,17 +169,22 @@ class SchedulerView(OctopoesView):
             messages.error(self.request, error.message)
             return []
 
-    def get_json_task_details(self) -> JsonResponse | None:
-        task = self.get_task_details(self.kwargs["task_id"])
-        if task:
-            return JsonResponse(
-                {
-                    "oois": self.get_output_oois(task),
-                    "valid_time": task.data.raw_data.boefje_meta.ended_at.strftime("%Y-%m-%dT%H:%M:%S"),
-                },
-                safe=False,
-            )
-        return task
+    def get_json_task_details(self) -> JsonResponse:
+        try:
+            task = self.get_task_details(self.kwargs["task_id"])
+            if task:
+                return JsonResponse(
+                    {
+                        "oois": self.get_output_oois(task),
+                        "valid_time": task.data.raw_data.boefje_meta.ended_at.strftime("%Y-%m-%dT%H:%M:%S"),
+                    },
+                    safe=False,
+                )
+            else:
+                raise SchedulerTaskNotFound()
+
+        except SchedulerTaskNotFound:
+            raise Http404()
 
     def get_schedule_with_filters(self, filters: dict[str, list[dict[str, str]]]) -> ScheduleResponse:
         try:
@@ -209,19 +213,22 @@ class SchedulerView(OctopoesView):
     # task info from the scheduler. Task data should be available from the context
     # from which the task is created.
     def reschedule_task(self, task_id: str) -> None:
-        task = self.get_task_details(task_id)
+        try:
+            task = self.get_task_details(task_id)
+            if task:
+                if task.organization_id() != self.organization.code:
+                    raise SchedulerTaskNotFound()
 
-        if task is not None:
-            if task.organization_id() != self.organization.code:
-                messages.error(self.request, SchedulerTaskNotFound.message)
-                return
+                new_id = uuid.uuid4()
+                task.data.id = new_id
 
-            new_id = uuid.uuid4()
-            task.data.id = new_id
+                new_task = Task(id=new_id, scheduler_id=task.scheduler_id, priority=1, data=task.data)
 
-            new_task = Task(id=new_id, scheduler_id=task.scheduler_id, priority=1, data=task.data)
-
-            self.schedule_task(new_task)
+                self.schedule_task(new_task)
+            else:
+                raise SchedulerTaskNotFound()
+        except SchedulerTaskNotFound:
+            raise Http404()
 
     def run_normalizer(self, katalogus_normalizer: Normalizer, raw_data: RawData) -> None:
         try:
