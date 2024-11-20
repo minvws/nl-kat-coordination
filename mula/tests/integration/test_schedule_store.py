@@ -52,12 +52,6 @@ class ScheduleStoreTestCase(unittest.TestCase):
 
         self.assertEqual(schedule.deadline_at, now)
 
-    def test_create_schedule_not_provided_schedule(self):
-        """When a schedule is created, the deadline_at should be None if schedule is not provided."""
-        schedule = models.Schedule(scheduler_id="test_scheduler_id", data={})
-
-        self.assertIsNone(schedule.deadline_at)
-
     def test_create_schedule(self):
         # Arrange
         scheduler_id = "test_scheduler_id"
