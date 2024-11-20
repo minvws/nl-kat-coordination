@@ -113,6 +113,22 @@ span {
     margin: var(--spacing-grid-050) var(--spacing-grid-100)
       var(--spacing-grid-050) 0;
 
+    &.tags-color-green-1 {
+      color: var(--colors-green-500);
+      background-color: var(--colors-white);
+      border: 2px solid var(--colors-green-500);
+      border-radius: var(--spacing-grid-500);
+      padding: var(--spacing-grid-025) var(--spacing-grid-100);
+    }
+
+    &.tags-color-orange-1 {
+      color: var(--colors-yellow-400);
+      background-color: var(--colors-white);
+      border: 2px solid var(--colors-yellow-400);
+      border-radius: var(--spacing-grid-500);
+      padding: var(--spacing-grid-025) var(--spacing-grid-100);
+    }
+
     &.tags-color-grey-2 {
       color: var(--colors-grey-800);
       background-color: var(--colors-grey-100);

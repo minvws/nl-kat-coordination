@@ -75,9 +75,9 @@
             <td class="nowrap">{{ schedule.cron }}</td>
             <td class="nowrap">
                 {% if schedule.enabled %}
-                    Enabled
+                    <span class="label tags-color-green-1">{% translate "Enabled" %}</span>
                 {% else %}
-                    Disabled
+                    <span class="label tags-color-orange-1">{% translate "Disabled" %}</span>
                 {% endif %}
             </td>
             <td class="actions">
