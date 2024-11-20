@@ -37,11 +37,7 @@ class ReportScheduler(Scheduler):
             name=f"scheduler-{self.scheduler_id}-reschedule", target=self.push_tasks_for_rescheduling, interval=60.0
         )
         self.logger.info(
-            "Report started for %s",
-            self.organisation_id,
-            organisation_id=self.organisation_id,
-            scheduler_id=self.scheduler_id,
-            item_type=self.queue.item_type.__name__,
+            "Report started for %s", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
         )
 
     @tracer.start_as_current_span(name="report_push_tasks_for_rescheduling")
@@ -50,7 +46,6 @@ class ReportScheduler(Scheduler):
             self.logger.warning(
                 "Report queue is full, not populating with new tasks",
                 queue_qsize=self.queue.qsize(),
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
             )
             return
@@ -80,15 +75,14 @@ class ReportScheduler(Scheduler):
         ) as executor:
             for schedule in schedules:
                 report_task = models.ReportTask.model_validate(schedule.data)
-                executor.submit(self.push_report_task, report_task, self.push_tasks_for_rescheduling.__name__)
+
+                task = models.Task(id=report_task.id, scheduler_id=self.scheduler_id)
+
+                executor.submit(self.push_task, task, self.push_tasks_for_rescheduling.__name__)
 
     def push_report_task(self, report_task: models.ReportTask, caller: str = "") -> None:
         self.logger.debug(
-            "Pushing report task",
-            task_hash=report_task.hash,
-            organisation_id=self.organisation_id,
-            scheduler_id=self.scheduler_id,
-            caller=caller,
+            "Pushing report task", task_hash=report_task.hash, scheduler_id=self.scheduler_id, caller=caller
         )
 
         if self.is_item_on_queue_by_hash(report_task.hash):

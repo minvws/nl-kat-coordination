@@ -5,7 +5,6 @@ import structlog
 from opentelemetry import trace
 
 from scheduler import context, schedulers, server
-from scheduler.schedulers import create_schedulers, new_scheduler
 from scheduler.utils import thread
 
 tracer = trace.get_tracer(__name__)

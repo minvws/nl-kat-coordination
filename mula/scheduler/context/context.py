@@ -165,7 +165,6 @@ class AppContext:
         # Datastores, SimpleNamespace allows us to use dot notation
         self.datastores: SimpleNamespace = SimpleNamespace(
             **{
-                stores.SchedulerStore.name: stores.SchedulerStore(dbconn),
                 stores.ScheduleStore.name: stores.ScheduleStore(dbconn),
                 stores.TaskStore.name: stores.TaskStore(dbconn),
                 stores.PriorityQueueStore.name: stores.PriorityQueueStore(dbconn),
