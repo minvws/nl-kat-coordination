@@ -68,7 +68,14 @@ class BoefjeScheduler(Scheduler):
             pq_store=ctx.datastores.pq_store,
         )
 
-        super().__init__(ctx=ctx, queue=self.queue, scheduler_id=scheduler_id, callback=callback, create_schedule=True)
+        super().__init__(
+            ctx=ctx,
+            queue=self.queue,
+            scheduler_id=scheduler_id,
+            callback=callback,
+            create_schedule=True,
+            auto_calculate_deadline=True,
+        )
 
         # Priority ranker
         self.priority_ranker = rankers.BoefjeRanker(self.ctx)
