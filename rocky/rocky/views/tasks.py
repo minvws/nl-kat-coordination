@@ -5,7 +5,6 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.list import ListView
 from httpx import HTTPError
-from katalogus.client import get_katalogus
 from tools.forms.scheduler import TaskFilterForm
 
 from rocky.paginator import RockyPaginator
@@ -68,7 +67,7 @@ class NormalizersTaskListView(TaskListView):
             for task in task_list
             if task.data.raw_data.boefje_meta.boefje.id != "manual"
         ]
-        plugins = get_katalogus(self.organization.code).get_plugins(ids=ids)
+        plugins = self.get_katalogus().get_plugins(ids=ids)
         plugin_dict = {p.id: p.name for p in plugins}
 
         for task in task_list:
