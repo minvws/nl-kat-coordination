@@ -42,7 +42,13 @@
                                 </ul>
                             </td>
                             <td class="nowrap">{{ schedule.deadline_at }}</td>
-                            <td class="nowrap">{{ schedule.cron }}</td>
+                            <td class="nowrap">
+                                {% if schedule.cron is None %}
+                                    {% translate "Once" %}
+                                {% else %}
+                                    {{ schedule.cron }}
+                                {% endif %}
+                            </td>
                             <td class="actions">
                                 <button class="expando-button"
                                         data-icon-open-class="icon ti-chevron-down"

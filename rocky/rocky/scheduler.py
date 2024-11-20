@@ -150,7 +150,7 @@ class ScheduleRequest(BaseModel):
 
     scheduler_id: str
     data: dict
-    schedule: str
+    schedule: str | None = None
     deadline_at: str
 
 
@@ -161,7 +161,7 @@ class ScheduleResponse(BaseModel):
     hash: str
     data: dict
     enabled: bool
-    schedule: str
+    schedule: str | None
     tasks: list[Task]
     deadline_at: datetime.datetime
     created_at: datetime.datetime
@@ -322,7 +322,7 @@ class SchedulerClient:
             filter_key = "filters"
             params = {k: v for k, v in kwargs.items() if v is not None if k != filter_key}  # filter Nones from kwargs
             endpoint = "/tasks"
-            res = self._client.post(endpoint, params=params, json=kwargs.get(filter_key, None))
+            res = self._client.post(endpoint, params=params, json=kwargs.get(filter_key))
             return PaginatedTasksResponse.model_validate_json(res.content)
         except ValidationError:
             raise SchedulerValidationError(extra_message=_("Task list: "))
