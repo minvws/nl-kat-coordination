@@ -1311,7 +1311,7 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
         # Act
-        self.scheduler.push_tasks_for_new_boefjes()
+        self.scheduler.push_tasks_for_new_boefjes([boefje])
 
         # Task should be on priority queue
         task_pq = self.scheduler.queue.peek(0)
@@ -1339,8 +1339,8 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
         # Act
-        self.scheduler.push_tasks_for_new_boefjes()
-        self.scheduler.push_tasks_for_new_boefjes()
+        self.scheduler.push_tasks_for_new_boefjes([boefje])
+        self.scheduler.push_tasks_for_new_boefjes([boefje])
 
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -1355,7 +1355,7 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_new_boefjes_by_org_id.return_value = []
 
         # Act
-        self.scheduler.push_tasks_for_new_boefjes()
+        self.scheduler.push_tasks_for_new_boefjes([])
 
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -1371,7 +1371,7 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
         # Act
-        self.scheduler.push_tasks_for_new_boefjes()
+        self.scheduler.push_tasks_for_new_boefjes([boefje])
 
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -1385,7 +1385,7 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
         # Act
-        self.scheduler.push_tasks_for_new_boefjes()
+        self.scheduler.push_tasks_for_new_boefjes([boefje])
 
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -1401,7 +1401,7 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
         # Act
-        self.scheduler.push_tasks_for_new_boefjes()
+        self.scheduler.push_tasks_for_new_boefjes([boefje])
 
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -1420,8 +1420,8 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
         # Act
-        self.scheduler.push_tasks_for_new_boefjes()
-        self.scheduler.push_tasks_for_new_boefjes()
+        self.scheduler.push_tasks_for_new_boefjes([boefje])
+        self.scheduler.push_tasks_for_new_boefjes([boefje])
 
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -1438,7 +1438,7 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_has_boefje_permission_to_run.return_value = False
 
         # Act
-        self.scheduler.push_tasks_for_new_boefjes()
+        self.scheduler.push_tasks_for_new_boefjes([boefje])
 
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -1455,7 +1455,7 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_has_boefje_task_started_running.return_value = True
 
         # Act
-        self.scheduler.push_tasks_for_new_boefjes()
+        self.scheduler.push_tasks_for_new_boefjes([boefje])
 
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -1471,7 +1471,7 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
         # Act
-        self.scheduler.push_tasks_for_new_boefjes()
+        self.scheduler.push_tasks_for_new_boefjes([boefje])
 
         # Task should be on priority queue
         task_pq = self.scheduler.queue.peek(0)
@@ -1486,11 +1486,38 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
         # Act
-        self.scheduler.push_tasks_for_new_boefjes()
+        self.scheduler.push_tasks_for_new_boefjes([boefje])
 
         # Should only be one task on queue
         task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
         self.assertEqual(1, self.scheduler.queue.qsize())
+
+    def test_create_schedule_for_new_boefjes(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        # Act
+        self.scheduler.create_schedule_for_new_boefjes([boefje])
+
+        # Assert
+        schedules, _ = self.mock_ctx.datastores.schedule_store.get_schedules(self.scheduler.scheduler_id)
+        self.assertEqual(1, len(schedules))
+
+    def test_create_schedule_for_new_boefje_schedule_exists(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        # Act
+        self.scheduler.create_schedule_for_new_boefjes([boefje])
+        self.scheduler.create_schedule_for_new_boefjes([boefje])
+
+        # Assert
+        schedules, _ = self.mock_ctx.datastores.schedule_store.get_schedules(self.scheduler.scheduler_id)
+        self.assertEqual(1, len(schedules))
 
 
 class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
