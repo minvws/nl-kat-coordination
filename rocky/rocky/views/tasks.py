@@ -32,15 +32,10 @@ class TaskListView(SchedulerView, SchedulerListView, PageActionsView):
         return self.get_task_list()
 
     def post(self, request, *args, **kwargs):
-        try:
-            if self.action == self.RESCHEDULE_TASK:
-                task_id = self.request.POST.get("task_id", "")
-                self.reschedule_task(task_id)
-        except HTTPError as exc:
-            message = f"HTTP error for {exc.request.url} - {exc}"
-            messages.error(request, message)
-        except SchedulerError as error:
-            messages.error(request, error.message)
+        if self.action == self.RESCHEDULE_TASK:
+            task_id = self.request.POST.get("task_id", "")
+            self.reschedule_task(task_id)
+
         return super().post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):

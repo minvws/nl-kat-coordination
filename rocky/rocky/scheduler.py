@@ -327,7 +327,7 @@ class SchedulerClient:
             task_id = str(uuid.UUID(task_id))
             return Task.model_validate_json(self._get(f"/tasks/{task_id}", "content"))
         except ValueError:
-            raise SchedulerBadRequestError()
+            raise SchedulerTaskNotFound()
 
     def push_task(self, item: Task) -> None:
         try:

@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import Boefje, Normalizer
 from reports.forms import (
@@ -112,13 +112,15 @@ class SchedulerView(OctopoesView):
         return self.report_child_name_form()
 
     def get_task_details(self, task_id: str) -> Task | None:
-        task = self.scheduler_client.get_task_details(task_id)
+        try:
+            task = self.scheduler_client.get_task_details(task_id)
+            if task.organization_id() != self.organization.code:
+                messages.error(self.request, SchedulerTaskNotFound.message)
+                return None
 
-        if task.organization_id() != self.organization.code:
-            messages.error(self.request, SchedulerTaskNotFound.message)
-            return None
-
-        return task
+            return task
+        except SchedulerTaskNotFound:
+            raise Http404()
 
     def create_report_schedule(self, report_recipe: ReportRecipe, deadline_at: str) -> ScheduleResponse | None:
         try:
@@ -169,19 +171,16 @@ class SchedulerView(OctopoesView):
             return []
 
     def get_json_task_details(self) -> JsonResponse | None:
-        try:
-            task = self.get_task_details(self.kwargs["task_id"])
-            if task:
-                return JsonResponse(
-                    {
-                        "oois": self.get_output_oois(task),
-                        "valid_time": task.data.raw_data.boefje_meta.ended_at.strftime("%Y-%m-%dT%H:%M:%S"),
-                    },
-                    safe=False,
-                )
-            return task
-        except SchedulerError as error:
-            return messages.error(self.request, error.message)
+        task = self.get_task_details(self.kwargs["task_id"])
+        if task:
+            return JsonResponse(
+                {
+                    "oois": self.get_output_oois(task),
+                    "valid_time": task.data.raw_data.boefje_meta.ended_at.strftime("%Y-%m-%dT%H:%M:%S"),
+                },
+                safe=False,
+            )
+        return task
 
     def get_schedule_with_filters(self, filters: dict[str, Any]) -> ScheduleResponse:
         try:
@@ -210,18 +209,19 @@ class SchedulerView(OctopoesView):
     # task info from the scheduler. Task data should be available from the context
     # from which the task is created.
     def reschedule_task(self, task_id: str) -> None:
-        task = self.scheduler_client.get_task_details(task_id)
+        task = self.get_task_details(task_id)
 
-        if task.organization_id() != self.organization.code:
-            messages.error(self.request, SchedulerTaskNotFound.message)
-            return
+        if task is not None:
+            if task.organization_id() != self.organization.code:
+                messages.error(self.request, SchedulerTaskNotFound.message)
+                return
 
-        new_id = uuid.uuid4()
-        task.data.id = new_id
+            new_id = uuid.uuid4()
+            task.data.id = new_id
 
-        new_task = Task(id=new_id, scheduler_id=task.scheduler_id, priority=1, data=task.data)
+            new_task = Task(id=new_id, scheduler_id=task.scheduler_id, priority=1, data=task.data)
 
-        self.schedule_task(new_task)
+            self.schedule_task(new_task)
 
     def run_normalizer(self, katalogus_normalizer: Normalizer, raw_data: RawData) -> None:
         try:
