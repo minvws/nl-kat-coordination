@@ -9,6 +9,9 @@
     <p class="de-emphasized">
         {% blocktranslate with length=scheduled_reports|length total=total_oois %}Showing {{ length }} of {{ total }} reports{% endblocktranslate %}
     </p>
+    {% blocktranslate %}
+    "Are you sure you want to disable the schedule for {{ schedule.recipe.report_name_format }}"
+    {% endblocktranslate %}
     <div class="horizontal-scroll">
         <table>
             <caption class="visually-hidden">{% translate "Scheduled reports:" %}</caption>
@@ -33,8 +36,10 @@
                     <form id="content-form"  class="horizontal-view"  action=""  method="post">
                         {% csrf_token %}
                         <p>
-                            {% translate "Are you sure you want to disable the schedule for" %} '{{ schedule.recipe.report_name_format }}'?
-                            {% translate "The recipe will still exist and the schedule can be enabled later on." %}
+                            {% blocktranslate with report_name=schedule.recipe.report_name_format %}
+                              Are you sure you want to disable the schedule for {{ report_name }}?
+                              The recipe will still exist and the schedule can be enabled later on.
+                          {% endblocktranslate %}
                         </p>
                     </form>
                 {% endfill %}
