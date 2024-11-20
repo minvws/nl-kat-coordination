@@ -125,7 +125,7 @@ repos:
           requirements-.*.txt$ |
           retirejs.json$ |
           ^boefjes/boefjes/plugins/kat_fierce/lists |
-          ^boefjes/boefjes/plugins/kat_wappalyzer/technologies.json |
+          ^boefjes/boefjes/plugins/kat_wappalyzer/data/.*.json |
           ^boefjes/tests/examples/inputs/cve-result-without-cvss.json |
           ^boefjes/tests/examples |
           ^keiko/glossaries |
