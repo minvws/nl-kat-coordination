@@ -6,6 +6,7 @@ def test_page_analyzer_normalizer(normalizer_runner):
     meta = NormalizerMeta.model_validate_json(get_dummy_data("body-page-analysis-normalize.json"))
     output = normalizer_runner.run(meta, get_dummy_data("download_page_analysis.raw"))
 
+    assert output.observations
     results = output.observations[0].results
     assert len(results) == 2
     assert {o.primary_key for o in results if o.object_type == "Software"} == {

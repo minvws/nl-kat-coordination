@@ -26,11 +26,10 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         path=tokenized_weburl["path"],
     )
 
-    fingerprints = Fingerprints.model_validate_pattern(
-        Path(__file__).parent.joinpath("data/technologies/*.json").as_posix()
-    )
-    categories = Categories.model_validate_file(Path(__file__).parent.joinpath("data/categories.json"))
-    groups = Groups.model_validate_file(Path(__file__).parent.joinpath("data/groups.json"))
+    data_directory = Path(__file__).parent / "data"
+    fingerprints = Fingerprints.model_validate_pattern(data_directory.joinpath("technologies/*.json").as_posix())
+    categories = Categories.model_validate_file(data_directory.joinpath("categories.json"))
+    groups = Groups.model_validate_file(data_directory.joinpath("groups.json"))
 
     har = Har.model_validate_json(raw)
 
