@@ -25,125 +25,108 @@
             <tbody>
                 {% for schedule in scheduled_reports %}
                     {% if schedule.recipe %}
-                        {% component "modal" size="dialog-small" modal_id="disable-schedule-modal" %}
-                        {% fill "header" %}
-                        {% translate "Disable schedule" %}
-                    {% endfill %}
-                    {% fill "content" %}
-                    <form id="content-form"  class="horizontal-view"  action=""  method="post">
-                        {% csrf_token %}
-                        <p>
-                            {% blocktranslate with report_name=schedule.recipe.report_name_format %}
-                              Are you sure you want to disable the schedule for {{ report_name }}?
-                              The recipe will still exist and the schedule can be enabled later on.
-                          {% endblocktranslate %}
-                        </p>
-                    </form>
-                {% endfill %}
-                {% fill "footer_buttons" %}
-                <a class="button destructive"
-                   href="{% url "enable_disable_scheduled_reports" organization.code %}?schedule_id={{ schedule.schedule_id }}">{% translate "Disable schedule" %}</a>
-                <button class="ghost close-modal-button">{% translate "Cancel" %}</button>
-            {% endfill %}
-        {% endcomponent %}
-        {% component_css_dependencies %}
-        <tr>
-            <td class="nowrap">{{ schedule.recipe.report_name_format }}</td>
-            <td>
-                <ul class="tags horizontal-view">
-                    {% if schedule.recipe.parent_report_type == "aggregate-organisation-report" %}
-                        <li class="label tags-color-{{ schedule.recipe.parent_report_type|get_report_type_label_style }}">
-                            {{ schedule.recipe.parent_report_type|get_report_type_name }}
-                        </li>
-                    {% else %}
-                        {% for report_type in schedule.recipe.report_types %}
-                            {% if forloop.counter0 < 2 %}
-                                <li class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</li>
-                            {% endif %}
-                            {% if forloop.counter0 == 2 %}
-                                <li class="label tags-color-grey-2">+ {{ schedule.recipe.report_types|length|add:"-2" }}</li>
-                            {% endif %}
-                        {% endfor %}
+                        <tr>
+                            <td class="nowrap">{{ schedule.recipe.report_name_format }}</td>
+                            <td>
+                                <ul class="tags horizontal-view">
+                                    {% if schedule.recipe.parent_report_type == "aggregate-organisation-report" %}
+                                        <li class="label tags-color-{{ schedule.recipe.parent_report_type|get_report_type_label_style }}">
+                                            {{ schedule.recipe.parent_report_type|get_report_type_name }}
+                                        </li>
+                                    {% else %}
+                                        {% for report_type in schedule.recipe.report_types %}
+                                            {% if forloop.counter0 < 2 %}
+                                                <li class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</li>
+                                            {% endif %}
+                                            {% if forloop.counter0 == 2 %}
+                                                <li class="label tags-color-grey-2">+ {{ schedule.recipe.report_types|length|add:"-2" }}</li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </ul>
+                            </td>
+                            <td class="nowrap">
+                                {% if not schedule.enabled %}
+                                    {% translate "-" %}
+                                {% else %}
+                                    {{ schedule.deadline_at }}
+                                {% endif %}
+                            </td>
+                            <td class="nowrap">{{ schedule.cron }}</td>
+                            <td class="nowrap">
+                                {% if schedule.enabled %}
+                                    <span class="label system-tag color-2">{% translate "Enabled" %}</span>
+                                {% else %}
+                                    <span class="label system-tag color-3">{% translate "Disabled" %}</span>
+                                {% endif %}
+                            </td>
+                            <td class="actions">
+                                <button class="expando-button"
+                                        data-icon-open-class="icon ti-chevron-down"
+                                        data-icon-close-class="icon ti-chevron-up"
+                                        data-close-label="{% translate "Close details" %}">
+                                    {% translate "Open details" %}
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="expando-row">
+                            <td colspan="6">
+                                {% if schedule.reports %}
+                                    <table>
+                                        <caption class="visually-hidden">{% translate "Scheduled Reports:" %}</caption>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="nowrap">{% translate "Name" %}</th>
+                                                <th scope="col">{% translate "Input" %}</th>
+                                                <th scope="col" class="nowrap">{% translate "Reference date" %}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for report in schedule.reports %}
+                                                <tr>
+                                                    <td>
+                                                        <a href="{% url "view_report" organization.code %}?report_id={{ report.reference }}&observed_at={{ report.observed_at|date:"Y-m-d H:i:s:u" }}"
+                                                           title="{% translate "Show report details" %}">{{ report.name }}</a>
+                                                    </td>
+                                                    <td>
+                                                        {% if report.input_oois|length == 1 %}
+                                                            {% with ooi=report.input_oois.0 %}
+                                                                <a href="{% ooi_url 'ooi_detail' ooi organization.code query=ooi.mandatory_fields %}">{{ ooi|human_readable }}</a>
+                                                            {% endwith %}
+                                                        {% else %}
+                                                            {{ report.input_oois|length }} {% translate "objects" %}
+                                                        {% endif %}
+                                                    </td>
+                                                    <td class="nowrap">{{ report.observed_at|date }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                {% endif %}
+                                <div class="horizontal-view toolbar">
+                                    {% if schedule.enabled %}
+                                        {% include "report_overview/modal_partials/enable_disable_schedule_modal.html" with modal_id=schedule.schedule_id|add:"-disable-schedule-modal" %}
+
+                                        <a class="button ghost"
+                                           href="{% ooi_url "ooi_edit" schedule.recipe organization.code %}"><span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit report recipe" %}</a>
+                                        <a class="button ghost destructive"
+                                           href="#{{ schedule.schedule_id }}-disable-schedule-modal">{% translate "Disable schedule" %}</a>
+                                    {% else %}
+                                        <a class="button"
+                                           href="{% url "enable_disable_scheduled_reports" organization.code %}?schedule_id={{ schedule.schedule_id }}">{% translate "Enable schedule" %}</a>
+                                        <a class="button ghost"
+                                           href="{% ooi_url "ooi_edit" schedule.recipe organization.code %}"><span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit report recipe" %}</a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
                     {% endif %}
-                </ul>
-            </td>
-            <td class="nowrap">
-                {% if not schedule.enabled %}
-                    {% translate "-" %}
-                {% else %}
-                    {{ schedule.deadline_at }}
-                {% endif %}
-            </td>
-            <td class="nowrap">{{ schedule.cron }}</td>
-            <td class="nowrap">
-                {% if schedule.enabled %}
-                    <span class="label system-tag color-2">{% translate "Enabled" %}</span>
-                {% else %}
-                    <span class="label system-tag color-3">{% translate "Disabled" %}</span>
-                {% endif %}
-            </td>
-            <td class="actions">
-                <button class="expando-button"
-                        data-icon-open-class="icon ti-chevron-down"
-                        data-icon-close-class="icon ti-chevron-up"
-                        data-close-label="{% translate "Close details" %}">{% translate "Open details" %}</button>
-            </td>
-        </tr>
-        <tr class="expando-row">
-            <td colspan="6">
-                {% if schedule.reports %}
-                    <table>
-                        <caption class="visually-hidden">{% translate "Scheduled Reports:" %}</caption>
-                        <thead>
-                            <tr>
-                                <th scope="col" class="nowrap">{% translate "Name" %}</th>
-                                <th scope="col">{% translate "Input" %}</th>
-                                <th scope="col" class="nowrap">{% translate "Reference date" %}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for report in schedule.reports %}
-                                <tr>
-                                    <td>
-                                        <a href="{% url "view_report" organization.code %}?report_id={{ report.reference }}&observed_at={{ report.observed_at|date:"Y-m-d H:i:s:u" }}"
-                                           title="{% translate "Show report details" %}">{{ report.name }}</a>
-                                    </td>
-                                    <td>
-                                        {% if report.input_oois|length == 1 %}
-                                            {% with ooi=report.input_oois.0 %}
-                                                <a href="{% ooi_url 'ooi_detail' ooi organization.code query=ooi.mandatory_fields %}">{{ ooi|human_readable }}</a>
-                                            {% endwith %}
-                                        {% else %}
-                                            {{ report.input_oois|length }} {% translate "objects" %}
-                                        {% endif %}
-                                    </td>
-                                    <td class="nowrap">{{ report.observed_at|date }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                {% endif %}
-                <div class="horizontal-view toolbar">
-                    {% if schedule.enabled %}
-                        <a class="button ghost"
-                           href="{% ooi_url "ooi_edit" schedule.recipe organization.code %}"><span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit report recipe" %}</a>
-                        <a class="button ghost destructive" href="#disable-schedule-modal">{% translate "Disable schedule" %}</a>
-                    {% else %}
-                        <a class="button"
-                           href="{% url "enable_disable_scheduled_reports" organization.code %}?schedule_id={{ schedule.schedule_id }}">{% translate "Enable schedule" %}</a>
-                        <a class="button ghost"
-                           href="{% ooi_url "ooi_edit" schedule.recipe organization.code %}"><span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit report recipe" %}</a>
-                    {% endif %}
-                </div>
-            </td>
-        </tr>
-    {% endif %}
-{% endfor %}
-</tbody>
-</table>
-</div>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% else %}
-<p>{% translate "No scheduled reports have been generated yet." %}</p>
+    <p>{% translate "No scheduled reports have been generated yet." %}</p>
 {% endif %}
 {% block html_at_end_body %}
     {% compress js %}
