@@ -1,3 +1,4 @@
+import re
 from abc import ABC
 
 from boefjes.models import Boefje, Normalizer, Organisation, PluginType
@@ -15,6 +16,20 @@ class IntegrityError(StorageError):
 
     def __init__(self, message: str):
         self.message = message
+
+
+class UniqueViolation(IntegrityError):
+    def __init__(self, message: str):
+        self.field = self._get_field_name(message)
+        self.message = message
+
+    def _get_field_name(self, message: str) -> str | None:
+        matches = re.findall(r"Key \((.*)\)=", message)
+
+        if matches:
+            return matches[0]
+
+        return None
 
 
 class SettingsNotConformingToSchema(StorageError):
@@ -56,8 +71,8 @@ class CannotUpdateStaticPlugin(NotAllowed):
 
 
 class DuplicatePlugin(NotAllowed):
-    def __init__(self, key: str):
-        super().__init__(f"Duplicate plugin {key}")
+    def __init__(self, field: str | None):
+        super().__init__(f"Duplicate plugin: a plugin with this {field} already exists")
 
 
 class OrganisationStorage(ABC):
