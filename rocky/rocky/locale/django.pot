@@ -1019,6 +1019,18 @@ msgstr ""
 msgid "Tableview"
 msgstr ""
 
+#: katalogus/templates/partials/modal_report_types.html
+msgid "Required for"
+msgstr ""
+
+#: katalogus/templates/partials/modal_report_types.html
+msgid "report types"
+msgstr ""
+
+#: katalogus/templates/partials/modal_report_types.html
+msgid "Report types for "
+msgstr ""
+
 #: katalogus/templates/partials/objects_to_scan.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/forms/widgets/checkbox_group_table.html
