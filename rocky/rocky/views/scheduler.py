@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any
 
 from django.contrib import messages
@@ -10,7 +10,6 @@ from reports.forms import (
     ChildReportNameForm,
     ParentReportNameForm,
     ReportRecurrenceChoiceForm,
-    ReportScheduleRecurrenceForm,
     ReportScheduleStartDateChoiceForm,
     ReportScheduleStartDateForm,
 )
@@ -48,10 +47,9 @@ class SchedulerView(OctopoesView):
     task_filter_form = TaskFilterForm
 
     report_schedule_form_start_date_choice = ReportScheduleStartDateChoiceForm  # today or different date
-    report_schedule_form_start_date = ReportScheduleStartDateForm  # date widget
+    report_schedule_form_start_date_time_recurrence = ReportScheduleStartDateForm  # date, time and recurrence
 
     report_schedule_form_recurrence_choice = ReportRecurrenceChoiceForm  # once or repeat
-    report_schedule_form_recurrence = ReportScheduleRecurrenceForm  # select interval (daily, weekly, etc..)
 
     report_parent_name_form = ParentReportNameForm  # parent name format
     report_child_name_form = ChildReportNameForm  # child name format
@@ -96,14 +94,11 @@ class SchedulerView(OctopoesView):
     def get_report_schedule_form_start_date_choice(self):
         return self.report_schedule_form_start_date_choice(self.request.POST)
 
-    def get_report_schedule_form_start_date(self):
-        return self.report_schedule_form_start_date()
+    def get_report_schedule_form_start_date_time_recurrence(self):
+        return self.report_schedule_form_start_date_time_recurrence()
 
     def get_report_schedule_form_recurrence_choice(self):
         return self.report_schedule_form_recurrence_choice(self.request.POST)
-
-    def get_report_schedule_form_recurrence(self):
-        return self.report_schedule_form_recurrence()
 
     def get_report_parent_name_form(self):
         return self.report_parent_name_form()
@@ -121,7 +116,7 @@ class SchedulerView(OctopoesView):
         except SchedulerTaskNotFound:
             raise Http404()
 
-    def create_report_schedule(self, report_recipe: ReportRecipe, deadline_at: str) -> ScheduleResponse | None:
+    def create_report_schedule(self, report_recipe: ReportRecipe, deadline_at: datetime) -> ScheduleResponse | None:
         try:
             report_task = ReportTask(
                 organisation_id=self.organization.code, report_recipe_id=str(report_recipe.recipe_id)
@@ -131,7 +126,7 @@ class SchedulerView(OctopoesView):
                 scheduler_id=self.scheduler_id,
                 data=report_task,
                 schedule=report_recipe.cron_expression,
-                deadline_at=deadline_at,
+                deadline_at=str(deadline_at),
             )
 
             submit_schedule = self.scheduler_client.post_schedule(schedule=schedule_request)
@@ -269,28 +264,31 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             messages.error(self.request, error.message)
 
-    def convert_recurrence_to_cron_expressions(self, recurrence: str) -> str:
+    def convert_recurrence_to_cron_expressions(self, recurrence: str, start_date_time: datetime) -> str:
         """
-        Because there is no time defined for the start date, we use midnight 00:00 for all expressions.
+        The user defines the start date and time.
         """
 
-        start_date = datetime.now(tz=timezone.utc).date()  # for now, not set by user
-
-        if start_date and recurrence:
-            day = start_date.day
-            month = start_date.month
-            week = start_date.strftime("%w").upper()  # ex. 4
+        if start_date_time and recurrence:
+            day = start_date_time.day
+            month = start_date_time.month
+            week = start_date_time.strftime("%w").upper()  # ex. 4
+            hour = start_date_time.hour
+            minute = start_date_time.minute
 
             cron_expr = {
-                "daily": "0 0 * * *",  # Recurres every day at 00:00
-                "weekly": f"0 0 * * {week}",  # Recurres every week on the {week} at 00:00
-                "yearly": f"0 0 {day} {month} *",  # Recurres every year on the {day} of the {month} at 00:00
+                "daily": f"{minute} {hour} * * *",  # Recurres every day at the selected time
+                "weekly": f"{minute} {hour} * * {week}",  # Recurres every week on the {week} at the selected time
+                "yearly": f"{minute} {hour} {day} {month} *",
+                # Recurres every year on the {day} of the {month} at the selected time
             }
 
-            if 28 <= day <= 31:
-                cron_expr["monthly"] = "0 0 28-31 * *"
+            if day >= 28:
+                cron_expr["monthly"] = f"{minute} {hour} L * *"
             else:
-                cron_expr["monthly"] = f"0 0 {day} * *"  # Recurres on the exact {day} of the month at 00:00
+                cron_expr["monthly"] = (
+                    f"{minute} {hour} {day} * *"  # Recurres on the exact {day} of the month at the selected time
+                )
 
             return cron_expr.get(recurrence, "")
         return ""
