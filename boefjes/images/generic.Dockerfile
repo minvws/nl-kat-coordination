@@ -37,8 +37,6 @@ COPY boefjes/plugins/kat_kat_finding_types boefjes/plugins/kat_kat_finding_types
 COPY boefjes/plugins/kat_retirejs_finding_types boefjes/plugins/kat_retirejs_finding_types
 COPY boefjes/plugins/kat_snyk_finding_types boefjes/plugins/kat_snyk_finding_types
 
-
-
 RUN find ./boefjes -name 'requirements.txt' -execdir sh -c "cat {} && echo" \; | sort -u > /tmp/boefjes-requirements.txt
 
 RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip && pip install httpx && \
