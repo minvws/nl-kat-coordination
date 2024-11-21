@@ -65,6 +65,7 @@ def save_report_data(
     report_data,
     report_names,
     parent_report_name,
+    report_recipe: Reference | None = None,
 ) -> Report | None:
     if len(report_data) == 0:
         return None
@@ -97,6 +98,7 @@ def save_report_data(
             observed_at=observed_at,
             parent_report=None,
             has_parent=False,
+            report_recipe=report_recipe,
         )
 
         create_ooi(octopoes_api_connector, bytes_client, parent_report_ooi, observed_at)
@@ -127,7 +129,7 @@ def save_report_data(
                 ]
 
                 child_input_data = {
-                    "input_data": {"input_oois": [ooi], "report_types": [report_type_id], "plugins": [child_plugins]}
+                    "input_data": {"input_oois": [ooi], "report_types": [report_type_id], "plugins": child_plugins}
                 }
 
                 raw_id = bytes_client.upload_raw(
@@ -185,6 +187,7 @@ def save_report_data(
             observed_at=observed_at,
             parent_report=None,
             has_parent=False,
+            report_recipe=report_recipe,
         )
 
         create_ooi(octopoes_api_connector, bytes_client, parent_report_ooi, observed_at)
@@ -202,6 +205,7 @@ def save_aggregate_report_data(
     report_data,
     post_processed_data,
     aggregate_report,
+    report_recipe: Reference | None = None,
 ) -> Report:
     observed_at = get_observed_at
 
@@ -231,6 +235,7 @@ def save_aggregate_report_data(
         observed_at=observed_at,
         parent_report=None,
         has_parent=False,
+        report_recipe=report_recipe,
     )
     create_ooi(octopoes_api_connector, bytes_client, report_ooi, observed_at)
 

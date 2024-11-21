@@ -265,7 +265,7 @@ class SchedulerHTTPError(SchedulerError):
 
 class SchedulerClient:
     def __init__(self, base_uri: str, organization_code: str | None):
-        self._client = httpx.Client(base_url=base_uri)
+        self._client = httpx.Client(base_url=base_uri, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT)
         self.organization_code = organization_code
 
     def list_schedules(self, **kwargs) -> PaginatedSchedulesResponse:

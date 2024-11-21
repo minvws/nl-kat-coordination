@@ -42,6 +42,9 @@ class BaseReport:
     def __init__(self, octopoes_api_connector: OctopoesAPIConnector):
         self.octopoes_api_connector = octopoes_api_connector
 
+    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+        raise NotImplementedError
+
     @classmethod
     def class_attributes(cls) -> dict[str, Any]:
         return {
