@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-18 09:14+0000\n"
+"POT-Creation-Date: 2024-11-18 15:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1017,6 +1017,18 @@ msgstr ""
 
 #: katalogus/templates/partials/katalogus_toolbar.html
 msgid "Tableview"
+msgstr ""
+
+#: katalogus/templates/partials/modal_report_types.html
+msgid "Required for"
+msgstr ""
+
+#: katalogus/templates/partials/modal_report_types.html
+msgid "report types"
+msgstr ""
+
+#: katalogus/templates/partials/modal_report_types.html
+msgid "Report types for "
 msgstr ""
 
 #: katalogus/templates/partials/objects_to_scan.html

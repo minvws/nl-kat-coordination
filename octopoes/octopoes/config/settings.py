@@ -70,6 +70,8 @@ class Settings(BaseSettings):
 
     outgoing_request_timeout: int = Field(30, description="Timeout for outgoing HTTP requests")
 
+    workers: int = Field(4, description="Number of Octopoes Celery workers")
+
     model_config = SettingsConfigDict(env_prefix="OCTOPOES_")
 
     @classmethod
