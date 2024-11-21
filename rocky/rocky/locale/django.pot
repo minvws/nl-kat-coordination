@@ -2420,15 +2420,19 @@ msgid "Different date"
 msgstr ""
 
 #: reports/forms.py
-msgid "Start date"
-msgstr ""
-
-#: reports/forms.py
 msgid "No, just once"
 msgstr ""
 
 #: reports/forms.py
 msgid "Yes, repeat"
+msgstr ""
+
+#: reports/forms.py
+msgid "Start date"
+msgstr ""
+
+#: reports/forms.py
+msgid "Start time (UTC)"
 msgstr ""
 
 #: reports/forms.py
