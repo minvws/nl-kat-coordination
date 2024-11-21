@@ -1,7 +1,19 @@
 from collections.abc import Iterable
 from pathlib import Path
 
-from tanimachi import Categories, Fingerprints, Groups, Har, Wappalyzer
+import httpx
+from tanimachi import (
+    Categories,
+    Fingerprints,
+    Groups,
+    Har,
+    Wappalyzer,
+    analyze_css,
+    analyze_headers,
+    analyze_scripts,
+    analyze_url,
+)
+from tanimachi.wappalyzer import analyze_cookies, analyze_dom, analyze_html, analyze_meta
 
 from boefjes.job_models import NormalizerOutput
 from octopoes.models import Reference
@@ -30,11 +42,18 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     fingerprints = Fingerprints.model_validate_pattern(data_directory.joinpath("technologies/*.json").as_posix())
     categories = Categories.model_validate_file(data_directory.joinpath("categories.json"))
     groups = Groups.model_validate_file(data_directory.joinpath("groups.json"))
-
+    httpx.HTTPTransport()
     har = Har.model_validate_json(raw)
 
     wappalyzer = Wappalyzer(fingerprints, categories=categories, groups=groups)
-    detections = wappalyzer.analyze(har)
+
+    analyzes = [analyze_scripts, analyze_css]
+
+    # check if the content type is html
+    if har.log.entries and "html" in har.log.entries[0].response.content.mime_type:
+        analyzes.extend([analyze_headers, analyze_url, analyze_cookies, analyze_meta, analyze_html, analyze_dom])
+
+    detections = wappalyzer.analyze(har, analyzes=analyzes)
 
     for detection in detections:
         cpe = detection.fingerprint.cpe
