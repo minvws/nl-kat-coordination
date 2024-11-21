@@ -9,9 +9,9 @@
     {% csrf_token %}
     <p>
         {% blocktranslate with report_name=schedule.recipe.report_name_format %}
-                    Are you sure you want to disable the schedule for {{ report_name }}?
-                    The recipe will still exist and the schedule can be enabled later on.
-                {% endblocktranslate %}
+            Are you sure you want to disable the schedule for {{ report_name }}?
+            The recipe will still exist and the schedule can be enabled later on.
+        {% endblocktranslate %}
     </p>
 </form>
 {% endfill %}

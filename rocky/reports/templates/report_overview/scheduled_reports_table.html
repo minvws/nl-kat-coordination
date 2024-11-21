@@ -105,12 +105,12 @@
                                 {% endif %}
                                 <div class="horizontal-view toolbar">
                                     {% if schedule.enabled %}
-                                        {% include "report_overview/modal_partials/enable_disable_schedule_modal.html" with modal_id=schedule.schedule_id|add:"-disable-schedule-modal" %}
+                                        {% include "report_overview/modal_partials/enable_disable_schedule_modal.html" with modal_id="disable-schedule-modal-"|add:schedule.schedule_id %}
 
                                         <a class="button ghost"
                                            href="{% ooi_url "ooi_edit" schedule.recipe organization.code %}"><span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit report recipe" %}</a>
                                         <a class="button ghost destructive"
-                                           href="#{{ schedule.schedule_id }}-disable-schedule-modal">{% translate "Disable schedule" %}</a>
+                                           href="#disable-schedule-modal-{{ schedule.schedule_id }}">{% translate "Disable schedule" %}</a>
                                     {% else %}
                                         <a class="button"
                                            href="{% url "enable_disable_scheduled_reports" organization.code %}?schedule_id={{ schedule.schedule_id }}">{% translate "Enable schedule" %}</a>
