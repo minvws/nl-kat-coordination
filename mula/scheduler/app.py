@@ -32,9 +32,8 @@ class App:
         """Initialize the application.
 
         Args:
-            ctx:
-                Application context of shared data (e.g. configuration,
-                external services connections).
+            ctx (context.AppContext): Application context of shared data (e.g.
+                configuration, external services connections).
         """
 
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)

@@ -44,7 +44,7 @@ class SchedulerAPI:
             description="Push a task to a scheduler",
         )
 
-    def list(self, request: fastapi.Request) -> Any:
+    def list(self) -> Any:
         return [models.Scheduler(**s.dict()) for s in self.schedulers.values()]
 
     def get(self, scheduler_id: str) -> Any:

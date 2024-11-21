@@ -16,31 +16,25 @@ tracer = trace.get_tracer(__name__)
 
 
 class NormalizerScheduler(Scheduler):
-    """A KAT specific implementation of a Normalizer scheduler. It extends
-    the `Scheduler` class by adding a `organisation` attribute.
+    """Scheduler implementation for the creation of NormalizerTask models.
 
     Attributes:
-        logger: A logger instance.
-        organisation: The organisation that this scheduler is for.
+        ranker: The ranker to calculate the priority of a task.
     """
 
     ITEM_TYPE: Any = models.NormalizerTask
 
     def __init__(self, ctx: context.AppContext):
-        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
-        self.scheduler_id = "normalizer"
+        """Initializes the NormalizerScheduler.
 
-        self.queue = PriorityQueue(
-            pq_id=self.scheduler_id,
-            maxsize=ctx.config.pq_maxsize,
-            item_type=self.ITEM_TYPE,
-            allow_priority_updates=True,
-            pq_store=ctx.datastores.pq_store,
-        )
+        Args:
+            ctx (context.AppContext): Application context of shared data (e.g.
+                configuration, external services connections).
+        """
+        self.scheduler_id = "normalizer"
+        self.ranker = NormalizerRanker(ctx=self.ctx)
 
         super().__init__(ctx=ctx, queue=self.queue, scheduler_id=self.scheduler_id, create_schedule=False)
-
-        self.ranker = NormalizerRanker(ctx=self.ctx)
 
     def run(self) -> None:
         """The run method is called when the scheduler is started. It will
@@ -105,7 +99,9 @@ class NormalizerScheduler(Scheduler):
         # Get all normalizers for the mime types of the raw data
         normalizers: dict[str, models.Plugin] = {}
         for mime_type in latest_raw_data.raw_data.mime_types:
-            normalizers_by_mime_type: list[models.Plugin] = self.get_normalizers_for_mime_type(mime_type.get("value"))
+            normalizers_by_mime_type: list[models.Plugin] = self.get_normalizers_for_mime_type(
+                mime_type.get("value"), latest_raw_data.organisation
+            )
 
             for normalizer in normalizers_by_mime_type:
                 normalizers[normalizer.id] = normalizer
@@ -176,7 +172,6 @@ class NormalizerScheduler(Scheduler):
                 "Task is still running: %s",
                 normalizer_task.id,
                 task_id=normalizer_task.id,
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
             )
@@ -192,16 +187,7 @@ class NormalizerScheduler(Scheduler):
             )
             return
 
-        score = self.ranker.rank(SimpleNamespace(raw_data=normalizer_task.raw_data, task=normalizer_task))
-
-        task = models.Task(
-            id=normalizer_task.id,
-            scheduler_id=self.scheduler_id,
-            type=self.ITEM_TYPE.type,
-            priority=score,
-            hash=normalizer_task.hash,
-            data=normalizer_task.model_dump(),
-        )
+        task.priority = self.ranker.rank(SimpleNamespace(raw_data=normalizer_task.raw_data, task=normalizer_task))
 
         self.push_item_to_queue_with_timeout(task, self.max_tries)
 
@@ -242,11 +228,7 @@ class NormalizerScheduler(Scheduler):
         """
         if not normalizer.enabled:
             self.logger.debug(
-                "Normalizer: %s is disabled",
-                normalizer.id,
-                normalizer_id=normalizer.id,
-                organisation_id=self.organisation_id,
-                scheduler_id=self.scheduler_id,
+                "Normalizer: %s is disabled", normalizer.id, normalizer_id=normalizer.id, scheduler_id=self.scheduler_id
             )
             return False
 
@@ -271,7 +253,6 @@ class NormalizerScheduler(Scheduler):
                 "Could not get latest task by hash: %s",
                 task.hash,
                 task_id=task.id,
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
                 exc_info=exc_db,
             )
@@ -283,14 +264,13 @@ class NormalizerScheduler(Scheduler):
                 "Task is still running, according to the datastore",
                 task_id=task_db.id,
                 task_hash=task.hash,
-                organisation_id=self.organisation_id,
                 scheduler_id=self.scheduler_id,
             )
             return True
 
         return False
 
-    def get_normalizers_for_mime_type(self, mime_type: str) -> list[models.Plugin]:
+    def get_normalizers_for_mime_type(self, mime_type: str, organisation: str) -> list[models.Plugin]:
         """Get available normalizers for a given mime type.
 
         Args:
@@ -300,26 +280,20 @@ class NormalizerScheduler(Scheduler):
             A list of Plugins of type normalizer for the given mime type.
         """
         try:
-            normalizers = self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(
-                self.organisation_id, mime_type
-            )
+            normalizers = self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(organisation, mime_type)
         except ExternalServiceError:
             self.logger.warning(
                 "Could not get normalizers for mime_type: %s [mime_type=%s, organisation_id=%s, scheduler_id=%s]",
                 mime_type,
                 mime_type,
-                self.organisation_id,
+                organisation,
                 self.scheduler_id,
             )
             return []
 
         if normalizers is None:
             self.logger.debug(
-                "No normalizer found for mime_type: %s",
-                mime_type,
-                mime_type=mime_type,
-                organisation_id=self.organisation_id,
-                scheduler_id=self.scheduler_id,
+                "No normalizer found for mime_type: %s", mime_type, mime_type=mime_type, scheduler_id=self.scheduler_id
             )
             return []
 
@@ -329,7 +303,6 @@ class NormalizerScheduler(Scheduler):
             mime_type,
             mime_type=mime_type,
             normalizers=[normalizer.id for normalizer in normalizers],
-            organisation_=self.organisation_id,
             scheduler_id=self.scheduler_id,
         )
 

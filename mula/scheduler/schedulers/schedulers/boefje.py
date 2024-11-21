@@ -18,8 +18,10 @@ tracer = trace.get_tracer(__name__)
 
 
 class BoefjeScheduler(Scheduler):
-    """A KAT specific implementation of a Boefje scheduler. It extends
-    the `Scheduler` class by adding an `organisation` attribute.
+    """Scheduler implementation for the creation of BoefjeTask models.
+
+    Attributes:
+        ranker: The ranker to calculate the priority of a task.
     """
 
     ITEM_TYPE: Any = models.BoefjeTask
@@ -28,25 +30,13 @@ class BoefjeScheduler(Scheduler):
         """Initializes the BoefjeScheduler.
 
         Args:
-            ctx: The application context.
-            scheduler_id: The id of the scheduler.
-            queue: The queue to use for this scheduler.
-            callback: The callback function to call when a task is completed.
+            ctx (context.AppContext): Application context of shared data (e.g.
+                configuration, external services connections).
         """
-        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.scheduler_id = "boefje"
-
-        self.queue = PriorityQueue(
-            pq_id=self.scheduler_id,
-            maxsize=ctx.config.pq_maxsize,
-            item_type=self.ITEM_TYPE,
-            allow_priority_updates=True,
-            pq_store=ctx.datastores.pq_store,
-        )
+        self.ranker = BoefjeRanker(self.ctx)
 
         super().__init__(ctx=ctx, queue=self.queue, scheduler_id=self.scheduler_id, create_schedule=True)
-
-        self.priority_ranker = BoefjeRanker(self.ctx)
 
     def run(self) -> None:
         """The run method is called when the scheduler is started. It will
@@ -277,24 +267,15 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        try:
-            schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
-                filters=filters.FilterRequest(
-                    filters=[
-                        filters.Filter(column="scheduler_id", operator="eq", value=self.scheduler_id),
-                        filters.Filter(column="deadline_at", operator="lt", value=datetime.now(timezone.utc)),
-                        filters.Filter(column="enabled", operator="eq", value=True),
-                    ]
-                )
+        schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
+            filters=filters.FilterRequest(
+                filters=[
+                    filters.Filter(column="scheduler_id", operator="eq", value=self.scheduler_id),
+                    filters.Filter(column="deadline_at", operator="lt", value=datetime.now(timezone.utc)),
+                    filters.Filter(column="enabled", operator="eq", value=True),
+                ]
             )
-        except storage.errors.StorageError as exc_db:
-            self.logger.error(
-                "Could not get schedules for rescheduling %s",
-                self.scheduler_id,
-                scheduler_id=self.scheduler_id,
-                exc_info=exc_db,
-            )
-            raise exc_db
+        )
 
         if not schedules:
             self.logger.debug(
@@ -309,29 +290,18 @@ class BoefjeScheduler(Scheduler):
                 boefje_task = models.BoefjeTask.model_validate(schedule.data)
 
                 # Plugin still exists?
-                try:
-                    plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
-                        boefje_task.boefje.id, schedule.organisation
-                    )
-                    if not plugin:
-                        self.logger.info(
-                            "Boefje does not exist anymore, skipping and disabling schedule",
-                            boefje_id=boefje_task.boefje.id,
-                            schedule_id=schedule.id,
-                            scheduler_id=self.scheduler_id,
-                        )
-                        schedule.enabled = False
-                        self.ctx.datastores.schedule_store.update_schedule(schedule)
-                        continue
-                except ExternalServiceError as exc_plugin:
-                    self.logger.error(
-                        "Could not get plugin %s from katalogus",
-                        boefje_task.boefje.id,
+                plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+                    boefje_task.boefje.id, schedule.organisation
+                )
+                if not plugin:
+                    self.logger.info(
+                        "Boefje does not exist anymore, skipping and disabling schedule",
                         boefje_id=boefje_task.boefje.id,
                         schedule_id=schedule.id,
                         scheduler_id=self.scheduler_id,
-                        exc_info=exc_plugin,
                     )
+                    schedule.enabled = False
+                    self.ctx.datastores.schedule_store.update_schedule(schedule)
                     continue
 
                 # Plugin still enabled?
@@ -364,29 +334,17 @@ class BoefjeScheduler(Scheduler):
                 ooi = None
                 if boefje_task.input_ooi:
                     # OOI still exists?
-                    try:
-                        ooi = self.ctx.services.octopoes.get_object(boefje_task.organization, boefje_task.input_ooi)
-                        if not ooi:
-                            self.logger.info(
-                                "OOI does not exist anymore, skipping and disabling schedule",
-                                ooi_primary_key=boefje_task.input_ooi,
-                                schedule_id=schedule.id,
-                                organisation_id=schedule.organisation,
-                                scheduler_id=self.scheduler_id,
-                            )
-                            schedule.enabled = False
-                            self.ctx.datastores.schedule_store.update_schedule(schedule)
-                            continue
-                    except ExternalServiceError as exc_ooi:
-                        self.logger.error(
-                            "Could not get ooi %s from octopoes",
-                            boefje_task.input_ooi,
+                    ooi = self.ctx.services.octopoes.get_object(boefje_task.organization, boefje_task.input_ooi)
+                    if not ooi:
+                        self.logger.info(
+                            "OOI does not exist anymore, skipping and disabling schedule",
                             ooi_primary_key=boefje_task.input_ooi,
                             schedule_id=schedule.id,
                             organisation_id=schedule.organisation,
                             scheduler_id=self.scheduler_id,
-                            exc_info=exc_ooi,
                         )
+                        schedule.enabled = False
+                        self.ctx.datastores.schedule_store.update_schedule(schedule)
                         continue
 
                     # Boefje still consuming ooi type?
@@ -426,12 +384,12 @@ class BoefjeScheduler(Scheduler):
                 )
 
                 task = models.Task(
-                    id=boefje_task.id,
+                    id=new_boefje_task.id,
                     scheduler_id=self.scheduler_id,
                     organisation=schedule.organisation,
                     type=self.ITEM_TYPE.type,
-                    hash=boefje_task.hash,
-                    data=boefje_task.model_dump(),
+                    hash=new_boefje_task.hash,
+                    data=new_boefje_task.model_dump(),
                 )
 
                 executor.submit(self.push_task, task, self.push_tasks_for_rescheduling.__name__)
@@ -490,7 +448,7 @@ class BoefjeScheduler(Scheduler):
             return
 
         prior_tasks = self.ctx.datastores.task_store.get_tasks_by_hash(boefje_task.hash)
-        task.score = self.priority_ranker.rank(SimpleNamespace(prior_tasks=prior_tasks, task=boefje_task))
+        task.priority = self.ranker.rank(SimpleNamespace(prior_tasks=prior_tasks, task=boefje_task))
 
         self.push_item_to_queue_with_timeout(task, self.max_tries)
 
@@ -719,17 +677,7 @@ class BoefjeScheduler(Scheduler):
         else:
             timeout = timedelta(seconds=self.ctx.config.pq_grace_period)
 
-        try:
-            task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
-        except Exception as exc_db:
-            self.logger.warning(
-                "Could not get latest task by hash: %s",
-                task.hash,
-                task_hash=task.hash,
-                scheduler_id=self.scheduler_id,
-                exc_info=exc_db,
-            )
-            raise exc_db
+        task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
 
         # Has grace period passed according to datastore?
         if task_db is not None and datetime.now(timezone.utc) - task_db.modified_at < timeout:
@@ -741,18 +689,9 @@ class BoefjeScheduler(Scheduler):
             )
             return False
 
-        try:
-            task_bytes = self.ctx.services.bytes.get_last_run_boefje(
-                boefje_id=task.boefje.id, input_ooi=task.input_ooi, organization_id=task.organization
-            )
-        except ExternalServiceError as exc_bytes:
-            self.logger.error(
-                "Failed to get last run boefje from bytes",
-                boefje_id=task.boefje.id,
-                scheduler_id=self.scheduler_id,
-                exc_info=exc_bytes,
-            )
-            raise exc_bytes
+        task_bytes = self.ctx.services.bytes.get_last_run_boefje(
+            boefje_id=task.boefje.id, input_ooi=task.input_ooi, organization_id=task.organization
+        )
 
         # Did the grace period pass, according to bytes?
         if (
@@ -779,16 +718,7 @@ class BoefjeScheduler(Scheduler):
         Returns:
             A list of Plugin of type Boefje that can be run on the ooi.
         """
-        try:
-            boefjes = self.ctx.services.katalogus.get_boefjes_by_type_and_org_id(ooi.object_type, organisation)
-        except ExternalServiceError:
-            self.logger.error(
-                "Could not get boefjes for object_type: %s",
-                ooi.object_type,
-                object_type=ooi.object_type,
-                scheduler_id=self.scheduler_id,
-            )
-            return []
+        boefjes = self.ctx.services.katalogus.get_boefjes_by_type_and_org_id(ooi.object_type, organisation)
 
         if boefjes is None:
             self.logger.debug(

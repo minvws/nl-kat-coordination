@@ -18,8 +18,37 @@ tracer = trace.get_tracer(__name__)
 
 
 class Scheduler(abc.ABC):
-    """The Scheduler class combines the priority queue.
-    The scheduler is responsible for populating the queue, and ranking tasks.
+    """The scheduler base class that all schedulers should inherit from.
+
+    Attributes:
+        logger:
+            The logger instance.
+        ctx:
+            Application context of shared data (e.g. configuration, external
+            services connections).
+        scheduler_id:
+            The id of the scheduler.
+        max_tries:
+            The maximum number of retries for an item to be pushed to
+            the queue.
+        enabled:
+            Whether the scheduler is enabled.
+        create_schedule:
+            Whether to create a schedule for a task.
+        last_activity:
+            The last activity of the scheduler.
+        queue:
+            A queues.PriorityQueue instance
+        listeners:
+            A dictionary of listeners, typically AMQP listeners on which
+            event messages are received.
+        threads:
+            A list of threads that are running, typically long running
+            processes.
+        lock:
+            A threading lock
+        stop_event_threads:
+            A threading event to stop the running threads.
     """
 
     ITEM_TYPE: Any = None
@@ -32,21 +61,6 @@ class Scheduler(abc.ABC):
         max_tries: int = -1,
         create_schedule: bool = False,
     ):
-        """Initialize the Scheduler.
-
-        Args:
-            ctx:
-                Application context of shared data (e.g. configuration, external
-                services connections).
-            scheduler_id:
-                The id of the scheduler.
-            queue:
-                A queues.PriorityQueue instance
-            max_tries:
-                The maximum number of retries for an item to be pushed to
-                the queue.
-        """
-
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
 
@@ -69,9 +83,9 @@ class Scheduler(abc.ABC):
         self.listeners: dict[str, clients.amqp.Listener] = {}
 
         # Threads
+        self.threads: list[thread.ThreadRunner] = []
         self.lock: threading.Lock = threading.Lock()
         self.stop_event_threads: threading.Event = threading.Event()
-        self.threads: list[thread.ThreadRunner] = []
 
     @abc.abstractmethod
     def run(self) -> None:
@@ -231,7 +245,7 @@ class Scheduler(abc.ABC):
         return item
 
     def post_push(self, item: models.Task) -> models.Task:
-        """After an in item is pushed to the queue, we execute this function
+        """After an in item is pushed on the queue, we execute this function
 
         Args:
             item: The item from the priority queue.

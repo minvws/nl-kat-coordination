@@ -15,23 +15,22 @@ tracer = trace.get_tracer(__name__)
 
 
 class ReportScheduler(Scheduler):
+    """Scheduler implementation for the ReportTask models."""
+
     ITEM_TYPE: Any = models.ReportTask
 
     def __init__(self, ctx: context.AppContext):
-        self.logger: structlog.BoundLogger = structlog.get_logger(__name__)
         self.scheduler_id: str = "report"
-
-        self.queue = queue or PriorityQueue(
-            pq_id=self.scheduler_id,
-            maxsize=ctx.config.pq_maxsize,
-            item_type=self.ITEM_TYPE,
-            allow_priority_updates=True,
-            pq_store=ctx.datastores.pq_store,
-        )
 
         super().__init__(ctx=ctx, queue=self.queue, scheduler_id=self.scheduler_id, create_schedule=True)
 
     def run(self) -> None:
+        """Initializes the ReportScheduler.
+
+        Args:
+            ctx (context.AppContext): Application context of shared data (e.g.
+                configuration, external services connections).
+        """
         # Rescheduling
         self.run_in_thread(
             name=f"scheduler-{self.scheduler_id}-reschedule", target=self.push_tasks_for_rescheduling, interval=60.0
@@ -65,7 +64,6 @@ class ReportScheduler(Scheduler):
                 "Could not get schedules for rescheduling %s",
                 self.scheduler_id,
                 scheduler_id=self.scheduler_id,
-                organisation_id=self.organisation_id,
                 exc_info=exc_db,
             )
             raise exc_db
@@ -76,53 +74,28 @@ class ReportScheduler(Scheduler):
             for schedule in schedules:
                 report_task = models.ReportTask.model_validate(schedule.data)
 
-                task = models.Task(id=report_task.id, scheduler_id=self.scheduler_id)
+                task = models.Task(
+                    id=report_task.id,
+                    scheduler_id=self.scheduler_id,
+                    organisation=schedule.organisation,
+                    type=self.ITEM_TYPE.type,
+                    hash=report_task.hash,
+                    data=report_task.model_dump(),
+                )
 
                 executor.submit(self.push_task, task, self.push_tasks_for_rescheduling.__name__)
 
-    def push_report_task(self, report_task: models.ReportTask, caller: str = "") -> None:
-        self.logger.debug(
-            "Pushing report task", task_hash=report_task.hash, scheduler_id=self.scheduler_id, caller=caller
-        )
-
-        if self.is_item_on_queue_by_hash(report_task.hash):
-            self.logger.debug(
-                "Report task already on queue",
-                task_hash=report_task.hash,
-                organisation_id=self.organisation_id,
-                scheduler_id=self.scheduler_id,
-                caller=caller,
-            )
+    def push_task(self, task: models.Task, caller: str = "") -> None:
+        if self.is_item_on_queue_by_hash(task.hash):
+            self.logger.debug("Report task already on queue", scheduler_id=self.scheduler_id, caller=caller)
             return
 
-        task = models.Task(
-            scheduler_id=self.scheduler_id,
-            priority=int(datetime.now().timestamp()),
-            type=self.ITEM_TYPE.type,
-            hash=report_task.hash,
-            data=report_task.model_dump(),
-        )
-
-        try:
-            self.push_item_to_queue_with_timeout(task, self.max_tries)
-        except QueueFullError:
-            self.logger.warning(
-                "Could not add task %s to queue, queue was full",
-                report_task.hash,
-                task_hash=report_task.hash,
-                queue_qsize=self.queue.qsize(),
-                queue_maxsize=self.queue.maxsize,
-                organisation_id=self.organisation_id,
-                scheduler_id=self.scheduler_id,
-                caller=caller,
-            )
-            return
+        self.push_item_to_queue_with_timeout(task, self.max_tries)
 
         self.logger.info(
             "Report task pushed to queue",
             task_id=task.id,
-            task_hash=report_task.hash,
-            organisation_id=self.organisation_id,
+            task_hash=task.hash,
             scheduler_id=self.scheduler_id,
             caller=caller,
         )
