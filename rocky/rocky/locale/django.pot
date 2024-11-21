@@ -3117,7 +3117,8 @@ msgid "First seen"
 msgstr ""
 
 #: reports/report_types/findings_report/report.html
-msgid "No findings have been found."
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "No findings have been identified yet."
 msgstr ""
 
 #: reports/report_types/findings_report/report.py
@@ -5925,7 +5926,7 @@ msgid "Save %(display_type)s"
 msgstr ""
 
 #: rocky/templates/oois/ooi_findings.html
-msgid "Currently there are no findings for OOI"
+msgid "Currently no findings have been identified for OOI"
 msgstr ""
 
 #: rocky/templates/oois/ooi_list.html
