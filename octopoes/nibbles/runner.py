@@ -83,7 +83,7 @@ class NibblesRunner:
                             source=source_ooi.reference,
                             result=[ooi.reference for ooi in result],
                             parameters_hash=nibble_hasher(frozen_arg),
-                            # What to do if a is not an OOI?
+                            # TODO: What to do if a is not an OOI?
                             parameters_references=[a.reference for a in frozen_arg if isinstance(a, OOI)],
                         )
                         for ooi in result:
