@@ -901,6 +901,31 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
             datetime.fromisoformat(response.json().get("deadline_at")[:-1]).astimezone(timezone.utc),
         )
 
+    def test_post_schedule_explicit_deadline_at(self):
+        """When a schedule is created, the deadline_at should be set if it is provided."""
+        item = functions.create_item(self.scheduler.scheduler_id, 1)
+        now = datetime.now(timezone.utc)
+        response = self.client.post(
+            "/schedules", json={"scheduler_id": item.scheduler_id, "data": item.data, "deadline_at": now.isoformat()}
+        )
+        self.assertEqual(201, response.status_code)
+        self.assertIsNone(response.json().get("schedule"))
+        self.assertEqual(
+            # NOTE: Remove Z from the end of the string. Until 3.11
+            # datetime.fromisoformat does not accept Z at the end of the string
+            datetime.fromisoformat(response.json().get("deadline_at")[:-1]).astimezone(timezone.utc),
+            now,
+        )
+
+    def test_post_schedule_schedule_and_deadline_at_none(self):
+        """When a schedule is created, both schedule and deadline_at should not be None."""
+        item = functions.create_item(self.scheduler.scheduler_id, 1)
+        response = self.client.post("/schedules", json={"scheduler_id": item.scheduler_id, "data": item.data})
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(
+            {"detail": "Bad request error occurred: Either deadline_at or schedule must be provided"}, response.json()
+        )
+
     def test_post_schedule_invalid_schedule(self):
         item = functions.create_item(self.scheduler.scheduler_id, 1)
         response = self.client.post(

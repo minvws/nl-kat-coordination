@@ -5,67 +5,67 @@
 {% load component_tags %}
 {% load compress %}
 
-<div class="horizontal-view toolbar">
-    <div class="dropdown">
-        {% comment %} <p class="visually-hidden" id="language-selector-description">{% translate "Select your language" %}</p> {% endcomment %}
-        <button id="action-dropdown-button"
-                type="button"
-                aria-label="{{ aria_label_current_language }}"
-                aria-haspopup="menu"
-                aria-controls="action-dropdown"
-                aria-expanded="false"
-                class="dropdown-button ghost">
-            {% translate "Actions" %}
-            <span class="icon ti-chevron-down"></span>
-        </button>
-        <div id="action-dropdown"
-             class="dropdown-list"
-             role="menu"
-             aria-labelledby="action-dropdown-button">
-            <ul role="presentation">
-                <li>
-                    <a href="#rerun-modal" role="menuitem" data-value="test">
-                        <i class="icon ti-refresh"></i>{% translate "Rerun" %}
-                    </a>
-                </li>
-                {% comment %} <li>
+{% if reports %}
+    <div class="horizontal-view toolbar">
+        <div class="dropdown">
+            {% comment %} <p class="visually-hidden" id="language-selector-description">{% translate "Select your language" %}</p> {% endcomment %}
+            <button id="action-dropdown-button"
+                    type="button"
+                    aria-label="{{ aria_label_current_language }}"
+                    aria-haspopup="menu"
+                    aria-controls="action-dropdown"
+                    aria-expanded="false"
+                    class="dropdown-button ghost">
+                {% translate "Actions" %}
+                <span class="icon ti-chevron-down"></span>
+            </button>
+            <div id="action-dropdown"
+                 class="dropdown-list"
+                 role="menu"
+                 aria-labelledby="action-dropdown-button">
+                <ul role="presentation">
+                    <li>
+                        <a href="#rerun-modal" role="menuitem" data-value="test">
+                            <i class="icon ti-refresh"></i>{% translate "Rerun" %}
+                        </a>
+                    </li>
+                    {% comment %} <li>
                     <a href="#" role="option" data-value="test">
                         <i class="icon ti-calendar-event"></i>{% translate "Reschedule" %}
                     </a>
-                </li> {% endcomment %}
-                {% comment %} <li>
+                    </li> {% endcomment %}
+                    {% comment %} <li>
                     <a href="#" role="option" data-value="test">
                         <i class="icon ti-share"></i>{% translate "Share" %}
                     </a>
-                </li> {% endcomment %}
-                {% comment %} <li>
+                    </li> {% endcomment %}
+                    {% comment %} <li>
                   <a href="#" role="option" data-value="test">
                     <i class="icon ti-layers-difference"></i>{% translate "Concatenate" %}
                   </a>
-                </li> {% endcomment %}
-                <li>
-                    <a href="#rename-modal" role="menuitem" data-value="test">
-                        <i class="icon ti-edit"></i>{% translate "Rename" %}
-                    </a>
-                </li>
-                <li>
-                    <a href="#delete-modal"
-                       class="plain destructive"
-                       role="menuitem"
-                       data-value="test">
-                        <i class="icon ti-trash"></i>{% translate "Delete" %}
-                    </a>
-                </li>
-            </ul>
+                    </li> {% endcomment %}
+                    <li>
+                        <a href="#rename-modal" role="menuitem" data-value="test">
+                            <i class="icon ti-edit"></i>{% translate "Rename" %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#delete-modal"
+                           class="plain destructive"
+                           role="menuitem"
+                           data-value="test">
+                            <i class="icon ti-trash"></i>{% translate "Delete" %}
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-    {% include "report_overview/modal_partials/rerun_modal.html" %}
-    {% include "report_overview/modal_partials/rename_modal.html" %}
-    {% include "report_overview/modal_partials/delete_modal.html" %}
+        {% include "report_overview/modal_partials/rerun_modal.html" %}
+        {% include "report_overview/modal_partials/rename_modal.html" %}
+        {% include "report_overview/modal_partials/delete_modal.html" %}
 
-</div>
-<div class="horizontal-scroll">
-    {% if reports %}
+    </div>
+    <div class="horizontal-scroll">
         <p class="de-emphasized">
             {% blocktranslate with length=reports|length total=total_oois %}Showing {{ length }} of {{ total }} reports{% endblocktranslate %}
         </p>
@@ -107,15 +107,19 @@
                                         {% if report.parent_report.report_type == "concatenated-report" or report.parent_report.report_type is None %}
                                             {% for report_type, total_objects in report.report_type_summary.items %}
                                                 {% if forloop.counter0 < 2 %}
-                                                    <li class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</li>
+                                                    <li>
+                                                        <span class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</span>
+                                                    </li>
                                                 {% endif %}
                                                 {% if forloop.counter0 == 2 %}
-                                                    <li class="label tags-color-grey-2">+ {{ report.report_type_summary|length|add:"-2" }}</li>
+                                                    <li>
+                                                        <span class="label tags-color-grey-2">+ {{ report.report_type_summary|length|add:"-2" }}</span>
+                                                    </li>
                                                 {% endif %}
                                             {% endfor %}
                                         {% else %}
-                                            <li class="label tags-color-{{ report.parent_report.report_type|get_report_type_label_style }}">
-                                                {{ report.parent_report.report_type|get_report_type_name }}
+                                            <li>
+                                                <span class="label tags-color-{{ report.parent_report.report_type|get_report_type_label_style }}">{{ report.parent_report.report_type|get_report_type_name }}</span>
                                             </li>
                                         {% endif %}
                                     </ul>
@@ -168,7 +172,9 @@
                                                     <tr>
                                                         <td>
                                                             <ul class="tags horizontal-view">
-                                                                <li class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</li>
+                                                                <li>
+                                                                    <span class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</span>
+                                                                </li>
                                                             </ul>
                                                         </td>
                                                         <td>{{ total_objects }}</td>
@@ -193,8 +199,8 @@
                                                     <tr>
                                                         <td>
                                                             <ul class="tags horizontal-view">
-                                                                <li class="label tags-color-{{ child_report.report_type|get_report_type_label_style }}">
-                                                                    {{ child_report.report_type|get_report_type_name }}
+                                                                <li>
+                                                                    <span class="label tags-color-{{ child_report.report_type|get_report_type_label_style }}">{{ child_report.report_type|get_report_type_name }}</span>
                                                                 </li>
                                                             </ul>
                                                         </td>
@@ -223,10 +229,12 @@
                 </table>
             </form>
         </div>
-    {% else %}
+    </div>
+{% else %}
+    <div>
         <p>{% translate "No reports have been generated yet." %}</p>
-    {% endif %}
-</div>
+    </div>
+{% endif %}
 {% block html_at_end_body %}
     {% compress js %}
         <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
