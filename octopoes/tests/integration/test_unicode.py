@@ -10,7 +10,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import DeclaredScanProfile, ScanLevel
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
-from octopoes.models.origin import OriginType
+from octopoes.models.origin import Origin, OriginType
 
 if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
@@ -67,13 +67,15 @@ def test_unicode_hostname(octopoes_api_connector: OctopoesAPIConnector, valid_ti
     assert hostname_object.reference == hostname.reference
 
     origins = octopoes_api_connector.list_origins(task_id=task_id, valid_time=valid_time)
-    assert origins[0].dict() == {
-        "method": NAMES[2],
-        "origin_type": OriginType.OBSERVATION,
-        "source": network.reference,
-        "source_method": "test",
-        "result": [hostname.reference],
-        "task_id": task_id,
-    }
+    assert origins[0] == Origin.model_validate(
+        {
+            "method": NAMES[2],
+            "origin_type": OriginType.OBSERVATION,
+            "source": network.reference,
+            "source_method": "test",
+            "result": [hostname.reference],
+            "task_id": task_id,
+        }
+    )
 
     assert len(octopoes_api_connector.list_origins(result=hostname.reference, valid_time=valid_time)) == 1

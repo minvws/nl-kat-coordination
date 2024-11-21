@@ -235,7 +235,7 @@ class XTDBOOIRepository(OOIRepository):
     @classmethod
     def deserialize(cls, data: dict[str, Any]) -> OOI:
         if "object_type" not in data:
-            raise ValueError("Data is missing object_type")
+            raise ValueError("OOI data is missing object_type")
 
         # pop global attributes
         object_cls = type_by_name(data.pop("object_type"))

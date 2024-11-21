@@ -7,7 +7,7 @@ from unittest.mock import Mock
 
 import pytest
 from nibbles.definitions import NibbleDefinition, NibbleParameter
-from nibbles.runner import NibblesRunner
+from nibbles.runner import NibblesRunner, nibble_hasher
 
 from octopoes.core.service import OctopoesService
 from octopoes.models import OOI, ScanLevel
@@ -15,6 +15,7 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 from octopoes.models.ooi.web import URL, HostnameHTTPURL, IPAddressHTTPURL, WebScheme
+from octopoes.models.origin import OriginType
 
 if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
@@ -104,6 +105,7 @@ def test_url_classification_nibble(xtdb_octopoes_service: OctopoesService, event
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
         xtdb_octopoes_service.scan_profile_repository,
+        perform_writes=False,
     )
     nibbler.nibbles = [url_classification_nibble]
     network = Network(name="internet")
@@ -117,7 +119,7 @@ def test_url_classification_nibble(xtdb_octopoes_service: OctopoesService, event
     assert url in result
     assert "url_classification" in result[url]
     assert len(result[url]["url_classification"]) == 1
-    assert len(result[url]["url_classification"][frozenset({url.reference})]) == 3
+    assert len(result[url]["url_classification"][frozenset([url])]) == 3
 
 
 def find_network_url(network: Network, url: URL) -> Iterator[OOI]:
@@ -163,20 +165,41 @@ def test_find_network_url_nibble(xtdb_octopoes_service: OctopoesService, event_m
     nibbler.nibbles = [find_network_url_nibble]
     network1 = Network(name="internetverbinding")
     xtdb_octopoes_service.ooi_repository.save(network1, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
     network2 = Network(name="internet")
     xtdb_octopoes_service.ooi_repository.save(network2, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
     url1 = URL(network=network1.reference, raw="https://potato.ls/")
     xtdb_octopoes_service.ooi_repository.save(url1, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
     url2 = URL(network=network2.reference, raw="https://mispo.es/")
     xtdb_octopoes_service.ooi_repository.save(url2, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
 
+    xtdb_url1 = xtdb_octopoes_service.ooi_repository.get(url1.reference, valid_time)
+    xtdb_url2 = xtdb_octopoes_service.ooi_repository.get(url2.reference, valid_time)
+
     result = nibbler.infer([network1], valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    target = set(find_network_url(network1, url1))
+
     assert network1 in result
     assert len(result[network1]["find_network_url"]) == 4
-    assert result[network1]["find_network_url"][frozenset([network1.reference, url1.reference])] == set(
-        find_network_url(network1, url1)
+    assert result[network1]["find_network_url"][frozenset([network1, xtdb_url1])] == target
+    assert result[network1]["find_network_url"][frozenset([network2, xtdb_url1])] == set()
+    assert result[network1]["find_network_url"][frozenset([network1, xtdb_url2])] == set()
+    assert result[network1]["find_network_url"][frozenset([network2, xtdb_url2])] == set()
+
+    nibblettes = xtdb_octopoes_service.origin_repository.list_origins(
+        origin_type=OriginType.NIBBLETTE, valid_time=valid_time
     )
-    assert result[network1]["find_network_url"][frozenset([network2.reference, url1.reference])] == set()
-    assert result[network1]["find_network_url"][frozenset([network1.reference, url2.reference])] == set()
-    assert result[network1]["find_network_url"][frozenset([network2.reference, url2.reference])] == set()
+
+    assert len(nibblettes) == 4
+    for nibblette in nibblettes:
+        assert nibblette.parameters_references is not None
+        arg = [xtdb_octopoes_service.ooi_repository.get(obj, valid_time) for obj in nibblette.parameters_references]
+        assert nibblette.parameters_hash == nibble_hasher(frozenset(arg))
+        if nibblette.result:
+            assert len(nibblette.result) == 1
+            assert nibblette.result == [t.reference for t in target]
