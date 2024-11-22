@@ -42,7 +42,7 @@ class Task(BaseModel):
 
 
 class Handler:
-    def handle(self, item: Task):
+    def handle(self, task: Task):
         raise NotImplementedError()
 
 

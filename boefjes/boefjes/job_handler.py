@@ -5,11 +5,11 @@ from typing import cast
 
 import docker
 import structlog
-from docker.errors import ContainerError, ImageNotFound, APIError
+from docker.errors import APIError, ContainerError, ImageNotFound
 from httpx import HTTPError
 
 from boefjes.clients.bytes_client import BytesAPIClient
-from boefjes.clients.scheduler_client import get_octopoes_api_connector, SchedulerAPIClient
+from boefjes.clients.scheduler_client import SchedulerAPIClient, get_octopoes_api_connector
 from boefjes.config import settings
 from boefjes.interfaces import BoefjeJobRunner, Handler, Task, TaskStatus
 from boefjes.job_models import BoefjeMeta
@@ -28,15 +28,82 @@ bytes_api_client = BytesAPIClient(
 )
 
 
+class DockerBoefjeHandler(Handler):
+    CACHE_VOLUME_NAME = "openkat_cache"
+    CACHE_VOLUME_TARGET = "/home/nonroot/openkat_cache"
+
+    def __init__(self, scheduler_client: SchedulerAPIClient, bytes_api_client: BytesAPIClient):
+        self.docker_client = docker.from_env()
+        self.scheduler_client = scheduler_client
+        self.bytes_api_client = bytes_api_client
+
+    def handle(self, task: Task) -> None:
+        boefje_meta = task.data
+        oci_image = boefje_meta.arguments["oci_image"]
+
+        if not oci_image:
+            raise RuntimeError("Boefje does not have OCI image")
+
+        # local import to prevent circular dependency
+        import boefjes.plugins.models
+
+        stderr_mime_types = boefjes.plugins.models._default_mime_types(boefje_meta.boefje)
+
+        task_id = boefje_meta.id
+        boefje_meta.started_at = datetime.now(timezone.utc)
+
+        try:
+            input_url = str(settings.api).rstrip("/") + f"/api/v0/tasks/{task_id}"
+            container_logs = self.docker_client.containers.run(
+                image=oci_image,
+                name="kat_boefje_" + str(task_id),
+                command=input_url,
+                stdout=False,
+                stderr=True,
+                remove=True,
+                network=settings.docker_network,
+                volumes=[f"{self.CACHE_VOLUME_NAME}:{self.CACHE_VOLUME_TARGET}"],
+            )
+
+            task = self.scheduler_client.get_task(task_id)
+
+            # if status is still running the container didn't call the output API endpoint, so set to status to failed
+            if task.status == TaskStatus.RUNNING:
+                boefje_meta.ended_at = datetime.now(timezone.utc)
+                self.bytes_api_client.save_boefje_meta(boefje_meta)  # The task didn't create a boefje_meta object
+                self.bytes_api_client.save_raw(task_id, container_logs, stderr_mime_types.union({"error/boefje"}))
+                self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
+
+                # have to raise exception to prevent _start_working function from setting status to completed
+                raise RuntimeError("Boefje did not call output API endpoint")
+        except ContainerError as e:
+            logger.error(
+                "Container for task %s failed and returned exit status %d, stderr saved to bytes",
+                task_id,
+                e.exit_status,
+            )
+
+            # save container log (stderr) to bytes
+            self.bytes_api_client.login()
+            boefje_meta.ended_at = datetime.now(timezone.utc)
+            try:
+                # this boefje_meta might be incomplete, it comes from the scheduler instead of the Boefje I/O API
+                self.bytes_api_client.save_boefje_meta(boefje_meta)
+            except HTTPError:
+                logger.error("Failed to save boefje meta to bytes, continuing anyway")
+            self.bytes_api_client.save_raw(task_id, e.stderr, stderr_mime_types)
+            self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
+        except ImageNotFound:
+            logger.error("Docker image %s not found", oci_image)
+            self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
+        except APIError as e:
+            logger.error("Docker API error: %s", e)
+            self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
+
+
 class BoefjeHandler(Handler):
-    def __init__(
-        self,
-        job_runner: BoefjeJobRunner,
-        docker_runner: "DockerBoefjeHandler",
-        bytes_client: BytesAPIClient,
-    ):
+    def __init__(self, job_runner: BoefjeJobRunner, bytes_client: BytesAPIClient):
         self.job_runner = job_runner
-        self.docker_runner = docker_runner
         self.bytes_client = bytes_client
 
     def handle(self, task: Task) -> None:
@@ -44,18 +111,6 @@ class BoefjeHandler(Handler):
 
         if not isinstance(boefje_meta, BoefjeMeta):
             raise ValueError("Plugin id does not belong to a boefje")
-
-        logger.info("Handling boefje %s[task_id=%s]", boefje_meta.boefje.id, str(boefje_meta.id))
-
-        # Check if this boefje is container-native, if so, continue using the Docker boefjes runner
-        if boefje_meta.arguments["oci_image"]:
-            logger.info(
-                "Delegating boefje %s[task_id=%s] to Docker runner with OCI image [%s]",
-                boefje_meta.boefje.id,
-                str(boefje_meta.id),
-                boefje_meta.arguments["oci_image"],
-            )
-            return self.docker_runner.handle(task)
 
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
@@ -206,78 +261,29 @@ class NormalizerHandler(Handler):
         logger.info("Done with normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
 
 
-class InvalidWhitelist(Exception):
-    pass
+class CompositeBoefjeHandler(Handler):
+    """This is a pattern that allows us to use the Handler interface while allowing multiple handlers to be active at
+    the same time, depending on the configuration. This way, we don't need to keep the option to delegate in every
+    BoefjeHandler instance."""
 
+    def __init__(self, boefje_handler: BoefjeHandler | None = None, docker_handler: DockerBoefjeHandler | None = None):
+        self.boefje_handler = boefje_handler
+        self.docker_handler = docker_handler
 
-class DockerBoefjeHandler(Handler):
-    CACHE_VOLUME_NAME = "openkat_cache"
-    CACHE_VOLUME_TARGET = "/home/nonroot/openkat_cache"
+    def handle(self, task: Task):
+        if isinstance(task.data, BoefjeMeta):
+            raise RuntimeError("Did not receive boefje task")
 
-    def __init__(self, scheduler_client: SchedulerAPIClient, bytes_api_client: BytesAPIClient):
-        self.docker_client = docker.from_env()
-        self.scheduler_client = scheduler_client
-        self.bytes_api_client = bytes_api_client
-
-    def handle(self, task: Task) -> None:
-        boefje_meta = task.data
-        oci_image = boefje_meta.arguments["oci_image"]
-
-        if not oci_image:
-            raise RuntimeError("Boefje does not have OCI image")
-
-        # local import to prevent circular dependency
-        import boefjes.plugins.models
-
-        stderr_mime_types = boefjes.plugins.models._default_mime_types(boefje_meta.boefje)
-
-        task_id = boefje_meta.id
-        boefje_meta.started_at = datetime.now(timezone.utc)
-
-        try:
-            input_url = str(settings.api).rstrip("/") + f"/api/v0/tasks/{task_id}"
-            container_logs = self.docker_client.containers.run(
-                image=oci_image,
-                name="kat_boefje_" + str(task_id),
-                command=input_url,
-                stdout=False,
-                stderr=True,
-                remove=True,
-                network=settings.docker_network,
-                volumes=[f"{self.CACHE_VOLUME_NAME}:{self.CACHE_VOLUME_TARGET}"],
+        if self.docker_handler and task.data.arguments["oci_image"]:
+            logger.info(
+                "Delegating boefje %s[task_id=%s] to Docker runner with OCI image [%s]",
+                task.data.boefje.id,
+                str(task.data.id),
+                task.data.arguments["oci_image"],
             )
+            self.docker_handler.handle(task)
 
-            task = self.scheduler_client.get_task(task_id)
+        if not self.boefje_handler:
+            raise RuntimeError("No handlers defined")
 
-            # if status is still running the container didn't call the output API endpoint, so set to status to failed
-            if task.status == TaskStatus.RUNNING:
-                boefje_meta.ended_at = datetime.now(timezone.utc)
-                self.bytes_api_client.save_boefje_meta(boefje_meta)  # The task didn't create a boefje_meta object
-                self.bytes_api_client.save_raw(task_id, container_logs, stderr_mime_types.union({"error/boefje"}))
-                self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
-
-                # have to raise exception to prevent _start_working function from setting status to completed
-                raise RuntimeError("Boefje did not call output API endpoint")
-        except ContainerError as e:
-            logger.error(
-                "Container for task %s failed and returned exit status %d, stderr saved to bytes",
-                task_id,
-                e.exit_status,
-            )
-
-            # save container log (stderr) to bytes
-            self.bytes_api_client.login()
-            boefje_meta.ended_at = datetime.now(timezone.utc)
-            try:
-                # this boefje_meta might be incomplete, it comes from the scheduler instead of the Boefje I/O API
-                self.bytes_api_client.save_boefje_meta(boefje_meta)
-            except HTTPError:
-                logger.error("Failed to save boefje meta to bytes, continuing anyway")
-            self.bytes_api_client.save_raw(task_id, e.stderr, stderr_mime_types)
-            self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
-        except ImageNotFound:
-            logger.error("Docker image %s not found", oci_image)
-            self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
-        except APIError as e:
-            logger.error("Docker API error: %s", e)
-            self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
+        self.boefje_handler.handle(task)

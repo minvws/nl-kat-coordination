@@ -4,7 +4,13 @@ from boefjes.clients.scheduler_client import SchedulerAPIClient
 from boefjes.config import Settings
 from boefjes.dependencies.plugins import PluginService
 from boefjes.interfaces import Handler
-from boefjes.job_handler import BoefjeHandler, NormalizerHandler, bytes_api_client, DockerBoefjeHandler
+from boefjes.job_handler import (
+    BoefjeHandler,
+    CompositeBoefjeHandler,
+    DockerBoefjeHandler,
+    NormalizerHandler,
+    bytes_api_client,
+)
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
 from boefjes.local_repository import get_local_repository
 from boefjes.sql.config_storage import create_config_storage
@@ -22,11 +28,11 @@ def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue) -> Worke
 
     item_handler: Handler
     if queue is WorkerManager.Queue.BOEFJES:
-        item_handler = BoefjeHandler(
-            LocalBoefjeJobRunner(local_repository),
+        item_handler = CompositeBoefjeHandler(
+            BoefjeHandler(LocalBoefjeJobRunner(local_repository), bytes_api_client),
             DockerBoefjeHandler(scheduler_client, bytes_api_client),
-            bytes_api_client,
         )
+
     else:
         item_handler = NormalizerHandler(
             LocalNormalizerJobRunner(local_repository), bytes_api_client, settings.scan_profile_whitelist

@@ -1,6 +1,7 @@
 import ast
 import os
 import sys
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from unittest import mock
@@ -8,15 +9,12 @@ from uuid import UUID
 
 import pytest
 
-from boefjes.dependencies.plugins import PluginService
-from boefjes.interfaces import JobRuntimeError
+from boefjes.interfaces import JobRuntimeError, Task, TaskStatus
 from boefjes.job_handler import BoefjeHandler
 from boefjes.job_models import BoefjeMeta, InvalidReturnValueNormalizer, NormalizerMeta
 from boefjes.local import LocalBoefjeJobRunner
 from boefjes.local_repository import LocalPluginRepository
 from boefjes.models import Bit, Boefje, Normalizer, PluginType
-from boefjes.sql.config_storage import create_config_storage
-from boefjes.sql.plugin_storage import create_plugin_storage
 from tests.loading import get_dummy_data
 
 boefjes = [
@@ -56,12 +54,22 @@ def test_handle_boefje_with_exception(mocker):
     mock_bytes_api_client = mocker.patch("boefjes.job_handler.bytes_api_client")
     mocker.patch("boefjes.job_handler.get_octopoes_api_connector")
 
-    meta = BoefjeMeta(
-        id="0dca59db-b339-47c4-bcc9-896fc18e2386",
-        boefje={"id": "dummy_boefje_runtime_exception"},
-        input_ooi="Network|internet",
-        arguments={},
-        organization="_dev",
+    task = Task(
+        id=uuid.uuid4().hex,
+        scheduler_id="test",
+        schedule_id="test",
+        priority=1,
+        status=TaskStatus.RUNNING,
+        type="boefje",
+        created_at=datetime.now(),
+        modified_at=datetime.now(),
+        data=BoefjeMeta(
+            id="0dca59db-b339-47c4-bcc9-896fc18e2386",
+            boefje={"id": "dummy_boefje_runtime_exception"},
+            input_ooi="Network|internet",
+            arguments={},
+            organization="_dev",
+        ),
     )
     local_repository = LocalPluginRepository(Path(__file__).parent / "modules")
 
@@ -69,9 +77,9 @@ def test_handle_boefje_with_exception(mocker):
     mock_session.query.all.return_value = []
 
     with pytest.raises(RuntimeError):  # Bytes still saves exceptions before they are reraised
-        BoefjeHandler(LocalBoefjeJobRunner(local_repository), mock.MagicMock(), mock_bytes_api_client).handle(meta)
+        BoefjeHandler(LocalBoefjeJobRunner(local_repository), mock_bytes_api_client).handle(task)
 
-    mock_bytes_api_client.save_boefje_meta.assert_called_once_with(meta)
+    mock_bytes_api_client.save_boefje_meta.assert_called_once_with(task)
     mock_bytes_api_client.save_raw.assert_called_once()
     raw_call_args = mock_bytes_api_client.save_raw.call_args
 
