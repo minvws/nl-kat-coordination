@@ -68,12 +68,8 @@ def test_handle_boefje_with_exception(mocker):
     mock_session = mock.MagicMock()
     mock_session.query.all.return_value = []
 
-    plugin_service = PluginService(
-        create_plugin_storage(mock_session), create_config_storage(mock_session), local_repository
-    )
-
     with pytest.raises(RuntimeError):  # Bytes still saves exceptions before they are reraised
-        BoefjeHandler(LocalBoefjeJobRunner(local_repository), plugin_service, mock_bytes_api_client).handle(meta)
+        BoefjeHandler(LocalBoefjeJobRunner(local_repository), mock.MagicMock(), mock_bytes_api_client).handle(meta)
 
     mock_bytes_api_client.save_boefje_meta.assert_called_once_with(meta)
     mock_bytes_api_client.save_raw.assert_called_once()
