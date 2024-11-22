@@ -1,6 +1,7 @@
 import json
 
-from boefjes.job_models import NormalizerDeclaration, NormalizerMeta
+from boefjes.job_models import NormalizerMeta
+from boefjes.normalizer_models import NormalizerDeclaration
 from tests.loading import get_dummy_data
 
 

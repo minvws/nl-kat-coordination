@@ -6,7 +6,7 @@ import structlog
 
 from boefjes.app import get_runtime_manager
 from boefjes.config import settings
-from boefjes.runtime_interfaces import WorkerManager
+from boefjes.worker.manager import WorkerManager
 
 with settings.log_cfg.open() as f:
     logging.config.dictConfig(json.load(f))
@@ -42,7 +42,7 @@ def cli(worker_type: str, log_level: str):
     logger.info("Starting runtime for %s", worker_type)
 
     queue = WorkerManager.Queue(worker_type)
-    runtime = get_runtime_manager(settings, queue, log_level)
+    runtime = get_runtime_manager(settings, queue)
 
     if worker_type == "boefje":
         import boefjes.api

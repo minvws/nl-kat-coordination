@@ -12,7 +12,6 @@ from pathlib import Path
 import requests
 from netaddr import IPAddress, IPNetwork
 
-
 # Paths and URLs for RPKI
 BASE_PATH = Path(getenv("OPENKAT_CACHE_PATH", Path(__file__).parent))
 

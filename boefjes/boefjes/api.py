@@ -12,15 +12,12 @@ from pydantic import BaseModel, ConfigDict, Field
 from uvicorn import Config, Server
 
 from boefjes.clients.bytes_client import BytesAPIClient
-from boefjes.clients.scheduler_client import SchedulerAPIClient, TaskStatus
+from boefjes.clients.scheduler_client import SchedulerAPIClient
 from boefjes.config import settings
-from boefjes.dependencies.plugins import PluginService, get_plugin_service
-from boefjes.job_handler import get_environment_settings, get_octopoes_api_connector
+from boefjes.dependencies.plugins import get_plugin_service
+from boefjes.interfaces import TaskStatus
 from boefjes.job_models import BoefjeMeta
-from boefjes.models import PluginType
 from boefjes.plugins.models import _default_mime_types
-from octopoes.models import Reference
-from octopoes.models.exception import ObjectNotFoundException
 
 app = FastAPI(title="Boefje API")
 logger = structlog.get_logger(__name__)
@@ -70,8 +67,8 @@ class BoefjeOutput(BaseModel):
     files: list[File] | None = None
 
 
-def get_scheduler_client():
-    return SchedulerAPIClient(str(settings.scheduler_api))
+def get_scheduler_client(plugin_service=Depends(get_plugin_service)):
+    return SchedulerAPIClient(plugin_service, str(settings.scheduler_api))
 
 
 def get_bytes_client():
@@ -84,21 +81,14 @@ async def root():
 
 
 @app.get("/api/v0/tasks/{task_id}", response_model=BoefjeInput)
-def boefje_input(
-    task_id: UUID,
-    scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),
-    plugin_service: PluginService = Depends(get_plugin_service),
-):
+def boefje_input(task_id: UUID, scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client)):
     task = get_task(task_id, scheduler_client)
 
     if task.status is not TaskStatus.RUNNING:
         raise HTTPException(status_code=403, detail="Task does not have status running")
 
-    plugin = plugin_service.by_plugin_id(task.data.boefje.id, task.data.organization)
-    boefje_meta = create_boefje_meta(task, plugin)
-
     output_url = str(settings.api).rstrip("/") + f"/api/v0/tasks/{task_id}"
-    return BoefjeInput(task_id=task_id, output_url=output_url, boefje_meta=boefje_meta)
+    return BoefjeInput(task_id=task_id, output_url=output_url, boefje_meta=task.data)
 
 
 @app.post("/api/v0/tasks/{task_id}")
@@ -107,15 +97,13 @@ def boefje_output(
     boefje_output: BoefjeOutput,
     scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),
     bytes_client: BytesAPIClient = Depends(get_bytes_client),
-    plugin_service: PluginService = Depends(get_plugin_service),
 ):
     task = get_task(task_id, scheduler_client)
+    boefje_meta = task.data
 
     if task.status is not TaskStatus.RUNNING:
         raise HTTPException(status_code=403, detail="Task does not have status running")
 
-    plugin = plugin_service.by_plugin_id(task.data.boefje.id, task.data.organization)
-    boefje_meta = create_boefje_meta(task, plugin)
     boefje_meta.started_at = task.modified_at
     boefje_meta.ended_at = datetime.now(timezone.utc)
 
@@ -147,28 +135,3 @@ def get_task(task_id, scheduler_client):
             logger.exception("Failed to get task from scheduler")
             raise HTTPException(status_code=500, detail="Internal server error")
     return task
-
-
-def create_boefje_meta(task, plugin: PluginType) -> BoefjeMeta:
-    organization = task.data.organization
-    input_ooi = task.data.input_ooi
-    arguments = {"oci_arguments": plugin.oci_arguments}
-
-    if input_ooi:
-        reference = Reference.from_str(input_ooi)
-        try:
-            ooi = get_octopoes_api_connector(organization).get(reference, valid_time=datetime.now(timezone.utc))
-        except ObjectNotFoundException as e:
-            raise ObjectNotFoundException(f"Object {reference} not found in Octopoes") from e
-
-        arguments["input"] = ooi.serialize()
-
-    boefje_meta = BoefjeMeta(
-        id=task.id,
-        boefje=task.data.boefje,
-        input_ooi=input_ooi,
-        arguments=arguments,
-        organization=organization,
-        environment=get_environment_settings(task.data, plugin.boefje_schema),
-    )
-    return boefje_meta

@@ -3,7 +3,6 @@ import time
 import uuid
 from datetime import datetime, timezone
 from ipaddress import ip_address
-from multiprocessing import Manager
 from pathlib import Path
 from uuid import UUID
 
@@ -13,11 +12,10 @@ from fastapi.testclient import TestClient
 from pydantic import TypeAdapter
 from sqlalchemy.orm import sessionmaker
 
-from boefjes.app import SchedulerWorkerManager
 from boefjes.clients.bytes_client import BytesAPIClient
-from boefjes.clients.scheduler_client import Queue, SchedulerClientInterface, Task, TaskStatus
-from boefjes.config import Settings, settings
+from boefjes.config import settings
 from boefjes.dependencies.plugins import PluginService, get_plugin_service
+from boefjes.interfaces import Handler, Queue, SchedulerClientInterface, Task, TaskStatus
 from boefjes.job_handler import bytes_api_client
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.katalogus.organisations import check_organisation_exists
@@ -25,13 +23,13 @@ from boefjes.katalogus.root import app
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
 from boefjes.local_repository import LocalPluginRepository, get_local_repository
 from boefjes.models import Organisation
-from boefjes.runtime_interfaces import Handler, WorkerManager
 from boefjes.sql.config_storage import SQLConfigStorage, create_encrypter
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage, get_organisations_store
 from boefjes.sql.plugin_storage import SQLPluginStorage
 from boefjes.storage.interfaces import OrganisationNotFound
 from boefjes.storage.memory import ConfigStorageMemory, OrganisationStorageMemory, PluginStorageMemory
+from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
@@ -114,7 +112,7 @@ class MockSchedulerClient(SchedulerClientInterface):
 class MockHandler(Handler):
     def __init__(self, exception=Exception):
         self.sleep_time = 0
-        self.queue = Manager().Queue()
+        self.queue = multiprocessing.Manager().Queue()
         self.exception = exception
 
     def handle(self, item: BoefjeMeta | NormalizerMeta):
@@ -147,7 +145,7 @@ def manager(item_handler: MockHandler, tmp_path: Path) -> SchedulerWorkerManager
         log_path=tmp_path / "patch_task_log",
     )
 
-    return SchedulerWorkerManager(item_handler, scheduler_client, Settings(pool_size=1, poll_interval=0.01), "DEBUG")
+    return SchedulerWorkerManager(item_handler, scheduler_client, pool_size=1, poll_interval=0.01, worker_heartbeat=1.0)
 
 
 @pytest.fixture

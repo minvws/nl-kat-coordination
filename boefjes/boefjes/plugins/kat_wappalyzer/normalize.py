@@ -3,7 +3,7 @@ from collections.abc import Iterable
 
 from Wappalyzer import Wappalyzer, WebPage
 
-from boefjes.job_models import NormalizerOutput
+from boefjes.normalizer_models import NormalizerOutput
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network

@@ -2,8 +2,8 @@ from pathlib import Path
 from unittest import mock
 
 import boefjes.api
-from boefjes.clients.scheduler_client import TaskStatus
 from boefjes.dependencies.plugins import PluginService
+from boefjes.interfaces import TaskStatus
 from boefjes.local_repository import get_local_repository
 from tests.conftest import MockSchedulerClient
 from tests.loading import get_dummy_data

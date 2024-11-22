@@ -3,19 +3,17 @@ from collections.abc import Iterable
 
 import structlog
 
-from boefjes.job_models import (
-    BoefjeMeta,
-    InvalidReturnValueNormalizer,
+from boefjes.interfaces import BoefjeJobRunner, JobRuntimeError
+from boefjes.job_models import BoefjeMeta, InvalidReturnValueNormalizer, NormalizerMeta, ObservationsWithoutInputOOI
+from boefjes.local_repository import LocalPluginRepository
+from boefjes.normalizer_interfaces import NormalizerJobRunner
+from boefjes.normalizer_models import (
     NormalizerAffirmation,
     NormalizerDeclaration,
-    NormalizerMeta,
     NormalizerObservation,
     NormalizerOutput,
     NormalizerResults,
-    ObservationsWithoutInputOOI,
 )
-from boefjes.local_repository import LocalPluginRepository
-from boefjes.runtime_interfaces import BoefjeJobRunner, JobRuntimeError, NormalizerJobRunner
 from octopoes.models import OOI, DeclaredScanProfile
 
 logger = structlog.get_logger(__name__)

@@ -1,11 +1,8 @@
-from datetime import datetime, timedelta
-from typing import Annotated, Literal, TypeAlias
+from datetime import timedelta
+from typing import Annotated
 from uuid import UUID
 
 from pydantic import AwareDatetime, BaseModel, Field, StringConstraints
-
-from octopoes.models import DeclaredScanProfile
-from octopoes.models.types import OOIType
 
 
 class JobException(Exception):
@@ -35,13 +32,6 @@ class Boefje(BaseModel):
     version: str | None = Field(default=None)
 
 
-class Normalizer(BaseModel):
-    """Identifier for Normalizer in a NormalizerMeta"""
-
-    id: Annotated[str, StringConstraints(min_length=1)]
-    version: str | None = Field(default=None)
-
-
 class BoefjeMeta(Job):
     boefje: Boefje
     input_ooi: str | None = None
@@ -55,6 +45,13 @@ class RawDataMeta(BaseModel):
     id: UUID
     boefje_meta: BoefjeMeta
     mime_types: list[dict[str, str]]
+
+
+class Normalizer(BaseModel):
+    """Identifier for Normalizer in a NormalizerMeta"""
+
+    id: Annotated[str, StringConstraints(min_length=1)]
+    version: str | None = Field(default=None)
 
 
 class NormalizerMeta(Job):
@@ -74,30 +71,3 @@ class ObservationsWithoutInputOOI(JobException):
 
 class InvalidReturnValueNormalizer(JobException):
     pass
-
-
-class NormalizerObservation(BaseModel):
-    type: Literal["observation"] = "observation"
-    input_ooi: str
-    results: list[OOIType]
-
-
-class NormalizerDeclaration(BaseModel):
-    type: Literal["declaration"] = "declaration"
-    ooi: OOIType
-    end_valid_time: datetime | None = None
-
-
-class NormalizerAffirmation(BaseModel):
-    type: Literal["affirmation"] = "affirmation"
-    ooi: OOIType
-
-
-class NormalizerResults(BaseModel):
-    observations: list[NormalizerObservation] = []
-    declarations: list[NormalizerDeclaration] = []
-    affirmations: list[NormalizerAffirmation] = []
-    scan_profiles: list[DeclaredScanProfile] = []
-
-
-NormalizerOutput: TypeAlias = OOIType | NormalizerDeclaration | NormalizerAffirmation | DeclaredScanProfile

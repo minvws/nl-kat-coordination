@@ -9,12 +9,12 @@ from uuid import UUID
 import pytest
 
 from boefjes.dependencies.plugins import PluginService
+from boefjes.interfaces import JobRuntimeError
 from boefjes.job_handler import BoefjeHandler
 from boefjes.job_models import BoefjeMeta, InvalidReturnValueNormalizer, NormalizerMeta
 from boefjes.local import LocalBoefjeJobRunner
 from boefjes.local_repository import LocalPluginRepository
 from boefjes.models import Bit, Boefje, Normalizer, PluginType
-from boefjes.runtime_interfaces import JobRuntimeError
 from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.plugin_storage import create_plugin_storage
 from tests.loading import get_dummy_data

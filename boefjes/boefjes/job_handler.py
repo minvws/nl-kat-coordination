@@ -1,27 +1,22 @@
-import os
 import traceback
 from collections.abc import Callable
 from datetime import datetime, timezone
 from typing import cast
 
-import httpx
 import structlog
-from httpx import HTTPError
-from jsonschema.exceptions import ValidationError
-from jsonschema.validators import validate
 
 from boefjes.clients.bytes_client import BytesAPIClient
+from boefjes.clients.scheduler_client import get_octopoes_api_connector
 from boefjes.config import settings
 from boefjes.dependencies.plugins import PluginService
 from boefjes.docker_boefjes_runner import DockerBoefjesRunner
-from boefjes.job_models import BoefjeMeta, NormalizerMeta
+from boefjes.interfaces import BoefjeJobRunner, Handler, Task
+from boefjes.job_models import BoefjeMeta
+from boefjes.normalizer_interfaces import NormalizerJobRunner
 from boefjes.plugins.models import _default_mime_types
-from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
-from boefjes.storage.interfaces import SettingsNotConformingToSchema
 from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference, ScanLevel
-from octopoes.models.exception import ObjectNotFoundException
 
 MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought to be reasonable
 
@@ -32,90 +27,39 @@ bytes_api_client = BytesAPIClient(
 )
 
 
-def get_octopoes_api_connector(org_code: str) -> OctopoesAPIConnector:
-    return OctopoesAPIConnector(str(settings.octopoes_api), org_code)
-
-
-def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None) -> dict[str, str]:
-    try:
-        katalogus_api = str(settings.katalogus_api).rstrip("/")
-        response = httpx.get(
-            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings", timeout=30
-        )
-        response.raise_for_status()
-    except HTTPError:
-        logger.exception("Error getting environment settings")
-        raise
-
-    allowed_keys = schema.get("properties", []) if schema else []
-    new_env = {
-        key.split("BOEFJE_", 1)[1]: value
-        for key, value in os.environ.items()
-        if key.startswith("BOEFJE_") and key in allowed_keys
-    }
-
-    settings_from_katalogus = response.json()
-
-    for key, value in settings_from_katalogus.items():
-        if key in allowed_keys:
-            new_env[key] = value
-
-    # The schema, besides dictating that a boefje cannot run if it is not matched, also provides an extra safeguard:
-    # it is possible to inject code if arguments are passed that "escape" the call to a tool. Hence, we should enforce
-    # the schema somewhere and make the schema as strict as possible.
-    if schema is not None:
-        try:
-            validate(instance=new_env, schema=schema)
-        except ValidationError as e:
-            raise SettingsNotConformingToSchema(boefje_meta.boefje.id, e.message) from e
-
-    return new_env
-
-
 class BoefjeHandler(Handler):
-    def __init__(self, job_runner: BoefjeJobRunner, plugin_service: PluginService, bytes_client: BytesAPIClient):
+    def __init__(
+        self,
+        job_runner: BoefjeJobRunner,
+        plugin_service: PluginService,
+        docker_runner: DockerBoefjesRunner,
+        bytes_client: BytesAPIClient,
+    ):
         self.job_runner = job_runner
         self.plugin_service = plugin_service
+        self.docker_runner = docker_runner
         self.bytes_client = bytes_client
 
-    def handle(self, boefje_meta: BoefjeMeta) -> None:
+    def handle(self, task: Task) -> None:
+        boefje_meta = task.data
+        plugin = self.plugin_service.by_plugin_id(boefje_meta.boefje.id, boefje_meta.organization)
+
+        if not isinstance(boefje_meta, BoefjeMeta):
+            raise ValueError("Plugin id does not belong to a boefje")
+
         logger.info("Handling boefje %s[task_id=%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
         # Check if this boefje is container-native, if so, continue using the Docker boefjes runner
-        plugin = self.plugin_service.by_plugin_id(boefje_meta.boefje.id, boefje_meta.organization)
-
-        if plugin.type != "boefje":
-            raise ValueError("Plugin id does not belong to a boefje")
-
-        if plugin.oci_image:
+        if boefje_meta.arguments["oci_image"]:
             logger.info(
                 "Delegating boefje %s[task_id=%s] to Docker runner with OCI image [%s]",
                 boefje_meta.boefje.id,
                 str(boefje_meta.id),
-                plugin.oci_image,
+                boefje_meta.arguments["oci_image"],
             )
-            docker_runner = DockerBoefjesRunner(plugin, boefje_meta)
-            return docker_runner.run()
-
-        if boefje_meta.input_ooi:
-            reference = Reference.from_str(boefje_meta.input_ooi)
-            try:
-                ooi = get_octopoes_api_connector(boefje_meta.organization).get(
-                    reference, valid_time=datetime.now(timezone.utc)
-                )
-            except ObjectNotFoundException:
-                logger.info(
-                    "Can't run boefje because OOI does not exist anymore",
-                    boefje_id=boefje_meta.boefje.id,
-                    ooi=reference,
-                    task_id=boefje_meta.id,
-                )
-                return
-
-            boefje_meta.arguments["input"] = ooi.serialize()
+            return self.docker_runner.run(task)
 
         boefje_meta.runnable_hash = plugin.runnable_hash
-        boefje_meta.environment = get_environment_settings(boefje_meta, plugin.boefje_schema)
 
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
@@ -124,7 +68,7 @@ class BoefjeHandler(Handler):
         boefje_results: list[tuple[set, bytes | str]] = []
 
         try:
-            boefje_results = self.job_runner.run(boefje_meta, boefje_meta.environment)
+            boefje_results = self.job_runner.run(boefje_meta, boefje_meta.environment or {})
         except:
             logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
             boefje_results = [({"error/boefje"}, traceback.format_exc())]
@@ -171,7 +115,8 @@ class NormalizerHandler(Handler):
         self.whitelist = whitelist or {}
         self.octopoes_factory = octopoes_factory
 
-    def handle(self, normalizer_meta: NormalizerMeta) -> None:
+    def handle(self, task: Task) -> None:
+        normalizer_meta = task.data
         logger.info("Handling normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
 
         raw = self.bytes_client.get_raw(normalizer_meta.raw_data.id)
