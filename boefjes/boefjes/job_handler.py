@@ -59,12 +59,9 @@ class BoefjeHandler(Handler):
             )
             return self.docker_runner.run(task)
 
-        boefje_meta.runnable_hash = plugin.runnable_hash
-
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
         boefje_meta.started_at = datetime.now(timezone.utc)
-
         boefje_results: list[tuple[set, bytes | str]] = []
 
         try:

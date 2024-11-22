@@ -43,16 +43,16 @@ class SchedulerWorkerManager(WorkerManager):
 
         manager = ctx.Manager()
 
-        self.task_queue = manager.Queue()  # multiprocessing.Queue() will not work on macOS, see mp.Queue.qsize()
-        self.handling_tasks = manager.dict()
-        self.workers: list[BaseProcess] = []
-        self.exited = False
+        self._task_queue = manager.Queue()  # multiprocessing.Queue() will not work on macOS, see mp.Queue.qsize()
+        self._handling_tasks = manager.dict()
+        self._workers: list[BaseProcess] = []
+        self._exited = False
 
     def run(self, queue_type: WorkerManager.Queue) -> None:
         logger.info("Created worker pool for queue '%s'", queue_type.value)
 
-        self.workers = [ctx.Process(target=_start_working, args=self._worker_args()) for _ in range(self.pool_size)]
-        for worker in self.workers:
+        self._workers = [ctx.Process(target=_start_working, args=self._worker_args()) for _ in range(self.pool_size)]
+        for worker in self._workers:
             worker.start()
 
         signal.signal(signal.SIGINT, lambda signum, _: self.exit(signum))
@@ -61,7 +61,7 @@ class SchedulerWorkerManager(WorkerManager):
         while True:
             try:
                 self._check_workers()
-                self._fill_queue(self.task_queue, queue_type)
+                self._fill_queue(self._task_queue, queue_type)
             except Exception as e:  # noqa
                 logger.exception("Unhandled Exception:")
                 logger.info("Continuing worker...")
@@ -71,7 +71,7 @@ class SchedulerWorkerManager(WorkerManager):
                 # should only log the exception and call self.exit() when the
                 # exception is caused by something else and self.exit() hasn't
                 # been called yet.
-                if not self.exited:
+                if not self._exited:
                     logger.exception("Exiting worker...")
                     self.exit()
 
@@ -140,7 +140,7 @@ class SchedulerWorkerManager(WorkerManager):
     def _check_workers(self) -> None:
         new_workers = []
 
-        for worker in self.workers:
+        for worker in self._workers:
             closed = False
 
             try:
@@ -162,14 +162,14 @@ class SchedulerWorkerManager(WorkerManager):
             new_worker.start()
             new_workers.append(new_worker)
 
-        self.workers = new_workers
+        self._workers = new_workers
 
     def _cleanup_pending_worker_task(self, worker: BaseProcess) -> None:
-        if worker.pid not in self.handling_tasks:
+        if worker.pid not in self._handling_tasks:
             logger.debug("No pending task found for Worker[pid=%s, %s]", worker.pid, _format_exit_code(worker.exitcode))
             return
 
-        handling_task_id = self.handling_tasks[worker.pid]
+        handling_task_id = self._handling_tasks[worker.pid]
 
         try:
             task = self.scheduler_client.get_task(handling_task_id)
@@ -184,15 +184,15 @@ class SchedulerWorkerManager(WorkerManager):
             logger.exception("Could not get scheduler task[id=%s]", handling_task_id)
 
     def _worker_args(self) -> tuple:
-        return self.task_queue, self.item_handler, self.scheduler_client, self.handling_tasks
+        return self._task_queue, self.item_handler, self.scheduler_client, self._handling_tasks
 
     def exit(self, signum: int | None = None):
         try:
             if signum:
                 logger.info("Received %s, exiting", signal.Signals(signum).name)
 
-            if not self.task_queue.empty():
-                items: list[Task] = [self.task_queue.get() for _ in range(self.task_queue.qsize())]
+            if not self._task_queue.empty():
+                items: list[Task] = [self._task_queue.get() for _ in range(self._task_queue.qsize())]
 
                 for p_item in items:
                     try:
@@ -202,7 +202,7 @@ class SchedulerWorkerManager(WorkerManager):
 
             killed_workers = []
 
-            for worker in self.workers:  # Send all signals before joining, speeding up shutdowns
+            for worker in self._workers:  # Send all signals before joining, speeding up shutdowns
                 try:
                     if worker.is_alive():
                         worker.kill()
@@ -215,7 +215,7 @@ class SchedulerWorkerManager(WorkerManager):
                 self._cleanup_pending_worker_task(worker)
                 worker.close()
         finally:
-            self.exited = True
+            self._exited = True
             # If we are called from the main run loop we are already in the
             # process of exiting, so we only need to call sys.exit() in the
             # signal handler.

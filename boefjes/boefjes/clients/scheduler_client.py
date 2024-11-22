@@ -75,6 +75,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         octopoes_api_connector = get_octopoes_api_connector(boefje_meta.organization)
         input_ooi = boefje_meta.input_ooi
         boefje_meta.arguments = {"oci_image": plugin.oci_image, "oci_arguments": plugin.oci_arguments}
+        boefje_meta.runnable_hash = plugin.runnable_hash
 
         if input_ooi:
             reference = Reference.from_str(input_ooi)
