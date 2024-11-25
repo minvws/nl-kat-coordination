@@ -577,10 +577,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_boefje_permission_to_run")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_boefje_task_grace_period_passed")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_item_on_queue_by_hash")
-    @mock.patch("scheduler.context.AppContext.datastores.task_store.get_tasks_by_hash")
+    @mock.patch("scheduler.context.AppContext.datastores.task_store.get_latest_task_by_hash")
     def test_push_task_queue_full(
         self,
-        mock_get_tasks_by_hash,
+        mock_get_latest_task_by_hash,
         mock_is_item_on_queue_by_hash,
         mock_has_boefje_task_grace_period_passed,
         mock_has_boefje_permission_to_run,
@@ -606,7 +606,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         mock_has_boefje_task_started_running.return_value = False
         mock_has_boefje_task_grace_period_passed.return_value = True
         mock_is_item_on_queue_by_hash.return_value = False
-        mock_get_tasks_by_hash.return_value = None
+        mock_get_latest_task_by_hash.return_value = None
         self.mock_get_plugin.return_value = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Act
