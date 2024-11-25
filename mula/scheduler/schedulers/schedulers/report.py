@@ -6,11 +6,11 @@ from typing import Any
 import structlog
 from opentelemetry import trace
 
-from scheduler import context, queues, storage
+from scheduler import context, storage
 from scheduler.models import Organisation, ReportTask, Task
+from scheduler.schedulers import Scheduler
+from scheduler.schedulers.queue import PriorityQueue, QueueFullError
 from scheduler.storage import filters
-
-from .scheduler import Scheduler
 
 tracer = trace.get_tracer(__name__)
 
@@ -23,12 +23,12 @@ class ReportScheduler(Scheduler):
         ctx: context.AppContext,
         scheduler_id: str,
         organisation: Organisation,
-        queue: queues.PriorityQueue | None = None,
+        queue: PriorityQueue | None = None,
         callback: Callable[..., None] | None = None,
     ):
         self.logger: structlog.BoundLogger = structlog.get_logger(__name__)
         self.organisation = organisation
-        self.queue = queue or queues.PriorityQueue(
+        self.queue = queue or PriorityQueue(
             pq_id=scheduler_id,
             maxsize=ctx.config.pq_maxsize,
             item_type=self.ITEM_TYPE,
@@ -111,7 +111,7 @@ class ReportScheduler(Scheduler):
 
         try:
             self.push_item_to_queue_with_timeout(task, self.max_tries)
-        except queues.QueueFullError:
+        except QueueFullError:
             self.logger.warning(
                 "Could not add task %s to queue, queue was full",
                 report_task.hash,

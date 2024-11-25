@@ -3,7 +3,8 @@ import uuid
 from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import config, models, storage
+from scheduler import context, models, storage
+from scheduler.storage import stores
 
 from tests.factories import OrganisationFactory
 from tests.utils import functions
@@ -13,7 +14,7 @@ class PriorityQueueStoreTestCase(unittest.TestCase):
     def setUp(self):
         # Application Context
         self.mock_ctx = mock.patch("scheduler.context.AppContext").start()
-        self.mock_ctx.config = config.settings.Settings()
+        self.mock_ctx.config = context.settings.Settings()
 
         # Database
         self.dbconn = storage.DBConn(str(self.mock_ctx.config.db_uri))
@@ -23,8 +24,8 @@ class PriorityQueueStoreTestCase(unittest.TestCase):
 
         self.mock_ctx.datastores = SimpleNamespace(
             **{
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
-                storage.TaskStore.name: storage.TaskStore(self.dbconn),
+                stores.PriorityQueueStore.name: stores.PriorityQueueStore(self.dbconn),
+                stores.TaskStore.name: stores.TaskStore(self.dbconn),
             }
         )
 

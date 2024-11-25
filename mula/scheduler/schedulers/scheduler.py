@@ -9,7 +9,9 @@ from typing import Any
 import structlog
 from opentelemetry import trace
 
-from scheduler import connectors, context, models, queues, storage, utils
+from scheduler import clients, context, models, storage, utils
+from scheduler.schedulers.queue import PriorityQueue
+from scheduler.schedulers.queue.errors import InvalidItemError, NotAllowedError, QueueEmptyError, QueueFullError
 from scheduler.utils import cron, thread
 
 tracer = trace.get_tracer(__name__)
@@ -26,7 +28,7 @@ class Scheduler(abc.ABC):
             Application context of shared data (e.g. configuration, external
             services connections).
         queue:
-            A queues.PriorityQueue instance
+            A queue.PriorityQueue instance
         callback:
             A callback function to call when the scheduler is stopped.
         scheduler_id:
@@ -57,7 +59,7 @@ class Scheduler(abc.ABC):
         self,
         ctx: context.AppContext,
         scheduler_id: str,
-        queue: queues.PriorityQueue | None = None,
+        queue: PriorityQueue | None = None,
         callback: Callable[..., None] | None = None,
         max_tries: int = -1,
         create_schedule: bool = False,
@@ -71,7 +73,7 @@ class Scheduler(abc.ABC):
             scheduler_id:
                 The id of the scheduler.
             queue:
-                A queues.PriorityQueue instance
+                A queue.PriorityQueue instance
             callback:
                 A callback function to call when the scheduler is stopped.
             max_tries:
@@ -91,7 +93,7 @@ class Scheduler(abc.ABC):
         self._last_activity: datetime | None = None
 
         # Queue
-        self.queue = queue or queues.PriorityQueue(
+        self.queue = queue or PriorityQueue(
             pq_id=scheduler_id,
             maxsize=self.ctx.config.pq_maxsize,
             item_type=self.ITEM_TYPE,
@@ -99,7 +101,7 @@ class Scheduler(abc.ABC):
         )
 
         # Listeners
-        self.listeners: dict[str, connectors.listeners.Listener] = {}
+        self.listeners: dict[str, clients.amqp.Listener] = {}
 
         # Threads
         self.lock: threading.Lock = threading.Lock()
@@ -139,7 +141,7 @@ class Scheduler(abc.ABC):
         for item in items:
             try:
                 self.push_item_to_queue(item)
-            except (queues.errors.NotAllowedError, queues.errors.QueueFullError, queues.errors.InvalidItemError) as exc:
+            except (NotAllowedError, QueueFullError, InvalidItemError) as exc:
                 self.logger.debug(
                     "Unable to push item %s to queue %s (%s)",
                     item.id,
@@ -186,7 +188,7 @@ class Scheduler(abc.ABC):
             tries += 1
 
         if tries >= max_tries and max_tries != -1:
-            raise queues.errors.QueueFullError()
+            raise QueueFullError()
 
         self.push_item_to_queue(item)
 
@@ -209,14 +211,14 @@ class Scheduler(abc.ABC):
                 queue_id=self.queue.pq_id,
                 scheduler_id=self.scheduler_id,
             )
-            raise queues.errors.NotAllowedError("Scheduler is disabled")
+            raise NotAllowedError("Scheduler is disabled")
 
         try:
             if item.type is None:
                 item.type = self.ITEM_TYPE.type
             item.status = models.TaskStatus.QUEUED
             item = self.queue.push(item)
-        except queues.errors.NotAllowedError as exc:
+        except NotAllowedError as exc:
             self.logger.warning(
                 "Not allowed to push to queue %s (%s)",
                 self.queue.pq_id,
@@ -226,7 +228,7 @@ class Scheduler(abc.ABC):
                 scheduler_id=self.scheduler_id,
             )
             raise exc
-        except queues.errors.QueueFullError as exc:
+        except QueueFullError as exc:
             self.logger.warning(
                 "Queue %s is full, not pushing new items (%s)",
                 self.queue.pq_id,
@@ -237,7 +239,7 @@ class Scheduler(abc.ABC):
                 scheduler_id=self.scheduler_id,
             )
             raise exc
-        except queues.errors.InvalidItemError as exc:
+        except InvalidItemError as exc:
             self.logger.warning(
                 "Invalid item %s",
                 item.id,
@@ -355,11 +357,11 @@ class Scheduler(abc.ABC):
                 queue_qsize=self.queue.qsize(),
                 scheduler_id=self.scheduler_id,
             )
-            raise queues.errors.NotAllowedError("Scheduler is disabled")
+            raise NotAllowedError("Scheduler is disabled")
 
         try:
             item = self.queue.pop(filters)
-        except queues.QueueEmptyError as exc:
+        except QueueEmptyError as exc:
             raise exc
 
         if item is not None:

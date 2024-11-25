@@ -3,7 +3,8 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import config, connectors, models, schedulers, storage
+from scheduler import clients, context, models, schedulers, storage
+from scheduler.storage import stores
 from structlog.testing import capture_logs
 
 from tests.factories import (
@@ -21,24 +22,22 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
     def setUp(self):
         # Application Context
         self.mock_ctx = mock.patch("scheduler.context.AppContext").start()
-        self.mock_ctx.config = config.settings.Settings()
+        self.mock_ctx.config = context.settings.Settings()
 
         # Mock connectors: octopoes
-        self.mock_octopoes = mock.create_autospec(spec=connectors.services.Octopoes, spec_set=True)
+        self.mock_octopoes = mock.create_autospec(spec=clients.Octopoes, spec_set=True)
         self.mock_ctx.services.octopoes = self.mock_octopoes
 
         # Mock connectors: Scan profile mutation
-        self.mock_scan_profile_mutation = mock.create_autospec(
-            spec=connectors.listeners.ScanProfileMutation, spec_set=True
-        )
+        self.mock_scan_profile_mutation = mock.create_autospec(spec=clients.ScanProfileMutation, spec_set=True)
         self.mock_ctx.services.scan_profile_mutation = self.mock_scan_profile_mutation
 
         # Mock connectors: Katalogus
-        self.mock_katalogus = mock.create_autospec(spec=connectors.services.Katalogus, spec_set=True)
+        self.mock_katalogus = mock.create_autospec(spec=clients.Katalogus, spec_set=True)
         self.mock_ctx.services.katalogus = self.mock_katalogus
 
         # Mock connectors: Bytes
-        self.mock_bytes = mock.create_autospec(spec=connectors.services.Bytes, spec_set=True)
+        self.mock_bytes = mock.create_autospec(spec=clients.Bytes, spec_set=True)
         self.mock_ctx.services.bytes = self.mock_bytes
 
         # Database
@@ -49,9 +48,9 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
 
         self.mock_ctx.datastores = SimpleNamespace(
             **{
-                storage.ScheduleStore.name: storage.ScheduleStore(self.dbconn),
-                storage.TaskStore.name: storage.TaskStore(self.dbconn),
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+                stores.ScheduleStore.name: stores.ScheduleStore(self.dbconn),
+                stores.TaskStore.name: stores.TaskStore(self.dbconn),
+                stores.PriorityQueueStore.name: stores.PriorityQueueStore(self.dbconn),
             }
         )
 
@@ -1333,8 +1332,8 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_objects_by_object_types.side_effect = [
-            connectors.errors.ExternalServiceError("External service is not available."),
-            connectors.errors.ExternalServiceError("External service is not available."),
+            clients.errors.ExternalServiceError("External service is not available."),
+            clients.errors.ExternalServiceError("External service is not available."),
         ]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
@@ -1414,8 +1413,8 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_objects_by_object_types.side_effect = [
-            connectors.errors.ExternalServiceError("External service is not available."),
-            connectors.errors.ExternalServiceError("External service is not available."),
+            clients.errors.ExternalServiceError("External service is not available."),
+            clients.errors.ExternalServiceError("External service is not available."),
         ]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
