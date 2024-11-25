@@ -2420,15 +2420,19 @@ msgid "Different date"
 msgstr ""
 
 #: reports/forms.py
-msgid "Start date"
-msgstr ""
-
-#: reports/forms.py
 msgid "No, just once"
 msgstr ""
 
 #: reports/forms.py
 msgid "Yes, repeat"
+msgstr ""
+
+#: reports/forms.py
+msgid "Start date"
+msgstr ""
+
+#: reports/forms.py
+msgid "Start time (UTC)"
 msgstr ""
 
 #: reports/forms.py
@@ -3113,7 +3117,8 @@ msgid "First seen"
 msgstr ""
 
 #: reports/report_types/findings_report/report.html
-msgid "No findings have been found."
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "No findings have been identified yet."
 msgstr ""
 
 #: reports/report_types/findings_report/report.py
@@ -3711,6 +3716,13 @@ msgid ""
 "generate it just once now, or set it to run automatically at regular "
 "intervals, like daily, weekly, or monthly. If you need the report just for a "
 "single occasion, select the one-time option."
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid ""
+"Please choose a start date, time and recurrence for scheduling your "
+"report(s). If you select a date on the 28th-31st of the month, it will "
+"always be scheduled on the last day of the month."
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -5914,7 +5926,7 @@ msgid "Save %(display_type)s"
 msgstr ""
 
 #: rocky/templates/oois/ooi_findings.html
-msgid "Currently there are no findings for OOI"
+msgid "Currently no findings have been identified for OOI"
 msgstr ""
 
 #: rocky/templates/oois/ooi_list.html

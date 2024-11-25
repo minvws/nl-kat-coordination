@@ -31,11 +31,11 @@ class BoefjeRanker(Ranker):
         grace_period = timedelta(seconds=self.ctx.config.pq_grace_period)
 
         # New tasks that have not yet run before
-        if obj.prior_tasks is None or not obj.prior_tasks:
+        if obj.latest_task is None or not obj.latest_task:
             return 2
 
         # Make sure that we don't have tasks that are still in the grace period
-        time_since_grace_period = ((datetime.now(timezone.utc) - obj.prior_tasks[0].modified_at) - grace_period).seconds
+        time_since_grace_period = ((datetime.now(timezone.utc) - obj.latest_task.modified_at) - grace_period).seconds
         if time_since_grace_period < 0:
             return -1
 
