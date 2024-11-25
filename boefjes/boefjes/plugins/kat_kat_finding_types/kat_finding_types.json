@@ -444,7 +444,7 @@
     "description": "Cryptographic algorithms (ciphers) are used that are labeled as 'sufficient' by the Dutch NCSC. This is caused by either the certificate verification, key exchange, bulk encryption or the hashing algorithm.",
     "source": "https://english.ncsc.nl/binaries/ncsc-en/documenten/publications/2021/january/19/it-security-guidelines-for-transport-layer-security-2.1/IT+Security+Guidelines+for+Transport+Layer+Security+v2.1.pdf",
     "risk": "recommendation",
-    "impact": "Sufficient ciphers may result in a loss of confidentiality of data. While there is currently no direct impact, the data may be decrypted in the futer with enough computing power and resources or new attacks.",
+    "impact": "Sufficient ciphers may result in a loss of confidentiality of data. While there is currently no direct impact, the data may be decrypted in the future with enough computing power and resources or new attacks.",
     "recommendation": "Disable 'sufficient' ciphers and enable ciphers labeled as 'Good' by the NCSC. Check https://cipherlist.eu/ for safe ciphers."
   },
   "KAT-NO-RPKI": {
