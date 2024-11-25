@@ -546,6 +546,21 @@ class ReportFinalSettingsView(BaseReportView, SchedulerView, TemplateView):
 class SaveReportView(BaseReportView, SchedulerView):
     task_type = "report"
 
+    def get_query(self):
+        object_selection = self.request.POST.get("object_selection", "")
+        query = {}
+
+        if object_selection == "query":
+            query = {
+                "ooi_types": [t.__name__ for t in self.get_ooi_types()],
+                "scan_level": self.get_ooi_scan_levels(),
+                "scan_type": self.get_ooi_profile_types(),
+                "search_string": self.search_string,
+                "order_by": self.order_by,
+                "asc_desc": self.sorting_order,
+            }
+        return query
+
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         old_report_names = request.POST.getlist("old_report_name")
         report_names = request.POST.getlist("report_name", [])
@@ -563,23 +578,11 @@ class SaveReportView(BaseReportView, SchedulerView):
         elif self.is_scheduled_report():
             report_name_format = request.POST.get("parent_report_name", "")
             subreport_name_format = request.POST.get("child_report_name", "")
-            object_selection = request.POST.get("object_selection", "")
 
             form = ReportScheduleStartDateForm(request.POST)
             if form.is_valid():
                 start_datetime = form.cleaned_data["start_datetime"]
                 recurrence = form.cleaned_data["recurrence"]
-
-            query = {}
-            if object_selection == "query":
-                query = {
-                    "ooi_types": [t.__name__ for t in self.get_ooi_types()],
-                    "scan_level": self.get_ooi_scan_levels(),
-                    "scan_type": self.get_ooi_profile_types(),
-                    "search_string": self.search_string,
-                    "order_by": self.order_by,
-                    "asc_desc": self.sorting_order,
-                }
 
             parent_report_type = None
             if self.report_type is not None:
@@ -590,7 +593,7 @@ class SaveReportView(BaseReportView, SchedulerView):
             schedule = self.convert_recurrence_to_cron_expressions(recurrence, start_datetime)
 
             report_recipe = self.create_report_recipe(
-                report_name_format, subreport_name_format, parent_report_type, schedule, query
+                report_name_format, subreport_name_format, parent_report_type, schedule, self.get_query()
             )
 
             self.create_report_schedule(report_recipe, start_datetime)

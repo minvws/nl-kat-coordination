@@ -9,6 +9,7 @@
     <main id="main-content">
         <section>
             <div>
+                {{ member }}
                 <h1>{% translate "Crisis room" %} {{ organization.name }} @ {{ observed_at|date:'M d, Y' }}</h1>
                 {% if not indemnification_present %}
                     <p class="warning"
@@ -25,6 +26,7 @@
                 <p>
                     {% translate "An overview of the top 10 most severe findings OpenKAT found. Check the detail section for additional severity information." %}
                 </p>
+                {{ recipe_form_fields }}
                 <h2>{% translate "Top 10 most severe Findings" %}</h2>
                 {% if object_list %}
                     {% translate "Object list" as filter_title %}
