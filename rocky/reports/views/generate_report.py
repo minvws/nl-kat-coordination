@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from httpx import HTTPError
 from katalogus.client import get_katalogus
+from tools.view_helpers import PostRedirect
 
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
@@ -109,9 +110,9 @@ class ExportSetupGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenerat
         if not selected_plugins:
             return super().post(request, *args, **kwargs)
 
-        if not self.organization_member.has_perms("tools.can_enable_disable_boefje"):
+        if not self.organization_member.has_perm("tools.can_enable_disable_boefje"):
             messages.error(request, _("You do not have the required permissions to enable plugins."))
-            super().post(request, *args, **kwargs)
+            return PostRedirect(self.get_previous())
 
         client = get_katalogus(self.organization.code)
         for selected_plugin in selected_plugins:
