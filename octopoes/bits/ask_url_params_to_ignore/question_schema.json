@@ -3,7 +3,9 @@
   "$id": "/bit/oois-in-headers",
   "type": "object",
   "default": {},
-  "required": ["ignored_url_parameters"],
+  "required": [
+    "ignored_url_parameters"
+  ],
   "properties": {
     "ignored_url_parameters": {
       "description": "Comma separated list of url parameters that are ignored when following location headers.",
