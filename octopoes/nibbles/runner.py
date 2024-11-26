@@ -1,8 +1,9 @@
+import json
 from collections.abc import Callable, Iterable
 from datetime import datetime
 from typing import TypeVar
 
-from xxhash import xxh3_64_intdigest as xxh3
+from xxhash import xxh3_128_hexdigest as xxh3  # INFO: xxh3_64_hexdigest is faster but hash more collision probabilities
 
 from nibbles.definitions import NibbleDefinition, get_nibble_definitions
 from octopoes.models import OOI
@@ -34,8 +35,17 @@ def flatten(items: Iterable[OOI | Iterable[OOI | None] | None]) -> Iterable[OOI]
             yield from flatten(item)
 
 
-def nibble_hasher(data: frozenset) -> int:
-    return xxh3("|".join([ooi.model_dump_json() for ooi in data]).encode())
+def nibble_hasher(data: Iterable) -> str:
+    return xxh3(
+        "".join(
+            [
+                json.dumps(json.loads(ooi.model_dump_json()), sort_keys=True)
+                if isinstance(ooi, OOI)
+                else json.dumps(ooi, sort_keys=True)
+                for ooi in data
+            ]
+        ).encode()
+    )
 
 
 class NibblesRunner:
@@ -53,45 +63,68 @@ class NibblesRunner:
         self.update_nibbles()
 
     def update_nibbles(self):
-        self.nibbles: list[NibbleDefinition] = get_nibble_definitions()
+        self.nibbles: dict[str, NibbleDefinition] = get_nibble_definitions()
 
-    def _run(self, ooi: OOI, valid_time: datetime) -> dict[str, dict[frozenset, set[OOI]]]:
-        return_value: dict[str, dict[frozenset, set[OOI]]] = {}
-        for nibble in filter(lambda x: type(ooi) in x.signature, self.nibbles):
-            args = self.ooi_repository.nibble_query(ooi, nibble, valid_time)
-            results = {frozenset(arg): set(flatten([nibble(arg)])) for arg in args}
-            if results:
+    def _run(self, ooi: OOI, valid_time: datetime) -> dict[str, dict[tuple, set[OOI]]]:
+        return_value: dict[str, dict[tuple, set[OOI]]] = {}
+        nibblettes = self.origin_repository.list_origins(
+            valid_time, origin_type=OriginType.NIBBLETTE, parameters_references=[ooi.reference]
+        )
+        if nibblettes:
+            for nibblette in nibblettes:
+                # INFO: we do not strictly need this if statement because OriginType.NIBBLETTES \
+                # always have parameters_references but it makes the linters super happy
+                if nibblette.parameters_references:
+                    nibble = self.nibbles[nibblette.method]
+                    args = self.ooi_repository.nibble_query(
+                        ooi,
+                        nibble,
+                        valid_time,
+                        nibblette.parameters_references
+                        if nibble.query is not None and nibble.query.count("$") > 0
+                        else [],
+                    )
+                    results = {
+                        tuple(arg): set(flatten([nibble(arg)]))
+                        for arg in args
+                        if nibblette.parameters_hash != nibble_hasher(arg)
+                    }
+                    return_value |= {nibble.id: results}
+        else:
+            for nibble in filter(lambda x: type(ooi) in x.signature, self.nibbles.values()):
+                args = self.ooi_repository.nibble_query(ooi, nibble, valid_time)
+                results = {tuple(arg): set(flatten([nibble(arg)])) for arg in args}
                 return_value |= {nibble.id: results}
-                # TODO: we could cache the writes for single OOI nibbles
-                self._write({ooi: return_value}, valid_time)
+        # TODO: we could cache the writes for single OOI nibbles
+        self._write({ooi: return_value}, valid_time)
         return return_value
 
     def _cleared(self, ooi: OOI, valid_time: datetime) -> bool:
         ooi_level = self.scan_profile_repository.get(ooi.reference, valid_time).level.value
-        target_nibbles = filter(lambda x: type(ooi) in x.signature, self.nibbles)
+        target_nibbles = filter(lambda x: type(ooi) in x.signature, self.nibbles.values())
         return any(nibble.min_scan_level < ooi_level for nibble in target_nibbles)
 
-    def _write(self, inferences: dict[OOI, dict[str, dict[frozenset, set[OOI]]]], valid_time: datetime):
+    def _write(self, inferences: dict[OOI, dict[str, dict[tuple, set[OOI]]]], valid_time: datetime):
         if self.perform_writes:
             for source_ooi, results in inferences.items():
                 self.ooi_repository.save(source_ooi, valid_time)
                 for nibble_id, run_result in results.items():
-                    for frozen_arg, result in run_result.items():
+                    for arg, result in run_result.items():
                         nibble_origin = Origin(
                             method=nibble_id,
                             origin_type=OriginType.NIBBLETTE,
                             source=source_ooi.reference,
                             result=[ooi.reference for ooi in result],
-                            parameters_hash=nibble_hasher(frozen_arg),
+                            parameters_hash=nibble_hasher(arg),
                             # TODO: What to do if a is not an OOI?
-                            parameters_references=[a.reference for a in frozen_arg if isinstance(a, OOI)],
+                            parameters_references=[a.reference for a in arg if isinstance(a, OOI)],
                         )
                         for ooi in result:
                             self.ooi_repository.save(ooi, valid_time=valid_time)
                         self.origin_repository.save(nibble_origin, valid_time=valid_time)
 
-    def infer(self, stack: list[OOI], valid_time: datetime) -> dict[OOI, dict[str, dict[frozenset, set[OOI]]]]:
-        inferences: dict[OOI, dict[str, dict[frozenset, set[OOI]]]] = {}
+    def infer(self, stack: list[OOI], valid_time: datetime) -> dict[OOI, dict[str, dict[tuple, set[OOI]]]]:
+        inferences: dict[OOI, dict[str, dict[tuple, set[OOI]]]] = {}
         blockset = set(stack)
         if stack and self._cleared(stack[-1], valid_time):
             while stack:

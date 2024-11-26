@@ -157,7 +157,9 @@ class OOIRepository(Repository):
     def query(self, query: str | Query, valid_time: datetime) -> list[OOI | tuple]:
         raise NotImplementedError
 
-    def nibble_query(self, ooi: OOI, nibble: NibbleDefinition, valid_time: datetime) -> Iterable[Iterable[Any]]:
+    def nibble_query(
+        self, ooi: OOI, nibble: NibbleDefinition, valid_time: datetime, arguments: list[Reference] = []
+    ) -> Iterable[Iterable[Any]]:
         raise NotImplementedError
 
 
@@ -859,7 +861,16 @@ class XTDBOOIRepository(OOIRepository):
 
         return parsed_results
 
-    def nibble_query(self, ooi: OOI, nibble: NibbleDefinition, valid_time: datetime) -> Iterable[Iterable[Any]]:
+    def nibble_query(
+        self, ooi: OOI, nibble: NibbleDefinition, valid_time: datetime, arguments: list[Reference] = []
+    ) -> Iterable[Iterable[Any]]:
+        def strformat(a: str, *args) -> str:
+            def sub(match: re.Match) -> str:
+                idx = int(match.group(1)) - 1
+                return str(args[idx]) if 0 <= idx < len(args) else ""
+
+            return re.sub(r"\$(\d+)", sub, a)
+
         def objectify(t: type, obj: dict | list):
             if isinstance(obj, dict):
                 if issubclass(t, OOI):
@@ -872,11 +883,11 @@ class XTDBOOIRepository(OOIRepository):
         if nibble.query is None:
             return [{ooi}]
         else:
-            query = self.session.client.raw_query(nibble.query, valid_time)
-            arguments = [
-                {ooi, *[objectify(sgn.object_type, obj) for obj in search(sgn.parser, query)]}
+            data = self.session.client.raw_query(strformat(nibble.query, *arguments), valid_time)
+            objects = [
+                {ooi, *[objectify(sgn.object_type, obj) for obj in search(sgn.parser, data)]}
                 if isinstance(ooi, sgn.object_type)
-                else {objectify(sgn.object_type, obj) for obj in search(sgn.parser, query)}
+                else {objectify(sgn.object_type, obj) for obj in search(sgn.parser, data)}
                 for sgn in nibble.signature
             ]
-            return list(product(*arguments))
+            return list(product(*objects))

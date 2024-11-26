@@ -60,8 +60,8 @@ class NibbleDefinition:
             return self.payload(*args)
 
 
-def get_nibble_definitions() -> list[NibbleDefinition]:
-    nibble_definitions = []
+def get_nibble_definitions() -> dict[str, NibbleDefinition]:
+    nibble_definitions = {}
 
     for package in pkgutil.walk_packages([str(NIBBLES_DIR)]):
         if package.name in ["definitions", "runner"]:
@@ -85,7 +85,7 @@ def get_nibble_definitions() -> list[NibbleDefinition]:
                 except ModuleNotFoundError:
                     logger.warning('package "%s" has no function nibble', package.name)
 
-                nibble_definitions.append(nibble_definition)
+                nibble_definitions[nibble_definition.id] = nibble_definition
 
             else:
                 logger.warning('module "%s" has no attribute %s', package.name, NIBBLE_ATTR_NAME)

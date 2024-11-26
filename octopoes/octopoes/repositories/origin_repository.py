@@ -37,6 +37,8 @@ class OriginRepository(Repository):
         source: Reference | None = None,
         result: Reference | None = None,
         method: str | list[str] | None = None,
+        parameters_hash: int | None = None,
+        parameters_references: list[Reference] | None = None,
         origin_type: OriginType | list[OriginType] | set[OriginType] | None = None,
     ) -> list[Origin]:
         raise NotImplementedError

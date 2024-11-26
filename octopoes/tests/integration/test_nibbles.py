@@ -36,7 +36,7 @@ dummy_nibble.payload = getattr(sys.modules[__name__], "dummy")
 
 
 def test_dummy_nibble(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
-    xtdb_octopoes_service.nibbler.nibbles = [dummy_nibble]
+    xtdb_octopoes_service.nibbler.nibbles = {dummy_nibble.id: dummy_nibble}
     network = Network(name="internet")
     xtdb_octopoes_service.ooi_repository.save(network, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
@@ -107,7 +107,7 @@ def test_url_classification_nibble(xtdb_octopoes_service: OctopoesService, event
         xtdb_octopoes_service.scan_profile_repository,
         perform_writes=False,
     )
-    nibbler.nibbles = [url_classification_nibble]
+    nibbler.nibbles = {url_classification_nibble.id: url_classification_nibble}
     network = Network(name="internet")
     xtdb_octopoes_service.ooi_repository.save(network, valid_time)
     url = URL(network=network.reference, raw="https://mispo.es/")
@@ -119,7 +119,7 @@ def test_url_classification_nibble(xtdb_octopoes_service: OctopoesService, event
     assert url in result
     assert "url_classification" in result[url]
     assert len(result[url]["url_classification"]) == 1
-    assert len(result[url]["url_classification"][frozenset([url])]) == 3
+    assert len(result[url]["url_classification"][tuple([url])]) == 3
 
 
 def find_network_url(network: Network, url: URL) -> Iterator[OOI]:
@@ -162,7 +162,7 @@ def test_find_network_url_nibble(xtdb_octopoes_service: OctopoesService, event_m
         xtdb_octopoes_service.origin_repository,
         xtdb_octopoes_service.scan_profile_repository,
     )
-    nibbler.nibbles = [find_network_url_nibble]
+    nibbler.nibbles = {find_network_url_nibble.id: find_network_url_nibble}
     network1 = Network(name="internetverbinding")
     xtdb_octopoes_service.ooi_repository.save(network1, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
@@ -186,10 +186,10 @@ def test_find_network_url_nibble(xtdb_octopoes_service: OctopoesService, event_m
 
     assert network1 in result
     assert len(result[network1]["find_network_url"]) == 4
-    assert result[network1]["find_network_url"][frozenset([network1, xtdb_url1])] == target
-    assert result[network1]["find_network_url"][frozenset([network2, xtdb_url1])] == set()
-    assert result[network1]["find_network_url"][frozenset([network1, xtdb_url2])] == set()
-    assert result[network1]["find_network_url"][frozenset([network2, xtdb_url2])] == set()
+    assert result[network1]["find_network_url"][tuple([network1, xtdb_url1])] == target
+    assert result[network1]["find_network_url"][tuple([network2, xtdb_url1])] == set()
+    assert result[network1]["find_network_url"][tuple([network1, xtdb_url2])] == set()
+    assert result[network1]["find_network_url"][tuple([network2, xtdb_url2])] == set()
 
     nibblettes = xtdb_octopoes_service.origin_repository.list_origins(
         origin_type=OriginType.NIBBLETTE, valid_time=valid_time
@@ -199,7 +199,7 @@ def test_find_network_url_nibble(xtdb_octopoes_service: OctopoesService, event_m
     for nibblette in nibblettes:
         assert nibblette.parameters_references is not None
         arg = [xtdb_octopoes_service.ooi_repository.get(obj, valid_time) for obj in nibblette.parameters_references]
-        assert nibblette.parameters_hash == nibble_hasher(frozenset(arg))
+        assert nibblette.parameters_hash == nibble_hasher(tuple(arg))
         if nibblette.result:
             assert len(nibblette.result) == 1
             assert nibblette.result == [t.reference for t in target]
