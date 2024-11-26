@@ -133,7 +133,7 @@ def test_events_created_in_worker_during_handling(
 
     assert len(event_manager.queue) == 8  # Handling OOI delete event triggers Origin delete event
 
-    event = event_manager.queue[7]  # OOID]elete event
+    event = event_manager.queue[7]  # OOIDelete event
 
     assert isinstance(event, OriginDBEvent)
     assert event.operation_type.value == "delete"
