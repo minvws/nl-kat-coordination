@@ -1617,7 +1617,6 @@ msgstr ""
 #: onboarding/templates/account/step_2a_organization_update.html
 #: onboarding/templates/account/step_2b_indemnification_setup.html
 #: onboarding/templates/step_3d_clearance_level_introduction.html
-#: reports/templates/partials/report_setup_scan.html
 msgid "Continue"
 msgstr ""
 
@@ -2385,7 +2384,8 @@ msgstr ""
 msgid "Please select all required plugins to proceed."
 msgstr ""
 
-#: onboarding/views.py
+#: onboarding/views.py reports/views/aggregate_report.py
+#: reports/views/generate_report.py
 msgid "An error occurred while enabling {}. The plugin is not available."
 msgstr ""
 
@@ -4063,6 +4063,10 @@ msgstr ""
 msgid "There are no optional plugins."
 msgstr ""
 
+#: reports/templates/partials/report_setup_scan.html
+msgid "Enable plugins and continue"
+msgstr ""
+
 #: reports/templates/partials/report_severity_totals.html
 #: reports/templates/partials/report_severity_totals_table.html
 msgid "Findings overview"
@@ -4461,6 +4465,10 @@ msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 msgid "Save report"
+msgstr ""
+
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+msgid "You do not have the required permissions to enable plugins."
 msgstr ""
 
 #: reports/views/base.py
