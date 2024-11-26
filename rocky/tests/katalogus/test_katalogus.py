@@ -13,10 +13,12 @@ from tests.conftest import create_member, get_boefjes_data, get_normalizers_data
 
 def test_valid_plugin_id():
     with pytest.raises(ValueError):
-        valid_plugin_id("123")
         valid_plugin_id("test test")
+
+    with pytest.raises(ValueError):
         valid_plugin_id("test$test")
 
+    assert valid_plugin_id("123") == "123"
     assert valid_plugin_id("test-test") == "test-test"
 
 
@@ -28,38 +30,46 @@ def test_valid_organization_code():
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
-def katalogus_plugin_listing(request, rf, member, mocker):
+def test_katalogus_plugin_listing(request, rf, member, mocker):
     plugins = get_plugins_data()
     mock_requests = mocker.patch("katalogus.client.httpx")
     mock_response = mocker.MagicMock()
-    mock_requests.Session().get.return_value = mock_response
+    mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = plugins
     member = request.getfixturevalue(member)
 
-    response = KATalogusView.as_view()(
-        setup_request(rf.get("katalogus"), member.user), organization_code=member.organization.code
-    )
+    request = setup_request(rf.get("all_plugins_list"), member.user)
+    request.resolver_match = mocker.Mock(url_name="all_plugins_list")
+    response = KATalogusView.as_view()(request, organization_code=member.organization.code)
     assert response.status_code == 200
     assertContains(response, "KAT-alogus")
     assertContains(response, "An overview of all available plugins.")
 
     # active toolbar, only one link is active, "All"
     assertContains(
-        response, '<li aria-current="page"><a href="/en/' + member.organization.code + '/kat-alogus/">All</a></li>'
+        response,
+        '<li aria-current="page"><a href="/en/'
+        + member.organization.code
+        + '/kat-alogus/plugins/all/grid/">All</a></li>',
+        html=True,
     )
     assertNotContains(
-        response, '<li aria-current="page"><a href="/en/' + member.organization.code + '/kat-alogus/">Boefjes</a></li>'
+        response,
+        '<li aria-current="page"><a href="/en/' + member.organization.code + '/kat-alogus/">Boefjes</a></li>',
+        html=True,
     )
     assertNotContains(
         response,
         '<li aria-current="page"><a href="/en/' + member.organization.code + '/kat-alogus/">Normalizers</a></li>',
+        html=True,
     )
     assertNotContains(
         response,
         '<li aria-current="page"><a href="/en/' + member.organization.code + '/kat-alogus/">About plugins</a></li>',
+        html=True,
     )
 
-    assertContains(response, str(len(plugins)) + " Plugins available")
+    assertContains(response, f"<strong>{len(plugins)}</strong>Plugins available", html=True)
 
     # All plugins shows Boefjes and Normalizers, checking if one of each is available
     assertContains(response, "kat_adr_finding_types_normalize")
@@ -70,56 +80,64 @@ def katalogus_plugin_listing(request, rf, member, mocker):
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
-def katalogus_plugin_listing_boefjes(request, rf, member, mocker):
+def test_katalogus_plugin_listing_boefjes(request, rf, member, mocker):
     boefjes = get_boefjes_data()
     mock_requests = mocker.patch("katalogus.client.httpx")
     mock_response = mocker.MagicMock()
-    mock_requests.Session().get.return_value = mock_response
+    mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = boefjes
     member = request.getfixturevalue(member)
 
-    response = BoefjeListView.as_view()(
-        setup_request(rf.get("boefjes_list"), member.user), organization_code=member.organization.code
-    )
+    request = setup_request(rf.get("boefjes_list"), member.user)
+    request.resolver_match = mocker.Mock(url_name="boefjes_list")
+    response = BoefjeListView.as_view()(request, organization_code=member.organization.code)
+
     assert response.status_code == 200
     assertContains(response, "Boefjes")
     assertContains(
-        response, '<li aria-current="page"><a href="/en/' + member.organization.code + '/kat-alogus/">Boefjes</a></li>'
+        response,
+        '<li aria-current="page"><a href="/en/'
+        + member.organization.code
+        + '/kat-alogus/plugins/boefjes/grid/">Boefjes</a></li>',
+        html=True,
     )
-    assertContains(response, str(len(boefjes)) + " Boefjes available")
+    assertContains(response, f"<strong>{len(boefjes)}</strong>Boefjes available", html=True)
     assertNotContains(response, '<span class="label-plugin-type normalizer">Normalizer</span>')
     assertContains(response, '<span class="label-plugin-type boefje">Boefje</span>')
     assertContains(response, "ssl-certificates")
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
-def katalogus_plugin_listing_normalizers(request, rf, member, mocker):
+def test_katalogus_plugin_listing_normalizers(request, rf, member, mocker):
     normalizers = get_normalizers_data()
     mock_requests = mocker.patch("katalogus.client.httpx")
     mock_response = mocker.MagicMock()
-    mock_requests.Session().get.return_value = mock_response
+    mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = normalizers
     member = request.getfixturevalue(member)
 
-    response = NormalizerListView.as_view()(
-        setup_request(rf.get("normalizers_list"), member.user), organization_code=member.organization.code
-    )
+    request = setup_request(rf.get("normalizers_list"), member.user)
+    request.resolver_match = mocker.Mock(url_name="normalizers_list")
+    response = NormalizerListView.as_view()(request, organization_code=member.organization.code)
     assert response.status_code == 200
 
     assertContains(response, "Normalizers")
     assertContains(
         response,
-        '<li aria-current="page"><a href="/en/' + member.organization.code + '/kat-alogus/">Normalizers</a></li>',
+        '<li aria-current="page"><a href="/en/'
+        + member.organization.code
+        + '/kat-alogus/plugins/normalizers/grid/">Normalizers</a></li>',
+        html=True,
     )
-    assertContains(response, str(len(normalizers)) + " Normalizers available")
+    assertContains(response, f"<strong>{len(normalizers)}</strong>Normalizers available", html=True)
     assertContains(response, '<span class="label-plugin-type normalizer">Normalizer</span>')
     assertNotContains(response, '<span class="label-plugin-type boefje">Boefje</span>')
     assertNotContains(response, "ssl-certificates")
-    assertNotContains(response, "binaryedge")
+    assertContains(response, "binaryedge")
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
-def katalogus_about_plugins(request, rf, member):
+def test_katalogus_about_plugins(request, rf, member):
     member = request.getfixturevalue(member)
 
     response = AboutPluginsView.as_view()(
