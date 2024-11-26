@@ -40,7 +40,7 @@ def test_port_classification_tcp_5432():
     assert len(results) == 2
     finding = results[-1]
     assert isinstance(finding, Finding)
-    assert finding.description == "Port 5432/tcp is a database port and should possibly not be open."
+    assert finding.description == "Port 5432/tcp is a database port and should not be open."
 
 
 def test_port_classification_tcp_12345():
