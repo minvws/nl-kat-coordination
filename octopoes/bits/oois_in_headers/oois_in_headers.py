@@ -16,14 +16,14 @@ def is_url(input_str):
     return bool(result.scheme)
 
 
-def get_ignored_url_params(config, config_key, default):
-    ignored_url_params = config.get(config_key, None)
+def get_ignored_url_params(config: dict, config_key: str, default: list) -> list[str]:
+    ignored_url_params = config.get(config_key)
     if ignored_url_params is None:
         return default
     return [param.strip() for param in ignored_url_params.split(",")] if ignored_url_params else []
 
 
-def remove_ignored_params(url, ignored_params):
+def remove_ignored_params(url: str, ignored_params: list[str]) -> str:
     parsed_url = urlparse(url)
     query_params = parse_qs(parsed_url.query)
     if not query_params:
