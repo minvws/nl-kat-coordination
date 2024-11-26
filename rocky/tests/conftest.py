@@ -223,22 +223,8 @@ def redteamuser(django_user_model):
 
 
 @pytest.fixture
-def redteamuser_b(django_user_model):
-    return create_user(
-        django_user_model, "redteamerB@openkat.nl", "RedteamBRedteamB123!!", "Redteam B name", "default_redteam_b"
-    )
-
-
-@pytest.fixture
 def redteam_member(redteamuser, organization):
     member = create_member(redteamuser, organization)
-    add_redteam_group_permissions(member)
-    return member
-
-
-@pytest.fixture
-def redteam_member_b(redteamuser_b, organization_b):
-    member = create_member(redteamuser_b, organization_b)
     add_redteam_group_permissions(member)
     return member
 
@@ -329,14 +315,6 @@ def mock_organization_view_octopoes(mocker):
 @pytest.fixture
 def mock_crisis_room_octopoes(mocker):
     return mocker.patch("crisis_room.views.OctopoesAPIConnector")
-
-
-@pytest.fixture
-def lazy_task_list_empty() -> MagicMock:
-    mock = MagicMock()
-    mock.__getitem__.return_value = []
-    mock.count.return_value = 0
-    return mock
 
 
 @pytest.fixture
@@ -793,17 +771,6 @@ def tree_data_dns_findings():
             },
         },
     }
-
-
-@pytest.fixture
-def finding_type_kat_no_caa() -> KATFindingType:
-    return KATFindingType(
-        id="KAT-NO-CAA",
-        description="Fake description...",
-        recommendation="Fake recommendation...",
-        risk_score=9.5,
-        risk_severity=RiskLevelSeverity.CRITICAL,
-    )
 
 
 @pytest.fixture
@@ -1322,93 +1289,6 @@ def report_recipe():
     )
 
 
-@pytest.fixture
-def get_report_schedules():
-    report_schedule = [
-        {
-            "id": "06a783b3-af62-429d-8b48-5934c8702366",
-            "scheduler_id": "report-madelon123",
-            "hash": "f429f60fda539f9017544758163a955e",
-            "data": {
-                "type": "report",
-                "organisation_id": "madelon123",
-                "report_recipe_id": "6a121a53-f795-4bfe-9aea-f410a96fca59",
-            },
-            "enabled": "true",
-            "schedule": "0 * * * *",
-            "tasks": [
-                {
-                    "id": "21ce00b8-57c4-4d65-a53e-275b4e44da6f",
-                    "scheduler_id": "report-madelon123",
-                    "schedule_id": "06a783b3-af62-429d-8b48-5934c8702366",
-                    "priority": 1729520184,
-                    "status": "completed",
-                    "type": "report",
-                    "hash": "f429f60fda539f9017544758163a955e",
-                    "data": {
-                        "organisation_id": "madelon123",
-                        "report_recipe_id": "6a121a53-f795-4bfe-9aea-f410a96fca59",
-                    },
-                    "created_at": "2024-10-21T14:16:24.702759Z",
-                    "modified_at": "2024-10-21T14:16:24.702761Z",
-                },
-                {
-                    "id": "f63c2224-a4b2-4161-9790-9b4d665a4683",
-                    "scheduler_id": "report-madelon123",
-                    "schedule_id": "06a783b3-af62-429d-8b48-5934c8702366",
-                    "priority": 1729580020,
-                    "status": "completed",
-                    "type": "report",
-                    "hash": "f429f60fda539f9017544758163a955e",
-                    "data": {
-                        "organisation_id": "madelon123",
-                        "report_recipe_id": "6a121a53-f795-4bfe-9aea-f410a96fca59",
-                    },
-                    "created_at": "2024-10-22T06:53:40.405185Z",
-                    "modified_at": "2024-10-22T06:53:40.405192Z",
-                },
-            ],
-            "deadline_at": "2024-10-22T12:00:00Z",
-            "created_at": "2024-10-21T14:14:00.359039Z",
-            "modified_at": "2024-10-21T14:14:00.359043Z",
-        },
-        {
-            "id": "e9a00bc1-850a-401a-89d9-252d98823bb3",
-            "scheduler_id": "report-madelon123",
-            "hash": "02e67c8676cb8135681d52ca62a9fe5b",
-            "data": {
-                "type": "report",
-                "organisation_id": "madelon123",
-                "report_recipe_id": "31c79490-fb51-440d-9108-0c388276f655",
-            },
-            "enabled": "true",
-            "schedule": "0 0 * * *",
-            "tasks": [
-                {
-                    "id": "f4f938e0-5f2d-4bcd-9b28-11831b7835e4",
-                    "scheduler_id": "report-madelon123",
-                    "schedule_id": "e9a00bc1-850a-401a-89d9-252d98823bb3",
-                    "priority": 1729521145,
-                    "status": "completed",
-                    "type": "report",
-                    "hash": "02e67c8676cb8135681d52ca62a9fe5b",
-                    "data": {
-                        "organisation_id": "madelon123",
-                        "report_recipe_id": "31c79490-fb51-440d-9108-0c388276f655",
-                    },
-                    "created_at": "2024-10-21T14:32:25.247525Z",
-                    "modified_at": "2024-10-21T14:32:25.247527Z",
-                }
-            ],
-            "deadline_at": "2024-10-23T00:00:00Z",
-            "created_at": "2024-10-21T13:34:42.791561Z",
-            "modified_at": "2024-10-21T13:34:42.791563Z",
-        },
-    ]
-
-    return report_schedule
-
-
 def setup_request(request, user):
     request = SessionMiddleware(lambda r: r)(request)
     request.session[DEVICE_ID_SESSION_KEY] = user.staticdevice_set.get().persistent_id
@@ -1708,29 +1588,6 @@ def reports_more_input_oois():
             ],
         )
     ]
-
-
-def onboarding_collect_data():
-    return {
-        "Hostname|internet|mispo.es": {
-            "input_ooi": "Hostname|internet|mispo.es",
-            "records": [
-                {"type": "A", "ttl": 480, "name": "mispo.es", "content": "134.209.85.72"},
-                {"type": "MX", "ttl": 480, "name": "mispo.es", "content": "10 mx.wijmailenveilig.nl."},
-                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns1.domaindiscount24.net."},
-                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns2.domaindiscount24.net."},
-                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns3.domaindiscount24.net."},
-                {
-                    "type": "SOA",
-                    "ttl": 480,
-                    "name": "mispo.es",
-                    "content": "ns1.domaindiscount24.net. tech.key-systems.net. 2023012324 10800 3600 604800 3600",
-                },
-            ],
-            "security": {"spf": False, "dkim": False, "dmarc": False, "dnssec": False, "caa": False},
-            "finding_types": [],
-        }
-    }
 
 
 @pytest.fixture
