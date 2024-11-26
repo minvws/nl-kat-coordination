@@ -136,7 +136,7 @@
     "description": "An open Microsoft Remote Desktop Protocol (RDP) port was detected.",
     "source": "https://www.cloudflare.com/en-gb/learning/access-management/rdp-security-risks/",
     "risk": "medium",
-    "impact":"Remote desktop ports are often the root cause in ransomware attacks, due to weak password usage, outdated software or insecure configurations.",
+    "impact": "Remote desktop ports are often the root cause in ransomware attacks, due to weak password usage, outdated software or insecure configurations.",
     "recommendation": "Disable the Microsoft RDP service on port 3389 if this is publicly reachable. Add additional security layers, such as VPN access if these ports do require to be enabled to limit the attack surface."
   },
   "KAT-OPEN-DATABASE-PORT": {

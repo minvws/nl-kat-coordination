@@ -239,7 +239,7 @@ def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector):
     assert findings.items == [
         Finding(
             finding_type=KATFindingType(id="KAT-OPEN-DATABASE-PORT").reference,
-            description="Port 3306/tcp is a database port and should not be open.",
+            description="Port 3306/tcp is a database port and should possibly not be open.",
             ooi=tcp_port.reference,
         )
     ]
@@ -276,7 +276,7 @@ def test_no_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector):
     assert findings.items == [
         Finding(
             finding_type=KATFindingType(id="KAT-OPEN-DATABASE-PORT").reference,
-            description="Port 3306/tcp is a database port and should not be open.",
+            description="Port 3306/tcp is a database port and should possibly not be open.",
             ooi=tcp_port.reference,
         )
     ]

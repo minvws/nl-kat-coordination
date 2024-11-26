@@ -36,7 +36,7 @@ DB_TCP_PORTS = [
     5432,  # PostgreSQL
 ]
 MICROSOFT_RDP_PORTS = [
-    3389,  # Microsoft Remote Desktop
+    3389  # Microsoft Remote Desktop
 ]
 
 
@@ -69,7 +69,8 @@ def run(input_ooi: IPPort, additional_oois: list, config: dict[str, Any]) -> Ite
                 yield Finding(
                     finding_type=open_sa_port.reference,
                     ooi=ip_port.reference,
-                    description=f"Port {port}/{protocol.value} is a system administrator port and should possibly not be open.",
+                    description=f"Port {port}/{protocol.value} is a system administrator port and "
+                    f"should possibly not be open.",
                 )
         elif protocol == Protocol.TCP and port in db_tcp_ports:
             ft = KATFindingType(id="KAT-OPEN-DATABASE-PORT")
@@ -91,7 +92,8 @@ def run(input_ooi: IPPort, additional_oois: list, config: dict[str, Any]) -> Ite
                 yield Finding(
                     finding_type=open_rdp_port.reference,
                     ooi=ip_port.reference,
-                    description=f"Port {port}/{protocol.value} is a Microsoft Remote Desktop port and should possibly not be open.",
+                    description=f"Port {port}/{protocol.value} is a Microsoft Remote Desktop port and "
+                    f"should possibly not be open.",
                 )
         elif (protocol == Protocol.TCP and port not in common_tcp_ports) or (
             protocol == Protocol.UDP and port not in common_udp_ports
