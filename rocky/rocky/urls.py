@@ -9,7 +9,7 @@ from two_factor.urls import urlpatterns as tf_urls
 
 from rocky.views.bytes_raw import BytesRawView
 from rocky.views.finding_add import FindingAddView
-from rocky.views.finding_list import FindingListView
+from rocky.views.finding_list import FindingListView, FindingsAllOrganizationsView
 from rocky.views.finding_type_add import FindingTypeAddView
 from rocky.views.health import Health, HealthChecks
 from rocky.views.indemnification_add import IndemnificationAddView
@@ -78,6 +78,7 @@ urlpatterns += i18n_patterns(
     path(
         "<organization_code>/settings/indemnifications/", IndemnificationAddView.as_view(), name="indemnification_add"
     ),
+    path("findings/", FindingsAllOrganizationsView.as_view(), name="finding_list_all_org"),
     path("<organization_code>/findings/", FindingListView.as_view(), name="finding_list"),
     path("<organization_code>/findings/add/", FindingAddView.as_view(), name="finding_add"),
     path("<organization_code>/findings/mute/", MuteFindingView.as_view(), name="finding_mute"),

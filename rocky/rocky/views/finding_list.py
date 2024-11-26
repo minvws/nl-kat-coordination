@@ -3,9 +3,10 @@ from datetime import datetime, timezone
 from typing import Any, Literal
 
 import structlog
+from django.conf import settings
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import ListView
+from django.views.generic import ListView, TemplateView
 from tools.forms.base import ObservedAtForm
 from tools.forms.findings import (
     FindingSearchForm,
@@ -14,10 +15,12 @@ from tools.forms.findings import (
     OrderByFindingTypeForm,
     OrderBySeverityForm,
 )
+from tools.models import OrganizationMember
 from tools.view_helpers import BreadcrumbsMixin
 
+from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.ooi.findings import RiskLevelSeverity
-from rocky.views.mixins import ConnectorFormMixin, FindingList, OctopoesView, SeveritiesMixin
+from rocky.views.mixins import ConnectorFormMixin, FindingList, ObservedAtMixin, OctopoesView, SeveritiesMixin
 
 logger = structlog.get_logger(__name__)
 
@@ -137,3 +140,51 @@ class Top10FindingListView(FindingListView):
                 "text": _("Crisis room"),
             }
         ]
+
+
+class FindingsAllOrganizationsView(ObservedAtMixin, SeveritiesMixin, TemplateView):
+    template_name = "findings/findings_list_all_org.html"
+
+    def get_user_organizations(self):
+        return [member.organization for member in OrganizationMember.objects.filter(user=self.request.user)]
+
+    @staticmethod
+    def get_octopoes_client(organization_code: str):
+        return OctopoesAPIConnector(
+            settings.OCTOPOES_API, organization_code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+        )
+
+    def get_findings_all_organizations(self):
+        all_findings = {}
+        organizations = self.get_user_organizations()
+        for organization in organizations:
+            all_findings[organization] = FindingList(
+                self.get_octopoes_client(organization.code), **self.get_queryset_params()
+            )
+
+        return all_findings
+
+    def get_queryset_params(self):
+        muted_findings = self.request.GET.get("muted_findings", "non-muted")
+        return {
+            "valid_time": self.observed_at,
+            "severities": self.get_severities(),
+            "exclude_muted": muted_findings == "non-muted",
+            "only_muted": muted_findings == "muted",
+            "search_string": self.request.GET.get("search", ""),
+            "order_by": self.order_by,
+            "asc_desc": self.sorting_order,
+        }
+
+    @property
+    def order_by(self) -> Literal["score", "finding_type"]:
+        return "finding_type" if self.request.GET.get("order_by", "") == "finding_type" else "score"
+
+    @property
+    def sorting_order(self) -> Literal["asc", "desc"]:
+        return "asc" if self.request.GET.get("sorting_order", "") == "asc" else "desc"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["findings"] = self.get_findings_all_organizations()
+        return context
