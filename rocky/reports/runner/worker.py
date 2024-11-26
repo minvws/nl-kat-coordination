@@ -85,7 +85,7 @@ class SchedulerWorkerManager(WorkerManager):
 
         # We do not target a specific queue since we start one runtime for all organisations
         # and queue ids contain the organisation_id
-        queues = [q for q in queues if q.id.startswith("report")]
+        queues = [q for q in queues if q.id.startswith("report") and q.size > 0]
 
         logger.debug("Found queues: %s", [queue.id for queue in queues])
 

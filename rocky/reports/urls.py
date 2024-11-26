@@ -25,12 +25,22 @@ from reports.views.multi_report import (
     ReportTypesSelectionMultiReportView,
     SetupScanMultiReportView,
 )
-from reports.views.report_overview import ReportHistoryView, ScheduledReportsView, SubreportView
+from reports.views.report_overview import (
+    ReportHistoryView,
+    ScheduledReportsEnableDisableView,
+    ScheduledReportsView,
+    SubreportView,
+)
 
 # Report overview urls
 urlpatterns = [
     path("", ReportsLandingView.as_view(), name="reports"),
     path("scheduled-reports/", ScheduledReportsView.as_view(), name="scheduled_reports"),
+    path(
+        "scheduled-reports/enable-disable",
+        ScheduledReportsEnableDisableView.as_view(),
+        name="enable_disable_scheduled_reports",
+    ),
     path("report-history/", ReportHistoryView.as_view(), name="report_history"),
     path("report-history/subreports", SubreportView.as_view(), name="subreports"),
 ]
