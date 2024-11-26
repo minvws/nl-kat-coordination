@@ -26,6 +26,8 @@ def get_ignored_url_params(config, config_key, default):
 def remove_ignored_params(url, ignored_params):
     parsed_url = urlparse(url)
     query_params = parse_qs(parsed_url.query)
+    if not query_params:
+        return url
     filtered_params = {k: v for k, v in query_params.items() if k.lower() not in ignored_params}
     new_query = urlencode(filtered_params, doseq=True)
     new_url = urlunparse(
