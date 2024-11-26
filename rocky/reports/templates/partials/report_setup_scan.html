@@ -52,8 +52,13 @@
                     </div>
                     <div class="column-4 tiles plugins images-cover">
                         {% for required_plugin in plugins.required|dictsort:"enabled" %}
-                            {% include "partials/plugin_tile.html" with form_id="continue-to-configuration" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin=required_plugin remove_action_buttons="yes" add_checkbox="yes" checked="yes" %}
+                            {% if required_plugin.enabled %}
+                                {% include "partials/plugin_tile.html" with form_id="continue-to-configuration" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin=required_plugin remove_action_buttons="yes" add_checkbox="yes" %}
 
+                            {% else %}
+                                {% include "partials/plugin_tile.html" with form_id="continue-to-configuration" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin=required_plugin remove_action_buttons="yes" add_checkbox="yes" checked="yes" %}
+
+                            {% endif %}
                         {% endfor %}
                     </div>
                 </div>
