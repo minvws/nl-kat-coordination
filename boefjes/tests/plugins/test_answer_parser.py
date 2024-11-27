@@ -13,10 +13,10 @@ def test_config_yielded(normalizer_runner):
         normalizer_runner.run(meta, bytes(raw, "UTF-8"))
 
     with pytest.raises(ValidationError):
-        raw = '{"schema": "/bit/port-classification-ip", "answer": [{"key": "test"}]}'
+        raw = '{"schema": "/bit/port-classification-ip", "answer": [{"key": "test"}], "answer_ooi": "Network|internet"}'
         normalizer_runner.run(meta, bytes(raw, "UTF-8"))
 
-    raw = '{"schema": "/bit/port-classification-ip", "answer": {"key": "test"}}'
+    raw = '{"schema": "/bit/port-classification-ip", "answer": {"key": "test"}, "answer_ooi": "Network|internet"}'
     output = normalizer_runner.run(meta, bytes(raw, "UTF-8"))
 
     assert len(output.observations) == 1
