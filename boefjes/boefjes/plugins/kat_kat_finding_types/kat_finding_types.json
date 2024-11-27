@@ -502,5 +502,12 @@
     "source": "Check the version of the host manually.",
     "impact": "Unknown. The server may or may not be vulnerable. OpenKAT is not able to determine the version.",
     "recommendation": "Verify manually if the software is up to date as OpenKAT is not able to determine the software version ."
+  },
+  "KAT-LAME-DELEGATION": {
+    "description": "The nameservers for this object are configured but cannot be reached or are non existant.",
+    "risk": "recommendation",
+    "source": "Check the nameservers of the host or iprange manually.",
+    "impact": "No resolving can be done for this IP or host. This might cause problems for mailservers or slow down connections.",
+    "recommendation": "Verify that the listed nameservers are reachable and have valid hostnames."    
   }
 }
