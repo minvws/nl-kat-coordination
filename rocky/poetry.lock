@@ -2763,13 +2763,13 @@ files = [
 
 [[package]]
 name = "robotframework"
-version = "6.1.1"
+version = "7.1.1"
 description = "Generic automation framework for acceptance testing and robotic process automation (RPA)"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.8"
 files = [
-    {file = "robotframework-6.1.1-py3-none-any.whl", hash = "sha256:ee0d512d557e72ed760dd075525f6226baaab309010a48f9c9bf1f416ca434f7"},
-    {file = "robotframework-6.1.1.zip", hash = "sha256:3fa18f2596a4df2418c4b59abf43248327c15ed38ad8665f6a9a9c75c95d7789"},
+    {file = "robotframework-7.1.1-py3-none-any.whl", hash = "sha256:0461360be00dfb8ce1ab3f42370fa6eea3779e41c0b8d79a1f8ddcd2ec8e3679"},
+    {file = "robotframework-7.1.1.zip", hash = "sha256:f85919c68c4d0837006e5f09dde1ef689f082eba2e7e64d5758753f9ee8bfea9"},
 ]
 
 [[package]]
@@ -2866,13 +2866,13 @@ files = [
 
 [[package]]
 name = "robotframework-tidy"
-version = "4.9.0"
+version = "4.14.0"
 description = "Code autoformatter for Robot Framework"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "robotframework-tidy-4.9.0.tar.gz", hash = "sha256:bffb592ba18f573975457fed43dc51b8d33fa298efffb63ef0a8203f7b2790cf"},
-    {file = "robotframework_tidy-4.9.0-py3-none-any.whl", hash = "sha256:eebc6663cc7246059bc2fec501f33ca782e9e19b01a8c1b50a50778d31765d6d"},
+    {file = "robotframework_tidy-4.14.0-py3-none-any.whl", hash = "sha256:17fc46c9c77f7abdddf6f172901d94e1ac87b5f66990cc6849920a052331d90b"},
+    {file = "robotframework_tidy-4.14.0.tar.gz", hash = "sha256:70d40544b66579f36c4dfcee40942d28985f1003f2441ff502c997a3d7e2a2b7"},
 ]
 
 [package.dependencies]
@@ -2880,7 +2880,7 @@ click = "==8.1.*"
 colorama = ">=0.4.3,<0.4.7"
 jinja2 = ">=3.1.3,<4.0"
 pathspec = ">=0.9.0,<0.12.2"
-rich-click = ">=1.4,<1.7.4"
+rich-click = ">=1.4,<1.8.4"
 robotframework = ">=4.0,<8.0"
 tomli = "==2.0.*"
 
@@ -3452,4 +3452,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "75d2a4a68b5c545a524ad38f9348fc384ddeb38a34197027d1942ba67e8c8840"
+content-hash = "ac20ed239ddc4d798428c5d86f772745672817b6db0fe7490027d5da04603ba7"

@@ -56,13 +56,13 @@ django-structlog = "^8.1.0"
 
 [tool.poetry.group.dev.dependencies]
 djlint = "^1.32.1"
-robotframework-tidy = "^4.1.0"
+robotframework-tidy = "^4.14.0"
 
 # Robot Framework dependencies
 PyNaCl = "^1.5.0"
-robotframework = "^6.1"
+robotframework = "^7.1.1"
 robotframework-browser = "^16.2.0"
-robotframework-debuglibrary = "^2.3.0"
+robotframework-debuglibrary = "^2.5.0"
 robotframework-otp = "^1.1.0"
 robotframework-postgresqldb = "^2.0.0"
 pytest = "^7.4.0"
@@ -75,6 +75,7 @@ model-mommy = "^2.0.0"
 factory-boy = "^3.2.1"
 
 django-admin-auto-tests = { git = "https://github.com/dekkers/django-admin-auto-tests", rev = "f6eb4cbb9112b5aa933313d79e4da823adb41e1e" }
+robotframework-assertion-engine = "^3.0.3"
 
 [build-system]
 requires = ["setuptools>=62.2", "wheel"]
