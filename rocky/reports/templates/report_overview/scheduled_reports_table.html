@@ -16,9 +16,10 @@
                 <tr>
                     <th scope="col">{% translate "Name" %}</th>
                     <th scope="col">{% translate "Report type" %}</th>
+                    <th scope="col">{% translate "Scheduled for" %}</th>
                     <th scope="col">{% translate "Recurrence" %}</th>
                     <th scope="col">{% translate "Schedule status" %}</th>
-                    <th scope="col" class="actions"></th>
+                    <th scope="col" class="actions">{% translate "Actions" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -44,6 +45,7 @@
                                     {% endif %}
                                 </ul>
                             </td>
+                            <td>{{ schedule.deadline_at }}</td>
                             <td class="nowrap">
                                 {% if schedule.cron is None %}
                                     {% translate "Once" %}

@@ -25,7 +25,7 @@ from tools.view_helpers import BreadcrumbsMixin, PostRedirect, url_with_querystr
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.reports import Report as ReportOOI
 from octopoes.models.ooi.reports import ReportRecipe
-from reports.forms import OOITypeMultiCheckboxForReportForm
+from reports.forms import OOITypeMultiCheckboxForReportForm, ReportScheduleStartDateForm
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import AggregateReport, BaseReport, Report, report_plugins_union
@@ -520,7 +520,7 @@ class ReportFinalSettingsView(BaseReportView, SchedulerView, TemplateView):
         return context
 
 
-class SaveReportView(BaseReportView, SchedulerView):
+class SaveReportView(BaseReportView, SchedulerView, TemplateView):
     task_type = "report"
 
     def get_parent_report_type(self):
@@ -531,30 +531,30 @@ class SaveReportView(BaseReportView, SchedulerView):
         return self.report_type
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        deadline_at = request.POST.get("start_date")
-        start_date_time: datetime = (
-            datetime.now(timezone.utc) if deadline_at is None else datetime.fromisoformat(deadline_at)
-        )
+        form = ReportScheduleStartDateForm(request.POST)
+        if form.is_valid():
+            start_datetime = form.cleaned_data["start_datetime"]
+            recurrence = form.cleaned_data["recurrence"]
 
-        recurrence = request.POST.get("recurrence")
-        schedule = (
-            self.convert_recurrence_to_cron_expressions(recurrence, start_date_time)
-            if recurrence is not None and recurrence != "once"
-            else None
-        )
+            schedule = (
+                self.convert_recurrence_to_cron_expressions(recurrence, datetime.fromisoformat(start_datetime))
+                if recurrence is not None and recurrence != "once"
+                else None
+            )
 
-        parent_report_type = self.get_parent_report_type()
+            parent_report_type = self.get_parent_report_type()
 
-        parent_report_name_format = request.POST.get("parent_report_name_format", "")
-        subreport_name_format = request.POST.get("subreport_name_format")
+            parent_report_name_format = request.POST.get("parent_report_name_format", "")
+            subreport_name_format = request.POST.get("subreport_name_format")
 
-        report_recipe = self.create_report_recipe(
-            parent_report_name_format, subreport_name_format, parent_report_type, schedule, self.get_query()
-        )
+            report_recipe = self.create_report_recipe(
+                parent_report_name_format, subreport_name_format, parent_report_type, schedule, self.get_query()
+            )
 
-        self.create_report_schedule(report_recipe, start_date_time.isoformat())
+            self.create_report_schedule(report_recipe, start_datetime.isoformat())
 
-        return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
+            return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
+        return super().get(request, *args, **kwargs)
 
 
 class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
