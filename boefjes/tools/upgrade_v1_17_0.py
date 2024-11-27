@@ -80,6 +80,17 @@ def migrate_organisation(
     and set the source_method to the boefje id. Then update the origin, i.e. save it and delete the old one.
     """
 
+    try:
+        connector.health()
+    except HTTPStatusError as e:
+        if e.response.status_code == 404:
+            logger.warning(
+                "Organisation found that does not exist in Octopoes [organisation_id=%s]. Make sure to remove this "
+                "organisation from the Katalogus database if it is no longer in use.",
+                organisation_id,
+            )
+        raise
+
     failed = 0
     processed = 0
 

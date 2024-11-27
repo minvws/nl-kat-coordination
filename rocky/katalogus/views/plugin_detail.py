@@ -9,7 +9,7 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
 
-from katalogus.client import Boefje, Normalizer, get_katalogus
+from katalogus.client import Boefje, Normalizer
 from katalogus.views.plugin_settings_list import PluginSettingsListView
 from rocky.views.tasks import TaskListView
 
@@ -18,7 +18,7 @@ class PluginCoverImgView(OrganizationView):
     """Get the cover image of a plugin."""
 
     def get(self, request, *args, **kwargs):
-        file = FileResponse(get_katalogus(self.organization.code).get_cover(kwargs["plugin_id"]))
+        file = FileResponse(self.get_katalogus().get_cover(kwargs["plugin_id"]))
         file.headers["Cache-Control"] = "max-age=604800"
         return file
 
@@ -120,7 +120,7 @@ class BoefjeDetailView(PluginDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["new_variant"] = self.request.GET.get("new_variant")
-        context["variants"] = get_katalogus(self.organization.code).get_plugins(oci_image=self.plugin.oci_image)
+        context["variants"] = self.get_katalogus().get_plugins(oci_image=self.plugin.oci_image)
 
         for variant in context["variants"]:
             if variant.created:

@@ -46,7 +46,7 @@ express_organizations = pluralized(express_organization)
 class TestOrganizationViewSet(ViewSetTest):
     @pytest.fixture
     def organizations(self):
-        with patch("katalogus.client.KATalogusClientV1"), patch("tools.models.OctopoesAPIConnector"):
+        with patch("katalogus.client.KATalogusClient"), patch("rocky.signals.OctopoesAPIConnector"):
             return [
                 Organization.objects.create(name="Test Organization 1", code="test1", tags=["tag1", "tag2"]),
                 Organization.objects.create(name="Test Organization 2", code="test2"),
@@ -75,6 +75,10 @@ class TestOrganizationViewSet(ViewSetTest):
             async_=False,
         )
 
+        @pytest.fixture(autouse=True)
+        def mock_katalogus(self, mocker):
+            mocker.patch("katalogus.client.KATalogusClient")
+
         def test_it_creates_new_organization(self, initial_ids, json):
             expected = initial_ids | {json["id"]}
             actual = set(Organization.objects.values_list("id", flat=True))
@@ -98,11 +102,11 @@ class TestOrganizationViewSet(ViewSetTest):
 
         @pytest.fixture(autouse=True)
         def mock_services(self, mocker):
-            mocker.patch("tools.models.KATalogusClientV1.organization_exists", return_value=False)
-            mocker.patch("tools.models.KATalogusClientV1.create_organization", side_effect=HTTPError("Test error"))
-            mocker.patch("tools.models.KATalogusClientV1.health")
-            mocker.patch("tools.models.OctopoesAPIConnector.root_health")
-            mocker.patch("tools.models.OctopoesAPIConnector.create_node")
+            mocker.patch("katalogus.client.KATalogusClient.organization_exists", return_value=False)
+            mocker.patch("katalogus.client.KATalogusClient.create_organization", side_effect=HTTPError("Test error"))
+            mocker.patch("katalogus.client.KATalogusClient.health")
+            mocker.patch("rocky.signals.OctopoesAPIConnector.root_health")
+            mocker.patch("rocky.signals.OctopoesAPIConnector.create_node")
 
         def test_it_returns_error(self, json):
             expected = {
@@ -116,12 +120,12 @@ class TestOrganizationViewSet(ViewSetTest):
 
         @pytest.fixture(autouse=True)
         def mock_services(self, mocker):
-            mocker.patch("tools.models.KATalogusClientV1.health")
-            mocker.patch("tools.models.KATalogusClientV1.organization_exists", return_value=False)
-            mocker.patch("tools.models.KATalogusClientV1.create_organization")
-            mocker.patch("tools.models.KATalogusClientV1.delete_organization")  # Needed because of the "rollback"
-            mocker.patch("tools.models.OctopoesAPIConnector.root_health")
-            mocker.patch("tools.models.OctopoesAPIConnector.create_node", side_effect=HTTPError("Test error"))
+            mocker.patch("katalogus.client.KATalogusClient.health")
+            mocker.patch("katalogus.client.KATalogusClient.organization_exists", return_value=False)
+            mocker.patch("katalogus.client.KATalogusClient.create_organization")
+            mocker.patch("katalogus.client.KATalogusClient.delete_organization")  # Needed because of the "rollback"
+            mocker.patch("rocky.signals.OctopoesAPIConnector.root_health")
+            mocker.patch("rocky.signals.OctopoesAPIConnector.create_node", side_effect=HTTPError("Test error"))
 
         def test_it_returns_error(self, json):
             expected = {
@@ -144,11 +148,11 @@ class TestOrganizationViewSet(ViewSetTest):
 
         @pytest.fixture(autouse=True)
         def mock_services(self, mocker):
-            mocker.patch("tools.models.KATalogusClientV1.health")
-            mocker.patch("tools.models.KATalogusClientV1.organization_exists", return_value=False)
-            mocker.patch("tools.models.KATalogusClientV1.create_organization")
-            mocker.patch("tools.models.KATalogusClientV1.delete_organization")  # Needed because of the "rollback"
-            mocker.patch("tools.models.OctopoesAPIConnector")
+            mocker.patch("katalogus.client.KATalogusClient.health")
+            mocker.patch("katalogus.client.KATalogusClient.organization_exists", return_value=False)
+            mocker.patch("katalogus.client.KATalogusClient.create_organization")
+            mocker.patch("katalogus.client.KATalogusClient.delete_organization")  # Needed because of the "rollback"
+            mocker.patch("rocky.signals.OctopoesAPIConnector")
 
         def test_it_sets_expected_attrs(self, organization):
             # We must tell Django to grab fresh data from the database, or we'll
@@ -173,6 +177,10 @@ class TestOrganizationViewSet(ViewSetTest):
             async_=False,
         )
 
+        @pytest.fixture(autouse=True)
+        def mock_katalogus(self, mocker):
+            mocker.patch("katalogus.client.KATalogusClient")
+
         def test_it_deletes_organization(self, initial_ids, organization, log_output):
             expected = initial_ids - {organization.id}
             actual = set(Organization.objects.values_list("id", flat=True))
@@ -186,9 +194,9 @@ class TestOrganizationViewSet(ViewSetTest):
     class TestDestroyKatalogusError(UsesDeleteMethod, UsesDetailEndpoint, Returns500):
         @pytest.fixture(autouse=True)
         def mock_services(self, mocker):
-            mocker.patch("tools.models.KATalogusClientV1.health")
-            mocker.patch("tools.models.KATalogusClientV1.delete_organization", side_effect=HTTPError("Test error"))
-            mocker.patch("tools.models.OctopoesAPIConnector")
+            mocker.patch("katalogus.client.KATalogusClient.health")
+            mocker.patch("katalogus.client.KATalogusClient.delete_organization", side_effect=HTTPError("Test error"))
+            mocker.patch("rocky.signals.OctopoesAPIConnector")
 
         def test_it_returns_error(self, json):
             expected = {
@@ -200,10 +208,9 @@ class TestOrganizationViewSet(ViewSetTest):
     class TestDestroyOctopoesError(UsesDeleteMethod, UsesDetailEndpoint, Returns500):
         @pytest.fixture(autouse=True)
         def mock_services(self, mocker):
-            mocker.patch("tools.models.KATalogusClientV1.health")
-            mocker.patch("tools.models.KATalogusClientV1.delete_organization")
-            mocker.patch("tools.models.OctopoesAPIConnector.root_health")
-            mocker.patch("tools.models.OctopoesAPIConnector.delete_node", side_effect=HTTPError("Test error"))
+            mocker.patch("katalogus.client.KATalogusClient")
+            mocker.patch("rocky.signals.OctopoesAPIConnector.root_health")
+            mocker.patch("rocky.signals.OctopoesAPIConnector.delete_node", side_effect=HTTPError("Test error"))
 
         def test_it_returns_error(self, json):
             expected = {
@@ -309,15 +316,23 @@ class TestKatalogusCloneSettings(APIViewTest, UsesPostMethod, Returns200):
 
     @pytest.fixture
     def client(self, drf_redteam_client, redteamuser):
-        redteamuser.user_permissions.set([Permission.objects.get(codename="can_set_katalogus_settings")])
+        redteamuser.user_permissions.set(
+            [
+                Permission.objects.get(codename="can_set_katalogus_settings"),
+                Permission.objects.get(codename="can_access_all_organizations"),
+            ]
+        )
+
         return drf_redteam_client
 
     @pytest.fixture(autouse=True)
     def mock_katalogus(self, mocker):
-        return mocker.patch("katalogus.client.KATalogusClientV1")
+        return mocker.patch("katalogus.client.KATalogusClient")
 
-    def test_it_clones_settings(self, mock_katalogus, organization_b):
-        mock_katalogus().clone_all_configuration_to_organization.assert_called_once_with(organization_b.code)
+    def test_it_clones_settings(self, mock_katalogus, organization, organization_b):
+        mock_katalogus().clone_all_configuration_to_organization.assert_called_once_with(
+            organization.code, organization_b.code
+        )
 
 
 class TestCloneKatalogusSettingsNoPermission(APIViewTest, UsesPostMethod, Returns403):

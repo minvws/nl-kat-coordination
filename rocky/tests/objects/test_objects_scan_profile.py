@@ -38,7 +38,7 @@ TREE_DATA = {
 
 
 def test_scan_profile(rf, redteam_member, mock_scheduler, mock_organization_view_octopoes, mocker):
-    mocker.patch("katalogus.utils.get_katalogus")
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
 
     request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
@@ -51,7 +51,7 @@ def test_scan_profile(rf, redteam_member, mock_scheduler, mock_organization_view
 
 
 def test_scan_profile_submit(rf, redteam_member, mock_scheduler, mock_organization_view_octopoes, mocker):
-    mocker.patch("katalogus.utils.get_katalogus")
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
 
     # Passing query params in POST requests is not well-supported for RequestFactory it seems, hence the absolute path
@@ -72,7 +72,7 @@ def test_scan_profile_submit(rf, redteam_member, mock_scheduler, mock_organizati
 def test_scan_profile_submit_no_indemnification(
     rf, redteam_member, mock_scheduler, mock_organization_view_octopoes, mocker
 ):
-    mocker.patch("katalogus.utils.get_katalogus")
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
 
     Indemnification.objects.get(user=redteam_member.user).delete()
@@ -95,7 +95,7 @@ def test_scan_profile_submit_no_indemnification(
 def test_scan_profile_no_permissions_acknowledged(
     rf, redteam_member, mock_scheduler, mock_organization_view_octopoes, mocker
 ):
-    mocker.patch("katalogus.utils.get_katalogus")
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
 
     redteam_member.acknowledged_clearance_level = -1
@@ -114,7 +114,7 @@ def test_scan_profile_no_permissions_trusted(
     rf, redteam_member, mock_scheduler, mock_organization_view_octopoes, mocker
 ):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
-    mocker.patch("katalogus.utils.get_katalogus")
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
 
     redteam_member.trusted_clearance_level = -1
     redteam_member.save()
@@ -130,7 +130,7 @@ def test_scan_profile_no_permissions_trusted(
 
 def test_scan_profile_reset_view(rf, redteam_member, mock_scheduler, mock_organization_view_octopoes, mocker):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
-    mocker.patch("katalogus.utils.get_katalogus")
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
 
     request = setup_request(rf.get("scan_profile_reset", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
     response = ScanProfileResetView.as_view()(request, organization_code=redteam_member.organization.code)
@@ -145,7 +145,7 @@ def test_scan_profile_reset_view(rf, redteam_member, mock_scheduler, mock_organi
 
 def test_scan_reset_calls_octopoes(rf, redteam_member, mock_scheduler, mock_organization_view_octopoes, mocker):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
-    mocker.patch("katalogus.utils.get_katalogus")
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
 
     query_string = urlencode({"ooi_id": "Network|testnetwork"}, doseq=True)
     request = setup_request(

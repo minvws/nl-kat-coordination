@@ -29,7 +29,12 @@ fi
 pushd /
 
 echo "Stop OpenKAT"
-sudo systemctl stop xtdb-http-multinode kat-rocky kat-rocky-worker kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
+sudo systemctl stop xtdb-http-multinode kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
+
+# Kat-rocky-worker service was introduced in OpenKAT 1.18
+if [ -f /usr/lib/systemd/system/kat-rocky-worker.service ]; then
+    sudo systemctl stop kat-rocky-worker
+fi
 
 echo "Delete XTDB databases"
 sudo rm -rf /var/lib/xtdb/*
@@ -89,6 +94,11 @@ if [[ ${1} != "no_super_user" ]]; then
 fi
 
 echo "Start OpenKAT"
-sudo systemctl start xtdb-http-multinode kat-rocky kat-rocky-worker kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
+sudo systemctl start xtdb-http-multinode kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
+
+# Kat-rocky-worker service was introduced in OpenKAT 1.18
+if [ -f /usr/lib/systemd/system/kat-rocky-worker.service ]; then
+    sudo systemctl start kat-rocky-worker
+fi
 
 popd

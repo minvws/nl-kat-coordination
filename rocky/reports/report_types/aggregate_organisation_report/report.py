@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Any
 
 import structlog
-from django.utils.translation import gettext_lazy as _
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
@@ -372,16 +371,16 @@ class AggregateOrganisationReport(AggregateReport):
 
         summary = {
             # _("General recommendations"): "",
-            str(_("Critical vulnerabilities")): total_criticals,
-            str(_("IPs scanned")): total_ips,
-            str(_("Hostnames scanned")): total_hostnames,
+            "critical_vulnerabilities": total_criticals,
+            "ips_scanned": total_ips,
+            "hostnames_scanned": total_hostnames,
             # _("Systems found"): total_systems,
             # _("Sector of organisation"): "",
             # _("Basic security score compared to sector"): "",
             # _("Sector defined"): "",
             # _("Lowest security score in organisation"): "",
             # _("Newly discovered items since last week, october 8th 2023"): "",
-            str(_("Terms in report")): ", ".join(sorted(terms)),
+            "terms_in_report": ", ".join(sorted(terms)),
         }
 
         all_findings = set()

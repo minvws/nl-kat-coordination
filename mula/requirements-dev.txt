@@ -92,9 +92,9 @@ coverage[toml]==7.6.1 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:f5796e664fe802da4f57a168c85359a8fbf3eab5e55cd4e4569fbacecc903959 \
     --hash=sha256:fc5a77d0c516700ebad189b587de289a20a78324bc54baee03dd486f0855d234 \
     --hash=sha256:fd21f6ae3f08b41004dfb433fa895d858f3f5979e7762d052b12aef444e29afc
-croniter==3.0.3 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:34117ec1741f10a7bd0ec3ad7d8f0eb8fa457a2feb9be32e6a2250e158957668 \
-    --hash=sha256:b3bd11f270dc54ccd1f2397b813436015a86d30ffc5a7a9438eec1ed916f2101
+croniter==5.0.1 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:7d9b1ef25b10eece48fdf29d8ac52f9b6252abff983ac614ade4f3276294019e \
+    --hash=sha256:eb28439742291f6c10b181df1a5ecf421208b1fc62ef44501daec1780a0b09e9
 decorator==5.1.1 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:637996211036b6385ef91435e4fae22989472f9d571faba8927ba8253acbc330 \
     --hash=sha256:b8c3f85900b9dc423225913c5aace94729fe1fa9763b38939a95226f02d37186

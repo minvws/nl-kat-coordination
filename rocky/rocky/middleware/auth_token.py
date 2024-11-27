@@ -9,12 +9,13 @@ def AuthTokenMiddleware(get_response):
         if not request.user.is_authenticated and "authorization" in request.headers:
             authenticator = TokenAuthentication()
             try:
-                user, token = authenticator.authenticate(request)
+                user_and_token = authenticator.authenticate(request)
             except APIException:
                 return HttpResponseForbidden("Invalid token\n")
             else:
-                request.user = user
-                structlog.contextvars.bind_contextvars(auth_method="token")
+                if user_and_token:
+                    request.user = user_and_token[0]
+                    structlog.contextvars.bind_contextvars(auth_method="token")
 
         return get_response(request)
 

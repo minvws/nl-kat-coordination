@@ -10,12 +10,17 @@
             {% endif %}
         </button>
     </div>
-    <form method="get" class="help">
+    <form id="finding-list" method="get" class="help">
         {% include "partials/form/fieldset.html" with fields=observed_at_form %}
         {% include "partials/form/fieldset.html" with fields=severity_filter fieldset_class="filter-fields-direction column" %}
         {% include "partials/form/fieldset.html" with fields=muted_findings_filter fieldset_class="filter-fields-direction column" %}
         {% include "partials/form/fieldset.html" with fields=finding_search_form %}
 
+        {{ order_by_severity_form }}
+        {{ order_by_finding_type_form }}
+        <input type="hidden"
+               name="sorting_order"
+               value="{% if sorting_order == "asc" %}desc{% else %}asc{% endif %}">
         <div class="button-container">
             <input type="submit"
                    value="{% if submit_text %}{{ submit_text }}{% else %}{% translate "Set filters" %}{% endif %}" />

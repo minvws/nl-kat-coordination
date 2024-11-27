@@ -8,6 +8,7 @@ import pytest
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
+from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.dns.records import DNSAAAARecord, DNSARecord, DNSMXRecord, DNSNSRecord
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, KATFindingType, RiskLevelSeverity
@@ -64,6 +65,9 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
         [Reference.from_str(f"Hostname|test|test{i}") for i in range(0, 10, 2)], valid_time=valid_time
     )
     assert octopoes_api_connector.list_objects(types={Network, Hostname}, valid_time=valid_time).count == 6
+
+    with pytest.raises(ObjectNotFoundException):
+        octopoes_api_connector.delete_many(["bla"], valid_time=valid_time)
 
 
 def test_history(octopoes_api_connector: OctopoesAPIConnector):

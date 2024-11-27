@@ -45,13 +45,17 @@
                 </thead>
                 <tbody>
                     {% for asset_vulnerability in report_data.asset_vulnerabilities %}
-                        {% if asset_vulnerability.vulnerabilities %}
-                            <tr>
-                                <td>{{ asset_vulnerability.asset }}</td>
-                                <td>{{ asset_vulnerability.vulnerabilities|join:", " }}</td>
-                                <td>{% translate "Organisation" %} {{ asset_vulnerability.organisation }}</td>
-                            </tr>
-                        {% endif %}
+                        <tr>
+                            <td>{{ asset_vulnerability.asset }}</td>
+                            <td>
+                                {% if asset_vulnerability.vulnerabilities %}
+                                    {{ asset_vulnerability.vulnerabilities|join:", " }}
+                                {% else %}
+                                    {% translate "No vulnerabilities found." %}
+                                {% endif %}
+                            </td>
+                            <td>{% translate "Organisation" %} {{ asset_vulnerability.organisation }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>

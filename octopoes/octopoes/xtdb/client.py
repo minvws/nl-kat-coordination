@@ -10,11 +10,13 @@ import structlog
 from httpx import HTTPError, HTTPStatusError, Response, codes
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
+from octopoes.config.settings import Settings
 from octopoes.models.transaction import TransactionRecord
 from octopoes.xtdb.exceptions import NodeNotFound, XTDBException
 from octopoes.xtdb.query import Query
 
 logger = structlog.get_logger(__name__)
+settings = Settings()
 
 
 class OperationType(Enum):
@@ -46,7 +48,10 @@ class XTDBStatus(BaseModel):
 @functools.cache
 def _get_xtdb_http_session(base_url: str) -> httpx.Client:
     return httpx.Client(
-        base_url=base_url, headers={"Accept": "application/json"}, transport=(httpx.HTTPTransport(retries=3))
+        base_url=base_url,
+        headers={"Accept": "application/json"},
+        transport=httpx.HTTPTransport(retries=3),
+        timeout=settings.outgoing_request_timeout,
     )
 
 

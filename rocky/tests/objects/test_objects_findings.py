@@ -65,7 +65,7 @@ def test_ooi_finding_list(rf, client_member, mock_organization_view_octopoes):
 
 @pytest.mark.parametrize("member", ["superuser_member", "redteam_member"])
 def test_mute_finding_button_is_visible(request, member, rf, mock_organization_view_octopoes, mock_scheduler, mocker):
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
 
     member = request.getfixturevalue(member)
@@ -83,7 +83,7 @@ def test_mute_finding_button_is_visible(request, member, rf, mock_organization_v
 def test_mute_finding_button_is_not_visible_without_perms(
     request, member, rf, mock_organization_view_octopoes, mock_scheduler, mocker
 ):
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
 
     member = request.getfixturevalue(member)
@@ -153,7 +153,7 @@ def test_mute_finding_post(
     # Redirects to ooi_detail
     assert response.status_code == 302
 
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
     resulted_request = setup_request(rf.get(response.url), redteam_member.user)
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(MUTED_FINDING_TREE_DATA)
@@ -240,7 +240,7 @@ def test_muted_finding_button_presence_more_findings_and_post(
     assert response.status_code == 200
     assertContains(response, '<input class="toggle-all" data-toggle-target="finding" type="checkbox">', html=True)
     assertContains(response, '<input type="checkbox" name="finding" value="' + finding_1.primary_key + '">', html=True)
-    assertContains(response, '<button type="submit">Mute Findings</button>')
+    assertContains(response, '<button type="submit" form="finding-list-form">Mute Findings</button>')
 
     request = setup_request(
         rf.post("finding_mute_bulk", {"finding": [finding_1, finding_2], "reason": "testing"}), member.user
@@ -285,7 +285,7 @@ def test_can_mute_findings_perms(rf, request, member, mock_organization_view_oct
     )
 
     assert response.status_code == 200
-    assertNotContains(response, '<button type="submit">Mute Findings</button>')
+    assertNotContains(response, '<button type="submit" form="finding-list-form">Mute Findings</button>')
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])

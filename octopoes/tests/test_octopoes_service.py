@@ -75,7 +75,7 @@ def test_on_update_origin(octopoes_service, valid_time):
     octopoes_service.process_event(event)
 
     # the ooi should be deleted
-    octopoes_service.ooi_repository.delete.assert_called_once_with(
+    octopoes_service.ooi_repository.delete_if_exists.assert_called_once_with(
         Reference.from_str("IPAddress|internet|1.1.1.1"), valid_time
     )
 

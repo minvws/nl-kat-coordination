@@ -15,8 +15,9 @@ def test_crisis_room(rf, client_member, mock_crisis_room_octopoes):
     response = CrisisRoomView.as_view()(request)
 
     assert response.status_code == 200
+
     assertContains(response, '<a href="/en/test/findings/?severity=medium">1</a>', html=True)
-    assertContains(response, '<td><span class="critical">Critical</span></td><td class="number">0</td>', html=True)
+    assertContains(response, "<dd>0</dd>", html=True)
 
     assert mock_crisis_room_octopoes().count_findings_by_severity.call_count == 1
 
@@ -55,8 +56,9 @@ def test_crisis_room_error(rf, client_user_two_organizations, mock_crisis_room_o
     response = CrisisRoomView.as_view()(request)
 
     assert response.status_code == 200
+
     assertContains(response, '<a href="/en/test/findings/?severity=medium">1</a>', html=True)
-    assertContains(response, '<td><span class="critical">Critical</span></td><td class="number">0</td>', html=True)
+    assertContains(response, "<dd>0</dd>", html=True)
 
     messages = list(request._messages)
     assert (

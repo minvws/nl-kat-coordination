@@ -95,7 +95,7 @@ def test_events_created_through_crud(xtdb_octopoes_service: OctopoesService, eve
     assert call2.new_data == origin
     assert call2.operation_type.value == "create"
 
-    xtdb_octopoes_service.ooi_repository.delete(network.reference, valid_time)
+    xtdb_octopoes_service.ooi_repository.delete_if_exists(network.reference, valid_time)
     xtdb_octopoes_service.commit()
 
     assert len(event_manager.queue) == 3  # Origin will be deleted by the worker due to the OOI delete event
@@ -118,7 +118,7 @@ def test_events_created_in_worker_during_handling(
     )
     xtdb_octopoes_service.save_origin(origin, [network], valid_time)
     xtdb_octopoes_service.commit()
-    xtdb_octopoes_service.ooi_repository.delete(network.reference, valid_time)
+    xtdb_octopoes_service.ooi_repository.delete_if_exists(network.reference, valid_time)
     xtdb_octopoes_service.commit()
 
     assert len(event_manager.queue) == 3
@@ -131,9 +131,9 @@ def test_events_created_in_worker_during_handling(
         xtdb_octopoes_service.process_event(event)
     xtdb_octopoes_service.commit()
 
-    assert len(event_manager.queue) == 7  # Handling OOI delete event triggers Origin delete event
+    assert len(event_manager.queue) == 8  # Handling OOI delete event triggers Origin delete event
 
-    event = event_manager.queue[6]  # OOID]elete event
+    event = event_manager.queue[7]  # OOIDelete event
 
     assert isinstance(event, OriginDBEvent)
     assert event.operation_type.value == "delete"
@@ -169,8 +169,8 @@ def test_events_deletion_after_bits(xtdb_octopoes_service: OctopoesService, even
     printer("ORIGINS", xtdb_octopoes_service.origin_repository.list_origins(valid_time))
     printer("EVENTS", event_manager.queue)
 
-    xtdb_octopoes_service.ooi_repository.delete(network.reference, valid_time)
-    xtdb_octopoes_service.ooi_repository.delete(hostname.reference, valid_time)
+    xtdb_octopoes_service.ooi_repository.delete_if_exists(network.reference, valid_time)
+    xtdb_octopoes_service.ooi_repository.delete_if_exists(hostname.reference, valid_time)
 
     print(3)
     print(f"PROCESSED {event_manager.complete_process_events(xtdb_octopoes_service)}")
@@ -229,7 +229,7 @@ def test_deletion_events_after_nxdomain(
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) == 0
-    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 7
+    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 8
 
     nxd = NXDOMAIN(hostname=hostname.reference)
     xtdb_octopoes_service.ooi_repository.save(nxd, valid_time)
@@ -250,7 +250,7 @@ def test_deletion_events_after_nxdomain(
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) >= 3
-    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 5
+    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 6
 
 
 @pytest.mark.xfail(reason="Wappalyzer works on wrong input objects (to be addressed)")
@@ -393,7 +393,7 @@ def test_easy_chain_deletion(xtdb_octopoes_service: OctopoesService, event_manag
 
     count = xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count
 
-    xtdb_octopoes_service.ooi_repository.delete(ip[0].reference, valid_time)
+    xtdb_octopoes_service.ooi_repository.delete_if_exists(ip[0].reference, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count < count
@@ -421,7 +421,7 @@ def test_basic_chain_deletion(xtdb_octopoes_service: OctopoesService, event_mana
 
     chain(software1, [Software(name="ACME", version="v2")])
 
-    xtdb_octopoes_service.ooi_repository.delete(software1.reference, valid_time)
+    xtdb_octopoes_service.ooi_repository.delete_if_exists(software1.reference, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 0

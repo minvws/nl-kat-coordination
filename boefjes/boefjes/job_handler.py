@@ -2,6 +2,7 @@ import os
 import traceback
 from collections.abc import Callable
 from datetime import datetime, timezone
+from functools import cache
 from typing import cast
 
 import httpx
@@ -33,14 +34,34 @@ bytes_api_client = BytesAPIClient(
 
 
 def get_octopoes_api_connector(org_code: str) -> OctopoesAPIConnector:
-    return OctopoesAPIConnector(str(settings.octopoes_api), org_code)
+    return OctopoesAPIConnector(str(settings.octopoes_api), org_code, timeout=settings.outgoing_request_timeout)
+
+
+@cache
+def boefje_env_variables() -> dict:
+    """
+    Return all environment variables that start with BOEFJE_. The returned
+    keys have the BOEFJE_ prefix removed.
+    """
+
+    boefje_variables = {}
+    for key, value in os.environ.items():
+        if key.startswith("BOEFJE_"):
+            boefje_variables[key.removeprefix("BOEFJE_")] = value
+
+    return boefje_variables
+
+
+def get_system_env_settings_for_boefje(allowed_keys: list[str]) -> dict:
+    return {key: value for key, value in boefje_env_variables().items() if key in allowed_keys}
 
 
 def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None) -> dict[str, str]:
     try:
         katalogus_api = str(settings.katalogus_api).rstrip("/")
         response = httpx.get(
-            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings", timeout=30
+            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings",
+            timeout=settings.outgoing_request_timeout,
         )
         response.raise_for_status()
     except HTTPError:
@@ -48,11 +69,7 @@ def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None
         raise
 
     allowed_keys = schema.get("properties", []) if schema else []
-    new_env = {
-        key.split("BOEFJE_", 1)[1]: value
-        for key, value in os.environ.items()
-        if key.startswith("BOEFJE_") and key in allowed_keys
-    }
+    new_env = get_system_env_settings_for_boefje(allowed_keys)
 
     settings_from_katalogus = response.json()
 

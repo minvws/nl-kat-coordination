@@ -23,6 +23,9 @@ services:
       test: ["CMD", "gosu", "postgres", "pg_isready"]
       interval: 10s
       retries: 10
+    # Django runserver does not limit the number of threads. We need to increase
+    # the maximum number of connection to make sure that we don't hit the limit.
+    command: -c max_connections=500
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh

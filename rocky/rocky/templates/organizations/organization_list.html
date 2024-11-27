@@ -12,19 +12,8 @@
             <div>
                 <h1>{% translate "Organizations" %}</h1>
                 <div class="horizontal-view toolbar">
-                    {% if perms.tools.can_recalculate_bits %}
-                        <form method="post" class="inline">
-                            {% csrf_token %}
-                            <button type="submit"
-                                    class="dropdown-button"
-                                    name="action"
-                                    value="recalculate">
-                                {% translate "Rerun all bits for all my organizations" %}
-                            </button>
-                        </form>
-                    {% endif %}
                     {% if perms.tools.add_organization %}
-                        <a href="{% url 'organization_add' %}" class="button">{% translate "Add new organization" %}</a>
+                        <a href="{% url 'organization_add' %}" class="button ghost"><span class="icon ti-plus" aria-hidden="true"></span>{% translate "Add new organization" %}</a>
                     {% endif %}
                 </div>
                 <div class="horizontal-scroll">
@@ -59,6 +48,19 @@
                         </table>
                     {% else %}
                         {% translate "There were no organizations found for your user account" %}.
+                    {% endif %}
+                </div>
+                <div>
+                    <h2>{% translate "Actions" %}</h2>
+                    <p>{% translate "Actions to perform for all of your organizations." %}</p>
+                    {% if perms.tools.can_recalculate_bits %}
+                        <form method="post" class="inline">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="dropdown-button ghost"
+                                    name="action"
+                                    value="recalculate">{% translate "Rerun all bits" %}</button>
+                        </form>
                     {% endif %}
                 </div>
             </div>

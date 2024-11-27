@@ -116,6 +116,9 @@ class OOIRepository(Repository):
     def save(self, ooi: OOI, valid_time: datetime, end_valid_time: datetime | None = None) -> None:
         raise NotImplementedError
 
+    def delete_if_exists(self, reference: Reference, valid_time: datetime) -> None:
+        raise NotImplementedError
+
     def delete(self, reference: Reference, valid_time: datetime) -> None:
         raise NotImplementedError
 
@@ -613,12 +616,14 @@ class XTDBOOIRepository(OOIRepository):
         # After transaction, send event
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
-    def delete(self, reference: Reference, valid_time: datetime) -> None:
-        # retrieve old ooi
+    def delete_if_exists(self, reference: Reference, valid_time: datetime) -> None:
         try:
-            ooi = self.get(reference, valid_time=valid_time)
+            self.delete(reference, valid_time)
         except ObjectNotFoundException:
             return
+
+    def delete(self, reference: Reference, valid_time: datetime) -> None:
+        ooi = self.get(reference, valid_time=valid_time)
 
         self.session.add((XTDBOperationType.DELETE, str(reference), valid_time))
 

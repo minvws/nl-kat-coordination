@@ -57,21 +57,24 @@
                         </tbody>
                     </table>
                 </div>
-                <h2>{% translate "Settings" %}</h2>
-                {% if perms.tools.add_indemnification %}
-                    <a href="{% url "indemnification_add" organization.code %}"
-                       class="button ghost">{% translate "Add indemnification" %}</a>
-                {% endif %}
                 <h2>{% translate "Actions" %}</h2>
-                {% if perms.tools.can_recalculate_bits %}
-                    <form method="post" class="inline">
-                        {% csrf_token %}
-                        <button type="submit"
-                                class="dropdown-button"
-                                name="action"
-                                value="recalculate">{% translate "Rerun all bits" %}</button>
-                    </form>
-                {% endif %}
+                <div class="button-container">
+                    {% if perms.tools.add_indemnification %}
+                        <a href="{% url "indemnification_add" organization.code %}"
+                           class="button ghost">
+                            <span class="icon ti-plus" aria-hidden="true"></span>{% translate "Add indemnification" %}
+                        </a>
+                    {% endif %}
+                    {% if perms.tools.can_recalculate_bits %}
+                        <form method="post" class="inline">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="dropdown-button ghost"
+                                    name="action"
+                                    value="recalculate">{% translate "Rerun all bits" %}</button>
+                        </form>
+                    {% endif %}
+                </div>
             </div>
         </section>
         {% if organization.tags.all %}

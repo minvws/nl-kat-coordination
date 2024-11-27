@@ -154,8 +154,8 @@ def test_plugin_settings_add_error_message_about_integer_too_big(
 
 def test_plugin_single_settings_add_view_no_schema(rf, superuser_member, mock_mixins_katalogus, plugin_details):
     mock_katalogus = mock_mixins_katalogus()
+    plugin_details.boefje_schema = None
     mock_katalogus.get_plugin.return_value = plugin_details
-    mock_katalogus.get_plugin_schema.return_value = None
     mock_katalogus.get_plugin_settings.return_value = None
 
     request = setup_request(rf.post("plugin_settings_add", data={"boefje_id": 123}), superuser_member.user)

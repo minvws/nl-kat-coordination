@@ -30,18 +30,23 @@
         {% endif %}
         <span class="plugin-author-link de-emphasized"><a target="_blank" href="https://openkat.nl" rel="noopener noreferrer">OpenKAT</a></span>
         {% if show_report_types %}
-            <div class="tags">
-                <p>
-                    <strong>{% translate "Required for:" %}</strong>
-                </p>
-                {% for plugin_id, report_types in plugin_report_types.items %}
-                    {% if plugin_id == plugin.id %}
-                        {% for report_type in report_types %}
-                            <span class="label tags-color-{{ report_type.label_style }}">{{ report_type.name }}</span>
-                        {% endfor %}
+            {% for plugin_id, report_types in plugin_report_types.items %}
+                {% if plugin_id == plugin.id %}
+                    {% if report_types|length >= 2 %}
+                        {% include "partials/modal_report_types.html" with plugin=plugin %}
+
+                    {% else %}
+                        <ul class="tags report-types">
+                            {% for report_type in report_types %}
+                                <li>
+                                    <label for="report-types-required-for-plugin">{% translate "Required for:" %}</label>
+                                    <span class="tags-color-{{ report_type.label_style }}">{{ report_type.name }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
                     {% endif %}
-                {% endfor %}
-            </div>
+                {% endif %}
+            {% endfor %}
         {% endif %}
         {% if not remove_action_buttons %}
             <div class="action-buttons">

@@ -24,6 +24,7 @@
                 {% translate "Object list" as filter_title %}
                 {% if object_list|length > 1 and perms.tools.can_mute_findings %}
                     <form method="post"
+                          id="finding-list-form"
                           class="inline layout-wide"
                           action="{% url 'finding_mute_bulk' organization.code %}">
                         {% csrf_token %}
@@ -31,9 +32,12 @@
                     <p class="de-emphasized">
                         {% translate "Showing " %}{{ object_list|length }} {% translate "of" %} {{ paginator.count }} {% translate "findings" %}
                     </p>
-                    <div class="horizontal-scroll">
+                    <div class="horizontal-scroll sticky-column">
                         <table class="action-buttons nowrap">
-                            <caption class="visually-hidden">{% translate "Findings table" %}</caption>
+                            <caption class="visually-hidden">
+                                {% translate "Findings table " %}
+                                <span class="visually-hidden">, {% translate "column headers with buttons are sortable" %}</span>
+                            </caption>
                             <thead>
                                 <tr>
                                     {% if object_list|length > 1 and perms.tools.can_mute_findings %}
@@ -41,11 +45,27 @@
                                             <input class="toggle-all" data-toggle-target="finding" type="checkbox">
                                         </th>
                                     {% endif %}
-                                    <th>{% translate "Severity" %}</th>
-                                    <th>{% translate "Finding" %}</th>
+                                    <th scope="col"
+                                        class="sortable"
+                                        {% if order_by == "score" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
+                                        <button form="finding-list" name="order_by" value="score" class="sort">
+                                            {% translate "Severity" %}
+                                            <span aria-hidden="true"
+                                                  class="icon ti-{% if order_by == "score" and sorting_order == "asc" %}chevron-up{% elif order_by == "score" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
+                                        </button>
+                                    </th>
+                                    <th scope="col"
+                                        class="sortable"
+                                        {% if order_by == "finding_type" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
+                                        <button form="finding-list" name="order_by" value="finding_type" class="sort">
+                                            {% translate "Finding" %}
+                                            <span aria-hidden="true"
+                                                  class="icon ti-{% if order_by == "finding_type" and sorting_order == "asc" %}chevron-up{% elif order_by == "finding_type" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
+                                        </button>
+                                    </th>
                                     <th>{% translate "Tree" %}</th>
                                     <th>{% translate "Graph" %}</th>
-                                    <th class="visually-hidden">{% translate "Details" %}</th>
+                                    <th class="sticky-cell visually-hidden actions">{% translate "Details" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -75,7 +95,7 @@
                                                class="icon ti-affiliate button"
                                                href="{% ooi_url 'ooi_graph' hydrated_finding.finding.primary_key organization.code query=mandatory_fields %}">{% translate "Graph" %}</a>
                                         </td>
-                                        <td class="actions">
+                                        <td class="actions sticky-cell">
                                             <button type="button"
                                                     class="expando-button"
                                                     data-icon-open-class="icon ti-chevron-down"
@@ -122,10 +142,10 @@
                         {% endif %}
                         <div class="button-container">
                             {% if only_muted %}
-                                <button type="submit">{% translate "Unmute Findings" %}</button>
+                                <button type="submit" form="finding-list-form">{% translate "Unmute Findings" %}</button>
                                 <input type="checkbox" class="hidden" value="true" name="unmute" checked>
                             {% else %}
-                                <button type="submit">{% translate "Mute Findings" %}</button>
+                                <button type="submit" form="finding-list-form">{% translate "Mute Findings" %}</button>
                             {% endif %}
                         </div>
                     </form>

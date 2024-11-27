@@ -58,6 +58,7 @@ class ReportRecipe(OOI):
     subreport_name_format: str | None = None
 
     input_recipe: dict[str, Any]  # can contain a query which maintains a live set of OOIs or manually picked OOIs.
+    parent_report_type: str | None = None
     report_types: list[str]
 
     cron_expression: str

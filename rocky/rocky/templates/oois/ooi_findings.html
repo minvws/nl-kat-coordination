@@ -16,7 +16,7 @@
                     {% include "oois/ooi_detail_findings_list.html" with findings=findings %}
 
                 {% else %}
-                    <p>{% translate "Currently there are no findings for OOI" %} "{{ ooi.human_readable }}".</p>
+                    <p>{% translate "Currently no findings have been identified for OOI" %} "{{ ooi.human_readable }}".</p>
                     <a href="{% ooi_url 'finding_add' ooi.primary_key organization.code %}"
                        class="button">{% translate "Add finding" %}</a>
                 {% endif %}

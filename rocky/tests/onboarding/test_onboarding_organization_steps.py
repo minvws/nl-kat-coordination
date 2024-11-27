@@ -250,7 +250,7 @@ def test_onboarding_set_clearance_level(
 
 @pytest.mark.parametrize("member", ["superuser_member", "redteam_member"])
 def test_onboarding_select_plugins(request, member, rf, mocker, mock_organization_view_octopoes, url):
-    mocker.patch("onboarding.views.get_katalogus")
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
     member = request.getfixturevalue(member)
     request = setup_request(rf.get("step_setup_scan_select_plugins", {"ooi": url.primary_key}), member.user)
 
@@ -303,7 +303,7 @@ def test_onboarding_scanning_boefjes(
 ):
     member = request.getfixturevalue(member)
 
-    mocker.patch("reports.views.base.get_katalogus")
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
     mock_organization_view_octopoes().get.return_value = url
     mock_bytes_client().upload_raw.return_value = "raw_id"
 

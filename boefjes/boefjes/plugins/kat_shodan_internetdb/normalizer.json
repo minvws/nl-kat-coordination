@@ -1,6 +1,7 @@
 {
   "id": "kat_shodan_internetdb_normalize",
   "name": "Shodan InternetDB normalizer",
+  "description": "Parses Shodan InternetDB into findings.",
   "consumes": [
     "boefje/shodan_internetdb"
   ],

@@ -10,7 +10,7 @@ This outlines the basic usages and provides a code block example below, of how t
 
 ### Instantiate
 
-First you need to add `{% load component_tags %}` at the top of your template. Next you need to add the following code block at the bottom, to include the corresponding JS (if you haven't already you also need to add `{% load compress %}`).
+First you need to add `{% load component_tags %}` at the top of your template. Next you need to add the following code block at the bottom, to include the corresponding JS (if you haven't already you also need to add `{% load compress %}` and `{% load static %}`).
 
 ```
 {% block html_at_end_body %}
@@ -58,7 +58,7 @@ Including `{% component_css_dependencies %}` is needed to inject the reference t
 	{% fill "content" %}
 		<form  id="content-form"  class="horizontal-view"  action=""  method="post">
 			{% csrf_token %}
-			{% blocktranslate %}
+			{% blocktranslate with context_data_variable=context_data_variable %}
 				<p>You can use {{ context_data_variable }} and HTML here <code>valid_time</code>!</p>
 			{% endblocktranslate %}
 		</form>

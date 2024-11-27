@@ -17,11 +17,11 @@ from boefjes.sql.plugin_storage import create_plugin_storage
 from boefjes.storage.interfaces import (
     ConfigStorage,
     DuplicatePlugin,
-    IntegrityError,
     NotFound,
     PluginNotFound,
     PluginStorage,
     SettingsNotConformingToSchema,
+    UniqueViolation,
 )
 
 logger = structlog.get_logger(__name__)
@@ -49,9 +49,9 @@ class PluginService:
         return [self._set_plugin_enabled(plugin, organisation_id) for plugin in all_plugins.values()]
 
     def _get_all_without_enabled(self) -> dict[str, PluginType]:
-        all_plugins = {plugin.id: plugin for plugin in self.local_repo.get_all()}
+        all_plugins = {plugin.id: plugin for plugin in self.plugin_storage.get_all()}
 
-        for plugin in self.plugin_storage.get_all():
+        for plugin in self.local_repo.get_all():  # Local plugins take precedence
             all_plugins[plugin.id] = plugin
 
         return all_plugins
@@ -94,7 +94,7 @@ class PluginService:
             self.set_enabled_by_id(plugin_id, to_organisation, enabled=True)
 
     def upsert_settings(self, settings: dict, organisation_id: str, plugin_id: str):
-        self._assert_settings_match_schema(settings, plugin_id)
+        self._assert_settings_match_schema(settings, plugin_id, organisation_id)
         self._put_boefje(plugin_id)
 
         return self.config_storage.upsert(organisation_id, plugin_id, settings=settings)
@@ -113,29 +113,25 @@ class PluginService:
                     try:
                         with self.plugin_storage as storage:
                             storage.create_boefje(boefje)
-                    except IntegrityError as error:
-                        raise DuplicatePlugin(self._translate_duplicate_plugin(error.message))
+                    except UniqueViolation as error:
+                        raise DuplicatePlugin(error.field)
             except KeyError:
                 try:
                     with self.plugin_storage as storage:
                         storage.create_boefje(boefje)
-                except IntegrityError as error:
-                    raise DuplicatePlugin(self._translate_duplicate_plugin(error.message))
-
-    def _translate_duplicate_plugin(self, error_message):
-        translations = {"boefje_plugin_id": "id", "boefje_name": "name"}
-        return next((value for key, value in translations.items() if key in error_message), None)
+                except UniqueViolation as error:
+                    raise DuplicatePlugin(error.field)
 
     def create_normalizer(self, normalizer: Normalizer) -> None:
         try:
             self.local_repo.by_id(normalizer.id)
-            raise DuplicatePlugin("id")
+            raise DuplicatePlugin(field="id")
         except KeyError:
             try:
                 plugin = self.local_repo.by_name(normalizer.name)
 
                 if plugin.types == "normalizer":
-                    raise DuplicatePlugin("name")
+                    raise DuplicatePlugin(field="name")
                 else:
                     self.plugin_storage.create_normalizer(normalizer)
             except KeyError:
@@ -177,12 +173,12 @@ class PluginService:
         # We don't check the schema anymore because we can provide entries through the global environment as well
 
     def schema(self, plugin_id: str) -> dict | None:
-        try:
-            boefje = self.plugin_storage.boefje_by_id(plugin_id)
+        plugin = self._get_all_without_enabled().get(plugin_id)
 
-            return boefje.boefje_schema
-        except PluginNotFound:
-            return self.local_repo.schema(plugin_id)
+        if plugin is None or not isinstance(plugin, Boefje):
+            return None
+
+        return plugin.boefje_schema
 
     def cover(self, plugin_id: str) -> Path:
         try:
@@ -212,8 +208,8 @@ class PluginService:
 
         self.config_storage.upsert(organisation_id, plugin_id, enabled=enabled)
 
-    def _assert_settings_match_schema(self, all_settings: dict, plugin_id: str):
-        schema = self.schema(plugin_id)
+    def _assert_settings_match_schema(self, all_settings: dict, plugin_id: str, organisation_id: str):
+        schema = self.by_plugin_id(plugin_id, organisation_id).boefje_schema
 
         if schema:  # No schema means that there is nothing to assert
             try:
