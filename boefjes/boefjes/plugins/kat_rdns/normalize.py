@@ -18,7 +18,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         return
     if answers.startswith("NoAuthServersReachable:"):
         ft = KATFindingType(id="KAT-LAME-DELEGATION")
-        f = Finding(finding_type=ft.reference, ooi=ooi.reference, description=answer.split(':')[1])
+        f = Finding(finding_type=ft.reference, ooi=ooi.reference, description=answer.split(":", 1)[1])
         yield ft
         yield f
     else:
