@@ -51,7 +51,10 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
                 messages.error(self.request, error.message)
             return
 
-        self.bytes_client.upload_raw(schema_answer.encode(), {"answer", f"{self.ooi.schema_id}"}, self.ooi.ooi)
+        raw = json.dumps(
+            {"schema": self.ooi.schema_id, "answer": parsed_schema_answer, "answer_ooi": self.ooi.ooi}
+        ).encode()
+        self.bytes_client.upload_raw(raw, {"answer"}, self.ooi.primary_key)
         messages.success(self.request, _("Question has been answered."))
 
     def start_boefje_scan(self) -> None:
