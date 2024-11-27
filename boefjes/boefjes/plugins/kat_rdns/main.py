@@ -1,6 +1,6 @@
 import dns
-from dns.resolver import Answer
 from dns.edns import EDEOption
+from dns.resolver import Answer
 
 from boefjes.config import settings
 from boefjes.job_models import BoefjeMeta
