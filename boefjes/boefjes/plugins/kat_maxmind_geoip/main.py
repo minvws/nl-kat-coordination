@@ -6,6 +6,7 @@ import re
 import shutil
 import tarfile
 from datetime import datetime, timezone
+from ipaddress import ip_address
 from os import getenv
 from pathlib import Path
 
@@ -25,8 +26,13 @@ REQUEST_TIMEOUT = 30
 
 def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]
+    ip = input_["address"]
     hash_algorithm = getenv("HASHFUNC", HASHFUNC)
 
+    # if the address is private, we do not need a Location
+    if not ip_address(ip).is_global:
+        return [(set(), json.dumps("IP address is private, no location possible"))]
+    
     if not geoip_file_exists() or cache_out_of_date():
         geoip_meta = refresh_geoip(hash_algorithm)
     else:
