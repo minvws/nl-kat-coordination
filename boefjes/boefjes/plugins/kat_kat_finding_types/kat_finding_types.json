@@ -508,6 +508,6 @@
     "risk": "recommendation",
     "source": "Check the nameservers of the host or iprange manually.",
     "impact": "No resolving can be done for this IP or host. This might cause problems for mailservers or slow down connections.",
-    "recommendation": "Verify that the listed nameservers are reachable and have valid hostnames."    
+    "recommendation": "Verify that the listed nameservers are reachable and have valid hostnames."
   }
 }
