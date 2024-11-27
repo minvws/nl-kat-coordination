@@ -3,11 +3,10 @@ from datetime import datetime
 from sqlalchemy import exc
 
 from scheduler import models
-
-from .errors import StorageError, exception_handler
-from .filters import FilterRequest, apply_filter
-from .storage import DBConn
-from .utils import retry
+from scheduler.storage import DBConn
+from scheduler.storage.errors import StorageError, exception_handler
+from scheduler.storage.filters import FilterRequest, apply_filter
+from scheduler.storage.utils import retry
 
 
 class ScheduleStore:
@@ -22,7 +21,7 @@ class ScheduleStore:
         self,
         scheduler_id: str | None = None,
         schedule_hash: str | None = None,
-        enabled: bool | None = None,
+        enabled: bool | None = True,  # FIXME: None?
         min_deadline_at: datetime | None = None,
         max_deadline_at: datetime | None = None,
         min_created_at: datetime | None = None,
