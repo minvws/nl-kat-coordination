@@ -46,7 +46,18 @@ class PluginService:
     def get_all(self, organisation_id: str) -> list[PluginType]:
         all_plugins = self._get_all_without_enabled()
 
-        return [self._set_plugin_enabled(plugin, organisation_id) for plugin in all_plugins.values()]
+        for plugin_id in self.config_storage.get_enabled_boefjes(organisation_id):
+            if plugin_id not in all_plugins:
+                continue
+            all_plugins[plugin_id].enabled = True
+
+        for plugin_id in self.config_storage.get_enabled_normalizers(organisation_id):
+            if plugin_id not in all_plugins:
+                continue
+
+            all_plugins[plugin_id].enabled = True
+
+        return list(all_plugins.values())
 
     def _get_all_without_enabled(self) -> dict[str, PluginType]:
         all_plugins = {plugin.id: plugin for plugin in self.plugin_storage.get_all()}
@@ -216,12 +227,6 @@ class PluginService:
                 validate(instance=all_settings, schema=schema)
             except ValidationError as e:
                 raise SettingsNotConformingToSchema(plugin_id, e.message) from e
-
-    def _set_plugin_enabled(self, plugin: PluginType, organisation_id: str) -> PluginType:
-        with contextlib.suppress(KeyError, NotFound):
-            plugin.enabled = self.config_storage.is_enabled_by_id(plugin.id, organisation_id)
-
-        return plugin
 
 
 def get_plugin_service() -> Iterator[PluginService]:

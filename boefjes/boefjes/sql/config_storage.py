@@ -99,6 +99,19 @@ class SQLConfigStorage(SessionMixin, ConfigStorage):
 
         return [x.plugin_id for x in enabled_boefjes.all()]
 
+    def get_enabled_normalizers(self, organisation_id: str) -> list[str]:
+        enabled_normalizers = (
+            self.session.query(NormalizerInDB)
+            .join(NormalizerConfigInDB)
+            .filter(NormalizerConfigInDB.normalizer_id == NormalizerInDB.id)
+            .join(OrganisationInDB)
+            .filter(NormalizerConfigInDB.organisation_pk == OrganisationInDB.pk)
+            .filter(OrganisationInDB.id == organisation_id)
+            .filter(NormalizerConfigInDB.enabled)
+        )
+
+        return [x.plugin_id for x in enabled_normalizers.all()]
+
     def _db_instance_by_id(self, organisation_id: str, plugin_id: str) -> BoefjeConfigInDB | NormalizerConfigInDB:
         instance = (
             self.session.query(BoefjeConfigInDB)
