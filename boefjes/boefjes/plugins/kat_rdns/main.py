@@ -28,9 +28,11 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
         # https://www.rfc-editor.org/rfc/rfc8914#name-extended-dns-error-code-6-d
         firsterror = error.kwargs["errors"][0]
         if firsterror[3] == "SERVFAIL":
-            for edeerror in firsterror[4].options:                
-                if int(edeerror.code) == 22:  # Auth nameserver for ip could not be reached, error codes defined in RFC 8914
-                    return [(set(), "NoAuthServersReachable:" + edeerror.text)]  # returned when the resolver indicates a Lame delegation.
+            for edeerror in firsterror[4].options:
+                if int(edeerror.code) == 22:
+                    # Auth nameserver for ip could not be reached, error codes defined in RFC 8914
+                    return [(set(), "NoAuthServersReachable:" + edeerror.text)]  
+                    # returned when the resolver indicates a Lame delegation.
         return [(set(), "SERVFAIL")]
     except (dns.resolver.Timeout, dns.resolver.NoAnswer):
         return [(set(), "NoAnswer")]
