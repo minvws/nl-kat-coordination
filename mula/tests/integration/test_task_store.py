@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import context, models, storage
+from scheduler import config, models, storage
 from scheduler.storage import stores
 
 from tests.factories import OrganisationFactory
@@ -14,7 +14,7 @@ class StoreTestCase(unittest.TestCase):
     def setUp(self):
         # Application Context
         self.mock_ctx = mock.patch("scheduler.context.AppContext").start()
-        self.mock_ctx.config = context.settings.Settings()
+        self.mock_ctx.config = config.settings.Settings()
 
         # Database
         self.dbconn = storage.DBConn(str(self.mock_ctx.config.db_uri))

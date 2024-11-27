@@ -6,7 +6,7 @@ import unittest
 import uuid
 from unittest import mock
 
-from scheduler import context, models, storage
+from scheduler import config, models, storage
 from scheduler.schedulers.queue import InvalidItemError, ItemNotFoundError, NotAllowedError, QueueEmptyError
 from scheduler.storage import stores
 
@@ -16,7 +16,7 @@ from tests.utils import functions
 
 class PriorityQueueTestCase(unittest.TestCase):
     def setUp(self) -> None:
-        cfg = context.settings.Settings()
+        cfg = config.settings.Settings()
 
         # Database
         self.dbconn = storage.DBConn(str(cfg.db_uri))

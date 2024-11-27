@@ -4,7 +4,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 import scheduler
-from scheduler import context, models, server, storage
+from scheduler import config, models, server, storage
 from scheduler.storage import stores
 
 from tests.factories import OrganisationFactory
@@ -15,7 +15,7 @@ class AppTestCase(unittest.TestCase):
     def setUp(self):
         # Application Context
         self.mock_ctx = mock.patch("scheduler.context.AppContext").start()
-        self.mock_ctx.config = context.settings.Settings()
+        self.mock_ctx.config = config.settings.Settings()
         self.mock_ctx.services.katalogus = MockKatalogusService()
 
         # Database

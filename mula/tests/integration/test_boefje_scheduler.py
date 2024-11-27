@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import clients, context, models, schedulers, storage
+from scheduler import clients, config, models, schedulers, storage
 from scheduler.storage import stores
 from structlog.testing import capture_logs
 
@@ -22,7 +22,7 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
     def setUp(self):
         # Application Context
         self.mock_ctx = mock.patch("scheduler.context.AppContext").start()
-        self.mock_ctx.config = context.settings.Settings()
+        self.mock_ctx.config = config.settings.Settings()
 
         # Mock connectors: octopoes
         self.mock_octopoes = mock.create_autospec(spec=clients.Octopoes, spec_set=True)

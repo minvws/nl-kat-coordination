@@ -7,7 +7,7 @@ from unittest import mock
 from urllib.parse import quote
 
 from fastapi.testclient import TestClient
-from scheduler import context, models, server, storage, utils
+from scheduler import config, models, server, storage, utils
 from scheduler.server import serializers
 from scheduler.storage import stores
 
@@ -22,7 +22,7 @@ class APITemplateTestCase(unittest.TestCase):
     def setUp(self):
         # Application Context
         self.mock_ctx = mock.patch("scheduler.context.AppContext").start()
-        self.mock_ctx.config = context.settings.Settings()
+        self.mock_ctx.config = config.settings.Settings()
 
         # Database
         self.dbconn = storage.DBConn(str(self.mock_ctx.config.db_uri))

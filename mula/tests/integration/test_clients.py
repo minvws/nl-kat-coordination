@@ -3,7 +3,7 @@ import time
 import unittest
 from unittest import mock
 
-from scheduler import clients, context, models, storage
+from scheduler import clients, config, models, storage
 from scheduler.utils import remove_trailing_slash
 
 from tests.factories import PluginFactory
@@ -11,7 +11,7 @@ from tests.factories import PluginFactory
 
 class BytesTestCase(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = context.settings.Settings()
+        self.config = config.settings.Settings()
         self.service_bytes = clients.Bytes(
             host=remove_trailing_slash(str(self.config.host_bytes)),
             user=self.config.host_bytes_user,
@@ -43,7 +43,7 @@ class BytesTestCase(unittest.TestCase):
 
 class KatalogusTestCase(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = context.settings.Settings()
+        self.config = config.settings.Settings()
         self.dbconn = storage.DBConn(str(self.config.db_uri))
         self.dbconn.connect()
 
