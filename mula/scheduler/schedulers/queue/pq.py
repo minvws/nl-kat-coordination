@@ -58,7 +58,7 @@ class PriorityQueue(abc.ABC):
         pq_id: str,
         maxsize: int,
         item_type: Any,
-        pq_store: storage.PriorityQueueStore,
+        pq_store: storage.stores.PriorityQueueStore,
         allow_replace: bool = False,
         allow_updates: bool = False,
         allow_priority_updates: bool = False,
@@ -94,7 +94,7 @@ class PriorityQueue(abc.ABC):
         self.allow_replace: bool = allow_replace
         self.allow_updates: bool = allow_updates
         self.allow_priority_updates: bool = allow_priority_updates
-        self.pq_store: storage.PriorityQueueStore = pq_store
+        self.pq_store: storage.stores.PriorityQueueStore = pq_store
         self.lock: threading.Lock = threading.Lock()
 
     def pop(self, filters: storage.filters.FilterRequest | None = None) -> models.Task | None:
