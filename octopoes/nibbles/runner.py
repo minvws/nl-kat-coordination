@@ -44,7 +44,7 @@ def nibble_hasher(data: Iterable) -> str:
                 else json.dumps(ooi, sort_keys=True)
                 for ooi in data
             ]
-        ).encode()
+        )
     )
 
 
