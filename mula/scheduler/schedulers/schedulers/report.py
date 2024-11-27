@@ -7,7 +7,7 @@ import structlog
 from opentelemetry import trace
 
 from scheduler import context, storage
-from scheduler.models import Organisation, ReportTask, Task
+from scheduler.models import Organisation, ReportTask, Task, TaskStatus
 from scheduler.schedulers import Scheduler
 from scheduler.schedulers.queue import PriorityQueue, QueueFullError
 from scheduler.storage import filters
@@ -87,6 +87,30 @@ class ReportScheduler(Scheduler):
         ) as executor:
             for schedule in schedules:
                 report_task = ReportTask.model_validate(schedule.data)
+
+                # When the schedule has no schedule, but a task is
+                # already executed we should not push the task again
+                task_db = None
+                try:
+                    task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(report_task.hash)
+                    if task_db and schedule.schedule is None:
+                        self.logger.debug(
+                            "Schedule has no schedule, but task already executed",
+                            schedule_id=schedule.id,
+                            scheduler_id=self.scheduler_id,
+                            organisation_id=self.organisation.id,
+                        )
+                        continue
+                except storage.errors.StorageError as exc_db:
+                    self.logger.error(
+                        "Could not get latest task by hash %s",
+                        report_task.hash,
+                        scheduler_id=self.scheduler_id,
+                        organisation_id=self.organisation.id,
+                        exc_info=exc_db,
+                    )
+                    continue
+
                 executor.submit(self.push_report_task, report_task, self.push_tasks_for_rescheduling.__name__)
 
     def push_report_task(self, report_task: ReportTask, caller: str = "") -> None:
@@ -97,6 +121,16 @@ class ReportScheduler(Scheduler):
             scheduler_id=self.scheduler_id,
             caller=caller,
         )
+
+        if self.has_report_task_started_running(report_task):
+            self.logger.debug(
+                "Report task already running",
+                task_hash=report_task.hash,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+                caller=caller,
+            )
+            return
 
         if self.is_item_on_queue_by_hash(report_task.hash):
             self.logger.debug(
@@ -139,3 +173,28 @@ class ReportScheduler(Scheduler):
             scheduler_id=self.scheduler_id,
             caller=caller,
         )
+
+    def has_report_task_started_running(self, task: ReportTask) -> bool:
+        task_db = None
+        try:
+            task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
+        except storage.errors.StorageError as exc_db:
+            self.logger.error(
+                "Could not get latest task by hash %s",
+                task.hash,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+                exc_info=exc_db,
+            )
+            raise exc_db
+
+        if task_db is not None and task_db.status not in [TaskStatus.FAILED, TaskStatus.COMPLETED]:
+            self.logger.debug(
+                "Task is still running, according to the datastore",
+                task_id=task_db.id,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+            )
+            return True
+
+        return False
