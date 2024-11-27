@@ -67,27 +67,27 @@ class NibblesRunner:
 
     def _run(self, ooi: OOI, valid_time: datetime) -> dict[str, dict[tuple, set[OOI]]]:
         return_value: dict[str, dict[tuple, set[OOI]]] = {}
-        nibblettes = self.origin_repository.list_origins(
-            valid_time, origin_type=OriginType.NIBBLETTE, parameters_references=[ooi.reference]
+        nibblets = self.origin_repository.list_origins(
+            valid_time, origin_type=OriginType.NIBBLET, parameters_references=[ooi.reference]
         )
-        if nibblettes:
-            for nibblette in nibblettes:
-                # INFO: we do not strictly need this if statement because OriginType.NIBBLETTES \
+        if nibblets:
+            for nibblet in nibblets:
+                # INFO: we do not strictly need this if statement because OriginType.NIBBLETS \
                 # always have parameters_references but it makes the linters super happy
-                if nibblette.parameters_references:
-                    nibble = self.nibbles[nibblette.method]
+                if nibblet.parameters_references:
+                    nibble = self.nibbles[nibblet.method]
                     args = self.ooi_repository.nibble_query(
                         ooi,
                         nibble,
                         valid_time,
-                        nibblette.parameters_references
+                        nibblet.parameters_references
                         if nibble.query is not None and nibble.query.count("$") > 0
                         else [],
                     )
                     results = {
                         tuple(arg): set(flatten([nibble(arg)]))
                         for arg in args
-                        if nibblette.parameters_hash != nibble_hasher(arg)
+                        if nibblet.parameters_hash != nibble_hasher(arg)
                     }
                     return_value |= {nibble.id: results}
         else:
@@ -112,7 +112,7 @@ class NibblesRunner:
                     for arg, result in run_result.items():
                         nibble_origin = Origin(
                             method=nibble_id,
-                            origin_type=OriginType.NIBBLETTE,
+                            origin_type=OriginType.NIBBLET,
                             source=source_ooi.reference,
                             result=[ooi.reference for ooi in result],
                             parameters_hash=nibble_hasher(arg),

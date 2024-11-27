@@ -172,7 +172,7 @@ class OctopoesService:
             self.ooi_repository.get(origin.source, valid_time)
         except ObjectNotFoundException:
             if (
-                origin.origin_type not in [OriginType.DECLARATION, OriginType.AFFIRMATION, OriginType.NIBBLETTE]
+                origin.origin_type not in [OriginType.DECLARATION, OriginType.AFFIRMATION, OriginType.NIBBLET]
                 and origin.source not in origin.result
             ):
                 raise ValueError(f"Origin source [{origin.source}] does not exist")

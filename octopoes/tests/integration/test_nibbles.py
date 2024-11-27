@@ -191,15 +191,15 @@ def test_find_network_url_nibble(xtdb_octopoes_service: OctopoesService, event_m
     assert result[network1]["find_network_url"][tuple([network1, xtdb_url2])] == set()
     assert result[network1]["find_network_url"][tuple([network2, xtdb_url2])] == set()
 
-    nibblettes = xtdb_octopoes_service.origin_repository.list_origins(
-        origin_type=OriginType.NIBBLETTE, valid_time=valid_time
+    nibblets = xtdb_octopoes_service.origin_repository.list_origins(
+        origin_type=OriginType.NIBBLET, valid_time=valid_time
     )
 
-    assert len(nibblettes) == 4
-    for nibblette in nibblettes:
-        assert nibblette.parameters_references is not None
-        arg = [xtdb_octopoes_service.ooi_repository.get(obj, valid_time) for obj in nibblette.parameters_references]
-        assert nibblette.parameters_hash == nibble_hasher(tuple(arg))
-        if nibblette.result:
-            assert len(nibblette.result) == 1
-            assert nibblette.result == [t.reference for t in target]
+    assert len(nibblets) == 4
+    for nibblet in nibblets:
+        assert nibblet.parameters_references is not None
+        arg = [xtdb_octopoes_service.ooi_repository.get(obj, valid_time) for obj in nibblet.parameters_references]
+        assert nibblet.parameters_hash == nibble_hasher(tuple(arg))
+        if nibblet.result:
+            assert len(nibblet.result) == 1
+            assert nibblet.result == [t.reference for t in target]

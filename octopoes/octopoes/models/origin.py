@@ -11,7 +11,7 @@ class OriginType(Enum):
     OBSERVATION = "observation"
     INFERENCE = "inference"
     AFFIRMATION = "affirmation"
-    NIBBLETTE = "nibblette"
+    NIBBLET = "nibblet"
 
 
 class Origin(BaseModel):
@@ -32,7 +32,7 @@ class Origin(BaseModel):
 
     @property
     def id(self) -> str:
-        if self.origin_type == OriginType.NIBBLETTE:
+        if self.origin_type == OriginType.NIBBLET:
             return "|".join(
                 map(
                     str,
