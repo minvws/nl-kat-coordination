@@ -46,15 +46,9 @@ class PluginService:
     def get_all(self, organisation_id: str) -> list[PluginType]:
         all_plugins = self._get_all_without_enabled()
 
-        for plugin_id in self.config_storage.get_enabled_boefjes(organisation_id):
+        for plugin_id in self.config_storage.get_enabled_plugins(organisation_id):
             if plugin_id not in all_plugins:
                 continue
-            all_plugins[plugin_id].enabled = True
-
-        for plugin_id in self.config_storage.get_enabled_normalizers(organisation_id):
-            if plugin_id not in all_plugins:
-                continue
-
             all_plugins[plugin_id].enabled = True
 
         return list(all_plugins.values())

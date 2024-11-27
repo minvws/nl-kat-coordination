@@ -88,7 +88,7 @@ class SQLConfigStorage(SessionMixin, ConfigStorage):
 
     def get_enabled_boefjes(self, organisation_id: str) -> list[str]:
         enabled_boefjes = (
-            self.session.query(BoefjeInDB)
+            self.session.query(BoefjeInDB.plugin_id)
             .join(BoefjeConfigInDB)
             .filter(BoefjeConfigInDB.boefje_id == BoefjeInDB.id)
             .join(OrganisationInDB)
@@ -96,12 +96,11 @@ class SQLConfigStorage(SessionMixin, ConfigStorage):
             .filter(OrganisationInDB.id == organisation_id)
             .filter(BoefjeConfigInDB.enabled)
         )
-
-        return [x.plugin_id for x in enabled_boefjes.all()]
+        return [x[0] for x in enabled_boefjes.all()]
 
     def get_enabled_normalizers(self, organisation_id: str) -> list[str]:
         enabled_normalizers = (
-            self.session.query(NormalizerInDB)
+            self.session.query(NormalizerInDB.plugin_id)
             .join(NormalizerConfigInDB)
             .filter(NormalizerConfigInDB.normalizer_id == NormalizerInDB.id)
             .join(OrganisationInDB)
@@ -110,7 +109,29 @@ class SQLConfigStorage(SessionMixin, ConfigStorage):
             .filter(NormalizerConfigInDB.enabled)
         )
 
-        return [x.plugin_id for x in enabled_normalizers.all()]
+        return [x[0] for x in enabled_normalizers.all()]
+
+    def get_enabled_plugins(self, organisation_id: str) -> list[str]:
+        enabled_boefjes = (
+            self.session.query(BoefjeInDB.plugin_id)
+            .join(BoefjeConfigInDB)
+            .filter(BoefjeConfigInDB.boefje_id == BoefjeInDB.id)
+            .join(OrganisationInDB)
+            .filter(BoefjeConfigInDB.organisation_pk == OrganisationInDB.pk)
+            .filter(OrganisationInDB.id == organisation_id)
+            .filter(BoefjeConfigInDB.enabled)
+        )
+        enabled_normalizers = (
+            self.session.query(NormalizerInDB.plugin_id)
+            .join(NormalizerConfigInDB)
+            .filter(NormalizerConfigInDB.normalizer_id == NormalizerInDB.id)
+            .join(OrganisationInDB)
+            .filter(NormalizerConfigInDB.organisation_pk == OrganisationInDB.pk)
+            .filter(OrganisationInDB.id == organisation_id)
+            .filter(NormalizerConfigInDB.enabled)
+        )
+
+        return [x[0] for x in enabled_boefjes.union_all(enabled_normalizers).all()]
 
     def _db_instance_by_id(self, organisation_id: str, plugin_id: str) -> BoefjeConfigInDB | NormalizerConfigInDB:
         instance = (
