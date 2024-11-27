@@ -3,11 +3,10 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy import exc, func
 
 from scheduler import models
-
-from .errors import StorageError, exception_handler
-from .filters import FilterRequest, apply_filter
-from .storage import DBConn
-from .utils import retry
+from scheduler.storage import DBConn
+from scheduler.storage.errors import StorageError, exception_handler
+from scheduler.storage.filters import FilterRequest, apply_filter
+from scheduler.storage.utils import retry
 
 
 class TaskStore:
@@ -74,14 +73,14 @@ class TaskStore:
 
     @retry()
     @exception_handler
-    def get_tasks_by_hash(self, task_hash: str) -> list[models.Task] | None:
+    def get_tasks_by_hash(self, task_hash: str, limit: int | None = None) -> list[models.Task] | None:
         with self.dbconn.session.begin() as session:
-            tasks_orm = (
-                session.query(models.TaskDB)
-                .filter(models.TaskDB.hash == task_hash)
-                .order_by(models.TaskDB.created_at.desc())
-                .all()
-            )
+            query = session.query(models.TaskDB).filter(models.TaskDB.hash == task_hash)
+
+            if limit is not None:
+                query = query.limit(limit)
+
+            tasks_orm = query.order_by(models.TaskDB.created_at.desc()).all()
 
             if tasks_orm is None:
                 return None
