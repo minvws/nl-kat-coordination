@@ -339,6 +339,22 @@ def save_declaration(declaration: ValidatedDeclaration, octopoes: OctopoesServic
     octopoes.commit()
 
 
+@router.post("/declarations/save_many", tags=["Origins"])
+def save_many_declarations(declarations: list[ValidatedDeclaration], octopoes: OctopoesService = Depends(octopoes_service)) -> None:
+    for declaration in declarations:
+        origin = Origin(
+            origin_type=OriginType.DECLARATION,
+            method=declaration.method if declaration.method else "manual",
+            source=declaration.ooi.reference,
+            source_method=declaration.source_method,
+            result=[declaration.ooi.reference],
+            task_id=declaration.task_id if declaration.task_id else uuid.uuid4(),
+        )
+        octopoes.save_origin(origin, [declaration.ooi], declaration.valid_time, declaration.end_valid_time)
+
+    octopoes.commit()
+
+
 @router.post("/affirmations", tags=["Origins"])
 def save_affirmation(affirmation: ValidatedAffirmation, octopoes: OctopoesService = Depends(octopoes_service)) -> None:
     origin = Origin(
