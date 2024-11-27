@@ -38,7 +38,6 @@ class NormalizerScheduler(Scheduler):
     ):
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.organisation: Organisation = organisation
-        self.create_schedule = False
 
         self.queue = queue or PriorityQueue(
             pq_id=scheduler_id,
@@ -48,7 +47,14 @@ class NormalizerScheduler(Scheduler):
             pq_store=ctx.datastores.pq_store,
         )
 
-        super().__init__(ctx=ctx, queue=self.queue, scheduler_id=scheduler_id, callback=callback)
+        super().__init__(
+            ctx=ctx,
+            queue=self.queue,
+            scheduler_id=scheduler_id,
+            callback=callback,
+            create_schedule=False,
+            auto_calculate_deadline=False,
+        )
 
         self.ranker = NormalizerRanker(ctx=self.ctx)
 
