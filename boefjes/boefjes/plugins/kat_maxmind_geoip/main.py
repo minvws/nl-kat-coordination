@@ -42,7 +42,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     geoip_path = find_geoip_path()
 
     with maxminddb.open_database(geoip_path) as reader:
-        results = reader.get(input_["address"])
+        results = reader.get(ip)
 
     return [({"maxmind-geoip/geo_data"}, json.dumps(results)), ({"maxmind-geoip/cache-meta"}, json.dumps(geoip_meta))]
 
