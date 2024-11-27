@@ -4,7 +4,8 @@ import fastapi
 import structlog
 from fastapi import status
 
-from scheduler import context, models, queues, schedulers, storage
+from scheduler import context, models, schedulers, storage
+from scheduler.schedulers.queue import NotAllowedError, QueueEmptyError, QueueFullError
 from scheduler.server import serializers
 from scheduler.server.errors import BadRequestError, ConflictError, NotFoundError, TooManyRequestsError
 
@@ -70,7 +71,7 @@ class QueueAPI:
 
         try:
             item = s.pop_item_from_queue(filters)
-        except queues.QueueEmptyError:
+        except QueueEmptyError:
             return None
 
         if item is None:
@@ -94,9 +95,9 @@ class QueueAPI:
             pushed_item = s.push_item_to_queue(new_item)
         except ValueError:
             raise BadRequestError("malformed item")
-        except queues.QueueFullError:
+        except QueueFullError:
             raise TooManyRequestsError("queue is full")
-        except queues.errors.NotAllowedError:
+        except NotAllowedError:
             raise ConflictError("queue is not allowed to push items")
 
         return pushed_item

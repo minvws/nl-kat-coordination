@@ -9,6 +9,7 @@ from urllib.parse import quote
 from fastapi.testclient import TestClient
 from scheduler import config, models, server, storage, utils
 from scheduler.server import serializers
+from scheduler.storage import stores
 
 from tests.factories import OrganisationFactory
 from tests.mocks import queue as mock_queue
@@ -31,9 +32,9 @@ class APITemplateTestCase(unittest.TestCase):
 
         self.mock_ctx.datastores = SimpleNamespace(
             **{
-                storage.TaskStore.name: storage.TaskStore(self.dbconn),
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
-                storage.ScheduleStore.name: storage.ScheduleStore(self.dbconn),
+                stores.TaskStore.name: stores.TaskStore(self.dbconn),
+                stores.PriorityQueueStore.name: stores.PriorityQueueStore(self.dbconn),
+                stores.ScheduleStore.name: stores.ScheduleStore(self.dbconn),
             }
         )
 
