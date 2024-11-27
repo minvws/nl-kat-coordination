@@ -114,7 +114,7 @@ docs:
 	$(call build-settings-doc,octopoes,octopoes.config.settings,octopoes,Octopoes)
 	$(call build-settings-doc,boefjes,boefjes.config,boefjes,Boefjes)
 	$(call build-settings-doc,bytes,bytes.config,bytes,Bytes)
-	$(call build-settings-doc,mula/scheduler,context.settings,mula,Mula)
+	$(call build-settings-doc,mula/scheduler,scheduler.context.settings,mula,Mula)
 
 	curl -sL -o - https://registry.npmjs.org/d3/-/d3-7.9.0.tgz | tar -Oxzf - package/dist/d3.min.js > docs/source/_static/d3.min.js
 	curl -sL -o - https://registry.npmjs.org/mermaid/-/mermaid-11.3.0.tgz | tar -Oxzf - package/dist/mermaid.min.js > docs/source/_static/mermaid.min.js
