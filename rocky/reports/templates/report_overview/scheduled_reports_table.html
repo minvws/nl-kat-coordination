@@ -1,6 +1,9 @@
 {% load i18n %}
+{% load static %}
 {% load ooi_extra %}
 {% load report_extra %}
+{% load compress %}
+{% load component_tags %}
 
 {% if scheduled_reports %}
     <p class="de-emphasized">
@@ -11,10 +14,10 @@
             <caption class="visually-hidden">{% translate "Scheduled reports:" %}</caption>
             <thead>
                 <tr>
-                    <th scope="col">{% translate "Report Name" %}</th>
-                    <th scope="col">{% translate "Report types" %}</th>
-                    <th scope="col">{% translate "Scheduled for" %}</th>
+                    <th scope="col">{% translate "Name" %}</th>
+                    <th scope="col">{% translate "Report type" %}</th>
                     <th scope="col">{% translate "Recurrence" %}</th>
+                    <th scope="col">{% translate "Schedule status" %}</th>
                     <th scope="col" class="actions"></th>
                 </tr>
             </thead>
@@ -41,12 +44,18 @@
                                     {% endif %}
                                 </ul>
                             </td>
-                            <td class="nowrap">{{ schedule.deadline_at }}</td>
                             <td class="nowrap">
                                 {% if schedule.cron is None %}
                                     {% translate "Once" %}
                                 {% else %}
                                     {{ schedule.cron }}
+                                {% endif %}
+                            </td>
+                            <td class="nowrap">
+                                {% if schedule.enabled %}
+                                    <span class="label system-tag color-2">{% translate "Enabled" %}</span>
+                                {% else %}
+                                    <span class="label system-tag color-3">{% translate "Disabled" %}</span>
                                 {% endif %}
                             </td>
                             <td class="actions">
@@ -66,10 +75,8 @@
                                         <thead>
                                             <tr>
                                                 <th scope="col" class="nowrap">{% translate "Name" %}</th>
-                                                <th scope="col">{% translate "Report type" %}</th>
-                                                <th scope="col">{% translate "Input object" %}</th>
+                                                <th scope="col">{% translate "Input" %}</th>
                                                 <th scope="col" class="nowrap">{% translate "Reference date" %}</th>
-                                                <th scope="col" class="nowrap">{% translate "Creation date" %}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -80,27 +87,32 @@
                                                            title="{% translate "Show report details" %}">{{ report.name }}</a>
                                                     </td>
                                                     <td>
-                                                        <span class="label tags-color-{{ report.report_type|get_report_type_label_style }}">{{ report.report_type|get_report_type_name }}</span>
-                                                    </td>
-                                                    <td>
                                                         {% if report.input_oois|length == 1 %}
                                                             {% with ooi=report.input_oois.0 %}
                                                                 <a href="{% ooi_url 'ooi_detail' ooi organization.code query=ooi.mandatory_fields %}">{{ ooi|human_readable }}</a>
                                                             {% endwith %}
                                                         {% else %}
-                                                            {{ report.input_oois|length }}
+                                                            {{ report.input_oois|length }} {% translate "objects" %}
                                                         {% endif %}
                                                     </td>
                                                     <td class="nowrap">{{ report.observed_at|date }}</td>
-                                                    <td class="nowrap">{{ report.date_generated }}</td>
                                                 </tr>
                                             {% endfor %}
                                         </tbody>
                                     </table>
                                 {% endif %}
-                                <div class="horizontal-view toolbar">
-                                    <a class="button ghost"
-                                       href="{% ooi_url "ooi_edit" schedule.recipe organization.code %}"><span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit report recipe" %}</a>
+                                <div class="button-container">
+                                    {% if schedule.enabled %}
+                                        <a class="button ghost"
+                                           href="{% ooi_url "ooi_edit" schedule.recipe organization.code %}"><span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit report recipe" %}</a>
+                                        <a class="button ghost destructive"
+                                           href="#disable-schedule-modal-{{ schedule.schedule_id }}">{% translate "Disable schedule" %}</a>
+                                    {% else %}
+                                        <a class="button"
+                                           href="{% url "enable_disable_scheduled_reports" organization.code %}?schedule_id={{ schedule.schedule_id }}">{% translate "Enable schedule" %}</a>
+                                        <a class="button ghost"
+                                           href="{% ooi_url "ooi_edit" schedule.recipe organization.code %}"><span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit report recipe" %}</a>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>
@@ -112,3 +124,8 @@
 {% else %}
     <p>{% translate "No scheduled reports have been generated yet." %}</p>
 {% endif %}
+{% block html_at_end_body %}
+    {% compress js %}
+        <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
+    {% endcompress %}
+{% endblock html_at_end_body %}

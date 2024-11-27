@@ -38,15 +38,6 @@ class ReportScheduleStartDateChoiceForm(BaseRockyForm):
     )
 
 
-class ReportScheduleStartDateForm(BaseRockyForm):
-    start_date = forms.DateTimeField(
-        label=_("Start date and time (UTC)"),
-        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
-        required=True,
-        initial=lambda: datetime.now().strftime("%Y-%m-%d %H:%M"),
-    )
-
-
 class ReportRecurrenceChoiceForm(BaseRockyForm):
     choose_recurrence = forms.ChoiceField(
         label="",
@@ -57,7 +48,23 @@ class ReportRecurrenceChoiceForm(BaseRockyForm):
     )
 
 
-class ReportScheduleRecurrenceForm(BaseRockyForm):
+class ReportScheduleStartDateForm(BaseRockyForm):
+    start_date = forms.DateField(
+        label=_("Start date"),
+        widget=DateInput(format="%Y-%m-%d", attrs={"form": "generate_report"}),
+        initial=lambda: datetime.now(tz=timezone.utc).date(),
+        required=True,
+        input_formats=["%Y-%m-%d"],
+    )
+
+    start_time = forms.TimeField(
+        label=_("Start time (UTC)"),
+        widget=forms.TimeInput(format="%H:%M", attrs={"form": "generate_report"}),
+        initial=lambda: datetime.now(tz=timezone.utc).time(),
+        required=True,
+        input_formats=["%H:%M"],
+    )
+
     recurrence = forms.ChoiceField(
         label=_("Recurrence"),
         required=True,
@@ -70,6 +77,17 @@ class ReportScheduleRecurrenceForm(BaseRockyForm):
             ("yearly", _("Yearly")),
         ],
     )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get("start_date")
+        start_time = cleaned_data.get("start_time")
+
+        if start_date and start_time:
+            start_datetime = datetime.combine(start_date, start_time)
+            cleaned_data["start_datetime"] = start_datetime
+
+        return cleaned_data
 
 
 class CustomReportScheduleForm(BaseRockyForm):

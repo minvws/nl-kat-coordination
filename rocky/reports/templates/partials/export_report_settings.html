@@ -18,24 +18,35 @@
             <form id="generate_report" class="inline" method="post" action="{{ next }}">
                 {% csrf_token %}
                 {% include "forms/report_form_fields.html" %}
+                {% include "partials/form/fieldset.html" with fields=report_schedule_form_start_date fieldset_parent_class="column-2" %}
 
-                <div class="column-2">
-                    <div>
-                        {% include "partials/form/fieldset.html" with fields=report_schedule_form_start_date %}
-
-                    </div>
-                    <div>
-                        {% include "partials/form/fieldset.html" with fields=report_schedule_form_recurrence %}
-
-                    </div>
+                <div>
+                    <h2>{% translate "Report name" %}</h2>
+                    <p>
+                        {% blocktranslate trimmed %}
+                            Define a custom name format for your report(s). This format will be applied to all generated
+                            (sub)reports.
+                        {% endblocktranslate %}
+                    </p>
+                    <p>
+                        {% blocktranslate trimmed %}
+                            To make the report names more descriptive, you can include placeholders for the
+                            object name, the report type and/or the reference date. For subreports and reports over a single object,
+                            use the placeholder "${ooi}" for the object name, "${report_type}" for the report type and use a
+                            <a href="https://strftime.org/" target="_blank" rel="noopener">Python strftime code</a> for the reference
+                            date. For reports over multiple objects, use "${oois_count}" for the number of objects in the report.
+                        {% endblocktranslate %}
+                    </p>
+                    <p>
+                        {% blocktranslate trimmed %}
+                            For example, the format "${report_type} for ${ooi} at %x" could generate:
+                            "DNS Report for example.com at 01/01/25".
+                        {% endblocktranslate %}
+                    </p>
                 </div>
-                {% include "partials/report_names_header.html" with recurrence=True %}
-
                 <fieldset>
                     <div>
-                        <label for="parent_report_name_format">
-                            {% translate "Report name format" %}
-                        </label>
+                        <label for="parent_report_name_format">{% translate "Report name format" %}</label>
                         <input type="text"
                                id="parent_report_name_format"
                                name="parent_report_name_format"
@@ -45,9 +56,7 @@
                 {% if not is_single_report %}
                     <fieldset>
                         <div>
-                            <label for="subreport_name_format">
-                                {% translate "Subreports name format" %}
-                            </label>
+                            <label for="subreport_name_format">{% translate "Subreports name format" %}</label>
                             <input type="text"
                                    id="subreport_name_format"
                                    name="subreport_name_format"

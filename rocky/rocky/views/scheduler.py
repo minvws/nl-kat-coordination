@@ -6,12 +6,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import Boefje, Normalizer
-from reports.forms import (
-    ReportRecurrenceChoiceForm,
-    ReportScheduleRecurrenceForm,
-    ReportScheduleStartDateChoiceForm,
-    ReportScheduleStartDateForm,
-)
+from reports.forms import ReportRecurrenceChoiceForm, ReportScheduleStartDateChoiceForm, ReportScheduleStartDateForm
 from tools.forms.scheduler import TaskFilterForm
 
 from octopoes.models import OOI
@@ -46,10 +41,9 @@ class SchedulerView(OctopoesView):
     task_filter_form = TaskFilterForm
 
     report_schedule_form_start_date_choice = ReportScheduleStartDateChoiceForm  # today or different date
-    report_schedule_form_start_date = ReportScheduleStartDateForm  # date widget
+    report_schedule_form_start_date_time_recurrence = ReportScheduleStartDateForm  # date, time and recurrence
 
     report_schedule_form_recurrence_choice = ReportRecurrenceChoiceForm  # once or repeat
-    report_schedule_form_recurrence = ReportScheduleRecurrenceForm  # select interval (daily, weekly, etc..)
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -91,14 +85,11 @@ class SchedulerView(OctopoesView):
     def get_report_schedule_form_start_date_choice(self):
         return self.report_schedule_form_start_date_choice(self.request.POST)
 
-    def get_report_schedule_form_start_date(self):
-        return self.report_schedule_form_start_date()
+    def get_report_schedule_form_start_date_time_recurrence(self):
+        return self.report_schedule_form_start_date_time_recurrence()
 
     def get_report_schedule_form_recurrence_choice(self):
         return self.report_schedule_form_recurrence_choice(self.request.POST)
-
-    def get_report_schedule_form_recurrence(self):
-        return self.report_schedule_form_recurrence()
 
     def get_task_details(self, task_id: str) -> Task | None:
         task = self.scheduler_client.get_task_details(task_id)
@@ -169,6 +160,12 @@ class SchedulerView(OctopoesView):
                     safe=False,
                 )
             return task
+        except SchedulerError as error:
+            return messages.error(self.request, error.message)
+
+    def get_schedule_details(self, schedule_id: str) -> ScheduleResponse:
+        try:
+            return self.scheduler_client.get_schedule_details(schedule_id)
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
@@ -251,9 +248,9 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             messages.error(self.request, error.message)
 
-    def convert_schedule_to_cron_expressions(self, start_date_time: datetime, recurrence: str) -> str:
+    def convert_recurrence_to_cron_expressions(self, recurrence: str, start_date_time: datetime) -> str:
         """
-        Because there is no time defined for the start date, we use midnight 00:00 for all expressions.
+        The user defines the start date and time.
         """
 
         if start_date_time and recurrence:
@@ -270,7 +267,7 @@ class SchedulerView(OctopoesView):
                 # Recurres every year on the {day} of the {month} at the selected time
             }
 
-            if 28 <= day <= 31:
+            if day >= 28:
                 cron_expr["monthly"] = f"{minute} {hour} L * *"
             else:
                 cron_expr["monthly"] = (

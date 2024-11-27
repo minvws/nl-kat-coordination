@@ -223,22 +223,8 @@ def redteamuser(django_user_model):
 
 
 @pytest.fixture
-def redteamuser_b(django_user_model):
-    return create_user(
-        django_user_model, "redteamerB@openkat.nl", "RedteamBRedteamB123!!", "Redteam B name", "default_redteam_b"
-    )
-
-
-@pytest.fixture
 def redteam_member(redteamuser, organization):
     member = create_member(redteamuser, organization)
-    add_redteam_group_permissions(member)
-    return member
-
-
-@pytest.fixture
-def redteam_member_b(redteamuser_b, organization_b):
-    member = create_member(redteamuser_b, organization_b)
     add_redteam_group_permissions(member)
     return member
 
@@ -329,14 +315,6 @@ def mock_organization_view_octopoes(mocker):
 @pytest.fixture
 def mock_crisis_room_octopoes(mocker):
     return mocker.patch("crisis_room.views.OctopoesAPIConnector")
-
-
-@pytest.fixture
-def lazy_task_list_empty() -> MagicMock:
-    mock = MagicMock()
-    mock.__getitem__.return_value = []
-    mock.count.return_value = 0
-    return mock
 
 
 @pytest.fixture
@@ -793,17 +771,6 @@ def tree_data_dns_findings():
             },
         },
     }
-
-
-@pytest.fixture
-def finding_type_kat_no_caa() -> KATFindingType:
-    return KATFindingType(
-        id="KAT-NO-CAA",
-        description="Fake description...",
-        recommendation="Fake recommendation...",
-        risk_score=9.5,
-        risk_severity=RiskLevelSeverity.CRITICAL,
-    )
 
 
 @pytest.fixture
@@ -1322,93 +1289,6 @@ def report_recipe():
     )
 
 
-@pytest.fixture
-def get_report_schedules():
-    report_schedule = [
-        {
-            "id": "06a783b3-af62-429d-8b48-5934c8702366",
-            "scheduler_id": "report-madelon123",
-            "hash": "f429f60fda539f9017544758163a955e",
-            "data": {
-                "type": "report",
-                "organisation_id": "madelon123",
-                "report_recipe_id": "6a121a53-f795-4bfe-9aea-f410a96fca59",
-            },
-            "enabled": "true",
-            "schedule": "0 * * * *",
-            "tasks": [
-                {
-                    "id": "21ce00b8-57c4-4d65-a53e-275b4e44da6f",
-                    "scheduler_id": "report-madelon123",
-                    "schedule_id": "06a783b3-af62-429d-8b48-5934c8702366",
-                    "priority": 1729520184,
-                    "status": "completed",
-                    "type": "report",
-                    "hash": "f429f60fda539f9017544758163a955e",
-                    "data": {
-                        "organisation_id": "madelon123",
-                        "report_recipe_id": "6a121a53-f795-4bfe-9aea-f410a96fca59",
-                    },
-                    "created_at": "2024-10-21T14:16:24.702759Z",
-                    "modified_at": "2024-10-21T14:16:24.702761Z",
-                },
-                {
-                    "id": "f63c2224-a4b2-4161-9790-9b4d665a4683",
-                    "scheduler_id": "report-madelon123",
-                    "schedule_id": "06a783b3-af62-429d-8b48-5934c8702366",
-                    "priority": 1729580020,
-                    "status": "completed",
-                    "type": "report",
-                    "hash": "f429f60fda539f9017544758163a955e",
-                    "data": {
-                        "organisation_id": "madelon123",
-                        "report_recipe_id": "6a121a53-f795-4bfe-9aea-f410a96fca59",
-                    },
-                    "created_at": "2024-10-22T06:53:40.405185Z",
-                    "modified_at": "2024-10-22T06:53:40.405192Z",
-                },
-            ],
-            "deadline_at": "2024-10-22T12:00:00Z",
-            "created_at": "2024-10-21T14:14:00.359039Z",
-            "modified_at": "2024-10-21T14:14:00.359043Z",
-        },
-        {
-            "id": "e9a00bc1-850a-401a-89d9-252d98823bb3",
-            "scheduler_id": "report-madelon123",
-            "hash": "02e67c8676cb8135681d52ca62a9fe5b",
-            "data": {
-                "type": "report",
-                "organisation_id": "madelon123",
-                "report_recipe_id": "31c79490-fb51-440d-9108-0c388276f655",
-            },
-            "enabled": "true",
-            "schedule": "0 0 * * *",
-            "tasks": [
-                {
-                    "id": "f4f938e0-5f2d-4bcd-9b28-11831b7835e4",
-                    "scheduler_id": "report-madelon123",
-                    "schedule_id": "e9a00bc1-850a-401a-89d9-252d98823bb3",
-                    "priority": 1729521145,
-                    "status": "completed",
-                    "type": "report",
-                    "hash": "02e67c8676cb8135681d52ca62a9fe5b",
-                    "data": {
-                        "organisation_id": "madelon123",
-                        "report_recipe_id": "31c79490-fb51-440d-9108-0c388276f655",
-                    },
-                    "created_at": "2024-10-21T14:32:25.247525Z",
-                    "modified_at": "2024-10-21T14:32:25.247527Z",
-                }
-            ],
-            "deadline_at": "2024-10-23T00:00:00Z",
-            "created_at": "2024-10-21T13:34:42.791561Z",
-            "modified_at": "2024-10-21T13:34:42.791563Z",
-        },
-    ]
-
-    return report_schedule
-
-
 def setup_request(request, user):
     request = SessionMiddleware(lambda r: r)(request)
     request.session[DEVICE_ID_SESSION_KEY] = user.staticdevice_set.get().persistent_id
@@ -1708,29 +1588,6 @@ def reports_more_input_oois():
             ],
         )
     ]
-
-
-def onboarding_collect_data():
-    return {
-        "Hostname|internet|mispo.es": {
-            "input_ooi": "Hostname|internet|mispo.es",
-            "records": [
-                {"type": "A", "ttl": 480, "name": "mispo.es", "content": "134.209.85.72"},
-                {"type": "MX", "ttl": 480, "name": "mispo.es", "content": "10 mx.wijmailenveilig.nl."},
-                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns1.domaindiscount24.net."},
-                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns2.domaindiscount24.net."},
-                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns3.domaindiscount24.net."},
-                {
-                    "type": "SOA",
-                    "ttl": 480,
-                    "name": "mispo.es",
-                    "content": "ns1.domaindiscount24.net. tech.key-systems.net. 2023012324 10800 3600 604800 3600",
-                },
-            ],
-            "security": {"spf": False, "dkim": False, "dmarc": False, "dnssec": False, "caa": False},
-            "finding_types": [],
-        }
-    }
 
 
 @pytest.fixture
@@ -2340,3 +2197,217 @@ def get_report_input_data_from_bytes():
         }
     }
     return json.dumps(input_data).encode("utf-8")
+
+
+@pytest.fixture
+def aggregate_report_with_sub_reports():
+    aggregate_report: Paginated[tuple[Report, list[Report | None]]] = Paginated(
+        count=1,
+        items=[
+            (
+                Report(
+                    object_type="Report",
+                    scan_profile=None,
+                    user_id=None,
+                    primary_key="Report|23820a64-db8f-41b7-b045-031338fbb91d",
+                    name="Aggregate Report",
+                    report_type="aggregate-organisation-report",
+                    template="aggregate_organisation_report/report.html",
+                    date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
+                    input_oois=["Hostname|internet|mispo.es"],
+                    report_id=UUID("23820a64-db8f-41b7-b045-031338fbb91d"),
+                    organization_code="_rieven",
+                    organization_name="Rieven",
+                    organization_tags=[],
+                    data_raw_id="3a362cd7-6348-4e91-8a6f-4cd83f9f6a83",
+                    observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
+                    parent_report=None,
+                    report_recipe=None,
+                    has_parent=False,
+                ),
+                [
+                    Report(
+                        object_type="Report",
+                        scan_profile=None,
+                        user_id=None,
+                        primary_key="Report|28c7b15e-6dda-49e8-a101-41df3124287e",
+                        name="Mail Report",
+                        report_type="mail-report",
+                        template="mail_report/report.html",
+                        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
+                        input_oois=["Hostname|internet|mispo.es"],
+                        report_id=UUID("28c7b15e-6dda-49e8-a101-41df3124287e"),
+                        organization_code="_rieven",
+                        organization_name="Rieven",
+                        organization_tags=[],
+                        data_raw_id="a534b4d5-5dba-4ddc-9b77-970675ae4b1c",
+                        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
+                        parent_report=Reference("Report|23820a64-db8f-41b7-b045-031338fbb91d"),
+                        report_recipe=None,
+                        has_parent=True,
+                    ),
+                    Report(
+                        object_type="Report",
+                        scan_profile=None,
+                        user_id=None,
+                        primary_key="Report|2a56737f-492f-424b-88cc-0029ce2a444b",
+                        name="IPv6 Report",
+                        report_type="ipv6-report",
+                        template="ipv6_report/report.html",
+                        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
+                        input_oois=["Hostname|internet|mispo.es"],
+                        report_id=UUID("2a56737f-492f-424b-88cc-0029ce2a444b"),
+                        organization_code="_rieven",
+                        organization_name="Rieven",
+                        organization_tags=[],
+                        data_raw_id="0bdea8eb-7ac0-46ef-ad14-ea3b0bfe1030",
+                        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
+                        parent_report=Reference("Report|23820a64-db8f-41b7-b045-031338fbb91d"),
+                        report_recipe=None,
+                        has_parent=True,
+                    ),
+                    Report(
+                        object_type="Report",
+                        scan_profile=None,
+                        user_id=None,
+                        primary_key="Report|4ec12350-7552-40de-8c9f-f75ac04b99cb",
+                        name="RPKI Report",
+                        report_type="rpki-report",
+                        template="rpki_report/report.html",
+                        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
+                        input_oois=["Hostname|internet|mispo.es"],
+                        report_id=UUID("4ec12350-7552-40de-8c9f-f75ac04b99cb"),
+                        organization_code="_rieven",
+                        organization_name="Rieven",
+                        organization_tags=[],
+                        data_raw_id="53d5452c-9e67-42d2-9cb0-3b684d8967a2",
+                        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
+                        parent_report=Reference("Report|23820a64-db8f-41b7-b045-031338fbb91d"),
+                        report_recipe=None,
+                        has_parent=True,
+                    ),
+                    Report(
+                        object_type="Report",
+                        scan_profile=None,
+                        user_id=None,
+                        primary_key="Report|8137a050-f897-45ce-a695-fd21c63e2e5c",
+                        name="Safe Connections Report",
+                        report_type="safe-connections-report",
+                        template="safe_connections_report/report.html",
+                        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
+                        input_oois=["Hostname|internet|mispo.es"],
+                        report_id=UUID("8137a050-f897-45ce-a695-fd21c63e2e5c"),
+                        organization_code="_rieven",
+                        organization_name="Rieven",
+                        organization_tags=[],
+                        data_raw_id="a218ca79-47de-4473-a93d-54d14baadd98",
+                        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
+                        parent_report=Reference("Report|23820a64-db8f-41b7-b045-031338fbb91d"),
+                        report_recipe=None,
+                        has_parent=True,
+                    ),
+                    Report(
+                        object_type="Report",
+                        scan_profile=None,
+                        user_id=None,
+                        primary_key="Report|9ca7ad01-e19e-42c9-9361-751db4399b94",
+                        name="Web System Report",
+                        report_type="web-system-report",
+                        template="web_system_report/report.html",
+                        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
+                        input_oois=["Hostname|internet|mispo.es"],
+                        report_id=UUID("9ca7ad01-e19e-42c9-9361-751db4399b94"),
+                        organization_code="_rieven",
+                        organization_name="Rieven",
+                        organization_tags=[],
+                        data_raw_id="3779f5b0-3adf-41c8-9630-8eed8a857ae6",
+                        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
+                        parent_report=Reference("Report|23820a64-db8f-41b7-b045-031338fbb91d"),
+                        report_recipe=None,
+                        has_parent=True,
+                    ),
+                    Report(
+                        object_type="Report",
+                        scan_profile=None,
+                        user_id=None,
+                        primary_key="Report|a76878ba-55e0-4971-b645-63cfdfd34e78",
+                        name="Open Ports Report",
+                        report_type="open-ports-report",
+                        template="open_ports_report/report.html",
+                        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
+                        input_oois=["Hostname|internet|mispo.es"],
+                        report_id=UUID("a76878ba-55e0-4971-b645-63cfdfd34e78"),
+                        organization_code="_rieven",
+                        organization_name="Rieven",
+                        organization_tags=[],
+                        data_raw_id="851feeab-7036-48f6-81ef-599467c52457",
+                        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
+                        parent_report=Reference("Report|23820a64-db8f-41b7-b045-031338fbb91d"),
+                        report_recipe=None,
+                        has_parent=True,
+                    ),
+                    Report(
+                        object_type="Report",
+                        scan_profile=None,
+                        user_id=None,
+                        primary_key="Report|ad33bbf1-bd35-4cb4-a61d-ebe1409e2f67",
+                        name="Vulnerability Report",
+                        report_type="vulnerability-report",
+                        template="vulnerability_report/report.html",
+                        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
+                        input_oois=["Hostname|internet|mispo.es"],
+                        report_id=UUID("ad33bbf1-bd35-4cb4-a61d-ebe1409e2f67"),
+                        organization_code="_rieven",
+                        organization_name="Rieven",
+                        organization_tags=[],
+                        data_raw_id="1e259fce-3cd7-436f-b233-b4ae24a8f11b",
+                        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
+                        parent_report=Reference("Report|23820a64-db8f-41b7-b045-031338fbb91d"),
+                        report_recipe=None,
+                        has_parent=True,
+                    ),
+                    Report(
+                        object_type="Report",
+                        scan_profile=None,
+                        user_id=None,
+                        primary_key="Report|bd26a0c0-92c2-4323-977d-a10bd90619e7",
+                        name="System Report",
+                        report_type="systems-report",
+                        template="systems_report/report.html",
+                        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
+                        input_oois=["Hostname|internet|mispo.es"],
+                        report_id=UUID("bd26a0c0-92c2-4323-977d-a10bd90619e7"),
+                        organization_code="_rieven",
+                        organization_name="Rieven",
+                        organization_tags=[],
+                        data_raw_id="50a9e4df-3b69-4ad8-b798-df626162db5a",
+                        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
+                        parent_report=Reference("Report|23820a64-db8f-41b7-b045-031338fbb91d"),
+                        report_recipe=None,
+                        has_parent=True,
+                    ),
+                    Report(
+                        object_type="Report",
+                        scan_profile=None,
+                        user_id=None,
+                        primary_key="Report|d8fcaa8f-65ca-4304-a18c-078767b37bcb",
+                        name="Name Server Report",
+                        report_type="name-server-report",
+                        template="name_server_report/report.html",
+                        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
+                        input_oois=["Hostname|internet|mispo.es"],
+                        report_id=UUID("d8fcaa8f-65ca-4304-a18c-078767b37bcb"),
+                        organization_code="_rieven",
+                        organization_name="Rieven",
+                        organization_tags=[],
+                        data_raw_id="5faa3364-c8b2-4b9c-8cc8-99d8f19ccf8a",
+                        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
+                        parent_report=Reference("Report|23820a64-db8f-41b7-b045-031338fbb91d"),
+                        report_recipe=None,
+                        has_parent=True,
+                    ),
+                ],
+            )
+        ],
+    )
+    return aggregate_report

@@ -275,6 +275,21 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
     def is_single_report(self) -> bool:
         return len(self.get_report_type_ids()) == 1
 
+    def get_query(self):
+        object_selection = self.request.POST.get("object_selection", "")
+        query = {}
+
+        if object_selection == "query":
+            query = {
+                "ooi_types": [t.__name__ for t in self.get_ooi_types()],
+                "scan_level": self.get_ooi_scan_levels(),
+                "scan_type": self.get_ooi_profile_types(),
+                "search_string": self.search_string,
+                "order_by": self.order_by,
+                "asc_desc": self.sorting_order,
+            }
+        return query
+
     def create_report_recipe(
         self,
         report_name_format: str,
@@ -500,8 +515,8 @@ class ReportFinalSettingsView(BaseReportView, SchedulerView, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["initial_report_name"] = self.get_initial_report_name()
-        context["report_schedule_form_start_date"] = self.get_report_schedule_form_start_date()
-        context["report_schedule_form_recurrence"] = self.get_report_schedule_form_recurrence()
+        context["report_schedule_form_start_date"] = self.get_report_schedule_form_start_date_time_recurrence()
+        context["report_schedule_form_recurrence_choice"] = self.get_report_schedule_form_recurrence_choice()
         return context
 
 
@@ -515,21 +530,6 @@ class SaveReportView(BaseReportView, SchedulerView):
             return ConcatenatedReport.id
         return self.report_type
 
-    def get_query(self):
-        object_selection = self.request.POST.get("object_selection", "")
-        query = {}
-
-        if object_selection == "query":
-            query = {
-                "ooi_types": [t.__name__ for t in self.get_ooi_types()],
-                "scan_level": self.get_ooi_scan_levels(),
-                "scan_type": self.get_ooi_profile_types(),
-                "search_string": self.search_string,
-                "order_by": self.order_by,
-                "asc_desc": self.sorting_order,
-            }
-        return query
-
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         deadline_at = request.POST.get("start_date")
         start_date_time: datetime = (
@@ -538,7 +538,7 @@ class SaveReportView(BaseReportView, SchedulerView):
 
         recurrence = request.POST.get("recurrence")
         schedule = (
-            self.convert_schedule_to_cron_expressions(start_date_time, recurrence)
+            self.convert_recurrence_to_cron_expressions(recurrence, start_date_time)
             if recurrence is not None and recurrence != "once"
             else None
         )

@@ -17,6 +17,11 @@ class ReportPlugins(TypedDict):
     optional: set[str]
 
 
+class SubReportPlugins(TypedDict):
+    required: list[str]
+    optional: list[str]
+
+
 def report_plugins_union(report_types: list[type["BaseReport"]]) -> ReportPlugins:
     """Take the union of the required and optional plugin sets and remove optional plugins that are required"""
 
