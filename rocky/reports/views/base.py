@@ -537,7 +537,7 @@ class SaveReportView(BaseReportView, SchedulerView, TemplateView):
             recurrence = form.cleaned_data["recurrence"]
 
             schedule = (
-                self.convert_recurrence_to_cron_expressions(recurrence, datetime.fromisoformat(start_datetime))
+                self.convert_recurrence_to_cron_expressions(recurrence, start_datetime)
                 if recurrence is not None and recurrence != "once"
                 else None
             )
