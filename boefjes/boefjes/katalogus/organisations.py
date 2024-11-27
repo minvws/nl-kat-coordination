@@ -14,12 +14,11 @@ def check_organisation_exists(
     """
     Checks if an organisation exists, if not, creates it.
     """
-    with storage as store:
-        try:
-            store.get_by_id(organisation_id)
-        except OrganisationNotFound:
-            add_organisation(Organisation(id=organisation_id, name=organisation_id), storage)
-            storage.get_by_id(organisation_id)
+    try:
+        storage.get_by_id(organisation_id)
+    except OrganisationNotFound:
+        add_organisation(Organisation(id=organisation_id, name=organisation_id), storage)
+        storage.get_by_id(organisation_id)
 
 
 @router.get("", response_model=dict[str, Organisation])

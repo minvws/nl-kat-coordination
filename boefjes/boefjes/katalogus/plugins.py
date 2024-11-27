@@ -44,14 +44,13 @@ def list_plugins(
     pagination_params: PaginationParameters = Depends(get_pagination_parameters),
     plugin_service: PluginService = Depends(get_plugin_service),
 ) -> list[PluginType]:
-    with plugin_service as p:
-        if filter_params.ids:
-            try:
-                plugins = p.by_plugin_ids(filter_params.ids, organisation_id)
-            except KeyError:
-                raise HTTPException(status.HTTP_404_NOT_FOUND, "Plugin not found")
-        else:
-            plugins = p.get_all(organisation_id)
+    if filter_params.ids:
+        try:
+            plugins = plugin_service.by_plugin_ids(filter_params.ids, organisation_id)
+        except KeyError:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Plugin not found")
+    else:
+        plugins = plugin_service.get_all(organisation_id)
 
     # filter plugins by id, name or description
     if filter_params.q is not None:
@@ -84,8 +83,7 @@ def get_plugin(
     plugin_id: str, organisation_id: str, plugin_service: PluginService = Depends(get_plugin_service)
 ) -> PluginType:
     try:
-        with plugin_service as p:
-            return p.by_plugin_id(plugin_id, organisation_id)
+        return plugin_service.by_plugin_id(plugin_id, organisation_id)
     except KeyError:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plugin not found")
 
