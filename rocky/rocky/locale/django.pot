@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-27 10:30+0000\n"
+"POT-Creation-Date: 2024-11-27 11:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3716,6 +3716,36 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
+#: reports/templates/report_overview/report_history_table.html
+msgid "Report name"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid ""
+"Define a custom name format for your report(s). This format will be applied "
+"to all generated (sub)reports."
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+#, python-brace-format
+msgid ""
+"To make the report names more descriptive, you can include placeholders for "
+"the object name, the report type and/or the reference date. For subreports "
+"and reports over a single object, use the placeholder \"${ooi}\" for the "
+"object name, \"${report_type}\" for the report type and use a <a "
+"href=\"https://strftime.org/\" target=\"_blank\" rel=\"noopener\">Python "
+"strftime code</a> for the reference date. For reports over multiple objects, "
+"use \"${oois_count}\" for the number of objects in the report."
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+#, python-format, python-brace-format
+msgid ""
+"For example, the format \"${report_type} for ${ooi} at %%x\" could generate: "
+"\"DNS Report for example.com at 01/01/25\"."
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
 msgid "Report name format"
 msgstr ""
 
@@ -3822,36 +3852,6 @@ msgstr ""
 
 #: reports/templates/partials/report_names_form.html
 msgid "Year"
-msgstr ""
-
-#: reports/templates/partials/report_names_header.html
-#: reports/templates/report_overview/report_history_table.html
-msgid "Report name"
-msgstr ""
-
-#: reports/templates/partials/report_names_header.html
-msgid ""
-"Define a custom name format for your report(s). This format will be applied "
-"to all generated (sub)reports."
-msgstr ""
-
-#: reports/templates/partials/report_names_header.html
-#, python-brace-format
-msgid ""
-"To make the report names more descriptive, you can include placeholders for "
-"the object name, the report type and/or the reference date. For subreports "
-"and reports over a single object, use the placeholder \"${ooi}\" for the "
-"object name, \"${report_type}\" for the report type and use a <a "
-"href=\"https://strftime.org/\" target=\"_blank\" rel=\"noopener\">Python "
-"strftime code</a> for the reference date. For reports over multiple objects, "
-"use \"${oois_count}\" for the number of objects in the report."
-msgstr ""
-
-#: reports/templates/partials/report_names_header.html
-#, python-format, python-brace-format
-msgid ""
-"For example, the format \"${report_type} for ${ooi} at %%x\" could generate: "
-"\"DNS Report for example.com at 01/01/25\"."
 msgstr ""
 
 #: reports/templates/partials/report_navigation.html
@@ -4299,10 +4299,6 @@ msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Scheduled reports:"
-msgstr ""
-
-#: reports/templates/report_overview/scheduled_reports_table.html
-msgid "Scheduled for"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
