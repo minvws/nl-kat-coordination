@@ -61,6 +61,7 @@ class Scheduler(abc.ABC):
         callback: Callable[..., None] | None = None,
         max_tries: int = -1,
         create_schedule: bool = False,
+        auto_calculate_deadline: bool = True,
     ):
         """Initialize the Scheduler.
 
@@ -88,6 +89,7 @@ class Scheduler(abc.ABC):
         self.max_tries: int = max_tries
         self.enabled: bool = True
         self.create_schedule: bool = create_schedule
+        self.auto_calculate_deadline: bool = auto_calculate_deadline
         self._last_activity: datetime | None = None
 
         # Queue
@@ -327,7 +329,7 @@ class Scheduler(abc.ABC):
         # based on the item.
         if schedule_db.schedule is not None:
             schedule_db.deadline_at = cron.next_run(schedule_db.schedule)
-        else:
+        elif self.auto_calculate_deadline:
             schedule_db.deadline_at = self.calculate_deadline(item)
 
         self.ctx.datastores.schedule_store.update_schedule(schedule_db)
