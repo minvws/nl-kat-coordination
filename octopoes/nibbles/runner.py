@@ -39,7 +39,7 @@ def nibble_hasher(data: Iterable) -> str:
     return xxh3(
         "".join(
             [
-                json.dumps(json.loads(ooi.model_dump_json()), sort_keys=True)
+                json.dumps(ooi.model_dump(), sort_keys=True)
                 if isinstance(ooi, OOI)
                 else json.dumps(ooi, sort_keys=True)
                 for ooi in data
