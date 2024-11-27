@@ -15,14 +15,11 @@ from boefjes.dependencies.plugins import (
     get_plugin_service,
     get_plugins_filter_parameters,
 )
-from boefjes.katalogus.organisations import check_organisation_exists
 from boefjes.models import FilterParameters, PaginationParameters, PluginType
 from boefjes.sql.plugin_storage import get_plugin_storage
 from boefjes.storage.interfaces import DuplicatePlugin, IntegrityError, NotAllowed, PluginStorage
 
-router = APIRouter(
-    prefix="/organisations/{organisation_id}", tags=["plugins"], dependencies=[Depends(check_organisation_exists)]
-)
+router = APIRouter(prefix="/organisations/{organisation_id}", tags=["plugins"])
 
 logger = structlog.get_logger(__name__)
 

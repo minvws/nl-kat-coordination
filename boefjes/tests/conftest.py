@@ -20,7 +20,6 @@ from boefjes.config import Settings, settings
 from boefjes.dependencies.plugins import PluginService, get_plugin_service
 from boefjes.job_handler import bytes_api_client
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
-from boefjes.katalogus.organisations import check_organisation_exists
 from boefjes.katalogus.root import app
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
 from boefjes.local_repository import LocalPluginRepository, get_local_repository
@@ -255,7 +254,6 @@ def unit_test_client(mock_plugin_service) -> TestClient:
 
     app.dependency_overrides[get_organisations_store] = lambda: _store
     app.dependency_overrides[get_plugin_service] = get_service
-    app.dependency_overrides[check_organisation_exists] = lambda: None
 
     yield client
 

@@ -8,19 +8,6 @@ from boefjes.storage.interfaces import OrganisationNotFound, OrganisationStorage
 router = APIRouter(prefix="/organisations", tags=["organisations"])
 
 
-def check_organisation_exists(
-    organisation_id: str, storage: OrganisationStorage = Depends(get_organisations_store)
-) -> None:
-    """
-    Checks if an organisation exists, if not, creates it.
-    """
-    try:
-        storage.get_by_id(organisation_id)
-    except OrganisationNotFound:
-        add_organisation(Organisation(id=organisation_id, name=organisation_id), storage)
-        storage.get_by_id(organisation_id)
-
-
 @router.get("", response_model=dict[str, Organisation])
 def list_organisations(storage: OrganisationStorage = Depends(get_organisations_store)):
     return storage.get_all()

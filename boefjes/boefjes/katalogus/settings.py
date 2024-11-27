@@ -1,13 +1,8 @@
 from fastapi import APIRouter, Depends
 
 from boefjes.dependencies.plugins import PluginService, get_plugin_service
-from boefjes.katalogus.organisations import check_organisation_exists
 
-router = APIRouter(
-    prefix="/organisations/{organisation_id}/{plugin_id}/settings",
-    tags=["settings"],
-    dependencies=[Depends(check_organisation_exists)],
-)
+router = APIRouter(prefix="/organisations/{organisation_id}/{plugin_id}/settings", tags=["settings"])
 
 
 @router.get("", response_model=dict)
