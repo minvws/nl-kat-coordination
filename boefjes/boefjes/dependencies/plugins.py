@@ -17,7 +17,6 @@ from boefjes.sql.plugin_storage import create_plugin_storage
 from boefjes.storage.interfaces import (
     ConfigStorage,
     DuplicatePlugin,
-    NotFound,
     PluginNotFound,
     PluginStorage,
     SettingsNotConformingToSchema,
