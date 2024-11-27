@@ -75,7 +75,6 @@ model-mommy = "^2.0.0"
 factory-boy = "^3.2.1"
 
 django-admin-auto-tests = { git = "https://github.com/dekkers/django-admin-auto-tests", rev = "f6eb4cbb9112b5aa933313d79e4da823adb41e1e" }
-robotframework-assertion-engine = "^3.0.3"
 
 [build-system]
 requires = ["setuptools>=62.2", "wheel"]
