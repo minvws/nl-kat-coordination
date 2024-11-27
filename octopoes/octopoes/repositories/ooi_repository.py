@@ -867,7 +867,7 @@ class XTDBOOIRepository(OOIRepository):
         def strformat(a: str, *args) -> str:
             def sub(match: re.Match) -> str:
                 idx = int(match.group(1)) - 1
-                return str(args[idx]) if 0 <= idx < len(args) else ""
+                return f'"{args[idx]}"' if 0 <= idx < len(args) else ""
 
             return re.sub(r"\$(\d+)", sub, a)
 

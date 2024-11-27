@@ -131,7 +131,7 @@ class NibblesRunner:
                 ooi = stack.pop()
                 results = self._run(ooi, valid_time)
                 if results:
-                    blocks = set.union(*[ooiset for result in results.values() for _, ooiset in result.items()])
+                    blocks = set.union(set(), *[ooiset for result in results.values() for _, ooiset in result.items()])
                     stack += [o for o in blocks if o not in blockset]
                     blockset |= blocks
                     inferences |= {ooi: results}

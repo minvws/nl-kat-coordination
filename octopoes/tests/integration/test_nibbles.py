@@ -11,6 +11,7 @@ from nibbles.runner import NibblesRunner, nibble_hasher
 
 from octopoes.core.service import OctopoesService
 from octopoes.models import OOI, ScanLevel
+from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
@@ -42,7 +43,7 @@ def test_dummy_nibble(xtdb_octopoes_service: OctopoesService, event_manager: Moc
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     assert xtdb_octopoes_service.ooi_repository.list_oois({Network}, valid_time).count == 1
-    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 3
+    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 4
 
     sp = xtdb_octopoes_service.scan_profile_repository.get(network.reference, valid_time)
     new_sp = sp.model_copy()
@@ -52,7 +53,7 @@ def test_dummy_nibble(xtdb_octopoes_service: OctopoesService, event_manager: Moc
 
     ctx = 1 + MAX_NETWORK_NAME_LENGTH - len(network.name)
     assert xtdb_octopoes_service.ooi_repository.list_oois({Network}, valid_time).count == ctx
-    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 3 * ctx
+    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 4 * ctx
 
 
 def url_classification(url: URL) -> Iterator[OOI]:
@@ -203,3 +204,76 @@ def test_find_network_url_nibble(xtdb_octopoes_service: OctopoesService, event_m
         if nibblet.result:
             assert len(nibblet.result) == 1
             assert nibblet.result == [t.reference for t in target]
+
+
+def max_url_length_config(url: URL, config: Config) -> Iterator[OOI]:
+    if "max_length" in config.config:
+        max_length = int(str(config.config["max_length"]))
+        if len(str(url.raw)) >= max_length:
+            yield Finding(
+                finding_type=KATFindingType(id="URL exceeds configured maximum length").reference,
+                ooi=url.reference,
+                proof=f"The length of {url.raw} ({len(str(url.raw))}) exceeds the configured maximum length \
+                ({max_length}).",
+            )
+
+
+max_url_length_config_params = [
+    NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]"),
+    NibbleParameter(object_type=Config, parser="[*][?object_type == 'Config'][]"),
+]
+max_url_length_config_nibble = NibbleDefinition(
+    name="max_url_length_config",
+    signature=max_url_length_config_params,
+    query="""
+    {
+        :query {
+            :find [(pull ?var [*])]
+            :where [
+                (or
+                    (and [?var :object_type "URL" ] [?var :URL/primary_key $1])
+                    (and [?var :object_type "Config" ] [?var :Config/primary_key $2])
+                )
+            ]
+        }
+    }
+    """,
+    min_scan_level=-1,
+)
+max_url_length_config_nibble.payload = getattr(sys.modules[__name__], "max_url_length_config")
+
+
+def test_max_length_config_nibble(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
+    nibbler = NibblesRunner(
+        xtdb_octopoes_service.ooi_repository,
+        xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.scan_profile_repository,
+    )
+    nibbler.nibbles = {max_url_length_config_nibble.id: max_url_length_config_nibble}
+    network = Network(name="internet")
+    xtdb_octopoes_service.ooi_repository.save(network, valid_time)
+    url = URL(network=network.reference, raw="https://mispo.es/")
+    xtdb_octopoes_service.ooi_repository.save(url, valid_time)
+    config = Config(ooi=network.reference, bit_id="superkat", config={"max_length": "57"})
+    xtdb_octopoes_service.ooi_repository.save(config, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    result = nibbler.infer([url], valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    assert url in result
+    # FIXME: wait shouldn't this be one?
+    assert len(result[url]["max_url_length_config"]) == 2
+    assert result[url]["max_url_length_config"][tuple([url, config])] == set()
+
+    config = Config(ooi=network.reference, bit_id="superkat", config={"max_length": "13"})
+    xtdb_octopoes_service.ooi_repository.save(config, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    result = nibbler.infer([url], valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    assert url in result
+    # FIXME: wait shouldn't this be one?
+    assert len(result[url]["max_url_length_config"]) == 2
+    assert result[url]["max_url_length_config"][tuple([url, config])] == set(max_url_length_config(url, config))
