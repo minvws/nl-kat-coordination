@@ -5,6 +5,7 @@ from unittest import mock
 
 from scheduler import clients, context, models, storage
 from scheduler.utils import remove_trailing_slash
+
 from tests.factories import PluginFactory
 
 

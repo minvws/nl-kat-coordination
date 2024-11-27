@@ -8,7 +8,7 @@ from typing import Any
 import structlog
 from opentelemetry import trace
 
-from scheduler import clients, context, models, storage, utils
+from scheduler import clients, context, storage, utils
 from scheduler.clients.errors import ExternalServiceError
 from scheduler.models import (
     OOI,

@@ -1,10 +1,8 @@
 from uuid import UUID
 
-from sqlalchemy import exc
-
 from scheduler import models
 from scheduler.storage import DBConn
-from scheduler.storage.errors import StorageError, exception_handler
+from scheduler.storage.errors import exception_handler
 from scheduler.storage.filters import FilterRequest, apply_filter
 from scheduler.storage.utils import retry
 

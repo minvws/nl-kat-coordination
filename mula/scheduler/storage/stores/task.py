@@ -73,7 +73,7 @@ class TaskStore:
 
     @retry()
     @exception_handler
-    def get_tasks_by_hash(self, task_hash: str, limit: int = None) -> list[models.Task] | None:
+    def get_tasks_by_hash(self, task_hash: str, limit: int | None = None) -> list[models.Task] | None:
         with self.dbconn.session.begin() as session:
             query = session.query(models.TaskDB).filter(models.TaskDB.hash == task_hash)
 
