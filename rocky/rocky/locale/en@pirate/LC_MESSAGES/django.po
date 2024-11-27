@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-29 11:51+0000\n"
+"POT-Creation-Date: 2024-11-18 15:24+0000\n"
 "PO-Revision-Date: 2023-11-18 13:03+0000\n"
 "Last-Translator: jan klopper <jan@underdark.nl>\n"
 "Language-Team: English (Pirate) <https://hosted.weblate.org/projects/openkat/"
@@ -32,6 +32,10 @@ msgstr ""
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/tls_report/report.html
 #: reports/templates/partials/report_names_form.html
+#: reports/templates/report_overview/modal_partials/delete_modal.html
+#: reports/templates/report_overview/modal_partials/rename_modal.html
+#: reports/templates/report_overview/modal_partials/rerun_modal.html
+#: reports/templates/report_overview/modal_partials/share_modal.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/report_overview/subreports_table.html
@@ -351,6 +355,7 @@ msgstr ""
 
 #: account/templates/account_detail.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/tasks/normalizers.html
 msgid "Organization"
 msgstr ""
 
@@ -602,20 +607,16 @@ msgid ""
 msgstr ""
 
 #: katalogus/client.py
+#, python-format
+msgid "An HTTP %d error occurred. Check logs for more info."
+msgstr ""
+
+#: katalogus/client.py
 msgid "Boefje with this name already exists."
 msgstr ""
 
 #: katalogus/client.py
 msgid "Boefje with this ID already exists."
-msgstr ""
-
-#: katalogus/client.py
-msgid "Editing this boefje is not allowed because it is static."
-msgstr ""
-
-#: katalogus/client.py
-#, python-format
-msgid "An HTTP %d error occurred. Check logs for more info."
 msgstr ""
 
 #: katalogus/forms/katalogus_filter.py
@@ -942,7 +943,6 @@ msgstr ""
 #: katalogus/templates/partials/boefje_tile.html
 #: katalogus/templates/partials/plugin_tile.html
 #: katalogus/templates/partials/plugin_tile_modal.html
-#: katalogus/templates/partials/plugins.html
 msgid "See details"
 msgstr ""
 
@@ -1009,7 +1009,6 @@ msgstr ""
 #: katalogus/templates/plugin_settings_list.html
 #: katalogus/views/katalogus_settings.py tools/view_helpers.py
 #: rocky/templates/header.html
-#: rocky/templates/organizations/organization_settings.html
 msgid "Settings"
 msgstr ""
 
@@ -1019,6 +1018,18 @@ msgstr ""
 
 #: katalogus/templates/partials/katalogus_toolbar.html
 msgid "Tableview"
+msgstr ""
+
+#: katalogus/templates/partials/modal_report_types.html
+msgid "Required for"
+msgstr ""
+
+#: katalogus/templates/partials/modal_report_types.html
+msgid "report types"
+msgstr ""
+
+#: katalogus/templates/partials/modal_report_types.html
+msgid "Report types for "
 msgstr ""
 
 #: katalogus/templates/partials/objects_to_scan.html
@@ -1123,8 +1134,14 @@ msgid "Plugin description"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
+#: reports/templates/report_overview/report_history_table.html
+#: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Actions"
+msgstr ""
+
+#: katalogus/templates/partials/plugins.html
+msgid "Detail page"
 msgstr ""
 
 #: katalogus/templates/partials/plugins_navigation.html
@@ -1259,6 +1276,8 @@ msgid "Boefje ID"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
+#: reports/templates/report_overview/modal_partials/delete_modal.html
+#: reports/templates/report_overview/modal_partials/rerun_modal.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/report_overview/subreports_table.html
@@ -1358,6 +1377,8 @@ msgstr ""
 
 #: katalogus/templates/plugin_settings_delete.html
 #: katalogus/views/plugin_settings_delete.py
+#: reports/templates/report_overview/modal_partials/delete_modal.html
+#: reports/templates/report_overview/report_history_table.html
 #: rocky/templates/admin/delete_confirmation.html rocky/views/ooi_delete.py
 msgid "Delete"
 msgstr ""
@@ -2024,6 +2045,8 @@ msgstr ""
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 #: reports/report_types/dns_report/report.html
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/report_overview/modal_partials/delete_modal.html
+#: reports/templates/report_overview/modal_partials/rerun_modal.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: rocky/templates/oois/ooi_list.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
@@ -2398,15 +2421,19 @@ msgid "Different date"
 msgstr ""
 
 #: reports/forms.py
-msgid "Start date"
-msgstr ""
-
-#: reports/forms.py
 msgid "No, just once"
 msgstr ""
 
 #: reports/forms.py
 msgid "Yes, repeat"
+msgstr ""
+
+#: reports/forms.py
+msgid "Start date"
+msgstr ""
+
+#: reports/forms.py
+msgid "Start time (UTC)"
 msgstr ""
 
 #: reports/forms.py
@@ -2488,6 +2515,7 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/plugin_overview_table.html
+#: reports/templates/report_overview/modal_partials/rename_modal.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/report_overview/subreports_table.html
@@ -3007,7 +3035,6 @@ msgid "Other findings found"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
 #: rocky/templates/oois/ooi_detail_findings_overview.html
@@ -3047,7 +3074,6 @@ msgstr ""
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/templates/partials/report_severity_totals_table.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
@@ -3092,7 +3118,8 @@ msgid "First seen"
 msgstr ""
 
 #: reports/report_types/findings_report/report.html
-msgid "No findings have been found."
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "No findings have been identified yet."
 msgstr ""
 
 #: reports/report_types/findings_report/report.py
@@ -3661,7 +3688,7 @@ msgid "Has a certificate"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.html
-msgid "Certificate is not expired"
+msgid "Certificate is valid"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.html
@@ -3690,6 +3717,13 @@ msgid ""
 "generate it just once now, or set it to run automatically at regular "
 "intervals, like daily, weekly, or monthly. If you need the report just for a "
 "single occasion, select the one-time option."
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid ""
+"Please choose a start date, time and recurrence for scheduling your "
+"report(s). If you select a date on the 28th-31st of the month, it will "
+"always be scheduled on the last day of the month."
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -3811,20 +3845,21 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_names_header.html
+#, python-brace-format
 msgid ""
 "To make the report names more descriptive, you can include placeholders for "
 "the object name, the report type and/or the reference date. For subreports "
-"and reports over a single object, use the placeholder \"{ooi}\" for the "
-"object name, \"{report type}\" for the report type and use a <a "
+"and reports over a single object, use the placeholder \"${ooi}\" for the "
+"object name, \"${report_type}\" for the report type and use a <a "
 "href=\"https://strftime.org/\" target=\"_blank\" rel=\"noopener\">Python "
 "strftime code</a> for the reference date. For reports over multiple objects, "
-"use \"{oois_count}\" for the number of objects in the report."
+"use \"${oois_count}\" for the number of objects in the report."
 msgstr ""
 
 #: reports/templates/partials/report_names_header.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"For example, the format \"{report type} for {ooi} at %%x\" could generate: "
+"For example, the format \"${report_type} for ${ooi} at %%x\" could generate: "
 "\"DNS Report for example.com at 01/01/25\"."
 msgstr ""
 
@@ -3860,7 +3895,36 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Select which objects you want to include in your report."
+msgid ""
+"\n"
+"                Select which objects you want to include in your report. You "
+"can either continue\n"
+"                with a live set or you can select the objects manually from "
+"the table below.\n"
+"            "
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid ""
+"\n"
+"                A live set is a set of objects based on the applied "
+"filters.\n"
+"                Any object that matches this applied filter (now or in the "
+"future) will be used as\n"
+"                input for the scheduled report. If your live set filter (e."
+"g. 'hostnames' with\n"
+"                'L2 clearance' that are 'declared') shows 2 hostnames that "
+"match the filter today,\n"
+"                the scheduled report will run for those 2 hostnames. If you "
+"add 3 more hostnames\n"
+"                tomorrow (with the same filter criteria), your next "
+"scheduled report will contain\n"
+"                5 hostnames. Your live set will update as you go.\n"
+"            "
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "Continue with live set"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
@@ -4070,6 +4134,70 @@ msgstr ""
 msgid "%(btn_text)s"
 msgstr ""
 
+#: reports/templates/report_overview/modal_partials/delete_modal.html
+#: reports/templates/report_overview/modal_partials/share_modal.html
+msgid "Delete the following report(s):"
+msgstr ""
+
+#: reports/templates/report_overview/modal_partials/delete_modal.html
+#: reports/templates/report_overview/modal_partials/share_modal.html
+msgid ""
+"\n"
+"      Deleted reports are removed in the view from the moment of deletion. "
+"The report can still be accessed on timestamps before the deletion. Only the "
+"report is removed from the view, not the data it is based on.\n"
+"  "
+msgstr ""
+
+#: reports/templates/report_overview/modal_partials/delete_modal.html
+#: reports/templates/report_overview/modal_partials/share_modal.html
+msgid ""
+"\n"
+"      It is still possible to generate a new report for same date. If the "
+"report is part of a combined report, it will remain available in the "
+"combined report.\n"
+"  "
+msgstr ""
+
+#: reports/templates/report_overview/modal_partials/delete_modal.html
+#: reports/templates/report_overview/modal_partials/rerun_modal.html
+msgid "Input objects"
+msgstr ""
+
+#: reports/templates/report_overview/modal_partials/delete_modal.html
+#: reports/templates/report_overview/modal_partials/rerun_modal.html
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/report_overview/subreports_table.html
+msgid "Reference date"
+msgstr ""
+
+#: reports/templates/report_overview/modal_partials/rename_modal.html
+msgid "Rename the following report(s):"
+msgstr ""
+
+#: reports/templates/report_overview/modal_partials/rename_modal.html
+#: reports/templates/report_overview/report_history_table.html
+msgid "Rename"
+msgstr ""
+
+#: reports/templates/report_overview/modal_partials/rerun_modal.html
+msgid "Rerun the following report(s):"
+msgstr ""
+
+#: reports/templates/report_overview/modal_partials/rerun_modal.html
+msgid ""
+"\n"
+"      By submitting you're generating the selected reports again, using the "
+"current data.\n"
+"  "
+msgstr ""
+
+#: reports/templates/report_overview/modal_partials/rerun_modal.html
+#: reports/templates/report_overview/report_history_table.html
+msgid "Rerun"
+msgstr ""
+
 #: reports/templates/report_overview/report_history.html
 msgid "Reports history"
 msgstr ""
@@ -4092,12 +4220,6 @@ msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
 msgid "Input Objects"
-msgstr ""
-
-#: reports/templates/report_overview/report_history_table.html
-#: reports/templates/report_overview/scheduled_reports_table.html
-#: reports/templates/report_overview/subreports_table.html
-msgid "Reference date"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
@@ -4189,10 +4311,8 @@ msgid "Scheduled Reports:"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
-#: reports/templates/report_overview/subreports_table.html
-#: rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "Input Object"
+#: rocky/templates/tasks/boefje_task_detail.html
+msgid "Input object"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
@@ -4227,6 +4347,12 @@ msgstr ""
 
 #: reports/templates/report_overview/subreports_table.html
 msgid "Subreports:"
+msgstr ""
+
+#: reports/templates/report_overview/subreports_table.html
+#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "Input Object"
 msgstr ""
 
 #: reports/templates/summary/report_asset_overview.html
@@ -4366,6 +4492,40 @@ msgstr ""
 
 #: reports/views/multi_report.py
 msgid "View report"
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid "An unexpected error occurred, please check logs for more info."
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid "Deletion successful."
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid ""
+"Multi organization reports cannot be rescheduled. It consists of imported "
+"data from different organizations and not based on new generated data."
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid "Rerun successful"
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid "Renaming failed. Empty report name found."
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid "Report names and reports does not match."
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid "Reports successfully renamed."
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid "Report {} could not be renamed."
 msgstr ""
 
 #: reports/views/view_helpers.py
@@ -5179,12 +5339,6 @@ msgid " Finding Details"
 msgstr ""
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Finding details"
-msgstr ""
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/organizations/organization_list.html
 msgid "There were no organizations found for your user account"
 msgstr ""
@@ -5292,8 +5446,12 @@ msgid "findings"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "Findings table"
+msgid "Findings table "
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/oois/ooi_list.html
+msgid "column headers with buttons are sortable"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -5681,6 +5839,11 @@ msgstr ""
 msgid "Score"
 msgstr ""
 
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Finding details"
+msgstr ""
+
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 msgid "Overview of the number of findings and their severity found on"
 msgstr ""
@@ -5764,7 +5927,7 @@ msgid "Save %(display_type)s"
 msgstr ""
 
 #: rocky/templates/oois/ooi_findings.html
-msgid "Currently there are no findings for OOI"
+msgid "Currently no findings have been identified for OOI"
 msgstr ""
 
 #: rocky/templates/oois/ooi_list.html
@@ -5777,10 +5940,6 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_list.html
 msgid "Objects "
-msgstr ""
-
-#: rocky/templates/oois/ooi_list.html
-msgid "column headers with buttons are sortable"
 msgstr ""
 
 #: rocky/templates/oois/ooi_list.html
@@ -5898,6 +6057,10 @@ msgid "Top 10 most severe Findings"
 msgstr ""
 
 #: rocky/templates/organizations/organization_crisis_room.html
+msgid "Findings table"
+msgstr ""
+
+#: rocky/templates/organizations/organization_crisis_room.html
 msgid "Finding type:"
 msgstr ""
 
@@ -5918,10 +6081,6 @@ msgid "Save organization"
 msgstr ""
 
 #: rocky/templates/organizations/organization_list.html
-msgid "Rerun all bits for all my organizations"
-msgstr ""
-
-#: rocky/templates/organizations/organization_list.html
 msgid "Add new organization"
 msgstr ""
 
@@ -5932,6 +6091,15 @@ msgstr ""
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Tags"
+msgstr ""
+
+#: rocky/templates/organizations/organization_list.html
+msgid "Actions to perform for all of your organizations."
+msgstr ""
+
+#: rocky/templates/organizations/organization_list.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Rerun all bits"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_add.html
@@ -6057,10 +6225,6 @@ msgstr ""
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/views/indemnification_add.py
 msgid "Add indemnification"
-msgstr ""
-
-#: rocky/templates/organizations/organization_settings.html
-msgid "Rerun all bits"
 msgstr ""
 
 #: rocky/templates/partials/elements/ooi_detail_settings.html
@@ -6508,10 +6672,6 @@ msgstr ""
 msgid "Download meta data"
 msgstr ""
 
-#: rocky/templates/tasks/boefje_task_detail.html
-msgid "Input object"
-msgstr ""
-
 #: rocky/templates/tasks/boefjes.html
 #, python-format
 msgid ""
@@ -6531,7 +6691,7 @@ msgstr ""
 msgid "List of tasks for boefjes"
 msgstr ""
 
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/boefjes.html
 msgid "Organization Code"
 msgstr ""
 
