@@ -4,7 +4,7 @@ import unittest
 from unittest import mock
 
 import pika
-from scheduler import connectors, utils
+from scheduler import clients, utils
 
 from tests.mocks import listener
 
@@ -13,7 +13,7 @@ class RabbitMQTestCase(unittest.TestCase):
     DSN = "amqp://guest:guest@ci_rabbitmq:5672/%2Fkat"
 
     def setUp(self):
-        self.listeners: list[connectors.listeners.Listener] = []
+        self.listeners: list[clients.listeners.Listener] = []
 
         threading.excepthook = self.unhandled_exception
 
