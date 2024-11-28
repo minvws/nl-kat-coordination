@@ -9,7 +9,6 @@ function initToggle() {
   );
 
   for (let i = 0; i < switch_button_list.length; i++) {
-    console.log(switch_button_list[i]);
     switch_button_list[i].addEventListener("click", (event) => {
       toggle();
     });
