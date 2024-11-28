@@ -194,7 +194,7 @@ class Scheduler(abc.ABC):
         if tries >= max_tries and max_tries != -1:
             raise QueueFullError()
 
-        self.push_item_to_queue(item)
+        self.push_item_to_queue(item=item, create_schedule=create_schedule)
 
     def push_item_to_queue(self, item: models.Task, create_schedule: bool = True) -> models.Task:
         """Push a Task to the queue.
@@ -288,17 +288,20 @@ class Scheduler(abc.ABC):
             return item
 
         scheduler_create_schedule = self.create_schedule
-        item_create_schedule = create_schedule
-
-        # - If the scheduler is creating schedules, and the item is not creating
-        #   schedules, we don't create a schedule for the item.
-        # - If the scheduler is not creating schedules, and the item is creating
-        #   schedules, we create a schedule for the item.
-        # - If both are False, we don't create a schedule for the item.
-        # - If both are True, we create a schedule for the item.
-        if not (scheduler_create_schedule ^ item_create_schedule):
+        if not scheduler_create_schedule:
             self.logger.debug(
-                "Not creating schedule for item %s",
+                "Scheduler is not creating schedules, not creating schedule for item %s",
+                item.id,
+                item_id=item.id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
+            return item
+
+        item_create_schedule = create_schedule
+        if not item_create_schedule:
+            self.logger.debug(
+                "Item is not creating schedules, not creating schedule for item %s",
                 item.id,
                 item_id=item.id,
                 queue_id=self.queue.pq_id,

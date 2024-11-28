@@ -636,7 +636,7 @@ class BoefjeScheduler(Scheduler):
             caller=caller,
         )
 
-    def push_item_to_queue(self, item: Task) -> Task:
+    def push_item_to_queue(self, item: Task, create_schedule: bool = True) -> Task:
         """Some boefje scheduler specific logic before pushing the item to the
         queue."""
         boefje_task = BoefjeTask.model_validate(item.data)
@@ -649,7 +649,7 @@ class BoefjeScheduler(Scheduler):
             item.id = new_id
             item.data = boefje_task.model_dump()
 
-        return super().push_item_to_queue(item)
+        return super().push_item_to_queue(item=item, create_schedule=create_schedule)
 
     @tracer.start_as_current_span("boefje_has_boefje_permission_to_run")
     def has_boefje_permission_to_run(self, boefje: Plugin, ooi: OOI) -> bool:
