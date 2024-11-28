@@ -167,7 +167,9 @@ class Scheduler(abc.ABC):
 
             count += 1
 
-    def push_item_to_queue_with_timeout(self, item: models.Task, max_tries: int = 5, timeout: int = 1) -> None:
+    def push_item_to_queue_with_timeout(
+        self, item: models.Task, max_tries: int = 5, timeout: int = 1, create_schedule: bool = True
+    ) -> None:
         """Push an item to the queue, with a timeout.
 
         Args:
@@ -194,7 +196,7 @@ class Scheduler(abc.ABC):
 
         self.push_item_to_queue(item)
 
-    def push_item_to_queue(self, item: models.Task) -> models.Task:
+    def push_item_to_queue(self, item: models.Task, create_schedule: bool = True) -> models.Task:
         """Push a Task to the queue.
 
         Args:
@@ -263,11 +265,11 @@ class Scheduler(abc.ABC):
             scheduler_id=self.scheduler_id,
         )
 
-        item = self.post_push(item)
+        item = self.post_push(item, create_schedule)
 
         return item
 
-    def post_push(self, item: models.Task) -> models.Task:
+    def post_push(self, item: models.Task, create_schedule: bool = True) -> models.Task:
         """After an in item is pushed to the queue, we execute this function
 
         Args:
@@ -276,6 +278,25 @@ class Scheduler(abc.ABC):
         self.last_activity = datetime.now(timezone.utc)
 
         if self.create_schedule is False:
+            self.logger.debug(
+                "Not creating schedule for item %s",
+                item.id,
+                item_id=item.id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
+            return item
+
+        scheduler_create_schedule = self.create_schedule
+        item_create_schedule = create_schedule
+
+        # - If the scheduler is creating schedules, and the item is not creating
+        #   schedules, we don't create a schedule for the item.
+        # - If the scheduler is not creating schedules, and the item is creating
+        #   schedules, we create a schedule for the item.
+        # - If both are False, we don't create a schedule for the item.
+        # - If both are True, we create a schedule for the item.
+        if not (scheduler_create_schedule ^ item_create_schedule):
             self.logger.debug(
                 "Not creating schedule for item %s",
                 item.id,

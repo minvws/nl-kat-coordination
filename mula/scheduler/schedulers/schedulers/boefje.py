@@ -194,6 +194,7 @@ class BoefjeScheduler(Scheduler):
             thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-mutations"
         ) as executor:
             for boefje in boefjes:
+                # Is the boefje allowed to run on the ooi?
                 if not self.has_boefje_permission_to_run(boefje, ooi):
                     self.logger.debug(
                         "Boefje not allowed to run on ooi",
@@ -204,13 +205,21 @@ class BoefjeScheduler(Scheduler):
                     )
                     continue
 
+                # TODO: What type of run boefje is it?
+                create_schedule = True
+
                 boefje_task = BoefjeTask(
                     boefje=Boefje.model_validate(boefje.model_dump()),
                     input_ooi=ooi.primary_key if ooi else None,
                     organization=self.organisation.id,
                 )
 
-                executor.submit(self.push_boefje_task, boefje_task, self.push_tasks_for_scan_profile_mutations.__name__)
+                executor.submit(
+                    self.push_boefje_task,
+                    boefje_task,
+                    create_schedule,
+                    self.push_tasks_for_scan_profile_mutations.__name__,
+                )
 
     @tracer.start_as_current_span("boefje_push_tasks_for_new_boefjes")
     def push_tasks_for_new_boefjes(self) -> None:
@@ -461,7 +470,7 @@ class BoefjeScheduler(Scheduler):
                 executor.submit(self.push_boefje_task, new_boefje_task, self.push_tasks_for_rescheduling.__name__)
 
     @tracer.start_as_current_span("boefje_push_task")
-    def push_boefje_task(self, boefje_task: BoefjeTask, caller: str = "") -> None:
+    def push_boefje_task(self, boefje_task: BoefjeTask, create_schedule: bool = True, caller: str = "") -> None:
         """Given a Boefje and OOI create a BoefjeTask and push it onto
         the queue.
 
@@ -582,7 +591,7 @@ class BoefjeScheduler(Scheduler):
         )
 
         try:
-            self.push_item_to_queue_with_timeout(task, self.max_tries)
+            self.push_item_to_queue_with_timeout(task, self.max_tries, create_schedule)
         except QueueFullError:
             self.logger.warning(
                 "Could not add task to queue, queue was full: %s",
