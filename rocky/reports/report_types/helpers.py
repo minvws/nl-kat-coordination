@@ -59,8 +59,21 @@ def get_report_types_for_oois(oois: list[str]) -> set[type[BaseReport]]:
     """
     Get all report types that can be generated for a given list of OOIs
     """
-
     return {report for ooi_pk in oois for report in get_report_types_for_ooi(ooi_pk)}
+
+
+def get_report_types_for_ooi_type(ooi_type: str) -> list[type[BaseReport]]:
+    """
+    Get all report types that can be generated for a given OOI Type
+    """
+    return [report for report in REPORTS if ooi_type in report.input_ooi_types]
+
+
+def get_report_types_for_ooi_types(ooi_types: list[str]) -> set[type[BaseReport]]:
+    """
+    Get all report types that can be generated for a given list of OOIs
+    """
+    return {report for ooi_type in ooi_types for report in get_report_types_for_ooi_type(ooi_type)}
 
 
 def get_report_by_id(report_id: str) -> type[BaseReport]:

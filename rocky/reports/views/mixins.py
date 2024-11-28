@@ -84,14 +84,10 @@ def save_report_data(
     parent_report_name,
     report_recipe: Reference | None = None,
 ) -> Report | None:
-    if len(report_data) == 0:
-        return None
-
     now = datetime.now(timezone.utc)
 
     # if it's not a single report, we need a parent
-
-    if len(report_data) > 1 or len(list(report_data.values())[0]) > 1:
+    if report_data and (len(report_data) > 1 or len(list(report_data.values())[0]) > 1):
         raw_id = bytes_client.upload_raw(
             raw=ReportDataDict(input_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
         )
@@ -163,11 +159,11 @@ def save_report_data(
 
     # if it's a single report we can just save it as complete
     else:
-        report_type_id = next(iter(report_data))
-        ooi = next(iter(report_data[report_type_id]))
-        data = report_data[report_type_id][ooi]
+        report_type_id = next(iter(input_data["input_data"]["report_types"]))
+        ooi = next(iter(report_data[report_type_id])) if report_data else None
+        data = report_data[report_type_id][ooi]["data"] if report_data else {}
         raw_id = bytes_client.upload_raw(
-            raw=ReportDataDict({"report_data": data["data"]} | input_data).model_dump_json().encode(),
+            raw=ReportDataDict({"report_data": data} | input_data).model_dump_json().encode(),
             manual_mime_types={"openkat/report"},
         )
         report_type = get_report_by_id(report_type_id)
@@ -186,7 +182,7 @@ def save_report_data(
             organization_tags=[tag.name for tag in organization.tags.all()],
             data_raw_id=raw_id,
             date_generated=datetime.now(timezone.utc),
-            input_oois=[ooi],
+            input_oois=input_data["input_data"]["input_oois"],
             observed_at=observed_at,
             parent_report=None,
             has_parent=False,
