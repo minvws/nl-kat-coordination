@@ -12,13 +12,14 @@ from octopoes.models.ooi.network import Network
 
 
 def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
-    ooi = Reference.from_str(input_ooi["primary_key"])
+    reference = Reference.from_str(input_ooi["primary_key"])
+
     answers = raw.decode()
     if answers == "NXDOMAIN" or answers == "NoAnswer":
         return
     if answers.startswith("NoAuthServersReachable:"):
         ft = KATFindingType(id="KAT-LAME-DELEGATION")
-        f = Finding(finding_type=ft.reference, ooi=ooi.reference, description=answers.split(":", 1)[1])
+        f = Finding(finding_type=ft.reference, ooi=reference, description=answers.split(":", 1)[1])
         yield ft
         yield f
     else:
@@ -31,5 +32,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
                         name=rr.to_text().rstrip("."), network=Network(name=input_ooi["network"]["name"]).reference
                     )
                     yield hostname
-                    ptr_record = DNSPTRRecord(address=ooi, hostname=hostname.reference, value=value, ttl=rrset.ttl)
+                    ptr_record = DNSPTRRecord(
+                        address=reference, hostname=hostname.reference, value=value, ttl=rrset.ttl
+                    )
                     yield ptr_record

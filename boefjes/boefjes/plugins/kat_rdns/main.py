@@ -26,12 +26,12 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
         # no servers responded happily, we'll check the response from the first
         # https://dnspython.readthedocs.io/en/latest/_modules/dns/rcode.html
         # https://www.rfc-editor.org/rfc/rfc8914#name-extended-dns-error-code-6-d
-        firsterror = error.kwargs["errors"][0]
-        if firsterror[3] == "SERVFAIL":
-            for edeerror in firsterror[4].options:
-                if int(edeerror.code) == 22:
+        first_error = error.kwargs["errors"][0]
+        if first_error[3] == "SERVFAIL":
+            for ede_error in first_error[4].options:
+                if int(ede_error.code) == 22:
                     # Auth nameserver for ip could not be reached, error codes defined in RFC 8914
-                    return [(set(), "NoAuthServersReachable:" + edeerror.text)]  
+                    return [(set(), "NoAuthServersReachable:" + ede_error.text)]
                     # returned when the resolver indicates a Lame delegation.
         return [(set(), "SERVFAIL")]
     except (dns.resolver.Timeout, dns.resolver.NoAnswer):
