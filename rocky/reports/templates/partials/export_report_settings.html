@@ -50,17 +50,17 @@
                         <input type="text"
                                id="parent_report_name_format"
                                name="parent_report_name_format"
-                               value="{{ initial_report_name }}">
+                               value="{{ initial_report_names.0 }}">
                     </div>
                 </fieldset>
-                {% if not is_single_report %}
+                {% if initial_report_names.1 %}
                     <fieldset>
                         <div>
                             <label for="subreport_name_format">{% translate "Subreports name format" %}</label>
                             <input type="text"
                                    id="subreport_name_format"
                                    name="subreport_name_format"
-                                   value="{{ initial_report_name }}">
+                                   value="{{ initial_report_names.1 }}">
                         </div>
                     </fieldset>
                 {% endif %}

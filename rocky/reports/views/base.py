@@ -504,17 +504,21 @@ class ReportFinalSettingsView(BaseReportView, SchedulerView, TemplateView):
             return PostRedirect(self.get_previous())
         return super().get(request, *args, **kwargs)
 
-    def get_initial_report_name(self) -> str:
+    def get_initial_report_names(self) -> tuple[str, str]:
         oois = self.get_total_oois()
-        if oois == 1:
-            return "${report_type} for ${ooi}"
+        is_single_report = self.is_single_report()
+
+        if oois == 1 and is_single_report:
+            return ("${report_type} for ${ooi}", "")
+        if oois == 1 and not is_single_report:
+            return ("${report_type} for ${ooi}", "${report_type} for ${ooi}")
         if oois > 1:
-            return "${report_type} for ${oois_count} objects"
-        return ""
+            return ("${report_type} for ${oois_count} objects", "${report_type} for ${ooi}")
+        return ("", "")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["initial_report_name"] = self.get_initial_report_name()
+        context["initial_report_names"] = self.get_initial_report_names()
         context["report_schedule_form_start_date"] = self.get_report_schedule_form_start_date_time_recurrence()
         context["report_schedule_form_recurrence_choice"] = self.get_report_schedule_form_recurrence_choice()
         return context
@@ -551,7 +555,7 @@ class SaveReportView(BaseReportView, SchedulerView, TemplateView):
                 parent_report_name_format, subreport_name_format, parent_report_type, schedule, self.get_query()
             )
 
-            self.create_report_schedule(report_recipe, start_datetime.isoformat())
+            self.create_report_schedule(report_recipe, start_datetime)
 
             return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
         return super().get(request, *args, **kwargs)
