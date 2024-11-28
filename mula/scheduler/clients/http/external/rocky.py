@@ -1,4 +1,4 @@
-from .services import HTTPService
+from scheduler.clients.http import HTTPService
 
 
 class Rocky(HTTPService):
