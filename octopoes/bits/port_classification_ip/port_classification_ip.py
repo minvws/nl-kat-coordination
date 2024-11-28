@@ -83,7 +83,7 @@ def run(input_ooi: IPPort, additional_oois: list, config: dict[str, Any]) -> Ite
                     ooi=ip_port.reference,
                     description=f"Port {port}/{protocol.value} is a database port and should not be open.",
                 )
-        elif (protocol == Protocol.TCP or protocol == Protocol.UDP) and port in microsoft_rdp_ports:
+        elif port in microsoft_rdp_ports:
             open_rdp_port = KATFindingType(id="KAT-REMOTE-DESKTOP-PORT")
             if aggregate_findings:
                 open_ports.append(ip_port.port)
