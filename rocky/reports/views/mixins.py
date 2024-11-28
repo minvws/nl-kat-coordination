@@ -14,6 +14,7 @@ from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
 from octopoes.models.ooi.reports import Report
 from reports.report_types.aggregate_organisation_report.report import aggregate_reports
 from reports.report_types.concatenated_report.report import ConcatenatedReport
+from reports.report_types.definitions import BaseReport, SubReportPlugins
 from reports.report_types.helpers import REPORTS, get_report_by_id
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.views.base import BaseReportView, ReportDataDict
@@ -57,6 +58,22 @@ def collect_reports(observed_at: datetime, octopoes_connector: OctopoesAPIConnec
             }
 
     return error_reports, report_data
+
+
+def get_child_input_data(input_data: dict[str, Any], ooi: str, report_type: type[BaseReport]):
+    required_plugins = list(input_data["input_data"]["plugins"]["required"])
+    optional_plugins = list(input_data["input_data"]["plugins"]["optional"])
+
+    child_plugins: SubReportPlugins = {"required": [], "optional": []}
+
+    child_plugins["required"] = [
+        plugin_id for plugin_id in required_plugins if plugin_id in report_type.plugins["required"]
+    ]
+    child_plugins["optional"] = [
+        plugin_id for plugin_id in optional_plugins if plugin_id in report_type.plugins["optional"]
+    ]
+
+    return {"input_data": {"input_oois": [ooi], "report_types": [report_type.id], "plugins": child_plugins}}
 
 
 def save_report_data(
@@ -119,21 +136,7 @@ def save_report_data(
                         name_to_save = updated_name
                         break
 
-                required_plugins = list(input_data["input_data"]["plugins"]["required"])
-                optional_plugins = list(input_data["input_data"]["plugins"]["optional"])
-
-                child_plugins: dict[str, list[str]] = {"required": [], "optional": []}
-
-                child_plugins["required"] = [
-                    plugin_id for plugin_id in required_plugins if plugin_id in report_type.plugins["required"]
-                ]
-                child_plugins["optional"] = [
-                    plugin_id for plugin_id in optional_plugins if plugin_id in report_type.plugins["optional"]
-                ]
-
-                child_input_data = {
-                    "input_data": {"input_oois": [ooi], "report_types": [report_type_id], "plugins": child_plugins}
-                }
+                child_input_data = get_child_input_data(input_data, ooi, report_type)
 
                 raw_id = bytes_client.upload_raw(
                     raw=ReportDataDict({"report_data": data["data"]} | child_input_data).model_dump_json().encode(),
@@ -213,8 +216,7 @@ def save_aggregate_report_data(
     report_recipe: Reference | None = None,
 ) -> Report:
     observed_at = get_observed_at
-
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
 
     # Create the report
     report_data_raw_id = bytes_client.upload_raw(
@@ -235,7 +237,7 @@ def save_aggregate_report_data(
         organization_name=organization.name,
         organization_tags=[tag.name for tag in organization.tags.all()],
         data_raw_id=report_data_raw_id,
-        date_generated=datetime.now(timezone.utc),
+        date_generated=now,
         input_oois=ooi_pks,
         observed_at=observed_at,
         parent_report=None,
@@ -245,11 +247,34 @@ def save_aggregate_report_data(
     create_ooi(octopoes_api_connector, bytes_client, report_ooi, observed_at)
 
     # Save the child reports to bytes
+
     for ooi, types in report_data.items():
-        for report_type, data in types.items():
-            bytes_client.upload_raw(
-                raw=ReportDataDict(data | input_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
+        for report_type_id, data in types.items():
+            report_type = get_report_by_id(report_type_id)
+            child_input_data = get_child_input_data(input_data, ooi, report_type)
+
+            raw_id = bytes_client.upload_raw(
+                raw=ReportDataDict({"report_data": data} | child_input_data).model_dump_json().encode(),
+                manual_mime_types={"openkat/report"},
             )
+
+            aggregate_sub_report_ooi = Report(
+                name=str(report_type.name),
+                report_type=report_type_id,
+                template=report_type.template_path,
+                report_id=uuid4(),
+                organization_code=organization.code,
+                organization_name=organization.name,
+                organization_tags=[tag.name for tag in organization.tags.all()],
+                data_raw_id=raw_id,
+                date_generated=now,
+                input_oois=[ooi],
+                observed_at=observed_at,
+                parent_report=report_ooi.reference,
+                has_parent=True,
+            )
+
+            create_ooi(octopoes_api_connector, bytes_client, aggregate_sub_report_ooi, observed_at)
 
     logger.info("Report created", event_code=800071, report=report_ooi)
     return report_ooi

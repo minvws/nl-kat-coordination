@@ -25,7 +25,7 @@ from tools.view_helpers import BreadcrumbsMixin, PostRedirect, url_with_querystr
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.reports import Report as ReportOOI
 from octopoes.models.ooi.reports import ReportRecipe
-from reports.forms import OOITypeMultiCheckboxForReportForm
+from reports.forms import OOITypeMultiCheckboxForReportForm, ReportScheduleStartDateForm
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import AggregateReport, BaseReport, Report, report_plugins_union
@@ -532,9 +532,8 @@ class ReportFinalSettingsView(BaseReportView, SchedulerView, TemplateView):
         context = super().get_context_data(**kwargs)
         context["reports"] = self.get_report_names()
 
-        context["report_schedule_form_start_date"] = self.get_report_schedule_form_start_date()
+        context["report_schedule_form_start_date"] = self.get_report_schedule_form_start_date_time_recurrence()
         context["report_schedule_form_recurrence_choice"] = self.get_report_schedule_form_recurrence_choice()
-        context["report_schedule_form_recurrence"] = self.get_report_schedule_form_recurrence()
 
         context["report_parent_name_form"] = self.get_report_parent_name_form()
         context["report_child_name_form"] = self.get_report_child_name_form()
@@ -565,9 +564,12 @@ class SaveReportView(BaseReportView, SchedulerView):
         elif self.is_scheduled_report():
             report_name_format = request.POST.get("parent_report_name", "")
             subreport_name_format = request.POST.get("child_report_name", "")
-            recurrence = request.POST.get("recurrence", "")
-            deadline_at = request.POST.get("start_date", datetime.now(timezone.utc).date())
             object_selection = request.POST.get("object_selection", "")
+
+            form = ReportScheduleStartDateForm(request.POST)
+            if form.is_valid():
+                start_datetime = form.cleaned_data["start_datetime"]
+                recurrence = form.cleaned_data["recurrence"]
 
             query = {}
             if object_selection == "query":
@@ -586,13 +588,13 @@ class SaveReportView(BaseReportView, SchedulerView):
             elif not self.report_type and subreport_name_format:
                 parent_report_type = ConcatenatedReport.id
 
-            schedule = self.convert_recurrence_to_cron_expressions(recurrence)
+            schedule = self.convert_recurrence_to_cron_expressions(recurrence, start_datetime)
 
             report_recipe = self.create_report_recipe(
                 report_name_format, subreport_name_format, parent_report_type, schedule, query
             )
 
-            self.create_report_schedule(report_recipe, deadline_at)
+            self.create_report_schedule(report_recipe, start_datetime)
 
             return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 
