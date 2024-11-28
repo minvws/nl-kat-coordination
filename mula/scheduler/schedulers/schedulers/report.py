@@ -63,15 +63,31 @@ class ReportScheduler(Scheduler):
             return
 
         try:
-            schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
+            schedules_with_recurrence, _ = self.ctx.datastores.schedule_store.get_schedules(
                 filters=filters.FilterRequest(
                     filters=[
                         filters.Filter(column="scheduler_id", operator="eq", value=self.scheduler_id),
                         filters.Filter(column="deadline_at", operator="lt", value=datetime.now(timezone.utc)),
                         filters.Filter(column="enabled", operator="eq", value=True),
+                        filters.Filter(column="schedule", operator="is_not_null"),
                     ]
                 )
             )
+
+            schedules_run_once, _ = self.ctx.datastores.schedule_store.get_schedules(
+                filters=filters.FilterRequest(
+                    filters=[
+                        filters.Filter(column="scheduler_id", operator="eq", value=self.scheduler_id),
+                        filters.Filter(column="deadline_at", operator="lt", value=datetime.now(timezone.utc)),
+                        filters.Filter(column="enabled", operator="eq", value=True),
+                        filters.Filter(column="schedule", operator="is_null"),
+                        filters.Filter(column="tasks", operator="is_null"),
+                    ]
+                )
+            )
+
+            # Combine and deduplicate
+            schedules = list(set(schedules_with_recurrence + schedules_run_once))
         except storage.errors.StorageError as exc_db:
             self.logger.error(
                 "Could not get schedules for rescheduling %s",
