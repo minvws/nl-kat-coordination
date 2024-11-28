@@ -88,12 +88,21 @@ class ReportScheduler(Scheduler):
             for schedule in schedules:
                 report_task = ReportTask.model_validate(schedule.data)
 
-                # When the schedule has no schedule, but a task is
-                # already executed we should not push the task again
-                task_db = None
+                # When the schedule has no schedule (cron expression), but a
+                # task is already executed for this schedule we should not run
+                # the task again
                 try:
-                    task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(report_task.hash)
-                    if task_db and schedule.schedule is None:
+                    _, count = self.ctx.datastores.task_store.get_tasks(
+                        scheduler_id=self.scheduler_id,
+                        task_type=report_task.type,
+                        filters=filters.FilterRequest(
+                            filters=[
+                                filters.Filter(column="hash", operator="eq", value=report_task.hash),
+                                filters.Filter(column="schedule_id", operator="eq", value=schedule.id),
+                            ]
+                        ),
+                    )
+                    if count > 0 and schedule.schedule is None:
                         self.logger.debug(
                             "Schedule has no schedule, but task already executed",
                             schedule_id=schedule.id,
