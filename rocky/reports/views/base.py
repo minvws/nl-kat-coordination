@@ -268,14 +268,10 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
     def get_observed_at(self):
         return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
 
-    def is_scheduled_report(self) -> bool:
-        recurrence_choice = self.request.POST.get("choose_recurrence", "once")
-        return recurrence_choice == "repeat"
-
     def is_single_report(self) -> bool:
         return len(self.get_report_type_ids()) == 1
 
-    def get_query(self):
+    def get_input_recipe(self):
         object_selection = self.request.POST.get("object_selection", "")
         query = {}
 
@@ -288,7 +284,11 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
                 "order_by": self.order_by,
                 "asc_desc": self.sorting_order,
             }
-        return query
+
+        if not query:
+            return {"input_oois": self.get_ooi_pks()}
+
+        return {"query": query}
 
     def create_report_recipe(
         self,
@@ -296,20 +296,12 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         subreport_name_format: str | None,
         parent_report_type: str | None,
         schedule: str | None,
-        query: dict[str, Any] | None,
     ) -> ReportRecipe:
-        input_recipe: dict[str, Any] = {}
-
-        if query:
-            input_recipe = {"query": query}
-        else:
-            input_recipe = {"input_oois": self.get_ooi_pks()}
-
         report_recipe = ReportRecipe(
             recipe_id=uuid4(),
             report_name_format=report_name_format,
             subreport_name_format=subreport_name_format,
-            input_recipe=input_recipe,
+            input_recipe=self.get_input_recipe(),
             parent_report_type=parent_report_type,
             report_types=self.get_report_type_ids(),
             cron_expression=schedule,
@@ -553,7 +545,7 @@ class SaveReportView(BaseReportView, SchedulerView, TemplateView):
             subreport_name_format = request.POST.get("subreport_name_format")
 
             report_recipe = self.create_report_recipe(
-                parent_report_name_format, subreport_name_format, parent_report_type, schedule, self.get_query()
+                parent_report_name_format, subreport_name_format, parent_report_type, schedule
             )
 
             self.create_report_schedule(report_recipe, start_datetime)
