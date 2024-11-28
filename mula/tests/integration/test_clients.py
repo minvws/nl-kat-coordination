@@ -3,8 +3,7 @@ import time
 import unittest
 from unittest import mock
 
-from scheduler import config, models, storage
-from scheduler.connectors import services
+from scheduler import clients, config, models, storage
 from scheduler.utils import remove_trailing_slash
 
 from tests.factories import PluginFactory
@@ -13,7 +12,7 @@ from tests.factories import PluginFactory
 class BytesTestCase(unittest.TestCase):
     def setUp(self) -> None:
         self.config = config.settings.Settings()
-        self.service_bytes = services.Bytes(
+        self.service_bytes = clients.Bytes(
             host=remove_trailing_slash(str(self.config.host_bytes)),
             user=self.config.host_bytes_user,
             password=self.config.host_bytes_password,
@@ -48,7 +47,7 @@ class KatalogusTestCase(unittest.TestCase):
         self.dbconn = storage.DBConn(str(self.config.db_uri))
         self.dbconn.connect()
 
-        self.service_katalogus = services.Katalogus(
+        self.service_katalogus = clients.Katalogus(
             host=remove_trailing_slash(str(self.config.host_katalogus)),
             source="scheduler_test",
             timeout=self.config.katalogus_request_timeout,
@@ -61,7 +60,7 @@ class KatalogusTestCase(unittest.TestCase):
         self.service_katalogus.boefje_cache.reset()
         self.service_katalogus.normalizer_cache.reset()
 
-    @mock.patch("scheduler.connectors.services.Katalogus.get_organisations")
+    @mock.patch("scheduler.clients.http.external.katalogus.Katalogus.get_organisations")
     def test_flush_plugin_cache(self, mock_get_organisations):
         # Mock
         mock_get_organisations.return_value = [
@@ -75,7 +74,7 @@ class KatalogusTestCase(unittest.TestCase):
         # Assert
         self.assertCountEqual(self.service_katalogus.plugin_cache.cache.keys(), ("org-1", "org-2"))
 
-    @mock.patch("scheduler.connectors.services.Katalogus.get_organisations")
+    @mock.patch("scheduler.clients.http.external.katalogus.Katalogus.get_organisations")
     def test_flush_plugin_cache_empty(self, mock_get_organisations):
         # Mock
         mock_get_organisations.return_value = []
@@ -86,8 +85,8 @@ class KatalogusTestCase(unittest.TestCase):
         # Assert
         self.assertDictEqual(self.service_katalogus.plugin_cache.cache, {})
 
-    @mock.patch("scheduler.connectors.services.Katalogus.get_plugins_by_organisation")
-    @mock.patch("scheduler.connectors.services.Katalogus.get_organisations")
+    @mock.patch("scheduler.clients.http.external.katalogus.Katalogus.get_plugins_by_organisation")
+    @mock.patch("scheduler.clients.http.external.katalogus.Katalogus.get_organisations")
     def test_flush_boefje_cache(self, mock_get_organisations, mock_get_plugins_by_organisation):
         # Mock
         mock_get_organisations.return_value = [
@@ -114,8 +113,8 @@ class KatalogusTestCase(unittest.TestCase):
         self.assertIsNotNone(self.service_katalogus.boefje_cache.get("org-2").get("Hostname"))
         self.assertEqual(len(self.service_katalogus.boefje_cache.get("org-2").get("Hostname")), 2)
 
-    @mock.patch("scheduler.connectors.services.Katalogus.get_plugins_by_organisation")
-    @mock.patch("scheduler.connectors.services.Katalogus.get_organisations")
+    @mock.patch("scheduler.clients.http.external.katalogus.Katalogus.get_plugins_by_organisation")
+    @mock.patch("scheduler.clients.http.external.katalogus.Katalogus.get_organisations")
     def test_flush_normalizer_cache(self, mock_get_organisations, mock_get_plugins_by_organisation):
         # Mock
         mock_get_organisations.return_value = [
@@ -142,7 +141,7 @@ class KatalogusTestCase(unittest.TestCase):
         self.assertIsNotNone(self.service_katalogus.normalizer_cache.get("org-2").get("Hostname"))
         self.assertEqual(len(self.service_katalogus.normalizer_cache.get("org-2").get("Hostname")), 2)
 
-    @mock.patch("scheduler.connectors.services.Katalogus.get_plugins_by_organisation")
+    @mock.patch("scheduler.clients.http.external.katalogus.Katalogus.get_plugins_by_organisation")
     def test_get_new_boefjes_by_org_id(self, mock_get_plugins_by_organisation):
         # Mock
         mock_get_plugins_by_organisation.side_effect = [
@@ -197,8 +196,8 @@ class KatalogusTestCase(unittest.TestCase):
         self.assertEqual(len(new_boefjes), 1)
         self.assertEqual(new_boefjes[0].id, "plugin-5")
 
-    @mock.patch("scheduler.connectors.services.Katalogus.get_plugins_by_organisation")
-    @mock.patch("scheduler.connectors.services.Katalogus.get_organisations")
+    @mock.patch("scheduler.clients.http.external.katalogus.Katalogus.get_plugins_by_organisation")
+    @mock.patch("scheduler.clients.http.external.katalogus.Katalogus.get_organisations")
     def test_plugin_cache_thread_safety(self, mock_get_organisations, mock_get_plugins_by_organisation):
         # Mock
         mock_get_organisations.return_value = [models.Organisation(id="org-1", name="org-1")]
@@ -241,8 +240,8 @@ class KatalogusTestCase(unittest.TestCase):
 
         self.assertEqual(len(self.service_katalogus.plugin_cache.get("org-1")), 3)
 
-    @mock.patch("scheduler.connectors.services.Katalogus.get_plugins_by_organisation")
-    @mock.patch("scheduler.connectors.services.Katalogus.get_organisations")
+    @mock.patch("scheduler.clients.http.external.katalogus.Katalogus.get_plugins_by_organisation")
+    @mock.patch("scheduler.clients.http.external.katalogus.Katalogus.get_organisations")
     def test_boefje_cache_thread_safety(self, mock_get_organisations, mock_get_plugins_by_organisation):
         # Mock
         mock_get_organisations.return_value = [models.Organisation(id="org-1", name="org-1")]
@@ -287,8 +286,8 @@ class KatalogusTestCase(unittest.TestCase):
 
         self.assertEqual(len(self.service_katalogus.boefje_cache.get("org-1").get("Hostname")), 2)
 
-    @mock.patch("scheduler.connectors.services.Katalogus.get_plugins_by_organisation")
-    @mock.patch("scheduler.connectors.services.Katalogus.get_organisations")
+    @mock.patch("scheduler.clients.http.external.katalogus.Katalogus.get_plugins_by_organisation")
+    @mock.patch("scheduler.clients.http.external.katalogus.Katalogus.get_organisations")
     def test_normalizer_cache_thread_safety(self, mock_get_organisations, mock_get_plugins_by_organisation):
         # Mock
         mock_get_organisations.return_value = [models.Organisation(id="org-1", name="org-1")]
@@ -331,7 +330,7 @@ class KatalogusTestCase(unittest.TestCase):
 
         self.assertEqual(len(self.service_katalogus.normalizer_cache.get("org-1").get("Hostname")), 2)
 
-    @mock.patch("scheduler.connectors.services.Katalogus.get_plugins_by_organisation")
+    @mock.patch("scheduler.clients.http.external.katalogus.Katalogus.get_plugins_by_organisation")
     def test_new_boefjes_cache_thread_safety(self, mock_get_plugins_by_organisation):
         mock_get_plugins_by_organisation.side_effect = [
             [

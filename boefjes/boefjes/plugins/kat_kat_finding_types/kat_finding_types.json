@@ -132,6 +132,13 @@
     "impact": "System administrator ports should only be reachable from safe and known locations to reduce attack surface.",
     "recommendation": "Determine if the open system administrator port should be reachable from the identified location. Limit access to reduce the attack surface if necessary."
   },
+  "KAT-REMOTE-DESKTOP-PORT": {
+    "description": "An open Microsoft Remote Desktop Protocol (RDP) port was detected.",
+    "source": "https://www.cloudflare.com/en-gb/learning/access-management/rdp-security-risks/",
+    "risk": "medium",
+    "impact": "Remote desktop ports are often the root cause in ransomware attacks, due to weak password usage, outdated software or insecure configurations.",
+    "recommendation": "Disable the Microsoft RDP service on port 3389 if this is publicly reachable. Add additional security layers, such as VPN access if these ports do require to be enabled to limit the attack surface."
+  },
   "KAT-OPEN-DATABASE-PORT": {
     "description": "A database port is open.",
     "source": "https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers",
