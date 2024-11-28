@@ -11,7 +11,7 @@
     "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP",
     "risk": "medium",
     "impact": "The usage possibility of JavaScript is not limited by the website. If the website contains a cross-site scripting vulnerability, then JavaScript code can be injected into the web page. This code is then executed by the browser of the victim. If a well-established Content Security Policy is active, the attacker can inject JavaScript code into the browser of the victim, but then the code will not get executed by the browser. A good configured Content Security Policy is a strong protection against cross-site scripting vulnerabilities.",
-    "recommendation": "1. Set the Content-Security-Policy HTTP header in all HTTP answers. 2. Make sure that when the Content Security Policy is violated by a browser, that this violation is logged and monitored. Point the content security violation variable report-uri to a server-side log script. 3. Implement a process that periodically analyses these logs for programming errors and hack attacks."
+    "recommendation": "Set the Content-Security-Policy HTTP header in all HTTP answers. Make sure that when the Content Security Policy is violated by a browser, that this violation is logged and monitored. Point the content security violation variable report-uri to a server-side log script. Implement a process that periodically analyses these logs for programming errors and hack attacks."
   },
   "KAT-X-PERMITTED-CROSS-DOMAIN-POLICIES": {
     "description": "The HTTP header X-Permitted-Cross-Domain- Policies is missing in HTTP responses. This header is not officially supported by Mozilla MDN.",
@@ -130,28 +130,28 @@
     "source": "https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers",
     "risk": "medium",
     "impact": "System administrator ports should only be reachable from safe and known locations to reduce attack surface.",
-    "recommendation": "Determine if this port should be reachable from the identified location. Limit access to reduce the attack surface if necessary."
+    "recommendation": "Determine if the open system administrator port should be reachable from the identified location. Limit access to reduce the attack surface if necessary."
   },
   "KAT-OPEN-DATABASE-PORT": {
     "description": "A database port is open.",
     "source": "https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers",
     "risk": "high",
     "impact": "Databases should never be reachable from the internet, but only from secured internal networks. This will reduce unauthorized access.",
-    "recommendation": "Determine if this port should be reachable from the identified location. Limit access to reduce the attack surface if necessary."
+    "recommendation": "Determine if the open database port should be reachable from the identified location. Limit access to reduce the attack surface if necessary."
   },
   "KAT-UNCOMMON-OPEN-PORT": {
     "description": "An uncommon open port was identified. This could introduce security risks.",
     "source": "https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers",
     "risk": "medium",
     "impact": "Uncommon ports are sometimes overlooked and may become unwanted entry points for attackers into an organisations network.",
-    "recommendation": "Manually validate whether this port should be open."
+    "recommendation": "Manually validate whether ports should be open."
   },
   "KAT-OPEN-COMMON-PORT": {
     "description": "A port commonly used was found to be open.",
     "source": "https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers",
     "risk": "recommendation",
     "impact": "Depending on the port there may or may not be impact.",
-    "recommendation": "Manually validate whether this port should be open."
+    "recommendation": "Manually validate whether ports should be open."
   },
   "KAT-WEBSERVER-NO-IPV6": {
     "description": "For this website there is no web server with an IPv6 address available.",
@@ -235,7 +235,7 @@
     "source": "https://en.wikipedia.org/wiki/DICOM",
     "risk": "critical",
     "impact": "Impact depends on segmentation and where the server is reachable from.",
-    "recommendation": "Validate whether this server should actually be exposed."
+    "recommendation": "Validate whether servers should actually be exposed."
   },
   "KAT-10-OR-MORE-NEW-PORTS-OPEN": {
     "description": "A lot of ports are open which were not open a week ago.",
@@ -333,7 +333,7 @@
     "source": "https://datatracker.ietf.org/doc/html/rfc5280",
     "risk": "medium",
     "impact": "Attackers, who can perform a man-in-the-middle attack, can read all your traffic.",
-    "recommendation": "Generate an SSL certificate for this web server to offer confidentiality and integrity to users."
+    "recommendation": "Generate SSL certificates for web servers that do not use secure connections to offer confidentiality and integrity to users and data."
   },
   "KAT-SSL-CERT-HOSTNAME-MISMATCH": {
     "description": "The alternative name of the certificate does not match with the hostname of the website.",
