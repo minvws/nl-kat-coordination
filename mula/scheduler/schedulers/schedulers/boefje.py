@@ -209,14 +209,13 @@ class BoefjeScheduler(Scheduler):
                 run_task = True
 
                 # What type of run boefje is it?
-                boefje_run_on: list[str] = []  # FIXME: we need to get this from the boefje
-                if boefje_run_on:
+                if boefje.run_on:
                     create_schedule = False
                     run_task = False
                     if mutation.operation == MutationOperationType.CREATE:
-                        run_task = "create" in boefje_run_on
+                        run_task = "create" in boefje.run_on
                     elif mutation.operation == MutationOperationType.UPDATE:
-                        run_task = "update" in boefje_run_on
+                        run_task = "update" in boefje.run_on
 
                 if not run_task:
                     self.logger.debug(
