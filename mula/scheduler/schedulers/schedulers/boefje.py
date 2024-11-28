@@ -205,8 +205,28 @@ class BoefjeScheduler(Scheduler):
                     )
                     continue
 
-                # TODO: What type of run boefje is it?
                 create_schedule = True
+                run_task = True
+
+                # What type of run boefje is it?
+                boefje_run_on: list[str] = []  # FIXME: we need to get this from the boefje
+                if boefje_run_on:
+                    create_schedule = False
+                    run_task = False
+                    if mutation.operation == MutationOperationType.CREATE:
+                        run_task = "create" in boefje_run_on
+                    elif mutation.operation == MutationOperationType.UPDATE:
+                        run_task = "update" in boefje_run_on
+
+                if not run_task:
+                    self.logger.debug(
+                        "Based on boefje run on type, skipping",
+                        boefje_id=boefje.id,
+                        ooi_primary_key=ooi.primary_key,
+                        organisation_id=self.organisation.id,
+                        scheduler_id=self.scheduler_id,
+                    )
+                    continue
 
                 boefje_task = BoefjeTask(
                     boefje=Boefje.model_validate(boefje.model_dump()),
