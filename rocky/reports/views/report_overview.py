@@ -4,6 +4,8 @@ from uuid import uuid4
 
 import structlog
 from django.contrib import messages
+from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
@@ -70,9 +72,11 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
                         recipe_tree = recipe_ooi_tree.store.values()
                         recipe_ooi = next(ooi for ooi in recipe_tree if isinstance(ooi, ReportRecipe))
                         report_oois = [ooi for ooi in recipe_tree if isinstance(ooi, Report)]
+                        report_oois.sort(key=lambda ooi: ooi.date_generated, reverse=True)
                         recipes.append(
                             {
                                 "schedule_id": schedule["id"],
+                                "enabled": schedule["enabled"],
                                 "recipe": recipe_ooi,
                                 "cron": schedule["schedule"],
                                 "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
@@ -86,6 +90,54 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
         context = super().get_context_data(**kwargs)
         context["total_oois"] = len(self.object_list)
         return context
+
+
+class ScheduledReportsEnableDisableView(BreadcrumbsReportOverviewView, SchedulerView, ListView):
+    """
+    Cancel the selected report(s)
+    """
+
+    task_type = "report"
+    template_name = "report_overview/scheduled_reports.html"
+
+    def get_queryset(self) -> ReportList:
+        return ReportList(self.octopoes_api_connector, valid_time=self.observed_at)
+
+    def get(self, request, *args, **kwargs) -> HttpResponse:
+        schedule_id = request.GET.get("schedule_id")
+        schedule = self.get_schedule_details(schedule_id)
+        is_schedule_enabled = schedule.enabled
+
+        self.edit_report_schedule(schedule_id, {"enabled": not is_schedule_enabled})
+
+        logger.info(
+            _("Schedule {}").format("disabled" if is_schedule_enabled else "enabled"),
+            event_code="0800081" if is_schedule_enabled else "0800082",
+            schedule_id=schedule_id,
+        )
+
+        report_recipe_id = schedule.data["report_recipe_id"]
+        report_recipe = self.octopoes_api_connector.get(
+            Reference.from_str(f"ReportRecipe|{report_recipe_id}"), valid_time=datetime.now(timezone.utc)
+        )
+
+        if is_schedule_enabled:
+            messages.success(
+                self.request,
+                _(
+                    "Schedule disabled successfully. '{}' will not be generated "
+                    "automatically until the schedule is enabled again."
+                ).format(report_recipe.report_name_format),
+            )
+        else:
+            messages.success(
+                self.request,
+                _("Schedule enabled successfully. '{}' will be generated according to schedule.").format(
+                    report_recipe.report_name_format
+                ),
+            )
+
+        return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 
 
 class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
