@@ -16,6 +16,7 @@ from tests.conftest import seed_system
 from tests.loading import get_boefje_meta, get_normalizer_meta
 
 
+@pytest.mark.skipif("not os.getenv('DATABASE_MIGRATION')")
 @pytest.mark.slow
 def test_migration(
     octopoes_api_connector: OctopoesAPIConnector,

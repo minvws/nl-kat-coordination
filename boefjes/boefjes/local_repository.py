@@ -1,7 +1,7 @@
 import json
 import pkgutil
+from functools import lru_cache
 from pathlib import Path
-from typing import Any
 
 import structlog
 
@@ -15,6 +15,7 @@ from boefjes.plugins.models import (
     BoefjeResource,
     ModuleException,
     NormalizerResource,
+    hash_path,
 )
 
 logger = structlog.get_logger(__name__)
@@ -23,16 +24,9 @@ logger = structlog.get_logger(__name__)
 class LocalPluginRepository:
     def __init__(self, path: Path):
         self.path = path
-        self._cached_boefjes: dict[str, Any] | None = None
-        self._cached_normalizers: dict[str, Any] | None = None
 
     def get_all(self) -> list[PluginType]:
-        all_plugins = [boefje_resource.boefje for boefje_resource in self.resolve_boefjes().values()]
-        normalizers = [normalizer_resource.normalizer for normalizer_resource in self.resolve_normalizers().values()]
-
-        all_plugins += normalizers
-
-        return all_plugins
+        return _cached_resolve_plugins(self.path, hash_path(self.path))
 
     def by_id(self, plugin_id: str) -> PluginType:
         boefjes = self.resolve_boefjes()
@@ -107,66 +101,106 @@ class LocalPluginRepository:
         return boefjes[id_].path / "description.md"
 
     def resolve_boefjes(self) -> dict[str, BoefjeResource]:
-        if self._cached_boefjes:
-            return self._cached_boefjes
-
-        paths_and_packages = self._find_packages_in_path_containing_files([BOEFJE_DEFINITION_FILE])
-        boefje_resources = []
-
-        for path, package in paths_and_packages:
-            try:
-                boefje_resources.append(BoefjeResource(path, package))
-            except ModuleException as exc:
-                logger.exception(exc)
-
-        self._cached_boefjes = {resource.boefje.id: resource for resource in boefje_resources}
-
-        return self._cached_boefjes
+        return _cached_resolve_boefjes(self.path, hash_path(self.path))
 
     def resolve_normalizers(self) -> dict[str, NormalizerResource]:
-        if self._cached_normalizers:
-            return self._cached_normalizers
+        return _cached_resolve_normalizers(self.path, hash_path(self.path))
 
-        paths_and_packages = self._find_packages_in_path_containing_files(
-            [NORMALIZER_DEFINITION_FILE, ENTRYPOINT_NORMALIZERS]
-        )
-        normalizer_resources = []
 
-        for path, package in paths_and_packages:
-            try:
-                normalizer_resources.append(NormalizerResource(path, package))
-            except ModuleException as exc:
-                logger.exception(exc)
+@lru_cache(maxsize=5)
+def _cached_resolve_plugins(path, path_hash: str) -> dict[str, PluginType]:
+    """Adding the hash to the arguments makes sure we refresh this. The size could hence be 1, but since this is not
+    expensive it's worth catching scenarios where we are testing new boefjes and removing them and still having the old
+    hash cached"""
 
-        self._cached_normalizers = {resource.normalizer.id: resource for resource in normalizer_resources}
+    all_plugins = [boefje_resource.boefje for boefje_resource in _cached_resolve_boefjes(path, path_hash).values()]
+    normalizers = [
+        normalizer_resource.normalizer for normalizer_resource in _cached_resolve_normalizers(path, path_hash).values()
+    ]
 
-        return self._cached_normalizers
+    all_plugins += normalizers
 
-    def _find_packages_in_path_containing_files(self, required_files: list[str]) -> list[tuple[Path, str]]:
-        prefix = self.create_relative_import_statement_from_cwd(self.path)
-        paths = []
+    return all_plugins
 
-        for package in pkgutil.walk_packages([str(self.path)], prefix):
-            if not package.ispkg:
-                logger.debug("%s is not a package", package.name)
-                continue
 
-            path = self.path / package.name.replace(prefix, "").replace(".", "/")
-            missing_files = [file for file in required_files if not (path / file).exists()]
+@lru_cache(maxsize=10)
+def _cached_resolve_boefjes(path, path_hash: str) -> dict[str, BoefjeResource]:
+    """Adding the hash to the arguments makes sure we refresh this. The size could hence be 1, but since this is not
+    expensive it's worth catching scenarios where we are testing new boefjes and removing them and still having the old
+    hash cached"""
 
-            if missing_files:
-                logger.debug("Files %s not found for %s", missing_files, package.name)
-                continue
+    paths_and_packages = _find_packages_in_path_containing_files(path, (BOEFJE_DEFINITION_FILE,))
+    boefje_resources = []
 
-            paths.append((path, package.name))
+    for path, package in paths_and_packages:
+        try:
+            boefje_resources.append(get_boefje_resource(path, package, hash_path(path)))
+        except ModuleException as exc:
+            logger.exception(exc)
 
-        return paths
+    return {resource.boefje.id: resource for resource in boefje_resources}
 
-    @staticmethod
-    def create_relative_import_statement_from_cwd(package_dir: Path) -> str:
-        relative_path = str(package_dir.absolute()).replace(str(Path.cwd()), "")  # e.g. "/boefjes/plugins"
 
-        return f"{relative_path[1:].replace('/', '.')}."  # Turns into "boefjes.plugins."
+@lru_cache(maxsize=10)
+def _cached_resolve_normalizers(path: Path, path_hash: str) -> dict[str, NormalizerResource]:
+    """Adding the hash to the arguments makes sure we refresh this. The size could hence be 1, but since this is not
+    expensive it's worth catching scenarios where we are testing new boefjes and removing them and still having the old
+    hash cached"""
+
+    paths_and_packages = _find_packages_in_path_containing_files(
+        path, (NORMALIZER_DEFINITION_FILE, ENTRYPOINT_NORMALIZERS)
+    )
+    normalizer_resources = []
+
+    for path, package in paths_and_packages:
+        try:
+            normalizer_resources.append(get_normalizer_resource(path, package, hash(path)))
+        except ModuleException as exc:
+            logger.exception(exc)
+
+    return {resource.normalizer.id: resource for resource in normalizer_resources}
+
+
+def _find_packages_in_path_containing_files(path, required_files: tuple[str]) -> list[tuple[Path, str]]:
+    prefix = create_relative_import_statement_from_cwd(path)
+    paths = []
+
+    for package in pkgutil.walk_packages([str(path)], prefix):
+        if not package.ispkg:
+            logger.debug("%s is not a package", package.name)
+            continue
+
+        new_path = path / package.name.replace(prefix, "").replace(".", "/")
+        missing_files = [file for file in required_files if not (new_path / file).exists()]
+
+        if missing_files:
+            logger.debug("Files %s not found for %s", missing_files, package.name)
+            continue
+
+        paths.append((new_path, package.name))
+
+    return paths
+
+
+def create_relative_import_statement_from_cwd(package_dir: Path) -> str:
+    relative_path = str(package_dir.absolute()).replace(str(Path.cwd()), "")  # e.g. "/boefjes/plugins"
+
+    return f"{relative_path[1:].replace('/', '.')}."  # Turns into "boefjes.plugins."
+
+
+@lru_cache(maxsize=200)
+def get_boefje_resource(path, package, path_hash):
+    """The cache size in theory only has to be the amount of local boefjes available, but 200 gives us some extra
+    space."""
+    return BoefjeResource(path, package, path_hash)
+
+
+@lru_cache(maxsize=200)
+def get_normalizer_resource(path, package, path_hash):
+    """The cache size in theory only has to be the amount of local normalizers available, but 200 gives us some extra
+    space."""
+
+    return NormalizerResource(path, package)
 
 
 def get_local_repository():

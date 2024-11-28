@@ -132,4 +132,4 @@ class ConfigStorageMemory(ConfigStorage):
         ]
 
     def get_enabled_plugins(self, organisation_id: str) -> list[str]:
-        return self.get_enabled_normalizers() + self.get_enabled_boefjes()
+        return self.get_enabled_normalizers(organisation_id) + self.get_enabled_boefjes(organisation_id)

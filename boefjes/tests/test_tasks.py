@@ -12,7 +12,12 @@ from boefjes.dependencies.plugins import PluginService
 from boefjes.job_handler import BoefjeHandler
 from boefjes.job_models import BoefjeMeta, InvalidReturnValueNormalizer, NormalizerMeta
 from boefjes.local import LocalBoefjeJobRunner
-from boefjes.local_repository import LocalPluginRepository
+from boefjes.local_repository import (
+    LocalPluginRepository,
+    _cached_resolve_boefjes,
+    _cached_resolve_normalizers,
+    _cached_resolve_plugins,
+)
 from boefjes.models import Bit, Boefje, Normalizer, PluginType
 from boefjes.runtime_interfaces import JobRuntimeError
 from boefjes.sql.config_storage import create_config_storage
@@ -40,6 +45,27 @@ bits = [
 ]
 plugins: list[PluginType] = boefjes + normalizers + bits
 sys.path.append(str(Path(__file__).parent))
+
+
+def test_local_repo_benchmark(local_repository):
+    assert local_repository.get_all()
+    assert local_repository.get_all()
+    assert local_repository.get_all()
+
+    assert _cached_resolve_plugins.cache_info().misses == 1
+    assert _cached_resolve_plugins.cache_info().hits == 2
+
+    local_repository.resolve_boefjes()
+    local_repository.resolve_boefjes()
+    local_repository.resolve_boefjes()
+    assert _cached_resolve_boefjes.cache_info().misses == 1
+    assert _cached_resolve_boefjes.cache_info().hits == 3
+
+    local_repository.resolve_normalizers()
+    local_repository.resolve_normalizers()
+    local_repository.resolve_normalizers()
+    assert _cached_resolve_normalizers.cache_info().misses == 1
+    assert _cached_resolve_normalizers.cache_info().hits == 3
 
 
 def test_parse_normalizer_meta_to_json():

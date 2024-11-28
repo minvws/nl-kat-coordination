@@ -340,7 +340,9 @@ def save_declaration(declaration: ValidatedDeclaration, octopoes: OctopoesServic
 
 
 @router.post("/declarations/save_many", tags=["Origins"])
-def save_many_declarations(declarations: list[ValidatedDeclaration], octopoes: OctopoesService = Depends(octopoes_service)) -> None:
+def save_many_declarations(
+    declarations: list[ValidatedDeclaration], octopoes: OctopoesService = Depends(octopoes_service)
+) -> None:
     for declaration in declarations:
         origin = Origin(
             origin_type=OriginType.DECLARATION,

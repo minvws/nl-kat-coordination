@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from boefjes.models import Organisation
 from boefjes.sql.db import ObjectNotFoundException
 from boefjes.sql.organisation_storage import get_organisations_store
-from boefjes.storage.interfaces import OrganisationNotFound, OrganisationStorage
+from boefjes.storage.interfaces import OrganisationStorage
 
 router = APIRouter(prefix="/organisations", tags=["organisations"])
 
