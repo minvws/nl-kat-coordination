@@ -4,7 +4,7 @@ import fastapi
 import structlog
 from fastapi import status
 
-from scheduler import context, models, queues, schedulers, storage
+from scheduler import context, models, schedulers, storage
 from scheduler.schedulers.queue import NotAllowedError, QueueEmptyError, QueueFullError
 from scheduler.server import serializers
 from scheduler.server.errors import BadRequestError, ConflictError, NotFoundError, TooManyRequestsError
