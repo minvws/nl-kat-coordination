@@ -258,22 +258,24 @@ def test_max_length_config_nibble(xtdb_octopoes_service: OctopoesService, event_
     xtdb_octopoes_service.ooi_repository.save(config, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
 
-    result = nibbler.infer([url], valid_time)
+    xtdb_url = xtdb_octopoes_service.ooi_repository.get(url.reference, valid_time)
+
+    result = nibbler.infer([xtdb_url], valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
 
-    assert url in result
-    # FIXME: wait shouldn't this be one?
-    assert len(result[url]["max_url_length_config"]) == 2
-    assert result[url]["max_url_length_config"][tuple([url, config])] == set()
+    assert xtdb_url in result
+    assert len(result[xtdb_url]["max_url_length_config"]) == 1
+    assert result[xtdb_url]["max_url_length_config"][tuple([xtdb_url, config])] == set()
 
     config = Config(ooi=network.reference, bit_id="superkat", config={"max_length": "13"})
     xtdb_octopoes_service.ooi_repository.save(config, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
 
-    result = nibbler.infer([url], valid_time)
+    result = nibbler.infer([xtdb_url], valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
 
-    assert url in result
-    # FIXME: wait shouldn't this be one?
-    assert len(result[url]["max_url_length_config"]) == 2
-    assert result[url]["max_url_length_config"][tuple([url, config])] == set(max_url_length_config(url, config))
+    assert xtdb_url in result
+    assert len(result[xtdb_url]["max_url_length_config"]) == 1
+    assert result[xtdb_url]["max_url_length_config"][tuple([xtdb_url, config])] == set(
+        max_url_length_config(xtdb_url, config)
+    )
