@@ -20,4 +20,5 @@
 {% block html_at_end_body %}
     {{ block.super }}
     <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% comment %} <script src="{% static "js/toggleSwitch.js" %}" nonce="{{ request.csp_nonce }}"></script> {% endcomment %}
 {% endblock html_at_end_body %}
