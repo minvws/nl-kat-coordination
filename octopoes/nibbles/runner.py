@@ -90,11 +90,11 @@ class NibblesRunner:
                         if nibblet.parameters_hash != nibble_hasher(arg)
                     }
                     return_value |= {nibble.id: results}
-        else:
-            for nibble in filter(lambda x: type(ooi) in x.signature, self.nibbles.values()):
-                args = self.ooi_repository.nibble_query(ooi, nibble, valid_time)
-                results = {tuple(arg): set(flatten([nibble(arg)])) for arg in args}
-                return_value |= {nibble.id: results}
+        nibblet_nibbles = {self.nibbles[nibblet.method] for nibblet in nibblets}
+        for nibble in filter(lambda x: type(ooi) in x.signature and x not in nibblet_nibbles, self.nibbles.values()):
+            args = self.ooi_repository.nibble_query(ooi, nibble, valid_time)
+            results = {tuple(arg): set(flatten([nibble(arg)])) for arg in args}
+            return_value |= {nibble.id: results}
         # TODO: we could cache the writes for single OOI nibbles
         self._write({ooi: return_value}, valid_time)
         return return_value
