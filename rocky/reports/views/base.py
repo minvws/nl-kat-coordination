@@ -241,7 +241,7 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
 
     def get_report_types_for_generate_report(self):
         if self.object_selection == "query":
-            report_types = get_report_types_for_ooi_types(self.get_report_ooi_types())
+            report_types = get_report_types_for_ooi_types(self.get_ooi_types())
         else:
             report_types = get_report_types_for_oois(self.selected_oois)
         return self.get_report_types_from_ooi_selelection(report_types)
