@@ -195,7 +195,7 @@ def save_report_data(
 
         create_ooi(octopoes_api_connector, bytes_client, parent_report_ooi, observed_at)
 
-    logger.info("Report created", event_code="080071", report=parent_report_ooi)
+    logger.info("Report created", event_code=800071, report=parent_report_ooi)
     return parent_report_ooi
 
 
@@ -251,7 +251,7 @@ def save_aggregate_report_data(
                 raw=ReportDataDict(data | input_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
             )
 
-    logger.info("Report created", event_code="080071", report=report_ooi)
+    logger.info("Report created", event_code=800071, report=report_ooi)
     return report_ooi
 
 
@@ -357,6 +357,6 @@ class SaveMultiReportMixin(BaseReportView):
         )
 
         create_ooi(self.octopoes_api_connector, self.bytes_client, report_ooi, observed_at)
-        logger.info("Report created", event_code="080071", report=report_ooi)
+        logger.info("Report created", event_code=800071, report=report_ooi)
 
         return report_ooi

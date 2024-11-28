@@ -299,7 +299,7 @@ class SchedulerClient:
         try:
             response = self._client.patch(f"/schedules/{schedule_id}", json=params)
             response.raise_for_status()
-            logger.info("Schedule updated", event_code="080082", schedule_id=schedule_id, params=params)
+            logger.info("Schedule updated", event_code=800082, schedule_id=schedule_id, params=params)
         except (HTTPStatusError, ConnectError):
             raise SchedulerHTTPError()
 
@@ -307,7 +307,7 @@ class SchedulerClient:
         try:
             res = self._client.post("/schedules", json=schedule.model_dump(exclude_none=True))
             res.raise_for_status()
-            logger.info("Schedule created", event_code="080081", schedule=schedule)
+            logger.info("Schedule created", event_code=800081, schedule=schedule)
             return ScheduleResponse.model_validate_json(res.content)
         except (ValidationError, HTTPStatusError, ConnectError):
             raise SchedulerValidationError(extra_message="Report schedule failed: ")
@@ -316,7 +316,7 @@ class SchedulerClient:
         try:
             response = self._client.delete(f"/schedules/{schedule_id}")
             response.raise_for_status()
-            logger.info("Schedule deleted", event_code="080083", schedule_id=schedule_id)
+            logger.info("Schedule deleted", event_code=800083, schedule_id=schedule_id)
         except (HTTPStatusError, ConnectError):
             raise SchedulerHTTPError()
 
