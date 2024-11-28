@@ -98,7 +98,7 @@ class ReportScheduler(Scheduler):
                         filters=filters.FilterRequest(
                             filters=[
                                 filters.Filter(column="hash", operator="eq", value=report_task.hash),
-                                filters.Filter(column="schedule_id", operator="eq", value=schedule.id),
+                                filters.Filter(column="schedule_id", operator="eq", value=str(schedule.id)),
                             ]
                         ),
                     )
