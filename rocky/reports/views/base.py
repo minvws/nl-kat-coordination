@@ -302,6 +302,7 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
             ooi=report_recipe,
             observed_at=datetime.now(timezone.utc),
         )
+        logger.info("ReportRecipe created", event_code=800091, report_recipe=report_recipe)
         return report_recipe
 
     def get_input_data(self) -> dict[str, Any]:
