@@ -1,11 +1,11 @@
 import json
 import pkgutil
-from functools import lru_cache
+from functools import lru_cache, cache
 from pathlib import Path
 
 import structlog
 
-from boefjes.models import PluginType, Boefje, Normalizer
+from boefjes.models import PluginType
 from boefjes.plugins.models import (
     BOEFJE_DEFINITION_FILE,
     BOEFJES_DIR,
@@ -24,18 +24,10 @@ logger = structlog.get_logger(__name__)
 class LocalPluginRepository:
     def __init__(self, path: Path):
         self.path = path
-        self._cached_boefjes: dict[str, BoefjeResource] | None = None
-        self._cached_normalizers: dict[str, NormalizerResource] | None = None
 
     def get_all(self) -> list[PluginType]:
-        if not self._cached_boefjes or not self._cached_normalizers:  # first check the instance-level cache
-            # Then check the global cache based on directory hashes
-            resources = _cached_resolve_plugins(self.path, hash_path(self.path))
-            self._cached_boefjes = {resource.boefje.id: resource for resource in resources if isinstance(resource, BoefjeResource)}
-            self._cached_normalizers = {resource.normalizer.id: resource for resource in resources if isinstance(resource, NormalizerResource)}
-
-        boefjes = [resource.boefje for resource in self._cached_boefjes.values()]
-        normalizers = [resource.normalizer for resource in self._cached_normalizers.values()]
+        boefjes = [resource.boefje for resource in self.resolve_boefjes().values()]
+        normalizers = [resource.normalizer for resource in self.resolve_normalizers().values()]
         return boefjes + normalizers
 
     def by_id(self, plugin_id: str) -> PluginType:
@@ -111,36 +103,14 @@ class LocalPluginRepository:
         return boefjes[id_].path / "description.md"
 
     def resolve_boefjes(self) -> dict[str, BoefjeResource]:
-        if self._cached_boefjes:  # first check the instance-level cache
-            return self._cached_boefjes
-
-        # Then check the global cache based on directory hashes
-        self._cached_boefjes = _cached_resolve_boefjes(self.path, hash_path(self.path))
-
-        return self._cached_boefjes
+        return _cached_resolve_boefjes(self.path)
 
     def resolve_normalizers(self) -> dict[str, NormalizerResource]:
-        if self._cached_normalizers:  # first check the instance-level cache
-            return self._cached_normalizers
-
-        # Then check the global cache based on directory hashes
-        self._cached_normalizers = _cached_resolve_normalizers(self.path, hash_path(self.path))
-
-        return self._cached_normalizers
+        return _cached_resolve_normalizers(self.path)
 
 
-@lru_cache(maxsize=5)
-def _cached_resolve_plugins(path, path_hash: str) -> list[BoefjeResource | NormalizerResource]:
-    """Adding the hash to the arguments makes sure we refresh this. The size could hence be 1, but since this is not
-    expensive it's worth catching scenarios where we are testing new boefjes and removing them and still having the old
-    hash cached"""
-
-    return (list(_cached_resolve_boefjes(path, path_hash).values())
-            + list(_cached_resolve_normalizers(path, path_hash).values()))
-
-
-@lru_cache(maxsize=10)
-def _cached_resolve_boefjes(path, path_hash: str) -> dict[str, BoefjeResource]:
+@cache
+def _cached_resolve_boefjes(path) -> dict[str, BoefjeResource]:
     """Adding the hash to the arguments makes sure we refresh this. The size could hence be 1, but since this is not
     expensive it's worth catching scenarios where we are testing new boefjes and removing them and still having the old
     hash cached"""
@@ -157,8 +127,8 @@ def _cached_resolve_boefjes(path, path_hash: str) -> dict[str, BoefjeResource]:
     return {resource.boefje.id: resource for resource in boefje_resources}
 
 
-@lru_cache(maxsize=10)
-def _cached_resolve_normalizers(path: Path, path_hash: str) -> dict[str, NormalizerResource]:
+@cache
+def _cached_resolve_normalizers(path: Path) -> dict[str, NormalizerResource]:
     """Adding the hash to the arguments makes sure we refresh this. The size could hence be 1, but since this is not
     expensive it's worth catching scenarios where we are testing new boefjes and removing them and still having the old
     hash cached"""
