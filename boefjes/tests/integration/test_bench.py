@@ -116,3 +116,8 @@ def test_migration(
     assert observation.source_method == "boefje_udp"
 
     assert octopoes_api_connector.list_objects(set(), valid_time).count == total_oois
+
+
+@pytest.mark.slow
+def test_plugins_bench(plugin_service, organisation):
+    plugin_service.get_all(organisation.id)
