@@ -1,5 +1,6 @@
 import datetime
 
+from crisis_room.models import Dashboard
 from django.conf import settings
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
@@ -115,6 +116,8 @@ def organization_pre_save(sender, instance, *args, **kwargs):
 @receiver(post_save, sender=Organization)
 def organization_post_save(sender, instance, *args, **kwargs):
     octopoes_client = _get_healthy_octopoes(instance.code)
+
+    Dashboard.objects.get_or_create(organization=instance)
 
     try:
         valid_time = datetime.datetime.now(datetime.timezone.utc)

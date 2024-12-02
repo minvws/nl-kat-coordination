@@ -17,7 +17,7 @@
         </section>
         <section>
             <div>
-                {{ recipe.input_recipe }}
+                {% for dashboard in dashboards %}{{ dashboard.recipe }}{% endfor %}
                 {% include "partials/elements/ooi_report_settings.html" %}
 
             </div>

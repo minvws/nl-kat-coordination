@@ -1,6 +1,4 @@
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from uuid import uuid4
 
 import structlog
 from account.models import KATUser
@@ -9,20 +7,14 @@ from django.contrib import messages
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-from reports.report_types.concatenated_report.report import ConcatenatedReport
-from reports.report_types.findings_report.report import FindingsReport
-from reports.report_types.helpers import get_ooi_types_with_report
 from tools.forms.base import ObservedAtForm
 from tools.models import Organization, OrganizationMember
-from tools.ooi_helpers import create_ooi
 from tools.view_helpers import BreadcrumbsMixin
 
+from crisis_room.models import Dashboard
 from octopoes.connector import ConnectorException
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import ScanLevel, ScanProfileType
 from octopoes.models.ooi.findings import RiskLevelSeverity
-from octopoes.models.ooi.reports import ReportRecipe
-from rocky.bytes_client import get_bytes_client
 from rocky.views.mixins import ObservedAtMixin
 from rocky.views.ooi_view import ConnectorFormMixin
 
@@ -109,56 +101,15 @@ class CrisisRoomView(BreadcrumbsMixin, ConnectorFormMixin, ObservedAtMixin, Temp
 
 class CrisisRoomAllOrganizations(TemplateView):
     template_name = "crisis_room/crisis_room.html"
-    default_scan_level = {ScanLevel.L2}
-    default_scan_profiles = {ScanProfileType.EMPTY, ScanProfileType.INHERITED, ScanProfileType.DECLARED}
-    default_valid_time = datetime.now(timezone.utc)
 
     def get_user_organizations(self):
         return [member.organization for member in OrganizationMember.objects.filter(user=self.request.user)]
 
-    def get_query(self):
-        return {
-            "query": {
-                "ooi_types": [ooi_type.__name__ for ooi_type in get_ooi_types_with_report()],
-                "scan_level": self.default_scan_level,
-                "scan_type": self.default_scan_profiles,
-                "search_string": "",
-                "order_by": "object_type",
-                "asc_desc": "desc",
-            }
-        }
-
-    def create_report_recipe_for_all_organizations(self):
-        report_recipe = ReportRecipe(
-            recipe_id=uuid4(),
-            report_name_format="Findings Report for ${oois_count} objects",
-            subreport_name_format="Findings Report for ${ooi}",
-            input_recipe=self.get_query(),
-            parent_report_type=ConcatenatedReport.id,
-            report_types=[FindingsReport.id],
-            cron_expression="0 0 * * *",
-        )
-
-        organizations = self.get_user_organizations()
-
-        for organization in organizations:
-            octopoes_client = OctopoesAPIConnector(
-                settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
-            )
-
-            bytes_client = get_bytes_client(organization.code)
-
-            create_ooi(
-                api_connector=octopoes_client,
-                bytes_client=bytes_client,
-                ooi=report_recipe,
-                observed_at=self.default_valid_time,
-            )
-
-        return report_recipe
+    def get_organization_dashboard(self):
+        return Dashboard.objects.filter(organization__in=[org.id for org in self.get_user_organizations()])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["recipe"] = self.create_report_recipe_for_all_organizations()
+        context["dashboards"] = self.get_organization_dashboard()
 
         return context

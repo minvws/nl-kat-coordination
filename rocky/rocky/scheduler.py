@@ -322,7 +322,7 @@ class SchedulerClient:
             filter_key = "filters"
             params = {k: v for k, v in kwargs.items() if v is not None if k != filter_key}  # filter Nones from kwargs
             endpoint = "/tasks"
-            res = self._client.post(endpoint, params=params, json=kwargs.get(filter_key, None))
+            res = self._client.post(endpoint, params=params, json=kwargs.get(filter_key))
             return PaginatedTasksResponse.model_validate_json(res.content)
         except ValidationError:
             raise SchedulerValidationError(extra_message=_("Task list: "))
