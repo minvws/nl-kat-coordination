@@ -4,7 +4,9 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import config, models, queues, storage
+from scheduler import config, models, storage
+from scheduler.schedulers.queue import InvalidItemError, NotAllowedError, QueueEmptyError, QueueFullError
+from scheduler.storage import stores
 from structlog.testing import capture_logs
 
 from tests.mocks import item as mock_item
@@ -27,9 +29,9 @@ class SchedulerTestCase(unittest.TestCase):
 
         self.mock_ctx.datastores = SimpleNamespace(
             **{
-                storage.TaskStore.name: storage.TaskStore(self.dbconn),
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
-                storage.ScheduleStore.name: storage.ScheduleStore(self.dbconn),
+                stores.TaskStore.name: stores.TaskStore(self.dbconn),
+                stores.PriorityQueueStore.name: stores.PriorityQueueStore(self.dbconn),
+                stores.ScheduleStore.name: stores.ScheduleStore(self.dbconn),
             }
         )
 
@@ -138,7 +140,7 @@ class SchedulerTestCase(unittest.TestCase):
         # Assert
         self.assertEqual(1, self.scheduler.queue.qsize())
 
-        with self.assertRaises(queues.errors.QueueFullError):
+        with self.assertRaises(QueueFullError):
             self.scheduler.push_item_to_queue_with_timeout(item=item, max_tries=1)
 
         self.assertEqual(1, self.scheduler.queue.qsize())
@@ -149,7 +151,7 @@ class SchedulerTestCase(unittest.TestCase):
         item.data = {"invalid": "data"}
 
         # Assert
-        with self.assertRaises(queues.errors.InvalidItemError):
+        with self.assertRaises(InvalidItemError):
             self.scheduler.push_item_to_queue(item)
 
     def test_pop_item_from_queue(self):
@@ -167,7 +169,7 @@ class SchedulerTestCase(unittest.TestCase):
 
     def test_pop_item_from_queue_empty(self):
         self.assertEqual(0, self.scheduler.queue.qsize())
-        with self.assertRaises(queues.errors.QueueEmptyError):
+        with self.assertRaises(QueueEmptyError):
             self.scheduler.pop_item_from_queue()
 
     def test_post_push(self):
@@ -387,7 +389,7 @@ class SchedulerTestCase(unittest.TestCase):
         # Scheduler should be disabled
         self.assertFalse(self.scheduler.is_enabled())
 
-        with self.assertRaises(queues.errors.NotAllowedError):
+        with self.assertRaises(NotAllowedError):
             self.scheduler.push_item_to_queue(item)
 
     def test_enable_scheduler(self):

@@ -7,12 +7,12 @@ from typing import Any
 import structlog
 from opentelemetry import trace
 
-from scheduler import context, models, queues, rankers
-from scheduler.connectors import listeners
-from scheduler.connectors.errors import ExternalServiceError
+from scheduler import clients, context, models
+from scheduler.clients.errors import ExternalServiceError
 from scheduler.models import Normalizer, NormalizerTask, Organisation, Plugin, RawDataReceivedEvent, Task, TaskStatus
-
-from .scheduler import Scheduler
+from scheduler.schedulers import Scheduler
+from scheduler.schedulers.queue import PriorityQueue, QueueFullError
+from scheduler.schedulers.rankers import NormalizerRanker
 
 tracer = trace.get_tracer(__name__)
 
@@ -33,14 +33,13 @@ class NormalizerScheduler(Scheduler):
         ctx: context.AppContext,
         scheduler_id: str,
         organisation: Organisation,
-        queue: queues.PriorityQueue | None = None,
+        queue: PriorityQueue | None = None,
         callback: Callable[..., None] | None = None,
     ):
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.organisation: Organisation = organisation
-        self.create_schedule = False
 
-        self.queue = queue or queues.PriorityQueue(
+        self.queue = queue or PriorityQueue(
             pq_id=scheduler_id,
             maxsize=ctx.config.pq_maxsize,
             item_type=self.ITEM_TYPE,
@@ -48,9 +47,16 @@ class NormalizerScheduler(Scheduler):
             pq_store=ctx.datastores.pq_store,
         )
 
-        super().__init__(ctx=ctx, queue=self.queue, scheduler_id=scheduler_id, callback=callback)
+        super().__init__(
+            ctx=ctx,
+            queue=self.queue,
+            scheduler_id=scheduler_id,
+            callback=callback,
+            create_schedule=False,
+            auto_calculate_deadline=False,
+        )
 
-        self.ranker = rankers.NormalizerRanker(ctx=self.ctx)
+        self.ranker = NormalizerRanker(ctx=self.ctx)
 
     def run(self) -> None:
         """The run method is called when the scheduler is started. It will
@@ -62,7 +68,7 @@ class NormalizerScheduler(Scheduler):
         for each normalizer that is registered for the mime type of the raw
         file.
         """
-        listener = listeners.RawData(
+        listener = clients.RawData(
             dsn=str(self.ctx.config.host_raw_data),
             queue=f"{self.organisation.id}__raw_file_received",
             func=self.push_tasks_for_received_raw_data,
@@ -249,7 +255,7 @@ class NormalizerScheduler(Scheduler):
 
         try:
             self.push_item_to_queue_with_timeout(task, self.max_tries)
-        except queues.QueueFullError:
+        except QueueFullError:
             self.logger.warning(
                 "Could not add task to queue, queue was full: %s",
                 task.id,
