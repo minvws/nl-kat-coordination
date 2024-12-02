@@ -20,8 +20,8 @@ class Origin(BaseModel):
     source: Reference
     source_method: str | None = None  # None for bits and normalizers
     result: list[Reference] = Field(default_factory=list)
-    parameters_hash: str | None = None  # None for anything other than Nibblette
-    parameters_references: list[Reference] | None = None  # None for anything other than Nibblette
+    parameters_hash: str | None = None  # None for anything other than nibblet
+    parameters_references: list[Reference | None] | None = None  # None for anything other than nibblet
     task_id: UUID | None = None
 
     def __sub__(self, other) -> set[Reference]:

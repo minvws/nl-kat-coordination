@@ -158,7 +158,7 @@ class OOIRepository(Repository):
         raise NotImplementedError
 
     def nibble_query(
-        self, ooi: OOI, nibble: NibbleDefinition, valid_time: datetime, arguments: list[Reference] = []
+        self, ooi: OOI, nibble: NibbleDefinition, valid_time: datetime, arguments: list[Reference | None] | None = None
     ) -> Iterable[Iterable[Any]]:
         raise NotImplementedError
 
@@ -862,27 +862,35 @@ class XTDBOOIRepository(OOIRepository):
         return parsed_results
 
     def nibble_query(
-        self, ooi: OOI, nibble: NibbleDefinition, valid_time: datetime, arguments: list[Reference] = []
+        self, ooi: OOI, nibble: NibbleDefinition, valid_time: datetime, arguments: list[Reference | None] | None = None
     ) -> Iterable[Iterable[Any]]:
         def strformat(a: str, *args) -> str:
             def sub(match: re.Match) -> str:
                 idx = int(match.group(1)) - 1
-                return f'"{args[idx]}"' if 0 <= idx < len(args) else ""
+                if args[idx] is not None:
+                    return f'"{args[idx]}"' if 0 <= idx < len(args) else ""
+                else:
+                    return ""
 
             return re.sub(r"\$(\d+)", sub, a)
 
-        def objectify(t: type, obj: dict | list):
+        def objectify(t: type[Any], obj: dict | list):
             if isinstance(obj, dict):
                 if issubclass(t, OOI):
                     return self.deserialize(obj)
                 else:
                     return t(**obj)
             else:
-                return t(*obj)
+                return [t(o) for o in obj]
 
         if nibble.query is None:
             return [{ooi}]
         else:
+            if arguments is None:
+                arguments = [
+                    ooi.reference if sgn.object_type == type_by_name(ooi.get_ooi_type()) else None
+                    for sgn in nibble.signature
+                ]
             data = self.session.client.query(strformat(nibble.query, *arguments), valid_time)
             objects = [
                 {ooi, *[objectify(sgn.object_type, obj) for obj in search(sgn.parser, data)]}

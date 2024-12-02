@@ -3,6 +3,7 @@ import pkgutil
 from collections.abc import Iterable
 from pathlib import Path
 from types import MethodType, ModuleType
+from typing import Any
 
 import structlog
 from pydantic import BaseModel
@@ -16,7 +17,7 @@ logger = structlog.get_logger(__name__)
 
 
 class NibbleParameter(BaseModel):
-    object_type: type
+    object_type: type[Any]
     parser: str = "[]"
 
     def __eq__(self, other):
