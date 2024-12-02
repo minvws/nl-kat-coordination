@@ -7,7 +7,7 @@ export function renderRenameSelection(modal, selection) {
     references.push(input_element.value);
   });
 
-  let table_element = document.getElementById("rename-table");
+  let table_element = document.getElementById("report-name-table");
   let table_body = table_element.querySelector("tbody");
   let table_row = table_element.querySelector("tr.rename-table-row");
 
