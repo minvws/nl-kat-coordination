@@ -30,8 +30,8 @@
                             <td class="nowrap">
                                 <ul class="tags horizontal-view">
                                     {% if schedule.recipe.parent_report_type == "aggregate-organisation-report" %}
-                                        <li class="label tags-color-{{ schedule.recipe.parent_report_type|get_report_type_label_style }}">
-                                            {{ schedule.recipe.parent_report_type|get_report_type_name }}
+                                        <li>
+                                            <span class="label tags-color-{{ schedule.recipe.parent_report_type|get_report_type_label_style }}">{{ schedule.recipe.parent_report_type|get_report_type_name }}</span>
                                         </li>
                                     {% else %}
                                         {% for report_type in schedule.recipe.report_types %}
@@ -49,8 +49,8 @@
                                     {% endif %}
                                 </ul>
                             </td>
-                            <td>{{ schedule.deadline_at }}</td>
-                            <td>
+                            <td class="nowrap">{{ schedule.deadline_at }}</td>
+                            <td class="nowrap">
                                 {% if schedule.cron is None %}
                                     {% translate "Once" %}
                                 {% else %}
@@ -64,7 +64,7 @@
                                     <span class="label system-tag color-3">{% translate "Disabled" %}</span>
                                 {% endif %}
                             </td>
-                            <td class="actions">
+                            <td class="nowrap actions">
                                 <button class="expando-button"
                                         data-icon-open-class="icon ti-chevron-down"
                                         data-icon-close-class="icon ti-chevron-up"
