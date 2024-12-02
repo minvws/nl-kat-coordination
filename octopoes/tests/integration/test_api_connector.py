@@ -73,7 +73,10 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
 
     octopoes_api_connector.save_many_declarations([Declaration(ooi=h, valid_time=valid_time) for h in hostnames])
 
-    assert len(octopoes_api_connector.list_origins(origin_type=OriginType.DECLARATION, valid_time=valid_time)) == 11
+    assert (
+        len(octopoes_api_connector.list_origins(origin_type=OriginType.DECLARATION, valid_time=valid_time))
+        == len(hostnames) + 1
+    )
 
 
 def test_history(octopoes_api_connector: OctopoesAPIConnector):
