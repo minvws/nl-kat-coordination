@@ -7,7 +7,9 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
+from octopoes.models.ooi.findings import RiskLevelSeverity
 from reports.report_types.definitions import AggregateReport
+from reports.report_types.findings_report.report import FindingsReport
 from reports.report_types.ipv6_report.report import IPv6Report
 from reports.report_types.mail_report.report import MailReport
 from reports.report_types.name_server_report.report import NameServerSystemReport
@@ -20,6 +22,8 @@ from reports.report_types.web_system_report.report import WebSystemReport
 from rocky.views.health import flatten_health, get_rocky_health
 
 logger = structlog.get_logger(__name__)
+
+SEVERITY_OPTIONS = [severity.value for severity in RiskLevelSeverity]
 
 
 class AggregateOrganisationReport(AggregateReport):
@@ -37,6 +41,7 @@ class AggregateOrganisationReport(AggregateReport):
             WebSystemReport,
             NameServerSystemReport,
             SafeConnectionsReport,
+            FindingsReport,
         ],
     }
     template_path = "aggregate_organisation_report/report.html"
@@ -47,6 +52,7 @@ class AggregateOrganisationReport(AggregateReport):
         open_ports = {}
         ipv6 = {}
         vulnerabilities = {}
+        findings: dict[str, Any] = {}
         total_criticals = 0
         total_systems = 0
         unique_ips = set()
@@ -112,6 +118,41 @@ class AggregateOrganisationReport(AggregateReport):
                 if report_id == SafeConnectionsReport.id:
                     safe_connections_ips.update({ip: value for ip, value in report_specific_data["sc_ips"].items()})
 
+                if report_id == FindingsReport.id:
+                    if not findings:
+                        findings["finding_types"] = {}
+                        findings["summary"] = {
+                            "total_by_severity": {severity: 0 for severity in SEVERITY_OPTIONS},
+                            "total_by_severity_per_finding_type": {severity: 0 for severity in SEVERITY_OPTIONS},
+                            "total_finding_types": 0,
+                            "total_occurrences": 0,
+                        }
+
+                    for key in SEVERITY_OPTIONS:
+                        findings["summary"]["total_by_severity"][key] += report_specific_data["summary"][
+                            "total_by_severity"
+                        ][key]
+
+                    for key in SEVERITY_OPTIONS:
+                        findings["summary"]["total_by_severity_per_finding_type"][key] += report_specific_data[
+                            "summary"
+                        ]["total_by_severity_per_finding_type"][key]
+
+                    findings["summary"]["total_finding_types"] += report_specific_data["summary"]["total_finding_types"]
+                    findings["summary"]["total_occurrences"] += report_specific_data["summary"]["total_occurrences"]
+
+                    for data in report_specific_data["finding_types"]:
+                        finding_type_id = data["finding_type"]
+                        occurrences = data["occurrences"]
+
+                        if finding_type_id not in findings["finding_types"]:
+                            findings["finding_types"][finding_type_id] = {
+                                "finding_type": data["finding_type"],
+                                "occurrences": occurrences,
+                            }
+                        else:
+                            findings["finding_types"][finding_type_id]["occurrences"].extend(occurrences)
+
         mail_report_data = self.collect_system_specific_data(data, services, SystemType.MAIL, MailReport.id)
         web_report_data = self.collect_system_specific_data(data, services, SystemType.WEB, WebSystemReport.id)
         dns_report_data = self.collect_system_specific_data(data, services, SystemType.DNS, NameServerSystemReport.id)
@@ -124,7 +165,7 @@ class AggregateOrganisationReport(AggregateReport):
         basic_security: dict[str, Any] = {"rpki": {}, "system_specific": {}, "safe_connections": {}}
 
         # Safe connections
-        for ip, findings in safe_connections_ips.items():
+        for ip, findings_types in safe_connections_ips.items():
             ip_services = systems["services"][str(ip)]["services"]
 
             for service in ip_services:
@@ -138,12 +179,12 @@ class AggregateOrganisationReport(AggregateReport):
                 if ip in basic_security["safe_connections"][service]["sc_ips"]:
                     continue  # We already processed data from this ip for this service
 
-                basic_security["safe_connections"][service]["sc_ips"][ip.tokenized.address] = findings
+                basic_security["safe_connections"][service]["sc_ips"][ip.tokenized.address] = findings_types
                 basic_security["safe_connections"][service]["number_of_ips"] += 1
-                basic_security["safe_connections"][service]["number_of_available"] += 1 if not findings else 0
+                basic_security["safe_connections"][service]["number_of_available"] += 1 if not findings_types else 0
 
                 # Collect recommendations from findings
-                recommendations.extend({finding_type.recommendation for finding_type in findings})
+                recommendations.extend({finding_type.recommendation for finding_type in findings_types})
 
         # RPKI
         for ip, compliance in rpki_ips.items():
@@ -181,6 +222,11 @@ class AggregateOrganisationReport(AggregateReport):
         basic_security["system_specific"][SystemType.DNS] = [
             report for ip in dns_report_data for report in dns_report_data[ip]
         ]
+
+        # Findings
+        findings["finding_types"] = sorted(
+            findings["finding_types"].values(), key=lambda x: x["finding_type"].risk_score or 0, reverse=True
+        )
 
         # Summary
         basic_security["summary"] = {}
@@ -401,6 +447,7 @@ class AggregateOrganisationReport(AggregateReport):
             "open_ports": open_ports,
             "ipv6": ipv6,
             "vulnerabilities": vulnerabilities,
+            "findings": findings,
             "basic_security": basic_security,
             "summary": summary,
             "total_findings": len(all_findings),

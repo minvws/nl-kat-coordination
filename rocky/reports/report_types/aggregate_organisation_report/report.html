@@ -103,6 +103,19 @@
                     </div>
                 </section>
             {% endif %}
+            {% if data.findings %}
+                <section id="findings">
+                    <div>
+                        <h2>{% translate "Findings" %}</h2>
+                        {% if not data.findings %}
+                            <p>{% translate "No findings have been identified yet." %}</p>
+                        {% else %}
+                            {% include "findings_report/report.html" with data=data.findings show_introduction="yes" %}
+
+                        {% endif %}
+                    </div>
+                </section>
+            {% endif %}
         </div>
         <div class="chapter-numbers report-content type-a">
             {% include "aggregate_organisation_report/appendix.html" %}
