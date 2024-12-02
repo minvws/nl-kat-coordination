@@ -178,6 +178,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
 
     def delete_reports(self, report_references: list[Reference]) -> None:
         self.octopoes_api_connector.delete_many(report_references, datetime.now(timezone.utc))
+        logger.info("Reports deleted", event_code=800073, reports=report_references)
         messages.success(self.request, _("Deletion successful."))
 
     def rerun_reports(self, report_references: list[str]) -> None:
@@ -247,6 +248,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
         )
 
         create_ooi(self.octopoes_api_connector, self.bytes_client, new_report_ooi, observed_at)
+        logger.info("Report created", event_code=800071, report=new_report_ooi)
 
         return new_report_ooi
 
@@ -349,6 +351,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
                 error_reports.append(f'"{report_ooi.name}"')
 
         if not error_reports:
+            logger.info("Reports created", event_code=800071, reports=report_references)
             return messages.success(self.request, _("Reports successfully renamed."))
 
         return messages.error(self.request, _("Report {} could not be renamed.").format(", ".join(error_reports)))
