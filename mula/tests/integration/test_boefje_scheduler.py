@@ -1075,6 +1075,8 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
             "scheduler.schedulers.BoefjeScheduler.has_boefje_task_grace_period_passed", return_value=True
         ).start()
 
+        self.mock_set_cron = mock.patch("scheduler.schedulers.BoefjeScheduler.set_cron").start()
+
         self.mock_get_boefjes_for_ooi = mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi").start()
 
     def tearDown(self):
@@ -1272,7 +1274,8 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.status, models.TaskStatus.CANCELLED)
 
     def test_push_tasks_for_scan_profile_mutations_runon_create(self):
-        """When a boefje has the runon contains the setting create, it should:
+        """When a boefje has the runon contains the setting create,
+        and we receive a create mutation, it should:
 
         - NOT create a `Schedule`
         - SHOULD run a `Task`
@@ -1306,6 +1309,105 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         self.assertIsNone(task_db.schedule_id)
         schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_hash(task_db.hash)
         self.assertIsNone(schedule_db)
+
+    def test_push_tasks_for_scan_profile_mutations_runon_create_update(self):
+        """When a boefje has the runon contains the setting create,update,
+        and we receive a create mutation, it should:
+
+        - NOT create a `Schedule`
+        - SHOULD run a `Task`
+        """
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], runon=["create", "update"])
+        mutation = models.ScanProfileMutation(
+            operation=models.MutationOperationType.CREATE, primary_key=ooi.primary_key, value=ooi
+        ).model_dump_json()
+
+        # Mocks
+        self.mock_get_boefjes_for_ooi.return_value = [boefje]
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+
+        # Assert: task should be on priority queue
+        item = self.scheduler.queue.peek(0)
+        task_pq = models.BoefjeTask(**item.data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Assert: task should be in datastore, and queued
+        task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Assert: schedule should NOT be created
+        self.assertIsNone(task_db.schedule_id)
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_hash(task_db.hash)
+        self.assertIsNone(schedule_db)
+
+    def test_push_tasks_for_scan_profile_mutations_runon_update(self):
+        """When a boefje has the runon contains the setting update,
+        and we receive a create mutation, it should:
+
+        - NOT create a `Schedule`
+        - NOT run a `Task`
+        """
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], runon=["update"])
+        mutation = models.ScanProfileMutation(
+            operation=models.MutationOperationType.CREATE, primary_key=ooi.primary_key, value=ooi
+        ).model_dump_json()
+
+        # Mocks
+        self.mock_get_boefjes_for_ooi.return_value = [boefje]
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+
+        # Assert: task should NOT be on priority queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+    def test_push_tasks_for_scan_profile_mutations_runon_none(self):
+        """When a boefje has the runon is empty, and we receive a create
+        mutation, it should:
+
+        - SHOULD create a `Schedule`
+        - SHOULD run a `Task`
+        """
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], runon=[])
+        mutation = models.ScanProfileMutation(
+            operation=models.MutationOperationType.CREATE, primary_key=ooi.primary_key, value=ooi
+        ).model_dump_json()
+
+        # Mocks
+        self.mock_get_boefjes_for_ooi.return_value = [boefje]
+        self.mock_set_cron.return_value = "0 0 * * *"
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+
+        # Assert: task should be on priority queue
+        item = self.scheduler.queue.peek(0)
+        task_pq = models.BoefjeTask(**item.data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Assert: task should be in datastore, and queued
+        task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Assert: schedule should be created
+        self.assertIsNotNone(task_db.schedule_id)
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(task_db.schedule_id)
+        self.assertIsNotNone(schedule_db)
 
 
 class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):

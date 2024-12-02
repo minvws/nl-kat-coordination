@@ -342,6 +342,7 @@ class Scheduler(abc.ABC):
 
         item.schedule_id = schedule_db.id
 
+        breakpoint()
         # Set the cron schedule based on the item, default this is None.
         # We do this because we want to explicitly set the cron schedule. When
         # a schedule already has a cron expression, this will not be updated
