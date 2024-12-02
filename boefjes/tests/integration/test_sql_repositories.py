@@ -53,7 +53,7 @@ def test_settings_storage(plugin_storage, organisation_storage, config_storage):
     with pytest.raises(ConfigNotFound):
         config_storage.delete("no organisation!", plugin_id)
 
-    assert {"TEST_SETTING": "123.9", "TEST_SETTING2": 13} == settings_storage.get_all_settings(org.id, plugin_id)
+    assert settings_storage.get_all_settings(org.id, plugin_id) == {"TEST_SETTING": "123.9", "TEST_SETTING2": 13}
     assert config_storage.get_all_settings(org.id, "wrong") == {}
     assert config_storage.get_all_settings("wrong", plugin_id) == {}
 
@@ -91,14 +91,14 @@ def test_settings_storage_values_field_limits(plugin_storage, organisation_stora
             },
         )
 
-    assert {
+    assert settings_storage.get_all_settings(org.id, plugin_id) == {
         "TEST_SETTING": 12 * "123.9",
         "TEST_SETTING2": 12000,
         "TEST_SETTING3": 30 * "b",
         "TEST_SETTING4": 30 * "b",
         "TEST_SETTING5": 10 * "b",
         "TEST_SETTING6": 123456789,
-    } == settings_storage.get_all_settings(org.id, plugin_id)
+    }
 
 
 def test_plugin_enabled_storage(organisation_storage, plugin_storage, config_storage):
