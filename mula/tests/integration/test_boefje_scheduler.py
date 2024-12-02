@@ -3,10 +3,10 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import clients, config, models, schedulers, storage
-from scheduler.storage import stores
 from structlog.testing import capture_logs
 
+from scheduler import clients, config, models, schedulers, storage
+from scheduler.storage import stores
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -1270,6 +1270,42 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
 
         task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
         self.assertEqual(task_db.status, models.TaskStatus.CANCELLED)
+
+    def test_push_tasks_for_scan_profile_mutations_runon_create(self):
+        """When a boefje has the runon contains the setting create, it should:
+
+        - NOT create a `Schedule`
+        - SHOULD run a `Task`
+        """
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], runon=["create"])
+        mutation = models.ScanProfileMutation(
+            operation=models.MutationOperationType.CREATE, primary_key=ooi.primary_key, value=ooi
+        ).model_dump_json()
+
+        # Mocks
+        self.mock_get_boefjes_for_ooi.return_value = [boefje]
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+
+        # Assert: task should be on priority queue
+        item = self.scheduler.queue.peek(0)
+        task_pq = models.BoefjeTask(**item.data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Assert: task should be in datastore, and queued
+        task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Assert: schedule should NOT be created
+        self.assertIsNone(task_db.schedule_id)
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_hash(task_db.hash)
+        self.assertIsNone(schedule_db)
 
 
 class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
