@@ -334,8 +334,7 @@ class SchedulerClient:
 
     def get_task_details(self, task_id: str) -> Task:
         try:
-            if not isinstance(task_id, uuid.UUID):
-                task_id = str(uuid.UUID(task_id))
+            task_id = str(uuid.UUID(task_id))
             return Task.model_validate_json(self._get(f"/tasks/{task_id}", "content"))
         except ValueError:
             raise SchedulerTaskNotFound()
