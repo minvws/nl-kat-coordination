@@ -12,7 +12,8 @@ def run(
     ip_address: IPAddressV4, additional_oois: list[IPService | ResolvedHostname], config: dict[str, Any]
 ) -> Iterator[OOI]:
     def is_service_http(ip_service: IPService) -> bool:
-        return "http" in ip_service.service.tokenized.name.lower().strip()
+        servicename = ip_service.service.tokenized.name.lower().strip()
+        return servicename in ("http", "https")
 
     hostnames = [resolved.hostname for resolved in additional_oois if isinstance(resolved, ResolvedHostname)]
     services = [ip_service for ip_service in additional_oois if isinstance(ip_service, IPService)]
