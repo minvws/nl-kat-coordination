@@ -106,7 +106,7 @@ class CrisisRoomAllOrganizations(TemplateView):
         return [member.organization for member in OrganizationMember.objects.filter(user=self.request.user)]
 
     def get_organization_dashboard(self):
-        return Dashboard.objects.filter(organization__in=[org.id for org in self.get_user_organizations()])
+        return Dashboard.objects.filter(organization__in=[org.pk for org in self.get_user_organizations()])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
