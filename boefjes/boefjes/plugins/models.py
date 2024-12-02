@@ -96,9 +96,8 @@ def hash_path(path: Path) -> str:
         # Thus there may be a desync between the source code and the cached, compiled bytecode
         if file.is_file() and file.suffix != ".pyc":
             with file.open("rb") as f:
-                folder_hash.update(f.read())
-                # while chunk := f.read(32768):
-                #     folder_hash.update(chunk)
+                while chunk := f.read(32768):
+                    folder_hash.update(chunk)
 
     return folder_hash.hexdigest()
 

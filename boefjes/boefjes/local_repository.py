@@ -1,6 +1,6 @@
 import json
 import pkgutil
-from functools import lru_cache, cache
+from functools import cache, lru_cache
 from pathlib import Path
 
 import structlog
@@ -147,7 +147,7 @@ def _cached_resolve_normalizers(path: Path) -> dict[str, NormalizerResource]:
     return {resource.normalizer.id: resource for resource in normalizer_resources}
 
 
-def _find_packages_in_path_containing_files(path, required_files: tuple[str]) -> list[tuple[Path, str]]:
+def _find_packages_in_path_containing_files(path, required_files: tuple[str, ...]) -> list[tuple[Path, str]]:
     prefix = create_relative_import_statement_from_cwd(path)
     paths = []
 

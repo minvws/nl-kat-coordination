@@ -157,5 +157,5 @@ class ConfigStorage(ABC):
     def get_enabled_normalizers(self, organisation_id: str) -> list[str]:
         raise NotImplementedError
 
-    def get_enabled_plugins(self, organisation_id: str) -> list[str]:
+    def get_state_by_id(self, organisation_id: str) -> dict[str, bool]:
         raise NotImplementedError

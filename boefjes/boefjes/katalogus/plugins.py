@@ -1,5 +1,4 @@
 import datetime
-from functools import partial
 
 import structlog
 from croniter import croniter
@@ -51,22 +50,24 @@ def list_plugins(
 
     # filter plugins by id, name or description
     if filter_params.q is not None:
-        plugins = filter(partial(_plugin_matches_query, query=filter_params.q), plugins)
+        plugins = [plugin for plugin in plugins if _plugin_matches_query(plugin, filter_params.q)]
 
     # filter plugins by type
     if filter_params.type is not None:
-        plugins = filter(lambda plugin: plugin.type == filter_params.type, plugins)
+        plugins = [plugin for plugin in plugins if plugin.type == filter_params.type]
 
     # filter plugins by state
     if filter_params.state is not None:
-        plugins = filter(lambda x: x.enabled is filter_params.state, plugins)
+        plugins = [plugin for plugin in plugins if plugin.enabled is filter_params.state]
 
     # filter plugins by oci_image
     if filter_params.oci_image is not None:
-        plugins = filter(lambda x: x.type == "boefje" and x.oci_image == filter_params.oci_image, plugins)
+        plugins = [
+            plugin for plugin in plugins if plugin.type == "boefje" and plugin.oci_image == filter_params.oci_image
+        ]
 
     # filter plugins by scan level for boefje plugins
-    plugins = list(filter(lambda x: x.type != "boefje" or x.scan_level >= filter_params.scan_level, plugins))
+    plugins = [plugin for plugin in plugins if plugin.type != "boefje" or plugin.scan_level >= filter_params.scan_level]
 
     if pagination_params.limit is None:
         return plugins[pagination_params.offset :]
