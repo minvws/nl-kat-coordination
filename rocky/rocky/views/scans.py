@@ -1,6 +1,5 @@
 from account.mixins import OrganizationView
 from django.views.generic import TemplateView
-from katalogus.client import get_katalogus
 from tools.view_helpers import Breadcrumb, ObjectsBreadcrumbsMixin
 
 
@@ -16,6 +15,6 @@ class ScanListView(ObjectsBreadcrumbsMixin, OrganizationView, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["boefjes"] = get_katalogus(self.organization.code).get_enabled_boefjes()
+        context["boefjes"] = self.get_katalogus().get_enabled_boefjes()
 
         return context

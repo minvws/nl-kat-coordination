@@ -8,7 +8,7 @@ from prometheus_client import CollectorRegistry, Gauge, Info
 
 import scheduler
 from scheduler import clients, storage
-from scheduler.context import settings
+from scheduler.config import settings
 from scheduler.storage import stores
 from scheduler.utils import remove_trailing_slash
 

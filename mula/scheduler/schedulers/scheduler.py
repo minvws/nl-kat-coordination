@@ -377,16 +377,6 @@ class Scheduler(abc.ABC):
 
         self.logger.info("Disabled scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
 
-    def delete(self) -> None:
-        """Delete the scheduler.
-
-        This will stop the scheduler, and remove it from the database.
-        """
-        self.logger.info("Deleting scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
-        self.stop()
-        self.ctx.datastores.scheduler_store.delete_scheduler(self.scheduler_id)
-        self.logger.info("Deleted scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
-
     def stop(self) -> None:
         self.logger.info("Stopping scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
 

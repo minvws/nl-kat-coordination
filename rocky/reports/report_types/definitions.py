@@ -17,6 +17,11 @@ class ReportPlugins(TypedDict):
     optional: set[str]
 
 
+class SubReportPlugins(TypedDict):
+    required: list[str]
+    optional: list[str]
+
+
 def report_plugins_union(report_types: list[type["BaseReport"]]) -> ReportPlugins:
     """Take the union of the required and optional plugin sets and remove optional plugins that are required"""
 
@@ -41,6 +46,9 @@ class BaseReport:
 
     def __init__(self, octopoes_api_connector: OctopoesAPIConnector):
         self.octopoes_api_connector = octopoes_api_connector
+
+    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+        raise NotImplementedError
 
     @classmethod
     def class_attributes(cls) -> dict[str, Any]:

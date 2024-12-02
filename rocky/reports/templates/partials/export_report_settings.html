@@ -23,19 +23,19 @@
                 {% if is_scheduled_report %}
                     <p>
                         {% blocktranslate trimmed %}
+                            Please choose a start date, time and recurrence for scheduling your report(s).
+                            If you select a date on the 28th-31st of the month, it will always be scheduled on the last day of the month.
+                        {% endblocktranslate %}
+                    </p>
+                    <p>
+                        {% blocktranslate trimmed %}
                             The date you select will be the reference date for the data set for your report.
                             Please allow for up to 24 hours for your report to be ready.
                         {% endblocktranslate %}
                     </p>
                     <div class="column-2">
-                        <div>
-                            {% include "partials/form/fieldset.html" with fields=report_schedule_form_start_date %}
+                        {% include "partials/form/fieldset.html" with fields=report_schedule_form_start_date %}
 
-                        </div>
-                        <div>
-                            {% include "partials/form/fieldset.html" with fields=report_schedule_form_recurrence %}
-
-                        </div>
                     </div>
                 {% endif %}
             </form>

@@ -26,7 +26,6 @@ class ReportScheduler(Scheduler):
 
     def run(self) -> None:
         """Initializes the ReportScheduler.
-
         Args:
             ctx (context.AppContext): Application context of shared data (e.g.
                 configuration, external services connections).

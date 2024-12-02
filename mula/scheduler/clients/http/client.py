@@ -10,7 +10,7 @@ class HTTPClient:
     """A class that provides methods to check if a host is available and healthy."""
 
     def __init__(self):
-        self.logger = structlog.getLogger(self.__class__.__name__)
+        self.logger = structlog.get_logger(self.__class__.__name__)
 
     def is_host_available(self, hostname: str, port: int) -> bool:
         """Check if the host is available.

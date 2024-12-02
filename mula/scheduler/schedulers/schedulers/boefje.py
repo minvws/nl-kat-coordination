@@ -7,10 +7,22 @@ from typing import Any
 import structlog
 from opentelemetry import trace
 
-from scheduler import clients, context, models, storage, utils
+from scheduler import clients, context, models, queues, rankers, utils
 from scheduler.clients.errors import ExternalServiceError
+from scheduler.connectors.errors import ExternalServiceError
+from scheduler.models import (
+    OOI,
+    Boefje,
+    BoefjeTask,
+    MutationOperationType,
+    Organisation,
+    Plugin,
+    ScanProfileMutation,
+    Task,
+    TaskStatus,
+)
 from scheduler.schedulers import Scheduler
-from scheduler.schedulers.queue import PriorityQueue, QueueFullError
+from scheduler.schedulers.queue import PriorityQueue
 from scheduler.schedulers.rankers import BoefjeRanker
 from scheduler.storage import filters
 
@@ -34,7 +46,7 @@ class BoefjeScheduler(Scheduler):
                 configuration, external services connections).
         """
         self.scheduler_id = "boefje"
-        self.ranker = BoefjeRanker(self.ctx)
+        self.ranker = rankers.BoefjeRanker(self.ctx)
 
         super().__init__(ctx=ctx, queue=self.queue, scheduler_id=self.scheduler_id, create_schedule=True)
 
@@ -84,7 +96,7 @@ class BoefjeScheduler(Scheduler):
             "Boefje scheduler started", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
         )
 
-    @tracer.start_as_current_span("boefje_push_tasks_for_scan_profile_mutations")
+    @tracer.start_as_current_span("boefje_push_tasks_for_mutations")
     def push_tasks_for_mutations(self, body: bytes) -> None:
         """Create tasks for oois that have a scan level change.
 

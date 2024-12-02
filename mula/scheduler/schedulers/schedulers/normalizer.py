@@ -6,11 +6,12 @@ from typing import Any
 import structlog
 from opentelemetry import trace
 
-from scheduler import clients, context, models
+from scheduler import clients, context, models, rankers
 from scheduler.clients.errors import ExternalServiceError
+from scheduler.connectors.errors import ExternalServiceError
 from scheduler.schedulers import Scheduler
-from scheduler.schedulers.queue import PriorityQueue
-from scheduler.schedulers.rankers import NormalizerRanker
+
+from .scheduler import Scheduler
 
 tracer = trace.get_tracer(__name__)
 
@@ -32,7 +33,7 @@ class NormalizerScheduler(Scheduler):
                 configuration, external services connections).
         """
         self.scheduler_id = "normalizer"
-        self.ranker = NormalizerRanker(ctx=self.ctx)
+        self.ranker = rankers.NormalizerRanker(ctx=self.ctx)
 
         super().__init__(ctx=ctx, queue=self.queue, scheduler_id=self.scheduler_id, create_schedule=False)
 
