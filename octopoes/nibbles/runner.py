@@ -74,7 +74,7 @@ class NibblesRunner:
             for nibblet in nibblets:
                 # INFO: we do not strictly need this if statement because OriginType.NIBBLETS \
                 # always have parameters_references but it makes the linters super happy
-                if nibblet.parameters_references:
+                if nibblet.parameters_references is not None:
                     nibble = self.nibbles[nibblet.method]
                     args = self.ooi_repository.nibble_query(
                         ooi,
@@ -90,6 +90,8 @@ class NibblesRunner:
                         if nibblet.parameters_hash != nibble_hasher(arg)
                     }
                     return_value |= {nibble.id: results}
+                else:
+                    raise ValueError("Expecting a nibblet")
         nibblet_nibbles = {self.nibbles[nibblet.method] for nibblet in nibblets}
         for nibble in filter(lambda x: type(ooi) in x.signature and x not in nibblet_nibbles, self.nibbles.values()):
             args = self.ooi_repository.nibble_query(ooi, nibble, valid_time)
