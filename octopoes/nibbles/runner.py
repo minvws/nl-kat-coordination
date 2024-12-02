@@ -105,7 +105,7 @@ class NibblesRunner:
                 return_value |= {nibble.id: results}
         nibblet_nibbles = {self.nibbles[nibblet.method] for nibblet in nibblets}
         for nibble in filter(lambda x: type(ooi) in x.signature and x not in nibblet_nibbles, self.nibbles.values()):
-            if len(nibble.signature) > 1 and self.cache:
+            if len(nibble.signature) > 1:
                 self._write(valid_time)
             args = self.ooi_repository.nibble_query(ooi, nibble, valid_time)
             results = {tuple(arg): set(flatten([nibble(arg)])) for arg in args}
@@ -149,6 +149,5 @@ class NibblesRunner:
                     stack += [o for o in blocks if o not in blockset]
                     blockset |= blocks
                     inferences |= {ooi: results}
-        if self.cache:
-            self._write(valid_time)
+        self._write(valid_time)
         return inferences
