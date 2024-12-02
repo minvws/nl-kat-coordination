@@ -881,6 +881,7 @@ class XTDBOOIRepository(OOIRepository):
                 else:
                     return t(**obj)
             else:
+                # FIXME: this does not allow lists of OOI's (yet)
                 return [t(o) for o in obj]
 
         if nibble.query is None:
