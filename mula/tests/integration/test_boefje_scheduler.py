@@ -3,10 +3,10 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
-from structlog.testing import capture_logs
-
 from scheduler import clients, config, models, schedulers, storage
 from scheduler.storage import stores
+from structlog.testing import capture_logs
+
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
