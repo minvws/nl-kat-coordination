@@ -883,7 +883,7 @@ class XTDBOOIRepository(OOIRepository):
         if nibble.query is None:
             return [{ooi}]
         else:
-            data = self.session.client.raw_query(strformat(nibble.query, *arguments), valid_time)
+            data = self.session.client.query(strformat(nibble.query, *arguments), valid_time)
             objects = [
                 {ooi, *[objectify(sgn.object_type, obj) for obj in search(sgn.parser, data)]}
                 if isinstance(ooi, sgn.object_type)
