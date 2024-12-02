@@ -110,7 +110,7 @@ class LocalPluginRepository:
 
 
 @cache
-def _cached_resolve_boefjes(path) -> dict[str, BoefjeResource]:
+def _cached_resolve_boefjes(path: Path) -> dict[str, BoefjeResource]:
     """Adding the hash to the arguments makes sure we refresh this. The size could hence be 1, but since this is not
     expensive it's worth catching scenarios where we are testing new boefjes and removing them and still having the old
     hash cached"""
