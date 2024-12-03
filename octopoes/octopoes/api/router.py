@@ -114,7 +114,7 @@ def list_objects(
     search_string: str | None = None,
     order_by: Literal["scan_level", "object_type"] = "object_type",
     asc_desc: Literal["asc", "desc"] = "asc",
-) -> Paginated[OOI]:
+):
     return octopoes.list_ooi(
         types, valid_time, offset, limit, scan_level, scan_profile_type, search_string, order_by, asc_desc
     )
@@ -128,7 +128,7 @@ def query(
     valid_time: datetime = Depends(extract_valid_time),
     offset: int = DEFAULT_OFFSET,
     limit: int = DEFAULT_LIMIT,
-) -> list[OOI | tuple]:
+):
     object_path = ObjectPath.parse(path)
     xtdb_query = XTDBQuery.from_path(object_path).offset(offset).limit(limit)
 
@@ -144,7 +144,7 @@ def query_many(
     sources: list[str] = Query(),
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-) -> list[OOI | tuple]:
+):
     """
     How does this work and why do we do this?
 
@@ -189,7 +189,7 @@ def load_objects_bulk(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     references: set[Reference] = Depends(extract_references),
-) -> dict[str, OOI]:
+):
     return octopoes.ooi_repository.load_bulk(references, valid_time)
 
 
@@ -198,7 +198,7 @@ def get_object(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     reference: Reference = Depends(extract_reference),
-) -> OOI:
+):
     return octopoes.get_ooi(reference, valid_time)
 
 
@@ -230,7 +230,7 @@ def list_random_objects(
     valid_time: datetime = Depends(extract_valid_time),
     amount: int = 1,
     scan_level: set[ScanLevel] = Query(DEFAULT_SCAN_LEVEL_FILTER),
-) -> list[OOI]:
+):
     return octopoes.list_random_ooi(valid_time, amount, scan_level)
 
 
@@ -459,8 +459,8 @@ def list_findings(
 
 @router.get("/reports", tags=["Reports"])
 def list_reports(
-    offset=DEFAULT_OFFSET,
-    limit=DEFAULT_LIMIT,
+    offset: int = DEFAULT_OFFSET,
+    limit: int = DEFAULT_LIMIT,
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
 ) -> Paginated[tuple[Report, list[Report | None]]]:
