@@ -17,7 +17,10 @@
         </section>
         <section>
             <div>
-                {% for dashboard in dashboards %}{{ dashboard.recipe }}{% endfor %}
+                {% for organization, findings in organizations_findings.items %}
+                    <p>{{ organization.name }}</p>
+                    {% for finding in findings %}{{ finding }}{% endfor %}
+                {% endfor %}
                 {% include "partials/elements/ooi_report_settings.html" %}
 
             </div>

@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.findings_report.report import FindingsReport
 from reports.report_types.helpers import get_ooi_types_with_report
+from reports.report_types.systems_report.report import SystemReport
 from tools.models import Organization
 from tools.ooi_helpers import create_ooi
 
@@ -20,7 +21,7 @@ DEFAULT_OOI_TYPES = [ooi_type.__name__ for ooi_type in get_ooi_types_with_report
 DEFAULT_SCAN_LEVELS = {ScanLevel.L2}
 DEFAULT_SCAN_PROFILES = {ScanProfileType.EMPTY, ScanProfileType.INHERITED, ScanProfileType.DECLARED}
 PARENT_REPORT = AggregateOrganisationReport
-SUB_REPORT = FindingsReport
+SUB_REPORTS = [SystemReport, FindingsReport]
 
 
 class Dashboard(models.Model):
@@ -38,13 +39,23 @@ class Dashboard(models.Model):
     class Meta:
         unique_together = ["organization", "recipe"]
 
+    def get_readonly_fields(self, request, obj=None):
+        return ["recipe"]
+
     def save(self, *args, **kwargs):
         if not self.recipe and self.organization:
             self.create_dashboard(self.organization)
         super().save(*args, **kwargs)
 
-    def get_readonly_fields(self, request, obj=None):
-        return ["recipe"]
+    def create_dashboard(self, organization: Organization):
+        valid_time = datetime.now(timezone.utc)
+        is_scheduler_ready = self.is_scheduler_ready(organization)
+
+        if is_scheduler_ready:
+            recipe = self.create_organization_recipe(valid_time, organization)
+            self.recipe = recipe.primary_key
+            schedule_request = self.create_schedule_request(valid_time, organization, recipe)
+            scheduler_client(organization.code).post_schedule(schedule=schedule_request)
 
     def is_scheduler_ready(self, organization: Organization) -> bool:
         scheduler_id = f"report-{organization.code}"
@@ -70,7 +81,7 @@ class Dashboard(models.Model):
                 }
             },
             parent_report_type=PARENT_REPORT.id,
-            report_types=[SUB_REPORT.id],
+            report_types=[report.id for report in SUB_REPORTS],
             cron_expression=f"{minute} {hour} * * *",
         )
 
@@ -95,16 +106,6 @@ class Dashboard(models.Model):
             schedule=report_recipe.cron_expression,
             deadline_at=start_datetime.isoformat(),
         )
-
-    def create_dashboard(self, organization: Organization):
-        valid_time = datetime.now(timezone.utc)
-        is_scheduler_ready = self.is_scheduler_ready(organization)
-
-        if is_scheduler_ready:
-            recipe = self.create_organization_recipe(valid_time, organization)
-            self.recipe = recipe.primary_key
-            schedule_request = self.create_schedule_request(valid_time, organization, recipe)
-            scheduler_client(organization.code).post_schedule(schedule=schedule_request)
 
     def __str__(self) -> str:
         if self.organization:

@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Any
 
 import structlog
 from account.models import KATUser
@@ -7,6 +9,7 @@ from django.contrib import messages
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
+from pydantic import TypeAdapter
 from tools.forms.base import ObservedAtForm
 from tools.models import Organization, OrganizationMember
 from tools.view_helpers import BreadcrumbsMixin
@@ -14,7 +17,9 @@ from tools.view_helpers import BreadcrumbsMixin
 from crisis_room.models import Dashboard
 from octopoes.connector import ConnectorException
 from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import Reference
 from octopoes.models.ooi.findings import RiskLevelSeverity
+from rocky.bytes_client import get_bytes_client
 from rocky.views.mixins import ObservedAtMixin
 from rocky.views.ooi_view import ConnectorFormMixin
 
@@ -102,14 +107,53 @@ class CrisisRoomView(BreadcrumbsMixin, ConnectorFormMixin, ObservedAtMixin, Temp
 class CrisisRoomAllOrganizations(TemplateView):
     template_name = "crisis_room/crisis_room.html"
 
-    def get_user_organizations(self):
+    def get_user_organizations(self) -> list[Organization]:
         return [member.organization for member in OrganizationMember.objects.filter(user=self.request.user)]
 
-    def get_organization_dashboard(self):
-        return Dashboard.objects.filter(organization__in=[org.pk for org in self.get_user_organizations()])
+    @staticmethod
+    def get_octopoes_client(organization: Organization) -> OctopoesAPIConnector:
+        return OctopoesAPIConnector(
+            settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+        )
+
+    @staticmethod
+    def get_bytes_client(organization: Organization) -> OctopoesAPIConnector:
+        return OctopoesAPIConnector(
+            settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+        )
+
+    def get_report_data(self, dashboard: Dashboard) -> list[dict[str, Any]]:
+        valid_time = datetime.now(timezone.utc)
+        octopoes_client = self.get_octopoes_client(dashboard.organization)
+
+        reports = octopoes_client.query(
+            "ReportRecipe.<report_recipe[is Report]", valid_time=valid_time, source=Reference.from_str(dashboard.recipe)
+        )
+
+        bytes_client = get_bytes_client(dashboard.organization.code)
+        bytes_client.login()
+
+        return [
+            TypeAdapter(Any, config={"arbitrary_types_allowed": True})
+            .validate_json(bytes_client.get_raw(raw_id=report.data_raw_id))
+            .get("findings", {})
+            for report in reports
+        ]
+
+    def get_organizations_report_data(self) -> dict[Organization, list[dict[str, Any]]]:
+        reports = {}
+
+        organizations = self.get_user_organizations()
+        dashboards = Dashboard.objects.filter(organization__in=[org.pk for org in organizations])
+
+        for dashboard in dashboards:
+            if dashboard.organization:
+                reports[dashboard.organization] = self.get_report_data(dashboard)
+
+        return reports
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["dashboards"] = self.get_organization_dashboard()
+        context["organizations_findings"] = self.get_organizations_report_data()
 
         return context
