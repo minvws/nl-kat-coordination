@@ -70,9 +70,9 @@ class OOIForm(BaseRockyForm):
                 fields[name] = generate_ip_field(field)
             elif annotation == AnyUrl:
                 fields[name] = generate_url_field(field)
-            elif annotation == dict or annotation == list[str] or annotation == dict[str, Any]:
+            elif annotation is dict or annotation == list[str] or annotation == dict[str, Any]:
                 fields[name] = forms.JSONField(**default_attrs)
-            elif annotation == int or (hasattr(annotation, "__args__") and int in annotation.__args__):
+            elif annotation is int or (hasattr(annotation, "__args__") and int in annotation.__args__):
                 fields[name] = forms.IntegerField(**default_attrs)
             elif isclass(annotation) and issubclass(annotation, Enum):
                 fields[name] = generate_select_ooi_type(name, annotation, field)
@@ -112,7 +112,7 @@ def generate_select_ooi_field(
 ) -> forms.fields.Field:
     # field is a relation, query all objects, and build select
     default_attrs = default_field_options(name, field)
-    is_multiselect = getattr(field.annotation, "__origin__", None) == list
+    is_multiselect = getattr(field.annotation, "__origin__", None) is list
     option_label = default_attrs.get("label", _("option"))
 
     option_text = "-- " + _("Optionally choose a {option_label}").format(option_label=option_label) + " --"
