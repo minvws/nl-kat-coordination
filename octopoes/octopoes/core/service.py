@@ -295,9 +295,7 @@ class OctopoesService:
                 }
 
                 temp_next_ooi_set = set()
-                for ooi_type_ in grouped_per_type:
-                    current_ooi_set = grouped_per_type[ooi_type_]
-
+                for ooi_type_, current_ooi_set in grouped_per_type.items():
                     # find paths to neighbours higher or equal than current processing level
                     paths = get_paths_to_neighours(ooi_type_)
                     paths = {
