@@ -2,91 +2,44 @@
 
 <section>
     <div>
-        {% if perms.tools.view_organization %}
-            <h2>{% translate "Top critical organizations" %}</h2>
+        <h2>{% translate "Findings overview" %}</h2>
+        {% if findings_per_org %}
+            <p>
+                {% translate "This overview shows the total number of findings per severity that have been identified for all organizations." %}
+            </p>
+            <div class="column-2">
+                {% include "partials/report_severity_totals_table.html" with data=total_overview %}
+
+            </div>
         {% else %}
-            <h2>{% translate "Critical findings" %}</h2>
+            <p>{% translate "No findings have been identified yet." %}</p>
         {% endif %}
-        <div class="horizontal-scroll sticky-column">
-            {% if organizations %}
-                <table class="nowrap">
-                    <caption class="visually-hidden">{% translate "Critical findings" %}</caption>
-                    <thead>
-                        <tr>
-                            <th>{% translate "Organization" %}</th>
-                            <th>{% translate "Critical Findings" %}</th>
-                            <th scope="col" class="visually-hidden actions">{% translate "Details" %}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for org_finding_count in org_finding_counts_per_severity_critical %}
-                            <tr>
-                                <td>
-                                    <a href="{% url "organization_crisis_room" org_finding_count.code %}">{{ org_finding_count.name }}</a>
-                                </td>
-                                <td class="number">{{ org_finding_count.total_critical }}</td>
-                                <td class="actions sticky-cell">
-                                    <button class="expando-button"
-                                            data-icon-open-class="icon ti-chevron-down"
-                                            data-icon-close-class="icon ti-chevron-up"
-                                            data-close-label="{% translate "Close details" %}">
-                                        {% translate "Open details" %}
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr class="expando-row">
-                                <td colspan="3">
-                                    <p>{{ org_finding_count.name }} {% translate " Finding Details" %}</p>
-                                    <dl>
-                                        {% for severity, count in org_finding_count.finding_count_per_severity.items %}
-                                            <div>
-                                                <dt>
-                                                    {% if count != 0 %}
-                                                        <a href="{% url "finding_list" organization_code=org_finding_count.code %}?severity={{ severity }}"><span class="{{ severity }}">{{ severity|title }}</span></a>
-                                                    {% else %}
-                                                        <span class="{{ severity }}">{{ severity|title }}</span>
-                                                    {% endif %}
-                                                </dt>
-                                                <dd>
-                                                    {% if count != 0 %}
-                                                        <a href="{% url "finding_list" organization_code=org_finding_count.code %}?severity={{ severity }}">{{ count }}</a>
-                                                    {% else %}
-                                                        {{ count }}
-                                                    {% endif %}
-                                                </dd>
-                                            </div>
-                                        {% endfor %}
-                                    </dl>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                {% translate "There were no organizations found for your user account" %}.
-            {% endif %}
-        </div>
     </div>
-    <div>
-        <h2>{% translate "Total findings" %}</h2>
-        {% if organizations %}
+    {% if findings_per_org %}
+        <div>
+            <h2>{% translate "Findings per organization" %}</h2>
+            <p>{% translate "This table shows the findings that have been identified for each organization." %}</p>
             <div class="horizontal-scroll">
                 <table>
-                    <caption class="visually-hidden">{% translate "Findings for all organizations" %}</caption>
+                    <caption class="visually-hidden">{% translate "Findings per organization overview" %}</caption>
                     <thead>
                         <tr>
                             <th>{% translate "Organization" %}</th>
-                            <th scope="col" class="sortable" abbr="Sortable data">{% translate "Total Findings" %}</th>
+                            <th scope="col">{% translate "Total findings" %}</th>
+                            <th scope="col">{% translate "Critical findings" %}</th>
+                            <th scope="col">{% translate "Highest risk level" %}</th>
                             <th scope="col" class="visually-hidden actions">{% translate "Details" %}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for org_finding_count in org_finding_counts_per_severity %}
+                        {% for organization, findings in organizations_findings.items %}
                             <tr>
+                                <td>{{ organization.name }}</td>
+                                <td class="number">{{ findings.total_finding_types }}</td>
+                                <td class="number">{{ findings.total_by_severity_per_finding_type.critical }}</td>
                                 <td>
-                                    <a href="{% url "organization_crisis_room" org_finding_count.code %}">{{ org_finding_count.name }}</a>
+                                    <span class="{{ findings.finding_types.0.finding_type.risk_severity }}">{{ findings.finding_types.0.finding_type.risk_severity|capfirst }}</span>}
                                 </td>
-                                <td class="number">{{ org_finding_count.total }}</td>
                                 <td class="actions">
                                     <button class="expando-button"
                                             data-icon-open-class="icon ti-chevron-down"
@@ -98,20 +51,22 @@
                             </tr>
                             <tr class="expando-row">
                                 <td colspan="3">
-                                    {% if finding_types %}
-                                        {% include "partials/report_findings_table.html" %}
+                                    <h4>{% translate "Findings overview" %}</h4>
+                                    <div class="column-2">
+                                        {% include "partials/report_severity_totals_table.html" with data=findings.summary %}
 
-                                    {% else %}
-                                        <p>{% translate "No findings have been identified yet." %}</p>
-                                    {% endif %}
+                                    </div>
+                                    <h4>{% translate "Findings" %} (0/0)</h4>
+                                    <div class="column-2">
+                                        {% include "partials/report_findings_per_organization_table.html" %}
+
+                                    </div>
                                 </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-        {% else %}
-            {% translate "There were no organizations found for your user account" %}.
-        {% endif %}
-    </div>
+        </div>
+    {% endif %}
 </section>

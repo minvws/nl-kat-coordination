@@ -142,7 +142,7 @@ class AggregateOrganisationReport(AggregateReport):
                     findings["summary"]["total_occurrences"] += report_specific_data["summary"]["total_occurrences"]
 
                     for data in report_specific_data["finding_types"]:
-                        finding_type_id = data["finding_type"]
+                        finding_type_id = data["finding_type"].id
                         occurrences = data["occurrences"]
 
                         if finding_type_id not in findings["finding_types"]:
@@ -224,6 +224,14 @@ class AggregateOrganisationReport(AggregateReport):
         ]
 
         # Findings
+        for finding_type in findings["finding_types"].values():
+            findings["first_seen_occurrence"] = None
+            for occurrence in finding_type["occurrences"]:
+                if findings["first_seen_occurrence"] is None or datetime.fromisoformat(
+                    occurrence["first_seen"]
+                ) > datetime.fromisoformat(findings["first_seen_occurrence"]):
+                    findings["first_seen_occurrence"] = occurrence["first_seen"]
+
         findings["finding_types"] = sorted(
             findings["finding_types"].values(), key=lambda x: x["finding_type"].risk_score or 0, reverse=True
         )
