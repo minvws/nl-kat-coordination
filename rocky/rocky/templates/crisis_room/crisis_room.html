@@ -19,7 +19,7 @@
             <div>
                 {% for organization, findings in organizations_findings.items %}
                     <p>{{ organization.name }}</p>
-                    {% for finding in findings %}{{ finding }}{% endfor %}
+                    <p>{{ findings }}</p>
                 {% endfor %}
                 {% include "partials/elements/ooi_report_settings.html" %}
 

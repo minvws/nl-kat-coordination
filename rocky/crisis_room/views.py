@@ -122,25 +122,27 @@ class CrisisRoomAllOrganizations(TemplateView):
             settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
         )
 
-    def get_report_data(self, dashboard: Dashboard) -> list[dict[str, Any]]:
+    def get_report_data(self, dashboard: Dashboard) -> dict[str, Any]:
         valid_time = datetime.now(timezone.utc)
         octopoes_client = self.get_octopoes_client(dashboard.organization)
 
         reports = octopoes_client.query(
             "ReportRecipe.<report_recipe[is Report]", valid_time=valid_time, source=Reference.from_str(dashboard.recipe)
         )
+        if reports:
+            report = reports[0]
 
-        bytes_client = get_bytes_client(dashboard.organization.code)
-        bytes_client.login()
+            bytes_client = get_bytes_client(dashboard.organization.code)
+            bytes_client.login()
 
-        return [
-            TypeAdapter(Any, config={"arbitrary_types_allowed": True})
-            .validate_json(bytes_client.get_raw(raw_id=report.data_raw_id))
-            .get("findings", {})
-            for report in reports
-        ]
+            return (
+                TypeAdapter(Any, config={"arbitrary_types_allowed": True})
+                .validate_json(bytes_client.get_raw(raw_id=report.data_raw_id))
+                .get("findings", {})
+            )
+        return {}
 
-    def get_organizations_report_data(self) -> dict[Organization, list[dict[str, Any]]]:
+    def get_organizations_report_data(self) -> dict[Organization, dict[str, Any]]:
         reports = {}
 
         organizations = self.get_user_organizations()
