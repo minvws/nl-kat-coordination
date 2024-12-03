@@ -102,7 +102,7 @@ def get_runnable_hash(path: Path) -> str:
     return folder_hash.hexdigest()
 
 
-def _default_mime_types(boefje: Boefje):
+def _default_mime_types(boefje: Boefje) -> set:
     mime_types = {f"boefje/{boefje.id}"}
 
     if boefje.version is not None:

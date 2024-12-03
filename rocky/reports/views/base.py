@@ -1,5 +1,5 @@
 from collections import defaultdict
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from datetime import datetime, timezone
 from operator import attrgetter
 from typing import Any, Literal, cast
@@ -20,7 +20,7 @@ from django_weasyprint import WeasyTemplateResponseMixin
 from katalogus.client import Boefje, KATalogus, KATalogusError, Plugin
 from pydantic import RootModel, TypeAdapter
 from tools.ooi_helpers import create_ooi
-from tools.view_helpers import BreadcrumbsMixin, PostRedirect, url_with_querystring
+from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, PostRedirect, url_with_querystring
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.reports import Report as ReportOOI
@@ -46,7 +46,7 @@ from rocky.views.scheduler import SchedulerView
 REPORTS_PRE_SELECTION = {"clearance_level": ["2", "3", "4"], "clearance_type": "declared"}
 
 
-def get_selection(request: HttpRequest, pre_selection: dict[str, str | Sequence[str]] | None = None) -> str:
+def get_selection(request: HttpRequest, pre_selection: Mapping[str, str | Sequence[str]] | None = None) -> str:
     if pre_selection is not None:
         return "?" + urlencode(pre_selection, True)
     return "?" + urlencode(request.GET, True)
@@ -79,13 +79,11 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
     def is_valid_breadcrumbs(self):
         return self.breadcrumbs_step < len(self.breadcrumbs)
 
-    def build_breadcrumbs(self):
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
 
-        breadcrumbs = [{"url": reverse("reports", kwargs=kwargs) + selection, "text": _("Reports")}]
-
-        return breadcrumbs
+        return [{"url": reverse("reports", kwargs=kwargs) + selection, "text": _("Reports")}]
 
     def get_breadcrumbs(self):
         if self.is_valid_breadcrumbs():

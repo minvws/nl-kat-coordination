@@ -27,7 +27,7 @@ class RiskLevelSeverity(Enum):
     def __gt__(self, other: "RiskLevelSeverity") -> bool:
         return severity_order.index(self.value) > severity_order.index(other.value)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.value
 
 
