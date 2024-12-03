@@ -111,10 +111,6 @@ class LocalPluginRepository:
 
 @cache
 def _cached_resolve_boefjes(path: Path) -> dict[str, BoefjeResource]:
-    """Adding the hash to the arguments makes sure we refresh this. The size could hence be 1, but since this is not
-    expensive it's worth catching scenarios where we are testing new boefjes and removing them and still having the old
-    hash cached"""
-
     paths_and_packages = _find_packages_in_path_containing_files(path, (BOEFJE_DEFINITION_FILE,))
     boefje_resources = []
 
@@ -129,10 +125,6 @@ def _cached_resolve_boefjes(path: Path) -> dict[str, BoefjeResource]:
 
 @cache
 def _cached_resolve_normalizers(path: Path) -> dict[str, NormalizerResource]:
-    """Adding the hash to the arguments makes sure we refresh this. The size could hence be 1, but since this is not
-    expensive it's worth catching scenarios where we are testing new boefjes and removing them and still having the old
-    hash cached"""
-
     paths_and_packages = _find_packages_in_path_containing_files(
         path, (NORMALIZER_DEFINITION_FILE, ENTRYPOINT_NORMALIZERS)
     )
