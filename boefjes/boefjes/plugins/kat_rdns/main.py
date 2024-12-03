@@ -33,6 +33,6 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
                     # Auth nameserver for ip could not be reached, error codes defined in RFC 8914
                     return [(set(), "NoAuthServersReachable:" + ede_error.text)]
                     # returned when the resolver indicates a Lame delegation.
-        return [(set(), "SERVFAIL")]
+        return [(set(), "NoAnswer")]
     except (dns.resolver.Timeout, dns.resolver.NoAnswer):
         return [(set(), "NoAnswer")]
