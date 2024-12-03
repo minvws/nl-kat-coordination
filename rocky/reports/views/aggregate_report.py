@@ -121,7 +121,7 @@ class ExportSetupAggregateReportView(
             messages.error(request, _("You do not have the required permissions to enable plugins."))
             return PostRedirect(self.get_previous())
 
-        client = get_katalogus(self.organization.code)
+        client = get_katalogus(self.organization_member)
         for selected_plugin in selected_plugins:
             try:
                 client.enable_boefje_by_id(selected_plugin)
