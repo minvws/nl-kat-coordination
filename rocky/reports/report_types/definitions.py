@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, TypedDict, TypeVar
 
-from django_stubs_ext import StrPromise
+from django.utils.functional import Promise
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference
@@ -39,8 +39,8 @@ def report_plugins_union(report_types: list[type["BaseReport"]]) -> ReportPlugin
 
 class BaseReport:
     id: str
-    name: StrPromise
-    description: StrPromise
+    name: Promise
+    description: Promise
     template_path: str = "report.html"
     plugins: ReportPlugins
     input_ooi_types: set[type[OOI]]

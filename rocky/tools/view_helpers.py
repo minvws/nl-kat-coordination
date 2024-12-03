@@ -6,8 +6,8 @@ from urllib.parse import urlencode, urlparse, urlunparse
 from django.http import HttpRequest
 from django.http.response import HttpResponseRedirectBase
 from django.urls.base import reverse, reverse_lazy
+from django.utils.functional import Promise
 from django.utils.translation import gettext_lazy as _
-from django_stubs_ext import StrOrPromise
 
 from octopoes.models.types import OOI_TYPES
 from tools.models import Organization
@@ -76,7 +76,7 @@ def existing_ooi_type(ooi_type: str) -> bool:
 
 
 class Breadcrumb(TypedDict):
-    text: StrOrPromise
+    text: str | Promise
     url: str
 
 

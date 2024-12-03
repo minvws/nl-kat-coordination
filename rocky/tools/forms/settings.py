@@ -1,10 +1,10 @@
+from django.utils.functional import Promise
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from django_stubs_ext import StrPromise
 
 from tools.enums import SCAN_LEVEL
 
-Choice = tuple[str, StrPromise]
+Choice = tuple[str, Promise]
 Choices = list[Choice]
 ChoicesGroup = tuple[str, Choices]
 ChoicesGroups = list[ChoicesGroup]
