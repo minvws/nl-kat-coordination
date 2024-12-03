@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -83,7 +85,7 @@ class WebChecks:
     def __len__(self) -> int:
         return len(self.checks)
 
-    def __add__(self, other: "WebChecks") -> "WebChecks":
+    def __add__(self, other: WebChecks) -> WebChecks:
         return WebChecks(checks=self.checks + other.checks)
 
 

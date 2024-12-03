@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from uuid import UUID, uuid4
 
@@ -76,13 +78,13 @@ class Query:
     _offset: int | None = None
     _order_by: tuple[Aliased, bool] | None = None
 
-    def where(self, ooi_type: Ref, **kwargs: Ref | str | set[str] | bool) -> "Query":
+    def where(self, ooi_type: Ref, **kwargs: Ref | str | set[str] | bool) -> Query:
         for field_name, value in kwargs.items():
             self._where_field_is(ooi_type, field_name, value)
 
         return self
 
-    def where_in(self, ooi_type: Ref, **kwargs: list[str]) -> "Query":
+    def where_in(self, ooi_type: Ref, **kwargs: list[str]) -> Query:
         """Allows for filtering on multiple values for a specific field."""
 
         for field_name, values in kwargs.items():
@@ -94,7 +96,7 @@ class Query:
         return self._compile(separator="\n    ")
 
     @classmethod
-    def from_path(cls, path: Path) -> "Query":
+    def from_path(cls, path: Path) -> Query:
         """
         Create a query from a Path.
 
@@ -147,14 +149,14 @@ class Query:
 
         return query
 
-    def pull(self, ooi_type: Ref, *, fields: str = "[*]") -> "Query":
+    def pull(self, ooi_type: Ref, *, fields: str = "[*]") -> Query:
         """By default, we pull the target type. But when using find, count, etc., you have to pull explicitly."""
 
         self._find_clauses.append(f"(pull {self._get_object_alias(ooi_type)} {fields})")
 
         return self
 
-    def find(self, item: Ref, *, index: int | None = None) -> "Query":
+    def find(self, item: Ref, *, index: int | None = None) -> Query:
         """Add a find clause, so we can select specific fields in a query to be returned as well."""
 
         if index is None:
@@ -164,22 +166,22 @@ class Query:
 
         return self
 
-    def count(self, ooi_type: Ref) -> "Query":
+    def count(self, ooi_type: Ref) -> Query:
         self._find_clauses.append(f"(count {self._get_object_alias(ooi_type)})")
 
         return self
 
-    def limit(self, limit: int) -> "Query":
+    def limit(self, limit: int) -> Query:
         self._limit = limit
 
         return self
 
-    def offset(self, offset: int) -> "Query":
+    def offset(self, offset: int) -> Query:
         self._offset = offset
 
         return self
 
-    def order_by(self, ref: Aliased, ascending: bool = True) -> "Query":
+    def order_by(self, ref: Aliased, ascending: bool = True) -> Query:
         self._order_by = (ref, ascending)
 
         return self
