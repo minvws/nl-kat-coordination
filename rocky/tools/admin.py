@@ -87,7 +87,7 @@ class OrganizationTagAdmin(admin.ModelAdmin):
 
 @admin.register(Dashboard)
 class DahboardAdmin(admin.ModelAdmin):
-    pass
+    readonly_fields = ("recipe",)
 
 
 tagulous.admin.register(Organization, OrganizationAdmin)

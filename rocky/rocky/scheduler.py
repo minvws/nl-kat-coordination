@@ -168,6 +168,17 @@ class ScheduleResponse(BaseModel):
     modified_at: datetime.datetime
 
 
+class SchedulerResponse(BaseModel):
+    id: str
+    enabled: bool
+    priority_queue: dict[str, Any]
+    last_activity: str | None
+
+
+class SchedulerNoResponse(BaseModel):
+    detail: str
+
+
 class Queue(BaseModel):
     id: str
     size: int
@@ -286,6 +297,17 @@ class SchedulerClient:
             return ScheduleResponse.model_validate_json(res.content)
         except ConnectError:
             raise SchedulerConnectError()
+
+    def is_scheduler_ready(self, scheduler_id: str) -> bool:
+        is_ready = False
+        while not is_ready:
+            try:
+                res = self._client.get(f"/schedulers/{scheduler_id}")
+                res.raise_for_status()
+                is_ready = True
+            except HTTPStatusError:
+                continue
+        return SchedulerResponse.model_validate_json(res.content).enabled
 
     def post_schedule_search(self, filters: dict[str, list[dict[str, str]]]) -> PaginatedSchedulesResponse:
         try:
