@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
+from httpx import HTTPError
 from pydantic import ValidationError
 from tools.forms.upload_csv import CSV_ERRORS
 from tools.forms.upload_oois import UploadOOICSVForm
@@ -158,15 +159,14 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
 
         csv_data = io.StringIO(csv_raw_data.decode("UTF-8"))
         rows_with_error = []
+        oois = []
         try:
             for row_number, row in enumerate(csv.DictReader(csv_data, delimiter=",", quotechar='"'), start=1):
                 if not row:
                     continue  # skip empty lines
                 try:
                     ooi, level = self.get_ooi_from_csv(object_type, row)
-                    self.octopoes_api_connector.save_declaration(
-                        Declaration(ooi=ooi, valid_time=datetime.now(timezone.utc), task_id=task_id)
-                    )
+                    oois.append(Declaration(ooi=ooi, valid_time=datetime.now(timezone.utc), task_id=task_id))
                     if isinstance(level, int):
                         self.raise_clearance_level(ooi.reference, level)
                 except ValidationError:
@@ -179,3 +179,8 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
             self.add_success_notification(_("Object(s) successfully added."))
         except (csv.Error, IndexError):
             return self.add_error_notification(CSV_ERRORS["csv_error"])
+
+        try:
+            self.octopoes_api_connector.save_many_declarations(oois)
+        except HTTPError:
+            return self.add_error_notification("Failed to save data from the CSV")
