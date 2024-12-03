@@ -6,12 +6,9 @@ from typing import Any
 import structlog
 from opentelemetry import trace
 
-from scheduler import clients, context, models, rankers
+from scheduler import clients, context, models
 from scheduler.clients.errors import ExternalServiceError
-from scheduler.connectors.errors import ExternalServiceError
-from scheduler.schedulers import Scheduler
-
-from .scheduler import Scheduler
+from scheduler.schedulers import Scheduler, rankers
 
 tracer = trace.get_tracer(__name__)
 
@@ -23,6 +20,7 @@ class NormalizerScheduler(Scheduler):
         ranker: The ranker to calculate the priority of a task.
     """
 
+    ID: str = "normalizer"
     ITEM_TYPE: Any = models.NormalizerTask
 
     def __init__(self, ctx: context.AppContext):
@@ -32,10 +30,8 @@ class NormalizerScheduler(Scheduler):
             ctx (context.AppContext): Application context of shared data (e.g.
                 configuration, external services connections).
         """
-        self.scheduler_id = "normalizer"
+        super().__init__(ctx=ctx, scheduler_id=self.ID, create_schedule=False)
         self.ranker = rankers.NormalizerRanker(ctx=self.ctx)
-
-        super().__init__(ctx=ctx, queue=self.queue, scheduler_id=self.scheduler_id, create_schedule=False)
 
     def run(self) -> None:
         """The run method is called when the scheduler is started. It will

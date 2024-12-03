@@ -15,27 +15,31 @@ tracer = trace.get_tracer(__name__)
 
 
 class ReportScheduler(Scheduler):
-    """Scheduler implementation for the ReportTask models."""
+    """Scheduler implementation for the creation of ReportTask models."""
 
+    ID: str = "report"
     ITEM_TYPE: Any = models.ReportTask
 
     def __init__(self, ctx: context.AppContext):
-        self.scheduler_id: str = "report"
+        """Initializes the NormalizerScheduler.
 
-        super().__init__(ctx=ctx, queue=self.queue, scheduler_id=self.scheduler_id, create_schedule=True)
-
-    def run(self) -> None:
-        """Initializes the ReportScheduler.
         Args:
             ctx (context.AppContext): Application context of shared data (e.g.
                 configuration, external services connections).
+        """
+        super().__init__(ctx=ctx, scheduler_id=self.ID, create_schedule=True)
+
+    def run(self) -> None:
+        """The run method is called when the schedulers is started. It will
+        start the rescheduling process for the ReportTask models that are
+        scheduled.
         """
         # Rescheduling
         self.run_in_thread(
             name=f"scheduler-{self.scheduler_id}-reschedule", target=self.push_tasks_for_rescheduling, interval=60.0
         )
         self.logger.info(
-            "Report started for %s", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
+            "Report scheduler started", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
         )
 
     @tracer.start_as_current_span(name="report_push_tasks_for_rescheduling")

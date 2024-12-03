@@ -4,7 +4,7 @@ from functools import partial
 import sqlalchemy
 import structlog
 
-from scheduler.context import settings
+from scheduler.config import settings
 from scheduler.storage.errors import StorageError
 
 

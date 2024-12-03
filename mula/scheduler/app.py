@@ -86,13 +86,16 @@ class App:
 
     def start_schedulers(self) -> None:
         boefje = schedulers.BoefjeScheduler(ctx=self.ctx)
-        boefje.run()
+        self.schedulers[boefje.scheduler_id] = boefje
 
         normalizer = schedulers.NormalizerScheduler(ctx=self.ctx)
-        normalizer.run()
+        self.schedulers[normalizer.scheduler_id] = normalizer
 
         report = schedulers.ReportScheduler(ctx=self.ctx)
-        report.run()
+        self.schedulers[report.scheduler_id] = report
+
+        for s in self.schedulers.values():
+            s.run()
 
     def start_collectors(self) -> None:
         thread.ThreadRunner(
@@ -107,8 +110,11 @@ class App:
         """Shutdown the scheduler application, and all threads."""
         self.logger.info("Shutdown initiated")
 
-        # TODO: check if this will stop the scheduler threads
         self.stop_event.set()
+
+        # Stop all schedulers
+        for s in self.schedulers.values():
+            s.stop()
 
         # Stop all threads that are still running, except the main thread.
         # These threads likely have a blocking call and as such are not able
@@ -140,15 +146,14 @@ class App:
 
     def _collect_metrics(self) -> None:
         """Collect application metrics throughout the application."""
-        schedulers_db, _ = self.ctx.datastores.scheduler_store.get_schedulers()
-        if not schedulers_db:
-            self.logger.warning("No schedulers to collect metrics for")
-            return
 
-        for s in schedulers_db:
-            qsize = self.ctx.datastores.pq_store.qsize(s.id)
-            self.ctx.metrics_qsize.labels(scheduler_id=s.id).set(qsize)
+        # FIXME:: can be queries instead of a loop
+        # Collect the queue size of the schedulers, and the status counts of
+        # the tasks for each scheduler.
+        for s in self.schedulers.values():
+            qsize = self.ctx.datastores.pq_store.qsize(s.scheduler_id)
+            self.ctx.metrics_qsize.labels(scheduler_id=s.scheduler_id).set(qsize)
 
-            status_counts = self.ctx.datastores.task_store.get_status_counts(s.id)
+            status_counts = self.ctx.datastores.task_store.get_status_counts(s.scheduler_id)
             for status, count in status_counts.items():
-                self.ctx.metrics_task_status_counts.labels(scheduler_id=s.id, status=status).set(count)
+                self.ctx.metrics_task_status_counts.labels(scheduler_id=s.scheduler_id, status=status).set(count)

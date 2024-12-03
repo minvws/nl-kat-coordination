@@ -9,7 +9,7 @@ from typing import Any
 import structlog
 from opentelemetry import trace
 
-from scheduler import clients, context, models, storage, utils
+from scheduler import clients, context, models, utils
 from scheduler.schedulers.queue import PriorityQueue
 from scheduler.schedulers.queue.errors import InvalidItemError, NotAllowedError, QueueFullError
 from scheduler.utils import cron, thread
@@ -190,14 +190,14 @@ class Scheduler(abc.ABC):
                 queue_id=self.queue.pq_id,
                 scheduler_id=self.scheduler_id,
             )
-            raise queues.errors.NotAllowedError("Scheduler is disabled")
+            raise NotAllowedError("Scheduler is disabled")
 
         try:
             if item.type is None:
                 item.type = self.ITEM_TYPE.type
             item.status = models.TaskStatus.QUEUED
             item = self.queue.push(item)
-        except queues.errors.NotAllowedError as exc:
+        except NotAllowedError as exc:
             self.logger.warning(
                 "Not allowed to push to queue %s (%s)",
                 self.queue.pq_id,
@@ -207,7 +207,7 @@ class Scheduler(abc.ABC):
                 scheduler_id=self.scheduler_id,
             )
             raise exc
-        except queues.errors.QueueFullError as exc:
+        except QueueFullError as exc:
             self.logger.warning(
                 "Queue %s is full, not pushing new items (%s)",
                 self.queue.pq_id,
@@ -218,7 +218,7 @@ class Scheduler(abc.ABC):
                 scheduler_id=self.scheduler_id,
             )
             raise exc
-        except queues.errors.InvalidItemError as exc:
+        except InvalidItemError as exc:
             self.logger.warning(
                 "Invalid item %s",
                 item.id,
