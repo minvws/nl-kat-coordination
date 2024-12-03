@@ -1,5 +1,5 @@
 from account.mixins import OrganizationView
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 from tools.view_helpers import Breadcrumb, ObjectsBreadcrumbsMixin
 
