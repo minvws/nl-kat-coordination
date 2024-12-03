@@ -179,7 +179,7 @@ class AggregateOrganisationReport(AggregateReport):
         basic_security["system_specific"][SystemType.WEB] = [
             report for ip in web_report_data for report in web_report_data[ip]
         ]
-        basic_security["syst_specific"][SystemType.DNS] = [
+        basic_security["system_specific"][SystemType.DNS] = [
             report for ip in dns_report_data for report in dns_report_data[ip]
         ]
 
