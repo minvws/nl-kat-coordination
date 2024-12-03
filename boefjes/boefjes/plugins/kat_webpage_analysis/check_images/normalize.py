@@ -54,5 +54,5 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         yield Finding(
             finding_type=kat_ooi.reference,
             ooi=resource,
-            description="Image ended up bigger than %d Pixels, possible decompression Bomb" % image.MAX_IMAGE_PIXELS,
+            description=f"Image ended up bigger than {image.MAX_IMAGE_PIXELS} Pixels, possible decompression Bomb",
         )

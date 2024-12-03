@@ -70,7 +70,7 @@ def run():
     loglevel = os.getenv("CVEAPI_LOGLEVEL", "INFO")
     numeric_level = getattr(logging, loglevel.upper(), None)
     if not isinstance(numeric_level, int):
-        raise ValueError("Invalid log level: %s" % loglevel)
+        raise ValueError(f"Invalid log level: {loglevel}")
     logging.basicConfig(format="%(message)s", level=numeric_level)
 
     cveapi_dir = os.getenv("CVEAPI_DIR", "/var/lib/kat-cveapi")

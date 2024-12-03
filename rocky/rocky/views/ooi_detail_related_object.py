@@ -30,11 +30,6 @@ class OOIRelatedObjectManager(SingleOOITreeMixin):
                     related.append(rel)
         return related
 
-    def split_ooi_type_choice(self, ooi_type_choice) -> dict[str, str]:
-        ooi_type = ooi_type_choice.split("|", 1)
-
-        return {"ooi_type": ooi_type[0], "ooi_relation": ooi_type[1] if len(ooi_type) > 1 else None}
-
     def ooi_add_url(self, ooi: OOI, ooi_type: str, ooi_relation: str = "ooi_id") -> str:
         """
         When a user wants to add an OOI TYPE to another OOI TYPE object, it will
@@ -128,9 +123,17 @@ class OOIRelatedObjectAddView(OOIRelatedObjectManager, TemplateView):
             self.ooi_id = self.get_ooi(pk=request.GET["ooi_id"])
 
         if "add_ooi_type" in request.GET:
-            ooi_type_choice = self.split_ooi_type_choice(request.GET["add_ooi_type"])
-            if existing_ooi_type(ooi_type_choice["ooi_type"]):
-                return redirect(self.ooi_add_url(self.ooi_id, **ooi_type_choice))
+            if "|" in request.GET["add_ooi_type"]:
+                ooi_type, ooi_relation = request.GET["add_ooi_type"].split("|", 1)
+            else:
+                ooi_type = request.GET["add_ooi_type"]
+                ooi_relation = None
+
+            if existing_ooi_type(ooi_type):
+                if ooi_relation:
+                    return redirect(self.ooi_add_url(self.ooi_id, ooi_type, ooi_relation))
+                else:
+                    return redirect(self.ooi_add_url(self.ooi_id, ooi_type))
 
         if "status_code" in kwargs:
             response = super().get(request, *args, **kwargs)

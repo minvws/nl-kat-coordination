@@ -48,6 +48,7 @@ skip-magic-trailing-comma = true
 select = ["E", "F", "ERA", "W", "TID", "I", "G", "INP", "T20", "UP", "ISC", "PTH", "SIM", "PLC", "A", "S"]
 ignore = [
      "A003", # Built-in shadowing is usually not a problem and some built-ins have very generic names
+     "SIM103", # Creating long return statements is often less readable
      "SIM108", # Ternary operator is not always more readable
      "S101", # Assert use is normal in pytest tests
      "S104", # Binding to all is normal in containers
@@ -87,7 +88,7 @@ task-tags = ["Example", "todo", "TODO", "FIXME"]
 split-on-trailing-comma = false
 
 [tool.codespell]
-ignore-words-list = 'edn,juxt'
+ignore-words-list = 'edn,juxt,assertIn'
 
 [tool.poetry]
 name = "openkat"
