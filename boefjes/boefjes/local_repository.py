@@ -139,7 +139,7 @@ def _cached_resolve_normalizers(path: Path) -> dict[str, NormalizerResource]:
     return {resource.normalizer.id: resource for resource in normalizer_resources}
 
 
-def _find_packages_in_path_containing_files(path, required_files: tuple[str, ...]) -> list[tuple[Path, str]]:
+def _find_packages_in_path_containing_files(path: Path, required_files: tuple[str, ...]) -> list[tuple[Path, str]]:
     prefix = create_relative_import_statement_from_cwd(path)
     paths = []
 
@@ -167,16 +167,17 @@ def create_relative_import_statement_from_cwd(package_dir: Path) -> str:
 
 
 @lru_cache(maxsize=200)
-def get_boefje_resource(path, package, path_hash):
+def get_boefje_resource(path: Path, package: str, path_hash: str):
     """The cache size in theory only has to be the amount of local boefjes available, but 200 gives us some extra
-    space."""
+    space. Adding the hash to the arguments makes sure we refresh this."""
+
     return BoefjeResource(path, package, path_hash)
 
 
 @lru_cache(maxsize=200)
-def get_normalizer_resource(path, package, path_hash):
+def get_normalizer_resource(path: Path, package: str, path_hash: str):
     """The cache size in theory only has to be the amount of local normalizers available, but 200 gives us some extra
-    space."""
+    space. Adding the hash to the arguments makes sure we refresh this."""
 
     return NormalizerResource(path, package)
 
