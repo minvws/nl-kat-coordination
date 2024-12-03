@@ -3,7 +3,7 @@
 <section>
     <div>
         <h2>{% translate "Findings overview" %}</h2>
-        {% if findings_per_org %}
+        {% if organizations_findings.values %}
             <p>
                 {% translate "This overview shows the total number of findings per severity that have been identified for all organizations." %}
             </p>
@@ -15,7 +15,7 @@
             <p>{% translate "No findings have been identified yet." %}</p>
         {% endif %}
     </div>
-    {% if findings_per_org %}
+    {% if organizations_findings.values %}
         <div>
             <h2>{% translate "Findings per organization" %}</h2>
             <p>{% translate "This table shows the findings that have been identified for each organization." %}</p>
@@ -35,10 +35,10 @@
                         {% for organization, findings in organizations_findings.items %}
                             <tr>
                                 <td>{{ organization.name }}</td>
-                                <td class="number">{{ findings.total_finding_types }}</td>
-                                <td class="number">{{ findings.total_by_severity_per_finding_type.critical }}</td>
+                                <td>{{ findings.summary.total_finding_types }}</td>
+                                <td>{{ findings.summary.total_by_severity_per_finding_type.critical }}</td>
                                 <td>
-                                    <span class="{{ findings.finding_types.0.finding_type.risk_severity }}">{{ findings.finding_types.0.finding_type.risk_severity|capfirst }}</span>}
+                                    <span class="{{ findings.finding_types.0.finding_type.risk_severity }}">{{ findings.finding_types.0.finding_type.risk_severity|capfirst }}</span>
                                 </td>
                                 <td class="actions">
                                     <button class="expando-button"
@@ -58,7 +58,7 @@
                                     </div>
                                     <h4>{% translate "Findings" %} (0/0)</h4>
                                     <div class="column-2">
-                                        {% include "partials/report_findings_per_organization_table.html" %}
+                                        {% include "partials/report_findings_per_organization_table.html" with data=findings %}
 
                                     </div>
                                 </td>

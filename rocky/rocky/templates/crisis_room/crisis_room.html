@@ -15,7 +15,7 @@
                 </p>
             </div>
         </section>
-        {% if organizations %}
+        {% if organizations_findings %}
             <section>
                 <div>
                     {% for dashboard in dashboards %}{{ dashboard.recipe }}{% endfor %}
@@ -26,7 +26,11 @@
             {% include "crisis_room/crisis_room_findings_block.html" %}
 
         {% else %}
-            {% translate "There were no organizations found for your user account" %}.
+            <section>
+                <div>
+                    <p>{% translate "There were no organizations found for your user account." %}</p>
+                </div>
+            </section>
         {% endif %}
     </main>
 {% endblock content %}
