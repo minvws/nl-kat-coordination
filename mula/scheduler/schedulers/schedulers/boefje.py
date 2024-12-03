@@ -199,6 +199,7 @@ class BoefjeScheduler(Scheduler):
                     self.logger.debug(
                         "Boefje not allowed to run on ooi",
                         boefje_id=boefje.id,
+                        boefje_name=boefje.name,
                         ooi_primary_key=ooi.primary_key,
                         organisation_id=self.organisation.id,
                         scheduler_id=self.scheduler_id,
