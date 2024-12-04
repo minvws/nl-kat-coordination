@@ -12,8 +12,17 @@ from tanimachi import (
     analyze_headers,
     analyze_scripts,
     analyze_url,
+    schemas,
 )
-from tanimachi.wappalyzer import analyze_cookies, analyze_dom, analyze_html, analyze_meta
+from tanimachi.wappalyzer import (
+    Detection,
+    HarWrapper,
+    analyze_cookies,
+    analyze_dom,
+    analyze_html,
+    analyze_meta,
+    is_html,
+)
 
 from boefjes.job_models import NormalizerOutput
 from octopoes.models import Reference
@@ -50,8 +59,18 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     analyzes = [analyze_scripts, analyze_css]
 
     # check if the content type is html
-    if har.log.entries and "html" in har.log.entries[0].response.content.mime_type:
-        analyzes.extend([analyze_headers, analyze_url, analyze_cookies, analyze_meta, analyze_html, analyze_dom])
+    if har.log.entries and is_html(har.log.entries[0]):
+        analyzes.extend(
+            [
+                analyze_headers,
+                analyze_url,
+                analyze_cookies,
+                analyze_meta,
+                analyze_html,
+                analyze_dom,
+                analyze_script_src_in_html,
+            ]
+        )
 
     detections = wappalyzer.analyze(har, analyzes=analyzes)
 
@@ -61,3 +80,17 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         software = Software(name=detection.fingerprint.id, version=version, cpe=cpe)
         software_instance = SoftwareInstance(ooi=web_url.reference, software=software.reference)
         yield from [software, software_instance]
+
+
+# analyze_scripts is used to check javascript files, therefore we need another analyzer that analyzes the script
+# source in the html
+def analyze_script_src_in_html(har: HarWrapper, fingerprint: schemas.Fingerprint):
+    detections: list[Detection] = []
+
+    for pattern in fingerprint.script_src:
+        if pattern.regex.search(har.html):
+            detections.append(
+                Detection(url=har.url, fingerprint=fingerprint, app_type="html", pattern=pattern, value=har.html)
+            )
+
+    return detections
