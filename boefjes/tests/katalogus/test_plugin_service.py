@@ -47,12 +47,12 @@ def test_update_by_id_bad_schema(mock_plugin_service, test_organisation):
 
 def test_get_schema(mock_plugin_service):
     schema = mock_plugin_service.schema("kat_test")
-    assert {
+    assert schema == {
         "title": "Arguments",
         "type": "object",
         "properties": {"api_key": {"title": "Api Key", "maxLength": 128, "type": "string"}},
         "required": ["api_key"],
-    } == schema
+    }
 
     schema = mock_plugin_service.schema("kat_test_normalize")
     assert schema is None
