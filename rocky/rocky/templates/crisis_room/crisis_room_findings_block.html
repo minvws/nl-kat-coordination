@@ -56,7 +56,9 @@
                                         {% include "partials/report_severity_totals_table.html" with data=findings.summary %}
 
                                     </div>
-                                    <h4>{% translate "Findings" %} (0/0)</h4>
+                                    <h4>
+                                        {% translate "Findings" %} ({{ findings.summary.total_finding_types }}/{{ findings.summary.total_finding_types }})
+                                    </h4>
                                     <div class="column-2">
                                         {% include "partials/report_findings_per_organization_table.html" with data=findings %}
 
