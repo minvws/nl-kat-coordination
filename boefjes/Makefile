@@ -76,12 +76,19 @@ itest: ## Run the integration tests.
 	$(ci-docker-compose) build
 	$(ci-docker-compose) down --remove-orphans
 	$(ci-docker-compose) run --rm katalogus_integration
-	$(ci-docker-compose) down
+	$(ci-docker-compose) stop
 
-bench:  ## Run the report benchmark.
+migration_bench:  ## Run the migration benchmark.
 	$(ci-docker-compose) build
 	$(ci-docker-compose) down --remove-orphans
 	$(ci-docker-compose) run --rm migration_bench
+	$(ci-docker-compose) stop
+
+bench:  ## Run the other benchmarks
+	$(ci-docker-compose) build
+	$(ci-docker-compose) down --remove-orphans
+	$(ci-docker-compose) run --rm katalogus_integration \
+	python -m cProfile -o .ci/bench_$$(date +%Y_%m_%d-%H:%M:%S).pstat -m pytest -m slow --no-cov tests/integration
 	$(ci-docker-compose) stop
 
 debian12:
