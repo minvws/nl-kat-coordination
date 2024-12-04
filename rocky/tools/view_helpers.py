@@ -67,7 +67,7 @@ def get_ooi_url(routename: str, ooi_id: str, organization_code: str, **kwargs) -
     return url_with_querystring(reverse(routename, kwargs={"organization_code": organization_code}), **kwargs)
 
 
-def existing_ooi_type(ooi_type: str):
+def existing_ooi_type(ooi_type: str) -> bool:
     if not ooi_type:
         return False
 

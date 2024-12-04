@@ -449,6 +449,8 @@ docs/source/_static/mermaid.min.js
 # rpki cache
 /boefjes/boefjes/plugins/kat_rpki/rpki.json
 /boefjes/boefjes/plugins/kat_rpki/rpki-meta.json
+/boefjes/boefjes/plugins/kat_rpki/bgp.jsonl
+/boefjes/boefjes/plugins/kat_rpki/bgp-meta.json
 
 *.pstat
 **/.cache*

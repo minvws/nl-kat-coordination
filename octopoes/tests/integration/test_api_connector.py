@@ -69,7 +69,16 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
     assert octopoes_api_connector.list_objects(types={Network, Hostname}, valid_time=valid_time).count == 6
 
     with pytest.raises(ObjectNotFoundException):
-        octopoes_api_connector.delete_many(["bla"], valid_time=valid_time)
+        octopoes_api_connector.delete_many(["test"], valid_time=valid_time)
+
+    assert len(octopoes_api_connector.list_origins(origin_type=OriginType.DECLARATION, valid_time=valid_time)) == 1
+
+    octopoes_api_connector.save_many_declarations([Declaration(ooi=h, valid_time=valid_time) for h in hostnames])
+
+    assert (
+        len(octopoes_api_connector.list_origins(origin_type=OriginType.DECLARATION, valid_time=valid_time))
+        == len(hostnames) + 1
+    )
 
 
 def test_history(octopoes_api_connector: OctopoesAPIConnector):
