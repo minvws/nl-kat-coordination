@@ -504,7 +504,7 @@ class ReportFinalSettingsView(BaseReportView, SchedulerView, TemplateView):
 
         # Create name for parent report
         if not (report_types_count == 1 and oois_count == 1):
-            if report_types_count > 1 and (oois_count == 0 or oois_count > 1):
+            if report_types_count > 1 and oois_count != 1):
                 name = _("Concatenated Report for {oois_count} objects").format(
                     report_type=report_type, oois_count=oois_count
                 )
