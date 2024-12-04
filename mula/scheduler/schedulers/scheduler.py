@@ -194,7 +194,7 @@ class Scheduler(abc.ABC):
         if tries >= max_tries and max_tries != -1:
             raise QueueFullError()
 
-        self.push_item_to_queue(item=item, create_schedule=create_schedule)
+        self.push_item_to_queue(item, create_schedule=create_schedule)
 
     def push_item_to_queue(self, item: models.Task, create_schedule: bool = True) -> models.Task:
         """Push a Task to the queue.
