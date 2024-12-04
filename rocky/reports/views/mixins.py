@@ -3,6 +3,7 @@ from string import Template
 from typing import Any
 from uuid import uuid4
 
+import structlog
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from tools.ooi_helpers import create_ooi
@@ -17,6 +18,8 @@ from reports.report_types.definitions import BaseReport, SubReportPlugins
 from reports.report_types.helpers import REPORTS, get_report_by_id
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.views.base import BaseReportView, ReportDataDict
+
+logger = structlog.get_logger(__name__)
 
 
 def collect_reports(observed_at: datetime, octopoes_connector: OctopoesAPIConnector, ooi_pks: list[str], report_types):
@@ -190,6 +193,8 @@ def save_report_data(
         )
 
         create_ooi(octopoes_api_connector, bytes_client, parent_report_ooi, observed_at)
+
+    logger.info("Report created", event_code=800071, report=parent_report_ooi)
     return parent_report_ooi
 
 
@@ -267,6 +272,7 @@ def save_aggregate_report_data(
 
             create_ooi(octopoes_api_connector, bytes_client, aggregate_sub_report_ooi, observed_at)
 
+    logger.info("Report created", event_code=800071, report=report_ooi)
     return report_ooi
 
 
@@ -372,5 +378,6 @@ class SaveMultiReportMixin(BaseReportView):
         )
 
         create_ooi(self.octopoes_api_connector, self.bytes_client, report_ooi, observed_at)
+        logger.info("Report created", event_code=800071, report=report_ooi)
 
         return report_ooi
