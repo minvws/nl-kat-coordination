@@ -41,9 +41,11 @@ class Origin(BaseModel):
                         self.origin_type.value,
                         self.method,
                         self.source,
-                        self.result,
+                        f"[{','.join([str(param) for param in self.result])}]" if self.result else "Null",
                         self.parameters_hash,
-                        self.parameters_references,
+                        f"[{','.join([str(param) for param in self.parameters_references])}]"
+                        if self.parameters_references
+                        else "Null",
                     ],
                 )
             )

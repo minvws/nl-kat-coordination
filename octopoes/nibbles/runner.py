@@ -83,6 +83,9 @@ class NibblesRunner:
     def update_nibbles(self):
         self.nibbles: dict[str, NibbleDefinition] = get_nibble_definitions()
 
+    def list_nibbles(self) -> list[str]:
+        return list(self.nibbles.keys())
+
     def _run(self, ooi: OOI, valid_time: datetime) -> dict[str, dict[tuple[Any, ...], set[OOI]]]:
         return_value: dict[str, dict[tuple[Any, ...], set[OOI]]] = {}
         nibblets = self.origin_repository.list_origins(
