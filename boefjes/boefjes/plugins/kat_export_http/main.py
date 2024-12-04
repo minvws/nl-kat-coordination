@@ -33,7 +33,7 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
         else:
             kwargs.update({"json": input_ooi})
 
-    response = requests.request(request_verb, endpoint_uri, **kwargs)
+    response = requests.request(request_verb, endpoint_uri, **kwargs)  # noqa: S113
     response.raise_for_status()
 
     return [(set(), response.content)]
