@@ -46,27 +46,27 @@ def test_parse_manual_declarations(normalizer_runner):
     assert len(output.declarations) == 2
     assert len(output.observations) == 0
 
-    assert {
+    assert output.declarations[0].ooi.dict() == {
         "name": "net1",
         "object_type": "Network",
         "primary_key": "Network|net1",
         "scan_profile": None,
         "user_id": None,
-    } == output.declarations[0].ooi.dict()
-    assert {
+    }
+    assert output.declarations[1].ooi.dict() == {
         "name": "net2",
         "object_type": "Network",
         "primary_key": "Network|net2",
         "scan_profile": None,
         "user_id": None,
-    } == output.declarations[1].ooi.dict()
+    }
 
 
 def test_parse_manual_hostname_csv(normalizer_runner):
     meta, output, runner = check_network_created(normalizer_runner, 0)
 
     assert len(output.declarations) == 2
-    assert {
+    assert output.declarations[1].ooi.dict() == {
         "dns_zone": None,
         "name": "example.com",
         "network": Reference("Network|internet"),
@@ -75,12 +75,12 @@ def test_parse_manual_hostname_csv(normalizer_runner):
         "registered_domain": None,
         "scan_profile": None,
         "user_id": None,
-    } == output.declarations[1].ooi.dict()
+    }
 
     meta, output, runner = check_network_created(normalizer_runner, 1)
 
     assert len(output.declarations) == 2
-    assert {
+    assert output.declarations[1].ooi.dict() == {
         "dns_zone": None,
         "name": "example.net",
         "network": Reference("Network|internet"),
@@ -89,13 +89,13 @@ def test_parse_manual_hostname_csv(normalizer_runner):
         "registered_domain": None,
         "scan_profile": None,
         "user_id": None,
-    } == output.declarations[1].ooi.dict()
+    }
 
 
 def test_parse_manual_ip_csv(normalizer_runner):
     meta, output, runner = check_network_created(normalizer_runner, 2)
     assert len(output.declarations) == 6
-    assert {
+    assert output.declarations[1].ooi.model_dump() == {
         "address": "1.1.1.1",
         "netblock": None,
         "network": Reference("Network|internet"),
@@ -103,10 +103,10 @@ def test_parse_manual_ip_csv(normalizer_runner):
         "primary_key": "IPAddressV4|internet|1.1.1.1",
         "scan_profile": None,
         "user_id": None,
-    } == output.declarations[1].ooi.model_dump()
+    }
 
     meta, output, runner = check_network_created(normalizer_runner, 3)
-    assert {
+    assert output.declarations[1].ooi.model_dump() == {
         "address": "fe80:cd00:0:cde:1257:0:211e:729c",
         "netblock": None,
         "network": Reference("Network|internet"),
@@ -114,14 +114,14 @@ def test_parse_manual_ip_csv(normalizer_runner):
         "primary_key": "IPAddressV6|internet|fe80:cd00:0:cde:1257:0:211e:729c",
         "scan_profile": None,
         "user_id": None,
-    } == output.declarations[1].ooi.model_dump()
+    }
 
 
 def test_parse_url_csv(normalizer_runner):
     meta, output, runner = check_network_created(normalizer_runner, 4)
     assert len(output.declarations) == 4
 
-    assert {
+    assert output.declarations[1].ooi.model_dump() == {
         "network": Reference("Network|internet"),
         "object_type": "URL",
         "primary_key": "URL|internet|https://example.com/",
@@ -129,11 +129,11 @@ def test_parse_url_csv(normalizer_runner):
         "scan_profile": None,
         "user_id": None,
         "web_url": None,
-    } == output.declarations[1].ooi.model_dump()
+    }
 
     meta, output, runner = check_network_created(normalizer_runner, 5)
     assert len(output.declarations) == 2
-    assert {
+    assert output.declarations[1].ooi.dict() == {
         "network": Reference("Network|internet"),
         "object_type": "URL",
         "primary_key": "URL|internet|https://example.com/",
@@ -141,7 +141,7 @@ def test_parse_url_csv(normalizer_runner):
         "scan_profile": None,
         "user_id": None,
         "web_url": None,
-    } == output.declarations[1].ooi.dict()
+    }
 
 
 def check_network_created(
@@ -153,12 +153,12 @@ def check_network_created(
     output = normalizer_runner.run(meta, CSV_EXAMPLES[csv_idx])
 
     assert len(output.observations) == 0
-    assert {
+    assert output.declarations[0].ooi.dict() == {
         "name": "internet",
         "object_type": "Network",
         "primary_key": "Network|internet",
         "scan_profile": None,
         "user_id": None,
-    } == output.declarations[0].ooi.dict()
+    }
 
     return meta, output, runner
