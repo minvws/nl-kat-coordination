@@ -75,7 +75,7 @@ table tr.expando-row td {
 }
 
 table:not(.nowrap) tbody td:not(.nowrap) {
-  a {
+  a:not(.button) {
     line-break: break-all;
     display: inline-block; /* Needed to be able to use max-width */
     max-width: 20rem;
