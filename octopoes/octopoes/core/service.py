@@ -261,9 +261,6 @@ class OctopoesService:
 
         self.save_origin(origin, resulting_oois, valid_time)
 
-        # The nibble part of inferring
-        self.nibbler.infer([source], valid_time)
-
     @staticmethod
     def check_path_level(path_level: int | None, current_level: int):
         return path_level is not None and path_level >= current_level
@@ -415,6 +412,9 @@ class OctopoesService:
                 None, EmptyScanProfile(reference=ooi.reference), valid_time=event.valid_time
             )
 
+        # The nibble part of inferring
+        self.nibbler.infer([self.ooi_repository.get(ooi.reference, event.valid_time)], event.valid_time)
+
         # analyze bit definitions
         bit_definitions = get_bit_definitions()
         for bit_id, bit_definition in bit_definitions.items():
@@ -446,6 +446,9 @@ class OctopoesService:
     def _on_update_ooi(self, event: OOIDBEvent) -> None:
         if event.new_data is None:
             raise ValueError("Update event new_data should not be None")
+
+        # The nibble part of inferring
+        self.nibbler.infer([self.ooi_repository.get(event.new_data.reference, event.valid_time)], event.valid_time)
 
         if isinstance(event.new_data, Config):
             relevant_bit_ids = [
