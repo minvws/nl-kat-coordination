@@ -94,10 +94,8 @@ def url_classification(url: URL) -> Iterator[OOI]:
                 yield original_url
 
 
-url_classification_params = [NibbleParameter(object_type=URL)]
-url_classification_nibble = NibbleDefinition(
-    name="url_classification", signature=url_classification_params, min_scan_level=-1
-)
+url_classification_params = [NibbleParameter(object_type=URL, min_scan_level=-1)]
+url_classification_nibble = NibbleDefinition(name="url_classification", signature=url_classification_params)
 url_classification_nibble.payload = getattr(sys.modules[__name__], "url_classification")
 
 
@@ -133,8 +131,8 @@ def find_network_url(network: Network, url: URL) -> Iterator[OOI]:
 
 
 find_network_url_params = [
-    NibbleParameter(object_type=Network, parser="[*][?object_type == 'Network'][]"),
-    NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]"),
+    NibbleParameter(object_type=Network, parser="[*][?object_type == 'Network'][]", min_scan_level=-1),
+    NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]", min_scan_level=-1),
 ]
 find_network_url_nibble = NibbleDefinition(
     name="find_network_url",
@@ -152,7 +150,6 @@ find_network_url_nibble = NibbleDefinition(
         }
     }
     """,
-    min_scan_level=-1,
 )
 find_network_url_nibble.payload = getattr(sys.modules[__name__], "find_network_url")
 
@@ -214,13 +211,13 @@ def max_url_length_config(url: URL, config: Config) -> Iterator[OOI]:
                 finding_type=KATFindingType(id="URL exceeds configured maximum length").reference,
                 ooi=url.reference,
                 proof=f"The length of {url.raw} ({len(str(url.raw))}) exceeds the configured maximum length \
-                ({max_length}).",
+({max_length}).",
             )
 
 
 max_url_length_config_params = [
-    NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]"),
-    NibbleParameter(object_type=Config, parser="[*][?object_type == 'Config'][]"),
+    NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]", min_scan_level=-1),
+    NibbleParameter(object_type=Config, parser="[*][?object_type == 'Config'][]", min_scan_level=-1),
 ]
 max_url_length_config_nibble = NibbleDefinition(
     name="max_url_length_config",
@@ -238,7 +235,6 @@ max_url_length_config_nibble = NibbleDefinition(
         }
     }
     """,
-    min_scan_level=-1,
 )
 max_url_length_config_nibble.payload = getattr(sys.modules[__name__], "max_url_length_config")
 

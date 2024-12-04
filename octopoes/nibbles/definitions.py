@@ -19,6 +19,7 @@ logger = structlog.get_logger(__name__)
 class NibbleParameter(BaseModel):
     object_type: type[Any]
     parser: str = "[]"
+    min_scan_level: int = 1
 
     def __eq__(self, other):
         if isinstance(other, NibbleParameter):
@@ -33,7 +34,6 @@ class NibbleDefinition:
     id: str
     signature: list[NibbleParameter]
     query: str | None = None
-    min_scan_level: int = 1
     default_enabled: bool = True
     config_ooi_relation_path: str | None = None
     payload: MethodType | None = None
@@ -43,14 +43,12 @@ class NibbleDefinition:
         name: str,
         signature: list[NibbleParameter],
         query: str | None = None,
-        min_scan_level: int = 1,
         default_enabled: bool = True,
         config_ooi_relation_path: str | None = None,
     ):
         self.id = name
         self.signature = signature
         self.query = query
-        self.min_scan_level = min_scan_level
         self.default_enabled = default_enabled
         self.config_ooi_relation_path = config_ooi_relation_path
 

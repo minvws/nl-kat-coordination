@@ -118,8 +118,11 @@ class NibblesRunner:
 
     def _cleared(self, ooi: OOI, valid_time: datetime) -> bool:
         ooi_level = self.scan_profile_repository.get(ooi.reference, valid_time).level.value
-        target_nibbles = filter(lambda x: type(ooi) in x.signature, self.nibbles.values())
-        return any(nibble.min_scan_level < ooi_level for nibble in target_nibbles)
+        for nibble in self.nibbles.values():
+            for sgn in nibble.signature:
+                if isinstance(ooi, sgn.object_type) and sgn.min_scan_level < ooi_level:
+                    return True
+        return False
 
     def _write(self, valid_time: datetime):
         if self.perform_writes:

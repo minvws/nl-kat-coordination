@@ -5,8 +5,8 @@ from octopoes.models.ooi.web import URL
 NIBBLE = NibbleDefinition(
     name="max_url_length_config",
     signature=[
-        NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]"),
-        NibbleParameter(object_type=Config, parser="[*][?object_type == 'Config'][]"),
+        NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]", min_scan_level=-1),
+        NibbleParameter(object_type=Config, parser="[*][?object_type == 'Config'][]", min_scan_level=-1),
     ],
     query="""
     {
@@ -21,5 +21,4 @@ NIBBLE = NibbleDefinition(
         }
     }
     """,
-    min_scan_level=-1,
 )
