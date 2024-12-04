@@ -116,14 +116,6 @@ class NibblesRunner:
         self.cache = merge_results(self.cache, {ooi: return_value})
         return return_value
 
-    def _cleared(self, ooi: OOI, valid_time: datetime) -> bool:
-        ooi_level = self.scan_profile_repository.get(ooi.reference, valid_time).level.value
-        for nibble in self.nibbles.values():
-            for sgn in nibble.signature:
-                if isinstance(ooi, sgn.object_type) and sgn.min_scan_level < ooi_level:
-                    return True
-        return False
-
     def _write(self, valid_time: datetime):
         if self.perform_writes:
             for source_ooi, results in self.cache.items():
@@ -146,14 +138,13 @@ class NibblesRunner:
     def infer(self, stack: list[OOI], valid_time: datetime) -> dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]]:
         inferences: dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]] = {}
         blockset = set(stack)
-        if stack and self._cleared(stack[-1], valid_time):
-            while stack:
-                ooi = stack.pop()
-                results = self._run(ooi, valid_time)
-                if results:
-                    blocks = set.union(set(), *[ooiset for result in results.values() for _, ooiset in result.items()])
-                    stack += [o for o in blocks if o not in blockset]
-                    blockset |= blocks
-                    inferences |= {ooi: results}
+        while stack:
+            ooi = stack.pop()
+            results = self._run(ooi, valid_time)
+            if results:
+                blocks = set.union(set(), *[ooiset for result in results.values() for _, ooiset in result.items()])
+                stack += [o for o in blocks if o not in blockset]
+                blockset |= blocks
+                inferences |= {ooi: results}
         self._write(valid_time)
         return inferences

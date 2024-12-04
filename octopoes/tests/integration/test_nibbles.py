@@ -10,7 +10,7 @@ from nibbles.definitions import NibbleDefinition, NibbleParameter
 from nibbles.runner import NibblesRunner, nibble_hasher
 
 from octopoes.core.service import OctopoesService
-from octopoes.models import OOI, ScanLevel
+from octopoes.models import OOI
 from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, KATFindingType
@@ -40,15 +40,6 @@ def test_dummy_nibble(xtdb_octopoes_service: OctopoesService, event_manager: Moc
     xtdb_octopoes_service.nibbler.nibbles = {dummy_nibble.id: dummy_nibble}
     network = Network(name="internet")
     xtdb_octopoes_service.ooi_repository.save(network, valid_time)
-    event_manager.complete_process_events(xtdb_octopoes_service)
-
-    assert xtdb_octopoes_service.ooi_repository.list_oois({Network}, valid_time).count == 1
-    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 4
-
-    sp = xtdb_octopoes_service.scan_profile_repository.get(network.reference, valid_time)
-    new_sp = sp.model_copy()
-    new_sp.level = ScanLevel.L2
-    xtdb_octopoes_service.scan_profile_repository.save(sp, new_sp, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     ctx = 1 + MAX_NETWORK_NAME_LENGTH - len(network.name)
@@ -94,7 +85,7 @@ def url_classification(url: URL) -> Iterator[OOI]:
                 yield original_url
 
 
-url_classification_params = [NibbleParameter(object_type=URL, min_scan_level=-1)]
+url_classification_params = [NibbleParameter(object_type=URL)]
 url_classification_nibble = NibbleDefinition(name="url_classification", signature=url_classification_params)
 url_classification_nibble.payload = getattr(sys.modules[__name__], "url_classification")
 
@@ -131,8 +122,8 @@ def find_network_url(network: Network, url: URL) -> Iterator[OOI]:
 
 
 find_network_url_params = [
-    NibbleParameter(object_type=Network, parser="[*][?object_type == 'Network'][]", min_scan_level=-1),
-    NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]", min_scan_level=-1),
+    NibbleParameter(object_type=Network, parser="[*][?object_type == 'Network'][]"),
+    NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]"),
 ]
 find_network_url_nibble = NibbleDefinition(
     name="find_network_url",
@@ -216,8 +207,8 @@ def max_url_length_config(url: URL, config: Config) -> Iterator[OOI]:
 
 
 max_url_length_config_params = [
-    NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]", min_scan_level=-1),
-    NibbleParameter(object_type=Config, parser="[*][?object_type == 'Config'][]", min_scan_level=-1),
+    NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]"),
+    NibbleParameter(object_type=Config, parser="[*][?object_type == 'Config'][]"),
 ]
 max_url_length_config_nibble = NibbleDefinition(
     name="max_url_length_config",

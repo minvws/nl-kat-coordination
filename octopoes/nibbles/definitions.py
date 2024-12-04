@@ -19,7 +19,6 @@ logger = structlog.get_logger(__name__)
 class NibbleParameter(BaseModel):
     object_type: type[Any]
     parser: str = "[]"
-    min_scan_level: int = 1
 
     def __eq__(self, other):
         if isinstance(other, NibbleParameter):
