@@ -300,17 +300,18 @@ class SchedulerClient:
             raise SchedulerConnectError()
 
     def is_scheduler_ready(self, scheduler_id: str) -> bool:
-        is_ready = False
+        """Max trails is 1 minute, 10 x 6 seconds"""
         trials = 0
-        while not is_ready:
+        interval = 6  # in seconds
+        while trials < 10:
             try:
                 res = self._client.get(f"/schedulers/{scheduler_id}")
                 res.raise_for_status()
-                is_ready = True
+                break
             except HTTPStatusError as http_error:
-                if http_error.response.status_code == codes.NOT_FOUND and trials != 5:
+                if http_error.response.status_code == codes.NOT_FOUND:
                     trials += 1
-                    time.sleep(5)
+                    time.sleep(interval)
                     continue
                 raise SchedulerHTTPError()
         return SchedulerResponse.model_validate_json(res.content).enabled
