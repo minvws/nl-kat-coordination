@@ -10,6 +10,7 @@ from opentelemetry import trace
 from scheduler import clients, context, models, utils
 from scheduler.clients.errors import ExternalServiceError
 from scheduler.schedulers import Scheduler, rankers
+from scheduler.schedulers.queue.errors import QueueFullError
 from scheduler.storage import filters
 
 tracer = trace.get_tracer(__name__)
@@ -75,7 +76,6 @@ class BoefjeScheduler(Scheduler):
         """
         # Convert body into a ScanProfileMutation
         mutation = models.ScanProfileMutation.model_validate_json(body)
-
         self.logger.debug(
             "Received scan level mutation %s for: %s",
             mutation.operation,
@@ -153,12 +153,10 @@ class BoefjeScheduler(Scheduler):
     def push_tasks_for_new_boefjes(self) -> None:
         """When new boefjes are added or enabled we find the ooi's that
         boefjes can run on, and create tasks for it."""
-
-        orgs = self.ctx.services.katalogus.get_organisations()
-
         boefje_tasks = []
+        orgs = self.ctx.services.katalogus.get_organisations()
         for org in orgs:
-            new_boefjes = self.ctx.clients.katalogus.get_new_boefjes_by_org_id(org.id)
+            new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(org.id)
             if not new_boefjes:
                 self.logger.debug("No new boefjes found for organisation", organisation_id=org.id)
                 continue
@@ -319,10 +317,10 @@ class BoefjeScheduler(Scheduler):
                 new_boefje_task = models.BoefjeTask(
                     boefje=models.Boefje.model_validate(plugin.dict()),
                     input_ooi=ooi.primary_key if ooi else None,
-                    organization=schedule.organization,
+                    organization=schedule.organisation,
                 )
 
-                executor.submit(self.validate_and_push_task, boefje_task, self.push_tasks_for_rescheduling.__name__)
+                executor.submit(self.validate_and_push_task, new_boefje_task, self.push_tasks_for_rescheduling.__name__)
 
     # TODO: clean up exceptions -> exception handler
     def validate_and_push_task(self, boefje_task: models.BoefjeTask, organisation_id: str, caller: str = "") -> None:
@@ -386,7 +384,16 @@ class BoefjeScheduler(Scheduler):
         latest_task = self.ctx.datastores.task_store.get_latest_task_by_hash(boefje_task.hash)
         task.priority = self.ranker.rank(SimpleNamespace(latest_task=latest_task, task=boefje_task))
 
-        self.push_item_to_queue_with_timeout(task, self.max_tries)
+        try:
+            self.push_item_to_queue_with_timeout(task, self.max_tries)
+        except QueueFullError:
+            self.logger.warning(
+                "Could not add task to queue, queue is full",
+                queue_qsize=self.queue.qsize(),
+                scheduler_id=self.scheduler_id,
+                caller=caller,
+            )
+            return
 
         self.logger.info(
             "Created boefje task",

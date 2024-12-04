@@ -4,11 +4,12 @@ from typing import Any, ClassVar
 
 import mmh3
 import pydantic
-from scheduler import models
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Query
 
+from scheduler import models
 from tests import factories
+from tests.factories import organisation
 
 
 class TestModel(pydantic.BaseModel):
@@ -58,11 +59,17 @@ def create_schedule(scheduler_id: str, data: Any | None = None) -> models.Schedu
     return models.Schedule(scheduler_id=scheduler_id, hash=item.hash, data=item.model_dump())
 
 
-def create_task(scheduler_id: str, data: Any | None = None) -> models.Task:
+def create_task(scheduler_id: str, organisation: str, data: Any | None = None) -> models.Task:
     if data is None:
         data = TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex)
 
-    return models.Task(scheduler_id=scheduler_id, type=TestModel.type, hash=data.hash, data=data.model_dump())
+    return models.Task(
+        scheduler_id=scheduler_id,
+        type=TestModel.type,
+        hash=data.hash,
+        data=data.model_dump(),
+        organisation=organisation,
+    )
 
 
 def create_boefje() -> models.Boefje:

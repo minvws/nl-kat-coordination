@@ -97,7 +97,7 @@ class PriorityQueue(abc.ABC):
         self.pq_store: storage.stores.PriorityQueueStore = pq_store
         self.lock: threading.Lock = threading.Lock()
 
-    def pop(self, filters: storage.filters.FilterRequest | None = None) -> models.Task | None:
+    def pop(self, filters: storage.filters.FilterRequest | None = None) -> tuple[list[models.Task], int]:
         """Remove and return the highest priority item from the queue.
         Optionally apply filters to the queue.
 
@@ -113,14 +113,16 @@ class PriorityQueue(abc.ABC):
         if self.empty():
             raise QueueEmptyError(f"Queue {self.pq_id} is empty.")
 
-        item = self.pq_store.pop(self.pq_id, filters)
-        if item is None:
+        items, count = self.pq_store.pop(self.pq_id, filters)
+        if items is None:
             return None
 
-        item.status = models.TaskStatus.DISPATCHED
-        self.pq_store.update(self.pq_id, item)
+        # TODO: batch update
+        for item in items:
+            item.status = models.TaskStatus.DISPATCHED
+            self.pq_store.update(self.pq_id, item)
 
-        return item
+        return items, count
 
     def push(self, task: models.Task) -> models.Task:
         """Push an item onto the queue.

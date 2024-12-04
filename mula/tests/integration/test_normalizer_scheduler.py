@@ -3,10 +3,10 @@ import unittest
 from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import clients, config, models, schedulers, storage
-from scheduler.storage import stores
 from structlog.testing import capture_logs
 
+from scheduler import clients, config, models, schedulers, storage
+from scheduler.storage import stores
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -42,9 +42,7 @@ class NormalizerSchedulerBaseTestCase(unittest.TestCase):
 
         # Scheduler
         self.organisation = OrganisationFactory()
-        self.scheduler = schedulers.NormalizerScheduler(
-            ctx=self.mock_ctx, scheduler_id=self.organisation.id, organisation=self.organisation
-        )
+        self.scheduler = schedulers.NormalizerScheduler(self.mock_ctx)
 
     def tearDown(self):
         self.scheduler.stop()
@@ -63,57 +61,6 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_get_plugin = mock.patch(
             "scheduler.context.AppContext.services.katalogus.get_plugin_by_id_and_org_id"
         ).start()
-
-    def test_disable_scheduler(self):
-        # Act
-        self.scheduler.disable()
-
-        # Listeners should be stopped
-        self.assertEqual(0, len(self.scheduler.listeners))
-
-        # Threads should be stopped
-        self.assertEqual(0, len(self.scheduler.threads))
-
-        # Queue should be empty
-        self.assertEqual(0, self.scheduler.queue.qsize())
-
-        # All tasks on queue should be set to CANCELLED
-        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(self.scheduler.scheduler_id)
-        for task in tasks:
-            self.assertEqual(task.status, models.TaskStatus.CANCELLED)
-
-        # Scheduler should be disabled
-        self.assertFalse(self.scheduler.is_enabled())
-
-    def test_enable_scheduler(self):
-        # Disable scheduler first
-        self.scheduler.disable()
-
-        # Listeners should be stopped
-        self.assertEqual(0, len(self.scheduler.listeners))
-
-        # Threads should be stopped
-        self.assertEqual(0, len(self.scheduler.threads))
-
-        # Queue should be empty
-        self.assertEqual(0, self.scheduler.queue.qsize())
-
-        # All tasks on queue should be set to CANCELLED
-        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(self.scheduler.scheduler_id)
-        for task in tasks:
-            self.assertEqual(task.status, models.TaskStatus.CANCELLED)
-
-        # Re-enable scheduler
-        self.scheduler.enable()
-
-        # Threads should be started
-        self.assertGreater(len(self.scheduler.threads), 0)
-
-        # Scheduler should be enabled
-        self.assertTrue(self.scheduler.is_enabled())
-
-        # Stop the scheduler
-        self.scheduler.stop()
 
     def test_is_allowed_to_run(self):
         # Arrange
@@ -151,7 +98,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         mock_get_normalizers_by_org_id_and_type.return_value = [normalizer]
 
         # Act
-        result = self.scheduler.get_normalizers_for_mime_type("text/plain")
+        result = self.scheduler.get_normalizers_for_mime_type("text/plain", self.organisation.id)
 
         # Assert
         self.assertEqual(len(result), 1)
@@ -166,7 +113,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         ]
 
         # Act
-        result = self.scheduler.get_normalizers_for_mime_type("text/plain")
+        result = self.scheduler.get_normalizers_for_mime_type("text/plain", self.organisation.id)
 
         # Assert
         self.assertEqual(len(result), 0)
@@ -177,7 +124,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         mock_get_normalizers_by_org_id_and_type.return_value = None
 
         # Act
-        result = self.scheduler.get_normalizers_for_mime_type("text/plain")
+        result = self.scheduler.get_normalizers_for_mime_type("text/plain", self.organisation.id)
 
         # Assert
         self.assertEqual(len(result), 0)

@@ -55,7 +55,7 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
         )
 
         # Scheduler
-        self.scheduler = schedulers.BoefjeScheduler(ctx=self.mock_ctx)
+        self.scheduler = schedulers.BoefjeScheduler(self.mock_ctx)
 
         # Organisation
         self.organisation = OrganisationFactory()
@@ -170,7 +170,9 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         boefje = BoefjeFactory()
         boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
-        task = functions.create_task(scheduler_id=self.scheduler.scheduler_id, data=boefje_task)
+        task = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id, data=boefje_task, organisation=self.organisation.id
+        )
 
         # Mock
         self.mock_get_latest_task_by_hash.return_value = task
@@ -642,7 +644,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         with capture_logs() as cm:
             self.scheduler.validate_and_push_task(boefje_task, self.organisation.id)
 
-        self.assertIn("Could not add task to queue, queue was full", cm[-1].get("event"))
+        self.assertIn("Could not add task to queue, queue is full", cm[-1].get("event"))
         self.assertEqual(1, self.scheduler.queue.qsize())
 
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_boefje_task_stalled")
@@ -716,7 +718,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         mock_get_tasks_by_hash.return_value = None
 
         # Act
-        self.scheduler.push_boefje_task(boefje_task)
+        self.scheduler.validate_and_push_task(boefje_task, self.organisation.id)
 
         # Assert: task should be in datastore, and failed
         task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
@@ -1246,6 +1248,10 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
             "scheduler.context.AppContext.services.octopoes.get_objects_by_object_types"
         ).start()
 
+        self.mock_get_organisations = mock.patch(
+            "scheduler.context.AppContext.services.katalogus.get_organisations"
+        ).start()
+
     def tearDown(self):
         mock.patch.stopall()
 
@@ -1256,6 +1262,7 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Mocks
+        self.mock_get_organisations.return_value = [self.organisation]
         self.mock_get_objects_by_object_types.return_value = [ooi]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
@@ -1416,6 +1423,7 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Mocks
+        self.mock_get_organisations.return_value = [self.organisation]
         self.mock_get_objects_by_object_types.return_value = [ooi]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
@@ -1484,7 +1492,10 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id, hash=boefje_task.hash, data=boefje_task.model_dump()
+            scheduler_id=self.scheduler.scheduler_id,
+            organisation=self.organisation.id,
+            hash=boefje_task.hash,
+            data=boefje_task.model_dump(),
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
@@ -1525,7 +1536,10 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id, hash=boefje_task.hash, data=boefje_task.model_dump()
+            scheduler_id=self.scheduler.scheduler_id,
+            organisation=self.organisation.id,
+            hash=boefje_task.hash,
+            data=boefje_task.model_dump(),
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
@@ -1564,7 +1578,10 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id, hash=boefje_task.hash, data=boefje_task.model_dump()
+            scheduler_id=self.scheduler.scheduler_id,
+            organisation=self.organisation.id,
+            hash=boefje_task.hash,
+            data=boefje_task.model_dump(),
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
@@ -1598,7 +1615,10 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id, hash=boefje_task.hash, data=boefje_task.model_dump()
+            scheduler_id=self.scheduler.scheduler_id,
+            organisation=self.organisation.id,
+            hash=boefje_task.hash,
+            data=boefje_task.model_dump(),
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
@@ -1632,7 +1652,10 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id, hash=boefje_task.hash, data=boefje_task.model_dump()
+            scheduler_id=self.scheduler.scheduler_id,
+            organisation=self.organisation.id,
+            hash=boefje_task.hash,
+            data=boefje_task.model_dump(),
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
@@ -1666,7 +1689,10 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id, hash=boefje_task.hash, data=boefje_task.model_dump()
+            scheduler_id=self.scheduler.scheduler_id,
+            organisation=self.organisation.id,
+            hash=boefje_task.hash,
+            data=boefje_task.model_dump(),
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
@@ -1700,7 +1726,10 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id, hash=boefje_task.hash, data=boefje_task.model_dump()
+            scheduler_id=self.scheduler.scheduler_id,
+            organisation=self.organisation.id,
+            hash=boefje_task.hash,
+            data=boefje_task.model_dump(),
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)

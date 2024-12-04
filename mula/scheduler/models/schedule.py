@@ -53,6 +53,7 @@ class ScheduleDB(Base):
 
     id = Column(GUID, primary_key=True)
     scheduler_id = Column(String, nullable=False)
+    organisation = Column(String, nullable=False)
     hash = Column(String(32), nullable=True, unique=True)
     data = Column(JSONB, nullable=False)
     enabled = Column(Boolean, nullable=False, default=True)

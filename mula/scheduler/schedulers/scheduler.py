@@ -9,9 +9,9 @@ from typing import Any
 import structlog
 from opentelemetry import trace
 
-from scheduler import clients, context, models, utils
+from scheduler import clients, context, models, storage, utils
 from scheduler.schedulers.queue import PriorityQueue
-from scheduler.schedulers.queue.errors import InvalidItemError, NotAllowedError, QueueFullError
+from scheduler.schedulers.queue.errors import InvalidItemError, NotAllowedError, QueueEmptyError, QueueFullError
 from scheduler.utils import cron, thread
 
 tracer = trace.get_tracer(__name__)
@@ -31,8 +31,6 @@ class Scheduler(abc.ABC):
         max_tries:
             The maximum number of retries for an item to be pushed to
             the queue.
-        enabled:
-            Whether the scheduler is enabled.
         create_schedule:
             Whether to create a schedule for a task.
         last_activity:
@@ -67,7 +65,6 @@ class Scheduler(abc.ABC):
         # Properties
         self.scheduler_id: str = scheduler_id
         self.max_tries: int = max_tries
-        self.enabled: bool = True
         self.create_schedule: bool = create_schedule
         self._last_activity: datetime | None = None
 
@@ -182,16 +179,6 @@ class Scheduler(abc.ABC):
             QueueFullError: When the queue is full.
             InvalidItemError: When the item is invalid.
         """
-        if not self.is_enabled():
-            self.logger.warning(
-                "Scheduler is disabled, not pushing item to queue %s",
-                self.queue.pq_id,
-                item_id=item.id,
-                queue_id=self.queue.pq_id,
-                scheduler_id=self.scheduler_id,
-            )
-            raise NotAllowedError("Scheduler is disabled")
-
         try:
             if item.type is None:
                 item.type = self.ITEM_TYPE.type
@@ -269,7 +256,9 @@ class Scheduler(abc.ABC):
             schedule_db = self.ctx.datastores.schedule_store.get_schedule_by_hash(item.hash)
 
         if schedule_db is None:
-            schedule = models.Schedule(scheduler_id=self.scheduler_id, hash=item.hash, data=item.data)
+            schedule = models.Schedule(
+                scheduler_id=self.scheduler_id, hash=item.hash, data=item.data, organisation=item.organisation
+            )
             schedule_db = self.ctx.datastores.schedule_store.create_schedule(schedule)
 
         if schedule_db is None:
@@ -316,6 +305,45 @@ class Scheduler(abc.ABC):
 
         return item
 
+    def pop_item_from_queue(
+        self, filters: storage.filters.FilterRequest | None = None
+    ) -> tuple[list[models.Task], int]:
+        """Pop an item from the queue.
+        Args:
+            filters: Optional filters to apply when popping an item.
+
+        Returns:
+            An item from the queue
+
+        Raises:
+            NotAllowedError: When the scheduler is disabled.
+            QueueEmptyError: When the queue is empty.
+        """
+        try:
+            items, count = self.queue.pop(filters)
+        except QueueEmptyError as exc:
+            raise exc
+
+        if items is not None:
+            self.logger.debug(
+                "Popped %s item(s) from queue %s",
+                count,
+                self.queue.pq_id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
+
+            self.post_pop(items)
+
+        return items, count
+
+    def post_pop(self, items: list[models.Task]) -> None:
+        """After an item is popped from the queue, we execute this function
+        Args:
+            item: An item from the queue
+        """
+        self.last_activity = datetime.now(timezone.utc)
+
     def set_cron(self, task: models.Task) -> str | None:
         """Set the cron schedule for the task."""
         return None
@@ -334,48 +362,6 @@ class Scheduler(abc.ABC):
         adjusted_time = deadline + jitter
 
         return adjusted_time
-
-    def enable(self) -> None:
-        """Enable the scheduler.
-
-        This will start the scheduler, and start all listeners and threads.
-        """
-        if self.is_enabled():
-            self.logger.debug("Scheduler is already enabled")
-            return
-
-        self.logger.info("Enabling scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
-        self.enabled = True
-        self.stop_event_threads.clear()
-        self.run()
-
-        self.logger.info("Enabled scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
-
-    def disable(self) -> None:
-        """Disable the scheduler.
-
-        This will stop all listeners and threads, and clear the queue, and any
-        tasks that were on the queue will be set to CANCELLED.
-        """
-        if not self.is_enabled():
-            self.logger.warning("Scheduler already disabled: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
-            return
-
-        self.logger.info("Disabling scheduler: %s", self.scheduler_id)
-        self.enabled = False
-
-        self.stop_listeners()
-        self.stop_threads()
-        self.queue.clear()
-
-        # Get all tasks that were on the queue and set them to CANCELLED
-        tasks, _ = self.ctx.datastores.task_store.get_tasks(
-            scheduler_id=self.scheduler_id, status=models.TaskStatus.QUEUED
-        )
-        task_ids = [task.id for task in tasks]
-        self.ctx.datastores.task_store.cancel_tasks(scheduler_id=self.scheduler_id, task_ids=task_ids)
-
-        self.logger.info("Disabled scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
 
     def stop(self) -> None:
         self.logger.info("Stopping scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
