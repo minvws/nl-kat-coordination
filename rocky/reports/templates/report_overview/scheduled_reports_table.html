@@ -85,8 +85,12 @@
                                             {% for report in schedule.reports %}
                                                 <tr>
                                                     <td>
-                                                        <a href="{% url "view_report" organization.code %}?report_id={{ report.reference }}&observed_at={{ report.observed_at|date:"Y-m-d H:i:s:u" }}"
-                                                           title="{% translate "Show report details" %}">{{ report.name }}</a>
+                                                        {% if report.input_oois|length == 0 %}
+                                                            {{ report.name }}
+                                                        {% else %}
+                                                            <a href="{% url "view_report" organization.code %}?report_id={{ report.reference }}&observed_at={{ report.observed_at|date:"Y-m-d H:i:s:u" }}"
+                                                               title="{% translate "Show report details" %}">{{ report.name }}</a>
+                                                        {% endif %}
                                                     </td>
                                                     <td>
                                                         {% if report.input_oois|length == 1 %}
