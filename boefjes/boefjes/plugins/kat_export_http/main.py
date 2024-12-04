@@ -1,8 +1,8 @@
 """Boefje script for exporting OOI's to an external http api"""
 
 import json
-from contextlib import suppress
 from os import getenv
+from typing import Any
 
 import requests
 
@@ -19,33 +19,21 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     organization = getenv("", boefje_meta["organization"])
 
     headers = {"User-Agent": useragent}
-    if request_headers:
-        request_header_list = request_headers.split("\n")
-        for request_header in request_header_list:
-            request_header_tuple = request_header.split(":")
-            with suppress(IndexError):
-                headers[request_header_tuple[0]] = request_header_tuple[1]
 
-    session = requests.Session()
+    request_header_list = request_headers.split("\n")
+    headers.update({header.split(":")[0]: header.split(":")[1] for header in request_header_list if ":" in header})
+
+    kwargs: dict[str, Any] = {"headers": headers, "timeout": float(timeout)}
+
     if request_verb == "get":
-        response = session.get(
-            endpoint_uri,
-            params={request_parameter: json.dumps(input_ooi), "organization": organization},
-            headers=headers,
-            timeout=float(timeout),
-        )
+        kwargs.update({"params": {request_parameter: json.dumps(input_ooi), "organization": organization}})
     else:
-        data = None
-        jsondata = None
         if request_parameter:
-            data = {request_parameter: json.dumps(input_ooi), "organization": organization}
+            kwargs.update({"data": {request_parameter: json.dumps(input_ooi), "organization": organization}})
         else:
-            jsondata = input_ooi
+            kwargs.update({"json": input_ooi})
 
-        response = session.request(
-            request_verb, endpoint_uri, data=data, json=jsondata, headers=headers, timeout=float(timeout)
-        )
-    if not response.ok:
-        raise ValueError(response.content)
+    response = requests.request(request_verb, endpoint_uri, **kwargs)
+    response.raise_for_status()
 
     return [(set(), response.content)]
