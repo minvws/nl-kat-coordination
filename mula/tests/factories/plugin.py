@@ -13,4 +13,4 @@ class PluginFactory(Factory):
     enabled: bool = True
     cron: str | None = None
     interval: int | None = None
-    runon: list[str] | None = None
+    run_on: list[str] | None = None
