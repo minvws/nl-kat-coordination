@@ -128,28 +128,19 @@ class AggregateOrganisationReport(AggregateReport):
                             "total_occurrences": 0,
                         }
 
-                    for key in SEVERITY_OPTIONS:
-                        findings["summary"]["total_by_severity"][key] += report_specific_data["summary"][
-                            "total_by_severity"
-                        ][key]
-
-                    for key in SEVERITY_OPTIONS:
-                        findings["summary"]["total_by_severity_per_finding_type"][key] += report_specific_data[
-                            "summary"
-                        ]["total_by_severity_per_finding_type"][key]
-
-                    findings["summary"]["total_finding_types"] += report_specific_data["summary"]["total_finding_types"]
-                    findings["summary"]["total_occurrences"] += report_specific_data["summary"]["total_occurrences"]
-
                     for data in report_specific_data["finding_types"]:
-                        finding_type_id = data["finding_type"].id
+                        finding_type = data["finding_type"]
+                        finding_type_id = finding_type.id
                         occurrences = data["occurrences"]
+                        severity = data["finding_type"].risk_severity.value
 
                         if finding_type_id not in findings["finding_types"]:
                             findings["finding_types"][finding_type_id] = {
-                                "finding_type": data["finding_type"],
+                                "finding_type": finding_type,
                                 "occurrences": occurrences,
                             }
+                            findings["summary"]["total_by_severity_per_finding_type"][severity] += 1
+                            findings["summary"]["total_finding_types"] += 1
                         else:
                             findings["finding_types"][finding_type_id]["occurrences"].extend(occurrences)
 
@@ -225,12 +216,21 @@ class AggregateOrganisationReport(AggregateReport):
 
         # Findings
         for finding_type in findings["finding_types"].values():
-            findings["first_seen_occurrence"] = None
+            # Remove duplicate occurrences
+            severity = finding_type["finding_type"].risk_severity.value
+            unique_occurrences = []
+            seen_keys = set()
+
             for occurrence in finding_type["occurrences"]:
-                if findings["first_seen_occurrence"] is None or datetime.fromisoformat(
-                    occurrence["first_seen"]
-                ) > datetime.fromisoformat(findings["first_seen_occurrence"]):
-                    findings["first_seen_occurrence"] = occurrence["first_seen"]
+                occurrence_finding = occurrence["finding"]
+
+                if occurrence_finding not in seen_keys:
+                    seen_keys.add(occurrence_finding)
+                    unique_occurrences.append(occurrence)
+                    findings["summary"]["total_by_severity"][severity] += 1
+
+            finding_type["occurrences"] = unique_occurrences
+            findings["summary"]["total_occurrences"] += len(unique_occurrences)
 
         findings["finding_types"] = sorted(
             findings["finding_types"].values(), key=lambda x: x["finding_type"].risk_score or 0, reverse=True

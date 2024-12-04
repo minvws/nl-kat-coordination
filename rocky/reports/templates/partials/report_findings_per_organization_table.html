@@ -8,7 +8,6 @@
             <th scope="col">{% translate "Risk level" %}</th>
             <th scope="col">{% translate "Finding type" %}</th>
             <th scope="col">{% translate "Occurrences" %}</th>
-            <th scope="col">{% translate "First known occurrence" %}</th>
         </tr>
     </thead>
     <tbody>
@@ -19,7 +18,6 @@
                 </td>
                 <td>{{ info.finding_type.id }}</td>
                 <td>{{ info.occurrences|length }}</td>
-                <td>{{ info.first_seen_occurrence }}</td>
             </tr>
         {% endfor %}
     </tbody>
