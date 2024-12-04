@@ -3,6 +3,7 @@ from __future__ import annotations
 import collections
 import datetime
 import logging
+import time
 import uuid
 from enum import Enum
 from functools import cached_property
@@ -299,14 +300,20 @@ class SchedulerClient:
             raise SchedulerConnectError()
 
     def is_scheduler_ready(self, scheduler_id: str) -> bool:
-        is_ready = False
-        while not is_ready:
+        """Max trails is 1 minute, 10 x 6 seconds"""
+        trials = 0
+        interval = 6  # in seconds
+        while trials < 10:
             try:
                 res = self._client.get(f"/schedulers/{scheduler_id}")
                 res.raise_for_status()
-                is_ready = True
-            except HTTPStatusError:
-                continue
+                break
+            except HTTPStatusError as http_error:
+                if http_error.response.status_code == codes.NOT_FOUND:
+                    trials += 1
+                    time.sleep(interval)
+                    continue
+                raise SchedulerHTTPError()
         return SchedulerResponse.model_validate_json(res.content).enabled
 
     def post_schedule_search(self, filters: dict[str, list[dict[str, str]]]) -> PaginatedSchedulesResponse:
