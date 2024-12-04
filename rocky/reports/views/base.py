@@ -510,7 +510,7 @@ class ReportFinalSettingsView(BaseReportView, SchedulerView, TemplateView):
                 )
             elif report_types_count > 1 and oois_count == 1:
                 name = _("Concatenated Report for {ooi}").format(ooi=ooi)
-            elif report_types_count == 1 and (oois_count == 0 or oois_count > 1):
+            elif report_types_count == 1 and oois_count != 1):
                 name = _("{report_type} for {oois_count} objects").format(
                     report_type=report_type, oois_count=oois_count
                 )
