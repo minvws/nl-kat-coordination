@@ -35,34 +35,54 @@
                         {% for organization, findings in organizations_findings.items %}
                             <tr>
                                 <td>{{ organization.name }}</td>
-                                <td>{{ findings.summary.total_finding_types }}</td>
-                                <td>{{ findings.summary.total_by_severity_per_finding_type.critical }}</td>
                                 <td>
-                                    <span class="{{ findings.finding_types.0.finding_type.risk_severity }}">{{ findings.finding_types.0.finding_type.risk_severity|capfirst }}</span>
+                                    {% if findings %}
+                                        {{ findings.summary.total_finding_types }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if findings %}
+                                        {{ findings.summary.total_by_severity_per_finding_type.critical }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if findings %}
+                                        <span class="{{ findings.finding_types.0.finding_type.risk_severity }}">{{ findings.finding_types.0.finding_type.risk_severity|capfirst }}</span>
+                                    {% else %}
+                                        -
+                                    {% endif %}
                                 </td>
                                 <td class="actions">
-                                    <button class="expando-button"
-                                            data-icon-open-class="icon ti-chevron-down"
-                                            data-icon-close-class="icon ti-chevron-up"
-                                            data-close-label="{% translate "Close details" %}">
-                                        {% translate "Open details" %}
-                                    </button>
+                                    {% if findings %}
+                                        <button class="expando-button"
+                                                data-icon-open-class="icon ti-chevron-down"
+                                                data-icon-close-class="icon ti-chevron-up"
+                                                data-close-label="{% translate "Close details" %}">
+                                            {% translate "Open details" %}
+                                        </button>
+                                    {% endif %}
                                 </td>
                             </tr>
-                            <tr class="expando-row">
-                                <td colspan="3">
-                                    <h4>{% translate "Findings overview" %}</h4>
-                                    <div class="column-2">
-                                        {% include "partials/report_severity_totals_table.html" with data=findings.summary %}
+                            {% if findings %}
+                                <tr class="expando-row">
+                                    <td colspan="3">
+                                        <h4>{% translate "Findings overview" %}</h4>
+                                        <div class="column-2">
+                                            {% include "partials/report_severity_totals_table.html" with data=findings.summary %}
 
-                                    </div>
-                                    <h4>{% translate "Findings" %} (0/0)</h4>
-                                    <div class="column-2">
-                                        {% include "partials/report_findings_per_organization_table.html" with data=findings %}
+                                        </div>
+                                        <h4>{% translate "Findings" %} (0/0)</h4>
+                                        <div class="column-2">
+                                            {% include "partials/report_findings_per_organization_table.html" with data=findings %}
 
-                                    </div>
-                                </td>
-                            </tr>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
                         {% endfor %}
                     </tbody>
                 </table>
