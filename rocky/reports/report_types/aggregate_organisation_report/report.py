@@ -222,10 +222,10 @@ class AggregateOrganisationReport(AggregateReport):
             seen_keys = set()
 
             for occurrence in finding_type["occurrences"]:
-                occurrence_finding = occurrence["finding"]
+                occurrence_ooi = occurrence["finding"].ooi
 
-                if occurrence_finding not in seen_keys:
-                    seen_keys.add(occurrence_finding)
+                if occurrence_ooi not in seen_keys:
+                    seen_keys.add(occurrence_ooi)
                     unique_occurrences.append(occurrence)
                     findings["summary"]["total_by_severity"][severity] += 1
 
