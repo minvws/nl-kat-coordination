@@ -6,7 +6,9 @@ import unittest
 import uuid
 from unittest import mock
 
-from scheduler import config, models, queues, storage
+from scheduler import config, models, storage
+from scheduler.schedulers.queue import InvalidItemError, ItemNotFoundError, NotAllowedError, QueueEmptyError
+from scheduler.storage import stores
 
 from tests.mocks import queue as mock_queue
 from tests.utils import functions
@@ -22,7 +24,7 @@ class PriorityQueueTestCase(unittest.TestCase):
         models.Base.metadata.drop_all(self.dbconn.engine)
         models.Base.metadata.create_all(self.dbconn.engine)
 
-        self.pq_store = storage.PriorityQueueStore(self.dbconn)
+        self.pq_store = stores.PriorityQueueStore(self.dbconn)
 
         # Priority Queue
         self.pq = mock_queue.MockPriorityQueue(
@@ -50,7 +52,7 @@ class PriorityQueueTestCase(unittest.TestCase):
 
         self.assertEqual(1, self.pq.qsize())
 
-    @mock.patch("scheduler.storage.PriorityQueueStore.push")
+    @mock.patch("scheduler.storage.stores.PriorityQueueStore.push")
     def test_push_item_not_found_in_db(self, mock_push):
         """When adding an item to the priority queue, but the item is not
         found in the database, the item shouldn't be added.
@@ -59,7 +61,7 @@ class PriorityQueueTestCase(unittest.TestCase):
 
         mock_push.return_value = None
 
-        with self.assertRaises(queues.errors.ItemNotFoundError):
+        with self.assertRaises(ItemNotFoundError):
             self.pq.push(item)
 
         self.assertEqual(0, self.pq.qsize())
@@ -73,7 +75,7 @@ class PriorityQueueTestCase(unittest.TestCase):
         """
         item = {"priority": 1, "data": functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex)}
 
-        with self.assertRaises(queues.errors.InvalidItemError):
+        with self.assertRaises(InvalidItemError):
             self.pq.push(item)
 
         self.assertEqual(0, self.pq.qsize())
@@ -85,7 +87,7 @@ class PriorityQueueTestCase(unittest.TestCase):
         item = functions.create_item(scheduler_id=self.pq.pq_id, priority=1)
         item.data = {"invalid": "data"}
 
-        with self.assertRaises(queues.errors.InvalidItemError):
+        with self.assertRaises(InvalidItemError):
             self.pq.push(item)
 
         self.assertEqual(0, self.pq.qsize())
@@ -104,7 +106,7 @@ class PriorityQueueTestCase(unittest.TestCase):
         self.assertEqual(1, self.pq.qsize())
 
         # Add the same item again
-        with self.assertRaises(queues.errors.NotAllowedError):
+        with self.assertRaises(NotAllowedError):
             self.pq.push(initial_item)
 
         self.assertEqual(1, self.pq.qsize())
@@ -146,7 +148,7 @@ class PriorityQueueTestCase(unittest.TestCase):
         updated_item.data["name"] = "updated-name"
 
         # Add the same item again
-        with self.assertRaises(queues.errors.NotAllowedError):
+        with self.assertRaises(NotAllowedError):
             self.pq.push(updated_item)
 
         self.assertEqual(1, self.pq.qsize())
@@ -197,7 +199,7 @@ class PriorityQueueTestCase(unittest.TestCase):
         updated_item.priority = 100
 
         # Add the same item again
-        with self.assertRaises(queues.errors.NotAllowedError):
+        with self.assertRaises(NotAllowedError):
             self.pq.push(updated_item)
 
         self.assertEqual(1, self.pq.qsize())
@@ -474,7 +476,7 @@ class PriorityQueueTestCase(unittest.TestCase):
         """When popping an item from an empty queue, it should raise an
         exception.
         """
-        with self.assertRaises(queues.errors.QueueEmptyError):
+        with self.assertRaises(QueueEmptyError):
             self.pq.pop()
 
     def test_pop_highest_priority(self):

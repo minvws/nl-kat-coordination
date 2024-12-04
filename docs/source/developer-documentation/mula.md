@@ -6,8 +6,8 @@ The scheduler is responsible for scheduling the execution of tasks. The
 execution of those tasks are being prioritized / scored by a ranker. The tasks
 are then pushed onto a priority queue.
 
-Within the project of KAT, the scheduler is tasked with scheduling boefje and
-normalizer tasks.
+Within the project of KAT, the scheduler is tasked with scheduling boefje,
+normalizer, and report tasks.
 
 ## Architecture
 
@@ -20,12 +20,12 @@ rankers.
 
 ### Stack, packages and libraries
 
-| Name       | Version  | Description         |
-| ---------- | -------- | ------------------- |
-| Python     | ^3.8     |                     |
-| FastAPI    | ^0.109.0 | Used for api server |
-| SQLAlchemy | ^2.0.23  |                     |
-| pydantic   | ^2.5.2   |                     |
+| Name       | Version   | Description         |
+| ---------- | --------- | ------------------- |
+| Python     | ^3.10     |                     |
+| FastAPI    | ^0.1115.2 | Used for api server |
+| SQLAlchemy | ^2.0.23   |                     |
+| pydantic   | ^2.7.2    |                     |
 
 ### External services
 
@@ -41,36 +41,34 @@ The scheduler interfaces with the following services:
 ### Project structure
 
 ```
-$ tree -L 3 --dirsfirst
 .
 ├── docs/                           # additional documentation
 ├── scheduler/                      # scheduler python module
-│   ├── config                      # application settings configuration
-│   ├── connectors                  # external service connectors
-│   │   ├── listeners               # channel/socket listeners
-│   │   ├── services                # rest api connectors
-│   │   └── __init__.py
-│   ├── context/                    # shared application context
-│   ├── models/                     # internal model definitions
-│   ├── queues/                     # priority queue
-│   ├── rankers/                    # priority/score calculations
-│   ├── storage/                    # data abstraction layer
-│   ├── schedulers/                 # schedulers
-│   ├── server/                     # http rest api server
-│   ├── utils/                      # common utility functions
+│   ├── clients/                    # external service clients
+│   │   ├── amqp/                   # rabbitmq clients
+│   │   └── http/                   # http clients
+│   ├── context/                    # shared application context, and configuration
+│   ├── models/                     # internal model definitions
+│   ├── schedulers/                 # schedulers
+│   │   ├── queue/                  # priority queue
+│   │   ├── rankers/                # priority/score calculations
+│   │   └── schedulers/             # schedulers implementations
+│   ├── server/                     # http rest api server
+│   ├── storage/                    # data abstraction layer
+│   │   ├── migrations/             # database migrations
+│   │   └── stores/                 # data stores
+│   ├── utils/                      # common utility functions
 │   ├── __init__.py
 │   ├── __main__.py
-│   ├── app.py                      # kat scheduler app implementation
+│   ├── app.py                      # OpenKAT scheduler app implementation
 │   └── version.py                  # version information
-└─── tests/
-    ├── factories/
-    ├── integration/
-    ├── mocks/
-    ├── scripts/
-    ├── simulation/
-    ├── unit/
-    ├── utils/
-    └── __init__.py
+└─── tests/                         # test suite
+    ├── factories/                  # factories for test data
+    ├── integration/                # integration tests
+    ├── mocks/                      # mocks for testing
+    ├── simulation/                 # simulation tests
+    ├── unit/                       # unit tests
+    └── utils/                      # utility functions for tests
 ```
 
 ## Running / Developing
@@ -91,6 +89,22 @@ scheduler. See the environment settings section under Installation and Deploymen
 ```
 # Build and run the scheduler in the background
 $ docker compose up --build -d scheduler
+```
+
+### Migrations
+
+Creating a migration:
+
+```
+# Run migrations
+make revid=0008 m="add_task_schedule" migrations
+```
+
+Sometimes it is helpful to run the migrations in a clean environment:
+
+```
+docker system prune
+docker volume prune --force --all
 ```
 
 ## Testing
