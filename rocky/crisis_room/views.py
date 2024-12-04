@@ -130,6 +130,7 @@ class CrisisRoomAllOrganizations(TemplateView):
             "ReportRecipe.<report_recipe[is Report]", valid_time=valid_time, source=Reference.from_str(dashboard.recipe)
         )
         if reports:
+            reports.sort(key=lambda ooi: ooi.date_generated, reverse=True)
             report = reports[0]
 
             bytes_client = get_bytes_client(dashboard.organization.code)
