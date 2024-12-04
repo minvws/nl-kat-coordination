@@ -413,7 +413,10 @@ class OctopoesService:
             )
 
         # The nibble part of inferring
-        self.nibbler.infer([self.ooi_repository.get(ooi.reference, event.valid_time)], event.valid_time)
+        try:
+            self.nibbler.infer([self.ooi_repository.get(ooi.reference, event.valid_time)], event.valid_time)
+        except ObjectNotFoundException:
+            logger.info("OOI not found for inference")
 
         # analyze bit definitions
         bit_definitions = get_bit_definitions()
@@ -448,7 +451,10 @@ class OctopoesService:
             raise ValueError("Update event new_data should not be None")
 
         # The nibble part of inferring
-        self.nibbler.infer([self.ooi_repository.get(event.new_data.reference, event.valid_time)], event.valid_time)
+        try:
+            self.nibbler.infer([self.ooi_repository.get(event.new_data.reference, event.valid_time)], event.valid_time)
+        except ObjectNotFoundException:
+            logger.info("OOI not found for inference")
 
         if isinstance(event.new_data, Config):
             relevant_bit_ids = [

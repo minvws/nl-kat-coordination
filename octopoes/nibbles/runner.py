@@ -95,18 +95,21 @@ class NibblesRunner:
             valid_time, origin_type=OriginType.NIBBLET, parameters_references=[ooi.reference]
         )
         for nibblet in nibblets:
-            nibble = self.nibbles[nibblet.method]
-            args = self.ooi_repository.nibble_query(
-                ooi,
-                nibble,
-                valid_time,
-                nibblet.parameters_references if nibble.query is not None and nibble.query.count("$") > 0 else None,
-            )
-            results = {
-                tuple(arg): set(flatten([nibble(arg)])) for arg in args if nibblet.parameters_hash != nibble_hasher(arg)
-            }
-            return_value |= {nibble.id: results}
-        nibblet_nibbles = {self.nibbles[nibblet.method] for nibblet in nibblets}
+            if nibblet.method in self.nibbles:
+                nibble = self.nibbles[nibblet.method]
+                args = self.ooi_repository.nibble_query(
+                    ooi,
+                    nibble,
+                    valid_time,
+                    nibblet.parameters_references if nibble.query is not None and nibble.query.count("$") > 0 else None,
+                )
+                results = {
+                    tuple(arg): set(flatten([nibble(arg)]))
+                    for arg in args
+                    if nibblet.parameters_hash != nibble_hasher(arg)
+                }
+                return_value |= {nibble.id: results}
+        nibblet_nibbles = {self.nibbles[nibblet.method] for nibblet in nibblets if nibblet.method in self.nibbles}
         for nibble in filter(lambda x: type(ooi) in x.signature and x not in nibblet_nibbles, self.nibbles.values()):
             if len(nibble.signature) > 1:
                 self._write(valid_time)

@@ -97,6 +97,7 @@ def test_url_classification_nibble(xtdb_octopoes_service: OctopoesService, event
         xtdb_octopoes_service.scan_profile_repository,
         perform_writes=False,
     )
+    xtdb_octopoes_service.nibbler.nibbles = {}
     nibbler.nibbles = {url_classification_nibble.id: url_classification_nibble}
     network = Network(name="internet")
     xtdb_octopoes_service.ooi_repository.save(network, valid_time)
@@ -151,6 +152,7 @@ def test_find_network_url_nibble(xtdb_octopoes_service: OctopoesService, event_m
         xtdb_octopoes_service.origin_repository,
         xtdb_octopoes_service.scan_profile_repository,
     )
+    xtdb_octopoes_service.nibbler.nibbles = {}
     nibbler.nibbles = {find_network_url_nibble.id: find_network_url_nibble}
     network1 = Network(name="internetverbinding")
     xtdb_octopoes_service.ooi_repository.save(network1, valid_time)
@@ -236,6 +238,7 @@ def test_max_length_config_nibble(xtdb_octopoes_service: OctopoesService, event_
         xtdb_octopoes_service.origin_repository,
         xtdb_octopoes_service.scan_profile_repository,
     )
+    xtdb_octopoes_service.nibbler.nibbles = {}
     nibbler.nibbles = {max_url_length_config_nibble.id: max_url_length_config_nibble}
     network = Network(name="internet")
     xtdb_octopoes_service.ooi_repository.save(network, valid_time)
