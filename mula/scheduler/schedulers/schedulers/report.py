@@ -44,54 +44,49 @@ class ReportScheduler(Scheduler):
 
     @tracer.start_as_current_span(name="report_push_tasks_for_rescheduling")
     def push_tasks_for_rescheduling(self):
-        if self.queue.full():
-            self.logger.warning(
-                "Report queue is full, not populating with new tasks",
-                queue_qsize=self.queue.qsize(),
-                scheduler_id=self.scheduler_id,
+        schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
+            filters=filters.FilterRequest(
+                filters=[
+                    filters.Filter(column="scheduler_id", operator="eq", value=self.scheduler_id),
+                    filters.Filter(column="deadline_at", operator="lt", value=datetime.now(timezone.utc)),
+                    filters.Filter(column="enabled", operator="eq", value=True),
+                ]
             )
-            return
+        )
 
-        try:
-            schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
-                filters=filters.FilterRequest(
-                    filters=[
-                        filters.Filter(column="scheduler_id", operator="eq", value=self.scheduler_id),
-                        filters.Filter(column="deadline_at", operator="lt", value=datetime.now(timezone.utc)),
-                        filters.Filter(column="enabled", operator="eq", value=True),
-                    ]
-                )
-            )
-        except storage.errors.StorageError as exc_db:
-            self.logger.error(
-                "Could not get schedules for rescheduling %s",
-                self.scheduler_id,
-                scheduler_id=self.scheduler_id,
-                exc_info=exc_db,
-            )
-            raise exc_db
+        # Create report tasks for the schedules
+        report_tasks = []
+        for schedule in schedules:
+            if not self.has_schedule_permission_to_run(schedule):
+                continue
+
+            report_task = models.ReportTask.model_validate(schedule.data)
+            report_tasks.append(report_task)
 
         with futures.ThreadPoolExecutor(
             thread_name_prefix=f"ReportScheduler-TPE-{self.scheduler_id}-rescheduling"
         ) as executor:
-            for schedule in schedules:
-                report_task = models.ReportTask.model_validate(schedule.data)
-
-                task = models.Task(
-                    id=report_task.id,
-                    scheduler_id=self.scheduler_id,
-                    organisation=schedule.organisation,
-                    type=self.ITEM_TYPE.type,
-                    hash=report_task.hash,
-                    data=report_task.model_dump(),
+            for report_task in report_tasks:
+                executor.submit(
+                    self.validate_and_push_task,
+                    report_task,
+                    report_task.organisation_id,
+                    self.push_tasks_for_rescheduling.__name__,
                 )
 
-                executor.submit(self.push_task, task, self.push_tasks_for_rescheduling.__name__)
-
-    def push_task(self, task: models.Task, caller: str = "") -> None:
-        if self.is_item_on_queue_by_hash(task.hash):
+    def validate_and_push_task(self, report_task: models.ReportTask, organisation_id: str, caller: str = "") -> None:
+        if self.is_item_on_queue_by_hash(report_task.hash):
             self.logger.debug("Report task already on queue", scheduler_id=self.scheduler_id, caller=caller)
             return
+
+        task = models.Task(
+            scheduler_id=self.scheduler_id,
+            organisation=organisation_id,
+            priority=int(datetime.now().timestamp()),
+            type=self.ITEM_TYPE.type,
+            hash=report_task.hash,
+            data=report_task.model_dump(),
+        )
 
         self.push_item_to_queue_with_timeout(task, self.max_tries)
 
@@ -102,3 +97,25 @@ class ReportScheduler(Scheduler):
             scheduler_id=self.scheduler_id,
             caller=caller,
         )
+
+    def has_schedule_permission_to_run(self, schedule: models.Schedule) -> bool:
+        """Check if the schedule has permission to run.
+
+        Args:
+            schedule (models.Schedule): Schedule to check.
+
+        Returns:
+            bool: True if the schedule has permission to run, False otherwise.
+        """
+        report_task = models.ReportTask.model_validate(schedule.data)
+        _, count = self.ctx.datastores.task_store.get_tasks(
+            scheduler_id=self.scheduler_id,
+            task_type=report_task.type,
+            filters=filters.FilterRequest(
+                filters=[
+                    filters.Filter(column="hash", operator="eq", value=report_task.hash),
+                    filters.Filter(column="schedule_id", operator="eq", value=str(schedule.id)),
+                ]
+            ),
+        )
+        return not count > 0

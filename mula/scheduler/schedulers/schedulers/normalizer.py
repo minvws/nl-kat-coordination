@@ -46,7 +46,7 @@ class NormalizerScheduler(Scheduler):
         self.listeners["raw_data"] = clients.RawData(
             dsn=str(self.ctx.config.host_raw_data),
             queue="raw_file_received",
-            func=self.push_tasks_for_received_raw_data,
+            func=self.push_tasks_for_raw_data,
             prefetch_count=self.ctx.config.rabbitmq_prefetch_count,
         )
 
@@ -85,17 +85,12 @@ class NormalizerScheduler(Scheduler):
             return
 
         # Get all normalizers for the mime types of the raw data
-        normalizers = self.get_normalizers_for_mime_types(
-            latest_raw_data.raw_data.mime_types, latest_raw_data.organisation
-        )
-        if not normalizers:
-            self.logger.debug(
-                "No normalizers found for raw data %s",
-                latest_raw_data.raw_data.id,
-                raw_data_id=latest_raw_data.raw_data.id,
-                scheduler_id=self.scheduler_id,
-            )
+        normalizers = []
+        for mime_type in latest_raw_data.raw_data.mime_types:
+            normalizers_by_mime_type = self.get_normalizers_for_mime_type(mime_type, latest_raw_data.organization)
+            normalizers.extend(normalizers_by_mime_type)
 
+        # Create tasks for the normalizers
         normalizer_tasks = []
         for normalizer in normalizers:
             if not self.has_normalizer_permission_to_run(normalizer):
@@ -116,23 +111,12 @@ class NormalizerScheduler(Scheduler):
             thread_name_prefix=f"NormalizerScheduler-TPE-{self.scheduler_id}-raw_data"
         ) as executor:
             for normalizer_task in normalizer_tasks:
-                executor.submit(self.validate_and_push_task, normalizer_task, latest_raw_data.organisation)
+                executor.submit(self.validate_and_push_task, normalizer_task, latest_raw_data.organization)
 
     @tracer.start_as_current_span("normalizer_push_task")
     def validate_and_push_task(
         self, normalizer_task: models.NormalizerTask, organisation_id: str, caller: str = ""
     ) -> None:
-        plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(normalizer_task.normalizer.id, organisation_id)
-        if not self.has_normalizer_permission_to_run(plugin):
-            self.logger.debug(
-                "Task is not allowed to run: %s",
-                normalizer_task.id,
-                task_id=normalizer_task.id,
-                scheduler_id=self.scheduler_id,
-                caller=caller,
-            )
-            return
-
         if self.has_normalizer_task_started_running(normalizer_task):
             self.logger.debug(
                 "Task is still running: %s",
@@ -152,6 +136,15 @@ class NormalizerScheduler(Scheduler):
                 caller=caller,
             )
             return
+
+        task = models.Task(
+            id=normalizer_task.id,
+            scheduler_id=self.scheduler_id,
+            organisation=organisation_id,
+            type=normalizer_task.type,
+            hash=normalizer_task.hash,
+            data=normalizer_task.model_dump(),
+        )
 
         task.priority = self.ranker.rank(SimpleNamespace(raw_data=normalizer_task.raw_data, task=normalizer_task))
 
@@ -212,17 +205,7 @@ class NormalizerScheduler(Scheduler):
         """
         # Get the last tasks that have run or are running for the hash
         # of this particular NormalizerTask.
-        try:
-            task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
-        except Exception as exc_db:
-            self.logger.error(
-                "Could not get latest task by hash: %s",
-                task.hash,
-                task_id=task.id,
-                scheduler_id=self.scheduler_id,
-                exc_info=exc_db,
-            )
-            raise exc_db
+        task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
 
         # Is task still running according to the datastore?
         if task_db is not None and task_db.status not in [models.TaskStatus.COMPLETED, models.TaskStatus.FAILED]:
@@ -235,62 +218,6 @@ class NormalizerScheduler(Scheduler):
             return True
 
         return False
-
-    # FIXME: none or empty list?
-    def get_normalizers_for_mime_type(self, mime_type: str, organisation: str) -> list[models.Plugin]:
-        """Get available normalizers for a given mime type.
-
-        Args:
-            mime_type : The mime type to get normalizers for.
-
-        Returns:
-            A list of Plugins of type normalizer for the given mime type.
-        """
-        try:
-            normalizers = self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(organisation, mime_type)
-        except ExternalServiceError:
-            self.logger.warning(
-                "Could not get normalizers for mime_type: %s [mime_type=%s, organisation_id=%s, scheduler_id=%s]",
-                mime_type,
-                mime_type,
-                organisation,
-                self.scheduler_id,
-            )
-            return []
-
-        if normalizers is None:
-            self.logger.debug(
-                "No normalizer found for mime_type: %s", mime_type, mime_type=mime_type, scheduler_id=self.scheduler_id
-            )
-            return []
-
-        self.logger.debug(
-            "Found %d normalizers for mime_type: %s",
-            len(normalizers),
-            mime_type,
-            mime_type=mime_type,
-            normalizers=[normalizer.id for normalizer in normalizers],
-            scheduler_id=self.scheduler_id,
-        )
-
-        return normalizers
-
-    # TODO: check this
-    def get_normalizers_for_mime_types(self, mime_types: list[str], organisation: str) -> list[models.Plugin] | None:
-        """Get available normalizers for a given list of mime types.
-
-        Args:
-            mime_types : The list of mime types to get normalizers for.
-
-        Returns:
-            A list of Plugins of type normalizer for the given mime types.
-        """
-        normalizers = set()
-        for mime_type in mime_types:
-            normalizers_by_mime_type = self.get_normalizers_for_mime_type(mime_type, organisation)
-            normalizers.update(normalizers_by_mime_type)
-
-        return list(normalizers)
 
     def has_raw_data_errors(self, raw_data: models.RawData) -> bool:
         """Check if the raw data contains errors.
@@ -306,3 +233,19 @@ class NormalizerScheduler(Scheduler):
                 return True
 
         return False
+
+    # FIXME: none or empty list?
+    def get_normalizers_for_mime_type(self, mime_type: str, organisation: str) -> list[models.Plugin]:
+        """Get available normalizers for a given mime type.
+
+        Args:
+            mime_type : The mime type to get normalizers for.
+
+        Returns:
+            A list of Plugins of type normalizer for the given mime type.
+        """
+        normalizers = self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(organisation, mime_type)
+        if normalizers is None:
+            return []
+
+        return normalizers

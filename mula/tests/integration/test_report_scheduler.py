@@ -4,7 +4,6 @@ from unittest import mock
 
 from scheduler import config, models, schedulers, storage
 from scheduler.storage import stores
-
 from tests.factories import OrganisationFactory
 
 
@@ -29,10 +28,10 @@ class ReportSchedulerBaseTestCase(unittest.TestCase):
         )
 
         # Scheduler
+        self.scheduler = schedulers.ReportScheduler(ctx=self.mock_ctx)
+
+        # Organisation
         self.organisation = OrganisationFactory()
-        self.scheduler = schedulers.ReportScheduler(
-            ctx=self.mock_ctx, scheduler_id=self.organisation.id, organisation=self.organisation
-        )
 
     def tearDown(self):
         self.scheduler.stop()
@@ -51,48 +50,16 @@ class ReportSchedulerTestCase(ReportSchedulerBaseTestCase):
     def tearDown(self):
         mock.patch.stopall()
 
-    def test_enable_scheduler(self):
-        # Disable scheduler first
-        self.scheduler.disable()
-
-        # Threads should be stopped
-        self.assertEqual(0, len(self.scheduler.threads))
-
-        # Queue should be empty
-        self.assertEqual(0, self.scheduler.queue.qsize())
-
-        # Re-enable scheduler
-        self.scheduler.enable()
-
-        # Threads should be started
-        self.assertGreater(len(self.scheduler.threads), 0)
-
-        # Scheduler should be enabled
-        self.assertTrue(self.scheduler.is_enabled())
-
-        # Stop the scheduler
-        self.scheduler.stop()
-
-    def test_disable_scheduler(self):
-        # Disable scheduler
-        self.scheduler.disable()
-
-        # Threads should be stopped
-        self.assertEqual(0, len(self.scheduler.threads))
-
-        # Queue should be empty
-        self.assertEqual(0, self.scheduler.queue.qsize())
-
-        # Scheduler should be disabled
-        self.assertFalse(self.scheduler.is_enabled())
-
     def test_push_tasks_for_rescheduling(self):
         """When the deadline of schedules have passed, the resulting task should be added to the queue"""
         # Arrange
         report_task = models.ReportTask(organisation_id=self.organisation.id, report_recipe_id="123")
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id, hash=report_task.hash, data=report_task.model_dump()
+            scheduler_id=self.scheduler.scheduler_id,
+            hash=report_task.hash,
+            data=report_task.model_dump(),
+            organisation=self.organisation.id,
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
@@ -121,7 +88,10 @@ class ReportSchedulerTestCase(ReportSchedulerBaseTestCase):
         report_task = models.ReportTask(organisation_id=self.organisation.id, report_recipe_id="123")
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id, hash=report_task.hash, data=report_task.model_dump()
+            scheduler_id=self.scheduler.scheduler_id,
+            hash=report_task.hash,
+            data=report_task.model_dump(),
+            organisation=self.organisation.id,
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)

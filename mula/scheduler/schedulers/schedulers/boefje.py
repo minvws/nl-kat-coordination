@@ -90,9 +90,8 @@ class BoefjeScheduler(Scheduler):
             self.logger.debug("Mutation value is None, skipping", scheduler_id=self.scheduler_id)
             return
 
+        # When the mutation is a delete operation, we need to remove all tasks
         if mutation.operation == models.MutationOperationType.DELETE:
-            # When there are tasks of the ooi are on the queue, we need to
-            # remove them from the queue.
             items, _ = self.ctx.datastores.pq_store.get_items(
                 scheduler_id=self.scheduler_id,
                 filters=filters.FilterRequest(
@@ -154,36 +153,25 @@ class BoefjeScheduler(Scheduler):
         """When new boefjes are added or enabled we find the ooi's that
         boefjes can run on, and create tasks for it."""
         boefje_tasks = []
+
         orgs = self.ctx.services.katalogus.get_organisations()
         for org in orgs:
+            # Get new boefjes for organisation
             new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(org.id)
             if not new_boefjes:
                 self.logger.debug("No new boefjes found for organisation", organisation_id=org.id)
                 continue
 
+            # Get all oois for the new boefjes
             for boefje in new_boefjes:
-                oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
-                    org.id, boefje.consumes, list(range(boefje.scan_level, 5))
-                )
-
-                # Filter OOIs based on permission
-                for ooi in oois_by_object_type:
-                    if not self.has_boefje_permission_to_run(boefje, ooi):
-                        self.logger.debug(
-                            "Boefje not allowed to run on ooi",
-                            boefje_id=boefje.id,
-                            ooi_primary_key=ooi.primary_key,
-                            scheduler_id=self.scheduler_id,
-                        )
-                        continue
-
+                oois = self.get_oois_for_boefje(boefje, org.id)
+                for ooi in oois:
                     boefje_task = models.BoefjeTask(
                         boefje=models.Boefje.model_validate(boefje.dict()),
                         input_ooi=ooi.primary_key,
                         organization=org.id,
                     )
 
-                    # Add valid tasks
                     boefje_tasks.append((boefje_task, org.id))
 
         with futures.ThreadPoolExecutor(
@@ -196,14 +184,6 @@ class BoefjeScheduler(Scheduler):
 
     @tracer.start_as_current_span("boefje_push_tasks_for_rescheduling")
     def push_tasks_for_rescheduling(self):
-        if self.queue.full():
-            self.logger.warning(
-                "Boefjes queue is full, not populating with new tasks",
-                queue_qsize=self.queue.qsize(),
-                scheduler_id=self.scheduler_id,
-            )
-            return
-
         schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
             filters=filters.FilterRequest(
                 filters=[
@@ -213,7 +193,6 @@ class BoefjeScheduler(Scheduler):
                 ]
             )
         )
-
         if not schedules:
             self.logger.debug(
                 "No schedules tasks found for scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id
@@ -384,16 +363,7 @@ class BoefjeScheduler(Scheduler):
         latest_task = self.ctx.datastores.task_store.get_latest_task_by_hash(boefje_task.hash)
         task.priority = self.ranker.rank(SimpleNamespace(latest_task=latest_task, task=boefje_task))
 
-        try:
-            self.push_item_to_queue_with_timeout(task, self.max_tries)
-        except QueueFullError:
-            self.logger.warning(
-                "Could not add task to queue, queue is full",
-                queue_qsize=self.queue.qsize(),
-                scheduler_id=self.scheduler_id,
-                caller=caller,
-            )
-            return
+        self.push_item_to_queue_with_timeout(task, self.max_tries)
 
         self.logger.info(
             "Created boefje task",
@@ -496,19 +466,7 @@ class BoefjeScheduler(Scheduler):
             True if the task is still running, False otherwise.
         """
         # Is task still running according to the datastore?
-        task_db = None
-        try:
-            task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
-        except Exception as exc_db:
-            self.logger.error(
-                "Could not get latest task by hash: %s",
-                task.hash,
-                task_id=task.id,
-                scheduler_id=self.scheduler_id,
-                exc_info=exc_db,
-            )
-            raise exc_db
-
+        task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
         if task_db is not None and task_db.status not in [models.TaskStatus.FAILED, models.TaskStatus.COMPLETED]:
             self.logger.debug(
                 "Task is still running, according to the datastore", task_id=task_db.id, scheduler_id=self.scheduler_id
@@ -516,19 +474,9 @@ class BoefjeScheduler(Scheduler):
             return True
 
         # Is task running according to bytes?
-        try:
-            task_bytes = self.ctx.services.bytes.get_last_run_boefje(
-                boefje_id=task.boefje.id, input_ooi=task.input_ooi, organization_id=task.organization
-            )
-        except ExternalServiceError as exc:
-            self.logger.error(
-                "Failed to get last run boefje from bytes",
-                boefje_id=task.boefje.id,
-                input_ooi_primary_key=task.input_ooi,
-                scheduler_id=self.scheduler_id,
-                exc_info=exc,
-            )
-            raise exc
+        task_bytes = self.ctx.services.bytes.get_last_run_boefje(
+            boefje_id=task.boefje.id, input_ooi=task.input_ooi, organization_id=task.organization
+        )
 
         # Task has been finished (failed, or succeeded) according to
         # the datastore, but we have no results of it in bytes, meaning
@@ -570,19 +518,7 @@ class BoefjeScheduler(Scheduler):
         Returns:
             True if the task is stalled, False otherwise.
         """
-        task_db = None
-        try:
-            task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
-        except Exception as exc_db:
-            self.logger.warning(
-                "Could not get latest task by hash: %s",
-                task.hash,
-                task_hash=task.hash,
-                scheduler_id=self.scheduler_id,
-                exc_info=exc_db,
-            )
-            raise exc_db
-
+        task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
         if (
             task_db is not None
             and task_db.status == models.TaskStatus.DISPATCHED
@@ -678,6 +614,27 @@ class BoefjeScheduler(Scheduler):
         )
 
         return boefjes
+
+    def get_oois_for_boefje(self, boefje: models.Plugin, organisation: str) -> list[models.OOI]:
+        oois = []
+
+        oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
+            organisation, boefje.consumes, list(range(boefje.scan_level, 5))
+        )
+
+        # Filter OOIs based on permission
+        for ooi in oois_by_object_type:
+            if not self.has_boefje_permission_to_run(boefje, ooi):
+                self.logger.debug(
+                    "Boefje not allowed to run on ooi",
+                    boefje_id=boefje.id,
+                    ooi_primary_key=ooi.primary_key,
+                    scheduler_id=self.scheduler_id,
+                )
+                continue
+            oois.append(ooi)
+
+        return oois
 
     def set_cron(self, item: models.Task) -> str | None:
         """Override Schedule.set_cron() when a boefje specifies a schedule for
