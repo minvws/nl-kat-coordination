@@ -1,7 +1,6 @@
 from collections.abc import Iterator
 
-from bits.spf_discovery.internetnl_spf_parser import parse
-
+from nibbles.spf_discovery.internetnl_spf_parser import parse
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import DNSTXTRecord
 from octopoes.models.ooi.dns.zone import Hostname
