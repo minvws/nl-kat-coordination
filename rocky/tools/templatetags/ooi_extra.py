@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from typing import Any
 from urllib import parse
 
@@ -99,3 +100,8 @@ def clearance_level(ooi: OOI) -> ScanLevel:
 @register.filter
 def ooi_type(reference_string: str) -> str:
     return Reference.from_str(reference_string).class_
+
+
+@register.filter
+def get_date(date_str: str) -> datetime:
+    return datetime.fromisoformat(date_str)
