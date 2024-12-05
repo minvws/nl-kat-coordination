@@ -8,9 +8,8 @@ from typing import Any
 import structlog
 from opentelemetry import trace
 
-from scheduler import context, queues, rankers, storage, utils
-from scheduler.connectors import listeners
-from scheduler.connectors.errors import ExternalServiceError
+from scheduler import clients, context, storage, utils
+from scheduler.clients.errors import ExternalServiceError
 from scheduler.models import (
     OOI,
     Boefje,
@@ -22,9 +21,10 @@ from scheduler.models import (
     Task,
     TaskStatus,
 )
+from scheduler.schedulers import Scheduler
+from scheduler.schedulers.queue import PriorityQueue, QueueFullError
+from scheduler.schedulers.rankers import BoefjeRanker
 from scheduler.storage import filters
-
-from .scheduler import Scheduler
 
 tracer = trace.get_tracer(__name__)
 
@@ -45,7 +45,7 @@ class BoefjeScheduler(Scheduler):
         ctx: context.AppContext,
         scheduler_id: str,
         organisation: Organisation,
-        queue: queues.PriorityQueue | None = None,
+        queue: PriorityQueue | None = None,
         callback: Callable[..., None] | None = None,
     ):
         """Initializes the BoefjeScheduler.
@@ -60,7 +60,7 @@ class BoefjeScheduler(Scheduler):
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.organisation: Organisation = organisation
 
-        self.queue = queue or queues.PriorityQueue(
+        self.queue = queue or PriorityQueue(
             pq_id=scheduler_id,
             maxsize=ctx.config.pq_maxsize,
             item_type=self.ITEM_TYPE,
@@ -68,10 +68,17 @@ class BoefjeScheduler(Scheduler):
             pq_store=ctx.datastores.pq_store,
         )
 
-        super().__init__(ctx=ctx, queue=self.queue, scheduler_id=scheduler_id, callback=callback, create_schedule=True)
+        super().__init__(
+            ctx=ctx,
+            queue=self.queue,
+            scheduler_id=scheduler_id,
+            callback=callback,
+            create_schedule=True,
+            auto_calculate_deadline=True,
+        )
 
         # Priority ranker
-        self.priority_ranker = rankers.BoefjeRanker(self.ctx)
+        self.priority_ranker = BoefjeRanker(self.ctx)
 
     def run(self) -> None:
         """The run method is called when the scheduler is started. It will
@@ -90,7 +97,7 @@ class BoefjeScheduler(Scheduler):
         reschedule it.
         """
         # Scan profile mutations
-        self.listeners["scan_profile_mutations"] = listeners.ScanProfileMutation(
+        self.listeners["scan_profile_mutations"] = clients.ScanProfileMutation(
             dsn=str(self.ctx.config.host_raw_data),
             queue=f"{self.organisation.id}__scan_profile_mutations",
             func=self.push_tasks_for_scan_profile_mutations,
@@ -576,7 +583,7 @@ class BoefjeScheduler(Scheduler):
 
         try:
             self.push_item_to_queue_with_timeout(task, self.max_tries)
-        except queues.QueueFullError:
+        except QueueFullError:
             self.logger.warning(
                 "Could not add task to queue, queue was full: %s",
                 boefje_task.hash,

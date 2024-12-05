@@ -3,7 +3,8 @@ import unittest
 from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import config, connectors, models, schedulers, storage
+from scheduler import clients, config, models, schedulers, storage
+from scheduler.storage import stores
 from structlog.testing import capture_logs
 
 from tests.factories import (
@@ -33,9 +34,9 @@ class NormalizerSchedulerBaseTestCase(unittest.TestCase):
 
         self.mock_ctx.datastores = SimpleNamespace(
             **{
-                storage.TaskStore.name: storage.TaskStore(self.dbconn),
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
-                storage.ScheduleStore.name: storage.ScheduleStore(self.dbconn),
+                stores.TaskStore.name: stores.TaskStore(self.dbconn),
+                stores.PriorityQueueStore.name: stores.PriorityQueueStore(self.dbconn),
+                stores.ScheduleStore.name: stores.ScheduleStore(self.dbconn),
             }
         )
 
@@ -160,8 +161,8 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
     def test_get_normalizers_for_mime_type_request_exception(self, mock_get_normalizers_by_org_id_and_type):
         # Mocks
         mock_get_normalizers_by_org_id_and_type.side_effect = [
-            connectors.errors.ExternalServiceError("External service is not available."),
-            connectors.errors.ExternalServiceError("External service is not available."),
+            clients.errors.ExternalServiceError("External service is not available."),
+            clients.errors.ExternalServiceError("External service is not available."),
         ]
 
         # Act

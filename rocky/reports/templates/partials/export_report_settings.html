@@ -6,7 +6,7 @@
 
 <section>
     <div>
-        {% if selected_oois and selected_report_types %}
+        {% if selected_report_types %}
             <h2>{% translate "Report schedule" %}</h2>
             <p>
                 {% blocktranslate trimmed %}
@@ -21,6 +21,12 @@
                 {% include "partials/form/fieldset.html" with fields=report_schedule_form_recurrence_choice %}
 
                 {% if is_scheduled_report %}
+                    <p>
+                        {% blocktranslate trimmed %}
+                            Please choose a start date, time and recurrence for scheduling your report(s).
+                            If you select a date on the 28th-31st of the month, it will always be scheduled on the last day of the month.
+                        {% endblocktranslate %}
+                    </p>
                     <p>
                         {% blocktranslate trimmed %}
                             The date you select will be the reference date for the data set for your report.

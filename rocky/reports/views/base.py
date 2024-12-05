@@ -34,6 +34,7 @@ from reports.report_types.helpers import (
     get_ooi_types_from_aggregate_report,
     get_ooi_types_with_report,
     get_report_by_id,
+    get_report_types_for_ooi_types,
     get_report_types_for_oois,
     get_report_types_from_aggregate_report,
 )
@@ -239,7 +240,11 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         ]
 
     def get_report_types_for_generate_report(self):
-        return self.get_report_types_from_ooi_selelection(get_report_types_for_oois(self.selected_oois))
+        if self.object_selection == "query":
+            report_types = get_report_types_for_ooi_types(self.get_ooi_types())
+        else:
+            report_types = get_report_types_for_oois(self.selected_oois)
+        return self.get_report_types_from_ooi_selelection(report_types)
 
     def get_report_types_for_aggregate_report(self) -> dict[str, list[dict[str, str]]]:
         reports_dict = get_report_types_from_aggregate_report(AggregateOrganisationReport)
@@ -302,6 +307,7 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
             ooi=report_recipe,
             observed_at=datetime.now(timezone.utc),
         )
+        logger.info("ReportRecipe created", event_code=800091, report_recipe=report_recipe)
         return report_recipe
 
     def get_input_data(self) -> dict[str, Any]:
@@ -354,11 +360,11 @@ class ReportTypeSelectionView(BaseReportView, TemplateView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+        self.object_selection = request.POST.get("object_selection", "")
         self.available_report_types, self.counted_report_types = self.get_available_report_types()
 
     def post(self, request, *args, **kwargs):
-        object_selection = request.GET.get("object_selection", "")
-        if not (self.get_ooi_selection() or self.all_oois_selected()) and object_selection != "query":
+        if not (self.get_ooi_selection() or self.all_oois_selected()) and self.object_selection != "query":
             return PostRedirect(self.get_previous())
         return self.get(request, *args, **kwargs)
 
@@ -494,18 +500,18 @@ class ReportFinalSettingsView(BaseReportView, SchedulerView, TemplateView):
         reports = {}
         oois_count = len(oois)
         report_types_count = len(report_types)
-        ooi = oois[0].human_readable
+        ooi = oois[0].human_readable if oois else None
         report_type = report_types[0].name
 
         # Create name for parent report
         if not (report_types_count == 1 and oois_count == 1):
-            if report_types_count > 1 and oois_count > 1:
+            if report_types_count > 1 and oois_count != 1:
                 name = _("Concatenated Report for {oois_count} objects").format(
                     report_type=report_type, oois_count=oois_count
                 )
             elif report_types_count > 1 and oois_count == 1:
                 name = _("Concatenated Report for {ooi}").format(ooi=ooi)
-            elif report_types_count == 1 and oois_count > 1:
+            elif report_types_count == 1 and oois_count != 1:
                 name = _("{report_type} for {oois_count} objects").format(
                     report_type=report_type, oois_count=oois_count
                 )

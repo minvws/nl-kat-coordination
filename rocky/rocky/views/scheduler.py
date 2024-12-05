@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any
 
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import Boefje, Normalizer
 from reports.forms import (
@@ -107,13 +107,14 @@ class SchedulerView(OctopoesView):
         return self.report_child_name_form()
 
     def get_task_details(self, task_id: str) -> Task | None:
-        task = self.scheduler_client.get_task_details(task_id)
+        try:
+            task = self.scheduler_client.get_task_details(task_id)
+            if task.organization_id() != self.organization.code:
+                raise SchedulerTaskNotFound()
 
-        if task.organization_id() != self.organization.code:
-            messages.error(self.request, SchedulerTaskNotFound.message)
-            return None
-
-        return task
+            return task
+        except SchedulerTaskNotFound:
+            raise Http404()
 
     def create_report_schedule(self, report_recipe: ReportRecipe, deadline_at: datetime) -> ScheduleResponse | None:
         try:
@@ -163,7 +164,7 @@ class SchedulerView(OctopoesView):
             messages.error(self.request, error.message)
             return []
 
-    def get_json_task_details(self) -> JsonResponse | None:
+    def get_json_task_details(self) -> JsonResponse:
         try:
             task = self.get_task_details(self.kwargs["task_id"])
             if task:
@@ -174,7 +175,15 @@ class SchedulerView(OctopoesView):
                     },
                     safe=False,
                 )
-            return task
+            else:
+                raise SchedulerTaskNotFound()
+
+        except SchedulerTaskNotFound:
+            raise Http404()
+
+    def get_schedule_details(self, schedule_id: str) -> ScheduleResponse:
+        try:
+            return self.scheduler_client.get_schedule_details(schedule_id)
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
@@ -205,18 +214,22 @@ class SchedulerView(OctopoesView):
     # task info from the scheduler. Task data should be available from the context
     # from which the task is created.
     def reschedule_task(self, task_id: str) -> None:
-        task = self.scheduler_client.get_task_details(task_id)
+        try:
+            task = self.get_task_details(task_id)
+            if task:
+                if task.organization_id() != self.organization.code:
+                    raise SchedulerTaskNotFound()
 
-        if task.organization_id() != self.organization.code:
-            messages.error(self.request, SchedulerTaskNotFound.message)
-            return
+                new_id = uuid.uuid4()
+                task.data.id = new_id
 
-        new_id = uuid.uuid4()
-        task.data.id = new_id
+                new_task = Task(id=new_id, scheduler_id=task.scheduler_id, priority=1, data=task.data)
 
-        new_task = Task(id=new_id, scheduler_id=task.scheduler_id, priority=1, data=task.data)
-
-        self.schedule_task(new_task)
+                self.schedule_task(new_task)
+            else:
+                raise SchedulerTaskNotFound()
+        except SchedulerTaskNotFound:
+            raise Http404()
 
     def run_normalizer(self, katalogus_normalizer: Normalizer, raw_data: RawData) -> None:
         try:
@@ -276,8 +289,8 @@ class SchedulerView(OctopoesView):
                 # Recurres every year on the {day} of the {month} at the selected time
             }
 
-            if 28 <= day <= 31:
-                cron_expr["monthly"] = f"{minute} {hour} 28-31 * *"
+            if day >= 28:
+                cron_expr["monthly"] = f"{minute} {hour} L * *"
             else:
                 cron_expr["monthly"] = (
                     f"{minute} {hour} {day} * *"  # Recurres on the exact {day} of the month at the selected time

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-18 15:24+0000\n"
+"POT-Creation-Date: 2024-11-25 09:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -586,6 +586,7 @@ msgstr ""
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/confirmation_clone_settings.html
 #: katalogus/templates/plugin_settings_delete.html
+#: reports/templates/report_overview/modal_partials/enable_disable_schedule_modal.html
 #: rocky/templates/oois/ooi_delete.html
 #: rocky/templates/oois/ooi_mute_finding.html
 #: rocky/templates/organizations/organization_edit.html
@@ -626,12 +627,14 @@ msgstr ""
 #: katalogus/templates/partials/plugin_tile_modal.html
 #: katalogus/templates/plugin_container_image.html
 #: reports/report_types/dns_report/report.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Enabled"
 msgstr ""
 
 #: katalogus/forms/katalogus_filter.py
 #: katalogus/templates/partials/plugin_tile_modal.html
 #: katalogus/templates/plugin_container_image.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
 msgid "Disabled"
 msgstr ""
@@ -1101,7 +1104,6 @@ msgstr ""
 
 #: katalogus/templates/partials/plugin_tile_modal.html reports/forms.py
 #: reports/templates/report_overview/report_history_table.html
-#: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Report types"
 msgstr ""
 
@@ -1278,7 +1280,6 @@ msgstr ""
 #: reports/templates/report_overview/modal_partials/delete_modal.html
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
 #: reports/templates/report_overview/report_history_table.html
-#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/report_overview/subreports_table.html
 msgid "Creation date"
 msgstr ""
@@ -1616,7 +1617,6 @@ msgstr ""
 #: onboarding/templates/account/step_2a_organization_update.html
 #: onboarding/templates/account/step_2b_indemnification_setup.html
 #: onboarding/templates/step_3d_clearance_level_introduction.html
-#: reports/templates/partials/report_setup_scan.html
 msgid "Continue"
 msgstr ""
 
@@ -2384,7 +2384,8 @@ msgstr ""
 msgid "Please select all required plugins to proceed."
 msgstr ""
 
-#: onboarding/views.py
+#: onboarding/views.py reports/views/aggregate_report.py
+#: reports/views/generate_report.py
 msgid "An error occurred while enabling {}. The plugin is not available."
 msgstr ""
 
@@ -3117,7 +3118,8 @@ msgid "First seen"
 msgstr ""
 
 #: reports/report_types/findings_report/report.html
-msgid "No findings have been found."
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "No findings have been identified yet."
 msgstr ""
 
 #: reports/report_types/findings_report/report.py
@@ -3719,6 +3721,13 @@ msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
 msgid ""
+"Please choose a start date, time and recurrence for scheduling your "
+"report(s). If you select a date on the 28th-31st of the month, it will "
+"always be scheduled on the last day of the month."
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid ""
 "The date you select will be the reference date for the data set for your "
 "report. Please allow for up to 24 hours for your report to be ready."
 msgstr ""
@@ -4054,6 +4063,10 @@ msgstr ""
 msgid "There are no optional plugins."
 msgstr ""
 
+#: reports/templates/partials/report_setup_scan.html
+msgid "Enable plugins and continue"
+msgstr ""
+
 #: reports/templates/partials/report_severity_totals.html
 #: reports/templates/partials/report_severity_totals_table.html
 msgid "Findings overview"
@@ -4161,6 +4174,22 @@ msgstr ""
 #: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/report_overview/subreports_table.html
 msgid "Reference date"
+msgstr ""
+
+#: reports/templates/report_overview/modal_partials/enable_disable_schedule_modal.html
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Disable schedule"
+msgstr ""
+
+#: reports/templates/report_overview/modal_partials/enable_disable_schedule_modal.html
+#, python-format
+msgid ""
+"\n"
+"            Are you sure you want to disable the schedule for "
+"%(report_name)s?\n"
+"            The recipe will still exist and the schedule can be enabled "
+"later on.\n"
+"        "
 msgstr ""
 
 #: reports/templates/report_overview/modal_partials/rename_modal.html
@@ -4290,11 +4319,11 @@ msgid "Scheduled reports:"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
-msgid "Report Name"
+msgid "Scheduled for"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
-msgid "Scheduled for"
+msgid "Schedule status"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
@@ -4302,8 +4331,7 @@ msgid "Scheduled Reports:"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
-#: rocky/templates/tasks/boefje_task_detail.html
-msgid "Input object"
+msgid "Input"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
@@ -4311,7 +4339,15 @@ msgid "Show report details"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
+msgid "objects"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Edit report recipe"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Enable schedule"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
@@ -4431,6 +4467,10 @@ msgstr ""
 msgid "Save report"
 msgstr ""
 
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+msgid "You do not have the required permissions to enable plugins."
+msgstr ""
+
 #: reports/views/base.py
 msgid "Select at least one OOI to proceed."
 msgstr ""
@@ -4483,6 +4523,21 @@ msgstr ""
 
 #: reports/views/multi_report.py
 msgid "View report"
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid "Schedule {}"
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid ""
+"Schedule disabled successfully. '{}' will not be generated automatically "
+"until the schedule is enabled again."
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid ""
+"Schedule enabled successfully. '{}' will be generated according to schedule."
 msgstr ""
 
 #: reports/views/report_overview.py
@@ -5918,7 +5973,7 @@ msgid "Save %(display_type)s"
 msgstr ""
 
 #: rocky/templates/oois/ooi_findings.html
-msgid "Currently there are no findings for OOI"
+msgid "Currently no findings have been identified for OOI"
 msgstr ""
 
 #: rocky/templates/oois/ooi_list.html
@@ -6661,6 +6716,10 @@ msgstr ""
 
 #: rocky/templates/tasks/boefje_task_detail.html
 msgid "Download meta data"
+msgstr ""
+
+#: rocky/templates/tasks/boefje_task_detail.html
+msgid "Input object"
 msgstr ""
 
 #: rocky/templates/tasks/boefjes.html

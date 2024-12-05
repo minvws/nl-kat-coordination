@@ -48,7 +48,7 @@ def test_body_image_normalizer(normalizer_runner):
     output = normalizer_runner.run(meta, get_dummy_data("cat_image")).observations[0].results
 
     assert len(output) == 1
-    assert {
+    assert output[0].dict() == {
         "object_type": "ImageMetadata",
         "primary_key": "ImageMetadata|internet|134.209.85.72|tcp|443|https|internet"
         "|mispo.es|https|internet|mispo.es|443|/",
@@ -65,7 +65,7 @@ def test_body_image_normalizer(normalizer_runner):
             "size": (600, 600),
             "width": 600,
         },
-    } == output[0].dict()
+    }
 
 
 def test_body_normalizer(normalizer_runner):
