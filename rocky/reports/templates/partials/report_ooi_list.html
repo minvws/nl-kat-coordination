@@ -12,10 +12,12 @@
         </h2>
         <ul class="toggle-switch">
             <li aria-current="true">
-                <a class="toggle-switch-button live-set-button" href="#">{% translate "Live set" %}</a>
+                <a class="toggle-switch-button" data-target-id="live-set" href="#">{% translate "Live set" %}</a>
             </li>
             <li>
-                <a class="toggle-switch-button manual-selection-button" href="#">{% translate "Manual selection" %}</a>
+                <a class="toggle-switch-button"
+                   data-target-id="manual-selection"
+                   href="#">{% translate "Manual selection" %}</a>
             </li>
         </ul>
         <p>
@@ -37,7 +39,7 @@
         </p>
         {% include "partials/ooi_list_filters.html" %}
 
-        <div class="live-set-form">
+        <div id="live-set">
             <form novalidate
                   method="post"
                   action="{{ next }}"
@@ -54,7 +56,7 @@
                 </button>
             </form>
         </div>
-        <div class="manual-selection-form">
+        <div id="manual-selection">
             {% if not ooi_list %}
                 <p>{% translate "No objects found." %}</p>
                 <div class="button-container">
@@ -158,5 +160,7 @@
     {% if not all_oois_selected %}<input type="hidden" name="ooi" value="all">{% endif %}
 </form>
 {% block html_at_end_body %}
-    <script src="{% static "js/toggleSwitch.js" %}" type="module" nonce="{{ request.csp_nonce }}"></script>
+    {% compress js %}
+        <script src="{% static "js/toggleSwitch.js" %}" type="module" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
 {% endblock html_at_end_body %}
