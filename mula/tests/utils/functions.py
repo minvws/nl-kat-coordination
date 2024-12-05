@@ -4,11 +4,12 @@ from typing import Any, ClassVar
 
 import mmh3
 import pydantic
-from scheduler import models
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Query
 
+from scheduler import models
 from tests import factories
+from tests.factories import organisation
 
 
 class TestModel(pydantic.BaseModel):
@@ -34,23 +35,11 @@ def create_test_model() -> TestModel:
     return TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex)
 
 
-def create_task_in(priority: int, data: TestModel | None = None) -> str:
+def create_task_in(priority: int, organisation: str, data: TestModel | None = None) -> str:
     if data is None:
         data = TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex)
 
-    return json.dumps({"priority": priority, "data": data.model_dump()})
-
-
-def create_item(scheduler_id: str, priority: int, task: models.Task | None = None) -> models.Task:
-    if task is None:
-        task = create_task(scheduler_id)
-
-    item = models.Task(**task.model_dump())
-
-    if priority is not None:
-        item.priority = priority
-
-    return item
+    return json.dumps({"priority": priority, "organisation": organisation, "data": data.model_dump()})
 
 
 def create_schedule(scheduler_id: str, data: Any | None = None) -> models.Schedule:
@@ -58,11 +47,17 @@ def create_schedule(scheduler_id: str, data: Any | None = None) -> models.Schedu
     return models.Schedule(scheduler_id=scheduler_id, hash=item.hash, data=item.model_dump())
 
 
-def create_task(scheduler_id: str, data: Any | None = None) -> models.Task:
+def create_task(scheduler_id: str, organisation: str, data: Any | None = None) -> models.Task:
     if data is None:
         data = TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex)
 
-    return models.Task(scheduler_id=scheduler_id, type=TestModel.type, hash=data.hash, data=data.model_dump())
+    return models.Task(
+        scheduler_id=scheduler_id,
+        organisation=organisation,
+        type=TestModel.type,
+        hash=data.hash,
+        data=data.model_dump(),
+    )
 
 
 def create_boefje() -> models.Boefje:

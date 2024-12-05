@@ -1,14 +1,29 @@
-from datetime import datetime
-from typing import Any
+import enum
+from datetime import datetime, timezone
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import Boolean, Column, DateTime
+from sqlalchemy import Enum as SQLAlchemyEnum
+from sqlalchemy import Integer, String
+from sqlalchemy.sql import func
+
+from .base import Base
+
+
+class SchedulerType(str, enum.Enum):
+    """Enum for scheduler types."""
+
+    UNKNOWN = "unknown"
+    BOEFJE = "boefje"
+    NORMALIZER = "normalizer"
+    REPORT = "report"
 
 
 class Scheduler(BaseModel):
-    """Representation of a schedulers.Scheduler instance. Used for
-    unmarshalling of schedulers to a JSON representation."""
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
-    id: str | None = None
-    enabled: bool | None = None
-    priority_queue: dict[str, Any] | None = None
+    id: str
+    type: SchedulerType
     last_activity: datetime | None = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
