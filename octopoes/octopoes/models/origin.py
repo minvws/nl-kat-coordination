@@ -11,6 +11,7 @@ class OriginType(Enum):
     OBSERVATION = "observation"
     INFERENCE = "inference"
     AFFIRMATION = "affirmation"
+    NIBBLET = "nibblet"
 
 
 class Origin(BaseModel):
@@ -19,6 +20,8 @@ class Origin(BaseModel):
     source: Reference
     source_method: str | None = None  # None for bits and normalizers
     result: list[Reference] = Field(default_factory=list)
+    parameters_hash: str | None = None  # None for anything other than nibblet
+    parameters_references: list[Reference | None] | None = None  # None for anything other than nibblet
     task_id: UUID | None = None
 
     def __sub__(self, other) -> set[Reference]:
@@ -29,7 +32,23 @@ class Origin(BaseModel):
 
     @property
     def id(self) -> str:
-        if self.source_method is not None:
+        if self.origin_type == OriginType.NIBBLET:
+            return "|".join(
+                map(
+                    str,
+                    [
+                        self.__class__.__name__,
+                        self.origin_type.value,
+                        self.method,
+                        self.source,
+                        f"[{','.join([str(param) for param in self.result])}]" if self.result else "Null",
+                        f"[{','.join([str(param) for param in self.parameters_references])}]"
+                        if self.parameters_references
+                        else "Null",
+                    ],
+                )
+            )
+        elif self.source_method is not None:
             return (
                 f"{self.__class__.__name__}|{self.origin_type.value}|{self.method}|{self.source_method}|{self.source}"
             )
