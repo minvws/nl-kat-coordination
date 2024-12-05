@@ -7,8 +7,8 @@
             <p>
                 {% translate "This overview shows the total number of findings per severity that have been identified for all organizations." %}
             </p>
-            <div class="column-2">
-                {% include "partials/report_severity_totals_table.html" with data=total_overview %}
+            <div>
+                {% include "partials/report_severity_totals_table.html" with data=summary %}
 
             </div>
         {% else %}
@@ -25,9 +25,10 @@
                     <thead>
                         <tr>
                             <th>{% translate "Organization" %}</th>
-                            <th scope="col">{% translate "Total findings" %}</th>
-                            <th scope="col">{% translate "Critical findings" %}</th>
+                            <th scope="col">{% translate "Finding types" %}</th>
+                            <th scope="col">{% translate "Occurrences" %}</th>
                             <th scope="col">{% translate "Highest risk level" %}</th>
+                            <th scope="col">{% translate "Critical finding types" %}</th>
                             <th scope="col" class="visually-hidden actions">{% translate "Details" %}</th>
                         </tr>
                     </thead>
@@ -44,7 +45,7 @@
                                 </td>
                                 <td>
                                     {% if findings %}
-                                        {{ findings.summary.total_by_severity_per_finding_type.critical }}
+                                        {{ findings.summary.total_occurrences }}
                                     {% else %}
                                         -
                                     {% endif %}
@@ -52,6 +53,13 @@
                                 <td>
                                     {% if findings %}
                                         <span class="{{ findings.finding_types.0.finding_type.risk_severity }}">{{ findings.finding_types.0.finding_type.risk_severity|capfirst }}</span>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if findings %}
+                                        {{ findings.summary.total_by_severity_per_finding_type.critical }}
                                     {% else %}
                                         -
                                     {% endif %}
@@ -70,18 +78,9 @@
                             {% if findings %}
                                 <tr class="expando-row">
                                     <td colspan="3">
-                                        <h4>{% translate "Findings overview" %}</h4>
-                                        <div class="column-2">
-                                            {% include "partials/report_severity_totals_table.html" with data=findings.summary %}
+                                        {% include "partials/report_severity_totals_table.html" with data=findings.summary %}
+                                        {% include "partials/report_findings_table.html" with finding_types=findings.finding_types is_dashboard=is_dashboard %}
 
-                                        </div>
-                                        <h4>
-                                            {% translate "Findings" %} ({{ findings.summary.total_finding_types }}/{{ findings.summary.total_finding_types }})
-                                        </h4>
-                                        <div class="column-2">
-                                            {% include "partials/report_findings_per_organization_table.html" with data=findings %}
-
-                                        </div>
                                     </td>
                                 </tr>
                             {% endif %}
