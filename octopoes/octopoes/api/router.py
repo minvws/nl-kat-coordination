@@ -445,9 +445,9 @@ def list_reports(
     limit=DEFAULT_LIMIT,
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
+    recipe_id: uuid.UUID | None = Query(None),
 ) -> Paginated[tuple[Report, list[Report | None]]]:
-    res = octopoes.ooi_repository.list_reports(valid_time, offset, limit)
-    return res
+    return octopoes.ooi_repository.list_reports(valid_time, offset, limit, recipe_id)
 
 
 @router.get("/reports/{report_id}", tags=["Reports"])

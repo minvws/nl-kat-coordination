@@ -5,6 +5,7 @@ import re
 from collections import Counter
 from datetime import datetime
 from typing import Any, Literal, cast
+from uuid import UUID
 
 import structlog
 from bits.definitions import BitDefinition
@@ -23,7 +24,7 @@ from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
-from octopoes.models.ooi.reports import Report
+from octopoes.models.ooi.reports import Report, ReportRecipe
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Direction, Path, Segment, get_paths_to_neighours
 from octopoes.models.transaction import TransactionRecord
@@ -138,7 +139,7 @@ class OOIRepository(Repository):
     ) -> Paginated[Finding]:
         raise NotImplementedError
 
-    def list_reports(self, valid_time, offset, limit) -> Paginated[Report]:
+    def list_reports(self, valid_time: datetime, offset: int, limit: int, recipe_id: UUID | None = None) -> Paginated[tuple[Report, list[Report | None]]]:
         raise NotImplementedError
 
     def get_report(self, report_id) -> Report:
@@ -791,7 +792,13 @@ class XTDBOOIRepository(OOIRepository):
                 new_data[new_key] = value
         return new_data
 
-    def list_reports(self, valid_time, offset, limit) -> Paginated[tuple[Report, list[Report | None]]]:
+    def list_reports(
+        self,
+        valid_time: datetime,
+        offset: int,
+        limit: int,
+        recipe_id: UUID | None = None,
+    ) -> Paginated[tuple[Report, list[Report | None]]]:
         count_query = """
                             {
                                 :query {
@@ -817,6 +824,10 @@ class XTDBOOIRepository(OOIRepository):
             .offset(offset)
         )
 
+        if recipe_id:
+            query = query.where(ReportRecipe, recipe_id=str(recipe_id))
+            query = query.where(Report, report_recipe=ReportRecipe)
+
         results = [
             (
                 self.simplify_keys(x[0]),
@@ -832,6 +843,14 @@ class XTDBOOIRepository(OOIRepository):
         return Paginated(count=count, items=results)
 
     def query(self, query: str | Query, valid_time: datetime) -> list[OOI | tuple]:
+        """
+        Performs the given query and returns the query results at the provided valid_time.
+
+        At this point, the query can return both OOIs or more complex structures, see for example the query-many
+        endpoint. For backward compatibility, we try to deserialize oois whenever we expect that to be possible, but
+        when we are going to improve and extend query capabilities, deserialization should be moved outside this method.
+        """
+
         results = self.session.client.query(query, valid_time=valid_time)
 
         parsed_results: list[OOI | tuple] = []

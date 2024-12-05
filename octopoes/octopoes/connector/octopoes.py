@@ -280,9 +280,14 @@ class OctopoesAPIConnector:
         return TypeAdapter(Paginated[Finding]).validate_json(res.content)
 
     def list_reports(
-        self, valid_time: datetime, offset: int = DEFAULT_OFFSET, limit: int = DEFAULT_LIMIT
+        self, valid_time: datetime, offset: int = DEFAULT_OFFSET, limit: int = DEFAULT_LIMIT, recipe_id: UUID | None = None
     ) -> Paginated[tuple[Report, list[Report | None]]]:
-        params: dict[str, str | int | list[str]] = {"valid_time": str(valid_time), "offset": offset, "limit": limit}
+        params: dict[str, str | int | list[str]] = {
+            "valid_time": str(valid_time),
+            "offset": offset,
+            "limit": limit,
+            "recipe_id": recipe_id,
+        }
         res = self.session.get(f"/{self.client}/reports", params=params)
 
         return TypeAdapter(Paginated[tuple[Report, list[Report | None]]]).validate_json(res.content)
