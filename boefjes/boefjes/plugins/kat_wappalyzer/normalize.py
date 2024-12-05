@@ -84,7 +84,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
 # analyze_scripts is used to check javascript files, therefore we need another analyzer that analyzes the script
 # source in the html
-def analyze_script_src_in_html(har: HarWrapper, fingerprint: schemas.Fingerprint):
+def analyze_script_src_in_html(har: HarWrapper, fingerprint: schemas.Fingerprint) -> list[Detection]:
     detections: list[Detection] = []
 
     for pattern in fingerprint.script_src:

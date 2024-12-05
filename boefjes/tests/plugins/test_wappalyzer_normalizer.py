@@ -8,7 +8,7 @@ def test_page_analyzer_normalizer(normalizer_runner):
 
     assert output.observations
     results = output.observations[0].results
-    assert len(results) == 5
+    assert len(results) == 14
     assert {o.primary_key for o in results if o.object_type == "Software"} == {
         "Software|Bootstrap|2.3|cpe:2.3:a:getbootstrap:bootstrap:*:*:*:*:*:*:*:*",
         "Software|jQuery|2.3|cpe:2.3:a:jquery:jquery:*:*:*:*:*:*:*:*",
