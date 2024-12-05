@@ -36,12 +36,21 @@ class SchedulerAPI:
         )
 
         self.api.add_api_route(
-            path="/schedulers/{scheduler_id}",
+            path="/schedulers/{scheduler_id}/push",
             endpoint=self.push,
             methods=["POST"],
             response_model=models.Task,
-            status_code=status.HTTP_200_OK,
+            status_code=status.HTTP_201_CREATED,
             description="Push a task to a scheduler",
+        )
+
+        self.api.add_api_route(
+            path="/schedulers/{scheduler_id}/pop",
+            endpoint=self.pop,
+            methods=["POST"],
+            response_model=utils.PaginatedResponse,
+            status_code=status.HTTP_200_OK,
+            description="Pop a task from a scheduler",
         )
 
     def list(self) -> Any:
@@ -60,27 +69,31 @@ class SchedulerAPI:
         offset: int = 0,
         limit: int = 1,
         filters: storage.filters.FilterRequest | None = None,
-    ) -> Any:
+    ) -> utils.PaginatedResponse:
         results, count = self.ctx.datastores.pq_store.pop(offset=offset, limit=limit, filters=filters)
 
         # TODO: see if we can batch this
         # Update status for popped items
         for item in results:
-            self.ctx.datastores.pq_store.update_item(item)
+            item.status = models.TaskStatus.DISPATCHED
+            self.ctx.datastores.pq_store.update(item.scheduler_id, item)
 
         return utils.paginate(request, results, count, offset, limit)
 
-    def push(self, scheduler_id: str, item: serializers.Task) -> Any:
+    def push(self, scheduler_id: str, item: serializers.TaskPush) -> Any:
         s = self.schedulers.get(scheduler_id)
         if s is None:
             raise NotFoundError(f"Scheduler {scheduler_id} not found")
 
+        if item.scheduler_id is not None and item.scheduler_id != scheduler_id:
+            raise BadRequestError("scheduler_id in item does not match the scheduler_id in the path")
+
+        # Set scheduler_id if not set
+        if item.scheduler_id is None:
+            item.scheduler_id = scheduler_id
+
         # Load default values
         new_item = models.Task(**item.model_dump(exclude_unset=True))
-
-        # Set values
-        if new_item.scheduler_id is None:
-            new_item.scheduler_id = s.scheduler_id
 
         try:
             pushed_item = s.push_item_to_queue(new_item)

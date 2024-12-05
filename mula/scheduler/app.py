@@ -69,7 +69,7 @@ class App:
             self.start_collectors()
 
         # API Server
-        self.start_server()
+        self.start_server(self.schedulers)
 
         # Main thread
         while not self.stop_event.is_set():
@@ -102,8 +102,17 @@ class App:
             name="App-metrics_collector", target=self._collect_metrics, stop_event=self.stop_event, interval=10
         ).start()
 
-    def start_server(self) -> None:
-        self.server = server.Server(self.ctx, self.schedulers)
+    def start_server(
+        self,
+        schedulers: dict[
+            str,
+            schedulers.Scheduler
+            | schedulers.BoefjeScheduler
+            | schedulers.NormalizerScheduler
+            | schedulers.ReportScheduler,
+        ] = None,
+    ) -> None:
+        self.server = server.Server(self.ctx, schedulers)
         thread.ThreadRunner(name="App-server", target=self.server.run, stop_event=self.stop_event, loop=False).start()
 
     def shutdown(self) -> None:

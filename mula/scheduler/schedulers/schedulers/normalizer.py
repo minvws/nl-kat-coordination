@@ -21,6 +21,7 @@ class NormalizerScheduler(Scheduler):
     """
 
     ID: str = "normalizer"
+    TYPE: models.SchedulerType = models.SchedulerType.NORMALIZER
     ITEM_TYPE: Any = models.NormalizerTask
 
     def __init__(self, ctx: context.AppContext):

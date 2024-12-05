@@ -13,6 +13,7 @@ from .base import Base
 class SchedulerType(str, enum.Enum):
     """Enum for scheduler types."""
 
+    UNKNOWN = "unknown"
     BOEFJE = "boefje"
     NORMALIZER = "normalizer"
     REPORT = "report"

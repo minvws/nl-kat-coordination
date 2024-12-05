@@ -18,6 +18,7 @@ class ReportScheduler(Scheduler):
     """Scheduler implementation for the creation of ReportTask models."""
 
     ID: str = "report"
+    TYPE: models.SchedulerType = models.SchedulerType.REPORT
     ITEM_TYPE: Any = models.ReportTask
 
     def __init__(self, ctx: context.AppContext):

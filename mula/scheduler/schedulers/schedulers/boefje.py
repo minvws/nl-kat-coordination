@@ -24,6 +24,7 @@ class BoefjeScheduler(Scheduler):
     """
 
     ID: str = "boefje"
+    TYPE: models.SchedulerType = models.SchedulerType.BOEFJE
     ITEM_TYPE: Any = models.BoefjeTask
 
     def __init__(self, ctx: context.AppContext):

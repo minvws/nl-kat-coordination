@@ -49,6 +49,7 @@ class Scheduler(abc.ABC):
             A threading event to stop the running threads.
     """
 
+    TYPE: models.SchedulerType = models.SchedulerType.UNKNOWN
     ITEM_TYPE: Any = None
 
     def __init__(
@@ -428,7 +429,8 @@ class Scheduler(abc.ABC):
         """Get a dict representation of the scheduler."""
         return {
             "id": self.scheduler_id,
-            "item_type": self.queue.item_type.type,
+            "type": self.TYPE,
+            "item_type": self.ITEM_TYPE,
             "qsize": self.queue.qsize(),
             "last_activity": self.last_activity,
         }
