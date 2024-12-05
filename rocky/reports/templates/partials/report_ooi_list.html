@@ -12,12 +12,14 @@
         </h2>
         <ul class="toggle-switch">
             <li aria-current="true">
-                <a class="toggle-switch-button" data-target-id="live-set" href="#">{% translate "Live set" %}</a>
+                <a class="toggle-switch-button"
+                   data-target-id="live-set"
+                   href="#live-set">{% translate "Live set" %}</a>
             </li>
             <li>
                 <a class="toggle-switch-button"
                    data-target-id="manual-selection"
-                   href="#">{% translate "Manual selection" %}</a>
+                   href="#manual-selection">{% translate "Manual selection" %}</a>
             </li>
         </ul>
         <p>
@@ -160,7 +162,5 @@
     {% if not all_oois_selected %}<input type="hidden" name="ooi" value="all">{% endif %}
 </form>
 {% block html_at_end_body %}
-    {% compress js %}
-        <script src="{% static "js/toggleSwitch.js" %}" type="module" nonce="{{ request.csp_nonce }}"></script>
-    {% endcompress %}
+    <script src="{% static "js/toggleSwitch.js" %}" type="module" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}
