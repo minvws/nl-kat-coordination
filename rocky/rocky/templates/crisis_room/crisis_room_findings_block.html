@@ -43,7 +43,7 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {% if findings %}
+                                    {% if findings and indings.summary.total_by_severity_per_finding_type.critical > 0 %}
                                         {{ findings.summary.total_by_severity_per_finding_type.critical }}
                                     {% else %}
                                         -
@@ -69,13 +69,15 @@
                             </tr>
                             {% if findings %}
                                 <tr class="expando-row">
-                                    <td colspan="3">
+                                    <td colspan="5">
                                         <h4>{% translate "Findings overview" %}</h4>
                                         <div class="column-2">
                                             {% include "partials/report_severity_totals_table.html" with data=findings.summary %}
 
                                         </div>
-                                        <h4>{% translate "Findings" %} (0/0)</h4>
+                                        <h4>
+                                            {% translate "Findings" %} ({{ findings.summary.total_finding_types }}/{{ findings.summary.total_finding_types }})
+                                        </h4>
                                         <div class="column-2">
                                             {% include "partials/report_findings_per_organization_table.html" with data=findings %}
 

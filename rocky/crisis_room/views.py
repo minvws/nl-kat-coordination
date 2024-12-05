@@ -19,6 +19,7 @@ from octopoes.connector import ConnectorException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.findings import RiskLevelSeverity
+from octopoes.models.ooi.reports import ReportRecipe
 from rocky.bytes_client import get_bytes_client
 from rocky.views.mixins import ObservedAtMixin
 from rocky.views.ooi_view import ConnectorFormMixin
@@ -106,6 +107,7 @@ class CrisisRoomView(BreadcrumbsMixin, ConnectorFormMixin, ObservedAtMixin, Temp
 
 class CrisisRoomAllOrganizations(TemplateView):
     template_name = "crisis_room/crisis_room.html"
+    chapter = "findings"
 
     def get_user_organizations(self) -> list[Organization]:
         return [member.organization for member in OrganizationMember.objects.filter(user=self.request.user)]
@@ -122,41 +124,39 @@ class CrisisRoomAllOrganizations(TemplateView):
             settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
         )
 
-    def get_report_data(self, dashboard: Dashboard) -> dict[str, Any]:
+    def get_report_data(self, recipe: ReportRecipe, organization: Organization) -> dict[str, Any]:
         valid_time = datetime.now(timezone.utc)
-        octopoes_client = self.get_octopoes_client(dashboard.organization)
+        octopoes_client = self.get_octopoes_client(organization)
 
         reports = octopoes_client.query(
-            "ReportRecipe.<report_recipe[is Report]", valid_time=valid_time, source=Reference.from_str(dashboard.recipe)
+            "ReportRecipe.<report_recipe[is Report]", valid_time=valid_time, source=Reference.from_str(recipe)
         )
         if reports:
             reports.sort(key=lambda ooi: ooi.date_generated, reverse=True)
             report = reports[0]
 
-            bytes_client = get_bytes_client(dashboard.organization.code)
+            bytes_client = get_bytes_client(organization.code)
             bytes_client.login()
 
-            return (
-                TypeAdapter(Any, config={"arbitrary_types_allowed": True})
-                .validate_json(bytes_client.get_raw(raw_id=report.data_raw_id))
-                .get("findings", {})
+            return TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
+                bytes_client.get_raw(raw_id=report.data_raw_id)
             )
         return {}
 
-    def get_organizations_report_data(self) -> dict[Organization, dict[str, Any]]:
-        reports = {}
+    def get_dashboards(self) -> dict[Organization, dict[str, Any]]:
+        dashboards_data = {}
 
         organizations = self.get_user_organizations()
         dashboards = Dashboard.objects.filter(organization__in=[org.pk for org in organizations])
 
         for dashboard in dashboards:
             if dashboard.organization:
-                reports[dashboard.organization] = self.get_report_data(dashboard)
+                dashboards_data[dashboard] = self.get_report_data(dashboard.data.recipe, dashboard.organization)
 
-        return reports
+        return dashboards_data
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["organizations_findings"] = self.get_organizations_report_data()
+        context["dashboards"] = self.get_dashboards()
 
         return context

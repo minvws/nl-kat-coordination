@@ -2,7 +2,7 @@ import json
 from json import JSONDecodeError
 
 import tagulous.admin
-from crisis_room.models import Dashboard
+from crisis_room.models import Dashboard, DashboardData
 from django.contrib import admin, messages
 from django.db.models import JSONField
 from django.forms import widgets
@@ -85,9 +85,14 @@ class OrganizationTagAdmin(admin.ModelAdmin):
     pass
 
 
+@admin.register(DashboardData)
+class DahboardDataAdmin(admin.ModelAdmin):
+    pass
+
+
 @admin.register(Dashboard)
 class DahboardAdmin(admin.ModelAdmin):
-    readonly_fields = ("recipe",)
+    pass
 
 
 tagulous.admin.register(Organization, OrganizationAdmin)

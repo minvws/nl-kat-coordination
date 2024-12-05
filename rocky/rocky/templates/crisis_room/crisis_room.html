@@ -15,22 +15,15 @@
                 </p>
             </div>
         </section>
-        {% if organizations_findings %}
-            <section>
-                <div>
-                    {% for dashboard in dashboards %}{{ dashboard.recipe }}{% endfor %}
-                    {% include "partials/elements/ooi_report_settings.html" %}
+        <section>
+            <div>
+                {% for dashboard, data in dashboards.items %}
+                    <p>{{ dashboard.organization }}</p>
+                    <p>{{ dashboard.name }}</p>
+                    {% include dashboard.data.chapter %}
 
-                </div>
-            </section>
-            {% include "crisis_room/crisis_room_findings_block.html" %}
-
-        {% else %}
-            <section>
-                <div>
-                    <p>{% translate "There were no organizations found for your user account." %}</p>
-                </div>
-            </section>
-        {% endif %}
+                {% endfor %}
+            </div>
+        </section>
     </main>
 {% endblock content %}
