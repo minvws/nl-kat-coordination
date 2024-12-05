@@ -14,16 +14,9 @@
         </p>
     {% endif %}
     <div class="horizontal-scroll">
-        <h3>{% translate "Findings overview" %}</h3>
-        <div class="horizontal-scroll">
-            {% include "partials/report_severity_totals_table.html" with data=data.summary %}
+        {% include "partials/report_severity_totals_table.html" with data=data.summary %}
+        {% include "partials/report_findings_table.html" with finding_types=data.finding_types %}
 
-        </div>
-        <h3>{% translate "Findings" %}</h3>
-        <div class="horizontal-scroll sticky-column">
-            {% include "partials/report_findings_table.html" with finding_types=data.finding_types %}
-
-        </div>
     </div>
 {% else %}
     <p>{% translate "No findings have been identified yet." %}</p>

@@ -7,9 +7,8 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
-from octopoes.models.ooi.findings import RiskLevelSeverity
 from reports.report_types.definitions import AggregateReport
-from reports.report_types.findings_report.report import FindingsReport
+from reports.report_types.findings_report.report import SEVERITY_OPTIONS, FindingsReport
 from reports.report_types.ipv6_report.report import IPv6Report
 from reports.report_types.mail_report.report import MailReport
 from reports.report_types.name_server_report.report import NameServerSystemReport
@@ -22,8 +21,6 @@ from reports.report_types.web_system_report.report import WebSystemReport
 from rocky.views.health import flatten_health, get_rocky_health
 
 logger = structlog.get_logger(__name__)
-
-SEVERITY_OPTIONS = [severity.value for severity in RiskLevelSeverity]
 
 
 class AggregateOrganisationReport(AggregateReport):

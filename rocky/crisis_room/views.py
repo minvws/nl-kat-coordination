@@ -6,10 +6,12 @@ import structlog
 from account.models import KATUser
 from django.conf import settings
 from django.contrib import messages
+from django.http.request import HttpRequest
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from pydantic import TypeAdapter
+from reports.report_types.findings_report.report import SEVERITY_OPTIONS
 from tools.forms.base import ObservedAtForm
 from tools.models import Organization, OrganizationMember
 from tools.view_helpers import BreadcrumbsMixin
@@ -109,6 +111,10 @@ class CrisisRoomAllOrganizations(TemplateView):
     template_name = "crisis_room/crisis_room.html"
     chapter = "findings"
 
+    def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
+        super().setup(request, *args, **kwargs)
+        self.dashboards = self.get_dashboards()
+
     def get_user_organizations(self) -> list[Organization]:
         return [member.organization for member in OrganizationMember.objects.filter(user=self.request.user)]
 
@@ -155,8 +161,27 @@ class CrisisRoomAllOrganizations(TemplateView):
 
         return dashboards_data
 
+    def get_summary(self):
+        summary: dict[str, Any] = {
+            "total_by_severity": {severity: 0 for severity in SEVERITY_OPTIONS},
+            "total_by_severity_per_finding_type": {severity: 0 for severity in SEVERITY_OPTIONS},
+            "total_finding_types": 0,
+            "total_occurrences": 0,
+        }
+
+        for report_data in self.dashboards.values():
+            for severity in SEVERITY_OPTIONS:
+                summary["total_by_severity"][severity] += report_data["summary"]["total_by_severity"][severity]
+                summary["total_by_severity_per_finding_type"][severity] += report_data["summary"][
+                    "total_by_severity_per_finding_type"
+                ][severity]
+
+            summary["total_finding_types"] += report_data["summary"]["total_finding_types"]
+            summary["total_occurrences"] += report_data["summary"]["total_occurrences"]
+        return summary
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["dashboards"] = self.get_dashboards()
-
+        context["dashboards"] = self.dashboards
+        context["summary"] = self.get_summary()
         return context
