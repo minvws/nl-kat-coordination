@@ -74,12 +74,6 @@ class SchedulerAPIClient(SchedulerClientInterface):
         self._session = Client(
             base_url=base_url, transport=HTTPTransport(retries=6), timeout=settings.outgoing_request_timeout
         )
-        if settings.runner_type == "boefje":
-            self._task_capabilities = settings.boefje_task_capabilities
-            self._reachable_networks = settings.boefje_reachable_networks
-        else:
-            self._task_capabilities = None
-            self._reachable_networks = None
 
     @staticmethod
     def _verify_response(response: Response) -> None:
@@ -94,17 +88,24 @@ class SchedulerAPIClient(SchedulerClientInterface):
     def pop_item(self, queue_id: str) -> Task | None:
         filters: list[Filter] = []
 
-        # Client should only pop tasks that lie on a network that the runner is capable of reaching (e.g. the internet)
-        if self._reachable_networks:
+        if settings.runner_type == "boefje":
+            # Client should only pop tasks that lie on a network that the
+            # runner is capable of reaching (e.g. the internet)
             filters.append(
-                Filter(column="data", field="network", operator="<@", value=json.dumps(self._reachable_networks))
+                Filter(
+                    column="data", field="network", operator="<@", value=json.dumps(settings.boefje_reachable_networks)
+                )
             )
 
-        # Client should only pop tasks that have requirements that this runner is capable of (e.g. being able
-        # to handle ipv6 requests)
-        if self._task_capabilities:
+            # Client should only pop tasks that have requirements that this runner is capable of (e.g. being able
+            # to handle ipv6 requests)
             filters.append(
-                Filter(column="data", field="requirements", operator="<@", value=json.dumps(self._task_capabilities))
+                Filter(
+                    column="data",
+                    field="requirements",
+                    operator="<@",
+                    value=json.dumps(settings.boefje_task_capabilities),
+                )
             )
 
         response = self._session.post(
