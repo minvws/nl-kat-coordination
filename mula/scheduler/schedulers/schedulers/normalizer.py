@@ -254,7 +254,7 @@ class NormalizerScheduler(Scheduler):
         )
 
         try:
-            self.push_item_to_queue_with_timeout(task, self.max_tries)
+            self.push_item_to_queue_with_timeout(item=task, max_tries=self.max_tries)
         except QueueFullError:
             self.logger.warning(
                 "Could not add task to queue, queue was full: %s",
@@ -279,7 +279,7 @@ class NormalizerScheduler(Scheduler):
             caller=caller,
         )
 
-    def push_item_to_queue(self, item: Task) -> Task:
+    def push_item_to_queue(self, item: Task, create_schedule: bool = True) -> Task:
         """Some normalizer scheduler specific logic before pushing the item to the
         queue."""
         normalizer_task = NormalizerTask.model_validate(item.data)
@@ -292,7 +292,7 @@ class NormalizerScheduler(Scheduler):
             item.id = new_id
             item.data = normalizer_task.model_dump()
 
-        return super().push_item_to_queue(item)
+        return super().push_item_to_queue(item=item, create_schedule=create_schedule)
 
     @tracer.start_as_current_span("normalizer_has_normalizer_permission_to_run")
     def has_normalizer_permission_to_run(self, normalizer: Plugin) -> bool:

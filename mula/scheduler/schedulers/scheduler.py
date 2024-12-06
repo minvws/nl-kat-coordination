@@ -167,7 +167,9 @@ class Scheduler(abc.ABC):
 
             count += 1
 
-    def push_item_to_queue_with_timeout(self, item: models.Task, max_tries: int = 5, timeout: int = 1) -> None:
+    def push_item_to_queue_with_timeout(
+        self, item: models.Task, max_tries: int = 5, timeout: int = 1, create_schedule: bool = True
+    ) -> None:
         """Push an item to the queue, with a timeout.
 
         Args:
@@ -192,9 +194,9 @@ class Scheduler(abc.ABC):
         if tries >= max_tries and max_tries != -1:
             raise QueueFullError()
 
-        self.push_item_to_queue(item)
+        self.push_item_to_queue(item, create_schedule=create_schedule)
 
-    def push_item_to_queue(self, item: models.Task) -> models.Task:
+    def push_item_to_queue(self, item: models.Task, create_schedule: bool = True) -> models.Task:
         """Push a Task to the queue.
 
         Args:
@@ -263,11 +265,11 @@ class Scheduler(abc.ABC):
             scheduler_id=self.scheduler_id,
         )
 
-        item = self.post_push(item)
+        item = self.post_push(item, create_schedule)
 
         return item
 
-    def post_push(self, item: models.Task) -> models.Task:
+    def post_push(self, item: models.Task, create_schedule: bool = True) -> models.Task:
         """After an in item is pushed to the queue, we execute this function
 
         Args:
@@ -278,6 +280,28 @@ class Scheduler(abc.ABC):
         if self.create_schedule is False:
             self.logger.debug(
                 "Not creating schedule for item %s",
+                item.id,
+                item_id=item.id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
+            return item
+
+        scheduler_create_schedule = self.create_schedule
+        if not scheduler_create_schedule:
+            self.logger.debug(
+                "Scheduler is not creating schedules, not creating schedule for item %s",
+                item.id,
+                item_id=item.id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
+            return item
+
+        item_create_schedule = create_schedule
+        if not item_create_schedule:
+            self.logger.debug(
+                "Item is not creating schedules, not creating schedule for item %s",
                 item.id,
                 item_id=item.id,
                 queue_id=self.queue.pq_id,
