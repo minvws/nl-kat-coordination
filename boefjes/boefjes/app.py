@@ -50,7 +50,7 @@ class SchedulerWorkerManager(WorkerManager):
         self.exited = False
 
     def run(self, queue_type: WorkerManager.Queue) -> None:
-        logger.info("Created worker pool for queue '%s'", queue_type.value)
+        logger.info("Created worker pool for queue '%s'", queue_type)
 
         self.workers = [
             ctx.Process(target=_start_working, args=self._worker_args()) for _ in range(self.settings.pool_size)
@@ -95,7 +95,7 @@ class SchedulerWorkerManager(WorkerManager):
 
         # We do not target a specific queue since we start one runtime for all organisations
         # and queue ids contain the organisation_id
-        queues = [q for q in queues if q.id.startswith(queue_type.value)]
+        queues = [q for q in queues if q.id.startswith(queue_type) and q.size > 0]
 
         logger.debug("Found queues: %s", [queue.id for queue in queues])
 
@@ -272,13 +272,9 @@ def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_leve
     plugin_service = PluginService(create_plugin_storage(session), create_config_storage(session), local_repository)
 
     item_handler: Handler
-    capabilities: list[str] | None = None
-    reachable_networks: list[str] | None = None
 
-    if queue is WorkerManager.Queue.BOEFJES:
+    if queue == "boefje":
         item_handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), plugin_service, bytes_api_client)
-        capabilities = settings.boefje_task_capabilities
-        reachable_networks = settings.boefje_reachable_networks
     else:
         item_handler = NormalizerHandler(
             LocalNormalizerJobRunner(local_repository), bytes_api_client, settings.scan_profile_whitelist
@@ -286,9 +282,7 @@ def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_leve
 
     return SchedulerWorkerManager(
         item_handler,
-        SchedulerAPIClient(
-            base_url=str(settings.scheduler_api), task_capabilities=capabilities, reachable_networks=reachable_networks
-        ),  # Do not share a session between workers
+        SchedulerAPIClient(base_url=str(settings.scheduler_api)),  # Do not share a session between workers
         settings,
         log_level,
     )

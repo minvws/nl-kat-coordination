@@ -7,6 +7,7 @@ from typing import Any
 from httpx import Client, HTTPTransport, Response
 from pydantic import BaseModel, TypeAdapter
 
+from boefjes.config import settings
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
 
 
@@ -69,12 +70,12 @@ class SchedulerClientInterface:
 
 
 class SchedulerAPIClient(SchedulerClientInterface):
-    def __init__(
-        self, base_url: str, task_capabilities: list[str] | None = None, reachable_networks: list[str] | None = None
-    ):
-        self._session = Client(base_url=base_url, transport=HTTPTransport(retries=6))
-        self._task_capabilities = task_capabilities
-        self._reachable_networks = reachable_networks
+    def __init__(self, base_url: str):
+        self._session = Client(
+            base_url=base_url, transport=HTTPTransport(retries=6), timeout=settings.outgoing_request_timeout
+        )
+        self._task_capabilities = settings.boefje_task_capabilities
+        self._reachable_networks = settings.boefje_reachable_networks
 
     @staticmethod
     def _verify_response(response: Response) -> None:

@@ -20,12 +20,18 @@ from boefjes.config import Settings, settings
 from boefjes.dependencies.plugins import PluginService, get_plugin_service
 from boefjes.job_handler import bytes_api_client
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
-from boefjes.katalogus.organisations import check_organisation_exists
 from boefjes.katalogus.root import app
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
-from boefjes.local_repository import LocalPluginRepository, get_local_repository
+from boefjes.local_repository import (
+    LocalPluginRepository,
+    _cached_resolve_boefjes,
+    _cached_resolve_normalizers,
+    get_boefje_resource,
+    get_local_repository,
+    get_normalizer_resource,
+)
 from boefjes.models import Organisation
-from boefjes.runtime_interfaces import Handler, WorkerManager
+from boefjes.runtime_interfaces import Handler
 from boefjes.sql.config_storage import SQLConfigStorage, create_encrypter
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage, get_organisations_store
@@ -75,13 +81,13 @@ class MockSchedulerClient(SchedulerClientInterface):
         time.sleep(self.sleep_time)
 
         try:
-            if WorkerManager.Queue.BOEFJES.value in queue:
+            if "boefje" in queue:
                 p_item = TypeAdapter(Task).validate_json(self.boefje_responses.pop(0))
                 self._popped_items[str(p_item.id)] = p_item
                 self._tasks[str(p_item.id)] = self._task_from_id(p_item.id)
                 return p_item
 
-            if WorkerManager.Queue.NORMALIZERS.value in queue:
+            if "normalizer" in queue:
                 p_item = TypeAdapter(Task).validate_json(self.normalizer_responses.pop(0))
                 self._popped_items[str(p_item.id)] = p_item
                 self._tasks[str(p_item.id)] = self._task_from_id(p_item.id)
@@ -127,6 +133,14 @@ class MockHandler(Handler):
 
     def get_all(self) -> list[BoefjeMeta | NormalizerMeta]:
         return [self.queue.get() for _ in range(self.queue.qsize())]
+
+
+@pytest.fixture(autouse=True)
+def clear_caches():
+    get_boefje_resource.cache_clear()
+    get_normalizer_resource.cache_clear()
+    _cached_resolve_boefjes.cache_clear()
+    _cached_resolve_normalizers.cache_clear()
 
 
 @pytest.fixture
@@ -255,7 +269,6 @@ def unit_test_client(mock_plugin_service) -> TestClient:
 
     app.dependency_overrides[get_organisations_store] = lambda: _store
     app.dependency_overrides[get_plugin_service] = get_service
-    app.dependency_overrides[check_organisation_exists] = lambda: None
 
     yield client
 

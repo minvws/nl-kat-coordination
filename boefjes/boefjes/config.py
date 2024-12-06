@@ -120,19 +120,21 @@ class Settings(BaseSettings):
         None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
     )
 
-    boefje_reachable_networks: list[str] = Field(
-        ["Network|internet"],
+    boefje_reachable_networks: list[str] | None = Field(
+        None,
         description="List of networks the boefje-runner can reach",
         examples=[["Network|internet", "Network|dentist"], []],
     )
 
-    boefje_task_capabilities: list[str] = Field(
-        ["ipv6", "ipv4"],
+    boefje_task_capabilities: list[str] | None = Field(
+        None,
         description="List of technical requirements the boefje-runner is capable of running",
         examples=[[], ["ipv4", "wifi-pineapple"]],
     )
 
     logging_format: Literal["text", "json"] = Field("text", description="Logging format")
+
+    outgoing_request_timeout: int = Field(30, description="Timeout for outgoing HTTP requests")
 
     model_config = SettingsConfigDict(env_prefix="BOEFJES_")
 
@@ -151,4 +153,6 @@ class Settings(BaseSettings):
 
 # Do not initialize the settings module when compiling environment docs
 if not os.getenv("DOCS"):
+    if os.getenv("RUNNER_TYPE", "") != "boefje":
+        os.environ[""]
     settings = Settings()

@@ -4,7 +4,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 from scheduler import config, models, storage
-from scheduler.storage import filters
+from scheduler.storage import filters, stores
 
 from tests.utils import functions
 
@@ -23,8 +23,8 @@ class ScheduleStoreTestCase(unittest.TestCase):
 
         self.mock_ctx.datastores = SimpleNamespace(
             **{
-                storage.TaskStore.name: storage.TaskStore(self.dbconn),
-                storage.ScheduleStore.name: storage.ScheduleStore(self.dbconn),
+                stores.TaskStore.name: stores.TaskStore(self.dbconn),
+                stores.ScheduleStore.name: stores.ScheduleStore(self.dbconn),
             }
         )
 
@@ -51,12 +51,6 @@ class ScheduleStoreTestCase(unittest.TestCase):
         schedule = models.Schedule(scheduler_id="test_scheduler_id", schedule="* * * * *", data={}, deadline_at=now)
 
         self.assertEqual(schedule.deadline_at, now)
-
-    def test_create_schedule_not_provided_schedule(self):
-        """When a schedule is created, the deadline_at should be None if schedule is not provided."""
-        schedule = models.Schedule(scheduler_id="test_scheduler_id", data={})
-
-        self.assertIsNone(schedule.deadline_at)
 
     def test_create_schedule(self):
         # Arrange

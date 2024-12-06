@@ -18,7 +18,7 @@ logger = structlog.get_logger("bytes_client")
 class BytesClient:
     def __init__(self, base_url: str, username: str, password: str, organization: str | None):
         self.credentials = {"username": username, "password": password}
-        self.session = httpx.Client(base_url=base_url)
+        self.session = httpx.Client(base_url=base_url, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT)
         self.organization = organization
 
     def health(self) -> ServiceHealth:

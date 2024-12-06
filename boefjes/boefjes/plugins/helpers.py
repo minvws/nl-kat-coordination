@@ -54,18 +54,22 @@ def get_file_from_container(container: docker.models.containers.Container, path:
         logging.warning("%s not found in container %s %s", path, container.short_id, container.image.tags)
         return None
 
-    f = tarfile.open(mode="r|", fileobj=TarStream(stream).reader())
-    tarobject = f.next()
-    if not tarobject or tarobject.name != os.path.basename(path):
-        logging.warning("%s not found in tarfile from container %s %s", path, container.short_id, container.image.tags)
-        return None
+    with tarfile.open(mode="r|", fileobj=TarStream(stream).reader()) as f:
+        tarobject = f.next()
+        if not tarobject or tarobject.name != os.path.basename(path):
+            logging.warning(
+                "%s not found in tarfile from container %s %s", path, container.short_id, container.image.tags
+            )
+            return None
 
-    extracted_file = f.extractfile(tarobject)
-    if not extracted_file:
-        logging.warning("%s not found in tarfile from container %s %s", path, container.short_id, container.image.tags)
-        return None
+        extracted_file = f.extractfile(tarobject)
+        if not extracted_file:
+            logging.warning(
+                "%s not found in tarfile from container %s %s", path, container.short_id, container.image.tags
+            )
+            return None
 
-    return extracted_file.read()
+        return extracted_file.read()
 
 
 def cpe_to_name_version(cpe: str) -> tuple[str | None, str | None]:
