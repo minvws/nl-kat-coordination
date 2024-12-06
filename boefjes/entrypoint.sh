@@ -5,9 +5,9 @@ set -e
 shopt -s nocasematch
 
 if [ "$1" = "boefje" ]; then
-    exec env RUNNER_TYPE="$1" python -m boefjes boefje
+    exec env BOEFJES_RUNNER_TYPE="$1" python -m boefjes boefje
 elif [ "$1" = "normalizer" ]; then
-    exec env RUNNER_TYPE="$1" python -m boefjes normalizer
+    exec env BOEFJES_RUNNER_TYPE="$1" python -m boefjes normalizer
 fi
 
 # The migrations and seed are for the KATalogus. They are not inside the if because this way
@@ -17,7 +17,7 @@ if [ "$DATABASE_MIGRATION" = "1" ] || [[ $DATABASE_MIGRATION == "true" ]]; then
 fi
 
 if [ "$1" = "katalogus" ]; then
-    exec python -m uvicorn --host 0.0.0.0 boefjes.katalogus.root:app
+    exec env BOEFJES_RUNNER_TYPE="$1" python -m uvicorn --host 0.0.0.0 boefjes.katalogus.root:app
 fi
 
 exec "$@"

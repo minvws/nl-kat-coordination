@@ -74,8 +74,12 @@ class SchedulerAPIClient(SchedulerClientInterface):
         self._session = Client(
             base_url=base_url, transport=HTTPTransport(retries=6), timeout=settings.outgoing_request_timeout
         )
-        self._task_capabilities = settings.boefje_task_capabilities
-        self._reachable_networks = settings.boefje_reachable_networks
+        if settings.runner_type == "boefje":
+            self._task_capabilities = settings.boefje_task_capabilities
+            self._reachable_networks = settings.boefje_reachable_networks
+        else:
+            self._task_capabilities = None
+            self._reachable_networks = None
 
     @staticmethod
     def _verify_response(response: Response) -> None:

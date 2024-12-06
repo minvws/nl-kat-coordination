@@ -8,6 +8,7 @@ from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, Settings
 from pydantic_settings.sources import EnvSettingsSource
 
 from boefjes.models import EncryptionMiddleware
+from boefjes.runtime_interfaces import WorkerManager
 
 BASE_DIR: Path = Path(__file__).parent.resolve()
 
@@ -132,6 +133,8 @@ class Settings(BaseSettings):
         examples=[[], ["ipv4", "wifi-pineapple"]],
     )
 
+    runner_type: WorkerManager.Queue | None = Field(None, examples=["boefje", "normalizer"])
+
     logging_format: Literal["text", "json"] = Field("text", description="Logging format")
 
     outgoing_request_timeout: int = Field(30, description="Timeout for outgoing HTTP requests")
@@ -153,6 +156,4 @@ class Settings(BaseSettings):
 
 # Do not initialize the settings module when compiling environment docs
 if not os.getenv("DOCS"):
-    if os.getenv("RUNNER_TYPE", "") != "boefje":
-        os.environ[""]
     settings = Settings()
