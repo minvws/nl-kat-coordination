@@ -42,7 +42,7 @@ def upgrade() -> None:
     # ### end Alembic commands ###
 
 
-def upgrade_encrypted_settings(conn: Connection):
+def upgrade_encrypted_settings(conn: Connection) -> None:
     encrypter = create_encrypter()
 
     with conn.begin():
@@ -90,7 +90,7 @@ def downgrade() -> None:
     # ### end Alembic commands ###
 
 
-def downgrade_encrypted_settings(conn: Connection):
+def downgrade_encrypted_settings(conn: Connection) -> None:
     encrypter = create_encrypter()
 
     with conn.begin():

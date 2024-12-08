@@ -1,6 +1,7 @@
 import socket
 import time
 from collections.abc import Callable
+from typing import Any
 
 import httpx
 import structlog
@@ -47,7 +48,7 @@ class Connector:
             self.logger.warning("Exception: %s", exc)
             return False
 
-    def retry(self, func: Callable, *args, **kwargs) -> bool:
+    def retry(self, func: Callable, *args: Any, **kwargs: Any) -> bool:
         """Retry a function until it returns True.
 
         Args:

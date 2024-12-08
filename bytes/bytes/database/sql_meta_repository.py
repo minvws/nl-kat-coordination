@@ -229,7 +229,7 @@ def create_meta_data_repository() -> Iterator[MetaDataRepository]:
 
 
 class ObjectNotFoundException(Exception):
-    def __init__(self, cls: type[SQL_BASE], **kwargs):
+    def __init__(self, cls: type[SQL_BASE], **kwargs: str):
         super().__init__(f"The object of type {cls} was not found for query parameters {kwargs}")
 
 

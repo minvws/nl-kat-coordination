@@ -59,7 +59,7 @@ class SQLOrganisationStorage(SessionMixin, OrganisationStorage):
         return Organisation(id=organisation_in_db.id, name=organisation_in_db.name)
 
 
-def create_organisation_storage(session) -> SQLOrganisationStorage:
+def create_organisation_storage(session: Session) -> SQLOrganisationStorage:
     return SQLOrganisationStorage(session, settings)
 
 

@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 import structlog
 from django.core.management import BaseCommand, CommandParser
@@ -17,7 +18,7 @@ class Command(BaseCommand):
         parser.add_argument("from_id", action="store", type=int, help="Migration id to start from")
         parser.add_argument("--output-folder", action="store", default="export_migrations", help="Output folder")
 
-    def handle(self, **options) -> None:
+    def handle(self, **options: Any) -> None:
         # Get the database we're operating from
         connection = connections[DEFAULT_DB_ALIAS]
 

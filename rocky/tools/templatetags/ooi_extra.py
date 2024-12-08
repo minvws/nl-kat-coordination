@@ -12,7 +12,7 @@ register = template.Library()
 
 
 @register.filter
-def get_encoded_dict(data_dict: dict):
+def get_encoded_dict(data_dict: dict) -> str:
     return parse.urlencode(data_dict)
 
 
@@ -37,27 +37,27 @@ def get_scan_levels() -> list[str]:
 
 
 @register.filter
-def ooi_types_to_strings(ooi_types: set[type[OOI]]):
+def ooi_types_to_strings(ooi_types: set[type[OOI]]) -> list["str"]:
     return [ooi_type.get_ooi_type() for ooi_type in ooi_types]
 
 
 @register.filter()
-def get_type(x: Any):
+def get_type(x: Any) -> Any:
     return type(x)
 
 
 @register.simple_tag()
-def ooi_url(routename: str, ooi_id: str, organization_code: str, **kwargs) -> str:
+def ooi_url(routename: str, ooi_id: str, organization_code: str, **kwargs: str) -> str:
     return get_ooi_url(routename, ooi_id, organization_code, **kwargs)
 
 
 @register.filter()
-def is_finding(ooi: OOI):
+def is_finding(ooi: OOI) -> bool:
     return isinstance(ooi, Finding)
 
 
 @register.filter()
-def is_finding_type(ooi: OOI):
+def is_finding_type(ooi: OOI) -> bool:
     return isinstance(ooi, FindingType)
 
 
@@ -79,7 +79,7 @@ def index(indexable, i):
 
 
 @register.filter
-def pretty_json(obj: dict):
+def pretty_json(obj: dict) -> str:
     return json.dumps(obj, default=str, indent=4)
 
 

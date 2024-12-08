@@ -1,3 +1,5 @@
+from typing import Any
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from jsonschema.validators import Draft202012Validator
@@ -11,7 +13,7 @@ class PluginSchemaForm(forms.Form):
 
     error_messages = {"required": _("This field is required.")}
 
-    def __init__(self, plugin_schema: dict, values: dict, *args, **kwargs):
+    def __init__(self, plugin_schema: dict, values: dict, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.plugin_schema = plugin_schema
         self.values = values

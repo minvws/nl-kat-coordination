@@ -4,7 +4,7 @@ from typing import Any
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
-from octopoes.models.types import HTTPHeader
+from octopoes.models.ooi.web import HTTPHeader
 
 
 def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, Any]) -> Iterator[OOI]:

@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
+from tools.view_helpers import Breadcrumb
 
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport
 from reports.views.base import (
@@ -21,7 +22,7 @@ from reports.views.view_helpers import MultiReportStepsMixin
 
 
 class BreadcrumbsMultiReportView(ReportBreadcrumbs):
-    def build_breadcrumbs(self):
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
