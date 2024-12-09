@@ -673,8 +673,7 @@ class OctopoesService:
             self._run_inference(origin, valid_time)
             bit_counter.update({origin.method})
 
-
-        self.nibbler.reinfer(datetime)
+        self.nibbler.reinfer(valid_time)
 
         return sum(bit_counter.values())
 
