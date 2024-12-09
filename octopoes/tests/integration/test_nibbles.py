@@ -44,7 +44,7 @@ def test_dummy_nibble(xtdb_octopoes_service: OctopoesService, event_manager: Moc
 
     ctx = 1 + MAX_NETWORK_NAME_LENGTH - len(network.name)
     assert xtdb_octopoes_service.ooi_repository.list_oois({Network}, valid_time).count == ctx
-    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 4 * ctx
+    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == ctx
 
 
 def url_classification(url: URL) -> Iterator[OOI]:

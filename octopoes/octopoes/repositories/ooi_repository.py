@@ -874,15 +874,16 @@ class XTDBOOIRepository(OOIRepository):
 
             return re.sub(r"\$(\d+)", sub, a)
 
-        def objectify(t: type[Any], obj: dict | list):
+        def objectify(t: type[Any], obj: dict | list | Any):
             if isinstance(obj, dict):
                 if issubclass(t, OOI):
                     return self.deserialize(obj)
                 else:
                     return t(**obj)
+            elif isinstance(obj, list):
+                return tuple({objectify(t, o) for o in obj})
             else:
-                # FIXME: this does not allow lists of OOI's (yet)
-                return tuple({t(o) for o in obj})
+                return t(obj)
 
         if nibble.query is None:
             return [{ooi}]

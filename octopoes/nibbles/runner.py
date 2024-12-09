@@ -151,3 +151,8 @@ class NibblesRunner:
                 inferences |= {ooi: results}
         self._write(valid_time)
         return inferences
+
+    def reinfer(self, valid_time: datetime) -> dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]]:
+        nibblets = self.origin_repository.list_origins(valid_time, origin_type=OriginType.NIBBLET)
+        refs = set(map(lambda nibblet: nibblet.source, nibblets))
+        return self.infer(self.ooi_repository.load_bulk_as_list(refs, valid_time), valid_time)
