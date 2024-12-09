@@ -1,31 +1,41 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from tools.models import Organization
 
 
-class DashboardData(models.Model):
-    recipe = models.CharField(
-        blank=True,
-        max_length=126,
-        unique=True,
-        help_text=_(
-            "The recipe will be automatically created once you create a dashboard for an organization. "
-            "This is the recipe id."
-        ),
-    )
-    chapter = models.CharField(blank=True, max_length=126)
-    sort = models.CharField(blank=True, max_length=126)
-
-    def get_readonly_fields(self, request, obj=None):
-        return ["recipe"]
-
-
 class Dashboard(models.Model):
-    name = models.CharField(blank=False, max_length=126, unique=True)
+    name = models.CharField(blank=False, max_length=126)
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
-    data = models.ForeignKey(DashboardData, on_delete=models.SET_NULL, null=True)
+
+    class Meta:
+        unique_together = ["name", "organization"]
 
     def __str__(self) -> str:
         if self.name:
             return self.name
+        return super().__str__()
+
+
+class DashboardData(models.Model):
+    dashboard = models.ForeignKey(Dashboard, on_delete=models.SET_NULL, null=True)
+    recipe = models.CharField(blank=False, max_length=126)
+    template = models.CharField(blank=True, max_length=126, default="findings_report/report.html")
+    position = models.IntegerField(
+        blank=True,
+        max_length=126,
+        default=1,
+        validators=[MinValueValidator(1), MaxValueValidator(16)],
+        help_text=_(
+            "Where on the dashboard do you want to show the data? "
+            "Position 1 is the most top level and the max position is 16."
+        ),
+    )
+
+    class Meta:
+        unique_together = ["dashboard", "position"]
+
+    def __str__(self) -> str:
+        if self.dashboard:
+            return self.dashboard.name
         return super().__str__()

@@ -212,26 +212,27 @@ class AggregateOrganisationReport(AggregateReport):
         ]
 
         # Findings
-        for finding_type in findings["finding_types"].values():
-            # Remove duplicate occurrences
-            severity = finding_type["finding_type"].risk_severity.value
-            unique_occurrences = []
-            seen_keys = set()
+        if "finding_types" in findings:
+            for finding_type in findings["finding_types"].values():
+                # Remove duplicate occurrences
+                severity = finding_type["finding_type"].risk_severity.value
+                unique_occurrences = []
+                seen_keys = set()
 
-            for occurrence in finding_type["occurrences"]:
-                occurrence_ooi = occurrence["finding"].ooi
+                for occurrence in finding_type["occurrences"]:
+                    occurrence_ooi = occurrence["finding"].ooi
 
-                if occurrence_ooi not in seen_keys:
-                    seen_keys.add(occurrence_ooi)
-                    unique_occurrences.append(occurrence)
-                    findings["summary"]["total_by_severity"][severity] += 1
+                    if occurrence_ooi not in seen_keys:
+                        seen_keys.add(occurrence_ooi)
+                        unique_occurrences.append(occurrence)
+                        findings["summary"]["total_by_severity"][severity] += 1
 
-            finding_type["occurrences"] = unique_occurrences
-            findings["summary"]["total_occurrences"] += len(unique_occurrences)
+                finding_type["occurrences"] = unique_occurrences
+                findings["summary"]["total_occurrences"] += len(unique_occurrences)
 
-        findings["finding_types"] = sorted(
-            findings["finding_types"].values(), key=lambda x: x["finding_type"].risk_score or 0, reverse=True
-        )
+            findings["finding_types"] = sorted(
+                findings["finding_types"].values(), key=lambda x: x["finding_type"].risk_score or 0, reverse=True
+            )
 
         # Summary
         basic_security["summary"] = {}

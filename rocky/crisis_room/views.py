@@ -1,28 +1,23 @@
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from typing import Any
 
 import structlog
 from account.models import KATUser
 from django.conf import settings
 from django.contrib import messages
+from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-from pydantic import TypeAdapter
-from reports.report_types.findings_report.report import SEVERITY_OPTIONS
 from tools.forms.base import ObservedAtForm
 from tools.models import Organization, OrganizationMember
 from tools.view_helpers import BreadcrumbsMixin
 
-from crisis_room.models import Dashboard
+from crisis_room.models import DashboardData
 from octopoes.connector import ConnectorException
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import Reference
 from octopoes.models.ooi.findings import RiskLevelSeverity
-from octopoes.models.ooi.reports import ReportRecipe
-from rocky.bytes_client import get_bytes_client
 from rocky.views.mixins import ObservedAtMixin
 from rocky.views.ooi_view import ConnectorFormMixin
 
@@ -109,79 +104,20 @@ class CrisisRoomView(BreadcrumbsMixin, ConnectorFormMixin, ObservedAtMixin, Temp
 
 class CrisisRoomAllOrganizations(TemplateView):
     template_name = "crisis_room/crisis_room.html"
-    chapter = "findings"
 
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
         super().setup(request, *args, **kwargs)
-        self.dashboards = self.get_dashboards()
+        self.dashboards_data = self.get_dashboards_data()
 
     def get_user_organizations(self) -> list[Organization]:
         return [member.organization for member in OrganizationMember.objects.filter(user=self.request.user)]
 
-    @staticmethod
-    def get_octopoes_client(organization: Organization) -> OctopoesAPIConnector:
-        return OctopoesAPIConnector(
-            settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
-        )
-
-    @staticmethod
-    def get_bytes_client(organization: Organization) -> OctopoesAPIConnector:
-        return OctopoesAPIConnector(
-            settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
-        )
-
-    def get_report_data(self, recipe: ReportRecipe, organization: Organization) -> dict[str, Any]:
-        valid_time = datetime.now(timezone.utc)
-        octopoes_client = self.get_octopoes_client(organization)
-
-        reports = octopoes_client.query(
-            "ReportRecipe.<report_recipe[is Report]", valid_time=valid_time, source=Reference.from_str(recipe)
-        )
-        if reports:
-            reports.sort(key=lambda ooi: ooi.date_generated, reverse=True)
-            report = reports[0]
-
-            bytes_client = get_bytes_client(organization.code)
-            bytes_client.login()
-
-            return TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
-                bytes_client.get_raw(raw_id=report.data_raw_id)
-            )
-        return {}
-
-    def get_dashboards(self) -> dict[Organization, dict[str, Any]]:
-        dashboards_data = {}
-
+    def get_dashboards_data(self) -> QuerySet[DashboardData]:
         organizations = self.get_user_organizations()
-        dashboards = Dashboard.objects.filter(organization__in=[org.pk for org in organizations])
-
-        for dashboard in dashboards:
-            if dashboard.organization:
-                dashboards_data[dashboard] = self.get_report_data(dashboard.data.recipe, dashboard.organization)
-
+        dashboards_data = DashboardData.objects.filter(dashboard__organization__in=[org.pk for org in organizations])
         return dashboards_data
-
-    def get_summary(self):
-        summary: dict[str, Any] = {
-            "total_by_severity": {severity: 0 for severity in SEVERITY_OPTIONS},
-            "total_by_severity_per_finding_type": {severity: 0 for severity in SEVERITY_OPTIONS},
-            "total_finding_types": 0,
-            "total_occurrences": 0,
-        }
-
-        for report_data in self.dashboards.values():
-            for severity in SEVERITY_OPTIONS:
-                summary["total_by_severity"][severity] += report_data["summary"]["total_by_severity"][severity]
-                summary["total_by_severity_per_finding_type"][severity] += report_data["summary"][
-                    "total_by_severity_per_finding_type"
-                ][severity]
-
-            summary["total_finding_types"] += report_data["summary"]["total_finding_types"]
-            summary["total_occurrences"] += report_data["summary"]["total_occurrences"]
-        return summary
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["dashboards"] = self.dashboards
-        context["summary"] = self.get_summary()
+        context["dashboards_data"] = self.dashboards_data
         return context
