@@ -105,3 +105,9 @@ def ooi_type(reference_string: str) -> str:
 @register.filter
 def get_date(date_str: str) -> datetime:
     return datetime.fromisoformat(date_str)
+
+
+@register.filter
+def get_first_seen(occurrences: dict) -> datetime:
+    first_seen_list = [datetime.fromisoformat(occurrence["first_seen"]) for occurrence in occurrences]
+    return min(first_seen_list)

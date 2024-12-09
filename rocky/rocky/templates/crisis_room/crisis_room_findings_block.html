@@ -30,8 +30,8 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {% if findings and indings.summary.total_by_severity_per_finding_type.critical > 0 %}
-                                        {{ findings.summary.total_by_severity_per_finding_type.critical }}
+                                    {% if findings %}
+                                        {{ findings.summary.total_occurrences }}
                                     {% else %}
                                         -
                                     {% endif %}
@@ -65,7 +65,7 @@
                                 <tr class="expando-row">
                                     <td colspan="5">
                                         {% include "partials/report_severity_totals_table.html" with data=findings.summary %}
-                                        {% include "partials/report_findings_table.html" with finding_types=findings.finding_types is_dashboard=is_dashboard %}
+                                        {% include "partials/report_findings_table.html" with finding_types=findings.finding_types is_dashboard="yes" %}
 
                                     </td>
                                 </tr>

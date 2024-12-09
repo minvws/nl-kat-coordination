@@ -11,9 +11,10 @@
         <caption class="visually-hidden">{% translate "Other findings found" %}</caption>
         <thead>
             <tr>
-                <th scope="col">{% translate "Finding types" %}</th>
                 <th scope="col">{% translate "Risk level" %}</th>
+                <th scope="col">{% translate "Finding types" %}</th>
                 <th scope="col">{% translate "Occurrences" %}</th>
+                <th scope="col">{% translate "First known occurrence" %}</th>
                 {% if not is_dashboard %}
                     <th scope="col" class="visually-hidden actions">{% translate "Details" %}</th>
                 {% endif %}
@@ -22,11 +23,12 @@
         <tbody>
             {% for info in finding_types %}
                 <tr>
-                    <td>{{ info.finding_type.id }}</td>
                     <td>
                         <span class="{{ info.finding_type.risk_severity }}">{{ info.finding_type.risk_severity|capfirst }}</span>
                     </td>
+                    <td>{{ info.finding_type.id }}</td>
                     <td>{{ info.occurrences|length }}</td>
+                    <td>{{ info.occurrences|get_first_seen }}</td>
                     {% if not is_dashboard %}
                         <td class="actions sticky-cell">
                             <button class="expando-button"
