@@ -1,5 +1,5 @@
 from bits.port_classification_ip.port_classification_ip import run as run_port_classification
-from bits.port_common.port_common import run as run_port_common
+from nibbles.port_common.port_common import nibble as run_port_common
 
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import IPAddressV4, IPPort
@@ -78,7 +78,7 @@ def test_port_classification_udp_80():
 
 def test_port_common_tcp_80():
     port = IPPort(address="fake", protocol="tcp", port=80)
-    results = list(run_port_common(port, [], {}))
+    results = list(run_port_common(port))
 
     assert len(results) == 2
     finding = results[-1]
@@ -88,21 +88,21 @@ def test_port_common_tcp_80():
 
 def test_port_common_tcp_22():
     port = IPPort(address="fake", protocol="tcp", port=22)
-    results = list(run_port_common(port, [], {}))
+    results = list(run_port_common(port))
 
     assert not results
 
 
 def test_port_common_udp_80():
     port = IPPort(address="fake", protocol="udp", port=80)
-    results = list(run_port_common(port, [], {}))
+    results = list(run_port_common(port))
 
     assert not results
 
 
 def test_port_common_udp_53():
     port = IPPort(address="fake", protocol="udp", port=53)
-    results = list(run_port_common(port, [], {}))
+    results = list(run_port_common(port))
 
     assert len(results) == 2
     finding = results[-1]
