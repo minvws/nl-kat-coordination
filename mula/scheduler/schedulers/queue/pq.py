@@ -204,7 +204,17 @@ class PriorityQueue(abc.ABC):
             task.status = models.TaskStatus.QUEUED
             item_db = self.pq_store.push(task)
         else:
-            self.pq_store.update(self.pq_id, task)
+            # Get the item from the queue and update it
+            stored_item_data = self.get_item_by_identifier(task)
+            if stored_item_data is None:
+                raise ItemNotFoundError(f"Item {task} not found in datastore {self.pq_id}")
+
+            # Update the item with the new data
+            patch_data = task.dict(exclude_unset=True)
+            updated_task = stored_item_data.model_copy(update=patch_data)
+
+            # Update the item in the queue
+            self.pq_store.update(self.pq_id, updated_task)
             item_db = self.get_item_by_identifier(task)
 
         if not item_db:

@@ -36,6 +36,7 @@ class Task(BaseModel):
     id: uuid.UUID | None = None
     scheduler_id: str | None = None
     schedule_id: uuid.UUID | None = None
+    organisation: str | None = None
     priority: int | None = None
     status: TaskStatus | None = None
     type: str | None = None

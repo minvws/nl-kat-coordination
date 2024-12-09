@@ -6,8 +6,9 @@ import structlog
 from fastapi import status
 
 from scheduler import context, models, schedulers, storage
+from scheduler.schedulers.queue import NotAllowedError, QueueFullError
 from scheduler.server import serializers, utils
-from scheduler.server.errors import BadRequestError, NotFoundError
+from scheduler.server.errors import BadRequestError, ConflictError, NotFoundError, TooManyRequestsError
 
 
 class SchedulerAPI:
@@ -67,7 +68,7 @@ class SchedulerAPI:
         self,
         request: fastapi.Request,
         offset: int = 0,
-        limit: int = 1,
+        limit: int = 100,
         filters: storage.filters.FilterRequest | None = None,
     ) -> utils.PaginatedResponse:
         results, count = self.ctx.datastores.pq_store.pop(offset=offset, limit=limit, filters=filters)
@@ -99,9 +100,9 @@ class SchedulerAPI:
             pushed_item = s.push_item_to_queue(new_item)
         except ValueError:
             raise BadRequestError("malformed item")
-        except queues.QueueFullError:
+        except QueueFullError:
             raise TooManyRequestsError("queue is full")
-        except queues.errors.NotAllowedError:
+        except NotAllowedError:
             raise ConflictError("queue is not allowed to push items")
 
         return pushed_item

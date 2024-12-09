@@ -681,13 +681,11 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             modified_at=datetime.now(timezone.utc),
         )
 
-        item = functions.create_item(scheduler_id=self.organisation.id, priority=1, task=task)
-
         # Mocks
         self.mock_get_plugin.return_value = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Act
-        self.scheduler.push_item_to_queue(item)
+        self.scheduler.push_item_to_queue(task)
 
         # Assert: task should be on priority queue
         task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
@@ -696,16 +694,16 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(boefje_task.boefje.id, task_pq.boefje.id)
 
         # Assert: task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
-        self.assertEqual(task_db.id, item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(task.id)
+        self.assertEqual(task_db.id, task.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
         # Act
         self.scheduler.pop_item_from_queue()
 
         # Assert: task should be in datastore, and dispatched
-        task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
-        self.assertEqual(task_db.id, item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(task.id)
+        self.assertEqual(task_db.id, task.id)
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
 
         # Mocks
@@ -721,8 +719,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.scheduler.validate_and_push_task(boefje_task, self.organisation.id)
 
         # Assert: task should be in datastore, and failed
-        task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
-        self.assertEqual(task_db.id, item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(task.id)
+        self.assertEqual(task_db.id, task.id)
         self.assertEqual(task_db.status, models.TaskStatus.FAILED)
 
         # Assert: new task should be queued
@@ -751,12 +749,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             modified_at=datetime.now(timezone.utc),
         )
 
-        item = functions.create_item(scheduler_id=self.organisation.id, priority=1, task=task)
-
         self.mock_get_plugin.return_value = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Act
-        self.scheduler.push_item_to_queue(item)
+        self.scheduler.push_item_to_queue(task)
 
         # Task should be on priority queue
         task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
@@ -765,8 +761,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(boefje_task.boefje.id, task_pq.boefje.id)
 
         # Task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
-        self.assertEqual(task_db.id, item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(task.id)
+        self.assertEqual(task_db.id, task.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
         # Schedule should be in datastore
@@ -801,12 +797,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             modified_at=datetime.now(timezone.utc),
         )
 
-        item = functions.create_item(scheduler_id=self.organisation.id, priority=1, task=task)
-
         self.mock_get_plugin.return_value = PluginFactory(scan_level=0, consumes=[ooi.object_type], cron=cron)
 
         # Act
-        self.scheduler.push_item_to_queue(item)
+        self.scheduler.push_item_to_queue(task)
 
         # Task should be on priority queue
         task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
@@ -815,8 +809,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(boefje_task.boefje.id, task_pq.boefje.id)
 
         # Task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
-        self.assertEqual(task_db.id, item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(task.id)
+        self.assertEqual(task_db.id, task.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
         # Schedule should be in datastore
@@ -857,12 +851,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             modified_at=datetime.now(timezone.utc),
         )
 
-        item = functions.create_item(scheduler_id=self.organisation.id, priority=1, task=task)
-
         self.mock_get_plugin.return_value = PluginFactory(scan_level=0, consumes=[ooi.object_type], interval=1500)
 
         # Act
-        self.scheduler.push_item_to_queue(item)
+        self.scheduler.push_item_to_queue(task)
 
         # Task should be on priority queue
         task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
@@ -871,8 +863,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(boefje_task.boefje.id, task_pq.boefje.id)
 
         # Task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
-        self.assertEqual(task_db.id, item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(task.id)
+        self.assertEqual(task_db.id, task.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
         # Schedule should be in datastore
@@ -910,13 +902,11 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             modified_at=datetime.now(timezone.utc),
         )
 
-        item = functions.create_item(scheduler_id=self.organisation.id, priority=1, task=task)
-
         # Mocks
         self.mock_get_plugin.return_value = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Act
-        self.scheduler.push_item_to_queue(item)
+        self.scheduler.push_item_to_queue(task)
 
         # Assert: task should be on priority queue
         task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
@@ -925,16 +915,16 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(boefje_task.boefje.id, task_pq.boefje.id)
 
         # Assert: task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
-        self.assertEqual(task_db.id, item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(task.id)
+        self.assertEqual(task_db.id, task.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
         # Act
         self.scheduler.pop_item_from_queue()
 
         # Assert: task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
-        self.assertEqual(task_db.id, item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(task.id)
+        self.assertEqual(task_db.id, task.id)
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
 
     def test_has_boefje_permission_to_run(self):
