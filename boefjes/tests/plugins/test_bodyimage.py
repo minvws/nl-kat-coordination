@@ -21,7 +21,7 @@ def test_website_analysis(boefje_runner, mocker):
 
     output = boefje_runner.run(meta, {})
 
-    assert "openkat-http/response" in output[0][0]
+    assert "application/json+har" in output[0][0]
     assert "openkat-http/headers" in output[1][0]
     assert "openkat-http/body" in output[2][0]
 
