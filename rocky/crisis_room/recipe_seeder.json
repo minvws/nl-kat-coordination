@@ -1,0 +1,31 @@
+{
+  "report_name_format": "Crisis Room Aggregate Report",
+  "subreport_name_format": "Findings Report for ${ooi}",
+  "input_recipe": {
+    "query": {
+      "ooi_types": [
+        "IPAddressV6",
+        "Hostname",
+        "IPAddressV4"
+      ],
+      "scan_level": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "scan_type": [
+        "declared"
+      ],
+      "search_string": "",
+      "order_by": "object_type",
+      "asc_desc": "desc"
+    }
+  },
+  "parent_report_type": "aggregate-organisation-report",
+  "report_types": [
+    "systems-report",
+    "findings-report"
+  ],
+  "cron_expression": "0 * * * *"
+}

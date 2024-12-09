@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load static %}
+{% load report_data %}
 
 {% block content %}
     {% include "header.html" %}
@@ -15,13 +16,27 @@
                 </p>
             </div>
         </section>
+        {% with findings_summary=dashboards_data|get_findings_summary %}
+            <section>
+                <div>
+                    {% if findings_summary %}
+                        <div>
+                            {% include "partials/report_severity_totals_table.html" with data=findings_summary is_dashboard="yes" %}
+
+                        </div>
+                    {% else %}
+                        <p>{% translate "No findings have been identified yet." %}</p>
+                    {% endif %}
+                </div>
+            </section>
+        {% endwith %}
         <section>
             <div>
-                {% for dashboard, data in dashboards.items %}
-                    <p>{{ dashboard.organization }}</p>
-                    <p>{{ dashboard.name }}</p>
-                    {% include dashboard.data.chapter %}
+                {% for dashboard_data in dashboards_data %}
+                    {% with report_data=dashboard_data|get_report_data %}
+                        {% include dashboard_data.template with data=report_data.findings organization=dashboard_data.dashboard.organization %}
 
+                    {% endwith %}
                 {% endfor %}
             </div>
         </section>

@@ -300,9 +300,9 @@ class SchedulerClient:
             raise SchedulerConnectError()
 
     def is_scheduler_ready(self, scheduler_id: str) -> bool:
-        """Max trails is 1 minute, 10 x 6 seconds"""
+        """Max trails is 1 minute, 10 x 10 seconds"""
         trials = 0
-        interval = 6  # in seconds
+        interval = 10  # in seconds
         while trials < 10:
             try:
                 res = self._client.get(f"/schedulers/{scheduler_id}")
