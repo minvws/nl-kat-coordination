@@ -56,7 +56,7 @@ class Plugin(BaseModel):
     #  make sense out of it: for which organization is this plugin in fact enabled?
     enabled: bool
 
-    def can_scan(self, member) -> bool:
+    def can_scan(self, member: OrganizationMember) -> bool:
         return member.has_perm("tools.can_scan_organization")
 
 
@@ -73,7 +73,7 @@ class Boefje(Plugin):
 
     # use a custom field_serializer for `consumes`
     @field_serializer("consumes")
-    def serialize_consumes(self, consumes: set[type[OOI]]):
+    def serialize_consumes(self, consumes: set[type[OOI]]) -> set[str]:
         return {ooi_class.get_ooi_type() for ooi_class in consumes}
 
     @field_validator("boefje_schema")
@@ -89,7 +89,7 @@ class Boefje(Plugin):
 
         return boefje_schema
 
-    def can_scan(self, member) -> bool:
+    def can_scan(self, member: OrganizationMember) -> bool:
         return super().can_scan(member) and member.has_clearance_level(self.scan_level.value)
 
 
@@ -99,7 +99,7 @@ class Normalizer(Plugin):
 
     # use a custom field_serializer for `produces`
     @field_serializer("produces")
-    def serialize_produces(self, produces: set[type[OOI]]):
+    def serialize_produces(self, produces: set[type[OOI]]) -> set[str]:
         return {ooi_class.get_ooi_type() for ooi_class in produces}
 
 

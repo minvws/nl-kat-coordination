@@ -154,11 +154,11 @@
                                         <caption class="visually-hidden">{% translate "Subreports details:" %}</caption>
                                         <h5>{% translate "Report types" %}</h5>
                                         <p>
-                                            {% blocktranslate count counter=report.total_children_reports %}
-                                    This report consist of {{counter}} subreport with the following report type and object.
-                                {% plural %}
-                                    This report consist of {{counter}} subreports with the following report types and objects.
-                                {% endblocktranslate %}
+                                            {% blocktranslate trimmed count counter=report.total_children_reports %}
+                                                This report consist of {{ counter }} subreport with the following report type and object.
+                                            {% plural %}
+                                                This report consist of {{ counter }} subreports with the following report types and objects.
+                                            {% endblocktranslate %}
                                         </p>
                                         <thead>
                                             <tr>

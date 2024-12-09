@@ -23,8 +23,8 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.plugin_id = uuid.uuid4()
-        self.created = str(datetime.now())
+        self.plugin_id = str(uuid.uuid4())
+        self.created: str | None = str(datetime.now())
         self.query_params = urlencode({"new_variant": True})
 
     def get_success_url(self) -> str:
@@ -209,7 +209,7 @@ class EditBoefjeView(BoefjeSetupView):
         return context
 
 
-def create_boefje_with_form_data(form_data, plugin_id: str, created: str):
+def create_boefje_with_form_data(form_data, plugin_id: str, created: str | None):
     arguments = [] if not form_data["oci_arguments"] else form_data["oci_arguments"].split()
     consumes = [] if not form_data["consumes"] else form_data["consumes"].strip("[]").replace("'", "").split(", ")
     produces = [] if not form_data["produces"] else form_data["produces"].split(",")

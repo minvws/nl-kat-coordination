@@ -9,6 +9,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.utils.translation import gettext_lazy as _
 from django.views import View
+from django.views.generic.base import ContextMixin
 from katalogus.client import KATalogus, get_katalogus
 from rest_framework.exceptions import ValidationError
 from rest_framework.request import Request
@@ -31,7 +32,7 @@ class OrganizationPermLookupDict:
     def __init__(self, organization_member, app_label):
         self.organization_member, self.app_label = organization_member, app_label
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self.organization_member.get_all_permissions)
 
     def __getitem__(self, perm_name):
@@ -50,7 +51,7 @@ class OrganizationPermWrapper:
     def __init__(self, organization_member):
         self.organization_member = organization_member
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.__class__.__qualname__}({self.organization_member!r})"
 
     def __getitem__(self, app_label):
@@ -71,7 +72,7 @@ class OrganizationPermWrapper:
         return self[app_label][perm_name]
 
 
-class OrganizationView(View):
+class OrganizationView(ContextMixin, View):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 

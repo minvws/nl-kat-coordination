@@ -56,7 +56,7 @@ def _get_xtdb_http_session(base_url: str) -> httpx.Client:
 
 
 class XTDBHTTPClient:
-    def __init__(self, base_url, client: str):
+    def __init__(self, base_url: str, client: str):
         self._client = client
         self._session = _get_xtdb_http_session(base_url)
 
@@ -173,7 +173,7 @@ class XTDBHTTPClient:
         self._verify_response(res)
         return res.json()
 
-    def sync(self, timeout: int | None = None):
+    def sync(self, timeout: int | None = None) -> Any:
         params = {}
 
         if timeout is not None:
@@ -198,10 +198,10 @@ class XTDBSession:
     def __exit__(self, _exc_type: type[Exception], _exc_value: str, _exc_traceback: str) -> None:
         self.commit()
 
-    def add(self, operation: Operation):
+    def add(self, operation: Operation) -> None:
         self._operations.append(operation)
 
-    def put(self, document: str | dict[str, Any], valid_time: datetime):
+    def put(self, document: str | dict[str, Any], valid_time: datetime) -> None:
         self.add((OperationType.PUT, document, valid_time))
 
     def commit(self) -> None:
@@ -219,5 +219,5 @@ class XTDBSession:
         logger.info("Called %s callbacks after committing XTDBSession", len(self.post_commit_callbacks))
         self.post_commit_callbacks = []
 
-    def listen_post_commit(self, callback: Callable[[], None]):
+    def listen_post_commit(self, callback: Callable[[], None]) -> None:
         self.post_commit_callbacks.append(callback)

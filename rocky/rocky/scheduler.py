@@ -190,7 +190,7 @@ class PaginatedSchedulesResponse(BaseModel):
 class LazyTaskList:
     HARD_LIMIT = 500
 
-    def __init__(self, scheduler_client: SchedulerClient, **kwargs):
+    def __init__(self, scheduler_client: SchedulerClient, **kwargs: Any):
         self.scheduler_client = scheduler_client
         self.kwargs = kwargs
         self._count: int | None = None
@@ -204,7 +204,7 @@ class LazyTaskList:
     def __len__(self):
         return self.count
 
-    def __getitem__(self, key) -> list[Task]:
+    def __getitem__(self, key: slice | int) -> list[Task]:
         if isinstance(key, slice):
             offset = key.start or 0
             limit = min(LazyTaskList.HARD_LIMIT, key.stop - offset or key.stop or LazyTaskList.HARD_LIMIT)
@@ -231,7 +231,7 @@ class SchedulerError(Exception):
         if extra_message is not None:
             self.message = extra_message + self.message
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.message)
 
 

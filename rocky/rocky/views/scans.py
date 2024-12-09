@@ -1,4 +1,5 @@
 from account.mixins import OrganizationView
+from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 from tools.view_helpers import Breadcrumb, ObjectsBreadcrumbsMixin
 
@@ -9,7 +10,7 @@ class ScanListView(ObjectsBreadcrumbsMixin, OrganizationView, TemplateView):
     def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
 
-        breadcrumbs.append({"url": "", "text": "Scans"})
+        breadcrumbs.append({"url": "", "text": _("Scans")})
 
         return breadcrumbs
 

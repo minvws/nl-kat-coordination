@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from datetime import datetime
 from enum import Enum
 from typing import Any
@@ -47,7 +48,7 @@ def format_display(data: dict, ignore: list | None = None) -> dict[str, str]:
     return {format_attr_name(k): format_value(v) for k, v in data.items() if k not in ignore}
 
 
-def get_knowledge_base_data_for_ooi_store(ooi_store) -> dict[str, dict]:
+def get_knowledge_base_data_for_ooi_store(ooi_store: dict) -> dict[str, dict]:
     knowledge_base = {}
 
     for ooi in ooi_store.values():
@@ -126,9 +127,9 @@ def create_object_tree_item_from_ref(
     reference_node: ReferenceNode,
     ooi_store: dict[str, OOI],
     knowledge_base: dict[str, dict] | None = None,
-    depth=0,
-    position=1,
-    location="loc",
+    depth: int = 0,
+    position: int = 1,
+    location: str = "loc",
 ) -> dict:
     depth = sum([depth, 1])
     location = location + "-" + str(position)
@@ -177,7 +178,7 @@ def get_ooi_types_from_tree(ooi, include_self=True):
     return sorted(types)
 
 
-def filter_ooi_tree(ooi_node: dict, show_types=[], hide_types=[]) -> dict:
+def filter_ooi_tree(ooi_node: dict, show_types: Sequence = [], hide_types: Sequence = []) -> dict:
     if not show_types and not hide_types:
         return ooi_node
 

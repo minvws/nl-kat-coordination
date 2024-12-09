@@ -1,6 +1,6 @@
 from bits.definitions import BitDefinition, BitParameterDefinition
+from octopoes.models.ooi.dns.records import NXDOMAIN
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.types import NXDOMAIN
 
 BIT = BitDefinition(
     id="nxdomain-flag",

@@ -138,7 +138,7 @@ class AuthToken(AbstractAuthToken):
 
     EVENT_CODES = {"created": 900111, "updated": 900122, "deleted": 900123}
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.user})"
 
     def generate_new_token(self) -> str:

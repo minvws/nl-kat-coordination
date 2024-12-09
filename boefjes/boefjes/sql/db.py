@@ -52,5 +52,5 @@ def session_managed_iterator(service_factory: Callable[[Session], Any]) -> Itera
 
 
 class ObjectNotFoundException(Exception):
-    def __init__(self, cls: type | UnionType, **kwargs):  # type: ignore
+    def __init__(self, cls: type | UnionType, **kwargs):
         super().__init__(f"The object of type {cls} was not found for query parameters {kwargs}")

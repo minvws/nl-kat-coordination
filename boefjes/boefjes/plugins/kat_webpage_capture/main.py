@@ -10,11 +10,11 @@ BROWSER = "chromium"
 class WebpageCaptureException(Exception):
     """Exception raised when webpage capture fails."""
 
-    def __init__(self, message, container_log=None):
+    def __init__(self, message: str, container_log: str):
         self.message = message
         self.container_log = container_log
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.message) + "\n\nContainer log:\n" + self.container_log
 
 

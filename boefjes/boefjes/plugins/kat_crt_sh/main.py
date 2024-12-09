@@ -31,7 +31,13 @@ SEARCH_TYPES = (
 )
 
 
-def request_certs(search_string, search_type="Identity", match="=", deduplicate=True, json_output=True) -> str:
+def request_certs(
+    search_string: str,
+    search_type: str = "Identity",
+    match: str = "=",
+    deduplicate: bool = True,
+    json_output: bool = True,
+) -> str:
     """Queries the public service CRT.sh for certificate information
     the searchtype can be specified and defaults to Identity.
     the type of sql matching can be specified and defaults to "="

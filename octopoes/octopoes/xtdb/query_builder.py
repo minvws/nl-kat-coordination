@@ -2,7 +2,8 @@ import re
 from collections.abc import Iterable, Mapping
 from typing import Any
 
-from octopoes.xtdb.related_field_generator import FieldSet, RelatedFieldNode
+from octopoes.xtdb import FieldSet
+from octopoes.xtdb.related_field_generator import RelatedFieldNode
 
 
 def join_csv(values: Iterable[Any]) -> str:

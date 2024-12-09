@@ -10,7 +10,7 @@ IMAGE = "ghcr.io/minvws/nl-kat-masscan-build-image:latest"
 FILE_PATH = "/tmp/output.json"  # noqa: S108
 
 
-def run_masscan(target_ip) -> bytes:
+def run_masscan(target_ip: str) -> bytes:
     """Run Masscan in Docker."""
     client = docker.from_env()
 

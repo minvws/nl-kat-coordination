@@ -2,7 +2,7 @@ import re
 import subprocess
 
 
-def run(boefje_meta: dict):
+def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta["arguments"]["input"]
     domain = input_["name"]
 
@@ -19,6 +19,4 @@ def run(boefje_meta: dict):
 
     output.check_returncode()
 
-    results = [({"openkat/dnssec-output"}, output.stdout)]
-
-    return results
+    return [({"openkat/dnssec-output"}, output.stdout)]

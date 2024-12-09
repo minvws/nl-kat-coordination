@@ -20,7 +20,7 @@ def get_xtdb_client(base_uri: str, client: str) -> XTDBHTTPClient:
     return XTDBHTTPClient(f"{base_uri}/_xtdb", client)
 
 
-def close_rabbit_channel(queue_uri: str):
+def close_rabbit_channel(queue_uri: str) -> None:
     rabbit_channel = get_rabbit_channel(queue_uri)
 
     try:
