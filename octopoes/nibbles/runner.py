@@ -152,7 +152,11 @@ class NibblesRunner:
         self._write(valid_time)
         return inferences
 
-    def reinfer(self, valid_time: datetime) -> dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]]:
+    def reset(self, valid_time: datetime) -> dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]]:
         nibblets = self.origin_repository.list_origins(valid_time, origin_type=OriginType.NIBBLET)
         refs = set(map(lambda nibblet: nibblet.source, nibblets))
+        for nibblet in nibblets:
+            # INFO: Probably we should adapt the event manager to cope with this
+            # We are flooding the XTDB with events that will cause race conditions
+            self.origin_repository.delete(nibblet, valid_time)
         return self.infer(self.ooi_repository.load_bulk_as_list(refs, valid_time), valid_time)
