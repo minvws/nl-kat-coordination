@@ -129,7 +129,7 @@ class AggregateOrganisationReport(AggregateReport):
                         finding_type = data["finding_type"]
                         finding_type_id = finding_type.id
                         occurrences = data["occurrences"]
-                        severity = data["finding_type"].risk_severity.value
+                        severity = finding_type.risk_severity.value
 
                         if finding_type_id not in findings["finding_types"]:
                             findings["finding_types"][finding_type_id] = {
