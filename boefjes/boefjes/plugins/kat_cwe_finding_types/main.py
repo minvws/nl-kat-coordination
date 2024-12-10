@@ -4,7 +4,7 @@ import defusedxml.ElementTree as ET
 
 from boefjes.job_models import BoefjeMeta
 
-FINDING_TYPE_PATH = "boefjes/plugins/kat_cwe_finding_types/cwec_v4.11.xml"
+FINDING_TYPE_PATH = "boefjes/plugins/kat_cwe_finding_types/cwec_v4.16.xml"
 
 
 def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
@@ -14,7 +14,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     root = root.getroot()
 
     # Define the XML namespace
-    namespace = {"ns": "http://cwe.mitre.org/cwe-6"}
+    namespace = {"ns": "http://cwe.mitre.org/cwe-7"}
 
     # Find the Weakness element with the specified CWE ID
     xpath = f".//ns:Weakness[@ID='{cwe_id.split('-')[1]}']"
