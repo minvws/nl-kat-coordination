@@ -17,7 +17,28 @@
         </section>
         <section>
             <div>
-                {% for organization, data in dashboards_data.items %}{{ data }}{% endfor %}
+                {% if organizations_findings_summary %}
+                    <div>
+                        {% include "partials/report_severity_totals_table.html" with data=organizations_findings_summary %}
+
+                    </div>
+                {% else %}
+                    <p>{% translate "No findings have been identified yet." %}</p>
+                {% endif %}
+            </div>
+        </section>
+        <section>
+            <div>
+                {% for organization, organization_dashboards in organizations_dashboards.items %}
+                    {% for dashboards in organization_dashboards %}
+                        {% for dashboard_data, report_data in dashboards.items %}
+                            {% if report_data %}
+                                {% include dashboard_data.template with data=report_data.findings is_dashboard="yes" %}
+
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
             </div>
         </section>
     </main>
