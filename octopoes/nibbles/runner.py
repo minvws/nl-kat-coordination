@@ -101,7 +101,9 @@ class NibblesRunner:
                     ooi,
                     nibble,
                     valid_time,
-                    nibblet.parameters_references if nibble.query is not None and nibble.query.count("$") > 0 else None,
+                    nibblet.parameters_references
+                    if nibble.query is not None and (callable(nibble.query) or nibble.query.count("$") > 0)
+                    else None,
                 )
                 results = {
                     tuple(arg): set(flatten([nibble(arg)]))
