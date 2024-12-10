@@ -131,7 +131,6 @@ def test_events_created_in_worker_during_handling(
         xtdb_octopoes_service.process_event(event)
     xtdb_octopoes_service.commit()
 
-    printer("POTATO", event_manager.queue)
     assert len(event_manager.queue) == 5  # Handling OOI delete event triggers Origin delete event
 
     event = event_manager.queue[4]  # OOIDelete event
