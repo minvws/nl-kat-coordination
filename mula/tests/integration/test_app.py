@@ -6,6 +6,7 @@ from unittest import mock
 import scheduler
 from scheduler import config, models, server, storage
 from scheduler.storage import stores
+
 from tests.factories import OrganisationFactory
 from tests.mocks import MockKatalogusService
 

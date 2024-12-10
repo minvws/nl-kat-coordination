@@ -4,13 +4,10 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from typing import Any
 
-import structlog
 from opentelemetry import trace
 
 from scheduler import clients, context, models, utils
-from scheduler.clients.errors import ExternalServiceError
 from scheduler.schedulers import Scheduler, rankers
-from scheduler.schedulers.queue.errors import QueueFullError
 from scheduler.storage import filters
 
 tracer = trace.get_tracer(__name__)

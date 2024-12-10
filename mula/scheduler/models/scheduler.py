@@ -2,12 +2,6 @@ import enum
 from datetime import datetime, timezone
 
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Boolean, Column, DateTime
-from sqlalchemy import Enum as SQLAlchemyEnum
-from sqlalchemy import Integer, String
-from sqlalchemy.sql import func
-
-from .base import Base
 
 
 class SchedulerType(str, enum.Enum):

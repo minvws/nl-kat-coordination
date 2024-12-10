@@ -1,14 +1,11 @@
-from collections.abc import Callable
 from concurrent import futures
 from datetime import datetime, timezone
 from typing import Any
 
-import structlog
 from opentelemetry import trace
 
-from scheduler import context, models, storage
+from scheduler import context, models
 from scheduler.schedulers import Scheduler
-from scheduler.schedulers.queue import PriorityQueue, QueueFullError
 from scheduler.storage import filters
 
 tracer = trace.get_tracer(__name__)

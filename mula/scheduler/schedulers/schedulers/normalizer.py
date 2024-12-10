@@ -3,11 +3,9 @@ from concurrent import futures
 from types import SimpleNamespace
 from typing import Any
 
-import structlog
 from opentelemetry import trace
 
 from scheduler import clients, context, models
-from scheduler.clients.errors import ExternalServiceError
 from scheduler.schedulers import Scheduler, rankers
 
 tracer = trace.get_tracer(__name__)
@@ -229,11 +227,7 @@ class NormalizerScheduler(Scheduler):
         Returns:
             True if the raw data contains errors, False otherwise.
         """
-        for mime_type in raw_data.mime_types:
-            if mime_type.get("value", "").startswith("error/"):
-                return True
-
-        return False
+        return any(mime_type.get("value", "").startswith("error/") for mime_type in raw_data.mime_types)
 
     # FIXME: none or empty list?
     def get_normalizers_for_mime_type(self, mime_type: str, organisation: str) -> list[models.Plugin]:
