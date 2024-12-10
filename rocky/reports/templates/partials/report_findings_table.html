@@ -6,8 +6,8 @@
 {% else %}
     <h3>{% translate "Findings" %}</h3>
 {% endif %}
-<div class="horizontal-scroll sticky-column">
-    <table class="nowrap">
+<div class="horizontal-scroll">
+    <table>
         <caption class="visually-hidden">{% translate "Other findings found" %}</caption>
         <thead>
             <tr>
@@ -42,7 +42,7 @@
                 </tr>
                 {% if not is_dashboard %}
                     <tr class="expando-row">
-                        <td colspan="3">
+                        <td colspan="5">
                             <h4 class="heading-normal">{% translate "Description" %}</h4>
                             <p>{{ info.finding_type.description }}</p>
                             <h4 class="heading-normal">{% translate "Source" %}</h4>
