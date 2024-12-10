@@ -16,28 +16,30 @@
                 </p>
             </div>
         </section>
-        {% with findings_summary=dashboards_data|get_findings_summary %}
-            <section>
-                <div>
-                    {% if findings_summary %}
-                        <div>
-                            {% include "partials/report_severity_totals_table.html" with data=findings_summary is_dashboard="yes" %}
-
-                        </div>
-                    {% else %}
-                        <p>{% translate "No findings have been identified yet." %}</p>
-                    {% endif %}
-                </div>
-            </section>
-        {% endwith %}
         <section>
             <div>
+                {% if findings_report_summary %}
+                    <div>
+                        {% include "partials/report_severity_totals_table.html" with data=findings_report_summary %}
+
+                    </div>
+                {% else %}
+                    <p>{% translate "No findings have been identified yet." %}</p>
+                {% endif %}
+            </div>
+        </section>
+        <section>
+            <div>
+                {% include dashboards_data.0.template with data=findings_report_data is_dashboard="yes" %}
+
+                {% comment %}
                 {% for dashboard_data in dashboards_data %}
-                    {% with report_data=dashboard_data|get_report_data %}
-                        {% include dashboard_data.template with data=report_data.findings organization=dashboard_data.dashboard.organization %}
+                {% with report_data=dashboard_data|get_report_data %}
+
+                        {% include dashboard_data.template with data=report_data.findings organization=dashboard_data.dashboard.organization is_dashboard="yes" %}
 
                     {% endwith %}
-                {% endfor %}
+                {% endfor %} {% endcomment %}
             </div>
         </section>
     </main>

@@ -1,43 +1,37 @@
 {% load i18n %}
 {% load ooi_extra %}
 
-{% if data.finding_types %}
-    {% if show_introduction %}
-        <p>
-            {% blocktranslate trimmed %}
-                The Findings Report provides an overview of the identified findings on the scanned
-                systems. For each finding it shows the risk level and the number of occurrences of
-                the finding. Under the 'Details' section a description, impact, recommendation and
-                location of the finding can be found. The risk level may be different for your
-                specific environment.
-            {% endblocktranslate %}
-        </p>
-    {% endif %}
-    {% if not is_dashboard %}
+{% if show_introduction %}
+    <p>
+        {% blocktranslate trimmed %}
+            The Findings Report provides an overview of the identified findings on the scanned
+            systems. For each finding it shows the risk level and the number of occurrences of
+            the finding. Under the 'Details' section a description, impact, recommendation and
+            location of the finding can be found. The risk level may be different for your
+            specific environment.
+        {% endblocktranslate %}
+    </p>
+{% endif %}
+{% if is_dashboard %}
+    <div>
+        <h2>{% translate "Findings per organization" %}</h2>
+        <p>{% translate "This table shows the findings that have been identified for each organization." %}</p>
         <div class="horizontal-scroll">
-            {% include "partials/report_severity_totals_table.html" with data=data.summary %}
-            {% include "partials/report_findings_table.html" with finding_types=data.finding_types %}
-
-        </div>
-    {% else %}
-        <div>
-            <h2>{% translate "Findings per organization" %}</h2>
-            <p>{% translate "This table shows the findings that have been identified for each organization." %}</p>
-            <div class="horizontal-scroll">
-                <table>
-                    <caption class="visually-hidden">{% translate "Findings per organization overview" %}</caption>
-                    <thead>
-                        <tr>
-                            <th>{% translate "Organization" %}</th>
-                            <th scope="col">{% translate "Finding types" %}</th>
-                            <th scope="col">{% translate "Occurrences" %}</th>
-                            <th scope="col">{% translate "Highest risk level" %}</th>
-                            <th scope="col">{% translate "Critical finding types" %}</th>
-                            <th scope="col" class="visually-hidden actions">{% translate "Details" %}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for findings in data.values %}
+            <table>
+                <caption class="visually-hidden">{% translate "Findings per organization overview" %}</caption>
+                <thead>
+                    <tr>
+                        <th>{% translate "Organization" %}</th>
+                        <th scope="col">{% translate "Finding types" %}</th>
+                        <th scope="col">{% translate "Occurrences" %}</th>
+                        <th scope="col">{% translate "Highest risk level" %}</th>
+                        <th scope="col">{% translate "Critical finding types" %}</th>
+                        <th scope="col" class="visually-hidden actions">{% translate "Details" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for organization, report_data in data.items %}
+                        {% with findings=report_data.findings %}
                             <tr>
                                 <td>{{ organization.name }}</td>
                                 <td>
@@ -83,18 +77,22 @@
                                 <tr class="expando-row">
                                     <td>
                                         {% include "partials/report_severity_totals_table.html" with data=findings.summary %}
-                                        {% include "partials/report_findings_table.html" with finding_types=findings.finding_types is_dashboard="yes" %}
-                                        {% include "findings_report/report.html" with data=findings.summary finding_types=findings.finding_types is_dashboard="yes" %}
+                                        {% include "partials/report_findings_table.html" with finding_types=findings.finding_types %}
+                                        {% include "findings_report/report.html" with data=findings.summary finding_types=findings.finding_types %}
 
                                     </td>
                                 </tr>
                             {% endif %}
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                        {% endwith %}
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    {% endif %}
+    </div>
 {% else %}
-    <p>{% translate "No findings have been identified yet." %}</p>
+    <div class="horizontal-scroll">
+        {% include "partials/report_severity_totals_table.html" with data=data.summary %}
+        {% include "partials/report_findings_table.html" with finding_types=data.finding_types %}
+
+    </div>
 {% endif %}
