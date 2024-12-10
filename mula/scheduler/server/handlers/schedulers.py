@@ -21,7 +21,7 @@ class SchedulerAPI:
             path="/schedulers",
             endpoint=self.list,
             methods=["GET"],
-            response_model=list[models.Scheduler],
+            response_model=list[serializers.Scheduler],
             status_code=status.HTTP_200_OK,
             description="List all schedulers",
         )
@@ -30,7 +30,7 @@ class SchedulerAPI:
             path="/schedulers/{scheduler_id}",
             endpoint=self.get,
             methods=["GET"],
-            response_model=models.Scheduler,
+            response_model=serializers.Scheduler,
             status_code=status.HTTP_200_OK,
             description="Get a scheduler",
         )
@@ -53,15 +53,15 @@ class SchedulerAPI:
             description="Pop a task from a scheduler",
         )
 
-    def list(self) -> Any:
-        return [models.Scheduler(**s.dict()) for s in self.schedulers.values()]
+    def list(self) -> list[serializers.Scheduler]:
+        return [serializers.Scheduler(**s.dict()) for s in self.schedulers.values()]
 
     def get(self, scheduler_id: str) -> Any:
         s = self.schedulers.get(scheduler_id)
         if s is None:
             raise NotFoundError(f"Scheduler {scheduler_id} not found")
 
-        return models.Scheduler(**s.dict())
+        return serializers.Scheduler(**s.dict())
 
     def pop(
         self,

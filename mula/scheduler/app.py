@@ -61,14 +61,11 @@ class App:
             * metrics collecting
             * api server
         """
-        # Start schedulers
         self.start_schedulers()
 
-        # Start metrics collecting
         if self.ctx.config.collect_metrics:
             self.start_collectors()
 
-        # API Server
         self.start_server(self.schedulers)
 
         # Main thread

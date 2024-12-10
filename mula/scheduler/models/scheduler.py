@@ -1,5 +1,6 @@
 import enum
 from datetime import datetime, timezone
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -18,6 +19,6 @@ class Scheduler(BaseModel):
 
     id: str
     type: SchedulerType
+    item_type: Any
+    qsize: int = 0
     last_activity: datetime | None = None
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

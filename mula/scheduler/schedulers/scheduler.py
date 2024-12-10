@@ -421,8 +421,8 @@ class Scheduler(abc.ABC):
         """Get a dict representation of the scheduler."""
         return {
             "id": self.scheduler_id,
-            "type": self.TYPE,
-            "item_type": self.ITEM_TYPE,
+            "type": self.TYPE.value,
+            "item_type": self.ITEM_TYPE.__name__,
             "qsize": self.queue.qsize(),
             "last_activity": self.last_activity,
         }
