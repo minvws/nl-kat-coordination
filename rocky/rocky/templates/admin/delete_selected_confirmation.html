@@ -33,15 +33,15 @@
         <ul>{{ deletable_object|unordered_list }}</ul>
     {% endfor %}
     <form method="post">{% csrf_token %}
-    <div>
-    {% for obj in queryset %}
-    <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}">
-    {% endfor %}
-    <input type="hidden" name="action" value="delete_selected">
-    <input type="hidden" name="post" value="yes">
-    <input type="submit" value="{% translate 'Yes, I’m sure' %}">
-    <a href="#" class="button cancel-link">{% translate "No, take me back" %}</a>
-    </div>
+        <div>
+            {% for obj in queryset %}
+                <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}">
+            {% endfor %}
+            <input type="hidden" name="action" value="delete_selected">
+            <input type="hidden" name="post" value="yes">
+            <input type="submit" value="{% translate 'Yes, I’m sure' %}">
+            <a href="#" class="button ghost">{% translate "No, take me back" %}</a>
+        </div>
     </form>
 {% endif %}
 {% endblock %}

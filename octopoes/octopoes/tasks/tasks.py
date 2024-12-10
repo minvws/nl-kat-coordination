@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime, timezone
 from logging import config
 from pathlib import Path
+from typing import Any
 
 import structlog
 import yaml
@@ -12,7 +13,7 @@ from httpx import HTTPError
 from pydantic import TypeAdapter
 
 from octopoes.config.settings import QUEUE_NAME_OCTOPOES, Settings
-from octopoes.connector.katalogus import KATalogusClientV1
+from octopoes.connector.katalogus import KATalogusClient
 from octopoes.core.app import bootstrap_octopoes, close_rabbit_channel, get_xtdb_client
 from octopoes.events.events import DBEvent, DBEventType
 from octopoes.events.manager import get_rabbit_channel
@@ -65,7 +66,7 @@ log = get_task_logger(__name__)
 
 
 @app.task(queue=QUEUE_NAME_OCTOPOES)
-def handle_event(event: dict):
+def handle_event(event: dict) -> None:
     try:
         parsed_event: DBEvent = TypeAdapter(DBEventType).validate_python(event)
 
@@ -80,7 +81,7 @@ def handle_event(event: dict):
 @app.task(queue=QUEUE_NAME_OCTOPOES)
 def schedule_scan_profile_recalculations():
     try:
-        orgs = KATalogusClientV1(str(settings.katalogus_api)).get_organisations()
+        orgs = KATalogusClient(str(settings.katalogus_api)).get_organisations()
     except HTTPError:
         logger.exception("Failed getting organizations")
         raise
@@ -96,7 +97,7 @@ def schedule_scan_profile_recalculations():
 
 
 @app.task(queue=QUEUE_NAME_OCTOPOES)
-def recalculate_scan_profiles(org: str, *args, **kwargs):
+def recalculate_scan_profiles(org: str, *args: Any, **kwargs: Any) -> None:
     session = XTDBSession(get_xtdb_client(str(settings.xtdb_uri), org))
     octopoes = bootstrap_octopoes(settings, org, session)
 

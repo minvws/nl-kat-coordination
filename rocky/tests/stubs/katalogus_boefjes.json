@@ -76,18 +76,5 @@
       "Finding",
       "CVEFindingType"
     ]
-  },
-  {
-    "id": "kat_binaryedge_containers",
-    "name": "test_binary_edge_normalizer",
-    "version": null,
-    "created": null,
-    "description": null,
-    "enabled": true,
-    "type": "normalizer",
-    "consumes": [
-      "binaryedge"
-    ],
-    "produces": []
   }
 ]

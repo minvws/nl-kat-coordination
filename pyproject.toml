@@ -2,8 +2,6 @@
 python_version = "3.10"
 plugins = ["pydantic.mypy"]
 strict = true
-follow_imports = "skip"
-warn_unused_ignores = false # This gives false positives in pre-commit as long as we don't enable follow imports
 disallow_subclassing_any = false
 disallow_untyped_decorators = false # Needed for FastAPI decorators
 disallow_any_generics = false
@@ -14,8 +12,17 @@ no_implicit_reexport = false
 warn_return_any = false
 
 [[tool.mypy.overrides]]
-module = ["httpx.*"]
-follow_imports = "normal"
+# Following pydantic imports currently gives 2000 errors
+module = ["pydantic.*"]
+follow_imports = "skip"
+
+[[tool.mypy.overrides]]
+module = ["bytes.*", "cveapi.*"]
+disallow_any_generics = true
+disallow_untyped_defs = true
+disallow_untyped_calls = true
+disallow_incomplete_defs = true
+no_implicit_reexport = true
 
 [tool.setuptools_scm]
 write_to = "_version.py"
@@ -48,6 +55,7 @@ skip-magic-trailing-comma = true
 select = ["E", "F", "ERA", "W", "TID", "I", "G", "INP", "T20", "UP", "ISC", "PTH", "SIM", "PLC", "A", "S"]
 ignore = [
      "A003", # Built-in shadowing is usually not a problem and some built-ins have very generic names
+     "SIM103", # Creating long return statements is often less readable
      "SIM108", # Ternary operator is not always more readable
      "S101", # Assert use is normal in pytest tests
      "S104", # Binding to all is normal in containers
@@ -87,7 +95,7 @@ task-tags = ["Example", "todo", "TODO", "FIXME"]
 split-on-trailing-comma = false
 
 [tool.codespell]
-ignore-words-list = 'edn,juxt'
+ignore-words-list = 'edn,juxt,assertIn'
 
 [tool.poetry]
 name = "openkat"
@@ -104,12 +112,12 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.dependencies]
 python = "^3.10"
 sphinx = "^8.1.3"
-sphinx_rtd_theme = "3.0.0"
+sphinx_rtd_theme = "^3.0.2"
 sphinxcontrib-mermaid = "^1.0.0"
 myst-parser = "^4.0.0"
 settings-doc = "^4.3.1"
 colorama = "0.4.6" # Required on all platforms, not just win32
 autodoc-pydantic = "^2.2.0"
 # Needed for settings-doc and autodoc
-croniter = "^3.0.3"
+croniter = "^5.0.1"
 jsonschema = "^4.17.0"

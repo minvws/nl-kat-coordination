@@ -1,16 +1,15 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any
 
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import Boefje, Normalizer
 from reports.forms import (
     ChildReportNameForm,
     ParentReportNameForm,
     ReportRecurrenceChoiceForm,
-    ReportScheduleRecurrenceForm,
     ReportScheduleStartDateChoiceForm,
     ReportScheduleStartDateForm,
 )
@@ -48,10 +47,9 @@ class SchedulerView(OctopoesView):
     task_filter_form = TaskFilterForm
 
     report_schedule_form_start_date_choice = ReportScheduleStartDateChoiceForm  # today or different date
-    report_schedule_form_start_date = ReportScheduleStartDateForm  # date widget
+    report_schedule_form_start_date_time_recurrence = ReportScheduleStartDateForm  # date, time and recurrence
 
     report_schedule_form_recurrence_choice = ReportRecurrenceChoiceForm  # once or repeat
-    report_schedule_form_recurrence = ReportScheduleRecurrenceForm  # select interval (daily, weekly, etc..)
 
     report_parent_name_form = ParentReportNameForm  # parent name format
     report_child_name_form = ChildReportNameForm  # child name format
@@ -96,14 +94,11 @@ class SchedulerView(OctopoesView):
     def get_report_schedule_form_start_date_choice(self):
         return self.report_schedule_form_start_date_choice(self.request.POST)
 
-    def get_report_schedule_form_start_date(self):
-        return self.report_schedule_form_start_date(self.request.POST)
+    def get_report_schedule_form_start_date_time_recurrence(self):
+        return self.report_schedule_form_start_date_time_recurrence()
 
     def get_report_schedule_form_recurrence_choice(self):
         return self.report_schedule_form_recurrence_choice(self.request.POST)
-
-    def get_report_schedule_form_recurrence(self):
-        return self.report_schedule_form_recurrence(self.request.POST)
 
     def get_report_parent_name_form(self):
         return self.report_parent_name_form()
@@ -112,22 +107,26 @@ class SchedulerView(OctopoesView):
         return self.report_child_name_form()
 
     def get_task_details(self, task_id: str) -> Task | None:
-        task = self.scheduler_client.get_task_details(task_id)
+        try:
+            task = self.scheduler_client.get_task_details(task_id)
+            if task.organization_id() != self.organization.code:
+                raise SchedulerTaskNotFound()
 
-        if task.organization_id() != self.organization.code:
-            messages.error(self.request, SchedulerTaskNotFound.message)
-            return None
+            return task
+        except SchedulerTaskNotFound:
+            raise Http404()
 
-        return task
-
-    def create_report_schedule(self, report_recipe: ReportRecipe) -> ScheduleResponse | None:
+    def create_report_schedule(self, report_recipe: ReportRecipe, deadline_at: datetime) -> ScheduleResponse | None:
         try:
             report_task = ReportTask(
                 organisation_id=self.organization.code, report_recipe_id=str(report_recipe.recipe_id)
             ).model_dump()
 
             schedule_request = ScheduleRequest(
-                scheduler_id=self.scheduler_id, data=report_task, schedule=report_recipe.cron_expression
+                scheduler_id=self.scheduler_id,
+                data=report_task,
+                schedule=report_recipe.cron_expression,
+                deadline_at=str(deadline_at),
             )
 
             submit_schedule = self.scheduler_client.post_schedule(schedule=schedule_request)
@@ -135,6 +134,9 @@ class SchedulerView(OctopoesView):
             return submit_schedule
         except SchedulerError as error:
             return messages.error(self.request, error.message)
+
+    def edit_report_schedule(self, schedule_id: str, params):
+        self.scheduler_client.patch_schedule(schedule_id=schedule_id, params=params)
 
     def get_report_schedules(self) -> list[dict[str, Any]]:
         try:
@@ -162,7 +164,7 @@ class SchedulerView(OctopoesView):
             messages.error(self.request, error.message)
             return []
 
-    def get_json_task_details(self) -> JsonResponse | None:
+    def get_json_task_details(self) -> JsonResponse:
         try:
             task = self.get_task_details(self.kwargs["task_id"])
             if task:
@@ -173,7 +175,21 @@ class SchedulerView(OctopoesView):
                     },
                     safe=False,
                 )
-            return task
+            else:
+                raise SchedulerTaskNotFound()
+
+        except SchedulerTaskNotFound:
+            raise Http404()
+
+    def get_schedule_details(self, schedule_id: str) -> ScheduleResponse:
+        try:
+            return self.scheduler_client.get_schedule_details(schedule_id)
+        except SchedulerError as error:
+            return messages.error(self.request, error.message)
+
+    def get_schedule_with_filters(self, filters: dict[str, list[dict[str, str]]]) -> ScheduleResponse:
+        try:
+            return self.scheduler_client.post_schedule_search(filters).results[0]
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
@@ -198,18 +214,22 @@ class SchedulerView(OctopoesView):
     # task info from the scheduler. Task data should be available from the context
     # from which the task is created.
     def reschedule_task(self, task_id: str) -> None:
-        task = self.scheduler_client.get_task_details(task_id)
+        try:
+            task = self.get_task_details(task_id)
+            if task:
+                if task.organization_id() != self.organization.code:
+                    raise SchedulerTaskNotFound()
 
-        if task.organization_id() != self.organization.code:
-            messages.error(self.request, SchedulerTaskNotFound.message)
-            return
+                new_id = uuid.uuid4()
+                task.data.id = new_id
 
-        new_id = uuid.uuid4()
-        task.data.id = new_id
+                new_task = Task(id=new_id, scheduler_id=task.scheduler_id, priority=1, data=task.data)
 
-        new_task = Task(id=new_id, scheduler_id=task.scheduler_id, priority=1, data=task.data)
-
-        self.schedule_task(new_task)
+                self.schedule_task(new_task)
+            else:
+                raise SchedulerTaskNotFound()
+        except SchedulerTaskNotFound:
+            raise Http404()
 
     def run_normalizer(self, katalogus_normalizer: Normalizer, raw_data: RawData) -> None:
         try:
@@ -250,28 +270,31 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             messages.error(self.request, error.message)
 
-    def convert_recurrence_to_cron_expressions(self, recurrence: str) -> str:
+    def convert_recurrence_to_cron_expressions(self, recurrence: str, start_date_time: datetime) -> str:
         """
-        Because there is no time defined for the start date, we use midnight 00:00 for all expressions.
+        The user defines the start date and time.
         """
 
-        start_date = datetime.now(tz=timezone.utc).date()  # for now, not set by user
-
-        if start_date and recurrence:
-            day = start_date.day
-            month = start_date.month
-            week = start_date.strftime("%w").upper()  # ex. 4
+        if start_date_time and recurrence:
+            day = start_date_time.day
+            month = start_date_time.month
+            week = start_date_time.strftime("%w").upper()  # ex. 4
+            hour = start_date_time.hour
+            minute = start_date_time.minute
 
             cron_expr = {
-                "daily": "0 0 * * *",  # Recurres every day at 00:00
-                "weekly": f"0 0 * * {week}",  # Recurres every week on the {week} at 00:00
-                "yearly": f"0 0 {day} {month} *",  # Recurres every year on the {day} of the {month} at 00:00
+                "daily": f"{minute} {hour} * * *",  # Recurres every day at the selected time
+                "weekly": f"{minute} {hour} * * {week}",  # Recurres every week on the {week} at the selected time
+                "yearly": f"{minute} {hour} {day} {month} *",
+                # Recurres every year on the {day} of the {month} at the selected time
             }
 
-            if 28 <= day <= 31:
-                cron_expr["monthly"] = "0 0 28-31 * *"
+            if day >= 28:
+                cron_expr["monthly"] = f"{minute} {hour} L * *"
             else:
-                cron_expr["monthly"] = f"0 0 {day} * *"  # Recurres on the exact {day} of the month at 00:00
+                cron_expr["monthly"] = (
+                    f"{minute} {hour} {day} * *"  # Recurres on the exact {day} of the month at the selected time
+                )
 
             return cron_expr.get(recurrence, "")
         return ""

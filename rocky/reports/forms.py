@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import Any
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
@@ -12,7 +13,7 @@ class OOITypeMultiCheckboxForReportForm(BaseRockyForm):
         label=_("Filter by OOI types"), required=False, widget=forms.CheckboxSelectMultiple
     )
 
-    def __init__(self, ooi_types: list[str], *args, **kwargs):
+    def __init__(self, ooi_types: list[str], *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
         self.fields["ooi_type"].choices = ((ooi_type, ooi_type) for ooi_type in ooi_types)
 
@@ -22,7 +23,7 @@ class ReportTypeMultiselectForm(BaseRockyForm):
         label=_("Report types"), required=False, widget=forms.CheckboxSelectMultiple
     )
 
-    def __init__(self, report_types: set[Report], *args, **kwargs):
+    def __init__(self, report_types: set[Report], *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
         report_types_choices = ((report_type.id, report_type.name) for report_type in report_types)
         self.fields["report_type"].choices = report_types_choices
@@ -38,15 +39,6 @@ class ReportScheduleStartDateChoiceForm(BaseRockyForm):
     )
 
 
-class ReportScheduleStartDateForm(BaseRockyForm):
-    start_date = forms.DateField(
-        label="",
-        widget=DateInput(format="%Y-%m-%d"),
-        initial=lambda: datetime.now(tz=timezone.utc).date(),
-        required=True,
-    )
-
-
 class ReportRecurrenceChoiceForm(BaseRockyForm):
     choose_recurrence = forms.ChoiceField(
         label="",
@@ -57,13 +49,40 @@ class ReportRecurrenceChoiceForm(BaseRockyForm):
     )
 
 
-class ReportScheduleRecurrenceForm(BaseRockyForm):
+class ReportScheduleStartDateForm(BaseRockyForm):
+    start_date = forms.DateField(
+        label=_("Start date"),
+        widget=DateInput(format="%Y-%m-%d", attrs={"form": "generate_report"}),
+        initial=lambda: datetime.now(tz=timezone.utc).date(),
+        required=True,
+        input_formats=["%Y-%m-%d"],
+    )
+
+    start_time = forms.TimeField(
+        label=_("Start time (UTC)"),
+        widget=forms.TimeInput(format="%H:%M", attrs={"form": "generate_report"}),
+        initial=lambda: datetime.now(tz=timezone.utc).time(),
+        required=True,
+        input_formats=["%H:%M"],
+    )
+
     recurrence = forms.ChoiceField(
-        label="",
-        required=False,
+        label=_("Recurrence"),
+        required=True,
         widget=forms.Select(attrs={"form": "generate_report"}),
         choices=[("daily", _("Daily")), ("weekly", _("Weekly")), ("monthly", _("Monthly")), ("yearly", _("Yearly"))],
     )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get("start_date")
+        start_time = cleaned_data.get("start_time")
+
+        if start_date and start_time:
+            start_datetime = datetime.combine(start_date, start_time)
+            cleaned_data["start_datetime"] = start_datetime
+
+        return cleaned_data
 
 
 class CustomReportScheduleForm(BaseRockyForm):
@@ -106,13 +125,13 @@ class CustomReportScheduleForm(BaseRockyForm):
 
 class ParentReportNameForm(BaseRockyForm):
     parent_report_name = forms.CharField(
-        label=_("Report name format"), required=False, initial="{report type} for {oois_count} objects"
+        label=_("Report name format"), required=False, initial="${report_type} for ${oois_count} objects"
     )
 
 
 class ChildReportNameForm(BaseRockyForm):
     child_report_name = forms.CharField(
-        label=_("Subreports name format"), required=True, initial="{report type} for {ooi}"
+        label=_("Subreports name format"), required=True, initial="${report_type} for ${ooi}"
     )
 
 

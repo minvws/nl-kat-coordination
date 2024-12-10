@@ -17,3 +17,16 @@ class ReportSerializer(serializers.BaseSerializer):
             "generated_at": report.date_generated,
             "intput_oois": report.input_oois,
         }
+
+
+class ReportRecipeSerializer(serializers.Serializer):
+    id = serializers.UUIDField(source="recipe_id", read_only=True)
+    report_name_format = serializers.CharField()
+    subreport_name_format = serializers.CharField(required=False, allow_blank=True)
+
+    input_recipe = serializers.DictField()
+    parent_report_type = serializers.CharField(required=False, allow_blank=True)
+    report_types = serializers.ListField(child=serializers.CharField())
+
+    cron_expression = serializers.CharField()
+    start_date = serializers.DateField(write_only=True, required=False)
