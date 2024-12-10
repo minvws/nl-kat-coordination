@@ -126,6 +126,7 @@ find_network_url_params = [
     NibbleParameter(object_type=Network, parser="[*][?object_type == 'Network'][]"),
     NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]"),
 ]
+
 find_network_url_nibble = NibbleDefinition(
     name="find_network_url",
     signature=find_network_url_params,
@@ -189,7 +190,11 @@ def test_find_network_url_nibble(xtdb_octopoes_service: OctopoesService, event_m
     assert len(nibblets) == 4
     for nibblet in nibblets:
         assert nibblet.parameters_references is not None
-        arg = [xtdb_octopoes_service.ooi_repository.get(obj, valid_time) for obj in nibblet.parameters_references]
+        arg = [
+            xtdb_octopoes_service.ooi_repository.get(obj, valid_time)
+            for obj in nibblet.parameters_references
+            if obj is not None
+        ]
         assert nibblet.parameters_hash == nibble_hasher(tuple(arg))
         if nibblet.result:
             assert len(nibblet.result) == 1
@@ -208,26 +213,28 @@ def max_url_length_config(url: URL, config: Config) -> Iterator[OOI]:
             )
 
 
+def max_url_length_query_query(targets: list[Reference | None]) -> str:
+    links = list(f'"{target}"' if isinstance(target, Reference) else "" for target in targets)
+    return f"""{{
+            :query {{
+                :find [(pull ?var [*])]
+                :where [
+                    (or
+                        (and [?var :object_type "URL" ] [?var :URL/primary_key {links[0]}])
+                        (and [?var :object_type "Config" ] [?var :Config/primary_key {links[1]}])
+                    )
+                ]
+            }}
+        }}
+        """
+
+
 max_url_length_config_params = [
     NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]"),
     NibbleParameter(object_type=Config, parser="[*][?object_type == 'Config'][]"),
 ]
 max_url_length_config_nibble = NibbleDefinition(
-    name="max_url_length_config",
-    signature=max_url_length_config_params,
-    query="""
-    {
-        :query {
-            :find [(pull ?var [*])]
-            :where [
-                (or
-                    (and [?var :object_type "URL" ] [?var :URL/primary_key $1])
-                    (and [?var :object_type "Config" ] [?var :Config/primary_key $2])
-                )
-            ]
-        }
-    }
-    """,
+    name="max_url_length_config", signature=max_url_length_config_params, query=max_url_length_query_query
 )
 max_url_length_config_nibble.payload = getattr(sys.modules[__name__], "max_url_length_config")
 

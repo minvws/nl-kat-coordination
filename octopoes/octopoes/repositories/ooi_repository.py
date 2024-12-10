@@ -864,16 +864,6 @@ class XTDBOOIRepository(OOIRepository):
     def nibble_query(
         self, ooi: OOI, nibble: NibbleDefinition, valid_time: datetime, arguments: list[Reference | None] | None = None
     ) -> Iterable[Iterable[Any]]:
-        def strformat(a: str, *args) -> str:
-            def sub(match: re.Match) -> str:
-                idx = int(match.group(1)) - 1
-                if args[idx] is not None:
-                    return f'"{args[idx]}"' if 0 <= idx < len(args) else ""
-                else:
-                    return ""
-
-            return re.sub(r"\$(\d+)", sub, a)
-
         def objectify(t: type[Any], obj: dict | list | Any):
             if isinstance(obj, dict):
                 if issubclass(t, OOI):
@@ -893,7 +883,7 @@ class XTDBOOIRepository(OOIRepository):
                     ooi.reference if sgn.object_type == type_by_name(ooi.get_ooi_type()) else None
                     for sgn in nibble.signature
                 ]
-            query = strformat(nibble.query, *arguments) if isinstance(nibble.query, str) else nibble.query(arguments)
+            query = nibble.query if isinstance(nibble.query, str) else nibble.query(arguments)
             data = self.session.client.query(query, valid_time)
             objects = [
                 {ooi, *[objectify(sgn.object_type, obj) for obj in search(sgn.parser, data)]}

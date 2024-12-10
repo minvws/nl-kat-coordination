@@ -102,7 +102,7 @@ class NibblesRunner:
                     nibble,
                     valid_time,
                     nibblet.parameters_references
-                    if nibble.query is not None and (callable(nibble.query) or nibble.query.count("$") > 0)
+                    if nibble.query is not None and (callable(nibble.query) or isinstance(nibble.query, str))
                     else None,
                 )
                 results = {
