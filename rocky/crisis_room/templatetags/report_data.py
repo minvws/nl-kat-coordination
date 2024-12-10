@@ -56,7 +56,7 @@ def get_findings_summary(dashboards_data: QuerySet[DashboardData]):
 
     for dashboard_data in dashboards_data:
         report_data = get_report_data(dashboard_data)
-        if "findings" in report_data:
+        if "findings" in report_data and "summary" in report_data["findings"]:
             for summary_item, data in report_data["findings"]["summary"].items():
                 if isinstance(data, dict):
                     for severity, total in data.items():
