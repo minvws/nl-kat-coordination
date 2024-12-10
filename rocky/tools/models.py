@@ -68,6 +68,7 @@ class OrganizationTag(tagulous.models.TagTreeModel):
 
 
 class Organization(models.Model):
+    id: int
     name = models.CharField(max_length=126, unique=True, help_text=_("The name of the organisation"))
     code = LowerCaseSlugField(
         max_length=ORGANIZATION_CODE_LENGTH,
@@ -82,7 +83,7 @@ class Organization(models.Model):
 
     EVENT_CODES = {"created": 900201, "updated": 900202, "deleted": 900203}
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.name)
 
     class Meta:
@@ -190,7 +191,7 @@ class OrganizationMember(models.Model):
     class Meta:
         unique_together = ["user", "organization"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.user)
 
 
@@ -240,5 +241,5 @@ class OOIInformation(models.Model):
             self.data[key] = value
         self.save()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.id
