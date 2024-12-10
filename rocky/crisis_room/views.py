@@ -1,4 +1,6 @@
+from collections import defaultdict
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import Any
 
 import structlog
@@ -10,6 +12,8 @@ from django.http.request import HttpRequest
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
+from pydantic import TypeAdapter
+from reports.report_types.findings_report.report import SEVERITY_OPTIONS
 from tools.forms.base import ObservedAtForm
 from tools.models import Organization, OrganizationMember
 from tools.view_helpers import BreadcrumbsMixin
@@ -17,7 +21,9 @@ from tools.view_helpers import BreadcrumbsMixin
 from crisis_room.models import DashboardData
 from octopoes.connector import ConnectorException
 from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import Reference
 from octopoes.models.ooi.findings import RiskLevelSeverity
+from rocky.bytes_client import get_bytes_client
 from rocky.views.mixins import ObservedAtMixin
 from rocky.views.ooi_view import ConnectorFormMixin
 
@@ -114,8 +120,58 @@ class CrisisRoomAllOrganizations(TemplateView):
 
     def get_dashboards_data(self) -> QuerySet[DashboardData]:
         organizations = self.get_user_organizations()
-        dashboards_data = DashboardData.objects.filter(dashboard__organization__in=[org.pk for org in organizations])
-        return dashboards_data
+        grouped_data = defaultdict(list)
+        dashboards_data = DashboardData.objects.filter(dashboard__organization__in=organizations)
+        for data in dashboards_data:
+            grouped_data[data.dashboard.organization].append(self.get_report_data(data))
+        return dict(grouped_data)
+
+    def get_findings_summary(self, dashboards_data: QuerySet[DashboardData]):
+        summary: dict[str, Any] = {
+            "total_by_severity": {severity: 0 for severity in SEVERITY_OPTIONS},
+            "total_by_severity_per_finding_type": {severity: 0 for severity in SEVERITY_OPTIONS},
+            "total_finding_types": 0,
+            "total_occurrences": 0,
+        }
+
+        for dashboard_data in dashboards_data:
+            report_data = self.get_report_data(dashboard_data)
+            if "findings" in report_data and "summary" in report_data["findings"]:
+                for summary_item, data in report_data["findings"]["summary"].items():
+                    if isinstance(data, dict):
+                        for severity, total in data.items():
+                            summary[summary_item][severity] += total
+                    else:
+                        summary[summary_item] += data
+
+        return summary
+
+    @staticmethod
+    def get_octopoes_client(organization: Organization) -> OctopoesAPIConnector:
+        return OctopoesAPIConnector(
+            settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+        )
+
+    def get_report_data(self, dashboard_data: DashboardData) -> dict[str, Any]:
+        valid_time = datetime.now(timezone.utc)
+        octopoes_client = self.get_octopoes_client(dashboard_data.dashboard.organization)
+
+        reports = octopoes_client.query(
+            "ReportRecipe.<report_recipe[is Report]",
+            valid_time=valid_time,
+            source=Reference.from_str(dashboard_data.recipe),
+        )
+        if reports:
+            reports.sort(key=lambda ooi: ooi.date_generated, reverse=True)
+            report = reports[0]
+
+            bytes_client = get_bytes_client(dashboard_data.dashboard.organization.code)
+            bytes_client.login()
+
+            return TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
+                bytes_client.get_raw(raw_id=report.data_raw_id)
+            )
+        return {}
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
