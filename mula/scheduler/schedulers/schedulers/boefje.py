@@ -617,7 +617,9 @@ class BoefjeScheduler(Scheduler):
         oois = []
 
         oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
-            organisation, boefje.consumes, list(range(boefje.scan_level, 5))
+            organisation,
+            boefje.consumes,
+            list(range(boefje.scan_level, 5)),  # type: ignore
         )
 
         # Filter OOIs based on permission

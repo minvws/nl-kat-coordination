@@ -110,7 +110,7 @@ class App:
             | schedulers.BoefjeScheduler
             | schedulers.NormalizerScheduler
             | schedulers.ReportScheduler,
-        ] = None,
+        ],
     ) -> None:
         self.server = server.Server(self.ctx, schedulers)
         thread.ThreadRunner(name="App-server", target=self.server.run, stop_event=self.stop_event, loop=False).start()

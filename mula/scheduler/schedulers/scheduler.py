@@ -389,14 +389,6 @@ class Scheduler(abc.ABC):
 
         self.threads = []
 
-    def is_enabled(self) -> bool:
-        """Check if the scheduler is enabled.
-
-        Returns:
-            True if the scheduler is enabled, False otherwise.
-        """
-        return self.enabled
-
     def is_space_on_queue(self) -> bool:
         """Check if there is space on the queue.
 

@@ -115,7 +115,7 @@ class PriorityQueue(abc.ABC):
 
         items, count = self.pq_store.pop(self.pq_id, filters)
         if items is None:
-            return None
+            return ([], 0)
 
         # TODO: batch update
         for item in items:
