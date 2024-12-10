@@ -3,12 +3,16 @@ from __future__ import annotations
 import json
 import re
 from collections import Counter
+from collections.abc import Iterable
 from datetime import datetime
+from itertools import product
 from typing import Any, Literal, cast
 
 import structlog
 from bits.definitions import BitDefinition
 from httpx import HTTPStatusError, codes
+from jmespath import search
+from nibbles.definitions import NibbleDefinition
 from pydantic import RootModel, TypeAdapter
 
 from octopoes.config.settings import (
@@ -159,7 +163,12 @@ class OOIRepository(Repository):
     def list_related(self, ooi: OOI, path: Path, valid_time: datetime) -> list[OOI]:
         raise NotImplementedError
 
-    def query(self, query: Query, valid_time: datetime) -> list[OOI | tuple]:
+    def query(self, query: str | Query, valid_time: datetime) -> list[OOI | tuple]:
+        raise NotImplementedError
+
+    def nibble_query(
+        self, ooi: OOI, nibble: NibbleDefinition, valid_time: datetime, arguments: list[Reference | None] | None = None
+    ) -> Iterable[Iterable[Any]]:
         raise NotImplementedError
 
 
@@ -237,7 +246,7 @@ class XTDBOOIRepository(OOIRepository):
     @classmethod
     def deserialize(cls, data: dict[str, Any]) -> OOI:
         if "object_type" not in data:
-            raise ValueError("Data is missing object_type")
+            raise ValueError("OOI data is missing object_type")
 
         # pop global attributes
         object_cls = type_by_name(data.pop("object_type"))
@@ -860,3 +869,35 @@ class XTDBOOIRepository(OOIRepository):
             parsed_results.append(tuple(parsed_result))
 
         return parsed_results
+
+    def nibble_query(
+        self, ooi: OOI, nibble: NibbleDefinition, valid_time: datetime, arguments: list[Reference | None] | None = None
+    ) -> Iterable[Iterable[Any]]:
+        def objectify(t: type[Any], obj: dict | list | Any):
+            if isinstance(obj, dict):
+                if issubclass(t, OOI):
+                    return self.deserialize(obj)
+                else:
+                    return t(**obj)
+            elif isinstance(obj, list):
+                return tuple({objectify(t, o) for o in obj})
+            else:
+                return t(obj)
+
+        if nibble.query is None:
+            return [{ooi}]
+        else:
+            if arguments is None:
+                arguments = [
+                    ooi.reference if sgn.object_type == type_by_name(ooi.get_ooi_type()) else None
+                    for sgn in nibble.signature
+                ]
+            query = nibble.query if isinstance(nibble.query, str) else nibble.query(arguments)
+            data = self.session.client.query(query, valid_time)
+            objects = [
+                {ooi, *[objectify(sgn.object_type, obj) for obj in search(sgn.parser, data)]}
+                if isinstance(ooi, sgn.object_type)
+                else {objectify(sgn.object_type, obj) for obj in search(sgn.parser, data)}
+                for sgn in nibble.signature
+            ]
+            return list(product(*objects))
