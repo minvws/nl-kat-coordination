@@ -13,7 +13,7 @@ from octopoes.core.service import OctopoesService
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.findings import Finding, KATFindingType
+from octopoes.models.ooi.findings import Finding, FindingType, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 from octopoes.models.ooi.web import URL, HostnameHTTPURL, IPAddressHTTPURL, WebScheme
 from octopoes.models.origin import OriginType
@@ -126,7 +126,6 @@ find_network_url_params = [
     NibbleParameter(object_type=Network, parser="[*][?object_type == 'Network'][]"),
     NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]"),
 ]
-
 find_network_url_nibble = NibbleDefinition(
     name="find_network_url",
     signature=find_network_url_params,
@@ -344,3 +343,40 @@ def test_callable_query(xtdb_octopoes_service: OctopoesService, event_manager: M
     result = xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time)
     assert result.count == 2
     assert finding[0] in result.items
+
+
+mock_finding_type_nibble = NibbleDefinition(
+    name="default-findingtype-risk", signature=[NibbleParameter(object_type=FindingType)]
+)
+
+
+def set_default_severity(input_ooi: FindingType) -> Iterator[OOI]:
+    input_ooi.risk_severity = RiskLevelSeverity.PENDING
+    yield input_ooi
+
+
+mock_finding_type_nibble.payload = getattr(sys.modules[__name__], "set_default_severity")
+
+
+def test_parent_type_in_nibble_signature(
+    xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime
+):
+    nibbler = NibblesRunner(
+        xtdb_octopoes_service.ooi_repository,
+        xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.scan_profile_repository,
+    )
+    xtdb_octopoes_service.nibbler.nibbles = {}
+    nibbler.nibbles = {mock_finding_type_nibble.id: mock_finding_type_nibble}
+    network = Network(name="internet")
+    xtdb_octopoes_service.ooi_repository.save(network, valid_time)
+    finding_type = KATFindingType(id="test")
+    xtdb_octopoes_service.ooi_repository.save(finding_type, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    xtdb_finding_type = xtdb_octopoes_service.ooi_repository.get(finding_type.reference, valid_time)
+
+    result = nibbler.infer([xtdb_finding_type], valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    assert xtdb_finding_type in result
