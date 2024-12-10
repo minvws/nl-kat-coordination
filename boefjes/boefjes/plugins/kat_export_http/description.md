@@ -1,6 +1,6 @@
 # Export to HTTP api
 
-This Boefje can be confgred to un on selected OOI's with a selected clearance level, it then exports these OOI's to the configured Http endpoint.
+This Boefje can be configured to run on selected OOI's with a selected clearance level, it then exports these OOI's to the configured Http endpoint.
 Configure by copying this Boefje, and provinding Input OOI's of your choice. Limit Exported Objects by selecting an appropriate Scan Level.
 
 ### Input OOIs
