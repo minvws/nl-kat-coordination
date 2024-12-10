@@ -34,6 +34,9 @@ class AppContext:
             the schedulers.
     """
 
+    metrics_qsize: Gauge
+    metrics_task_status_counts: Gauge
+
     def __init__(self) -> None:
         """Initializer of the AppContext class."""
         self.config: settings.Settings = settings.Settings()

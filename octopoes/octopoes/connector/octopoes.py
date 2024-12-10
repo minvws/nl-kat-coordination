@@ -1,5 +1,5 @@
 import json
-from collections.abc import Sequence, Set
+from collections.abc import Iterable, Sequence, Set
 from datetime import datetime
 from typing import Literal
 from uuid import UUID
@@ -206,7 +206,7 @@ class OctopoesAPIConnector:
 
         self.logger.info("Saved affirmation", affirmation=affirmation, event_code=DECLARATION_CREATED)
 
-    def save_scan_profile(self, scan_profile: ScanProfile, valid_time: datetime):
+    def save_scan_profile(self, scan_profile: ScanProfile, valid_time: datetime) -> None:
         params = {"valid_time": str(valid_time)}
         self.session.put(
             f"/{self.client}/scan_profiles",
@@ -262,7 +262,7 @@ class OctopoesAPIConnector:
 
     def list_findings(
         self,
-        severities: set[RiskLevelSeverity],
+        severities: Iterable[RiskLevelSeverity],
         valid_time: datetime,
         exclude_muted: bool = True,
         only_muted: bool = False,
@@ -301,8 +301,8 @@ class OctopoesAPIConnector:
 
         return TypeAdapter(Report).validate_json(res.content)
 
-    def load_objects_bulk(self, references: set[Reference], valid_time):
-        params = {"valid_time": valid_time}
+    def load_objects_bulk(self, references: set[Reference], valid_time: datetime) -> dict[Reference, OOIType]:
+        params = {"valid_time": str(valid_time)}
         res = self.session.post(
             f"/{self.client}/objects/load_bulk", params=params, json=[str(ref) for ref in references]
         )
