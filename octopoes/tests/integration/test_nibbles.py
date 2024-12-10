@@ -10,7 +10,7 @@ from nibbles.definitions import NibbleDefinition, NibbleParameter
 from nibbles.runner import NibblesRunner, nibble_hasher
 
 from octopoes.core.service import OctopoesService
-from octopoes.models import OOI
+from octopoes.models import OOI, Reference
 from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, KATFindingType
@@ -286,14 +286,17 @@ callable_query_param = [
 ]
 
 
-def callable_query_query(targets: list[str]) -> str:
-    sgn = "".join(str(len(target)) for target in targets)
+def callable_query_query(targets: list[Reference | None]) -> str:
+    sgn = "".join(str(int(isinstance(target, Reference))) for target in targets)
     if sgn == "10":
         return f'{{:query {{:find [(pull ?var [*])] :where [[?var :object_type "URL"]\
-[?var :URL/primary_key {targets[0]}]]}}}}'
+[?var :URL/primary_key "{str(targets[0])}"]]}}}}'
     elif sgn == "01":
         return f'{{:query {{:find [(pull ?var [*])] :where [[?var :object_type "URL"]\
-[?var :URL/primary_key {targets[1]}]]}}}}'
+[?var :URL/primary_key "{str(targets[1])}"]]}}}}'
+    elif sgn == "11":
+        # INFO: probably this one should be specialized
+        return '{:query {:find [(pull ?var [*])] :where [[?var :object_type "URL"]]}}'
     else:
         return '{:query {:find [(pull ?var [*])] :where [[?var :object_type "URL"]]}}'
 
@@ -325,4 +328,12 @@ def test_callable_query(xtdb_octopoes_service: OctopoesService, event_manager: M
 
     event_manager.complete_process_events(xtdb_octopoes_service)
 
-    print(xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time))
+    url1 = URL(network=network1.reference, raw=url_names1[0]).reference
+    url2 = URL(network=network2.reference, raw=url_names2[2]).reference
+    xtdb_url1 = xtdb_octopoes_service.ooi_repository.get(url1, valid_time)
+    xtdb_url2 = xtdb_octopoes_service.ooi_repository.get(url2, valid_time)
+    finding = list(callable_query(xtdb_url1, xtdb_url2))
+
+    result = xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time)
+    assert result.count == 2
+    assert finding[0] in result.items

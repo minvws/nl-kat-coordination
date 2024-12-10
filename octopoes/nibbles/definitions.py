@@ -8,7 +8,7 @@ from typing import Any
 import structlog
 from pydantic import BaseModel
 
-from octopoes.models import OOI
+from octopoes.models import OOI, Reference
 
 NIBBLES_DIR = Path(__file__).parent
 NIBBLE_ATTR_NAME = "NIBBLE"
@@ -32,7 +32,7 @@ class NibbleParameter(BaseModel):
 class NibbleDefinition:
     id: str
     signature: list[NibbleParameter]
-    query: str | Callable[[list[str]], str] | None = None
+    query: str | Callable[[list[Reference | None]], str] | None = None
     default_enabled: bool = True
     config_ooi_relation_path: str | None = None
     payload: MethodType | None = None
@@ -41,7 +41,7 @@ class NibbleDefinition:
         self,
         name: str,
         signature: list[NibbleParameter],
-        query: str | Callable[[list[str]], str] | None = None,
+        query: str | Callable[[list[Reference | None]], str] | None = None,
         default_enabled: bool = True,
         config_ooi_relation_path: str | None = None,
     ):
