@@ -9,11 +9,11 @@ on:
       - "*"
     paths:
       - bytes/**
-      - .github/workflows/bytes_test.yml
+      - .github/workflows/bytes_tests.yml
   pull_request:
     paths:
       - bytes/**
-      - .github/workflows/bytes_test.yml
+      - .github/workflows/bytes_tests.yml
 
 jobs:
   test:

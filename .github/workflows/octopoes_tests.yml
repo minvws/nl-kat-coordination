@@ -9,11 +9,11 @@ on:
       - "*"
     paths:
       - octopoes/**
-      - .github/workflows/octopoes_test.yml
+      - .github/workflows/octopoes_tests.yml
   pull_request:
     paths:
       - octopoes/**
-      - .github/workflows/octopoes_test.yml
+      - .github/workflows/octopoes_tests.yml
 
 jobs:
   test:
