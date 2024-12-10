@@ -112,7 +112,11 @@ class NibblesRunner:
                 }
                 return_value |= {nibble.id: results}
         nibblet_nibbles = {self.nibbles[nibblet.method] for nibblet in nibblets if nibblet.method in self.nibbles}
-        for nibble in filter(lambda x: type(ooi) in x.signature and x not in nibblet_nibbles, self.nibbles.values()):
+
+        for nibble in filter(
+            lambda x: any(isinstance(ooi, param.object_type) for param in x.signature) and x not in nibblet_nibbles,
+            self.nibbles.values(),
+        ):
             if len(nibble.signature) > 1:
                 self._write(valid_time)
             args = self.ooi_repository.nibble_query(ooi, nibble, valid_time)
