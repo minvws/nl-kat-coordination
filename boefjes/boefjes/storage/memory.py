@@ -131,5 +131,5 @@ class ConfigStorageMemory(ConfigStorage):
             if enabled and "norm" in plugin_id
         ]
 
-    def get_state_by_id(self, organisation_id: str) -> dict[str, bool]:
+    def get_states_for_organisation(self, organisation_id: str) -> dict[str, bool]:
         return self._enabled.get(organisation_id, {})

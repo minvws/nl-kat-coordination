@@ -43,13 +43,13 @@ class PluginService:
 
     def get_all(self, organisation_id: str) -> list[PluginType]:
         all_plugins = self._get_all_without_enabled()
-        plugin_states = self.config_storage.get_state_by_id(organisation_id)
+        plugin_states = self.config_storage.get_states_for_organisation(organisation_id)
 
         for plugin in all_plugins.values():
             if plugin.id not in plugin_states:
                 continue
 
-            plugin.enabled = plugin_states[plugin.id]
+            all_plugins[plugin.id] = plugin.model_copy(update={"enabled": plugin_states[plugin.id]})
 
         return list(all_plugins.values())
 

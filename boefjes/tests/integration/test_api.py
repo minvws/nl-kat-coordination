@@ -73,6 +73,16 @@ def test_add_boefje(test_client, organisation):
     assert response.json() == boefje_dict
 
 
+def test_enable_boefje(test_client, organisation, second_organisation):
+    test_client.patch(f"/v1/organisations/{organisation.id}/plugins/dns-records", json={"enabled": True})
+
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/dns-records")
+    assert response.json()["enabled"] is True
+
+    response = test_client.get(f"/v1/organisations/{second_organisation.id}/plugins/dns-records")
+    assert response.json()["enabled"] is False
+
+
 def test_cannot_add_static_plugin_with_duplicate_name(test_client, organisation):
     boefje = Boefje(id="test_plugin", name="DNS records", static=False)
     response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
@@ -137,7 +147,7 @@ def test_delete_normalizer(test_client, organisation):
     assert response.status_code == 404
 
 
-def test_update_plugins(test_client, organisation):
+def test_update_plugins(test_client, organisation, second_organisation):
     normalizer = Normalizer(id="norm_id", name="My test normalizer")
     boefje = Boefje(id="test_plugin", name="My test boefje", description="123", interval=20)
 
