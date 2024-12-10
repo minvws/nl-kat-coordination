@@ -269,3 +269,60 @@ def test_max_length_config_nibble(xtdb_octopoes_service: OctopoesService, event_
     assert result[xtdb_url]["max_url_length_config"][tuple([xtdb_url, config])] == set(
         max_url_length_config(xtdb_url, config)
     )
+
+
+def callable_query(url1: URL, url2: URL) -> Iterator[OOI]:
+    if url1.raw == url2.raw and url1.network != url2.network:
+        yield Finding(
+            finding_type=KATFindingType(id="Duplicate URL's under different network").reference,
+            ooi=url1.reference,
+            proof=f"{url1.reference} matches {url2.reference}.",
+        )
+
+
+callable_query_param = [
+    NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]"),
+    NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]"),
+]
+
+
+def callable_query_query(targets: list[str]) -> str:
+    sgn = "".join(str(len(target)) for target in targets)
+    if sgn == "10":
+        return f'{{:query {{:find [(pull ?var [*])] :where [[?var :object_type "URL"]\
+[?var :URL/primary_key {targets[0]}]]}}}}'
+    elif sgn == "01":
+        return f'{{:query {{:find [(pull ?var [*])] :where [[?var :object_type "URL"]\
+[?var :URL/primary_key {targets[1]}]]}}}}'
+    else:
+        return '{:query {:find [(pull ?var [*])] :where [[?var :object_type "URL"]]}}'
+
+
+callable_query_nibble = NibbleDefinition(
+    name="max_url_length_config", signature=callable_query_param, query=callable_query_query
+)
+callable_query_nibble.payload = getattr(sys.modules[__name__], "callable_query")
+
+
+def test_callable_query(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
+    xtdb_octopoes_service.nibbler.nibbles = {"callable_nibble_query": callable_query_nibble}
+    network1 = Network(name="internet1")
+    network2 = Network(name="internet2")
+
+    xtdb_octopoes_service.ooi_repository.save(network1, valid_time)
+    xtdb_octopoes_service.ooi_repository.save(network2, valid_time)
+
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    url_names1 = ["https://mispo.es", "https://appelmo.es", "https://boesbo.es"]
+    url_names2 = ["https://tompo.es", "https://smo.es", "https://mispo.es"]
+
+    for url in url_names1:
+        xtdb_octopoes_service.ooi_repository.save(URL(network=network1.reference, raw=url), valid_time)
+
+    for url in url_names2:
+        xtdb_octopoes_service.ooi_repository.save(URL(network=network2.reference, raw=url), valid_time)
+
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    print(xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time))

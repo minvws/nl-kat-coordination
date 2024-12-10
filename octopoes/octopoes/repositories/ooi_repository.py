@@ -893,7 +893,12 @@ class XTDBOOIRepository(OOIRepository):
                     ooi.reference if sgn.object_type == type_by_name(ooi.get_ooi_type()) else None
                     for sgn in nibble.signature
                 ]
-            data = self.session.client.query(strformat(nibble.query, *arguments), valid_time)
+            query = (
+                strformat(nibble.query, *arguments)
+                if isinstance(nibble.query, str)
+                else nibble.query(list(str(arg) for arg in arguments))
+            )
+            data = self.session.client.query(query, valid_time)
             objects = [
                 {ooi, *[objectify(sgn.object_type, obj) for obj in search(sgn.parser, data)]}
                 if isinstance(ooi, sgn.object_type)
