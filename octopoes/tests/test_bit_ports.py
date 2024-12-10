@@ -1,5 +1,4 @@
 from bits.port_classification_ip.port_classification_ip import run as run_port_classification
-from nibbles.port_common.port_common import nibble as run_port_common
 
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import IPAddressV4, IPPort
@@ -74,37 +73,3 @@ def test_port_classification_udp_80():
     finding = results[-1]
     assert isinstance(finding, Finding)
     assert finding.description == "Port 80/udp is not a common port and should possibly not be open."
-
-
-def test_port_common_tcp_80():
-    port = IPPort(address="fake", protocol="tcp", port=80)
-    results = list(run_port_common(port))
-
-    assert len(results) == 2
-    finding = results[-1]
-    assert isinstance(finding, Finding)
-    assert finding.description == "Port 80/tcp is a common port and found to be open."
-
-
-def test_port_common_tcp_22():
-    port = IPPort(address="fake", protocol="tcp", port=22)
-    results = list(run_port_common(port))
-
-    assert not results
-
-
-def test_port_common_udp_80():
-    port = IPPort(address="fake", protocol="udp", port=80)
-    results = list(run_port_common(port))
-
-    assert not results
-
-
-def test_port_common_udp_53():
-    port = IPPort(address="fake", protocol="udp", port=53)
-    results = list(run_port_common(port))
-
-    assert len(results) == 2
-    finding = results[-1]
-    assert isinstance(finding, Finding)
-    assert finding.description == "Port 53/udp is a common port and found to be open."
