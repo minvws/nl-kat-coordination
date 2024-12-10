@@ -2,7 +2,7 @@ from collections.abc import Iterator
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import CVEFindingType, Finding
-from octopoes.models.types import HTTPHeader
+from octopoes.models.ooi.web import HTTPHeader
 
 
 def nibble(input_ooi: HTTPHeader) -> Iterator[OOI]:

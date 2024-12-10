@@ -13,7 +13,7 @@ SEVERITY_TO_ID = {
 }
 
 
-def get_severity_and_reasons(cipher_suite) -> list[tuple[str, str]]:
+def get_severity_and_reasons(cipher_suite: str) -> list[tuple[str, str]]:
     with Path.open(Path(__file__).parent / "list-ciphers-openssl-with-finding-type.csv", newline="") as csvfile:
         reader = csv.DictReader(csvfile)
         data = [{k.strip(): v.strip() for k, v in row.items() if k} for row in reader]

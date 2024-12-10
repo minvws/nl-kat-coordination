@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from enum import Enum
 from uuid import UUID
 
@@ -24,7 +26,7 @@ class Origin(BaseModel):
     parameters_references: list[Reference | None] | None = None  # None for anything other than nibblet
     task_id: UUID | None = None
 
-    def __sub__(self, other) -> set[Reference]:
+    def __sub__(self, other: Origin) -> set[Reference]:
         if isinstance(other, Origin):
             return set(self.result) - set(other.result)
         else:

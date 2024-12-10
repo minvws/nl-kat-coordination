@@ -41,7 +41,7 @@ class RabbitMQEventManager(EventManager):
 
         logger.info("Published event [event_id=%s] to queue %s", event.event_id, queue_name)
 
-    def _check_connection(self):
+    def _check_connection(self) -> None:
         if self.connection.is_closed:
             self.connection = pika.BlockingConnection(pika.URLParameters(self.queue_uri))
             self.channel = self.connection.channel()

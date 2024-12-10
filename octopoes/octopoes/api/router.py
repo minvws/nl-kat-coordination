@@ -443,8 +443,8 @@ def get_scan_profile_inheritance(
 def list_findings(
     exclude_muted: bool = True,
     only_muted: bool = False,
-    offset=DEFAULT_OFFSET,
-    limit=DEFAULT_LIMIT,
+    offset: int = DEFAULT_OFFSET,
+    limit: int = DEFAULT_LIMIT,
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     severities: set[RiskLevelSeverity] = Query(DEFAULT_SEVERITY_FILTER),
@@ -459,8 +459,8 @@ def list_findings(
 
 @router.get("/reports", tags=["Reports"])
 def list_reports(
-    offset=DEFAULT_OFFSET,
-    limit=DEFAULT_LIMIT,
+    offset: int = DEFAULT_OFFSET,
+    limit: int = DEFAULT_LIMIT,
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
 ) -> Paginated[tuple[Report, list[Report | None]]]:
