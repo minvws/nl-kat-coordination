@@ -111,7 +111,7 @@ class SQLConfigStorage(SessionMixin, ConfigStorage):
 
         return [plugin[0] for plugin in enabled_normalizers.all()]
 
-    def get_state_by_id(self, organisation_id: str) -> dict[str, bool]:
+    def get_states_for_organisation(self, organisation_id: str) -> dict[str, bool]:
         enabled_boefjes = (
             self.session.query(BoefjeInDB.plugin_id, BoefjeConfigInDB.enabled)
             .join(BoefjeConfigInDB)

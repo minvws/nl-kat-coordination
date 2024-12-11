@@ -926,7 +926,7 @@ class BoefjeScheduler(Scheduler):
 
         return True
 
-    def get_boefjes_for_ooi(self, ooi) -> list[Plugin]:
+    def get_boefjes_for_ooi(self, ooi: OOI) -> list[Plugin]:
         """Get available all boefjes (enabled and disabled) for an ooi.
 
         Args:

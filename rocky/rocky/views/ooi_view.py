@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from time import sleep
 from typing import Literal
 
-from django import forms
+from django.forms import Form
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -188,12 +188,12 @@ class BaseOOIDetailView(BreadcrumbsMixin, SingleOOITreeMixin, ConnectorFormMixin
 
 class BaseOOIFormView(SingleOOIMixin, FormView):
     ooi_class: type[OOI]
-    form_class: forms.Form = OOIForm
+    form_class: type[BaseRockyForm] = OOIForm
 
     def get_ooi_class(self):
         return self.ooi.__class__ if hasattr(self, "ooi") else None
 
-    def get_form(self, form_class=None) -> BaseRockyForm:
+    def get_form(self, form_class: type[Form] | None = None) -> BaseRockyForm:
         form = super().get_form(form_class)
 
         # Disable natural key attributes
