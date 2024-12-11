@@ -110,10 +110,10 @@ class NormalizerScheduler(Scheduler):
             thread_name_prefix=f"NormalizerScheduler-TPE-{self.scheduler_id}-raw_data"
         ) as executor:
             for normalizer_task in normalizer_tasks:
-                executor.submit(self.validate_and_push_task, normalizer_task, latest_raw_data.organization)
+                executor.submit(self.push_normalizer_task, normalizer_task, latest_raw_data.organization)
 
-    @tracer.start_as_current_span("normalizer_push_task")
-    def validate_and_push_task(
+    @tracer.start_as_current_span("push_normalizer_task")
+    def push_normalizer_task(
         self, normalizer_task: models.NormalizerTask, organisation_id: str, caller: str = ""
     ) -> None:
         if self.has_normalizer_task_started_running(normalizer_task):

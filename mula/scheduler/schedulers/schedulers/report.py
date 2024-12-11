@@ -66,13 +66,14 @@ class ReportScheduler(Scheduler):
         ) as executor:
             for report_task in report_tasks:
                 executor.submit(
-                    self.validate_and_push_task,
+                    self.push_report_task,
                     report_task,
                     report_task.organisation_id,
                     self.push_tasks_for_rescheduling.__name__,
                 )
 
-    def validate_and_push_task(self, report_task: models.ReportTask, organisation_id: str, caller: str = "") -> None:
+    @tracer.start_as_current_span("push_report_task")
+    def push_report_task(self, report_task: models.ReportTask, organisation_id: str, caller: str = "") -> None:
         if self.is_item_on_queue_by_hash(report_task.hash):
             self.logger.debug("Report task already on queue", scheduler_id=self.scheduler_id, caller=caller)
             return

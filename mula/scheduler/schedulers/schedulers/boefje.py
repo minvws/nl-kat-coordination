@@ -296,6 +296,7 @@ class BoefjeScheduler(Scheduler):
                 executor.submit(self.push_boefje_task, new_boefje_task, self.push_tasks_for_rescheduling.__name__)
 
     # TODO: clean up exceptions -> exception handler
+    @tracer.start_as_current_span("push_boefje_task")
     def push_boefje_task(self, boefje_task: models.BoefjeTask, organisation_id: str, caller: str = "") -> None:
         grace_period_passed = self.has_boefje_task_grace_period_passed(boefje_task)
         if not grace_period_passed:
