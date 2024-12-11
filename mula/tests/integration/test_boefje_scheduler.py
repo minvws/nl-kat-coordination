@@ -3,10 +3,10 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import clients, config, models, schedulers, storage
-from scheduler.storage import stores
 from structlog.testing import capture_logs
 
+from scheduler import clients, config, models, schedulers, storage
+from scheduler.storage import stores
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -575,7 +575,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_plugin.return_value = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Act
-        self.scheduler.validate_and_push_task(boefje_task, self.organisation.id)
+        self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
 
         # Assert
         self.assertEqual(1, self.scheduler.queue.qsize())
@@ -594,7 +594,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_plugin.return_value = PluginFactory(scan_level=0)
 
         # Act
-        self.scheduler.validate_and_push_task(boefje_task, self.organisation.id)
+        self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
 
         # Assert
         self.assertEqual(1, self.scheduler.queue.qsize())
@@ -636,13 +636,13 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_plugin.return_value = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Act
-        self.scheduler.validate_and_push_task(boefje_task, self.organisation.id)
+        self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
 
         # Assert
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         with capture_logs() as cm:
-            self.scheduler.validate_and_push_task(boefje_task, self.organisation.id)
+            self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
 
         self.assertIn("Could not add task to queue, queue is full", cm[-1].get("event"))
         self.assertEqual(1, self.scheduler.queue.qsize())
@@ -716,7 +716,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         mock_get_tasks_by_hash.return_value = None
 
         # Act
-        self.scheduler.validate_and_push_task(boefje_task, self.organisation.id)
+        self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
 
         # Assert: task should be in datastore, and failed
         task_db = self.mock_ctx.datastores.task_store.get_task(task.id)

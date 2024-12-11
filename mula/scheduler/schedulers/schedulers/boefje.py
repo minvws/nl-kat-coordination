@@ -140,10 +140,7 @@ class BoefjeScheduler(Scheduler):
         ) as executor:
             for boefje_task in boefje_tasks:
                 executor.submit(
-                    self.validate_and_push_task,
-                    boefje_task,
-                    mutation.organisation,
-                    self.push_tasks_for_mutations.__name__,
+                    self.push_boefje_task, boefje_task, mutation.organisation, self.push_tasks_for_mutations.__name__
                 )
 
     @tracer.start_as_current_span("boefje_push_tasks_for_new_boefjes")
@@ -177,9 +174,7 @@ class BoefjeScheduler(Scheduler):
             thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-new_boefjes"
         ) as executor:
             for boefje_task, org_id in boefje_tasks:
-                executor.submit(
-                    self.validate_and_push_task, boefje_task, org_id, self.push_tasks_for_new_boefjes.__name__
-                )
+                executor.submit(self.push_boefje_task, boefje_task, org_id, self.push_tasks_for_new_boefjes.__name__)
 
     @tracer.start_as_current_span("boefje_push_tasks_for_rescheduling")
     def push_tasks_for_rescheduling(self):
@@ -298,10 +293,10 @@ class BoefjeScheduler(Scheduler):
                     organization=schedule.organisation,
                 )
 
-                executor.submit(self.validate_and_push_task, new_boefje_task, self.push_tasks_for_rescheduling.__name__)
+                executor.submit(self.push_boefje_task, new_boefje_task, self.push_tasks_for_rescheduling.__name__)
 
     # TODO: clean up exceptions -> exception handler
-    def validate_and_push_task(self, boefje_task: models.BoefjeTask, organisation_id: str, caller: str = "") -> None:
+    def push_boefje_task(self, boefje_task: models.BoefjeTask, organisation_id: str, caller: str = "") -> None:
         grace_period_passed = self.has_boefje_task_grace_period_passed(boefje_task)
         if not grace_period_passed:
             self.logger.debug(
