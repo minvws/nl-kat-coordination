@@ -81,7 +81,7 @@ Objects
 
 The Objects page lists all the objects in Octopoes. Objects can be anything, like DNS records, hostnames, URLs, software, software versions, ports, etc. It is any piece of information that is found by the normalizers, bits and boefjes. On a new installation you'll see the following objects by default: 
 
-.. image:: img/object-clean-install.png
+.. image:: img/objects-clean-install.png
   :alt: overview of default objects
 
 The table gives an overview on the following items:
