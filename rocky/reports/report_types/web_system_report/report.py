@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -77,13 +79,13 @@ class WebChecks:
     def certificates_not_expiring_soon(self):
         return sum([check.certificates_not_expiring_soon for check in self.checks])
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return all(bool(check) for check in self.checks)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.checks)
 
-    def __add__(self, other: "WebChecks"):
+    def __add__(self, other: WebChecks) -> WebChecks:
         return WebChecks(checks=self.checks + other.checks)
 
 

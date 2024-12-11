@@ -5,7 +5,7 @@ from account.models import KATUser
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count
+from django.db.models import Count, QuerySet
 from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
@@ -21,7 +21,7 @@ logger = get_logger(__name__)
 class OrganizationListView(OrganizationBreadcrumbsMixin, ListView):
     template_name = "organizations/organization_list.html"
 
-    def get_queryset(self) -> list[Organization]:
+    def get_queryset(self) -> QuerySet[Organization]:
         user: KATUser = self.request.user
         return (
             Organization.objects.annotate(member_count=Count("members"))
