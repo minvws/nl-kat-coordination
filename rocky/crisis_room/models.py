@@ -31,6 +31,8 @@ class DashboardData(models.Model):
             "Position 1 is the most top level and the max position is 16."
         ),
     )
+    display_in_crisis_room = models.BooleanField(default=False)
+    display_in_dashboard = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ["dashboard", "position"]
