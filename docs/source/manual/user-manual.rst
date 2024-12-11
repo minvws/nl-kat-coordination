@@ -121,7 +121,7 @@ Object details can be found by clicking on an object on the Objects page. Object
 - Findings: the findings tab shows all findings that are linked to this object. Different objects have different findings, meaning that the Findings tab for a hostname is likely different from the findings tab for an IP address. 
 
 
-.. image:: img/objects-details.png
+.. image:: img/object-details.png
   :alt: object detail page
 
 Tasks
