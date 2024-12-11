@@ -65,7 +65,7 @@ class BoefjeScheduler(Scheduler):
             "Boefje scheduler started", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
         )
 
-    @tracer.start_as_current_span("boefje_push_tasks_for_mutations")
+    @tracer.start_as_current_span("process_mutations")
     def process_mutations(self, body: bytes) -> None:
         """Create tasks for oois that have a scan level change.
 
@@ -169,7 +169,7 @@ class BoefjeScheduler(Scheduler):
                     self.process_mutations.__name__,
                 )
 
-    @tracer.start_as_current_span("boefje_push_tasks_for_new_boefjes")
+    @tracer.start_as_current_span("process_new_boefjes")
     def process_new_boefjes(self) -> None:
         """When new boefjes are added or enabled we find the ooi's that
         boefjes can run on, and create tasks for it."""
@@ -204,7 +204,7 @@ class BoefjeScheduler(Scheduler):
                     self.push_boefje_task, boefje_task, org_id, self.create_schedule, self.process_new_boefjes.__name__
                 )
 
-    @tracer.start_as_current_span("boefje_push_tasks_for_rescheduling")
+    @tracer.start_as_current_span("process_rescheduling")
     def process_rescheduling(self):
         schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
             filters=filters.FilterRequest(

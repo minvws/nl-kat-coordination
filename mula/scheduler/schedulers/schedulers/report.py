@@ -40,7 +40,7 @@ class ReportScheduler(Scheduler):
             "Report scheduler started", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
         )
 
-    @tracer.start_as_current_span(name="report_push_tasks_for_rescheduling")
+    @tracer.start_as_current_span(name="process_rescheduling")
     def process_rescheduling(self):
         schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
             filters=filters.FilterRequest(

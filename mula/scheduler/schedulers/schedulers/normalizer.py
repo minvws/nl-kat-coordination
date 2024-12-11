@@ -55,7 +55,7 @@ class NormalizerScheduler(Scheduler):
             "Normalizer scheduler started", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
         )
 
-    @tracer.start_as_current_span("normalizer_push_task_for_raw_data")
+    @tracer.start_as_current_span("process_raw_data")
     def process_raw_data(self, body: bytes) -> None:
         """Create tasks for the received raw data.
 
