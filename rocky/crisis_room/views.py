@@ -128,7 +128,6 @@ class CrisisRoomMixin:
         self, display_in_crisis_room: bool = False, display_in_dashboard: bool = False
     ) -> dict[Organization, dict[DashboardData, dict[str, Any]]]:
         organizations = self.get_user_organizations()
-        organization_dashboards = {}
         grouped_data = defaultdict(list)
         dashboards_data = DashboardData.objects.filter(
             dashboard__organization__in=organizations,
@@ -136,8 +135,9 @@ class CrisisRoomMixin:
             display_in_dashboard=display_in_dashboard,
         )
         for data in dashboards_data:
-            organization_dashboards[data] = self.get_report_data(data)
-            grouped_data[data.dashboard.organization].append(organization_dashboards)
+            organization_dashboard = {}
+            organization_dashboard[data] = self.get_report_data(data)
+            grouped_data[data.dashboard.organization].append(organization_dashboard)
         return dict(grouped_data)
 
     @staticmethod
@@ -201,9 +201,9 @@ class CrisisRoomFindings(CrisisRoomMixin, TemplateView):
             dashboard__organization__in=organizations, dashboard__name="Crisis Room Findings Dashboard"
         )
         for data in dashboards_data:
-            organization_dashboards = {}
-            organization_dashboards[data] = self.get_report_data(data)
-            grouped_data[data.dashboard.organization].append(organization_dashboards)
+            organization_dashboard = {}
+            organization_dashboard[data] = self.get_report_data(data)
+            grouped_data[data.dashboard.organization].append(organization_dashboard)
         return dict(grouped_data)
 
     def get_organizations_findings_summary(self) -> dict[str, Any]:

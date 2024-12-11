@@ -62,34 +62,36 @@
                                         {% endif %}
                                     </td>
                                     <td class="actions">
-                                        {% if report_data %}
-                                            <button class="expando-button"
-                                                    data-icon-open-class="icon ti-chevron-down"
-                                                    data-icon-close-class="icon ti-chevron-up"
-                                                    data-close-label="{% translate "Close details" %}">
-                                                {% translate "Open details" %}
-                                            </button>
-                                        {% endif %}
+                                        <button class="expando-button"
+                                                data-icon-open-class="icon ti-chevron-down"
+                                                data-icon-close-class="icon ti-chevron-up"
+                                                data-close-label="{% translate "Close details" %}">
+                                            {% translate "Open details" %}
+                                        </button>
                                     </td>
                                 </tr>
-                                {% if report_data %}
-                                    <tr class="expando-row">
-                                        <td colspan="5">
-                                            <h4>{% translate "Findings overview" %}</h4>
+                                <tr class="expando-row">
+                                    <td colspan="6">
+                                        <div>
+                                            <h5>{% translate "Findings overview" %}</h5>
                                             <p>
                                                 {% translate "This overview shows the total number of findings per severity that have been identified for this organization." %}
                                             </p>
-                                            {% include "partials/report_severity_totals_table.html" with data=report_data.findings.summary %}
+                                        </div>
+                                        {% include "partials/report_severity_totals_table.html" with data=report_data.findings.summary %}
 
-                                            <h4>{% translate "Findings" %}</h4>
+                                        <div>
+                                            <h5>
+                                                {% translate "Findings" %} ({{ report_data.findings.finding_types|length }}/{{ report_data.findings.summary.total_finding_types }})
+                                            </h5>
                                             <p>
                                                 {% translate "This overview shows the total number of findings per severity that have been identified for this organization." %}
                                             </p>
-                                            {% include "partials/report_findings_table.html" with finding_types=report_data.findings.finding_types %}
+                                        </div>
+                                        {% include "partials/report_findings_table.html" with finding_types=report_data.findings.finding_types %}
 
-                                        </td>
-                                    </tr>
-                                {% endif %}
+                                    </td>
+                                </tr>
                             {% endif %}
                         {% endfor %}
                     {% endfor %}

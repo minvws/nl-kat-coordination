@@ -12,30 +12,46 @@
 
         </section>
         <section>
+            <div>
+                <h2>{% translate "Findings" %}</h2>
+                <p>
+                    {% blocktranslate %}
+                        On this page you can see an overview of all the findings that have
+                        been identified for all organizations. It first shows an overview with
+                        the total number of findings per severity that have been identified for
+                        all organizations. After that, a table is shown with all the findings,
+                        sorted by the finding types and grouped by organizations.
+                    {% endblocktranslate %}
+                </p>
+            </div>
             {% if organizations_findings_summary.total_finding_types != 0 %}
                 <section>
                     <div>
-                        <h2>{% translate "Findings overview" %}</h2>
-                        <p>
-                            {% blocktranslate %}
-                                This overview shows the total number of findings per
-                                severity that have been identified for all organizations.
-                            {% endblocktranslate %}
-                        </p>
+                        <div>
+                            <h3>{% translate "Findings overview" %}</h3>
+                            <p>
+                                {% blocktranslate %}
+                                    This overview shows the total number of findings per
+                                    severity that have been identified for all organizations.
+                                {% endblocktranslate %}
+                            </p>
+                        </div>
                         {% include "partials/report_severity_totals_table.html" with data=organizations_findings_summary %}
 
                     </div>
                 </section>
                 <section>
                     <div>
-                        <h2>{% translate "Findings per organization" %}</h2>
-                        <p>{% translate "This table shows the findings that have been identified for each organization." %}</p>
+                        <div>
+                            <h3>{% translate "Findings per organization" %}</h3>
+                            <p>{% translate "This table shows the findings that have been identified for each organization." %}</p>
+                        </div>
                         {% include "findings_report/report.html" with is_dashboard="yes" %}
 
                     </div>
                 </section>
             {% else %}
-                <h2>{% translate "Findings overview" %}</h2>
+                <h3>{% translate "Findings overview" %}</h3>
                 <p>
                     {% blocktranslate %}
                         No findings have been identified yet. As soon as they have been

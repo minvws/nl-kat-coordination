@@ -17,26 +17,32 @@
                 <p>
                     {% blocktranslate %}
                         On this page you can see an overview of the dashboards for all organizations.
-                        --More context can be written here--
+                        **More context can be written here**
                     {% endblocktranslate %}
                 </p>
             </div>
-            <div>
-                {% for organization, organization_dashboards in organizations_dashboards.items %}
-                    {% for dashboards in organization_dashboards %}
-                        {% for dashboard_data, report_data in dashboards.items %}
-                            {% if report_data %}
+            {% for organization, organization_dashboards in organizations_dashboards.items %}
+                <section>
+                    <div>
+                        <h3>{{ organization.name }} {% translate "dashboards" %}</h3>
+                        {% for dashboards in organization_dashboards %}
+                            {% for dashboard_data, report_data in dashboards.items %}
                                 <section>
-                                    {% include dashboard_data.template with data=report_data.findings is_dashboard="yes" %}
+                                    <div>
+                                        <h4>{{ dashboard_data }}</h4>
+                                        {% if report_data %}
+                                            {% include dashboard_data.template with data=report_data is_dashboard="yes" %}
 
+                                        {% else %}
+                                            <p>{% translate "There are no dashboards to display." %}</p>
+                                        {% endif %}
+                                    </div>
                                 </section>
-                            {% else %}
-                                <p>{% translate "There are no dashboards to display." %}</p>
-                            {% endif %}
+                            {% endfor %}
                         {% endfor %}
-                    {% endfor %}
-                {% endfor %}
-            </div>
+                    </div>
+                </section>
+            {% endfor %}
         </section>
     </main>
 {% endblock content %}
