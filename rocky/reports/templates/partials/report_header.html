@@ -5,10 +5,12 @@
         <div class="horizontal-view toolbar">
             <h1>{{ report_ooi.name }}</h1>
             <div class="dropdown">
-                <button aria-controls="export-add" class="dropdown-button ghost">
+                <button aria-controls="download-report"
+                        aria-expanded="false"
+                        class="dropdown-button ghost">
                     {% translate "Export" %}<span aria-hidden="true" class="icon ti-chevron-down"></span>
                 </button>
-                <div id="export-add" aria-expanded="false" class="dropdown-list">
+                <div id="download-report" class="dropdown-list">
                     <ul>
                         <li>
                             <a href="{{ report_download_pdf_url }}" target="_blank"><span class="icon ti-download" aria-hidden="true"></span>{% translate "Download report" %} (PDF)</a>
@@ -26,10 +28,10 @@
                 {% translate "All selected report types for the selected objects are displayed one below the other." %}
             </p>
             <p>
-                {% translate "Created with data from:" %} <strong>{{ report_ooi.observed_at }} {{ TIME_ZONE }}</strong>
+                {% translate "Created with data from:" %} <strong>{{ report_ooi.observed_at|date }}</strong>
             </p>
             <p>
-                {% translate "Created on:" %} <strong>{{ report_ooi.date_generated }}</strong>
+                {% translate "Created on:" %} <strong>{{ report_ooi.date_generated|date }}</strong>
             </p>
             <p>
                 {% translate "Created by:" %} <strong>{{ organization_member.user.full_name }}</strong>

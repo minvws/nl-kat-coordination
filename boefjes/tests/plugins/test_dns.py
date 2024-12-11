@@ -32,50 +32,24 @@ def test_dns_normalizer(normalizer_runner):
         IPAddressV4(network=internet.reference, address=IPv4Address("94.198.159.36")),
     ]
     dns_a_records = [
-        DNSARecord(
-            hostname=zone_hostname.reference,
-            value=str(ip.address),
-            address=ip.reference,
-            ttl=14364,
-        )
+        DNSARecord(hostname=zone_hostname.reference, value=str(ip.address), address=ip.reference, ttl=14364)
         for ip in ip_v4_addresses
     ]
     ip_v6_addresses = [
-        IPAddressV6(
-            network=internet.reference,
-            address=IPv6Address("2a00:d78:0:712:94:198:159:35"),
-        ),
-        IPAddressV6(
-            network=internet.reference,
-            address=IPv6Address("2a00:d78:0:712:94:198:159:36"),
-        ),
+        IPAddressV6(network=internet.reference, address=IPv6Address("2a00:d78:0:712:94:198:159:35")),
+        IPAddressV6(network=internet.reference, address=IPv6Address("2a00:d78:0:712:94:198:159:36")),
     ]
     dns_aaaa_records = [
-        DNSAAAARecord(
-            hostname=zone_hostname.reference,
-            value=str(ip.address),
-            address=ip.reference,
-            ttl=14400,
-        )
+        DNSAAAARecord(hostname=zone_hostname.reference, value=str(ip.address), address=ip.reference, ttl=14400)
         for ip in ip_v6_addresses
     ]
     dns_txt_records = [
-        DNSTXTRecord(
-            hostname=zone_hostname.reference,
-            value="v=spf1 redirect=spf-a.example.nl",
-            ttl=14400,
-        )
+        DNSTXTRecord(hostname=zone_hostname.reference, value="v=spf1 redirect=spf-a.example.nl", ttl=14400)
     ]
 
     mx_hostnames = [
-        Hostname(
-            network=internet.reference,
-            name="mail.example.nl",
-        ),
-        Hostname(
-            network=internet.reference,
-            name="mail2.example.nl",
-        ),
+        Hostname(network=internet.reference, name="mail.example.nl"),
+        Hostname(network=internet.reference, name="mail2.example.nl"),
     ]
     dns_mx_records = [
         DNSMXRecord(
@@ -90,12 +64,7 @@ def test_dns_normalizer(normalizer_runner):
 
     ns_hostnames = [
         Hostname(name=value, network=internet.reference)
-        for value in [
-            "ns3.examplenl.org",
-            "ns1.examplenl.nl",
-            "ns2.examplenl.eu",
-            "ns0.examplenl.com",
-        ]
+        for value in ["ns3.examplenl.org", "ns1.examplenl.nl", "ns2.examplenl.eu", "ns0.examplenl.com"]
     ]
 
     ns_records = [
@@ -108,11 +77,7 @@ def test_dns_normalizer(normalizer_runner):
         for ns_hostname in ns_hostnames
     ]
 
-    soa_hostname = Hostname(
-        network=internet.reference,
-        name="ns1.examplenl.nl",
-        dns_zone=zone.reference,
-    )
+    soa_hostname = Hostname(network=internet.reference, name="ns1.examplenl.nl", dns_zone=zone.reference)
     soa_record = DNSSOARecord(
         hostname=zone_hostname.reference,
         value="ns1.examplenl.nl. hostmaster.sidn.nl. 2021111101 14400 7200 1209600 86400",
@@ -152,24 +117,12 @@ def test_dns_normalizer(normalizer_runner):
 def test_dns_normalizer_cname(normalizer_runner):
     internet = Network(name="internet")
 
-    zone_hostname = Hostname(
-        network=internet.reference,
-        name="example.nl",
-    )
-    zone = DNSZone(
-        hostname=zone_hostname.reference,
-    )
+    zone_hostname = Hostname(network=internet.reference, name="example.nl")
+    zone = DNSZone(hostname=zone_hostname.reference)
     zone_hostname.dns_zone = zone.reference
 
-    input_hostname = Hostname(
-        network=internet.reference,
-        name="www.example.nl",
-        dns_zone=zone.reference,
-    )
-    cname_target = Hostname(
-        network=internet.reference,
-        name="webredir.examplenl.nl",
-    )
+    input_hostname = Hostname(network=internet.reference, name="www.example.nl", dns_zone=zone.reference)
+    cname_target = Hostname(network=internet.reference, name="webredir.examplenl.nl")
 
     soa_hostname = Hostname(network=internet.reference, name="ns1.examplenl.nl")
     soa_record = DNSSOARecord(
@@ -193,10 +146,7 @@ def test_dns_normalizer_cname(normalizer_runner):
 
     ip_address = IPAddressV4(network=internet.reference, address=IPv4Address("94.198.159.35"))
     dns_a_record = DNSARecord(
-        hostname=cname_target.reference,
-        address=ip_address.reference,
-        value=str(ip_address.address),
-        ttl=10800,
+        hostname=cname_target.reference, address=ip_address.reference, value=str(ip_address.address), ttl=10800
     )
 
     expected = [
@@ -221,10 +171,7 @@ def test_dns_normalizer_cname(normalizer_runner):
                 boefje=Boefje(id="dns-records"),
                 organization="_dev",
                 input_ooi="Hostname|internet|www.example.nl",
-                arguments={
-                    "domain": "www.example.nl.",
-                    "input": {"name": "www.example.nl."},
-                },
+                arguments={"domain": "www.example.nl.", "input": {"name": "www.example.nl."}},
             ),
             mime_types=[{"value": "boefje/dns-records"}],
         ),
@@ -247,10 +194,7 @@ def test_parse_record_null_mx_record(normalizer_runner):
                 boefje=Boefje(id="dns-records"),
                 organization="_dev",
                 input_ooi="Hostname|internet|english.example.nl",
-                arguments={
-                    "domain": "english.example.nl",
-                    "input": {"name": "english.example.nl"},
-                },
+                arguments={"domain": "english.example.nl", "input": {"name": "english.example.nl"}},
             ),
             mime_types=[{"value": "boefje/dns-records"}],
         ),
@@ -259,24 +203,13 @@ def test_parse_record_null_mx_record(normalizer_runner):
     answer = get_dummy_data("inputs/dns-result-mx-example.nl.json")
 
     internet = Network(name="internet")
-    input_hostname = Hostname(
-        network=internet.reference,
-        name="english.example.nl",
-    )
+    input_hostname = Hostname(network=internet.reference, name="english.example.nl")
 
     cname_target = Hostname(network=internet.reference, name="redir.example.nl")
     cname_record = DNSCNAMERecord(
-        hostname=input_hostname.reference,
-        value="redir.example.nl.",
-        ttl=60,
-        target_hostname=cname_target.reference,
+        hostname=input_hostname.reference, value="redir.example.nl.", ttl=60, target_hostname=cname_target.reference
     )
-    mx_record = DNSMXRecord(
-        hostname=cname_target.reference,
-        value="0 .",
-        ttl=14400,
-        preference=0,
-    )
+    mx_record = DNSMXRecord(hostname=cname_target.reference, value="0 .", ttl=14400, preference=0)
 
     results = normalizer_runner.run(meta, answer)
 
@@ -289,41 +222,22 @@ def test_parse_record_null_mx_record(normalizer_runner):
 def test_parse_cname_soa(normalizer_runner):
     internet = Network(name="internet")
 
-    zone_hostname = Hostname(
-        network=internet.reference,
-        name="example.com",
-    )
-    zone = DNSZone(
-        hostname=zone_hostname.reference,
-    )
+    zone_hostname = Hostname(network=internet.reference, name="example.com")
+    zone = DNSZone(hostname=zone_hostname.reference)
     zone_hostname.dns_zone = zone.reference
 
-    input_hostname = Hostname(
-        network=internet.reference,
-        name="www.example.com",
-        dns_zone=zone.reference,
-    )
+    input_hostname = Hostname(network=internet.reference, name="www.example.com", dns_zone=zone.reference)
 
     cname_record = DNSCNAMERecord(
-        hostname=input_hostname.reference,
-        value="example.com.",
-        ttl=60,
-        target_hostname=zone_hostname.reference,
+        hostname=input_hostname.reference, value="example.com.", ttl=60, target_hostname=zone_hostname.reference
     )
     ip_address = IPAddressV4(network=internet.reference, address=IPv4Address("94.198.159.35"))
     a_record = DNSARecord(
-        hostname=zone_hostname.reference,
-        address=ip_address.reference,
-        value=str(ip_address.address),
-        ttl=60,
+        hostname=zone_hostname.reference, address=ip_address.reference, value=str(ip_address.address), ttl=60
     )
     soa_hostname = Hostname(network=internet.reference, name="ns.icann.org")
     ns_hostnames = [
-        Hostname(name=value, network=internet.reference)
-        for value in [
-            "a.iana-servers.net",
-            "b.iana-servers.net",
-        ]
+        Hostname(name=value, network=internet.reference) for value in ["a.iana-servers.net", "b.iana-servers.net"]
     ]
     ns_records = [
         DNSNSRecord(
@@ -345,11 +259,7 @@ def test_parse_cname_soa(normalizer_runner):
         expire=1209600,
         minimum=3600,
     )
-    txt_record = DNSTXTRecord(
-        hostname=zone_hostname.reference,
-        value="v=spf1 -all",
-        ttl=60,
-    )
+    txt_record = DNSTXTRecord(hostname=zone_hostname.reference, value="v=spf1 -all", ttl=60)
     mx_record = DNSMXRecord(
         hostname=zone_hostname.reference,
         value="0 example.com.",
@@ -368,10 +278,7 @@ def test_parse_cname_soa(normalizer_runner):
                 boefje=Boefje(id="dns-records"),
                 organization="_dev",
                 input_ooi="Hostname|internet|www.example.com",
-                arguments={
-                    "domain": "www.example.com",
-                    "input": {"name": "www.example.com"},
-                },
+                arguments={"domain": "www.example.com", "input": {"name": "www.example.com"}},
             ),
             mime_types=[{"value": "boefje/dns-records"}],
         ),
@@ -403,25 +310,14 @@ def test_parse_cname_soa(normalizer_runner):
 def test_find_parent_dns_zone(normalizer_runner):
     internet = Network(name="internet")
 
-    requested_zone = DNSZone(
-        hostname=Hostname(
-            network=internet.reference,
-            name="sub.example.nl",
-        ).reference
-    )
-    parent_zone_hostname = Hostname(
-        network=internet.reference,
-        name="example.nl",
-    )
+    requested_zone = DNSZone(hostname=Hostname(network=internet.reference, name="sub.example.nl").reference)
+    parent_zone_hostname = Hostname(network=internet.reference, name="example.nl")
     parent_zone = DNSZone(hostname=parent_zone_hostname.reference)
     parent_zone_hostname.dns_zone = parent_zone.reference
 
     requested_zone.parent = parent_zone.reference
 
-    name_server_hostname = Hostname(
-        network=internet.reference,
-        name="ns1.examplenl.nl",
-    )
+    name_server_hostname = Hostname(network=internet.reference, name="ns1.examplenl.nl")
 
     soa_record = DNSSOARecord(
         hostname=parent_zone_hostname.reference,
@@ -436,10 +332,7 @@ def test_find_parent_dns_zone(normalizer_runner):
     )
 
     input_ = DNSZone(
-        hostname=Hostname(
-            network=Reference.from_str("Network|internet"),
-            name="sub.example.nl",
-        ).reference
+        hostname=Hostname(network=Reference.from_str("Network|internet"), name="sub.example.nl").reference
     ).serialize()
 
     meta = NormalizerMeta(
@@ -460,13 +353,7 @@ def test_find_parent_dns_zone(normalizer_runner):
 
     results = normalizer_runner.run(meta, get_dummy_data("inputs/dns-zone-result-sub.example.nl.txt"))
 
-    expected = [
-        requested_zone,
-        parent_zone,
-        parent_zone_hostname,
-        name_server_hostname,
-        soa_record,
-    ]
+    expected = [requested_zone, parent_zone, parent_zone_hostname, name_server_hostname, soa_record]
     assert len(list(map(BaseModel.model_dump, expected))) == len(
         list(map(BaseModel.model_dump, results.observations[0].results))
     )

@@ -3,6 +3,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, TypedDict, TypeVar
 
+from django.utils.functional import Promise
+
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
@@ -15,6 +17,11 @@ REPORTS_DIR = Path(__file__).parent
 class ReportPlugins(TypedDict):
     required: set[str]
     optional: set[str]
+
+
+class SubReportPlugins(TypedDict):
+    required: list[str]
+    optional: list[str]
 
 
 def report_plugins_union(report_types: list[type["BaseReport"]]) -> ReportPlugins:
@@ -32,8 +39,8 @@ def report_plugins_union(report_types: list[type["BaseReport"]]) -> ReportPlugin
 
 class BaseReport:
     id: str
-    name: str
-    description: str
+    name: Promise
+    description: Promise
     template_path: str = "report.html"
     plugins: ReportPlugins
     input_ooi_types: set[type[OOI]]
@@ -41,6 +48,9 @@ class BaseReport:
 
     def __init__(self, octopoes_api_connector: OctopoesAPIConnector):
         self.octopoes_api_connector = octopoes_api_connector
+
+    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+        raise NotImplementedError
 
     @classmethod
     def class_attributes(cls) -> dict[str, Any]:
@@ -69,8 +79,7 @@ class Report(BaseReport):
 
     @staticmethod
     def group_by_source(
-        query_result: list[tuple[str, OOIType]],
-        check: Callable[[OOIType], bool] | None = None,
+        query_result: list[tuple[str, OOIType]], check: Callable[[OOIType], bool] | None = None
     ) -> dict[str, list[OOIType]]:
         """Transform a query-many result from [(ref1, obj1), (ref1, obj2), ...] into {ref1: [obj1, obj2], ...}"""
 
@@ -87,8 +96,7 @@ class Report(BaseReport):
 
     @staticmethod
     def group_finding_types_by_source(
-        query_result: list[tuple[str, OOIType]],
-        keep_ids: list[str] | None = None,
+        query_result: list[tuple[str, OOIType]], keep_ids: list[str] | None = None
     ) -> dict[str, list[OOIType]]:
         if keep_ids:
             return Report.group_by_source(query_result, lambda x: x.id in keep_ids)
@@ -118,9 +126,7 @@ class Report(BaseReport):
         return hostnames_by_input_ooi
 
     @staticmethod
-    def hostnames_to_human_readable(
-        hostnames_by_input_ooi: dict,
-    ) -> dict[str, str]:
+    def hostnames_to_human_readable(hostnames_by_input_ooi: dict) -> dict[str, str]:
         """Converts input_oois to human readable hostname strings.
 
         Turns a list of either Hostname and IPAddress references into a string

@@ -15,11 +15,7 @@ from tests.conftest import get_aggregate_report_data, setup_request
 
 
 def test_select_all_oois_post_to_select_report_types(
-    rf,
-    client_member,
-    valid_time,
-    mock_organization_view_octopoes,
-    listed_hostnames,
+    rf, client_member, valid_time, mock_organization_view_octopoes, listed_hostnames
 ):
     """
     Will send the selected oois to the report type selection page.
@@ -32,10 +28,7 @@ def test_select_all_oois_post_to_select_report_types(
     request = setup_request(
         rf.post(
             "aggregate_report_select_report_types",
-            {
-                "observed_at": valid_time.strftime("%Y-%m-%d"),
-                "ooi": listed_hostnames,
-            },
+            {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": listed_hostnames},
         ),
         client_member.user,
     )
@@ -50,11 +43,7 @@ def test_select_all_oois_post_to_select_report_types(
 
 
 def test_select_some_oois_post_to_select_report_types(
-    rf,
-    client_member,
-    valid_time,
-    mock_organization_view_octopoes,
-    listed_hostnames,
+    rf, client_member, valid_time, mock_organization_view_octopoes, listed_hostnames
 ):
     """
     Will send the selected oois to the report type selection page.
@@ -69,11 +58,7 @@ def test_select_some_oois_post_to_select_report_types(
 
     request = setup_request(
         rf.post(
-            "generate_report_select_report_types",
-            {
-                "observed_at": valid_time.strftime("%Y-%m-%d"),
-                "ooi": selection,
-            },
+            "aggregate_report_select_report_types", {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": selection}
         ),
         client_member.user,
     )
@@ -90,11 +75,7 @@ def test_select_some_oois_post_to_select_report_types(
 
 
 def test_change_ooi_selection_for_none_selection(
-    rf,
-    client_member,
-    valid_time,
-    mock_organization_view_octopoes,
-    listed_hostnames,
+    rf, client_member, valid_time, mock_organization_view_octopoes, listed_hostnames
 ):
     """
     Will send the selected oois to the report type selection page.
@@ -105,13 +86,7 @@ def test_change_ooi_selection_for_none_selection(
     )
 
     request = setup_request(
-        rf.post(
-            "generate_report_select_oois",
-            {
-                "observed_at": valid_time.strftime("%Y-%m-%d"),
-            },
-        ),
-        client_member.user,
+        rf.post("aggregate_report_select_oois", {"observed_at": valid_time.strftime("%Y-%m-%d")}), client_member.user
     )
 
     response = OOISelectionAggregateReportView.as_view()(request, organization_code=client_member.organization.code)
@@ -121,11 +96,7 @@ def test_change_ooi_selection_for_none_selection(
 
 
 def test_change_ooi_selection_with_ooi_selection(
-    rf,
-    client_member,
-    valid_time,
-    mock_organization_view_octopoes,
-    listed_hostnames,
+    rf, client_member, valid_time, mock_organization_view_octopoes, listed_hostnames
 ):
     """
     Will send the selected oois to the report type selection page.
@@ -139,10 +110,7 @@ def test_change_ooi_selection_with_ooi_selection(
     selection = ooi_pks[0:2]
 
     request = setup_request(
-        rf.post(
-            "generate_report_select_oois",
-            {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": selection},
-        ),
+        rf.post("aggregate_report_select_oois", {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": selection}),
         client_member.user,
     )
 
@@ -156,12 +124,7 @@ def test_change_ooi_selection_with_ooi_selection(
 
 
 def test_report_types_selection_nothing_selected(
-    rf,
-    client_member,
-    valid_time,
-    mock_organization_view_octopoes,
-    mock_katalogus_client,
-    listed_hostnames,
+    rf, client_member, valid_time, mock_organization_view_octopoes, mock_katalogus_client, listed_hostnames
 ):
     """
     Will send the selected report types to the configuration page (set plugins).
@@ -172,11 +135,7 @@ def test_report_types_selection_nothing_selected(
     )
 
     request = setup_request(
-        rf.post(
-            "aggregate_report_setup_scan",
-            {"observed_at": valid_time.strftime("%Y-%m-%d")},
-        ),
-        client_member.user,
+        rf.post("aggregate_report_setup_scan", {"observed_at": valid_time.strftime("%Y-%m-%d")}), client_member.user
     )
 
     response = SetupScanAggregateReportView.as_view()(request, organization_code=client_member.organization.code)
@@ -201,7 +160,7 @@ def test_report_types_selection(
     Will send the selected report types to the configuration page (set plugins).
     """
 
-    katalogus_mocker = mocker.patch("reports.views.base.get_katalogus")()
+    katalogus_mocker = mocker.patch("account.mixins.OrganizationView.get_katalogus")()
     katalogus_mocker.get_plugins.return_value = [boefje_dns_records, boefje_nmap_tcp]
 
     rocky_health_mocker = mocker.patch("reports.report_types.aggregate_organisation_report.report.get_rocky_health")()
@@ -241,10 +200,10 @@ def test_save_aggregate_report_view(
     mock_bytes_client,
 ):
     """
-    Will send data through post to aggregate report.
+    Will send data through post to aggregate report and immediately creates a report (not scheduled).
     """
 
-    katalogus_mocker = mocker.patch("reports.views.base.get_katalogus")()
+    katalogus_mocker = mocker.patch("account.mixins.OrganizationView.get_katalogus")()
     katalogus_mocker.get_plugins.return_value = [boefje_dns_records]
 
     rocky_health_mocker = mocker.patch("reports.report_types.aggregate_organisation_report.report.get_rocky_health")()
@@ -276,6 +235,56 @@ def test_save_aggregate_report_view(
     assert "report_id=Report" in response.url
 
 
+def test_save_aggregate_report_view_scheduled(
+    rf,
+    client_member,
+    valid_time,
+    mock_organization_view_octopoes,
+    listed_hostnames,
+    rocky_health,
+    mocker,
+    boefje_dns_records,
+    mock_bytes_client,
+):
+    """
+    Will send data through post to aggregate report and creates a scheduled aggregate report.
+    """
+
+    katalogus_mocker = mocker.patch("account.mixins.OrganizationView.get_katalogus")()
+    katalogus_mocker.get_plugins.return_value = [boefje_dns_records]
+
+    rocky_health_mocker = mocker.patch("reports.report_types.aggregate_organisation_report.report.get_rocky_health")()
+    rocky_health_mocker.return_value = rocky_health
+
+    mock_bytes_client().upload_raw.return_value = "Report|1730b72f-b115-412e-ad44-dae6ab3edff9"
+
+    mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
+        count=len(listed_hostnames), items=listed_hostnames
+    )
+
+    request = setup_request(
+        rf.post(
+            "aggregate_report_save",
+            {
+                "observed_at": valid_time.strftime("%Y-%m-%d"),
+                "ooi": listed_hostnames,
+                "report_type": ["systems-report", "vulnerability-report"],
+                "choose_recurrence": "repeat",
+                "start_date": "2024-01-01",
+                "start_time": "10:10",
+                "recurrence": "weekly",
+                "parent_report_name": ["Scheduled Aggregate Report %x"],
+            },
+        ),
+        client_member.user,
+    )
+
+    response = SaveAggregateReportView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 302  # after post follows redirect, this to first create report ID
+    assert response.url == f"/en/{client_member.organization.code}/reports/scheduled-reports/"
+
+
 def test_json_download_aggregate_report(
     rf,
     client_member,
@@ -283,16 +292,14 @@ def test_json_download_aggregate_report(
     get_aggregate_report_from_bytes,
     mock_organization_view_octopoes,
     mock_bytes_client,
+    mock_katalogus_client,
 ):
     mock_organization_view_octopoes().get.return_value = get_aggregate_report_ooi
     mock_bytes_client().get_raw.return_value = get_aggregate_report_from_bytes
     mock_organization_view_octopoes().query.return_value = []
 
     request = setup_request(
-        rf.get(
-            "view_report_json",
-            {"json": "true", "report_id": f"{get_aggregate_report_ooi.primary_key}"},
-        ),
+        rf.get("view_report_json", {"json": "true", "report_id": f"{get_aggregate_report_ooi.primary_key}"}),
         client_member.user,
     )
 

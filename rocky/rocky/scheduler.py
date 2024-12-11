@@ -151,6 +151,7 @@ class ScheduleRequest(BaseModel):
     scheduler_id: str
     data: dict
     schedule: str
+    deadline_at: str
 
 
 class ScheduleResponse(BaseModel):
@@ -189,11 +190,7 @@ class PaginatedSchedulesResponse(BaseModel):
 class LazyTaskList:
     HARD_LIMIT = 500
 
-    def __init__(
-        self,
-        scheduler_client: SchedulerClient,
-        **kwargs,
-    ):
+    def __init__(self, scheduler_client: SchedulerClient, **kwargs: Any):
         self.scheduler_client = scheduler_client
         self.kwargs = kwargs
         self._count: int | None = None
@@ -201,16 +198,13 @@ class LazyTaskList:
     @cached_property
     def count(self) -> int:
         if self._count is None:
-            self._count = self.scheduler_client.list_tasks(
-                limit=0,
-                **self.kwargs,
-            ).count
+            self._count = self.scheduler_client.list_tasks(limit=0, **self.kwargs).count
         return self._count
 
     def __len__(self):
         return self.count
 
-    def __getitem__(self, key) -> list[Task]:
+    def __getitem__(self, key: slice | int) -> list[Task]:
         if isinstance(key, slice):
             offset = key.start or 0
             limit = min(LazyTaskList.HARD_LIMIT, key.stop - offset or key.stop or LazyTaskList.HARD_LIMIT)
@@ -222,11 +216,7 @@ class LazyTaskList:
             raise TypeError("Invalid slice argument type.")
 
         logging.info("Getting max %s lazy items at offset %s with filter %s", limit, offset, self.kwargs)
-        res = self.scheduler_client.list_tasks(
-            limit=limit,
-            offset=offset,
-            **self.kwargs,
-        )
+        res = self.scheduler_client.list_tasks(limit=limit, offset=offset, **self.kwargs)
 
         self._count = res.count
 
@@ -241,7 +231,7 @@ class SchedulerError(Exception):
         if extra_message is not None:
             self.message = extra_message + self.message
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.message)
 
 
@@ -275,7 +265,7 @@ class SchedulerHTTPError(SchedulerError):
 
 class SchedulerClient:
     def __init__(self, base_uri: str, organization_code: str | None):
-        self._client = httpx.Client(base_url=base_uri)
+        self._client = httpx.Client(base_url=base_uri, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT)
         self.organization_code = organization_code
 
     def list_schedules(self, **kwargs) -> PaginatedSchedulesResponse:
@@ -297,26 +287,45 @@ class SchedulerClient:
         except ConnectError:
             raise SchedulerConnectError()
 
+    def post_schedule_search(self, filters: dict[str, list[dict[str, str]]]) -> PaginatedSchedulesResponse:
+        try:
+            res = self._client.post("/schedules/search", json=filters)
+            res.raise_for_status()
+            return PaginatedSchedulesResponse.model_validate_json(res.content)
+        except ConnectError:
+            raise SchedulerConnectError()
+
+    def patch_schedule(self, schedule_id: str, params: dict[str, Any]) -> None:
+        try:
+            response = self._client.patch(f"/schedules/{schedule_id}", json=params)
+            response.raise_for_status()
+            logger.info("Schedule updated", event_code=800082, schedule_id=schedule_id, params=params)
+        except (HTTPStatusError, ConnectError):
+            raise SchedulerHTTPError()
+
     def post_schedule(self, schedule: ScheduleRequest) -> ScheduleResponse:
         try:
-            res = self._client.post(
-                "/schedules",
-                json=schedule.model_dump(exclude_none=True),
-            )
+            res = self._client.post("/schedules", json=schedule.model_dump(exclude_none=True))
             res.raise_for_status()
+            logger.info("Schedule created", event_code=800081, schedule=schedule)
             return ScheduleResponse.model_validate_json(res.content)
         except (ValidationError, HTTPStatusError, ConnectError):
             raise SchedulerValidationError(extra_message="Report schedule failed: ")
 
-    def list_tasks(
-        self,
-        **kwargs,
-    ) -> PaginatedTasksResponse:
+    def delete_schedule(self, schedule_id: str) -> None:
+        try:
+            response = self._client.delete(f"/schedules/{schedule_id}")
+            response.raise_for_status()
+            logger.info("Schedule deleted", event_code=800083, schedule_id=schedule_id)
+        except (HTTPStatusError, ConnectError):
+            raise SchedulerHTTPError()
+
+    def list_tasks(self, **kwargs) -> PaginatedTasksResponse:
         try:
             filter_key = "filters"
             params = {k: v for k, v in kwargs.items() if v is not None if k != filter_key}  # filter Nones from kwargs
             endpoint = "/tasks"
-            res = self._client.post(endpoint, params=params, json=kwargs.get(filter_key, None))
+            res = self._client.post(endpoint, params=params, json=kwargs.get(filter_key))
             return PaginatedTasksResponse.model_validate_json(res.content)
         except ValidationError:
             raise SchedulerValidationError(extra_message=_("Task list: "))
@@ -324,7 +333,11 @@ class SchedulerClient:
             raise SchedulerConnectError(extra_message=_("Task list: "))
 
     def get_task_details(self, task_id: str) -> Task:
-        return Task.model_validate_json(self._get(f"/tasks/{task_id}", "content"))
+        try:
+            task_id = str(uuid.UUID(task_id))
+            return Task.model_validate_json(self._get(f"/tasks/{task_id}", "content"))
+        except ValueError:
+            raise SchedulerTaskNotFound()
 
     def push_task(self, item: Task) -> None:
         try:

@@ -37,10 +37,7 @@ class BytesAPIClient:
         self.client = httpx.Client(
             base_url=base_url, headers={"User-Agent": f"bytes-api-client/{BYTES_API_CLIENT_VERSION}"}
         )
-        self._credentials = {
-            "username": username,
-            "password": password,
-        }
+        self._credentials = {"username": username, "password": password}
 
     def login(self) -> None:
         self.client.headers.update(self._get_authentication_headers())
@@ -54,9 +51,7 @@ class BytesAPIClient:
 
     def _get_token(self) -> str:
         response = self.client.post(
-            "/token",
-            data=self._credentials,
-            headers={"content-type": "application/x-www-form-urlencoded"},
+            "/token", data=self._credentials, headers={"content-type": "application/x-www-form-urlencoded"}
         )
 
         return str(response.json()["access_token"])
@@ -131,15 +126,7 @@ class BytesAPIClient:
         file_name = "raw"  # The name provides a key for all ids returned, so this is arbitrary as we only upload 1 file
         response = self.client.post(
             "/bytes/raw",
-            json={
-                "files": [
-                    {
-                        "name": file_name,
-                        "content": b64encode(raw).decode(),
-                        "tags": mime_types,
-                    }
-                ],
-            },
+            json={"files": [{"name": file_name, "content": b64encode(raw).decode(), "tags": mime_types}]},
             params={"boefje_meta_id": str(boefje_meta_id)},
         )
         self._verify_response(response)
@@ -149,9 +136,7 @@ class BytesAPIClient:
     @retry_with_login
     def save_raws(self, boefje_meta_id: UUID, boefje_output: BoefjeOutput) -> dict[str, str]:
         response = self.client.post(
-            "/bytes/raw",
-            content=boefje_output.model_dump_json(),
-            params={"boefje_meta_id": str(boefje_meta_id)},
+            "/bytes/raw", content=boefje_output.model_dump_json(), params={"boefje_meta_id": str(boefje_meta_id)}
         )
         self._verify_response(response)
 

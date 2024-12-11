@@ -1,5 +1,4 @@
 import datetime
-from functools import partial
 
 import structlog
 from croniter import croniter
@@ -15,16 +14,11 @@ from boefjes.dependencies.plugins import (
     get_plugin_service,
     get_plugins_filter_parameters,
 )
-from boefjes.katalogus.organisations import check_organisation_exists
 from boefjes.models import FilterParameters, PaginationParameters, PluginType
 from boefjes.sql.plugin_storage import get_plugin_storage
 from boefjes.storage.interfaces import DuplicatePlugin, IntegrityError, NotAllowed, PluginStorage
 
-router = APIRouter(
-    prefix="/organisations/{organisation_id}",
-    tags=["plugins"],
-    dependencies=[Depends(check_organisation_exists)],
-)
+router = APIRouter(prefix="/organisations/{organisation_id}", tags=["plugins"])
 
 logger = structlog.get_logger(__name__)
 
@@ -46,36 +40,34 @@ def list_plugins(
     pagination_params: PaginationParameters = Depends(get_pagination_parameters),
     plugin_service: PluginService = Depends(get_plugin_service),
 ) -> list[PluginType]:
-    with plugin_service as p:
-        if filter_params.ids:
-            try:
-                plugins = p.by_plugin_ids(filter_params.ids, organisation_id)
-            except KeyError:
-                raise HTTPException(status.HTTP_404_NOT_FOUND, "Plugin not found")
-        else:
-            plugins = p.get_all(organisation_id)
+    if filter_params.ids:
+        try:
+            plugins = plugin_service.by_plugin_ids(filter_params.ids, organisation_id)
+        except KeyError:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Plugin not found")
+    else:
+        plugins = plugin_service.get_all(organisation_id)
 
     # filter plugins by id, name or description
     if filter_params.q is not None:
-        plugins = filter(
-            partial(_plugin_matches_query, query=filter_params.q),
-            plugins,
-        )
+        plugins = [plugin for plugin in plugins if _plugin_matches_query(plugin, filter_params.q)]
 
     # filter plugins by type
     if filter_params.type is not None:
-        plugins = filter(lambda plugin: plugin.type == filter_params.type, plugins)
+        plugins = [plugin for plugin in plugins if plugin.type == filter_params.type]
 
     # filter plugins by state
     if filter_params.state is not None:
-        plugins = filter(lambda x: x.enabled is filter_params.state, plugins)
+        plugins = [plugin for plugin in plugins if plugin.enabled is filter_params.state]
 
     # filter plugins by oci_image
     if filter_params.oci_image is not None:
-        plugins = filter(lambda x: x.type == "boefje" and x.oci_image == filter_params.oci_image, plugins)
+        plugins = [
+            plugin for plugin in plugins if plugin.type == "boefje" and plugin.oci_image == filter_params.oci_image
+        ]
 
     # filter plugins by scan level for boefje plugins
-    plugins = list(filter(lambda x: x.type != "boefje" or x.scan_level >= filter_params.scan_level, plugins))
+    plugins = [plugin for plugin in plugins if plugin.type != "boefje" or plugin.scan_level >= filter_params.scan_level]
 
     if pagination_params.limit is None:
         return plugins[pagination_params.offset :]
@@ -86,13 +78,10 @@ def list_plugins(
 
 @router.get("/plugins/{plugin_id}", response_model=PluginType)
 def get_plugin(
-    plugin_id: str,
-    organisation_id: str,
-    plugin_service: PluginService = Depends(get_plugin_service),
+    plugin_id: str, organisation_id: str, plugin_service: PluginService = Depends(get_plugin_service)
 ) -> PluginType:
     try:
-        with plugin_service as p:
-            return p.by_plugin_id(plugin_id, organisation_id)
+        return plugin_service.by_plugin_id(plugin_id, organisation_id)
     except KeyError:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plugin not found")
 
@@ -165,11 +154,7 @@ class BoefjeIn(BaseModel):
 
 
 @router.patch("/boefjes/{boefje_id}", status_code=status.HTTP_204_NO_CONTENT)
-def update_boefje(
-    boefje_id: str,
-    boefje: BoefjeIn,
-    storage: PluginStorage = Depends(get_plugin_storage),
-):
+def update_boefje(boefje_id: str, boefje: BoefjeIn, storage: PluginStorage = Depends(get_plugin_storage)):
     # todo: update boefje should be done in the plugin service
     try:
         with storage as p:
@@ -203,9 +188,7 @@ class NormalizerIn(BaseModel):
 
 @router.patch("/normalizers/{normalizer_id}", status_code=status.HTTP_204_NO_CONTENT)
 def update_normalizer(
-    normalizer_id: str,
-    normalizer: NormalizerIn,
-    storage: PluginStorage = Depends(get_plugin_storage),
+    normalizer_id: str, normalizer: NormalizerIn, storage: PluginStorage = Depends(get_plugin_storage)
 ):
     with storage as p:
         p.update_normalizer(normalizer_id, normalizer.model_dump(exclude_unset=True))
@@ -223,18 +206,13 @@ def get_plugin_schema(plugin_id: str, plugin_service: PluginService = Depends(ge
 
 
 @router.get("/plugins/{plugin_id}/cover.jpg", include_in_schema=False)
-def get_plugin_cover(
-    plugin_id: str,
-    plugin_service: PluginService = Depends(get_plugin_service),
-) -> FileResponse:
+def get_plugin_cover(plugin_id: str, plugin_service: PluginService = Depends(get_plugin_service)) -> FileResponse:
     return FileResponse(plugin_service.cover(plugin_id))
 
 
 @router.get("/plugins/{plugin_id}/description.md", include_in_schema=False)
 def get_plugin_description(
-    plugin_id: str,
-    organisation_id: str,
-    plugin_service: PluginService = Depends(get_plugin_service),
+    plugin_id: str, organisation_id: str, plugin_service: PluginService = Depends(get_plugin_service)
 ) -> Response:
     return Response(plugin_service.description(plugin_id, organisation_id))
 

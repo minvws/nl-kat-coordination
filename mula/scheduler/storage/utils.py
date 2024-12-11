@@ -14,10 +14,7 @@ def retry(max_retries: int = 3, retry_delay: float = 5.0):
             for i in range(max_retries):
                 try:
                     return func(*args, **kwargs)
-                except (
-                    sqlalchemy.exc.OperationalError,
-                    sqlalchemy.exc.InternalError,
-                ) as e:
+                except (sqlalchemy.exc.OperationalError, sqlalchemy.exc.InternalError) as e:
                     if i == max_retries - 1:
                         raise e
 

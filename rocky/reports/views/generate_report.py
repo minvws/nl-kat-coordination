@@ -1,11 +1,15 @@
 from typing import Any
 
+from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView
+from httpx import HTTPError
+from katalogus.client import get_katalogus
+from tools.view_helpers import Breadcrumb, PostRedirect
 
-from reports.report_types.helpers import get_ooi_types_with_report
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
     OOISelectionView,
@@ -21,35 +25,20 @@ from reports.views.view_helpers import GenerateReportStepsMixin
 
 
 class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
-    def build_breadcrumbs(self):
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
         breadcrumbs += [
-            {
-                "url": reverse("generate_report_landing", kwargs=kwargs) + selection,
-                "text": _("Generate report"),
-            },
-            {
-                "url": reverse("generate_report_select_oois", kwargs=kwargs) + selection,
-                "text": _("Select objects"),
-            },
+            {"url": reverse("generate_report_landing", kwargs=kwargs) + selection, "text": _("Generate report")},
+            {"url": reverse("generate_report_select_oois", kwargs=kwargs) + selection, "text": _("Select objects")},
             {
                 "url": reverse("generate_report_select_report_types", kwargs=kwargs) + selection,
                 "text": _("Select report types"),
             },
-            {
-                "url": reverse("generate_report_setup_scan", kwargs=kwargs) + selection,
-                "text": _("Configuration"),
-            },
-            {
-                "url": reverse("generate_report_export_setup", kwargs=kwargs) + selection,
-                "text": _("Export setup"),
-            },
-            {
-                "url": reverse("generate_report_view", kwargs=kwargs) + selection,
-                "text": _("Save report"),
-            },
+            {"url": reverse("generate_report_setup_scan", kwargs=kwargs) + selection, "text": _("Configuration")},
+            {"url": reverse("generate_report_export_setup", kwargs=kwargs) + selection, "text": _("Export setup")},
+            {"url": reverse("generate_report_view", kwargs=kwargs) + selection, "text": _("Save report")},
         ]
         return breadcrumbs
 
@@ -74,7 +63,6 @@ class OOISelectionGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenera
     template_name = "generate_report/select_oois.html"
     breadcrumbs_step = 3
     current_step = 1
-    ooi_types = get_ooi_types_with_report()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -83,7 +71,7 @@ class OOISelectionGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenera
 
 
 class ReportTypesSelectionGenerateReportView(
-    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportTypeSelectionView
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportTypeSelectionView, TemplateView
 ):
     """
     Shows all possible report types from a list of OOIs.
@@ -115,6 +103,28 @@ class ExportSetupGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenerat
     template_name = "generate_report/export_setup.html"
     breadcrumbs_step = 6
     current_step = 4
+
+    def post(self, request, *args, **kwargs):
+        selected_plugins = request.POST.getlist("plugin", [])
+
+        if not selected_plugins:
+            return super().post(request, *args, **kwargs)
+
+        if not self.organization_member.has_perm("tools.can_enable_disable_boefje"):
+            messages.error(request, _("You do not have the required permissions to enable plugins."))
+            return PostRedirect(self.get_previous())
+
+        client = get_katalogus(self.organization_member)
+        for selected_plugin in selected_plugins:
+            try:
+                client.enable_boefje_by_id(selected_plugin)
+            except HTTPError:
+                messages.error(
+                    request,
+                    _("An error occurred while enabling {}. The plugin is not available.").format(selected_plugin),
+                )
+                return self.post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
 
 class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportView, SaveReportView):

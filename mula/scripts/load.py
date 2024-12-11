@@ -24,17 +24,10 @@ def run(org_num: int = 1):
     # Create organisations
     orgs: list[dict[str, Any]] = []
     for n in range(0, org_num):
-        org = {
-            "id": f"org-{n}",
-            "name": f"Organisation {n}",
-        }
+        org = {"id": f"org-{n}", "name": f"Organisation {n}"}
         orgs.append(org)
 
-        resp_katalogus = katalogus_client.post(
-            url="/v1/organisations/",
-            json=org,
-            timeout=30,
-        )
+        resp_katalogus = katalogus_client.post(url="/v1/organisations/", json=org, timeout=30)
 
         try:
             resp_katalogus.raise_for_status()
@@ -45,10 +38,7 @@ def run(org_num: int = 1):
             if resp_katalogus.status_code == httpx.codes.NOT_FOUND:
                 logger.info("Organisation already exists in katalogus %s", org)
 
-        resp_octo = octopoes_client.post(
-            url=f"/{org.get('id')}/node",
-            timeout=30,
-        )
+        resp_octo = octopoes_client.post(url=f"/{org.get('id')}/node", timeout=30)
 
         try:
             resp_octo.raise_for_status()
@@ -67,9 +57,7 @@ def run(org_num: int = 1):
         boefjes = ("dns-records", "dns-sec", "dns-zone")
         for boefje_id in boefjes:
             resp_enable_boefje = katalogus_client.patch(
-                url=f"/v1/organisations/{org.get('id')}/plugins/{boefje_id}",
-                json={"enabled": True},
-                timeout=30,
+                url=f"/v1/organisations/{org.get('id')}/plugins/{boefje_id}", json={"enabled": True}, timeout=30
             )
 
             try:
@@ -113,11 +101,7 @@ def run(org_num: int = 1):
 
     for org in orgs:
         for declaration in declarations[:10]:
-            resp_octopoes_decl = octopoes_client.post(
-                f"/{org.get('id')}/declarations",
-                json=declaration,
-                timeout=30,
-            )
+            resp_octopoes_decl = octopoes_client.post(f"/{org.get('id')}/declarations", json=declaration, timeout=30)
 
             try:
                 resp_octopoes_decl.raise_for_status()
@@ -142,18 +126,11 @@ def run(org_num: int = 1):
             try:
                 resp_octopoes_scan_profile.raise_for_status()
             except httpx.HTTPError:
-                logger.info(
-                    "Error creating scan profile %s",
-                    declaration.get("ooi").get("scan_profile"),
-                )
+                logger.info("Error creating scan profile %s", declaration.get("ooi").get("scan_profile"))
                 logger.info(resp_octopoes_scan_profile.text)
                 raise
 
-            logger.info(
-                "Org %s created scan profile %s",
-                org.get("id"),
-                declaration.get("ooi").get("scan_profile"),
-            )
+            logger.info("Org %s created scan profile %s", org.get("id"), declaration.get("ooi").get("scan_profile"))
 
 
 if __name__ == "__main__":

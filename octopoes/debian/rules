@@ -34,3 +34,6 @@ override_dh_installsystemd:
 
 execute_after_dh_install:
 	dh_installsysusers
+
+# Disables dh_strip_nondeterminism because it very slow and not useful for us
+override_dh_strip_nondeterminism:

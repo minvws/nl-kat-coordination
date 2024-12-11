@@ -7,7 +7,6 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, ListView, TemplateView
 
-from katalogus.client import get_katalogus
 from katalogus.forms import KATalogusFilter
 
 
@@ -30,7 +29,7 @@ class BaseKATalogusView(OrganizationView, ListView, FormView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.katalogus_client = get_katalogus(self.organization.code)
+        self.katalogus_client = self.get_katalogus()
 
     def get_initial(self) -> dict[str, Any]:
         initial = super().get_initial()
@@ -81,10 +80,7 @@ class BaseKATalogusView(OrganizationView, ListView, FormView):
         context["url_name"] = self.request.resolver_match.url_name
         context["active_filters_counter"] = self.count_active_filters()
         context["breadcrumbs"] = [
-            {
-                "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
-                "text": _("KAT-alogus"),
-            },
+            {"url": reverse("katalogus", kwargs={"organization_code": self.organization.code}), "text": _("KAT-alogus")}
         ]
         return context
 
@@ -126,9 +122,6 @@ class AboutPluginsView(OrganizationView, TemplateView):
         context = super().get_context_data(**kwargs)
         context["view_type"] = self.kwargs.get("view_type", "grid")
         context["breadcrumbs"] = [
-            {
-                "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
-                "text": _("KAT-alogus"),
-            },
+            {"url": reverse("katalogus", kwargs={"organization_code": self.organization.code}), "text": _("KAT-alogus")}
         ]
         return context

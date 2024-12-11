@@ -1,11 +1,10 @@
-from typing import Any
-
+from django.utils.functional import Promise
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from tools.enums import SCAN_LEVEL
 
-Choice = tuple[Any, str]
+Choice = tuple[str, Promise]
 Choices = list[Choice]
 ChoicesGroup = tuple[str, Choices]
 ChoicesGroups = list[ChoicesGroup]
@@ -31,18 +30,9 @@ PIE_SCALE_EFFORT_CHOICES: Choices = [
     ("high", _("high")),
 ]
 
-PIE_SCALE_CHOICES: Choices = [
-    BLANK_CHOICE,
-    ("low", _("low")),
-    ("medium", _("medium")),
-    ("high", _("high")),
-]
+PIE_SCALE_CHOICES: Choices = [BLANK_CHOICE, ("low", _("low")), ("medium", _("medium")), ("high", _("high"))]
 
-CLEARANCE_TYPE_CHOICES = [
-    ("declared", _("Declared")),
-    ("inherited", _("Inherited")),
-    ("empty", _("Empty")),
-]
+CLEARANCE_TYPE_CHOICES = [("declared", _("Declared")), ("inherited", _("Inherited")), ("empty", _("Empty"))]
 SCAN_LEVEL_CHOICES = [BLANK_CHOICE] + SCAN_LEVEL.choices
 
 MANUAL_FINDING_ID_PREFIX = "KAT-"

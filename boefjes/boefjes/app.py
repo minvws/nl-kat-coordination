@@ -80,7 +80,7 @@ class SchedulerWorkerManager(WorkerManager):
 
                 raise
 
-    def _fill_queue(self, task_queue: Queue, queue_type: WorkerManager.Queue):
+    def _fill_queue(self, task_queue: Queue, queue_type: WorkerManager.Queue) -> None:
         if task_queue.qsize() > self.settings.pool_size:
             time.sleep(self.settings.worker_heartbeat)
             return
@@ -90,12 +90,12 @@ class SchedulerWorkerManager(WorkerManager):
         except HTTPError:
             # Scheduler is having issues, so make note of it and try again
             logger.exception("Getting the queues from the scheduler failed")
-            time.sleep(10 * self.settings.poll_interval)  # But not immediately
+            time.sleep(self.settings.poll_interval)  # But not immediately
             return
 
         # We do not target a specific queue since we start one runtime for all organisations
         # and queue ids contain the organisation_id
-        queues = [q for q in queues if q.id.startswith(queue_type.value)]
+        queues = [q for q in queues if q.id.startswith(queue_type.value) and q.size > 0]
 
         logger.debug("Found queues: %s", [queue.id for queue in queues])
 
@@ -189,7 +189,7 @@ class SchedulerWorkerManager(WorkerManager):
     def _worker_args(self) -> tuple:
         return self.task_queue, self.item_handler, self.scheduler_client, self.handling_tasks
 
-    def exit(self, signum: int | None = None):
+    def exit(self, signum: int | None = None) -> None:
         try:
             if signum:
                 logger.info("Received %s, exiting", signal.Signals(signum).name)
@@ -238,7 +238,7 @@ def _start_working(
     handler: Handler,
     scheduler_client: SchedulerClientInterface,
     handling_tasks: dict[int, str],
-):
+) -> None:
     logger.info("Started listening for tasks from worker[pid=%s]", os.getpid())
 
     while True:
@@ -269,11 +269,7 @@ def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_leve
     local_repository = get_local_repository()
 
     session = sessionmaker(bind=get_engine())()
-    plugin_service = PluginService(
-        create_plugin_storage(session),
-        create_config_storage(session),
-        local_repository,
-    )
+    plugin_service = PluginService(create_plugin_storage(session), create_config_storage(session), local_repository)
 
     item_handler: Handler
     if queue is WorkerManager.Queue.BOEFJES:

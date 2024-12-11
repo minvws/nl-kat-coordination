@@ -9,9 +9,11 @@ on:
       - "*"
     paths:
       - keiko/**
+      - .github/workflows/keiko_tex_linters.yml
   pull_request:
     paths:
       - keiko/**
+      - .github/workflows/keiko_tex_linters.yml
 
 jobs:
   check-latex:

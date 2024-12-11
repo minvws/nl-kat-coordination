@@ -4,8 +4,8 @@
 <section>
     <div>
         <h2>{% translate "Configuration" %}</h2>
-        <p class="emphasized">{% translate "Set up the required plugins for this report." %}</p>
-        {% if selected_oois and selected_report_types %}
+        <p>{% translate "Set up the required plugins for this report." %}</p>
+        {% if selected_report_types %}
             {% include "partials/return_button.html" with btn_text="Change selection" %}
             {% include "partials/plugin_overview_table.html" %}
 
@@ -52,8 +52,13 @@
                     </div>
                     <div class="column-4 tiles plugins images-cover">
                         {% for required_plugin in plugins.required|dictsort:"enabled" %}
-                            {% include "partials/plugin_tile.html" with plugin=required_plugin plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types %}
+                            {% if required_plugin.enabled %}
+                                {% include "partials/plugin_tile.html" with form_id="continue-to-configuration" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin=required_plugin remove_action_buttons="yes" add_checkbox="yes" %}
 
+                            {% else %}
+                                {% include "partials/plugin_tile.html" with form_id="continue-to-configuration" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin=required_plugin remove_action_buttons="yes" add_checkbox="yes" checked="yes" %}
+
+                            {% endif %}
                         {% endfor %}
                     </div>
                 </div>
@@ -62,11 +67,9 @@
             {% endif %}
             <h3>{% translate "Suggested plugins" %}</h3>
             {% if enabled_plugins.optional %}
-                <p>{% translate "Good job! All suggested plugins are enabled" %}</p>
+                <p>{% translate "Good job! All suggested plugins are enabled." %}</p>
             {% elif plugins.optional %}
-                <p>
-                    {% translate "This report requires at least one of the following plugins to be enabled to generate the report:" %}
-                </p>
+                <p>{% translate "The following plugins are optional to generate the report:" %}</p>
                 <div class="optional-plugin-container hide-overflow">
                     <div class="toolbar">
                         <div class="checkbox">
@@ -78,7 +81,7 @@
                     </div>
                     <div class="column-4 tiles plugins images-cover">
                         {% for optional_plugin in plugins.optional|dictsort:"enabled" %}
-                            {% include "partials/plugin_tile.html" with plugin=optional_plugin form_id="continue-to-configurationt" show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types %}
+                            {% include "partials/plugin_tile.html" with form_id="continue-to-configuration" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin=optional_plugin remove_action_buttons="yes" add_checkbox="yes" %}
 
                         {% endfor %}
                     </div>
@@ -100,7 +103,7 @@
                 {% include "forms/report_form_fields.html" %}
 
                 <button type="submit">
-                    {% translate "Continue" %}<span class="icon ti-chevron-right"></span>
+                    {% translate "Enable plugins and continue" %}<span class="icon ti-chevron-right"></span>
                 </button>
             </form>
         {% else %}

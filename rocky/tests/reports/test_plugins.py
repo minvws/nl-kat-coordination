@@ -10,15 +10,9 @@ from tests.conftest import setup_request
 
 
 def test_generate_report_setup_scan_wrong_plugin_id(
-    rf,
-    client_member,
-    valid_time,
-    mocker,
-    mock_organization_view_octopoes,
-    mock_bytes_client,
-    listed_hostnames,
+    rf, client_member, valid_time, mocker, mock_organization_view_octopoes, mock_bytes_client, listed_hostnames
 ):
-    katalogus_client = mocker.patch("reports.views.base.get_katalogus")()
+    katalogus_client = mocker.patch("account.mixins.OrganizationView.get_katalogus")()
     mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
         count=len(listed_hostnames), items=listed_hostnames
     )
@@ -28,14 +22,7 @@ def test_generate_report_setup_scan_wrong_plugin_id(
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("generate_report_setup_scan", kwargs=kwargs)
 
-    request = rf.post(
-        url,
-        {
-            "observed_at": valid_time.strftime("%Y-%m-%d"),
-            "ooi": "all",
-            "report_type": "ipv6-report",
-        },
-    )
+    request = rf.post(url, {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": "all", "report_type": "ipv6-report"})
     request.resolver_match = resolve(url)
 
     setup_request(request, client_member.user)

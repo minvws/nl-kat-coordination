@@ -46,21 +46,34 @@ def get_ooi_types_with_report() -> set[type[OOI]]:
     return {ooi_type for report in REPORTS for ooi_type in report.input_ooi_types}
 
 
-def get_report_types_for_ooi(ooi_pk: str) -> list[type[BaseReport]]:
+def get_report_types_for_ooi(ooi_pk: str) -> set[type[BaseReport]]:
     """
     Get all report types that can be generated for a given OOI
     """
     reference = Reference.from_str(ooi_pk)
     ooi_type = reference.class_type
-    return [report for report in REPORTS if ooi_type in report.input_ooi_types]
+    return {report for report in REPORTS if ooi_type in report.input_ooi_types}
 
 
 def get_report_types_for_oois(oois: list[str]) -> set[type[BaseReport]]:
     """
     Get all report types that can be generated for a given list of OOIs
     """
-
     return {report for ooi_pk in oois for report in get_report_types_for_ooi(ooi_pk)}
+
+
+def get_report_types_for_ooi_type(ooi_type: type[OOI]) -> set[type[BaseReport]]:
+    """
+    Get all report types that can be generated for a given OOI type
+    """
+    return {report for report in REPORTS if ooi_type in report.input_ooi_types}
+
+
+def get_report_types_for_ooi_types(ooi_types: set[type[OOI]]) -> set[type[BaseReport]]:
+    """
+    Get all report types that can be generated for a given list of OOI types
+    """
+    return {report for ooi_type in ooi_types for report in get_report_types_for_ooi_type(ooi_type)}
 
 
 def get_report_by_id(report_id: str) -> type[BaseReport]:
@@ -92,9 +105,7 @@ def get_plugins_for_report_ids(reports: list[str]) -> dict[str, set[str]]:
     return {"required": required_boefjes, "optional": optional_boefjes}
 
 
-def get_report_types_from_aggregate_report(
-    aggregate_report: type[AggregateReport],
-) -> dict[str, set[type[Report]]]:
+def get_report_types_from_aggregate_report(aggregate_report: type[AggregateReport]) -> dict[str, set[type[Report]]]:
     required_reports = set()
     optional_reports = set()
 

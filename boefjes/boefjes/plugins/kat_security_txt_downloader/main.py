@@ -5,6 +5,7 @@ from os import getenv
 import requests
 from forcediphttpsadapter.adapters import ForcedIPHTTPSAdapter
 from requests import Session
+from requests.models import Response
 
 from boefjes.job_models import BoefjeMeta
 
@@ -41,7 +42,10 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
         elif response.status_code in [301, 302, 307, 308]:
             uri = response.headers["Location"]
             response = requests.get(uri, stream=True, timeout=30, verify=False)  # noqa: S501
-            ip = response.raw._connection.sock.getpeername()[0]
+            if response.raw._connection:
+                ip = response.raw._connection.sock.getpeername()[0]
+            else:
+                ip = ""
             results[path] = {
                 "content": response.content.decode(),
                 "url": response.url,
@@ -53,12 +57,9 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     return [(set(), json.dumps(results))]
 
 
-def do_request(hostname: str, session: Session, uri: str, useragent: str):
+def do_request(hostname: str, session: Session, uri: str, useragent: str) -> Response:
     response = session.get(
-        uri,
-        headers={"Host": hostname, "User-Agent": useragent},
-        verify=False,
-        allow_redirects=False,
+        uri, headers={"Host": hostname, "User-Agent": useragent}, verify=False, allow_redirects=False
     )
 
     return response

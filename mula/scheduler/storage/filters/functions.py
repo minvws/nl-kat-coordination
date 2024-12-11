@@ -1,4 +1,5 @@
 import sqlalchemy
+from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm.query import Query
 from sqlalchemy.sql.elements import BinaryExpression
 
@@ -9,7 +10,7 @@ from .filters import FilterRequest
 from .operators import FILTER_OPERATORS
 
 
-def apply_filter(entity, query: Query, filter_request: FilterRequest) -> Query:
+def apply_filter(entity: DeclarativeBase, query: Query, filter_request: FilterRequest) -> Query:
     """Apply the filter criteria to a SQLAlchemy query.
 
     Args:

@@ -34,19 +34,12 @@ class GeneratingReportFailed(ReportException):
 
 class KeikoClient:
     def __init__(self, base_uri: str, timeout: int = 60):
-        self.session = httpx.Client(base_url=base_uri)
+        self.session = httpx.Client(base_url=base_uri, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT)
         self._timeout = timeout
 
     def generate_report(self, template: str, data: dict, glossary: str) -> str:
         try:
-            res = self.session.post(
-                "/reports",
-                json={
-                    "template": template,
-                    "data": data,
-                    "glossary": glossary,
-                },
-            )
+            res = self.session.post("/reports", json={"template": template, "data": data, "glossary": glossary})
             res.raise_for_status()
         except HTTPError as e:
             raise GeneratingReportFailed from e
@@ -139,11 +132,7 @@ class OOIReportQuery(ReportQuery):
         self.origin = origin
 
     def to_dict(self) -> dict:
-        return {
-            "observed_at": str(self.observed_at),
-            "ooi": self.ooi.reference,
-            "depth": self.depth,
-        }
+        return {"observed_at": str(self.observed_at), "ooi": self.ooi.reference, "depth": self.depth}
 
     def to_url(self) -> str:
         translation.activate(self.language)
@@ -162,12 +151,7 @@ class ReportsService:
         self.keiko_client = keiko_client
 
     def get_report(
-        self,
-        valid_time: datetime,
-        source_type: str,
-        source_value: str,
-        store: dict,
-        filters: ReportQuery,
+        self, valid_time: datetime, source_type: str, source_value: str, store: dict, filters: ReportQuery
     ) -> BinaryIO:
         report_data = build_findings_list_from_store(store)  # reuse existing dict structure
         report_data["findings_grouped"] = _ooi_field_as_string(report_data["findings_grouped"], store)
@@ -196,7 +180,7 @@ class ReportsService:
         return self.get_report(valid_time, "Organisatie", organization_name, store, filters)
 
     @classmethod
-    def ooi_report_file_name(cls, valid_time: datetime, organization_code: str, ooi_id: str):
+    def ooi_report_file_name(cls, valid_time: datetime, organization_code: str, ooi_id: str) -> str:
         report_file_name = "_".join(
             [
                 "bevindingenrapport",
@@ -214,7 +198,7 @@ class ReportsService:
         return report_file_name
 
     @classmethod
-    def organization_report_file_name(cls, organization_code: str):
+    def organization_report_file_name(cls, organization_code: str) -> str:
         file_name = "_".join(
             [
                 "bevindingenrapport_nl",
@@ -226,7 +210,7 @@ class ReportsService:
         return f"{file_name}.pdf"
 
 
-def _ooi_field_as_string(findings_grouped: dict, store: dict):
+def _ooi_field_as_string(findings_grouped: dict, store: dict) -> dict:
     new_findings_grouped = {}
 
     for finding_type, finding_group in findings_grouped.items():
@@ -237,10 +221,7 @@ def _ooi_field_as_string(findings_grouped: dict, store: dict):
 
             list_of_findings.append({**finding, "ooi": ooi_field})
 
-        new_findings_grouped[finding_type] = {
-            "list": list_of_findings,
-            "finding_type": finding_group["finding_type"],
-        }
+        new_findings_grouped[finding_type] = {"list": list_of_findings, "finding_type": finding_group["finding_type"]}
 
     return new_findings_grouped
 
@@ -264,23 +245,14 @@ def build_findings_list_from_store(ooi_store: dict, finding_filter: list[str] | 
     findings_grouped = {}
     for finding in findings:
         if finding["finding_type"]["id"] not in findings_grouped:
-            findings_grouped[finding["finding_type"]["id"]] = {
-                "finding_type": finding["finding_type"],
-                "list": [],
-            }
+            findings_grouped[finding["finding_type"]["id"]] = {"finding_type": finding["finding_type"], "list": []}
 
         findings_grouped[finding["finding_type"]["id"]]["list"].append(finding)
 
-    return {
-        "meta": build_meta(findings),
-        "findings_grouped": findings_grouped,
-    }
+    return {"meta": build_meta(findings), "findings_grouped": findings_grouped}
 
 
-def build_finding_dict(
-    finding_ooi: Finding,
-    ooi_store: dict[str, OOI],
-) -> dict:
+def build_finding_dict(finding_ooi: Finding, ooi_store: dict[str, OOI]) -> dict:
     finding_dict = get_ooi_dict(finding_ooi)
 
     finding_type_ooi = ooi_store[finding_ooi.finding_type]

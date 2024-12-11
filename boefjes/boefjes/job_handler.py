@@ -2,6 +2,7 @@ import os
 import traceback
 from collections.abc import Callable
 from datetime import datetime, timezone
+from functools import cache
 from typing import cast
 
 import httpx
@@ -28,14 +29,31 @@ MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought t
 logger = structlog.get_logger(__name__)
 
 bytes_api_client = BytesAPIClient(
-    str(settings.bytes_api),
-    username=settings.bytes_username,
-    password=settings.bytes_password,
+    str(settings.bytes_api), username=settings.bytes_username, password=settings.bytes_password
 )
 
 
 def get_octopoes_api_connector(org_code: str) -> OctopoesAPIConnector:
-    return OctopoesAPIConnector(str(settings.octopoes_api), org_code)
+    return OctopoesAPIConnector(str(settings.octopoes_api), org_code, timeout=settings.outgoing_request_timeout)
+
+
+@cache
+def boefje_env_variables() -> dict:
+    """
+    Return all environment variables that start with BOEFJE_. The returned
+    keys have the BOEFJE_ prefix removed.
+    """
+
+    boefje_variables = {}
+    for key, value in os.environ.items():
+        if key.startswith("BOEFJE_"):
+            boefje_variables[key.removeprefix("BOEFJE_")] = value
+
+    return boefje_variables
+
+
+def get_system_env_settings_for_boefje(allowed_keys: list[str]) -> dict:
+    return {key: value for key, value in boefje_env_variables().items() if key in allowed_keys}
 
 
 def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None) -> dict[str, str]:
@@ -43,7 +61,7 @@ def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None
         katalogus_api = str(settings.katalogus_api).rstrip("/")
         response = httpx.get(
             f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings",
-            timeout=30,
+            timeout=settings.outgoing_request_timeout,
         )
         response.raise_for_status()
     except HTTPError:
@@ -51,11 +69,7 @@ def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None
         raise
 
     allowed_keys = schema.get("properties", []) if schema else []
-    new_env = {
-        key.split("BOEFJE_", 1)[1]: value
-        for key, value in os.environ.items()
-        if key.startswith("BOEFJE_") and key in allowed_keys
-    }
+    new_env = get_system_env_settings_for_boefje(allowed_keys)
 
     settings_from_katalogus = response.json()
 
@@ -76,12 +90,7 @@ def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None
 
 
 class BoefjeHandler(Handler):
-    def __init__(
-        self,
-        job_runner: BoefjeJobRunner,
-        plugin_service: PluginService,
-        bytes_client: BytesAPIClient,
-    ):
+    def __init__(self, job_runner: BoefjeJobRunner, plugin_service: PluginService, bytes_client: BytesAPIClient):
         self.job_runner = job_runner
         self.plugin_service = plugin_service
         self.bytes_client = bytes_client
@@ -111,8 +120,14 @@ class BoefjeHandler(Handler):
                 ooi = get_octopoes_api_connector(boefje_meta.organization).get(
                     reference, valid_time=datetime.now(timezone.utc)
                 )
-            except ObjectNotFoundException as e:
-                raise ObjectNotFoundException(f"Object {reference} not found in Octopoes") from e
+            except ObjectNotFoundException:
+                logger.info(
+                    "Can't run boefje because OOI does not exist anymore",
+                    boefje_id=boefje_meta.boefje.id,
+                    ooi=reference,
+                    task_id=boefje_meta.id,
+                )
+                return
 
             boefje_meta.arguments["input"] = ooi.serialize()
 

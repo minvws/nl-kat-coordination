@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from time import sleep
 from typing import Literal
 
-from django import forms
+from django.forms import Form
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -18,6 +18,7 @@ from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_mandatory_field
 from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.models import OOI, ScanLevel, ScanProfileType
 from octopoes.models.ooi.findings import Finding, FindingType
+from octopoes.models.ooi.reports import Report
 from octopoes.models.types import get_collapsed_types, type_by_name
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import ConnectorFormMixin, OctopoesView, OOIList, SingleOOIMixin, SingleOOITreeMixin
@@ -29,7 +30,7 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
     """
 
     connector_form_class = ObservedAtForm
-    ooi_types = get_collapsed_types().difference({Finding, FindingType})
+    ooi_types = get_collapsed_types().difference({Finding, FindingType, Report})
     scan_levels = DEFAULT_SCAN_LEVEL_FILTER
     scan_profile_types = DEFAULT_SCAN_PROFILE_TYPE_FILTER
 
@@ -187,12 +188,12 @@ class BaseOOIDetailView(BreadcrumbsMixin, SingleOOITreeMixin, ConnectorFormMixin
 
 class BaseOOIFormView(SingleOOIMixin, FormView):
     ooi_class: type[OOI]
-    form_class: forms.Form = OOIForm
+    form_class: type[BaseRockyForm] = OOIForm
 
     def get_ooi_class(self):
         return self.ooi.__class__ if hasattr(self, "ooi") else None
 
-    def get_form(self, form_class=None) -> BaseRockyForm:
+    def get_form(self, form_class: type[Form] | None = None) -> BaseRockyForm:
         form = super().get_form(form_class)
 
         # Disable natural key attributes
@@ -203,10 +204,7 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
         return form
 
     def get_form_kwargs(self):
-        kwargs = {
-            "ooi_class": self.get_ooi_class(),
-            "connector": self.octopoes_api_connector,
-        }
+        kwargs = {"ooi_class": self.get_ooi_class(), "connector": self.octopoes_api_connector}
         kwargs.update(super().get_form_kwargs())
 
         return kwargs
@@ -219,11 +217,7 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
                 end_valid_time = end_valid_time.replace(tzinfo=timezone.utc)
             new_ooi = self.ooi_class.model_validate(form.cleaned_data)
             create_ooi(
-                self.octopoes_api_connector,
-                self.bytes_client,
-                new_ooi,
-                datetime.now(timezone.utc),
-                end_valid_time,
+                self.octopoes_api_connector, self.bytes_client, new_ooi, datetime.now(timezone.utc), end_valid_time
             )
             sleep(1)
             return redirect(self.get_ooi_success_url(new_ooi))

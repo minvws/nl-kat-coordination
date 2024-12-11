@@ -23,7 +23,7 @@ class OOIClearanceMixin:
         # Mypy doesn't have the information to understand this
         return self.get(request, *args, **kwargs)  # type: ignore[attr-defined]
 
-    def handle_page_action(self, action: str):
+    def handle_page_action(self, action: str) -> None:
         if action == PageActions.ACCEPT_CLEARANCE.value:
             self.organization_member.acknowledged_clearance_level = self.organization_member.trusted_clearance_level
         elif action == PageActions.WITHDRAW_ACCEPTANCE.value:
@@ -36,7 +36,5 @@ class AccountView(OrganizationView, TemplateView, OOIClearanceMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [
-            {"url": "", "text": _("Account details")},
-        ]
+        context["breadcrumbs"] = [{"url": "", "text": _("Account details")}]
         return context

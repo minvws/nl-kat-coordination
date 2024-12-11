@@ -1,7 +1,7 @@
 from octopoes.models.ooi.reports import ReportRecipe
 
 
-class ReportJobRunner:
+class ReportRunner:
     def run(self, recipe: ReportRecipe) -> None:
         raise NotImplementedError()
 

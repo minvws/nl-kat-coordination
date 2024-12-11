@@ -3,7 +3,8 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import config, connectors, models, schedulers, storage
+from scheduler import clients, config, models, schedulers, storage
+from scheduler.storage import stores
 from structlog.testing import capture_logs
 
 from tests.factories import (
@@ -24,31 +25,19 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
         self.mock_ctx.config = config.settings.Settings()
 
         # Mock connectors: octopoes
-        self.mock_octopoes = mock.create_autospec(
-            spec=connectors.services.Octopoes,
-            spec_set=True,
-        )
+        self.mock_octopoes = mock.create_autospec(spec=clients.Octopoes, spec_set=True)
         self.mock_ctx.services.octopoes = self.mock_octopoes
 
         # Mock connectors: Scan profile mutation
-        self.mock_scan_profile_mutation = mock.create_autospec(
-            spec=connectors.listeners.ScanProfileMutation,
-            spec_set=True,
-        )
+        self.mock_scan_profile_mutation = mock.create_autospec(spec=clients.ScanProfileMutation, spec_set=True)
         self.mock_ctx.services.scan_profile_mutation = self.mock_scan_profile_mutation
 
         # Mock connectors: Katalogus
-        self.mock_katalogus = mock.create_autospec(
-            spec=connectors.services.Katalogus,
-            spec_set=True,
-        )
+        self.mock_katalogus = mock.create_autospec(spec=clients.Katalogus, spec_set=True)
         self.mock_ctx.services.katalogus = self.mock_katalogus
 
         # Mock connectors: Bytes
-        self.mock_bytes = mock.create_autospec(
-            spec=connectors.services.Bytes,
-            spec_set=True,
-        )
+        self.mock_bytes = mock.create_autospec(spec=clients.Bytes, spec_set=True)
         self.mock_ctx.services.bytes = self.mock_bytes
 
         # Database
@@ -59,18 +48,16 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
 
         self.mock_ctx.datastores = SimpleNamespace(
             **{
-                storage.ScheduleStore.name: storage.ScheduleStore(self.dbconn),
-                storage.TaskStore.name: storage.TaskStore(self.dbconn),
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+                stores.ScheduleStore.name: stores.ScheduleStore(self.dbconn),
+                stores.TaskStore.name: stores.TaskStore(self.dbconn),
+                stores.PriorityQueueStore.name: stores.PriorityQueueStore(self.dbconn),
             }
         )
 
         # Scheduler
         self.organisation = OrganisationFactory()
         self.scheduler = schedulers.BoefjeScheduler(
-            ctx=self.mock_ctx,
-            scheduler_id=self.organisation.id,
-            organisation=self.organisation,
+            ctx=self.mock_ctx, scheduler_id=self.organisation.id, organisation=self.organisation
         )
 
     def tearDown(self):
@@ -92,7 +79,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ).start()
 
         self.mock_get_plugin = mock.patch(
-            "scheduler.context.AppContext.services.katalogus.get_plugin_by_id_and_org_id",
+            "scheduler.context.AppContext.services.katalogus.get_plugin_by_id_and_org_id"
         ).start()
 
         self.mock_get_object = mock.patch("scheduler.context.AppContext.services.octopoes.get_object").start()
@@ -107,10 +94,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Act
-        allowed_to_run = self.scheduler.has_boefje_permission_to_run(
-            plugin,
-            ooi,
-        )
+        allowed_to_run = self.scheduler.has_boefje_permission_to_run(plugin, ooi)
 
         # Assert
         self.assertTrue(allowed_to_run)
@@ -122,10 +106,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Act
-        allowed_to_run = self.scheduler.has_boefje_permission_to_run(
-            plugin,
-            ooi,
-        )
+        allowed_to_run = self.scheduler.has_boefje_permission_to_run(plugin, ooi)
 
         # Assert
         self.assertTrue(allowed_to_run)
@@ -138,10 +119,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
 
         # Act
         with capture_logs() as cm:
-            allowed_to_run = self.scheduler.has_boefje_permission_to_run(
-                plugin,
-                ooi,
-            )
+            allowed_to_run = self.scheduler.has_boefje_permission_to_run(plugin, ooi)
 
         # Assert
         self.assertFalse(allowed_to_run)
@@ -155,11 +133,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
-        boefje_task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
+        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
         # Mock
         self.mock_get_latest_task_by_hash.return_value = None
@@ -179,16 +153,9 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
-        boefje_task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
+        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
-        task = functions.create_task(
-            scheduler_id=self.scheduler.scheduler_id,
-            data=boefje_task,
-        )
+        task = functions.create_task(scheduler_id=self.scheduler.scheduler_id, data=boefje_task)
 
         # Mock
         self.mock_get_latest_task_by_hash.return_value = task
@@ -208,11 +175,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
-        boefje_task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
+        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
         task_db_first = models.Task(
             scheduler_id=self.scheduler.scheduler_id,
@@ -236,17 +199,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             modified_at=datetime.now(timezone.utc),
         )
 
-        last_run_boefje = BoefjeMetaFactory(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            ended_at=datetime.utcnow(),
-        )
+        last_run_boefje = BoefjeMetaFactory(boefje=boefje, input_ooi=ooi.primary_key, ended_at=datetime.utcnow())
 
         # Mock
-        self.mock_get_latest_task_by_hash.side_effect = [
-            task_db_first,
-            task_db_second,
-        ]
+        self.mock_get_latest_task_by_hash.side_effect = [task_db_first, task_db_second]
         self.mock_get_last_run_boefje.return_value = last_run_boefje
 
         # First run
@@ -262,11 +218,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
-        task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
+        task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
         # Mock
         self.mock_get_latest_task_by_hash.side_effect = Exception("Something went wrong")
@@ -283,16 +235,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
-        task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
-        last_run_boefje = BoefjeMetaFactory(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            ended_at=None,
-        )
+        task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
+        last_run_boefje = BoefjeMetaFactory(boefje=boefje, input_ooi=ooi.primary_key, ended_at=None)
 
         # Mock
         self.mock_get_latest_task_by_hash.return_value = None
@@ -311,16 +255,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
-        task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
-        last_run_boefje = BoefjeMetaFactory(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            ended_at=datetime.utcnow(),
-        )
+        task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
+        last_run_boefje = BoefjeMetaFactory(boefje=boefje, input_ooi=ooi.primary_key, ended_at=datetime.utcnow())
 
         # Mock
         self.mock_get_latest_task_by_hash.return_value = None
@@ -337,11 +273,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
-        task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
+        task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
         # Mock
         self.mock_get_latest_task_by_hash.return_value = None
@@ -356,9 +288,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task_db = models.Task(
@@ -385,9 +315,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task_db = models.Task(
@@ -417,9 +345,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task_db = models.Task(
@@ -452,9 +378,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task_db = models.Task(
@@ -482,9 +406,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task_db = models.Task(
@@ -515,9 +437,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task_db = models.Task(
@@ -547,11 +467,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
-        boefje_task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
+        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
         task_db = models.Task(
             scheduler_id=self.scheduler.scheduler_id,
@@ -586,11 +502,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
-        boefje_task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
+        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
         task_db = models.Task(
             scheduler_id=self.scheduler.scheduler_id,
@@ -604,9 +516,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         last_run_boefje = BoefjeMetaFactory(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            ended_at=datetime.now(timezone.utc),
+            boefje=boefje, input_ooi=ooi.primary_key, ended_at=datetime.now(timezone.utc)
         )
 
         # Mock
@@ -635,10 +545,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_latest_task_by_hash.return_value = None
         self.mock_get_last_run_boefje.return_value = None
-        self.mock_get_plugin.return_value = PluginFactory(
-            scan_level=0,
-            consumes=[ooi.object_type],
-        )
+        self.mock_get_plugin.return_value = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Act
         self.scheduler.push_boefje_task(boefje_task)
@@ -651,17 +558,13 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         boefje = BoefjeFactory()
 
         boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.model_validate(boefje.dict()),
-            input_ooi=None,
-            organization=self.organisation.id,
+            boefje=models.Boefje.model_validate(boefje.dict()), input_ooi=None, organization=self.organisation.id
         )
 
         # Mocks
         self.mock_get_latest_task_by_hash.return_value = None
         self.mock_get_last_run_boefje.return_value = None
-        self.mock_get_plugin.return_value = PluginFactory(
-            scan_level=0,
-        )
+        self.mock_get_plugin.return_value = PluginFactory(scan_level=0)
 
         # Act
         self.scheduler.push_boefje_task(boefje_task)
@@ -673,10 +576,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_boefje_permission_to_run")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_boefje_task_grace_period_passed")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_item_on_queue_by_hash")
-    @mock.patch("scheduler.context.AppContext.datastores.task_store.get_tasks_by_hash")
+    @mock.patch("scheduler.context.AppContext.datastores.task_store.get_latest_task_by_hash")
     def test_push_task_queue_full(
         self,
-        mock_get_tasks_by_hash,
+        mock_get_latest_task_by_hash,
         mock_is_item_on_queue_by_hash,
         mock_has_boefje_task_grace_period_passed,
         mock_has_boefje_permission_to_run,
@@ -702,11 +605,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         mock_has_boefje_task_started_running.return_value = False
         mock_has_boefje_task_grace_period_passed.return_value = True
         mock_is_item_on_queue_by_hash.return_value = False
-        mock_get_tasks_by_hash.return_value = None
-        self.mock_get_plugin.return_value = PluginFactory(
-            scan_level=0,
-            consumes=[ooi.object_type],
-        )
+        mock_get_latest_task_by_hash.return_value = None
+        self.mock_get_plugin.return_value = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Act
         self.scheduler.push_boefje_task(boefje_task)
@@ -741,11 +641,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
 
-        boefje_task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
+        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
         task = models.Task(
             scheduler_id=self.scheduler.scheduler_id,
@@ -757,17 +653,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             modified_at=datetime.now(timezone.utc),
         )
 
-        item = functions.create_item(
-            scheduler_id=self.organisation.id,
-            priority=1,
-            task=task,
-        )
+        item = functions.create_item(scheduler_id=self.organisation.id, priority=1, task=task)
 
         # Mocks
-        self.mock_get_plugin.return_value = PluginFactory(
-            scan_level=0,
-            consumes=[ooi.object_type],
-        )
+        self.mock_get_plugin.return_value = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Act
         self.scheduler.push_item_to_queue(item)
@@ -820,9 +709,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task = models.Task(
@@ -835,16 +722,9 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             modified_at=datetime.now(timezone.utc),
         )
 
-        item = functions.create_item(
-            scheduler_id=self.organisation.id,
-            priority=1,
-            task=task,
-        )
+        item = functions.create_item(scheduler_id=self.organisation.id, priority=1, task=task)
 
-        self.mock_get_plugin.return_value = PluginFactory(
-            scan_level=0,
-            consumes=[ooi.object_type],
-        )
+        self.mock_get_plugin.return_value = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Act
         self.scheduler.push_item_to_queue(item)
@@ -878,9 +758,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task = models.Task(
@@ -893,17 +771,9 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             modified_at=datetime.now(timezone.utc),
         )
 
-        item = functions.create_item(
-            scheduler_id=self.organisation.id,
-            priority=1,
-            task=task,
-        )
+        item = functions.create_item(scheduler_id=self.organisation.id, priority=1, task=task)
 
-        self.mock_get_plugin.return_value = PluginFactory(
-            scan_level=0,
-            consumes=[ooi.object_type],
-            cron=cron,
-        )
+        self.mock_get_plugin.return_value = PluginFactory(scan_level=0, consumes=[ooi.object_type], cron=cron)
 
         # Act
         self.scheduler.push_item_to_queue(item)
@@ -943,9 +813,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task = models.Task(
@@ -958,17 +826,9 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             modified_at=datetime.now(timezone.utc),
         )
 
-        item = functions.create_item(
-            scheduler_id=self.organisation.id,
-            priority=1,
-            task=task,
-        )
+        item = functions.create_item(scheduler_id=self.organisation.id, priority=1, task=task)
 
-        self.mock_get_plugin.return_value = PluginFactory(
-            scan_level=0,
-            consumes=[ooi.object_type],
-            interval=1500,
-        )
+        self.mock_get_plugin.return_value = PluginFactory(scan_level=0, consumes=[ooi.object_type], interval=1500)
 
         # Act
         self.scheduler.push_item_to_queue(item)
@@ -997,10 +857,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
 
         # Check if the deadline_at is set correctly with the interval
         # set to 1500 minutes (25 hours) to at least the next day
-        self.assertGreater(
-            schedule_db.deadline_at,
-            datetime.now(timezone.utc) + timedelta(days=1),
-        )
+        self.assertGreater(schedule_db.deadline_at, datetime.now(timezone.utc) + timedelta(days=1))
 
     def test_post_pop(self):
         """When a task is removed from the queue, its status should be updated"""
@@ -1008,9 +865,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task = models.Task(
@@ -1023,17 +878,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             modified_at=datetime.now(timezone.utc),
         )
 
-        item = functions.create_item(
-            scheduler_id=self.organisation.id,
-            priority=1,
-            task=task,
-        )
+        item = functions.create_item(scheduler_id=self.organisation.id, priority=1, task=task)
 
         # Mocks
-        self.mock_get_plugin.return_value = PluginFactory(
-            scan_level=0,
-            consumes=[ooi.object_type],
-        )
+        self.mock_get_plugin.return_value = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Act
         self.scheduler.push_item_to_queue(item)
@@ -1065,28 +913,16 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         # Mocks
-        self.mock_get_plugin.return_value = PluginFactory(
-            scan_level=0,
-            consumes=[ooi.object_type],
-        )
+        self.mock_get_plugin.return_value = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Act
-        task = functions.create_task(
-            scheduler_id=self.scheduler.scheduler_id,
-            data=boefje_task,
-        )
+        task = functions.create_task(scheduler_id=self.scheduler.scheduler_id, data=boefje_task)
 
-        item = functions.create_item(
-            scheduler_id=self.organisation.id,
-            priority=1,
-            task=task,
-        )
+        item = functions.create_item(scheduler_id=self.organisation.id, priority=1, task=task)
         self.scheduler.push_item_to_queue(item)
 
         # Assert: task should be on priority queue
@@ -1228,23 +1064,20 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         super().setUp()
 
         self.mock_has_boefje_task_started_running = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.has_boefje_task_started_running",
-            return_value=False,
+            "scheduler.schedulers.BoefjeScheduler.has_boefje_task_started_running", return_value=False
         ).start()
 
         self.mock_has_boefje_permission_to_run = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.has_boefje_permission_to_run",
-            return_value=True,
+            "scheduler.schedulers.BoefjeScheduler.has_boefje_permission_to_run", return_value=True
         ).start()
 
         self.mock_has_boefje_task_grace_period_passed = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.has_boefje_task_grace_period_passed",
-            return_value=True,
+            "scheduler.schedulers.BoefjeScheduler.has_boefje_task_grace_period_passed", return_value=True
         ).start()
 
-        self.mock_get_boefjes_for_ooi = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi",
-        ).start()
+        self.mock_set_cron = mock.patch("scheduler.schedulers.BoefjeScheduler.set_cron").start()
+
+        self.mock_get_boefjes_for_ooi = mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi").start()
 
     def tearDown(self):
         mock.patch.stopall()
@@ -1385,9 +1218,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         mutation1 = models.ScanProfileMutation(
-            operation=models.MutationOperationType.DELETE,
-            primary_key=ooi.primary_key,
-            value=ooi,
+            operation=models.MutationOperationType.DELETE, primary_key=ooi.primary_key, value=ooi
         ).model_dump_json()
 
         # Mocks
@@ -1409,9 +1240,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         mutation1 = models.ScanProfileMutation(
-            operation=models.MutationOperationType.CREATE,
-            primary_key=ooi.primary_key,
-            value=ooi,
+            operation=models.MutationOperationType.CREATE, primary_key=ooi.primary_key, value=ooi
         ).model_dump_json()
 
         # Mocks
@@ -1429,9 +1258,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
 
         # Arrange
         mutation2 = models.ScanProfileMutation(
-            operation=models.MutationOperationType.DELETE,
-            primary_key=ooi.primary_key,
-            value=ooi,
+            operation=models.MutationOperationType.DELETE, primary_key=ooi.primary_key, value=ooi
         ).model_dump_json()
 
         # Act
@@ -1446,24 +1273,293 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
         self.assertEqual(task_db.status, models.TaskStatus.CANCELLED)
 
+    def test_push_tasks_for_scan_profile_mutations_op_create_run_on_create(self):
+        """When a boefje has the run_on contains the setting create,
+        and we receive a create mutation, it should:
+
+        - NOT create a `Schedule`
+        - SHOULD run a `Task`
+        """
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=["create"])
+        mutation = models.ScanProfileMutation(
+            operation=models.MutationOperationType.CREATE, primary_key=ooi.primary_key, value=ooi
+        ).model_dump_json()
+
+        # Mocks
+        self.mock_get_boefjes_for_ooi.return_value = [boefje]
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+
+        # Assert: task should be on priority queue
+        item = self.scheduler.queue.peek(0)
+        task_pq = models.BoefjeTask(**item.data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Assert: task should be in datastore, and queued
+        task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Assert: schedule should NOT be created
+        self.assertIsNone(task_db.schedule_id)
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_hash(task_db.hash)
+        self.assertIsNone(schedule_db)
+
+    def test_push_tasks_for_scan_profile_mutations_op_create_run_on_create_update(self):
+        """When a boefje has the run_on contains the setting create,update,
+        and we receive a create mutation, it should:
+
+        - NOT create a `Schedule`
+        - SHOULD run a `Task`
+        """
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=["create", "update"])
+        mutation = models.ScanProfileMutation(
+            operation=models.MutationOperationType.CREATE, primary_key=ooi.primary_key, value=ooi
+        ).model_dump_json()
+
+        # Mocks
+        self.mock_get_boefjes_for_ooi.return_value = [boefje]
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+
+        # Assert: task should be on priority queue
+        item = self.scheduler.queue.peek(0)
+        task_pq = models.BoefjeTask(**item.data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Assert: task should be in datastore, and queued
+        task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Assert: schedule should NOT be created
+        self.assertIsNone(task_db.schedule_id)
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_hash(task_db.hash)
+        self.assertIsNone(schedule_db)
+
+    def test_push_tasks_for_scan_profile_mutations_op_create_run_on_update(self):
+        """When a boefje has the run_on contains the setting update,
+        and we receive a create mutation, it should:
+
+        - NOT create a `Schedule`
+        - NOT run a `Task`
+        """
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=["update"])
+        mutation = models.ScanProfileMutation(
+            operation=models.MutationOperationType.CREATE, primary_key=ooi.primary_key, value=ooi
+        ).model_dump_json()
+
+        # Mocks
+        self.mock_get_boefjes_for_ooi.return_value = [boefje]
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+
+        # Assert: task should NOT be on priority queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+    def test_push_tasks_for_scan_profile_mutations_op_create_run_on_none(self):
+        """When a boefje has the run_on is empty, and we receive a create
+        mutation, it should:
+
+        - SHOULD create a `Schedule`
+        - SHOULD run a `Task`
+        """
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=[])
+        mutation = models.ScanProfileMutation(
+            operation=models.MutationOperationType.CREATE, primary_key=ooi.primary_key, value=ooi
+        ).model_dump_json()
+
+        # Mocks
+        self.mock_get_boefjes_for_ooi.return_value = [boefje]
+        self.mock_set_cron.return_value = "0 0 * * *"
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+
+        # Assert: task should be on priority queue
+        item = self.scheduler.queue.peek(0)
+        task_pq = models.BoefjeTask(**item.data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Assert: task should be in datastore, and queued
+        task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Assert: schedule should be created
+        self.assertIsNotNone(task_db.schedule_id)
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(task_db.schedule_id)
+        self.assertIsNotNone(schedule_db)
+
+    def test_push_tasks_for_scan_profile_mutations_op_update_run_on_create(self):
+        """When a boefje has the run_on contains the setting create,
+        and we receive an update mutation, it should:
+
+        - NOT create a `Schedule`
+        - NOT run a `Task`
+        """
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=["create"])
+        mutation = models.ScanProfileMutation(
+            operation=models.MutationOperationType.UPDATE, primary_key=ooi.primary_key, value=ooi
+        ).model_dump_json()
+
+        # Mocks
+        self.mock_get_boefjes_for_ooi.return_value = [boefje]
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+
+        # Assert: task should NOT be on priority queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+    def test_push_tasks_scan_profile_mutations_op_update_run_on_create_update(self):
+        """When a boefje has the run_on contains the setting create,update,
+        and we receive an update mutation, it should:
+
+        - NOT create a `Schedule`
+        - SHOULD run a `Task`
+        """
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=["create", "update"])
+        mutation = models.ScanProfileMutation(
+            operation=models.MutationOperationType.UPDATE, primary_key=ooi.primary_key, value=ooi
+        ).model_dump_json()
+
+        # Mocks
+        self.mock_get_boefjes_for_ooi.return_value = [boefje]
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+
+        # Assert: task should be on priority queue
+        item = self.scheduler.queue.peek(0)
+        task_pq = models.BoefjeTask(**item.data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Assert: task should be in datastore, and queued
+        task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Assert: schedule should NOT be created
+        self.assertIsNone(task_db.schedule_id)
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_hash(task_db.hash)
+        self.assertIsNone(schedule_db)
+
+    def test_push_tasks_scan_profile_mutations_op_update_run_on_update(self):
+        """When a boefje has the run_on contains the setting update,
+        and we receive an update mutation, it should:
+
+        - NOT create a `Schedule`
+        - SHOULD run a `Task`
+        """
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=["update"])
+        mutation = models.ScanProfileMutation(
+            operation=models.MutationOperationType.UPDATE, primary_key=ooi.primary_key, value=ooi
+        ).model_dump_json()
+
+        # Mocks
+        self.mock_get_boefjes_for_ooi.return_value = [boefje]
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+
+        # Assert: task should be on priority queue
+        item = self.scheduler.queue.peek(0)
+        task_pq = models.BoefjeTask(**item.data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Assert: task should be in datastore, and queued
+        task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Assert: schedule should NOT be created
+        self.assertIsNone(task_db.schedule_id)
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_hash(task_db.hash)
+        self.assertIsNone(schedule_db)
+
+    def test_push_tasks_scan_profile_mutations_op_update_run_on_none(self):
+        """When a boefje has the run_on is empty, and we receive an update
+        mutation, it should:
+
+        - SHOULD create a `Schedule`
+        - SHOULD run a `Task`
+        """
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=[])
+        mutation = models.ScanProfileMutation(
+            operation=models.MutationOperationType.UPDATE, primary_key=ooi.primary_key, value=ooi
+        ).model_dump_json()
+
+        # Mocks
+        self.mock_get_boefjes_for_ooi.return_value = [boefje]
+        self.mock_set_cron.return_value = "0 0 * * *"
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+
+        # Assert: task should be on priority queue
+        item = self.scheduler.queue.peek(0)
+        task_pq = models.BoefjeTask(**item.data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Assert: task should be in datastore, and queued
+        task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Assert: schedule should be created
+        self.assertIsNotNone(task_db.schedule_id)
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(task_db.schedule_id)
+        self.assertIsNotNone(schedule_db)
+
 
 class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
     def setUp(self):
         super().setUp()
 
         self.mock_has_boefje_task_started_running = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.has_boefje_task_started_running",
-            return_value=False,
+            "scheduler.schedulers.BoefjeScheduler.has_boefje_task_started_running", return_value=False
         ).start()
 
         self.mock_has_boefje_permission_to_run = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.has_boefje_permission_to_run",
-            return_value=True,
+            "scheduler.schedulers.BoefjeScheduler.has_boefje_permission_to_run", return_value=True
         ).start()
 
         self.mock_has_boefje_task_grace_period_passed = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.has_boefje_task_grace_period_passed",
-            return_value=True,
+            "scheduler.schedulers.BoefjeScheduler.has_boefje_task_grace_period_passed", return_value=True
         ).start()
 
         self.mock_get_new_boefjes_by_org_id = mock.patch(
@@ -1510,8 +1606,8 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_objects_by_object_types.side_effect = [
-            connectors.errors.ExternalServiceError("External service is not available."),
-            connectors.errors.ExternalServiceError("External service is not available."),
+            clients.errors.ExternalServiceError("External service is not available."),
+            clients.errors.ExternalServiceError("External service is not available."),
         ]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
@@ -1591,8 +1687,8 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_objects_by_object_types.side_effect = [
-            connectors.errors.ExternalServiceError("External service is not available."),
-            connectors.errors.ExternalServiceError("External service is not available."),
+            clients.errors.ExternalServiceError("External service is not available."),
+            clients.errors.ExternalServiceError("External service is not available."),
         ]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
@@ -1675,25 +1771,21 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         super().setUp()
 
         self.mock_has_boefje_task_started_running = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.has_boefje_task_started_running",
-            return_value=False,
+            "scheduler.schedulers.BoefjeScheduler.has_boefje_task_started_running", return_value=False
         ).start()
 
         self.mock_has_boefje_task_grace_period_passed = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.has_boefje_task_grace_period_passed",
-            return_value=True,
+            "scheduler.schedulers.BoefjeScheduler.has_boefje_task_grace_period_passed", return_value=True
         ).start()
 
         self.mock_get_schedules = mock.patch(
-            "scheduler.context.AppContext.datastores.schedule_store.get_schedules",
+            "scheduler.context.AppContext.datastores.schedule_store.get_schedules"
         ).start()
 
-        self.mock_get_object = mock.patch(
-            "scheduler.context.AppContext.services.octopoes.get_object",
-        ).start()
+        self.mock_get_object = mock.patch("scheduler.context.AppContext.services.octopoes.get_object").start()
 
         self.mock_get_plugin = mock.patch(
-            "scheduler.context.AppContext.services.katalogus.get_plugin_by_id_and_org_id",
+            "scheduler.context.AppContext.services.katalogus.get_plugin_by_id_and_org_id"
         ).start()
 
     def tearDown(self):
@@ -1716,9 +1808,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id,
-            hash=boefje_task.hash,
-            data=boefje_task.model_dump(),
+            scheduler_id=self.scheduler.scheduler_id, hash=boefje_task.hash, data=boefje_task.model_dump()
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
@@ -1759,9 +1849,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id,
-            hash=boefje_task.hash,
-            data=boefje_task.model_dump(),
+            scheduler_id=self.scheduler.scheduler_id, hash=boefje_task.hash, data=boefje_task.model_dump()
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
@@ -1800,9 +1888,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id,
-            hash=boefje_task.hash,
-            data=boefje_task.model_dump(),
+            scheduler_id=self.scheduler.scheduler_id, hash=boefje_task.hash, data=boefje_task.model_dump()
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
@@ -1836,9 +1922,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id,
-            hash=boefje_task.hash,
-            data=boefje_task.model_dump(),
+            scheduler_id=self.scheduler.scheduler_id, hash=boefje_task.hash, data=boefje_task.model_dump()
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
@@ -1872,9 +1956,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id,
-            hash=boefje_task.hash,
-            data=boefje_task.model_dump(),
+            scheduler_id=self.scheduler.scheduler_id, hash=boefje_task.hash, data=boefje_task.model_dump()
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
@@ -1908,9 +1990,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id,
-            hash=boefje_task.hash,
-            data=boefje_task.model_dump(),
+            scheduler_id=self.scheduler.scheduler_id, hash=boefje_task.hash, data=boefje_task.model_dump()
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
@@ -1944,9 +2024,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id,
-            hash=boefje_task.hash,
-            data=boefje_task.model_dump(),
+            scheduler_id=self.scheduler.scheduler_id, hash=boefje_task.hash, data=boefje_task.model_dump()
         )
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)

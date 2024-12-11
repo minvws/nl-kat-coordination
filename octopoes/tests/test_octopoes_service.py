@@ -27,22 +27,13 @@ def test_process_ooi_create_event(octopoes_service, valid_time):
     ooi = Hostname(network=Network(name="internet").reference, name="example.com")
     octopoes_service.process_event(
         OOIDBEvent(
-            operation_type=OperationType.CREATE,
-            valid_time=valid_time,
-            client="_dev",
-            old_data=None,
-            new_data=ooi,
+            operation_type=OperationType.CREATE, valid_time=valid_time, client="_dev", old_data=None, new_data=ooi
         )
     )
 
     # octopoes should create a new origin, because there is a matching bit definition
     octopoes_service.origin_repository.save.assert_called_once_with(
-        Origin(
-            origin_type=OriginType.INFERENCE,
-            method="fake-hostname-bit",
-            source=ooi.reference,
-        ),
-        valid_time,
+        Origin(origin_type=OriginType.INFERENCE, method="fake-hostname-bit", source=ooi.reference), valid_time
     )
 
 
@@ -52,22 +43,13 @@ def test_process_event_abstract_bit_consumes(octopoes_service, valid_time):
     ooi = IPAddressV4(network=Network(name="internet").reference, address=ip_address("1.1.1.1"))
     octopoes_service.process_event(
         OOIDBEvent(
-            operation_type=OperationType.CREATE,
-            valid_time=valid_time,
-            client="_dev",
-            old_data=None,
-            new_data=ooi,
+            operation_type=OperationType.CREATE, valid_time=valid_time, client="_dev", old_data=None, new_data=ooi
         )
     )
 
     # octopoes should create a new origin, because there is a matching bit definition (w/ abstract class)
     octopoes_service.origin_repository.save.assert_called_once_with(
-        Origin(
-            origin_type=OriginType.INFERENCE,
-            method="fake-ipaddress-bit",
-            source=ooi.reference,
-        ),
-        valid_time,
+        Origin(origin_type=OriginType.INFERENCE, method="fake-ipaddress-bit", source=ooi.reference), valid_time
     )
 
 
@@ -85,11 +67,7 @@ def test_on_update_origin(octopoes_service, valid_time):
         source=Reference.from_str("Hostname|internet|example.com"),
     )
     event = OriginDBEvent(
-        operation_type=OperationType.UPDATE,
-        valid_time=valid_time,
-        client="_dev",
-        old_data=old_data,
-        new_data=new_data,
+        operation_type=OperationType.UPDATE, valid_time=valid_time, client="_dev", old_data=old_data, new_data=new_data
     )
 
     # and the deferenced ooi is no longer referred to by any origins
@@ -97,7 +75,7 @@ def test_on_update_origin(octopoes_service, valid_time):
     octopoes_service.process_event(event)
 
     # the ooi should be deleted
-    octopoes_service.ooi_repository.delete.assert_called_once_with(
+    octopoes_service.ooi_repository.delete_if_exists.assert_called_once_with(
         Reference.from_str("IPAddress|internet|1.1.1.1"), valid_time
     )
 

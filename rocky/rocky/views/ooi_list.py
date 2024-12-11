@@ -2,12 +2,14 @@ import csv
 import json
 from datetime import datetime, timezone
 from enum import Enum
+from typing import Any
 
 from django.contrib import messages
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy
 from httpx import HTTPError
 from tools.enums import CUSTOM_SCAN_LEVEL
 from tools.forms.ooi_form import OOISearchForm, OOITypeMultiCheckboxForm
@@ -32,7 +34,7 @@ class PageActions(Enum):
 
 
 class OOIListView(BaseOOIListView, OctopoesView):
-    breadcrumbs = [{"url": reverse_lazy("ooi_list"), "text": _("Objects")}]
+    breadcrumbs = [{"url": reverse_lazy("ooi_list"), "text": gettext_lazy("Objects")}]
     template_name = "oois/ooi_list.html"
 
     def get_context_data(self, **kwargs):
@@ -45,19 +47,19 @@ class OOIListView(BaseOOIListView, OctopoesView):
         context["scan_levels"] = [alias for _, alias in CUSTOM_SCAN_LEVEL.choices]
         context["organization_indemnification"] = self.get_organization_indemnification
         context["breadcrumbs"] = [
-            {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": _("Objects")},
+            {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": _("Objects")}
         ]
 
         return context
 
-    def get(self, request: HttpRequest, *args, status=200, **kwargs) -> HttpResponse:
+    def get(self, request: HttpRequest, *args: Any, status: int = 200, **kwargs: Any) -> HttpResponse:
         """Override the response status in case submitting a form returns an error message"""
         response = super().get(request, *args, **kwargs)
         response.status_code = status
 
         return response
 
-    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         """Perform bulk action on selected oois."""
         selected_oois = request.POST.getlist("ooi")
         if not selected_oois:
@@ -82,19 +84,16 @@ class OOIListView(BaseOOIListView, OctopoesView):
         return self.get(request, status=404, *args, **kwargs)
 
     def _set_scan_profiles(
-        self, selected_oois: list[Reference], level: CUSTOM_SCAN_LEVEL, request: HttpRequest, *args, **kwargs
+        self, selected_oois: list[str], level: CUSTOM_SCAN_LEVEL, request: HttpRequest, *args: Any, **kwargs: Any
     ) -> HttpResponse:
         try:
-            self.raise_clearance_levels(selected_oois, level.value)
+            self.raise_clearance_levels([Reference.from_str(ooi) for ooi in selected_oois], level.value)
         except IndemnificationNotPresentException:
             messages.add_message(
                 self.request,
                 messages.ERROR,
                 _("Could not raise clearance levels to L%s. Indemnification not present at organization %s.")
-                % (
-                    level.value,
-                    self.organization.name,
-                ),
+                % (level.value, self.organization.name),
             )
             return self.get(request, status=403, *args, **kwargs)
         except TrustedClearanceLevelTooLowException:
@@ -106,10 +105,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
                     "You were trusted a clearance level of L%s. "
                     "Contact your administrator to receive a higher clearance."
                 )
-                % (
-                    level.value,
-                    self.organization_member.max_clearance_level,
-                ),
+                % (level.value, self.organization_member.max_clearance_level),
             )
             return self.get(request, status=403, *args, **kwargs)
         except AcknowledgedClearanceLevelTooLowException:
@@ -121,10 +117,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
                     "You acknowledged a clearance level of L%s. "
                     "Please accept the clearance level below to proceed."
                 )
-                % (
-                    level.value,
-                    self.organization_member.acknowledged_clearance_level,
-                ),
+                % (level.value, self.organization_member.acknowledged_clearance_level),
             )
             return redirect(reverse("account_detail", kwargs={"organization_code": self.organization.code}))
 
@@ -148,7 +141,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
         return self.get(request, *args, **kwargs)
 
     def _set_oois_to_inherit(
-        self, selected_oois: list[Reference], request: HttpRequest, *args, **kwargs
+        self, selected_oois: list[str], request: HttpRequest, *args: Any, **kwargs: Any
     ) -> HttpResponse:
         scan_profiles = [EmptyScanProfile(reference=Reference.from_str(ooi)) for ooi in selected_oois]
 
@@ -156,9 +149,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
             self.octopoes_api_connector.save_many_scan_profiles(scan_profiles, valid_time=datetime.now(timezone.utc))
         except (HTTPError, RemoteException, ConnectionError):
             messages.add_message(
-                request,
-                messages.ERROR,
-                _("An error occurred while setting clearance levels to inherit."),
+                request, messages.ERROR, _("An error occurred while setting clearance levels to inherit.")
             )
             return self.get(request, status=500, *args, **kwargs)
         except ObjectNotFoundException:
@@ -170,18 +161,16 @@ class OOIListView(BaseOOIListView, OctopoesView):
             return self.get(request, status=404, *args, **kwargs)
 
         messages.add_message(
-            request,
-            messages.SUCCESS,
-            _("Successfully set %d ooi(s) clearance level to inherit.") % len(selected_oois),
+            request, messages.SUCCESS, _("Successfully set %d ooi(s) clearance level to inherit.") % len(selected_oois)
         )
         return self.get(request, *args, **kwargs)
 
-    def _delete_oois(self, selected_oois: list[Reference], request: HttpRequest, *args, **kwargs) -> HttpResponse:
+    def _delete_oois(self, selected_oois: list[str], request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         connector = self.octopoes_api_connector
         valid_time = datetime.now(timezone.utc)
 
         try:
-            connector.delete_many(selected_oois, valid_time)
+            connector.delete_many([Reference.from_str(ooi) for ooi in selected_oois], valid_time)
         except (HTTPError, RemoteException, ConnectionError):
             messages.add_message(request, messages.ERROR, _("An error occurred while deleting oois."))
             return self.get(request, status=500, *args, **kwargs)
@@ -211,21 +200,10 @@ class OOIListExportView(BaseOOIListView):
         queryset = self.get_queryset()
         ooi_list = queryset[: OOIList.HARD_LIMIT]
 
-        exports = [
-            {
-                "observed_at": str(self.observed_at),
-                "filters": str(filters),
-            }
-        ]
+        exports = [{"observed_at": str(self.observed_at), "filters": str(filters)}]
 
         for ooi in ooi_list:
-            exports.append(
-                {
-                    "key": ooi.primary_key,
-                    "name": ooi.human_readable,
-                    "ooi_type": ooi.ooi_type,
-                }
-            )
+            exports.append({"key": ooi.primary_key, "name": ooi.human_readable, "ooi_type": ooi.ooi_type})
 
         if file_type == "json":
             response = HttpResponse(
@@ -247,13 +225,7 @@ class OOIListExportView(BaseOOIListView):
             writer.writerow([str(self.observed_at), str(filters)])
             writer.writerow(["key", "name", "ooi_type"])
             for ooi in ooi_list:
-                writer.writerow(
-                    [
-                        ooi.primary_key,
-                        ooi.human_readable,
-                        ooi.ooi_type,
-                    ]
-                )
+                writer.writerow([ooi.primary_key, ooi.human_readable, ooi.ooi_type])
 
             return response
 
