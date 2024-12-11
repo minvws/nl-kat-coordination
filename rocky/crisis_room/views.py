@@ -120,11 +120,17 @@ class CrisisRoomAllOrganizations(TemplateView):
     def get_user_organizations(self) -> list[Organization]:
         return [member.organization for member in OrganizationMember.objects.filter(user=self.request.user)]
 
-    def get_organizations_dashboards(self) -> dict[Organization, dict[DashboardData, dict[str, Any]]]:
+    def get_organizations_dashboards(
+        self, display_in_crisis_room: bool = False, display_in_dashboard: bool = False
+    ) -> dict[Organization, dict[DashboardData, dict[str, Any]]]:
         organizations = self.get_user_organizations()
         organization_dashboards = {}
         grouped_data = defaultdict(list)
-        dashboards_data = DashboardData.objects.filter(dashboard__organization__in=organizations)
+        dashboards_data = DashboardData.objects.filter(
+            dashboard__organization__in=organizations,
+            display_in_crisis_room=display_in_crisis_room,
+            display_in_dashboard=display_in_dashboard,
+        )
         for data in dashboards_data:
             organization_dashboards[data] = self.get_report_data(data)
             grouped_data[data.dashboard.organization].append(organization_dashboards)
@@ -165,6 +171,8 @@ class CrisisRoomAllOrganizations(TemplateView):
             "total_occurrences": 0,
         }
 
+        summary_added = False
+
         for organization, organizations_data in self.organizations_dashboards.items():
             for dashboards_data in organizations_data:
                 for report_data in dashboards_data.values():
@@ -173,8 +181,13 @@ class CrisisRoomAllOrganizations(TemplateView):
                             if isinstance(data, dict):
                                 for severity, total in data.items():
                                     summary[summary_item][severity] += total
+                                    summary_added = True
                             else:
                                 summary[summary_item] += data
+                                summary_added = True
+
+        if not summary_added:
+            return {}
 
         return summary
 

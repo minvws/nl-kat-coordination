@@ -33,6 +33,7 @@
                     {% for dashboards in organization_dashboards %}
                         {% for dashboard_data, report_data in dashboards.items %}
                             {% if report_data %}
+                                {{ dashboard_data.recipe }}
                                 {% include dashboard_data.template with data=report_data.findings is_dashboard="yes" %}
 
                             {% endif %}
