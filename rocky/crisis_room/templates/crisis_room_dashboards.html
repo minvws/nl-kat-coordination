@@ -8,7 +8,7 @@
 
     <main id="main-content" tabindex="-1" class="crisisroom">
         <section>
-            {% include "crisis_room/crisis_room_header.html" with active="dashboards" %}
+            {% include "crisis_room_header.html" with active="dashboards" %}
 
         </section>
         <section>
@@ -21,6 +21,7 @@
                     {% endblocktranslate %}
                 </p>
             </div>
+            {{ organizations_dashboards }}
             <div>
                 {% for organization, organization_dashboards in organizations_dashboards.items %}
                     {% for dashboards in organization_dashboards %}

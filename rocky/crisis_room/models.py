@@ -13,7 +13,7 @@ class Dashboard(models.Model):
 
     def __str__(self) -> str:
         if self.name:
-            return self.name
+            return f"{self.name} for organization {self.organization}"
         return super().__str__()
 
 
