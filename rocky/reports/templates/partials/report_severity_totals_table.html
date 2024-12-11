@@ -1,13 +1,5 @@
 {% load i18n %}
 
-{% if is_dashboard %}
-    <h4>{% translate "Findings overview" %}</h4>
-    <p>
-        {% translate "This overview shows the total number of findings per severity that have been identified for all organizations." %}
-    </p>
-{% else %}
-    <h3>{% translate "Findings overview" %}</h3>
-{% endif %}
 <div class="horizontal-scroll">
     <table>
         <caption class="visually-hidden">{% translate "Total per severity overview" %}</caption>

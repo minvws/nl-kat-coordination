@@ -1,11 +1,6 @@
 {% load i18n %}
 {% load ooi_extra %}
 
-{% if is_dashboard %}
-    <h4>{% translate "Findings" %}</h4>
-{% else %}
-    <h3>{% translate "Findings" %}</h3>
-{% endif %}
 <div class="horizontal-scroll">
     <table>
         <caption class="visually-hidden">{% translate "Other findings found" %}</caption>

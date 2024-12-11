@@ -1,0 +1,18 @@
+{% load i18n %}
+
+<div>
+    <h1>{% translate "Crisis Room" %}</h1>
+    <p class="emphasized">{% translate "Crisis Room overview for all organizations" %}</p>
+</div>
+<div>
+    <nav class="tabs" aria-label="{% translate "Crsis Room Navigation" %}">
+        <ul>
+            <li {% if active == "dashboards" %}aria-current="page"{% endif %}>
+                <a href="{% url 'crisis_room_dashboards' %}">{% translate "Dashboards" %}</a>
+            </li>
+            <li {% if active == "findings" %}aria-current="page"{% endif %}>
+                <a href="{% url 'crisis_room_findings' %}">{% translate "Findings" %}</a>
+            </li>
+        </ul>
+    </nav>
+</div>

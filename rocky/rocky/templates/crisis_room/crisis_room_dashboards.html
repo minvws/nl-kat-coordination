@@ -1,0 +1,40 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1" class="crisisroom">
+        <section>
+            {% include "crisis_room/crisis_room_header.html" with active="dashboards" %}
+
+        </section>
+        <section>
+            <div>
+                <h2>{% translate "Dashboards" %}</h2>
+                <p>
+                    {% blocktranslate %}
+                        On this page you can see an overview of the dashboards for all organizations.
+                        --More context can be written here--
+                    {% endblocktranslate %}
+                </p>
+            </div>
+            <div>
+                {% for organization, organization_dashboards in organizations_dashboards.items %}
+                    {% for dashboards in organization_dashboards %}
+                        {% for dashboard_data, report_data in dashboards.items %}
+                            {% if report_data %}
+                                <section>
+                                    {% include dashboard_data.template with data=report_data.findings is_dashboard="yes" %}
+
+                                </section>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+{% endblock content %}

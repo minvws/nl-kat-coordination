@@ -1,0 +1,48 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1" class="crisisroom">
+        <section>
+            {% include "crisis_room/crisis_room_header.html" with active="findings" %}
+
+        </section>
+        <section>
+            {% if organizations_findings_summary.total_finding_types != 0 %}
+                <section>
+                    <div>
+                        <h2>{% translate "Findings overview" %}</h2>
+                        <p>
+                            {% blocktranslate %}
+                                This overview shows the total number of findings per
+                                severity that have been identified for all organizations.
+                            {% endblocktranslate %}
+                        </p>
+                        {% include "partials/report_severity_totals_table.html" with data=organizations_findings_summary %}
+
+                    </div>
+                </section>
+                <section>
+                    <div>
+                        <h2>{% translate "Findings per organization" %}</h2>
+                        <p>{% translate "This table shows the findings that have been identified for each organization." %}</p>
+                        {% include "findings_report/report.html" with data=report_data.findings is_dashboard="yes" %}
+
+                    </div>
+                </section>
+            {% else %}
+                <h2>{% translate "Findings overview" %}</h2>
+                <p>
+                    {% blocktranslate %}
+                            No findings have been identified yet. As soon as they have been
+                            identified, they will be shown on this page.
+                        {% endblocktranslate %}
+                </p>
+            {% endif %}
+        </section>
+    </main>
+{% endblock content %}

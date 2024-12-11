@@ -7,7 +7,9 @@ import structlog
 from account.models import KATUser
 from django.conf import settings
 from django.contrib import messages
+from django.http import HttpResponse
 from django.http.request import HttpRequest
+from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
@@ -108,7 +110,94 @@ class CrisisRoomView(BreadcrumbsMixin, ConnectorFormMixin, ObservedAtMixin, Temp
 
 
 class CrisisRoomAllOrganizations(TemplateView):
-    template_name = "crisis_room/crisis_room.html"
+    """
+    Crisis Room langding page.
+    """
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        return redirect(reverse("crisis_room_dashboards"))
+
+
+class CrisisRoomDashboards(TemplateView):
+    template_name = "crisis_room/crisis_room_dashboards.html"
+
+    def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
+        super().setup(request, *args, **kwargs)
+        self.organizations_dashboards: dict[Organization, dict[DashboardData, dict[str, Any]]] = (
+            self.get_organizations_dashboards()
+        )
+        self.organizations_findings_summary = self.get_organizations_findings_summary()
+
+    def get_user_organizations(self) -> list[Organization]:
+        return [member.organization for member in OrganizationMember.objects.filter(user=self.request.user)]
+
+    def get_organizations_dashboards(self) -> dict[Organization, dict[DashboardData, dict[str, Any]]]:
+        organizations = self.get_user_organizations()
+        organization_dashboards = {}
+        grouped_data = defaultdict(list)
+        dashboards_data = DashboardData.objects.filter(dashboard__organization__in=organizations)
+        for data in dashboards_data:
+            organization_dashboards[data] = self.get_report_data(data)
+            grouped_data[data.dashboard.organization].append(organization_dashboards)
+        return dict(grouped_data)
+
+    @staticmethod
+    def get_octopoes_client(organization: Organization) -> OctopoesAPIConnector:
+        return OctopoesAPIConnector(
+            settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+        )
+
+    def get_report_data(self, dashboard_data: DashboardData) -> dict[str, Any]:
+        valid_time = datetime.now(timezone.utc)
+        octopoes_client = self.get_octopoes_client(dashboard_data.dashboard.organization)
+
+        reports = octopoes_client.query(
+            "ReportRecipe.<report_recipe[is Report]",
+            valid_time=valid_time,
+            source=Reference.from_str(dashboard_data.recipe),
+        )
+        if reports:
+            reports.sort(key=lambda ooi: ooi.date_generated, reverse=True)
+            report = reports[0]
+
+            bytes_client = get_bytes_client(dashboard_data.dashboard.organization.code)
+            bytes_client.login()
+
+            return TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
+                bytes_client.get_raw(raw_id=report.data_raw_id)
+            )
+        return {}
+
+    def get_organizations_findings_summary(self) -> dict[str, Any]:
+        summary: dict[str, Any] = {
+            "total_by_severity": {severity: 0 for severity in SEVERITY_OPTIONS},
+            "total_by_severity_per_finding_type": {severity: 0 for severity in SEVERITY_OPTIONS},
+            "total_finding_types": 0,
+            "total_occurrences": 0,
+        }
+
+        for organization, organizations_data in self.organizations_dashboards.items():
+            for dashboards_data in organizations_data:
+                for report_data in dashboards_data.values():
+                    if "findings" in report_data and "summary" in report_data["findings"]:
+                        for summary_item, data in report_data["findings"]["summary"].items():
+                            if isinstance(data, dict):
+                                for severity, total in data.items():
+                                    summary[summary_item][severity] += total
+                            else:
+                                summary[summary_item] += data
+
+        return summary
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["organizations_dashboards"] = self.organizations_dashboards
+        context["organizations_findings_summary"] = self.organizations_findings_summary
+        return context
+
+
+class CrisisRoomFindings(TemplateView):
+    template_name = "crisis_room/crisis_room_findings.html"
 
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
         super().setup(request, *args, **kwargs)
