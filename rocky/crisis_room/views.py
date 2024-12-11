@@ -154,6 +154,7 @@ class CrisisRoomMixin:
             "ReportRecipe.<report_recipe[is Report]",
             valid_time=valid_time,
             source=Reference.from_str(dashboard_data.recipe),
+            offset=0,
             limit=1,
         )
         if report:
