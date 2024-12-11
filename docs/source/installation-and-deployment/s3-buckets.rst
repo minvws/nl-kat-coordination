@@ -1,5 +1,5 @@
 ==========
-S3 support
+S3 buckets
 ==========
 
 OpenKAT stores most of its data in integrated databases. However, if you
