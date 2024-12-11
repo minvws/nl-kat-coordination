@@ -5,10 +5,10 @@
     <p>
         {% blocktranslate trimmed %}
             The Findings Report provides an overview of the identified findings on the scanned
-            systems. For each finding it shows the risk level and the number of occurrences of
-            the finding. Under the 'Details' section a description, impact, recommendation and
-            location of the finding can be found. The risk level may be different for your
-            specific environment.
+            systems. For each finding type it shows the risk level, the number of occurrences
+            and the first known occurrence of the finding. The risk level may be different for your specific environment.
+            The details can be seen when expanding a row. A description, the source, impact and recommendation of the finding
+            can be found here. It also shows in which findings the finding type occurred.
         {% endblocktranslate %}
     </p>
 {% endif %}
@@ -27,59 +27,73 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>{{ organization.name }}</td>
-                    <td>
-                        {% if data.summary.total_finding_types %}
-                            {{ data.summary.total_finding_types }}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if data.summary.total_occurrences %}
-                            {{ data.summary.total_occurrences }}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if data.finding_types.0.finding_type.risk_severity %}
-                            <span class="{{ findings.finding_types.0.finding_type.risk_severity }}">{{ data.finding_types.0.finding_type.risk_severity|capfirst }}</span>
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if data.summary.total_by_severity_per_finding_type.critical %}
-                            {{ data.summary.total_by_severity_per_finding_type.critical }}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                    <td class="actions">
-                        {% if data %}
-                            <button class="expando-button"
-                                    data-icon-open-class="icon ti-chevron-down"
-                                    data-icon-close-class="icon ti-chevron-up"
-                                    data-close-label="{% translate "Close details" %}">
-                                {% translate "Open details" %}
-                            </button>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% if data %}
-                    <tr class="expando-row">
-                        <td>
-                            <h4>{% translate "Findings overview" %}</h4>
-                            {% include "partials/report_severity_totals_table.html" with data=data.summary %}
+                {% for organization, organization_dashboards in organizations_dashboards.items %}
+                    {% for dashboards in organization_dashboards %}
+                        {% for dashboard_data, report_data in dashboards.items %}
+                            {% if report_data.findings %}
+                                <tr>
+                                    <td>{{ organization.name }}</td>
+                                    <td>
+                                        {% if report_data.findings.summary.total_finding_types %}
+                                            {{ report_data.findings.summary.total_finding_types }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if report_data.findings.summary.total_occurrences %}
+                                            {{ report_data.findings.summary.total_occurrences }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if report_data.findings.finding_types.0.finding_type.risk_severity %}
+                                            <span class="{{ report_data.findings.finding_types.0.finding_type.risk_severity }}">{{ report_data.findings.finding_types.0.finding_type.risk_severity|capfirst }}</span>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if report_data.findings.summary.total_by_severity_per_finding_type %}
+                                            {{ report_data.findings.summary.total_by_severity_per_finding_type.critical }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td class="actions">
+                                        {% if report_data %}
+                                            <button class="expando-button"
+                                                    data-icon-open-class="icon ti-chevron-down"
+                                                    data-icon-close-class="icon ti-chevron-up"
+                                                    data-close-label="{% translate "Close details" %}">
+                                                {% translate "Open details" %}
+                                            </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% if report_data %}
+                                    <tr class="expando-row">
+                                        <td colspan="5">
+                                            <h4>{% translate "Findings overview" %}</h4>
+                                            <p>
+                                                {% translate "This overview shows the total number of findings per severity that have been identified for this organization." %}
+                                            </p>
+                                            {% include "partials/report_severity_totals_table.html" with data=report_data.findings.summary %}
 
-                            <h4>{% translate "Findings" %}</h4>
-                            {% include "partials/report_findings_table.html" with finding_types=data.finding_types %}
+                                            <h4>{% translate "Findings" %}</h4>
+                                            <p>
+                                                {% translate "This overview shows the total number of findings per severity that have been identified for this organization." %}
+                                            </p>
+                                            {% include "partials/report_findings_table.html" with finding_types=report_data.findings.finding_types %}
 
-                        </td>
-                    </tr>
-                {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
             </tbody>
         </table>
     </div>

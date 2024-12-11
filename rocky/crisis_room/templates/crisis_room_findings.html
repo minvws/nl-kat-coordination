@@ -30,7 +30,7 @@
                     <div>
                         <h2>{% translate "Findings per organization" %}</h2>
                         <p>{% translate "This table shows the findings that have been identified for each organization." %}</p>
-                        {% include "findings_report/report.html" with data=report_data.findings is_dashboard="yes" %}
+                        {% include "findings_report/report.html" with is_dashboard="yes" %}
 
                     </div>
                 </section>
@@ -38,9 +38,9 @@
                 <h2>{% translate "Findings overview" %}</h2>
                 <p>
                     {% blocktranslate %}
-                            No findings have been identified yet. As soon as they have been
-                            identified, they will be shown on this page.
-                        {% endblocktranslate %}
+                        No findings have been identified yet. As soon as they have been
+                        identified, they will be shown on this page.
+                    {% endblocktranslate %}
                 </p>
             {% endif %}
         </section>
