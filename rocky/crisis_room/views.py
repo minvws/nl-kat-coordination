@@ -174,7 +174,7 @@ class CrisisRoomDashboards(CrisisRoomMixin, TemplateView):
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
         super().setup(request, *args, **kwargs)
         self.organizations_dashboards: dict[Organization, dict[DashboardData, dict[str, Any]]] = (
-            self.get_organizations_dashboards(display_in_dashboard=True)
+            self.get_organizations_dashboards(display_in_crisis_room=True)
         )
 
     def get_context_data(self, **kwargs):
@@ -188,9 +188,21 @@ class CrisisRoomFindings(CrisisRoomMixin, TemplateView):
 
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
         super().setup(request, *args, **kwargs)
-        self.organizations_dashboards: dict[Organization, dict[DashboardData, dict[str, Any]]] = (
-            self.get_organizations_dashboards(display_in_crisis_room=True)
+        self.organizations_findings: dict[Organization, dict[DashboardData, dict[str, Any]]] = (
+            self.get_organizations_findings()
         )
+
+    def get_organizations_findings(self) -> dict[Organization, dict[DashboardData, dict[str, Any]]]:
+        organizations = self.get_user_organizations()
+        organization_dashboards = {}
+        grouped_data = defaultdict(list)
+        dashboards_data = DashboardData.objects.filter(
+            dashboard__organization__in=organizations, dashboard__name="Crisis Room Findings Dashboard"
+        )
+        for data in dashboards_data:
+            organization_dashboards[data] = self.get_report_data(data)
+            grouped_data[data.dashboard.organization].append(organization_dashboards)
+        return dict(grouped_data)
 
     def get_organizations_findings_summary(self) -> dict[str, Any]:
         summary: dict[str, Any] = {
@@ -202,7 +214,7 @@ class CrisisRoomFindings(CrisisRoomMixin, TemplateView):
 
         summary_added = False
 
-        for organization, organizations_data in self.organizations_dashboards.items():
+        for organization, organizations_data in self.organizations_findings.items():
             for dashboards_data in organizations_data:
                 for report_data in dashboards_data.values():
                     if "findings" in report_data and "summary" in report_data["findings"]:
@@ -222,6 +234,6 @@ class CrisisRoomFindings(CrisisRoomMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["organizations_dashboards"] = self.organizations_dashboards
+        context["organizations_dashboards"] = self.organizations_findings
         context["organizations_findings_summary"] = self.get_organizations_findings_summary()
         return context

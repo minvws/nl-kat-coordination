@@ -21,7 +21,6 @@
                     {% endblocktranslate %}
                 </p>
             </div>
-            {{ organizations_dashboards }}
             <div>
                 {% for organization, organization_dashboards in organizations_dashboards.items %}
                     {% for dashboards in organization_dashboards %}
@@ -31,6 +30,8 @@
                                     {% include dashboard_data.template with data=report_data.findings is_dashboard="yes" %}
 
                                 </section>
+                            {% else %}
+                                <p>{% translate "There are no dashboards to display." %}</p>
                             {% endif %}
                         {% endfor %}
                     {% endfor %}
