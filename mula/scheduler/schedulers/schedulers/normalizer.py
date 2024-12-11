@@ -7,6 +7,7 @@ from opentelemetry import trace
 
 from scheduler import clients, context, models
 from scheduler.schedulers import Scheduler, rankers
+from scheduler.schedulers.errors import exception_handler
 
 tracer = trace.get_tracer(__name__)
 
@@ -55,6 +56,7 @@ class NormalizerScheduler(Scheduler):
             "Normalizer scheduler started", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
         )
 
+    # TODO: exceptions
     @tracer.start_as_current_span("process_raw_data")
     def process_raw_data(self, body: bytes) -> None:
         """Create tasks for the received raw data.
@@ -114,6 +116,7 @@ class NormalizerScheduler(Scheduler):
                     self.push_normalizer_task, normalizer_task, latest_raw_data.organization, self.create_schedule
                 )
 
+    @exception_handler
     @tracer.start_as_current_span("push_normalizer_task")
     def push_normalizer_task(
         self, normalizer_task: models.NormalizerTask, organisation_id: str, create_schedule: bool, caller: str = ""

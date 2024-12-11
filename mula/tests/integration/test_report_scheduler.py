@@ -4,6 +4,7 @@ from unittest import mock
 
 from scheduler import config, models, schedulers, storage
 from scheduler.storage import stores
+
 from tests.factories import OrganisationFactory
 
 
@@ -50,7 +51,7 @@ class ReportSchedulerTestCase(ReportSchedulerBaseTestCase):
     def tearDown(self):
         mock.patch.stopall()
 
-    def test_push_tasks_for_rescheduling(self):
+    def test_process_rescheduling(self):
         """When the deadline of schedules have passed, the resulting task should be added to the queue"""
         # Arrange
         report_task = models.ReportTask(organisation_id=self.organisation.id, report_recipe_id="123")
@@ -82,7 +83,7 @@ class ReportSchedulerTestCase(ReportSchedulerBaseTestCase):
         self.assertIsNotNone(task_db)
         self.assertEqual(peek.id, task_db.id)
 
-    def test_push_tasks_for_rescheduling_item_on_queue(self):
+    def test_process_rescheduling_item_on_queue(self):
         """When the deadline of schedules have passed, the resulting task should be added to the queue"""
         # Arrange
         report_task = models.ReportTask(organisation_id=self.organisation.id, report_recipe_id="123")

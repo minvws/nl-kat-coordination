@@ -3,10 +3,10 @@ import unittest
 from types import SimpleNamespace
 from unittest import mock
 
-from structlog.testing import capture_logs
-
 from scheduler import clients, config, models, schedulers, storage
 from scheduler.storage import stores
+from structlog.testing import capture_logs
+
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -152,7 +152,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             "scheduler.context.AppContext.services.katalogus.get_plugin_by_id_and_org_id"
         ).start()
 
-    def test_push_tasks_for_raw_data(self):
+    def test_process_raw_data(self):
         # Arrange
         ooi = OOIFactory(scan_profile=ScanProfileFactory(level=0))
         boefje = BoefjeFactory()
@@ -181,7 +181,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
-    def test_push_tasks_for_raw_data_no_normalizers_found(self):
+    def test_process_raw_data_no_normalizers_found(self):
         # Arrange
         ooi = OOIFactory(scan_profile=ScanProfileFactory(level=0))
         boefje = BoefjeFactory()
@@ -202,7 +202,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-    def test_push_tasks_for_raw_data_not_allowed_to_run(self):
+    def test_process_raw_data_not_allowed_to_run(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -232,7 +232,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-    def test_push_tasks_for_raw_data_still_running(self):
+    def test_process_raw_data_still_running(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -263,7 +263,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-    def test_push_tasks_for_raw_data_still_running_exception(self):
+    def test_process_raw_data_still_running_exception(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -294,7 +294,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-    def test_push_tasks_for_raw_data_item_on_queue(self):
+    def test_process_raw_data_item_on_queue(self):
         # Arrange
         ooi = OOIFactory(scan_profile=ScanProfileFactory(level=0))
         boefje = BoefjeFactory()
@@ -328,7 +328,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
-    def test_push_tasks_for_raw_data_error_mimetype(self):
+    def test_process_raw_data_error_mimetype(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -354,7 +354,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-    def test_push_tasks_for_raw_data_queue_full(self):
+    def test_process_raw_data_queue_full(self):
         events = []
         for _ in range(0, 2):
             # Arrange
@@ -392,5 +392,5 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         with capture_logs() as cm:
             self.scheduler.process_raw_data(events[1])
 
-        self.assertIn("Could not add task to queue, queue was full", cm[-1].get("event"))
+        self.assertIn("Queue is full", cm[-1].get("event"))
         self.assertEqual(1, self.scheduler.queue.qsize())

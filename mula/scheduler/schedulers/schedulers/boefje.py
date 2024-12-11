@@ -8,6 +8,7 @@ from opentelemetry import trace
 
 from scheduler import clients, context, models, utils
 from scheduler.schedulers import Scheduler, rankers
+from scheduler.schedulers.errors import exception_handler
 from scheduler.storage import filters
 
 tracer = trace.get_tracer(__name__)
@@ -65,6 +66,7 @@ class BoefjeScheduler(Scheduler):
             "Boefje scheduler started", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
         )
 
+    # TODO: exceptions
     @tracer.start_as_current_span("process_mutations")
     def process_mutations(self, body: bytes) -> None:
         """Create tasks for oois that have a scan level change.
@@ -169,6 +171,7 @@ class BoefjeScheduler(Scheduler):
                     self.process_mutations.__name__,
                 )
 
+    # TODO: exceptions
     @tracer.start_as_current_span("process_new_boefjes")
     def process_new_boefjes(self) -> None:
         """When new boefjes are added or enabled we find the ooi's that
@@ -204,6 +207,7 @@ class BoefjeScheduler(Scheduler):
                     self.push_boefje_task, boefje_task, org_id, self.create_schedule, self.process_new_boefjes.__name__
                 )
 
+    # TODO: exceptions
     @tracer.start_as_current_span("process_rescheduling")
     def process_rescheduling(self):
         schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
@@ -329,7 +333,7 @@ class BoefjeScheduler(Scheduler):
                     self.process_rescheduling.__name__,
                 )
 
-    # TODO: clean up exceptions -> exception handler
+    @exception_handler
     @tracer.start_as_current_span("push_boefje_task")
     def push_boefje_task(
         self, boefje_task: models.BoefjeTask, organisation_id: str, create_schedule: bool = True, caller: str = ""

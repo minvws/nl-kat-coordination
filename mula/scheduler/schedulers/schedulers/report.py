@@ -6,6 +6,7 @@ from opentelemetry import trace
 
 from scheduler import context, models
 from scheduler.schedulers import Scheduler
+from scheduler.schedulers.errors import exception_handler
 from scheduler.storage import filters
 
 tracer = trace.get_tracer(__name__)
@@ -73,6 +74,7 @@ class ReportScheduler(Scheduler):
                     self.process_rescheduling.__name__,
                 )
 
+    @exception_handler
     @tracer.start_as_current_span("push_report_task")
     def push_report_task(
         self, report_task: models.ReportTask, organisation_id: str, create_schedule: bool, caller: str = ""

@@ -161,6 +161,7 @@ class Scheduler(abc.ABC):
         while not self.is_space_on_queue() and (tries < max_tries or max_tries == -1):
             self.logger.debug(
                 "Queue %s is full, waiting for space",
+                self.queue.pq_id,
                 queue_id=self.queue.pq_id,
                 queue_qsize=self.queue.qsize(),
                 scheduler_id=self.scheduler_id,
