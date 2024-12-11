@@ -183,11 +183,14 @@ class OctopoesService:
         if origin.origin_type == OriginType.AFFIRMATION and not any(
             other_origin
             for other_origin in self.origin_repository.list_origins(
-                origin_type={OriginType.DECLARATION, OriginType.OBSERVATION, OriginType.INFERENCE},
+                origin_type={OriginType.DECLARATION, OriginType.OBSERVATION, OriginType.INFERENCE, OriginType.NIBBLET},
                 valid_time=valid_time,
                 result=origin.source,
             )
-            if not (other_origin.origin_type == OriginType.INFERENCE and [other_origin.source] == other_origin.result)
+            if not (
+                other_origin.origin_type in [OriginType.INFERENCE, OriginType.NIBBLET]
+                and [other_origin.source] == other_origin.result
+            )
         ):
             logger.debug("Affirmation source %s seems dangling, deleting", origin.source)
             self.ooi_repository.delete_if_exists(origin.source, valid_time)
@@ -198,7 +201,7 @@ class OctopoesService:
         self.origin_repository.save(origin, valid_time=valid_time)
 
         # Origins that are stale need to be deleted. #3561
-        if not origin.result and origin.origin_type != OriginType.INFERENCE:
+        if not origin.result and origin.origin_type not in [OriginType.INFERENCE, OriginType.NIBBLET]:
             self.origin_repository.delete(origin, valid_time=valid_time)
 
     def _run_inference(self, origin: Origin, valid_time: datetime) -> None:
