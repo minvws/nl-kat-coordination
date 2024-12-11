@@ -7,7 +7,6 @@ from unittest import mock
 from scheduler import config, models, storage
 from scheduler.schedulers.queue import InvalidItemError, QueueEmptyError, QueueFullError
 from scheduler.storage import stores
-
 from tests.factories import OrganisationFactory
 from tests.mocks import item as mock_item
 from tests.mocks import queue as mock_queue

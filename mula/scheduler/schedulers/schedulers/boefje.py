@@ -53,20 +53,20 @@ class BoefjeScheduler(Scheduler):
         self.listeners["mutations"] = clients.ScanProfileMutation(
             dsn=str(self.ctx.config.host_raw_data),
             queue="scan_profile_mutations",
-            func=self.push_tasks_for_mutations,
+            func=self.process_mutations,
             prefetch_count=self.ctx.config.rabbitmq_prefetch_count,
         )
 
         self.run_in_thread(name="BoefjeScheduler-mutations", target=self.listeners["mutations"].listen, loop=False)
-        self.run_in_thread(name="BoefjeScheduler-new_boefjes", target=self.push_tasks_for_new_boefjes, interval=60.0)
-        self.run_in_thread(name="BoefjeScheduler-rescheduling", target=self.push_tasks_for_rescheduling, interval=60.0)
+        self.run_in_thread(name="BoefjeScheduler-new_boefjes", target=self.process_new_boefjes, interval=60.0)
+        self.run_in_thread(name="BoefjeScheduler-rescheduling", target=self.process_rescheduling, interval=60.0)
 
         self.logger.info(
             "Boefje scheduler started", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
         )
 
     @tracer.start_as_current_span("boefje_push_tasks_for_mutations")
-    def push_tasks_for_mutations(self, body: bytes) -> None:
+    def process_mutations(self, body: bytes) -> None:
         """Create tasks for oois that have a scan level change.
 
         Args:
@@ -166,11 +166,11 @@ class BoefjeScheduler(Scheduler):
                     boefje_task,
                     mutation.organisation,
                     create_schedule,
-                    self.push_tasks_for_mutations.__name__,
+                    self.process_mutations.__name__,
                 )
 
     @tracer.start_as_current_span("boefje_push_tasks_for_new_boefjes")
-    def push_tasks_for_new_boefjes(self) -> None:
+    def process_new_boefjes(self) -> None:
         """When new boefjes are added or enabled we find the ooi's that
         boefjes can run on, and create tasks for it."""
         boefje_tasks = []
@@ -201,15 +201,11 @@ class BoefjeScheduler(Scheduler):
         ) as executor:
             for boefje_task, org_id in boefje_tasks:
                 executor.submit(
-                    self.push_boefje_task,
-                    boefje_task,
-                    org_id,
-                    self.create_schedule,
-                    self.push_tasks_for_new_boefjes.__name__,
+                    self.push_boefje_task, boefje_task, org_id, self.create_schedule, self.process_new_boefjes.__name__
                 )
 
     @tracer.start_as_current_span("boefje_push_tasks_for_rescheduling")
-    def push_tasks_for_rescheduling(self):
+    def process_rescheduling(self):
         schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
             filters=filters.FilterRequest(
                 filters=[
@@ -330,7 +326,7 @@ class BoefjeScheduler(Scheduler):
                     new_boefje_task,
                     schedule.organisation,
                     self.create_schedule,
-                    self.push_tasks_for_rescheduling.__name__,
+                    self.process_rescheduling.__name__,
                 )
 
     # TODO: clean up exceptions -> exception handler

@@ -4,7 +4,6 @@ from unittest import mock
 
 from scheduler import config, models, schedulers, storage
 from scheduler.storage import stores
-
 from tests.factories import OrganisationFactory
 
 
@@ -69,7 +68,7 @@ class ReportSchedulerTestCase(ReportSchedulerBaseTestCase):
         self.mock_get_schedules.return_value = ([schedule_db], 1)
 
         # Act
-        self.scheduler.push_tasks_for_rescheduling()
+        self.scheduler.process_rescheduling()
 
         # Assert: new item should be on queue
         self.assertEqual(1, self.scheduler.queue.qsize())
@@ -101,7 +100,7 @@ class ReportSchedulerTestCase(ReportSchedulerBaseTestCase):
         self.mock_get_schedules.return_value = ([schedule_db], 1)
 
         # Act
-        self.scheduler.push_tasks_for_rescheduling()
+        self.scheduler.process_rescheduling()
 
         # Assert: new item should be on queue
         self.assertEqual(1, self.scheduler.queue.qsize())
@@ -116,7 +115,7 @@ class ReportSchedulerTestCase(ReportSchedulerBaseTestCase):
         self.assertEqual(peek.id, task_db.id)
 
         # Act: push again
-        self.scheduler.push_tasks_for_rescheduling()
+        self.scheduler.process_rescheduling()
 
         # Should only be one task on queue
         self.assertEqual(1, self.scheduler.queue.qsize())

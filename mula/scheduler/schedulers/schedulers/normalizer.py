@@ -45,7 +45,7 @@ class NormalizerScheduler(Scheduler):
         self.listeners["raw_data"] = clients.RawData(
             dsn=str(self.ctx.config.host_raw_data),
             queue="raw_file_received",
-            func=self.push_tasks_for_raw_data,
+            func=self.process_raw_data,
             prefetch_count=self.ctx.config.rabbitmq_prefetch_count,
         )
 
@@ -56,7 +56,7 @@ class NormalizerScheduler(Scheduler):
         )
 
     @tracer.start_as_current_span("normalizer_push_task_for_raw_data")
-    def push_tasks_for_raw_data(self, body: bytes) -> None:
+    def process_raw_data(self, body: bytes) -> None:
         """Create tasks for the received raw data.
 
         Args:

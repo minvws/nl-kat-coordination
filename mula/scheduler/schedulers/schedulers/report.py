@@ -34,14 +34,14 @@ class ReportScheduler(Scheduler):
         """
         # Rescheduling
         self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-reschedule", target=self.push_tasks_for_rescheduling, interval=60.0
+            name=f"scheduler-{self.scheduler_id}-reschedule", target=self.process_rescheduling, interval=60.0
         )
         self.logger.info(
             "Report scheduler started", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
         )
 
     @tracer.start_as_current_span(name="report_push_tasks_for_rescheduling")
-    def push_tasks_for_rescheduling(self):
+    def process_rescheduling(self):
         schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
             filters=filters.FilterRequest(
                 filters=[
@@ -70,7 +70,7 @@ class ReportScheduler(Scheduler):
                     report_task,
                     report_task.organisation_id,
                     self.create_schedule,
-                    self.push_tasks_for_rescheduling.__name__,
+                    self.process_rescheduling.__name__,
                 )
 
     @tracer.start_as_current_span("push_report_task")

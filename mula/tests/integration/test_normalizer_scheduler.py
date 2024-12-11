@@ -3,10 +3,10 @@ import unittest
 from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import clients, config, models, schedulers, storage
-from scheduler.storage import stores
 from structlog.testing import capture_logs
 
+from scheduler import clients, config, models, schedulers, storage
+from scheduler.storage import stores
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -170,7 +170,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_get_normalizers_for_mime_type.return_value = [plugin]
 
         # Act
-        self.scheduler.push_tasks_for_raw_data(raw_data_event)
+        self.scheduler.process_raw_data(raw_data_event)
 
         # Task should be on priority queue
         task_pq = self.scheduler.queue.peek(0)
@@ -197,7 +197,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_get_normalizers_for_mime_type.return_value = []
 
         # Act
-        self.scheduler.push_tasks_for_raw_data(raw_data_event)
+        self.scheduler.process_raw_data(raw_data_event)
 
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -227,7 +227,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_has_normalizer_permission_to_run.return_value = False
 
         # Act
-        self.scheduler.push_tasks_for_raw_data(raw_data_event)
+        self.scheduler.process_raw_data(raw_data_event)
 
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -258,7 +258,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_has_normalizer_task_started_running.return_value = True
 
         # Act
-        self.scheduler.push_tasks_for_raw_data(raw_data_event)
+        self.scheduler.process_raw_data(raw_data_event)
 
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -289,7 +289,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_has_normalizer_task_started_running.side_effect = Exception("Something went wrong")
 
         # Act
-        self.scheduler.push_tasks_for_raw_data(raw_data_event)
+        self.scheduler.process_raw_data(raw_data_event)
 
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -316,8 +316,8 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_get_normalizers_for_mime_type.return_value = [NormalizerFactory()]
 
         # Act
-        self.scheduler.push_tasks_for_raw_data(raw_data_event1)
-        self.scheduler.push_tasks_for_raw_data(raw_data_event2)
+        self.scheduler.process_raw_data(raw_data_event1)
+        self.scheduler.process_raw_data(raw_data_event2)
 
         # Task should be on priority queue (only one)
         task_pq = self.scheduler.queue.peek(0)
@@ -349,7 +349,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         ).model_dump_json()
 
         # Act
-        self.scheduler.push_tasks_for_raw_data(raw_data_event)
+        self.scheduler.process_raw_data(raw_data_event)
 
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -384,13 +384,13 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_get_normalizers_for_mime_type.return_value = [NormalizerFactory()]
 
         # Act
-        self.scheduler.push_tasks_for_raw_data(events[0])
+        self.scheduler.process_raw_data(events[0])
 
         # Assert
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         with capture_logs() as cm:
-            self.scheduler.push_tasks_for_raw_data(events[1])
+            self.scheduler.process_raw_data(events[1])
 
         self.assertIn("Could not add task to queue, queue was full", cm[-1].get("event"))
         self.assertEqual(1, self.scheduler.queue.qsize())
