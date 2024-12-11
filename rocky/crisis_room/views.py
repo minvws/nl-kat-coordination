@@ -147,6 +147,7 @@ class CrisisRoomMixin:
         )
 
     def get_report_data(self, dashboard_data: DashboardData) -> dict[str, Any]:
+        """Get the latest/newest report data with the recipe ID"""
         valid_time = datetime.now(timezone.utc)
         octopoes_client = self.get_octopoes_client(dashboard_data.dashboard.organization)
 
