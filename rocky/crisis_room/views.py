@@ -194,12 +194,12 @@ class CrisisRoomFindings(CrisisRoomMixin, TemplateView):
 
     def get_organizations_findings(self) -> dict[Organization, dict[DashboardData, dict[str, Any]]]:
         organizations = self.get_user_organizations()
-        organization_dashboards = {}
         grouped_data = defaultdict(list)
         dashboards_data = DashboardData.objects.filter(
             dashboard__organization__in=organizations, dashboard__name="Crisis Room Findings Dashboard"
         )
         for data in dashboards_data:
+            organization_dashboards = {}
             organization_dashboards[data] = self.get_report_data(data)
             grouped_data[data.dashboard.organization].append(organization_dashboards)
         return dict(grouped_data)
