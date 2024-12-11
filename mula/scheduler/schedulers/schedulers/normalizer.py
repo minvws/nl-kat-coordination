@@ -56,7 +56,6 @@ class NormalizerScheduler(Scheduler):
             "Normalizer scheduler started", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
         )
 
-    # TODO: exceptions
     @tracer.start_as_current_span("process_raw_data")
     def process_raw_data(self, body: bytes) -> None:
         """Create tasks for the received raw data.
@@ -233,7 +232,6 @@ class NormalizerScheduler(Scheduler):
         """
         return any(mime_type.get("value", "").startswith("error/") for mime_type in raw_data.mime_types)
 
-    # FIXME: none or empty list?
     def get_normalizers_for_mime_type(self, mime_type: str, organisation: str) -> list[models.Plugin]:
         """Get available normalizers for a given mime type.
 

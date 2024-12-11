@@ -66,7 +66,6 @@ class BoefjeScheduler(Scheduler):
             "Boefje scheduler started", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
         )
 
-    # TODO: exceptions
     @tracer.start_as_current_span("process_mutations")
     def process_mutations(self, body: bytes) -> None:
         """Create tasks for oois that have a scan level change.
@@ -171,7 +170,6 @@ class BoefjeScheduler(Scheduler):
                     self.process_mutations.__name__,
                 )
 
-    # TODO: exceptions
     @tracer.start_as_current_span("process_new_boefjes")
     def process_new_boefjes(self) -> None:
         """When new boefjes are added or enabled we find the ooi's that
@@ -207,9 +205,9 @@ class BoefjeScheduler(Scheduler):
                     self.push_boefje_task, boefje_task, org_id, self.create_schedule, self.process_new_boefjes.__name__
                 )
 
-    # TODO: exceptions
     @tracer.start_as_current_span("process_rescheduling")
     def process_rescheduling(self):
+        # FIXME: return on exceptions
         schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
             filters=filters.FilterRequest(
                 filters=[
@@ -228,6 +226,7 @@ class BoefjeScheduler(Scheduler):
         with futures.ThreadPoolExecutor(
             thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-rescheduling"
         ) as executor:
+            # FIXME: continue on exceptions
             for schedule in schedules:
                 boefje_task = models.BoefjeTask.model_validate(schedule.data)
 
