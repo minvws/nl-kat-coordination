@@ -38,6 +38,8 @@ class Scheduler(abc.ABC):
             the queue.
         enabled:
             Whether the scheduler is enabled or not.
+        create_schedule:
+            Whether the scheduler should create schedules for items.
         _last_activity:
             The last activity of the scheduler.
         listeners:
@@ -277,16 +279,12 @@ class Scheduler(abc.ABC):
         """
         self.last_activity = datetime.now(timezone.utc)
 
-        if self.create_schedule is False:
-            self.logger.debug(
-                "Not creating schedule for item %s",
-                item.id,
-                item_id=item.id,
-                queue_id=self.queue.pq_id,
-                scheduler_id=self.scheduler_id,
-            )
-            return item
+        # We can differentiate between the scheduler and the item creating
+        # schedules. Meaning when the scheduler allows creating schedules, but
+        # the item does not, we can still create a schedule for the item. Note
+        # that the scheduler create_schedule always overrides the item.
 
+        # If the scheduler is marked as not creating schedules, we skip this
         scheduler_create_schedule = self.create_schedule
         if not scheduler_create_schedule:
             self.logger.debug(
@@ -298,6 +296,7 @@ class Scheduler(abc.ABC):
             )
             return item
 
+        # If the item is marked as not creating schedules, we skip this
         item_create_schedule = create_schedule
         if not item_create_schedule:
             self.logger.debug(

@@ -3,10 +3,10 @@ import unittest
 from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import clients, config, models, schedulers, storage
-from scheduler.storage import stores
 from structlog.testing import capture_logs
 
+from scheduler import clients, config, models, schedulers, storage
+from scheduler.storage import stores
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -227,6 +227,11 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         task_db = self.mock_ctx.datastores.task_store.get_task(task_pq.id)
         self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Schedule should not be created
+        schedules, count = self.mock_ctx.datastores.schedule_store.get_schedules(self.scheduler.scheduler_id)
+        self.assertEqual(count, 0)
+        self.assertEqual(len(schedules), 0)
 
     def test_push_tasks_for_received_raw_file_no_normalizers_found(self):
         # Arrange
