@@ -1071,7 +1071,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-    def test_push_tasks_for_scan_profile_mutations_not_allowed_to_run(self):
+    def test_push_tasks_for_mutations_not_allowed_to_run(self):
         """When a boefje is not allowed to run, it should not be added to the queue"""
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -1091,7 +1091,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-    def test_push_tasks_for_scan_profile_mutations_still_running(self):
+    def test_push_tasks_for_mutations_still_running(self):
         """When a boefje is still running, it should not be added to the queue"""
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -1111,7 +1111,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-    def test_push_tasks_for_scan_profile_mutations_item_on_queue(self):
+    def test_push_tasks_for_mutations_item_on_queue(self):
         """When a boefje is already on the queue, it should not be added to the queue"""
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -1143,7 +1143,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         task_db = self.mock_ctx.datastores.task_store.get_task(task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
-    def test_push_tasks_for_scan_profile_mutations_delete(self):
+    def test_push_tasks_for_mutations_delete(self):
         """When an OOI is deleted it should not create tasks"""
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -1166,7 +1166,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         # Assert
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-    def test_push_tasks_for_scan_profile_mutations_delete_on_queue(self):
+    def test_push_tasks_for_mutations_delete_on_queue(self):
         """When an OOI is deleted, and tasks associated with that ooi
         should be removed from the queue
         """
@@ -1215,7 +1215,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
         self.assertEqual(task_db.status, models.TaskStatus.CANCELLED)
 
-    def test_push_tasks_for_scan_profile_mutations_op_create_run_on_create(self):
+    def test_push_tasks_for_mutations_op_create_run_on_create(self):
         """When a boefje has the run_on contains the setting create,
         and we receive a create mutation, it should:
 
@@ -1227,14 +1227,17 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=["create"])
         mutation = models.ScanProfileMutation(
-            operation=models.MutationOperationType.CREATE, primary_key=ooi.primary_key, value=ooi
+            operation=models.MutationOperationType.CREATE,
+            primary_key=ooi.primary_key,
+            value=ooi,
+            organisation=self.organisation.id,
         ).model_dump_json()
 
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
 
         # Act
-        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+        self.scheduler.push_tasks_for_mutations(mutation)
 
         # Assert: task should be on priority queue
         item = self.scheduler.queue.peek(0)
@@ -1252,7 +1255,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_hash(task_db.hash)
         self.assertIsNone(schedule_db)
 
-    def test_push_tasks_for_scan_profile_mutations_op_create_run_on_create_update(self):
+    def test_push_tasks_for_mutations_op_create_run_on_create_update(self):
         """When a boefje has the run_on contains the setting create,update,
         and we receive a create mutation, it should:
 
@@ -1264,14 +1267,17 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=["create", "update"])
         mutation = models.ScanProfileMutation(
-            operation=models.MutationOperationType.CREATE, primary_key=ooi.primary_key, value=ooi
+            operation=models.MutationOperationType.CREATE,
+            primary_key=ooi.primary_key,
+            value=ooi,
+            organisation=self.organisation.id,
         ).model_dump_json()
 
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
 
         # Act
-        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+        self.scheduler.push_tasks_for_mutations(mutation)
 
         # Assert: task should be on priority queue
         item = self.scheduler.queue.peek(0)
@@ -1289,7 +1295,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_hash(task_db.hash)
         self.assertIsNone(schedule_db)
 
-    def test_push_tasks_for_scan_profile_mutations_op_create_run_on_update(self):
+    def test_push_tasks_for_mutations_op_create_run_on_update(self):
         """When a boefje has the run_on contains the setting update,
         and we receive a create mutation, it should:
 
@@ -1301,19 +1307,22 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=["update"])
         mutation = models.ScanProfileMutation(
-            operation=models.MutationOperationType.CREATE, primary_key=ooi.primary_key, value=ooi
+            operation=models.MutationOperationType.CREATE,
+            primary_key=ooi.primary_key,
+            value=ooi,
+            organisation=self.organisation.id,
         ).model_dump_json()
 
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
 
         # Act
-        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+        self.scheduler.push_tasks_for_mutations(mutation)
 
         # Assert: task should NOT be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-    def test_push_tasks_for_scan_profile_mutations_op_create_run_on_none(self):
+    def test_push_tasks_for_mutations_op_create_run_on_none(self):
         """When a boefje has the run_on is empty, and we receive a create
         mutation, it should:
 
@@ -1325,7 +1334,10 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=[])
         mutation = models.ScanProfileMutation(
-            operation=models.MutationOperationType.CREATE, primary_key=ooi.primary_key, value=ooi
+            operation=models.MutationOperationType.CREATE,
+            primary_key=ooi.primary_key,
+            value=ooi,
+            organisation=self.organisation.id,
         ).model_dump_json()
 
         # Mocks
@@ -1333,7 +1345,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_set_cron.return_value = "0 0 * * *"
 
         # Act
-        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+        self.scheduler.push_tasks_for_mutations(mutation)
 
         # Assert: task should be on priority queue
         item = self.scheduler.queue.peek(0)
@@ -1351,7 +1363,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(task_db.schedule_id)
         self.assertIsNotNone(schedule_db)
 
-    def test_push_tasks_for_scan_profile_mutations_op_update_run_on_create(self):
+    def test_push_tasks_for_mutations_op_update_run_on_create(self):
         """When a boefje has the run_on contains the setting create,
         and we receive an update mutation, it should:
 
@@ -1363,14 +1375,17 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=["create"])
         mutation = models.ScanProfileMutation(
-            operation=models.MutationOperationType.UPDATE, primary_key=ooi.primary_key, value=ooi
+            operation=models.MutationOperationType.UPDATE,
+            primary_key=ooi.primary_key,
+            value=ooi,
+            organisation=self.organisation.id,
         ).model_dump_json()
 
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
 
         # Act
-        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+        self.scheduler.push_tasks_for_mutations(mutation)
 
         # Assert: task should NOT be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -1387,14 +1402,17 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=["create", "update"])
         mutation = models.ScanProfileMutation(
-            operation=models.MutationOperationType.UPDATE, primary_key=ooi.primary_key, value=ooi
+            operation=models.MutationOperationType.UPDATE,
+            primary_key=ooi.primary_key,
+            value=ooi,
+            organisation=self.organisation.id,
         ).model_dump_json()
 
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
 
         # Act
-        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+        self.scheduler.push_tasks_for_mutations(mutation)
 
         # Assert: task should be on priority queue
         item = self.scheduler.queue.peek(0)
@@ -1424,14 +1442,17 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=["update"])
         mutation = models.ScanProfileMutation(
-            operation=models.MutationOperationType.UPDATE, primary_key=ooi.primary_key, value=ooi
+            operation=models.MutationOperationType.UPDATE,
+            primary_key=ooi.primary_key,
+            value=ooi,
+            organisation=self.organisation.id,
         ).model_dump_json()
 
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
 
         # Act
-        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+        self.scheduler.push_tasks_for_mutations(mutation)
 
         # Assert: task should be on priority queue
         item = self.scheduler.queue.peek(0)
@@ -1461,7 +1482,10 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=[])
         mutation = models.ScanProfileMutation(
-            operation=models.MutationOperationType.UPDATE, primary_key=ooi.primary_key, value=ooi
+            operation=models.MutationOperationType.UPDATE,
+            primary_key=ooi.primary_key,
+            value=ooi,
+            organisation=self.organisation.id,
         ).model_dump_json()
 
         # Mocks
@@ -1469,7 +1493,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_set_cron.return_value = "0 0 * * *"
 
         # Act
-        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+        self.scheduler.push_tasks_for_mutations(mutation)
 
         # Assert: task should be on priority queue
         item = self.scheduler.queue.peek(0)
