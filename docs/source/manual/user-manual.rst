@@ -81,7 +81,7 @@ Objects
 
 The Objects page lists all the objects in Octopoes. Objects can be anything, like DNS records, hostnames, URLs, software, software versions, ports, etc. It is any piece of information that is found by the normalizers, bits and boefjes. On a new installation you'll see the following objects by default: 
 
-.. image:: img/objects-clean-install.png
+.. image:: img/object-clean-install.png
   :alt: overview of default objects
 
 The table gives an overview on the following items:
@@ -141,7 +141,7 @@ The image below shows the normalizer tasks by clicking on the normalizer tab.
 
 The normalizer tab has a special functionality called 'yielded objects'. If the normalizer was able to extract new data (points) this will result in new yielded objects. As an example below, the DNS records for the hostname `mispo.es` are parsed. The normalizer identifies various DNS records (A, NS, MX, SOA) and other information and creates objects for each of the identified information. This information is now also available to other tools to be parsed, if possible. 
 
-.. image:: img/tasks-normalizer-yielded.png
+.. image:: img/tasks-normalizer-yielded-objects.png
   :alt: yielded objects for normalizers
 
 Members
