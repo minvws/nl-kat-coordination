@@ -153,3 +153,9 @@ class ConfigStorage(ABC):
 
     def get_enabled_boefjes(self, organisation_id: str) -> list[str]:
         raise NotImplementedError
+
+    def get_enabled_normalizers(self, organisation_id: str) -> list[str]:
+        raise NotImplementedError
+
+    def get_states_for_organisation(self, organisation_id: str) -> dict[str, bool]:
+        raise NotImplementedError

@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from httpx import HTTPError
 from katalogus.client import get_katalogus
-from tools.view_helpers import PostRedirect
+from tools.view_helpers import Breadcrumb, PostRedirect
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.views.base import (
@@ -26,7 +26,7 @@ from reports.views.view_helpers import AggregateReportStepsMixin
 
 
 class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
-    def build_breadcrumbs(self):
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
@@ -121,7 +121,7 @@ class ExportSetupAggregateReportView(
             messages.error(request, _("You do not have the required permissions to enable plugins."))
             return PostRedirect(self.get_previous())
 
-        client = get_katalogus(self.organization.code)
+        client = get_katalogus(self.organization_member)
         for selected_plugin in selected_plugins:
             try:
                 client.enable_boefje_by_id(selected_plugin)

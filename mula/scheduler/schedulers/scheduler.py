@@ -59,6 +59,7 @@ class Scheduler(abc.ABC):
         queue: PriorityQueue | None = None,
         max_tries: int = -1,
         create_schedule: bool = False,
+        auto_calculate_deadline: bool = True,
     ):
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
@@ -67,6 +68,7 @@ class Scheduler(abc.ABC):
         self.scheduler_id: str = scheduler_id
         self.max_tries: int = max_tries
         self.create_schedule: bool = create_schedule
+        self.auto_calculate_deadline: bool = auto_calculate_deadline
         self._last_activity: datetime | None = None
 
         # Queue
@@ -142,7 +144,9 @@ class Scheduler(abc.ABC):
 
             count += 1
 
-    def push_item_to_queue_with_timeout(self, item: models.Task, max_tries: int = 5, timeout: int = 1) -> None:
+    def push_item_to_queue_with_timeout(
+        self, item: models.Task, max_tries: int = 5, timeout: int = 1, create_schedule: bool = True
+    ) -> None:
         """Push an item to the queue, with a timeout.
 
         Args:
@@ -167,9 +171,9 @@ class Scheduler(abc.ABC):
         if tries >= max_tries and max_tries != -1:
             raise QueueFullError()
 
-        self.push_item_to_queue(item)
+        self.push_item_to_queue(item, create_schedule=create_schedule)
 
-    def push_item_to_queue(self, item: models.Task) -> models.Task:
+    def push_item_to_queue(self, item: models.Task, create_schedule: bool = True) -> models.Task:
         """Push a Task to the queue.
 
         Args:
@@ -228,12 +232,12 @@ class Scheduler(abc.ABC):
             scheduler_id=self.scheduler_id,
         )
 
-        item = self.post_push(item)
+        item = self.post_push(item, create_schedule)
 
         return item
 
-    def post_push(self, item: models.Task) -> models.Task:
-        """After an in item is pushed on the queue, we execute this function
+    def post_push(self, item: models.Task, create_schedule: bool = True) -> models.Task:
+        """After an in item is pushed to the queue, we execute this function
 
         Args:
             item: The item from the priority queue.
@@ -243,6 +247,28 @@ class Scheduler(abc.ABC):
         if self.create_schedule is False:
             self.logger.debug(
                 "Not creating schedule for item %s",
+                item.id,
+                item_id=item.id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
+            return item
+
+        scheduler_create_schedule = self.create_schedule
+        if not scheduler_create_schedule:
+            self.logger.debug(
+                "Scheduler is not creating schedules, not creating schedule for item %s",
+                item.id,
+                item_id=item.id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
+            return item
+
+        item_create_schedule = create_schedule
+        if not item_create_schedule:
+            self.logger.debug(
+                "Item is not creating schedules, not creating schedule for item %s",
                 item.id,
                 item_id=item.id,
                 queue_id=self.queue.pq_id,
@@ -298,7 +324,7 @@ class Scheduler(abc.ABC):
         # based on the item.
         if schedule_db.schedule is not None:
             schedule_db.deadline_at = cron.next_run(schedule_db.schedule)
-        else:
+        elif self.auto_calculate_deadline:
             schedule_db.deadline_at = self.calculate_deadline(item)
 
         self.ctx.datastores.schedule_store.update_schedule(schedule_db)

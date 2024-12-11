@@ -31,7 +31,7 @@ class BoefjeScheduler(Scheduler):
             ctx (context.AppContext): Application context of shared data (e.g.
                 configuration, external services connections).
         """
-        super().__init__(ctx=ctx, scheduler_id=self.ID, create_schedule=True)
+        super().__init__(ctx=ctx, scheduler_id=self.ID, create_schedule=True, auto_calculate_deadline=True)
         self.ranker = rankers.BoefjeRanker(self.ctx)
 
     def run(self) -> None:
@@ -127,6 +127,28 @@ class BoefjeScheduler(Scheduler):
                 )
                 continue
 
+            create_schedule = True
+            run_task = True
+
+            # What type of run boefje is it?
+            if boefje.run_on:
+                create_schedule = False
+                run_task = False
+                if mutation.operation == models.MutationOperationType.CREATE:
+                    run_task = "create" in boefje.run_on
+                elif mutation.operation == models.MutationOperationType.UPDATE:
+                    run_task = "update" in boefje.run_on
+
+            if not run_task:
+                self.logger.debug(
+                    "Based on boefje run on type, skipping",
+                    boefje_id=boefje.id,
+                    ooi_primary_key=ooi.primary_key,
+                    organisation_id=mutation.organisation,
+                    scheduler_id=self.scheduler_id,
+                )
+                continue
+
             boefje_tasks.append(
                 models.BoefjeTask(
                     boefje=models.Boefje.model_validate(boefje.model_dump()),
@@ -140,7 +162,11 @@ class BoefjeScheduler(Scheduler):
         ) as executor:
             for boefje_task in boefje_tasks:
                 executor.submit(
-                    self.push_boefje_task, boefje_task, mutation.organisation, self.push_tasks_for_mutations.__name__
+                    self.push_boefje_task,
+                    boefje_task,
+                    mutation.organisation,
+                    create_schedule,
+                    self.push_tasks_for_mutations.__name__,
                 )
 
     @tracer.start_as_current_span("boefje_push_tasks_for_new_boefjes")
@@ -174,7 +200,13 @@ class BoefjeScheduler(Scheduler):
             thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-new_boefjes"
         ) as executor:
             for boefje_task, org_id in boefje_tasks:
-                executor.submit(self.push_boefje_task, boefje_task, org_id, self.push_tasks_for_new_boefjes.__name__)
+                executor.submit(
+                    self.push_boefje_task,
+                    boefje_task,
+                    org_id,
+                    self.create_schedule,
+                    self.push_tasks_for_new_boefjes.__name__,
+                )
 
     @tracer.start_as_current_span("boefje_push_tasks_for_rescheduling")
     def push_tasks_for_rescheduling(self):
@@ -293,11 +325,19 @@ class BoefjeScheduler(Scheduler):
                     organization=schedule.organisation,
                 )
 
-                executor.submit(self.push_boefje_task, new_boefje_task, self.push_tasks_for_rescheduling.__name__)
+                executor.submit(
+                    self.push_boefje_task,
+                    new_boefje_task,
+                    schedule.organisation,
+                    self.create_schedule,
+                    self.push_tasks_for_rescheduling.__name__,
+                )
 
     # TODO: clean up exceptions -> exception handler
     @tracer.start_as_current_span("push_boefje_task")
-    def push_boefje_task(self, boefje_task: models.BoefjeTask, organisation_id: str, caller: str = "") -> None:
+    def push_boefje_task(
+        self, boefje_task: models.BoefjeTask, organisation_id: str, create_schedule: bool, caller: str = ""
+    ) -> None:
         grace_period_passed = self.has_boefje_task_grace_period_passed(boefje_task)
         if not grace_period_passed:
             self.logger.debug(
@@ -358,7 +398,7 @@ class BoefjeScheduler(Scheduler):
         latest_task = self.ctx.datastores.task_store.get_latest_task_by_hash(boefje_task.hash)
         task.priority = self.ranker.rank(SimpleNamespace(latest_task=latest_task, task=boefje_task))
 
-        self.push_item_to_queue_with_timeout(task, self.max_tries)
+        self.push_item_to_queue_with_timeout(item=task, max_tries=self.max_tries, create_schedule=create_schedule)
 
         self.logger.info(
             "Created boefje task",
@@ -370,7 +410,7 @@ class BoefjeScheduler(Scheduler):
             caller=caller,
         )
 
-    def push_item_to_queue(self, item: models.Task) -> models.Task:
+    def push_item_to_queue(self, item: models.Task, create_schedule: bool = True) -> models.Task:
         """Some boefje scheduler specific logic before pushing the item to the
         queue."""
         boefje_task = models.BoefjeTask.model_validate(item.data)
@@ -384,7 +424,7 @@ class BoefjeScheduler(Scheduler):
             item.id = new_id
             item.data = boefje_task.model_dump()
 
-        return super().push_item_to_queue(item)
+        return super().push_item_to_queue(item=item, create_schedule=create_schedule)
 
     def has_boefje_permission_to_run(self, boefje: models.Plugin, ooi: models.OOI) -> bool:
         """Checks whether a boefje is allowed to run on an ooi.

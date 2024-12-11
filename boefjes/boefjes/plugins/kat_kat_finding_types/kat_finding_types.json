@@ -3,22 +3,22 @@
     "description": "The website does not use HTTP Strict Transport Security (HSTS). HSTS ensures that browsers can only access the website using encryption (HTTPS).",
     "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security",
     "risk": "medium",
-    "impact": "Absence of the HSTS header allows clients to connect insecurely to the website. This may result in eavesdropping of (sensitive) data by an attacker. Enabling the HSTS header forces the web browser to choose HTTPS instead of HTTP",
+    "impact": "Absence of the HSTS header allows clients to connect insecurely to the website. This may result in eavesdropping of (sensitive) data by an attacker. Enabling the HSTS header forces the web browser to choose HTTPS instead of HTTP.",
     "recommendation": "Configure the Strict-Transport-Security HTTP header for all websites."
   },
   "KAT-NO-CSP": {
-    "description": "The website does not use a Content Security Policy (CSP) configuration. CSP is used to mitigate certain attacks, including loading malicious code (JavaScript) inside the users browser (XSS)",
+    "description": "The website does not use a Content Security Policy (CSP) configuration. CSP is used to mitigate certain attacks, including loading malicious code (JavaScript) inside the users browser (XSS).",
     "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP",
     "risk": "medium",
     "impact": "The usage possibility of JavaScript is not limited by the website. If the website contains a cross-site scripting vulnerability, then JavaScript code can be injected into the web page. This code is then executed by the browser of the victim. If a well-established Content Security Policy is active, the attacker can inject JavaScript code into the browser of the victim, but then the code will not get executed by the browser. A good configured Content Security Policy is a strong protection against cross-site scripting vulnerabilities.",
-    "recommendation": "1. Set the Content-Security-Policy HTTP header in all HTTP answers. 2. Make sure that when the Content Security Policy is violated by a browser, that this violation is logged and monitored. Point the content security violation variable report-uri to a server-side log script. 3. Implement a process that periodically analyses these logs for programming errors and hack attacks."
+    "recommendation": "Set the Content-Security-Policy HTTP header in all HTTP answers. Make sure that when the Content Security Policy is violated by a browser, that this violation is logged and monitored. Point the content security violation variable report-uri to a server-side log script. Implement a process that periodically analyses these logs for programming errors and hack attacks."
   },
   "KAT-X-PERMITTED-CROSS-DOMAIN-POLICIES": {
     "description": "The HTTP header X-Permitted-Cross-Domain- Policies is missing in HTTP responses. This header is not officially supported by Mozilla MDN.",
     "source": "https://owasp.org/www-project-secure-headers/#div-headers",
     "risk": "recommendation",
     "impact": "When the value of this header is not set to master- only, Adobe Flash or Adobe Acrobat (and possibly other software) can also look at cross-domain configuration files hosted at the web server.",
-    "recommendation": "This header is not supported by default by Mozilla. If this header is required for your environment: Set the HTTP header X-Permitted-Cross- Domain-Policies: none in all HTTP responses. Use value master-only if a Flash or Acrobat cross- domain configuration file is used that is placed in the root of the web server"
+    "recommendation": "This header is not supported by default by Mozilla. If this header is required for your environment: Set the HTTP header X-Permitted-Cross- Domain-Policies: none in all HTTP responses. Use value master-only if a Flash or Acrobat cross- domain configuration file is used that is placed in the root of the web server."
   },
   "KAT-EXPLICIT-XSS-PROTECTION": {
     "description": "The 'X-XSS-Protection' header is a deprecated header previously used to prevent against Cross-Site-Scripting attacks. Support in modern browsers could introduce XSS attacks again.",
@@ -122,7 +122,7 @@
     "description": "The encrypted connection provides no protection against downgrade attacks.",
     "source": "https://www.rfc-editor.org/rfc/rfc7507",
     "risk": "low",
-    "impact": "An attacker, who can perform a man-in-the-middle attack, can weaken the session between the client and server. This could result in loss of confidentiality and integrity of data. ",
+    "impact": "An attacker, who can perform a man-in-the-middle attack, can weaken the session between the client and server. This could result in loss of confidentiality and integrity of data.",
     "recommendation": "Implement TLS_FALLBACK_SCSV."
   },
   "KAT-OPEN-SYSADMIN-PORT": {
@@ -130,7 +130,7 @@
     "source": "https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers",
     "risk": "medium",
     "impact": "System administrator ports should only be reachable from safe and known locations to reduce attack surface.",
-    "recommendation": "Determine if this port should be reachable from the identified location. Limit access to reduce the attack surface if necessary."
+    "recommendation": "Determine if the open system administrator port should be reachable from the identified location. Limit access to reduce the attack surface if necessary."
   },
   "KAT-REMOTE-DESKTOP-PORT": {
     "description": "An open Microsoft Remote Desktop Protocol (RDP) port was detected.",
@@ -144,21 +144,21 @@
     "source": "https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers",
     "risk": "high",
     "impact": "Databases should never be reachable from the internet, but only from secured internal networks. This will reduce unauthorized access.",
-    "recommendation": "Determine if this port should be reachable from the identified location. Limit access to reduce the attack surface if necessary. "
+    "recommendation": "Determine if the open database port should be reachable from the identified location. Limit access to reduce the attack surface if necessary."
   },
   "KAT-UNCOMMON-OPEN-PORT": {
     "description": "An uncommon open port was identified. This could introduce security risks.",
     "source": "https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers",
     "risk": "medium",
     "impact": "Uncommon ports are sometimes overlooked and may become unwanted entry points for attackers into an organisations network.",
-    "recommendation": "Manually validate whether this port should be open."
+    "recommendation": "Manually validate whether ports should be open."
   },
   "KAT-OPEN-COMMON-PORT": {
     "description": "A port commonly used was found to be open.",
     "source": "https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers",
     "risk": "recommendation",
-    "impact": "Depending on the port there may or may not be impact. ",
-    "recommendation": "Manually validate whether this port should be open."
+    "impact": "Depending on the port there may or may not be impact.",
+    "recommendation": "Manually validate whether ports should be open."
   },
   "KAT-WEBSERVER-NO-IPV6": {
     "description": "For this website there is no web server with an IPv6 address available.",
@@ -179,7 +179,7 @@
     "source": "https://www.internetsociety.org/deploy360/ipv6/",
     "risk": "low",
     "impact": "Users that only have IPv6 support cannot access your server.",
-    "recommendation": "Configure IPv6 addresses for the web servers"
+    "recommendation": "Configure IPv6 addresses for the web servers."
   },
   "KAT-NOT-ENOUGH-IPV6-NAMESERVERS": {
     "description": "OpenKAT tests all IPv6 addresses received from your name servers. For this website there are not enough name servers accessible via IPv6.",
@@ -228,7 +228,7 @@
     "source": "Check your OpenKAT install on what software was identified.",
     "risk": "critical",
     "impact": "Impact depends on the identified software.",
-    "recommendation": "Move the software to a more secure location and/or make it only accessible through a VPN. "
+    "recommendation": "Move the software to a more secure location and/or make it only accessible through a VPN."
   },
   "KAT-VERIFIED-VULNERABILITY": {
     "description": "A verified vulnerability is found by BinaryEdge.",
@@ -242,7 +242,7 @@
     "source": "https://en.wikipedia.org/wiki/DICOM",
     "risk": "critical",
     "impact": "Impact depends on segmentation and where the server is reachable from.",
-    "recommendation": "Validate whether this server should actually be exposed."
+    "recommendation": "Validate whether servers should actually be exposed."
   },
   "KAT-10-OR-MORE-NEW-PORTS-OPEN": {
     "description": "A lot of ports are open which were not open a week ago.",
@@ -340,10 +340,10 @@
     "source": "https://datatracker.ietf.org/doc/html/rfc5280",
     "risk": "medium",
     "impact": "Attackers, who can perform a man-in-the-middle attack, can read all your traffic.",
-    "recommendation": "Generate an SSL certificate for this web server to offer confidentiality and integrity to users."
+    "recommendation": "Generate SSL certificates for web servers that do not use secure connections to offer confidentiality and integrity to users and data."
   },
   "KAT-SSL-CERT-HOSTNAME-MISMATCH": {
-    "description": "The alternative name of the certificate does not match with the hostname of the website",
+    "description": "The alternative name of the certificate does not match with the hostname of the website.",
     "source": "https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.6",
     "risk": "high",
     "impact": "A properly configured client cannot connect to your server.",
@@ -357,7 +357,7 @@
     "recommendation": "Check if redirection is setup properly."
   },
   "KAT-CERTIFICATE-EXPIRING-SOON": {
-    "description": "TLS certificate is expiring soon",
+    "description": "TLS certificate is expiring soon.",
     "source": "https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.5",
     "risk": "medium",
     "impact": "Expired certificates could result in compromise of confidentiality and integrity of clients that connect to the service.",
@@ -434,42 +434,42 @@
     "recommendation": "Ideally to minimize the attack surface as much as possible these panels should not be directly exposed to the internet."
   },
   "KAT-CRITICAL-BAD-CIPHER": {
-    "description": "Ciphers are used that are labeled as bad. These should not be used anymore",
-    "source": "https://wiki.mozilla.org/Security/Server_Side_TLS",
+    "description": "Cryptographic algorithms (ciphers) are used that are labeled as insecure by the Dutch NCSC. This is caused by either the certificate verification, key exchange, bulk encryption or the hashing algorithm. These should not be used anymore",
+    "source": "https://english.ncsc.nl/binaries/ncsc-en/documenten/publications/2021/january/19/it-security-guidelines-for-transport-layer-security-2.1/IT+Security+Guidelines+for+Transport+Layer+Security+v2.1.pdf",
     "risk": "critical",
-    "impact": "Weak or insecure ciphers may result in loss of confidentiality and integrity of data through decryption.",
-    "recommendation": "It is recommended to only use ciphers labelled as 'good'. Check https://cipherlist.eu/ for safe ciphers."
+    "impact": "Insecure ciphers may result in loss of confidentiality and integrity of data through decryption attacks",
+    "recommendation": "Disable insecure ciphers as much as possible. Enable ciphers that are labeled as 'Good' by the NCSC. Check https://cipherlist.eu/ for safe ciphers. If this is not possible make sure that systems using these ciphers are segmented and additionally secured."
   },
   "KAT-MEDIUM-BAD-CIPHER": {
-    "description": "Ciphers are used that are labeled as bad. These should not be used anymore",
-    "source": "https://wiki.mozilla.org/Security/Server_Side_TLS",
+    "description": "Cryptographic algorithms (ciphers) are used that are labeled as 'phase out' by the Dutch NCSC. This is caused by either the certificate verification, key exchange, bulk encryption or the hashing algorithm.",
+    "source": "https://english.ncsc.nl/binaries/ncsc-en/documenten/publications/2021/january/19/it-security-guidelines-for-transport-layer-security-2.1/IT+Security+Guidelines+for+Transport+Layer+Security+v2.1.pdf",
     "risk": "medium",
-    "impact": "Weak or insecure ciphers may result in loss of confidentiality and integrity of data through decryption.",
-    "recommendation": "It is recommended to only use ciphers labelled as 'good'. Check https://cipherlist.eu/ for safe ciphers."
+    "impact": "Weak ciphers may result in loss of confidentiality and integrity of data through decryption attacks.",
+    "recommendation": "Disable phase out ciphers as much as possible. Enable ciphers that are labeled as 'Good' by the NCSC. Check https://cipherlist.eu/ for safe ciphers."
   },
   "KAT-RECOMMENDATION-BAD-CIPHER": {
-    "description": "Ciphers are used that are labeled as bad. These should not be used anymore",
-    "source": "https://wiki.mozilla.org/Security/Server_Side_TLS",
+    "description": "Cryptographic algorithms (ciphers) are used that are labeled as 'sufficient' by the Dutch NCSC. This is caused by either the certificate verification, key exchange, bulk encryption or the hashing algorithm.",
+    "source": "https://english.ncsc.nl/binaries/ncsc-en/documenten/publications/2021/january/19/it-security-guidelines-for-transport-layer-security-2.1/IT+Security+Guidelines+for+Transport+Layer+Security+v2.1.pdf",
     "risk": "recommendation",
-    "impact": "Weak or insecure ciphers may result in loss of confidentiality and integrity of data through decryption.",
-    "recommendation": "It is recommended to only use ciphers labelled as 'good'. Check https://cipherlist.eu/ for safe ciphers."
+    "impact": "Sufficient ciphers may result in a loss of confidentiality of data. While there is currently no direct impact, the data may be decrypted in the future with enough computing power and resources or new attacks.",
+    "recommendation": "Disable 'sufficient' ciphers and enable ciphers labeled as 'Good' by the NCSC. Check https://cipherlist.eu/ for safe ciphers."
   },
   "KAT-NO-RPKI": {
-    "description": "The IP address does not have a route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+    "description": "The IP address does not have a route announcement that is matched by the published Route Policy and Authorization (RPKI).",
     "source": "https://blog.cloudflare.com/rpki/",
     "risk": "low",
     "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
     "recommendation": "Work on implementing RPKI for your IP addresses. This may involve creating Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses."
   },
   "KAT-EXPIRED-RPKI": {
-    "description": "The route announcement that is matched by the published Route Policy and Authorization (RPKI) is expired",
+    "description": "The route announcement that is matched by the published Route Policy and Authorization (RPKI) is expired.",
     "source": "https://blog.cloudflare.com/rpki/",
     "risk": "low",
     "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
     "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired."
   },
   "KAT-INVALID-RPKI": {
-    "description": "A route announcement that is matched by the published Route Policy and Authorization (RPKI) is invalid",
+    "description": "A route announcement that is matched by the published Route Policy and Authorization (RPKI) is invalid.",
     "source": "https://blog.cloudflare.com/rpki/",
     "risk": "medium",
     "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
@@ -509,5 +509,12 @@
     "source": "Check the version of the host manually.",
     "impact": "Unknown. The server may or may not be vulnerable. OpenKAT is not able to determine the version.",
     "recommendation": "Verify manually if the software is up to date as OpenKAT is not able to determine the software version ."
+  },
+  "KAT-LAME-DELEGATION": {
+    "description": "The nameservers for this object are configured but cannot be reached or are non existent.",
+    "risk": "recommendation",
+    "source": "Check the nameservers of the host or iprange manually.",
+    "impact": "No resolving can be done for this IP or host. This might cause problems for mailservers or slow down connections.",
+    "recommendation": "Verify that the listed nameservers are reachable and have valid hostnames."
   }
 }

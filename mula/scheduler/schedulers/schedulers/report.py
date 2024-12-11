@@ -25,7 +25,7 @@ class ReportScheduler(Scheduler):
             ctx (context.AppContext): Application context of shared data (e.g.
                 configuration, external services connections).
         """
-        super().__init__(ctx=ctx, scheduler_id=self.ID, create_schedule=True)
+        super().__init__(ctx=ctx, scheduler_id=self.ID, create_schedule=True, auto_calculate_deadline=False)
 
     def run(self) -> None:
         """The run method is called when the schedulers is started. It will
@@ -69,11 +69,14 @@ class ReportScheduler(Scheduler):
                     self.push_report_task,
                     report_task,
                     report_task.organisation_id,
+                    self.create_schedule,
                     self.push_tasks_for_rescheduling.__name__,
                 )
 
     @tracer.start_as_current_span("push_report_task")
-    def push_report_task(self, report_task: models.ReportTask, organisation_id: str, caller: str = "") -> None:
+    def push_report_task(
+        self, report_task: models.ReportTask, organisation_id: str, create_schedule: bool, caller: str = ""
+    ) -> None:
         if self.is_item_on_queue_by_hash(report_task.hash):
             self.logger.debug("Report task already on queue", scheduler_id=self.scheduler_id, caller=caller)
             return

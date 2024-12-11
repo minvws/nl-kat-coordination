@@ -16,6 +16,7 @@ from tests.conftest import seed_system
 from tests.loading import get_boefje_meta, get_normalizer_meta
 
 
+@pytest.mark.skipif("not os.getenv('DATABASE_MIGRATION')")
 @pytest.mark.slow
 def test_migration(
     octopoes_api_connector: OctopoesAPIConnector,
@@ -115,3 +116,8 @@ def test_migration(
     assert observation.source_method == "boefje_udp"
 
     assert octopoes_api_connector.list_objects(set(), valid_time).count == total_oois
+
+
+@pytest.mark.slow
+def test_plugins_bench(plugin_service, organisation):
+    plugin_service.get_all(organisation.id)

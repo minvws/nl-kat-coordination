@@ -29,7 +29,7 @@ class NormalizerScheduler(Scheduler):
             ctx (context.AppContext): Application context of shared data (e.g.
                 configuration, external services connections).
         """
-        super().__init__(ctx=ctx, scheduler_id=self.ID, create_schedule=False)
+        super().__init__(ctx=ctx, scheduler_id=self.ID, create_schedule=False, auto_calculate_deadline=False)
         self.ranker = rankers.NormalizerRanker(ctx=self.ctx)
 
     def run(self) -> None:
@@ -110,11 +110,13 @@ class NormalizerScheduler(Scheduler):
             thread_name_prefix=f"NormalizerScheduler-TPE-{self.scheduler_id}-raw_data"
         ) as executor:
             for normalizer_task in normalizer_tasks:
-                executor.submit(self.push_normalizer_task, normalizer_task, latest_raw_data.organization)
+                executor.submit(
+                    self.push_normalizer_task, normalizer_task, latest_raw_data.organization, self.create_schedule
+                )
 
     @tracer.start_as_current_span("push_normalizer_task")
     def push_normalizer_task(
-        self, normalizer_task: models.NormalizerTask, organisation_id: str, caller: str = ""
+        self, normalizer_task: models.NormalizerTask, organisation_id: str, create_schedule: bool, caller: str = ""
     ) -> None:
         if self.has_normalizer_task_started_running(normalizer_task):
             self.logger.debug(
@@ -146,8 +148,7 @@ class NormalizerScheduler(Scheduler):
         )
 
         task.priority = self.ranker.rank(SimpleNamespace(raw_data=normalizer_task.raw_data, task=normalizer_task))
-
-        self.push_item_to_queue_with_timeout(task, self.max_tries)
+        self.push_item_to_queue_with_timeout(task, self.max_tries, create_schedule=create_schedule)
 
         self.logger.info(
             "Created normalizer task",
@@ -159,7 +160,7 @@ class NormalizerScheduler(Scheduler):
             caller=caller,
         )
 
-    def push_item_to_queue(self, item: models.Task) -> models.Task:
+    def push_item_to_queue(self, item: models.Task, create_schedule: bool = True) -> models.Task:
         """Some normalizer scheduler specific logic before pushing the item to the
         queue."""
         normalizer_task = models.NormalizerTask.model_validate(item.data)
@@ -172,7 +173,7 @@ class NormalizerScheduler(Scheduler):
             item.id = new_id
             item.data = normalizer_task.model_dump()
 
-        return super().push_item_to_queue(item)
+        return super().push_item_to_queue(item=item, create_schedule=create_schedule)
 
     @tracer.start_as_current_span("normalizer_has_normalizer_permission_to_run")
     def has_normalizer_permission_to_run(self, normalizer: models.Plugin) -> bool:
