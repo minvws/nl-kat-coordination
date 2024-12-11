@@ -151,14 +151,14 @@ class OctopoesService:
         return tree
 
     def _delete_ooi(self, reference: Reference, valid_time: datetime) -> None:
-        referencing_origins = self.origin_repository.list_origins(valid_time, result=reference)
         if not any(
             origin
-            for origin in referencing_origins
-            if not (
-                origin.origin_type == OriginType.AFFIRMATION
-                or (origin.origin_type == OriginType.INFERENCE and origin.source == reference)
+            for origin in self.origin_repository.list_origins(
+                valid_time,
+                origin_type={OriginType.DECLARATION, OriginType.OBSERVATION, OriginType.INFERENCE, OriginType.NIBBLET},
+                result=reference,
             )
+            if not (origin.origin_type in [OriginType.INFERENCE, OriginType.NIBBLET] and origin.source == reference)
         ):
             self.ooi_repository.delete_if_exists(reference, valid_time)
 
