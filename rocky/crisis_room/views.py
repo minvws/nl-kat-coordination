@@ -150,14 +150,14 @@ class CrisisRoomMixin:
         valid_time = datetime.now(timezone.utc)
         octopoes_client = self.get_octopoes_client(dashboard_data.dashboard.organization)
 
-        reports = octopoes_client.query(
+        report = octopoes_client.query(
             "ReportRecipe.<report_recipe[is Report]",
             valid_time=valid_time,
             source=Reference.from_str(dashboard_data.recipe),
+            limit=1,
         )
-        if reports:
-            reports.sort(key=lambda ooi: ooi.date_generated, reverse=True)
-            report = reports[0]
+        if report:
+            report = report[0]
 
             bytes_client = get_bytes_client(dashboard_data.dashboard.organization.code)
             bytes_client.login()
