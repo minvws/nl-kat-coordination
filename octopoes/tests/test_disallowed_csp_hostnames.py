@@ -14,7 +14,12 @@ def test_disallowed_csp_headers_no_findings():
         ),
     )
 
-    results = list(nibble(http_header_hostname, Config(bit_id="disallowed-csp-hostnames", config={})))
+    results = list(
+        nibble(
+            http_header_hostname,
+            Config(ooi=http_header_hostname.reference, bit_id="disallowed-csp-hostnames", config={}),
+        )
+    )
 
     assert results == []
 
@@ -27,7 +32,12 @@ def test_disallowed_csp_headers_simple_finding():
         ),
     )
 
-    results = list(nibble(http_header_hostname, Config(bit_id="disallowed-csp-hostnames", config={})))
+    results = list(
+        nibble(
+            http_header_hostname,
+            Config(ooi=http_header_hostname.reference, bit_id="disallowed-csp-hostnames", config={}),
+        )
+    )
 
     assert results == [
         KATFindingType(id="KAT-DISALLOWED-DOMAIN-IN-CSP"),
