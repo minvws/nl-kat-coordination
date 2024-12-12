@@ -4,29 +4,37 @@ onDomReady(initToggleSwitches);
 
 function initToggleSwitches() {
   // Switches get stitches ;-)
+  // Grab all toggle switches
   let toggle_switches = document.querySelectorAll(".toggle-switch");
 
   for (let i = 0; i < toggle_switches.length; i++) {
-    let options = toggle_switches[i].querySelectorAll(".toggle-switch-button");
+    initButtonsAndContentBlocks(toggle_switches[i]);
+  }
+}
 
-    for (let j = 0; j < options.length; j++) {
-      let option = options[j];
+function initButtonsAndContentBlocks(toggle_switch) {
+  // Get all the toggle switch options
+  let options = toggle_switch.querySelectorAll(".toggle-switch-button");
 
-      // Hide all elements linked to toggle switch options.
-      document
-        .getElementById(option.getAttribute("data-target-id"))
-        .classList.add("hidden");
+  for (let i = 0; i < options.length; i++) {
+    let option = options[i];
 
-      // Add click listener to switch options.
-      option.addEventListener("click", (event) => {
-        toggle(event.target, options);
-      });
-    }
-
-    // Initially show first option contents from toggle-switch.
+    // Hide all elements linked to toggle switch options.
     document
-      .getElementById(options[0].getAttribute("data-target-id"))
+      .getElementById(option.getAttribute("data-target-id"))
+      .classList.add("hidden");
+
+    // Add click listener to switch options.
+    option.addEventListener("click", (event) => {
+      toggle(event.target, options);
+    });
+
+    // Show option that on init has "aria-current".
+    if (option.parentElement.hasAttribute("aria-current", "true")) {
+      document
+      .getElementById(option.getAttribute("data-target-id"))
       .classList.remove("hidden");
+    }
   }
 }
 
