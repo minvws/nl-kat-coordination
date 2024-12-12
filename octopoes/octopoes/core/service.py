@@ -162,6 +162,12 @@ class OctopoesService:
         ):
             self.ooi_repository.delete_if_exists(reference, valid_time)
 
+        # Clear out affirmation dangling objects a bit later
+        residue = self.origin_repository.list_origins(valid_time, result=reference)
+        if all(map(lambda x: x.origin_type == OriginType.AFFIRMATION, residue)):
+            for res in residue:
+                self.origin_repository.delete(res, valid_time)
+
     def save_origin(
         self, origin: Origin, oois: list[OOI], valid_time: datetime, end_valid_time: datetime | None = None
     ) -> None:
