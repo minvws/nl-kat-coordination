@@ -16,6 +16,7 @@ Contains documentation for developers and contributors.
    windows-install
    gitpod
    nginx
+   s3-buckets
    debugging-troubleshooting
    latex
    environment-settings/index
