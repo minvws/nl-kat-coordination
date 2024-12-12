@@ -29,33 +29,20 @@ class NibbleParameter(BaseModel):
             return False
 
 
-class NibbleDefinition:
+class NibbleDefinition(BaseModel):
     id: str
     signature: list[NibbleParameter]
     query: str | Callable[[list[Reference | None]], str] | None = None
-    default_enabled: bool = True
-    config_ooi_relation_path: str | None = None
-    payload: MethodType | None = None
-
-    def __init__(
-        self,
-        name: str,
-        signature: list[NibbleParameter],
-        query: str | Callable[[list[Reference | None]], str] | None = None,
-        default_enabled: bool = True,
-        config_ooi_relation_path: str | None = None,
-    ):
-        self.id = name
-        self.signature = signature
-        self.query = query
-        self.default_enabled = default_enabled
-        self.config_ooi_relation_path = config_ooi_relation_path
+    _payload: MethodType | None = None
 
     def __call__(self, args: Iterable[OOI]) -> OOI | Iterable[OOI | None] | None:
-        if self.payload is None:
+        if self._payload is None:
             raise NotImplementedError
         else:
-            return self.payload(*args)
+            return self._payload(*args)
+
+    def __hash__(self):
+        return hash(self.id)
 
 
 def get_nibble_definitions() -> dict[str, NibbleDefinition]:
@@ -76,7 +63,7 @@ def get_nibble_definitions() -> dict[str, NibbleDefinition]:
                         f".{package.name}", f"{NIBBLES_DIR.name}.{package.name}"
                     )
                     if hasattr(payload, NIBBLE_FUNC_NAME):
-                        nibble_definition.payload = getattr(payload, NIBBLE_FUNC_NAME)
+                        nibble_definition._payload = getattr(payload, NIBBLE_FUNC_NAME)
                     else:
                         logger.warning('module "%s" has no function %s', package.name, NIBBLE_FUNC_NAME)
 

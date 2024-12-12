@@ -22,7 +22,7 @@ def query(targets: list[Reference | None]) -> str:
 
 
 NIBBLE = NibbleDefinition(
-    name="max_url_length_config",
+    id="max_url_length_config",
     signature=[
         NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]"),
         NibbleParameter(object_type=Config, parser="[*][?object_type == 'Config'][]"),

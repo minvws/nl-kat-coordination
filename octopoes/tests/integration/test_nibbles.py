@@ -30,8 +30,8 @@ def dummy(network: Network) -> Network | None:
 
 
 dummy_params = [NibbleParameter(object_type=Network)]
-dummy_nibble = NibbleDefinition(name="dummy", signature=dummy_params)
-dummy_nibble.payload = getattr(sys.modules[__name__], "dummy")
+dummy_nibble = NibbleDefinition(id="dummy", signature=dummy_params)
+dummy_nibble._payload = getattr(sys.modules[__name__], "dummy")
 
 
 def test_dummy_nibble(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
@@ -83,7 +83,7 @@ find_network_url_params = [
     NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]"),
 ]
 find_network_url_nibble = NibbleDefinition(
-    name="find_network_url",
+    id="find_network_url",
     signature=find_network_url_params,
     query="""
     {
@@ -99,7 +99,7 @@ find_network_url_nibble = NibbleDefinition(
     }
     """,
 )
-find_network_url_nibble.payload = getattr(sys.modules[__name__], "find_network_url")
+find_network_url_nibble._payload = getattr(sys.modules[__name__], "find_network_url")
 
 
 def test_find_network_url_nibble(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
@@ -225,9 +225,9 @@ def callable_query_query(targets: list[Reference | None]) -> str:
 
 
 callable_query_nibble = NibbleDefinition(
-    name="max_url_length_config", signature=callable_query_param, query=callable_query_query
+    id="max_url_length_config", signature=callable_query_param, query=callable_query_query
 )
-callable_query_nibble.payload = getattr(sys.modules[__name__], "callable_query")
+callable_query_nibble._payload = getattr(sys.modules[__name__], "callable_query")
 
 
 def test_callable_query(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
@@ -263,7 +263,7 @@ def test_callable_query(xtdb_octopoes_service: OctopoesService, event_manager: M
 
 
 mock_finding_type_nibble = NibbleDefinition(
-    name="default-findingtype-risk", signature=[NibbleParameter(object_type=FindingType)]
+    id="default-findingtype-risk", signature=[NibbleParameter(object_type=FindingType)]
 )
 
 
@@ -272,7 +272,7 @@ def set_default_severity(input_ooi: FindingType) -> Iterator[OOI]:
     yield input_ooi
 
 
-mock_finding_type_nibble.payload = getattr(sys.modules[__name__], "set_default_severity")
+mock_finding_type_nibble._payload = getattr(sys.modules[__name__], "set_default_severity")
 
 
 def test_parent_type_in_nibble_signature(

@@ -41,7 +41,7 @@ def query(targets: list[Reference | None]) -> str:
 
 
 NIBBLE = NibbleDefinition(
-    name="website_discovery",
+    id="website_discovery",
     signature=[
         NibbleParameter(object_type=ResolvedHostname, parser="[*][?object_type == 'ResolvedHostname'][]"),
         NibbleParameter(object_type=IPService, parser="[*][?object_type == 'IPService'][]"),
