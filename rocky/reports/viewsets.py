@@ -73,6 +73,11 @@ class ReportRecipeViewSet(OrganizationAPIMixin, viewsets.ModelViewSet):
 
         return self.get_paginated_response(serializer.data)
 
+    # The HTML renderer wants this to be defined, but doesn't seem to use what
+    # is returned.
+    def get_queryset(self):
+        return []
+
     def get_object(self) -> ReportRecipe:
         pk = self.kwargs["pk"]
 

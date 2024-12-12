@@ -49,7 +49,7 @@ class SchedulerWorkerManager(WorkerManager):
 
         self.exited = False
 
-    def run(self, queue_type: WorkerManager.Queue) -> None:
+    def run(self, queue_type: str) -> None:
         logger.info("Created worker pool for queue '%s'", queue_type)
 
         self.workers = [
@@ -80,7 +80,7 @@ class SchedulerWorkerManager(WorkerManager):
 
                 raise
 
-    def _fill_queue(self, task_queue: Queue, queue_type: WorkerManager.Queue):
+    def _fill_queue(self, task_queue: Queue, queue_type: str) -> None:
         if task_queue.qsize() > self.settings.pool_size:
             time.sleep(self.settings.worker_heartbeat)
             return
@@ -189,7 +189,7 @@ class SchedulerWorkerManager(WorkerManager):
     def _worker_args(self) -> tuple:
         return self.task_queue, self.item_handler, self.scheduler_client, self.handling_tasks
 
-    def exit(self, signum: int | None = None):
+    def exit(self, signum: int | None = None) -> None:
         try:
             if signum:
                 logger.info("Received %s, exiting", signal.Signals(signum).name)
@@ -238,7 +238,7 @@ def _start_working(
     handler: Handler,
     scheduler_client: SchedulerClientInterface,
     handling_tasks: dict[int, str],
-):
+) -> None:
     logger.info("Started listening for tasks from worker[pid=%s]", os.getpid())
 
     while True:
@@ -265,7 +265,7 @@ def _start_working(
                 logger.exception("Could not patch scheduler task to %s", status.value)
 
 
-def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_level: str) -> WorkerManager:
+def get_runtime_manager(settings: Settings, queue: str, log_level: str) -> WorkerManager:
     local_repository = get_local_repository()
 
     session = sessionmaker(bind=get_engine())()

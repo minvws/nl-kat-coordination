@@ -43,12 +43,12 @@ class Reference(str):
         return core_schema.with_info_after_validator_function(cls.validate, core_schema.str_schema())
 
     @classmethod
-    def validate(cls, v, info: ValidationInfo):
+    def validate(cls, v: str, info: ValidationInfo) -> Any:
         if not isinstance(v, str):
             raise TypeError("string required")
         return cls(str(v))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Reference({super().__repr__()})"
 
     @classmethod
@@ -125,7 +125,7 @@ class OOI(BaseModel):
     def model_post_init(self, __context: Any) -> None:  # noqa: F841
         self.primary_key = self.primary_key or f"{self.get_object_type()}|{self.natural_key}"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.primary_key
 
     @classmethod
@@ -192,11 +192,11 @@ class OOI(BaseModel):
         return cls._reverse_relation_names.get(attr, f"{cls.get_object_type()}_{attr}")
 
     @classmethod
-    def get_tokenized_primary_key(cls, natural_key: str):
+    def get_tokenized_primary_key(cls, natural_key: str) -> PrimaryKeyToken:
         token_tree = build_token_tree(cls)
         natural_key_parts = natural_key.split("|")
 
-        def hydrate(node) -> dict | str:
+        def hydrate(node: dict[str, dict | str]) -> dict | str:
             for key, value in node.items():
                 if isinstance(value, dict):
                     node[key] = hydrate(value)
@@ -257,10 +257,10 @@ def format_id_short(id_: str) -> str:
 class PrimaryKeyToken(RootModel):
     root: dict[str, str | PrimaryKeyToken]
 
-    def __getattr__(self, item) -> Any:
+    def __getattr__(self, item: str) -> Any:
         return self.root[item]
 
-    def __getitem__(self, item) -> Any:
+    def __getitem__(self, item: str) -> Any:
         return self.root[item]
 
 

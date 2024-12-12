@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from httpx import HTTPError
 from katalogus.client import get_katalogus
-from tools.view_helpers import PostRedirect
+from tools.view_helpers import Breadcrumb, PostRedirect
 
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
@@ -25,7 +25,7 @@ from reports.views.view_helpers import GenerateReportStepsMixin
 
 
 class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
-    def build_breadcrumbs(self):
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
