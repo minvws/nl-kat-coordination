@@ -122,4 +122,4 @@ class ReportScheduler(Scheduler):
                 ]
             ),
         )
-        return not count > 0
+        return not count

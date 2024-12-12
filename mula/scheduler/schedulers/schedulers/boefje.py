@@ -76,7 +76,6 @@ class BoefjeScheduler(Scheduler):
         Args:
             mutation: The mutation that was received.
         """
-        # TODO: exceptions
         try:
             # Convert body into a ScanProfileMutation
             mutation = models.ScanProfileMutation.model_validate_json(body)
@@ -227,7 +226,6 @@ class BoefjeScheduler(Scheduler):
 
     @tracer.start_as_current_span("process_rescheduling")
     def process_rescheduling(self):
-        # FIXME: return on exceptions
         try:
             schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
                 filters=filters.FilterRequest(
@@ -445,7 +443,6 @@ class BoefjeScheduler(Scheduler):
         queue."""
         boefje_task = models.BoefjeTask.model_validate(item.data)
 
-        # TODO: check this
         # Check if id's are unique and correctly set. Same id's are necessary
         # for the task runner.
         if item.id != boefje_task.id or self.ctx.datastores.task_store.get_task(item.id):
