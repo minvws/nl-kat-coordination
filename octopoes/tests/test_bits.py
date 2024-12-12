@@ -1,6 +1,7 @@
 from bits.https_availability.https_availability import run as run_https_availability
-from bits.oois_in_headers.oois_in_headers import run as run_oois_in_headers
+from nibbles.oois_in_headers.oois_in_headers import nibble as run_oois_in_headers
 
+from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import IPPort
 from octopoes.models.ooi.web import URL, HTTPHeader, HTTPHeaderURL, Website
@@ -9,7 +10,7 @@ from octopoes.models.ooi.web import URL, HTTPHeader, HTTPHeaderURL, Website
 def test_url_extracted_by_oois_in_headers_url():
     header = HTTPHeader(resource="", key="Location", value="https://www.example.com/")
 
-    results = list(run_oois_in_headers(header, [], {}))
+    results = list(run_oois_in_headers(header, Config(bit_id="oois-in-headers", config={})))
 
     url = results[0]
     assert isinstance(url, URL)
@@ -25,7 +26,7 @@ def test_url_extracted_by_oois_in_headers_url():
 def test_url_extracted_by_oois_in_headers_relative_path(http_resource_https):
     header = HTTPHeader(resource=http_resource_https.reference, key="Location", value="script.php")
 
-    results = list(run_oois_in_headers(header, [], {}))
+    results = list(run_oois_in_headers(header, Config(bit_id="oois-in-headers", config={})))
 
     url = results[0]
     assert isinstance(url, URL)
