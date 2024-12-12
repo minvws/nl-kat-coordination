@@ -6,6 +6,7 @@ from typing import Any
 from opentelemetry import trace
 
 from scheduler import clients, context, models
+from scheduler.clients.errors import ExternalServiceError
 from scheduler.schedulers import Scheduler, rankers
 from scheduler.schedulers.errors import exception_handler
 
@@ -150,6 +151,7 @@ class NormalizerScheduler(Scheduler):
         )
 
         task.priority = self.ranker.rank(SimpleNamespace(raw_data=normalizer_task.raw_data, task=normalizer_task))
+
         self.push_item_to_queue_with_timeout(task, self.max_tries, create_schedule=create_schedule)
 
         self.logger.info(
@@ -177,7 +179,6 @@ class NormalizerScheduler(Scheduler):
 
         return super().push_item_to_queue(item=item, create_schedule=create_schedule)
 
-    @tracer.start_as_current_span("normalizer_has_normalizer_permission_to_run")
     def has_normalizer_permission_to_run(self, normalizer: models.Plugin) -> bool:
         """Check if the task is allowed to run.
 
@@ -195,7 +196,6 @@ class NormalizerScheduler(Scheduler):
 
         return True
 
-    @tracer.start_as_current_span("normalizer_has_normalizer_task_started_running")
     def has_normalizer_task_started_running(self, task: models.NormalizerTask) -> bool:
         """Check if the same task is already running.
 
@@ -241,7 +241,17 @@ class NormalizerScheduler(Scheduler):
         Returns:
             A list of Plugins of type normalizer for the given mime type.
         """
-        normalizers = self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(organisation, mime_type)
+        try:
+            normalizers = self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(organisation, mime_type)
+        except ExternalServiceError:
+            self.logger.error(
+                "Failed to get normalizers for mime type %s",
+                mime_type,
+                mime_type=mime_type,
+                scheduler_id=self.scheduler_id,
+            )
+            return []
+
         if normalizers is None:
             return []
 
