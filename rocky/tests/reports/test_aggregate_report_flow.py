@@ -58,7 +58,7 @@ def test_select_some_oois_post_to_select_report_types(
 
     request = setup_request(
         rf.post(
-            "generate_report_select_report_types", {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": selection}
+            "aggregate_report_select_report_types", {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": selection}
         ),
         client_member.user,
     )
@@ -86,7 +86,7 @@ def test_change_ooi_selection_for_none_selection(
     )
 
     request = setup_request(
-        rf.post("generate_report_select_oois", {"observed_at": valid_time.strftime("%Y-%m-%d")}), client_member.user
+        rf.post("aggregate_report_select_oois", {"observed_at": valid_time.strftime("%Y-%m-%d")}), client_member.user
     )
 
     response = OOISelectionAggregateReportView.as_view()(request, organization_code=client_member.organization.code)
@@ -110,7 +110,7 @@ def test_change_ooi_selection_with_ooi_selection(
     selection = ooi_pks[0:2]
 
     request = setup_request(
-        rf.post("generate_report_select_oois", {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": selection}),
+        rf.post("aggregate_report_select_oois", {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": selection}),
         client_member.user,
     )
 
@@ -160,7 +160,7 @@ def test_report_types_selection(
     Will send the selected report types to the configuration page (set plugins).
     """
 
-    katalogus_mocker = mocker.patch("reports.views.base.get_katalogus")()
+    katalogus_mocker = mocker.patch("account.mixins.OrganizationView.get_katalogus")()
     katalogus_mocker.get_plugins.return_value = [boefje_dns_records, boefje_nmap_tcp]
 
     rocky_health_mocker = mocker.patch("reports.report_types.aggregate_organisation_report.report.get_rocky_health")()
@@ -200,10 +200,10 @@ def test_save_aggregate_report_view(
     mock_bytes_client,
 ):
     """
-    Will send data through post to aggregate report.
+    Will send data through post to aggregate report and immediately creates a report (not scheduled).
     """
 
-    katalogus_mocker = mocker.patch("reports.views.base.get_katalogus")()
+    katalogus_mocker = mocker.patch("account.mixins.OrganizationView.get_katalogus")()
     katalogus_mocker.get_plugins.return_value = [boefje_dns_records]
 
     rocky_health_mocker = mocker.patch("reports.report_types.aggregate_organisation_report.report.get_rocky_health")()
@@ -233,6 +233,56 @@ def test_save_aggregate_report_view(
 
     assert response.status_code == 302  # after post follows redirect, this to first create report ID
     assert "report_id=Report" in response.url
+
+
+def test_save_aggregate_report_view_scheduled(
+    rf,
+    client_member,
+    valid_time,
+    mock_organization_view_octopoes,
+    listed_hostnames,
+    rocky_health,
+    mocker,
+    boefje_dns_records,
+    mock_bytes_client,
+):
+    """
+    Will send data through post to aggregate report and creates a scheduled aggregate report.
+    """
+
+    katalogus_mocker = mocker.patch("account.mixins.OrganizationView.get_katalogus")()
+    katalogus_mocker.get_plugins.return_value = [boefje_dns_records]
+
+    rocky_health_mocker = mocker.patch("reports.report_types.aggregate_organisation_report.report.get_rocky_health")()
+    rocky_health_mocker.return_value = rocky_health
+
+    mock_bytes_client().upload_raw.return_value = "Report|1730b72f-b115-412e-ad44-dae6ab3edff9"
+
+    mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
+        count=len(listed_hostnames), items=listed_hostnames
+    )
+
+    request = setup_request(
+        rf.post(
+            "aggregate_report_save",
+            {
+                "observed_at": valid_time.strftime("%Y-%m-%d"),
+                "ooi": listed_hostnames,
+                "report_type": ["systems-report", "vulnerability-report"],
+                "choose_recurrence": "repeat",
+                "start_date": "2024-01-01",
+                "start_time": "10:10",
+                "recurrence": "weekly",
+                "parent_report_name": ["Scheduled Aggregate Report %x"],
+            },
+        ),
+        client_member.user,
+    )
+
+    response = SaveAggregateReportView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 302  # after post follows redirect, this to first create report ID
+    assert response.url == f"/en/{client_member.organization.code}/reports/scheduled-reports/"
 
 
 def test_json_download_aggregate_report(

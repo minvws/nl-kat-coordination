@@ -7,6 +7,7 @@ from urllib.parse import urlparse, urlunsplit
 import requests
 from forcediphttpsadapter.adapters import ForcedIPHTTPSAdapter
 from requests import Session
+from requests.models import Response
 
 ALLOWED_CONTENT_TYPES = mimetypes.types_map.values()
 
@@ -52,9 +53,9 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
             body_mimetypes.add(content_type)
 
         # Pick up the content type for the body from the server and split away encodings to make normalization easier
-        content_type = content_type.split(";")
-        if content_type[0] in ALLOWED_CONTENT_TYPES:
-            body_mimetypes.add(content_type[0])
+        content_type_splitted = content_type.split(";")
+        if content_type_splitted[0] in ALLOWED_CONTENT_TYPES:
+            body_mimetypes.add(content_type_splitted[0])
 
     # in case of a full response object, we hexdump to avoid issues with binary data or different encoding
     response_dump = json.dumps(create_response_object(response))
@@ -85,7 +86,7 @@ def create_response_object(response: requests.Response) -> dict:
     }
 
 
-def do_request(hostname: str, session: Session, uri: str, useragent: str):
+def do_request(hostname: str, session: Session, uri: str, useragent: str) -> Response:
     response = session.get(
         uri, headers={"Host": hostname, "User-Agent": useragent}, verify=False, allow_redirects=False
     )

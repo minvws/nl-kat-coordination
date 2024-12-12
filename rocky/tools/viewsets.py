@@ -1,5 +1,6 @@
 from django.conf import settings
-from katalogus.client import get_katalogus
+from katalogus.client import get_katalogus_client
+from katalogus.exceptions import KATalogusException
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -7,6 +8,8 @@ from rest_framework.response import Response
 from structlog import get_logger
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
+from rocky.exceptions import OctopoesException
+from rocky.signals import _get_healthy_katalogus, _get_healthy_octopoes
 from tools.models import Indemnification, Organization
 from tools.permissions import CanRecalculateBits, CanSetKatalogusSettings
 from tools.serializers import OrganizationSerializer, OrganizationSerializerReadOnlyCode, ToOrganizationSerializer
@@ -17,6 +20,11 @@ logger = get_logger(__name__)
 class OrganizationViewSet(viewsets.ModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
+    # When we created this viewset we didn't have pagination enabled in the
+    # django-rest-framework settings. Enabling it afterwards would cause the API
+    # to change in an incompatible way, we should enable this when we introduce
+    # a new API version.
+    pagination_class = None
 
     # Unfortunately django-rest-framework doesn't have support for create only
     # fields so we have to change the serializer class depending on the request
@@ -27,10 +35,32 @@ class OrganizationViewSet(viewsets.ModelViewSet):
             serializer_class = OrganizationSerializerReadOnlyCode
         return serializer_class
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        katalogus_client = _get_healthy_katalogus()
+        octopoes_client = _get_healthy_octopoes(instance.code)
+
+        try:
+            octopoes_client.delete_node()
+        except Exception as e:
+            raise OctopoesException("Failed deleting organization in Octopoes") from e
+
+        try:
+            katalogus_client.delete_organization(instance.code)
+        except Exception as e:
+            try:
+                octopoes_client.create_node()
+            except Exception as second_exception:
+                raise OctopoesException("Failed creating organization in Octopoes") from second_exception
+
+            raise KATalogusException("Failed deleting organization in the Katalogus") from e
+
+        return super().destroy(request, *args, **kwargs)
+
     @action(detail=True, permission_classes=[])
     def indemnification(self, request, pk=None):
         # DRF does not support different arguments when mapping POST/GET of the
-        # same endpoind to a different method, so we can't use the
+        # same endpoint to a different method, so we can't use the
         # permission_classes argument here.
         if not request.user.has_perm("tools.view_organization"):
             raise PermissionDenied()
@@ -62,7 +92,9 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     def recalculate_bits(self, request, pk=None):
         organization = self.get_object()
         logger.info("Recalculating bits", event_code=920000, organization_code=organization.code)
-        connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization.code)
+        connector = OctopoesAPIConnector(
+            settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+        )
         number_of_bits = connector.recalculate_bits()
 
         return Response({"number_of_bits": number_of_bits})
@@ -80,7 +112,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
                 organization_code=from_organization.code,
                 to_organization_code=to_organization.code,
             )
-            get_katalogus(from_organization.code).clone_all_configuration_to_organization(to_organization.code)
+            get_katalogus_client().clone_all_configuration_to_organization(from_organization.code, to_organization.code)
 
             return Response()
         else:

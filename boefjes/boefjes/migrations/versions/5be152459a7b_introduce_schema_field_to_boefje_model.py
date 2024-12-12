@@ -34,7 +34,7 @@ def upgrade() -> None:
         plugins = local_repo.get_all()
         logger.info("Found %s plugins", len(plugins))
 
-        for plugin in local_repo.get_all():
+        for plugin in plugins:
             schema = local_repo.schema(plugin.id)
             if schema:
                 query = text("UPDATE boefje SET schema = :schema WHERE plugin_id = :plugin_id")  # noqa: S608

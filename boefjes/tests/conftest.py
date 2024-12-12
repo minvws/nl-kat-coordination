@@ -18,10 +18,16 @@ from boefjes.dependencies.plugins import PluginService, get_plugin_service
 from boefjes.interfaces import Handler, Queue, SchedulerClientInterface, Task, TaskStatus
 from boefjes.job_handler import bytes_api_client
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
-from boefjes.katalogus.organisations import check_organisation_exists
 from boefjes.katalogus.root import app
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
-from boefjes.local_repository import LocalPluginRepository, get_local_repository
+from boefjes.local_repository import (
+    LocalPluginRepository,
+    _cached_resolve_boefjes,
+    _cached_resolve_normalizers,
+    get_boefje_resource,
+    get_local_repository,
+    get_normalizer_resource,
+)
 from boefjes.models import Organisation
 from boefjes.sql.config_storage import SQLConfigStorage, create_encrypter
 from boefjes.sql.db import SQL_BASE, get_engine
@@ -127,6 +133,14 @@ class MockHandler(Handler):
         return [self.queue.get() for _ in range(self.queue.qsize())]
 
 
+@pytest.fixture(autouse=True)
+def clear_caches():
+    get_boefje_resource.cache_clear()
+    get_normalizer_resource.cache_clear()
+    _cached_resolve_boefjes.cache_clear()
+    _cached_resolve_normalizers.cache_clear()
+
+
 @pytest.fixture
 def item_handler(tmp_path: Path):
     return MockHandler()
@@ -223,6 +237,11 @@ def test_organisation():
 
 
 @pytest.fixture
+def second_test_organisation():
+    return Organisation(id="test2", name="Test org2")
+
+
+@pytest.fixture
 def mock_plugin_service(mock_local_repository, test_organisation) -> PluginService:
     storage = ConfigStorageMemory()
     storage.upsert(test_organisation.id, "test_plugin", {"DUMMY_VAR": "123"})
@@ -236,6 +255,14 @@ def organisation(organisation_storage, test_organisation) -> Organisation:
         repo.create(test_organisation)
 
     return test_organisation
+
+
+@pytest.fixture
+def second_organisation(organisation_storage, second_test_organisation) -> Organisation:
+    with organisation_storage as repo:
+        repo.create(second_test_organisation)
+
+    return second_test_organisation
 
 
 @pytest.fixture
@@ -253,7 +280,6 @@ def unit_test_client(mock_plugin_service) -> TestClient:
 
     app.dependency_overrides[get_organisations_store] = lambda: _store
     app.dependency_overrides[get_plugin_service] = get_service
-    app.dependency_overrides[check_organisation_exists] = lambda: None
 
     yield client
 

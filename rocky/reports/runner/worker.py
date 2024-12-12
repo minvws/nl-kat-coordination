@@ -10,8 +10,9 @@ from django.conf import settings
 from httpx import HTTPError
 from pydantic import ValidationError
 
-from reports.runner.local import LocalReportJobRunner
-from reports.runner.models import ReportJobRunner, WorkerManager
+from reports.runner.models import ReportRunner, WorkerManager
+from reports.runner.report_runner import LocalReportRunner
+from rocky.bytes_client import get_bytes_client
 from rocky.scheduler import SchedulerClient, Task, TaskStatus, scheduler_client
 
 logger = structlog.get_logger(__name__)
@@ -20,7 +21,7 @@ logger = structlog.get_logger(__name__)
 class SchedulerWorkerManager(WorkerManager):
     def __init__(
         self,
-        runner: ReportJobRunner,
+        runner: ReportRunner,
         scheduler: SchedulerClient,
         pool_size: int,
         poll_interval: int,
@@ -84,7 +85,7 @@ class SchedulerWorkerManager(WorkerManager):
 
         # We do not target a specific queue since we start one runtime for all organisations
         # and queue ids contain the organisation_id
-        queues = [q for q in queues if q.id.startswith("report")]
+        queues = [q for q in queues if q.id.startswith("report") and q.size > 0]
 
         logger.debug("Found queues: %s", [queue.id for queue in queues])
 
@@ -221,7 +222,7 @@ def _format_exit_code(exitcode: int | None) -> str:
 
 
 def _start_working(
-    task_queue: mp.Queue, runner: ReportJobRunner, scheduler: SchedulerClient, handling_tasks: dict[int, str]
+    task_queue: mp.Queue, runner: ReportRunner, scheduler: SchedulerClient, handling_tasks: dict[int, str]
 ):
     logger.info("Started listening for tasks from worker[pid=%s]", os.getpid())
 
@@ -251,7 +252,7 @@ def _start_working(
 
 def get_runtime_manager() -> WorkerManager:
     return SchedulerWorkerManager(
-        LocalReportJobRunner(),
+        LocalReportRunner(get_bytes_client("")),  # These are set dynamically. Needs a refactor.
         scheduler_client(None),
         settings.POOL_SIZE,
         settings.POLL_INTERVAL,

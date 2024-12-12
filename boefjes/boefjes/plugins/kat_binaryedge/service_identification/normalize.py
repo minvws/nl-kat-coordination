@@ -4,6 +4,7 @@ from collections.abc import Iterable
 
 from boefjes.normalizer_models import NormalizerOutput
 from boefjes.plugins.kat_binaryedge.services.normalize import get_name_from_cpe
+from boefjes.plugins.helpers import cpe_to_name_version
 from octopoes.models import Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, PortState, Protocol
@@ -51,7 +52,8 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
             if "cpe" in service:
                 for cpe in service["cpe"]:
-                    software_ooi = Software(name=get_name_from_cpe(cpe), cpe=cpe)
+                    name, version = cpe_to_name_version(cpe=cpe)
+                    software_ooi = Software(name=name, version=version, cpe=cpe)
                     yield software_ooi
                     software_instance_ooi = SoftwareInstance(
                         ooi=ip_service_ooi.reference, software=software_ooi.reference

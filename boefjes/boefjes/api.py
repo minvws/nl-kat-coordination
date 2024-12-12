@@ -30,7 +30,7 @@ class UvicornServer(ForkProcess):
         self.server = Server(config=config)
         self.config = config
 
-    def stop(self):
+    def stop(self) -> None:
         self.terminate()
 
     def run(self, *args, **kwargs):
@@ -81,7 +81,7 @@ async def root():
 
 
 @app.get("/api/v0/tasks/{task_id}", response_model=BoefjeInput)
-def boefje_input(task_id: UUID, scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client)):
+def boefje_input(task_id: UUID, scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client)) -> BoefjeInput:
     task = get_task(task_id, scheduler_client)
 
     if task.status is not TaskStatus.RUNNING:
@@ -97,7 +97,7 @@ def boefje_output(
     boefje_output: BoefjeOutput,
     scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),
     bytes_client: BytesAPIClient = Depends(get_bytes_client),
-):
+) -> Response:
     task = get_task(task_id, scheduler_client)
     boefje_meta = task.data
 
@@ -115,7 +115,7 @@ def boefje_output(
         for file in boefje_output.files:
             raw = base64.b64decode(file.content)
             # when supported, also save file.name to Bytes
-            bytes_client.save_raw(task_id, raw, mime_types.union(file.tags))
+            bytes_client.save_raw(task_id, raw, mime_types.union(file.tags) if file.tags else mime_types)
 
     if boefje_output.status == StatusEnum.COMPLETED:
         scheduler_client.patch_task(task_id, TaskStatus.COMPLETED)

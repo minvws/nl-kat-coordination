@@ -16,9 +16,9 @@ logger = structlog.get_logger("bytes_client")
 
 
 class BytesClient:
-    def __init__(self, base_url: str, username: str, password: str, organization: str):
+    def __init__(self, base_url: str, username: str, password: str, organization: str | None):
         self.credentials = {"username": username, "password": password}
-        self.session = httpx.Client(base_url=base_url)
+        self.session = httpx.Client(base_url=base_url, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT)
         self.organization = organization
 
     def health(self) -> ServiceHealth:
@@ -28,14 +28,14 @@ class BytesClient:
         return ServiceHealth.model_validate(response.json())
 
     @staticmethod
-    def raw_from_declarations(declarations: list[Declaration]):
+    def raw_from_declarations(declarations: list[Declaration]) -> bytes:
         json_string = f"[{','.join([declaration.model_dump_json() for declaration in declarations])}]"
 
         return json_string.encode("utf-8")
 
     def add_manual_proof(
         self, normalizer_id: uuid.UUID, raw: bytes, manual_mime_types: Set[str] = frozenset({"manual/ooi"})
-    ):
+    ) -> None:
         """Per convention for a generic normalizer, we add a raw list of declarations, not a single declaration"""
 
         self.login()

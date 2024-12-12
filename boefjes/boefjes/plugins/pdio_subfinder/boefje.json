@@ -1,7 +1,7 @@
 {
   "id": "pdio-subfinder",
   "name": "Subfinder",
-  "description": "A subdomain discovery tool. (projectdiscovery.io)",
+  "description": "A subdomain discovery tool. (projectdiscovery.io). Returns valid subdomains for websites using passive online sources. Beware that many of the online sources require their own API key to get more accurate data.",
   "consumes": [
     "Hostname"
   ],
@@ -9,7 +9,7 @@
     "SUBFINDER_RATE_LIMIT",
     "SUBFINDER_VERSION"
   ],
-  "scan_level": 2,
+  "scan_level": 1,
   "oci_image": "ghcr.io/minvws/openkat/generic:latest",
   "oci_arguments": [
     "pdio_subfinder.main"

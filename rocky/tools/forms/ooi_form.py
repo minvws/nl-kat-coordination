@@ -2,11 +2,11 @@ from datetime import datetime, timezone
 from enum import Enum
 from inspect import isclass
 from ipaddress import IPv4Address, IPv6Address
-from typing import Literal, Union, get_args, get_origin
+from typing import Any, Literal, TypedDict, Union, get_args, get_origin
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from pydantic import AnyUrl, JsonValue
+from pydantic import AnyUrl
 from pydantic.fields import FieldInfo
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -19,7 +19,7 @@ from tools.forms.settings import CLEARANCE_TYPE_CHOICES
 
 
 class OOIForm(BaseRockyForm):
-    def __init__(self, ooi_class: type[OOI], connector: OctopoesAPIConnector, *args, **kwargs):
+    def __init__(self, ooi_class: type[OOI], connector: OctopoesAPIConnector, *args: Any, **kwargs: Any):
         self.user_id = kwargs.pop("user_id", None)
         super().__init__(*args, **kwargs)
         self.ooi_class = ooi_class
@@ -38,7 +38,7 @@ class OOIForm(BaseRockyForm):
         return self.generate_form_fields()
 
     def generate_form_fields(self, hidden_ooi_fields: dict[str, str] | None = None) -> dict[str, forms.fields.Field]:
-        fields = {}
+        fields: dict[str, forms.fields.Field] = {}
         for name, field in self.ooi_class.model_fields.items():
             annotation = field.annotation
             default_attrs = default_field_options(name, field)
@@ -70,14 +70,9 @@ class OOIForm(BaseRockyForm):
                 fields[name] = generate_ip_field(field)
             elif annotation == AnyUrl:
                 fields[name] = generate_url_field(field)
-            elif (
-                annotation == dict
-                or annotation == dict[str, str]
-                or annotation == list[str]
-                or annotation == dict[str, JsonValue]
-            ):
+            elif annotation is dict or annotation == list[str] or annotation == dict[str, Any]:
                 fields[name] = forms.JSONField(**default_attrs)
-            elif annotation == int or (hasattr(annotation, "__args__") and int in annotation.__args__):
+            elif annotation is int or (hasattr(annotation, "__args__") and int in annotation.__args__):
                 fields[name] = forms.IntegerField(**default_attrs)
             elif isclass(annotation) and issubclass(annotation, Enum):
                 fields[name] = generate_select_ooi_type(name, annotation, field)
@@ -117,7 +112,7 @@ def generate_select_ooi_field(
 ) -> forms.fields.Field:
     # field is a relation, query all objects, and build select
     default_attrs = default_field_options(name, field)
-    is_multiselect = getattr(field.annotation, "__origin__", None) == list
+    is_multiselect = getattr(field.annotation, "__origin__", None) is list
     option_label = default_attrs.get("label", _("option"))
 
     option_text = "-- " + _("Optionally choose a {option_label}").format(option_label=option_label) + " --"
@@ -166,7 +161,12 @@ def generate_url_field(field: FieldInfo) -> forms.fields.Field:
     return field
 
 
-def default_field_options(name: str, field_info: FieldInfo) -> dict[str, str | bool]:
+class DefaultFieldOptions(TypedDict):
+    label: str
+    required: bool
+
+
+def default_field_options(name: str, field_info: FieldInfo) -> DefaultFieldOptions:
     return {"label": name, "required": field_info.is_required()}
 
 
@@ -180,7 +180,7 @@ class ClearanceFilterForm(BaseRockyForm):
     )
 
 
-_EXCLUDED_OOI_TYPES = ("Finding", "FindingType")
+_EXCLUDED_OOI_TYPES = ("Finding", "FindingType", "Report")
 
 SORTED_OOI_TYPES = sorted(
     [

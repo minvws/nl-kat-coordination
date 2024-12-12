@@ -23,7 +23,7 @@ logger = structlog.get_logger(__name__)
 
 class SchedulerAPIClient(SchedulerClientInterface):
     def __init__(self, plugin_service: PluginService, base_url: str):
-        self._session = Client(base_url=base_url, transport=HTTPTransport(retries=6))
+        self._session = Client(base_url=base_url, transport=HTTPTransport(retries=6), timeout=settings.outgoing_request_timeout)
         self.plugin_service = plugin_service
 
     @staticmethod

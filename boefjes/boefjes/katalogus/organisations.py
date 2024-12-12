@@ -3,23 +3,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from boefjes.models import Organisation
 from boefjes.sql.db import ObjectNotFoundException
 from boefjes.sql.organisation_storage import get_organisations_store
-from boefjes.storage.interfaces import OrganisationNotFound, OrganisationStorage
+from boefjes.storage.interfaces import OrganisationStorage
 
 router = APIRouter(prefix="/organisations", tags=["organisations"])
-
-
-def check_organisation_exists(
-    organisation_id: str, storage: OrganisationStorage = Depends(get_organisations_store)
-) -> None:
-    """
-    Checks if an organisation exists, if not, creates it.
-    """
-    with storage as store:
-        try:
-            store.get_by_id(organisation_id)
-        except OrganisationNotFound:
-            add_organisation(Organisation(id=organisation_id, name=organisation_id), storage)
-            storage.get_by_id(organisation_id)
 
 
 @router.get("", response_model=dict[str, Organisation])

@@ -4,8 +4,7 @@ import threading
 import structlog
 from opentelemetry import trace
 
-from scheduler import context, schedulers, server
-from scheduler.connectors.errors import ExternalServiceError
+from scheduler import clients, context, schedulers, server
 from scheduler.utils import thread
 
 tracer = trace.get_tracer(__name__)
@@ -83,7 +82,7 @@ class App:
         }
         try:
             orgs = self.ctx.services.katalogus.get_organisations()
-        except ExternalServiceError:
+        except clients.errors.ExternalServiceError:
             self.logger.exception("Failed to get organisations from Katalogus")
             return
 
@@ -117,7 +116,7 @@ class App:
         for org_id in additions:
             try:
                 org = self.ctx.services.katalogus.get_organisation(org_id)
-            except ExternalServiceError as e:
+            except clients.errors.ExternalServiceError as e:
                 self.logger.error("Failed to get organisation from Katalogus", error=e, org_id=org_id)
                 continue
 
@@ -166,7 +165,7 @@ class App:
         # Initialize the schedulers
         try:
             orgs = self.ctx.services.katalogus.get_organisations()
-        except ExternalServiceError as e:
+        except clients.errors.ExternalServiceError as e:
             self.logger.error("Failed to get organisations from Katalogus", error=e)
             return
 

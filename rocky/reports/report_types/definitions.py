@@ -3,6 +3,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, TypedDict, TypeVar
 
+from django.utils.functional import Promise
+
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
@@ -15,6 +17,11 @@ REPORTS_DIR = Path(__file__).parent
 class ReportPlugins(TypedDict):
     required: set[str]
     optional: set[str]
+
+
+class SubReportPlugins(TypedDict):
+    required: list[str]
+    optional: list[str]
 
 
 def report_plugins_union(report_types: list[type["BaseReport"]]) -> ReportPlugins:
@@ -32,8 +39,8 @@ def report_plugins_union(report_types: list[type["BaseReport"]]) -> ReportPlugin
 
 class BaseReport:
     id: str
-    name: str
-    description: str
+    name: Promise
+    description: Promise
     template_path: str = "report.html"
     plugins: ReportPlugins
     input_ooi_types: set[type[OOI]]
@@ -41,6 +48,9 @@ class BaseReport:
 
     def __init__(self, octopoes_api_connector: OctopoesAPIConnector):
         self.octopoes_api_connector = octopoes_api_connector
+
+    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+        raise NotImplementedError
 
     @classmethod
     def class_attributes(cls) -> dict[str, Any]:

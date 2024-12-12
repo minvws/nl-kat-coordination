@@ -25,7 +25,7 @@ logger = structlog.get_logger(__name__)
 
 class AggregateOrganisationReport(AggregateReport):
     id = "aggregate-organisation-report"
-    name = "Aggregate Organisation Report"
+    name = _("Aggregate Organisation Report")
     description = "Aggregate Organisation Report"
     reports = {
         "required": [SystemReport],
@@ -372,16 +372,16 @@ class AggregateOrganisationReport(AggregateReport):
 
         summary = {
             # _("General recommendations"): "",
-            str(_("Critical vulnerabilities")): total_criticals,
-            str(_("IPs scanned")): total_ips,
-            str(_("Hostnames scanned")): total_hostnames,
+            "critical_vulnerabilities": total_criticals,
+            "ips_scanned": total_ips,
+            "hostnames_scanned": total_hostnames,
             # _("Systems found"): total_systems,
             # _("Sector of organisation"): "",
             # _("Basic security score compared to sector"): "",
             # _("Sector defined"): "",
             # _("Lowest security score in organisation"): "",
             # _("Newly discovered items since last week, october 8th 2023"): "",
-            str(_("Terms in report")): ", ".join(sorted(terms)),
+            "terms_in_report": ", ".join(sorted(terms)),
         }
 
         all_findings = set()
@@ -412,7 +412,9 @@ class AggregateOrganisationReport(AggregateReport):
             "config_oois": config_oois,
         }
 
-    def collect_system_specific_data(self, data, services, system_type: str, report_id: str) -> dict[str, Any]:
+    def collect_system_specific_data(
+        self, data: dict, services: dict, system_type: str, report_id: str
+    ) -> dict[str, Any]:
         """Given a system, return a list of report data from the right sub-reports based on the related report_id"""
 
         report_data: dict[str, Any] = {}
