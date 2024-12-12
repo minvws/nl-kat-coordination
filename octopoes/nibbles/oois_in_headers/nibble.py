@@ -1,7 +1,7 @@
 from nibbles.definitions import NibbleDefinition, NibbleParameter
 from octopoes.models import Reference
 from octopoes.models.ooi.config import Config
-from octopoes.models.ooi.web import HTTPHeaderHostname
+from octopoes.models.ooi.web import HTTPHeader
 
 
 def query(targets: list[Reference | None]) -> str:
@@ -12,7 +12,7 @@ def query(targets: list[Reference | None]) -> str:
                 :where [
                     (or
                         (and [?var :object_type "URL" ] [?var :URL/primary_key {links[0]}])
-                        (and [?var :object_type "Config" ] [?var :Config/bit_id "disallowed-csp-hostnames"]\
+                        (and [?var :object_type "Config" ] [?var :Config/bit_id "oois-in-headers"]\
  [?var :Config/primary_key {links[1]}])
                     )
                 ]
@@ -22,9 +22,9 @@ def query(targets: list[Reference | None]) -> str:
 
 
 NIBBLE = NibbleDefinition(
-    id="disallowed-csp-hostnames",
+    id="oois-in-headers",
     signature=[
-        NibbleParameter(object_type=HTTPHeaderHostname, parser="[*][?object_type == 'HTTPHeaderHostname'][]"),
+        NibbleParameter(object_type=HTTPHeader, parser="[*][?object_type == 'HTTPHeader'][]"),
         NibbleParameter(object_type=Config, parser="[*][?object_type == 'Config'][]"),
     ],
     query=query,

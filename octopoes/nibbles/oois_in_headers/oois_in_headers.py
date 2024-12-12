@@ -1,11 +1,11 @@
 import re
 from collections.abc import Iterator
-from typing import Any
 from urllib.parse import parse_qs, urlencode, urljoin, urlparse, urlunparse
 
 from pydantic import ValidationError
 
 from octopoes.models import OOI
+from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 from octopoes.models.ooi.web import URL, HTTPHeader, HTTPHeaderHostname, HTTPHeaderURL
@@ -36,11 +36,11 @@ def remove_ignored_params(url: str, ignored_params: list[str]) -> str:
     return new_url
 
 
-def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, Any]) -> Iterator[OOI]:
+def nibble(input_ooi: HTTPHeader, config: Config) -> Iterator[OOI]:
     network = Network(name="internet")
 
     if input_ooi.key.lower() == "location":
-        ignored_url_params = get_ignored_url_params(config, "ignored_url_parameters", [])
+        ignored_url_params = get_ignored_url_params(config.config, "ignored_url_parameters", [])
         if is_url(input_ooi.value):
             u = URL(raw=remove_ignored_params(input_ooi.value, ignored_url_params), network=network.reference)
         else:
