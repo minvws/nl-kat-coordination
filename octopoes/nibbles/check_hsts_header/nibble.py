@@ -24,7 +24,7 @@ def query(targets: list[Reference | None]) -> str:
 NIBBLE = NibbleDefinition(
     id="check-hsts-header",
     signature=[
-        NibbleParameter(object_type=HTTPHeader, parser="[*][?object_type == 'URL'][]"),
+        NibbleParameter(object_type=HTTPHeader, parser="[*][?object_type == 'HTTPHeader'][]"),
         NibbleParameter(object_type=Config, parser="[*][?object_type == 'Config'][]"),
     ],
     query=query,
