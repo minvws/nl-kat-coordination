@@ -258,6 +258,18 @@ class XTDBOOIRepository(OOIRepository):
         stripped["user_id"] = user_id
         return object_cls.model_validate(stripped)
 
+    @classmethod
+    def objectify(cls, t: Any, obj: dict | list | Any) -> tuple | Any:
+        if isinstance(obj, dict):
+            if issubclass(t, OOI):
+                return cls.deserialize(obj)
+            else:
+                return t(**obj)
+        elif isinstance(obj, list):
+            return tuple(cls.objectify(t, o) for o in obj)
+        else:
+            return t(obj)
+
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
         try:
             res = self.session.client.get_entity(str(reference), valid_time)
@@ -873,17 +885,6 @@ class XTDBOOIRepository(OOIRepository):
     def nibble_query(
         self, ooi: OOI, nibble: NibbleDefinition, valid_time: datetime, arguments: list[Reference | None] | None = None
     ) -> Iterable[Iterable[Any]]:
-        def objectify(t: type[Any], obj: dict | list | Any):
-            if isinstance(obj, dict):
-                if issubclass(t, OOI):
-                    return self.deserialize(obj)
-                else:
-                    return t(**obj)
-            elif isinstance(obj, list):
-                return tuple({objectify(t, o) for o in obj})
-            else:
-                return t(obj)
-
         if nibble.query is None:
             return [{ooi}]
         else:
@@ -895,9 +896,9 @@ class XTDBOOIRepository(OOIRepository):
             query = nibble.query if isinstance(nibble.query, str) else nibble.query(arguments)
             data = self.session.client.query(query, valid_time)
             objects = [
-                {ooi, *[objectify(sgn.object_type, obj) for obj in search(sgn.parser, data)]}
-                if isinstance(ooi, sgn.object_type)
-                else {objectify(sgn.object_type, obj) for obj in search(sgn.parser, data)}
-                for sgn in nibble.signature
+                {ooi, *[self.objectify(element.object_type, obj) for obj in search(element.parser, data)]}
+                if isinstance(ooi, element.object_type)
+                else {self.objectify(element.object_type, obj) for obj in search(element.parser, data)}
+                for element in nibble.signature
             ]
             return list(product(*objects))

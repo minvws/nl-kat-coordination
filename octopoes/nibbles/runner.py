@@ -86,8 +86,17 @@ class NibblesRunner:
     def update_nibbles(self):
         self.nibbles: dict[str, NibbleDefinition] = get_nibble_definitions()
 
+    def select_nibbles(self, nibble_ids: Iterable[str]):
+        self.nibbles = {key: value for key, value in self.nibbles.items() if key in nibble_ids}
+
     def list_nibbles(self) -> list[str]:
         return list(self.nibbles.keys())
+
+    def list_available_nibbles(self) -> list[str]:
+        return list(get_nibble_definitions())
+
+    def disable(self):
+        self.nibbles = {}
 
     def _run(self, ooi: OOI, valid_time: datetime) -> dict[str, dict[tuple[Any, ...], set[OOI]]]:
         return_value: dict[str, dict[tuple[Any, ...], set[OOI]]] = {}

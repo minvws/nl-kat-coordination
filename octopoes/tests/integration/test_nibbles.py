@@ -53,7 +53,7 @@ def test_url_classification_nibble(xtdb_octopoes_service: OctopoesService, event
         perform_writes=False,
     )
     nibble = xtdb_octopoes_service.nibbler.nibbles["url_classification"]
-    xtdb_octopoes_service.nibbler.nibbles = {}
+    xtdb_octopoes_service.nibbler.disable()
     nibbler.nibbles = {nibble.id: nibble}
     network = Network(name="internet")
     xtdb_octopoes_service.ooi_repository.save(network, valid_time)
@@ -108,7 +108,7 @@ def test_find_network_url_nibble(xtdb_octopoes_service: OctopoesService, event_m
         xtdb_octopoes_service.origin_repository,
         xtdb_octopoes_service.scan_profile_repository,
     )
-    xtdb_octopoes_service.nibbler.nibbles = {}
+    xtdb_octopoes_service.nibbler.disable()
     nibbler.nibbles = {find_network_url_nibble.id: find_network_url_nibble}
     network1 = Network(name="internetverbinding")
     xtdb_octopoes_service.ooi_repository.save(network1, valid_time)
@@ -163,8 +163,8 @@ def test_max_length_config_nibble(xtdb_octopoes_service: OctopoesService, event_
         xtdb_octopoes_service.scan_profile_repository,
     )
     nibble = xtdb_octopoes_service.nibbler.nibbles["max_url_length_config"]
-    xtdb_octopoes_service.nibbler.nibbles = {}
-    nibbler.nibbles = {nibble.id: nibble}
+    nibbler.nibbles = {"max_url_length_config": nibble}
+    xtdb_octopoes_service.nibbler.disable()
     network = Network(name="internet")
     xtdb_octopoes_service.ooi_repository.save(network, valid_time)
     url = URL(network=network.reference, raw="https://mispo.es/")
@@ -283,7 +283,7 @@ def test_parent_type_in_nibble_signature(
         xtdb_octopoes_service.origin_repository,
         xtdb_octopoes_service.scan_profile_repository,
     )
-    xtdb_octopoes_service.nibbler.nibbles = {}
+    xtdb_octopoes_service.nibbler.disable()
     nibbler.nibbles = {mock_finding_type_nibble.id: mock_finding_type_nibble}
     network = Network(name="internet")
     xtdb_octopoes_service.ooi_repository.save(network, valid_time)

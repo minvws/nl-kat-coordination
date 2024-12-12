@@ -596,6 +596,20 @@ def nibbles_update(octopoes: OctopoesService = Depends(octopoes_service)) -> lis
 
 
 @router.get("/nibbles/disable", tags=["nibbles"])
-def nibbles_disable(nibble_id: str, octopoes: OctopoesService = Depends(octopoes_service)) -> list[str]:
-    octopoes.nibbler.nibbles.pop(nibble_id, None)
+def nibbles_disable(nibble_id: str = "", octopoes: OctopoesService = Depends(octopoes_service)) -> list[str]:
+    if nibble_id:
+        octopoes.nibbler.nibbles.pop(nibble_id, None)
+    else:
+        octopoes.nibbler.disable()
+    return nibbles_list(octopoes)
+
+
+@router.get("/nibbles/available", tags=["nibbles"])
+def nibbles_available(octopoes: OctopoesService = Depends(octopoes_service)) -> list[str]:
+    return octopoes.nibbler.list_available_nibbles()
+
+
+@router.get("/nibbles/select", tags=["nibbles"])
+def nibbles_select(nibble_ids: list[str] = Query(), octopoes: OctopoesService = Depends(octopoes_service)) -> list[str]:
+    octopoes.nibbler.select_nibbles(nibble_ids)
     return nibbles_list(octopoes)
