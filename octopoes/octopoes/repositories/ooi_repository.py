@@ -901,4 +901,9 @@ class XTDBOOIRepository(OOIRepository):
                 else {self.objectify(element.object_type, obj) for obj in search(element.parser, data)}
                 for element in nibble.signature
             ]
+            objects = [
+                obj if obj else ({None} if element.optional else set())
+                for obj, element in zip(objects, nibble.signature)
+            ]
+
             return list(product(*objects))
