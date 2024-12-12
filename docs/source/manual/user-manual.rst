@@ -79,20 +79,20 @@ One or more findings can be selected. The textbox at the bottom allows for a des
 Objects
 -------
 
-The Objects page lists all the objects in Octopoes. Objects can be anything, like DNS records, hostnames, URLs, software, software versions, ports, etc. It is any piece of information that is found by the normalizers, bits and boefjes. On a new installation you'll see the following objects by default: 
+The Objects page lists all the objects in Octopoes. Objects can be anything, like DNS records, hostnames, URLs, software, software versions, ports, etc. It is any piece of information that is found by the normalizers, bits and boefjes. On a new installation you'll see the following objects by default:
 
 .. image:: img/objects-clean-install.png
   :alt: overview of default objects
 
 The table gives an overview on the following items:
-- Object: this is the piece of data that was identified, such as a port, software version, hostname, etc. 
+- Object: this is the piece of data that was identified, such as a port, software version, hostname, etc.
 - Object type: this shows how this object is labelled.
 - Clearance level: this shows the clearance level of this object.
-- Clearance type: this shows what kind of clearance level is set on the object. See `Object clearances` __ below for more information. 
+- Clearance type: this shows what kind of clearance level is set on the object. See `Object clearances` __ below for more information.
 
-The objects can be filtered by object types, clearance levels and clearance types. The search functionality can also be used to search for specific objects, such as hostnames. 
+The objects can be filtered by object types, clearance levels and clearance types. The search functionality can also be used to search for specific objects, such as hostnames.
 
-More information on objects is provided by clicking on the object. This will give an overview page with all information for the specific object. The object details page is further described below. 
+More information on objects is provided by clicking on the object. This will give an overview page with all information for the specific object. The object details page is further described below.
 
 
 Object clearances
@@ -103,7 +103,7 @@ Each object has a clearance type. The clearance type tells how the object was ad
 - Inherited: inherited objects were identified through propagation and the parsing of bits and normalizers. This means there is a relation to other object(s).
 - Empty: empyth objects do not have a relation to other objects.
 
-The objects below show different clearance types for various objects. The hostname `mispo.es` was manually added and thus is `declared`. The DNS zone is `inherited` based on the DNS zone boefje. 
+The objects below show different clearance types for various objects. The hostname `mispo.es` was manually added and thus is `declared`. The DNS zone is `inherited` based on the DNS zone boefje.
 
 .. image:: img/objects-clearance-types.png
   :alt: different object clearance types
@@ -112,13 +112,13 @@ __ Object clearances_
 
 Object details
 --------------
-Object details can be found by clicking on an object on the Objects page. Object details provide data on that specific object and how it relates to other objects. The following detail tabs are available: 
+Object details can be found by clicking on an object on the Objects page. Object details provide data on that specific object and how it relates to other objects. The following detail tabs are available:
 
-- Overview: the overview tab gives object details, it's declaration, related objects (objects that are somehow related), tasks that ran on this object, findings that are applicable to this object and a list of boefjes that can scan this object.  
-- Tree: the tree tab shows how all objects are related to this object. The point of view will be from the specific object. Thus the view for a hostname will be slightly different than the tree view for an IP address. Filters can be applied to the tree view. 
-- Graph: the graph tab visually shows how the objects are connected using lines. The graph is interactive, meaning you can click on objects in the graph. Filters can be applied to the graph view. 
-- Clearance level: the clearance level can be changed on the clearance level tab. This tab also shows the clearance type (declared, inherited, empty) and the inheritence tree for the object. 
-- Findings: the findings tab shows all findings that are linked to this object. Different objects have different findings, meaning that the Findings tab for a hostname is likely different from the findings tab for an IP address. 
+- Overview: the overview tab gives object details, it's declaration, related objects (objects that are somehow related), tasks that ran on this object, findings that are applicable to this object and a list of boefjes that can scan this object.
+- Tree: the tree tab shows how all objects are related to this object. The point of view will be from the specific object. Thus the view for a hostname will be slightly different than the tree view for an IP address. Filters can be applied to the tree view.
+- Graph: the graph tab visually shows how the objects are connected using lines. The graph is interactive, meaning you can click on objects in the graph. Filters can be applied to the graph view.
+- Clearance level: the clearance level can be changed on the clearance level tab. This tab also shows the clearance type (declared, inherited, empty) and the inheritance tree for the object.
+- Findings: the findings tab shows all findings that are linked to this object. Different objects have different findings, meaning that the Findings tab for a hostname is likely different from the findings tab for an IP address.
 
 
 .. image:: img/object-details.png
@@ -127,19 +127,19 @@ Object details can be found by clicking on an object on the Objects page. Object
 Tasks
 -----
 
-All tasks can be found on the Tasks page. A task is created for each job that needs to be performed, such as running a boefje, normalizer or for generating a report. Each task is performed on an object (such as a hostname, finding, DNS records, etc.) and tasks have a status to show if the task is completed, scheduled, queued, etc. Each task contains meta and raw data that can be downloaded. This is the output, error message, proof, security hashes, etc. that belongs to the boefje or normalizer. Tasks can also be rescheduled and filtered to find specific tasks. 
+All tasks can be found on the Tasks page. A task is created for each job that needs to be performed, such as running a boefje, normalizer or for generating a report. Each task is performed on an object (such as a hostname, finding, DNS records, etc.) and tasks have a status to show if the task is completed, scheduled, queued, etc. Each task contains meta and raw data that can be downloaded. This is the output, error message, proof, security hashes, etc. that belongs to the boefje or normalizer. Tasks can also be rescheduled and filtered to find specific tasks.
 
-Tasks are organised between the boefje and normalizer tabs. The image below shows what the boefje tab could look like. 
+Tasks are organised between the boefje and normalizer tabs. The image below shows what the boefje tab could look like.
 
 .. image:: img/tasks-boefjes.png
   :alt: overview of boefje tasks
 
-The image below shows the normalizer tasks by clicking on the normalizer tab. 
+The image below shows the normalizer tasks by clicking on the normalizer tab.
 
 .. image:: img/tasks-normalizers.png
   :alt: overview of normalizer tasks
 
-The normalizer tab has a special functionality called 'yielded objects'. If the normalizer was able to extract new data (points) this will result in new yielded objects. As an example below, the DNS records for the hostname `mispo.es` are parsed. The normalizer identifies various DNS records (A, NS, MX, SOA) and other information and creates objects for each of the identified information. This information is now also available to other tools to be parsed, if possible. 
+The normalizer tab has a special functionality called 'yielded objects'. If the normalizer was able to extract new data (points) this will result in new yielded objects. As an example below, the DNS records for the hostname `mispo.es` are parsed. The normalizer identifies various DNS records (A, NS, MX, SOA) and other information and creates objects for each of the identified information. This information is now also available to other tools to be parsed, if possible.
 
 .. image:: img/tasks-normalizer-yielded-objects.png
   :alt: yielded objects for normalizers
@@ -147,7 +147,7 @@ The normalizer tab has a special functionality called 'yielded objects'. If the 
 Members
 -------
 
-The Members page allows for user management and is visible to users who have the rights to do this. When you have sufficient rights you can add new users either manually or through a file upload (CSV). This page also shows the accepted and assigned clearance levels to each user and whether or not the user is active. 
+The Members page allows for user management and is visible to users who have the rights to do this. When you have sufficient rights you can add new users either manually or through a file upload (CSV). This page also shows the accepted and assigned clearance levels to each user and whether or not the user is active.
 
 .. image:: img/members.png
   :alt: Members page
@@ -155,7 +155,7 @@ The Members page allows for user management and is visible to users who have the
 Settings
 --------
 
-The Settings page shows general information and its settings. In some cases you might want to add tags to the organisation or decide to manually run all bits. This can be done from the settings page. If you created a new organization, you can also add the indemnification on this page. 
+The Settings page shows general information and its settings. In some cases you might want to add tags to the organisation or decide to manually run all bits. This can be done from the settings page. If you created a new organization, you can also add the indemnification on this page.
 
 * Organization data
 * Indemnification
