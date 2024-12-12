@@ -21,6 +21,7 @@ from reports.views.base import ReportBreadcrumbs, ReportDataDict, get_selection
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import OctopoesView, ReportList
 from rocky.views.scheduler import SchedulerView
+from cron_descriptor import get_description, ExpressionDescriptor
 
 logger = structlog.get_logger(__name__)
 
@@ -78,7 +79,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
                                 "schedule_id": schedule["id"],
                                 "enabled": schedule["enabled"],
                                 "recipe": recipe_ooi,
-                                "cron": schedule["schedule"],
+                                "cron": get_description(schedule["schedule"]),
                                 "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
                                 "reports": report_oois,
                             }
