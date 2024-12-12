@@ -80,7 +80,11 @@ def test_disallowed_csp_headers_disallow_custom_hostname():
     results = list(
         nibble(
             http_header_hostname,
-            Config(bit_id="disallowed-csp-hostnames", config={"disallowed_hostnames": "example.com"}),
+            Config(
+                ooi=http_header_hostname.reference,
+                bit_id="disallowed-csp-hostnames",
+                config={"disallowed_hostnames": "example.com"},
+            ),
         )
     )
 
