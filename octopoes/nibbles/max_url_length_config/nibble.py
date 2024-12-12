@@ -12,7 +12,8 @@ def query(targets: list[Reference | None]) -> str:
                 :where [
                     (or
                         (and [?var :object_type "URL" ] [?var :URL/primary_key {links[0]}])
-                        (and [?var :object_type "Config" ] [?var :Config/primary_key {links[1]}])
+                        (and [?var :object_type "Config" ] [?var :Config/bit_id "superkat"]\
+ [?var :Config/primary_key {links[1]}])
                     )
                 ]
             }}

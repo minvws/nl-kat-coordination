@@ -2,7 +2,6 @@ import os
 import sys
 from collections.abc import Iterator
 from datetime import datetime
-from ipaddress import IPv4Address, ip_address
 from unittest.mock import Mock
 
 import pytest
@@ -12,10 +11,9 @@ from nibbles.runner import NibblesRunner, nibble_hasher
 from octopoes.core.service import OctopoesService
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.config import Config
-from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, FindingType, KATFindingType, RiskLevelSeverity
-from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
-from octopoes.models.ooi.web import URL, HostnameHTTPURL, IPAddressHTTPURL, WebScheme
+from octopoes.models.ooi.network import Network
+from octopoes.models.ooi.web import URL
 from octopoes.models.origin import OriginType
 
 if os.environ.get("CI") != "1":
@@ -47,49 +45,6 @@ def test_dummy_nibble(xtdb_octopoes_service: OctopoesService, event_manager: Moc
     assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == ctx
 
 
-def url_classification(url: URL) -> Iterator[OOI]:
-    if url.raw.scheme == "http" or url.raw.scheme == "https":
-        port = url.raw.port
-        if port is None:
-            if url.raw.scheme == "https":
-                port = 443
-            elif url.raw.scheme == "http":
-                port = 80
-
-        path = url.raw.path if url.raw.path is not None else "/"
-
-        default_args = {"network": url.network, "scheme": WebScheme(url.raw.scheme), "port": port, "path": path}
-        try:
-            addr = ip_address(url.raw.host)
-        except ValueError:
-            hostname = Hostname(network=url.network, name=url.raw.host)
-            hostname_url = HostnameHTTPURL(netloc=hostname.reference, **default_args)
-            original_url = URL(network=url.network, raw=url.raw, web_url=hostname_url.reference)
-            yield hostname
-            yield hostname_url
-            yield original_url
-        else:
-            if isinstance(addr, IPv4Address):
-                ip = IPAddressV4(network=url.network, address=addr)
-                ip_url = IPAddressHTTPURL(netloc=ip.reference, **default_args)
-                original_url = URL(network=url.network, raw=url.raw, web_url=ip_url.reference)
-                yield ip
-                yield ip_url
-                yield original_url
-            else:
-                ip = IPAddressV6(network=url.network, address=addr)
-                ip_url = IPAddressHTTPURL(netloc=ip.reference, **default_args)
-                original_url = URL(network=url.network, raw=url.raw, web_url=ip_url.reference)
-                yield ip
-                yield ip_url
-                yield original_url
-
-
-url_classification_params = [NibbleParameter(object_type=URL)]
-url_classification_nibble = NibbleDefinition(name="url_classification", signature=url_classification_params)
-url_classification_nibble.payload = getattr(sys.modules[__name__], "url_classification")
-
-
 def test_url_classification_nibble(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
@@ -97,8 +52,9 @@ def test_url_classification_nibble(xtdb_octopoes_service: OctopoesService, event
         xtdb_octopoes_service.scan_profile_repository,
         perform_writes=False,
     )
+    nibble = xtdb_octopoes_service.nibbler.nibbles["url_classification"]
     xtdb_octopoes_service.nibbler.nibbles = {}
-    nibbler.nibbles = {url_classification_nibble.id: url_classification_nibble}
+    nibbler.nibbles = {nibble.id: nibble}
     network = Network(name="internet")
     xtdb_octopoes_service.ooi_repository.save(network, valid_time)
     url = URL(network=network.reference, raw="https://mispo.es/")
@@ -200,52 +156,15 @@ def test_find_network_url_nibble(xtdb_octopoes_service: OctopoesService, event_m
             assert nibblet.result == [t.reference for t in target]
 
 
-def max_url_length_config(url: URL, config: Config) -> Iterator[OOI]:
-    if "max_length" in config.config:
-        max_length = int(str(config.config["max_length"]))
-        if len(str(url.raw)) >= max_length:
-            yield Finding(
-                finding_type=KATFindingType(id="URL exceeds configured maximum length").reference,
-                ooi=url.reference,
-                proof=f"The length of {url.raw} ({len(str(url.raw))}) exceeds the configured maximum length \
-({max_length}).",
-            )
-
-
-def max_url_length_query_query(targets: list[Reference | None]) -> str:
-    links = list(f'"{target}"' if isinstance(target, Reference) else "" for target in targets)
-    return f"""{{
-            :query {{
-                :find [(pull ?var [*])]
-                :where [
-                    (or
-                        (and [?var :object_type "URL" ] [?var :URL/primary_key {links[0]}])
-                        (and [?var :object_type "Config" ] [?var :Config/primary_key {links[1]}])
-                    )
-                ]
-            }}
-        }}
-        """
-
-
-max_url_length_config_params = [
-    NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]"),
-    NibbleParameter(object_type=Config, parser="[*][?object_type == 'Config'][]"),
-]
-max_url_length_config_nibble = NibbleDefinition(
-    name="max_url_length_config", signature=max_url_length_config_params, query=max_url_length_query_query
-)
-max_url_length_config_nibble.payload = getattr(sys.modules[__name__], "max_url_length_config")
-
-
 def test_max_length_config_nibble(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
         xtdb_octopoes_service.scan_profile_repository,
     )
+    nibble = xtdb_octopoes_service.nibbler.nibbles["max_url_length_config"]
     xtdb_octopoes_service.nibbler.nibbles = {}
-    nibbler.nibbles = {max_url_length_config_nibble.id: max_url_length_config_nibble}
+    nibbler.nibbles = {nibble.id: nibble}
     network = Network(name="internet")
     xtdb_octopoes_service.ooi_repository.save(network, valid_time)
     url = URL(network=network.reference, raw="https://mispo.es/")
@@ -272,9 +191,7 @@ def test_max_length_config_nibble(xtdb_octopoes_service: OctopoesService, event_
 
     assert xtdb_url in result
     assert len(result[xtdb_url]["max_url_length_config"]) == 1
-    assert result[xtdb_url]["max_url_length_config"][tuple([xtdb_url, config])] == set(
-        max_url_length_config(xtdb_url, config)
-    )
+    assert result[xtdb_url]["max_url_length_config"][tuple([xtdb_url, config])] == set(nibble([xtdb_url, config]))
 
 
 def callable_query(url1: URL, url2: URL) -> Iterator[OOI]:
