@@ -57,7 +57,12 @@ def test_disallowed_csp_headers_allow_url_shortener():
 
     results = list(
         nibble(
-            http_header_hostname, Config(bit_id="disallowed-csp-hostnames", config={"disallow_url_shorteners": False})
+            http_header_hostname,
+            Config(
+                ooi=http_header_hostname.reference,
+                bit_id="disallowed-csp-hostnames",
+                config={"disallow_url_shorteners": False},
+            ),
         )
     )
 
