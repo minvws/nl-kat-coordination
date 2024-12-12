@@ -2,7 +2,7 @@ import uuid
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, Literal
 
 from opentelemetry import trace
 from pydantic import ValidationError
@@ -24,7 +24,7 @@ class BoefjeScheduler(Scheduler):
         ranker: The ranker to calculate the priority of a task.
     """
 
-    ID: str = "boefje"
+    ID: Literal["boefje"] = "boefje"
     TYPE: models.SchedulerType = models.SchedulerType.BOEFJE
     ITEM_TYPE: Any = models.BoefjeTask
 

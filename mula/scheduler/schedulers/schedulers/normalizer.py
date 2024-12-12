@@ -1,7 +1,7 @@
 import uuid
 from concurrent import futures
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, Literal
 
 from opentelemetry import trace
 
@@ -20,7 +20,7 @@ class NormalizerScheduler(Scheduler):
         ranker: The ranker to calculate the priority of a task.
     """
 
-    ID: str = "normalizer"
+    ID: Literal["normalizer"] = "normalizer"
     TYPE: models.SchedulerType = models.SchedulerType.NORMALIZER
     ITEM_TYPE: Any = models.NormalizerTask
 

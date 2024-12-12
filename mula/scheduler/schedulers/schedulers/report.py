@@ -1,6 +1,6 @@
 from concurrent import futures
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Literal
 
 from opentelemetry import trace
 
@@ -15,7 +15,7 @@ tracer = trace.get_tracer(__name__)
 class ReportScheduler(Scheduler):
     """Scheduler implementation for the creation of ReportTask models."""
 
-    ID: str = "report"
+    ID: Literal["report"] = "report"
     TYPE: models.SchedulerType = models.SchedulerType.REPORT
     ITEM_TYPE: Any = models.ReportTask
 
