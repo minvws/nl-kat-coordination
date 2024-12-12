@@ -10,6 +10,8 @@ import httpx
 import structlog
 from docker.errors import APIError, ContainerError, ImageNotFound
 from httpx import HTTPError
+from jsonschema.exceptions import ValidationError
+from jsonschema.validators import validate
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient, get_octopoes_api_connector
@@ -21,6 +23,8 @@ from boefjes.plugins.models import _default_mime_types
 from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference, ScanLevel
+
+from boefjes.storage.interfaces import SettingsNotConformingToSchema
 
 MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought to be reasonable
 
