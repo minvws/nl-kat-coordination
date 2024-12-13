@@ -1,6 +1,7 @@
 import datetime
 import os
 import uuid
+from functools import cache
 
 import httpx
 import structlog
@@ -97,6 +98,25 @@ class SchedulerAPIClient(SchedulerClientInterface):
         return boefje_meta
 
 
+@cache
+def boefje_env_variables() -> dict:
+    """
+    Return all environment variables that start with BOEFJE_. The returned
+    keys have the BOEFJE_ prefix removed.
+    """
+
+    boefje_variables = {}
+    for key, value in os.environ.items():
+        if key.startswith("BOEFJE_"):
+            boefje_variables[key.removeprefix("BOEFJE_")] = value
+
+    return boefje_variables
+
+
+def get_system_env_settings_for_boefje(allowed_keys: list[str]) -> dict:
+    return {key: value for key, value in boefje_env_variables().items() if key in allowed_keys}
+
+
 def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None) -> dict[str, str]:
     try:
         katalogus_api = str(settings.katalogus_api).rstrip("/")
@@ -109,11 +129,7 @@ def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None
         raise
 
     allowed_keys = schema.get("properties", []) if schema else []
-    new_env = {
-        key.split("BOEFJE_", 1)[1]: value
-        for key, value in os.environ.items()
-        if key.startswith("BOEFJE_") and key in allowed_keys
-    }
+    new_env = get_system_env_settings_for_boefje(allowed_keys)
 
     settings_from_katalogus = response.json()
 

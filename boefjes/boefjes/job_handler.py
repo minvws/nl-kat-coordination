@@ -1,25 +1,17 @@
-import os
 from collections.abc import Callable
 from datetime import datetime, timezone
-from functools import cache
 from typing import cast
 
 import docker
-import httpx
 import structlog
 from docker.errors import APIError, ContainerError, ImageNotFound
 from httpx import HTTPError
-from jsonschema.exceptions import ValidationError
-from jsonschema.validators import validate
 
-import boefjes.worker.boefje_handler
-import boefjes.worker.repository
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient, get_octopoes_api_connector
 from boefjes.config import settings
 from boefjes.worker.job_models import BoefjeMeta
 from boefjes.normalizer_interfaces import NormalizerJobRunner
-from boefjes.storage.interfaces import SettingsNotConformingToSchema
 from boefjes.worker.interfaces import Handler, Task, TaskStatus
 from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -30,58 +22,6 @@ logger = structlog.get_logger(__name__)
 bytes_api_client = BytesAPIClient(
     str(settings.bytes_api), username=settings.bytes_username, password=settings.bytes_password
 )
-
-
-@cache
-def boefje_env_variables() -> dict:
-    """
-    Return all environment variables that start with BOEFJE_. The returned
-    keys have the BOEFJE_ prefix removed.
-    """
-
-    boefje_variables = {}
-    for key, value in os.environ.items():
-        if key.startswith("BOEFJE_"):
-            boefje_variables[key.removeprefix("BOEFJE_")] = value
-
-    return boefje_variables
-
-
-def get_system_env_settings_for_boefje(allowed_keys: list[str]) -> dict:
-    return {key: value for key, value in boefje_env_variables().items() if key in allowed_keys}
-
-
-def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None) -> dict[str, str]:
-    try:
-        katalogus_api = str(settings.katalogus_api).rstrip("/")
-        response = httpx.get(
-            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings",
-            timeout=settings.outgoing_request_timeout,
-        )
-        response.raise_for_status()
-    except HTTPError:
-        logger.exception("Error getting environment settings")
-        raise
-
-    allowed_keys = schema.get("properties", []) if schema else []
-    new_env = get_system_env_settings_for_boefje(allowed_keys)
-
-    settings_from_katalogus = response.json()
-
-    for key, value in settings_from_katalogus.items():
-        if key in allowed_keys:
-            new_env[key] = value
-
-    # The schema, besides dictating that a boefje cannot run if it is not matched, also provides an extra safeguard:
-    # it is possible to inject code if arguments are passed that "escape" the call to a tool. Hence, we should enforce
-    # the schema somewhere and make the schema as strict as possible.
-    if schema is not None:
-        try:
-            validate(instance=new_env, schema=schema)
-        except ValidationError as e:
-            raise SettingsNotConformingToSchema(boefje_meta.boefje.id, e.message) from e
-
-    return new_env
 
 
 class DockerBoefjeHandler(Handler):
