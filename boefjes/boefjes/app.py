@@ -3,7 +3,6 @@ from sqlalchemy.orm import sessionmaker
 from boefjes.clients.scheduler_client import SchedulerAPIClient
 from boefjes.config import Settings
 from boefjes.dependencies.plugins import PluginService
-from boefjes.worker.interfaces import Handler
 from boefjes.job_handler import (
     BoefjeHandler,
     CompositeBoefjeHandler,
@@ -16,6 +15,7 @@ from boefjes.local_repository import get_local_repository
 from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.db import get_engine
 from boefjes.sql.plugin_storage import create_plugin_storage
+from boefjes.worker.interfaces import Handler
 from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
 
 

@@ -7,7 +7,6 @@ from ipaddress import IPv4Network, ip_network
 from pydantic import ValidationError
 
 from boefjes.normalizer_models import NormalizerDeclaration, NormalizerOutput
-from octopoes.models import Reference
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network

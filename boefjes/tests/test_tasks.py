@@ -9,12 +9,12 @@ from uuid import UUID
 
 import pytest
 
-from boefjes.worker.interfaces import JobRuntimeError, Task, TaskStatus
 from boefjes.job_handler import BoefjeHandler
 from boefjes.job_models import BoefjeMeta, InvalidReturnValueNormalizer, NormalizerMeta
 from boefjes.local import LocalBoefjeJobRunner
 from boefjes.local_repository import LocalPluginRepository
 from boefjes.models import Bit, Boefje, Normalizer, PluginType
+from boefjes.worker.interfaces import JobRuntimeError, Task, TaskStatus
 from tests.loading import get_dummy_data
 
 boefjes = [

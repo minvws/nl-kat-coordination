@@ -16,15 +16,14 @@ from jsonschema.validators import validate
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient, get_octopoes_api_connector
 from boefjes.config import settings
-from boefjes.worker.interfaces import BoefjeJobRunner, Handler, Task, TaskStatus
 from boefjes.job_models import BoefjeMeta
 from boefjes.normalizer_interfaces import NormalizerJobRunner
 from boefjes.plugins.models import _default_mime_types
+from boefjes.storage.interfaces import SettingsNotConformingToSchema
+from boefjes.worker.interfaces import BoefjeJobRunner, Handler, Task, TaskStatus
 from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference, ScanLevel
-
-from boefjes.storage.interfaces import SettingsNotConformingToSchema
 
 MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought to be reasonable
 
@@ -48,6 +47,7 @@ def boefje_env_variables() -> dict:
             boefje_variables[key.removeprefix("BOEFJE_")] = value
 
     return boefje_variables
+
 
 def get_system_env_settings_for_boefje(allowed_keys: list[str]) -> dict:
     return {key: value for key, value in boefje_env_variables().items() if key in allowed_keys}

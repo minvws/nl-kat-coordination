@@ -2,8 +2,6 @@ import json
 
 import defusedxml.ElementTree as ET
 
-from boefjes.job_models import BoefjeMeta
-
 FINDING_TYPE_PATH = "boefjes/plugins/kat_cwe_finding_types/cwec_v4.16.xml"
 
 
