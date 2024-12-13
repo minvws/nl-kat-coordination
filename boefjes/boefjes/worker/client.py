@@ -16,13 +16,13 @@ class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
         response.raise_for_status()
 
     def get_queues(self) -> list[Queue]:
-        response = self._session.get("/api/v0/queues")
+        response = self._session.get("/api/v0/scheduler/queues")
         self._verify_response(response)
 
         return TypeAdapter(list[Queue]).validate_json(response.content)
 
     def pop_item(self, queue_id: str) -> Task | None:
-        response = self._session.post(f"/api/v0/queues/{queue_id}/pop")
+        response = self._session.post(f"/api/v0/scheduler/queues/{queue_id}/pop")
         self._verify_response(response)
 
         task = TypeAdapter(Task | None).validate_json(response.content)
@@ -33,15 +33,17 @@ class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
         return task
 
     def push_item(self, p_item: Task) -> None:
-        response = self._session.post(f"/api/v0/queues/{p_item.scheduler_id}/push", content=p_item.model_dump_json())
+        response = self._session.post(
+            f"/api/v0/scheduler/queues/{p_item.scheduler_id}/push", content=p_item.model_dump_json()
+        )
         self._verify_response(response)
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
-        response = self._session.patch(f"/api/v0/tasks/{task_id}", json={"status": status.value})
+        response = self._session.patch(f"/api/v0/scheduler/tasks/{task_id}", json={"status": status.value})
         self._verify_response(response)
 
     def get_task(self, task_id: uuid.UUID) -> Task:
-        response = self._session.get(f"/api/v0/tasks/{task_id}")
+        response = self._session.get(f"/api/v0/scheduler/tasks/{task_id}")
         self._verify_response(response)
 
         task = Task.model_validate_json(response.content)
