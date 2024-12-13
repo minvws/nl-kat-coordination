@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.11-slim as base
 
 WORKDIR /app
 RUN adduser --disabled-password --gecos '' nonroot
@@ -42,7 +42,25 @@ RUN find ./boefjes -name 'requirements.txt' -execdir sh -c "cat {} && echo" \; |
 RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip && pip install httpx && \
     pip install -r /tmp/boefjes-requirements.txt
 
-COPY ./images/generic_oci_adapter.py .
+USER nonroot
+
+
+FROM base as standalone
 
 ENTRYPOINT ["/usr/local/bin/python", "-m", "generic_oci_adapter"]
-USER nonroot
+COPY ./images/generic_oci_adapter.py .
+
+
+FROM base as worker
+
+ENTRYPOINT ["python", "-m", "worker"]
+
+RUN --mount=type=cache,target=/root/.cache pip install structlog
+RUN --mount=type=cache,target=/root/.cache pip install pydantic
+RUN --mount=type=cache,target=/root/.cache pip install jsonschema
+RUN --mount=type=cache,target=/root/.cache pip install croniter
+
+COPY ./boefjes/worker ./worker
+COPY ./boefjes/logging.json logging.json
+
+FROM standalone
