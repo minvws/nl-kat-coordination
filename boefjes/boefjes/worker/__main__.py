@@ -6,7 +6,7 @@ from pathlib import Path
 import click
 import structlog
 
-from boefjes.worker.client import BoefjeAPIClient
+from .client import BoefjeAPIClient
 from .boefje_handler import BoefjeHandler
 from .boefje_runner import LocalBoefjeJobRunner
 from .repository import get_local_repository
