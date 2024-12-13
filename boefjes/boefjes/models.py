@@ -1,5 +1,4 @@
 import datetime
-from enum import Enum
 from typing import Literal
 
 from croniter import croniter
@@ -77,11 +76,6 @@ class Bit(Plugin):
 
 
 PluginType = Boefje | Normalizer | Bit
-
-
-class EncryptionMiddleware(Enum):
-    IDENTITY = "IDENTITY"
-    NACL_SEALBOX = "NACL_SEALBOX"
 
 
 class PaginationParameters(BaseModel):

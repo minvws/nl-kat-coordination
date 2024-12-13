@@ -1,5 +1,6 @@
 import logging
 import os
+from enum import Enum
 from pathlib import Path
 from typing import Any, Literal
 
@@ -7,13 +8,15 @@ from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath, IPvAnyAddress, Postgr
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 from pydantic_settings.sources import EnvSettingsSource
 
-from boefjes.models import EncryptionMiddleware
-
 BASE_DIR: Path = Path(__file__).parent.resolve()
 
 # Set base dir to something generic when compiling environment docs
 if os.getenv("DOCS"):
     BASE_DIR = Path("../")
+
+class EncryptionMiddleware(Enum):
+    IDENTITY = "IDENTITY"
+    NACL_SEALBOX = "NACL_SEALBOX"
 
 
 class BackwardsCompatibleEnvSettings(EnvSettingsSource):

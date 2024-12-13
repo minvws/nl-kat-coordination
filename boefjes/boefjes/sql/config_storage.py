@@ -3,9 +3,8 @@ import logging
 
 from sqlalchemy.orm import Session
 
-from boefjes.config import settings as config_settings
+from boefjes.config import settings as config_settings, EncryptionMiddleware
 from boefjes.dependencies.encryption import EncryptMiddleware, IdentityMiddleware, NaclBoxMiddleware
-from boefjes.models import EncryptionMiddleware
 from boefjes.sql.db import ObjectNotFoundException
 from boefjes.sql.db_models import BoefjeConfigInDB, BoefjeInDB, NormalizerConfigInDB, NormalizerInDB, OrganisationInDB
 from boefjes.sql.session import SessionMixin
