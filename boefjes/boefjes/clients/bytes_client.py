@@ -1,7 +1,7 @@
 import typing
 import uuid
 from base64 import b64encode
-from collections.abc import Callable, Set
+from collections.abc import Callable
 from functools import wraps
 from typing import Any
 from uuid import UUID
@@ -10,6 +10,7 @@ import structlog
 from httpx import Client, HTTPStatusError, HTTPTransport, Response
 
 from boefjes.config import settings
+from boefjes.worker.interfaces import BoefjeStorageInterface
 from boefjes.worker.job_models import BoefjeMeta, NormalizerMeta, RawDataMeta
 
 BYTES_API_CLIENT_VERSION = "0.3"
@@ -33,7 +34,7 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
     return typing.cast(ClientSessionMethod, wrapper)
 
 
-class BytesAPIClient:
+class BytesAPIClient(BoefjeStorageInterface):
     def __init__(self, base_url: str, username: str, password: str):
         self._session = Client(
             base_url=base_url,
@@ -98,7 +99,7 @@ class BytesAPIClient:
         return NormalizerMeta.model_validate_json(response.content)
 
     @retry_with_login
-    def save_raw(self, boefje_meta_id: str, raw: str | bytes, mime_types: Set[str] = frozenset()) -> UUID:
+    def save_raw(self, boefje_meta_id: UUID, raw: str | bytes, mime_types: set[str] = frozenset()) -> UUID:
         file_name = "raw"  # The name provides a key for all ids returned, so this is arbitrary as we only upload 1 file
 
         response = self._session.post(

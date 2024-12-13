@@ -13,7 +13,7 @@ from boefjes.normalizer_models import (
     NormalizerOutput,
     NormalizerResults,
 )
-from boefjes.worker.interfaces import BoefjeJobRunner, JobRuntimeError
+from boefjes.worker.interfaces import JobRuntimeError
 from octopoes.models import OOI, DeclaredScanProfile
 
 logger = structlog.get_logger(__name__)
@@ -34,7 +34,7 @@ class TemporaryEnvironment:
         os.environ.update(self._original_environment)
 
 
-class LocalBoefjeJobRunner(BoefjeJobRunner):
+class LocalBoefjeJobRunner:
     def __init__(self, local_repository: LocalPluginRepository):
         self.local_repository = local_repository
 

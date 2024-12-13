@@ -43,12 +43,7 @@ class Task(BaseModel):
 
 
 class Handler:
-    def handle(self, task: Task):
-        raise NotImplementedError()
-
-
-class BoefjeJobRunner:
-    def run(self, boefje_meta: BoefjeMeta, environment: dict[str, str]) -> list[tuple[set, bytes | str]]:
+    def handle(self, task: Task) -> None:
         raise NotImplementedError()
 
 
@@ -66,4 +61,12 @@ class SchedulerClientInterface:
         raise NotImplementedError()
 
     def push_item(self, p_item: Task) -> None:
+        raise NotImplementedError()
+
+
+class BoefjeStorageInterface:
+    def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
+        raise NotImplementedError()
+
+    def save_raw(self, boefje_meta_id: uuid.UUID, raw: str | bytes, mime_types: set[str] = frozenset()) -> uuid.UUID:
         raise NotImplementedError()

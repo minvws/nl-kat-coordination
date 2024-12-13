@@ -9,7 +9,7 @@ from uuid import UUID
 
 import pytest
 
-from boefjes.job_handler import BoefjeHandler
+from boefjes.worker.boefje_handler import BoefjeHandler
 from boefjes.worker.job_models import BoefjeMeta, InvalidReturnValueNormalizer, NormalizerMeta
 from boefjes.local.local import LocalBoefjeJobRunner
 from boefjes.local.local_repository import LocalPluginRepository

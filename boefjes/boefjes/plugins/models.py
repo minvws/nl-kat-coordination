@@ -10,6 +10,7 @@ from typing import Protocol
 from jsonschema.exceptions import SchemaError
 
 from boefjes.models import Boefje, Normalizer
+from boefjes.worker.boefje_handler import _default_mime_types
 
 BOEFJES_DIR = Path(__file__).parent
 
@@ -100,12 +101,3 @@ def hash_path(path: Path) -> str:
                     folder_hash.update(chunk)
 
     return folder_hash.hexdigest()
-
-
-def _default_mime_types(boefje: Boefje) -> set:
-    mime_types = {f"boefje/{boefje.id}"}
-
-    if boefje.version is not None:
-        mime_types = mime_types.union({f"boefje/{boefje.id}-{boefje.version}"})
-
-    return mime_types

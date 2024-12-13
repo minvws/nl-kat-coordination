@@ -13,19 +13,17 @@ from httpx import HTTPError
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
 
+import boefjes.worker.boefje_handler
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient, get_octopoes_api_connector
 from boefjes.config import settings
 from boefjes.worker.job_models import BoefjeMeta
 from boefjes.normalizer_interfaces import NormalizerJobRunner
-from boefjes.plugins.models import _default_mime_types
 from boefjes.storage.interfaces import SettingsNotConformingToSchema
-from boefjes.worker.interfaces import BoefjeJobRunner, Handler, Task, TaskStatus
+from boefjes.worker.interfaces import Handler, Task, TaskStatus
 from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference, ScanLevel
-
-MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought to be reasonable
 
 logger = structlog.get_logger(__name__)
 
@@ -105,7 +103,7 @@ class DockerBoefjeHandler(Handler):
         # local import to prevent circular dependency
         import boefjes.plugins.models
 
-        stderr_mime_types = boefjes.plugins.models._default_mime_types(boefje_meta.boefje)
+        stderr_mime_types = boefjes.worker.boefje_handler._default_mime_types(boefje_meta.boefje)
 
         task_id = boefje_meta.id
         boefje_meta.started_at = datetime.now(timezone.utc)
@@ -157,57 +155,6 @@ class DockerBoefjeHandler(Handler):
         except APIError as e:
             logger.error("Docker API error: %s", e)
             self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
-
-
-class BoefjeHandler(Handler):
-    def __init__(self, job_runner: BoefjeJobRunner, bytes_client: BytesAPIClient):
-        self.job_runner = job_runner
-        self.bytes_client = bytes_client
-
-    def handle(self, task: Task) -> None:
-        boefje_meta = task.data
-
-        if not isinstance(boefje_meta, BoefjeMeta):
-            raise ValueError("Plugin id does not belong to a boefje")
-
-        logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
-
-        boefje_meta.started_at = datetime.now(timezone.utc)
-        boefje_results: list[tuple[set, bytes | str]] = []
-
-        try:
-            boefje_results = self.job_runner.run(boefje_meta, boefje_meta.environment or {})
-        except:
-            logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
-            boefje_results = [({"error/boefje"}, traceback.format_exc())]
-
-            raise
-        finally:
-            boefje_meta.ended_at = datetime.now(timezone.utc)
-            logger.info("Saving to Bytes for boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
-
-            self.bytes_client.save_boefje_meta(boefje_meta)
-
-            if boefje_results:
-                for boefje_added_mime_types, output in boefje_results:
-                    valid_mimetypes = set()
-                    for mimetype in boefje_added_mime_types:
-                        if len(mimetype) < MIMETYPE_MIN_LENGTH or "/" not in mimetype:
-                            logger.warning(
-                                "Invalid mime-type encountered in output for boefje %s[%s]",
-                                boefje_meta.boefje.id,
-                                str(boefje_meta.id),
-                            )
-                        else:
-                            valid_mimetypes.add(mimetype)
-                    raw_file_id = self.bytes_client.save_raw(
-                        boefje_meta.id, output, _default_mime_types(boefje_meta.boefje).union(valid_mimetypes)
-                    )
-                    logger.info(
-                        "Saved raw file %s for boefje %s[%s]", raw_file_id, boefje_meta.boefje.id, boefje_meta.id
-                    )
-            else:
-                logger.info("No results for boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
 
 
 class NormalizerHandler(Handler):
