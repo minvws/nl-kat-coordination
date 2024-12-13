@@ -9,7 +9,7 @@ from uuid import UUID
 
 import pytest
 
-from boefjes.interfaces import JobRuntimeError, Task, TaskStatus
+from boefjes.worker.interfaces import JobRuntimeError, Task, TaskStatus
 from boefjes.job_handler import BoefjeHandler
 from boefjes.job_models import BoefjeMeta, InvalidReturnValueNormalizer, NormalizerMeta
 from boefjes.local import LocalBoefjeJobRunner

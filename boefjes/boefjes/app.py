@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from boefjes.clients.scheduler_client import SchedulerAPIClient
 from boefjes.config import Settings
 from boefjes.dependencies.plugins import PluginService
-from boefjes.interfaces import Handler
+from boefjes.worker.interfaces import Handler
 from boefjes.job_handler import (
     BoefjeHandler,
     CompositeBoefjeHandler,

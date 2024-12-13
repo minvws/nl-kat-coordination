@@ -3,7 +3,7 @@ from collections.abc import Iterable
 
 import structlog
 
-from boefjes.interfaces import BoefjeJobRunner, JobRuntimeError
+from boefjes.worker.interfaces import BoefjeJobRunner, JobRuntimeError
 from boefjes.job_models import BoefjeMeta, InvalidReturnValueNormalizer, NormalizerMeta, ObservationsWithoutInputOOI
 from boefjes.local_repository import LocalPluginRepository
 from boefjes.normalizer_interfaces import NormalizerJobRunner

@@ -16,7 +16,7 @@ from jsonschema.validators import validate
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient, get_octopoes_api_connector
 from boefjes.config import settings
-from boefjes.interfaces import BoefjeJobRunner, Handler, Task, TaskStatus
+from boefjes.worker.interfaces import BoefjeJobRunner, Handler, Task, TaskStatus
 from boefjes.job_models import BoefjeMeta
 from boefjes.normalizer_interfaces import NormalizerJobRunner
 from boefjes.plugins.models import _default_mime_types

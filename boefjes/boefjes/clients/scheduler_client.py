@@ -11,7 +11,7 @@ from pydantic import TypeAdapter
 
 from boefjes.config import settings
 from boefjes.dependencies.plugins import PluginService
-from boefjes.interfaces import Queue, SchedulerClientInterface, Task, TaskStatus
+from boefjes.worker.interfaces import Queue, SchedulerClientInterface, Task, TaskStatus
 from boefjes.job_models import BoefjeMeta
 from boefjes.storage.interfaces import SettingsNotConformingToSchema
 from octopoes.connector.octopoes import OctopoesAPIConnector

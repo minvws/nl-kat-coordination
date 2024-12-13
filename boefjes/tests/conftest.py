@@ -15,7 +15,7 @@ from sqlalchemy.orm import sessionmaker
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import settings
 from boefjes.dependencies.plugins import PluginService, get_plugin_service
-from boefjes.interfaces import Handler, Queue, SchedulerClientInterface, Task, TaskStatus
+from boefjes.worker.interfaces import Handler, Queue, SchedulerClientInterface, Task, TaskStatus
 from boefjes.job_handler import bytes_api_client
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.katalogus.root import app

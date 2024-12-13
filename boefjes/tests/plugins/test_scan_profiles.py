@@ -7,7 +7,7 @@ import pytest
 from pydantic import ValidationError
 
 from boefjes.config import Settings
-from boefjes.interfaces import Task, TaskStatus
+from boefjes.worker.interfaces import Task, TaskStatus
 from boefjes.job_handler import NormalizerHandler
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import DeclaredScanProfile
