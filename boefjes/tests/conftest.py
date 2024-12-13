@@ -18,8 +18,8 @@ from boefjes.dependencies.plugins import PluginService, get_plugin_service
 from boefjes.job_handler import bytes_api_client
 from boefjes.worker.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.katalogus.root import app
-from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
-from boefjes.local_repository import (
+from boefjes.local.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
+from boefjes.local.local_repository import (
     LocalPluginRepository,
     _cached_resolve_boefjes,
     _cached_resolve_normalizers,
