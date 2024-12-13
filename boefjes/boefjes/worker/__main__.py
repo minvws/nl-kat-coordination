@@ -6,6 +6,7 @@ from pathlib import Path
 import click
 import structlog
 
+from boefjes.worker.client import BoefjeAPIClient
 from .boefje_handler import BoefjeHandler
 from .boefje_runner import LocalBoefjeJobRunner
 from .repository import get_local_repository
@@ -46,17 +47,21 @@ def cli(log_level: str) -> None:
     logger.setLevel(log_level)
     logger.info("Starting runtime")
 
-    local_repository = get_local_repository()
-
-    scheduler = None  # TODO: boefje API proxy
-    boefje_storage = None  # TODO: boefje API proxy
-
-    handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), boefje_storage)
+    base_url = os.getenv("BOEFJE_API")
     pool_size = int(os.getenv("POOL_SIZE", "2"))
     poll_interval = float(os.getenv("POLL_INTERVAL", "10.0"))
     heartbeat = float(os.getenv("WORKER_HEARTBEAT", "1.0"))
 
-    SchedulerWorkerManager(handler, scheduler, pool_size, poll_interval, heartbeat).run(WorkerManager.Queue.BOEFJES)
+    if base_url is None:
+        raise ValueError("An API to communicate with is needed for the worker")
+
+    outgoing_request_timeout = int(os.getenv("OUTGOING_REQUEST_TIMEOUT", "30"))
+
+    local_repository = get_local_repository()
+    boefje_api = BoefjeAPIClient(base_url, outgoing_request_timeout)
+    handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), boefje_api)
+
+    SchedulerWorkerManager(handler, boefje_api, pool_size, poll_interval, heartbeat).run(WorkerManager.Queue.BOEFJES)
 
 
 if __name__ == "__main__":

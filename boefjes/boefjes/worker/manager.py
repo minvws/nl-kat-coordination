@@ -11,7 +11,7 @@ from queue import Queue
 import structlog
 from httpx import HTTPError
 
-# A deliberate relative import to make this module (more) self-contained
+# A deliberate relative import to make this module self-contained
 from .interfaces import Handler, SchedulerClientInterface, Task, TaskStatus
 
 logger = structlog.get_logger(__name__)

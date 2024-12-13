@@ -2,9 +2,9 @@ import datetime
 import uuid
 from enum import Enum
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-# A deliberate relative import to make this module (more) self-contained
+# A deliberate relative import to make this module self-contained
 from .job_models import BoefjeMeta, NormalizerMeta
 
 
@@ -42,6 +42,22 @@ class Task(BaseModel):
     modified_at: datetime.datetime
 
 
+class StatusEnum(str, Enum):
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+
+
+class File(BaseModel):
+    name: str | None = None
+    content: str = Field(json_schema_extra={"contentEncoding": "base64"})
+    tags: list[str] | None = None
+
+
+class BoefjeOutput(BaseModel):
+    status: StatusEnum
+    files: list[File] | None = None
+
+
 class Handler:
     def handle(self, task: Task) -> None:
         raise NotImplementedError()
@@ -65,8 +81,5 @@ class SchedulerClientInterface:
 
 
 class BoefjeStorageInterface:
-    def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
-        raise NotImplementedError()
-
-    def save_raw(self, boefje_meta_id: uuid.UUID, raw: str | bytes, mime_types: set[str] = frozenset()) -> uuid.UUID:
+    def save_raws(self, boefje_meta_id: uuid.UUID, boefje_output: BoefjeOutput) -> dict[str, uuid.UUID]:
         raise NotImplementedError()

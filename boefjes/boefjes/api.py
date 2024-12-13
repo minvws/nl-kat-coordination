@@ -1,14 +1,13 @@
 import base64
 import multiprocessing
 from datetime import datetime, timezone
-from enum import Enum
 from multiprocessing.context import ForkContext, ForkProcess
 from uuid import UUID
 
 import structlog
 from fastapi import Depends, FastAPI, HTTPException, Response
 from httpx import HTTPError, HTTPStatusError
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 from uvicorn import Config, Server
 
 from boefjes.clients.bytes_client import BytesAPIClient
@@ -17,7 +16,7 @@ from boefjes.config import settings
 from boefjes.dependencies.plugins import get_plugin_service
 from boefjes.worker.job_models import BoefjeMeta
 from boefjes.worker.repository import _default_mime_types
-from boefjes.worker.interfaces import TaskStatus
+from boefjes.worker.interfaces import TaskStatus, StatusEnum, BoefjeOutput
 
 app = FastAPI(title="Boefje API")
 logger = structlog.get_logger(__name__)
@@ -49,22 +48,6 @@ class BoefjeInput(BaseModel):
     output_url: str
     boefje_meta: BoefjeMeta
     model_config = ConfigDict(extra="forbid")
-
-
-class StatusEnum(str, Enum):
-    COMPLETED = "COMPLETED"
-    FAILED = "FAILED"
-
-
-class File(BaseModel):
-    name: str | None = None
-    content: str = Field(json_schema_extra={"contentEncoding": "base64"})
-    tags: list[str] | None = None
-
-
-class BoefjeOutput(BaseModel):
-    status: StatusEnum
-    files: list[File] | None = None
 
 
 def get_scheduler_client(plugin_service=Depends(get_plugin_service)):
@@ -113,9 +96,10 @@ def boefje_output(
     if boefje_output.files:
         mime_types = _default_mime_types(boefje_meta.boefje)
         for file in boefje_output.files:
-            raw = base64.b64decode(file.content)
-            # when supported, also save file.name to Bytes
-            bytes_client.save_raw(task_id, raw, mime_types.union(file.tags) if file.tags else mime_types)
+            file.tags = mime_types.union(file.tags) if file.tags else mime_types
+
+        # when supported, also save file.name to Bytes
+        bytes_client.save_raws(task_id, boefje_output)
 
     if boefje_output.status == StatusEnum.COMPLETED:
         scheduler_client.patch_task(task_id, TaskStatus.COMPLETED)

@@ -10,7 +10,7 @@ import structlog
 from httpx import Client, HTTPStatusError, HTTPTransport, Response
 
 from boefjes.config import settings
-from boefjes.worker.interfaces import BoefjeStorageInterface
+from boefjes.worker.interfaces import BoefjeStorageInterface, BoefjeOutput
 from boefjes.worker.job_models import BoefjeMeta, NormalizerMeta, RawDataMeta
 
 BYTES_API_CLIENT_VERSION = "0.3"
@@ -99,26 +99,16 @@ class BytesAPIClient(BoefjeStorageInterface):
         return NormalizerMeta.model_validate_json(response.content)
 
     @retry_with_login
-    def save_raw(self, boefje_meta_id: UUID, raw: str | bytes, mime_types: set[str] = frozenset()) -> UUID:
-        file_name = "raw"  # The name provides a key for all ids returned, so this is arbitrary as we only upload 1 file
-
+    def save_raws(self, boefje_meta_id: uuid.UUID, boefje_output: BoefjeOutput) -> dict[str, uuid.UUID]:
         response = self._session.post(
             "/bytes/raw",
-            json={
-                "files": [
-                    {
-                        "name": file_name,
-                        "content": b64encode(raw if isinstance(raw, bytes) else raw.encode()).decode(),
-                        "tags": list(mime_types),
-                    }
-                ]
-            },
+            content=boefje_output.model_dump_json(),
             headers=self.headers,
             params={"boefje_meta_id": str(boefje_meta_id)},
         )
         self._verify_response(response)
 
-        return UUID(response.json()[file_name])
+        return response.json()
 
     @retry_with_login
     def get_raw(self, raw_data_id: str) -> bytes:
