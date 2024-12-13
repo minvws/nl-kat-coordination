@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from boefjes.app import get_runtime_manager
+from boefjes.__main__ import get_runtime_manager
 from boefjes.config import Settings
 from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
 from tests.conftest import MockHandler, MockSchedulerClient
