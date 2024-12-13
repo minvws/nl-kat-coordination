@@ -2,7 +2,7 @@ import pytest
 
 from boefjes.clients.scheduler_client import get_environment_settings
 from boefjes.dependencies.plugins import PluginService
-from boefjes.models import Organisation
+from boefjes.worker.models import Organisation
 from tests.loading import get_boefje_meta
 
 

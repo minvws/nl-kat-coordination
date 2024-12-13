@@ -1,7 +1,7 @@
 import re
 from abc import ABC
 
-from boefjes.models import Boefje, Normalizer, Organisation, PluginType
+from boefjes.worker.models import Boefje, Normalizer, Organisation, PluginType
 
 
 class StorageError(Exception):

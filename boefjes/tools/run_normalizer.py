@@ -15,7 +15,7 @@ from boefjes.config import settings
 from boefjes.job_handler import NormalizerHandler, bytes_api_client
 from boefjes.worker.job_models import Normalizer, NormalizerMeta
 from boefjes.local.runner import LocalNormalizerJobRunner
-from boefjes.local.repository import get_local_repository
+from boefjes.worker.repository import get_local_repository
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, force=True)
 

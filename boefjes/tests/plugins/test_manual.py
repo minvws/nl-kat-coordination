@@ -4,7 +4,7 @@ from pydantic_core import Url
 
 from boefjes.worker.job_models import NormalizerMeta
 from boefjes.local.runner import LocalNormalizerJobRunner
-from boefjes.local.repository import LocalPluginRepository
+from boefjes.worker.repository import LocalPluginRepository
 from boefjes.normalizer_models import NormalizerResults
 from octopoes.models import Reference
 from tests.loading import get_dummy_data

@@ -9,8 +9,9 @@ from boefjes.job_handler import (
     NormalizerHandler,
     bytes_api_client,
 )
-from boefjes.local.runner import LocalBoefjeJobRunner, LocalNormalizerJobRunner
-from boefjes.local.repository import get_local_repository
+from boefjes.local.runner import LocalNormalizerJobRunner
+from boefjes.worker.boefje_runner import LocalBoefjeJobRunner
+from boefjes.worker.repository import get_local_repository
 from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.db import get_engine
 from boefjes.sql.plugin_storage import create_plugin_storage

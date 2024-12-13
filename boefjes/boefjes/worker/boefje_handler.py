@@ -4,8 +4,9 @@ from datetime import datetime, timezone
 import structlog
 
 from .interfaces import Handler, Task, BoefjeStorageInterface
-from .job_models import BoefjeMeta, Boefje
-from ..local.runner import LocalBoefjeJobRunner
+from .job_models import BoefjeMeta
+from .boefje_runner import LocalBoefjeJobRunner
+from .repository import _default_mime_types
 
 logger = structlog.get_logger(__name__)
 
@@ -61,12 +62,3 @@ class BoefjeHandler(Handler):
                     )
             else:
                 logger.info("No results for boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
-
-
-def _default_mime_types(boefje: Boefje) -> set:
-    mime_types = {f"boefje/{boefje.id}"}
-
-    if boefje.version is not None:
-        mime_types = mime_types.union({f"boefje/{boefje.id}-{boefje.version}"})
-
-    return mime_types

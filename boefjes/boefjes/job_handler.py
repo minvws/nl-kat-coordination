@@ -1,5 +1,4 @@
 import os
-import traceback
 from collections.abc import Callable
 from datetime import datetime, timezone
 from functools import cache
@@ -14,6 +13,7 @@ from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
 
 import boefjes.worker.boefje_handler
+import boefjes.worker.repository
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient, get_octopoes_api_connector
 from boefjes.config import settings
@@ -101,9 +101,9 @@ class DockerBoefjeHandler(Handler):
             raise RuntimeError("Boefje does not have OCI image")
 
         # local import to prevent circular dependency
-        import boefjes.plugins.models
+        import boefjes.worker.repository
 
-        stderr_mime_types = boefjes.worker.boefje_handler._default_mime_types(boefje_meta.boefje)
+        stderr_mime_types = boefjes.worker.repository._default_mime_types(boefje_meta.boefje)
 
         task_id = boefje_meta.id
         boefje_meta.started_at = datetime.now(timezone.utc)

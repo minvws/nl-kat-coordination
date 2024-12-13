@@ -7,7 +7,7 @@ from tools.upgrade_v1_17_0 import upgrade
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import BASE_DIR
-from boefjes.models import Organisation
+from boefjes.worker.models import Organisation
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference

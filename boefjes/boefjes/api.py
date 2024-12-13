@@ -16,7 +16,7 @@ from boefjes.clients.scheduler_client import SchedulerAPIClient
 from boefjes.config import settings
 from boefjes.dependencies.plugins import get_plugin_service
 from boefjes.worker.job_models import BoefjeMeta
-from boefjes.worker.boefje_handler import _default_mime_types
+from boefjes.worker.repository import _default_mime_types
 from boefjes.worker.interfaces import TaskStatus
 
 app = FastAPI(title="Boefje API")

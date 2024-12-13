@@ -11,9 +11,9 @@ import pytest
 
 from boefjes.worker.boefje_handler import BoefjeHandler
 from boefjes.worker.job_models import BoefjeMeta, InvalidReturnValueNormalizer, NormalizerMeta
-from boefjes.local.runner import LocalBoefjeJobRunner
-from boefjes.local.repository import LocalPluginRepository
-from boefjes.models import Bit, Boefje, Normalizer, PluginType
+from boefjes.worker.boefje_runner import LocalBoefjeJobRunner
+from boefjes.worker.repository import LocalPluginRepository
+from boefjes.worker.models import Bit, Boefje, Normalizer, PluginType
 from boefjes.worker.interfaces import JobRuntimeError, Task, TaskStatus
 from tests.loading import get_dummy_data
 

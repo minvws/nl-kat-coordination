@@ -1,4 +1,4 @@
-from boefjes.models import Boefje, Normalizer, Organisation, PluginType
+from boefjes.worker.models import Boefje, Normalizer, Organisation, PluginType
 from boefjes.storage.interfaces import ConfigStorage, OrganisationStorage, PluginNotFound, PluginStorage
 
 # key = organisation id; value = organisation

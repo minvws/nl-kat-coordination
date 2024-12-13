@@ -6,7 +6,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session, sessionmaker
 
 from boefjes.config import settings
-from boefjes.models import Organisation
+from boefjes.worker.models import Organisation
 from boefjes.sql.config_storage import SQLConfigStorage, create_encrypter
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage

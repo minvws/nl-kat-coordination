@@ -14,7 +14,7 @@ from boefjes.dependencies.plugins import (
     get_plugin_service,
     get_plugins_filter_parameters,
 )
-from boefjes.models import FilterParameters, PaginationParameters, PluginType
+from boefjes.worker.models import FilterParameters, PaginationParameters, PluginType
 from boefjes.sql.plugin_storage import get_plugin_storage
 from boefjes.storage.interfaces import DuplicatePlugin, IntegrityError, NotAllowed, PluginStorage
 
