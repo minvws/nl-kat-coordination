@@ -15,12 +15,14 @@ def query(targets: list[Reference | None]) -> str:
                                     [?header :object_type "HTTPHeader"]
                                     [?header :HTTPHeader/primary_key "{str(targets[0])}"]
 
+
                                     (or
                                         (and
                                             [?header :HTTPHeader/resource ?resource]
                                             [?resource :HTTPResource/web_url ?url]
                                             [?url :HostnameHTTPURL/network ?network]
                                             [?config :Config/ooi ?network]
+                                            [?config :Config/bit_id "check-hsts-header"]
                                         )
                                         (and
                                             [(identity nil) ?resource]
@@ -42,6 +44,7 @@ def query(targets: list[Reference | None]) -> str:
 
                                     [?config :object_type "Config"]
                                     [?config :Config/primary_key "{str(targets[1])}"]
+                                    [?config :Config/bit_id "check-hsts-header"]
 
                                     (or
                                         (and
@@ -71,6 +74,7 @@ def query(targets: list[Reference | None]) -> str:
                                             [?header :HTTPHeader/primary_key "{str(targets[0])}"]
                                             [?config :object_type "Config"]
                                             [?config :Config/primary_key "{str(targets[1])}"]
+                                            [?config :Config/bit_id "check-hsts-header"]
                                           ]
                                      }}
                                 }}
