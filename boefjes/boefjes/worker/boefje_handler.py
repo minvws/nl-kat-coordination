@@ -5,7 +5,7 @@ import structlog
 
 from .interfaces import Handler, Task, BoefjeStorageInterface
 from .job_models import BoefjeMeta, Boefje
-from ..local.local import LocalBoefjeJobRunner
+from ..local.runner import LocalBoefjeJobRunner
 
 logger = structlog.get_logger(__name__)
 

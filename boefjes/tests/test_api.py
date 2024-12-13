@@ -3,7 +3,7 @@ from unittest import mock
 
 import boefjes.api
 from boefjes.dependencies.plugins import PluginService
-from boefjes.local.local_repository import get_local_repository
+from boefjes.local.repository import get_local_repository
 from boefjes.worker.interfaces import TaskStatus
 from tests.conftest import MockSchedulerClient
 from tests.loading import get_dummy_data

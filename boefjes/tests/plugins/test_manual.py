@@ -3,8 +3,8 @@ from pathlib import Path
 from pydantic_core import Url
 
 from boefjes.worker.job_models import NormalizerMeta
-from boefjes.local.local import LocalNormalizerJobRunner
-from boefjes.local.local_repository import LocalPluginRepository
+from boefjes.local.runner import LocalNormalizerJobRunner
+from boefjes.local.repository import LocalPluginRepository
 from boefjes.normalizer_models import NormalizerResults
 from octopoes.models import Reference
 from tests.loading import get_dummy_data

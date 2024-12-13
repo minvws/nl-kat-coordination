@@ -21,8 +21,8 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from boefjes.job_handler import bytes_api_client
 from boefjes.worker.job_models import Boefje, BoefjeMeta
-from boefjes.local.local import LocalBoefjeJobRunner
-from boefjes.local.local_repository import get_local_repository
+from boefjes.local.runner import LocalBoefjeJobRunner
+from boefjes.local.repository import get_local_repository
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, force=True)
 

@@ -8,7 +8,7 @@ from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
 from sqlalchemy.orm import Session
 
-from boefjes.local.local_repository import LocalPluginRepository, get_local_repository
+from boefjes.local.repository import LocalPluginRepository, get_local_repository
 from boefjes.models import Boefje, FilterParameters, Normalizer, PaginationParameters, PluginType
 from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.db import session_managed_iterator
