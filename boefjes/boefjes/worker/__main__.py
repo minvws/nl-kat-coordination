@@ -48,6 +48,7 @@ def cli(log_level: str) -> None:
     logger.info("Starting runtime")
 
     base_url = os.getenv("BOEFJE_API")
+    oci_image = os.getenv("OCI_IMAGE")
     pool_size = int(os.getenv("POOL_SIZE", "2"))
     poll_interval = float(os.getenv("POLL_INTERVAL", "10.0"))
     heartbeat = float(os.getenv("WORKER_HEARTBEAT", "1.0"))
@@ -58,7 +59,7 @@ def cli(log_level: str) -> None:
     outgoing_request_timeout = int(os.getenv("OUTGOING_REQUEST_TIMEOUT", "30"))
 
     local_repository = get_local_repository()
-    boefje_api = BoefjeAPIClient(base_url, outgoing_request_timeout)
+    boefje_api = BoefjeAPIClient(base_url, outgoing_request_timeout, oci_image)
     handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), boefje_api)
 
     SchedulerWorkerManager(handler, boefje_api, pool_size, poll_interval, heartbeat).run(WorkerManager.Queue.BOEFJES)

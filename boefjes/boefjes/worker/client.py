@@ -8,20 +8,23 @@ from .interfaces import Queue, Task, TaskStatus, SchedulerClientInterface, Boefj
 
 
 class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
-    def __init__(self, base_url: str, outgoing_request_timeout: int):
+    def __init__(self, base_url: str, outgoing_request_timeout: int, oci_image: str | None):
         self._session = Client(base_url=base_url, transport=HTTPTransport(retries=6), timeout=outgoing_request_timeout)
+        self.oci_image = oci_image
 
     @staticmethod
     def _verify_response(response: Response) -> None:
         response.raise_for_status()
 
     def get_queues(self) -> list[Queue]:
+        # TODO: oci_image filter
         response = self._session.get("/api/v0/scheduler/queues")
         self._verify_response(response)
 
         return TypeAdapter(list[Queue]).validate_json(response.content)
 
     def pop_item(self, queue_id: str) -> Task | None:
+        # TODO: oci_image filter
         response = self._session.post(f"/api/v0/scheduler/queues/{queue_id}/pop")
         self._verify_response(response)
 

@@ -53,6 +53,9 @@ COPY ./images/generic_oci_adapter.py .
 
 FROM base as worker
 
+ARG OCI_IMAGE
+ENV OCI_IMAGE=$OCI_IMAGE
+
 ENTRYPOINT ["python", "-m", "worker"]
 
 RUN --mount=type=cache,target=/root/.cache pip install structlog

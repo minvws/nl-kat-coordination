@@ -39,7 +39,7 @@ images:  # Build the images for the containerized boefjes
 	docker build -f ./boefjes/plugins/kat_dnssec/boefje.Dockerfile -t ghcr.io/minvws/openkat/dns-sec:latest .
 	docker build -f ./boefjes/plugins/kat_nmap_tcp/boefje.Dockerfile -t ghcr.io/minvws/openkat/nmap:latest  .
 	docker build -f ./boefjes/plugins/kat_export_http/boefje.Dockerfile -t ghcr.io/minvws/openkat/export-http:latest .
-	docker build -f images/generic.Dockerfile -t ghcr.io/minvws/openkat/generic:latest .
+	docker build -f images/generic.Dockerfile -t ghcr.io/minvws/openkat/generic:latest --build-arg OCI_IMAGE=ghcr.io/minvws/openkat/generic:latest .
 
 
 ##
