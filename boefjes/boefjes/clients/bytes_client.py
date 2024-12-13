@@ -10,7 +10,7 @@ import structlog
 from httpx import Client, HTTPStatusError, HTTPTransport, Response
 
 from boefjes.config import settings
-from boefjes.job_models import BoefjeMeta, NormalizerMeta, RawDataMeta
+from boefjes.worker.job_models import BoefjeMeta, NormalizerMeta, RawDataMeta
 
 BYTES_API_CLIENT_VERSION = "0.3"
 logger = structlog.get_logger(__name__)

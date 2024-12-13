@@ -9,7 +9,7 @@ import requests
 import urllib3
 import validators
 
-from boefjes.job_models import BoefjeMeta
+from boefjes.worker.job_models import BoefjeMeta
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logging.basicConfig(level=logging.INFO)

@@ -4,7 +4,7 @@ from os import getenv
 
 import docker
 
-from boefjes.job_models import BoefjeMeta
+from boefjes.worker.job_models import BoefjeMeta
 
 WPSCAN_IMAGE = "wpscanteam/wpscan:latest"
 

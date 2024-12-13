@@ -4,7 +4,7 @@ from os import getenv
 
 import docker
 
-from boefjes.job_models import BoefjeMeta
+from boefjes.worker.job_models import BoefjeMeta
 
 NMAP_IMAGE = "instrumentisto/nmap:latest"
 NMAP_VALID_PORTS = re.compile(

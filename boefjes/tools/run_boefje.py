@@ -19,7 +19,7 @@ from boefjes.sql.plugin_storage import create_plugin_storage
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from boefjes.job_handler import BoefjeHandler, bytes_api_client
-from boefjes.job_models import Boefje, BoefjeMeta
+from boefjes.worker.job_models import Boefje, BoefjeMeta
 from boefjes.local import LocalBoefjeJobRunner
 from boefjes.local_repository import get_local_repository
 

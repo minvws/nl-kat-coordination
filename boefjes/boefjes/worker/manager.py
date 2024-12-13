@@ -11,7 +11,8 @@ from queue import Queue
 import structlog
 from httpx import HTTPError
 
-from boefjes.worker.interfaces import Handler, SchedulerClientInterface, Task, TaskStatus
+# A deliberate relative import to make this module (more) self-contained
+from .interfaces import Handler, SchedulerClientInterface, Task, TaskStatus
 
 logger = structlog.get_logger(__name__)
 ctx: ForkContext = multiprocessing.get_context("fork")

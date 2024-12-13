@@ -1,6 +1,6 @@
 import docker
 
-from boefjes.job_models import BoefjeMeta
+from boefjes.worker.job_models import BoefjeMeta
 
 SSLSCAN_IMAGE = "breezethink/sslscan:latest"
 

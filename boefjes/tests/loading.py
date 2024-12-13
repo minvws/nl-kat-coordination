@@ -3,7 +3,7 @@ from datetime import timezone
 from uuid import UUID
 
 from boefjes.config import BASE_DIR
-from boefjes.job_models import Boefje, BoefjeMeta, Normalizer, NormalizerMeta, RawDataMeta
+from boefjes.worker.job_models import Boefje, BoefjeMeta, Normalizer, NormalizerMeta, RawDataMeta
 
 
 def get_dummy_data(filename: str) -> bytes:

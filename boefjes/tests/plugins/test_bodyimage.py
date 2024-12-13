@@ -2,7 +2,7 @@ import json
 
 from requests.models import CaseInsensitiveDict, PreparedRequest, Response
 
-from boefjes.job_models import BoefjeMeta, NormalizerMeta
+from boefjes.worker.job_models import BoefjeMeta, NormalizerMeta
 from tests.loading import get_dummy_data
 
 

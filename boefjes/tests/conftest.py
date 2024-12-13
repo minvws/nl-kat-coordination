@@ -16,7 +16,7 @@ from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import settings
 from boefjes.dependencies.plugins import PluginService, get_plugin_service
 from boefjes.job_handler import bytes_api_client
-from boefjes.job_models import BoefjeMeta, NormalizerMeta
+from boefjes.worker.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.katalogus.root import app
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
 from boefjes.local_repository import (

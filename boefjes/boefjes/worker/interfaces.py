@@ -4,7 +4,8 @@ from enum import Enum
 
 from pydantic import BaseModel
 
-from boefjes.job_models import BoefjeMeta, NormalizerMeta
+# A deliberate relative import to make this module (more) self-contained
+from .job_models import BoefjeMeta, NormalizerMeta
 
 
 class JobRuntimeError(RuntimeError):

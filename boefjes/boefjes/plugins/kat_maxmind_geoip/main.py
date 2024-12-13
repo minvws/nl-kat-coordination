@@ -13,7 +13,7 @@ from pathlib import Path
 import maxminddb
 import requests
 
-from boefjes.job_models import BoefjeMeta
+from boefjes.worker.job_models import BoefjeMeta
 
 BASE_PATH = Path(getenv("OPENKAT_CACHE_PATH", Path(__file__).parent))
 

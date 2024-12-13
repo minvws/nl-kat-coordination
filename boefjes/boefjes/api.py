@@ -15,7 +15,7 @@ from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient
 from boefjes.config import settings
 from boefjes.dependencies.plugins import get_plugin_service
-from boefjes.job_models import BoefjeMeta
+from boefjes.worker.job_models import BoefjeMeta
 from boefjes.plugins.models import _default_mime_types
 from boefjes.worker.interfaces import TaskStatus
 

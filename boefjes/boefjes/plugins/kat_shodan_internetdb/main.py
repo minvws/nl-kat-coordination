@@ -2,7 +2,7 @@ from ipaddress import ip_address
 
 import httpx
 
-from boefjes.job_models import BoefjeMeta
+from boefjes.worker.job_models import BoefjeMeta
 
 REQUEST_TIMEOUT = 60
 

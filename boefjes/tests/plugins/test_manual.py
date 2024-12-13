@@ -2,7 +2,7 @@ from pathlib import Path
 
 from pydantic_core import Url
 
-from boefjes.job_models import NormalizerMeta
+from boefjes.worker.job_models import NormalizerMeta
 from boefjes.local import LocalNormalizerJobRunner
 from boefjes.local_repository import LocalPluginRepository
 from boefjes.normalizer_models import NormalizerResults

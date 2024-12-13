@@ -1,7 +1,7 @@
 import json
 from unittest import mock
 
-from boefjes.job_models import BoefjeMeta
+from boefjes.worker.job_models import BoefjeMeta
 from boefjes.plugins.kat_snyk.main import run as run_boefje
 from boefjes.plugins.kat_snyk.normalize import run
 from octopoes.models.ooi.findings import SnykFindingType

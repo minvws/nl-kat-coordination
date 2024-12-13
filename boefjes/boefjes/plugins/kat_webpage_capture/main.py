@@ -1,6 +1,6 @@
 import docker
 
-from boefjes.job_models import BoefjeMeta
+from boefjes.worker.job_models import BoefjeMeta
 from boefjes.plugins.helpers import get_file_from_container
 
 PLAYWRIGHT_IMAGE = "mcr.microsoft.com/playwright:latest"
