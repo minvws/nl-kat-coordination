@@ -5,27 +5,83 @@ from octopoes.models.ooi.web import HTTPHeader
 
 
 def query(targets: list[Reference | None]) -> str:
-    links = list(f'"{target}"' if isinstance(target, Reference) else "" for target in targets)
-    return f"""{{
-            :query {{
-                :find [(pull ?var [*])]
-                :where [
-                    (or
-                        (and [?var :object_type "URL" ] [?var :URL/primary_key {links[0]}])
-                        (and [?var :object_type "Config" ] [?var :Config/bit_id "check-hsts-header"]\
- [?var :Config/primary_key {links[1]}])
-                    )
-                ]
-            }}
-        }}
-        """
+    sgn = "".join(str(int(isinstance(target, Reference))) for target in targets)
+    if sgn == "10":
+        return f"""
+                        {{
+                            :query {{
+                                :find [(pull ?header [*]) (pull ?config [*])] :where [
+
+                                    [?header :object_type "HTTPHeader"]
+                                    [?header :HTTPHeader/primary_key "{str(targets[0])}"]
+
+                                    (or
+                                        (and
+                                            [?header :HTTPHeader/resource ?resource]
+                                            [?resource :HTTPResource/web_url ?url]
+                                            [?url :HostnameHTTPURL/network ?network]
+                                            [?config :Config/ooi ?network]
+                                        )
+                                        (and
+                                            [(identity nil) ?resource]
+                                            [(identity nil) ?url]
+                                            [(identity nil) ?network]
+                                            [(identity nil) ?config]
+                                        )
+                                    )
+
+                                ]
+                            }}
+                        }}
+                    """
+    elif sgn == "01":
+        return f"""
+                        {{
+                            :query {{
+                                :find [(pull ?header [*]) (pull ?config [*])] :where [
+
+                                    [?config :object_type "Config"]
+                                    [?config :Config/primary_key "{str(targets[1])}"]
+
+                                    (or
+                                        (and
+                                            [?header :HTTPHeader/resource ?resource]
+                                            [?resource :HTTPResource/web_url ?url]
+                                            [?url :HostnameHTTPURL/network ?network]
+                                            [?config :Config/ooi ?network]
+                                        )
+                                        (and
+                                            [(identity nil) ?header]
+                                            [(identity nil) ?resource]
+                                            [(identity nil) ?url]
+                                            [(identity nil) ?network]
+                                        )
+                                    )
+
+                                ]
+                            }}
+                        }}
+                    """
+    else:
+        return f"""
+                               {{
+                                   :query {{
+                                       :find [(pull ?header [*]) (pull ?config [*])] :where [
+                                            [?header :object_type "HTTPHeader"]
+                                            [?header :HTTPHeader/primary_key "{str(targets[0])}"]
+                                            [?config :object_type "Config"]
+                                            [?config :Config/primary_key "{str(targets[1])}"]
+                                          ]
+                                     }}
+                                }}
+                            """
 
 
 NIBBLE = NibbleDefinition(
     id="check-hsts-header",
     signature=[
         NibbleParameter(object_type=HTTPHeader, parser="[*][?object_type == 'HTTPHeader'][]"),
-        NibbleParameter(object_type=Config, parser="[*][?object_type == 'Config'][]"),
+        NibbleParameter(object_type=Config, parser="[*][?object_type == 'Config'][]", optional=True),
     ],
     query=query,
 )

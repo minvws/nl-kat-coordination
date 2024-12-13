@@ -7,14 +7,14 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.web import HTTPHeader
 
 
-def nibble(input_ooi: HTTPHeader, config: Config) -> Iterator[OOI]:
+def nibble(input_ooi: HTTPHeader, config: Config | None) -> Iterator[OOI]:
     header = input_ooi
     if header.key.lower() != "strict-transport-security":
         return
 
     one_year = datetime.timedelta(days=365).total_seconds()
 
-    max_age = int(str(config.config.get("max-age", one_year))) if config.config else one_year
+    max_age = int(str(config.config.get("max-age", one_year))) if config and config.config else one_year
     findings: list[str] = []
 
     headervalue = header.value.lower()
