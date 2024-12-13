@@ -75,8 +75,11 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     detections = wappalyzer.analyze(har, analyzes=analyzes)
 
     for detection in detections:
-        cpe = detection.fingerprint.cpe
-        version = cpe.split(":")[1] if cpe else None
+        cpe = detection.fingerprint.cpe  # todo: fix version in cpe if it's in the fingerprint
+        if detection.pattern.version:
+            version = detection.pattern.regex.search(detection.value).expand(detection.pattern.version)
+        else:
+            version = cpe.split(":")[1] if cpe else None
         software = Software(name=detection.fingerprint.id, version=version, cpe=cpe)
         software_instance = SoftwareInstance(ooi=web_url.reference, software=software.reference)
         yield from [software, software_instance]
