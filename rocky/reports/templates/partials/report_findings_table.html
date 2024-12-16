@@ -10,7 +10,9 @@
                 <th scope="col">{% translate "Finding types" %}</th>
                 <th scope="col">{% translate "Occurrences" %}</th>
                 <th scope="col">{% translate "First known occurrence" %}</th>
-                {% if not is_dashboard %}
+                {% if is_dashboard_findings %}
+                    <th scope="col">{% translate "Open in report" %}</th>
+                {% else %}
                     <th scope="col" class="visually-hidden actions">{% translate "Details" %}</th>
                 {% endif %}
             </tr>
@@ -24,7 +26,11 @@
                     <td>{{ info.finding_type.id }}</td>
                     <td>{{ info.occurrences|length }}</td>
                     <td>{{ info.occurrences|get_first_seen }}</td>
-                    {% if not is_dashboard %}
+                    {% if is_dashboard_findings %}
+                        <td class="number">
+                            <a href="{% url "view_report" organization.code %}?report_id={{ report.report_id }}#{{ info.finding_type.id }}"><span class="icon ti-arrow-right"></span></a>
+                        </td>
+                    {% else %}
                         <td class="actions sticky-cell">
                             <button class="expando-button"
                                     data-icon-open-class="icon ti-chevron-down"

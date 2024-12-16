@@ -96,6 +96,8 @@
                                             {% else %}
                                                 <p>{% translate "No critical and high finding types have been identified for this organization." %}</p>
                                             {% endif %}
+                                            <a class="button ghost"
+                                               href="{% url "view_report" organization.code %}?report_id={{ report.report_id }}#findings">{% translate "View findings report" %}</a>
                                         </td>
                                     </tr>
                                 {% endif %}
