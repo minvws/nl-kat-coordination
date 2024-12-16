@@ -9,6 +9,7 @@ from octopoes.events.manager import EventManager
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import DNSZone
 from octopoes.models.ooi.network import IPAddressV4, Network
+from octopoes.models.ooi.web import URL
 from octopoes.models.path import Direction, Path, Segment
 from octopoes.models.persistence import ReferenceField
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
@@ -132,3 +133,38 @@ class OOIRepositoryTest(TestCase):
 
         resolved_hostname = neighbours[Path.parse("MockHostname.<hostname[is MockResolvedHostname]")][0]
         self.assertEqual(Reference.from_str("MockIPAddressV4|internet|1.1.1.1"), resolved_hostname.address)
+
+    def test_objectify(self):
+        assert self.repository.objectify(int, "6") == 6
+        assert self.repository.objectify(int, ["9", "9", "9"]) == tuple([9, 9, 9])
+        assert self.repository.objectify(int, {"9", "9", "9"}) == frozenset([9])
+        assert self.repository.objectify(int, {"1", "2", "5"}) == frozenset([1, 2, 5])
+
+        assert self.repository.objectify(str, "potato") == "potato"
+        assert self.repository.objectify(str, ["potato", "piper"]) == tuple(["potato", "piper"])
+        assert self.repository.objectify(str, {"potato", "piper"}) == frozenset(["potato", "piper"])
+        assert self.repository.objectify(str, {"potato", "potato"}) == frozenset(["potato"])
+
+        assert self.repository.objectify(dict, {"potato1": "piper", "potato2": "king-edward"}) == {
+            "potato1": "piper",
+            "potato2": "king-edward",
+        }
+
+        assert self.repository.objectify([str, int], ["seven", "11"]) == tuple(["seven", 11])
+
+        network = Network(name="internet")
+        url = URL(network=network.reference, raw="https://mispo.es")
+
+        def pull(ooi: OOI):
+            return self.repository.serialize(ooi)
+
+        assert self.repository.objectify(Network, pull(network)) == network
+        assert self.repository.objectify(URL, pull(url)) == url
+        assert self.repository.objectify(dict, pull(network)) == pull(network)
+        assert self.repository.objectify(Network, [pull(network), pull(network), pull(network)]) == tuple(
+            [network, network, network]
+        )
+        assert self.repository.objectify(Network, [pull(network), pull(url), pull(network)]) == tuple(
+            [network, url, network]
+        )
+        assert self.repository.objectify(Network, [pull(network), pull(url), pull(url)]) == tuple([network, url, url])

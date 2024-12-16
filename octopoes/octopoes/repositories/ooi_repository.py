@@ -259,15 +259,27 @@ class XTDBOOIRepository(OOIRepository):
         return object_cls.model_validate(stripped)
 
     @classmethod
-    def objectify(cls, t: Any, obj: dict | list | Any) -> tuple | Any:
+    def objectify(cls, t: list | Any, obj: dict | list | set | Any) -> tuple | frozenset | Any:
         if isinstance(obj, dict):
+            if isinstance(t, list):
+                t = t[-1]
             if issubclass(t, OOI):
                 return cls.deserialize(obj)
             else:
                 return t(**obj)
         elif isinstance(obj, list):
-            return tuple(cls.objectify(t, o) for o in obj)
+            if isinstance(t, list):
+                return tuple(cls.objectify(tt, o) for o, tt in zip(obj, t))
+            else:
+                return tuple(cls.objectify(t, o) for o in obj)
+        elif isinstance(obj, set):
+            if isinstance(t, list):
+                return frozenset(cls.objectify(tt, o) for o, tt in zip(obj, t))
+            else:
+                return frozenset(cls.objectify(t, o) for o in obj)
         else:
+            if isinstance(t, list):
+                t = t[-1]
             return t(obj)
 
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
