@@ -29,34 +29,34 @@
             <tbody>
                 {% for organization, organization_dashboards in organizations_dashboards.items %}
                     {% for dashboards in organization_dashboards %}
-                        {% for dashboard_data, report_data in dashboards.items %}
-                            {% if report_data.findings %}
+                        {% for dashboard_data, report in dashboards.items %}
+                            {% if report.1.findings %}
                                 <tr>
                                     <td>{{ organization.name }}</td>
                                     <td>
-                                        {% if report_data.findings.summary.total_finding_types %}
-                                            {{ report_data.findings.summary.total_finding_types }}
+                                        {% if report.1.findings.summary.total_finding_types %}
+                                            {{ report.1.findings.summary.total_finding_types }}
                                         {% else %}
                                             -
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if report_data.findings.summary.total_occurrences %}
-                                            {{ report_data.findings.summary.total_occurrences }}
+                                        {% if report.1.findings.summary.total_occurrences %}
+                                            {{ report.1.findings.summary.total_occurrences }}
                                         {% else %}
                                             -
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if report_data.findings.finding_types.0.finding_type.risk_severity %}
-                                            <span class="{{ report_data.findings.finding_types.0.finding_type.risk_severity }}">{{ report_data.findings.finding_types.0.finding_type.risk_severity|capfirst }}</span>
+                                        {% if report.1.findings.finding_types.0.finding_type.risk_severity %}
+                                            <span class="{{ report.1.findings.finding_types.0.finding_type.risk_severity }}">{{ report.1.findings.finding_types.0.finding_type.risk_severity|capfirst }}</span>
                                         {% else %}
                                             -
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if report_data.findings.summary.total_by_severity_per_finding_type %}
-                                            {{ report_data.findings.summary.total_by_severity_per_finding_type.critical }}
+                                        {% if report.1.findings.summary.total_by_severity_per_finding_type %}
+                                            {{ report.1.findings.summary.total_by_severity_per_finding_type.critical }}
                                         {% else %}
                                             -
                                         {% endif %}
@@ -78,17 +78,17 @@
                                                 {% translate "This overview shows the total number of findings per severity that have been identified for this organization." %}
                                             </p>
                                         </div>
-                                        {% include "partials/report_severity_totals_table.html" with data=report_data.findings.summary %}
+                                        {% include "partials/report_severity_totals_table.html" with data=report.1.findings.summary %}
 
                                         <div>
                                             <h5>
-                                                {% translate "Findings" %} ({{ report_data.findings.finding_types|length }}/{{ report_data.findings.summary.total_finding_types }})
+                                                {% translate "Findings" %} ({{ report.1.findings.finding_types|length }}/{{ report.1.findings.summary.total_finding_types }})
                                             </h5>
                                             <p>
                                                 {% translate "This overview shows the total number of findings per severity that have been identified for this organization." %}
                                             </p>
                                         </div>
-                                        {% include "partials/report_findings_table.html" with finding_types=report_data.findings.finding_types %}
+                                        {% include "partials/report_findings_table.html" with finding_types=report.1.findings.finding_types %}
 
                                     </td>
                                 </tr>

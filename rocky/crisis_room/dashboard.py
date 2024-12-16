@@ -26,7 +26,7 @@ def create_default_dashboard(organization: Organization):
 
         recipe = create_organization_recipe(valid_time, organization, recipe_default)
         dashboard, _ = Dashboard.objects.get_or_create(name="Crisis Room Findings Dashboard", organization=organization)
-        DashboardData.objects.get_or_create(dashboard=dashboard, recipe=recipe, display_in_crisis_room=True)
+        DashboardData.objects.get_or_create(dashboard=dashboard, recipe=recipe, findings_dashboard=True)
         schedule_request = create_schedule_request(valid_time, organization, recipe)
         scheduler_client(organization.code).post_schedule(schedule=schedule_request)
 

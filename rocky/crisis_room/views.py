@@ -25,6 +25,7 @@ from octopoes.connector import ConnectorException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.findings import RiskLevelSeverity
+from octopoes.models.ooi.reports import Report
 from rocky.bytes_client import get_bytes_client
 from rocky.views.mixins import ObservedAtMixin
 from rocky.views.ooi_view import ConnectorFormMixin
@@ -164,7 +165,7 @@ class CrisisRoomMixin:
             settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
         )
 
-    def get_report_data(self, dashboard_data: DashboardData) -> dict[str, Any]:
+    def get_report_data(self, dashboard_data: DashboardData) -> tuple[Report | None, dict[str, Any]]:
         """Get the latest/newest report data with the recipe ID"""
         valid_time = datetime.now(timezone.utc)
         octopoes_client = self.get_octopoes_client(dashboard_data.dashboard.organization)
@@ -182,10 +183,13 @@ class CrisisRoomMixin:
             bytes_client = get_bytes_client(dashboard_data.dashboard.organization.code)
             bytes_client.login()
 
-            return TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
-                bytes_client.get_raw(raw_id=report.data_raw_id)
+            return (
+                report,
+                TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
+                    bytes_client.get_raw(raw_id=report.data_raw_id)
+                ),
             )
-        return {}
+        return (None, {})
 
 
 class CrisisRoomDashboards(CrisisRoomMixin, TemplateView):
@@ -224,7 +228,7 @@ class CrisisRoomFindings(CrisisRoomMixin, TemplateView):
 
         for organization, organizations_data in self.organizations_findings.items():
             for dashboards_data in organizations_data:
-                for report_data in dashboards_data.values():
+                for report, report_data in dashboards_data.values():
                     if "findings" in report_data and "summary" in report_data["findings"]:
                         for summary_item, data in report_data["findings"]["summary"].items():
                             if isinstance(data, dict):
