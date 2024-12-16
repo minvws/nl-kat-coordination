@@ -612,6 +612,10 @@ msgid "An HTTP %d error occurred. Check logs for more info."
 msgstr ""
 
 #: katalogus/client.py
+msgid "An HTTP error occurred. Check logs for more info."
+msgstr ""
+
+#: katalogus/client.py
 msgid "Boefje with this name already exists."
 msgstr ""
 
