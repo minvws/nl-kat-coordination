@@ -1,0 +1,46 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1" class="crisisroom">
+        <section>
+            {% include "crisis_room_header.html" with active="findings_settings" %}
+
+            <h2>{% translate "Findings settings" %}</h2>
+            <p>
+                {% blocktranslate %}
+                    Here are the settings used to generate the findings displayed in the findings
+                    dashboard across all organizations. Each organization's findings are generated
+                    using its specific report recipe.
+                {% endblocktranslate %}
+            </p>
+        </section>
+        <section>
+            <div class="horizontal-scroll">
+                <table>
+                    <caption class="visually-hidden">{% translate "Settings of findings per organization" %}</caption>
+                    <thead>
+                        <tr>
+                            <th>{% translate "Organization" %}</th>
+                            <th>{% translate "Recipe" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for settings in findings_settings %}
+                            <tr>
+                                <td>{{ settings.dashboard.organization.name }}</td>
+                                <td class="nowrap">
+                                    <a href="{% ooi_url "ooi_edit" settings.recipe settings.dashboard.organization.code %}">{{ settings.recipe }}</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

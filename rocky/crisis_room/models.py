@@ -32,10 +32,13 @@ class DashboardData(models.Model):
         ),
     )
     display_in_crisis_room = models.BooleanField(
-        default=False, help_text=_("Will be displayed on the general crisis room")
+        default=False, help_text=_("Will be displayed on the general crisis room, for all organizations.")
     )
     display_in_dashboard = models.BooleanField(
         default=False, help_text=_("Will be displayed on a single organization dashboard")
+    )
+    findings_dashboard = models.BooleanField(
+        default=False, help_text=_("Will be displayed on the findings dashboard for all organizations")
     )
 
     class Meta:

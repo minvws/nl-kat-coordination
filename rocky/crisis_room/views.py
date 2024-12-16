@@ -7,6 +7,7 @@ import structlog
 from account.models import KATUser
 from django.conf import settings
 from django.contrib import messages
+from django.db.models.query import QuerySet
 from django.http import HttpResponse
 from django.http.request import HttpRequest
 from django.shortcuts import redirect
@@ -115,7 +116,7 @@ class CrisisRoomAllOrganizations(TemplateView):
     """
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        return redirect(reverse("crisis_room_dashboards"))
+        return redirect(reverse("crisis_room_findings"))
 
 
 class CrisisRoomMixin:
@@ -139,6 +140,23 @@ class CrisisRoomMixin:
             organization_dashboard[data] = self.get_report_data(data)
             grouped_data[data.dashboard.organization].append(organization_dashboard)
         return dict(grouped_data)
+
+    def get_organizations_findings(self) -> dict[Organization, dict[DashboardData, dict[str, Any]]]:
+        organizations = self.get_user_organizations()
+        grouped_data = defaultdict(list)
+        dashboards_data = DashboardData.objects.filter(
+            dashboard__organization__in=organizations, findings_dashboard=True
+        )
+        for data in dashboards_data:
+            organization_dashboard = {}
+            organization_dashboard[data] = self.get_report_data(data)
+            grouped_data[data.dashboard.organization].append(organization_dashboard)
+        return dict(grouped_data)
+
+    def get_findings_settings(self) -> QuerySet:
+        organizations = self.get_user_organizations()
+
+        return DashboardData.objects.filter(dashboard__organization__in=organizations, findings_dashboard=True)
 
     @staticmethod
     def get_octopoes_client(organization: Organization) -> OctopoesAPIConnector:
@@ -194,18 +212,6 @@ class CrisisRoomFindings(CrisisRoomMixin, TemplateView):
             self.get_organizations_findings()
         )
 
-    def get_organizations_findings(self) -> dict[Organization, dict[DashboardData, dict[str, Any]]]:
-        organizations = self.get_user_organizations()
-        grouped_data = defaultdict(list)
-        dashboards_data = DashboardData.objects.filter(
-            dashboard__organization__in=organizations, dashboard__name="Crisis Room Findings Dashboard"
-        )
-        for data in dashboards_data:
-            organization_dashboard = {}
-            organization_dashboard[data] = self.get_report_data(data)
-            grouped_data[data.dashboard.organization].append(organization_dashboard)
-        return dict(grouped_data)
-
     def get_organizations_findings_summary(self) -> dict[str, Any]:
         summary: dict[str, Any] = {
             "total_by_severity": {severity: 0 for severity in SEVERITY_OPTIONS},
@@ -238,4 +244,13 @@ class CrisisRoomFindings(CrisisRoomMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context["organizations_dashboards"] = self.organizations_findings
         context["organizations_findings_summary"] = self.get_organizations_findings_summary()
+        return context
+
+
+class DasboardFindingsSettings(CrisisRoomMixin, TemplateView):
+    template_name = "crisis_room_findings_settings.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["findings_settings"] = self.get_findings_settings()
         return context

@@ -7,11 +7,11 @@
 <div>
     <nav class="tabs" aria-label="{% translate "Crisis Room Navigation" %}">
         <ul>
-            <li {% if active == "dashboards" %}aria-current="page"{% endif %}>
-                <a href="{% url 'crisis_room_dashboards' %}">{% translate "Dashboards" %}</a>
-            </li>
             <li {% if active == "findings" %}aria-current="page"{% endif %}>
                 <a href="{% url 'crisis_room_findings' %}">{% translate "Findings" %}</a>
+            </li>
+            <li {% if active == "findings_settings" %}aria-current="page"{% endif %}>
+                <a href="{% url 'crisis_room_findings_settings' %}">{% translate "Findings Settings" %}</a>
             </li>
         </ul>
     </nav>
