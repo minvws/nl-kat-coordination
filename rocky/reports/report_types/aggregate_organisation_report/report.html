@@ -107,6 +107,12 @@
                 <section id="findings">
                     <div>
                         <h2>{% translate "Findings" %}</h2>
+                        <p>
+                            {% blocktranslate %}
+                                This chapter contains information about the findings that have been identified
+                                for this organization.
+                            {% endblocktranslate%}
+                        </p>
                         {% if not data.findings %}
                             <p>{% translate "No findings have been identified yet." %}</p>
                         {% else %}
