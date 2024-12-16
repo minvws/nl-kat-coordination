@@ -9,7 +9,7 @@
         {% endblocktranslate %}
     </p>
 {% endif %}
-{% if is_dashboard %}
+{% if is_dashboard_findings %}
     <div class="horizontal-scroll">
         <table>
             <caption class="visually-hidden">{% translate "Findings per organization overview" %}</caption>
@@ -95,6 +95,15 @@
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+{% elif is_dashboard %}
+    <div class="horizontal-scroll">
+        <h5>{% translate "Findings overview" %}</h5>
+        {% include "partials/report_severity_totals_table.html" with data=data.findings.summary %}
+
+        <h5>{% translate "Findings" %}</h5>
+        {% include "partials/report_findings_table.html" with finding_types=data.findings.finding_types %}
+
     </div>
 {% else %}
     <div class="horizontal-scroll">
