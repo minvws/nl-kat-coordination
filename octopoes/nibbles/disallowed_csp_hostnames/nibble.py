@@ -41,7 +41,7 @@ def query(targets: list[Reference | None]) -> str:
 
                                 [?config :object_type "Config"]
                                 [?config :Config/primary_key "{str(targets[1])}"]
-                                [?config :Config/bit_id "check-hsts-header"]
+                                [?config :Config/bit_id "disallowed-csp-hostnames"]
 
                                 (or
                                     (and
