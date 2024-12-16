@@ -116,7 +116,7 @@
                         {% if not data.findings %}
                             <p>{% translate "No findings have been identified yet." %}</p>
                         {% else %}
-                            {% include "findings_report/report.html" with data=data.findings show_introduction="yes" %}
+                            {% include "findings_report/report.html" with data=data.findings %}
 
                         {% endif %}
                     </div>

@@ -150,7 +150,24 @@ class CrisisRoomMixin:
         )
         for data in dashboards_data:
             organization_dashboard = {}
-            organization_dashboard[data] = self.get_report_data(data)
+            report, report_data = self.get_report_data(data)
+
+            finding_types = report_data["findings"]["finding_types"]
+            highest_risk_level = finding_types[0]["finding_type"]["risk_severity"]
+            critical_high_finding_types = list(
+                filter(
+                    lambda finding_type: finding_type["finding_type"]["risk_severity"] == "critical"
+                    or finding_type["finding_type"]["risk_severity"] == "high",
+                    finding_types,
+                )
+            )
+            report_data["findings"]["finding_types"] = critical_high_finding_types[:25]
+
+            organization_dashboard[data] = {
+                "report_data": report_data,
+                "report_id": report,
+                "highest_risk_level": highest_risk_level,
+            }
             grouped_data[data.dashboard.organization].append(organization_dashboard)
         return dict(grouped_data)
 
@@ -228,9 +245,9 @@ class CrisisRoomFindings(CrisisRoomMixin, TemplateView):
 
         for organization, organizations_data in self.organizations_findings.items():
             for dashboards_data in organizations_data:
-                for report, report_data in dashboards_data.values():
-                    if "findings" in report_data and "summary" in report_data["findings"]:
-                        for summary_item, data in report_data["findings"]["summary"].items():
+                for report_data in dashboards_data.values():
+                    if "findings" in report_data["report_data"] and "summary" in report_data["report_data"]["findings"]:
+                        for summary_item, data in report_data["report_data"]["findings"]["summary"].items():
                             if isinstance(data, dict):
                                 for severity, total in data.items():
                                     summary[summary_item][severity] += total
