@@ -5,27 +5,83 @@ from octopoes.models.ooi.web import HTTPHeaderHostname
 
 
 def query(targets: list[Reference | None]) -> str:
-    links = list(f'"{target}"' if isinstance(target, Reference) else "" for target in targets)
-    return f"""{{
-            :query {{
-                :find [(pull ?var [*])]
-                :where [
-                    (or
-                        (and [?var :object_type "URL" ] [?var :URL/primary_key {links[0]}])
-                        (and [?var :object_type "Config" ] [?var :Config/bit_id "disallowed-csp-hostnames"]\
- [?var :Config/primary_key {links[1]}])
-                    )
-                ]
-            }}
-        }}
-        """
+    sgn = "".join(str(int(isinstance(target, Reference))) for target in targets)
+    if sgn == "10":
+        return f"""
+                    {{
+                        :query {{
+                            :find [(pull ?header [*]) (pull ?config [*])] :where [
+
+                                [?header :object_type "HTTPHeaderHostname"]
+                                [?header :HTTPHeaderHostname/primary_key "{str(targets[0])}"]
+
+                                (or
+                                    (and
+                                        [?header :HTTPHeaderHostname/hostname ?hostname]
+                                        [?hostname :Hostname/network ?network]
+                                        [?config :Config/ooi ?network]
+                                        [?config :Config/bit_id "disallowed-csp-hostnames"]
+                                    )
+                                    (and
+                                        [(identity nil) ?hostname]
+                                        [(identity nil) ?network]
+                                        [(identity nil) ?config]
+                                    )
+                                )
+
+                            ]
+                        }}
+                    }}
+                """
+    elif sgn == "01":
+        return f"""
+                    {{
+                        :query {{
+                            :find [(pull ?header [*]) (pull ?config [*])] :where [
+
+                                [?config :object_type "Config"]
+                                [?config :Config/primary_key "{str(targets[1])}"]
+                                [?config :Config/bit_id "check-hsts-header"]
+
+                                (or
+                                    (and
+                                        [?header :HTTPHeaderHostname/hostname ?hostname]
+                                        [?hostname :Hostname/network ?network]
+                                        [?config :Config/ooi ?network]
+                                        [?config :Config/bit_id "disallowed-csp-hostnames"]
+                                    )
+                                    (and
+                                        [(identity nil) ?hostname]
+                                        [(identity nil) ?network]
+                                        [(identity nil) ?config]
+                                    )
+                                )
+
+                            ]
+                        }}
+                    }}
+                """
+    else:
+        return f"""
+                   {{
+                       :query {{
+                           :find [(pull ?header [*]) (pull ?config [*])] :where [
+                                [?header :object_type "HTTPHeaderHostname"]
+                                [?header :HTTPHeaderHostname/primary_key "{str(targets[0])}"]
+                                [?config :object_type "Config"]
+                                [?config :Config/primary_key "{str(targets[1])}"]
+                                [?config :Config/bit_id "disallowed-csp-hostnames"]
+                              ]
+                         }}
+                    }}
+                """
 
 
 NIBBLE = NibbleDefinition(
     id="disallowed-csp-hostnames",
     signature=[
         NibbleParameter(object_type=HTTPHeaderHostname, parser="[*][?object_type == 'HTTPHeaderHostname'][]"),
-        NibbleParameter(object_type=Config, parser="[*][?object_type == 'Config'][]"),
+        NibbleParameter(object_type=Config, parser="[*][?object_type == 'Config'][]", optional=True),
     ],
     query=query,
 )

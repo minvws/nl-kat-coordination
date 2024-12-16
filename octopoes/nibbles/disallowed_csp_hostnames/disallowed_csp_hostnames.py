@@ -17,18 +17,20 @@ def get_disallowed_hostnames_from_config(config, config_key, default):
     return list(disallowed_hostnames.strip().split(",")) if disallowed_hostnames else []
 
 
-def nibble(input_ooi: HTTPHeaderHostname, config: Config) -> Iterator[OOI]:
+def nibble(input_ooi: HTTPHeaderHostname, config: Config | None) -> Iterator[OOI]:
     header_hostname = input_ooi
     header = header_hostname.header
 
     if header.tokenized.key.lower() != "content-security-policy":
         return
 
-    disallow_url_shorteners = config.config.get("disallow_url_shorteners", True) if config.config else True
+    disallow_url_shorteners = config.config.get("disallow_url_shorteners", True) if config and config.config else True
 
     hostname = header_hostname.hostname.tokenized.name
     disallowed_domains = link_shorteners_list() if disallow_url_shorteners else []
-    disallowed_hostnames_from_config = get_disallowed_hostnames_from_config(config.config, "disallowed_hostnames", [])
+    disallowed_hostnames_from_config = get_disallowed_hostnames_from_config(
+        config.config if config and config.config else {}, "disallowed_hostnames", []
+    )
 
     disallowed_domains.extend(disallowed_hostnames_from_config)
 

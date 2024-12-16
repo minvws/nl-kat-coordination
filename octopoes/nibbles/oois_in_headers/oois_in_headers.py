@@ -36,11 +36,11 @@ def remove_ignored_params(url: str, ignored_params: list[str]) -> str:
     return new_url
 
 
-def nibble(input_ooi: HTTPHeader, config: Config) -> Iterator[OOI]:
+def nibble(input_ooi: HTTPHeader, config: Config | None) -> Iterator[OOI]:
     network = Network(name="internet")
 
     if input_ooi.key.lower() == "location":
-        ignored_url_params = get_ignored_url_params(config.config, "ignored_url_parameters", [])
+        ignored_url_params = get_ignored_url_params(config.config if config else {}, "ignored_url_parameters", [])
         if is_url(input_ooi.value):
             u = URL(raw=remove_ignored_params(input_ooi.value, ignored_url_params), network=network.reference)
         else:
