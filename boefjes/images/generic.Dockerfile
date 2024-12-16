@@ -58,6 +58,7 @@ ENV OCI_IMAGE=$OCI_IMAGE
 
 ENTRYPOINT ["python", "-m", "worker"]
 
+# TODO: move inside the worker module?
 RUN --mount=type=cache,target=/root/.cache pip install structlog
 RUN --mount=type=cache,target=/root/.cache pip install pydantic
 RUN --mount=type=cache,target=/root/.cache pip install jsonschema

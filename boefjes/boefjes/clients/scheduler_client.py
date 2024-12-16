@@ -73,6 +73,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
     def _hydrate_boefje_meta(self, boefje_meta: BoefjeMeta) -> BoefjeMeta:
         plugin = self.plugin_service.by_plugin_id(boefje_meta.boefje.id, boefje_meta.organization)
 
+        # The octopoes API connector is organization-specific, where the client is generic.
         octopoes_api_connector = get_octopoes_api_connector(boefje_meta.organization)
         input_ooi = boefje_meta.input_ooi
         boefje_meta.arguments = {"oci_image": plugin.oci_image, "oci_arguments": plugin.oci_arguments}
