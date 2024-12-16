@@ -101,10 +101,10 @@
     </div>
 {% else %}
     <div class="horizontal-scroll">
-        <h3>{% translate "Findings overview" %}</h3>
+        <h3 id="findings-overview">{% translate "Findings overview" %}</h3>
         {% include "partials/report_severity_totals_table.html" with data=data.summary %}
 
-        <h3>{% translate "Findings" %}</h3>
+        <h3 id="findings-table">{% translate "Findings" %}</h3>
         {% include "partials/report_findings_table.html" with finding_types=data.finding_types %}
 
     </div>

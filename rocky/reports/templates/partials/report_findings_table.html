@@ -17,7 +17,7 @@
         </thead>
         <tbody>
             {% for info in finding_types %}
-                <tr>
+                <tr id="{{ info.finding_type.id }}">
                     <td>
                         <span class="{{ info.finding_type.risk_severity }}">{{ info.finding_type.risk_severity|capfirst }}</span>
                     </td>
