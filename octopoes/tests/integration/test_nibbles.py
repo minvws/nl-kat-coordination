@@ -204,24 +204,35 @@ def callable_query(url1: URL, url2: URL) -> Iterator[OOI]:
 
 
 callable_query_param = [
-    NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]"),
-    NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]"),
+    NibbleParameter(object_type=URL, parser='[*].{"URL1": @[1]}[?"URL1"] | [?URL1.object_type == \'URL\'].URL1'),
+    NibbleParameter(object_type=URL, parser='[*].{"URL2": @[3]}[?"URL2"] | [?URL2.object_type == \'URL\'].URL2'),
 ]
 
 
 def callable_query_query(targets: list[Reference | None]) -> str:
     sgn = "".join(str(int(isinstance(target, Reference))) for target in targets)
     if sgn == "10":
-        return f'{{:query {{:find [(pull ?var [*])] :where [[?var :object_type "URL"]\
-[?var :URL/primary_key "{str(targets[0])}"]]}}}}'
-    elif sgn == "01":
-        return f'{{:query {{:find [(pull ?var [*])] :where [[?var :object_type "URL"]\
-[?var :URL/primary_key "{str(targets[1])}"]]}}}}'
-    elif sgn == "11":
-        # INFO: probably this one should be specialized
-        return '{:query {:find [(pull ?var [*])] :where [[?var :object_type "URL"]]}}'
+        return f"""{{
+                :query {{
+                    :find ["URL1" (pull ?url1 [*]) "URL2" (pull ?url2 [*])]
+                    :where [
+                        [?url1 :URL/primary_key "{str(targets[0])}"]
+                        [?url2 :object_type "URL"]
+                    ]
+                  }}
+                }}
+                """
     else:
-        return '{:query {:find [(pull ?var [*])] :where [[?var :object_type "URL"]]}}'
+        return f"""{{
+                :query {{
+                    :find ["URL1" (pull ?url1 [*]) "URL2" (pull ?url2 [*])]
+                    :where [
+                        [?url1 :URL/primary_key "{str(targets[0])}"]
+                        [?url2 :URL/primary_key "{str(targets[1])}"]
+                    ]
+                  }}
+                }}
+                """
 
 
 callable_query_nibble = NibbleDefinition(
@@ -240,19 +251,16 @@ def test_callable_query(xtdb_octopoes_service: OctopoesService, event_manager: M
 
     event_manager.complete_process_events(xtdb_octopoes_service)
 
-    url_names1 = ["https://mispo.es", "https://appelmo.es", "https://boesbo.es"]
-    url_names2 = ["https://tompo.es", "https://smo.es", "https://mispo.es"]
-
-    for url in url_names1:
+    for url in ["https://mispo.es", "https://appelmo.es", "https://boesbo.es"]:
         xtdb_octopoes_service.ooi_repository.save(URL(network=network1.reference, raw=url), valid_time)
 
-    for url in url_names2:
+    for url in ["https://tompo.es", "https://smo.es", "https://mispo.es"]:
         xtdb_octopoes_service.ooi_repository.save(URL(network=network2.reference, raw=url), valid_time)
 
     event_manager.complete_process_events(xtdb_octopoes_service)
 
-    url1 = URL(network=network1.reference, raw=url_names1[0]).reference
-    url2 = URL(network=network2.reference, raw=url_names2[2]).reference
+    url1 = URL(network=network1.reference, raw="https://mispo.es").reference
+    url2 = URL(network=network2.reference, raw="https://mispo.es").reference
     xtdb_url1 = xtdb_octopoes_service.ooi_repository.get(url1, valid_time)
     xtdb_url2 = xtdb_octopoes_service.ooi_repository.get(url2, valid_time)
     finding = list(callable_query(xtdb_url1, xtdb_url2))

@@ -889,16 +889,17 @@ class XTDBOOIRepository(OOIRepository):
             return [{ooi}]
         else:
             if arguments is None:
+                first = True
                 arguments = [
-                    ooi.reference if sgn.object_type == type_by_name(ooi.get_ooi_type()) else None
+                    ooi.reference
+                    if sgn.object_type == type_by_name(ooi.get_ooi_type()) and (first and not (first := False))
+                    else None
                     for sgn in nibble.signature
                 ]
             query = nibble.query if isinstance(nibble.query, str) else nibble.query(arguments)
             data = self.session.client.query(query, valid_time)
             objects = [
-                {ooi, *[self.objectify(element.object_type, obj) for obj in search(element.parser, data)]}
-                if isinstance(ooi, element.object_type)
-                else {self.objectify(element.object_type, obj) for obj in search(element.parser, data)}
+                {self.objectify(element.object_type, obj) for obj in search(element.parser, data)}
                 for element in nibble.signature
             ]
             objects = [
