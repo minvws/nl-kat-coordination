@@ -43,7 +43,6 @@ class AddBoefjeView(BoefjeSetupView):
         plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
 
         try:
-            logger.info("Creating boefje", event_code=800025, boefje=plugin)
             self.get_katalogus().create_plugin(plugin)
             return super().form_valid(form)
         except DuplicatePluginError as error:
@@ -98,7 +97,6 @@ class AddBoefjeVariantView(BoefjeSetupView):
         plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
 
         try:
-            logger.info("Creating boefje", event_code=800025, boefje=plugin)
             self.get_katalogus().create_plugin(plugin)
             return super().form_valid(form)
         except DuplicatePluginError as error:
@@ -168,7 +166,6 @@ class EditBoefjeView(BoefjeSetupView):
         plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
 
         try:
-            logger.info("Editing boefje", event_code=800026, boefje=plugin)
             self.get_katalogus().edit_plugin(plugin)
             return super().form_valid(form)
         except DuplicatePluginError as error:
