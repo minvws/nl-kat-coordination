@@ -42,10 +42,8 @@ class Origin(BaseModel):
                         self.__class__.__name__,
                         self.origin_type.value,
                         self.method,
-                        self.source,
-                        f"[{','.join([str(param) for param in self.result])}]" if self.result else "Null",
-                        f"[{','.join([str(param) for param in self.parameters_references])}]"
-                        if self.parameters_references
+                        f"[{','.join(sorted([str(param) for param in self.parameters_references]))}]"
+                        if self.parameters_references is not None
                         else "Null",
                     ],
                 )
