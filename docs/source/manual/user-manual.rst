@@ -108,8 +108,6 @@ The objects below show different clearance types for various objects. The hostna
 .. image:: img/objects-clearance-types.png
   :alt: different object clearance types
 
-__ Object clearances_
-
 Object details
 --------------
 Object details can be found by clicking on an object on the Objects page. Object details provide data on that specific object and how it relates to other objects. The following detail tabs are available:
