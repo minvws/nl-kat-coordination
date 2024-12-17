@@ -500,6 +500,29 @@ Based on the report, object and safeguard, select the relevant boefjes for your 
 The scan is an ongoing process, looking for information based on derivation and logical connections in the data model. The results of the scan appear over time, any findings can be viewed by object, at Findings and in the Crisis Room. In each context, reports can also be generated.
 
 
+Questions & Configs
+===================
+OpenKAT can be used to customise OpenKAT to your own company policies and industry standards. This will allow you to set your security more or less strict depending on your needs and wishes. This can be done using the Question objects on the Objects page. By default no policies are applied. In order to set an policy you have to answer the policy questions and apply these. After applying the questions a Config is created which contains all the answers to your Questions. OpenKAT reads the applied Config files and ensures that all observations are measured against your applied policy..
+
+The summarize: your personal policy is stored in Configs. In order to create a Config you have to answer the Questions. After answering all questions the Config is automatically generated and applied. Questions consist of a JSON schema, which is rendered as a form in the web interface..
+
+Currently the following pre-defined policies are available:
+- Disallawed hostnames in the CSP header
+- Objects in the HTTP headers
+- Port classification
+
+.. list-table:: Questions
+   :widths: 25 100
+   :header-rows: 1
+
+   * - Disallowed CSP hostnames
+     - Checks CSP headers for hostnames that could be dangerous by serving malicious code. Loading external content from websites you do not have control over could result in supply chain attacks..
+   * - OOIs in headers
+     - Checks for specific parameters in headers, such as session parameters. This can be useful when you have SSO portals. Adding your session parameters to the list will prevent the objects database from being cluttered when it's scanning (and receiving) 'new' URLs from your SSO portal..
+   * - Port classification
+     - Classifies open ports to your needs. Can be used to specify which ports should receive what findings. This includes common TCP/UPD ports, but also which system administrator (sa) and database (db) ports are used in your network...
+
+
 Trusted timestamps in OpenKAT
 =============================
 
