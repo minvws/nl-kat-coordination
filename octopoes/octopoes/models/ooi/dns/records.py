@@ -50,7 +50,7 @@ class DNSMXRecord(DNSRecord):
     object_type: Literal["DNSMXRecord"] = "DNSMXRecord"
     dns_record_type: Literal["MX"] = "MX"
 
-    mail_hostname: Reference | None = ReferenceField(Hostname, default=None)
+    mail_hostname: Reference | None = ReferenceField(Hostname, default=None, max_inherit_scan_level=1)
     preference: int | None = None
 
     _reverse_relation_names = {"hostname": "dns_mx_records", "mail_hostname": "mail_server_of"}
@@ -144,7 +144,7 @@ class CAATAGS(Enum):
     ISSUEVMC = "issuevmc"
     ISSUEMAIL = "issuemail"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.value
 
 

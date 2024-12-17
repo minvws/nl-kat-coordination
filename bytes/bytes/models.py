@@ -38,10 +38,10 @@ def _validate_timezone_aware_datetime(value: datetime) -> datetime:
 class MimeType(BaseModel):
     value: str
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.value)
 
-    def __lt__(self, other: MimeType):
+    def __lt__(self, other: MimeType) -> bool:
         return self.value < other.value
 
 
