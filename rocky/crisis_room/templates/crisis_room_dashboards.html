@@ -25,21 +25,23 @@
                 <section>
                     <div>
                         <h3>{{ organization.name }} {% translate "dashboards" %}</h3>
-                        {% for dashboards in organization_dashboards %}
-                            {% for dashboard_data, report_data in dashboards.items %}
-                                <section>
-                                    <div>
-                                        <h4>{{ dashboard_data }}</h4>
-                                        {% if report_data %}
-                                            {% include dashboard_data.template with data=report_data is_dashboard="yes" %}
+                        {% if organization_dashboards %}
+                            {% for dashboards in organization_dashboards %}
+                                {% for dashboard_data, report in dashboards.items %}
+                                    {% if report %}
+                                        <section>
+                                            <div>
+                                                <h4>{{ dashboard_data }}</h4>
+                                                {% include dashboard_data.template with data=report.1 is_dashboard="yes" %}
 
-                                        {% else %}
-                                            <p>{% translate "There are no dashboards to display." %}</p>
-                                        {% endif %}
-                                    </div>
-                                </section>
+                                            </div>
+                                        </section>
+                                    {% endif %}
+                                {% endfor %}
                             {% endfor %}
-                        {% endfor %}
+                        {% else %}
+                            <p>{% translate "There are no dashboards to display." %}</p>
+                        {% endif %}
                     </div>
                 </section>
             {% endfor %}
