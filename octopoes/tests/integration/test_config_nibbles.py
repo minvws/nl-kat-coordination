@@ -19,7 +19,12 @@ if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
 
 
+counter = 0
+
+
 def config_nibble_payload(url: URL, config: Config | None) -> Iterator[OOI]:
+    global counter
+    counter += 1
     if config is not None and str(url.raw) in config.config:
         kft = KATFindingType(id="URL in config")
         yield kft
@@ -29,23 +34,21 @@ def config_nibble_payload(url: URL, config: Config | None) -> Iterator[OOI]:
 def config_nibble_query(targets: list[Reference | None]) -> str:
     sgn = "".join(str(int(isinstance(target, Reference))) for target in targets)
     if sgn == "10":
+        network = Network(name=targets[0].split("|")[1]).reference
         return f"""
                     {{
                         :query {{
                             :find [(pull ?url [*]) (pull ?config [*])] :where [
 
-                                [?header :object_type "URL"]
-                                [?header :URL/primary_key "{str(targets[0])}"]
+                                [?url :object_type "URL"]
+                                [?url :URL/primary_key "{str(targets[0])}"]
 
                                 (or
                                     (and
-                                        [?url :URL/network ?network]
-                                        [?config :Config/ooi ?network]
+                                        [?config :Config/ooi "{str(network)}"]
                                         [?config :Config/bit_id "config_nibble_test"]
                                     )
                                     (and
-                                        [(identity nil) ?url]
-                                        [(identity nil) ?network]
                                         [(identity nil) ?config]
                                     )
                                 )
@@ -55,6 +58,7 @@ def config_nibble_query(targets: list[Reference | None]) -> str:
                     }}
                 """
     elif sgn == "01":
+        network = Network(name=targets[1].split("|")[1]).reference
         return f"""
                     {{
                         :query {{
@@ -66,14 +70,10 @@ def config_nibble_query(targets: list[Reference | None]) -> str:
 
                                 (or
                                     (and
-                                        [?url :URL/network ?network]
-                                        [?config :Config/ooi ?network]
-                                        [?config :Config/bit_id "config_nibble_test"]
+                                        [?url :URL/network "{network}"]
                                     )
                                     (and
                                         [(identity nil) ?url]
-                                        [(identity nil) ?network]
-                                        [(identity nil) ?config]
                                     )
                                 )
 
@@ -109,6 +109,8 @@ config_nibble._payload = getattr(sys.modules[__name__], "config_nibble_payload")
 
 
 def test_inference_without_config(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
+    global counter
+    counter = 0
     xtdb_octopoes_service.nibbler.nibbles = {"config_nibble_test": config_nibble}
 
     network = Network(name="internet")
@@ -120,9 +122,12 @@ def test_inference_without_config(xtdb_octopoes_service: OctopoesService, event_
 
     assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 0
     assert xtdb_octopoes_service.ooi_repository.list_oois({KATFindingType}, valid_time).count == 0
+    assert counter == 1
 
 
 def test_inference_with_config(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
+    global counter
+    counter = 0
     xtdb_octopoes_service.nibbler.nibbles = {"config_nibble_test": config_nibble}
 
     network = Network(name="internet")
@@ -136,9 +141,12 @@ def test_inference_with_config(xtdb_octopoes_service: OctopoesService, event_man
 
     assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 1
     assert xtdb_octopoes_service.ooi_repository.list_oois({KATFindingType}, valid_time).count == 1
+    assert counter == 2
 
 
 def test_inference_with_other_config(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
+    global counter
+    counter = 0
     xtdb_octopoes_service.nibbler.nibbles = {"config_nibble_test": config_nibble}
 
     network = Network(name="internet")
@@ -154,11 +162,14 @@ def test_inference_with_other_config(xtdb_octopoes_service: OctopoesService, eve
 
     assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 0
     assert xtdb_octopoes_service.ooi_repository.list_oois({KATFindingType}, valid_time).count == 0
+    assert counter == 1
 
 
 def test_inference_with_fake_id_config(
     xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime
 ):
+    global counter
+    counter = 0
     xtdb_octopoes_service.nibbler.nibbles = {"config_nibble_test": config_nibble}
 
     network = Network(name="internet")
@@ -172,11 +183,14 @@ def test_inference_with_fake_id_config(
 
     assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 0
     assert xtdb_octopoes_service.ooi_repository.list_oois({KATFindingType}, valid_time).count == 0
+    assert counter == 1
 
 
 def test_inference_with_changed_config(
     xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime
 ):
+    global counter
+    counter = 0
     xtdb_octopoes_service.nibbler.nibbles = {"config_nibble_test": config_nibble}
 
     network = Network(name="internet")
@@ -199,3 +213,5 @@ def test_inference_with_changed_config(
     assert xtdb_octopoes_service.ooi_repository.list_oois({KATFindingType}, valid_time).count == 0
 
     assert len(xtdb_octopoes_service.origin_repository.list_origins(valid_time, origin_type=OriginType.NIBBLET)) == 1
+
+    assert counter == 3
