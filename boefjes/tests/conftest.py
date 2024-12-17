@@ -239,6 +239,11 @@ def test_organisation():
 
 
 @pytest.fixture
+def second_test_organisation():
+    return Organisation(id="test2", name="Test org2")
+
+
+@pytest.fixture
 def mock_plugin_service(mock_local_repository, test_organisation) -> PluginService:
     storage = ConfigStorageMemory()
     storage.upsert(test_organisation.id, "test_plugin", {"DUMMY_VAR": "123"})
@@ -252,6 +257,14 @@ def organisation(organisation_storage, test_organisation) -> Organisation:
         repo.create(test_organisation)
 
     return test_organisation
+
+
+@pytest.fixture
+def second_organisation(organisation_storage, second_test_organisation) -> Organisation:
+    with organisation_storage as repo:
+        repo.create(second_test_organisation)
+
+    return second_test_organisation
 
 
 @pytest.fixture

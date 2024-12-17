@@ -15,7 +15,6 @@ class PluginEnableDisableView(SinglePluginView):
         plugin_state = kwargs["plugin_state"]
 
         if plugin_state == "True":
-            logger.info("Disabling plugin", event_code=800022, plugin=self.plugin.name)
             self.katalogus_client.disable_plugin(self.plugin)
             messages.add_message(
                 self.request,
@@ -25,7 +24,6 @@ class PluginEnableDisableView(SinglePluginView):
             return HttpResponseRedirect(request.POST.get("current_url"))
 
         if self.plugin.can_scan(self.organization_member):
-            logger.info("Enabling plugin", event_code=800021, plugin=self.plugin.name)
             self.katalogus_client.enable_plugin(self.plugin)
             messages.add_message(
                 self.request, messages.SUCCESS, _("{} '{}' enabled.").format(self.plugin.type.title(), self.plugin.name)
