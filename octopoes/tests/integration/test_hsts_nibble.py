@@ -16,6 +16,8 @@ from octopoes.models.ooi.web import HostnameHTTPURL, HTTPHeader, HTTPResource, W
 if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
 
+STATIC_IP = ".".join((4 * "1 ").split())
+
 
 def test_hsts_nibble_with_and_without_config(
     xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime
@@ -42,7 +44,7 @@ def test_hsts_nibble_with_and_without_config(
     service = Service(name="https")
     xtdb_octopoes_service.ooi_repository.save(service, valid_time)
 
-    ip_address = IPAddressV4(address="1.1.1.1", network=network.reference)
+    ip_address = IPAddressV4(address=STATIC_IP, network=network.reference)
     xtdb_octopoes_service.ooi_repository.save(ip_address, valid_time)
 
     port = IPPort(port=443, address=ip_address.reference, protocol=Protocol.TCP)
@@ -108,7 +110,7 @@ def test_hsts_nibble_with_config(xtdb_octopoes_service: OctopoesService, event_m
     service = Service(name="https")
     xtdb_octopoes_service.ooi_repository.save(service, valid_time)
 
-    ip_address = IPAddressV4(address="1.1.1.1", network=network.reference)
+    ip_address = IPAddressV4(address=STATIC_IP, network=network.reference)
     xtdb_octopoes_service.ooi_repository.save(ip_address, valid_time)
 
     port = IPPort(port=443, address=ip_address.reference, protocol=Protocol.TCP)

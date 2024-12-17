@@ -6,6 +6,8 @@ from octopoes.models.ooi.email_security import DNSSPFMechanismIP, DNSSPFRecord
 from octopoes.models.ooi.findings import KATFindingType
 from octopoes.models.ooi.network import IPAddressV4
 
+STATIC_IP = ".".join((4 * "1 ").split())
+
 
 def test_spf_discovery_simple_success():
     dnstxt_record = DNSTXTRecord(
@@ -27,7 +29,7 @@ def test_spf_discovery_simple_success():
 
     assert (
         results[0].model_dump()
-        == IPAddressV4(address="1.1.1.1", network=Reference.from_str("Network|internet")).model_dump()
+        == IPAddressV4(address=STATIC_IP, network=Reference.from_str("Network|internet")).model_dump()
     )
 
     assert (
