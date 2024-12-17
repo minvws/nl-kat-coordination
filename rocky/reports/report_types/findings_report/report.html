@@ -90,12 +90,8 @@
                                                 {% endblocktranslate %}
                                                 </p>
                                             </div>
-                                            {% if findings.finding_types %}
-                                                {% include "partials/report_findings_table.html" with finding_types=findings.finding_types %}
+                                            {% include "partials/report_findings_table.html" with finding_types=findings.finding_types %}
 
-                                            {% else %}
-                                                <p>{% translate "No critical and high finding types have been identified for this organization." %}</p>
-                                            {% endif %}
                                             <a class="button ghost"
                                                href="{% url "view_report" organization.code %}?report_id={{ report.report_id }}#findings">{% translate "View findings report" %}</a>
                                         </td>
@@ -111,34 +107,19 @@
 {% elif is_dashboard %}
     <div class="horizontal-scroll">
         <h5>{% translate "Findings overview" %}</h5>
-        {% include "partials/report_severity_totals_table.html" with data=data.findings.summary %}
+        {% include "partials/report_severity_totals_table.html" with show_introduction="yes" data=data.findings.summary %}
 
         <h5>{% translate "Findings" %}</h5>
-        {% include "partials/report_findings_table.html" with finding_types=data.findings.finding_types %}
+        {% include "partials/report_findings_table.html" with show_introduction="yes" finding_types=data.findings.finding_types %}
 
     </div>
 {% else %}
     <div class="horizontal-scroll">
         <h3 id="findings-overview">{% translate "Findings overview" %}</h3>
-        <p>
-            {% blocktranslate %}
-                This overview shows the total number of findings per
-                severity that have been identified for this organization.
-            {% endblocktranslate %}
-        </p>
-        {% include "partials/report_severity_totals_table.html" with data=data.summary %}
+        {% include "partials/report_severity_totals_table.html" with show_introduction="yes" data=data.summary %}
 
         <h3 id="findings-table">{% translate "Findings" %}</h3>
-        <p>
-            {% blocktranslate %}
-                This table provides an overview of the identified findings on the scanned
-                systems. For each finding type it shows the risk level, the number of occurrences
-                and the first known occurrence of the finding. The risk level may be different for your specific environment.
-                The details can be seen when expanding a row. A description, the source, impact and recommendation of the finding
-                can be found here. It also shows in which findings the finding type occurred.
-            {% endblocktranslate %}
-        </p>
-        {% include "partials/report_findings_table.html" with finding_types=data.finding_types %}
+        {% include "partials/report_findings_table.html" with show_introduction="yes" finding_types=data.finding_types %}
 
     </div>
 {% endif %}

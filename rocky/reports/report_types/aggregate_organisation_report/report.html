@@ -113,12 +113,8 @@
                                 for this organization.
                             {% endblocktranslate%}
                         </p>
-                        {% if not data.findings %}
-                            <p>{% translate "No findings have been identified yet." %}</p>
-                        {% else %}
-                            {% include "findings_report/report.html" with data=data.findings %}
+                        {% include "findings_report/report.html" with data=data.findings %}
 
-                        {% endif %}
                     </div>
                 </section>
             {% endif %}
