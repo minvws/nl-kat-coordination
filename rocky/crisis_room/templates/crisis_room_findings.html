@@ -12,43 +12,52 @@
                 <h1>{% translate "Crisis Room" %}</h1>
                 <p class="emphasized">{% translate "Crisis Room overview for all organizations" %}</p>
             </div>
-            {% if organizations_findings_summary.total_finding_types != 0 %}
-                <section>
-                    <div>
+            {% if organizations_dashboards %}
+                {% if organizations_findings_summary.total_finding_types != 0 %}
+                    <section>
                         <div>
-                            <h2>{% translate "Findings overview" %}</h2>
-                            <p>
-                                {% blocktranslate %}
-                                    This overview shows the total number of findings per
-                                    severity that have been identified for all organizations.
-                                {% endblocktranslate %}
-                            </p>
-                        </div>
-                        {% include "partials/report_severity_totals_table.html" with data=organizations_findings_summary %}
+                            <div>
+                                <h2>{% translate "Findings overview" %}</h2>
+                                <p>
+                                    {% blocktranslate %}
+                                        This overview shows the total number of findings per
+                                        severity that have been identified for all organizations.
+                                    {% endblocktranslate %}
+                                </p>
+                            </div>
+                            {% include "partials/report_severity_totals_table.html" with data=organizations_findings_summary %}
 
-                    </div>
-                </section>
-                <section>
-                    <div>
+                        </div>
+                    </section>
+                    <section>
                         <div>
-                            <h2>{% translate "Findings per organization" %}</h2>
-                            <p>
-                                {% blocktranslate %}
-                                    This table shows the findings that have been identiefied for each organization,
-                                    sorted by the finding types and grouped by organizations.
-                                {% endblocktranslate %}
-                            </p>
-                        </div>
-                        {% include "findings_report/report.html" with is_dashboard_findings="yes" %}
+                            <div>
+                                <h2>{% translate "Findings per organization" %}</h2>
+                                <p>
+                                    {% blocktranslate %}
+                                        This table shows the findings that have been identiefied for each organization,
+                                        sorted by the finding types and grouped by organizations.
+                                    {% endblocktranslate %}
+                                </p>
+                            </div>
+                            {% include "findings_report/report.html" with is_dashboard_findings="yes" %}
 
-                    </div>
-                </section>
+                        </div>
+                    </section>
+                {% else %}
+                    <h3>{% translate "Findings overview" %}</h3>
+                    <p>
+                        {% blocktranslate %}
+                            No findings have been identified yet. As soon as they have been
+                            identified, they will be shown on this page.
+                        {% endblocktranslate %}
+                    </p>
+                {% endif %}
             {% else %}
-                <h3>{% translate "Findings overview" %}</h3>
                 <p>
                     {% blocktranslate %}
-                        No findings have been identified yet. As soon as they have been
-                        identified, they will be shown on this page.
+                        There are no organizations yet. After creating an organization,
+                        the identified findings with severity 'critical' and 'high' will be shown here.
                     {% endblocktranslate %}
                 </p>
             {% endif %}
