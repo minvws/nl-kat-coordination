@@ -176,7 +176,7 @@ class BoefjeDetailView(PluginDetailView):
             if schedules.count > 0:
                 schedule: ScheduleResponse = schedules.results[0]
 
-            oois_with_schedule.append((ooi, schedule))
+                oois_with_schedule.append((ooi, schedule))
         return oois_with_schedule
 
     def get_form_filtered_consumable_oois(self):
