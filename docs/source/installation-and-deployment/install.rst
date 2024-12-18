@@ -17,6 +17,19 @@ Debian packages
 
 The Debian packages can be used for production installations of OpenKAT and are available as artifacts from the Github actions in the repository of each module. How to install them is explained in the manual. A repository to enable ``apt install kat`` is under construction. The packages cannot easily be converted to RPM's, for this we do not have a solution yet.
 
+Alternative installs
+====================
+The following alternative installs are possible for OpenKAT. These are community contributions and are thus not maintained by OpenKAT.
+
+Kubernetes
+**********
+The Kubernetes files can be found at `https://gitlab.com/digilab.overheid.nl/platform/helm-charts/openkat/ <https://gitlab.com/digilab.overheid.nl/platform/helm-charts/openkat/>`_.
+
+Ansible
+*******
+The Ansible files can be found at `https://github.com/sigio/openkat-ansible <https://github.com/sigio/openkat-ansible>`_.
+
+
 Development environment
 =======================
 
