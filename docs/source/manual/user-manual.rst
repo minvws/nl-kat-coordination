@@ -513,7 +513,7 @@ Currently the following pre-defined policies are available:
 - Port classification
 
 .. list-table:: Questions
-   :widths: 25 75 75 75 50
+   :widths: 25 60 60 60 60
    :header-rows: 1
 
    * - Questions
