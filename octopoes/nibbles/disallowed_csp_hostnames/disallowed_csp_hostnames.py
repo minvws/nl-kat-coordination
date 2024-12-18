@@ -28,7 +28,9 @@ def nibble(input_ooi: HTTPHeaderHostname, config: Config | None) -> Iterator[OOI
 
     hostname = header_hostname.hostname.tokenized.name
     disallowed_domains = link_shorteners_list() if disallow_url_shorteners else []
-    disallowed_hostnames_from_config = get_disallowed_hostnames_from_config(config, "disallowed_hostnames", [])
+    disallowed_hostnames_from_config = get_disallowed_hostnames_from_config(
+        config.config if config else {}, "disallowed_hostnames", []
+    )
 
     disallowed_domains.extend(disallowed_hostnames_from_config)
     hostnameparts = hostname.lower().split(".")
