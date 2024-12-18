@@ -12,18 +12,6 @@
                 <h1>{% translate "Crisis Room" %}</h1>
                 <p class="emphasized">{% translate "Crisis Room overview for all organizations" %}</p>
             </div>
-            <div>
-                <h2>{% translate "Findings" %}</h2>
-                <p>
-                    {% blocktranslate %}
-                        On this page you can see an overview of all the findings that have
-                        been identified for all organizations. It first shows an overview with
-                        the total number of findings per severity that have been identified for
-                        all organizations. After that, a table is shown with all the findings,
-                        sorted by the finding types and grouped by organizations.
-                    {% endblocktranslate %}
-                </p>
-            </div>
             {% if organizations_findings_summary.total_finding_types != 0 %}
                 <section>
                     <div>
