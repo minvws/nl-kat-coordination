@@ -42,7 +42,7 @@ class DashboardData(models.Model):
     )
 
     class Meta:
-        unique_together = ["dashboard", "position"]
+        unique_together = [["dashboard", "position"], ["dashboard", "findings_dashboard"]]
 
     def __str__(self) -> str:
         if self.dashboard:
