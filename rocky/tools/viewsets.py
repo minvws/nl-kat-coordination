@@ -106,12 +106,6 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         serializer = ToOrganizationSerializer(data=request.data)
         if serializer.is_valid():
             to_organization = serializer.validated_data["to_organization"]
-            logger.info(
-                "Cloning organization settings",
-                event_code=910000,
-                organization_code=from_organization.code,
-                to_organization_code=to_organization.code,
-            )
             get_katalogus_client().clone_all_configuration_to_organization(from_organization.code, to_organization.code)
 
             return Response()
