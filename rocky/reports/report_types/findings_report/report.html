@@ -97,14 +97,16 @@
                                             {% include "partials/report_findings_table.html" with finding_types=findings.finding_types %}
 
                                             <div class="horizontal-view toolbar">
-                                                <a class="button"
-                                                   href="{% url "view_report" organization.code %}?report_id={{ report.report.primary_key }}#findings-table">
-                                                    {% translate "View findings report" %}
-                                                </a>
-                                                <a class="button ghost"
-                                                   href="{% ooi_url "ooi_edit" dashboard_data.recipe organization.code %}">
-                                                    <span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit report recipe" %}
-                                                </a>
+                                                <div class="button-container">
+                                                    <a class="button"
+                                                       href="{% url "view_report" organization.code %}?report_id={{ report.report.primary_key }}#findings-table">
+                                                        {% translate "View findings report" %}
+                                                    </a>
+                                                    <a class="button ghost"
+                                                       href="{% ooi_url "ooi_edit" dashboard_data.recipe organization.code %}">
+                                                        <span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit report recipe" %}
+                                                    </a>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
