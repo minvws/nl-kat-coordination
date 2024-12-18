@@ -3,6 +3,7 @@ from typing import Any
 from uuid import uuid4
 
 import structlog
+from cron_descriptor import get_description
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -21,7 +22,6 @@ from reports.views.base import ReportBreadcrumbs, ReportDataDict, get_selection
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import OctopoesView, ReportList
 from rocky.views.scheduler import SchedulerView
-from cron_descriptor import get_description, ExpressionDescriptor
 
 logger = structlog.get_logger(__name__)
 

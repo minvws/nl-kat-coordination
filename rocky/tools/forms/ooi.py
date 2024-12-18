@@ -3,10 +3,8 @@ from typing import Any
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from rocky.scheduler import (
-    ScheduleResponse,
-)
 from octopoes.models import OOI
+from rocky.scheduler import ScheduleResponse
 from tools.forms.base import BaseRockyForm, CheckboxTable, LabeledCheckboxInput, ObservedAtForm
 from tools.forms.settings import DEPTH_DEFAULT, DEPTH_HELP_TEXT, DEPTH_MAX, SCAN_LEVEL_CHOICES
 
@@ -46,7 +44,14 @@ class SelectOOIForm(BaseRockyForm):
         ),
     )
 
-    def __init__(self, oois: list[tuple[OOI, ScheduleResponse]], organization_code: str, mandatory_fields: list | None = None, *args, **kwargs):
+    def __init__(
+        self,
+        oois: list[tuple[OOI, ScheduleResponse]],
+        organization_code: str,
+        mandatory_fields: list | None = None,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.fields["ooi"].widget.attrs["organization_code"] = organization_code
         if mandatory_fields:
@@ -58,7 +63,7 @@ class SelectOOIForm(BaseRockyForm):
     @staticmethod
     def _to_choice(ooi_with_schedule: tuple[OOI, ScheduleResponse]) -> tuple[str, Any]:
         ooi, schedule = ooi_with_schedule[0], ooi_with_schedule[1]
-        print(schedule)
+
         return str(ooi), (ooi, ooi, ooi.scan_profile.level if ooi.scan_profile else 0, schedule)
 
 

@@ -7,15 +7,12 @@ from django.http import FileResponse
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
-from rocky.scheduler import (
-    ScheduleResponse,
-)
-
-from octopoes.models import OOI
 from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
 
 from katalogus.client import Boefje, Normalizer
 from katalogus.views.plugin_settings_list import PluginSettingsListView
+from octopoes.models import OOI
+from rocky.scheduler import ScheduleResponse
 from rocky.views.tasks import TaskListView
 
 
@@ -170,27 +167,14 @@ class BoefjeDetailView(PluginDetailView):
             schedules = self.scheduler_client.post_schedule_search(
                 {
                     "filters": [
-                        {
-                        "column": "data",
-                        "field": "boefje__id",
-                        "operator": "eq",
-                        "value": self.plugin.id,
-                        },
-                        {
-                        "column": "data",
-                        "field": "input_ooi",
-                        "operator": "eq",
-                        "value": ooi.primary_key,
-                        }
+                        {"column": "data", "field": "boefje__id", "operator": "eq", "value": self.plugin.id},
+                        {"column": "data", "field": "input_ooi", "operator": "eq", "value": ooi.primary_key},
                     ]
                 }
             )
 
-            schedule: ScheduleResponse = None
-
             if schedules.count > 0:
-                schedule = schedules.results[0]
-
+                schedule: ScheduleResponse = schedules.results[0]
 
             oois_with_schedule.append((ooi, schedule))
         return oois_with_schedule
