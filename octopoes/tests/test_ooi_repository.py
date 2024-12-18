@@ -137,7 +137,7 @@ class OOIRepositoryTest(TestCase):
     def test_objectify(self):
         assert self.repository.objectify(int, "6") == 6
         assert self.repository.objectify(int, ["9", "9", "9"]) == tuple([9, 9, 9])
-        assert self.repository.objectify(int, {"9", "9", "9"}) == frozenset([9])
+        assert self.repository.objectify(int, set((3 * "9 ").split())) == frozenset([9])
         assert self.repository.objectify(int, {"1", "2", "5"}) == frozenset([1, 2, 5])
 
         assert self.repository.objectify(str, "potato") == "potato"
