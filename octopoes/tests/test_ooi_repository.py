@@ -143,7 +143,7 @@ class OOIRepositoryTest(TestCase):
         assert self.repository.objectify(str, "potato") == "potato"
         assert self.repository.objectify(str, ["potato", "piper"]) == tuple(["potato", "piper"])
         assert self.repository.objectify(str, {"potato", "piper"}) == frozenset(["potato", "piper"])
-        assert self.repository.objectify(str, set((2 * "potato").split())) == frozenset(["potato"])
+        assert self.repository.objectify(str, set((2 * "potato ").split())) == frozenset(["potato"])
 
         assert self.repository.objectify(dict, {"potato1": "piper", "potato2": "king-edward"}) == {
             "potato1": "piper",
