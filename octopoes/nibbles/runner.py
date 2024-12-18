@@ -1,28 +1,16 @@
 import json
-from collections.abc import Callable, Iterable
+from collections.abc import Iterable
 from datetime import datetime
-from typing import Any, TypeVar
+from typing import Any
 
 from xxhash import xxh3_128_hexdigest as xxh3  # INFO: xxh3_64_hexdigest is faster but hash more collision probabilities
 
 from nibbles.definitions import NibbleDefinition, get_nibble_definitions
 from octopoes.models import OOI
 from octopoes.models.origin import Origin, OriginType
-from octopoes.models.types import type_by_name
 from octopoes.repositories.ooi_repository import OOIRepository
 from octopoes.repositories.origin_repository import OriginRepository
 from octopoes.repositories.scan_profile_repository import ScanProfileRepository
-
-T = TypeVar("T")
-U = TypeVar("U")
-
-
-def ooi_type(ooi: OOI) -> type[OOI]:
-    return type_by_name(ooi.get_ooi_type())
-
-
-def merge_with(func: Callable[[set[T], set[T]], set[T]], d1: dict[U, set[T]], d2: dict[U, set[T]]) -> dict[U, set[T]]:
-    return {k: func(d1.get(k, set()), d2.get(k, set())) for k in set(d1) | set(d2)}
 
 
 def merge_results(
