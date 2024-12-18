@@ -28,7 +28,7 @@
                 <section>
                     <div>
                         <div>
-                            <h3>{% translate "Findings overview" %}</h3>
+                            <h2>{% translate "Findings overview" %}</h2>
                             <p>
                                 {% blocktranslate %}
                                     This overview shows the total number of findings per
@@ -43,8 +43,13 @@
                 <section>
                     <div>
                         <div>
-                            <h3>{% translate "Findings per organization" %}</h3>
-                            <p>{% translate "This table shows the findings that have been identified for each organization." %}</p>
+                            <h2>{% translate "Findings per organization" %}</h2>
+                            <p>
+                                {% blocktranslate %}
+                                    This table shows the findings that have been identiefied for each organization,
+                                    sorted by the finding types and grouped by organizations.
+                                {% endblocktranslate %}
+                            </p>
                         </div>
                         {% include "findings_report/report.html" with is_dashboard_findings="yes" %}
 
