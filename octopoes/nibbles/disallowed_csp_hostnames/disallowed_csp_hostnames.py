@@ -28,14 +28,14 @@ def nibble(input_ooi: HTTPHeaderHostname, config: Config | None) -> Iterator[OOI
 
     hostname = header_hostname.hostname.tokenized.name
     disallowed_domains = link_shorteners_list() if disallow_url_shorteners else []
-    disallowed_hostnames_from_config = get_disallowed_hostnames_from_config(
-        config.config if config and config.config else {}, "disallowed_hostnames", []
-    )
+    disallowed_hostnames_from_config = get_disallowed_hostnames_from_config(config, "disallowed_hostnames", [])
 
     disallowed_domains.extend(disallowed_hostnames_from_config)
-
-    if hostname.lower() in disallowed_domains:
-        ft = KATFindingType(id="KAT-DISALLOWED-DOMAIN-IN-CSP")
-        f = Finding(ooi=input_ooi.reference, finding_type=ft.reference)
-        yield ft
-        yield f
+    hostnameparts = hostname.lower().split(".")
+    for i in range(len(hostnameparts)):
+        if ".".join(hostnameparts[i:]) in disallowed_domains:
+            ft = KATFindingType(id="KAT-DISALLOWED-DOMAIN-IN-CSP")
+            f = Finding(ooi=input_ooi.reference, finding_type=ft.reference)
+            yield ft
+            yield f
+            break
