@@ -34,7 +34,7 @@ def config_nibble_payload(url: URL, config: Config | None) -> Iterator[OOI]:
 def config_nibble_query(targets: list[Reference | None]) -> str:
     sgn = "".join(str(int(isinstance(target, Reference))) for target in targets)
     if sgn == "10":
-        network = Network(name=targets[0].split("|")[1]).reference
+        network = str(Network(name=targets[0].split("|")[1]).reference) if targets[0] is not None else ""
         return f"""
                     {{
                         :query {{
@@ -45,7 +45,7 @@ def config_nibble_query(targets: list[Reference | None]) -> str:
 
                                 (or
                                     (and
-                                        [?config :Config/ooi "{str(network)}"]
+                                        [?config :Config/ooi "{network}"]
                                         [?config :Config/bit_id "config_nibble_test"]
                                     )
                                     (and
@@ -58,7 +58,7 @@ def config_nibble_query(targets: list[Reference | None]) -> str:
                     }}
                 """
     elif sgn == "01":
-        network = Network(name=targets[1].split("|")[1]).reference
+        network = str(Network(name=targets[1].split("|")[1]).reference) if targets[1] is not None else ""
         return f"""
                     {{
                         :query {{
