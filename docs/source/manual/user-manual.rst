@@ -502,26 +502,40 @@ The scan is an ongoing process, looking for information based on derivation and 
 
 Questions & Configs
 ===================
-OpenKAT can be used to customise OpenKAT to your own company policies and industry standards. This will allow you to set your security more or less strict depending on your needs and wishes. This can be done using the Question objects on the Objects page. By default no policies are applied. In order to set an policy you have to answer the policy questions and apply these. After applying the questions a Config is created which contains all the answers to your Questions. OpenKAT reads the applied Config files and ensures that all observations are measured against your applied policy..
+OpenKAT can be used to customise OpenKAT to your own company policies and industry standards. This will allow you to set your security more or less strict depending on your needs and wishes. This can be done using the Question objects on the Objects page. By default no policies are applied. In order to set an policy you have to answer the policy questions and apply these. After applying the questions a Config is created which contains all the answers to your Questions. OpenKAT reads the applied Config files and ensures that all observations are measured against your applied policy.
 
-The summarize: your personal policy is stored in Configs. In order to create a Config you have to answer the Questions. After answering all questions the Config is automatically generated and applied. Questions consist of a JSON schema, which is rendered as a form in the web interface..
+The summarize: your personal policy is stored in Configs. In order to create a Config you have to answer the Questions. After answering all questions the Config is automatically generated and applied. Questions consist of a JSON schema, which is rendered as a form in the web interface.
 
 Currently the following pre-defined policies are available:
+
 - Disallawed hostnames in the CSP header
 - Objects in the HTTP headers
 - Port classification
 
 .. list-table:: Questions
-   :widths: 25 100
+   :widths: 25 50 50 50 50
    :header-rows: 1
 
+   * - Questions
+     - Why is this question introduced?
+     - What are the risks?
+     - Limitations
+     - Example input
    * - Disallowed CSP hostnames
-     - Checks CSP headers for hostnames that could be dangerous by serving malicious code. Loading external content from websites you do not have control over could result in supply chain attacks..
+     - Websites often load scripts and content from external servers (e.g. jQuery from a Content Delivery Network (CDN) like Cloudflare). This can be dangerous as you have limited control over the content that is inside the scripts that these external servers are serving. This Question allows you to check if the hostname in the CSP is allowed by your policy.
+     - Loading external content from websites you do not have control over could result in supply chain attacks. Attackers could serve malicious code (scripts) on CDN networks that is then automatically loaded into the browser of each website visitor.
+     - This question is currently only looking for specific bad hostnames that have been provided by the user. This means that malicious hostnames that are not entered here, are not shown as a finding. You can specify the main domain like `bad.com` and if scripts are loaded from `script.bad.com` a finding should be triggered for that subdomain.
+     - Provide hostnames which are unwanted, separate each hostname by a comma. E.g. evil.com, bad.evil.com, attacker.com.
    * - OOIs in headers
-     - Checks for specific parameters in headers, such as session parameters. This can be useful when you have SSO portals. Adding your session parameters to the list will prevent the objects database from being cluttered when it's scanning (and receiving) 'new' URLs from your SSO portal..
+     - Some websites like SSO portals result in new objects on the Objects page for each time a boefje visited the website with a new session token. This creates unwanted clutter on the Objects page. By specifying which session parameters are used the number of objects will be limited to only the paths on the server.
+     - There is no direct impact. Having good insights in your network helps with risk mitigation.
+     - It only checks for parameters in the URL, headers are ignored. There is currently no way to specify the parameters per hostname.
+     - Provide the URL parameter that is to be ignored, separate each parameter by a comma. URL parameters can be found in the URL bar after the `?` sign. They  are the values after the `&` and before the `=` signs. If you browse to your website and it shows `https://example.com/index.php?session_id=12346&user=admin`. This URL has two parameters:`session_id` and `user`. The `session_id` is expected to clutter the Objects list, thus that can be added to the ignored URL parameters list.
    * - Port classification
-     - Classifies open ports to your needs. Can be used to specify which ports should receive what findings. This includes common TCP/UPD ports, but also which system administrator (sa) and database (db) ports are used in your network...
-
+     - Classifies open ports to your needs to adjust findings to your environment. You can specify common TCP and UDP ports which will not trigger a finding (such as e-mail server ports). Specifying the database (db) and system administrator (sa) ports that are commonly found in your network will tell OpenKAT which findings to show if these ports are detected.
+     - There is no direct impact. Having good insights in your network helps with risk mitigation.
+     - If a port is added to multiple lists it is categorized under the first category it found (from top to bottom on the form).
+     - Enter ports in comma separated lists.
 
 Trusted timestamps in OpenKAT
 =============================
