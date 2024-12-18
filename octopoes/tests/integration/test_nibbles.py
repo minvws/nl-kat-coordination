@@ -235,7 +235,7 @@ def callable_query_query(targets: list[Reference | None]) -> str:
 
 
 callable_query_nibble = NibbleDefinition(
-    id="max_url_length_config", signature=callable_query_param, query=callable_query_query
+    id="callable_nibble_query", signature=callable_query_param, query=callable_query_query
 )
 callable_query_nibble._payload = getattr(sys.modules[__name__], "callable_query")
 

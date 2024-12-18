@@ -40,7 +40,7 @@ def flatten(items: Iterable[OOI | Iterable[OOI | None] | None]) -> Iterable[OOI]
             yield from flatten(item)
 
 
-def nibble_hasher(data: Iterable) -> str:
+def nibble_hasher(data: Iterable, additional: str | None = None) -> str:
     return xxh3(
         "".join(
             [
@@ -50,6 +50,7 @@ def nibble_hasher(data: Iterable) -> str:
                 for ooi in data
             ]
         )
+        + (additional or "")
     )
 
 
@@ -64,13 +65,17 @@ class NibblesRunner:
         self.origin_repository = origin_repository
         self.scan_profile_repository = scan_profile_repository
         self.cache: dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]] = {}
-        self.update_nibbles()
+        self.nibbles: dict[str, NibbleDefinition] = get_nibble_definitions()
 
     def __del__(self):
         self._write(datetime.now())
 
-    def update_nibbles(self):
-        self.nibbles: dict[str, NibbleDefinition] = get_nibble_definitions()
+    def update_nibbles(self, valid_time: datetime):
+        self.nibbles = get_nibble_definitions()
+        # FIXME: this is nice, but does not allow newly affected elements -- this will be addressed shortly
+        nibblets = self.origin_repository.list_origins(valid_time, origin_type=OriginType.NIBBLET)
+        refs = set(map(lambda nibblet: nibblet.source, nibblets))
+        self.infer(self.ooi_repository.load_bulk_as_list(refs, valid_time), valid_time)
 
     def select_nibbles(self, nibble_ids: Iterable[str]):
         self.nibbles = {key: value for key, value in self.nibbles.items() if key in nibble_ids}
@@ -80,6 +85,9 @@ class NibblesRunner:
 
     def list_available_nibbles(self) -> list[str]:
         return list(get_nibble_definitions())
+
+    def checksum_nibbles(self) -> dict[str, str | None]:
+        return {nibble.id: nibble._checksum for nibble in self.nibbles.values()}
 
     def disable(self):
         self.nibbles = {}
@@ -103,7 +111,7 @@ class NibblesRunner:
                 results = {
                     tuple(arg): set(flatten([nibble(arg)]))
                     for arg in args
-                    if nibblet.parameters_hash != nibble_hasher(arg)
+                    if nibblet.parameters_hash != nibble_hasher(arg, nibble._checksum)
                 }
                 return_value |= {nibble.id: results}
         nibblet_nibbles = {self.nibbles[nibblet.method] for nibblet in nibblets if nibblet.method in self.nibbles}
@@ -130,7 +138,7 @@ class NibblesRunner:
                         origin_type=OriginType.NIBBLET,
                         source=source_ooi.reference,
                         result=[ooi.reference for ooi in result],
-                        parameters_hash=nibble_hasher(arg),
+                        parameters_hash=nibble_hasher(arg, self.nibbles[nibble_id]._checksum),
                         parameters_references=[a.reference if isinstance(a, OOI) else None for a in arg],
                     )
                     for ooi in result:

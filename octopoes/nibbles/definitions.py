@@ -1,4 +1,5 @@
 import importlib
+import inspect
 import pkgutil
 from collections.abc import Callable, Iterable
 from pathlib import Path
@@ -7,6 +8,7 @@ from typing import Any
 
 import structlog
 from pydantic import BaseModel
+from xxhash import xxh3_128_hexdigest as xxh3  # INFO: xxh3_64_hexdigest is faster but hash more collision probabilities
 
 from octopoes.models import OOI, Reference
 
@@ -35,6 +37,7 @@ class NibbleDefinition(BaseModel):
     signature: list[NibbleParameter]
     query: str | Callable[[list[Reference | None]], str] | None = None
     _payload: MethodType | None = None
+    _checksum: str | None = None
 
     def __call__(self, args: Iterable[OOI]) -> OOI | Iterable[OOI | None] | None:
         if self._payload is None:
@@ -65,6 +68,7 @@ def get_nibble_definitions() -> dict[str, NibbleDefinition]:
                     )
                     if hasattr(payload, NIBBLE_FUNC_NAME):
                         nibble_definition._payload = getattr(payload, NIBBLE_FUNC_NAME)
+                        nibble_definition._checksum = xxh3(inspect.getsource(module) + inspect.getsource(payload))
                     else:
                         logger.warning('module "%s" has no function %s', package.name, NIBBLE_FUNC_NAME)
 

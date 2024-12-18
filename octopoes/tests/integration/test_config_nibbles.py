@@ -98,7 +98,7 @@ def config_nibble_query(targets: list[Reference | None]) -> str:
 
 
 config_nibble = NibbleDefinition(
-    id="config_nibble",
+    id="config_nibble_test",
     signature=[
         NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]"),
         NibbleParameter(object_type=Config, parser="[*][?object_type == 'Config'][]", optional=True),
@@ -204,6 +204,7 @@ def test_inference_with_changed_config(
 
     assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 1
     assert xtdb_octopoes_service.ooi_repository.list_oois({KATFindingType}, valid_time).count == 1
+    assert counter == 2
 
     config = Config(ooi=network.reference, bit_id="config_nibble_test", config={})
     xtdb_octopoes_service.ooi_repository.save(config, valid_time)
@@ -211,7 +212,6 @@ def test_inference_with_changed_config(
 
     assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 0
     assert xtdb_octopoes_service.ooi_repository.list_oois({KATFindingType}, valid_time).count == 0
+    assert counter == 3
 
     assert len(xtdb_octopoes_service.origin_repository.list_origins(valid_time, origin_type=OriginType.NIBBLET)) == 1
-
-    assert counter == 3
