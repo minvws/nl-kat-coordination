@@ -26,8 +26,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.findings import RiskLevelSeverity
 from rocky.bytes_client import get_bytes_client
-from rocky.views.mixins import ObservedAtMixin
-from rocky.views.ooi_view import ConnectorFormMixin
+from rocky.views.mixins import ConnectorFormMixin, ObservedAtMixin
 
 logger = structlog.get_logger(__name__)
 

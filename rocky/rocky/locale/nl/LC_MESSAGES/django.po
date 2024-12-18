@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-18 15:24+0000\n"
-"PO-Revision-Date: 2024-11-22 17:00+0000\n"
+"POT-Creation-Date: 2024-12-03 21:56+0000\n"
+"PO-Revision-Date: 2024-12-13 16:00+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
 "coordination/nl/>\n"
@@ -24,7 +24,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.9-dev\n"
+"X-Generator: Weblate 5.9-rc\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -645,6 +645,7 @@ msgstr "Modal sluiten"
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/confirmation_clone_settings.html
 #: katalogus/templates/plugin_settings_delete.html
+#: reports/templates/report_overview/modal_partials/enable_disable_schedule_modal.html
 #: rocky/templates/oois/ooi_delete.html
 #: rocky/templates/oois/ooi_mute_finding.html
 #: rocky/templates/organizations/organization_edit.html
@@ -690,12 +691,14 @@ msgstr "Alles tonen"
 #: katalogus/templates/partials/plugin_tile_modal.html
 #: katalogus/templates/plugin_container_image.html
 #: reports/report_types/dns_report/report.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Enabled"
 msgstr "Ingeschakeld"
 
 #: katalogus/forms/katalogus_filter.py
 #: katalogus/templates/partials/plugin_tile_modal.html
 #: katalogus/templates/plugin_container_image.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
 msgid "Disabled"
 msgstr "Uitgeschakeld"
@@ -1218,7 +1221,6 @@ msgstr "Boefje-details"
 
 #: katalogus/templates/partials/plugin_tile_modal.html reports/forms.py
 #: reports/templates/report_overview/report_history_table.html
-#: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Report types"
 msgstr "Rapporttypes"
 
@@ -1401,7 +1403,6 @@ msgstr "Boefje-ID"
 #: reports/templates/report_overview/modal_partials/delete_modal.html
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
 #: reports/templates/report_overview/report_history_table.html
-#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/report_overview/subreports_table.html
 msgid "Creation date"
 msgstr "Aanmaakdatum"
@@ -1808,7 +1809,6 @@ msgstr "Wijzigingen opslaan"
 #: onboarding/templates/account/step_2a_organization_update.html
 #: onboarding/templates/account/step_2b_indemnification_setup.html
 #: onboarding/templates/step_3d_clearance_level_introduction.html
-#: reports/templates/partials/report_setup_scan.html
 msgid "Continue"
 msgstr "Doorgaan"
 
@@ -2751,7 +2751,8 @@ msgstr "Selecteer een plug-in om door te gaan."
 msgid "Please select all required plugins to proceed."
 msgstr "Selecteer alle benodigde plug-ins om door te gaan."
 
-#: onboarding/views.py
+#: onboarding/views.py reports/views/aggregate_report.py
+#: reports/views/generate_report.py
 msgid "An error occurred while enabling {}. The plugin is not available."
 msgstr ""
 "Er is een fout opgetreden bij het inschakelen van {}. De plug-in is niet "
@@ -2802,7 +2803,7 @@ msgstr "Startdatum"
 
 #: reports/forms.py
 msgid "Start time (UTC)"
-msgstr ""
+msgstr "Starttijd (UTC)"
 
 #: reports/forms.py
 #: reports/templates/report_overview/scheduled_reports_table.html
@@ -3161,6 +3162,10 @@ msgstr "Gevonden kwetsbaarheden zijn per systeem gegroepeerd."
 #: reports/report_types/multi_organization_report/vulnerabilities.html
 msgid "No CVEs have been found."
 msgstr "Er zijn geen CVE’s gevonden."
+
+#: reports/report_types/aggregate_organisation_report/report.py
+msgid "Aggregate Organisation Report"
+msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
 msgid "Observed at:"
@@ -3576,7 +3581,7 @@ msgstr "Eerst gezien"
 #: reports/report_types/findings_report/report.html
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid "No findings have been identified yet."
-msgstr ""
+msgstr "Er zijn nog geen bevindingen geïdentificeerd."
 
 #: reports/report_types/findings_report/report.py
 msgid "Findings Report"
@@ -4259,6 +4264,9 @@ msgid ""
 "report(s). If you select a date on the 28th-31st of the month, it will "
 "always be scheduled on the last day of the month."
 msgstr ""
+"Kies voor uw rapport(en) een startdatum, -tijd en herhaling. Als u een datum "
+"kiest tussen de 28e en 31e van de maand, zal het altijd op de laatste dag "
+"van de maand worden ingepland."
 
 #: reports/templates/partials/export_report_settings.html
 msgid ""
@@ -4353,6 +4361,7 @@ msgid "Add reference date"
 msgstr "Referentiedatum toevoegen"
 
 #: reports/templates/partials/report_names_form.html
+#: reports/templates/report_overview/modal_partials/rename_modal.html
 #: rocky/views/scan_profile.py
 msgid "Reset"
 msgstr "Opnieuw instellen"
@@ -4629,6 +4638,10 @@ msgstr "Meer voorgestelde plug-ins tonen"
 msgid "There are no optional plugins."
 msgstr "Er zijn geen optionele plug-ins."
 
+#: reports/templates/partials/report_setup_scan.html
+msgid "Enable plugins and continue"
+msgstr "Plug-ins inschakelen en doorgaan"
+
 #: reports/templates/partials/report_severity_totals.html
 #: reports/templates/partials/report_severity_totals_table.html
 msgid "Findings overview"
@@ -4734,7 +4747,7 @@ msgstr ""
 #: reports/templates/report_overview/modal_partials/delete_modal.html
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
 msgid "Input objects"
-msgstr ""
+msgstr "Objecten invoeren"
 
 #: reports/templates/report_overview/modal_partials/delete_modal.html
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
@@ -4743,6 +4756,22 @@ msgstr ""
 #: reports/templates/report_overview/subreports_table.html
 msgid "Reference date"
 msgstr "Referentiedatum"
+
+#: reports/templates/report_overview/modal_partials/enable_disable_schedule_modal.html
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Disable schedule"
+msgstr "Schema uitschakelen"
+
+#: reports/templates/report_overview/modal_partials/enable_disable_schedule_modal.html
+#, python-format
+msgid ""
+"\n"
+"            Are you sure you want to disable the schedule for "
+"%(report_name)s?\n"
+"            The recipe will still exist and the schedule can be enabled "
+"later on.\n"
+"        "
+msgstr ""
 
 #: reports/templates/report_overview/modal_partials/rename_modal.html
 msgid "Rename the following report(s):"
@@ -4815,25 +4844,13 @@ msgstr "Details subrapporten :"
 #: reports/templates/report_overview/report_history_table.html
 #, python-format
 msgid ""
-"\n"
-"                                        This report consist of %(counter)s "
-"subreport with the following report type and object.\n"
-"                                    "
+"This report consist of %(counter)s subreport with the following report type "
+"and object."
 msgid_plural ""
-"\n"
-"                                        This report consist of %(counter)s "
-"subreports with the following report types and objects.\n"
-"                                    "
+"This report consist of %(counter)s subreports with the following report "
+"types and objects."
 msgstr[0] ""
-"\n"
-"                                        Dit rapport bestaat uit %(counter)s "
-"sub-rapport met het volgende rapporttype en object.\n"
-"                                    "
 msgstr[1] ""
-"\n"
-"                                        Dit rapport bestaat uit %(counter)s "
-"sub-rapporten met de volgende rapporttypen en objecten.\n"
-"                                    "
 
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/subreports_header.html
@@ -4884,29 +4901,36 @@ msgid "Scheduled reports:"
 msgstr "Ingeplande rapporten:"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
-msgid "Report Name"
-msgstr "Rapportnaam"
-
-#: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Scheduled for"
 msgstr "Ingepland voor"
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Schedule status"
+msgstr "Schemastatus"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Scheduled Reports:"
 msgstr "Ingeplande rapporten:"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
-#: rocky/templates/tasks/boefje_task_detail.html
-msgid "Input object"
-msgstr "Inputobject"
+msgid "Input"
+msgstr "Invoer"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Show report details"
 msgstr "Rapportdetails tonen"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
+msgid "objects"
+msgstr "objecten"
+
+#: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Edit report recipe"
 msgstr "Rapportrecept bewerken"
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Enable schedule"
+msgstr "Schema inschakelen"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "No scheduled reports have been generated yet."
@@ -5035,6 +5059,10 @@ msgstr "Instellingen exporteren"
 msgid "Save report"
 msgstr "Rapport opslaan"
 
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+msgid "You do not have the required permissions to enable plugins."
+msgstr "U hebt niet de benodigde rechten om plug-ins in te schakelen."
+
 #: reports/views/base.py
 msgid "Select at least one OOI to proceed."
 msgstr "Selecteer minstens één OOI om door te gaan."
@@ -5090,6 +5118,21 @@ msgstr "Multi-rapport"
 #: reports/views/multi_report.py
 msgid "View report"
 msgstr "Toon rapport"
+
+#: reports/views/report_overview.py
+msgid "Schedule {}"
+msgstr "Schema {}"
+
+#: reports/views/report_overview.py
+msgid ""
+"Schedule disabled successfully. '{}' will not be generated automatically "
+"until the schedule is enabled again."
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid ""
+"Schedule enabled successfully. '{}' will be generated according to schedule."
+msgstr ""
 
 #: reports/views/report_overview.py
 msgid "An unexpected error occurred, please check logs for more info."
@@ -6635,7 +6678,7 @@ msgstr "%(display_type)s opslaan"
 
 #: rocky/templates/oois/ooi_findings.html
 msgid "Currently no findings have been identified for OOI"
-msgstr ""
+msgstr "Er zijn momenteel nog geen bevindingen voor OOI geïdentificeerd"
 
 #: rocky/templates/oois/ooi_list.html
 #, python-format
@@ -7441,6 +7484,10 @@ msgstr "Meta- en raw-gegevens downloaden"
 msgid "Download meta data"
 msgstr "Meta-gegevens downloaden"
 
+#: rocky/templates/tasks/boefje_task_detail.html
+msgid "Input object"
+msgstr "Inputobject"
+
 #: rocky/templates/tasks/boefjes.html
 #, python-format
 msgid ""
@@ -8144,6 +8191,10 @@ msgstr ""
 "Kan het scanniveau niet opnieuw instellen. Scanniveau van {ooi_name} is niet "
 "gedeclareerd"
 
+#: rocky/views/scans.py
+msgid "Scans"
+msgstr "Scans"
+
 #: rocky/views/scheduler.py
 msgid "Your report has been scheduled."
 msgstr "Uw rapport is ingepland."
@@ -8223,6 +8274,31 @@ msgstr "Raw-bestand kan niet naar Bytes worden geüpload: %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Raw-bestand met succes toegevoegd."
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                                        This report consist of "
+#~ "%(counter)s subreport with the following report type and object.\n"
+#~ "                                    "
+#~ msgid_plural ""
+#~ "\n"
+#~ "                                        This report consist of "
+#~ "%(counter)s subreports with the following report types and objects.\n"
+#~ "                                    "
+#~ msgstr[0] ""
+#~ "\n"
+#~ "                                        Dit rapport bestaat uit "
+#~ "%(counter)s sub-rapport met het volgende rapporttype en object.\n"
+#~ "                                    "
+#~ msgstr[1] ""
+#~ "\n"
+#~ "                                        Dit rapport bestaat uit "
+#~ "%(counter)s sub-rapporten met de volgende rapporttypen en objecten.\n"
+#~ "                                    "
+
+#~ msgid "Report Name"
+#~ msgstr "Rapportnaam"
 
 #~ msgid "No findings have been found."
 #~ msgstr "Er zijn geen bevindingen gevonden."
@@ -9699,6 +9775,3 @@ msgstr "Raw-bestand met succes toegevoegd."
 
 #~ msgid "Scanning successfully scheduled."
 #~ msgstr "Scan met success ingepland."
-
-#~ msgid "Scans"
-#~ msgstr "Scans"

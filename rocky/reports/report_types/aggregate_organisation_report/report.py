@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Any
 
 import structlog
+from django.utils.translation import gettext_lazy as _
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
@@ -25,7 +26,7 @@ logger = structlog.get_logger(__name__)
 
 class AggregateOrganisationReport(AggregateReport):
     id = "aggregate-organisation-report"
-    name = "Aggregate Organisation Report"
+    name = _("Aggregate Organisation Report")
     description = "Aggregate Organisation Report"
     reports = {
         "required": [SystemReport],
@@ -464,7 +465,9 @@ class AggregateOrganisationReport(AggregateReport):
             "config_oois": config_oois,
         }
 
-    def collect_system_specific_data(self, data, services, system_type: str, report_id: str) -> dict[str, Any]:
+    def collect_system_specific_data(
+        self, data: dict, services: dict, system_type: str, report_id: str
+    ) -> dict[str, Any]:
         """Given a system, return a list of report data from the right sub-reports based on the related report_id"""
 
         report_data: dict[str, Any] = {}
