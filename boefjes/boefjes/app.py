@@ -282,7 +282,7 @@ def get_runtime_manager(settings: Settings, queue: str, log_level: str) -> Worke
 
     return SchedulerWorkerManager(
         item_handler,
-        SchedulerAPIClient(base_url=str(settings.scheduler_api)),  # Do not share a session between workers
+        SchedulerAPIClient(str(settings.scheduler_api)),  # Do not share a session between workers
         settings,
         log_level,
     )
