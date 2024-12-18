@@ -8,10 +8,10 @@
 
     <main id="main-content" tabindex="-1" class="crisisroom">
         <section>
-            {% include "crisis_room_header.html" with active="findings" %}
-
-        </section>
-        <section>
+            <div>
+                <h1>{% translate "Crisis Room" %}</h1>
+                <p class="emphasized">{% translate "Crisis Room overview for all organizations" %}</p>
+            </div>
             <div>
                 <h2>{% translate "Findings" %}</h2>
                 <p>

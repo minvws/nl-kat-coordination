@@ -1,17 +1,10 @@
 {% load i18n %}
 
 <div>
-    <h1>{% translate "Crisis Room" %}</h1>
-    <p class="emphasized">{% translate "Crisis Room overview for all organizations" %}</p>
-</div>
-<div>
     <nav class="tabs" aria-label="{% translate "Crisis Room Navigation" %}">
         <ul>
             <li {% if active == "findings" %}aria-current="page"{% endif %}>
                 <a href="{% url 'crisis_room_findings' %}">{% translate "Findings" %}</a>
-            </li>
-            <li {% if active == "findings_settings" %}aria-current="page"{% endif %}>
-                <a href="{% url 'crisis_room_findings_settings' %}">{% translate "Findings Settings" %}</a>
             </li>
         </ul>
     </nav>
