@@ -17,6 +17,8 @@ from scheduler.utils import cron, thread
 
 tracer = trace.get_tracer(__name__)
 
+INTERNET_BOEFJES = ["shodan", "adr-finding-types", "adr-validator", "cve-finding-types", "cwe-finding-types"]
+
 
 class Scheduler(abc.ABC):
     """The Scheduler class combines the priority queue.
@@ -225,7 +227,7 @@ class Scheduler(abc.ABC):
                 hydrated_task.data["requirements"] = requirements
                 hydrated_task.data["network"] = ooi.network
 
-                if hydrated_task.data["boefje"]["id"] in ["shodan"] and ooi.network != "Network|internet":
+                if hydrated_task.data["boefje"]["id"] in INTERNET_BOEFJES and ooi.network != "Network|internet":
                     raise Exception(
                         "Attempted to make a Task with an OOI that does not lie on the internet with a boefje that\
                         only works with internet access"
