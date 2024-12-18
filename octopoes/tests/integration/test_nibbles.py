@@ -50,7 +50,6 @@ def test_url_classification_nibble(xtdb_octopoes_service: OctopoesService, event
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
         xtdb_octopoes_service.scan_profile_repository,
-        perform_writes=False,
     )
     nibble = xtdb_octopoes_service.nibbler.nibbles["url_classification"]
     xtdb_octopoes_service.nibbler.disable()

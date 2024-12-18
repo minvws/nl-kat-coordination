@@ -71,12 +71,10 @@ class NibblesRunner:
         ooi_repository: OOIRepository,
         origin_repository: OriginRepository,
         scan_profile_repository: ScanProfileRepository,
-        perform_writes: bool = True,
     ):
         self.ooi_repository = ooi_repository
         self.origin_repository = origin_repository
         self.scan_profile_repository = scan_profile_repository
-        self.perform_writes = perform_writes
         self.cache: dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]] = {}
         self.update_nibbles()
 
@@ -135,23 +133,22 @@ class NibblesRunner:
         return return_value
 
     def _write(self, valid_time: datetime):
-        if self.perform_writes:
-            for source_ooi, results in self.cache.items():
-                self.ooi_repository.save(source_ooi, valid_time)
-                for nibble_id, run_result in results.items():
-                    for arg, result in run_result.items():
-                        nibble_origin = Origin(
-                            method=nibble_id,
-                            origin_type=OriginType.NIBBLET,
-                            source=source_ooi.reference,
-                            result=[ooi.reference for ooi in result],
-                            parameters_hash=nibble_hasher(arg),
-                            parameters_references=[a.reference if isinstance(a, OOI) else None for a in arg],
-                        )
-                        for ooi in result:
-                            self.ooi_repository.save(ooi, valid_time=valid_time)
-                        self.origin_repository.save(nibble_origin, valid_time=valid_time)
-            self.cache = {}
+        for source_ooi, results in self.cache.items():
+            self.ooi_repository.save(source_ooi, valid_time)
+            for nibble_id, run_result in results.items():
+                for arg, result in run_result.items():
+                    nibble_origin = Origin(
+                        method=nibble_id,
+                        origin_type=OriginType.NIBBLET,
+                        source=source_ooi.reference,
+                        result=[ooi.reference for ooi in result],
+                        parameters_hash=nibble_hasher(arg),
+                        parameters_references=[a.reference if isinstance(a, OOI) else None for a in arg],
+                    )
+                    for ooi in result:
+                        self.ooi_repository.save(ooi, valid_time=valid_time)
+                    self.origin_repository.save(nibble_origin, valid_time=valid_time)
+        self.cache = {}
 
     def infer(self, stack: list[OOI], valid_time: datetime) -> dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]]:
         inferences: dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]] = {}
