@@ -243,7 +243,7 @@ def _start_working(
         finally:
             try:
                 # The docker runner could have handled this already
-                if scheduler.get_task_details(p_item.id).status == TaskStatus.RUNNING:
+                if scheduler.get_task_details(str(p_item.id)).status == TaskStatus.RUNNING:
                     scheduler.patch_task(p_item.id, status)  # Note that implicitly, we have p_item.id == task_id
                     logger.info("Set status to %s in the scheduler for task[id=%s]", status, p_item.id)
             except HTTPError:

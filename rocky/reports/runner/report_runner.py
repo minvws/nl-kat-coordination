@@ -101,9 +101,9 @@ class LocalReportRunner(ReportRunner):
                 for ooi in data:
                     ooi_human_readable = Reference.from_str(ooi).human_readable
                     subreport_name = now.strftime(
-                        Template(recipe.subreport_name_format).safe_substitute(
-                            ooi=ooi_human_readable, report_type=str(report_type.name)
-                        )
+                        Template(
+                            "" if recipe.subreport_name_format is None else recipe.subreport_name_format
+                        ).safe_substitute(ooi=ooi_human_readable, report_type=str(report_type.name))
                     )
                     subreport_names.append((subreport_name, subreport_name))
 
@@ -112,7 +112,7 @@ class LocalReportRunner(ReportRunner):
             )
 
             if "${ooi}" in parent_report_name and oois_count == 1:
-                parent_report_name = Template(parent_report_name).safe_substitute(ooi=ooi[0].human_readable)
+                parent_report_name = Template(parent_report_name).safe_substitute(ooi=ooi_human_readable)
 
             save_report_data(
                 self.bytes_client,
