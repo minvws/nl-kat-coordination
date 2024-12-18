@@ -25,7 +25,6 @@ from octopoes.connector import ConnectorException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.findings import RiskLevelSeverity
-from octopoes.models.ooi.reports import Report
 from rocky.bytes_client import get_bytes_client
 from rocky.views.mixins import ObservedAtMixin
 from rocky.views.ooi_view import ConnectorFormMixin
@@ -150,24 +149,21 @@ class CrisisRoomMixin:
         )
         for data in dashboards_data:
             organization_dashboard = {}
-            report, report_data = self.get_report_data(data)
-
-            finding_types = report_data["findings"]["finding_types"]
-            highest_risk_level = finding_types[0]["finding_type"]["risk_severity"]
-            critical_high_finding_types = list(
-                filter(
-                    lambda finding_type: finding_type["finding_type"]["risk_severity"] == "critical"
-                    or finding_type["finding_type"]["risk_severity"] == "high",
-                    finding_types,
+            report = self.get_report_data(data)
+            if "findings" in report["report_data"] and "finding_types" in report["report_data"]["findings"]:
+                finding_types = report["report_data"]["findings"]["finding_types"]
+                highest_risk_level = finding_types[0]["finding_type"]["risk_severity"]
+                critical_high_finding_types = list(
+                    filter(
+                        lambda finding_type: finding_type["finding_type"]["risk_severity"] == "critical"
+                        or finding_type["finding_type"]["risk_severity"] == "high",
+                        finding_types,
+                    )
                 )
-            )
-            report_data["findings"]["finding_types"] = critical_high_finding_types[:25]
+                report["report_data"]["findings"]["finding_types"] = critical_high_finding_types[:25]
 
-            organization_dashboard[data] = {
-                "report_data": report_data,
-                "report_id": report,
-                "highest_risk_level": highest_risk_level,
-            }
+            organization_dashboard[data] = report | {"highest_risk_level": highest_risk_level}
+
             grouped_data[data.dashboard.organization].append(organization_dashboard)
         return dict(grouped_data)
 
@@ -182,7 +178,7 @@ class CrisisRoomMixin:
             settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
         )
 
-    def get_report_data(self, dashboard_data: DashboardData) -> tuple[Report | None, dict[str, Any]]:
+    def get_report_data(self, dashboard_data: DashboardData) -> dict[str, Any]:
         """Get the latest/newest report data with the recipe ID"""
         valid_time = datetime.now(timezone.utc)
         octopoes_client = self.get_octopoes_client(dashboard_data.dashboard.organization)
@@ -200,13 +196,14 @@ class CrisisRoomMixin:
             bytes_client = get_bytes_client(dashboard_data.dashboard.organization.code)
             bytes_client.login()
 
-            return (
-                report,
-                TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
+            return {
+                "report": report,
+                "report_data": TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
                     bytes_client.get_raw(raw_id=report.data_raw_id)
                 ),
-            )
-        return (None, {})
+            }
+
+        return {}
 
 
 class CrisisRoomDashboards(CrisisRoomMixin, TemplateView):
