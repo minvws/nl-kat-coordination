@@ -11,9 +11,9 @@ def test_page_analyzer_normalizer(normalizer_runner):
     assert len(results) == 14
     assert {o.primary_key for o in results if o.object_type == "Software"} == {
         "Software|BootstrapCDN|3.3.7|",
-        "Software|Bootstrap|3.3.7|cpe:2.3:a:getbootstrap:bootstrap:*:*:*:*:*:*:*:*",
+        "Software|Bootstrap|3.3.7|cpe:2.3:a:getbootstrap:3.3.7:*:*:*:*:*:*:*:*",
         "Software|cdnjs||",
         "Software|jQuery Migrate|1.0.0|",
-        "Software|jQuery|2.3|cpe:2.3:a:jquery:jquery:*:*:*:*:*:*:*:*",
-        "Software|jQuery|3.6.0|cpe:2.3:a:jquery:jquery:*:*:*:*:*:*:*:*",
+        "Software|jQuery|3.6.0|cpe:2.3:a:jquery:3.6.0:*:*:*:*:*:*:*:*",
+        "Software|jQuery||cpe:2.3:a:jquery:jquery:*:*:*:*:*:*:*:*",
     }
