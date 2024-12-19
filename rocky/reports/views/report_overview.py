@@ -3,7 +3,6 @@ from typing import Any
 from uuid import uuid4
 
 import structlog
-from cron_descriptor import get_description
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -79,7 +78,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
                                 "schedule_id": schedule["id"],
                                 "enabled": schedule["enabled"],
                                 "recipe": recipe_ooi,
-                                "cron": get_description(schedule["schedule"]),
+                                "cron": schedule["schedule"],
                                 "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
                                 "reports": report_oois,
                             }
