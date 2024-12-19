@@ -25,6 +25,7 @@ from octopoes.connector import ConnectorException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.findings import RiskLevelSeverity
+from octopoes.models.ooi.reports import ReportRecipe
 from rocky.bytes_client import get_bytes_client
 from rocky.views.mixins import ConnectorFormMixin, ObservedAtMixin
 
@@ -161,7 +162,8 @@ class CrisisRoomMixin:
                 )
                 report["report_data"]["findings"]["finding_types"] = critical_high_finding_types[:25]
 
-            organization_dashboard[data] = report | {"highest_risk_level": highest_risk_level}
+            recurrence = self.get_report_recipe(data).cron_expression
+            organization_dashboard[data] = report | {"highest_risk_level": highest_risk_level, "recurrence": recurrence}
 
             grouped_data[data.dashboard.organization].append(organization_dashboard)
         return dict(grouped_data)
@@ -176,6 +178,13 @@ class CrisisRoomMixin:
         return OctopoesAPIConnector(
             settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
         )
+
+    def get_report_recipe(self, dashboard_data: DashboardData) -> ReportRecipe:
+        """Get the report recipe that is used to generate the dashboard data"""
+        valid_time = datetime.now(timezone.utc)
+        octopoes_client = self.get_octopoes_client(dashboard_data.dashboard.organization)
+
+        return octopoes_client.get(Reference.from_str(dashboard_data.recipe), valid_time=valid_time)
 
     def get_report_data(self, dashboard_data: DashboardData) -> dict[str, Any]:
         """Get the latest/newest report data with the recipe ID"""

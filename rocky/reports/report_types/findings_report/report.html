@@ -10,7 +10,7 @@
     </p>
 {% endif %}
 {% if is_dashboard_findings %}
-    <div class="horizontal-scroll">
+    <div>
         <table>
             <caption class="visually-hidden">{% translate "Findings per organization overview" %}</caption>
             <thead>
@@ -83,7 +83,7 @@
                                             <div>
                                                 <h5>
                                                     {% with total=findings.summary.total_by_severity_per_finding_type %}
-                                                        {% translate "Critical and high findings" %} ({{ findings.finding_types|length }}/{{ total.critical|add:total.high }})
+                                                        {% translate "Critical & high findings" %} ({{ findings.finding_types|length }}/{{ total.critical|add:total.high }})
                                                     {% endwith %}
                                                 </h5>
                                                 <p>
@@ -96,6 +96,10 @@
                                             </div>
                                             {% include "partials/report_findings_table.html" with finding_types=findings.finding_types %}
 
+                                            <div>
+                                                <h5>{% translate "Created with data from" %}</h5>
+                                                <p>{{ report.report.date_generated }} ({% translate "refreshes" %} {{ report.recurrence }})</p>
+                                            </div>
                                             <div class="horizontal-view toolbar">
                                                 <div class="button-container">
                                                     <a class="button"
