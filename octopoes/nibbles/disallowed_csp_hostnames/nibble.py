@@ -57,7 +57,7 @@ def query(targets: list[Reference | None]) -> str:
                         }}
                     }}
                 """
-    else:
+    elif sgn == "11":
         return f"""
                    {{
                        :query {{
@@ -70,6 +70,32 @@ def query(targets: list[Reference | None]) -> str:
                               ]
                          }}
                     }}
+                """
+    else:
+        return """
+                    {
+                        :query {
+                            :find [(pull ?header [*]) (pull ?config [*])] :where [
+
+                                [?header :object_type "HTTPHeaderHostname"]
+
+                                (or
+                                    (and
+                                        [?header :HTTPHeaderHostname/hostname ?hostname]
+                                        [?hostname :Hostname/network ?network]
+                                        [?config :Config/ooi ?network]
+                                        [?config :Config/bit_id "disallowed-csp-hostnames"]
+                                    )
+                                    (and
+                                        [(identity nil) ?hostname]
+                                        [(identity nil) ?network]
+                                        [(identity nil) ?config]
+                                    )
+                                )
+
+                            ]
+                        }
+                    }
                 """
 
 

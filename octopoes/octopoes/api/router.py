@@ -620,3 +620,19 @@ def nibbles_select(nibble_ids: list[str] = Query(), octopoes: OctopoesService = 
 @router.get("/nibbles/checksum", tags=["nibbles"])
 def nibbles_checksum(octopoes: OctopoesService = Depends(octopoes_service)) -> dict[str, str | None]:
     return octopoes.nibbler.checksum_nibbles()
+
+
+@router.get("/nibbles/retrieve", tags=["nibbles"])
+def nibble_retrieve(
+    nibble_id: str,
+    valid_time: datetime = Depends(extract_valid_time),
+    octopoes: OctopoesService = Depends(octopoes_service),
+) -> list[list[Any]]:
+    return octopoes.nibbler.retrieve(nibble_id, valid_time)
+
+
+@router.get("/nibbles/retrieve_all", tags=["nibbles"])
+def nibble_retrieve_all(
+    valid_time: datetime = Depends(extract_valid_time), octopoes: OctopoesService = Depends(octopoes_service)
+) -> dict[str, list[list[Any]]]:
+    return octopoes.nibbler.retrieve_all(valid_time)

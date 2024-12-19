@@ -59,7 +59,7 @@ def query(targets: list[Reference | None]) -> str:
                         }}
                     }}
                 """
-    else:
+    elif sgn == "11":
         return f"""
                    {{
                        :query {{
@@ -72,6 +72,34 @@ def query(targets: list[Reference | None]) -> str:
                               ]
                          }}
                     }}
+                """
+    else:
+        return """
+                    {
+                        :query {
+                            :find [(pull ?header [*]) (pull ?config [*])] :where [
+
+                                [?header :object_type "HTTPHeader"]
+
+                                (or
+                                    (and
+                                        [?header :HTTPHeader/resource ?resource]
+                                        [?resource :HTTPResource/web_url ?url]
+                                        [?url :HostnameHTTPURL/network ?network]
+                                        [?config :Config/ooi ?network]
+                                        [?config :Config/bit_id "check-hsts-header"]
+                                    )
+                                    (and
+                                        [(identity nil) ?resource]
+                                        [(identity nil) ?url]
+                                        [(identity nil) ?network]
+                                        [(identity nil) ?config]
+                                    )
+                                )
+
+                            ]
+                        }
+                    }
                 """
 
 

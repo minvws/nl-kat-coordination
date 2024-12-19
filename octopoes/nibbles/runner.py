@@ -92,6 +92,24 @@ class NibblesRunner:
     def disable(self):
         self.nibbles = {}
 
+    def retrieve(self, nibble_id: str, valid_time: datetime) -> list[list[Any]]:
+        nibble = self.nibbles[nibble_id]
+        if len(nibble.signature) > 1:
+            return [list(args) for args in self.ooi_repository.nibble_query(None, nibble, valid_time)]
+        else:
+            t = nibble.signature[0].object_type
+            if issubclass(t, OOI):
+                return [[ooi] for ooi in self.ooi_repository.list_oois_by_object_types({t}, valid_time)]
+            else:
+                return [[]]
+
+    def retrieve_all(self, valid_time: datetime) -> dict[str, list[list[Any]]]:
+        retrieved: dict[str, list[list[Any]]] = {}
+        for nibble_id in self.nibbles:
+            retrieve = self.retrieve(nibble_id, valid_time)
+            retrieved |= {nibble_id: retrieve}
+        return retrieved
+
     def _run(self, ooi: OOI, valid_time: datetime) -> dict[str, dict[tuple[Any, ...], set[OOI]]]:
         return_value: dict[str, dict[tuple[Any, ...], set[OOI]]] = {}
         nibblets = self.origin_repository.list_origins(

@@ -167,7 +167,11 @@ class OOIRepository(Repository):
         raise NotImplementedError
 
     def nibble_query(
-        self, ooi: OOI, nibble: NibbleDefinition, valid_time: datetime, arguments: list[Reference | None] | None = None
+        self,
+        ooi: OOI | None,
+        nibble: NibbleDefinition,
+        valid_time: datetime,
+        arguments: list[Reference | None] | None = None,
     ) -> Iterable[Iterable[Any]]:
         raise NotImplementedError
 
@@ -895,19 +899,26 @@ class XTDBOOIRepository(OOIRepository):
         return parsed_results
 
     def nibble_query(
-        self, ooi: OOI, nibble: NibbleDefinition, valid_time: datetime, arguments: list[Reference | None] | None = None
+        self,
+        ooi: OOI | None,
+        nibble: NibbleDefinition,
+        valid_time: datetime,
+        arguments: list[Reference | None] | None = None,
     ) -> Iterable[Iterable[Any]]:
         if nibble.query is None:
             return [{ooi}]
         else:
             if arguments is None:
-                first = True
-                arguments = [
-                    ooi.reference
-                    if sgn.object_type == type_by_name(ooi.get_ooi_type()) and (first and not (first := False))
-                    else None
-                    for sgn in nibble.signature
-                ]
+                if ooi is not None:
+                    first = True
+                    arguments = [
+                        ooi.reference
+                        if sgn.object_type == type_by_name(ooi.get_ooi_type()) and (first and not (first := False))
+                        else None
+                        for sgn in nibble.signature
+                    ]
+                else:
+                    arguments = [None for _ in nibble.signature]
             query = nibble.query if isinstance(nibble.query, str) else nibble.query(arguments)
             data = self.session.client.query(query, valid_time)
             objects = [

@@ -92,7 +92,7 @@ def spf_query(targets: list[Reference | None]) -> str:
                         }}
                     }}
                 """
-    else:
+    elif sgn == "111":
         return f"""
                            {{
                                :query {{
@@ -107,6 +107,40 @@ def spf_query(targets: list[Reference | None]) -> str:
                                  }}
                             }}
                         """
+    else:
+        return """
+                    {
+                        :query {
+                            :find [(pull ?hostname [*]) (pull ?spf [*]) (pull ?nx [*])] :where [
+
+                                [?hostname :object_type "Hostname"]
+
+                                (or
+                                    (and
+                                        [?spf :object_type "DNSSPFRecord"]
+                                        [?spf :DNSSPFRecord/dns_txt_record ?txt]
+                                        [?txt :DNSTXTRecord/hostname ?hostname]
+                                    )
+                                    (and
+                                        [(identity nil) ?spf]
+                                        [(identity nil) ?txt]
+                                    )
+                                )
+
+                                (or
+                                    (and
+                                        [?nx :object_type "NXDOMAIN"]
+                                        [?nx :NXDOMAIN/hostname ?hostname]
+                                    )
+                                    (and
+                                        [(identity nil) ?nx]
+                                    )
+                                )
+
+                            ]
+                        }
+                    }
+                """
 
 
 NIBBLE = NibbleDefinition(
