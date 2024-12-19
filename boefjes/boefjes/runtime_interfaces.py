@@ -1,3 +1,5 @@
+from typing import Literal
+
 from boefjes.job_models import BoefjeMeta, NormalizerMeta, NormalizerResults
 
 
@@ -17,7 +19,9 @@ class NormalizerJobRunner:
 
 
 class WorkerManager:
-    def run(self, queue: str) -> None:
+    WorkerType = Literal["boefje", "normalizer"]
+
+    def run(self, queue: WorkerType) -> None:
         raise NotImplementedError()
 
 

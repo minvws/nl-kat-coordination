@@ -265,7 +265,7 @@ def _start_working(
                 logger.exception("Could not patch scheduler task to %s", status.value)
 
 
-def get_runtime_manager(settings: Settings, queue: str, log_level: str) -> WorkerManager:
+def get_runtime_manager(settings: Settings, queue: WorkerManager.WorkerType, log_level: str) -> WorkerManager:
     local_repository = get_local_repository()
 
     session = sessionmaker(bind=get_engine())()

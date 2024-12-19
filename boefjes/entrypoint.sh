@@ -17,7 +17,7 @@ if [ "$DATABASE_MIGRATION" = "1" ] || [[ $DATABASE_MIGRATION == "true" ]]; then
 fi
 
 if [ "$1" = "katalogus" ]; then
-    exec env BOEFJES_RUNNER_TYPE="$1" python -m uvicorn --host 0.0.0.0 boefjes.katalogus.root:app
+    exec python -m uvicorn --host 0.0.0.0 boefjes.katalogus.root:app
 fi
 
 exec "$@"

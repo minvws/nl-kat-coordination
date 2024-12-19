@@ -8,6 +8,7 @@ from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, Settings
 from pydantic_settings.sources import EnvSettingsSource
 
 from boefjes.models import EncryptionMiddleware
+from boefjes.runtime_interfaces import WorkerManager
 
 BASE_DIR: Path = Path(__file__).parent.resolve()
 
@@ -132,7 +133,7 @@ class Settings(BaseSettings):
         examples=[[], ["ipv4", "wifi-pineapple"]],
     )
 
-    runner_type: Literal["boefje", "normalizer"] = Field(None, examples=["boefje", "normalizer"])
+    runner_type: WorkerManager.WorkerType | None = Field(None, examples=["boefje", "normalizer"])
 
     logging_format: Literal["text", "json"] = Field("text", description="Logging format")
 

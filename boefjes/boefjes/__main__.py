@@ -1,11 +1,13 @@
 import json
 import logging.config
+import typing
 
 import click
 import structlog
 
 from boefjes.app import get_runtime_manager
 from boefjes.config import settings
+from boefjes.runtime_interfaces import WorkerManager
 
 with settings.log_cfg.open() as f:
     logging.config.dictConfig(json.load(f))
@@ -34,9 +36,9 @@ logger = structlog.get_logger(__name__)
 
 
 @click.command()
-@click.argument("worker_type", type=click.Choice(["boefje", "normalizer"]))
+@click.argument("worker_type", type=click.Choice(typing.get_args(WorkerManager.WorkerType)))
 @click.option("--log-level", type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"]), help="Log level", default="INFO")
-def cli(worker_type: str, log_level: str) -> None:
+def cli(worker_type: WorkerManager.WorkerType, log_level: str) -> None:
     logger.setLevel(log_level)
     logger.info("Starting runtime for %s", worker_type)
 
