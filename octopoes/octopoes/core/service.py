@@ -8,6 +8,7 @@ from typing import Literal, overload
 import structlog
 from bits.definitions import get_bit_definitions
 from bits.runner import BitRunner
+from nibbles.runner import NibblesRunner
 from pydantic import TypeAdapter
 
 from octopoes.config.settings import (
@@ -76,6 +77,7 @@ class OctopoesService:
         self.origin_repository = origin_repository
         self.origin_parameter_repository = origin_parameter_repository
         self.scan_profile_repository = scan_profile_repository
+        self.nibbler = NibblesRunner(ooi_repository, origin_repository, scan_profile_repository)
         self.session = session
 
     @overload
@@ -149,16 +151,22 @@ class OctopoesService:
         return tree
 
     def _delete_ooi(self, reference: Reference, valid_time: datetime) -> None:
-        referencing_origins = self.origin_repository.list_origins(valid_time, result=reference)
         if not any(
             origin
-            for origin in referencing_origins
-            if not (
-                origin.origin_type == OriginType.AFFIRMATION
-                or (origin.origin_type == OriginType.INFERENCE and origin.source == reference)
+            for origin in self.origin_repository.list_origins(
+                valid_time,
+                origin_type={OriginType.DECLARATION, OriginType.OBSERVATION, OriginType.INFERENCE, OriginType.NIBBLET},
+                result=reference,
             )
+            if not (origin.origin_type in [OriginType.INFERENCE, OriginType.NIBBLET] and origin.source == reference)
         ):
             self.ooi_repository.delete_if_exists(reference, valid_time)
+
+        # Clear out affirmation dangling objects a bit later
+        residue = self.origin_repository.list_origins(valid_time, result=reference)
+        if all(map(lambda x: x.origin_type == OriginType.AFFIRMATION, residue)):
+            for res in residue:
+                self.origin_repository.delete(res, valid_time)
 
     def save_origin(
         self, origin: Origin, oois: list[OOI], valid_time: datetime, end_valid_time: datetime | None = None
@@ -170,10 +178,10 @@ class OctopoesService:
             self.ooi_repository.get(origin.source, valid_time)
         except ObjectNotFoundException:
             if (
-                origin.origin_type not in [OriginType.DECLARATION, OriginType.AFFIRMATION]
+                origin.origin_type not in [OriginType.DECLARATION, OriginType.AFFIRMATION, OriginType.NIBBLET]
                 and origin.source not in origin.result
             ):
-                raise ValueError("Origin source of observation does not exist")
+                raise ValueError(f"Origin source [{origin.source}] does not exist")
             elif origin.origin_type == OriginType.AFFIRMATION:
                 logger.debug("Affirmation source %s already deleted", origin.source)
                 return
@@ -181,11 +189,14 @@ class OctopoesService:
         if origin.origin_type == OriginType.AFFIRMATION and not any(
             other_origin
             for other_origin in self.origin_repository.list_origins(
-                origin_type={OriginType.DECLARATION, OriginType.OBSERVATION, OriginType.INFERENCE},
+                origin_type={OriginType.DECLARATION, OriginType.OBSERVATION, OriginType.INFERENCE, OriginType.NIBBLET},
                 valid_time=valid_time,
                 result=origin.source,
             )
-            if not (other_origin.origin_type == OriginType.INFERENCE and [other_origin.source] == other_origin.result)
+            if not (
+                other_origin.origin_type in [OriginType.INFERENCE, OriginType.NIBBLET]
+                and [other_origin.source] == other_origin.result
+            )
         ):
             logger.debug("Affirmation source %s seems dangling, deleting", origin.source)
             self.ooi_repository.delete_if_exists(origin.source, valid_time)
@@ -196,10 +207,11 @@ class OctopoesService:
         self.origin_repository.save(origin, valid_time=valid_time)
 
         # Origins that are stale need to be deleted. #3561
-        if not origin.result and origin.origin_type != OriginType.INFERENCE:
+        if not origin.result and origin.origin_type not in [OriginType.INFERENCE, OriginType.NIBBLET]:
             self.origin_repository.delete(origin, valid_time=valid_time)
 
     def _run_inference(self, origin: Origin, valid_time: datetime) -> None:
+        # The bit part of inferring
         bit_definition = get_bit_definitions().get(origin.method, None)
 
         if bit_definition is None:
@@ -234,6 +246,7 @@ class OctopoesService:
             if len(configs) != 0:
                 config = configs[-1].config
 
+        resulting_oois: list[OOI] = []
         try:
             if isinstance(self.session, XTDBSession):
                 start = perf_counter()
@@ -252,9 +265,10 @@ class OctopoesService:
                 self.session.client.submit_transaction(ops)
             else:
                 resulting_oois = BitRunner(bit_definition).run(source, parameters, config=config)
-            self.save_origin(origin, resulting_oois, valid_time)
         except Exception as e:
             logger.exception("Error running inference", exc_info=e)
+
+        self.save_origin(origin, resulting_oois, valid_time)
 
     @staticmethod
     def check_path_level(path_level: int | None, current_level: int) -> bool:
@@ -407,6 +421,12 @@ class OctopoesService:
                 None, EmptyScanProfile(reference=ooi.reference), valid_time=event.valid_time
             )
 
+        # The nibble part of inferring
+        try:
+            self.nibbler.infer([self.ooi_repository.get(ooi.reference, event.valid_time)], event.valid_time)
+        except ObjectNotFoundException:
+            logger.info("OOI not found for inference")
+
         # analyze bit definitions
         bit_definitions = get_bit_definitions()
         for bit_id, bit_definition in bit_definitions.items():
@@ -438,6 +458,12 @@ class OctopoesService:
     def _on_update_ooi(self, event: OOIDBEvent) -> None:
         if event.new_data is None:
             raise ValueError("Update event new_data should not be None")
+
+        # The nibble part of inferring
+        try:
+            self.nibbler.infer([self.ooi_repository.get(event.new_data.reference, event.valid_time)], event.valid_time)
+        except ObjectNotFoundException:
+            logger.info("OOI not found for inference")
 
         if isinstance(event.new_data, Config):
             relevant_bit_ids = [
