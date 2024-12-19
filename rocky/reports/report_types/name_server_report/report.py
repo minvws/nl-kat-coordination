@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -37,13 +39,13 @@ class NameServerChecks:
     def has_valid_dnssec(self):
         return sum([check.has_valid_dnssec for check in self.checks])
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return all(bool(check) for check in self.checks)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.checks)
 
-    def __add__(self, other: "NameServerChecks"):
+    def __add__(self, other: NameServerChecks) -> NameServerChecks:
         return NameServerChecks(checks=self.checks + other.checks)
 
 

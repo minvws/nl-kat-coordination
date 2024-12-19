@@ -7,6 +7,7 @@ from urllib.parse import urlparse, urlunsplit
 import requests
 from forcediphttpsadapter.adapters import ForcedIPHTTPSAdapter
 from requests import Session
+from requests.models import Response
 
 from boefjes.job_models import BoefjeMeta
 from boefjes.plugins.kat_webpage_analysis.har.requests import create_har_object
@@ -55,9 +56,9 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
             body_mimetypes.add(content_type)
 
         # Pick up the content type for the body from the server and split away encodings to make normalization easier
-        content_type = content_type.split(";")
-        if content_type[0] in ALLOWED_CONTENT_TYPES:
-            body_mimetypes.add(content_type[0])
+        content_type_splitted = content_type.split(";")
+        if content_type_splitted[0] in ALLOWED_CONTENT_TYPES:
+            body_mimetypes.add(content_type_splitted[0])
 
     har = json.dumps(create_har_object(response))
 

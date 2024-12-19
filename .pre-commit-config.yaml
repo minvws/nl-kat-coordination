@@ -96,6 +96,7 @@ repos:
           - types-python-dateutil
           - types-requests
           - types-croniter
+          - boto3-stubs[s3]
         exclude: |
           (?x)(
           ^boefjes/tools |

@@ -10,7 +10,7 @@ from tools.view_helpers import existing_ooi_type, get_mandatory_fields, url_with
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.types import OOI_TYPES, get_relations, to_concrete
-from rocky.views.ooi_view import SingleOOITreeMixin
+from rocky.views.mixins import SingleOOITreeMixin
 
 
 class OOIRelatedObjectManager(SingleOOITreeMixin):
