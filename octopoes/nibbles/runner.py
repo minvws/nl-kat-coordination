@@ -6,7 +6,7 @@ from typing import Any
 from xxhash import xxh3_128_hexdigest as xxh3  # INFO: xxh3_64_hexdigest is faster but hash more collision probabilities
 
 from nibbles.definitions import NibbleDefinition, get_nibble_definitions
-from octopoes.models import OOI
+from octopoes.models import OOI, Reference
 from octopoes.models.origin import Origin, OriginType
 from octopoes.repositories.ooi_repository import OOIRepository
 from octopoes.repositories.origin_repository import OriginRepository
@@ -104,11 +104,19 @@ class NibblesRunner:
                 return [[]]
 
     def retrieve_all(self, valid_time: datetime) -> dict[str, list[list[Any]]]:
-        retrieved: dict[str, list[list[Any]]] = {}
-        for nibble_id in self.nibbles:
-            retrieve = self.retrieve(nibble_id, valid_time)
-            retrieved |= {nibble_id: retrieve}
-        return retrieved
+        return {nibble_id: self.retrieve(nibble_id, valid_time) for nibble_id in self.nibbles}
+
+    def yields(self, nibble_id: str, valid_time: datetime) -> dict[tuple[Reference | None, ...], list[Reference]]:
+        return {
+            tuple(nibblet.parameters_references): nibblet.result
+            for nibblet in self.origin_repository.list_origins(
+                valid_time, origin_type=OriginType.NIBBLET, method=nibble_id
+            )
+            if nibblet.parameters_references is not None
+        }
+
+    def yields_all(self, valid_time: datetime) -> dict[str, dict[tuple[Reference | None, ...], list[Reference]]]:
+        return {nibble_id: self.yields(nibble_id, valid_time) for nibble_id in self.nibbles}
 
     def _run(self, ooi: OOI, valid_time: datetime) -> dict[str, dict[tuple[Any, ...], set[OOI]]]:
         return_value: dict[str, dict[tuple[Any, ...], set[OOI]]] = {}

@@ -636,3 +636,19 @@ def nibble_retrieve_all(
     valid_time: datetime = Depends(extract_valid_time), octopoes: OctopoesService = Depends(octopoes_service)
 ) -> dict[str, list[list[Any]]]:
     return octopoes.nibbler.retrieve_all(valid_time)
+
+
+@router.get("/nibbles/yields", tags=["nibbles"])
+def nibble_yield(
+    nibble_id: str,
+    valid_time: datetime = Depends(extract_valid_time),
+    octopoes: OctopoesService = Depends(octopoes_service),
+) -> dict[tuple[Reference | None, ...], list[Reference]]:
+    return octopoes.nibbler.yields(nibble_id, valid_time)
+
+
+@router.get("/nibbles/yields_all", tags=["nibbles"])
+def nibble_yields_all(
+    valid_time: datetime = Depends(extract_valid_time), octopoes: OctopoesService = Depends(octopoes_service)
+) -> dict[str, dict[tuple[Reference | None, ...], list[Reference]]]:
+    return octopoes.nibbler.yields_all(valid_time)
