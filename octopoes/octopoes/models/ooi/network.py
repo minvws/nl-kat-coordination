@@ -32,7 +32,8 @@ class IPAddress(OOI):
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
-        return reference.tokenized.address
+        tokens = reference.tokenized
+        return f"{tokens.address} @ {tokens.network.name}"
 
 
 class IPAddressV4(IPAddress):

@@ -6,14 +6,13 @@ import pytest
 
 from boefjes.app import SchedulerWorkerManager, get_runtime_manager
 from boefjes.config import Settings
-from boefjes.runtime_interfaces import WorkerManager
 from tests.conftest import MockHandler, MockSchedulerClient
 from tests.loading import get_dummy_data
 
 
 def test_one_process(manager: SchedulerWorkerManager, item_handler: MockHandler) -> None:
     with pytest.raises(KeyboardInterrupt):
-        manager.run(WorkerManager.Queue.BOEFJES)
+        manager.run("boefje")
 
     items = item_handler.get_all()
     assert len(items) == 2
@@ -38,7 +37,7 @@ def test_two_processes(manager: SchedulerWorkerManager, item_handler: MockHandle
     manager.task_queue = Manager().Queue()
 
     with pytest.raises(KeyboardInterrupt):
-        manager.run(WorkerManager.Queue.BOEFJES)
+        manager.run("boefje")
 
     items = item_handler.get_all()
     assert len(items) == 2
@@ -64,7 +63,7 @@ def test_two_processes_exception(manager: SchedulerWorkerManager, item_handler: 
 
     manager.settings.pool_size = 2
     with pytest.raises(KeyboardInterrupt):
-        manager.run(WorkerManager.Queue.BOEFJES)
+        manager.run("boefje")
 
     assert item_handler.queue.empty()
     assert manager.scheduler_client.log_path.exists()
@@ -81,7 +80,7 @@ def test_two_processes_handler_exception(manager: SchedulerWorkerManager, item_h
     manager.settings.pool_size = 2
     manager.task_queue = Manager().Queue()
     with pytest.raises(KeyboardInterrupt):
-        manager.run(WorkerManager.Queue.BOEFJES)
+        manager.run("boefje")
 
     items = item_handler.get_all()
     assert len(items) == 1
@@ -137,7 +136,7 @@ def test_two_processes_cleanup_unfinished_tasks(
     item_handler.sleep_time = 200
 
     with pytest.raises(KeyboardInterrupt):
-        manager.run(WorkerManager.Queue.BOEFJES)
+        manager.run("boefje")
 
     items = item_handler.get_all()
     assert len(items) == 0
@@ -161,7 +160,7 @@ def test_two_processes_cleanup_unfinished_tasks(
 
 def test_normalizer_queue(manager: SchedulerWorkerManager, item_handler: MockHandler) -> None:
     with pytest.raises(KeyboardInterrupt):
-        manager.run(WorkerManager.Queue.NORMALIZERS)
+        manager.run("normalizer")
 
     items = item_handler.get_all()
     assert len(items) == 1
@@ -179,7 +178,7 @@ def test_null(manager: SchedulerWorkerManager, tmp_path: Path, item_handler: Moc
     )
 
     with pytest.raises(KeyboardInterrupt):
-        manager.run(WorkerManager.Queue.BOEFJES)
+        manager.run("boefje")
 
     items = item_handler.get_all()
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
@@ -197,5 +196,5 @@ def test_null(manager: SchedulerWorkerManager, tmp_path: Path, item_handler: Moc
 
 
 def test_create_manager():
-    get_runtime_manager(Settings(), WorkerManager.Queue.BOEFJES, "INFO")
-    get_runtime_manager(Settings(), WorkerManager.Queue.NORMALIZERS, "INFO")
+    get_runtime_manager(Settings(), "boefje", "INFO")
+    get_runtime_manager(Settings(), "normalizer", "INFO")

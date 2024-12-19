@@ -31,7 +31,7 @@ from boefjes.local_repository import (
     get_normalizer_resource,
 )
 from boefjes.models import Organisation
-from boefjes.runtime_interfaces import Handler, WorkerManager
+from boefjes.runtime_interfaces import Handler
 from boefjes.sql.config_storage import SQLConfigStorage, create_encrypter
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage, get_organisations_store
@@ -81,13 +81,13 @@ class MockSchedulerClient(SchedulerClientInterface):
         time.sleep(self.sleep_time)
 
         try:
-            if WorkerManager.Queue.BOEFJES.value in queue:
+            if "boefje" in queue:
                 p_item = TypeAdapter(Task).validate_json(self.boefje_responses.pop(0))
                 self._popped_items[str(p_item.id)] = p_item
                 self._tasks[str(p_item.id)] = self._task_from_id(p_item.id)
                 return p_item
 
-            if WorkerManager.Queue.NORMALIZERS.value in queue:
+            if "normalizer" in queue:
                 p_item = TypeAdapter(Task).validate_json(self.normalizer_responses.pop(0))
                 self._popped_items[str(p_item.id)] = p_item
                 self._tasks[str(p_item.id)] = self._task_from_id(p_item.id)
