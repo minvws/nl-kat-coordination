@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 from pathlib import Path
+from typing import cast
 
 import httpx
 from tanimachi import (
@@ -25,6 +26,7 @@ from tanimachi.wappalyzer import (
 )
 
 from boefjes.job_models import NormalizerOutput
+from boefjes.plugins.kat_wappalyzer.utils import replace_cpe_version
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
@@ -72,14 +74,17 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
             ]
         )
 
-    detections = wappalyzer.analyze(har, analyzes=analyzes)
+    detections = cast(list[Detection], wappalyzer.analyze(har, analyzes=analyzes))
 
     for detection in detections:
-        cpe = detection.fingerprint.cpe  # todo: fix version in cpe if it's in the fingerprint
+        version = None
+        cpe = detection.fingerprint.cpe
         if detection.pattern.version:
             version = detection.pattern.regex.search(detection.value).expand(detection.pattern.version)
-        else:
-            version = cpe.split(":")[1] if cpe else None
+
+        if cpe is not None and version is not None:
+            cpe = replace_cpe_version(cpe, version)
+
         software = Software(name=detection.fingerprint.id, version=version, cpe=cpe)
         software_instance = SoftwareInstance(ooi=web_url.reference, software=software.reference)
         yield from [software, software_instance]

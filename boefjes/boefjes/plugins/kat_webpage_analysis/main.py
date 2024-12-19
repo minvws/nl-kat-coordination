@@ -7,7 +7,6 @@ from urllib.parse import urlparse, urlunsplit
 import requests
 from forcediphttpsadapter.adapters import ForcedIPHTTPSAdapter
 from requests import Session
-from requests.models import Response
 
 from boefjes.job_models import BoefjeMeta
 from boefjes.plugins.kat_webpage_analysis.har.requests import create_har_object
