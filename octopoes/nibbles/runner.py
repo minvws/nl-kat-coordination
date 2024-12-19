@@ -30,14 +30,16 @@ def merge_results(
     }
 
 
-def flatten(items: Iterable[OOI | Iterable[OOI | None] | None]) -> Iterable[OOI]:
+def flatten(items: Iterable[Any | Iterable[Any | None] | None]) -> Iterable[OOI]:
     for item in items:
         if isinstance(item, OOI):
             yield item
         elif item is None:
             continue
-        else:
+        elif isinstance(item, Iterable):
             yield from flatten(item)
+        else:
+            continue
 
 
 def nibble_hasher(data: Iterable, additional: str | None = None) -> str:
@@ -70,12 +72,16 @@ class NibblesRunner:
     def __del__(self):
         self._write(datetime.now())
 
-    def update_nibbles(self, valid_time: datetime):
-        self.nibbles = get_nibble_definitions()
-        # FIXME: this is nice, but does not allow newly affected elements -- this will be addressed shortly
-        nibblets = self.origin_repository.list_origins(valid_time, origin_type=OriginType.NIBBLET)
-        refs = set(map(lambda nibblet: nibblet.source, nibblets))
-        self.infer(self.ooi_repository.load_bulk_as_list(refs, valid_time), valid_time)
+    def update_nibbles(self, valid_time: datetime, new_nibbles: dict[str, NibbleDefinition] = get_nibble_definitions()):
+        old_checksums = self.checksum_nibbles()
+        self.nibbles = new_nibbles
+        new_checksums = self.checksum_nibbles()
+        updated_nibble_ids = [
+            nibble_id
+            for nibble_id in new_checksums
+            if nibble_id not in old_checksums or old_checksums[nibble_id] != new_checksums[nibble_id]
+        ]
+        self.infer(list(flatten(self.retrieve(nibble_id, valid_time) for nibble_id in updated_nibble_ids)), valid_time)
 
     def select_nibbles(self, nibble_ids: Iterable[str]):
         self.nibbles = {key: value for key, value in self.nibbles.items() if key in nibble_ids}

@@ -304,3 +304,42 @@ def test_parent_type_in_nibble_signature(
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     assert xtdb_finding_type in result
+
+
+def find_network_url_v2(network: Network, url: URL) -> Iterator[OOI]:
+    if len(network.name) == len(str(url.raw)):
+        kt = KATFindingType(id="Network and URL have same name length")
+        yield kt
+        yield Finding(finding_type=kt.reference, ooi=network.reference, proof=url.reference)
+
+
+def test_nibbles_update(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
+    xtdb_octopoes_service.nibbler.nibbles = {find_network_url_nibble.id: find_network_url_nibble}
+
+    network1 = Network(name="internetverbinding")
+    xtdb_octopoes_service.ooi_repository.save(network1, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+    network2 = Network(name="internet")
+    xtdb_octopoes_service.ooi_repository.save(network2, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+    url1 = URL(network=network1.reference, raw="https://potato.ls/")
+    xtdb_octopoes_service.ooi_repository.save(url1, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+    url2 = URL(network=network2.reference, raw="https://mispo.es/")
+    xtdb_octopoes_service.ooi_repository.save(url2, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 1
+    assert xtdb_octopoes_service.ooi_repository.list_oois({KATFindingType}, valid_time).count == 0
+
+    find_network_url_nibble_v2 = find_network_url_nibble.model_copy(deep=True)
+    find_network_url_nibble_v2._payload = getattr(sys.modules[__name__], "find_network_url_v2")
+    find_network_url_nibble_v2._checksum = "deadbeef"
+
+    xtdb_octopoes_service.nibbler.update_nibbles(
+        valid_time, {find_network_url_nibble_v2.id: find_network_url_nibble_v2}
+    )
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 1
+    assert xtdb_octopoes_service.ooi_repository.list_oois({KATFindingType}, valid_time).count == 1
