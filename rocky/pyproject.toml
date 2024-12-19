@@ -52,6 +52,7 @@ opentelemetry-semantic-conventions = "^0.49b2"
 opentelemetry-util-http = "^0.49b2"
 structlog = "^24.2.0"
 django-structlog = "^8.1.0"
+cron-descriptor = "^1.4.5"
 
 
 [tool.poetry.group.dev.dependencies]
