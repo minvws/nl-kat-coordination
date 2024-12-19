@@ -49,7 +49,7 @@ class SchedulerWorkerManager(WorkerManager):
 
         self.exited = False
 
-    def run(self, queue_type: str) -> None:
+    def run(self, queue_type: WorkerManager.WorkerType) -> None:
         logger.info("Created worker pool for queue '%s'", queue_type)
 
         self.workers = [
@@ -80,7 +80,7 @@ class SchedulerWorkerManager(WorkerManager):
 
                 raise
 
-    def _fill_queue(self, task_queue: Queue, queue_type: str) -> None:
+    def _fill_queue(self, task_queue: Queue, queue_type: WorkerManager.WorkerType) -> None:
         if task_queue.qsize() > self.settings.pool_size:
             time.sleep(self.settings.worker_heartbeat)
             return
