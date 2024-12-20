@@ -5,9 +5,9 @@ set -e
 shopt -s nocasematch
 
 if [ "$1" = "boefje" ]; then
-    exec python -m boefjes boefje
+    exec env BOEFJES_RUNNER_TYPE="$1" python -m boefjes boefje
 elif [ "$1" = "normalizer" ]; then
-    exec python -m boefjes normalizer
+    exec env BOEFJES_RUNNER_TYPE="$1" python -m boefjes normalizer
 fi
 
 # The migrations and seed are for the KATalogus. They are not inside the if because this way

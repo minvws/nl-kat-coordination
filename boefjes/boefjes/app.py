@@ -49,8 +49,8 @@ class SchedulerWorkerManager(WorkerManager):
 
         self.exited = False
 
-    def run(self, queue_type: WorkerManager.Queue) -> None:
-        logger.info("Created worker pool for queue '%s'", queue_type.value)
+    def run(self, queue_type: WorkerManager.WorkerType) -> None:
+        logger.info("Created worker pool for queue '%s'", queue_type)
 
         self.workers = [
             ctx.Process(target=_start_working, args=self._worker_args()) for _ in range(self.settings.pool_size)
@@ -80,7 +80,7 @@ class SchedulerWorkerManager(WorkerManager):
 
                 raise
 
-    def _fill_queue(self, task_queue: Queue, queue_type: WorkerManager.Queue) -> None:
+    def _fill_queue(self, task_queue: Queue, queue_type: WorkerManager.WorkerType) -> None:
         if task_queue.qsize() > self.settings.pool_size:
             time.sleep(self.settings.worker_heartbeat)
             return
@@ -95,7 +95,7 @@ class SchedulerWorkerManager(WorkerManager):
 
         # We do not target a specific queue since we start one runtime for all organisations
         # and queue ids contain the organisation_id
-        queues = [q for q in queues if q.id.startswith(queue_type.value) and q.size > 0]
+        queues = [q for q in queues if q.id.startswith(queue_type) and q.size > 0]
 
         logger.debug("Found queues: %s", [queue.id for queue in queues])
 
@@ -265,14 +265,15 @@ def _start_working(
                 logger.exception("Could not patch scheduler task to %s", status.value)
 
 
-def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_level: str) -> WorkerManager:
+def get_runtime_manager(settings: Settings, queue: WorkerManager.WorkerType, log_level: str) -> WorkerManager:
     local_repository = get_local_repository()
 
     session = sessionmaker(bind=get_engine())()
     plugin_service = PluginService(create_plugin_storage(session), create_config_storage(session), local_repository)
 
     item_handler: Handler
-    if queue is WorkerManager.Queue.BOEFJES:
+
+    if queue == "boefje":
         item_handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), plugin_service, bytes_api_client)
     else:
         item_handler = NormalizerHandler(
