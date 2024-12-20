@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-03 21:56+0000\n"
-"PO-Revision-Date: 2024-12-13 16:00+0000\n"
+"POT-Creation-Date: 2024-12-18 09:24+0000\n"
+"PO-Revision-Date: 2024-12-20 18:00+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
 "coordination/nl/>\n"
@@ -24,7 +24,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.9-rc\n"
+"X-Generator: Weblate 5.9.2-dev\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -674,6 +674,10 @@ msgstr ""
 msgid "An HTTP %d error occurred. Check logs for more info."
 msgstr ""
 "Er is een HTTP-%d-fout opgetreden. Controleer de logboeken voor meer info."
+
+#: katalogus/client.py
+msgid "An HTTP error occurred. Check logs for more info."
+msgstr ""
 
 #: katalogus/client.py
 msgid "Boefje with this name already exists."
@@ -3165,7 +3169,7 @@ msgstr "Er zijn geen CVE’s gevonden."
 
 #: reports/report_types/aggregate_organisation_report/report.py
 msgid "Aggregate Organisation Report"
-msgstr ""
+msgstr "Organisatierapport samenstellen"
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
 msgid "Observed at:"
@@ -4947,7 +4951,7 @@ msgstr "Terug naar rapportgeschiedenis"
 
 #: reports/templates/report_overview/subreports_header.html
 msgid "An overview of all underlying reports of"
-msgstr "En overzicht van alle onderliggende rapporten van"
+msgstr "Een overzicht van alle onderliggende rapporten van"
 
 #: reports/templates/report_overview/subreports_header.html
 #: reports/templates/report_overview/subreports_table.html
@@ -5374,6 +5378,10 @@ msgstr "Filtertypes"
 #: tools/forms/ooi.py
 msgid "Clearance Level"
 msgstr "Vrijwaringsniveau"
+
+#: tools/forms/ooi.py
+msgid "Next scan"
+msgstr ""
 
 #: tools/forms/ooi.py
 msgid "Show objects that don't meet the Boefjes scan level."
