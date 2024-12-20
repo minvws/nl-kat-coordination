@@ -3,12 +3,16 @@ from __future__ import annotations
 import json
 import re
 from collections import Counter
+from collections.abc import Iterable
 from datetime import datetime
+from itertools import product
 from typing import Any, Literal, cast
 
 import structlog
 from bits.definitions import BitDefinition
 from httpx import HTTPStatusError, codes
+from jmespath import search
+from nibbles.definitions import NibbleDefinition
 from pydantic import RootModel, TypeAdapter
 
 from octopoes.config.settings import (
@@ -159,7 +163,16 @@ class OOIRepository(Repository):
     def list_related(self, ooi: OOI, path: Path, valid_time: datetime) -> list[OOI]:
         raise NotImplementedError
 
-    def query(self, query: Query, valid_time: datetime) -> list[OOI | tuple]:
+    def query(self, query: str | Query, valid_time: datetime) -> list[OOI | tuple]:
+        raise NotImplementedError
+
+    def nibble_query(
+        self,
+        ooi: OOI | None,
+        nibble: NibbleDefinition,
+        valid_time: datetime,
+        arguments: list[Reference | None] | None = None,
+    ) -> Iterable[Iterable[Any]]:
         raise NotImplementedError
 
 
@@ -237,7 +250,7 @@ class XTDBOOIRepository(OOIRepository):
     @classmethod
     def deserialize(cls, data: dict[str, Any]) -> OOI:
         if "object_type" not in data:
-            raise ValueError("Data is missing object_type")
+            raise ValueError("OOI data is missing object_type")
 
         # pop global attributes
         object_cls = type_by_name(data.pop("object_type"))
@@ -248,6 +261,30 @@ class XTDBOOIRepository(OOIRepository):
         stripped = {key.split("/")[1]: value for key, value in data.items()}
         stripped["user_id"] = user_id
         return object_cls.model_validate(stripped)
+
+    @classmethod
+    def objectify(cls, t: list | Any, obj: dict | list | set | Any) -> tuple | frozenset | Any:
+        if isinstance(obj, dict):
+            if isinstance(t, list):
+                t = t[-1]
+            if issubclass(t, OOI):
+                return cls.deserialize(obj)
+            else:
+                return t(**obj)
+        elif isinstance(obj, list):
+            if isinstance(t, list):
+                return tuple(cls.objectify(tt, o) for o, tt in zip(obj, t))
+            else:
+                return tuple(cls.objectify(t, o) for o in obj)
+        elif isinstance(obj, set):
+            if isinstance(t, list):
+                return frozenset(cls.objectify(tt, o) for o, tt in zip(obj, t))
+            else:
+                return frozenset(cls.objectify(t, o) for o in obj)
+        else:
+            if isinstance(t, list):
+                t = t[-1]
+            return t(obj)
 
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
         try:
@@ -860,3 +897,37 @@ class XTDBOOIRepository(OOIRepository):
             parsed_results.append(tuple(parsed_result))
 
         return parsed_results
+
+    def nibble_query(
+        self,
+        ooi: OOI | None,
+        nibble: NibbleDefinition,
+        valid_time: datetime,
+        arguments: list[Reference | None] | None = None,
+    ) -> Iterable[Iterable[Any]]:
+        if nibble.query is None:
+            return [{ooi}]
+        else:
+            if arguments is None:
+                if ooi is not None:
+                    first = True
+                    arguments = [
+                        ooi.reference
+                        if sgn.object_type == type_by_name(ooi.get_ooi_type()) and (first and not (first := False))
+                        else None
+                        for sgn in nibble.signature
+                    ]
+                else:
+                    arguments = [None for _ in nibble.signature]
+            query = nibble.query if isinstance(nibble.query, str) else nibble.query(arguments)
+            data = self.session.client.query(query, valid_time)
+            objects = [
+                {self.objectify(element.object_type, obj) for obj in search(element.parser, data)}
+                for element in nibble.signature
+            ]
+            objects = [
+                obj if obj else ({None} if element.optional else set())
+                for obj, element in zip(objects, nibble.signature)
+            ]
+
+            return list(product(*objects))
