@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-03 21:56+0000\n"
+"POT-Creation-Date: 2024-12-18 09:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -607,6 +607,10 @@ msgstr ""
 #: katalogus/client.py
 #, python-format
 msgid "An HTTP %d error occurred. Check logs for more info."
+msgstr ""
+
+#: katalogus/client.py
+msgid "An HTTP error occurred. Check logs for more info."
 msgstr ""
 
 #: katalogus/client.py
@@ -4774,6 +4778,10 @@ msgstr ""
 
 #: tools/forms/ooi.py
 msgid "Clearance Level"
+msgstr ""
+
+#: tools/forms/ooi.py
+msgid "Next scan"
 msgstr ""
 
 #: tools/forms/ooi.py
