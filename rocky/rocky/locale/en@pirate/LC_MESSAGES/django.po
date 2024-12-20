@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-03 21:56+0000\n"
+"POT-Creation-Date: 2024-12-18 09:24+0000\n"
 "PO-Revision-Date: 2023-11-18 13:03+0000\n"
 "Last-Translator: jan klopper <jan@underdark.nl>\n"
 "Language-Team: English (Pirate) <https://hosted.weblate.org/projects/openkat/"
@@ -610,6 +610,10 @@ msgstr ""
 #: katalogus/client.py
 #, python-format
 msgid "An HTTP %d error occurred. Check logs for more info."
+msgstr ""
+
+#: katalogus/client.py
+msgid "An HTTP error occurred. Check logs for more info."
 msgstr ""
 
 #: katalogus/client.py
@@ -4777,6 +4781,10 @@ msgstr ""
 
 #: tools/forms/ooi.py
 msgid "Clearance Level"
+msgstr ""
+
+#: tools/forms/ooi.py
+msgid "Next scan"
 msgstr ""
 
 #: tools/forms/ooi.py
