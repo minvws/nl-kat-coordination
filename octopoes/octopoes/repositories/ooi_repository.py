@@ -263,28 +263,40 @@ class XTDBOOIRepository(OOIRepository):
         return object_cls.model_validate(stripped)
 
     @classmethod
-    def objectify(cls, t: list | Any, obj: dict | list | set | Any) -> tuple | frozenset | Any:
+    def objectify(cls, type_: type | list[type], obj: dict | list | set | Any) -> tuple | frozenset | Any:
+        """
+        objectify takes a type and a serialized object and tries to turn it into the supplied type or the closest
+        hashable relative
+        for instance:
+            objectify(int, "6") -> 6
+            objectify(str, "6") -> "6"
+        see test_ooi_repository.py for more examples
+        """
         if isinstance(obj, dict):
-            if isinstance(t, list):
-                t = t[-1]
-            if issubclass(t, OOI):
+            # assume the dictionary is the serialized object
+            if isinstance(type_, list):
+                type_ = type_[0]
+            if issubclass(type_, OOI):
                 return cls.deserialize(obj)
             else:
-                return t(**obj)
+                return type_(**obj)
         elif isinstance(obj, list):
-            if isinstance(t, list):
-                return tuple(cls.objectify(tt, o) for o, tt in zip(obj, t))
+            # list --> tuple
+            if isinstance(type_, list):
+                return tuple(cls.objectify(type_t, o) for o, type_t in zip(obj, type_))
             else:
-                return tuple(cls.objectify(t, o) for o in obj)
+                return tuple(cls.objectify(type_, o) for o in obj)
         elif isinstance(obj, set):
-            if isinstance(t, list):
-                return frozenset(cls.objectify(tt, o) for o, tt in zip(obj, t))
+            # set --> frozenset
+            if isinstance(type_, list):
+                return frozenset(cls.objectify(type_t, o) for o, type_t in zip(obj, type_))
             else:
-                return frozenset(cls.objectify(t, o) for o in obj)
+                return frozenset(cls.objectify(type_, o) for o in obj)
         else:
-            if isinstance(t, list):
-                t = t[-1]
-            return t(obj)
+            # assume a simple type
+            if isinstance(type_, list):
+                type_ = type_[0]
+            return type_(obj)
 
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
         try:
