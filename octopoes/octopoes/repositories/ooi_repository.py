@@ -263,13 +263,13 @@ class XTDBOOIRepository(OOIRepository):
         return object_cls.model_validate(stripped)
 
     @classmethod
-    def objectify(cls, type_: type | list[type], obj: dict | list | set | Any) -> tuple | frozenset | Any:
+    def parse_as(cls, type_: type | list[type], obj: dict | list | set | Any) -> tuple | frozenset | Any:
         """
-        objectify takes a type and a serialized object and tries to turn it into the supplied type or the closest
+        parse_as takes a type and a serialized object and tries to turn it into the supplied type or the closest
         hashable relative
         for instance:
-            objectify(int, "6") -> 6
-            objectify(str, "6") -> "6"
+            parse_as(int, "6") -> 6
+            parse_as(str, "6") -> "6"
         see test_ooi_repository.py for more examples
         """
         if isinstance(obj, dict):
@@ -283,15 +283,15 @@ class XTDBOOIRepository(OOIRepository):
         elif isinstance(obj, list):
             # list --> tuple
             if isinstance(type_, list):
-                return tuple(cls.objectify(type_t, o) for o, type_t in zip(obj, type_))
+                return tuple(cls.parse_as(type_t, o) for o, type_t in zip(obj, type_))
             else:
-                return tuple(cls.objectify(type_, o) for o in obj)
+                return tuple(cls.parse_as(type_, o) for o in obj)
         elif isinstance(obj, set):
             # set --> frozenset
             if isinstance(type_, list):
-                return frozenset(cls.objectify(type_t, o) for o, type_t in zip(obj, type_))
+                return frozenset(cls.parse_as(type_t, o) for o, type_t in zip(obj, type_))
             else:
-                return frozenset(cls.objectify(type_, o) for o in obj)
+                return frozenset(cls.parse_as(type_, o) for o in obj)
         else:
             # assume a simple type
             if isinstance(type_, list):
@@ -934,7 +934,7 @@ class XTDBOOIRepository(OOIRepository):
             query = nibble.query if isinstance(nibble.query, str) else nibble.query(arguments)
             data = self.session.client.query(query, valid_time)
             objects = [
-                {self.objectify(element.object_type, obj) for obj in search(element.parser, data)}
+                {self.parse_as(element.object_type, obj) for obj in search(element.parser, data)}
                 for element in nibble.signature
             ]
             objects = [
