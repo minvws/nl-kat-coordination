@@ -295,7 +295,7 @@ def xtdb_scan_profile_repository(xtdb_session: XTDBSession, event_manager) -> It
 
 
 @pytest.fixture
-def xtdb_nibble_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBNibbleRepository]:
+def xtdb_nibble_repository(xtdb_session: XTDBSession) -> Iterator[XTDBNibbleRepository]:
     yield XTDBNibbleRepository(xtdb_session)
 
 

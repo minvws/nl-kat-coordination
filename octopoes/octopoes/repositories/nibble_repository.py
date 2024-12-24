@@ -64,5 +64,8 @@ class XTDBNibbleRepository(NibbleRepository):
     def history(self, nibble: str, with_docs: bool = False) -> list[TransactionRecord]:
         return self.session.client.get_entity_history(self._xtid(nibble), with_docs=with_docs)
 
+    def status(self):
+        return self.session.client.status()
+
     def commit(self):
         self.session.commit()

@@ -77,8 +77,6 @@ class NibblesRunner:
         self.cache: dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]] = {}
         self.nibble_repository = nibble_repository
         self.nibbles: dict[str, NibbleDefinition] = get_nibble_definitions()
-        inis = [nibble._ini() for nibble in self.nibbles.values()]
-        nibble_repository.put_many(inis, datetime.now())
 
     def __del__(self):
         self._write(datetime.now())
@@ -108,6 +106,10 @@ class NibblesRunner:
 
     def disable(self):
         self.nibbles = {}
+
+    def register(self):
+        inis = [nibble._ini() for nibble in self.nibbles.values()]
+        self.nibble_repository.put_many(inis, datetime.now())
 
     def retrieve(self, nibble_id: str, valid_time: datetime) -> list[list[Any]]:
         nibble = self.nibbles[nibble_id]
