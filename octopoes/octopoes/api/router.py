@@ -27,7 +27,7 @@ from octopoes.models import OOI, Reference, ScanLevel, ScanProfile, ScanProfileB
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
-from octopoes.models.ooi.reports import Report
+from octopoes.models.ooi.reports import Report, AssetReport
 from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Path as ObjectPath
@@ -446,7 +446,7 @@ def list_reports(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     recipe_id: uuid.UUID | None = Query(None),
-) -> Paginated[tuple[Report, list[Report | None]]]:
+) -> Paginated[tuple[Report, list[AssetReport]]]:
     return octopoes.ooi_repository.list_reports(valid_time, offset, limit, recipe_id)
 
 

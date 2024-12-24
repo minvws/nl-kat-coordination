@@ -24,7 +24,7 @@ from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
-from octopoes.models.ooi.reports import Report, ReportRecipe
+from octopoes.models.ooi.reports import Report, ReportRecipe, AssetReport
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Direction, Path, Segment, get_paths_to_neighours
 from octopoes.models.transaction import TransactionRecord
@@ -139,7 +139,9 @@ class OOIRepository(Repository):
     ) -> Paginated[Finding]:
         raise NotImplementedError
 
-    def list_reports(self, valid_time: datetime, offset: int, limit: int, recipe_id: UUID | None = None) -> Paginated[tuple[Report, list[Report | None]]]:
+    def list_reports(
+        self, valid_time: datetime, offset: int, limit: int, recipe_id: UUID | None = None
+    ) -> Paginated[tuple[Report, list[AssetReport]]]:
         raise NotImplementedError
 
     def get_report(self, report_id) -> Report:
@@ -793,41 +795,24 @@ class XTDBOOIRepository(OOIRepository):
         return new_data
 
     def list_reports(
-        self,
-        valid_time: datetime,
-        offset: int,
-        limit: int,
-        recipe_id: UUID | None = None,
-    ) -> Paginated[tuple[Report, list[Report | None]]]:
-        count_query = """
-                            {
-                                :query {
-                                    :find [(count ?report)]
-                                    :where [[?report :object_type "Report"]
-                                        [?report :Report/has_parent false]]
-                                }
-                            }
-                        """
-        count_results = self.session.client.query(count_query, valid_time)
-        count = 0
-        if count_results and count_results[0]:
-            count = count_results[0][0]
-
+        self, valid_time: datetime, offset: int, limit: int, recipe_id: UUID | None = None
+    ) -> Paginated[tuple[Report, list[AssetReport]]]:
         date = Aliased(Report, field="date_generated")
-        query = (
-            Query(Report)
-            .pull(Report, fields="[* {:Report/_parent_report [*]}]")
-            .find(date)
-            .where(Report, has_parent=False, date_generated=date)
-            .order_by(date, ascending=False)
-            .limit(limit)
-            .offset(offset)
-        )
+        query = Query(Report).where(Report, date_generated=date)
 
         if recipe_id:
             query = query.where(ReportRecipe, recipe_id=str(recipe_id))
             query = query.where(Report, report_recipe=ReportRecipe)
 
+        count_query = query.count()
+        count_results = self.session.client.query(count_query, valid_time)
+        count = 0
+
+        if count_results and count_results[0]:
+            count = count_results[0][0]
+
+        query = query.order_by(date, ascending=False).limit(limit).offset(offset).pull(Report).find(date)
+        breakpoint()
         results = [
             (
                 self.simplify_keys(x[0]),

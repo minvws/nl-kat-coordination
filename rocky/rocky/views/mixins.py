@@ -27,7 +27,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
-from octopoes.models.ooi.reports import Report
+from octopoes.models.ooi.reports import Report, AssetReport
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import get_relations
@@ -332,7 +332,7 @@ class FindingList:
 
 class HydratedReport:
     parent_report: Report
-    children_reports: list[Report] | None
+    asset_reports: list[Report] | None
     total_children_reports: int
     total_objects: int
     report_type_summary: dict[str, int]
@@ -395,56 +395,33 @@ class ReportList:
 
         return subreports
 
-    def hydrate_report_list(self, reports: list[tuple[Report, list[Report | None]]]) -> list[HydratedReport]:
+    def hydrate_report_list(self, reports: list[tuple[Report, list[AssetReport]]]) -> list[HydratedReport]:
         hydrated_reports: list[HydratedReport] = []
 
         for report in reports:
-            hydrated_report: HydratedReport = HydratedReport()
+            hydrated_report = HydratedReport()
 
-            parent_report, children_reports = report
-            filtered_children_reports: list[Report] = list(filter(None, children_reports))
+            hydrated_report.parent_report, asset_reports = report
+            hydrated_report.total_children_reports = len(asset_reports)
+            hydrated_report.total_objects = len({asset_report.input_ooi for asset_report in asset_reports})
+            hydrated_report.report_type_summary = self.report_type_summary(asset_reports)
 
-            hydrated_report.total_children_reports = len(filtered_children_reports)
-
-            if len(parent_report.input_oois) > 0:
-                hydrated_report.total_objects = len(parent_report.input_oois)
-            else:
-                hydrated_report.total_objects = len(self.get_children_input_oois(filtered_children_reports))
-
-            hydrated_report.report_type_summary = self.report_type_summary(filtered_children_reports)
-
-            if not parent_report.has_parent:
-                hydrated_children_reports: list[Report] = []
-                for child_report in filtered_children_reports:
-                    if str(child_report.parent_report) == str(parent_report):
-                        hydrated_children_reports.append(child_report)
-                    if len(hydrated_children_reports) >= 5:  # We want to show only 5 children reports
-                        break
-
-                hydrated_report.children_reports = sorted(hydrated_children_reports, key=attrgetter("name"))
-
-            hydrated_report.parent_report = parent_report
+            # We want to show only 5 children reports
+            hydrated_report.asset_reports = sorted(asset_reports[:5], key=attrgetter("name"))
             hydrated_reports.append(hydrated_report)
 
         return hydrated_reports
 
     @staticmethod
-    def get_children_input_oois(children_reports: list[Report]) -> set[str]:
-        return {input_ooi for child_report in children_reports for input_ooi in child_report.input_oois}
-
-    @staticmethod
-    def report_type_summary(reports: list[Report]) -> dict[str, int]:
+    def report_type_summary(reports: list[AssetReport]) -> dict[str, int]:
         """
         Calculates per report type how many objects it consumed.
         """
 
         summary: dict[str, int] = {}
-        report_types: set[str] = {report.report_type for report in reports}
 
-        for report_type in sorted(report_types):
-            summary[report_type] = sum(
-                [len(report.input_oois) for report in reports if report_type == report.report_type]
-            )
+        for report_type in sorted({report.report_type for report in reports}):
+            summary[report_type] = len([report for report in reports if report.report_type == report_type])
 
         return summary
 

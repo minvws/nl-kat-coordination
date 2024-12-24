@@ -11,7 +11,7 @@ from tools.ooi_helpers import create_ooi
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
-from octopoes.models.ooi.reports import Report
+from octopoes.models.ooi.reports import Report, AssetReport
 from reports.report_types.aggregate_organisation_report.report import aggregate_reports
 from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import BaseReport, SubReportPlugins
@@ -91,113 +91,73 @@ def save_report_data(
         return None
 
     now = datetime.now(timezone.utc)
+    subreports = []
 
-    # if it's not a single report, we need a parent
+    for report_type_id, ooi_data in report_data.items():
+        for ooi, data in ooi_data.items():
+            name_to_save = ""
+            report_type = get_report_by_id(report_type_id)
+            report_type_name = str(report_type.name)
 
-    if len(report_data) > 1 or len(list(report_data.values())[0]) > 1:
-        raw_id = bytes_client.upload_raw(
-            raw=ReportDataDict(input_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
-        )
+            ooi_name = Reference.from_str(ooi).human_readable
+            for default_name, updated_name in report_names:
+                # Use default_name to check if we're on the right index in the list to update the name to save.
+                if ooi_name in default_name and report_type_name in default_name:
+                    name_to_save = updated_name
+                    break
 
-        name = now.strftime(Template(parent_report_name).safe_substitute(report_type=str(ConcatenatedReport.name)))
+            child_input_data = get_child_input_data(input_data, ooi, report_type)
 
-        if not name or name.isspace():
-            name = ConcatenatedReport.name
+            raw_id = bytes_client.upload_raw(
+                raw=ReportDataDict({"report_data": data["data"]} | child_input_data).model_dump_json().encode(),
+                manual_mime_types={"openkat/report"},
+            )
+            name = now.strftime(name_to_save)
+            if not name or name.isspace():
+                name = ConcatenatedReport.name
 
-        parent_report_ooi = Report(
-            name=str(name),
-            report_type=str(ConcatenatedReport.id),
-            template=ConcatenatedReport.template_path,
-            report_id=uuid4(),
-            organization_code=organization.code,
-            organization_name=organization.name,
-            organization_tags=[tag.name for tag in organization.tags.all()],
-            data_raw_id=raw_id,
-            date_generated=datetime.now(timezone.utc),
-            input_oois=input_data["input_data"]["input_oois"],
-            observed_at=observed_at,
-            parent_report=None,
-            has_parent=False,
-            report_recipe=report_recipe,
-        )
+            sub_report_ooi = AssetReport(
+                name=str(name),
+                report_type=report_type_id,
+                report_recipe=report_recipe,
+                template=report_type.template_path,
+                organization_code=organization.code,
+                organization_name=organization.name,
+                organization_tags=[tag.name for tag in organization.tags.all()],
+                data_raw_id=raw_id,
+                date_generated=now,
+                input_ooi=ooi,
+                observed_at=observed_at,
+            )
+            subreports.append(sub_report_ooi)
 
-        create_ooi(octopoes_api_connector, bytes_client, parent_report_ooi, observed_at)
+            create_ooi(octopoes_api_connector, bytes_client, sub_report_ooi, observed_at)
 
-        for report_type_id, ooi_data in report_data.items():
-            for ooi, data in ooi_data.items():
-                name_to_save = ""
-                report_type = get_report_by_id(report_type_id)
-                report_type_name = str(report_type.name)
+    report_inputs = [subreport.reference for subreport in subreports]
 
-                ooi_name = Reference.from_str(ooi).human_readable
-                for default_name, updated_name in report_names:
-                    # Use default_name to check if we're on the right index in the list to update the name to save.
-                    if ooi_name in default_name and report_type_name in default_name:
-                        name_to_save = updated_name
-                        break
+    raw_id = bytes_client.upload_raw(
+        raw=ReportDataDict(input_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
+    )
+    name = now.strftime(Template(parent_report_name).safe_substitute(report_type=str(ConcatenatedReport.name)))
 
-                child_input_data = get_child_input_data(input_data, ooi, report_type)
+    if not name or name.isspace():
+        name = ConcatenatedReport.name
 
-                raw_id = bytes_client.upload_raw(
-                    raw=ReportDataDict({"report_data": data["data"]} | child_input_data).model_dump_json().encode(),
-                    manual_mime_types={"openkat/report"},
-                )
-                name = now.strftime(name_to_save)
-                if not name or name.isspace():
-                    name = ConcatenatedReport.name
+    parent_report_ooi = Report(
+        name=str(name),
+        report_type=str(ConcatenatedReport.id),
+        template=ConcatenatedReport.template_path,
+        organization_code=organization.code,
+        organization_name=organization.name,
+        organization_tags=[tag.name for tag in organization.tags.all()],
+        data_raw_id=raw_id,
+        date_generated=now,
+        input_oois=report_inputs,
+        observed_at=observed_at,
+        report_recipe=report_recipe,
+    )
 
-                sub_report_ooi = Report(
-                    name=str(name),
-                    report_type=report_type_id,
-                    template=report_type.template_path,
-                    report_id=uuid4(),
-                    organization_code=organization.code,
-                    organization_name=organization.name,
-                    organization_tags=[tag.name for tag in organization.tags.all()],
-                    data_raw_id=raw_id,
-                    date_generated=datetime.now(timezone.utc),
-                    input_oois=[ooi],
-                    observed_at=observed_at,
-                    parent_report=parent_report_ooi.reference,
-                    has_parent=True,
-                )
-
-                create_ooi(octopoes_api_connector, bytes_client, sub_report_ooi, observed_at)
-
-    # if it's a single report we can just save it as complete
-    else:
-        report_type_id = next(iter(report_data))
-        ooi = next(iter(report_data[report_type_id]))
-        data = report_data[report_type_id][ooi]
-        raw_id = bytes_client.upload_raw(
-            raw=ReportDataDict({"report_data": data["data"]} | input_data).model_dump_json().encode(),
-            manual_mime_types={"openkat/report"},
-        )
-        report_type = get_report_by_id(report_type_id)
-        name = now.strftime(Template(parent_report_name).safe_substitute(report_type=str(report_type.name)))
-
-        if not name or name.isspace():
-            name = ConcatenatedReport.name
-
-        parent_report_ooi = Report(
-            name=str(name),
-            report_type=report_type_id,
-            template=report_type.template_path,
-            report_id=uuid4(),
-            organization_code=organization.code,
-            organization_name=organization.name,
-            organization_tags=[tag.name for tag in organization.tags.all()],
-            data_raw_id=raw_id,
-            date_generated=datetime.now(timezone.utc),
-            input_oois=[ooi],
-            observed_at=observed_at,
-            parent_report=None,
-            has_parent=False,
-            report_recipe=report_recipe,
-        )
-
-        create_ooi(octopoes_api_connector, bytes_client, parent_report_ooi, observed_at)
-
+    create_ooi(octopoes_api_connector, bytes_client, parent_report_ooi, observed_at)
     logger.info("Report created", event_code=800071, report=parent_report_ooi)
     return parent_report_ooi
 
@@ -240,8 +200,6 @@ def save_aggregate_report_data(
         date_generated=now,
         input_oois=ooi_pks,
         observed_at=observed_at,
-        parent_report=None,
-        has_parent=False,
         report_recipe=report_recipe,
     )
     create_ooi(octopoes_api_connector, bytes_client, report_ooi, observed_at)

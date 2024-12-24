@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from uuid import UUID, uuid4
 
 from octopoes.models import OOI
@@ -49,7 +49,7 @@ class Aliased:
 Ref = type[OOI] | Aliased
 
 
-@dataclass
+@dataclass(frozen=True)
 class Query:
     """Object representing an XTDB query.
 
@@ -77,21 +77,26 @@ class Query:
     _order_by: tuple[Aliased, bool] | None = None
 
     def where(self, ooi_type: Ref, **kwargs) -> "Query":
-        for field_name, value in kwargs.items():
-            self._where_field_is(ooi_type, field_name, value)
+        new = self._copy()
 
-        return self
+        for field_name, value in kwargs.items():
+            new._where_field_is(ooi_type, field_name, value)
+
+        return new
 
     def where_in(self, ooi_type: Ref, **kwargs: list[str]) -> "Query":
         """Allows for filtering on multiple values for a specific field."""
+        new = self._copy()
 
         for field_name, values in kwargs.items():
-            self._where_field_in(ooi_type, field_name, values)
+            new._where_field_in(ooi_type, field_name, values)
 
-        return self
+        return new
 
     def format(self) -> str:
-        return self._compile(separator="\n    ")
+        new = self._copy()
+
+        return new._compile(separator="\n    ")
 
     @classmethod
     def from_path(cls, path: Path) -> "Query":
@@ -143,46 +148,44 @@ class Query:
                 query = query.where(target_ref, **{segment.property_name: source_ref})
 
         # Make sure we use the last reference in the path as a target
-        query.result_type = target_ref
+        query = replace(query, result_type=target_ref)
 
         return query
 
     def pull(self, ooi_type: Ref, *, fields: str = "[*]") -> "Query":
         """By default, we pull the target type. But when using find, count, etc., you have to pull explicitly."""
+        new = self._copy()
 
-        self._find_clauses.append(f"(pull {self._get_object_alias(ooi_type)} {fields})")
+        new._find_clauses.append(f"(pull {new._get_object_alias(ooi_type)} {fields})")
 
-        return self
+        return new
 
     def find(self, item: Ref, *, index: int | None = None) -> "Query":
         """Add a find clause, so we can select specific fields in a query to be returned as well."""
-
         if index is None:
-            self._find_clauses.append(self._get_object_alias(item))
+            return replace(self, _find_clauses=self._find_clauses + [self._get_object_alias(item)])
         else:
-            self._find_clauses.insert(index, self._get_object_alias(item))
+            find_clauses = self._find_clauses
+            find_clauses.insert(index, self._get_object_alias(item))
+            return replace(self, _find_clauses=find_clauses)
 
-        return self
-
-    def count(self, ooi_type: Ref) -> "Query":
-        self._find_clauses.append(f"(count {self._get_object_alias(ooi_type)})")
-
-        return self
+    def count(self, ooi_type: Ref | None = None) -> "Query":
+        if ooi_type:
+            return replace(self, _find_clauses=self._find_clauses + [f"(count {self._get_object_alias(ooi_type)})"])
+        else:
+            return replace(self, _find_clauses=self._find_clauses + [f"(count {self._get_object_alias(self.result_type)})"])
 
     def limit(self, limit: int) -> "Query":
-        self._limit = limit
-
-        return self
+        return replace(self, _limit=limit)
 
     def offset(self, offset: int) -> "Query":
-        self._offset = offset
-
-        return self
+        return replace(self, _offset=offset)
 
     def order_by(self, ref: Aliased, ascending: bool = True) -> "Query":
-        self._order_by = (ref, ascending)
+        return replace(self, _order_by=(ref, ascending))
 
-        return self
+    def _copy(self) -> "Query":
+        return replace(self)
 
     def _where_field_is(self, ref: Ref, field_name: str, value: Ref | str | set[str]) -> None:
         """
@@ -336,20 +339,22 @@ class Query:
         where_clauses = self._compile_where_clauses(separator=separator)
 
         if not self._find_clauses:
-            self._find_clauses = [f"(pull {self._get_object_alias(self.result_type)} [*])"]
+            new = replace(self, _find_clauses=self._find_clauses + [f"(pull {self._get_object_alias(self.result_type)} [*])"])
+        else:
+            new = self
 
-        find_clauses = self._compile_find_clauses()
+        find_clauses = new._compile_find_clauses()
         compiled = f"{{:query {{:find [{find_clauses}] :where [{where_clauses}]"
 
-        if self._order_by is not None:
-            asc_desc = ":asc" if self._order_by[1] else ":desc"
-            compiled += f" :order-by [[{self._get_object_alias(self._order_by[0])} {asc_desc}]]"
+        if new._order_by is not None:
+            asc_desc = ":asc" if new._order_by[1] else ":desc"
+            compiled += f" :order-by [[{new._get_object_alias(new._order_by[0])} {asc_desc}]]"
 
-        if self._limit is not None:
-            compiled += f" :limit {self._limit}"
+        if new._limit is not None:
+            compiled += f" :limit {new._limit}"
 
-        if self._offset is not None:
-            compiled += f" :offset {self._offset}"
+        if new._offset is not None:
+            compiled += f" :offset {new._offset}"
 
         return compiled + "}}"
 

@@ -20,17 +20,10 @@ class ReportData(OOI):
         return f"Report data of organization {reference.tokenized.organization_code}"
 
 
-class Report(OOI):
-    object_type: Literal["Report"] = "Report"
-
+class BaseReport(OOI):
     name: str
-    report_type: str
     template: str | None = None
     date_generated: datetime
-
-    input_oois: list[str]
-
-    report_id: UUID
 
     organization_code: str
     organization_name: str
@@ -38,15 +31,29 @@ class Report(OOI):
     data_raw_id: str
 
     observed_at: datetime
-    parent_report: Reference | None = ReferenceField("Report", default=None)
     report_recipe: Reference | None = ReferenceField("ReportRecipe", default=None)
-    has_parent: bool
-
-    _natural_key_attrs = ["report_id"]
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
-        return f"Report {reference.tokenized.report_id}"
+        return f"Report {reference.tokenized.name}"
+
+
+class Report(BaseReport):
+    object_type: Literal["Report"] = "Report"
+    report_type: Literal["concatenated-report", "aggregate-organisation-report", "multi-organization-report"]
+
+    input_oois: list[str]
+
+    _natural_key_attrs = ["report_recipe"]
+
+
+class AssetReport(BaseReport):
+    object_type: Literal["AssetReport"] = "AssetReport"
+    report_type: str
+
+    input_ooi: str
+
+    _natural_key_attrs = ["input_ooi", "report_type"]
 
 
 class ReportRecipe(OOI):

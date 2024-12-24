@@ -21,7 +21,7 @@ from octopoes.models import OOI, Reference, ScanLevel, ScanProfile, ScanProfileT
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
-from octopoes.models.ooi.reports import Report
+from octopoes.models.ooi.reports import Report, AssetReport
 from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.transaction import TransactionRecord
@@ -280,8 +280,12 @@ class OctopoesAPIConnector:
         return TypeAdapter(Paginated[Finding]).validate_json(res.content)
 
     def list_reports(
-        self, valid_time: datetime, offset: int = DEFAULT_OFFSET, limit: int = DEFAULT_LIMIT, recipe_id: UUID | None = None
-    ) -> Paginated[tuple[Report, list[Report | None]]]:
+        self,
+        valid_time: datetime,
+        offset: int = DEFAULT_OFFSET,
+        limit: int = DEFAULT_LIMIT,
+        recipe_id: UUID | None = None,
+    ) -> Paginated[tuple[Report, list[AssetReport]]]:
         params: dict[str, str | int | list[str]] = {
             "valid_time": str(valid_time),
             "offset": offset,
@@ -290,7 +294,7 @@ class OctopoesAPIConnector:
         }
         res = self.session.get(f"/{self.client}/reports", params=params)
 
-        return TypeAdapter(Paginated[tuple[Report, list[Report | None]]]).validate_json(res.content)
+        return TypeAdapter(Paginated[tuple[Report, list[AssetReport]]]).validate_json(res.content)
 
     def get_report(self, report_id: str) -> Report:
         res = self.session.get(f"/{self.client}/reports/{report_id}")
