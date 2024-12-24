@@ -268,7 +268,7 @@ class MockEventManager:
 
 
 @pytest.fixture
-def event_manager(xtdb_session: XTDBSession) -> Mock:
+def event_manager(xtdb_session: XTDBSession) -> MockEventManager:
     return MockEventManager()
 
 
@@ -278,22 +278,24 @@ def xtdb_ooi_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XT
 
 
 @pytest.fixture
-def xtdb_origin_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOOIRepository]:
+def xtdb_origin_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOriginRepository]:
     yield XTDBOriginRepository(event_manager, xtdb_session)
 
 
 @pytest.fixture
-def xtdb_origin_parameter_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOOIRepository]:
+def xtdb_origin_parameter_repository(
+    xtdb_session: XTDBSession, event_manager
+) -> Iterator[XTDBOriginParameterRepository]:
     yield XTDBOriginParameterRepository(event_manager, xtdb_session)
 
 
 @pytest.fixture
-def xtdb_scan_profile_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOOIRepository]:
+def xtdb_scan_profile_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBScanProfileRepository]:
     yield XTDBScanProfileRepository(event_manager, xtdb_session)
 
 
 @pytest.fixture
-def xtdb_nibble_repository(xtdb_session: XTDBSession) -> Iterator[XTDBNibbleRepository]:
+def xtdb_nibble_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBNibbleRepository]:
     yield XTDBNibbleRepository(xtdb_session)
 
 

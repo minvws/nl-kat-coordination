@@ -22,7 +22,7 @@ def test_missing_spf_nibble_with_and_without_nx(
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
-        xtdb_octopoes_service.scan_profile_repository,
+        xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()
     nibbler.nibbles = {missing_spf_nibble.id: missing_spf_nibble}
@@ -57,7 +57,7 @@ def test_missing_spf_nibble_with_and_without_spf(
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
-        xtdb_octopoes_service.scan_profile_repository,
+        xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()
     nibbler.nibbles = {missing_spf_nibble.id: missing_spf_nibble}
@@ -92,7 +92,7 @@ def test_missing_spf_nibble_non_tld(xtdb_octopoes_service: OctopoesService, even
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
-        xtdb_octopoes_service.scan_profile_repository,
+        xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()
     nibbler.nibbles = {missing_spf_nibble.id: missing_spf_nibble}
