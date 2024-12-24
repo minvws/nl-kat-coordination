@@ -8,7 +8,7 @@ from typing import Any
 
 import structlog
 from pydantic import BaseModel
-from xxhash import xxh3_128_hexdigest as xxh3  # INFO: xxh3_64_hexdigest is faster but hash more collision probabilities
+from xxhash import xxh3_128_hexdigest as xxh3
 
 from octopoes.models import OOI, Reference
 
@@ -36,6 +36,7 @@ class NibbleDefinition(BaseModel):
     id: str
     signature: list[NibbleParameter]
     query: str | Callable[[list[Reference | None]], str] | None = None
+    enabled: bool = True
     _payload: MethodType | None = None
     _checksum: str | None = None
 
@@ -47,6 +48,9 @@ class NibbleDefinition(BaseModel):
 
     def __hash__(self):
         return hash(self.id)
+
+    def _ini(self) -> dict[str, Any]:
+        return {"id": self.id, "enabled": self.enabled, "checksum": self._checksum}
 
 
 def get_nibble_definitions() -> dict[str, NibbleDefinition]:

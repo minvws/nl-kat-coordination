@@ -42,6 +42,7 @@ from octopoes.models.path import (
 )
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
+from octopoes.repositories.nibble_repository import NibbleRepository
 from octopoes.repositories.ooi_repository import OOIRepository
 from octopoes.repositories.origin_parameter_repository import OriginParameterRepository
 from octopoes.repositories.origin_repository import OriginRepository
@@ -71,13 +72,14 @@ class OctopoesService:
         origin_repository: OriginRepository,
         origin_parameter_repository: OriginParameterRepository,
         scan_profile_repository: ScanProfileRepository,
+        nibble_repository: NibbleRepository,
         session: XTDBSession | None = None,
     ):
         self.ooi_repository = ooi_repository
         self.origin_repository = origin_repository
         self.origin_parameter_repository = origin_parameter_repository
         self.scan_profile_repository = scan_profile_repository
-        self.nibbler = NibblesRunner(ooi_repository, origin_repository, scan_profile_repository)
+        self.nibbler = NibblesRunner(ooi_repository, origin_repository, nibble_repository)
         self.session = session
 
     @overload

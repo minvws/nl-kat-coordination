@@ -343,3 +343,9 @@ def test_nibbles_update(xtdb_octopoes_service: OctopoesService, event_manager: M
 
     assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 1
     assert xtdb_octopoes_service.ooi_repository.list_oois({KATFindingType}, valid_time).count == 1
+
+
+def test_nibble_states(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
+    assert len(xtdb_octopoes_service.nibbler.nibble_repository.get_all(valid_time)) == len(
+        xtdb_octopoes_service.nibbler.nibbles
+    )

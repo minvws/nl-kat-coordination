@@ -3,19 +3,25 @@ from collections.abc import Iterable
 from datetime import datetime
 from typing import Any
 
-from xxhash import xxh3_128_hexdigest as xxh3  # INFO: xxh3_64_hexdigest is faster but hash more collision probabilities
+from xxhash import xxh3_128_hexdigest as xxh3
 
 from nibbles.definitions import NibbleDefinition, get_nibble_definitions
 from octopoes.models import OOI, Reference
 from octopoes.models.origin import Origin, OriginType
+from octopoes.repositories.nibble_repository import NibbleRepository
 from octopoes.repositories.ooi_repository import OOIRepository
 from octopoes.repositories.origin_repository import OriginRepository
-from octopoes.repositories.scan_profile_repository import ScanProfileRepository
 
 
 def merge_results(
     d1: dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]], d2: dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]]
 ) -> dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]]:
+    """
+    Merge new runner results with old runner results
+    d1: runner_results
+    d2: runner_results
+    --> runner_results
+    """
     return {
         key: {
             nibble_id: {
@@ -31,6 +37,9 @@ def merge_results(
 
 
 def flatten(items: Iterable[Any | Iterable[Any | None] | None]) -> Iterable[OOI]:
+    """
+    Retrieve OOIs as returned from the nibble
+    """
     for item in items:
         if isinstance(item, OOI):
             yield item
@@ -43,6 +52,9 @@ def flatten(items: Iterable[Any | Iterable[Any | None] | None]) -> Iterable[OOI]
 
 
 def nibble_hasher(data: Iterable, additional: str | None = None) -> str:
+    """
+    Hash the nibble generated data with its content together with the nibble checksum
+    """
     return xxh3(
         "".join(
             [
@@ -58,16 +70,15 @@ def nibble_hasher(data: Iterable, additional: str | None = None) -> str:
 
 class NibblesRunner:
     def __init__(
-        self,
-        ooi_repository: OOIRepository,
-        origin_repository: OriginRepository,
-        scan_profile_repository: ScanProfileRepository,
+        self, ooi_repository: OOIRepository, origin_repository: OriginRepository, nibble_repository: NibbleRepository
     ):
         self.ooi_repository = ooi_repository
         self.origin_repository = origin_repository
-        self.scan_profile_repository = scan_profile_repository
         self.cache: dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]] = {}
+        self.nibble_repository = nibble_repository
         self.nibbles: dict[str, NibbleDefinition] = get_nibble_definitions()
+        inis = [nibble._ini() for nibble in self.nibbles.values()]
+        nibble_repository.put_many(inis, datetime.now())
 
     def __del__(self):
         self._write(datetime.now())
