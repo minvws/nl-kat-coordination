@@ -109,6 +109,8 @@ debian12-build-image:
 ubuntu22.04-build-image:
 	docker build -t kat-ubuntu22.04-build-image packaging/ubuntu22.04
 
+CHECKSUM_CMD = $(if $(filter $(UNAME), Darwin), shasum -a 256, sha256sum --quiet)
+
 docs:
 	$(call build-settings-doc,keiko,keiko.settings,keiko,Keiko)
 	$(call build-settings-doc,octopoes,octopoes.config.settings,octopoes,Octopoes)
@@ -118,8 +120,9 @@ docs:
 
 	curl -sL -o - https://registry.npmjs.org/d3/-/d3-7.9.0.tgz | tar -Oxzf - package/dist/d3.min.js > docs/source/_static/d3.min.js
 	curl -sL -o - https://registry.npmjs.org/mermaid/-/mermaid-11.3.0.tgz | tar -Oxzf - package/dist/mermaid.min.js > docs/source/_static/mermaid.min.js
-	echo "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539  docs/source/_static/d3.min.js" | sha256sum --quiet --check || exit 1
-	echo "0d2b6f2361e7e0ce466a6ed458e03daa5584b42ef6926c3beb62eb64670ca261  docs/source/_static/mermaid.min.js" | sha256sum --quiet --check || exit 1
+
+	echo "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539  docs/source/_static/d3.min.js" | $(CHECKSUM_CMD) --check || exit 1
+	echo "0d2b6f2361e7e0ce466a6ed458e03daa5584b42ef6926c3beb62eb64670ca261  docs/source/_static/mermaid.min.js" | $(CHECKSUM_CMD) --check || exit 1
 
 	PYTHONPATH=$(PYTHONPATH):boefjes/:bytes/:keiko/:mula/:octopoes/ sphinx-build -b html --fail-on-warning docs/source docs/_build
 
