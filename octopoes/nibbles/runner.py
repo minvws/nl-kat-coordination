@@ -77,6 +77,7 @@ class NibblesRunner:
         self.cache: dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]] = {}
         self.nibble_repository = nibble_repository
         self.nibbles: dict[str, NibbleDefinition] = get_nibble_definitions()
+        self.federated: bool = False
 
     def __del__(self):
         self._write(datetime.now())
@@ -85,15 +86,14 @@ class NibblesRunner:
         old_checksums = self.checksum_nibbles()
         self.nibbles = new_nibbles
         new_checksums = self.checksum_nibbles()
+        if self.federated:
+            self.register(valid_time)
         updated_nibble_ids = [
             nibble_id
             for nibble_id in new_checksums
             if nibble_id not in old_checksums or old_checksums[nibble_id] != new_checksums[nibble_id]
         ]
         self.infer(list(flatten(self.retrieve(nibble_id, valid_time) for nibble_id in updated_nibble_ids)), valid_time)
-
-    def select_nibbles(self, nibble_ids: Iterable[str]):
-        self.nibbles = {key: value for key, value in self.nibbles.items() if key in nibble_ids}
 
     def list_nibbles(self) -> list[str]:
         return list(self.nibbles.keys())
@@ -107,20 +107,24 @@ class NibblesRunner:
     def disable(self):
         self.nibbles = {}
 
-    def register(self):
-        inis = [nibble._ini for nibble in self.nibbles.values()]
-        self.nibble_repository.put_many(inis, datetime.now())
+    def register(self, valid_time: datetime = datetime.now()):
+        self.federated = True
+        self.nibble_repository.put_many([nibble._ini for nibble in self.nibbles.values()], valid_time)
 
     def sync(self, valid_time: datetime):
-        xtdb_nibble_inis = {ni["id"]: ni for ni in self.nibble_repository.get_all(valid_time)}
-        for nibble in self.nibbles.values():
-            xtdb_nibble_ini = xtdb_nibble_inis[nibble.id]
-            if xtdb_nibble_ini["enabled"] != nibble.enabled:
-                self.nibbles[nibble.id].enabled = xtdb_nibble_ini["enabled"]
+        if self.federated:
+            xtdb_nibble_inis = {ni["id"]: ni for ni in self.nibble_repository.get_all(valid_time)}
+            for nibble in self.nibbles.values():
+                xtdb_nibble_ini = xtdb_nibble_inis[nibble.id]
+                if xtdb_nibble_ini["enabled"] != nibble.enabled:
+                    self.nibbles[nibble.id].enabled = xtdb_nibble_ini["enabled"]
 
-    def toggle_nibble(self, nibble_id: str, is_enabled: bool, valid_time: datetime):
-        self.nibbles[nibble_id].enabled = is_enabled
-        self.nibble_repository.put(self.nibbles[nibble_id]._ini, valid_time)
+    def toggle_nibbles(self, nibble_ids: list[str], is_enabled: bool | list[bool], valid_time: datetime):
+        is_enabled = is_enabled if isinstance(is_enabled, list) else [is_enabled] * len(nibble_ids)
+        for nibble_id, state in zip(nibble_ids, is_enabled):
+            self.nibbles[nibble_id].enabled = state
+        if self.federated:
+            self.nibble_repository.put_many([self.nibbles[nibble_id]._ini for nibble_id in nibble_ids], valid_time)
 
     def retrieve(self, nibble_id: str, valid_time: datetime) -> list[list[Any]]:
         nibble = self.nibbles[nibble_id]
@@ -176,11 +180,12 @@ class NibblesRunner:
             lambda x: any(isinstance(ooi, param.object_type) for param in x.signature) and x not in nibblet_nibbles,
             self.nibbles.values(),
         ):
-            if len(nibble.signature) > 1:
-                self._write(valid_time)
-            args = self.ooi_repository.nibble_query(ooi, nibble, valid_time)
-            results = {tuple(arg): set(flatten([nibble(arg)])) for arg in args}
-            return_value |= {nibble.id: results}
+            if nibble.enabled:
+                if len(nibble.signature) > 1:
+                    self._write(valid_time)
+                args = self.ooi_repository.nibble_query(ooi, nibble, valid_time)
+                results = {tuple(arg): set(flatten([nibble(arg)])) for arg in args}
+                return_value |= {nibble.id: results}
         self.cache = merge_results(self.cache, {ooi: return_value})
         return return_value
 

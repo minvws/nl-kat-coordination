@@ -354,7 +354,7 @@ def test_nibble_states(xtdb_octopoes_service: OctopoesService, valid_time: datet
     for nibble_ini in nibble_inis:
         assert xtdb_nibble_inis[nibble_ini["id"]] == nibble_ini
 
-    xtdb_octopoes_service.nibbler.toggle_nibble("max_url_length_config", False, valid_time)
+    xtdb_octopoes_service.nibbler.toggle_nibbles(["max_url_length_config"], False, valid_time)
 
     nibble_inis = [nibble._ini for nibble in xtdb_octopoes_service.nibbler.nibbles.values()]
     xtdb_nibble_inis = {ni["id"]: ni for ni in xtdb_octopoes_service.nibbler.nibble_repository.get_all(valid_time)}

@@ -589,6 +589,11 @@ def nibbles_list(octopoes: OctopoesService = Depends(octopoes_service)) -> list[
     return octopoes.nibbler.list_nibbles()
 
 
+@router.get("/nibbles/list_enabled", tags=["nibbles"])
+def nibbles_list_enabled(octopoes: OctopoesService = Depends(octopoes_service)) -> list[str]:
+    return [nibble.id for nibble in octopoes.nibbler.nibbles.values() if nibble.enabled]
+
+
 @router.get("/nibbles/update", tags=["nibbles"])
 def nibbles_update(
     valid_time: datetime = Depends(extract_valid_time), octopoes: OctopoesService = Depends(octopoes_service)
@@ -598,11 +603,10 @@ def nibbles_update(
 
 
 @router.get("/nibbles/disable", tags=["nibbles"])
-def nibbles_disable(nibble_id: str = "", octopoes: OctopoesService = Depends(octopoes_service)) -> list[str]:
-    if nibble_id:
-        octopoes.nibbler.nibbles.pop(nibble_id, None)
-    else:
-        octopoes.nibbler.disable()
+def nibbles_disable(octopoes: OctopoesService = Depends(octopoes_service)) -> list[str]:
+    if octopoes.nibbler.federated:
+        octopoes.nibbler.toggle_nibbles(list(octopoes.nibbler.nibbles.keys()), False, datetime.now())
+    octopoes.nibbler.disable()
     return nibbles_list(octopoes)
 
 
@@ -612,9 +616,11 @@ def nibbles_available(octopoes: OctopoesService = Depends(octopoes_service)) -> 
 
 
 @router.get("/nibbles/select", tags=["nibbles"])
-def nibbles_select(nibble_ids: list[str] = Query(), octopoes: OctopoesService = Depends(octopoes_service)) -> list[str]:
-    octopoes.nibbler.select_nibbles(nibble_ids)
-    return nibbles_list(octopoes)
+def nibbles_toggle(
+    state: bool, nibble_ids: list[str] = Query(), octopoes: OctopoesService = Depends(octopoes_service)
+) -> list[str]:
+    octopoes.nibbler.toggle_nibbles(nibble_ids, state, datetime.now())
+    return nibbles_list_enabled(octopoes)
 
 
 @router.get("/nibbles/checksum", tags=["nibbles"])
@@ -639,7 +645,7 @@ def nibble_retrieve_all(
 
 
 @router.get("/nibbles/yields", tags=["nibbles"])
-def nibble_yield(
+def nibble_yields(
     nibble_id: str,
     valid_time: datetime = Depends(extract_valid_time),
     octopoes: OctopoesService = Depends(octopoes_service),
