@@ -628,6 +628,16 @@ def nibbles_checksum(octopoes: OctopoesService = Depends(octopoes_service)) -> d
     return octopoes.nibbler.checksum_nibbles()
 
 
+@router.get("/nibbles/federate", tags=["nibbles"])
+def nibbles_federate(octopoes: OctopoesService = Depends(octopoes_service)):
+    octopoes.nibbler.federated = True
+
+
+@router.get("/nibbles/register", tags=["nibbles"])
+def nibbles_register(octopoes: OctopoesService = Depends(octopoes_service)):
+    octopoes.nibbler.register(datetime.now())
+
+
 @router.get("/nibbles/retrieve", tags=["nibbles"])
 def nibble_retrieve(
     nibble_id: str,
