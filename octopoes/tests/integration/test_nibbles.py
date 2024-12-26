@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 from collections.abc import Iterator
 from datetime import datetime
 from unittest.mock import Mock
@@ -345,8 +346,27 @@ def test_nibbles_update(xtdb_octopoes_service: OctopoesService, event_manager: M
     assert xtdb_octopoes_service.ooi_repository.list_oois({KATFindingType}, valid_time).count == 1
 
 
-def test_nibble_states(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
+def test_nibble_states(xtdb_octopoes_service: OctopoesService, valid_time: datetime):
+    nibble_inis = [nibble._ini for nibble in xtdb_octopoes_service.nibbler.nibbles.values()]
     xtdb_octopoes_service.nibbler.register()
-    assert len(xtdb_octopoes_service.nibbler.nibble_repository.get_all(valid_time)) == len(
-        xtdb_octopoes_service.nibbler.nibbles
-    )
+    xtdb_nibble_inis = {ni["id"]: ni for ni in xtdb_octopoes_service.nibbler.nibble_repository.get_all(valid_time)}
+    time.sleep(2)  # the Heisenbug usual race condition
+    for nibble_ini in nibble_inis:
+        assert xtdb_nibble_inis[nibble_ini["id"]] == nibble_ini
+
+    xtdb_octopoes_service.nibbler.toggle_nibble("max_url_length_config", False, valid_time)
+
+    nibble_inis = [nibble._ini for nibble in xtdb_octopoes_service.nibbler.nibbles.values()]
+    xtdb_nibble_inis = {ni["id"]: ni for ni in xtdb_octopoes_service.nibbler.nibble_repository.get_all(valid_time)}
+    time.sleep(2)  # the Heisenbug usual race condition
+    for nibble_ini in nibble_inis:
+        assert xtdb_nibble_inis[nibble_ini["id"]] == nibble_ini
+
+    xtdb_octopoes_service.nibbler.nibbles["max_url_length_config"].enabled = True
+    xtdb_octopoes_service.nibbler.sync(valid_time)
+
+    nibble_inis = [nibble._ini for nibble in xtdb_octopoes_service.nibbler.nibbles.values()]
+    xtdb_nibble_inis = {ni["id"]: ni for ni in xtdb_octopoes_service.nibbler.nibble_repository.get_all(valid_time)}
+    time.sleep(2)  # the Heisenbug usual race condition
+    for nibble_ini in nibble_inis:
+        assert xtdb_nibble_inis[nibble_ini["id"]] == nibble_ini

@@ -108,8 +108,19 @@ class NibblesRunner:
         self.nibbles = {}
 
     def register(self):
-        inis = [nibble._ini() for nibble in self.nibbles.values()]
+        inis = [nibble._ini for nibble in self.nibbles.values()]
         self.nibble_repository.put_many(inis, datetime.now())
+
+    def sync(self, valid_time: datetime):
+        xtdb_nibble_inis = {ni["id"]: ni for ni in self.nibble_repository.get_all(valid_time)}
+        for nibble in self.nibbles.values():
+            xtdb_nibble_ini = xtdb_nibble_inis[nibble.id]
+            if xtdb_nibble_ini["enabled"] != nibble.enabled:
+                self.nibbles[nibble.id].enabled = xtdb_nibble_ini["enabled"]
+
+    def toggle_nibble(self, nibble_id: str, is_enabled: bool, valid_time: datetime):
+        self.nibbles[nibble_id].enabled = is_enabled
+        self.nibble_repository.put(self.nibbles[nibble_id]._ini, valid_time)
 
     def retrieve(self, nibble_id: str, valid_time: datetime) -> list[list[Any]]:
         nibble = self.nibbles[nibble_id]
@@ -192,6 +203,7 @@ class NibblesRunner:
         self.cache = {}
 
     def infer(self, stack: list[OOI], valid_time: datetime) -> dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]]:
+        self.sync(valid_time)
         inferences: dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]] = {}
         blockset = set(stack)
         while stack:

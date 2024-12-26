@@ -49,6 +49,7 @@ class NibbleDefinition(BaseModel):
     def __hash__(self):
         return hash(self.id)
 
+    @property
     def _ini(self) -> dict[str, Any]:
         return {"id": self.id, "enabled": self.enabled, "checksum": self._checksum}
 
