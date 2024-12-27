@@ -1,6 +1,5 @@
 import os
 import sys
-import time
 from collections.abc import Iterator
 from datetime import datetime
 from unittest.mock import Mock
@@ -350,7 +349,6 @@ def test_nibble_states(xtdb_octopoes_service: OctopoesService, valid_time: datet
     nibble_inis = [nibble._ini for nibble in xtdb_octopoes_service.nibbler.nibbles.values()]
     xtdb_octopoes_service.nibbler.register()
     xtdb_nibble_inis = {ni["id"]: ni for ni in xtdb_octopoes_service.nibbler.nibble_repository.get_all(valid_time)}
-    time.sleep(2)  # the Heisenbug usual race condition
     for nibble_ini in nibble_inis:
         assert xtdb_nibble_inis[nibble_ini["id"]] == nibble_ini
 
@@ -358,7 +356,6 @@ def test_nibble_states(xtdb_octopoes_service: OctopoesService, valid_time: datet
 
     nibble_inis = [nibble._ini for nibble in xtdb_octopoes_service.nibbler.nibbles.values()]
     xtdb_nibble_inis = {ni["id"]: ni for ni in xtdb_octopoes_service.nibbler.nibble_repository.get_all(valid_time)}
-    time.sleep(2)  # the Heisenbug usual race condition
     for nibble_ini in nibble_inis:
         assert xtdb_nibble_inis[nibble_ini["id"]] == nibble_ini
 
@@ -367,6 +364,5 @@ def test_nibble_states(xtdb_octopoes_service: OctopoesService, valid_time: datet
 
     nibble_inis = [nibble._ini for nibble in xtdb_octopoes_service.nibbler.nibbles.values()]
     xtdb_nibble_inis = {ni["id"]: ni for ni in xtdb_octopoes_service.nibbler.nibble_repository.get_all(valid_time)}
-    time.sleep(2)  # the Heisenbug usual race condition
     for nibble_ini in nibble_inis:
         assert xtdb_nibble_inis[nibble_ini["id"]] == nibble_ini
