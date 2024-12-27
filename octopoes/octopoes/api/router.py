@@ -625,7 +625,7 @@ def nibbles_toggle(
 
 @router.get("/nibbles/checksum", tags=["nibbles"])
 def nibbles_checksum(octopoes: OctopoesService = Depends(octopoes_service)) -> dict[str, str | None]:
-    return octopoes.nibbler.checksum_nibbles()
+    return {nibble.id: nibble._checksum for nibble in octopoes.nibbler.nibbles.values()}
 
 
 @router.get("/nibbles/federate", tags=["nibbles"])

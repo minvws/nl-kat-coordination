@@ -83,9 +83,9 @@ class NibblesRunner:
         self._write(datetime.now())
 
     def update_nibbles(self, valid_time: datetime, new_nibbles: dict[str, NibbleDefinition] = get_nibble_definitions()):
-        old_checksums = self.checksum_nibbles()
+        old_checksums = {nibble.id: nibble._checksum for nibble in self.nibbles.values()}
         self.nibbles = new_nibbles
-        new_checksums = self.checksum_nibbles()
+        new_checksums = {nibble.id: nibble._checksum for nibble in self.nibbles.values()}
         if self.federated:
             self.register(valid_time)
         updated_nibble_ids = [
@@ -100,9 +100,6 @@ class NibblesRunner:
 
     def list_available_nibbles(self) -> list[str]:
         return list(get_nibble_definitions())
-
-    def checksum_nibbles(self) -> dict[str, str | None]:
-        return {nibble.id: nibble._checksum for nibble in self.nibbles.values()}
 
     def disable(self):
         self.nibbles = {}
