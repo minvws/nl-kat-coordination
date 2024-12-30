@@ -9,7 +9,7 @@ from nibbles.definitions import NibbleDefinition, NibbleParameter
 from nibbles.runner import NibblesRunner, nibble_hasher
 
 from octopoes.core.service import OctopoesService
-from octopoes.events.events import OperationType, OOIDBEvent, OriginDBEvent
+from octopoes.events.events import OOIDBEvent, OperationType, OriginDBEvent
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.findings import Finding, FindingType, KATFindingType, RiskLevelSeverity
