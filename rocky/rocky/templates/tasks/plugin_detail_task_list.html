@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load humanize %}
 
 <div class="horizontal-scroll">
     <h2>{% translate "Tasks" %}</h2>
@@ -13,6 +14,8 @@
                 <tr>
                     <th scope="col">{% translate "Status" %}</th>
                     <th scope="col">{% translate "Created date" %}</th>
+                    <th scope="col">{% translate "Modify date" %}</th>
+                    <th scope="col">{% translate "Job priority" %}</th>
                     <th scope="col">{% translate "Input Object" %}</th>
                     <th scope="col" class="visually-hidden actions">{% translate "Details" %}</th>
                 </tr>
@@ -23,15 +26,17 @@
                         <td class="nowrap">
                             <i class="icon {{ task.status.value }}"></i>&nbsp;{{ task.status.value|capfirst }}
                         </td>
-                        <td>{{ task.created_at }}</td>
+                        <td title="{{ task.created_at }} UTC">{{ task.created_at|naturaltime }}</td>
+                        <td title="{{ task.modified_at }} UTC">{{ task.modified_at|naturaltime }}</td>
+                        <td>{{ task.priority }}</td>
                         <td>
                             {% if task.type == "boefje" %}
                                 {% with ooi=task.data.input_ooi %}
-                                    <a href="{% ooi_url "ooi_detail" ooi organization.code observed_at=task.created_at|date:'c' %}">{{ ooi }}</a>
+                                    <a href="{% ooi_url "ooi_detail" ooi organization.code observed_at=task.created_at|date:'c' %}">{{ ooi|human_readable }}</a>
                                 {% endwith %}
                             {% elif task.type == "normalizer" %}
                                 {% with ooi=task.data.raw_data.boefje_meta.input_ooi %}
-                                    <a href="{% ooi_url "ooi_detail" ooi organization.code observed_at=task.created_at|date:'c' %}">{{ ooi }}</a>
+                                    <a href="{% ooi_url "ooi_detail" ooi organization.code observed_at=task.created_at|date:'c' %}">{{ ooi|human_readable }}</a>
                                 {% endwith %}
                             {% endif %}
                         </td>
@@ -46,7 +51,7 @@
                         </td>
                     </tr>
                     <tr class="expando-row">
-                        <td colspan="4">
+                        <td colspan="6">
                             {% include "tasks/partials/task_actions.html" %}
 
                         </td>

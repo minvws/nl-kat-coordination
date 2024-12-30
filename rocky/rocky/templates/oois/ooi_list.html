@@ -79,7 +79,7 @@
                                             <a href="{% ooi_url "ooi_detail" object.primary_key organization.code observed_at=observed_at %}">{{ object.human_readable }}</a>
                                         </td>
                                         <td>
-                                            <a href="{{ request.path }}?observed_at={{ observed_at|date:"Y-m-d" }}&ooi_type={{ object.ooi_type }}">{{ object.ooi_type }}</a>
+                                            <a href="{{ request.path }}?observed_at={{ observed_at|date:"Y-m-d" }}&amp;ooi_type={{ object.ooi_type }}">{{ object.ooi_type }}</a>
                                         </td>
                                         <td>
                                             {% include "partials/scan_level_indicator.html" with value=object.scan_profile.level.value %}

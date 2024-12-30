@@ -18,7 +18,7 @@
                 </p>
             </div>
             <div>
-                <h2>RAW file</h2>
+                <h2>RAW files</h2>
                 {% if task.status.value in "completed,failed" %}
                     <a href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.id %}">{% translate "Download meta and raw data" %}</a>
                 {% else %}
@@ -28,7 +28,7 @@
             <div>
                 <h2>{% translate "Input object" %}</h2>
                 <p>
-                    <a href="{% ooi_url 'ooi_detail' task.data.input_ooi organization.code %}">{{ task.data.input_ooi }}</a>
+                    <a href="{% ooi_url 'ooi_detail' task.data.input_ooi organization.code %}">{{ task.data.input_ooi|human_readable }}</a>
                 </p>
             </div>
         </section>

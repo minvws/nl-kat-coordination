@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load humanize %}
 
 <div class="horizontal-scroll">
     <h2>{% translate "Tasks" %}</h2>
@@ -17,6 +18,8 @@
                     <th scope="col">{% translate "Plugin" %}</th>
                     <th scope="col">{% translate "Status" %}</th>
                     <th scope="col">{% translate "Created date" %}</th>
+                    <th scope="col">{% translate "Modify date" %}</th>
+                    <th scope="col">{% translate "Job priority" %}</th>
                     <th scope="col" class="visually-hidden actions">{% translate "Details" %}</th>
                 </tr>
             </thead>
@@ -35,7 +38,9 @@
                         <td class="nowrap">
                             <i class="icon {{ task.status.value }}"></i>&nbsp;{{ task.status.value|capfirst }}
                         </td>
-                        <td class="nowrap">{{ task.created_at }}</td>
+                        <td class="nowrap" title="{{ task.created_at }} UTC">{{ task.created_at|naturaltime }}</td>
+                        <td class="nowrap" title="{{ task.modified_at }} UTC">{{ task.modified_at|naturaltime }}</td>
+                        <td>{{ task.priority }}</td>
                         <td class="actions">
                             <button type="button"
                                     class="expando-button ooi-detail-task-list-table-row"
@@ -47,7 +52,7 @@
                         </td>
                     </tr>
                     <tr class="expando-row">
-                        <td colspan="4">
+                        <td colspan="6">
                             {% include "tasks/partials/task_actions.html" %}
 
                         </td>
