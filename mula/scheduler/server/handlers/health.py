@@ -23,11 +23,7 @@ class HealthAPI:
         )
 
     def health(self, externals: bool = False) -> Any:
-        response = models.ServiceHealth(
-            service="scheduler",
-            healthy=True,
-            version=version.__version__,
-        )
+        response = models.ServiceHealth(service="scheduler", healthy=True, version=version.__version__)
 
         if externals:
             for service in self.ctx.services.__dict__.values():

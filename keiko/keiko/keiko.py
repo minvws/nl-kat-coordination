@@ -80,25 +80,16 @@ def baretext(text: str) -> str:
 
 @tracer.start_as_current_span("generate_report")
 def generate_report(
-    template_name: str,
-    report_data: DataShapeBase,
-    glossary: str,
-    report_id: str,
-    debug: bool,
-    settings: Settings,
+    template_name: str, report_data: DataShapeBase, glossary: str, report_id: str, debug: bool, settings: Settings
 ) -> None:
     """Generate a preprocessed LateX file from a template, a JSON data file and a glossary CSV file."""
     current_span = trace.get_current_span()
 
     # load data shape and validate
     data_shape_class = get_data_shape(template_name, settings)
-    data = data_shape_class.parse_obj(report_data.dict())
+    data = data_shape_class.model_validate(report_data.model_dump())
     current_span.add_event("Data shape validation successful")
-    logger.info(
-        "Data shape validation successful. [report_id=%s] [template=%s]",
-        report_id,
-        template_name,
-    )
+    logger.info("Data shape validation successful. [report_id=%s] [template=%s]", report_id, template_name)
 
     # build glossary
     glossary_entries = read_glossary(glossary, settings)
@@ -107,9 +98,7 @@ def generate_report(
 
     # init jinja2 template
     env = Environment(  # noqa: S701
-        loader=FileSystemLoader(settings.templates_folder),
-        variable_start_string="@@{",
-        variable_end_string="}@@",
+        loader=FileSystemLoader(settings.templates_folder), variable_start_string="@@{", variable_end_string="}@@"
     )
     env.filters["latex_escape"] = latex_escape
     env.filters["to_text"] = to_text
@@ -117,11 +106,7 @@ def generate_report(
     template = env.get_template(f"{template_name}/template.tex")
 
     if not template.filename:
-        logger.error(
-            "Template file not found. [report_id=%s] [template=%s]",
-            report_id,
-            template_name,
-        )
+        logger.error("Template file not found. [report_id=%s] [template=%s]", report_id, template_name)
         ex = Exception("Template file %s not found", template_name)
         current_span.set_status(Status(StatusCode.ERROR))
         current_span.record_exception(ex)
@@ -136,7 +121,7 @@ def generate_report(
                 if bare_word in glossary_entries:
                     found_entries.add(bare_word)
 
-    context = data.dict()
+    context = data.model_dump()
 
     # build and merge glossary
     glossary_items = []
@@ -154,10 +139,7 @@ def generate_report(
     with tempfile.TemporaryDirectory() as directory:
         current_span.add_event("Temporary folder created")
         logger.info(
-            "Temporary folder created. [report_id=%s] [template=%s] [directory=%s]",
-            report_id,
-            template_name,
-            directory,
+            "Temporary folder created. [report_id=%s] [template=%s] [directory=%s]", report_id, template_name, directory
         )
 
         # copy assets
@@ -177,22 +159,13 @@ def generate_report(
 
         # if debug is enabled copy preprocessed tex file and input data
         if debug or settings.debug:
-            shutil.copyfile(
-                preprocessed_tex_path,
-                tex_output_file_path,
-            )
+            shutil.copyfile(preprocessed_tex_path, tex_output_file_path)
 
             json_output_file_path = output_file.with_suffix(".keiko.json")
             json_output_file_path.write_text(report_data.model_dump_json(indent=4))
 
         # run pdflatex
-        cmd = [
-            "latexmk",
-            "-xelatex",
-            "-synctex=1",
-            "-interaction=nonstopmode",
-            preprocessed_tex_path.as_posix(),
-        ]
+        cmd = ["latexmk", "-xelatex", "-synctex=1", "-interaction=nonstopmode", preprocessed_tex_path.as_posix()]
         env = {**os.environ, "TEXMFVAR": directory}
 
         def log_output(level, output):
@@ -208,12 +181,7 @@ def generate_report(
                 cmd, cwd=directory, env=env, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
             )
             current_span.add_event("Completed latexmk")
-            logger.info(
-                "latexmk [report_id=%s] [template=%s] [command=%s]",
-                report_id,
-                template_name,
-                " ".join(cmd),
-            )
+            logger.info("latexmk [report_id=%s] [template=%s] [command=%s]", report_id, template_name, " ".join(cmd))
             log_output(DEBUG, output.stdout)
         except subprocess.CalledProcessError as ex:
             log_output(ERROR, ex.stdout)
@@ -224,10 +192,7 @@ def generate_report(
             raise err
 
         # copy result back to output folder
-        shutil.copyfile(
-            preprocessed_tex_path.with_suffix(".pdf"),
-            pdf_output_file_path,
-        )
+        shutil.copyfile(preprocessed_tex_path.with_suffix(".pdf"), pdf_output_file_path)
         current_span.add_event("Report copied to reports folder")
         logger.info(
             "Report copied to reports folder. [report_id=%s] [template=%s] [output_file=%s]",

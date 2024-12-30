@@ -6,69 +6,62 @@
 
 <section>
     <div>
-        {% if selected_oois and selected_report_types %}
-            <h2>{% translate "Report name" %}</h2>
-            {% include "partials/return_button.html" with btn_text="Change selection" %}
-
+        {% if selected_report_types %}
+            <h2>{% translate "Report schedule" %}</h2>
             <p>
                 {% blocktranslate trimmed %}
-                    Give your report a custom name and optionally add the reports' reference date
-                    to the name. To do so you can select a standard option or use a <a href="https://strftime.org/" target="_blank">Python
-                    strftime code</a> in the report name.
+                    When scheduling your report, you have two options. You can either choose to generate it just once now,
+                    or set it to run automatically at regular intervals, like daily, weekly,
+                    or monthly. If you need the report just for a single occasion, select the one-time option.
                 {% endblocktranslate %}
             </p>
-            <form id="generate_report" class="inline" method="post" action="{{ next }}">
-                <table id="report-name-table">
-                    <caption class="visually-hidden">{% translate "Report names:" %}</caption>
-                    <thead>
-                        <tr>
-                            <th scope="col" colspan="2">
-                                {% translate "Name" %} <span class="nota-bene" aria-hidden>{% translate "(Required)" %}</span>
-                            </th>
-                            <th scope="col">{% translate "Add reference date" %}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for report_name in reports %}
-                            {% with report_id=report_name|slugify %}
-                                <input type="hidden" name="old_report_name" value="{{ report_name }}" />
-                                <tr>
-                                    <td>
-                                        <div>
-                                            <input id="{{ report_id }}"
-                                                   class="name-input"
-                                                   name="report_name"
-                                                   type="text"
-                                                   value="{{ report_name }}"
-                                                   required
-                                                   minlength="3" />
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <button type="button"
-                                                class="icon ti-arrow-back-up action-button reset-button hidden"
-                                                aria-label="{% translate "Reset" %}"></button>
-                                    </td>
-                                    <td>
-                                        <select class="reference-date" name="reference_date">
-                                            <option value="">{% translate "No reference date" %}</option>
-                                            <option value="%b %d %Y, %H:%M">{% translate "Day" %} ({{ current_datetime|date:"N jS Y, H:i" }})</option>
-                                            <option value="week">{% translate "Week" %} ({% translate "Week" %} {{ current_datetime|date:"W, Y" }})</option>
-                                            <option value="%b, %Y">{% translate "Month" %} ({{ current_datetime|date:"N, Y" }})</option>
-                                            <option value="%Y">{% translate "Year" %} ({{ current_datetime|date:"Y" }})</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                            {% endwith %}
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <form class="inline" method="post" action="{{ current }}">
                 {% csrf_token %}
-                <button type="submit" form="generate_report">
-                    {% include "forms/report_form_fields.html" %}
+                {% include "forms/report_form_fields.html" %}
+                {% include "partials/form/fieldset.html" with fields=report_schedule_form_recurrence_choice %}
 
-                    {% translate "Generate report" %}<span class="icon ti-chevron-right" aria-hidden="true"></span>
-                </button>
+                {% if is_scheduled_report %}
+                    <p>
+                        {% blocktranslate trimmed %}
+                            Please choose a start date, time and recurrence for scheduling your report(s).
+                            If you select a date on the 28th-31st of the month, it will always be scheduled on the last day of the month.
+                        {% endblocktranslate %}
+                    </p>
+                    <p>
+                        {% blocktranslate trimmed %}
+                            The date you select will be the reference date for the data set for your report.
+                            Please allow for up to 24 hours for your report to be ready.
+                        {% endblocktranslate %}
+                    </p>
+                    <div class="column-2">
+                        {% include "partials/form/fieldset.html" with fields=report_schedule_form_start_date %}
+
+                    </div>
+                {% endif %}
+            </form>
+            <form id="generate_report" class="inline" method="post" action="{{ next }}">
+                {% csrf_token %}
+                {% include "forms/report_form_fields.html" %}
+
+                {% if not is_scheduled_report %}
+                    {% include "partials/report_names_header.html" %}
+                    {% include "partials/report_names_form.html" %}
+
+                    <button type="submit" form="generate_report">
+                        {% translate "Generate report" %}<span class="icon ti-chevron-right" aria-hidden="true"></span>
+                    </button>
+                {% else %}
+                    {% include "partials/report_names_header.html" with recurrence=True %}
+                    {% include "partials/form/fieldset.html" with fields=report_parent_name_form %}
+
+                    {% if reports|length > 1 %}
+                        {% include "partials/form/fieldset.html" with fields=report_child_name_form %}
+
+                    {% endif %}
+                    <button type="submit" form="generate_report">
+                        {% translate "Generate report" %}<span class="icon ti-chevron-right" aria-hidden="true"></span>
+                    </button>
+                {% endif %}
             </form>
         {% else %}
             {% include "partials/return_button.html" with btn_text="Go back" %}
@@ -77,7 +70,6 @@
     </div>
 </section>
 {% block html_at_end_body %}
-    {% compress js %}
-        <script src="{% static "js/renameReports.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
-    {% endcompress %}
+    <script src="{% static "js/renameReports.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
+    <script src="{% static "js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
 {% endblock html_at_end_body %}

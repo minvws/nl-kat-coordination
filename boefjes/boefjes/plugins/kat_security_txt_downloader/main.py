@@ -9,6 +9,7 @@ from requests import Session
 from boefjes.job_models import BoefjeMeta
 
 DEFAULT_TIMEOUT = 30
+DEFAULT_USERAGENT = "OpenKAT"
 
 
 def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
@@ -17,7 +18,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     scheme = input_["ip_service"]["service"]["name"]
     ip = input_["ip_service"]["ip_port"]["address"]["address"]
 
-    useragent = getenv("USERAGENT", default="OpenKAT")
+    useragent = getenv("USERAGENT", default=DEFAULT_USERAGENT)
 
     try:
         timeout = int(getenv("TIMEOUT", default=DEFAULT_TIMEOUT))
@@ -40,7 +41,6 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 
         response = do_request(netloc, session, request_url, useragent, timeout)
 
-        # if the response is 301, we need to follow the location header to the correct security txt,
         # we can not force the ip anymore because we dont know it yet.
         # TODO return a redirected URL and have OpenKAT figure out if we want to follow this.
         if response.status_code in [301, 302, 307, 308]:
@@ -60,11 +60,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 
 def do_request(hostname: str, session: Session, uri: str, useragent: str, timeout: int):
     response = session.get(
-        uri,
-        headers={"Host": hostname, "User-Agent": useragent},
-        timeout=timeout,
-        verify=False,
-        allow_redirects=False,
+        uri, headers={"Host": hostname, "User-Agent": useragent}, timeout=timeout, verify=False, allow_redirects=False
     )
 
     return response

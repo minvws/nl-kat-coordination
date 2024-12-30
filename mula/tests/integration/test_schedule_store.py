@@ -4,7 +4,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 from scheduler import config, models, storage
-from scheduler.storage import filters
+from scheduler.storage import filters, stores
 
 from tests.utils import functions
 
@@ -23,8 +23,8 @@ class ScheduleStoreTestCase(unittest.TestCase):
 
         self.mock_ctx.datastores = SimpleNamespace(
             **{
-                storage.TaskStore.name: storage.TaskStore(self.dbconn),
-                storage.ScheduleStore.name: storage.ScheduleStore(self.dbconn),
+                stores.TaskStore.name: stores.TaskStore(self.dbconn),
+                stores.ScheduleStore.name: stores.ScheduleStore(self.dbconn),
             }
         )
 
@@ -34,56 +34,30 @@ class ScheduleStoreTestCase(unittest.TestCase):
 
     def test_create_schedule_calculate_deadline_at(self):
         """When a schedule is created, the deadline_at should be calculated."""
-        schedule = models.Schedule(
-            scheduler_id="test_scheduler_id",
-            schedule="* * * * *",
-            data={},
-        )
+        schedule = models.Schedule(scheduler_id="test_scheduler_id", schedule="* * * * *", data={})
 
         self.assertIsNotNone(schedule.deadline_at)
 
     def test_create_schedule_explicit_deadline_at(self):
         """When a schedule is created, the deadline_at should be set if it is provided."""
         now = datetime.now(timezone.utc)
-        schedule = models.Schedule(
-            scheduler_id="test_scheduler_id",
-            data={},
-            deadline_at=now,
-        )
+        schedule = models.Schedule(scheduler_id="test_scheduler_id", data={}, deadline_at=now)
 
         self.assertEqual(schedule.deadline_at, now)
 
     def test_create_schedule_deadline_at_takes_precedence(self):
         """When a schedule is created, the deadline_at should be set if it is provided."""
         now = datetime.now(timezone.utc)
-        schedule = models.Schedule(
-            scheduler_id="test_scheduler_id",
-            schedule="* * * * *",
-            data={},
-            deadline_at=now,
-        )
+        schedule = models.Schedule(scheduler_id="test_scheduler_id", schedule="* * * * *", data={}, deadline_at=now)
 
         self.assertEqual(schedule.deadline_at, now)
-
-    def test_create_schedule_not_provided_schedule(self):
-        """When a schedule is created, the deadline_at should be None if schedule is not provided."""
-        schedule = models.Schedule(
-            scheduler_id="test_scheduler_id",
-            data={},
-        )
-
-        self.assertIsNone(schedule.deadline_at)
 
     def test_create_schedule(self):
         # Arrange
         scheduler_id = "test_scheduler_id"
 
         task = functions.create_item(scheduler_id, 1)
-        schedule = models.Schedule(
-            scheduler_id=scheduler_id,
-            hash=task.hash,
-            data=task.model_dump(),
-        )
+        schedule = models.Schedule(scheduler_id=scheduler_id, hash=task.hash, data=task.model_dump())
 
         # Act
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
@@ -96,47 +70,23 @@ class ScheduleStoreTestCase(unittest.TestCase):
         scheduler_one = "test_scheduler_one"
         for i in range(5):
             task = functions.create_item(scheduler_one, 1)
-            schedule = models.Schedule(
-                scheduler_id=scheduler_one,
-                hash=task.hash,
-                data=task.model_dump(),
-            )
+            schedule = models.Schedule(scheduler_id=scheduler_one, hash=task.hash, data=task.model_dump())
             self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         scheduler_two = "test_scheduler_two"
         for i in range(5):
             task = functions.create_item(scheduler_two, 1)
-            schedule = models.Schedule(
-                scheduler_id=scheduler_two,
-                hash=task.hash,
-                data=task.model_dump(),
-            )
+            schedule = models.Schedule(scheduler_id=scheduler_two, hash=task.hash, data=task.model_dump())
             self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         schedules_scheduler_one, schedules_scheduler_one_count = self.mock_ctx.datastores.schedule_store.get_schedules(
             filters=storage.filters.FilterRequest(
-                filters={
-                    "and": [
-                        storage.filters.Filter(
-                            column="scheduler_id",
-                            operator="eq",
-                            value=scheduler_one,
-                        )
-                    ]
-                }
+                filters={"and": [storage.filters.Filter(column="scheduler_id", operator="eq", value=scheduler_one)]}
             )
         )
         schedules_scheduler_two, schedules_scheduler_two_count = self.mock_ctx.datastores.schedule_store.get_schedules(
             filters=storage.filters.FilterRequest(
-                filters={
-                    "and": [
-                        storage.filters.Filter(
-                            column="scheduler_id",
-                            operator="eq",
-                            value=scheduler_two,
-                        )
-                    ]
-                }
+                filters={"and": [storage.filters.Filter(column="scheduler_id", operator="eq", value=scheduler_two)]}
             )
         )
 
@@ -150,11 +100,7 @@ class ScheduleStoreTestCase(unittest.TestCase):
         # Arrange
         scheduler_id = "test_scheduler_id"
         task = functions.create_item(scheduler_id, 1)
-        schedule = models.Schedule(
-            scheduler_id=scheduler_id,
-            hash=task.hash,
-            data=task.model_dump(),
-        )
+        schedule = models.Schedule(scheduler_id=scheduler_id, hash=task.hash, data=task.model_dump())
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         # Act
@@ -167,11 +113,7 @@ class ScheduleStoreTestCase(unittest.TestCase):
         # Arrange
         scheduler_id = "test_scheduler_id"
         data = functions.create_test_model()
-        schedule = models.Schedule(
-            scheduler_id=scheduler_id,
-            hash=data.hash,
-            data=data.model_dump(),
-        )
+        schedule = models.Schedule(scheduler_id=scheduler_id, hash=data.hash, data=data.model_dump())
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         # Act
@@ -186,11 +128,7 @@ class ScheduleStoreTestCase(unittest.TestCase):
         # Arrange
         scheduler_id = "test_scheduler_id"
         task = functions.create_item(scheduler_id, 1)
-        schedule = models.Schedule(
-            scheduler_id=scheduler_id,
-            hash=task.hash,
-            data=task.model_dump(),
-        )
+        schedule = models.Schedule(scheduler_id=scheduler_id, hash=task.hash, data=task.model_dump())
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         # Assert
@@ -208,11 +146,7 @@ class ScheduleStoreTestCase(unittest.TestCase):
         # Arrange
         scheduler_id = "test_scheduler_id"
         task = functions.create_item(scheduler_id, 1)
-        schedule = models.Schedule(
-            scheduler_id=scheduler_id,
-            hash=task.hash,
-            data=task.model_dump(),
-        )
+        schedule = models.Schedule(scheduler_id=scheduler_id, hash=task.hash, data=task.model_dump())
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         # Act
@@ -227,11 +161,7 @@ class ScheduleStoreTestCase(unittest.TestCase):
         # Arrange
         scheduler_id = "test_scheduler_id"
         task = functions.create_item(scheduler_id, 1)
-        schedule = models.Schedule(
-            scheduler_id=scheduler_id,
-            hash=task.hash,
-            data=task.model_dump(),
-        )
+        schedule = models.Schedule(scheduler_id=scheduler_id, hash=task.hash, data=task.model_dump())
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         task.schedule_id = schedule_db.id
@@ -252,11 +182,7 @@ class ScheduleStoreTestCase(unittest.TestCase):
         # Arrange
         scheduler_id = "test_scheduler_id"
         task = functions.create_task(scheduler_id)
-        schedule = models.Schedule(
-            scheduler_id=scheduler_id,
-            hash=task.hash,
-            data=task.model_dump(),
-        )
+        schedule = models.Schedule(scheduler_id=scheduler_id, hash=task.hash, data=task.model_dump())
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         task.schedule_id = schedule_db.id
@@ -273,26 +199,14 @@ class ScheduleStoreTestCase(unittest.TestCase):
         # Arrange
         scheduler_id = "test_scheduler_id"
         task = functions.create_task(scheduler_id)
-        schedule = models.Schedule(
-            scheduler_id=scheduler_id,
-            hash=task.hash,
-            data=task.model_dump(),
-        )
+        schedule = models.Schedule(scheduler_id=scheduler_id, hash=task.hash, data=task.model_dump())
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         task.schedule_id = schedule_db.id
         created_task = self.mock_ctx.datastores.task_store.create_task(task)
 
         f_req = filters.FilterRequest(
-            filters={
-                "and": [
-                    filters.Filter(
-                        column="id",
-                        operator="eq",
-                        value=created_task.id.hex,
-                    ),
-                ]
-            }
+            filters={"and": [filters.Filter(column="id", operator="eq", value=created_task.id.hex)]}
         )
 
         tasks, count = self.mock_ctx.datastores.task_store.get_tasks(filters=f_req)

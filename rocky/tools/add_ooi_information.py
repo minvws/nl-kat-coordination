@@ -48,10 +48,7 @@ def iana_service_table(search_query: str) -> list[_Service]:
         try:
             if name == search_query:
                 service = _Service(
-                    name,
-                    int(port) if port else None,
-                    transport_protocol if transport_protocol else None,
-                    description,
+                    name, int(port) if port else None, transport_protocol if transport_protocol else None, description
                 )
                 services.append(service)
         except Exception:  # noqa: S110
@@ -60,7 +57,7 @@ def iana_service_table(search_query: str) -> list[_Service]:
     return services
 
 
-def service_info(value) -> tuple[str, str]:
+def service_info(value: str) -> tuple[str, str]:
     """Provides information about IP Services such as common assigned ports for certain protocols and descriptions"""
     services = iana_service_table(value)
     source = "https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml"
@@ -94,8 +91,7 @@ def table_to_2d(table_tag):
         # a colspan of 0 means “fill until the end” but can really only apply
         # to the last cell; ignore it elsewhere.
         colcount = max(
-            colcount,
-            sum(int(c.get("colspan", 1)) or 1 for c in cells[:-1]) + len(cells[-1:]) + len(rowspans_list),
+            colcount, sum(int(c.get("colspan", 1)) or 1 for c in cells[:-1]) + len(cells[-1:]) + len(rowspans_list)
         )
         # update rowspan bookkeeping; 0 is a span to the bottom.
         rowspans_list += [int(c.get("rowspan", 1)) or len(rows) - r for c in cells]
@@ -179,10 +175,7 @@ def port_info(number: str, protocol: str) -> tuple[str, str]:
     source = "https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers"
     descriptions = []
     if not items:
-        return (
-            f"No description found in wiki table for port {number} with protocol {protocol}",
-            source,
-        )
+        return (f"No description found in wiki table for port {number} with protocol {protocol}", source)
 
     for item in items:
         if item.port == int(number) and protocol.lower() in item.protocols:

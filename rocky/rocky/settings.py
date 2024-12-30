@@ -60,10 +60,7 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "json_formatter": {
-            "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.processors.JSONRenderer(),
-        },
+        "json_formatter": {"()": structlog.stdlib.ProcessorFormatter, "processor": structlog.processors.JSONRenderer()},
         "plain_console": {
             "()": structlog.stdlib.ProcessorFormatter,
             "processor": structlog.dev.ConsoleRenderer(colors=True, pad_level=False),
@@ -73,14 +70,9 @@ LOGGING = {
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "json_formatter" if LOGGING_FORMAT == "json" else "plain_console",
-        },
+        }
     },
-    "loggers": {
-        "root": {
-            "handlers": ["console"],
-            "level": env("LOG_LEVEL", default="INFO").upper(),
-        },
-    },
+    "loggers": {"root": {"handlers": ["console"], "level": env("LOG_LEVEL", default="INFO").upper()}},
 }
 
 # Make sure this header can never be set by an attacker, see also the security
@@ -92,13 +84,9 @@ if REMOTE_USER_HEADER:
     # Optional list of default organizations to add remote users to,
     # format: space separated list of ORGANIZATION_CODE:GROUP_NAME, e.g. `test:admin test2:redteam`
     REMOTE_USER_DEFAULT_ORGANIZATIONS = env.list("REMOTE_USER_DEFAULT_ORGANIZATIONS", default=[])
-    AUTHENTICATION_BACKENDS = [
-        "rocky.auth.remote_user.RemoteUserBackend",
-    ]
+    AUTHENTICATION_BACKENDS = ["rocky.auth.remote_user.RemoteUserBackend"]
     if REMOTE_USER_FALLBACK:
-        AUTHENTICATION_BACKENDS += [
-            "django.contrib.auth.backends.ModelBackend",
-        ]
+        AUTHENTICATION_BACKENDS += ["django.contrib.auth.backends.ModelBackend"]
 
 # SECURITY WARNING: enable two factor authentication in production!
 TWOFACTOR_ENABLED = env.bool("TWOFACTOR_ENABLED", not REMOTE_USER_HEADER)
@@ -219,10 +207,7 @@ TEMPLATES = [
                 "tools.context_processors.organizations_including_blocked",
                 "tools.context_processors.rocky_version",
             ],
-            "builtins": [
-                "django_components.templatetags.component_tags",
-                "tools.templatetags.ooi_extra",
-            ],
+            "builtins": ["django_components.templatetags.component_tags", "tools.templatetags.ooi_extra"],
             "loaders": [
                 (
                     "django.template.loaders.cached.Loader",
@@ -234,7 +219,7 @@ TEMPLATES = [
                 )
             ],
         },
-    },
+    }
 ]
 
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
@@ -275,9 +260,7 @@ if env.bool("POSTGRES_SSL_ENABLED", False):
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-        "OPTIONS": {
-            "min_length": env.int("PASSWORD_MIN_LENGTH", 12),
-        },
+        "OPTIONS": {"min_length": env.int("PASSWORD_MIN_LENGTH", 12)},
     },
     {
         "NAME": "django_password_validators.password_character_requirements"
@@ -310,36 +293,18 @@ LOCALE_PATHS = (BASE_DIR / "rocky/locale",)
 
 # Add custom languages not provided by Django
 EXTRA_LANG_INFO = {
-    "pap": {
-        "bidi": False,
-        "code": "pap",
-        "name": "Papiamentu",
-        "name_local": "Papiamentu",
-    },
-    "en@pirate": {
-        "bidi": False,
-        "code": "en@pirate",
-        "name": "English (Pirate)",
-        "name_local": "English (Pirate)",
-    },
+    "pap": {"bidi": False, "code": "pap", "name": "Papiamentu", "name_local": "Papiamentu"},
+    "en@pirate": {"bidi": False, "code": "en@pirate", "name": "English (Pirate)", "name_local": "English (Pirate)"},
 }
 LANG_INFO = locale.LANG_INFO.copy()
 LANG_INFO.update(EXTRA_LANG_INFO)
 locale.LANG_INFO = LANG_INFO
 
-LANGUAGES = [
-    ("en", "en"),
-    ("nl", "nl"),
-    ("pap", "pap"),
-    ("it", "it"),
-    ("fy", "fy"),
-]
+LANGUAGES = [("en", "en"), ("nl", "nl"), ("pap", "pap"), ("it", "it"), ("fy", "fy")]
 
 if env.bool("PIRATE", False):
     LANGUAGE_CODE = "en@pirate"
-    LANGUAGES += [
-        ("en@pirate", "en@pirate"),
-    ]
+    LANGUAGES += [("en@pirate", "en@pirate")]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -356,11 +321,7 @@ COMPRESS_ENABLED = env.bool("COMPRESS_ENABLED", True)
 COMPRESS_OFFLINE = True
 COMPRESS_STORAGE = "compressor.storage.BrotliCompressorFileStorage"
 
-STORAGES = {
-    "staticfiles": {
-        "BACKEND": "rocky.storage.RockyStaticFilesStorage",
-    },
-}
+STORAGES = {"staticfiles": {"BACKEND": "rocky.storage.RockyStaticFilesStorage"}}
 
 _IMMUTABLE_FILE_TEST_PATTERN = re.compile(r"^.+\.[0-9a-f]{12}\..+$")
 
@@ -373,7 +334,7 @@ def immutable_file_test(path, url):
 
 
 WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
-WHITENOISE_KEEP_ONLY_HASHED_FILES = True
+WHITENOISE_KEEP_ONLY_HASHED_FILES = False
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "crisis_room"
@@ -468,12 +429,10 @@ else:
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": DEFAULT_AUTHENTICATION_CLASSES,
-    "DEFAULT_PERMISSION_CLASSES": [
-        # For now this will provide a safe default, but non-admin users will
-        # need to be able to use the API in the future..
-        "rest_framework.permissions.IsAdminUser",
-    ],
+    "DEFAULT_PERMISSION_CLASSES": ["rocky.permissions.KATModelPermissions"],
     "DEFAULT_RENDERER_CLASSES": DEFAULT_RENDERER_CLASSES,
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 100,
     "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler",
 }
 
@@ -506,12 +465,7 @@ TAG_COLORS = [
     ("color-6-dark", _("Violet dark")),
 ]
 
-TAG_BORDER_TYPES = [
-    ("plain", _("Plain")),
-    ("solid", _("Solid")),
-    ("dashed", _("Dashed")),
-    ("dotted", _("Dotted")),
-]
+TAG_BORDER_TYPES = [("plain", _("Plain")), ("solid", _("Solid")), ("dashed", _("Dashed")), ("dotted", _("Dotted"))]
 
 WEASYPRINT_BASEURL = env("WEASYPRINT_BASEURL", default="http://127.0.0.1:8000/")
 
@@ -527,14 +481,26 @@ structlog.configure(
         structlog.dev.set_exc_info,
         structlog.stdlib.PositionalArgumentsFormatter(),
         structlog.processors.TimeStamper("iso", utc=False),
-        (
-            structlog.processors.JSONRenderer()
-            if LOGGING_FORMAT == "json"
-            else structlog.dev.ConsoleRenderer(colors=True, pad_level=False)
-        ),
+        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
     ],
     context_class=dict,
     logger_factory=structlog.stdlib.LoggerFactory(),
     wrapper_class=structlog.stdlib.BoundLogger,
     cache_logger_on_first_use=True,
 )
+
+# Number of workers to run for the report queue
+POOL_SIZE = env.int("POOL_SIZE", default=2)
+# Time to wait before polling for tasks when the queue is empty
+POLL_INTERVAL = env.int("POLL_INTERVAL", default=10)
+# Seconds to wait before checking the workers when queues are full
+WORKER_HEARTBEAT = env.int("WORKER_HEARTBEAT", default=5)
+
+# In production deployments the staticfiles are coming from the collected static
+# files in the static directory. We should not ship all those files also in
+# their original location, but Django will complain if a directory in
+# STATICFILES_DIRS does not exist. We silence the warning here to prevent the
+# warning from confusing users.
+SILENCED_SYSTEM_CHECKS = ["staticfiles.W004"]
+
+ROCKY_OUTGOING_REQUEST_TIMEOUT = env.int("ROCKY_OUTGOING_REQUEST_TIMEOUT", default=30)

@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from functools import cached_property
@@ -14,7 +14,7 @@ from django.http import Http404, HttpRequest
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from httpx import HTTPError
-from katalogus.client import Boefje, get_katalogus
+from katalogus.client import Boefje
 from pydantic import BaseModel
 from tools.forms.base import ObservedAtForm
 from tools.forms.settings import DEPTH_DEFAULT, DEPTH_MAX
@@ -22,9 +22,9 @@ from tools.models import Organization
 from tools.ooi_helpers import get_knowledge_base_data_for_ooi_store
 from tools.view_helpers import convert_date_to_datetime, get_ooi_url
 
-from octopoes.connector import ObjectNotFoundException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
+from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.ooi.reports import Report
@@ -90,10 +90,7 @@ class ObservedAtMixin:
             datetime_format = "%Y-%m-%d"
             date_time = convert_date_to_datetime(datetime.strptime(observed_at, datetime_format))
             if date_time.date() > datetime.now(timezone.utc).date():
-                messages.warning(
-                    self.request,
-                    _("The selected date is in the future."),
-                )
+                messages.warning(self.request, _("The selected date is in the future."))
             return date_time
         except ValueError:
             try:
@@ -103,10 +100,7 @@ class ObservedAtMixin:
 
                 return ret
             except ValueError:
-                messages.error(
-                    self.request,
-                    _("Can not parse date, falling back to show current date."),
-                )
+                messages.error(self.request, _("Can not parse date, falling back to show current date."))
                 return datetime.now(timezone.utc)
 
 
@@ -122,11 +116,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
             self.handle_connector_exception(e)
             raise
 
-    def get_origins(
-        self,
-        reference: Reference,
-        organization: Organization,
-    ) -> Origins:
+    def get_origins(self, reference: Reference, organization: Organization) -> Origins:
         declarations: list[OriginData] = []
         observations: list[OriginData] = []
         inferences: list[OriginData] = []
@@ -135,11 +125,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
         try:
             origins = self.octopoes_api_connector.list_origins(self.observed_at, result=reference)
         except Exception as e:
-            logger.error(
-                "Could not load origins for OOI: %s from octopoes, error: %s",
-                reference,
-                e,
-            )
+            logger.error("Could not load origins for OOI: %s from octopoes, error: %s", reference, e)
             return results
 
         try:
@@ -149,7 +135,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
             logger.error(e)
             return results
 
-        katalogus = get_katalogus(organization.code)
+        katalogus = self.get_katalogus()
 
         for origin in origins:
             origin = OriginData(origin=origin)
@@ -163,11 +149,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
             try:
                 normalizer_data = bytes_client.get_normalizer_meta(origin.origin.task_id)
             except HTTPError as e:
-                logger.error(
-                    "Could not load Normalizer meta for task_id: %s, error: %s",
-                    origin.origin.task_id,
-                    e,
-                )
+                logger.error("Could not load Normalizer meta for task_id: %s, error: %s", origin.origin.task_id, e)
             else:
                 boefje_meta = normalizer_data["raw_data"]["boefje_meta"]
                 boefje_id = boefje_meta["boefje"]["id"]
@@ -181,16 +163,12 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
                     try:
                         origin.boefje = katalogus.get_plugin(boefje_id)
                     except HTTPError as e:
-                        logger.error(
-                            "Could not load boefje %s from katalogus: %s",
-                            boefje_id,
-                            e,
-                        )
+                        logger.error("Could not load boefje %s from katalogus: %s", boefje_id, e)
             observations.append(origin)
 
         return results
 
-    def handle_connector_exception(self, exception: Exception):
+    def handle_connector_exception(self, exception: Exception) -> None:
         if isinstance(exception, ObjectNotFoundException):
             raise Http404("OOI not found")
 
@@ -227,6 +205,8 @@ class OOIList:
 
     @cached_property
     def count(self) -> int:
+        if not self.ooi_types:
+            return 0
         return self.octopoes_connector.list_objects(
             self.ooi_types,
             valid_time=self.valid_time,
@@ -240,6 +220,8 @@ class OOIList:
         return self.count
 
     def __getitem__(self, key: int | slice) -> list[OOI]:
+        if not self.ooi_types:
+            return []
         if isinstance(key, slice):
             offset = key.start or 0
             limit = OOIList.HARD_LIMIT
@@ -279,7 +261,7 @@ class FindingList:
         self,
         octopoes_connector: OctopoesAPIConnector,
         valid_time: datetime,
-        severities: set[RiskLevelSeverity],
+        severities: Iterable[RiskLevelSeverity],
         exclude_muted: bool = True,
         only_muted: bool = False,
         search_string: str | None = None,
@@ -340,9 +322,7 @@ class FindingList:
                     continue
                 hydrated_findings.append(
                     HydratedFinding(
-                        finding=finding,
-                        finding_type=objects[finding.finding_type],
-                        ooi=objects[finding.ooi],
+                        finding=finding, finding_type=objects[finding.finding_type], ooi=objects[finding.ooi]
                     )
                 )
             return hydrated_findings
@@ -362,10 +342,7 @@ class ReportList:
     HARD_LIMIT = 99_999_999
 
     def __init__(
-        self,
-        octopoes_connector: OctopoesAPIConnector,
-        valid_time: datetime,
-        parent_report_id: str | None = None,
+        self, octopoes_connector: OctopoesAPIConnector, valid_time: datetime, parent_report_id: str | None = None
     ):
         self.octopoes_connector = octopoes_connector
         self.valid_time = valid_time
@@ -381,10 +358,7 @@ class ReportList:
     def count(self) -> int:
         if self.subreports is not None:
             return len(self.subreports)
-        return self.octopoes_connector.list_reports(
-            valid_time=self.valid_time,
-            limit=0,
-        ).count
+        return self.octopoes_connector.list_reports(valid_time=self.valid_time, limit=0).count
 
     def __len__(self):
         return self.count
@@ -399,11 +373,7 @@ class ReportList:
             if self.subreports is not None:
                 return self.subreports[offset : offset + limit]
 
-            reports = self.octopoes_connector.list_reports(
-                valid_time=self.valid_time,
-                offset=offset,
-                limit=limit,
-            ).items
+            reports = self.octopoes_connector.list_reports(valid_time=self.valid_time, offset=offset, limit=limit).items
 
             return self.hydrate_report_list(reports)
 
@@ -418,35 +388,34 @@ class ReportList:
         # yet implemented for query requests. We use query_many to get more then 50 items at once.
 
         subreports = self.octopoes_connector.query_many(
-            "Report.<parent_report [is Report]",
-            self.valid_time,
-            [report_id],
+            "Report.<parent_report [is Report]", self.valid_time, [report_id]
         )
 
         subreports = sorted(subreports, key=lambda x: (x[1].report_type, x[1].input_oois))
 
         return subreports
 
-    def hydrate_report_list(self, reports: list[Report]) -> list[HydratedReport]:
+    def hydrate_report_list(self, reports: list[tuple[Report, list[Report | None]]]) -> list[HydratedReport]:
         hydrated_reports: list[HydratedReport] = []
 
         for report in reports:
             hydrated_report: HydratedReport = HydratedReport()
 
             parent_report, children_reports = report
+            filtered_children_reports: list[Report] = list(filter(None, children_reports))
 
-            hydrated_report.total_children_reports = len(children_reports)
+            hydrated_report.total_children_reports = len(filtered_children_reports)
 
             if len(parent_report.input_oois) > 0:
                 hydrated_report.total_objects = len(parent_report.input_oois)
             else:
-                hydrated_report.total_objects = len(self.get_children_input_oois(children_reports))
+                hydrated_report.total_objects = len(self.get_children_input_oois(filtered_children_reports))
 
-            hydrated_report.report_type_summary = self.report_type_summary(children_reports)
+            hydrated_report.report_type_summary = self.report_type_summary(filtered_children_reports)
 
             if not parent_report.has_parent:
                 hydrated_children_reports: list[Report] = []
-                for child_report in children_reports:
+                for child_report in filtered_children_reports:
                     if str(child_report.parent_report) == str(parent_report):
                         hydrated_children_reports.append(child_report)
                     if len(hydrated_children_reports) >= 5:  # We want to show only 5 children reports
@@ -510,10 +479,7 @@ class SingleOOIMixin(OctopoesView):
         return self.get_single_ooi(pk)
 
     def get_breadcrumb_list(self):
-        start = {
-            "url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}),
-            "text": "Objects",
-        }
+        start = {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": "Objects"}
         if isinstance(self.ooi, Finding):
             start = {
                 "url": reverse("finding_list", kwargs={"organization_code": self.organization.code}),
@@ -528,7 +494,7 @@ class SingleOOIMixin(OctopoesView):
             },
         ]
 
-    def get_ooi_properties(self, ooi: OOI):
+    def get_ooi_properties(self, ooi: OOI) -> dict:
         class_relations = get_relations(ooi.__class__)
         props = {field_name: value for field_name, value in ooi if field_name not in class_relations}
 

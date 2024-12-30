@@ -10,7 +10,7 @@ IMAGE = "ghcr.io/minvws/nl-kat-masscan-build-image:latest"
 FILE_PATH = "/tmp/output.json"  # noqa: S108
 
 
-def run_masscan(target_ip) -> bytes:
+def run_masscan(target_ip: str) -> bytes:
     """Run Masscan in Docker."""
     client = docker.from_env()
 
@@ -19,9 +19,7 @@ def run_masscan(target_ip) -> bytes:
     max_rate = os.getenv("MAX_RATE", 100)
     logging.info("Starting container %s to run masscan...", IMAGE)
     res = client.containers.run(
-        image=IMAGE,
-        command=f"-p {port_range} --max-rate {max_rate} -oJ {FILE_PATH} {target_ip}",
-        detach=True,
+        image=IMAGE, command=f"-p {port_range} --max-rate {max_rate} -oJ {FILE_PATH} {target_ip}", detach=True
     )
     res.wait()
     logging.debug(res.logs())

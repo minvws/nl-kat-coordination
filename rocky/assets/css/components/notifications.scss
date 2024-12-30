@@ -41,8 +41,9 @@ span {
   &.explanation,
   &.confirmation,
   &.system {
-    display: flex;
-    align-items: center;
+    &::before {
+      margin-left: -2rem;
+    }
   }
 }
 
@@ -50,7 +51,9 @@ span {
 p,
 span,
 section,
-div {
+div,
+form div,
+form section {
   &.error {
     &::before {
       content: "\eac5";

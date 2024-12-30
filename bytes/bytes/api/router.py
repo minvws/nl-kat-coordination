@@ -27,8 +27,7 @@ RAW_TAG = "Raw"
 
 @router.post("/boefje_meta", tags=[BOEFJE_META_TAG])
 def create_boefje_meta(
-    boefje_meta: BoefjeMeta,
-    meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
+    boefje_meta: BoefjeMeta, meta_repository: MetaDataRepository = Depends(create_meta_data_repository)
 ) -> JSONResponse:
     try:
         with meta_repository:
@@ -44,8 +43,7 @@ def create_boefje_meta(
 
 @router.get("/boefje_meta/{boefje_meta_id}", response_model=BoefjeMeta, tags=[BOEFJE_META_TAG])
 def get_boefje_meta_by_id(
-    boefje_meta_id: UUID,
-    meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
+    boefje_meta_id: UUID, meta_repository: MetaDataRepository = Depends(create_meta_data_repository)
 ) -> BoefjeMeta:
     with meta_repository:
         meta = meta_repository.get_boefje_meta_by_id(boefje_meta_id)
@@ -89,8 +87,7 @@ def get_boefje_meta(
 
 @router.post("/normalizer_meta", tags=[NORMALIZER_META_TAG])
 def create_normalizer_meta(
-    normalizer_meta: NormalizerMeta,
-    meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
+    normalizer_meta: NormalizerMeta, meta_repository: MetaDataRepository = Depends(create_meta_data_repository)
 ) -> JSONResponse:
     try:
         with meta_repository:
@@ -106,8 +103,7 @@ def create_normalizer_meta(
 
 @router.get("/normalizer_meta/{normalizer_meta_id}", response_model=NormalizerMeta, tags=[NORMALIZER_META_TAG])
 def get_normalizer_meta_by_id(
-    normalizer_meta_id: UUID,
-    meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
+    normalizer_meta_id: UUID, meta_repository: MetaDataRepository = Depends(create_meta_data_repository)
 ) -> NormalizerMeta:
     try:
         return meta_repository.get_normalizer_meta_by_id(normalizer_meta_id)
@@ -191,11 +187,7 @@ def create_raw(
 
             event = RawFileReceived(
                 organization=meta.organization,
-                raw_data=RawDataMeta(
-                    id=raw_id,
-                    boefje_meta=raw_data.boefje_meta,
-                    mime_types=raw_data.mime_types,
-                ),
+                raw_data=RawDataMeta(id=raw_id, boefje_meta=raw_data.boefje_meta, mime_types=raw_data.mime_types),
             )
             event_manager.publish(event)
         except Exception as error:
@@ -208,10 +200,7 @@ def create_raw(
 
 
 @router.get("/raw/{raw_id}", tags=[RAW_TAG])
-def get_raw_by_id(
-    raw_id: UUID,
-    meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
-) -> Response:
+def get_raw_by_id(raw_id: UUID, meta_repository: MetaDataRepository = Depends(create_meta_data_repository)) -> Response:
     try:
         raw_data = meta_repository.get_raw_by_id(raw_id)
     except ObjectNotFoundException as error:
@@ -222,8 +211,7 @@ def get_raw_by_id(
 
 @router.get("/raw/{raw_id}/meta", tags=[RAW_TAG])
 def get_raw_meta_by_id(
-    raw_id: UUID,
-    meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
+    raw_id: UUID, meta_repository: MetaDataRepository = Depends(create_meta_data_repository)
 ) -> RawDataMeta:
     try:
         raw_meta = meta_repository.get_raw_meta_by_id(raw_id)
@@ -283,9 +271,9 @@ def get_raw_count_per_mime_type(
     return cached_counts_per_mime_type(meta_repository, query_filter)
 
 
-def ignore_arguments_key(meta_repository: MetaDataRepository, query_filter: RawDataFilter):
+def ignore_arguments_key(meta_repository: MetaDataRepository, query_filter: RawDataFilter) -> str:
     """Helper to not cache based on the stateful meta_repository, but only use the query parameters as a key."""
-    return query_filter.json()
+    return query_filter.model_dump_json()
 
 
 @cached(
@@ -294,8 +282,7 @@ def ignore_arguments_key(meta_repository: MetaDataRepository, query_filter: RawD
 )
 def cached_counts_per_mime_type(meta_repository: MetaDataRepository, query_filter: RawDataFilter) -> dict[str, int]:
     logger.debug(
-        "Metrics cache miss for cached_counts_per_mime_type, ttl set to %s seconds",
-        get_settings().metrics_ttl_seconds,
+        "Metrics cache miss for cached_counts_per_mime_type, ttl set to %s seconds", get_settings().metrics_ttl_seconds
     )
 
     return meta_repository.get_raw_file_count_per_mime_type(query_filter)

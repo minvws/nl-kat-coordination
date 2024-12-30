@@ -21,7 +21,7 @@
                         as well as organization details.
                     {% endblocktranslate %}
                 </p>
-                <form novalidate method="post" class="horizontal-view help">
+                <form novalidate method="post" class="help">
                     {% csrf_token %}
                     {% translate "Admin details" as fieldset_legend %}
                     {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}

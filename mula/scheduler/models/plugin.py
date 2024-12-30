@@ -17,3 +17,6 @@ class Plugin(BaseModel):
     consumes: str | list[str]
     options: list[str] | None = None
     produces: list[str]
+    cron: str | None = None
+    interval: int | None = None
+    run_on: list[str] | None = None

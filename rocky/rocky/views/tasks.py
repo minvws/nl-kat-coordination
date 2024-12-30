@@ -31,15 +31,10 @@ class TaskListView(SchedulerView, SchedulerListView, PageActionsView):
         return self.get_task_list()
 
     def post(self, request, *args, **kwargs):
-        try:
-            if self.action == self.RESCHEDULE_TASK:
-                task_id = self.request.POST.get("task_id", "")
-                self.reschedule_task(task_id)
-        except HTTPError as exc:
-            message = f"HTTP error for {exc.request.url} - {exc}"
-            messages.error(request, message)
-        except SchedulerError as error:
-            messages.error(request, error.message)
+        if self.action == self.RESCHEDULE_TASK:
+            task_id = self.request.POST.get("task_id", "")
+            self.reschedule_task(task_id)
+
         return super().post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -48,10 +43,7 @@ class TaskListView(SchedulerView, SchedulerListView, PageActionsView):
         context["active_filters_counter"] = self.count_active_task_filters()
         context["stats"] = self.get_task_statistics()
         context["breadcrumbs"] = [
-            {
-                "url": reverse("task_list", kwargs={"organization_code": self.organization.code}),
-                "text": _("Tasks"),
-            },
+            {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")}
         ]
         return context
 
@@ -64,6 +56,25 @@ class BoefjesTaskListView(TaskListView):
 class NormalizersTaskListView(TaskListView):
     template_name = "tasks/normalizers.html"
     task_type = "normalizer"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Search for the corresponding Boefje names and add those to the task_list
+        task_list = context["task_list"]
+        ids = [
+            task.data.raw_data.boefje_meta.boefje.id
+            for task in task_list
+            if task.data.raw_data.boefje_meta.boefje.id != "manual"
+        ]
+        plugins = self.get_katalogus().get_plugins(ids=ids)
+        plugin_dict = {p.id: p.name for p in plugins}
+
+        for task in task_list:
+            boefje_id = task.data.raw_data.boefje_meta.boefje.id
+            task.data.raw_data.boefje_meta.boefje.name = plugin_dict[boefje_id] if boefje_id != "manual" else "Manual"
+
+        return context
 
 
 class AllTaskListView(SchedulerListView, PageActionsView):
@@ -99,9 +110,7 @@ class AllTaskListView(SchedulerListView, PageActionsView):
         context = super().get_context_data(**kwargs)
         context["task_filter_form"] = self.task_filter_form(self.request.GET)
         context["stats"] = self.client.get_combined_schedulers_stats(scheduler_ids=self.schedulers)
-        context["breadcrumbs"] = [
-            {"url": reverse("all_task_list", kwargs={}), "text": _("All Tasks")},
-        ]
+        context["breadcrumbs"] = [{"url": reverse("all_task_list", kwargs={}), "text": _("All Tasks")}]
         return context
 
 

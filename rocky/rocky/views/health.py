@@ -1,6 +1,8 @@
+from typing import Any
+
 import structlog
 from account.mixins import OrganizationView
-from django.http import JsonResponse
+from django.http import HttpRequest, JsonResponse
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView, View
@@ -18,7 +20,7 @@ logger = structlog.get_logger(__name__)
 
 
 class Health(OrganizationView, View):
-    def get(self, request, *args, **kwargs) -> JsonResponse:
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         octopoes_connector = self.octopoes_api_connector
         rocky_health = get_rocky_health(self.organization.code, octopoes_connector)
         return JsonResponse(rocky_health.model_dump())
@@ -30,9 +32,7 @@ def get_bytes_health() -> ServiceHealth:
     except HTTPError:
         logger.exception("Error while retrieving Bytes health state")
         bytes_health = ServiceHealth(
-            service="bytes",
-            healthy=False,
-            additional="Could not connect to Bytes. Service is possibly down",
+            service="bytes", healthy=False, additional="Could not connect to Bytes. Service is possibly down"
         )
     return bytes_health
 
@@ -44,9 +44,7 @@ def get_octopoes_health(octopoes_api_connector: OctopoesAPIConnector) -> Service
     except HTTPError:
         logger.exception("Error while retrieving Octopoes health state")
         octopoes_health = ServiceHealth(
-            service="octopoes",
-            healthy=False,
-            additional="Could not connect to Octopoes. Service is possibly down",
+            service="octopoes", healthy=False, additional="Could not connect to Octopoes. Service is possibly down"
         )
     return octopoes_health
 
@@ -57,9 +55,7 @@ def get_scheduler_health(organization_code: str) -> ServiceHealth:
     except SchedulerError:
         logger.exception("Error while retrieving Scheduler health state")
         scheduler_health = ServiceHealth(
-            service="scheduler",
-            healthy=False,
-            additional="Could not connect to Scheduler. Service is possibly down",
+            service="scheduler", healthy=False, additional="Could not connect to Scheduler. Service is possibly down"
         )
     return scheduler_health
 
@@ -70,9 +66,7 @@ def get_keiko_health() -> ServiceHealth:
     except HTTPError:
         logger.exception("Error while retrieving Keiko health state")
         return ServiceHealth(
-            service="keiko",
-            healthy=False,
-            additional="Could not connect to Keiko. Service is possibly down",
+            service="keiko", healthy=False, additional="Could not connect to Keiko. Service is possibly down"
         )
 
 
@@ -90,11 +84,7 @@ def get_rocky_health(organization_code: str, octopoes_api_connector: OctopoesAPI
     if not services_healthy:
         additional = "Rocky will not function properly. Not all services are healthy."
     rocky_health = ServiceHealth(
-        service="rocky",
-        healthy=services_healthy,
-        version=__version__,
-        results=services,
-        additional=additional,
+        service="rocky", healthy=services_healthy, version=__version__, results=services, additional=additional
     )
     return rocky_health
 

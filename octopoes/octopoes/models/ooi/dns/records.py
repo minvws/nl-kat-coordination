@@ -15,9 +15,7 @@ class DNSRecord(OOI):
     ttl: int | None = None  # todo: validation
 
     _natural_key_attrs = ["hostname", "value"]
-    _reverse_relation_names = {
-        "hostname": "dns_records",
-    }
+    _reverse_relation_names = {"hostname": "dns_records"}
 
     @classmethod
     def _get_record_type(cls) -> str:
@@ -45,23 +43,17 @@ class DNSAAAARecord(DNSRecord):
 
     address: Reference = ReferenceField(IPAddressV6)
 
-    _reverse_relation_names = {
-        "hostname": "dns_aaaa_records",
-        "address": "dns_aaaa_records",
-    }
+    _reverse_relation_names = {"hostname": "dns_aaaa_records", "address": "dns_aaaa_records"}
 
 
 class DNSMXRecord(DNSRecord):
     object_type: Literal["DNSMXRecord"] = "DNSMXRecord"
     dns_record_type: Literal["MX"] = "MX"
 
-    mail_hostname: Reference | None = ReferenceField(Hostname, default=None)
+    mail_hostname: Reference | None = ReferenceField(Hostname, default=None, max_inherit_scan_level=1)
     preference: int | None = None
 
-    _reverse_relation_names = {
-        "hostname": "dns_mx_records",
-        "mail_hostname": "mail_server_of",
-    }
+    _reverse_relation_names = {"hostname": "dns_mx_records", "mail_hostname": "mail_server_of"}
 
 
 class DNSTXTRecord(DNSRecord):
@@ -83,10 +75,7 @@ class DNSNSRecord(DNSRecord):
 
     name_server_hostname: Reference = ReferenceField(Hostname, max_issue_scan_level=1, max_inherit_scan_level=0)
 
-    _reverse_relation_names = {
-        "hostname": "dns_ns_records",
-        "name_server_hostname": "ns_record_targets",
-    }
+    _reverse_relation_names = {"hostname": "dns_ns_records", "name_server_hostname": "ns_record_targets"}
 
 
 class DNSCNAMERecord(DNSRecord):
@@ -95,10 +84,7 @@ class DNSCNAMERecord(DNSRecord):
 
     target_hostname: Reference = ReferenceField(Hostname)
 
-    _reverse_relation_names = {
-        "hostname": "dns_cname_records",
-        "target_hostname": "cname_target_of",
-    }
+    _reverse_relation_names = {"hostname": "dns_cname_records", "target_hostname": "cname_target_of"}
 
 
 class DNSSOARecord(DNSRecord):
@@ -112,10 +98,7 @@ class DNSSOARecord(DNSRecord):
     expire: int | None = None
     minimum: int | None = None
 
-    _reverse_relation_names = {
-        "hostname": "dns_soa_records",
-        "soa_hostname": "subject_of_dns_soa_records",
-    }
+    _reverse_relation_names = {"hostname": "dns_soa_records", "soa_hostname": "subject_of_dns_soa_records"}
 
     _natural_key_attrs = ["hostname", "soa_hostname"]
 
@@ -131,9 +114,7 @@ class NXDOMAIN(OOI):
     hostname: Reference = ReferenceField(Hostname)
 
     _natural_key_attrs = ["hostname"]
-    _reverse_relation_names = {
-        "hostname": "nxdomain_hostname",
-    }
+    _reverse_relation_names = {"hostname": "nxdomain_hostname"}
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
@@ -147,10 +128,7 @@ class DNSPTRRecord(DNSRecord):
 
     _natural_key_attrs = ["hostname", "address"]
 
-    _reverse_relation_names = {
-        "hostname": "dns_ptr_records",
-        "address": "ptr_record_ip",
-    }
+    _reverse_relation_names = {"hostname": "dns_ptr_records", "address": "ptr_record_ip"}
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
@@ -166,7 +144,7 @@ class CAATAGS(Enum):
     ISSUEVMC = "issuevmc"
     ISSUEMAIL = "issuemail"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.value
 
 

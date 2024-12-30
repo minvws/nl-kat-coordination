@@ -29,7 +29,7 @@ def test_port_classification_tcp_22():
     assert len(results) == 2
     finding = results[-1]
     assert isinstance(finding, Finding)
-    assert finding.description == "Port 22/tcp is a system administrator port and should not be open."
+    assert finding.description == "Port 22/tcp is a system administrator port and should possibly not be open."
 
 
 def test_port_classification_tcp_5432():

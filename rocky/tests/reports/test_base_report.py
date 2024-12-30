@@ -8,7 +8,7 @@ from tests.conftest import setup_request
 
 
 def test_aggregate_report_select_oois(rf, client_member, mock_organization_view_octopoes, mocker, listed_hostnames):
-    mocker.patch("reports.views.base.get_katalogus")
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("aggregate_report_select_oois", kwargs=kwargs)
     request = rf.get(url)
@@ -33,14 +33,11 @@ def test_aggregate_report_select_oois(rf, client_member, mock_organization_view_
 def test_aggregate_report_choose_report_types(
     rf, client_member, mock_organization_view_octopoes, mocker, listed_hostnames, valid_time
 ):
-    mocker.patch("reports.views.base.get_katalogus")
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
     kwargs = {"organization_code": client_member.organization.code}
-    url = reverse("aggregate_report_select_oois", kwargs=kwargs)
+    url = reverse("aggregate_report_select_report_types", kwargs=kwargs)
 
-    request = rf.get(
-        url,
-        {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": "all"},
-    )
+    request = rf.post(url, {"observed_at": valid_time.strftime("%Y-%m-%d"), "ooi": "all"})
     request.resolver_match = resolve(url)
 
     setup_request(request, client_member.user)

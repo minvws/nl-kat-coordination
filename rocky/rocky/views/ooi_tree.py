@@ -16,7 +16,7 @@ class OOITreeView(BaseOOIDetailView, TemplateView):
     def get_tree_dict(self):
         return create_object_tree_item_from_ref(self.tree.root, self.tree.store)
 
-    def get_filtered_tree(self, tree_dict):
+    def get_filtered_tree(self, tree_dict: dict) -> dict:
         filtered_types = self.request.GET.getlist("ooi_type", [])
         return filter_ooi_tree(tree_dict, filtered_types)
 
@@ -62,16 +62,13 @@ class OOISummaryView(OOITreeView):
     template_name = "oois/ooi_summary.html"
 
     def get_last_breadcrumb(self):
-        return {
-            "url": get_ooi_url("ooi_summary", self.ooi.primary_key, self.organization.code),
-            "text": _("Summary"),
-        }
+        return {"url": get_ooi_url("ooi_summary", self.ooi.primary_key, self.organization.code), "text": _("Summary")}
 
 
 class OOIGraphView(OOITreeView):
     template_name = "graph-d3.html"
 
-    def get_filtered_tree(self, tree_dict):
+    def get_filtered_tree(self, tree_dict: dict) -> dict:
         filtered_tree = super().get_filtered_tree(tree_dict)
         return hydrate_tree(filtered_tree, self.organization.code)
 
@@ -82,11 +79,11 @@ class OOIGraphView(OOITreeView):
         }
 
 
-def hydrate_tree(tree, organization_code: str):
+def hydrate_tree(tree: dict, organization_code: str) -> dict:
     return hydrate_branch(tree, organization_code)
 
 
-def hydrate_branch(branch, organization_code: str):
+def hydrate_branch(branch: dict, organization_code: str) -> dict:
     branch["name"] = branch["tree_meta"]["location"] + "-" + branch["ooi_type"]
     branch["overlay_data"] = {"Type": branch["ooi_type"]}
     if branch["ooi_type"] == "Finding":

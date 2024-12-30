@@ -24,10 +24,7 @@ class PageActions(Enum):
 
 
 class OrganizationMemberListView(
-    OrganizationPermissionRequiredMixin,
-    OrganizationMemberBreadcrumbsMixin,
-    OrganizationView,
-    ListView,
+    OrganizationPermissionRequiredMixin, OrganizationMemberBreadcrumbsMixin, OrganizationView, ListView
 ):
     model = OrganizationMember
     context_object_name = "members"
@@ -38,7 +35,7 @@ class OrganizationMemberListView(
         queryset = self.model.objects.filter(organization=self.organization)
         if "client_status" in self.request.GET:
             status_filter = self.request.GET.getlist("client_status", [])
-            queryset = [member for member in queryset if member.status in status_filter]
+            queryset = queryset.filter(status__in=status_filter)
 
         if "blocked_status" in self.request.GET:
             blocked_filter = self.request.GET.getlist("blocked_status", [])
@@ -51,7 +48,7 @@ class OrganizationMemberListView(
                 if filter_option == "unblocked":
                     blocked_filter_bools.append(False)
 
-            queryset = [member for member in queryset if member.blocked in blocked_filter_bools]
+            queryset = queryset.filter(blocked__in=blocked_filter_bools)
         return queryset
 
     def setup(self, request, *args, **kwargs):
@@ -66,7 +63,7 @@ class OrganizationMemberListView(
         self.handle_page_action(request.POST.get("action"))
         return redirect(reverse("organization_member_list", kwargs={"organization_code": self.organization.code}))
 
-    def handle_page_action(self, action: str):
+    def handle_page_action(self, action: str) -> None:
         member_id = self.request.POST.get("member_id")
         organizationmember = self.model.objects.get(id=member_id)
         try:

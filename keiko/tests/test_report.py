@@ -103,7 +103,7 @@ report_data_underscores = {
                     },
                 }
             ],
-        },
+        }
     },
     "valid_time": "2022-08-26 08:23:58.373810+00:00",
     "report_source_type": "Hostname",

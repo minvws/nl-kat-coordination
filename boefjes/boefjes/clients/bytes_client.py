@@ -9,6 +9,7 @@ from uuid import UUID
 import structlog
 from httpx import Client, HTTPStatusError, HTTPTransport, Response
 
+from boefjes.config import settings
 from boefjes.job_models import BoefjeMeta, NormalizerMeta, RawDataMeta
 
 BYTES_API_CLIENT_VERSION = "0.3"
@@ -38,12 +39,10 @@ class BytesAPIClient:
             base_url=base_url,
             headers={"User-Agent": f"bytes-api-client/{BYTES_API_CLIENT_VERSION}"},
             transport=(HTTPTransport(retries=6)),
+            timeout=settings.outgoing_request_timeout,
         )
 
-        self.credentials = {
-            "username": username,
-            "password": password,
-        }
+        self.credentials = {"username": username, "password": password}
         self.headers: dict[str, str] = {}
 
     def login(self) -> None:
@@ -65,16 +64,14 @@ class BytesAPIClient:
 
     def _get_token(self) -> str:
         response = self._session.post(
-            "/token",
-            data=self.credentials,
-            headers={"content-type": "application/x-www-form-urlencoded"},
+            "/token", data=self.credentials, headers={"content-type": "application/x-www-form-urlencoded"}
         )
 
         return str(response.json()["access_token"])
 
     @retry_with_login
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
-        response = self._session.post("/bytes/boefje_meta", content=boefje_meta.json(), headers=self.headers)
+        response = self._session.post("/bytes/boefje_meta", content=boefje_meta.model_dump_json(), headers=self.headers)
 
         self._verify_response(response)
 
@@ -87,7 +84,9 @@ class BytesAPIClient:
 
     @retry_with_login
     def save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
-        response = self._session.post("/bytes/normalizer_meta", content=normalizer_meta.json(), headers=self.headers)
+        response = self._session.post(
+            "/bytes/normalizer_meta", content=normalizer_meta.model_dump_json(), headers=self.headers
+        )
 
         self._verify_response(response)
 

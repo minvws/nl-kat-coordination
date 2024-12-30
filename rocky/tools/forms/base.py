@@ -95,20 +95,15 @@ class CheckboxGroup(forms.CheckboxSelectMultiple):
     required_options: list[str]
     wrap_label = True
 
-    def __init__(
-        self,
-        required_options: list[str] | None = None,
-        *args,
-        **kwargs,
-    ) -> None:
+    def __init__(self, required_options: list[str] | None = None, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.required_options = required_options or []
 
-    def get_context(self, name, value, attrs) -> dict[str, Any]:
+    def get_context(self, name: str, value: Any, attrs: dict[str, Any] | None) -> dict[str, Any]:
         context = super().get_context(name, value, attrs)
         return context
 
-    def create_option(self, *arg, **kwargs) -> dict[str, Any]:
+    def create_option(self, *arg: Any, **kwargs: Any) -> dict[str, Any]:
         option = super().create_option(*arg, **kwargs)
         option["wrap_label"] = self.wrap_label
         option["attrs"]["checked"] = self.is_required_option(option["value"])
@@ -142,14 +137,7 @@ class CheckboxTable(Widget):
         for index, (choice_value, choice_label) in enumerate(self.choices):
             selected = str(choice_value) in value if value is not None else False
             context["widget"]["options"].append(
-                self.create_option(
-                    name,
-                    choice_value,
-                    choice_label,
-                    selected,
-                    index,
-                    attrs=attrs,
-                )
+                self.create_option(name, choice_value, choice_label, selected, index, attrs=attrs)
             )
 
         context["widget"]["column_names"] = self.column_names

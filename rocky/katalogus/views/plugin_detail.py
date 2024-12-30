@@ -9,8 +9,10 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
 
-from katalogus.client import Boefje, Normalizer, get_katalogus
+from katalogus.client import Boefje, Normalizer
 from katalogus.views.plugin_settings_list import PluginSettingsListView
+from octopoes.models import OOI
+from rocky.scheduler import ScheduleResponse
 from rocky.views.tasks import TaskListView
 
 
@@ -18,7 +20,7 @@ class PluginCoverImgView(OrganizationView):
     """Get the cover image of a plugin."""
 
     def get(self, request, *args, **kwargs):
-        file = FileResponse(get_katalogus(self.organization.code).get_cover(kwargs["plugin_id"]))
+        file = FileResponse(self.get_katalogus().get_cover(kwargs["plugin_id"]))
         file.headers["Cache-Control"] = "max-age=604800"
         return file
 
@@ -36,10 +38,7 @@ class PluginDetailView(TaskListView, PluginSettingsListView):
                 oois_without_clearance_level = oois["oois_without_clearance"]
 
                 if oois_with_clearance_level:
-                    self.run_boefje_for_oois(
-                        boefje=boefje,
-                        oois=oois_with_clearance_level,
-                    )
+                    self.run_boefje_for_oois(boefje=boefje, oois=oois_with_clearance_level)
 
                 if oois_without_clearance_level:
                     if not self.organization_member.has_perm("tools.can_set_clearance_level"):
@@ -75,14 +74,13 @@ class PluginDetailView(TaskListView, PluginSettingsListView):
         oois_without_clearance = []
         for ooi in selected_oois:
             ooi_object = self.get_single_ooi(pk=ooi)
+
             if ooi_object.scan_profile and ooi_object.scan_profile.level >= self.plugin.scan_level.value:
                 oois_with_clearance.append(ooi_object)
             else:
                 oois_without_clearance.append(ooi_object.primary_key)
-        return {
-            "oois_with_clearance": oois_with_clearance,
-            "oois_without_clearance": oois_without_clearance,
-        }
+
+        return {"oois_with_clearance": oois_with_clearance, "oois_without_clearance": oois_without_clearance}
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -106,10 +104,7 @@ class NormalizerDetailView(PluginDetailView):
             {
                 "url": reverse(
                     "normalizer_detail",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "plugin_id": self.plugin.id,
-                    },
+                    kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id},
                 ),
                 "text": self.plugin.name,
             },
@@ -128,17 +123,21 @@ class BoefjeDetailView(PluginDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["new_variant"] = self.request.GET.get("new_variant")
+        context["variants"] = self.get_katalogus().get_plugins(oci_image=self.plugin.oci_image)
+
+        for variant in context["variants"]:
+            if variant.created:
+                variant.created = datetime.fromisoformat(variant.created)
 
         context["select_ooi_filter_form"] = SelectOOIFilterForm
         if "show_all" in self.request.GET:
             context["select_oois_form"] = SelectOOIForm(
-                oois=self.get_form_consumable_oois(),
-                organization_code=self.organization.code,
+                oois=self.get_form_consumable_oois(), organization_code=self.organization.code
             )
         else:
             context["select_oois_form"] = SelectOOIForm(
-                oois=self.get_form_filtered_consumable_oois(),
-                organization_code=self.organization.code,
+                oois=self.get_form_filtered_consumable_oois(), organization_code=self.organization.code
             )
 
         context["breadcrumbs"] = [
@@ -148,11 +147,7 @@ class BoefjeDetailView(PluginDetailView):
             },
             {
                 "url": reverse(
-                    "boefje_detail",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "plugin_id": self.plugin.id,
-                    },
+                    "boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id}
                 ),
                 "text": self.plugin.name,
             },
@@ -162,13 +157,29 @@ class BoefjeDetailView(PluginDetailView):
 
     def get_form_consumable_oois(self):
         """Get all available OOIS that plugin can consume."""
-        return self.octopoes_api_connector.list_objects(
-            self.plugin.consumes,
-            valid_time=datetime.now(timezone.utc),
-            limit=self.limit_ooi_list,
+        oois = self.octopoes_api_connector.list_objects(
+            self.plugin.consumes, valid_time=datetime.now(timezone.utc), limit=self.limit_ooi_list
         ).items
+
+        oois_with_schedule: list[tuple[OOI, ScheduleResponse]] = []
+
+        for ooi in oois:
+            schedules = self.scheduler_client.post_schedule_search(
+                {
+                    "filters": [
+                        {"column": "data", "field": "boefje__id", "operator": "eq", "value": self.plugin.id},
+                        {"column": "data", "field": "input_ooi", "operator": "eq", "value": ooi.primary_key},
+                    ]
+                }
+            )
+
+            if schedules.count > 0:
+                schedule: ScheduleResponse = schedules.results[0]
+
+                oois_with_schedule.append((ooi, schedule))
+        return oois_with_schedule
 
     def get_form_filtered_consumable_oois(self):
         """Return a list of oois that is filtered for oois that meets clearance level."""
-        oois = self.get_form_consumable_oois()
-        return [ooi for ooi in oois if ooi.scan_profile.level >= self.plugin.scan_level.value]
+        oois_with_schedule = self.get_form_consumable_oois()
+        return [ooi for ooi in oois_with_schedule if ooi[0].scan_profile.level >= self.plugin.scan_level.value]

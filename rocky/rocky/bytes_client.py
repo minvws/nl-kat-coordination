@@ -16,29 +16,26 @@ logger = structlog.get_logger("bytes_client")
 
 
 class BytesClient:
-    def __init__(self, base_url: str, username: str, password: str, organization: str):
-        self.credentials = {
-            "username": username,
-            "password": password,
-        }
-        self.session = httpx.Client(base_url=base_url)
+    def __init__(self, base_url: str, username: str, password: str, organization: str | None):
+        self.credentials = {"username": username, "password": password}
+        self.session = httpx.Client(base_url=base_url, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT)
         self.organization = organization
 
     def health(self) -> ServiceHealth:
         response = self.session.get("/health")
         response.raise_for_status()
 
-        return ServiceHealth.parse_obj(response.json())
+        return ServiceHealth.model_validate(response.json())
 
     @staticmethod
-    def raw_from_declarations(declarations: list[Declaration]):
-        json_string = f"[{','.join([declaration.json() for declaration in declarations])}]"
+    def raw_from_declarations(declarations: list[Declaration]) -> bytes:
+        json_string = f"[{','.join([declaration.model_dump_json() for declaration in declarations])}]"
 
         return json_string.encode("utf-8")
 
     def add_manual_proof(
         self, normalizer_id: uuid.UUID, raw: bytes, manual_mime_types: Set[str] = frozenset({"manual/ooi"})
-    ):
+    ) -> None:
         """Per convention for a generic normalizer, we add a raw list of declarations, not a single declaration"""
 
         self.login()
@@ -68,7 +65,7 @@ class BytesClient:
                 normalizer=Normalizer(id="normalizer/manual"),
                 started_at=datetime.now(timezone.utc),
                 ended_at=datetime.now(timezone.utc),
-            ),
+            )
         )
 
     def upload_raw(
@@ -118,15 +115,7 @@ class BytesClient:
 
         response = self.session.post(
             "/bytes/raw",
-            json={
-                "files": [
-                    {
-                        "name": file_name,
-                        "content": b64encode(raw).decode(),
-                        "tags": list(mime_types),
-                    }
-                ]
-            },
+            json={"files": [{"name": file_name, "content": b64encode(raw).decode(), "tags": list(mime_types)}]},
             params={"boefje_meta_id": str(boefje_meta_id)},
         )
 
@@ -179,9 +168,7 @@ class BytesClient:
 
     def _get_token(self) -> str:
         response = self.session.post(
-            "/token",
-            data=self.credentials,
-            headers={"content-type": "application/x-www-form-urlencoded"},
+            "/token", data=self.credentials, headers={"content-type": "application/x-www-form-urlencoded"}
         )
 
         return response.json()["access_token"]

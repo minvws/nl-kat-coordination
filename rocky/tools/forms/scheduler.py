@@ -7,16 +7,8 @@ from tools.forms.base import DateInput
 
 
 class TaskFilterForm(forms.Form):
-    min_created_at = forms.DateField(
-        label=_("From"),
-        widget=DateInput(format="%Y-%m-%d"),
-        required=False,
-    )
-    max_created_at = forms.DateField(
-        label=_("To"),
-        widget=DateInput(format="%Y-%m-%d"),
-        required=False,
-    )
+    min_created_at = forms.DateField(label=_("From"), widget=DateInput(format="%Y-%m-%d"), required=False)
+    max_created_at = forms.DateField(label=_("To"), widget=DateInput(format="%Y-%m-%d"), required=False)
     status = forms.ChoiceField(
         choices=(
             ("", _("All")),
@@ -31,9 +23,7 @@ class TaskFilterForm(forms.Form):
         required=False,
     )
     input_ooi = forms.CharField(
-        label=_("Search"),
-        widget=forms.TextInput(attrs={"placeholder": _("Search by object name")}),
-        required=False,
+        label=_("Search"), widget=forms.TextInput(attrs={"placeholder": _("Search by object name")}), required=False
     )
 
     def clean(self):

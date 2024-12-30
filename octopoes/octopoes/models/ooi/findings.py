@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from enum import Enum
 from functools import total_ordering
 from typing import Annotated, Literal
@@ -7,15 +9,7 @@ from pydantic import AnyUrl, StringConstraints
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
 
-severity_order = [
-    "unknown",
-    "pending",
-    "recommendation",
-    "low",
-    "medium",
-    "high",
-    "critical",
-]
+severity_order = ["unknown", "pending", "recommendation", "low", "medium", "high", "critical"]
 
 
 @total_ordering
@@ -32,10 +26,10 @@ class RiskLevelSeverity(Enum):
     # unknown = the third party has been contacted, but third party has not determined the risk level (yet)
     UNKNOWN = "unknown"
 
-    def __gt__(self, other: "RiskLevelSeverity") -> bool:
+    def __gt__(self, other: RiskLevelSeverity) -> bool:
         return severity_order.index(self.value) > severity_order.index(other.value)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.value
 
 

@@ -5,6 +5,7 @@ from unittest import mock
 
 import scheduler
 from scheduler import config, models, server, storage
+from scheduler.storage import stores
 
 from tests.factories import OrganisationFactory
 from tests.mocks import MockKatalogusService
@@ -25,8 +26,8 @@ class AppTestCase(unittest.TestCase):
 
         self.mock_ctx.datastores = SimpleNamespace(
             **{
-                storage.TaskStore.name: storage.TaskStore(self.dbconn),
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+                stores.TaskStore.name: stores.TaskStore(self.dbconn),
+                stores.PriorityQueueStore.name: stores.PriorityQueueStore(self.dbconn),
             }
         )
 
@@ -126,9 +127,7 @@ class AppTestCase(unittest.TestCase):
     def test_shutdown(self):
         """Test that the app shuts down gracefully"""
         # Arrange
-        self.mock_ctx.services.katalogus.organisations = {
-            "org-1": OrganisationFactory(id="org-1"),
-        }
+        self.mock_ctx.services.katalogus.organisations = {"org-1": OrganisationFactory(id="org-1")}
 
         self.app.start_schedulers()
         self.app.start_monitors()

@@ -4,6 +4,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 from scheduler import config, models, storage
+from scheduler.storage import stores
 
 from tests.factories import OrganisationFactory
 from tests.utils import functions
@@ -23,8 +24,8 @@ class StoreTestCase(unittest.TestCase):
 
         self.mock_ctx.datastores = SimpleNamespace(
             **{
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
-                storage.TaskStore.name: storage.TaskStore(self.dbconn),
+                stores.PriorityQueueStore.name: stores.PriorityQueueStore(self.dbconn),
+                stores.TaskStore.name: stores.TaskStore(self.dbconn),
             }
         )
 
@@ -148,13 +149,7 @@ class StoreTestCase(unittest.TestCase):
         twenty_five_hours = datetime.now(timezone.utc) - timedelta(hours=25)
 
         for r, status, modified_at in zip(
-            (
-                range(2),
-                range(2),
-                range(2),
-                range(2),
-                range(2),
-            ),
+            (range(2), range(2), range(2), range(2), range(2)),
             (
                 models.TaskStatus.QUEUED,
                 models.TaskStatus.COMPLETED,
@@ -162,13 +157,7 @@ class StoreTestCase(unittest.TestCase):
                 models.TaskStatus.DISPATCHED,
                 models.TaskStatus.DISPATCHED,
             ),
-            (
-                one_hour,
-                four_hours,
-                one_hour,
-                twenty_five_hours,
-                twenty_three_hours,
-            ),
+            (one_hour, four_hours, one_hour, twenty_five_hours, twenty_three_hours),
         ):
             for _ in r:
                 data = functions.create_test_model()
@@ -200,13 +189,7 @@ class StoreTestCase(unittest.TestCase):
         twenty_five_hours = datetime.now(timezone.utc) - timedelta(hours=25)
 
         for r, status, modified_at in zip(
-            (
-                range(2),
-                range(2),
-                range(2),
-                range(2),
-                range(2),
-            ),
+            (range(2), range(2), range(2), range(2), range(2)),
             (
                 models.TaskStatus.QUEUED,
                 models.TaskStatus.COMPLETED,
@@ -214,13 +197,7 @@ class StoreTestCase(unittest.TestCase):
                 models.TaskStatus.DISPATCHED,
                 models.TaskStatus.DISPATCHED,
             ),
-            (
-                one_hour,
-                four_hours,
-                one_hour,
-                twenty_five_hours,
-                twenty_three_hours,
-            ),
+            (one_hour, four_hours, one_hour, twenty_five_hours, twenty_three_hours),
         ):
             for _ in r:
                 data = functions.create_test_model()
