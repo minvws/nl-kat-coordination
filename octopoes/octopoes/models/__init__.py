@@ -240,7 +240,7 @@ class OOI(BaseModel):
             return str(value)
 
     def __hash__(self):
-        return hash(self.primary_key)
+        return hash(self.model_dump_json())
 
 
 OOIClassType = TypeVar("OOIClassType")
