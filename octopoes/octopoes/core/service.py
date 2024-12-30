@@ -492,6 +492,9 @@ class OctopoesService:
 
         # delete related origins to which it is a source
         origins = self.origin_repository.list_origins(event.valid_time, source=reference)
+        origins += self.origin_repository.list_origins(
+            event.valid_time, origin_type=OriginType.NIBBLET, parameters_references=[reference]
+        )
         for origin in origins:
             self.origin_repository.delete(origin, event.valid_time)
 

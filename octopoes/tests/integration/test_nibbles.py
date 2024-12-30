@@ -9,6 +9,7 @@ from nibbles.definitions import NibbleDefinition, NibbleParameter
 from nibbles.runner import NibblesRunner, nibble_hasher
 
 from octopoes.core.service import OctopoesService
+from octopoes.events.events import OperationType, OOIDBEvent, OriginDBEvent
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.findings import Finding, FindingType, KATFindingType, RiskLevelSeverity
@@ -366,3 +367,37 @@ def test_nibble_states(xtdb_octopoes_service: OctopoesService, valid_time: datet
     xtdb_nibble_inis = {ni["id"]: ni for ni in xtdb_octopoes_service.nibbler.nibble_repository.get_all(valid_time)}
     for nibble_ini in nibble_inis:
         assert xtdb_nibble_inis[nibble_ini["id"]] == nibble_ini
+
+
+def test_nibble_origin_deletion_propagation(
+    xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime
+):
+    network = Network(name="internet")
+    xtdb_octopoes_service.ooi_repository.save(network, valid_time)
+    url = URL(network=network.reference, raw="https://mispo.es/")
+    xtdb_octopoes_service.ooi_repository.save(url, valid_time)
+    config = Config(ooi=network.reference, bit_id="superkat", config={"max_length": "3"})
+    xtdb_octopoes_service.ooi_repository.save(config, valid_time)
+
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count > 3
+
+    xtdb_octopoes_service.ooi_repository.delete(network.reference, valid_time)
+    xtdb_octopoes_service.ooi_repository.delete(url.reference, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    for q in event_manager.queue:
+        if q.operation_type == OperationType.CREATE or q.operation_type == OperationType.UPDATE:
+            if isinstance(q, OOIDBEvent):
+                print(f"CREATE: {q.new_data.reference}")
+            elif isinstance(q, OriginDBEvent):
+                print(f"CREATE: {q.new_data.id}")
+        elif q.operation_type == OperationType.DELETE:
+            if isinstance(q, OOIDBEvent):
+                print(f"DELETE: {q.old_data.reference}")
+            elif isinstance(q, OriginDBEvent):
+                print(f"DELETE: {q.old_data.id}")
+
+    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 1
+    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).items == [config]
