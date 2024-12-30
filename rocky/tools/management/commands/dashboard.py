@@ -4,18 +4,20 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
-from django.conf import settings
-from tools.models import Organization
-from tools.ooi_helpers import create_ooi
-
 from crisis_room.models import Dashboard, DashboardData
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.management import BaseCommand
+
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.ooi.reports import ReportRecipe
 from rocky.bytes_client import get_bytes_client
 from rocky.scheduler import ReportTask, ScheduleRequest, scheduler_client
+from tools.models import Organization, OrganizationMember
+from tools.ooi_helpers import create_ooi
 
 
-def create_default_dashboard(organization: Organization):
+def update_or_create_default_dashboard(organization: Organization):
     valid_time = datetime.now(timezone.utc)
     is_scheduler_ready_for_schedule = is_scheduler_enabled(organization)
 
@@ -24,11 +26,17 @@ def create_default_dashboard(organization: Organization):
         with path.open("r") as recipe_seeder:
             recipe_default = json.load(recipe_seeder)
 
-        recipe = create_organization_recipe(valid_time, organization, recipe_default)
         dashboard, _ = Dashboard.objects.get_or_create(name="Crisis Room Findings Dashboard", organization=organization)
-        DashboardData.objects.get_or_create(dashboard=dashboard, recipe=recipe, findings_dashboard=True)
-        schedule_request = create_schedule_request(valid_time, organization, recipe)
-        scheduler_client(organization.code).post_schedule(schedule=schedule_request)
+
+        dashboard_data, created = DashboardData.objects.get_or_create(dashboard=dashboard)
+        if created:
+            recipe = create_organization_recipe(valid_time, organization, recipe_default)
+            dashboard_data.recipe = recipe.pk
+            schedule_request = create_schedule_request(valid_time, organization, recipe)
+            scheduler_client(organization.code).post_schedule(schedule=schedule_request)
+
+        dashboard_data.findings_dashboard = True
+        dashboard_data.save()
 
 
 def create_organization_recipe(
@@ -63,3 +71,10 @@ def create_schedule_request(
         schedule=report_recipe.cron_expression,
         deadline_at=start_datetime.isoformat(),
     )
+
+
+class Command(BaseCommand):
+    def handle(self, *args, **options):
+        organizations = [member.organization for member in OrganizationMember.objects.filter(user=get_user_model())]
+        for organization in organizations:
+            update_or_create_default_dashboard(organization)

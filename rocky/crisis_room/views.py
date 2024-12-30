@@ -1,4 +1,3 @@
-from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
@@ -7,7 +6,6 @@ import structlog
 from account.models import KATUser
 from django.conf import settings
 from django.contrib import messages
-from django.db.models.query import QuerySet
 from django.http import HttpResponse
 from django.http.request import HttpRequest
 from django.shortcuts import redirect
@@ -25,7 +23,7 @@ from octopoes.connector import ConnectorException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.findings import RiskLevelSeverity
-from rocky.bytes_client import get_bytes_client
+from rocky.bytes_client import BytesClient, get_bytes_client
 from rocky.views.mixins import ConnectorFormMixin, ObservedAtMixin
 
 logger = structlog.get_logger(__name__)
@@ -118,117 +116,92 @@ class CrisisRoomAllOrganizations(TemplateView):
         return redirect(reverse("crisis_room_findings"))
 
 
-class CrisisRoomMixin:
-    request: HttpRequest
+class DashboardService:
+    observed_at = datetime.now(timezone.utc)
 
-    def get_user_organizations(self) -> list[Organization]:
-        return [member.organization for member in OrganizationMember.objects.filter(user=self.request.user)]
+    @staticmethod
+    def get_organizations_findings(report_data: dict[str, Any]) -> dict[str, Any]:
+        findings = {}
+        if "findings" in report_data and report_data["findings"]:
+            finding_types = report_data["findings"]["finding_types"]
+            highest_risk_level = finding_types[0]["finding_type"]["risk_severity"]
+            critical_high_finding_types = list(
+                filter(
+                    lambda finding_type: finding_type["finding_type"]["risk_severity"] == "critical"
+                    or finding_type["finding_type"]["risk_severity"] == "high",
+                    finding_types,
+                )
+            )
+            report_data["findings"]["finding_types"] = critical_high_finding_types[:25]
 
-    def get_organizations_dashboards(
-        self, display_in_crisis_room: bool = False, display_in_dashboard: bool = False
-    ) -> dict[Organization, dict[DashboardData, dict[str, Any]]]:
-        organizations = self.get_user_organizations()
-        grouped_data = defaultdict(list)
-        dashboards_data = DashboardData.objects.filter(
-            dashboard__organization__in=organizations,
-            display_in_crisis_room=display_in_crisis_room,
-            display_in_dashboard=display_in_dashboard,
+            findings = report_data | {"highest_risk_level": highest_risk_level}
+        return findings
+
+    @staticmethod
+    def get_octopoes_client(organization_code: str) -> OctopoesAPIConnector:
+        return OctopoesAPIConnector(
+            settings.OCTOPOES_API, organization_code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
         )
-        for data in dashboards_data:
-            organization_dashboard = {}
-            organization_dashboard[data] = self.get_report_data(data)
-            grouped_data[data.dashboard.organization].append(organization_dashboard)
-        return dict(grouped_data)
 
-    def get_organizations_findings(self) -> dict[Organization, dict[DashboardData, dict[str, Any]]]:
-        organizations = self.get_user_organizations()
-        grouped_data = defaultdict(list)
+    @staticmethod
+    def get_reports(valid_time: datetime, octopoes_client: OctopoesAPIConnector, recipe_id: str):
+        return octopoes_client.query(
+            "ReportRecipe.<report_recipe[is Report]", valid_time=valid_time, source=Reference.from_str(recipe_id)
+        )
+
+    @staticmethod
+    def get_report_bytes_data(bytes_client: BytesClient, data_raw_id: str):
+        bytes_client.login()
+        return TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
+            bytes_client.get_raw(raw_id=data_raw_id)
+        )
+
+    def collect_findings_dashboard(
+        self, organizations: list[Organization]
+    ) -> dict[Organization, dict[DashboardData, dict[str, Any]]]:
+        findings_dashboard = {}
+
         dashboards_data = DashboardData.objects.filter(
             dashboard__organization__in=organizations, findings_dashboard=True
         )
+
         for data in dashboards_data:
-            organization_dashboard = {}
-            report = self.get_report_data(data)
-            if "findings" in report["report_data"] and "finding_types" in report["report_data"]["findings"]:
-                finding_types = report["report_data"]["findings"]["finding_types"]
-                highest_risk_level = finding_types[0]["finding_type"]["risk_severity"]
-                critical_high_finding_types = list(
-                    filter(
-                        lambda finding_type: finding_type["finding_type"]["risk_severity"] == "critical"
-                        or finding_type["finding_type"]["risk_severity"] == "high",
-                        finding_types,
-                    )
-                )
-                report["report_data"]["findings"]["finding_types"] = critical_high_finding_types[:25]
+            organization = data.dashboard.organization
+            octopoes_client = self.get_octopoes_client(organization.code)
+            bytes_client = get_bytes_client(organization.code)
+            recipe_id = data.recipe
 
-            organization_dashboard[data] = report | {"highest_risk_level": highest_risk_level}
+            # get reports with recipe id
+            reports = self.get_reports(self.observed_at, octopoes_client, recipe_id)
 
-            grouped_data[data.dashboard.organization].append(organization_dashboard)
-        return dict(grouped_data)
+            if reports:
+                reports.sort(key=lambda ooi: ooi.date_generated, reverse=True)
+                report = reports[0]
+                report_data_from_bytes = self.get_report_bytes_data(bytes_client, report.data_raw_id)
+                report_data = self.get_organizations_findings(report_data_from_bytes)
 
-    def get_findings_settings(self) -> QuerySet:
-        organizations = self.get_user_organizations()
+                if report_data:
+                    findings_dashboard[organization] = {data: {"report": report, "report_data": report_data}}
 
-        return DashboardData.objects.filter(dashboard__organization__in=organizations, findings_dashboard=True)
-
-    @staticmethod
-    def get_octopoes_client(organization: Organization) -> OctopoesAPIConnector:
-        return OctopoesAPIConnector(
-            settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
-        )
-
-    def get_report_data(self, dashboard_data: DashboardData) -> dict[str, Any]:
-        """Get the latest/newest report data with the recipe ID"""
-        valid_time = datetime.now(timezone.utc)
-        octopoes_client = self.get_octopoes_client(dashboard_data.dashboard.organization)
-
-        reports = octopoes_client.query(
-            "ReportRecipe.<report_recipe[is Report]",
-            valid_time=valid_time,
-            source=Reference.from_str(dashboard_data.recipe),
-        )
-        if reports:
-            reports.sort(key=lambda ooi: ooi.date_generated, reverse=True)
-            report = reports[0]
-
-            bytes_client = get_bytes_client(dashboard_data.dashboard.organization.code)
-            bytes_client.login()
-
-            return {
-                "report": report,
-                "report_data": TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
-                    bytes_client.get_raw(raw_id=report.data_raw_id)
-                ),
-            }
-
-        return {}
+        return findings_dashboard
 
 
-class CrisisRoomDashboards(CrisisRoomMixin, TemplateView):
-    template_name = "crisis_room_dashboards.html"
-
-    def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
-        super().setup(request, *args, **kwargs)
-        self.organizations_dashboards: dict[Organization, dict[DashboardData, dict[str, Any]]] = (
-            self.get_organizations_dashboards(display_in_crisis_room=True)
-        )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["organizations_dashboards"] = self.organizations_dashboards
-        return context
-
-
-class CrisisRoomFindings(CrisisRoomMixin, TemplateView):
+class CrisisRoomFindings(DashboardService, TemplateView):
     template_name = "crisis_room_findings.html"
 
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
         super().setup(request, *args, **kwargs)
-        self.organizations_findings: dict[Organization, dict[DashboardData, dict[str, Any]]] = (
-            self.get_organizations_findings()
-        )
 
-    def get_organizations_findings_summary(self) -> dict[str, Any]:
+        dashboard_service = DashboardService()
+        organizations = self.get_user_organizations()
+
+        self.organizations_findings = dashboard_service.collect_findings_dashboard(organizations)
+        self.organizations_findings_summary = self.get_organizations_findings_summary(self.organizations_findings)
+
+    def get_user_organizations(self) -> list[Organization]:
+        return [member.organization for member in OrganizationMember.objects.filter(user=self.request.user)]
+
+    def get_organizations_findings_summary(self, organizations_findings) -> dict[str, Any]:
         summary: dict[str, Any] = {
             "total_by_severity": {severity: 0 for severity in SEVERITY_OPTIONS},
             "total_by_severity_per_finding_type": {severity: 0 for severity in SEVERITY_OPTIONS},
@@ -238,18 +211,17 @@ class CrisisRoomFindings(CrisisRoomMixin, TemplateView):
 
         summary_added = False
 
-        for organization, organizations_data in self.organizations_findings.items():
-            for dashboards_data in organizations_data:
-                for report_data in dashboards_data.values():
-                    if "findings" in report_data["report_data"] and "summary" in report_data["report_data"]["findings"]:
-                        for summary_item, data in report_data["report_data"]["findings"]["summary"].items():
-                            if isinstance(data, dict):
-                                for severity, total in data.items():
-                                    summary[summary_item][severity] += total
-                                    summary_added = True
-                            else:
-                                summary[summary_item] += data
+        for organization, organizations_data in organizations_findings.items():
+            for data in organizations_data.values():
+                if "findings" in data["report_data"] and "summary" in data["report_data"]["findings"]:
+                    for summary_item, data in data["report_data"]["findings"]["summary"].items():
+                        if isinstance(data, dict):
+                            for severity, total in data.items():
+                                summary[summary_item][severity] += total
                                 summary_added = True
+                        else:
+                            summary[summary_item] += data
+                            summary_added = True
 
         if not summary_added:
             return {}
@@ -259,5 +231,5 @@ class CrisisRoomFindings(CrisisRoomMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["organizations_dashboards"] = self.organizations_findings
-        context["organizations_findings_summary"] = self.get_organizations_findings_summary()
+        context["organizations_findings_summary"] = self.organizations_findings_summary
         return context
