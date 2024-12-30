@@ -333,6 +333,10 @@ class APISchedulerEndpointTestCase(APITemplateTestCase):
         self.assertEqual(initial_item_id, response.json().get("results")[0].get("id"))
         self.assertEqual(0, self.scheduler.queue.qsize())
 
+        # Status of the item should be DISPATCHED
+        get_item = self.client.get(f"/tasks/{initial_item_id}")
+        self.assertEqual(get_item.json().get("status"), models.TaskStatus.DISPATCHED.name.lower())
+
     def test_pop_queue_not_found(self):
         mock_id = uuid.uuid4()
         response = self.client.post(f"/schedulers/{mock_id}/pop")
@@ -364,6 +368,12 @@ class APISchedulerEndpointTestCase(APITemplateTestCase):
         self.assertEqual(first_item_id, response.json().get("results")[0].get("id"))
         self.assertEqual(second_item_id, response.json().get("results")[1].get("id"))
         self.assertEqual(0, self.scheduler.queue.qsize())
+
+        # Status of the items should be DISPATCHED
+        get_first_item = self.client.get(f"/tasks/{first_item_id}")
+        get_second_item = self.client.get(f"/tasks/{second_item_id}")
+        self.assertEqual(get_first_item.json().get("status"), models.TaskStatus.DISPATCHED.name.lower())
+        self.assertEqual(get_second_item.json().get("status"), models.TaskStatus.DISPATCHED.name.lower())
 
     def test_pop_queue_filters_one_item(self):
         # Add one task to the queue

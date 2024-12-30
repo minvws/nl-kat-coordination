@@ -117,10 +117,7 @@ class PriorityQueue(abc.ABC):
         if items is None:
             return ([], 0)
 
-        # TODO: batch update
-        for item in items:
-            item.status = models.TaskStatus.DISPATCHED
-            self.pq_store.update(self.pq_id, item)
+        self.pq_store.bulk_update_status(self.pq_id, [item.id for item in items], models.TaskStatus.DISPATCHED)
 
         return items, count
 

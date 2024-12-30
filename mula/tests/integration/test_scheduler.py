@@ -184,6 +184,10 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(1, len(popped_items))
         self.assertEqual(popped_items[0].id, item.id)
 
+        # Status should be dispatched
+        task_db = self.mock_ctx.datastores.task_store.get_task(str(item.id))
+        self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
+
     def test_pop_item_from_queue_empty(self):
         self.assertEqual(0, self.scheduler.queue.qsize())
         with self.assertRaises(QueueEmptyError):

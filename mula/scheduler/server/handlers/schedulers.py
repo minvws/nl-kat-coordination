@@ -66,17 +66,17 @@ class SchedulerAPI:
     def pop(
         self,
         request: fastapi.Request,
+        scheduler_id: str,
         offset: int = 0,
         limit: int = 100,
         filters: storage.filters.FilterRequest | None = None,
     ) -> utils.PaginatedResponse:
         results, count = self.ctx.datastores.pq_store.pop(offset=offset, limit=limit, filters=filters)
 
-        # TODO: see if we can batch this
         # Update status for popped items
-        for item in results:
-            item.status = models.TaskStatus.DISPATCHED
-            self.ctx.datastores.pq_store.update(item.scheduler_id, item)
+        self.ctx.datastores.pq_store.bulk_update_status(
+            scheduler_id, [item.id for item in results], models.TaskStatus.DISPATCHED
+        )
 
         return utils.paginate(request, results, count, offset, limit)
 

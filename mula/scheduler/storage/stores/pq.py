@@ -198,3 +198,14 @@ class PriorityQueueStore:
                 .filter(models.TaskDB.scheduler_id == scheduler_id)
                 .delete(),
             )
+
+    @retry()
+    @exception_handler
+    def bulk_update_status(self, scheduler_id: str, item_ids: list[UUID], status: models.TaskStatus) -> None:
+        with self.dbconn.session.begin() as session:
+            (
+                session.query(models.TaskDB)
+                .filter(models.TaskDB.scheduler_id == scheduler_id)
+                .filter(models.TaskDB.id.in_([str(item_id) for item_id in item_ids]))
+                .update({"status": status.name}, synchronize_session=False),
+            )
