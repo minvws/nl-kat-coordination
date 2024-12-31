@@ -85,6 +85,8 @@ def get_parent_zone_soa(resolver: dns.resolver.Resolver, name: Name) -> Answer:
 def get_email_security_records(resolver: dns.resolver.Resolver, hostname: str, record_subdomain: str) -> str:
     try:
         answer = resolver.resolve(f"{record_subdomain}.{hostname}", "TXT", raise_on_no_answer=False)
+        if answer.rrset is None:
+            return "NXDOMAIN"
         return answer.response.to_text()
     except dns.resolver.NoNameservers as error:
         # no servers responded happily, we'll check the response from the first
@@ -96,7 +98,5 @@ def get_email_security_records(resolver: dns.resolver.Resolver, hostname: str, r
             if edeerror in (1, 2, 5, 6, 7, 8, 9, 10, 11, 12):  # DNSSEC error codes defined in RFC 8914
                 return "DNSSECFAIL"  # returned when the resolver indicates a DNSSEC failure.
         raise  # Not dnssec related, unhandled, raise.
-    except dns.resolver.NXDOMAIN:
-        return "NXDOMAIN"
     except dns.resolver.Timeout:
         return "Timeout"
