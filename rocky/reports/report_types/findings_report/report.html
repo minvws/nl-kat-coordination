@@ -47,8 +47,8 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if report.highest_risk_level %}
-                                            <span class="{{ report.highest_risk_level }}">{{ report.highest_risk_level|capfirst }}</span>
+                                        {% if report.report_data.highest_risk_level %}
+                                            <span class="{{ report.report_data.highest_risk_level }}">{{ report.report_data.highest_risk_level|capfirst }}</span>
                                         {% else %}
                                             -
                                         {% endif %}
@@ -102,7 +102,7 @@
                                                     {% translate "View findings report" %}
                                                 </a>
                                                 <a class="button ghost"
-                                                   href="{% ooi_url "ooi_edit" dashboard_data.recipe organization.code %}">
+                                                   href="{% ooi_url "ooi_edit" report.report.report_recipe organization.code %}">
                                                     <span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit report recipe" %}
                                                 </a>
                                             </div>
