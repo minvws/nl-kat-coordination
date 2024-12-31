@@ -2416,12 +2416,7 @@ def aggregate_report_with_sub_reports():
 
 
 @pytest.fixture
-def findings_dashboard_mock_data(mocker, client_member, client_member_b):
-    bytes_client = mocker.patch("crisis_room.views.get_bytes_client")
-
-    bytes_raw_id_a = "62258c3d-89b2-4fde-a2e0-d78715a174e6"
-    bytes_raw_id_b = "1b887350-0afb-4786-b587-4323cd8e4180"
-
+def dashboard_data(client_member, client_member_b):
     recipe_id_a = "ReportRecipe|7ebcdb32-e7f2-4c2d-840a-d7b8e6b37616"
     recipe_id_b = "ReportRecipe|c41bbf9a-7102-4b6b-b256-b3036e106316"
 
@@ -2434,6 +2429,17 @@ def findings_dashboard_mock_data(mocker, client_member, client_member_b):
         name="Crisis Room Findings Dashboard", organization=client_member_b.organization
     )
     dashboard_data_b = DashboardData.objects.create(dashboard=dashboard_b, recipe=recipe_id_b, findings_dashboard=True)
+
+    return [dashboard_data_a, dashboard_data_b]
+
+
+@pytest.fixture
+def findings_reports(client_member, client_member_b):
+    bytes_raw_id_a = "62258c3d-89b2-4fde-a2e0-d78715a174e6"
+    bytes_raw_id_b = "1b887350-0afb-4786-b587-4323cd8e4180"
+
+    recipe_id_a = "ReportRecipe|7ebcdb32-e7f2-4c2d-840a-d7b8e6b37616"
+    recipe_id_b = "ReportRecipe|c41bbf9a-7102-4b6b-b256-b3036e106316"
 
     report_a = Report(
         object_type="Report",
@@ -2452,7 +2458,7 @@ def findings_dashboard_mock_data(mocker, client_member, client_member_b):
         data_raw_id=bytes_raw_id_a,
         observed_at=datetime(2024, 12, 23, 12, 0, 32, 53194),
         parent_report=None,
-        report_recipe=Reference(dashboard_data_a.recipe),
+        report_recipe=Reference(recipe_id_a),
         has_parent=False,
     )
 
@@ -2473,10 +2479,15 @@ def findings_dashboard_mock_data(mocker, client_member, client_member_b):
         data_raw_id=bytes_raw_id_b,
         observed_at=datetime(2024, 12, 23, 11, 0, 31, 602127),
         parent_report=None,
-        report_recipe=Reference(dashboard_data_b.recipe),
+        report_recipe=Reference(recipe_id_b),
         has_parent=False,
     )
 
+    return [report_a, report_b]
+
+
+@pytest.fixture
+def findings_report_bytes_data():
     report_data_a = {
         "systems": {"services": {}},
         "services": {},
@@ -2660,16 +2671,25 @@ def findings_dashboard_mock_data(mocker, client_member, client_member_b):
             },
         },
     }
-    bytes_client().get_raw.side_effect = [
-        json.dumps(report_data_a).encode("utf-8"),
-        json.dumps(report_data_b).encode("utf-8"),
-    ]
+    return [report_data_a, report_data_b]
+
+
+@pytest.fixture
+def findings_dashboard_mock_data(dashboard_data, findings_reports, findings_report_bytes_data):
+    dashboard_data_a = dashboard_data[0]
+    dashboard_data_b = dashboard_data[1]
+
+    report_a = findings_reports[0]
+    report_b = findings_reports[1]
+
+    report_data_a = findings_report_bytes_data[0]
+    report_data_b = findings_report_bytes_data[1]
 
     return {
-        client_member.organization: [
-            {dashboard_data_a: {"report": report_a, "report_data": report_data_a, "highest_risk_level": "medium"}}
-        ],
-        client_member_b.organization: [
-            {dashboard_data_b: {"report": report_b, "report_data": report_data_b, "highest_risk_level": "medium"}}
-        ],
+        dashboard_data_a.dashboard.organization: {
+            dashboard_data_a: {"report": report_a, "report_data": report_data_a, "highest_risk_level": "medium"}
+        },
+        dashboard_data_b.dashboard.organization: {
+            dashboard_data_b: {"report": report_b, "report_data": report_data_b, "highest_risk_level": "medium"}
+        },
     }
