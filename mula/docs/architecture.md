@@ -42,15 +42,54 @@ External services used and for what purpose:
 
 ![scheduler_system.svg](./img/scheduler_system.svg)
 
+Scheduler and its external services that can result in the creation of tasks:
+
+```mermaid
+graph TB
+    Rocky["Rocky<br/>[webapp]"]
+    RabbitMQ["RabbitMQ<br/>[message broker]"]
+    Scheduler["SchedulerApp<br/>[system]"]
+    TaskRunner["Task Runner<br/>[software system]"]
+
+    Rocky-->Scheduler
+    RabbitMQ-->Scheduler
+
+    Scheduler--"Pop task of queue"-->TaskRunner
+```
+
+Scheduler and its external services that are reference to derive information
+for the creation of tasks:
+
+```mermaid
+graph TB
+    Octopoes["Octopoes<br/>[system]"]
+    Katalogus["Katalogus<br/>[system]"]
+    Bytes["Bytes<br/>[system]"]
+    Scheduler["SchedulerApp<br/>[system]"]
+
+    Octopoes-->Scheduler
+    Katalogus-->Scheduler
+    Bytes-->Scheduler
+```
+
 ### C3 Component level
 
 When we take a closer look at the `scheduler` system itself we can identify
-several components. The `SchedulerApp` directs the creation and maintenance
-of several schedulers.
+several components. The `App` directs the creation and maintenance
+of several schedulers. And the `API` that is responsible for interfacing with
+the `Scheduler` system.
 
-| Scheduler                         |
-| :-------------------------------- |
-| ![scheduler](./img/scheduler.svg) |
+```mermaid
+flowchart TB
+    subgraph "**Scheduler**<br/>[system]"
+        direction TB
+        subgraph API["API<br/>[component]"]
+        end
+        subgraph APP["App<br/>[component]"]
+        end
+        API-->APP
+    end
+```
 
 Typically in a OpenKAT installation 3 scheduler will be created
 
@@ -59,13 +98,9 @@ Typically in a OpenKAT installation 3 scheduler will be created
 3. _report scheduler_
 
 Each scheduler type implements it's own priority queue, and can implement it's
-own processes of populating, and prioritization of its tasks.
-
-![queue.svg](./img/queue.svg)
-
-Interaction with the scheduler and access to the internals of the
-`SchedulerApp` can be achieved by interfacing with the `Server`. Which
-implements a HTTP REST API interface.
+own processes of populating, and prioritization of its tasks. Interaction with
+the scheduler and access to the internals of the `App` can be achieved by
+interfacing with the `Server`. Which implements a HTTP REST API interface.
 
 ## Dataflows
 
