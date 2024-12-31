@@ -122,6 +122,7 @@ class DashboardService:
     @staticmethod
     def get_organizations_findings(report_data: dict[str, Any]) -> dict[str, Any]:
         findings = {}
+        highest_risk_level = ""
         if "findings" in report_data and report_data["findings"]:
             finding_types = report_data["findings"]["finding_types"]
             highest_risk_level = finding_types[0]["finding_type"]["risk_severity"]
@@ -134,7 +135,7 @@ class DashboardService:
             )
             report_data["findings"]["finding_types"] = critical_high_finding_types[:25]
 
-            findings = report_data | {"highest_risk_level": highest_risk_level}
+        findings = report_data | {"highest_risk_level": highest_risk_level}
         return findings
 
     @staticmethod
@@ -185,23 +186,10 @@ class DashboardService:
 
         return findings_dashboard
 
-
-class CrisisRoomFindings(DashboardService, TemplateView):
-    template_name = "crisis_room_findings.html"
-
-    def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
-        super().setup(request, *args, **kwargs)
-
-        dashboard_service = DashboardService()
-        organizations = self.get_user_organizations()
-
-        self.organizations_findings = dashboard_service.collect_findings_dashboard(organizations)
-        self.organizations_findings_summary = self.get_organizations_findings_summary(self.organizations_findings)
-
-    def get_user_organizations(self) -> list[Organization]:
-        return [member.organization for member in OrganizationMember.objects.filter(user=self.request.user)]
-
-    def get_organizations_findings_summary(self, organizations_findings) -> dict[str, Any]:
+    @staticmethod
+    def get_organizations_findings_summary(
+        organizations_findings: dict[Organization, dict[DashboardData, dict[str, Any]]],
+    ) -> dict[str, Any]:
         summary: dict[str, Any] = {
             "total_by_severity": {severity: 0 for severity in SEVERITY_OPTIONS},
             "total_by_severity_per_finding_type": {severity: 0 for severity in SEVERITY_OPTIONS},
@@ -227,6 +215,24 @@ class CrisisRoomFindings(DashboardService, TemplateView):
             return {}
 
         return summary
+
+
+class CrisisRoomFindings(TemplateView):
+    template_name = "crisis_room_findings.html"
+
+    def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
+        super().setup(request, *args, **kwargs)
+
+        dashboard_service = DashboardService()
+        organizations = self.get_user_organizations()
+
+        self.organizations_findings = dashboard_service.collect_findings_dashboard(organizations)
+        self.organizations_findings_summary = dashboard_service.get_organizations_findings_summary(
+            self.organizations_findings
+        )
+
+    def get_user_organizations(self) -> list[Organization]:
+        return [member.organization for member in OrganizationMember.objects.filter(user=self.request.user)]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

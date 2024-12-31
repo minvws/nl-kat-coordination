@@ -2578,6 +2578,7 @@ def findings_report_bytes_data():
                 "optional": ["leakix", "snyk", "service_banner", "shodan"],
             },
         },
+        "highest_risk_level": "medium",
     }
 
     report_data_b = {
@@ -2670,6 +2671,7 @@ def findings_report_bytes_data():
                 "optional": ["leakix", "snyk", "service_banner", "shodan"],
             },
         },
+        "highest_risk_level": "medium",
     }
     return [report_data_a, report_data_b]
 
