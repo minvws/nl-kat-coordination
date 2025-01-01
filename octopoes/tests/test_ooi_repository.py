@@ -137,13 +137,9 @@ class OOIRepositoryTest(TestCase):
     def test_parse_as(self):
         assert self.repository.parse_as(int, "6") == 6
         assert self.repository.parse_as(int, ["9", "9", "9"]) == tuple([9, 9, 9])
-        assert self.repository.parse_as(int, set((3 * "9 ").split())) == frozenset([9])
-        assert self.repository.parse_as(int, {"1", "2", "5"}) == frozenset([1, 2, 5])
 
         assert self.repository.parse_as(str, "potato") == "potato"
         assert self.repository.parse_as(str, ["potato", "piper"]) == tuple(["potato", "piper"])
-        assert self.repository.parse_as(str, {"potato", "piper"}) == frozenset(["potato", "piper"])
-        assert self.repository.parse_as(str, set((2 * "potato ").split())) == frozenset(["potato"])
 
         assert self.repository.parse_as(dict, {"potato1": "piper", "potato2": "king-edward"}) == {
             "potato1": "piper",

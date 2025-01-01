@@ -286,12 +286,6 @@ class XTDBOOIRepository(OOIRepository):
                 return tuple(cls.parse_as(type_t, o) for o, type_t in zip(obj, type_))
             else:
                 return tuple(cls.parse_as(type_, o) for o in obj)
-        elif isinstance(obj, set):
-            # set --> frozenset
-            if isinstance(type_, list):
-                return frozenset(cls.parse_as(type_t, o) for o, type_t in zip(obj, type_))
-            else:
-                return frozenset(cls.parse_as(type_, o) for o in obj)
         else:
             # assume a simple type
             if isinstance(type_, list):

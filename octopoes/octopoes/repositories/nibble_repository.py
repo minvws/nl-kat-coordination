@@ -5,18 +5,20 @@ from octopoes.models.transaction import TransactionRecord
 from octopoes.repositories.repository import Repository
 from octopoes.xtdb.client import XTDBSession
 
+NibbleINI = dict[str, Any]
+
 
 class NibbleRepository(Repository):
-    def get(self, nibble: str, valid_time: datetime) -> dict[str, Any]:
+    def get(self, nibble: str, valid_time: datetime) -> NibbleINI:
         raise NotImplementedError
 
-    def get_all(self, valid_time: datetime) -> list[dict[str, Any]]:
+    def get_all(self, valid_time: datetime) -> list[NibbleINI]:
         raise NotImplementedError
 
-    def put(self, ini: dict[str, Any], valid_time: datetime):
+    def put(self, ini: NibbleINI, valid_time: datetime):
         raise NotImplementedError
 
-    def put_many(self, inis: list[dict[str, Any]], valid_time: datetime):
+    def put_many(self, inis: list[NibbleINI], valid_time: datetime):
         raise NotImplementedError
 
     def history(self, nibble: str, with_docs: bool = False) -> list[TransactionRecord]:
@@ -29,36 +31,36 @@ class XTDBNibbleRepository(NibbleRepository):
 
     @classmethod
     def _xtid(cls, nibble: str) -> str:
-        return f"NibbleIni|{nibble}"
+        return f"NibbleINI|{nibble}"
 
     @classmethod
-    def _inify(cls, ini: dict[str, Any]) -> dict[str, Any]:
-        ini["type"] = "NibbleIni"
+    def _serialize(cls, ini: NibbleINI) -> NibbleINI:
+        ini["type"] = "NibbleINI"
         ini["xt/id"] = cls._xtid(ini["id"])
         return ini
 
     @classmethod
-    def _deinify(cls, ini: dict[str, Any]) -> dict[str, Any]:
+    def _deserialize(cls, ini: NibbleINI) -> NibbleINI:
         ini.pop("type", None)
         ini.pop("xt/id", None)
         return ini
 
-    def get(self, nibble: str, valid_time: datetime) -> dict[str, Any]:
-        return self._deinify(self.session.client.get_entity(self._xtid(nibble), valid_time))
+    def get(self, nibble: str, valid_time: datetime) -> NibbleINI:
+        return self._deserialize(self.session.client.get_entity(self._xtid(nibble), valid_time))
 
-    def get_all(self, valid_time: datetime) -> list[dict[str, Any]]:
+    def get_all(self, valid_time: datetime) -> list[NibbleINI]:
         result = self.session.client.query(
-            '{:query {:find [(pull ?var [*])] :where [[?var :type "NibbleIni"]]}}', valid_time
+            '{:query {:find [(pull ?var [*])] :where [[?var :type "NibbleINI"]]}}', valid_time
         )
-        return [self._deinify(item[0]) for item in result]
+        return [self._deserialize(item[0]) for item in result]
 
-    def put(self, ini: dict[str, Any], valid_time: datetime):
-        self.session.put(self._inify(ini), valid_time)
+    def put(self, ini: NibbleINI, valid_time: datetime):
+        self.session.put(self._serialize(ini), valid_time)
         self.commit()
 
-    def put_many(self, inis: list[dict[str, Any]], valid_time: datetime):
+    def put_many(self, inis: list[NibbleINI], valid_time: datetime):
         for ini in inis:
-            self.session.put(self._inify(ini), valid_time)
+            self.session.put(self._serialize(ini), valid_time)
         self.commit()
 
     def history(self, nibble: str, with_docs: bool = False) -> list[TransactionRecord]:

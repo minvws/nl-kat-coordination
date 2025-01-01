@@ -584,14 +584,14 @@ def migrate_origins(
     session.commit()  # The save-delete order is important to avoid garbage collection of the results
 
 
-@router.get("/nibbles/list", tags=["nibbles"])
+@router.get("/nibbles", tags=["nibbles"])
 def nibbles_list(octopoes: OctopoesService = Depends(octopoes_service)) -> list[str]:
     return octopoes.nibbler.list_nibbles()
 
 
-@router.get("/nibbles/list_enabled", tags=["nibbles"])
-def nibbles_list_enabled(octopoes: OctopoesService = Depends(octopoes_service)) -> list[str]:
-    return [nibble.id for nibble in octopoes.nibbler.nibbles.values() if nibble.enabled]
+@router.get("/nibbles/status", tags=["nibbles"])
+def nibbles_list_enabled(enabled: bool = True, octopoes: OctopoesService = Depends(octopoes_service)) -> list[str]:
+    return [nibble.id for nibble in octopoes.nibbler.nibbles.values() if nibble.enabled == enabled]
 
 
 @router.get("/nibbles/update", tags=["nibbles"])
