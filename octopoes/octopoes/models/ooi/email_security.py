@@ -31,8 +31,20 @@ class DNSSPFRecord(OOI):
         return f"SPF Record of {reference.tokenized.dns_txt_record.hostname.name}"
 
 
-# functional syntax due to special chars
-MechanismQualifier = Enum("MechanismQualifier", [("+", "Allow"), ("-", "Fail"), ("~", "Softfail"), ("?", "Neutral")])
+class MechanismQualifier(Enum):
+    ALLOW = "+"
+    FAIL = "-"
+    SOFTFAIL = "~"
+    NEUTRAL = "?"
+
+    # the string representation maps to a human readable format of the qualifier
+    def __str__(self):
+        return {
+            MechanismQualifier.ALLOW: "Allow",
+            MechanismQualifier.FAIL: "Fail",
+            MechanismQualifier.SOFTFAIL: "Softfail",
+            MechanismQualifier.NEUTRAL: "Neutral",
+        }[self]
 
 
 class DNSSPFMechanism(OOI):
@@ -44,7 +56,7 @@ class DNSSPFMechanismIP(DNSSPFMechanism):
     object_type: Literal["DNSSPFMechanismIP"] = "DNSSPFMechanismIP"
 
     ip: Reference = ReferenceField(IPAddress)
-    qualifier: MechanismQualifier = MechanismQualifier["+"]
+    qualifier: MechanismQualifier = MechanismQualifier.ALLOW
 
     _natural_key_attrs = ["spf_record", "mechanism", "ip", "qualifier"]
     _information_value = ["mechanism", "qualifier"]
