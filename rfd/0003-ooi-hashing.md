@@ -2,7 +2,7 @@
 authors: (@originalsouth)
 state: draft
 discussion: https://github.com/minvws/nl-kat-coordination/pull/4004
-labels: hashing, pydantic, ooi
+labels: hashing, pydantic, ooi, octopoes
 ---
 
 # RFD 0003: OOI Hashing
