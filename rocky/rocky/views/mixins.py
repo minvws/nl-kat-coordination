@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from functools import cached_property
@@ -14,7 +14,7 @@ from django.http import Http404, HttpRequest
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from httpx import HTTPError
-from katalogus.client import Boefje, get_katalogus
+from katalogus.client import Boefje
 from pydantic import BaseModel
 from tools.forms.base import ObservedAtForm
 from tools.forms.settings import DEPTH_DEFAULT, DEPTH_MAX
@@ -22,9 +22,9 @@ from tools.models import Organization
 from tools.ooi_helpers import get_knowledge_base_data_for_ooi_store
 from tools.view_helpers import convert_date_to_datetime, get_ooi_url
 
-from octopoes.connector import ObjectNotFoundException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
+from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.ooi.reports import Report
@@ -135,7 +135,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
             logger.error(e)
             return results
 
-        katalogus = get_katalogus(organization.code)
+        katalogus = self.get_katalogus()
 
         for origin in origins:
             origin = OriginData(origin=origin)
@@ -168,7 +168,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
 
         return results
 
-    def handle_connector_exception(self, exception: Exception):
+    def handle_connector_exception(self, exception: Exception) -> None:
         if isinstance(exception, ObjectNotFoundException):
             raise Http404("OOI not found")
 
@@ -205,6 +205,8 @@ class OOIList:
 
     @cached_property
     def count(self) -> int:
+        if not self.ooi_types:
+            return 0
         return self.octopoes_connector.list_objects(
             self.ooi_types,
             valid_time=self.valid_time,
@@ -218,6 +220,8 @@ class OOIList:
         return self.count
 
     def __getitem__(self, key: int | slice) -> list[OOI]:
+        if not self.ooi_types:
+            return []
         if isinstance(key, slice):
             offset = key.start or 0
             limit = OOIList.HARD_LIMIT
@@ -257,7 +261,7 @@ class FindingList:
         self,
         octopoes_connector: OctopoesAPIConnector,
         valid_time: datetime,
-        severities: set[RiskLevelSeverity],
+        severities: Iterable[RiskLevelSeverity],
         exclude_muted: bool = True,
         only_muted: bool = False,
         search_string: str | None = None,
@@ -490,7 +494,7 @@ class SingleOOIMixin(OctopoesView):
             },
         ]
 
-    def get_ooi_properties(self, ooi: OOI):
+    def get_ooi_properties(self, ooi: OOI) -> dict:
         class_relations = get_relations(ooi.__class__)
         props = {field_name: value for field_name, value in ooi if field_name not in class_relations}
 

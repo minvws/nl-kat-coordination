@@ -9,6 +9,8 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.utils.translation import gettext_lazy as _
 from django.views import View
+from django.views.generic.base import ContextMixin
+from katalogus.client import KATalogus, get_katalogus
 from rest_framework.exceptions import ValidationError
 from rest_framework.request import Request
 from tools.models import Indemnification, Organization, OrganizationMember
@@ -30,7 +32,7 @@ class OrganizationPermLookupDict:
     def __init__(self, organization_member, app_label):
         self.organization_member, self.app_label = organization_member, app_label
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self.organization_member.get_all_permissions)
 
     def __getitem__(self, perm_name):
@@ -49,7 +51,7 @@ class OrganizationPermWrapper:
     def __init__(self, organization_member):
         self.organization_member = organization_member
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.__class__.__qualname__}({self.organization_member!r})"
 
     def __getitem__(self, app_label):
@@ -70,7 +72,7 @@ class OrganizationPermWrapper:
         return self[app_label][perm_name]
 
 
-class OrganizationView(View):
+class OrganizationView(ContextMixin, View):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
@@ -109,8 +111,13 @@ class OrganizationView(View):
         if self.organization_member.blocked:
             raise PermissionDenied()
 
-        self.octopoes_api_connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization_code)
+        self.octopoes_api_connector = OctopoesAPIConnector(
+            settings.OCTOPOES_API, organization_code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+        )
         self.bytes_client = get_bytes_client(organization_code)
+
+    def get_katalogus(self) -> KATalogus:
+        return get_katalogus(self.organization_member)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -250,7 +257,9 @@ class OrganizationAPIMixin:
 
     @cached_property
     def octopoes_api_connector(self) -> OctopoesAPIConnector:
-        return OctopoesAPIConnector(settings.OCTOPOES_API, self.organization.code)
+        return OctopoesAPIConnector(
+            settings.OCTOPOES_API, self.organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+        )
 
     @cached_property
     def bytes_client(self) -> BytesClient:

@@ -19,3 +19,4 @@ class Plugin(BaseModel):
     produces: list[str]
     cron: str | None = None
     interval: int | None = None
+    run_on: list[str] | None = None

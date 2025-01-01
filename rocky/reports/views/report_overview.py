@@ -1,16 +1,23 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
+from uuid import uuid4
 
 import structlog
 from django.contrib import messages
+from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
+from pydantic import TypeAdapter, ValidationError
+from tools.ooi_helpers import create_ooi
 
-from octopoes.models import Reference
+from octopoes.models import OOI, Reference
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.reports import Report, ReportRecipe
-from reports.views.base import ReportBreadcrumbs, get_selection
+from reports.report_types.aggregate_organisation_report.report import aggregate_reports
+from reports.report_types.helpers import get_report_by_id
+from reports.views.base import ReportBreadcrumbs, ReportDataDict, get_selection
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import OctopoesView, ReportList
 from rocky.views.scheduler import SchedulerView
@@ -65,9 +72,11 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
                         recipe_tree = recipe_ooi_tree.store.values()
                         recipe_ooi = next(ooi for ooi in recipe_tree if isinstance(ooi, ReportRecipe))
                         report_oois = [ooi for ooi in recipe_tree if isinstance(ooi, Report)]
+                        report_oois.sort(key=lambda ooi: ooi.date_generated, reverse=True)
                         recipes.append(
                             {
                                 "schedule_id": schedule["id"],
+                                "enabled": schedule["enabled"],
                                 "recipe": recipe_ooi,
                                 "cron": schedule["schedule"],
                                 "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
@@ -83,6 +92,54 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
         return context
 
 
+class ScheduledReportsEnableDisableView(BreadcrumbsReportOverviewView, SchedulerView, ListView):
+    """
+    Cancel the selected report(s)
+    """
+
+    task_type = "report"
+    template_name = "report_overview/scheduled_reports.html"
+
+    def get_queryset(self) -> ReportList:
+        return ReportList(self.octopoes_api_connector, valid_time=self.observed_at)
+
+    def get(self, request, *args, **kwargs) -> HttpResponse:
+        schedule_id = request.GET.get("schedule_id")
+        schedule = self.get_schedule_details(schedule_id)
+        is_schedule_enabled = schedule.enabled
+
+        self.edit_report_schedule(schedule_id, {"enabled": not is_schedule_enabled})
+
+        logger.info(
+            _("Schedule {}").format("disabled" if is_schedule_enabled else "enabled"),
+            event_code="0800081" if is_schedule_enabled else "0800082",
+            schedule_id=schedule_id,
+        )
+
+        report_recipe_id = schedule.data["report_recipe_id"]
+        report_recipe = self.octopoes_api_connector.get(
+            Reference.from_str(f"ReportRecipe|{report_recipe_id}"), valid_time=datetime.now(timezone.utc)
+        )
+
+        if is_schedule_enabled:
+            messages.success(
+                self.request,
+                _(
+                    "Schedule disabled successfully. '{}' will not be generated "
+                    "automatically until the schedule is enabled again."
+                ).format(report_recipe.report_name_format),
+            )
+        else:
+            messages.success(
+                self.request,
+                _("Schedule enabled successfully. '{}' will be generated according to schedule.").format(
+                    report_recipe.report_name_format
+                ),
+            )
+
+        return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
+
+
 class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     """
     Shows all the reports that have ever been generated for the organization.
@@ -93,12 +150,216 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     paginator = RockyPaginator
     template_name = "report_overview/report_history.html"
 
+    def post(self, request, *args, **kwargs):
+        try:
+            self.run_bulk_actions()
+        except (ObjectNotFoundException, ValidationError):
+            messages.error(request, _("An unexpected error occurred, please check logs for more info."))
+        return self.get(request, *args, **kwargs)
+
     def get_queryset(self) -> ReportList:
         return ReportList(self.octopoes_api_connector, valid_time=self.observed_at)
+
+    def get_report_ooi(self, ooi_pk: str) -> Report:
+        return self.octopoes_api_connector.get(Reference.from_str(f"{ooi_pk}"), valid_time=datetime.now(timezone.utc))
+
+    def run_bulk_actions(self) -> None:
+        action = self.request.POST.get("action", "")
+        report_references = self.request.POST.getlist("report_reference", [])
+
+        if action == "rename":
+            return self.rename_reports(report_references)
+
+        if action == "delete":
+            return self.delete_reports(report_references)
+
+        if action == "rerun":
+            return self.rerun_reports(report_references)
+
+    def delete_reports(self, report_references: list[Reference]) -> None:
+        self.octopoes_api_connector.delete_many(report_references, datetime.now(timezone.utc))
+        logger.info("Reports deleted", event_code=800073, reports=report_references)
+        messages.success(self.request, _("Deletion successful."))
+
+    def rerun_reports(self, report_references: list[str]) -> None:
+        for report_id in report_references:
+            actual_report_ooi = self.get_report_ooi(report_id)
+
+            # First create new parent report and then create all subreports with new parent reference
+            if actual_report_ooi.report_type == "concatenated-report":
+                self.rerun_concatenated_report(actual_report_ooi)
+
+            elif actual_report_ooi.report_type == "aggregate-organisation-report":
+                self.rerun_aggregate_report(actual_report_ooi)
+
+            elif actual_report_ooi.report_type == "multi-organization-report":
+                return messages.warning(
+                    self.request,
+                    _(
+                        "Multi organization reports cannot be rescheduled. "
+                        "It consists of imported data from different organizations and not based on new generated data."
+                    ),
+                )
+
+            else:
+                self.rerun_single_report(actual_report_ooi)
+        messages.success(self.request, _("Rerun successful"))
+
+    def get_input_data(self, report_ooi: Report) -> dict[str, Any]:
+        self.bytes_client.login()
+
+        report_data = TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
+            self.bytes_client.get_raw(raw_id=report_ooi.data_raw_id)
+        )
+
+        return {
+            "input_data": {
+                "input_oois": report_data["input_data"]["input_oois"],
+                "report_types": report_data["input_data"]["report_types"],
+                "plugins": report_data["input_data"]["plugins"],
+            }
+        }
+
+    def get_input_oois(self, ooi_pks: list[str]) -> list[OOI]:
+        return [
+            self.octopoes_api_connector.get(Reference.from_str(ooi), valid_time=self.observed_at) for ooi in ooi_pks
+        ]
+
+    def recreate_report(
+        self, report_ooi: Report, observed_at: datetime, bytes_id: str, parent_report_ooi: Report | None = None
+    ) -> Report:
+        """Recreate a report with new UUID, observed_at and (bytes) data."""
+
+        new_report_ooi = Report(
+            name=report_ooi.name,
+            report_type=report_ooi.report_type,
+            template=report_ooi.template,
+            report_id=uuid4(),
+            organization_code=report_ooi.organization_code,
+            organization_name=report_ooi.organization_name,
+            organization_tags=report_ooi.organization_tags,
+            data_raw_id=bytes_id,
+            date_generated=observed_at,
+            input_oois=report_ooi.input_oois,
+            observed_at=observed_at,
+            parent_report=report_ooi.parent_report if parent_report_ooi is None else parent_report_ooi.reference,
+            report_recipe=report_ooi.report_recipe,
+            has_parent=report_ooi.has_parent if parent_report_ooi is None else True,
+        )
+
+        create_ooi(self.octopoes_api_connector, self.bytes_client, new_report_ooi, observed_at)
+        logger.info("Report created", event_code=800071, report=new_report_ooi)
+
+        return new_report_ooi
+
+    def rerun_single_report(self, report_ooi: Report) -> None:
+        observed_at = datetime.now(timezone.utc)
+        report_input_data = self.get_input_data(report_ooi)
+        report_type = get_report_by_id(report_ooi.report_type)
+
+        report_data = report_type(self.octopoes_api_connector).collect_data(report_ooi.input_oois, observed_at)
+        bytes_id = self.bytes_client.upload_raw(
+            raw=ReportDataDict({"report_data": report_data} | report_input_data).model_dump_json().encode(),
+            manual_mime_types={"openkat/report"},
+        )
+        self.recreate_report(report_ooi, observed_at, bytes_id)
+
+    def rerun_aggregate_report(self, report_ooi: Report) -> None:
+        observed_at = datetime.now(timezone.utc)
+        report_input_data = self.get_input_data(report_ooi)
+        report_types = report_input_data["input_data"]["report_types"]
+
+        _, post_processed_data, _, _ = aggregate_reports(
+            self.octopoes_api_connector,
+            self.get_input_oois(report_ooi.input_oois),
+            report_types,
+            observed_at,
+            report_ooi.organization_code,
+        )
+
+        bytes_id = self.bytes_client.upload_raw(
+            raw=ReportDataDict(post_processed_data | report_input_data).model_dump_json().encode(),
+            manual_mime_types={"openkat/report"},
+        )
+
+        self.recreate_report(report_ooi, observed_at, bytes_id)
+
+    def rerun_concatenated_report(self, report_ooi: Report) -> None:
+        observed_at = datetime.now(timezone.utc)
+        report_input_data = self.get_input_data(report_ooi)
+
+        bytes_id = self.bytes_client.upload_raw(
+            raw=ReportDataDict(report_input_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
+        )
+
+        parent_ooi = self.recreate_report(report_ooi, observed_at, bytes_id)
+
+        subreports = self.octopoes_api_connector.query(
+            "Report.<parent_report[is Report]", valid_time=observed_at, source=report_ooi.reference
+        )
+
+        for subreport_ooi in subreports:
+            sub_report_type = get_report_by_id(subreport_ooi.report_type)
+            sub_report_data = sub_report_type(self.octopoes_api_connector).collect_data(
+                subreport_ooi.input_oois, observed_at
+            )
+            for ooi, data in sub_report_data.items():
+                required_plugins = list(report_input_data["input_data"]["plugins"]["required"])
+                optional_plugins = list(report_input_data["input_data"]["plugins"]["optional"])
+
+                child_plugins: dict[str, list[str]] = {"required": [], "optional": []}
+
+                child_plugins["required"] = [
+                    plugin_id for plugin_id in required_plugins if plugin_id in sub_report_type.plugins["required"]
+                ]
+                child_plugins["optional"] = [
+                    plugin_id for plugin_id in optional_plugins if plugin_id in sub_report_type.plugins["optional"]
+                ]
+
+                child_input_data = {
+                    "input_data": {
+                        "input_oois": [ooi],
+                        "report_types": [subreport_ooi.report_type],
+                        "plugins": child_plugins,
+                    }
+                }
+
+                bytes_id_subreport = self.bytes_client.upload_raw(
+                    raw=ReportDataDict({"report_data": data} | child_input_data).model_dump_json().encode(),
+                    manual_mime_types={"openkat/report"},
+                )
+
+                self.recreate_report(subreport_ooi, observed_at, bytes_id_subreport, parent_ooi)
+
+    def rename_reports(self, report_references: list[str]) -> None:
+        report_names = self.request.POST.getlist("report_name", [])
+        error_reports = []
+
+        if not report_references or not report_names:
+            messages.error(self.request, _("Renaming failed. Empty report name found."))
+
+        if len(report_references) != len(report_names):
+            messages.error(self.request, _("Report names and reports does not match."))
+
+        for index, report_id in enumerate(report_references):
+            report_ooi = self.get_report_ooi(report_id)
+            report_ooi.name = report_names[index]
+
+            try:
+                create_ooi(self.octopoes_api_connector, self.bytes_client, report_ooi, datetime.now(timezone.utc))
+            except ValidationError:
+                error_reports.append(f'"{report_ooi.name}"')
+
+        if not error_reports:
+            logger.info("Reports created", event_code=800071, reports=report_references)
+            return messages.success(self.request, _("Reports successfully renamed."))
+
+        return messages.error(self.request, _("Report {} could not be renamed.").format(", ".join(error_reports)))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["total_oois"] = len(self.object_list)
+        context["selected_reports"] = self.request.GET.getlist("report", [])
         return context
 
 

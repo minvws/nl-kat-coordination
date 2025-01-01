@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.views.generic.edit import FormView
 from tools.forms.boefje import BoefjeSetupForm
 
-from katalogus.client import Boefje, DuplicatePluginError, KATalogusNotAllowedError, get_katalogus
+from katalogus.client import Boefje, DuplicatePluginError, KATalogusNotAllowedError
 from octopoes.models.types import type_by_name
 
 logger = structlog.get_logger(__name__)
@@ -23,9 +23,8 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.katalogus = get_katalogus(self.organization.code)
-        self.plugin_id = uuid.uuid4()
-        self.created = str(datetime.now())
+        self.plugin_id = str(uuid.uuid4())
+        self.created: str | None = str(datetime.now())
         self.query_params = urlencode({"new_variant": True})
 
     def get_success_url(self) -> str:
@@ -44,8 +43,7 @@ class AddBoefjeView(BoefjeSetupView):
         plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
 
         try:
-            logger.info("Creating boefje", event_code=800025, boefje=plugin)
-            self.katalogus.create_plugin(plugin)
+            self.get_katalogus().create_plugin(plugin)
             return super().form_valid(form)
         except DuplicatePluginError as error:
             if "name" in error.message:
@@ -74,7 +72,7 @@ class AddBoefjeVariantView(BoefjeSetupView):
 
         self.based_on_plugin_id = self.kwargs.get("plugin_id")
 
-        self.plugin = self.katalogus.get_plugin(self.based_on_plugin_id)
+        self.plugin = self.get_katalogus().get_plugin(self.based_on_plugin_id)
 
     def get_initial(self):
         initial = super().get_initial()
@@ -99,8 +97,7 @@ class AddBoefjeVariantView(BoefjeSetupView):
         plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
 
         try:
-            logger.info("Creating boefje", event_code=800025, boefje=plugin)
-            self.katalogus.create_plugin(plugin)
+            self.get_katalogus().create_plugin(plugin)
             return super().form_valid(form)
         except DuplicatePluginError as error:
             if "name" in error.message:
@@ -141,7 +138,7 @@ class EditBoefjeView(BoefjeSetupView):
 
         self.plugin_id = self.kwargs.get("plugin_id")
         self.query_params = urlencode({"new_variant": False})
-        self.plugin = self.katalogus.get_plugin(self.plugin_id)
+        self.plugin = self.get_katalogus().get_plugin(self.plugin_id)
         self.created = self.plugin.created
 
     def get_initial(self):
@@ -169,8 +166,7 @@ class EditBoefjeView(BoefjeSetupView):
         plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
 
         try:
-            logger.info("Editing boefje", event_code=800026, boefje=plugin)
-            self.katalogus.edit_plugin(plugin)
+            self.get_katalogus().edit_plugin(plugin)
             return super().form_valid(form)
         except DuplicatePluginError as error:
             if "name" in error.message:
@@ -210,7 +206,7 @@ class EditBoefjeView(BoefjeSetupView):
         return context
 
 
-def create_boefje_with_form_data(form_data, plugin_id: str, created: str):
+def create_boefje_with_form_data(form_data, plugin_id: str, created: str | None):
     arguments = [] if not form_data["oci_arguments"] else form_data["oci_arguments"].split()
     consumes = [] if not form_data["consumes"] else form_data["consumes"].strip("[]").replace("'", "").split(", ")
     produces = [] if not form_data["produces"] else form_data["produces"].split(",")

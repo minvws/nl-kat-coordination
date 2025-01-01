@@ -4,6 +4,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 from scheduler import config, models, storage
+from scheduler.storage import stores
 
 from tests.factories import OrganisationFactory
 from tests.utils import functions
@@ -23,8 +24,8 @@ class StoreTestCase(unittest.TestCase):
 
         self.mock_ctx.datastores = SimpleNamespace(
             **{
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
-                storage.TaskStore.name: storage.TaskStore(self.dbconn),
+                stores.PriorityQueueStore.name: stores.PriorityQueueStore(self.dbconn),
+                stores.TaskStore.name: stores.TaskStore(self.dbconn),
             }
         )
 

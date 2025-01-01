@@ -3,10 +3,11 @@ import uuid
 from pathlib import Path
 
 import pytest
-from tools.upgrade_v1_16_0 import upgrade
+from tools.upgrade_v1_17_0 import upgrade
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import BASE_DIR
+from boefjes.models import Organisation
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
@@ -15,6 +16,7 @@ from tests.conftest import seed_system
 from tests.loading import get_boefje_meta, get_normalizer_meta
 
 
+@pytest.mark.skipif("not os.getenv('DATABASE_MIGRATION')")
 @pytest.mark.slow
 def test_migration(
     octopoes_api_connector: OctopoesAPIConnector,
@@ -24,6 +26,9 @@ def test_migration(
 ):
     octopoes_api_connector.session._timeout.connect = 60
     octopoes_api_connector.session._timeout.read = 60
+
+    # Create an organisation that does not exist in Octopoes
+    organisation_storage.create(Organisation(id="test2", name="Test 2"))
 
     iterations = 30
     cache_path = Path(BASE_DIR.parent / ".ci" / f".cache_{iterations}.json")
@@ -111,3 +116,8 @@ def test_migration(
     assert observation.source_method == "boefje_udp"
 
     assert octopoes_api_connector.list_objects(set(), valid_time).count == total_oois
+
+
+@pytest.mark.slow
+def test_plugins_bench(plugin_service, organisation):
+    plugin_service.get_all(organisation.id)
