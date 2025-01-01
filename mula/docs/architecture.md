@@ -29,47 +29,44 @@ combines data from the `Octopoes`, `Katalogus`, `Bytes` and `RabbitMQ` systems.
 
 External services used and for what purpose:
 
-- Octopoes; retrieval of ooi information
-
 - RabbitMQ; messaging queues to notify the scheduler of scan level changes
   and the creation of raw files from bytes
+
+- Rocky; interfaces with the scheduler through its rest api
+
+- Octopoes; retrieval of ooi information
 
 - Katalogus; retrieval of plugin and organization information
 
 - Bytes; retrieval of raw file information
 
-- Rocky; interfaces with the scheduler through its rest api
-
-![scheduler_system.svg](./img/scheduler_system.svg)
-
-Scheduler and its external services that can result in the creation of tasks:
-
 ```mermaid
-graph TB
-    Rocky["Rocky<br/>[webapp]"]
-    RabbitMQ["RabbitMQ<br/>[message broker]"]
-    Scheduler["SchedulerApp<br/>[system]"]
-    TaskRunner["Task Runner<br/>[software system]"]
+flowchart TB
+    subgraph "External informational services"
+        Octopoes["Octopoes<br/>[system]"]
+        Katalogus["Katalogus<br/>[system]"]
+        Bytes["Bytes<br/>[system]"]
+    end
+    subgraph "Task creation services"
+        Rocky["Rocky<br/>[webapp]"]
+        RabbitMQ["RabbitMQ<br/>[message broker]"]
+    end
+
+    Scheduler["Scheduler<br/>[system]"]
+
+    subgraph "Task handling services"
+        TaskRunner["Task Runner<br/>[software system]"]
+    end
 
     Rocky-->Scheduler
     RabbitMQ-->Scheduler
 
-    Scheduler--"Pop task of queue"-->TaskRunner
-```
-
-Scheduler and its external services that are reference to derive information
-for the creation of tasks:
-
-```mermaid
-graph TB
-    Octopoes["Octopoes<br/>[system]"]
-    Katalogus["Katalogus<br/>[system]"]
-    Bytes["Bytes<br/>[system]"]
-    Scheduler["SchedulerApp<br/>[system]"]
-
     Octopoes-->Scheduler
     Katalogus-->Scheduler
     Bytes-->Scheduler
+
+
+    Scheduler--"Pop task of queue"-->TaskRunner
 ```
 
 ### C3 Component level
@@ -83,11 +80,11 @@ the `Scheduler` system.
 flowchart TB
     subgraph "**Scheduler**<br/>[system]"
         direction TB
-        subgraph API["API<br/>[component]"]
+        subgraph Server["**API**<br/>[component]<br/>REST API"]
         end
-        subgraph APP["App<br/>[component]"]
+        subgraph App["**App**<br/>[component]<br/>Main python application"]
         end
-        API-->APP
+        Server-->App
     end
 ```
 
@@ -122,7 +119,22 @@ responsible for maintaining a queue of tasks for `Task Runners` to pick up and
 process. A `Scheduler` is responsible for creating `Task` objects and pushing
 them onto the queue.
 
-![tasks.svg](./img/tasks.svg)
+```mermaid
+flowchart LR
+    subgraph "**Scheduler**<br/>[system]"
+        direction LR
+        subgraph Scheduler["**Scheduler**<br/>[component]<br/>"]
+            direction LR
+            Process["Task creation process"]
+            subgraph PriorityQueue["PriorityQueue"]
+                Task0
+                Task1[...]
+                TaskN
+            end
+        end
+        Process-->PriorityQueue
+    end
+```
 
 The `PriorityQueue` derives its state from the state of the `Task` objects that
 are persisted in the database. In other words, the current state of the
@@ -219,8 +231,6 @@ A `Schedule` will use the _'blueprint'_ that is defined in its `data` field (thi
 is the same as the `data` field of a `Task`) to generate a `Task` object to be
 pushed on the queue of a `Scheduler`.
 
-![schedules.svg](./img/schedules.svg)
-
 A `Schedule` object contains the following fields:
 
 | Field          | Description                                                                                                        |
@@ -284,7 +294,28 @@ Before a `BoefjeTask` and pushed on the queue we will check the following:
 
 #### Processes
 
-![boefje_scheduler.svg](./img/boefje_scheduler.svg)
+```mermaid
+flowchart LR
+    subgraph "**Scheduler**<br/>[system]"
+        direction LR
+        subgraph BoefjeScheduler["**BoefjeScheduler**<br/>[component]<br/>"]
+            direction LR
+            ProcessManual["Manual"]
+            ProcessMutations["Mutations"]
+            ProcessNewBoefjes["NewBoefjes"]
+            ProcessRescheduling["Rescheduling"]
+            subgraph PriorityQueue["PriorityQueue"]
+                Task0
+                Task1[...]
+                TaskN
+            end
+            ProcessManual-->PriorityQueue
+            ProcessMutations-->PriorityQueue
+            ProcessNewBoefjes-->PriorityQueue
+            ProcessRescheduling-->PriorityQueue
+        end
+    end
+```
 
 In order to create a `BoefjeTask` and trigger the dataflow we described above
 we have 3 different processes running in threads within a `BoefjeScheduler`
@@ -403,7 +434,22 @@ queue we will check the following:
 
 #### Processes
 
-![normalizer_scheduler.svg](./img/normalizer_scheduler.svg)
+```mermaid
+flowchart LR
+    subgraph "**Scheduler**<br/>[system]"
+        direction LR
+        subgraph NormalizerScheduler["**NormalizerScheduler**<br/>[component]<br/>"]
+            direction LR
+            ProcessRawData["RawData"]
+            subgraph PriorityQueue["PriorityQueue"]
+                Task0
+                Task1[...]
+                TaskN
+            end
+            ProcessRawData-->PriorityQueue
+        end
+    end
+```
 
 The following processes within a `NormalizerScheduler` will create a
 `NormalizerTask` tasks:
@@ -432,7 +478,22 @@ picked up and processed by the report task runner.
 
 #### Processes
 
-![report_scheduler.svg](./img/report_scheduler.svg)
+```mermaid
+flowchart LR
+    subgraph "**Scheduler**<br/>[system]"
+        direction LR
+        subgraph ReportScheduler["**ReportScheduler**<br/>[component]<br/>"]
+            direction LR
+            ProcessRescheduling["Rescheduling"]
+            subgraph PriorityQueue["PriorityQueue"]
+                Task0
+                Task1[...]
+                TaskN
+            end
+            ProcessRescheduling-->PriorityQueue
+        end
+    end
+```
 
 The `ReportScheduler` will create a `ReportTask` for the `Task` that is
 associated with a `Schedule` object.
