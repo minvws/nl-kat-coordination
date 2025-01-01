@@ -1,22 +1,125 @@
 ---
-authors: { author1 } <{ email }>, { author2 } ({ github username })
-state: { draft|discussion|published|implemented|abandoned }
-discussion: http://github.com/nl-kat-coordination/rfd/pull/{number}
-labels: { comma, separated, list }
+authors: @originalsouth
+state: draft
+discussion: https://github.com/minvws/nl-kat-coordination/pull/4004
+labels: hashing, pydantic, ooi
 ---
 
-# RFD {number}: {title}
+# RFD 0003: OOI Hashing
 
-## Introduction
+## Background
 
-{ Introduction to the RFD }
+The current `__hash__` implementation of OOI's:
+
+https://github.com/minvws/nl-kat-coordination/blob/8730e188e9dad6276a363aaeaead8fc1deb82ac9/octopoes/octopoes/models/__init__.py#L242-L243
+
+is broken because it only considers the primary key; meaning that OOI's with
+fields _not_ recorded in the primary key are erroneously deemed to be the same
+objects, causing Python's built-in hash dependent structures to find collapses.
 
 ## Proposal
 
-{ The proposal section should contain the main content of the RFD. This is
-where the idea is explained in detail. }
+Since we are dealing with OOI based on Pydantic BaseModel's we can easily
+generate a dict of the object using `model_dump`. Assuming that this is the
+best object to start to begin our `__hash__` implementation on, the question
+becomes how to best hash a dict (as python still hasn't figured out how to do
+this natively).
 
-## Footnotes
+The natural question arises why not hash `model_dump_json`? Because there is no
+guarantee it is stable see
+https://github.com/pydantic/pydantic/discussions/10343.
 
-{ Footnotes should be used to provide references to external sources or to
-provide additional information. }
+## Evaluation
+
+Hence, here I compare two algorithms with benchmarks:
+
+```python
+#!/usr/bin/env python
+
+from typing import Iterable, Any
+import jcs
+import random
+import string
+import time
+
+N = 8
+MAX_DEPTH = 4
+K = 10**6
+
+
+def random_string():
+    return ''.join(random.choice(string.ascii_letters) for _ in range(random.randint(1, N)))
+
+
+def random_obj(depth: int = 0, k: int = 7) -> Any:
+    if depth < MAX_DEPTH:
+        rand_choice = random.randint(0, k)
+        if rand_choice == 0:
+            return random.random()  # float
+        elif rand_choice == 1:
+            return random.randint(0, 10**6)  # int
+        elif rand_choice == 2:
+            return random_string()  # string
+        elif rand_choice == 3:
+            return [random_obj(depth + 1, 2) for _ in range(random.randint(1, N))]  # list
+        elif rand_choice == 4:
+            return [random_obj(depth + 1, 2) for _ in range(random.randint(1, N))]  # list
+            # Non JSON compatible so broken for hasher_2 but hasher_1 digests it
+            # return {random_obj(depth + 1, 2) for _ in range(random.randint(1, N))}  # set
+        else:
+            return {random_string(): random_obj(depth + 1) for _ in range(random.randint(1, N))}  # dict[str, Any]
+            # Non JSON compatible so broken for hasher_2 but hasher_1 digests it
+            # return {random_obj(depth + 1, 2): random_obj(depth + 1) for _ in range(random.randint(1, N))}  # dict[Any, Any]
+    else:
+        return random_string()
+
+
+targets = [random_obj() for _ in range(K)]
+
+
+def hasher_1(obj: Any) -> int:
+    def freeze(obj: Iterable[Any | Iterable[Any]]) -> Iterable[int]:
+        if isinstance(obj, Iterable) and not isinstance(obj, (str, bytes)):
+            if isinstance(obj, dict):
+                for key, value in obj.items():
+                    yield hash(key)
+                    yield from freeze(value)
+            else:
+                for item in obj:
+                    yield from freeze(item)
+        else:
+            yield hash(obj)
+    return hash(tuple(freeze(obj)))
+
+
+def hasher_2(obj: Any) -> int:
+    return hash(jcs.canonicalize(obj))
+
+
+st = time.time_ns()
+_ = list(map(hasher_1, targets))
+dt = time.time_ns() - st
+
+print(f"hasher_1: {dt / 10**9 / K}s")
+
+
+st = time.time_ns()
+_ = list(map(hasher_2, targets))
+dt = time.time_ns() - st
+
+print(f"hasher_2: {dt / 10**9 / K}s")
+```
+
+Resulting in:
+
+```
+hasher_1: 2.213041571e-05s
+hasher_2: 3.159127834e-05s
+```
+
+## Determinations
+
+Personally, I would opt for `hasher_1` as it more flexible and faster, but
+`hasher_2` is easier to maintain; also open to other suggestions.
+
+So how do we proceed to solve this problem?
