@@ -2499,15 +2499,6 @@ def findings_report_bytes_data():
         "findings": {
             "finding_types": [],
             "summary": {
-                "total_by_severity": {
-                    "critical": 0,
-                    "high": 0,
-                    "medium": 3,
-                    "low": 1,
-                    "recommendation": 0,
-                    "pending": 0,
-                    "unknown": 0,
-                },
                 "total_by_severity_per_finding_type": {
                     "critical": 0,
                     "high": 0,
@@ -2517,8 +2508,17 @@ def findings_report_bytes_data():
                     "pending": 0,
                     "unknown": 0,
                 },
+                "total_by_severity": {
+                    "critical": 0,
+                    "high": 0,
+                    "medium": 4,
+                    "low": 3,
+                    "recommendation": 0,
+                    "pending": 0,
+                    "unknown": 0,
+                },
                 "total_finding_types": 4,
-                "total_occurrences": 4,
+                "total_occurrences": 7,
             },
         },
         "basic_security": {
@@ -2578,7 +2578,6 @@ def findings_report_bytes_data():
                 "optional": ["leakix", "snyk", "service_banner", "shodan"],
             },
         },
-        "highest_risk_level": "medium",
     }
 
     report_data_b = {
@@ -2592,26 +2591,26 @@ def findings_report_bytes_data():
         "findings": {
             "finding_types": [],
             "summary": {
-                "total_by_severity": {
-                    "critical": 0,
-                    "high": 0,
-                    "medium": 3,
-                    "low": 1,
-                    "recommendation": 0,
-                    "pending": 0,
-                    "unknown": 0,
-                },
                 "total_by_severity_per_finding_type": {
-                    "critical": 0,
-                    "high": 0,
-                    "medium": 3,
-                    "low": 1,
-                    "recommendation": 0,
-                    "pending": 0,
-                    "unknown": 0,
+                    "critical": 1,
+                    "high": 2,
+                    "medium": 4,
+                    "low": 2,
+                    "recommendation": 1,
+                    "pending": 1,
+                    "unknown": 1,
                 },
-                "total_finding_types": 4,
-                "total_occurrences": 4,
+                "total_by_severity": {
+                    "critical": 3,
+                    "high": 3,
+                    "medium": 5,
+                    "low": 3,
+                    "recommendation": 1,
+                    "pending": 1,
+                    "unknown": 1,
+                },
+                "total_finding_types": 12,
+                "total_occurrences": 17,
             },
         },
         "basic_security": {
@@ -2671,7 +2670,6 @@ def findings_report_bytes_data():
                 "optional": ["leakix", "snyk", "service_banner", "shodan"],
             },
         },
-        "highest_risk_level": "medium",
     }
     return [report_data_a, report_data_b]
 
