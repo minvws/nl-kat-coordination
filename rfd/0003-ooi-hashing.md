@@ -129,3 +129,7 @@ Personally, I would opt for `hasher_1` as it more flexible and faster, but
 `hasher_2` is easier to maintain; also open to other suggestions.
 
 So how do we proceed to solve this problem?
+
+## References
+- Issue #3808: has to be solved either in that branched or before that branch is merged.
+- Issue #4000: original issue and discussion
