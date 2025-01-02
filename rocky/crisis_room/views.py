@@ -117,7 +117,7 @@ class CrisisRoomAllOrganizations(TemplateView):
 
 
 class DashboardService:
-    observed_at = datetime.now(timezone.utc)
+    observed_at = datetime.now(timezone.utc)  # we can later set any observed_at
 
     @staticmethod
     def get_organizations_findings(report_data: dict[str, Any]) -> dict[str, Any]:

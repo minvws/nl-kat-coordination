@@ -1,4 +1,4 @@
-from crisis_room.views import CrisisRoomFindings
+from crisis_room.views import CrisisRoomFindings, DashboardService
 from pytest_django.asserts import assertContains
 
 from tests.conftest import setup_request
@@ -7,9 +7,16 @@ from tests.conftest import setup_request
 def test_crisis_room_findings_dashboard(rf, mocker, client_member, findings_dashboard_mock_data):
     dashboard_service = mocker.patch("crisis_room.views.DashboardService")()
     dashboard_service.collect_findings_dashboard.return_value = findings_dashboard_mock_data
+    summary = dashboard_service.get_organizations_findings_summary.side_effect = (
+        DashboardService().get_organizations_findings_summary
+    )
+    summary(findings_dashboard_mock_data)
 
     request = setup_request(rf.get("crisis_room_findings"), client_member.user)
     response = CrisisRoomFindings.as_view()(request)
+
+    response.render()
+    print(response.content)
 
     assert response.status_code == 200
     assertContains(response, client_member.organization)
