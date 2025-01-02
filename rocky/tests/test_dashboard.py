@@ -114,8 +114,27 @@ def test_get_organizations_findings_no_input():
     assert findings == {"highest_risk_level": ""}
 
 
-def test_collect_findings_dashboard():
+def test_collect_findings_dashboard(mocker, dashboard_data, findings_reports, findings_report_bytes_data):
     """
     Test if the right dashboard is filtered and if the method returns the right dict format.
     Only the most recent report should be visible in the dict.
     """
+
+    octopoes_client = mocker.patch("crisis_room.views.OctopoesAPIConnector")
+    octopoes_client().query.return_value = findings_reports
+
+    dashboard_service = DashboardService()
+
+    organizations = [data.dashboard.organization for data in dashboard_data]
+
+    findings_dashboard = dashboard_service.collect_findings_dashboard(organizations)
+
+    assert findings_dashboard[organizations[0]][dashboard_data[0]]["report"] == findings_reports[0]
+
+    print(findings_dashboard[organizations[0]][dashboard_data[0]]["report_data"])
+
+    findings_report_bytes_data[0]["highest_risk_level"] = "medium"
+
+    print(findings_report_bytes_data[0])
+
+    assert findings_dashboard[organizations[0]][dashboard_data[0]]["report_data"] == findings_report_bytes_data[0]
