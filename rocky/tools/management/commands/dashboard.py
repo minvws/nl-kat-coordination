@@ -16,6 +16,8 @@ from rocky.scheduler import ReportTask, ScheduleRequest, scheduler_client
 from tools.models import Organization, OrganizationMember
 from tools.ooi_helpers import create_ooi
 
+FINDINGS_DASHBOARD_NAME = "Crisis Room Findings Dashboard"
+
 
 def update_or_create_default_dashboard(organization: Organization):
     valid_time = datetime.now(timezone.utc)
@@ -26,7 +28,7 @@ def update_or_create_default_dashboard(organization: Organization):
         with path.open("r") as recipe_seeder:
             recipe_default = json.load(recipe_seeder)
 
-        dashboard, _ = Dashboard.objects.get_or_create(name="Crisis Room Findings Dashboard", organization=organization)
+        dashboard, _ = Dashboard.objects.get_or_create(name=FINDINGS_DASHBOARD_NAME, organization=organization)
 
         dashboard_data, created = DashboardData.objects.get_or_create(dashboard=dashboard)
         if created:

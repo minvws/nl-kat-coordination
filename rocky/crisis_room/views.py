@@ -15,6 +15,7 @@ from django.views.generic import TemplateView
 from pydantic import TypeAdapter
 from reports.report_types.findings_report.report import SEVERITY_OPTIONS
 from tools.forms.base import ObservedAtForm
+from tools.management.commands.dashboard import FINDINGS_DASHBOARD_NAME
 from tools.models import Organization, OrganizationMember
 from tools.view_helpers import BreadcrumbsMixin
 
@@ -123,7 +124,7 @@ class DashboardService:
     def get_organizations_findings(report_data: dict[str, Any]) -> dict[str, Any]:
         findings = {}
         highest_risk_level = ""
-        if "findings" in report_data and report_data["findings"]:
+        if "findings" in report_data and report_data["findings"] and report_data["findings"]["finding_types"]:
             finding_types = report_data["findings"]["finding_types"]
             highest_risk_level = finding_types[0]["finding_type"]["risk_severity"]
             critical_high_finding_types = list(
@@ -163,7 +164,7 @@ class DashboardService:
         findings_dashboard = {}
 
         dashboards_data = DashboardData.objects.filter(
-            dashboard__organization__in=organizations, findings_dashboard=True
+            dashboard__name=FINDINGS_DASHBOARD_NAME, dashboard__organization__in=organizations, findings_dashboard=True
         )
 
         for data in dashboards_data:
@@ -191,8 +192,8 @@ class DashboardService:
         organizations_findings: dict[Organization, dict[DashboardData, dict[str, Any]]],
     ) -> dict[str, Any]:
         summary: dict[str, Any] = {
-            "total_by_severity": {severity: 0 for severity in SEVERITY_OPTIONS},
             "total_by_severity_per_finding_type": {severity: 0 for severity in SEVERITY_OPTIONS},
+            "total_by_severity": {severity: 0 for severity in SEVERITY_OPTIONS},
             "total_finding_types": 0,
             "total_occurrences": 0,
         }
