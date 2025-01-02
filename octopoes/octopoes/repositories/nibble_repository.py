@@ -9,7 +9,7 @@ NibbleINI = dict[str, Any]
 
 
 class NibbleRepository(Repository):
-    def get(self, nibble: str, valid_time: datetime) -> NibbleINI:
+    def get(self, nibble_id: str, valid_time: datetime) -> NibbleINI:
         raise NotImplementedError
 
     def get_all(self, valid_time: datetime) -> list[NibbleINI]:
@@ -21,7 +21,7 @@ class NibbleRepository(Repository):
     def put_many(self, inis: list[NibbleINI], valid_time: datetime):
         raise NotImplementedError
 
-    def history(self, nibble: str, with_docs: bool = False) -> list[TransactionRecord]:
+    def history(self, nibble_id: str, with_docs: bool = False) -> list[TransactionRecord]:
         raise NotImplementedError
 
 
@@ -30,8 +30,8 @@ class XTDBNibbleRepository(NibbleRepository):
         self.session = session
 
     @classmethod
-    def _xtid(cls, nibble: str) -> str:
-        return f"NibbleINI|{nibble}"
+    def _xtid(cls, nibble_id: str) -> str:
+        return f"NibbleINI|{nibble_id}"
 
     @classmethod
     def _serialize(cls, ini: NibbleINI) -> NibbleINI:
@@ -45,8 +45,8 @@ class XTDBNibbleRepository(NibbleRepository):
         ini.pop("xt/id", None)
         return ini
 
-    def get(self, nibble: str, valid_time: datetime) -> NibbleINI:
-        return self._deserialize(self.session.client.get_entity(self._xtid(nibble), valid_time))
+    def get(self, nibble_id: str, valid_time: datetime) -> NibbleINI:
+        return self._deserialize(self.session.client.get_entity(self._xtid(nibble_id), valid_time))
 
     def get_all(self, valid_time: datetime) -> list[NibbleINI]:
         result = self.session.client.query(
@@ -63,8 +63,8 @@ class XTDBNibbleRepository(NibbleRepository):
             self.session.put(self._serialize(ini), valid_time)
         self.commit()
 
-    def history(self, nibble: str, with_docs: bool = False) -> list[TransactionRecord]:
-        return self.session.client.get_entity_history(self._xtid(nibble), with_docs=with_docs)
+    def history(self, nibble_id: str, with_docs: bool = False) -> list[TransactionRecord]:
+        return self.session.client.get_entity_history(self._xtid(nibble_id), with_docs=with_docs)
 
     def status(self):
         return self.session.client.status()
