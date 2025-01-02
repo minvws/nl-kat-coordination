@@ -16,7 +16,13 @@ https://github.com/minvws/nl-kat-coordination/blob/8730e188e9dad6276a363aaeaead8
 is broken because it only considers the primary key; meaning that OOI's with
 fields _not_ recorded in the primary key are erroneously deemed to be the same
 objects, causing Python's built-in hash dependent structures to find collisions.
+Additionally, we'll have to consider whether we want for:
 
+d1 = {'a': 1, 'b': 2}
+d2 = {'b': 2, 'a': 1}
+
+to have different hashes (ie. `hash(d1) == hash(d2)` or `hash(d1) != hash(d2)`).
+(this because python dicts are ordered)
 ## Proposal
 
 Since we are dealing with OOI based on Pydantic BaseModel's we can easily
