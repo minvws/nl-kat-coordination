@@ -38,7 +38,10 @@ https://github.com/pydantic/pydantic/discussions/10343.
 ## Evaluation
 
 Hence, here I compare two algorithms with benchmarks:
+1. hashing the ooi using the [`jcs`](https://pypi.org/project/jcs/) package
+2. hashing the ooi using a custom `freeze()` function
 
+Code:
 ```python
 #!/usr/bin/env python
 
