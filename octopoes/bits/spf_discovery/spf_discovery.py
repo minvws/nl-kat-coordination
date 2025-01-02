@@ -39,7 +39,7 @@ def run(input_ooi: DNSTXTRecord, additional_oois: list, config: dict[str, Any]) 
                 if mechanism.startswith(("ip4:", "ip6:")):
                     yield from parse_ip_qualifiers(mechanism_qualifier, mechanism, input_ooi, spf_record)
                 # a mechanisms and mx mechanisms have the same syntax
-                if mechanism.startswith("a") or mechanism.startswith("mx"):
+                if mechanism == "a" or mechanism.startswith("mx"):
                     yield from parse_a_mx_qualifiers(mechanism_qualifier, mechanism, input_ooi, spf_record)
                 # exists ptr and include mechanisms have a similar syntax
                 if (
@@ -56,7 +56,7 @@ def run(input_ooi: DNSTXTRecord, additional_oois: list, config: dict[str, Any]) 
                 if mechanism.startswith("exp"):
                     spf_record.exp = mechanism.split("=", 1)[1]
                 if mechanism.endswith("all"):
-                    spf_record.all = mechanism.strip("all")
+                    spf_record.all = mechanism_qualifier.value
             yield spf_record
         else:
             ft = KATFindingType(id="KAT-INVALID-SPF")
