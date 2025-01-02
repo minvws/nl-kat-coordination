@@ -1,6 +1,8 @@
 import datetime
+import json
 import uuid
 from enum import Enum
+from typing import Any
 
 from httpx import Client, HTTPTransport, Response
 from pydantic import BaseModel, TypeAdapter
@@ -39,6 +41,17 @@ class Task(BaseModel):
     modified_at: datetime.datetime
 
 
+class Filter(BaseModel):
+    column: str
+    field: str
+    operator: str
+    value: Any
+
+
+class QueuePopRequest(BaseModel):
+    filters: list[Filter]
+
+
 class SchedulerClientInterface:
     def get_queues(self) -> list[Queue]:
         raise NotImplementedError()
@@ -73,7 +86,31 @@ class SchedulerAPIClient(SchedulerClientInterface):
         return TypeAdapter(list[Queue]).validate_json(response.content)
 
     def pop_item(self, queue_id: str) -> Task | None:
-        response = self._session.post(f"/queues/{queue_id}/pop")
+        filters: list[Filter] = []
+
+        if settings.runner_type == "boefje":
+            # Client should only pop tasks that lie on a network that the
+            # runner is capable of reaching (e.g. the internet)
+            filters.append(
+                Filter(
+                    column="data", field="network", operator="<@", value=json.dumps(settings.boefje_reachable_networks)
+                )
+            )
+
+            # Client should only pop tasks that have requirements that this runner is capable of (e.g. being able
+            # to handle ipv6 requests)
+            filters.append(
+                Filter(
+                    column="data",
+                    field="requirements",
+                    operator="<@",
+                    value=json.dumps(settings.boefje_task_capabilities),
+                )
+            )
+
+        response = self._session.post(
+            f"/queues/{queue_id}/pop", data=QueuePopRequest(filters=filters).model_dump_json()
+        )
         self._verify_response(response)
 
         return TypeAdapter(Task | None).validate_json(response.content)
