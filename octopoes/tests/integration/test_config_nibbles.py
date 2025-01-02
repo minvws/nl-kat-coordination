@@ -254,15 +254,15 @@ def test_retrieve(xtdb_octopoes_service: OctopoesService, event_manager: Mock, v
 
     xtdb_url = xtdb_octopoes_service.ooi_repository.get(url.reference, valid_time)
 
-    retrieved = xtdb_octopoes_service.nibbler.retrieve("config_nibble_test", valid_time)
+    retrieved = xtdb_octopoes_service.nibbler.retrieve(["config_nibble_test"], valid_time)
     assert len(retrieved) == 1
-    assert retrieved[0] == [xtdb_url, None]
+    assert retrieved["config_nibble_test"][0] == [xtdb_url, None]
 
     xtdb_octopoes_service.ooi_repository.save(config, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     xtdb_config = xtdb_octopoes_service.ooi_repository.get(config.reference, valid_time)
 
-    retrieved = xtdb_octopoes_service.nibbler.retrieve("config_nibble_test", valid_time)
+    retrieved = xtdb_octopoes_service.nibbler.retrieve(["config_nibble_test"], valid_time)
     assert len(retrieved) == 1
-    assert retrieved[0] == [xtdb_url, xtdb_config]
+    assert retrieved["config_nibble_test"][0] == [xtdb_url, xtdb_config]

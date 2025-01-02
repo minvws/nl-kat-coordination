@@ -93,7 +93,7 @@ class NibblesRunner:
             for nibble_id in new_checksums
             if nibble_id not in old_checksums or old_checksums[nibble_id] != new_checksums[nibble_id]
         ]
-        self.infer(list(flatten(self.retrieve(nibble_id, valid_time) for nibble_id in updated_nibble_ids)), valid_time)
+        self.infer(list(flatten(self.retrieve(updated_nibble_ids, valid_time).values())), valid_time)
 
     def list_nibbles(self) -> list[str]:
         return list(self.nibbles.keys())
@@ -123,7 +123,7 @@ class NibblesRunner:
         if self.federated:
             self.nibble_repository.put_many([self.nibbles[nibble_id]._ini for nibble_id in nibble_ids], valid_time)
 
-    def retrieve(self, nibble_id: str, valid_time: datetime) -> list[list[Any]]:
+    def _retrieve(self, nibble_id: str, valid_time: datetime) -> list[list[Any]]:
         nibble = self.nibbles[nibble_id]
         if len(nibble.signature) > 1:
             return [list(args) for args in self.ooi_repository.nibble_query(None, nibble, valid_time)]
@@ -134,20 +134,25 @@ class NibblesRunner:
             else:
                 return [[]]
 
-    def retrieve_all(self, valid_time: datetime) -> dict[str, list[list[Any]]]:
-        return {nibble_id: self.retrieve(nibble_id, valid_time) for nibble_id in self.nibbles}
-
-    def yields(self, nibble_id: str, valid_time: datetime) -> dict[tuple[Reference | None, ...], list[Reference]]:
+    def retrieve(self, nibble_ids: list[str] | None, valid_time: datetime) -> dict[str, list[list[Any]]]:
         return {
-            tuple(nibblet.parameters_references): nibblet.result
-            for nibblet in self.origin_repository.list_origins(
-                valid_time, origin_type=OriginType.NIBBLET, method=nibble_id
-            )
-            if nibblet.parameters_references is not None
+            nibble_id: self._retrieve(nibble_id, valid_time)
+            for nibble_id in (nibble_ids if nibble_ids is not None else self.nibbles)
         }
 
-    def yields_all(self, valid_time: datetime) -> dict[str, dict[tuple[Reference | None, ...], list[Reference]]]:
-        return {nibble_id: self.yields(nibble_id, valid_time) for nibble_id in self.nibbles}
+    def yields(
+        self, nibble_ids: list[str] | None, valid_time: datetime
+    ) -> dict[str, dict[tuple[Reference | None, ...], list[Reference]]]:
+        return {
+            nibble_id: {
+                tuple(nibblet.parameters_references): nibblet.result
+                for nibblet in self.origin_repository.list_origins(
+                    valid_time, origin_type=OriginType.NIBBLET, method=nibble_id
+                )
+                if nibblet.parameters_references is not None
+            }
+            for nibble_id in (nibble_ids if nibble_ids is not None else self.nibbles)
+        }
 
     def _run(self, ooi: OOI, valid_time: datetime) -> dict[str, dict[tuple[Any, ...], set[OOI]]]:
         return_value: dict[str, dict[tuple[Any, ...], set[OOI]]] = {}
