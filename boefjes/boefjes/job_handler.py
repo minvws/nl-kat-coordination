@@ -1,3 +1,4 @@
+import json
 import os
 import traceback
 from collections.abc import Callable
@@ -131,14 +132,24 @@ class BoefjeHandler(Handler):
 
             boefje_meta.arguments["input"] = ooi.serialize()
 
+        boefje_results: list[tuple[set, bytes | str]] = []
+
         boefje_meta.runnable_hash = plugin.runnable_hash
-        boefje_meta.environment = get_environment_settings(boefje_meta, plugin.boefje_schema)
+        try:
+            boefje_meta.environment = get_environment_settings(boefje_meta, plugin.boefje_schema)
+        except SettingsNotConformingToSchema:
+            logger.exception(
+                "Error running boefje due to settings/schema mismatch %s[%s]",
+                boefje_meta.boefje.id,
+                str(boefje_meta.id),
+            )
+            boefje_results = [({"error/boefje"}, json.dumps(plugin.boefje_schema))]
+
+            raise
 
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
         boefje_meta.started_at = datetime.now(timezone.utc)
-
-        boefje_results: list[tuple[set, bytes | str]] = []
 
         try:
             boefje_results = self.job_runner.run(boefje_meta, boefje_meta.environment)
