@@ -640,7 +640,7 @@ def nibbles_register(octopoes: OctopoesService = Depends(octopoes_service)):
 
 @router.get("/nibbles/retrieve", tags=["nibbles"])
 def nibble_retrieve(
-    nibble_ids: list[str] = Query(),
+    nibble_ids: list[str] | None = Query(None),
     valid_time: datetime = Depends(extract_valid_time),
     octopoes: OctopoesService = Depends(octopoes_service),
 ) -> dict[str, list[list[Any]]]:
@@ -649,7 +649,7 @@ def nibble_retrieve(
 
 @router.get("/nibbles/yields", tags=["nibbles"])
 def nibble_yields(
-    nibble_ids: list[str] = Query(),
+    nibble_ids: list[str] | None = Query(None),
     valid_time: datetime = Depends(extract_valid_time),
     octopoes: OctopoesService = Depends(octopoes_service),
 ) -> dict[str, dict[tuple[Reference | None, ...], list[Reference]]]:
