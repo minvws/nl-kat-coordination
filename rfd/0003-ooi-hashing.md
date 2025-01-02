@@ -15,7 +15,7 @@ https://github.com/minvws/nl-kat-coordination/blob/8730e188e9dad6276a363aaeaead8
 
 is broken because it only considers the primary key; meaning that OOI's with
 fields _not_ recorded in the primary key are erroneously deemed to be the same
-objects, causing Python's built-in hash dependent structures to find collapses.
+objects, causing Python's built-in hash dependent structures to find collisions.
 
 ## Proposal
 
