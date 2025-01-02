@@ -23,6 +23,7 @@ d2 = {'b': 2, 'a': 1}
 
 to have different hashes (ie. `hash(d1) == hash(d2)` or `hash(d1) != hash(d2)`).
 (this because python dicts are ordered)
+
 ## Proposal
 
 Since we are dealing with OOI based on Pydantic BaseModel's we can easily
@@ -38,10 +39,12 @@ https://github.com/pydantic/pydantic/discussions/10343.
 ## Evaluation
 
 Hence, here I compare two algorithms with benchmarks:
+
 1. hashing the ooi using the [`jcs`](https://pypi.org/project/jcs/) package
 2. hashing the ooi using a custom `freeze()` function
 
 Code:
+
 ```python
 #!/usr/bin/env python
 
@@ -134,5 +137,6 @@ Personally, I would opt for `hasher_1` as it more flexible and faster, but
 So how do we proceed to solve this problem?
 
 ## References
+
 - Issue #3808: has to be solved either in that branched or before that branch is merged.
 - Issue #4000: original issue and discussion
