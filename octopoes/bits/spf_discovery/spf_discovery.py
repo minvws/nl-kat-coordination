@@ -26,13 +26,10 @@ def run(input_ooi: DNSTXTRecord, additional_oois: list, config: dict[str, Any]) 
             for mechanism in parsed[1]:
                 # strip of optional mechanism qualifiers
                 # http://www.open-spf.org/SPF_Record_Syntax/
-
+                mechanism_qualifier = "+"
                 if mechanism.startswith(("+", "-", "~", "?")):
                     mechanism_qualifier = mechanism[0]
                     mechanism = mechanism[1:]
-                else:
-                    mechanism_qualifier = "+"
-
                 mechanism_qualifier = MechanismQualifier(mechanism_qualifier)
 
                 # ip4 and ip6 mechanisms
@@ -46,9 +43,8 @@ def run(input_ooi: DNSTXTRecord, additional_oois: list, config: dict[str, Any]) 
                     mechanism.startswith("exists")
                     or mechanism.startswith("ptr")
                     or mechanism.startswith("include")
-                    or mechanism.startswith("?include")
                 ):
-                    yield from parse_ptr_exists_include_mechanism(mechanism, input_ooi, spf_record)
+                    yield from parse_ptr_exists_include_mechanism(mechanism_qualifier, mechanism, input_ooi, spf_record)
                 # redirect mechanisms
                 if mechanism.startswith("redirect"):
                     yield from parse_redirect_mechanism(mechanism, input_ooi, spf_record)
@@ -104,7 +100,10 @@ def parse_a_mx_qualifiers(
             qualifier=mechanism_qualifier,
         )
     else:
-        mechanism_type, domain = mechanism.split(":", 1)
+        if mechanism.startswith("a/") or mechanism.startswith("mx/"):
+            mechanism_type, domain = mechanism.split("/", 1)
+        else:
+            mechanism_type, domain = mechanism.split(":", 1)
         # remove prefix-length for now
         # TODO: fix prefix lengths
         domain = domain.split("/")[0]
@@ -116,25 +115,27 @@ def parse_a_mx_qualifiers(
             mechanism=mechanism_type,
             qualifier=mechanism_qualifier,
         )
-    if mechanism.startswith("a/") or mechanism.startswith("mx/"):
-        mechanism_type, domain = mechanism.split("/", 1)
-        # TODO: fix prefix lengths
-        domain = domain.split("/")[0]
-        hostname = Hostname(name=domain, network=Network(name=input_ooi.hostname.tokenized.network.name).reference)
-        yield hostname
-        yield DNSSPFMechanismHostname(
-            spf_record=spf_record.reference,
-            hostname=hostname.reference,
-            mechanism=mechanism_type,
-            qualifier=mechanism_qualifier,
-        )
+
 
 
 def parse_ptr_exists_include_mechanism(
-    mechanism: str, input_ooi: DNSTXTRecord, spf_record: DNSSPFRecord
+    mechanism_qualifier: MechanismQualifier, mechanism: str, input_ooi: DNSTXTRecord, spf_record: DNSSPFRecord
 ) -> Iterator[OOI]:
     if mechanism == "ptr":
-        yield DNSSPFMechanismHostname(spf_record=spf_record.reference, hostname=input_ooi.hostname, mechanism="ptr")
+        yield DNSSPFMechanismHostname(
+            spf_record=spf_record.reference,
+            hostname=input_ooi.hostname,
+            mechanism="ptr",
+            qualifier=mechanism_qualifier
+        )
+        ft = KATFindingType(id="KAT-EXPENSIVE-SPF")
+        yield ft
+        yield Finding(
+            finding_type=ft.reference,
+            ooi=input_ooi.reference,
+            description="""This SPF record contains an PTR mechanism., 
+                If at all possible, you should avoid using this mechanism in your SPF record, because it will result in a larger number of expensive DNS lookups."""
+        )
     else:
         mechanism_type, domain = mechanism.split(":", 1)
         # currently, the model only supports hostnames and not domains
@@ -143,7 +144,10 @@ def parse_ptr_exists_include_mechanism(
         hostname = Hostname(name=domain, network=Network(name=input_ooi.hostname.tokenized.network.name).reference)
         yield hostname
         yield DNSSPFMechanismHostname(
-            spf_record=spf_record.reference, hostname=hostname.reference, mechanism=mechanism_type
+            spf_record=spf_record.reference,
+            hostname=hostname.reference,
+            mechanism=mechanism_type,
+            qualifier=mechanism_qualifier
         )
 
 
