@@ -125,7 +125,7 @@ def parse_ptr_exists_include_mechanism(
         yield Finding(
             finding_type=ft.reference,
             ooi=input_ooi.reference,
-            description="""This SPF record contains an PTR mechanism., 
+            description="""This SPF record contains a PTR mechanism.,
                 If at all possible, you should avoid using this mechanism in your SPF record,
                 because it will result in a larger number of expensive DNS lookups.""",
         )
