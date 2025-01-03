@@ -26,7 +26,7 @@ def run(input_ooi: DNSTXTRecord, additional_oois: list, config: dict[str, Any]) 
             for mechanism in parsed[1]:
                 # strip of optional mechanism qualifiers
                 # http://www.open-spf.org/SPF_Record_Syntax/
-                mechanism_qualifier = "+"
+                mechanism_qualifier = MechanismQualifier("+")
                 if mechanism.startswith(("+", "-", "~", "?")):
                     mechanism_qualifier = mechanism[0]
                     mechanism = mechanism[1:]
@@ -39,11 +39,7 @@ def run(input_ooi: DNSTXTRecord, additional_oois: list, config: dict[str, Any]) 
                 if not mechanism.startswith("all") and mechanism.startswith("a") or mechanism.startswith("mx"):
                     yield from parse_a_mx_qualifiers(mechanism_qualifier, mechanism, input_ooi, spf_record)
                 # exists ptr and include mechanisms have a similar syntax
-                if (
-                    mechanism.startswith("exists")
-                    or mechanism.startswith("ptr")
-                    or mechanism.startswith("include")
-                ):
+                if mechanism.startswith("exists") or mechanism.startswith("ptr") or mechanism.startswith("include"):
                     yield from parse_ptr_exists_include_mechanism(mechanism_qualifier, mechanism, input_ooi, spf_record)
                 # redirect mechanisms
                 if mechanism.startswith("redirect"):
@@ -117,16 +113,12 @@ def parse_a_mx_qualifiers(
         )
 
 
-
 def parse_ptr_exists_include_mechanism(
     mechanism_qualifier: MechanismQualifier, mechanism: str, input_ooi: DNSTXTRecord, spf_record: DNSSPFRecord
 ) -> Iterator[OOI]:
     if mechanism == "ptr":
         yield DNSSPFMechanismHostname(
-            spf_record=spf_record.reference,
-            hostname=input_ooi.hostname,
-            mechanism="ptr",
-            qualifier=mechanism_qualifier
+            spf_record=spf_record.reference, hostname=input_ooi.hostname, mechanism="ptr", qualifier=mechanism_qualifier
         )
         ft = KATFindingType(id="KAT-EXPENSIVE-SPF")
         yield ft
@@ -134,7 +126,8 @@ def parse_ptr_exists_include_mechanism(
             finding_type=ft.reference,
             ooi=input_ooi.reference,
             description="""This SPF record contains an PTR mechanism., 
-                If at all possible, you should avoid using this mechanism in your SPF record, because it will result in a larger number of expensive DNS lookups."""
+                If at all possible, you should avoid using this mechanism in your SPF record,
+                because it will result in a larger number of expensive DNS lookups.""",
         )
     else:
         mechanism_type, domain = mechanism.split(":", 1)
@@ -147,7 +140,7 @@ def parse_ptr_exists_include_mechanism(
             spf_record=spf_record.reference,
             hostname=hostname.reference,
             mechanism=mechanism_type,
-            qualifier=mechanism_qualifier
+            qualifier=mechanism_qualifier,
         )
 
 
