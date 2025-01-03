@@ -13,7 +13,6 @@
                 {% include "partials/stepper.html" %}
 
                 <h2>{% translate "Account setup" %}</h2>
-                <h3>{% translate "Accounts" %}</h3>
                 <h4>{% translate "Organization setup with separate accounts:" %}</h4>
                 <p>
                     {% blocktranslate trimmed %}
@@ -36,7 +35,7 @@
                 {% if organization %}
                     <div class="button-container">
                         <a href="{% url "step_choose_user_type" organization.code %}"
-                           class="button">{% translate "Create separate accounts" %}</a>
+                           class="button ghost">{% translate "Create separate accounts" %}</a>
                         <a href="{% url "step_introduction" organization.code %}"
                            class="button ">{% translate "Continue with this account, onboard me!" %}</a>
                     </div>

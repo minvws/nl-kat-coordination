@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-18 09:24+0000\n"
+"POT-Creation-Date: 2025-01-03 20:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1635,10 +1635,6 @@ msgstr ""
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "Account setup"
-msgstr ""
-
-#: onboarding/templates/account/step_2c_account_setup_intro.html
-msgid "Accounts"
 msgstr ""
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
