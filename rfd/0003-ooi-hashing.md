@@ -18,8 +18,10 @@ fields _not_ recorded in the primary key are erroneously deemed to be the same
 objects, causing Python's built-in hash dependent structures to find collisions.
 Additionally, we'll have to consider whether we want for:
 
+```python
 d1 = {'a': 1, 'b': 2}
 d2 = {'b': 2, 'a': 1}
+```
 
 to have different hashes (ie. `hash(d1) == hash(d2)` or `hash(d1) != hash(d2)`).
 (this because python dicts are ordered)
@@ -138,5 +140,5 @@ So how do we proceed to solve this problem?
 
 ## References
 
-- Issue #3808: has to be solved either in that branched or before that branch is merged.
-- Issue #4000: original issue and discussion
+- [Issue #3808](https://github.com/minvws/nl-kat-coordination/issues/3808): has to be solved either in that branched or before that branch is merged.
+- [Issue #4000](https://github.com/minvws/nl-kat-coordination/issues/4000): original issue and discussion
