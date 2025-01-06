@@ -29,6 +29,7 @@ These issues are particular problematic for nibbles:
 
 - Nibbles xxhash OOI's for recalculation, the underlying serialization (necessary for the resolution of this problem) must be reliable for hashing.
 - Nibbles are written with uniqueness of objects in mind and uses dicts and sets as such; they will likely suffer performance impact. Both because the data structures get slower and because nibbles will run/rerun unexpectedly.
+
 ## Proposal
 
 Since we are dealing with OOI based on Pydantic BaseModel's we can easily
