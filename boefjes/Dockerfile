@@ -20,9 +20,9 @@ RUN --mount=type=cache,target=/root/.cache \
     pip install --upgrade pip \
     && if [ "$ENVIRONMENT" = "dev" ]; \
     then \
-    pip install -r requirements-dev.txt && \
+    pip install -r requirements-dev.txt; \
     else \
-    pip install -r requirements.txt && \
+    pip install -r requirements.txt; \
     fi
 
 FROM dev
