@@ -654,12 +654,12 @@ python -m unittest discover octopoes/tests
 ## Nibbles
 
 **What are nibbles?**
-Nibbles are the flexible replacement for bits. We learned a lot on what does and doesn't work around bits and ran into some limitations. The nibbles are solving these limitations. We hope that the nibbles are 4 times as efficient as bits, but this isn't officially bench marked (and is more of a bits-nibbles joke ;)).
+Nibbles are the flexible replacement for bits. We learned a lot on what does and doesn't work around bits and ran into some limitations. The nibbles are solving these limitations. We hope that the nibbles are 4 times as efficient as bits, but this isn't officially benchmarked (and is more of a bits-nibbles joke ;)).
 
-Nibbles process the data in OpenKAT, they correlate data and try to extract as much information as possible based on the specified rules. Nibbles ensure for a mapping of one or more objects to another bunch of objects. Where bits would trigger on objects, nibbles can trigger on sets of objects. This makes it possible to map a single object to N objects (1 to N objects), but also map multiple objects to multiple objects (N to N objects).
+Nibbles process the data in OpenKAT, they correlate data and try to extract as much information as possible based on the specified rules. Nibbles ensure for a mapping of one or more objects to another group of objects. Where bits would trigger on objects, nibbles can trigger on sets of objects. This makes it possible to map a single object to N objects (1-to-N mapping), but also map multiple objects to multiple objects (N-to-N mapping).
 
-**Limitation example of bits**
-One of the limitations from bits was that if one of the bits (business rules) would identify an open port in network A, and for network B this port would identify as closed, how would you classify the port? With bits it was not possible to correctly identify data mismatches and decide upon this. Nibbles allow you to detect these differences in data observations. If there are any inconsistencies, this could other nibbles to be triggered to resolve the inconsistency.
+**Limitation example of Bits**
+One of the limitations from Bits was that if one of the bits (business rules) would identify an open port in network A, and for network B this port would identify as closed, how would you classify the port? With Bits it was not possible to correctly identify data mismatches and decide upon this. Nibbles allow you to detect these differences in data observations. If there are any inconsistencies, this could other nibbles to be triggered to resolve the inconsistency.
 
 **How are nibbles better than bits?**
 Nibbles are a successor for bits, all the mistakes and issues we learned from bits should be solved with nibbles.

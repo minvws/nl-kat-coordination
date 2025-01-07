@@ -454,9 +454,9 @@ Note that if you enable a bit that was previously enabled the bit won't be autom
 
 Nibbles
 =======
-Nibbles are the flexible replacement for bits. We learned a lot on what does and doesn't work around bits and ran into some limitations. The nibbles are solving these limitations. We hope that the nibbles are 4 times as efficient as bits, but this isn't officially bench marked (and is more of a bits-nibbles joke ;)).
+Nibbles are the flexible replacement for Bits. We learned a lot on what does and doesn't work around Bits and ran into some limitations. The nibbles are solving these limitations. We hope that the nibbles are 4 times as efficient as bits, but this isn't officially benchmarked (and is more of a bits-nibbles joke ;)).
 
-Nibbles process the data in OpenKAT, they correlate data and try to extract as much information as possible based on the specified rules. Nibbles ensure for a mapping of one or more objects to another bunch of objects.
+Nibbles process the data in OpenKAT, they correlate data and try to extract as much information as possible based on the specified rules. Nibbles ensure for a mapping of one or more objects to another group of objects.
 
 A more technical explanation on Nibbles can be found at: `https://docs.openkat.nl/developer-documentation/octopoes.html#nibbles <https://docs.openkat.nl/developer-documentation/octopoes.html#nibbles>`_.
 
