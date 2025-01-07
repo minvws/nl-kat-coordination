@@ -23,7 +23,7 @@ override_dh_fixperms:
 
 override_dh_virtualenv:
 	grep -v git+https:// requirements.txt > /tmp/requirements-nogit.txt
-	grep git+https:// requirements.txt > /tmp/requirements-git.txt
+#	grep git+https:// requirements.txt > /tmp/requirements-git.txt
 	dh_virtualenv --requirements=/tmp/requirements-nogit.txt $(DH_VENV_ARGS)
 	$(DH_VENV_DIR)/bin/python -m pip install -r /tmp/requirements-git.txt
 
