@@ -555,7 +555,7 @@ Port mapping
 ------------
 
 **Why is this question introduced?**
-Maps open ports into specific categories based on the services in your environment. You can specify common TCP and UDP ports which will not trigger a finding (such as e-mail server ports). By adding ports to the database (db) and system administrator (sa) lists you tell OpenKAT which ports are likely used in your network. Depending on your port mapping OpenKAT will show different findings if the port is detected. The `aggregate_findings` functionality allows you to group findings on the IP-address instead of as separate ports.
+Maps open ports into specific categories based on the services in your environment. You can specify common TCP and UDP ports which will not trigger a finding (such as e-mail server ports). By adding ports to the database (db) and system administrator (sa) lists you tell OpenKAT which ports are likely used in your network. Depending on your port mapping OpenKAT will show different findings if the port is detected. The `aggregate_findings` functionality allows you to group findings by IP address rather than treating them as separate ports.
 
 **What are the risks?**
 There is no direct impact. This question helps to tune findings to your own demands. Having good insights in your network helps with risk mitigation.
