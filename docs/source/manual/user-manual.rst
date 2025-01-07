@@ -458,7 +458,7 @@ Nibbles are the flexible replacement for Bits. We learned a lot on what does and
 
 Nibbles process the data in OpenKAT, they correlate data and try to extract as much information as possible based on the specified rules. Nibbles ensure for a mapping of one or more objects to another group of objects.
 
-A more technical explanation on Nibbles can be found at: `https://docs.openkat.nl/developer-documentation/octopoes.html#nibbles <https://docs.openkat.nl/developer-documentation/octopoes.html#nibbles>`_.
+A more technical explanation on Nibbles can be found at: `Nibbles`_.
 
 
 Reports
