@@ -13,7 +13,7 @@ def test_crisis_room_findings_dashboard(rf, mocker, client_member, findings_dash
     )
     summary(findings_dashboard_mock_data)
 
-    request = setup_request(rf.get("crisis_room_findings"), client_member.user)
+    request = setup_request(rf.get("crisis_room"), client_member.user)
     response = CrisisRoomFindings.as_view()(request)
 
     assert response.status_code == 200
