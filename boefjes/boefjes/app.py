@@ -81,42 +81,28 @@ class SchedulerWorkerManager(WorkerManager):
                 raise
 
     def _fill_queue(self, task_queue: Queue, queue_type: WorkerManager.Queue) -> None:
-        if task_queue.qsize() > self.settings.pool_size:
-            time.sleep(self.settings.worker_heartbeat)
-            return
+        logger.debug("Popping from queue %s", queue_type.value)
 
         try:
-            queues = self.scheduler_client.get_queues()
-        except HTTPError:
-            # Scheduler is having issues, so make note of it and try again
-            logger.exception("Getting the queues from the scheduler failed")
-            time.sleep(self.settings.poll_interval)  # But not immediately
+            response = self.scheduler_client.pop_item(queue_type.value)
+        except (HTTPError, ValidationError):
+            logger.exception("Popping task from scheduler failed, sleeping 10 seconds")
+            time.sleep(10)
             return
 
-        # We do not target a specific queue since we start one runtime for all organisations
-        # and queue ids contain the organisation_id
-        queues = [q for q in queues if q.id.startswith(queue_type.value) and q.size > 0]
+        # TODO: check
+        if not response:
+            logger.debug("Queue %s empty", queue_type.value)
+            time.sleep(10)
+            return
 
-        logger.debug("Found queues: %s", [queue.id for queue in queues])
+        # TODO: check
+        if response.count == 0:
+            logger.debug("Queue %s empty", queue_type.value)
+            time.sleep(10)
+            return
 
-        all_queues_empty = True
-
-        for queue in queues:
-            logger.debug("Popping from queue %s", queue.id)
-
-            try:
-                p_item = self.scheduler_client.pop_item(queue.id)
-            except (HTTPError, ValidationError):
-                logger.exception("Popping task from scheduler failed, sleeping 10 seconds")
-                time.sleep(10)
-                continue
-
-            if not p_item:
-                logger.debug("Queue %s empty", queue.id)
-                continue
-
-            all_queues_empty = False
-
+        for p_item in response.results:
             logger.info("Handling task[%s]", p_item.data.id)
 
             try:
@@ -133,12 +119,6 @@ class SchedulerWorkerManager(WorkerManager):
                     )
                 except HTTPError:
                     logger.exception("Could not patch scheduler task to %s", TaskStatus.FAILED.value)
-
-                raise
-
-        if all_queues_empty:
-            logger.debug("All queues empty, sleeping %f seconds", self.settings.poll_interval)
-            time.sleep(self.settings.poll_interval)
 
     def _check_workers(self) -> None:
         new_workers = []

@@ -53,7 +53,7 @@ class RabbitMQEventManager(EventManager):
 
     @staticmethod
     def _queue_name(event: Event) -> str:
-        return f"{event.organization}__{event.event_id}"
+        return event.event_id
 
 
 class NullManager(EventManager):

@@ -27,4 +27,4 @@ class ScanProfileMutation(BaseModel):
     operation: MutationOperationType
     primary_key: str
     value: OOI | None
-    organisation: str
+    client_id: str
