@@ -15,10 +15,10 @@ from django.views.generic import TemplateView
 from pydantic import TypeAdapter
 from reports.report_types.findings_report.report import SEVERITY_OPTIONS
 from tools.forms.base import ObservedAtForm
-from tools.management.commands.dashboard import FINDINGS_DASHBOARD_NAME
 from tools.models import Organization, OrganizationMember
 from tools.view_helpers import BreadcrumbsMixin
 
+from crisis_room.management.commands.dashboard import FINDINGS_DASHBOARD_NAME
 from crisis_room.models import DashboardData
 from octopoes.connector import ConnectorException
 from octopoes.connector.octopoes import OctopoesAPIConnector

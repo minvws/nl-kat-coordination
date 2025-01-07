@@ -8,18 +8,19 @@ from crisis_room.models import Dashboard, DashboardData
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management import BaseCommand
+from tools.models import Organization, OrganizationMember
+from tools.ooi_helpers import create_ooi
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.ooi.reports import ReportRecipe
 from rocky.bytes_client import get_bytes_client
 from rocky.scheduler import ReportTask, ScheduleRequest, scheduler_client
-from tools.models import Organization, OrganizationMember
-from tools.ooi_helpers import create_ooi
 
 FINDINGS_DASHBOARD_NAME = "Crisis Room Findings Dashboard"
+User = get_user_model()
 
 
-def update_or_create_default_dashboard(organization: Organization):
+def get_or_create_default_dashboard(organization: Organization):
     valid_time = datetime.now(timezone.utc)
     is_scheduler_ready_for_schedule = is_scheduler_enabled(organization)
 
@@ -33,7 +34,7 @@ def update_or_create_default_dashboard(organization: Organization):
         dashboard_data, created = DashboardData.objects.get_or_create(dashboard=dashboard)
         if created:
             recipe = create_organization_recipe(valid_time, organization, recipe_default)
-            dashboard_data.recipe = recipe.pk
+            dashboard_data.recipe = recipe.recipe_id
             schedule_request = create_schedule_request(valid_time, organization, recipe)
             scheduler_client(organization.code).post_schedule(schedule=schedule_request)
 
@@ -77,6 +78,8 @@ def create_schedule_request(
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        organizations = [member.organization for member in OrganizationMember.objects.filter(user=get_user_model())]
+        superusers = User.objects.filter(is_superuser=True)
+
+        organizations = [member.organization for member in OrganizationMember.objects.filter(user=superusers[0].pk)]
         for organization in organizations:
-            update_or_create_default_dashboard(organization)
+            get_or_create_default_dashboard(organization)
