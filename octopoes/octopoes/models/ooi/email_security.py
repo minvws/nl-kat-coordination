@@ -76,8 +76,8 @@ class DNSSPFMechanismHostname(DNSSPFMechanism):
     hostname: Reference = ReferenceField(Hostname)
     qualifier: MechanismQualifier = MechanismQualifier.ALLOW
 
-    _natural_key_attrs = ["spf_record", "mechanism", "hostname"]
-    _information_value = ["mechanism"]
+    _natural_key_attrs = ["spf_record", "mechanism", "hostname", "qualifier"]
+    _information_value = ["mechanism", "qualifier"]
     _reverse_relation_names = {"spf_record": "spf_hostname_mechanisms"}
 
     @classmethod
@@ -94,8 +94,8 @@ class DNSSPFMechanismNetBlock(DNSSPFMechanism):
     netblock: Reference = ReferenceField(NetBlock)
     qualifier: MechanismQualifier = MechanismQualifier.ALLOW
 
-    _natural_key_attrs = ["spf_record", "mechanism", "netblock"]
-    _information_value = ["mechanism"]
+    _natural_key_attrs = ["spf_record", "mechanism", "netblock", "qualifier"]
+    _information_value = ["mechanism", "qualifier"]
     _reverse_relation_names = {"spf_record": "spf_netblock_mechanisms"}
 
     @classmethod
