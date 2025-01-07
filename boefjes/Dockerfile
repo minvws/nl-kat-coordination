@@ -21,10 +21,8 @@ RUN --mount=type=cache,target=/root/.cache \
     && if [ "$ENVIRONMENT" = "dev" ]; \
     then \
     grep -v git+https:// requirements-dev.txt | pip install -r /dev/stdin && \
-    grep git+https:// requirements-dev.txt | pip install -r /dev/stdin ; \
     else \
     grep -v git+https:// requirements.txt | pip install -r /dev/stdin && \
-    grep git+https:// requirements.txt | pip install -r /dev/stdin ; \
     fi
 
 FROM dev
