@@ -5,6 +5,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from octopoes.models.pagination import Paginated
 from octopoes.models.types import OOIType
+from rocky.scheduler import PaginatedSchedulesResponse
 from tests.conftest import setup_request
 
 
@@ -61,6 +62,7 @@ def test_plugin_settings_list_perms(
     lazy_task_list_with_boefje,
 ):
     mock_scheduler.client.get_lazy_task_list.return_value = lazy_task_list_with_boefje
+    mock_scheduler.post_schedule_search.return_value = PaginatedSchedulesResponse(count=0, results=[])
 
     mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](count=1, items=[network])
     mock_mixins_katalogus().get_plugin.return_value = plugin_details
@@ -98,6 +100,7 @@ def test_plugin_settings_list_perms_2(
     lazy_task_list_with_boefje,
 ):
     mock_scheduler.client.get_lazy_task_list.return_value = lazy_task_list_with_boefje
+    mock_scheduler.post_schedule_search.return_value = PaginatedSchedulesResponse(count=0, results=[])
 
     mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](count=1, items=[network])
     mock_mixins_katalogus().get_plugin.return_value = plugin_details
