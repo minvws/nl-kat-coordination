@@ -79,7 +79,7 @@ One or more findings can be selected. The textbox at the bottom allows for a des
 Objects
 -------
 
-The Objects page lists all the objects in Octopoes. Objects can be anything, like DNS records, hostnames, URLs, software, software versions, ports, etc. It is any piece of information that is found by the normalizers, bits and boefjes. On a new installation you'll see the following objects by default:
+The Objects page lists all the objects in Octopoes. Objects can be anything, like DNS records, hostnames, URLs, software, software versions, ports, etc. It is any piece of information that is found by the normalizers, Bits and boefjes. On a new installation you'll see the following objects by default:
 
 .. image:: img/objects-clean-install.png
   :alt: overview of default objects
@@ -100,7 +100,7 @@ Object clearances
 Each object has a clearance type. The clearance type tells how the object was added to the Objects list. The following object types are available:
 
 - Declared: declared objects were added by the user.
-- Inherited: inherited objects were identified through propagation and the parsing of bits and normalizers. This means there is a relation to other object(s).
+- Inherited: inherited objects were identified through propagation and the parsing of Bits and normalizers. This means there is a relation to other object(s).
 - Empty: empyth objects do not have a relation to other objects.
 
 The objects below show different clearance types for various objects. The hostname `mispo.es` was manually added and thus is `declared`. The DNS zone is `inherited` based on the DNS zone boefje.
@@ -153,11 +153,11 @@ The Members page allows for user management and is visible to users who have the
 Settings
 --------
 
-The Settings page shows general information and its settings. In some cases you might want to add tags to the organisation or decide to manually run all bits. This can be done from the settings page. If you created a new organization, you can also add the indemnification on this page.
+The Settings page shows general information and its settings. In some cases you might want to add tags to the organisation or decide to manually run all Bits. This can be done from the settings page. If you created a new organization, you can also add the indemnification on this page.
 
 * Organization data
 * Indemnification
-* Rerun all bits on the current dataset
+* Rerun all Bits on the current dataset
 * Tags
 
 .. image:: img/settings.png
@@ -442,7 +442,7 @@ Bits
 
 Bits are businessrules that assess objects. These can be disabled or enabled using environment variables. The parameters of a Bit can be configured using config objects, which are explained in detail in :ref:`introduction/make-your-own:Bits: businessrules`.
 
-Almost all bits are enabled by default and be disabled by adding the bit to `BITS_DISABLED`. The disabled bits can be enabled using `BITS_ENABLED`. For example:
+Almost all Bits are enabled by default and be disabled by adding the bit to `BITS_DISABLED`. The disabled Bits can be enabled using `BITS_ENABLED`. For example:
 
 .. code-block:: sh
 
@@ -454,7 +454,7 @@ Note that if you enable a bit that was previously enabled the bit won't be autom
 
 Nibbles
 =======
-Nibbles are the flexible replacement for Bits. We learned a lot on what does and doesn't work around Bits and ran into some limitations. The nibbles are solving these limitations. We hope that the nibbles are 4 times as efficient as bits, but this isn't officially benchmarked (and is more of a bits-nibbles joke ;)).
+Nibbles are the flexible replacement for Bits. We learned a lot on what does and doesn't work around Bits and ran into some limitations. The Nibbles are solving these limitations. We hope that the Nibbles are 4 times as efficient as Bits, but this isn't officially benchmarked (and is more of a Bits-Nibbles joke ;)).
 
 Nibbles process the data in OpenKAT, they correlate data and try to extract as much information as possible based on the specified rules. Nibbles ensure for a mapping of one or more objects to another group of objects.
 
