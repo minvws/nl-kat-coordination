@@ -481,7 +481,8 @@ def test_ooi_repository_list_reports_with_children(
     report = seed_report("test", valid_time, xtdb_ooi_repository, xtdb_origin_repository, input_reports=[child, child2])
     report2 = seed_report("test2", valid_time, xtdb_ooi_repository, xtdb_origin_repository)
 
-    assert xtdb_ooi_repository.list_reports(valid_time, 0, 2).count == 2  # We filter on has_parent = False
+    # We filter on Reports and do not fetch the AssetReports
+    assert xtdb_ooi_repository.list_reports(valid_time, 0, 2).count == 2
     assert xtdb_ooi_repository.list_reports(valid_time, 0, 1).count == 2
     assert len(xtdb_ooi_repository.list_reports(valid_time, 0, 1).items) == 1
     assert (

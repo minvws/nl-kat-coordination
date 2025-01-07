@@ -286,12 +286,11 @@ class OctopoesAPIConnector:
         limit: int = DEFAULT_LIMIT,
         recipe_id: UUID | None = None,
     ) -> Paginated[HydratedReport]:
-        params: dict[str, str | int | list[str]] = {
-            "valid_time": str(valid_time),
-            "offset": offset,
-            "limit": limit,
-            "recipe_id": recipe_id,
-        }
+        params = {"valid_time": str(valid_time), "offset": offset, "limit": limit}
+
+        if recipe_id:
+            params["recipe_id"] = recipe_id.hex
+
         res = self.session.get(f"/{self.client}/reports", params=params)
 
         return TypeAdapter(Paginated[HydratedReport]).validate_json(res.content)
