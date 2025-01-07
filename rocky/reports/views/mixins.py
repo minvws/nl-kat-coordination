@@ -126,6 +126,7 @@ def save_report_data(
                 organization_tags=[tag.name for tag in organization.tags.all()],
                 data_raw_id=raw_id,
                 date_generated=now,
+                reference_date=now,
                 input_ooi=ooi,
                 observed_at=observed_at,
             )
@@ -152,6 +153,7 @@ def save_report_data(
         organization_tags=[tag.name for tag in organization.tags.all()],
         data_raw_id=raw_id,
         date_generated=now,
+        reference_date=now,
         input_oois=report_inputs,
         observed_at=observed_at,
         report_recipe=report_recipe,
