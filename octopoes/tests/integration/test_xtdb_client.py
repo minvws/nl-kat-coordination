@@ -8,7 +8,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddress, IPAddressV4, Network
-from octopoes.models.ooi.reports import Report, AssetReport
+from octopoes.models.ooi.reports import AssetReport, Report
 from octopoes.models.ooi.web import URL
 from octopoes.models.path import Path
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
@@ -16,7 +16,7 @@ from octopoes.repositories.origin_repository import XTDBOriginRepository
 from octopoes.xtdb.client import OperationType, XTDBHTTPClient, XTDBSession
 from octopoes.xtdb.exceptions import NodeNotFound
 from octopoes.xtdb.query import Aliased, Query
-from tests.conftest import seed_report, seed_system, seed_asset_report
+from tests.conftest import seed_asset_report, seed_report, seed_system
 
 logger = logging.getLogger(__name__)
 
@@ -467,6 +467,38 @@ def test_order_reports_and_filter_on_parent(
     assert len(xtdb_session.client.query(Query(AssetReport))) == 0
 
 
+def test_ooi_repository_list_reports_with_children(
+    octopoes_api_connector: OctopoesAPIConnector,
+    xtdb_ooi_repository: XTDBOOIRepository,
+    xtdb_origin_repository: XTDBOriginRepository,
+    xtdb_session: XTDBSession,
+    valid_time: datetime,
+):
+    seed_system(xtdb_ooi_repository, xtdb_origin_repository, valid_time)
+    child = seed_asset_report("child", valid_time, xtdb_ooi_repository, xtdb_origin_repository, "firstchild")
+    child2 = seed_asset_report("test", valid_time, xtdb_ooi_repository, xtdb_origin_repository, "secondchild")
+    seed_asset_report("test", valid_time, xtdb_ooi_repository, xtdb_origin_repository, "test")
+    report = seed_report("test", valid_time, xtdb_ooi_repository, xtdb_origin_repository, input_reports=[child, child2])
+    report2 = seed_report("test2", valid_time, xtdb_ooi_repository, xtdb_origin_repository)
+
+    assert xtdb_ooi_repository.list_reports(valid_time, 0, 2).count == 2  # We filter on has_parent = False
+    assert xtdb_ooi_repository.list_reports(valid_time, 0, 1).count == 2
+    assert len(xtdb_ooi_repository.list_reports(valid_time, 0, 1).items) == 1
+    assert (
+        xtdb_ooi_repository.list_reports(valid_time, 0, 2, recipe_id=report.report_recipe.tokenized.recipe_id).count
+        == 1
+    )
+    assert (
+        xtdb_ooi_repository.list_reports(valid_time, 0, 2, recipe_id=report2.report_recipe.tokenized.recipe_id).count
+        == 1
+    )
+    recipe_id = report.report_recipe.tokenized.recipe_id
+    (listed_report,) = xtdb_ooi_repository.list_reports(valid_time, 0, 1, recipe_id=recipe_id).items
+
+    assert child in listed_report.input_oois
+    assert child2 in listed_report.input_oois
+
+
 def test_query_children_of_reports(
     octopoes_api_connector: OctopoesAPIConnector,
     xtdb_ooi_repository: XTDBOOIRepository,
@@ -475,22 +507,20 @@ def test_query_children_of_reports(
     valid_time: datetime,
 ):
     seed_system(xtdb_ooi_repository, xtdb_origin_repository, valid_time)
-    child = seed_asset_report("child", valid_time, xtdb_ooi_repository, xtdb_origin_repository)
-    report = seed_report("test", valid_time, xtdb_ooi_repository, xtdb_origin_repository, input_reports=[child])
+    child = seed_asset_report("child", valid_time, xtdb_ooi_repository, xtdb_origin_repository, "firstchild")
+    child2 = seed_asset_report("test", valid_time, xtdb_ooi_repository, xtdb_origin_repository, "secondchild")
+    seed_asset_report("test", valid_time, xtdb_ooi_repository, xtdb_origin_repository, "test")
+    report = seed_report("test", valid_time, xtdb_ooi_repository, xtdb_origin_repository, input_reports=[child, child2])
     report2 = seed_report("test2", valid_time, xtdb_ooi_repository, xtdb_origin_repository)
 
-    assert xtdb_ooi_repository.list_reports(valid_time, 0, 2).count == 2  # We filter on has_parent = False
-    assert xtdb_ooi_repository.list_reports(valid_time, 0, 1).count == 2
-    assert len(xtdb_ooi_repository.list_reports(valid_time, 0, 1).items) == 1
-    assert xtdb_ooi_repository.list_reports(valid_time, 0, 2, recipe_id=report.report_recipe.tokenized.recipe_id).count == 1
-    assert xtdb_ooi_repository.list_reports(valid_time, 0, 2, recipe_id=report2.report_recipe.tokenized.recipe_id).count == 1
-
-    # See https://v1-docs.xtdb.com/language-reference/1.24.3/datalog-queries/#pull for documentation about prepending
-    # a "_" to query in the reverse direction in a pull statement.
-    query = Query(Report).pull(Report, fields="[* {:Report/_parent_report [*]}]").where(Report)
+    # See https://v1-docs.xtdb.com/language-reference/1.24.3/datalog-queries/#pull for documentation about joins in a
+    # pull statement.
+    query = Query(Report).pull(Report, fields="[* {:Report/input_oois [*]}]")
     results = xtdb_session.client.query(query)
-    assert len(results) == 2
+
+    # The Report is hydrated with its input OOIs
     assert [xtdb_ooi_repository.serialize(report2)] in results
     assert [
-        xtdb_ooi_repository.serialize(report) | {"Report/_parent_report": [xtdb_ooi_repository.serialize(child)]}
+        xtdb_ooi_repository.serialize(report)
+        | {"Report/input_oois": [xtdb_ooi_repository.serialize(child), xtdb_ooi_repository.serialize(child2)]}
     ] in results

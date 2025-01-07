@@ -2,6 +2,8 @@ from datetime import datetime
 from typing import Any, Literal
 from uuid import UUID
 
+from pydantic import AliasGenerator, ConfigDict, Field
+
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
 
@@ -24,6 +26,7 @@ class BaseReport(OOI):
     name: str
     template: str | None = None
     date_generated: datetime
+    reference_date: datetime
 
     organization_code: str
     organization_name: str
@@ -38,22 +41,38 @@ class BaseReport(OOI):
         return f"Report {reference.tokenized.name}"
 
 
+class AssetReport(BaseReport):
+    object_type: Literal["AssetReport"] = Field("AssetReport", alias="object_type")  # Skip alias generation
+    report_type: str
+
+    input_ooi: str
+
+    _natural_key_attrs = ["input_ooi", "report_type"]
+
+    # A POC for validating the JSON data from XTDB without having to remove the "OOIType/" part of the key. This
+    # is especially convenient when parsing nested OOI types as we do for a HydratedReport.
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(validation_alias=lambda field_name: f"AssetReport/{field_name}"),
+        populate_by_name=True,
+    )
+
+
 class Report(BaseReport):
     object_type: Literal["Report"] = "Report"
-    report_type: Literal["concatenated-report", "aggregate-organisation-report", "multi-organization-report"]
+    report_type: str  # e.g. "concatenated-report", "aggregate-organisation-report" or "multi-organization-report"
 
     input_oois: list[str]
 
     _natural_key_attrs = ["report_recipe"]
 
 
-class AssetReport(BaseReport):
-    object_type: Literal["AssetReport"] = "AssetReport"
-    report_type: str
+class HydratedReport(BaseReport):
+    object_type: Literal["HydratedReport"] = "HydratedReport"
+    report_type: str  # e.g. "concatenated-report", "aggregate-organisation-report" or "multi-organization-report"
 
-    input_ooi: str
+    input_oois: list[AssetReport]
 
-    _natural_key_attrs = ["input_ooi", "report_type"]
+    _natural_key_attrs = ["report_recipe"]
 
 
 class ReportRecipe(OOI):

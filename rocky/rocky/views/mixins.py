@@ -27,7 +27,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
-from octopoes.models.ooi.reports import Report, AssetReport
+from octopoes.models.ooi.reports import AssetReport, Report
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import get_relations

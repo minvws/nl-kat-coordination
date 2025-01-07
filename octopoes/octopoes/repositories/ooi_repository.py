@@ -24,12 +24,12 @@ from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
-from octopoes.models.ooi.reports import Report, ReportRecipe, AssetReport
+from octopoes.models.ooi.reports import HydratedReport, Report, ReportRecipe
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Direction, Path, Segment, get_paths_to_neighours
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceNode, ReferenceTree
-from octopoes.models.types import get_concrete_types, get_relation, get_relations, to_concrete, type_by_name
+from octopoes.models.types import OOIType, get_concrete_types, get_relation, get_relations, to_concrete, type_by_name
 from octopoes.repositories.repository import Repository
 from octopoes.xtdb import Datamodel, FieldSet, ForeignKey
 from octopoes.xtdb.client import OperationType as XTDBOperationType
@@ -141,7 +141,7 @@ class OOIRepository(Repository):
 
     def list_reports(
         self, valid_time: datetime, offset: int, limit: int, recipe_id: UUID | None = None
-    ) -> Paginated[tuple[Report, list[AssetReport]]]:
+    ) -> Paginated[HydratedReport]:
         raise NotImplementedError
 
     def get_report(self, report_id) -> Report:
@@ -153,7 +153,7 @@ class OOIRepository(Repository):
     def list_related(self, ooi: OOI, path: Path, valid_time: datetime) -> list[OOI]:
         raise NotImplementedError
 
-    def query(self, query: Query, valid_time: datetime) -> list[OOI | tuple]:
+    def query(self, query: Query, valid_time: datetime, to_type: OOI | None = None) -> list[OOI | tuple]:
         raise NotImplementedError
 
 
@@ -229,17 +229,20 @@ class XTDBOOIRepository(OOIRepository):
         return export
 
     @classmethod
-    def deserialize(cls, data: dict[str, Any]) -> OOI:
+    def deserialize(cls, data: dict[str, Any], to_type: OOIType | None = None) -> OOI:
         if "object_type" not in data:
             raise ValueError("Data is missing object_type")
 
-        # pop global attributes
-        object_cls = type_by_name(data.pop("object_type"))
-        data.pop(cls.pk_prefix)
-        user_id = data.pop("user_id", None)
+        object_cls = type_by_name(data["object_type"])
+        object_cls = to_type or object_cls
+        user_id = data.get("user_id")
 
         # remove type prefixes
-        stripped = {key.split("/")[1]: value for key, value in data.items()}
+        stripped = {
+            key.split("/")[1]: value
+            for key, value in data.items()
+            if key not in [cls.pk_prefix, "user_id", "object_type"]
+        }
         stripped["user_id"] = user_id
         return object_cls.model_validate(stripped)
 
@@ -796,7 +799,7 @@ class XTDBOOIRepository(OOIRepository):
 
     def list_reports(
         self, valid_time: datetime, offset: int, limit: int, recipe_id: UUID | None = None
-    ) -> Paginated[tuple[Report, list[AssetReport]]]:
+    ) -> Paginated[HydratedReport]:
         date = Aliased(Report, field="date_generated")
         query = Query(Report).where(Report, date_generated=date)
 
@@ -804,30 +807,19 @@ class XTDBOOIRepository(OOIRepository):
             query = query.where(ReportRecipe, recipe_id=str(recipe_id))
             query = query.where(Report, report_recipe=ReportRecipe)
 
-        count_query = query.count()
-        count_results = self.session.client.query(count_query, valid_time)
-        count = 0
+        count_results = self.query(query.count(), valid_time)
+        count = 0 if not count_results else count_results[0]
 
-        if count_results and count_results[0]:
-            count = count_results[0][0]
+        query = query.pull(Report, fields="[* {:Report/input_oois [*]}]").order_by(date, ascending=False)
 
-        query = query.order_by(date, ascending=False).limit(limit).offset(offset).pull(Report).find(date)
-        breakpoint()
-        results = [
-            (
-                self.simplify_keys(x[0]),
-                (
-                    [self.simplify_keys(y) for y in x[0]["Report/_parent_report"]]
-                    if "Report/_parent_report" in x[0]
-                    else []
-                ),
-            )
-            for x in self.session.client.query(query)
-        ]
+        # XTDB requires the field ordered on to be returned in a find statement, see e.g. the discussion here:
+        # https://github.com/xtdb/xtdb/issues/418
+        results = self.query(query.find(date).limit(limit).offset(offset), valid_time, HydratedReport)
 
-        return Paginated(count=count, items=results)
+        # Remove the date from the results
+        return Paginated(count=count, items=[results[0] for results in results])
 
-    def query(self, query: str | Query, valid_time: datetime) -> list[OOI | tuple]:
+    def query(self, query: str | Query, valid_time: datetime, to_type: OOIType | None = None) -> list[OOI | tuple]:
         """
         Performs the given query and returns the query results at the provided valid_time.
 
@@ -843,9 +835,12 @@ class XTDBOOIRepository(OOIRepository):
             parsed_result = []
 
             for item in result:
-                try:
-                    parsed_result.append(self.deserialize(item))
-                except (ValueError, TypeError):
+                if isinstance(item, dict):
+                    try:
+                        parsed_result.append(self.deserialize(item, to_type))
+                    except (ValueError, TypeError):
+                        parsed_result.append(item)
+                else:
                     parsed_result.append(item)
 
             if len(parsed_result) == 1:

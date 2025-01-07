@@ -173,7 +173,9 @@ class Query:
         if ooi_type:
             return replace(self, _find_clauses=self._find_clauses + [f"(count {self._get_object_alias(ooi_type)})"])
         else:
-            return replace(self, _find_clauses=self._find_clauses + [f"(count {self._get_object_alias(self.result_type)})"])
+            return replace(
+                self, _find_clauses=self._find_clauses + [f"(count {self._get_object_alias(self.result_type)})"]
+            )
 
     def limit(self, limit: int) -> "Query":
         return replace(self, _limit=limit)
@@ -339,7 +341,9 @@ class Query:
         where_clauses = self._compile_where_clauses(separator=separator)
 
         if not self._find_clauses:
-            new = replace(self, _find_clauses=self._find_clauses + [f"(pull {self._get_object_alias(self.result_type)} [*])"])
+            new = replace(
+                self, _find_clauses=self._find_clauses + [f"(pull {self._get_object_alias(self.result_type)} [*])"]
+            )
         else:
             new = self
 

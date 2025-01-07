@@ -16,7 +16,7 @@ from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Referenc
 from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import IPAddressV6
-from octopoes.models.ooi.reports import Report, AssetReport, ReportRecipe
+from octopoes.models.ooi.reports import AssetReport, Report, ReportRecipe
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import URL, HTTPHeader, SecurityTXT
 from octopoes.models.origin import Origin, OriginType
@@ -446,8 +446,12 @@ def seed_system(xtdb_ooi_repository: XTDBOOIRepository, xtdb_origin_repository: 
     xtdb_ooi_repository.commit()
 
 
-def seed_report(name: str, valid_time, ooi_repository, origin_repository, input_reports: list[AssetReport] | None = None) -> Report:
-    recipe = ReportRecipe(recipe_id=uuid.uuid4(), report_name_format="test", cron_expression="* * * *", input_recipe={}, report_types=[])
+def seed_report(
+    name: str, valid_time, ooi_repository, origin_repository, input_reports: list[AssetReport] | None = None
+) -> Report:
+    recipe = ReportRecipe(
+        recipe_id=uuid.uuid4(), report_name_format="test", cron_expression="* * * *", input_recipe={}, report_types=[]
+    )
     report = Report(
         name=name,
         date_generated=valid_time,
@@ -456,6 +460,7 @@ def seed_report(name: str, valid_time, ooi_repository, origin_repository, input_
         organization_tags=["tag1", "tag2"],
         data_raw_id="raw",
         observed_at=valid_time,
+        reference_date=valid_time,
         report_recipe=recipe.reference,
         input_oois=[input_report.reference for input_report in input_reports] if input_reports else [],
         report_type="concatenated-report",
@@ -487,8 +492,13 @@ def seed_report(name: str, valid_time, ooi_repository, origin_repository, input_
     return report
 
 
-def seed_asset_report(name: str, valid_time, ooi_repository, origin_repository) -> AssetReport:
-    recipe = ReportRecipe(recipe_id=uuid.uuid4(), report_name_format="test", cron_expression="* * * *", input_recipe={}, report_types=[])
+def seed_asset_report(
+    name: str, valid_time, ooi_repository, origin_repository, input_ooi: str = "testref"
+) -> AssetReport:
+    recipe = ReportRecipe(
+        recipe_id=uuid.uuid4(), report_name_format="test", cron_expression="* * * *", input_recipe={}, report_types=[]
+    )
+
     asset_report = AssetReport(
         name=name,
         date_generated=valid_time,
@@ -497,9 +507,10 @@ def seed_asset_report(name: str, valid_time, ooi_repository, origin_repository) 
         organization_name="name",
         organization_tags=["tag1", "tag2"],
         data_raw_id="raw",
+        reference_date=valid_time,
         observed_at=valid_time,
-        input_ooi="testref",
-        report_type="concatenated-report",
+        input_ooi=input_ooi,
+        report_type="system-report",
     )
     report_origin = Origin(
         origin_type=OriginType.DECLARATION,

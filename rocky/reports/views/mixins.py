@@ -11,7 +11,7 @@ from tools.ooi_helpers import create_ooi
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
-from octopoes.models.ooi.reports import Report, AssetReport
+from octopoes.models.ooi.reports import AssetReport, Report
 from reports.report_types.aggregate_organisation_report.report import aggregate_reports
 from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import BaseReport, SubReportPlugins
