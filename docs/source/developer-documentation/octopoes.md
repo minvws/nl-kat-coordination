@@ -661,11 +661,11 @@ Nibbles process the data in OpenKAT, they correlate data and try to extract as m
 **Limitation example of Bits**
 One of the limitations from Bits was that if one of the bits (business rules) would identify an open port in network A, and for network B this port would identify as closed, how would you classify the port? With Bits it was not possible to correctly identify data mismatches and decide upon this. Nibbles allow you to detect these differences in data observations. If there are any inconsistencies, this could other nibbles to be triggered to resolve the inconsistency.
 
-**How are nibbles better than bits?**
-Nibbles are a successor for bits, all the mistakes and issues we learned from bits should be solved with nibbles.
+**How are Nibbles better than Bits?**
+Nibbles are a successor for bits, all the mistakes and issues we learned from Bits should be solved with Nibbles.
 
 - Dynamic loading from the user interface. This allows a user to enable, run or add nibbles from the web interface, instead of having to edit the code.
-- Mapping of objects: bits would trigger if a specific object (ooi) was loaded. This required a lot of recalculation of bits, which is not cost effective. With nibbles, as soon as data is added to the XTDB database, the nibbles will pick this up and handle accordingly. This should speed things up and allows for more extensive querying.
+- Mapping of objects: Bits would trigger if a specific object (ooi) was loaded. This required a lot of recalculation of Bits, which is not cost effective. With Nibbles, as soon as data is added to the XTDB database, the Nibbles will pick this up and handle accordingly. This should speed things up and allows for more extensive querying.
 - Objects do not require a relation: it is now possible to search for specific objects (e.g. give me all URLs with port 80 open) and return all data. With bits it was not possible to query this kind of information, as the parameters (such as URL and port) were only accessible in the bit and not on the overall dataset.
 - Automatic updates: if a nibble gets updated, the affects are automatically recalculated.
 - Visual representation: it is now possible to get a better visual representation in a graph on which inputs are available for nibbles and how they relate to each other.
