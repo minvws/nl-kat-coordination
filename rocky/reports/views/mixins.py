@@ -106,15 +106,17 @@ def save_report_data(
                     name_to_save = updated_name
                     break
 
+            name = now.strftime(name_to_save)
+            if not name or name.isspace():
+                name = ConcatenatedReport.name
+
             asset_report_input = get_input_data(input_data, ooi, report_type)
 
             asset_raw_id = bytes_client.upload_raw(
                 raw=ReportDataDict({"report_data": data["data"]} | asset_report_input).model_dump_json().encode(),
                 manual_mime_types={"openkat/report"},
             )
-            name = now.strftime(name_to_save)
-            if not name or name.isspace():
-                name = ConcatenatedReport.name
+
 
             asset_report = AssetReport(
                 name=str(name),
@@ -194,15 +196,15 @@ def save_aggregate_report_data(
             asset_report = AssetReport(
                 name=str(report_type.name),
                 report_type=report_type_id,
+                report_recipe=report_recipe,
                 template=report_type.template_path,
-                report_id=uuid4(),
                 organization_code=organization.code,
                 organization_name=organization.name,
                 organization_tags=[tag.name for tag in organization.tags.all()],
                 data_raw_id=asset_raw_id,
                 date_generated=now,
                 reference_date=observed_at,
-                input_oois=[ooi],
+                input_ooi=ooi,
                 observed_at=observed_at,
             )
 
@@ -211,12 +213,11 @@ def save_aggregate_report_data(
 
     asset_report_references = [subreport.reference for subreport in asset_reports]
 
-    # Create the report
-    aggregate_report_type = type(aggregate_report)
     raw_id = bytes_client.upload_raw(
         raw=ReportDataDict(post_processed_data | input_data).model_dump_json().encode(),
         manual_mime_types={"openkat/report"},
     )
+    aggregate_report_type = type(aggregate_report)
 
     name = now.strftime(report_name)
     if not name or name.isspace():
