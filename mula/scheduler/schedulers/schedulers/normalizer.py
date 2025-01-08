@@ -57,6 +57,7 @@ class NormalizerScheduler(Scheduler):
             "Normalizer scheduler started", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
         )
 
+    # TODO: exception handling
     @tracer.start_as_current_span("process_raw_data")
     def process_raw_data(self, body: bytes) -> None:
         """Create tasks for the received raw data.
@@ -85,11 +86,22 @@ class NormalizerScheduler(Scheduler):
             )
             return
 
+        # TODO: deduplication
         # Get all normalizers for the mime types of the raw data
         normalizers = []
         for mime_type in latest_raw_data.raw_data.mime_types:
-            normalizers_by_mime_type = self.get_normalizers_for_mime_type(mime_type, latest_raw_data.organization)
+            normalizers_by_mime_type = self.get_normalizers_for_mime_type(
+                mime_type.get("value"), latest_raw_data.organization
+            )
             normalizers.extend(normalizers_by_mime_type)
+
+        self.logger.debug(
+            "Found normalizers for raw data",
+            raw_data_id=latest_raw_data.raw_data.id,
+            mime_types=[mime_type.get("value") for mime_type in latest_raw_data.raw_data.mime_types],
+            normalizers=[normalizer.id for normalizer in normalizers],
+            scheduler_id=self.scheduler_id,
+        )
 
         # Create tasks for the normalizers
         normalizer_tasks = []

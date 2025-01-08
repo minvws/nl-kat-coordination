@@ -78,6 +78,7 @@ class BoefjeScheduler(Scheduler):
         """
         try:
             # Convert body into a ScanProfileMutation
+            self.logger.info(body)
             mutation = models.ScanProfileMutation.model_validate_json(body)
             self.logger.debug(
                 "Received scan level mutation %s for: %s",
@@ -115,7 +116,7 @@ class BoefjeScheduler(Scheduler):
                 return
 
             # What available boefjes do we have for this ooi?
-            boefjes = self.get_boefjes_for_ooi(ooi, mutation.organisation)
+            boefjes = self.get_boefjes_for_ooi(ooi, mutation.client_id)
             if not boefjes:
                 self.logger.debug("No boefjes available for %s", ooi.primary_key, scheduler_id=self.scheduler_id)
                 return
@@ -151,7 +152,7 @@ class BoefjeScheduler(Scheduler):
                     "Based on boefje run on type, skipping",
                     boefje_id=boefje.id,
                     ooi_primary_key=ooi.primary_key,
-                    organisation_id=mutation.organisation,
+                    organisation_id=mutation.client_id,
                     scheduler_id=self.scheduler_id,
                 )
                 continue
@@ -160,7 +161,7 @@ class BoefjeScheduler(Scheduler):
                 models.BoefjeTask(
                     boefje=models.Boefje.model_validate(boefje.model_dump()),
                     input_ooi=ooi.primary_key if ooi else None,
-                    organization=mutation.organisation,
+                    organization=mutation.client_id,
                 )
             )
 
@@ -171,7 +172,7 @@ class BoefjeScheduler(Scheduler):
                 executor.submit(
                     self.push_boefje_task,
                     boefje_task,
-                    mutation.organisation,
+                    mutation.client_id,
                     create_schedule,
                     self.process_mutations.__name__,
                 )

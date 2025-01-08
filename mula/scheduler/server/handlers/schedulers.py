@@ -5,6 +5,7 @@ import structlog
 from fastapi import status
 
 from scheduler import context, models, schedulers, storage
+from scheduler.models.scheduler import SchedulerType
 from scheduler.schedulers.queue import NotAllowedError, QueueFullError
 from scheduler.server import serializers, utils
 from scheduler.server.errors import BadRequestError, ConflictError, NotFoundError, TooManyRequestsError
@@ -71,7 +72,9 @@ class SchedulerAPI:
         limit: int = 100,
         filters: storage.filters.FilterRequest | None = None,
     ) -> utils.PaginatedResponse:
-        results, count = self.ctx.datastores.pq_store.pop(offset=offset, limit=limit, filters=filters)
+        results, count = self.ctx.datastores.pq_store.pop(
+            scheduler_id=scheduler_id, offset=offset, limit=limit, filters=filters
+        )
 
         # Update status for popped items
         self.ctx.datastores.pq_store.bulk_update_status(
