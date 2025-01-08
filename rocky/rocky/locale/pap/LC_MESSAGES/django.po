@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-25 09:27+0000\n"
+"POT-Creation-Date: 2024-12-18 09:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -641,6 +641,10 @@ msgstr ""
 #: katalogus/client.py
 #, python-format
 msgid "An HTTP %d error occurred. Check logs for more info."
+msgstr ""
+
+#: katalogus/client.py
+msgid "An HTTP error occurred. Check logs for more info."
 msgstr ""
 
 #: katalogus/client.py
@@ -3049,6 +3053,10 @@ msgstr ""
 msgid "No CVEs have been found."
 msgstr ""
 
+#: reports/report_types/aggregate_organisation_report/report.py
+msgid "Aggregate Organisation Report"
+msgstr ""
+
 #: reports/report_types/aggregate_organisation_report/report_design.html
 msgid "Observed at:"
 msgstr ""
@@ -4086,6 +4094,7 @@ msgid "Add reference date"
 msgstr ""
 
 #: reports/templates/partials/report_names_form.html
+#: reports/templates/report_overview/modal_partials/rename_modal.html
 #: rocky/views/scan_profile.py
 msgid "Reset"
 msgstr "Resèt"
@@ -4538,15 +4547,11 @@ msgstr ""
 #: reports/templates/report_overview/report_history_table.html
 #, python-format
 msgid ""
-"\n"
-"                                        This report consist of %(counter)s "
-"subreport with the following report type and object.\n"
-"                                    "
+"This report consist of %(counter)s subreport with the following report type "
+"and object."
 msgid_plural ""
-"\n"
-"                                        This report consist of %(counter)s "
-"subreports with the following report types and objects.\n"
-"                                    "
+"This report consist of %(counter)s subreports with the following report "
+"types and objects."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -5053,6 +5058,10 @@ msgstr "Tipo di filternan"
 #: tools/forms/ooi.py
 msgid "Clearance Level"
 msgstr "Nivél di Autorisashon"
+
+#: tools/forms/ooi.py
+msgid "Next scan"
+msgstr ""
 
 #: tools/forms/ooi.py
 #, fuzzy
@@ -7802,6 +7811,10 @@ msgstr ""
 msgid "Can not reset scan level. Scan level of {ooi_name} not declared"
 msgstr "No por resèt nivél di skan. Nivél di skan òf {ooi_name} no ta deklará"
 
+#: rocky/views/scans.py
+msgid "Scans"
+msgstr "Skènnan"
+
 #: rocky/views/scheduler.py
 msgid "Your report has been scheduled."
 msgstr ""
@@ -8730,6 +8743,3 @@ msgstr "Arkivo crudo añadi ku èxito."
 
 #~ msgid "Scanning successfully scheduled."
 #~ msgstr "Skèn a start ku èxito."
-
-#~ msgid "Scans"
-#~ msgstr "Skènnan"

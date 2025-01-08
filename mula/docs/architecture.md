@@ -518,40 +518,36 @@ check for `Schedule` objects whose `deadline_at` has passed and will push the
 ## Project structure
 
 ```
-$ tree -L 3 --dirsfirst
 .
 ├── docs/                           # additional documentation
 ├── scheduler/                      # scheduler python module
-│   ├── config                      # application settings configuration
-│   ├── connectors                  # external service connectors
-│   │   ├── listeners               # channel/socket listeners
-│   │   ├── services                # rest api connectors
-│   │   └── __init__.py
+│   ├── clients/                    # external service clients
+│   │   ├── amqp/                   # amqp clients
+│   │   ├── http/                   # http api clients
+│   │   ├── __init__.py
+│   │   ├── connector.py
+│   │   └── errors.py
+│   ├── config/                     # application settings configuration
 │   ├── context/                    # shared application context
 │   ├── models/                     # internal model definitions
-│   ├── queues/                     # priority queue definition
-│   ├── rankers/                    # priority/score calculations
-│   ├── storage/                    # data abstraction layer
 │   ├── schedulers/                 # schedulers
-│   │   ├── boefje.py               # boefje scheduler implementation
-│   │   ├── normalizer.py           # normalizer scheduler implementation
-│   │   ├── report.py               # report scheduler implementation
+│   │   ├── queue/                  # priority queue implementation
+│   │   ├── rankers/                # rankers for tasks
+│   │   ├── schedulers/
+│   │   │   ├── __init__.py
+│   │   │   ├── boefje.py           # boefje scheduler implementation
+│   │   │   ├── normalizer.py       # normalizer scheduler implementation
+│   │   │   └── report.py           # report scheduler implementation
+│   │   ├── __init__.py
 │   │   └── scheduler.py            # abstract base class for schedulers
+│   ├── storage/                    # data abstraction layer
 │   ├── server/                     # http rest api server
 │   ├── utils/                      # common utility functions
 │   ├── __init__.py
 │   ├── __main__.py
 │   ├── app.py                      # openkat scheduler app implementation
 │   └── version.py                  # version information
-└─── tests/
-    ├── factories/
-    ├── integration/
-    ├── mocks/
-    ├── scripts/
-    ├── simulation/
-    ├── unit/
-    ├── utils/
-    └── __init__.py
+└─── tests/                        # test suite
 ```
 
 The following describes the main components of the scheduler application:
