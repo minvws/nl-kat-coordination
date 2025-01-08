@@ -4,6 +4,7 @@ from typing import Any
 import structlog
 from django.conf import settings
 from django.http.request import HttpRequest
+from django.urls import reverse
 from django.views.generic import TemplateView
 from pydantic import TypeAdapter
 from reports.report_types.findings_report.report import SEVERITY_OPTIONS
@@ -138,6 +139,7 @@ class CrisisRoom(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("crisis_room"), "text": "CRISIS ROOM"}]
         context["organizations_dashboards"] = self.organizations_findings
         context["organizations_findings_summary"] = self.organizations_findings_summary
         return context
