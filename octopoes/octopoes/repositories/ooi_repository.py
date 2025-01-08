@@ -927,6 +927,7 @@ class XTDBOOIRepository(OOIRepository):
                     arguments = [None for _ in nibble.signature]
             query = nibble.query if isinstance(nibble.query, str) else nibble.query(arguments)
             data = self.session.client.query(query, valid_time)
+            breakpoint()
             objects = [
                 {self.parse_as(element.object_type, obj) for obj in search(element.parser, data)}
                 for element in nibble.signature
