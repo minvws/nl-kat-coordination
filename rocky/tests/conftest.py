@@ -90,10 +90,9 @@ def create_user(django_user_model, email, password, name, device_name, superuser
     return user
 
 
-def create_organization(mocker, name, organization_code):
+def create_organization(name, organization_code):
     katalogus_client = "katalogus.client.KATalogusClient"
     octopoes_node = "rocky.signals.OctopoesAPIConnector"
-
     with patch(katalogus_client), patch(octopoes_node):
         return Organization.objects.create(name=name, code=organization_code)
 
@@ -158,13 +157,13 @@ def seed_groups(db):
 
 
 @pytest.fixture
-def organization(mocker):
-    return create_organization(mocker, "Test Organization", "test")
+def organization():
+    return create_organization("Test Organization", "test")
 
 
 @pytest.fixture
-def organization_b(mocker):
-    return create_organization(mocker, "OrganizationB", "org_b")
+def organization_b():
+    return create_organization("OrganizationB", "org_b")
 
 
 @pytest.fixture
