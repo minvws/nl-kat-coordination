@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-07 08:34+0000\n"
+"POT-Creation-Date: 2025-01-08 08:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -613,6 +613,15 @@ msgstr ""
 msgid "Will be displayed on the findings dashboard for all organizations"
 msgstr ""
 
+#: crisis_room/templates/crisis_room.html rocky/templates/403.html
+#: rocky/templates/404.html
+msgid "Crisis Room"
+msgstr ""
+
+#: crisis_room/templates/crisis_room.html
+msgid "Crisis Room overview for all organizations"
+msgstr ""
+
 #: crisis_room/templates/crisis_room_dashboards.html
 msgid "Dashboards"
 msgstr ""
@@ -634,15 +643,6 @@ msgstr ""
 msgid "There are no dashboards to display."
 msgstr ""
 
-#: crisis_room/templates/crisis_room_findings.html rocky/templates/403.html
-#: rocky/templates/404.html
-msgid "Crisis Room"
-msgstr ""
-
-#: crisis_room/templates/crisis_room_findings.html
-msgid "Crisis Room overview for all organizations"
-msgstr ""
-
 #: crisis_room/templates/crisis_room_findings.html
 #: reports/report_types/findings_report/report.html
 #: reports/templates/partials/report_findings_table.html
@@ -653,11 +653,11 @@ msgstr ""
 #: crisis_room/templates/crisis_room_findings.html
 msgid ""
 "\n"
-"                                        This overview shows the total number "
-"of findings per\n"
-"                                        severity that have been identified "
-"for all organizations.\n"
-"                                    "
+"                            This overview shows the total number of findings "
+"per\n"
+"                            severity that have been identified for all "
+"organizations.\n"
+"                        "
 msgstr ""
 
 #: crisis_room/templates/crisis_room_findings.html
@@ -667,30 +667,29 @@ msgstr ""
 #: crisis_room/templates/crisis_room_findings.html
 msgid ""
 "\n"
-"                                        This table shows the findings that "
-"have been identiefied for each organization,\n"
-"                                        sorted by the finding types and "
-"grouped by organizations.\n"
-"                                    "
-msgstr ""
-
-#: crisis_room/templates/crisis_room_findings.html
-msgid ""
-"\n"
-"                            No findings have been identified yet. As soon as "
-"they have been\n"
-"                            identified, they will be shown on this page.\n"
+"                            This table shows the findings that have been "
+"identiefied for each organization,\n"
+"                            sorted by the finding types and grouped by "
+"organizations.\n"
 "                        "
 msgstr ""
 
 #: crisis_room/templates/crisis_room_findings.html
 msgid ""
 "\n"
-"                        There are no organizations yet. After creating an "
-"organization,\n"
-"                        the identified findings with severity 'critical' and "
-"'high' will be shown here.\n"
-"                    "
+"                No findings have been identified yet. As soon as they have "
+"been\n"
+"                identified, they will be shown on this page.\n"
+"            "
+msgstr ""
+
+#: crisis_room/templates/crisis_room_findings.html
+msgid ""
+"\n"
+"            There are no organizations yet. After creating an organization,\n"
+"            the identified findings with severity 'critical' and 'high' will "
+"be shown here.\n"
+"        "
 msgstr ""
 
 #: crisis_room/templates/crisis_room_header.html
@@ -719,12 +718,6 @@ msgstr ""
 #: rocky/views/finding_list.py rocky/views/finding_type_add.py
 #: rocky/views/ooi_view.py
 msgid "Findings"
-msgstr ""
-
-#: crisis_room/views.py
-msgid ""
-"Failed to get list of findings for organization {}, check server logs for "
-"more details."
 msgstr ""
 
 #: katalogus/client.py
