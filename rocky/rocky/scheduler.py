@@ -124,6 +124,7 @@ class Task(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     scheduler_id: str
     schedule_id: str | None = None
+    organisation: str
     priority: int
     status: TaskStatus | None = TaskStatus.PENDING
     type: str | None = None
@@ -158,12 +159,14 @@ class ScheduleResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
+    scheduler_id: str
+    organisation: str
     hash: str
     data: dict
     enabled: bool
     schedule: str
     tasks: list[Task]
-    deadline_at: datetime.datetime
+    deadline_at: datetime.datetime | None
     created_at: datetime.datetime
     modified_at: datetime.datetime
 
@@ -342,7 +345,7 @@ class SchedulerClient:
     def push_task(self, item: Task) -> None:
         try:
             res = self._client.post(
-                f"/queues/{item.scheduler_id}/push",
+                f"/schedulers/{item.scheduler_id}/push",
                 content=item.model_dump_json(exclude_none=True),
                 headers={"Content-Type": "application/json"},
             )
@@ -364,8 +367,8 @@ class SchedulerClient:
 
         return TypeAdapter(list[Queue]).validate_json(response.content)
 
-    def pop_item(self, queue: str) -> Task | None:
-        response = self._client.post(f"/queues/{queue}/pop")
+    def pop_item(self, scheduler_id: str) -> Task | None:
+        response = self._client.post(f"/schedulers/{scheduler_id}/pop")
         response.raise_for_status()
 
         return TypeAdapter(Task | None).validate_json(response.content)
