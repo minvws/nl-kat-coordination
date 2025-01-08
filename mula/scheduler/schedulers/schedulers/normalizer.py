@@ -98,6 +98,7 @@ class NormalizerScheduler(Scheduler):
         self.logger.debug(
             "Found normalizers for raw data",
             raw_data_id=latest_raw_data.raw_data.id,
+            mime_types=[mime_type.get("value") for mime_type in latest_raw_data.raw_data.mime_types],
             normalizers=[normalizer.id for normalizer in normalizers],
             scheduler_id=self.scheduler_id,
         )
