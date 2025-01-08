@@ -164,7 +164,7 @@ class ScheduleResponse(BaseModel):
     hash: str
     data: dict
     enabled: bool
-    schedule: str
+    schedule: str | None
     tasks: list[Task]
     deadline_at: datetime.datetime | None
     created_at: datetime.datetime

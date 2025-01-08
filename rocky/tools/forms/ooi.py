@@ -4,6 +4,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import OOI
+from rocky.scheduler import ScheduleResponse
 from tools.forms.base import BaseRockyForm, CheckboxTable, LabeledCheckboxInput, ObservedAtForm
 from tools.forms.settings import DEPTH_DEFAULT, DEPTH_HELP_TEXT, DEPTH_MAX, SCAN_LEVEL_CHOICES
 
@@ -33,17 +34,23 @@ class SelectOOIForm(BaseRockyForm):
     ooi = forms.MultipleChoiceField(
         label=_("Objects"),
         widget=CheckboxTable(
-            column_names=("OOI", _("Type"), _("Clearance Level")),
+            column_names=("Object", _("Type"), _("Clearance Level"), _("Next scan")),
             column_templates=(
                 "partials/hyperlink_ooi_id.html",
                 "partials/hyperlink_ooi_type.html",
                 "partials/scan_level_indicator.html",
+                "partials/ooi_schedule.html",
             ),
         ),
     )
 
     def __init__(
-        self, oois: list[OOI], organization_code: str, mandatory_fields: list | None = None, *args: Any, **kwargs: Any
+        self,
+        oois: list[tuple[OOI, ScheduleResponse]],
+        organization_code: str,
+        mandatory_fields: list | None = None,
+        *args,
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.fields["ooi"].widget.attrs["organization_code"] = organization_code
@@ -54,8 +61,10 @@ class SelectOOIForm(BaseRockyForm):
             self.fields["ooi"].initial = self.fields["ooi"].choices[0][0]
 
     @staticmethod
-    def _to_choice(ooi: OOI) -> tuple[str, Any]:
-        return str(ooi), (ooi, ooi, ooi.scan_profile.level if ooi.scan_profile else 0)
+    def _to_choice(ooi_with_schedule: tuple[OOI, ScheduleResponse]) -> tuple[str, Any]:
+        ooi, schedule = ooi_with_schedule[0], ooi_with_schedule[1]
+
+        return str(ooi), (ooi, ooi, ooi.scan_profile.level if ooi.scan_profile else 0, schedule)
 
 
 class SelectOOIFilterForm(BaseRockyForm):
