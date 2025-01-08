@@ -7,8 +7,8 @@ from nibbles.https_availability.nibble import NIBBLE as https_availability
 from nibbles.runner import NibblesRunner
 
 from octopoes.core.service import OctopoesService
-from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import IPAddressV4, IPPort, Network, Protocol
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.web import HostnameHTTPURL, HTTPHeader, HTTPResource, WebScheme, Website
@@ -48,9 +48,6 @@ def test_https_availability_query(xtdb_octopoes_service: OctopoesService, event_
     port = IPPort(port=80, address=ip_address.reference, protocol=Protocol.TCP)
     xtdb_octopoes_service.ooi_repository.save(port, valid_time)
 
-    port443 = IPPort(port=443, address=ip_address.reference, protocol=Protocol.TCP)
-    xtdb_octopoes_service.ooi_repository.save(port443, valid_time)
-
     ip_service = IPService(ip_port=port.reference, service=service.reference)
     xtdb_octopoes_service.ooi_repository.save(ip_service, valid_time)
 
@@ -67,5 +64,13 @@ def test_https_availability_query(xtdb_octopoes_service: OctopoesService, event_
 
     event_manager.complete_process_events(xtdb_octopoes_service)
 
-    args: list[Reference | None] = [ip_address.reference, None, None, None]
-    print(xtdb_octopoes_service.ooi_repository.nibble_query(ip_address, https_availability, valid_time, args))
+    assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 1
+    assert xtdb_octopoes_service.ooi_repository.list_oois({KATFindingType}, valid_time).count == 1
+
+    port443 = IPPort(port=443, address=ip_address.reference, protocol=Protocol.TCP)
+    xtdb_octopoes_service.ooi_repository.save(port443, valid_time)
+
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 0
+    assert xtdb_octopoes_service.ooi_repository.list_oois({KATFindingType}, valid_time).count == 0
