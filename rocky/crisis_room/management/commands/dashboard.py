@@ -6,9 +6,8 @@ from uuid import uuid4
 
 from crisis_room.models import Dashboard, DashboardData
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.management import BaseCommand
-from tools.models import Organization, OrganizationMember
+from tools.models import Organization
 from tools.ooi_helpers import create_ooi
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -17,7 +16,6 @@ from rocky.bytes_client import get_bytes_client
 from rocky.scheduler import ReportTask, ScheduleRequest, scheduler_client
 
 FINDINGS_DASHBOARD_NAME = "Crisis Room Findings Dashboard"
-User = get_user_model()
 
 
 def get_or_create_default_dashboard(organization: Organization):
@@ -34,7 +32,7 @@ def get_or_create_default_dashboard(organization: Organization):
         dashboard_data, created = DashboardData.objects.get_or_create(dashboard=dashboard)
         if created:
             recipe = create_organization_recipe(valid_time, organization, recipe_default)
-            dashboard_data.recipe = recipe.recipe_id
+            dashboard_data.recipe = recipe.primary_key
             schedule_request = create_schedule_request(valid_time, organization, recipe)
             scheduler_client(organization.code).post_schedule(schedule=schedule_request)
 
@@ -78,8 +76,6 @@ def create_schedule_request(
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        superusers = User.objects.filter(is_superuser=True)
-
-        organizations = [member.organization for member in OrganizationMember.objects.filter(user=superusers[0].pk)]
+        organizations = Organization.objects.all()
         for organization in organizations:
             get_or_create_default_dashboard(organization)
