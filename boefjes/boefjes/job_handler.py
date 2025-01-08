@@ -135,8 +135,16 @@ class BoefjeHandler(Handler):
         boefje_results: list[tuple[set, bytes | str]] = []
 
         boefje_meta.runnable_hash = plugin.runnable_hash
+
+        logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
+
+        boefje_meta.started_at = datetime.now(timezone.utc)
+
         try:
             boefje_meta.environment = get_environment_settings(boefje_meta, plugin.boefje_schema)
+
+            boefje_results = self.job_runner.run(boefje_meta, boefje_meta.environment)
+
         except SettingsNotConformingToSchema:
             logger.exception(
                 "Error running boefje due to settings/schema mismatch %s[%s]",
@@ -147,17 +155,12 @@ class BoefjeHandler(Handler):
 
             raise
 
-        logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
-
-        boefje_meta.started_at = datetime.now(timezone.utc)
-
-        try:
-            boefje_results = self.job_runner.run(boefje_meta, boefje_meta.environment)
         except:
             logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
             boefje_results = [({"error/boefje"}, traceback.format_exc())]
 
             raise
+
         finally:
             boefje_meta.ended_at = datetime.now(timezone.utc)
             logger.info("Saving to Bytes for boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
