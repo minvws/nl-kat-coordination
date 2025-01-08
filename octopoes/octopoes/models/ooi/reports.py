@@ -36,10 +36,6 @@ class BaseReport(OOI):
     observed_at: datetime
     report_recipe: Reference | None = ReferenceField("ReportRecipe", default=None)
 
-    @classmethod
-    def format_reference_human_readable(cls, reference: Reference) -> str:
-        return f"Report {reference.tokenized.name}"
-
 
 class AssetReport(BaseReport):
     object_type: Literal["AssetReport"] = Field("AssetReport", alias="object_type")  # Skip alias generation
@@ -56,6 +52,10 @@ class AssetReport(BaseReport):
         populate_by_name=True,
     )
 
+    @classmethod
+    def format_reference_human_readable(cls, reference: Reference) -> str:
+        return f"{reference.tokenized.report_type} for {reference.tokenized.input_ooi}"
+
 
 class Report(BaseReport):
     object_type: Literal["Report"] = "Report"
@@ -65,6 +65,10 @@ class Report(BaseReport):
 
     _natural_key_attrs = ["report_recipe"]
 
+    @classmethod
+    def format_reference_human_readable(cls, reference: Reference) -> str:
+        return f"HydratedReport for recipe {reference.tokenized.report_recipe}"
+
 
 class HydratedReport(BaseReport):
     object_type: Literal["HydratedReport"] = "HydratedReport"
@@ -73,6 +77,10 @@ class HydratedReport(BaseReport):
     input_oois: list[AssetReport]
 
     _natural_key_attrs = ["report_recipe"]
+
+    @classmethod
+    def format_reference_human_readable(cls, reference: Reference) -> str:
+        return f"HydratedReport for recipe {reference.tokenized.report_recipe}"
 
 
 class ReportRecipe(OOI):
