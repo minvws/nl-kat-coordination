@@ -20,7 +20,7 @@ class ReportSerializer(serializers.BaseSerializer):
 
 
 class ReportRecipeSerializer(serializers.Serializer):
-    id = serializers.UUIDField(source="recipe_id", read_only=True)
+    id = serializers.UUIDField(source="recipe_id", required=False)
     report_name_format = serializers.CharField()
     subreport_name_format = serializers.CharField(required=False, allow_blank=True)
 
