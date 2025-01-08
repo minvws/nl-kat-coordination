@@ -60,7 +60,7 @@ def collect_reports(observed_at: datetime, octopoes_connector: OctopoesAPIConnec
     return error_reports, report_data
 
 
-def get_child_input_data(input_data: dict[str, Any], ooi: str, report_type: type[BaseReport]):
+def get_input_data(input_data: dict[str, Any], ooi: str, report_type: type[BaseReport]):
     required_plugins = list(input_data["input_data"]["plugins"]["required"])
     optional_plugins = list(input_data["input_data"]["plugins"]["optional"])
 
@@ -83,16 +83,15 @@ def save_report_data(
     organization,
     input_data: dict,
     report_data,
-    report_names,
-    parent_report_name,
+    asset_report_names,
+    report_name,
     report_recipe: Reference | None = None,
 ) -> Report | None:
     if len(report_data) == 0:
         return None
 
     now = datetime.now(timezone.utc)
-    reference_date = now  # TODO: https://github.com/minvws/nl-kat-coordination/issues/4014
-    subreports = []
+    asset_reports = []
 
     for report_type_id, ooi_data in report_data.items():
         for ooi, data in ooi_data.items():
@@ -101,23 +100,23 @@ def save_report_data(
             report_type_name = str(report_type.name)
 
             ooi_name = Reference.from_str(ooi).human_readable
-            for default_name, updated_name in report_names:
+            for default_name, updated_name in asset_report_names:
                 # Use default_name to check if we're on the right index in the list to update the name to save.
                 if ooi_name in default_name and report_type_name in default_name:
                     name_to_save = updated_name
                     break
 
-            child_input_data = get_child_input_data(input_data, ooi, report_type)
+            asset_report_input = get_input_data(input_data, ooi, report_type)
 
-            raw_id = bytes_client.upload_raw(
-                raw=ReportDataDict({"report_data": data["data"]} | child_input_data).model_dump_json().encode(),
+            asset_raw_id = bytes_client.upload_raw(
+                raw=ReportDataDict({"report_data": data["data"]} | asset_report_input).model_dump_json().encode(),
                 manual_mime_types={"openkat/report"},
             )
             name = now.strftime(name_to_save)
             if not name or name.isspace():
                 name = ConcatenatedReport.name
 
-            sub_report_ooi = AssetReport(
+            asset_report = AssetReport(
                 name=str(name),
                 report_type=report_type_id,
                 report_recipe=report_recipe,
@@ -125,27 +124,26 @@ def save_report_data(
                 organization_code=organization.code,
                 organization_name=organization.name,
                 organization_tags=[tag.name for tag in organization.tags.all()],
-                data_raw_id=raw_id,
+                data_raw_id=asset_raw_id,
                 date_generated=now,
-                reference_date=reference_date,
+                reference_date=observed_at,
                 input_ooi=ooi,
                 observed_at=observed_at,
             )
-            subreports.append(sub_report_ooi)
+            asset_reports.append(asset_report)
+            create_ooi(octopoes_api_connector, bytes_client, asset_report, observed_at)
 
-            create_ooi(octopoes_api_connector, bytes_client, sub_report_ooi, observed_at)
-
-    report_inputs = [subreport.reference for subreport in subreports]
+    asset_report_references = [subreport.reference for subreport in asset_reports]
 
     raw_id = bytes_client.upload_raw(
         raw=ReportDataDict(input_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
     )
-    name = now.strftime(Template(parent_report_name).safe_substitute(report_type=str(ConcatenatedReport.name)))
+    name = now.strftime(Template(report_name).safe_substitute(report_type=str(ConcatenatedReport.name)))
 
     if not name or name.isspace():
         name = ConcatenatedReport.name
 
-    parent_report_ooi = Report(
+    report_ooi = Report(
         name=str(name),
         report_type=str(ConcatenatedReport.id),
         template=ConcatenatedReport.template_path,
@@ -154,74 +152,46 @@ def save_report_data(
         organization_tags=[tag.name for tag in organization.tags.all()],
         data_raw_id=raw_id,
         date_generated=now,
-        reference_date=reference_date,
-        input_oois=report_inputs,
+        reference_date=observed_at,
+        input_oois=asset_report_references,
         observed_at=observed_at,
         report_recipe=report_recipe,
     )
 
-    create_ooi(octopoes_api_connector, bytes_client, parent_report_ooi, observed_at)
-    logger.info("Report created", event_code=800071, report=parent_report_ooi)
-    return parent_report_ooi
+    create_ooi(octopoes_api_connector, bytes_client, report_ooi, observed_at)
+    logger.info("Report created", event_code=800071, report=report_ooi)
+    return report_ooi
 
 
 def save_aggregate_report_data(
     bytes_client,
+    observed_at,
     octopoes_api_connector,
     organization,
-    get_observed_at,
-    ooi_pks,
     input_data: dict,
-    parent_report_name,
     report_data,
+    report_name,
     post_processed_data,
     aggregate_report,
     report_recipe: Reference | None = None,
-) -> Report:
-    observed_at = get_observed_at
+) -> Report | None:
+    if len(report_data) == 0:
+        return None
+
     now = datetime.now(timezone.utc)
-    reference_date = now  # TODO: https://github.com/minvws/nl-kat-coordination/issues/4014
-
-    # Create the report
-    report_data_raw_id = bytes_client.upload_raw(
-        raw=ReportDataDict(post_processed_data | input_data).model_dump_json().encode(),
-        manual_mime_types={"openkat/report"},
-    )
-    report_type = type(aggregate_report)
-    name = now.strftime(parent_report_name)
-    if not name or name.isspace():
-        name = report_type.name
-
-    report_ooi = Report(
-        name=str(name),
-        report_type=str(report_type.id),
-        template=report_type.template_path,
-        report_id=uuid4(),
-        organization_code=organization.code,
-        organization_name=organization.name,
-        organization_tags=[tag.name for tag in organization.tags.all()],
-        data_raw_id=report_data_raw_id,
-        date_generated=now,
-        reference_date=reference_date,
-        input_oois=ooi_pks,
-        observed_at=observed_at,
-        report_recipe=report_recipe,
-    )
-    create_ooi(octopoes_api_connector, bytes_client, report_ooi, observed_at)
-
-    # Save the child reports to bytes
+    asset_reports = []
 
     for ooi, types in report_data.items():
         for report_type_id, data in types.items():
             report_type = get_report_by_id(report_type_id)
-            child_input_data = get_child_input_data(input_data, ooi, report_type)
+            asset_report_input = get_input_data(input_data, ooi, report_type)
 
-            raw_id = bytes_client.upload_raw(
-                raw=ReportDataDict({"report_data": data} | child_input_data).model_dump_json().encode(),
+            asset_raw_id = bytes_client.upload_raw(
+                raw=ReportDataDict({"report_data": data} | asset_report_input).model_dump_json().encode(),
                 manual_mime_types={"openkat/report"},
             )
 
-            aggregate_sub_report_ooi = Report(
+            asset_report = AssetReport(
                 name=str(report_type.name),
                 report_type=report_type_id,
                 template=report_type.template_path,
@@ -229,18 +199,46 @@ def save_aggregate_report_data(
                 organization_code=organization.code,
                 organization_name=organization.name,
                 organization_tags=[tag.name for tag in organization.tags.all()],
-                data_raw_id=raw_id,
+                data_raw_id=asset_raw_id,
                 date_generated=now,
-                reference_date=reference_date,
+                reference_date=observed_at,
                 input_oois=[ooi],
                 observed_at=observed_at,
-                parent_report=report_ooi.reference,  # TODO: https://github.com/minvws/nl-kat-coordination/issues/4014
-                has_parent=True,
             )
 
-            create_ooi(octopoes_api_connector, bytes_client, aggregate_sub_report_ooi, observed_at)
+            asset_reports.append(asset_report)
+            create_ooi(octopoes_api_connector, bytes_client, asset_report, observed_at)
 
-    logger.info("Report created", event_code=800071, report=report_ooi)
+    asset_report_references = [subreport.reference for subreport in asset_reports]
+
+    # Create the report
+    aggregate_report_type = type(aggregate_report)
+    raw_id = bytes_client.upload_raw(
+        raw=ReportDataDict(post_processed_data | input_data).model_dump_json().encode(),
+        manual_mime_types={"openkat/report"},
+    )
+
+    name = now.strftime(report_name)
+    if not name or name.isspace():
+        name = aggregate_report_type.name
+
+    report_ooi = Report(
+        name=str(name),
+        report_type=str(aggregate_report_type.id),
+        template=aggregate_report_type.template_path,
+        organization_code=organization.code,
+        organization_name=organization.name,
+        organization_tags=[tag.name for tag in organization.tags.all()],
+        data_raw_id=raw_id,
+        date_generated=now,
+        reference_date=observed_at,
+        input_oois=asset_report_references,
+        observed_at=observed_at,
+        report_recipe=report_recipe,
+    )
+    create_ooi(octopoes_api_connector, bytes_client, report_ooi, observed_at)
+
+    logger.info("Aggregate Report created", event_code=800071, report=report_ooi)
     return report_ooi
 
 
@@ -299,13 +297,12 @@ class SaveAggregateReportMixin(BaseReportView):
 
         return save_aggregate_report_data(
             self.bytes_client,
+            self.get_observed_at(),
             self.octopoes_api_connector,
             self.organization,
-            self.get_observed_at(),
-            self.get_ooi_pks(),
             self.get_input_data(),
-            report_names[0][1],
             report_data,
+            report_names[0][1],
             post_processed_data,
             aggregate_report,
         )
@@ -314,7 +311,6 @@ class SaveAggregateReportMixin(BaseReportView):
 class SaveMultiReportMixin(BaseReportView):
     def save_report(self, report_names: list) -> Report:
         now = datetime.now(timezone.utc)
-        reference_date = now  # TODO: https://github.com/minvws/nl-kat-coordination/issues/4014
 
         observed_at = self.get_observed_at()
         report_type = MultiOrganizationReport(self.octopoes_api_connector)
@@ -341,7 +337,7 @@ class SaveMultiReportMixin(BaseReportView):
             organization_tags=list(self.organization.tags.all()),
             data_raw_id=report_data_raw_id,
             date_generated=now,
-            reference_date=reference_date,
+            reference_date=observed_at,  # TODO: https://github.com/minvws/nl-kat-coordination/issues/4014
             input_oois=self.get_ooi_pks(),
             observed_at=observed_at,
             parent_report=None,

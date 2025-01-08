@@ -34,12 +34,12 @@
                                             {{ schedule.recipe.parent_report_type|get_report_type_name }}
                                         </li>
                                     {% else %}
-                                        {% for report_type in schedule.recipe.report_types %}
+                                        {% for report_type in schedule.recipe.asset_report_types %}
                                             {% if forloop.counter0 < 2 %}
                                                 <li class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</li>
                                             {% endif %}
                                             {% if forloop.counter0 == 2 %}
-                                                <li class="label tags-color-grey-2">+ {{ schedule.recipe.report_types|length|add:"-2" }}</li>
+                                                <li class="label tags-color-grey-2">+ {{ schedule.recipe.asset_report_types|length|add:"-2" }}</li>
                                             {% endif %}
                                         {% endfor %}
                                     {% endif %}
