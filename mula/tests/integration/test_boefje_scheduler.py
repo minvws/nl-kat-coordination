@@ -3,10 +3,10 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import clients, config, models, schedulers, storage
-from scheduler.storage import stores
 from structlog.testing import capture_logs
 
+from scheduler import clients, config, models, schedulers, storage
+from scheduler.storage import stores
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -1019,7 +1019,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=ScanProfileFactory(level=0))
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
         mutation = models.ScanProfileMutation(
-            operation="create", primary_key=ooi.primary_key, value=ooi, organisation=self.organisation.id
+            operation="create", primary_key=ooi.primary_key, value=ooi, client_id=self.organisation.id
         ).model_dump_json()
 
         # Mocks
@@ -1044,7 +1044,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         """When the value of a mutation is empty it should not push any tasks"""
         # Arrange
         mutation = models.ScanProfileMutation(
-            operation="create", primary_key="123", value=None, organisation=self.organisation.id
+            operation="create", primary_key="123", value=None, client_id=self.organisation.id
         ).model_dump_json()
 
         # Act
@@ -1059,7 +1059,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         mutation = models.ScanProfileMutation(
-            operation="create", primary_key=ooi.primary_key, value=ooi, organisation=self.organisation.id
+            operation="create", primary_key=ooi.primary_key, value=ooi, client_id=self.organisation.id
         ).model_dump_json()
 
         # Mocks
@@ -1078,7 +1078,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
         mutation = models.ScanProfileMutation(
-            operation="create", primary_key=ooi.primary_key, value=ooi, organisation=self.organisation.id
+            operation="create", primary_key=ooi.primary_key, value=ooi, client_id=self.organisation.id
         ).model_dump_json()
 
         # Mocks
@@ -1098,7 +1098,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
         mutation = models.ScanProfileMutation(
-            operation="create", primary_key=ooi.primary_key, value=ooi, organisation=self.organisation.id
+            operation="create", primary_key=ooi.primary_key, value=ooi, client_id=self.organisation.id
         ).model_dump_json()
 
         # Mocks
@@ -1119,10 +1119,10 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         mutation1 = models.ScanProfileMutation(
-            operation="create", primary_key=ooi.primary_key, value=ooi, organisation=self.organisation.id
+            operation="create", primary_key=ooi.primary_key, value=ooi, client_id=self.organisation.id
         ).model_dump_json()
         mutation2 = models.ScanProfileMutation(
-            operation="create", primary_key=ooi.primary_key, value=ooi, organisation=self.organisation.id
+            operation="create", primary_key=ooi.primary_key, value=ooi, client_id=self.organisation.id
         ).model_dump_json()
 
         # Mocks
@@ -1154,7 +1154,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
             operation=models.MutationOperationType.DELETE,
             primary_key=ooi.primary_key,
             value=ooi,
-            organisation=self.organisation.id,
+            client_id=self.organisation.id,
         ).model_dump_json()
 
         # Mocks
@@ -1179,7 +1179,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
             operation=models.MutationOperationType.CREATE,
             primary_key=ooi.primary_key,
             value=ooi,
-            organisation=self.organisation.id,
+            client_id=self.organisation.id,
         ).model_dump_json()
 
         # Mocks
@@ -1200,7 +1200,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
             operation=models.MutationOperationType.DELETE,
             primary_key=ooi.primary_key,
             value=ooi,
-            organisation=self.organisation.id,
+            client_id=self.organisation.id,
         ).model_dump_json()
 
         # Act
@@ -1230,7 +1230,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
             operation=models.MutationOperationType.CREATE,
             primary_key=ooi.primary_key,
             value=ooi,
-            organisation=self.organisation.id,
+            client_id=self.organisation.id,
         ).model_dump_json()
 
         # Mocks
@@ -1270,7 +1270,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
             operation=models.MutationOperationType.CREATE,
             primary_key=ooi.primary_key,
             value=ooi,
-            organisation=self.organisation.id,
+            client_id=self.organisation.id,
         ).model_dump_json()
 
         # Mocks
@@ -1310,7 +1310,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
             operation=models.MutationOperationType.CREATE,
             primary_key=ooi.primary_key,
             value=ooi,
-            organisation=self.organisation.id,
+            client_id=self.organisation.id,
         ).model_dump_json()
 
         # Mocks
@@ -1337,7 +1337,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
             operation=models.MutationOperationType.CREATE,
             primary_key=ooi.primary_key,
             value=ooi,
-            organisation=self.organisation.id,
+            client_id=self.organisation.id,
         ).model_dump_json()
 
         # Mocks
@@ -1378,7 +1378,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
             operation=models.MutationOperationType.UPDATE,
             primary_key=ooi.primary_key,
             value=ooi,
-            organisation=self.organisation.id,
+            client_id=self.organisation.id,
         ).model_dump_json()
 
         # Mocks
@@ -1405,7 +1405,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
             operation=models.MutationOperationType.UPDATE,
             primary_key=ooi.primary_key,
             value=ooi,
-            organisation=self.organisation.id,
+            client_id=self.organisation.id,
         ).model_dump_json()
 
         # Mocks
@@ -1445,7 +1445,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
             operation=models.MutationOperationType.UPDATE,
             primary_key=ooi.primary_key,
             value=ooi,
-            organisation=self.organisation.id,
+            client_id=self.organisation.id,
         ).model_dump_json()
 
         # Mocks
@@ -1485,7 +1485,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
             operation=models.MutationOperationType.UPDATE,
             primary_key=ooi.primary_key,
             value=ooi,
-            organisation=self.organisation.id,
+            client_id=self.organisation.id,
         ).model_dump_json()
 
         # Mocks
