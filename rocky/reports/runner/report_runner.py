@@ -2,6 +2,8 @@ from datetime import datetime, timezone
 from string import Template
 
 from django.conf import settings
+from octopoes.models.ooi.reports import ReportRecipe
+
 from tools.models import Organization
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -28,7 +30,7 @@ class LocalReportRunner(ReportRunner):
             settings.OCTOPOES_API, report_task.organisation_id, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
         )
         recipe_ref = Reference.from_str(f"ReportRecipe|{report_task.report_recipe_id}")
-        recipe = connector.get(recipe_ref, valid_time)
+        recipe: ReportRecipe = connector.get(recipe_ref, valid_time)
 
         report_types = [get_report_by_id(report_type_id) for report_type_id in recipe.report_types]
         oois = []

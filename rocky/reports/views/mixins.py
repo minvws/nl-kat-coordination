@@ -91,6 +91,7 @@ def save_report_data(
         return None
 
     now = datetime.now(timezone.utc)
+    reference_date = now  # TODO: https://github.com/minvws/nl-kat-coordination/issues/4014
     subreports = []
 
     for report_type_id, ooi_data in report_data.items():
@@ -126,7 +127,7 @@ def save_report_data(
                 organization_tags=[tag.name for tag in organization.tags.all()],
                 data_raw_id=raw_id,
                 date_generated=now,
-                reference_date=now,
+                reference_date=reference_date,
                 input_ooi=ooi,
                 observed_at=observed_at,
             )
@@ -153,7 +154,7 @@ def save_report_data(
         organization_tags=[tag.name for tag in organization.tags.all()],
         data_raw_id=raw_id,
         date_generated=now,
-        reference_date=now,
+        reference_date=reference_date,
         input_oois=report_inputs,
         observed_at=observed_at,
         report_recipe=report_recipe,
@@ -179,6 +180,7 @@ def save_aggregate_report_data(
 ) -> Report:
     observed_at = get_observed_at
     now = datetime.now(timezone.utc)
+    reference_date = now  # TODO: https://github.com/minvws/nl-kat-coordination/issues/4014
 
     # Create the report
     report_data_raw_id = bytes_client.upload_raw(
@@ -200,6 +202,7 @@ def save_aggregate_report_data(
         organization_tags=[tag.name for tag in organization.tags.all()],
         data_raw_id=report_data_raw_id,
         date_generated=now,
+        reference_date=reference_date,
         input_oois=ooi_pks,
         observed_at=observed_at,
         report_recipe=report_recipe,
@@ -228,9 +231,10 @@ def save_aggregate_report_data(
                 organization_tags=[tag.name for tag in organization.tags.all()],
                 data_raw_id=raw_id,
                 date_generated=now,
+                reference_date=reference_date,
                 input_oois=[ooi],
                 observed_at=observed_at,
-                parent_report=report_ooi.reference,
+                parent_report=report_ooi.reference,  # TODO: https://github.com/minvws/nl-kat-coordination/issues/4014
                 has_parent=True,
             )
 
@@ -310,6 +314,8 @@ class SaveAggregateReportMixin(BaseReportView):
 class SaveMultiReportMixin(BaseReportView):
     def save_report(self, report_names: list) -> Report:
         now = datetime.now(timezone.utc)
+        reference_date = now  # TODO: https://github.com/minvws/nl-kat-coordination/issues/4014
+
         observed_at = self.get_observed_at()
         report_type = MultiOrganizationReport(self.octopoes_api_connector)
 
@@ -334,7 +340,8 @@ class SaveMultiReportMixin(BaseReportView):
             organization_name=self.organization.name,
             organization_tags=list(self.organization.tags.all()),
             data_raw_id=report_data_raw_id,
-            date_generated=datetime.now(timezone.utc),
+            date_generated=now,
+            reference_date=reference_date,
             input_oois=self.get_ooi_pks(),
             observed_at=observed_at,
             parent_report=None,
