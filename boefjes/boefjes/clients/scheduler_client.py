@@ -52,7 +52,10 @@ class SchedulerClientInterface:
     def get_queues(self) -> list[Queue]:
         raise NotImplementedError()
 
-    def pop_item(self, queue_id: str) -> Task | None:
+    def pop_item(self, scheduler_id: str) -> PaginatedTasksResponse | None:
+        raise NotImplementedError()
+
+    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
