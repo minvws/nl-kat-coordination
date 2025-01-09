@@ -332,7 +332,6 @@ class SaveMultiReportMixin(BaseReportView):
             name=str(name),
             report_type=str(report_type.id),
             template=report_type.template_path,
-            report_id=uuid4(),
             organization_code=self.organization.code,
             organization_name=self.organization.name,
             organization_tags=list(self.organization.tags.all()),
@@ -341,8 +340,6 @@ class SaveMultiReportMixin(BaseReportView):
             reference_date=observed_at,  # TODO: https://github.com/minvws/nl-kat-coordination/issues/4014
             input_oois=self.get_ooi_pks(),
             observed_at=observed_at,
-            parent_report=None,
-            has_parent=False,
         )
 
         create_ooi(self.octopoes_api_connector, self.bytes_client, report_ooi, observed_at)
