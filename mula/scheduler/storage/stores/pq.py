@@ -1,8 +1,10 @@
 from uuid import UUID
 
+from sqlalchemy import exc
+
 from scheduler import models
 from scheduler.storage import DBConn
-from scheduler.storage.errors import exception_handler
+from scheduler.storage.errors import StorageError, exception_handler
 from scheduler.storage.filters import FilterRequest, apply_filter
 from scheduler.storage.utils import retry
 
@@ -15,25 +17,33 @@ class PriorityQueueStore:
 
     @retry()
     @exception_handler
-    def pop(self, scheduler_id: str, filters: FilterRequest | None = None) -> models.Task | None:
+    def pop(
+        self, scheduler_id: str | None = None, offset: int = 0, limit: int = 100, filters: FilterRequest | None = None
+    ) -> tuple[list[models.Task], int]:
         with self.dbconn.session.begin() as session:
-            query = (
-                session.query(models.TaskDB)
-                .filter(models.TaskDB.status == models.TaskStatus.QUEUED)
-                .order_by(models.TaskDB.priority.asc())
-                .order_by(models.TaskDB.created_at.asc())
-                .filter(models.TaskDB.scheduler_id == scheduler_id)
-            )
+            query = session.query(models.TaskDB).filter(models.TaskDB.status == models.TaskStatus.QUEUED)
+
+            if scheduler_id is not None:
+                query = query.filter(models.TaskDB.scheduler_id == scheduler_id)
 
             if filters is not None:
                 query = apply_filter(models.TaskDB, query, filters)
 
-            item_orm = query.first()
+            try:
+                count = query.count()
+                item_orm = (
+                    query.order_by(models.TaskDB.priority.asc())
+                    .order_by(models.TaskDB.created_at.asc())
+                    .offset(offset)
+                    .limit(limit)
+                    .all()
+                )
+            except exc.ProgrammingError as e:
+                raise StorageError(f"Invalid filter: {e}") from e
 
-            if item_orm is None:
-                return None
+            items = [models.Task.model_validate(item_orm) for item_orm in item_orm]
 
-            return models.Task.model_validate(item_orm)
+            return items, count
 
     @retry()
     @exception_handler
@@ -187,4 +197,15 @@ class PriorityQueueStore:
                 .filter(models.TaskDB.status == models.TaskStatus.QUEUED)
                 .filter(models.TaskDB.scheduler_id == scheduler_id)
                 .delete(),
+            )
+
+    @retry()
+    @exception_handler
+    def bulk_update_status(self, scheduler_id: str, item_ids: list[UUID], status: models.TaskStatus) -> None:
+        with self.dbconn.session.begin() as session:
+            (
+                session.query(models.TaskDB)
+                .filter(models.TaskDB.scheduler_id == scheduler_id)
+                .filter(models.TaskDB.id.in_([str(item_id) for item_id in item_ids]))
+                .update({"status": status.name}, synchronize_session=False),
             )

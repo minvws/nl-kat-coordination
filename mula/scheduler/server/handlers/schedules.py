@@ -12,13 +12,11 @@ from scheduler.server.errors import BadRequestError, ConflictError, NotFoundErro
 
 
 class ScheduleAPI:
-    def __init__(
-        self, api: fastapi.FastAPI, ctx: context.AppContext, schedulers: dict[str, schedulers.Scheduler]
-    ) -> None:
-        self.logger: structlog.BoundLogger = structlog.get_logger(__name__)
-        self.api = api
-        self.ctx = ctx
-        self.schedulers = schedulers
+    def __init__(self, api: fastapi.FastAPI, ctx: context.AppContext, s: dict[str, schedulers.Scheduler]):
+        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
+        self.api: fastapi.FastAPI = api
+        self.ctx: context.AppContext = ctx
+        self.schedulers: dict[str, schedulers.Scheduler] = s
 
         self.api.add_api_route(
             path="/schedules",
@@ -113,8 +111,8 @@ class ScheduleAPI:
 
         try:
             new_schedule = models.Schedule(**schedule.model_dump())
-        except ValueError:
-            raise ValidationError("validation error")
+        except ValueError as exc:
+            raise ValidationError(exc)
 
         s = self.schedulers.get(new_schedule.scheduler_id)
         if s is None:
@@ -123,8 +121,8 @@ class ScheduleAPI:
         # Validate data with task type of the scheduler
         try:
             instance = s.ITEM_TYPE.model_validate(new_schedule.data)
-        except ValueError:
-            raise BadRequestError("validation error")
+        except ValueError as exc:
+            raise BadRequestError(exc)
 
         # Create hash for schedule with task type
         new_schedule.hash = instance.hash
