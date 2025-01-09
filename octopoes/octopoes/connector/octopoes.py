@@ -295,8 +295,10 @@ class OctopoesAPIConnector:
 
         return TypeAdapter(Paginated[HydratedReport]).validate_json(res.content)
 
-    def get_report(self, report_id: str) -> Report:
-        res = self.session.get(f"/{self.client}/reports/{report_id}")
+    def get_report(self, report_id: str, valid_time: datetime) -> Report:
+        params = {"valid_time": str(valid_time)}
+
+        res = self.session.get(f"/{self.client}/reports/{report_id}", params=params)
 
         return TypeAdapter(Report).validate_json(res.content)
 

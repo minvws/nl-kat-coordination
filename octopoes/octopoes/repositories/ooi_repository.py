@@ -34,6 +34,7 @@ from octopoes.repositories.repository import Repository
 from octopoes.xtdb import Datamodel, FieldSet, ForeignKey
 from octopoes.xtdb.client import OperationType as XTDBOperationType
 from octopoes.xtdb.client import XTDBSession
+from octopoes.xtdb.exceptions import ObjectNotFound
 from octopoes.xtdb.query import Aliased, Query
 from octopoes.xtdb.query_builder import generate_pull_query, str_val
 from octopoes.xtdb.related_field_generator import RelatedFieldNode
@@ -144,7 +145,7 @@ class OOIRepository(Repository):
     ) -> Paginated[HydratedReport]:
         raise NotImplementedError
 
-    def get_report(self, report_id) -> Report:
+    def get_report(self, valid_time: datetime, report_id: str | Reference) -> HydratedReport:
         raise NotImplementedError
 
     def get_bit_configs(self, source: OOI, bit_definition: BitDefinition, valid_time: datetime) -> list[Config]:
@@ -818,6 +819,20 @@ class XTDBOOIRepository(OOIRepository):
 
         # Remove the date from the results
         return Paginated(count=count, items=[results[0] for results in results])
+
+    def get_report(self, valid_time: datetime, report_id: str | Reference) -> HydratedReport:
+        query = Query(Report).where(Report, primary_key=str(report_id))
+        results = self.query(query.pull(Report, fields="[* {:Report/input_oois [*]}]"), valid_time, HydratedReport)
+
+        if not results:
+            raise ObjectNotFoundException(report_id)
+
+        result = results[0]
+
+        if not isinstance(result, HydratedReport):
+            raise ValueError("Invalid query result")
+
+        return result
 
     def query(self, query: str | Query, valid_time: datetime, to_type: OOIType | None = None) -> list[OOI | tuple]:
         """

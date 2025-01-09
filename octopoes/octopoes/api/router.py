@@ -451,8 +451,12 @@ def list_reports(
 
 
 @router.get("/reports/{report_id}", tags=["Reports"])
-def get_report(report_id: str, octopoes: OctopoesService = Depends(octopoes_service)):
-    return octopoes.ooi_repository.get_report(report_id)
+def get_report(
+    report_id: str,
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+) -> HydratedReport:
+    return octopoes.ooi_repository.get_report(valid_time, report_id)
 
 
 @router.get("/findings/count_by_severity", tags=["Findings"])
