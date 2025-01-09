@@ -21,7 +21,7 @@ from octopoes.models import OOI, Reference, ScanLevel, ScanProfile, ScanProfileT
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
-from octopoes.models.ooi.reports import HydratedReport, Report
+from octopoes.models.ooi.reports import HydratedReport
 from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.transaction import TransactionRecord
@@ -295,12 +295,12 @@ class OctopoesAPIConnector:
 
         return TypeAdapter(Paginated[HydratedReport]).validate_json(res.content)
 
-    def get_report(self, report_id: str, valid_time: datetime) -> Report:
+    def get_report(self, report_id: str, valid_time: datetime) -> HydratedReport:
         params = {"valid_time": str(valid_time)}
 
         res = self.session.get(f"/{self.client}/reports/{report_id}", params=params)
 
-        return TypeAdapter(Report).validate_json(res.content)
+        return TypeAdapter(HydratedReport).validate_json(res.content)
 
     def load_objects_bulk(self, references: set[Reference], valid_time):
         params = {"valid_time": valid_time}

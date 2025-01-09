@@ -280,8 +280,6 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         schedule: str,
         query: dict[str, Any] | None,
     ) -> ReportRecipe:
-        input_recipe: dict[str, Any] = {}
-
         if query:
             input_recipe = {"query": query}
         else:
@@ -293,7 +291,7 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
             subreport_name_format=subreport_name_format,
             input_recipe=input_recipe,
             parent_report_type=parent_report_type,
-            report_types=self.get_report_type_ids(),
+            asset_report_types=self.get_report_type_ids(),
             cron_expression=schedule,
         )
         create_ooi(

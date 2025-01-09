@@ -450,7 +450,11 @@ def seed_report(
     name: str, valid_time, ooi_repository, origin_repository, input_reports: list[AssetReport] | None = None
 ) -> Report:
     recipe = ReportRecipe(
-        recipe_id=uuid.uuid4(), report_name_format="test", cron_expression="* * * *", input_recipe={}, report_types=[]
+        recipe_id=uuid.uuid4(),
+        report_name_format="test",
+        cron_expression="* * * *",
+        input_recipe={},
+        asset_report_types=[],
     )
     report = Report(
         name=name,
@@ -496,7 +500,11 @@ def seed_asset_report(
     name: str, valid_time, ooi_repository, origin_repository, input_ooi: str = "testref"
 ) -> AssetReport:
     recipe = ReportRecipe(
-        recipe_id=uuid.uuid4(), report_name_format="test", cron_expression="* * * *", input_recipe={}, report_types=[]
+        recipe_id=uuid.uuid4(),
+        report_name_format="test",
+        cron_expression="* * * *",
+        input_recipe={},
+        asset_report_types=[],
     )
 
     asset_report = AssetReport(
