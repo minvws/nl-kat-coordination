@@ -183,7 +183,63 @@ The table below gives an overview of the elements that can be found in each repo
 
 Report flow
 ===========
-On the Reports page you can generate new reports and get an overview of all generated reports. With the button 'Generate report' you get into the Report flow wizard, which can be used to choose your report, objects and plugins that are required for the report. There are two ways to select objects. You can manually select objects, which will be static. Or you can select a live set of objects by continuing with the selected filters. The selected objects will then always be based on the selected filters at the time of generating the report. and  Please note that enabling plugins during the report flow wizard will result in inaccurate data, as the plugins will take some time before they have gathered and analyzed all data. Check the Tasks page to verify that all tasks have completed.
+On the Reports page you can generate new reports and get an overview of all generated reports.
+With the button 'Generate report' you get into the Report flow wizard, which can be used to choose your report, objects and plugins that are required for the report.
+There are two ways to select objects. You can manually select objects, which will be static.
+Or you can select a live set of objects by continuing with the selected filters.
+The selected objects will then always be based on the selected filters at the time of generating the report.
+And please note that enabling plugins during the report flow wizard will result in inaccurate data,
+as the plugins will take some time before they have gathered and analyzed all data.
+Check the Tasks page to verify that all tasks have completed.
+
+Report naming
+=======
+Reports can be named dynamically based on their input objects and report type.
+This is done through a templating language defined through the following examples.
+
+For Single Reports and Concatenated reports we have:
+
+1 report_type and 1 OOI:
+ Template: "{report_type} for {ooi}"
+
+ Example output: "DNS Report for mispo.es"
+
+>1 report_types and 1 OOI:
+ Template: "Concatenated Report for {ooi}"
+
+ Example output: "Concatenated Report for mispo.es"
+report_type and >1 OOIs:
+ "{report_type} for {n} objects"
+
+ Example output: "DNS Report for 3 objects"
+
+>1 report_types and >1 OOIs:
+ Template: "Concatenated Report for {n} objects"
+
+ Example output: "Concatenated Report for 5 objects"
+
+====
+
+For Aggregate Reports and Concatenated Reports we have:
+
+1 OOI:
+ Template: "Aggregate Report for {ooi}"
+
+ Example output: "Aggregate Report for mispo.es"
+
+>1 OOIs:
+ "Aggregate Report for {n} objects"
+
+ Example output: "Aggregate Report for 6 objects"
+
+====
+
+For Multi Reports we have:
+
+Any amount of OOIs:
+ Template: "Multi Report for {n} objects"
+
+ Example output: "Multi Report for 2 objects"
 
 
 Plugins
