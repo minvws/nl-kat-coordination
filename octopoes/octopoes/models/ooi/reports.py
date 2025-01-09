@@ -95,7 +95,7 @@ class ReportRecipe(OOI):
     recipe_id: UUID
 
     report_name_format: str
-    subreport_name_format: str | None = None
+    asset_report_name_format: str | None = None
 
     input_recipe: dict[str, Any]  # can contain a query which maintains a live set of OOIs or manually picked OOIs.
     report_type: str | None = None

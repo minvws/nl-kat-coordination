@@ -96,7 +96,7 @@ class LocalReportRunner(ReportRunner):
                 for ooi in data:
                     ooi_human_readable = Reference.from_str(ooi).human_readable
                     asset_report_name = now.strftime(
-                        Template(recipe.subreport_name_format).safe_substitute(
+                        Template(recipe.asset_report_name_format).safe_substitute(
                             ooi=ooi_human_readable, report_type=str(report_type.name)
                         )
                     )

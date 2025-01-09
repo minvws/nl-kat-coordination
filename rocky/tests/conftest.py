@@ -1282,9 +1282,9 @@ def report_recipe():
     return ReportRecipe(
         recipe_id="744d054e-9c70-4f18-ad27-122cfc1b7903",
         report_name_format="Test Report Name Format",
-        subreport_name_format="Test Subreport Name Format",
+        asset_report_name_format="Test Subreport Name Format",
         input_recipe={"input_oois": ["Hostname|internet|mispo.es"]},
-        report_types=["dns-report"],
+        asset_report_types=["dns-report"],
         cron_expression="0 0 * * *",
     )
 

@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 from string import Template
 from typing import Any
-from uuid import uuid4
 
 import structlog
 from django.contrib import messages
@@ -116,7 +115,6 @@ def save_report_data(
                 raw=ReportDataDict({"report_data": data["data"]} | asset_report_input).model_dump_json().encode(),
                 manual_mime_types={"openkat/report"},
             )
-
 
             asset_report = AssetReport(
                 name=str(name),

@@ -22,10 +22,10 @@ class ReportSerializer(serializers.BaseSerializer):
 class ReportRecipeSerializer(serializers.Serializer):
     id = serializers.UUIDField(source="recipe_id", read_only=True)
     report_name_format = serializers.CharField()
-    subreport_name_format = serializers.CharField(required=False)
+    asset_report_name_format = serializers.CharField(required=False)
 
     input_recipe = serializers.DictField()
-    report_types = serializers.ListField(child=serializers.CharField())
+    asset_report_types = serializers.ListField(child=serializers.CharField())
 
     cron_expression = serializers.CharField()
     start_date = serializers.DateField(write_only=True, required=False)
