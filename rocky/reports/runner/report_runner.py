@@ -49,22 +49,12 @@ class LocalReportRunner(ReportRunner):
                 asc_desc=query["asc_desc"],
             ).items
 
-        ooi_count = len(oois)
         ooi_pks = [ooi.primary_key for ooi in oois]
 
         self.bytes_client.organization = report_task.organisation_id
 
         if recipe.report_type == AggregateOrganisationReport.id:
-            report_name = now.strftime(
-                Template(recipe.report_name_format).safe_substitute(
-                    report_type=str(AggregateOrganisationReport.name), oois_count=str(ooi_count)
-                )
-            )
             report_type_ids = [report.id for report in report_types]
-
-            if "${ooi}" in report_name and ooi_count == 1:
-                report_name = Template(report_name).safe_substitute(ooi=oois[0].human_readable)
-
             aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
                 connector, oois, report_type_ids, valid_time, report_task.organisation_id
             )
@@ -73,18 +63,11 @@ class LocalReportRunner(ReportRunner):
                 valid_time,
                 connector,
                 Organization.objects.get(code=report_task.organisation_id),
-                {
-                    "input_data": {
-                        "input_oois": ooi_pks,
-                        "report_types": recipe.report_types,
-                        "plugins": report_plugins_union(report_types),
-                    }
-                },
+                oois,
                 report_data,
-                report_name,
                 post_processed_data,
                 aggregate_report,
-                recipe_ref,
+                recipe,
             )
         else:
             error_reports, report_data = collect_reports(valid_time, connector, ooi_pks, report_types)

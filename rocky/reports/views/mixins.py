@@ -15,7 +15,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
 from octopoes.models.ooi.reports import AssetReport, Report, ReportRecipe
-from reports.report_types.aggregate_organisation_report.report import aggregate_reports
+from reports.report_types.aggregate_organisation_report.report import aggregate_reports, AggregateOrganisationReport
 from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import BaseReport, SubReportPlugins, report_plugins_union
 from reports.report_types.helpers import REPORTS, get_report_by_id
@@ -92,7 +92,6 @@ def save_report_data(
         return None
 
     now = datetime.now(timezone.utc)
-    asset_reports = []
 
     input_data = {
         "input_data": {
@@ -101,6 +100,66 @@ def save_report_data(
             "plugins": report_plugins_union([get_report_by_id(type_id) for type_id in recipe.report_types]),
         }
     }
+
+    asset_reports = create_asset_reports(
+        bytes_client,
+        input_data,
+        now,
+        observed_at,
+        octopoes_api_connector,
+        organization,
+        recipe,
+        report_data,
+    )
+
+    raw_id = bytes_client.upload_raw(
+        raw=ReportDataDict(input_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
+    )
+
+    report_name = now.strftime(
+        Template(recipe.report_name_format).safe_substitute(
+            oois_count=str(len(oois)),
+            report_type=str(ConcatenatedReport.name)
+        )
+    )
+
+    if len(oois) == 1:
+        report_name = Template(report_name).safe_substitute(ooi=oois[0].human_readable)
+
+    if not report_name or report_name.isspace():
+        report_name = ConcatenatedReport.name
+
+    report_ooi = Report(
+        name=str(report_name),
+        report_type=str(ConcatenatedReport.id),
+        template=ConcatenatedReport.template_path,
+        organization_code=organization.code,
+        organization_name=organization.name,
+        organization_tags=[tag.name for tag in organization.tags.all()],
+        data_raw_id=raw_id,
+        date_generated=now,
+        reference_date=observed_at,
+        input_oois=[asset_report.reference for asset_report in asset_reports],
+        observed_at=observed_at,
+        report_recipe=recipe.reference,
+    )
+
+    create_ooi(octopoes_api_connector, bytes_client, report_ooi, observed_at)
+    logger.info("Report created", event_code=800071, report=report_ooi)
+    return report_ooi
+
+
+def create_asset_reports(
+    bytes_client,
+    input_data,
+    now,
+    observed_at,
+    octopoes_api_connector,
+    organization,
+    recipe,
+    report_data,
+):
+    asset_reports = []
 
     for report_type_id, ooi_data in report_data.items():
         report_type = get_report_by_id(report_type_id)
@@ -139,113 +198,72 @@ def save_report_data(
             asset_reports.append(asset_report)
             create_ooi(octopoes_api_connector, bytes_client, asset_report, observed_at)
 
-    asset_report_references = [subreport.reference for subreport in asset_reports]
-
-    raw_id = bytes_client.upload_raw(
-        raw=ReportDataDict(input_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
-    )
-
-    report_name = now.strftime(Template(recipe.report_name_format).safe_substitute(oois_count=str(len(oois))))
-
-    if len(oois) == 1:
-        report_name = Template(report_name).safe_substitute(ooi=oois[0].human_readable)
-
-    name = now.strftime(Template(report_name).safe_substitute(report_type=str(ConcatenatedReport.name)))
-
-    if not name or name.isspace():
-        name = ConcatenatedReport.name
-
-    report_ooi = Report(
-        name=str(name),
-        report_type=str(ConcatenatedReport.id),
-        template=ConcatenatedReport.template_path,
-        organization_code=organization.code,
-        organization_name=organization.name,
-        organization_tags=[tag.name for tag in organization.tags.all()],
-        data_raw_id=raw_id,
-        date_generated=now,
-        reference_date=observed_at,
-        input_oois=asset_report_references,
-        observed_at=observed_at,
-        report_recipe=recipe.reference,
-    )
-
-    create_ooi(octopoes_api_connector, bytes_client, report_ooi, observed_at)
-    logger.info("Report created", event_code=800071, report=report_ooi)
-    return report_ooi
-
+    return asset_reports
 
 def save_aggregate_report_data(
-    bytes_client,
-    observed_at,
-    octopoes_api_connector,
-    organization,
-    input_data: dict,
-    report_data,
-    report_name,
+    bytes_client: BytesClient,
+    observed_at: datetime,
+    octopoes_api_connector: OctopoesAPIConnector,
+    organization: Organization,
+    oois: list[OOIType],
+    report_data: dict,
     post_processed_data,
     aggregate_report,
-    report_recipe: Reference | None = None,
+    recipe: ReportRecipe,
 ) -> Report | None:
     if len(report_data) == 0:
         return None
 
     now = datetime.now(timezone.utc)
-    asset_reports = []
+    input_data = {
+        "input_data": {
+            "input_oois": [ooi.primary_key for ooi in oois],
+            "report_types": recipe.report_types,
+            "plugins": report_plugins_union([get_report_by_id(type_id) for type_id in recipe.report_types]),
+        }
+    }
 
-    for ooi, types in report_data.items():
-        for report_type_id, data in types.items():
-            report_type = get_report_by_id(report_type_id)
-            asset_report_input = get_input_data(input_data, ooi, report_type)
-
-            asset_raw_id = bytes_client.upload_raw(
-                raw=ReportDataDict({"report_data": data} | asset_report_input).model_dump_json().encode(),
-                manual_mime_types={"openkat/report"},
-            )
-
-            asset_report = AssetReport(
-                name=str(report_type.name),
-                report_type=report_type_id,
-                report_recipe=report_recipe,
-                template=report_type.template_path,
-                organization_code=organization.code,
-                organization_name=organization.name,
-                organization_tags=[tag.name for tag in organization.tags.all()],
-                data_raw_id=asset_raw_id,
-                date_generated=now,
-                reference_date=observed_at,
-                input_ooi=ooi,
-                observed_at=observed_at,
-            )
-
-            asset_reports.append(asset_report)
-            create_ooi(octopoes_api_connector, bytes_client, asset_report, observed_at)
-
-    asset_report_references = [subreport.reference for subreport in asset_reports]
+    asset_reports = create_asset_reports(
+        bytes_client,
+        input_data,
+        now,
+        observed_at,
+        octopoes_api_connector,
+        organization,
+        recipe,
+        report_data,
+    )
 
     raw_id = bytes_client.upload_raw(
         raw=ReportDataDict(post_processed_data | input_data).model_dump_json().encode(),
         manual_mime_types={"openkat/report"},
     )
-    aggregate_report_type = type(aggregate_report)
 
-    name = now.strftime(report_name)
-    if not name or name.isspace():
-        name = aggregate_report_type.name
+    report_name = now.strftime(
+        Template(recipe.report_name_format).safe_substitute(
+            report_type=str(AggregateOrganisationReport.name), oois_count=str(len(oois))
+        )
+    )
+
+    if len(oois) == 1:
+        report_name = Template(report_name).safe_substitute(ooi=oois[0].human_readable)
+
+    if not report_name or report_name.isspace():
+        report_name = type(aggregate_report).name
 
     report_ooi = Report(
-        name=str(name),
-        report_type=str(aggregate_report_type.id),
-        template=aggregate_report_type.template_path,
+        name=str(report_name),
+        report_type=str(type(aggregate_report).id),
+        template=type(aggregate_report).template_path,
         organization_code=organization.code,
         organization_name=organization.name,
         organization_tags=[tag.name for tag in organization.tags.all()],
         data_raw_id=raw_id,
         date_generated=now,
         reference_date=observed_at,
-        input_oois=asset_report_references,
+        input_oois=[asset_report.reference for asset_report in asset_reports],
         observed_at=observed_at,
-        report_recipe=report_recipe,
+        report_recipe=recipe.reference,
     )
     create_ooi(octopoes_api_connector, bytes_client, report_ooi, observed_at)
 
