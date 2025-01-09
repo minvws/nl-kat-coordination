@@ -327,6 +327,25 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
             }
         }
 
+    def get_initial_report_names(self) -> tuple[str, str]:
+        oois = self.get_total_oois()
+        is_single_report = self.is_single_report()
+
+        if oois == 1 and is_single_report:
+            return ("${report_type} for ${ooi}", "")
+        if oois == 1 and not is_single_report:
+            return ("${report_type} for ${ooi}", "${report_type} for ${ooi}")
+        if oois > 1:
+            return ("${report_type} for ${oois_count} objects", "${report_type} for ${ooi}")
+        return ("", "")
+
+    def get_parent_report_type(self):
+        if self.report_type is not None:
+            return self.report_type.id
+        if not self.is_single_report():
+            return ConcatenatedReport.id
+        return self.report_type
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -500,18 +519,6 @@ class ReportFinalSettingsView(BaseReportView, SchedulerView, TemplateView):
             return PostRedirect(self.get_previous())
         return super().get(request, *args, **kwargs)
 
-    def get_initial_report_names(self) -> tuple[str, str]:
-        oois = self.get_total_oois()
-        is_single_report = self.is_single_report()
-
-        if oois == 1 and is_single_report:
-            return ("${report_type} for ${ooi}", "")
-        if oois == 1 and not is_single_report:
-            return ("${report_type} for ${ooi}", "${report_type} for ${ooi}")
-        if oois > 1:
-            return ("${report_type} for ${oois_count} objects", "${report_type} for ${ooi}")
-        return ("", "")
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["initial_report_names"] = self.get_initial_report_names()
@@ -523,13 +530,6 @@ class ReportFinalSettingsView(BaseReportView, SchedulerView, TemplateView):
 class SaveReportView(BaseReportView, SchedulerView, FormView):
     task_type = "report"
     form_class = ReportScheduleStartDateForm
-
-    def get_parent_report_type(self):
-        if self.report_type is not None:
-            return self.report_type.id
-        if not self.is_single_report():
-            return ConcatenatedReport.id
-        return self.report_type
 
     def form_invalid(self, form):
         """
