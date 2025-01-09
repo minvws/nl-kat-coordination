@@ -20,7 +20,7 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
         report_name_format="Concatenated report for ${oois_count} objects",
         subreport_name_format="${report_type} for ${ooi} in %Y",
         input_recipe={"input_oois": [oois["hostnames"][0].reference, oois["hostnames"][1].reference]},
-        report_types=["dns-report"],
+        asset_report_types=["dns-report"],
         cron_expression="* * * * *",
     )
     octopoes_api_connector.save_declaration(Declaration(ooi=recipe, valid_time=valid_time))

@@ -29,9 +29,9 @@
                             <td class="nowrap">{{ schedule.recipe.report_name_format }}</td>
                             <td>
                                 <ul class="tags horizontal-view">
-                                    {% if schedule.recipe.parent_report_type == "aggregate-organisation-report" %}
-                                        <li class="label tags-color-{{ schedule.recipe.parent_report_type|get_report_type_label_style }}">
-                                            {{ schedule.recipe.parent_report_type|get_report_type_name }}
+                                    {% if schedule.recipe.report_type == "aggregate-organisation-report" %}
+                                        <li class="label tags-color-{{ schedule.recipe.report_type|get_report_type_label_style }}">
+                                            {{ schedule.recipe.report_type|get_report_type_name }}
                                         </li>
                                     {% else %}
                                         {% for report_type in schedule.recipe.asset_report_types %}
@@ -83,6 +83,7 @@
                                         </thead>
                                         <tbody>
                                             {% for report in schedule.reports %}
+                                                {{ report.dict }}
                                                 <tr>
                                                     <td>
                                                         <a href="{% url "view_report" organization.code %}?report_id={{ report.reference }}&observed_at={{ report.observed_at|date:"Y-m-d H:i:s:u" }}"

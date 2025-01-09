@@ -50,7 +50,7 @@ def test_ooi_edit_report_recipe_post(
                 "report_name_format": report_recipe.report_name_format,
                 "subreport_name_format": report_recipe.subreport_name_format,
                 "input_recipe": json.dumps(report_recipe.input_recipe),
-                "report_types": json.dumps(report_recipe.report_types),
+                "report_types": json.dumps(report_recipe.asset_report_types),
                 "cron_expression": report_recipe.cron_expression,
             },
         ),

@@ -276,7 +276,7 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         self,
         report_name_format: str,
         subreport_name_format: str,
-        parent_report_type: str | None,
+        report_type: str | None,
         schedule: str,
         query: dict[str, Any] | None,
     ) -> ReportRecipe:
@@ -292,8 +292,8 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
             report_name_format=report_name_format,
             subreport_name_format=subreport_name_format,
             input_recipe=input_recipe,
-            parent_report_type=parent_report_type,
-            report_types=self.get_report_type_ids(),
+            report_type=report_type,
+            asset_report_types=self.get_report_type_ids(),
             cron_expression=schedule,
         )
         create_ooi(
@@ -582,16 +582,16 @@ class SaveReportView(BaseReportView, SchedulerView):
                     "asc_desc": self.sorting_order,
                 }
 
-            parent_report_type = None
+            report_type = None
             if self.report_type is not None:
-                parent_report_type = self.report_type.id
+                report_type = self.report_type.id
             elif not self.report_type and subreport_name_format:
-                parent_report_type = ConcatenatedReport.id
+                report_type = ConcatenatedReport.id
 
             schedule = self.convert_recurrence_to_cron_expressions(recurrence, start_datetime)
 
             report_recipe = self.create_report_recipe(
-                report_name_format, subreport_name_format, parent_report_type, schedule, query
+                report_name_format, subreport_name_format, report_type, schedule, query
             )
 
             self.create_report_schedule(report_recipe, start_datetime)
@@ -664,7 +664,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         )
 
     def get_report_ooi(self, ooi_pk: str) -> ReportOOI:
-        return self.octopoes_api_connector.get(Reference.from_str(f"{ooi_pk}"), valid_time=self.custom_observed_at)
+        return self.octopoes_api_connector.get_report(Reference.from_str(ooi_pk), valid_time=self.custom_observed_at)
 
     def get_template_names(self):
         if self.report_ooi.report_type and issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):

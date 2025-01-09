@@ -32,7 +32,7 @@ class LocalReportRunner(ReportRunner):
         recipe_ref = Reference.from_str(f"ReportRecipe|{report_task.report_recipe_id}")
         recipe: ReportRecipe = connector.get(recipe_ref, valid_time)
 
-        report_types = [get_report_by_id(report_type_id) for report_type_id in recipe.report_types]
+        report_types = [get_report_by_id(report_type_id) for report_type_id in recipe.asset_report_types]
         oois = []
         now = datetime.now(timezone.utc)
 
@@ -76,7 +76,7 @@ class LocalReportRunner(ReportRunner):
                 {
                     "input_data": {
                         "input_oois": ooi_pks,
-                        "report_types": recipe.report_types,
+                        "report_types": recipe.asset_report_types,
                         "plugins": report_plugins_union(report_types),
                     }
                 },
@@ -115,7 +115,7 @@ class LocalReportRunner(ReportRunner):
                 {
                     "input_data": {
                         "input_oois": ooi_pks,
-                        "report_types": recipe.report_types,
+                        "report_types": recipe.asset_report_types,
                         "plugins": report_plugins_union(report_types),
                     }
                 },
