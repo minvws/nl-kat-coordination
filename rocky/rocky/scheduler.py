@@ -3,6 +3,7 @@ from __future__ import annotations
 import collections
 import datetime
 import logging
+import time
 import uuid
 from enum import Enum
 from functools import cached_property
@@ -168,6 +169,17 @@ class ScheduleResponse(BaseModel):
     modified_at: datetime.datetime
 
 
+class SchedulerResponse(BaseModel):
+    id: str
+    enabled: bool
+    priority_queue: dict[str, Any]
+    last_activity: str | None
+
+
+class SchedulerNoResponse(BaseModel):
+    detail: str
+
+
 class Queue(BaseModel):
     id: str
     size: int
@@ -286,6 +298,23 @@ class SchedulerClient:
             return ScheduleResponse.model_validate_json(res.content)
         except ConnectError:
             raise SchedulerConnectError()
+
+    def is_scheduler_ready(self, scheduler_id: str) -> bool:
+        """Max trails is 1 minute, 10 x 10 seconds"""
+        trials = 0
+        interval = 10  # in seconds
+        while trials < 10:
+            try:
+                res = self._client.get(f"/schedulers/{scheduler_id}")
+                res.raise_for_status()
+                break
+            except HTTPStatusError as http_error:
+                if http_error.response.status_code == codes.NOT_FOUND:
+                    trials += 1
+                    time.sleep(interval)
+                    continue
+                raise SchedulerHTTPError()
+        return SchedulerResponse.model_validate_json(res.content).enabled
 
     def post_schedule_search(self, filters: dict[str, list[dict[str, str]]]) -> PaginatedSchedulesResponse:
         try:

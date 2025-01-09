@@ -80,7 +80,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
                                 "recipe": recipe_ooi,
                                 "cron": schedule["schedule"],
                                 "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
-                                "reports": report_oois,
+                                "reports": report_oois[:5],
                             }
                         )
 
