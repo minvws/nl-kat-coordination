@@ -15,7 +15,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import TemplateView
+from django.views.generic import FormView, TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
 from katalogus.client import Boefje, KATalogus, KATalogusError, Plugin
 from pydantic import RootModel, TypeAdapter
@@ -520,8 +520,9 @@ class ReportFinalSettingsView(BaseReportView, SchedulerView, TemplateView):
         return context
 
 
-class SaveReportView(BaseReportView, SchedulerView, TemplateView):
+class SaveReportView(BaseReportView, SchedulerView, FormView):
     task_type = "report"
+    form_class = ReportScheduleStartDateForm
 
     def get_parent_report_type(self):
         if self.report_type is not None:
@@ -530,31 +531,36 @@ class SaveReportView(BaseReportView, SchedulerView, TemplateView):
             return ConcatenatedReport.id
         return self.report_type
 
-    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        form = ReportScheduleStartDateForm(request.POST)
-        if form.is_valid():
-            start_datetime = form.cleaned_data["start_datetime"]
-            recurrence = form.cleaned_data["recurrence"]
+    def form_invalid(self, form):
+        """
+        We need to overwrite this as FormView renders invalid forms with a get request,
+        we need to adapt it using Postredirect, returning invalid form.
+        """
 
-            schedule = (
-                self.convert_recurrence_to_cron_expressions(recurrence, start_datetime)
-                if recurrence is not None and recurrence != "once"
-                else None
-            )
+        return PostRedirect(self.get_current())
 
-            parent_report_type = self.get_parent_report_type()
+    def form_valid(self, form):
+        start_datetime = form.cleaned_data["start_datetime"]
+        recurrence = form.cleaned_data["recurrence"]
 
-            parent_report_name_format = request.POST.get("parent_report_name_format", "")
-            subreport_name_format = request.POST.get("subreport_name_format")
+        schedule = (
+            self.convert_recurrence_to_cron_expressions(recurrence, start_datetime)
+            if recurrence is not None and recurrence != "once"
+            else None
+        )
 
-            report_recipe = self.create_report_recipe(
-                parent_report_name_format, subreport_name_format, parent_report_type, schedule
-            )
+        parent_report_type = self.get_parent_report_type()
 
-            self.create_report_schedule(report_recipe, start_datetime)
+        parent_report_name_format = self.request.POST.get("parent_report_name_format", "")
+        subreport_name_format = self.request.POST.get("subreport_name_format")
 
-            return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
-        return super().get(request, *args, **kwargs)
+        report_recipe = self.create_report_recipe(
+            parent_report_name_format, subreport_name_format, parent_report_type, schedule
+        )
+
+        self.create_report_schedule(report_recipe, start_datetime)
+
+        return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 
 
 class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):

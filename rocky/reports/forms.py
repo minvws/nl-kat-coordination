@@ -60,7 +60,7 @@ class ReportScheduleStartDateForm(BaseRockyForm):
 
     start_time = forms.TimeField(
         label=_("Start time (UTC)"),
-        widget=forms.TimeInput(format="%H:%M", attrs={"form": "generate_report"}),
+        widget=forms.TimeInput(format="%H:%M", attrs={"type": "time"}),
         initial=lambda: datetime.now(tz=timezone.utc).time(),
         required=True,
         input_formats=["%H:%M"],
