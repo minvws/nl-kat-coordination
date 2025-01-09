@@ -395,13 +395,15 @@ class ReportList:
 
         return subreports
 
-    def hydrate_report_list(self, reports: list[tuple[Report, list[AssetReport]]]) -> list[HydratedReport]:
+    def hydrate_report_list(self, reports: list[AssetReport]) -> list[HydratedReport]:
         hydrated_reports: list[HydratedReport] = []
 
         for report in reports:
             hydrated_report = HydratedReport()
 
-            hydrated_report.parent_report, asset_reports = report
+            hydrated_report.parent_report = report
+            asset_reports = report.input_oois
+            hydrated_report.asset_reports = asset_reports
             hydrated_report.total_children_reports = len(asset_reports)
             hydrated_report.total_objects = len({asset_report.input_ooi for asset_report in asset_reports})
             hydrated_report.report_type_summary = self.report_type_summary(asset_reports)
