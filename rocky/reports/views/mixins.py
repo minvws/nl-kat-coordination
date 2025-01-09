@@ -5,15 +5,19 @@ from typing import Any
 import structlog
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
+from octopoes.models.types import OOIType
+
+from rocky.bytes_client import BytesClient
+from tools.models import Organization
 from tools.ooi_helpers import create_ooi
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
-from octopoes.models.ooi.reports import AssetReport, Report
+from octopoes.models.ooi.reports import AssetReport, Report, ReportRecipe
 from reports.report_types.aggregate_organisation_report.report import aggregate_reports
 from reports.report_types.concatenated_report.report import ConcatenatedReport
-from reports.report_types.definitions import BaseReport, SubReportPlugins
+from reports.report_types.definitions import BaseReport, SubReportPlugins, report_plugins_union
 from reports.report_types.helpers import REPORTS, get_report_by_id
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.views.base import BaseReportView, ReportDataDict
@@ -76,15 +80,13 @@ def get_input_data(input_data: dict[str, Any], ooi: str, report_type: type[BaseR
 
 
 def save_report_data(
-    bytes_client,
-    observed_at,
-    octopoes_api_connector,
-    organization,
-    input_data: dict,
-    report_data,
-    asset_report_names,
-    report_name,
-    report_recipe: Reference | None = None,
+    bytes_client: BytesClient,
+    observed_at: datetime,
+    octopoes_api_connector: OctopoesAPIConnector,
+    organization: Organization,
+    oois: list[OOIType],
+    report_data: dict,
+    recipe: ReportRecipe,
 ) -> Report | None:
     if len(report_data) == 0:
         return None
@@ -92,34 +94,38 @@ def save_report_data(
     now = datetime.now(timezone.utc)
     asset_reports = []
 
+    input_data = {
+        "input_data": {
+            "input_oois": [ooi.primary_key for ooi in oois],
+            "report_types": recipe.report_types,
+            "plugins": report_plugins_union([get_report_by_id(type_id) for type_id in recipe.report_types]),
+        }
+    }
+
     for report_type_id, ooi_data in report_data.items():
+        report_type = get_report_by_id(report_type_id)
+
         for ooi, data in ooi_data.items():
-            name_to_save = ""
-            report_type = get_report_by_id(report_type_id)
-            report_type_name = str(report_type.name)
+            ooi_human_readable = Reference.from_str(ooi).human_readable
+            asset_report_name = now.strftime(
+                Template(recipe.asset_report_name_format).safe_substitute(
+                    ooi=ooi_human_readable, report_type=str(report_type.name)
+                )
+            )
 
-            ooi_name = Reference.from_str(ooi).human_readable
-            for default_name, updated_name in asset_report_names:
-                # Use default_name to check if we're on the right index in the list to update the name to save.
-                if ooi_name in default_name and report_type_name in default_name:
-                    name_to_save = updated_name
-                    break
-
-            name = now.strftime(name_to_save)
-            if not name or name.isspace():
-                name = ConcatenatedReport.name
+            if not asset_report_name or asset_report_name.isspace():
+                asset_report_name = ConcatenatedReport.name
 
             asset_report_input = get_input_data(input_data, ooi, report_type)
-
             asset_raw_id = bytes_client.upload_raw(
                 raw=ReportDataDict({"report_data": data["data"]} | asset_report_input).model_dump_json().encode(),
                 manual_mime_types={"openkat/report"},
             )
 
             asset_report = AssetReport(
-                name=str(name),
+                name=str(asset_report_name),
                 report_type=report_type_id,
-                report_recipe=report_recipe,
+                report_recipe=recipe.reference,
                 template=report_type.template_path,
                 organization_code=organization.code,
                 organization_name=organization.name,
@@ -138,6 +144,12 @@ def save_report_data(
     raw_id = bytes_client.upload_raw(
         raw=ReportDataDict(input_data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
     )
+
+    report_name = now.strftime(Template(recipe.report_name_format).safe_substitute(oois_count=str(len(oois))))
+
+    if len(oois) == 1:
+        report_name = Template(report_name).safe_substitute(ooi=oois[0].human_readable)
+
     name = now.strftime(Template(report_name).safe_substitute(report_type=str(ConcatenatedReport.name)))
 
     if not name or name.isspace():
@@ -155,7 +167,7 @@ def save_report_data(
         reference_date=observed_at,
         input_oois=asset_report_references,
         observed_at=observed_at,
-        report_recipe=report_recipe,
+        report_recipe=recipe.reference,
     )
 
     create_ooi(octopoes_api_connector, bytes_client, report_ooi, observed_at)

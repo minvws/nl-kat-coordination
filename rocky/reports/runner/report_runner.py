@@ -30,7 +30,7 @@ class LocalReportRunner(ReportRunner):
             settings.OCTOPOES_API, report_task.organisation_id, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
         )
         recipe_ref = Reference.from_str(f"ReportRecipe|{report_task.report_recipe_id}")
-        recipe: ReportRecipe = connector.get(recipe_ref, valid_time)
+        recipe: ReportRecipe = connector.get(recipe_ref, valid_time)  # type: ignore
 
         report_types = [get_report_by_id(report_type_id) for report_type_id in recipe.report_types]
         oois = []
@@ -89,40 +89,14 @@ class LocalReportRunner(ReportRunner):
         else:
             error_reports, report_data = collect_reports(valid_time, connector, ooi_pks, report_types)
 
-            asset_report_names = []
-            for report_type_id, data in report_data.items():
-                report_type = get_report_by_id(report_type_id)
-
-                for ooi in data:
-                    ooi_human_readable = Reference.from_str(ooi).human_readable
-                    asset_report_name = now.strftime(
-                        Template(recipe.asset_report_name_format).safe_substitute(
-                            ooi=ooi_human_readable, report_type=str(report_type.name)
-                        )
-                    )
-                    asset_report_names.append((asset_report_name, asset_report_name))
-
-            report_name = now.strftime(Template(recipe.report_name_format).safe_substitute(oois_count=str(ooi_count)))
-
-            if "${ooi}" in report_name and ooi_count == 1:
-                report_name = Template(report_name).safe_substitute(ooi=ooi[0].human_readable)
-
             save_report_data(
                 self.bytes_client,
                 valid_time,
                 connector,
                 Organization.objects.get(code=report_task.organisation_id),
-                {
-                    "input_data": {
-                        "input_oois": ooi_pks,
-                        "report_types": recipe.report_types,
-                        "plugins": report_plugins_union(report_types),
-                    }
-                },
+                oois,
                 report_data,
-                asset_report_names,
-                report_name,
-                recipe_ref,
+                recipe,
             )
 
-            self.bytes_client.organization = None
+        self.bytes_client.organization = None
