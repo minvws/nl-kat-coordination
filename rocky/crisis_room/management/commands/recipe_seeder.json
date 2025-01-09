@@ -6,7 +6,8 @@
       "ooi_types": [
         "IPAddressV6",
         "Hostname",
-        "IPAddressV4"
+        "IPAddressV4",
+        "URL"
       ],
       "scan_level": [
         1,
