@@ -4,7 +4,6 @@ from unittest.mock import Mock
 
 import pytest
 from nibbles.https_availability.nibble import NIBBLE as https_availability
-from nibbles.runner import NibblesRunner
 
 from octopoes.core.service import OctopoesService
 from octopoes.models.ooi.dns.zone import Hostname
@@ -20,13 +19,7 @@ STATIC_IP = ".".join((4 * "1 ").split())
 
 
 def test_https_availability_query(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
-    nibbler = NibblesRunner(
-        xtdb_octopoes_service.ooi_repository,
-        xtdb_octopoes_service.origin_repository,
-        xtdb_octopoes_service.nibbler.nibble_repository,
-    )
-    xtdb_octopoes_service.nibbler.disable()
-    nibbler.nibbles = {https_availability.id: https_availability}
+    xtdb_octopoes_service.nibbler.nibbles = {https_availability.id: https_availability}
 
     network = Network(name="internet")
     xtdb_octopoes_service.ooi_repository.save(network, valid_time)
