@@ -57,6 +57,7 @@
                                     {{ schedule.cron }}
                                 {% endif %}
                             </td>
+                            <td class="nowrap">{{ schedule.cron|get_cron_description }}</td>
                             <td class="nowrap">
                                 {% if schedule.enabled %}
                                     <span class="label system-tag color-2">{% translate "Enabled" %}</span>

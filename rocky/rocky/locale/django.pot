@@ -1638,10 +1638,6 @@ msgid "Account setup"
 msgstr ""
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
-msgid "Accounts"
-msgstr ""
-
-#: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Organization setup with separate accounts:"
 msgstr ""
 
@@ -4736,6 +4732,10 @@ msgstr ""
 
 #: tools/forms/ooi.py
 msgid "Clearance Level"
+msgstr ""
+
+#: tools/forms/ooi.py
+msgid "Next scan"
 msgstr ""
 
 #: tools/forms/ooi.py

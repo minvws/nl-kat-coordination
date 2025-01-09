@@ -1,6 +1,7 @@
+from ipaddress import IPv4Address, IPv6Address
 from pathlib import Path
 
-from pydantic_core import Url
+from pydantic import AnyUrl
 
 from boefjes.job_models import NormalizerMeta, NormalizerResults
 from boefjes.local import LocalNormalizerJobRunner
@@ -96,7 +97,7 @@ def test_parse_manual_ip_csv(normalizer_runner):
     meta, output, runner = check_network_created(normalizer_runner, 2)
     assert len(output.declarations) == 6
     assert output.declarations[1].ooi.model_dump() == {
-        "address": "1.1.1.1",
+        "address": IPv4Address("1.1.1.1"),
         "netblock": None,
         "network": Reference("Network|internet"),
         "object_type": "IPAddressV4",
@@ -107,7 +108,7 @@ def test_parse_manual_ip_csv(normalizer_runner):
 
     meta, output, runner = check_network_created(normalizer_runner, 3)
     assert output.declarations[1].ooi.model_dump() == {
-        "address": "fe80:cd00:0:cde:1257:0:211e:729c",
+        "address": IPv6Address("fe80:cd00:0:cde:1257:0:211e:729c"),
         "netblock": None,
         "network": Reference("Network|internet"),
         "object_type": "IPAddressV6",
@@ -125,7 +126,7 @@ def test_parse_url_csv(normalizer_runner):
         "network": Reference("Network|internet"),
         "object_type": "URL",
         "primary_key": "URL|internet|https://example.com/",
-        "raw": Url("https://example.com/"),
+        "raw": AnyUrl("https://example.com/"),
         "scan_profile": None,
         "user_id": None,
         "web_url": None,
@@ -137,7 +138,7 @@ def test_parse_url_csv(normalizer_runner):
         "network": Reference("Network|internet"),
         "object_type": "URL",
         "primary_key": "URL|internet|https://example.com/",
-        "raw": Url("https://example.com/"),
+        "raw": AnyUrl("https://example.com/"),
         "scan_profile": None,
         "user_id": None,
         "web_url": None,
