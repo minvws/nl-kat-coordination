@@ -125,7 +125,7 @@ def parse_ptr_exists_include_mechanism(
         yield Finding(
             finding_type=ft.reference,
             ooi=input_ooi.reference,
-            description="""This SPF record contains a PTR mechanism, Use of PTR is deprecated.""",
+            description="This SPF record contains a PTR mechanism, Use of PTR is deprecated.",
         )
     else:
         mechanism_type, domain = mechanism.split(":", 1)
