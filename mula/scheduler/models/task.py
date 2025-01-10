@@ -121,6 +121,9 @@ class BoefjeTask(BaseModel):
 
     dispatches: list[Normalizer] = Field(default_factory=list)
 
+    requirements: list[str] = []
+    network: str = "Network|internet"
+
     @property
     def hash(self) -> str:
         """Make BoefjeTask hashable, so that we can de-duplicate it when used
