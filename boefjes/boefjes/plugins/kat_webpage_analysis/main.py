@@ -7,9 +7,9 @@ from urllib.parse import urlparse, urlunsplit
 import requests
 from forcediphttpsadapter.adapters import ForcedIPHTTPSAdapter
 from requests import Session
-from requests.models import Response
 
 from boefjes.job_models import BoefjeMeta
+from boefjes.plugins.kat_webpage_analysis.har.requests import create_har_object
 
 ALLOWED_CONTENT_TYPES = mimetypes.types_map.values()
 
@@ -59,36 +59,16 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
         if content_type_splitted[0] in ALLOWED_CONTENT_TYPES:
             body_mimetypes.add(content_type_splitted[0])
 
-    # in case of a full response object, we hexdump to avoid issues with binary data or different encoding
-    response_dump = json.dumps(create_response_object(response))
+    har = json.dumps(create_har_object(response))
 
     return [
-        ({"openkat-http/response"}, response_dump.encode() + b"\n\n" + response.content),
+        ({"application/json+har"}, har.encode()),
         ({"openkat-http/headers"}, json.dumps(dict(response.headers))),
         (body_mimetypes, response.content),
     ]
 
 
-# todo: perhaps also implement response.history?
-def create_response_object(response: requests.Response) -> dict:
-    return {
-        "response": {
-            "url": response.url,
-            "status_code": response.status_code,
-            "headers": dict(response.headers),
-            "cookies": dict(response.cookies),
-            "is_redirect": response.is_redirect,
-            "encoding": response.encoding,
-        },
-        "request": {
-            "url": response.request.url,
-            "method": response.request.method,
-            "headers": dict(response.request.headers),
-        },
-    }
-
-
-def do_request(hostname: str, session: Session, uri: str, useragent: str) -> Response:
+def do_request(hostname: str, session: Session, uri: str, useragent: str):
     response = session.get(
         uri, headers={"Host": hostname, "User-Agent": useragent}, verify=False, allow_redirects=False
     )
