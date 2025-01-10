@@ -6,9 +6,7 @@ from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
 from octopoes.models.ooi.network import Network
 
 
-def nibble(a: Hostname, cname_record: DNSCNAMERecord, resolved_hostname: ResolvedHostname) -> Iterator[OOI]:
-    yield Network(name="aaa")
-
+def nibble(cname_record: DNSCNAMERecord, resolved_hostname: ResolvedHostname) -> Iterator[OOI]:
     yield ResolvedHostname(hostname=cname_record.hostname, address=resolved_hostname.address)
 
     # Also the non-fqdn variant
@@ -19,5 +17,3 @@ def nibble(a: Hostname, cname_record: DNSCNAMERecord, resolved_hostname: Resolve
         ).reference,
         address=resolved_hostname.address,
     )
-
-    yield Network(name="bbb")
