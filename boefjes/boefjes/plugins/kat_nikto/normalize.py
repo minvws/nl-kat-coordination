@@ -16,7 +16,7 @@ MISSING_HEADER_TO_KAT_FINDING_TYPE = {
 }
 
 
-def scan_outdated_software(data: list[dict[str, Any]], ooi_ref: Reference) -> Iterable[NormalizerOutput]:
+def scan_nikto_output(data: list[dict[str, Any]], ooi_ref: Reference) -> Iterable[NormalizerOutput]:
     for scan in data:
         for vulnerability in scan["vulnerabilities"]:
             vulnerability_id: str = vulnerability["id"]
@@ -61,4 +61,4 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
     ooi_ref = Reference.from_str(input_ooi["primary_key"])
 
-    yield from scan_outdated_software(data, ooi_ref)
+    yield from scan_nikto_output(data, ooi_ref)

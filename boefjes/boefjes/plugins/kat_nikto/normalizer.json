@@ -6,6 +6,8 @@
   ],
   "produces": [
     "Software",
-    "SoftwareInstance"
+    "SoftwareInstance",
+    "Finding",
+    "KATFindingType"
   ]
 }
