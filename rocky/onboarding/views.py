@@ -326,11 +326,6 @@ class OnboardingSetupScanOOIDetailView(
     permission_required = "tools.can_scan_organization"
     task_type = "report"
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.selected_oois = self.get_ooi_pks()
-        self.selected_report_types = self.get_report_type_ids()
-
     def post(self, request, *args, **kwargs):
         parent_report_name_format, subreport_name_format = self.get_initial_report_names()
         parent_report_type = self.get_parent_report_type()

@@ -279,8 +279,14 @@ def test_onboarding_select_plugins_perms(request, member, rf, url):
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
-def test_onboarding_ooi_detail_scan(request, member, rf, mock_organization_view_octopoes, url):
+def test_onboarding_ooi_detail_scan(
+    request, mocker, member, mock_bytes_client, rf, mock_organization_view_octopoes, url
+):
     member = request.getfixturevalue(member)
+
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
+    mock_organization_view_octopoes().get.return_value = url
+    mock_bytes_client().upload_raw.return_value = "raw_id"
 
     response = OnboardingSetupScanOOIDetailView.as_view()(
         setup_request(rf.get("step_setup_scan_ooi_detail", {"ooi": url.primary_key}), member.user),
