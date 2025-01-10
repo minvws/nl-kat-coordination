@@ -8,23 +8,26 @@ def query(params: list[Reference]) -> str:
     hostname, dns_record, resolved_hostname = list(f'"{target}"' for target in params)
     return f"""
         {{
-        :query {{ ;;SOUF WAS HERE
+        :query {{
                     :find [(pull ?var [*])]
                     :where [
                         (or
                             (and
                                 [?var :object_type "Hostname"]
                                 [?var :Hostname/primary_key {hostname}]
+                                [?var :Hostname/name ?hostname]
                             )
 
                             (and
                                 [?var :object_type "DNSCNAMERecord"]
                                 [?var :DNSCNAMERecord/primary_key {dns_record}]
+                                [?var :DNSCNAMERecord/target_hostname ?hostname]
                             )
 
                             (and
                                 [?var :object_type "ResolvedHostname"]
                                 [?var :ResolvedHostname/primary_key {resolved_hostname}]
+                                [?var :ResolvedHostname/hostname ?hostname]
                             )
                         )
                     ]
