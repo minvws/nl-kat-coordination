@@ -24,12 +24,7 @@ class CVETest(TestCase):
             description="nginx/1.18.0 appears to be outdated (current is at least 1.25.3).",
         )
 
-        expected = [
-            software,
-            software_instance,
-            finding_type,
-            finding,
-        ]
+        expected = [software, software_instance, finding_type, finding]
 
         self.assertEqual(expected, oois)
 
