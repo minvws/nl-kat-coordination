@@ -2,7 +2,7 @@ from nibbles.https_availability.https_availability import nibble as run_https_av
 from nibbles.oois_in_headers.oois_in_headers import nibble as run_oois_in_headers
 
 from octopoes.models.ooi.config import Config
-from octopoes.models.ooi.findings import Finding
+from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import IPPort
 from octopoes.models.ooi.web import URL, HTTPHeader, HTTPHeaderURL, Website
 
@@ -43,6 +43,7 @@ def test_finding_generated_when_443_not_open_and_80_is_open():
     port_80 = IPPort(address="fake", protocol="tcp", port=80)
     website = Website(ip_service="fake", hostname="fake")
     results = list(run_https_availability(None, port_80, website, 1))
-    finding = results[0]
-    assert isinstance(finding, Finding)
+    finding = [result for result in results if isinstance(result, Finding)][0]
     assert finding.description == "HTTP port is open, but HTTPS port is not open"
+    katfindingtype = [result for result in results if not isinstance(result, Finding)][0]
+    assert isinstance(katfindingtype, KATFindingType)
