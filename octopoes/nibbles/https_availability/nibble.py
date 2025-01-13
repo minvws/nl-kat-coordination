@@ -30,16 +30,24 @@ def query(targets: list[Reference | None]) -> str:
         """
     ]
 
+    ref_queries = [
+        f'[?ipaddress :IPAddress/primary_key "{str(targets[0])}"]',
+        f'[?ipport80 :IPPort/primary_key "{str(targets[1])}"]',
+        f'[?website :Website/primary_key "{str(targets[2])}"]',
+    ]
+
     sgn = "".join(str(int(isinstance(target, Reference))) for target in targets)
     if sgn == "1000":
-        return pull([f'[?ipaddress :IPAddress/primary_key "{str(targets[0])}"]'] + base_query)
+        return pull(ref_queries[0:1] + base_query)
     elif sgn == "0100":
         if int(str(targets[1]).split("|")[-1]) == 80:
-            return pull([f'[?ipport80 :IPPort/primary_key "{str(targets[1])}"]'] + base_query)
+            return pull(ref_queries[1:2] + base_query)
         else:
             return pull(base_query)
     elif sgn == "0010":
-        return pull([f'[?website :Website/primary_key "{str(targets[2])}"]'] + base_query)
+        return pull(ref_queries[2:3] + base_query)
+    elif sgn == "1110":
+        return pull(ref_queries + base_query)
     else:
         return pull(base_query)
 
