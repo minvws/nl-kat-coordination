@@ -656,7 +656,7 @@ python -m unittest discover octopoes/tests
 **What are Nibbles?**
 Nibbles are the flexible replacement for bits. We learned a lot on what does and doesn't work around bits and ran into some limitations. The Nibbles are solving these limitations. We hope that the Nibbles are 4 times as efficient as bits, but this isn't officially benchmarked (and is more of a bits-Nibbles joke ;)).
 
-Nibbles process the data in OpenKAT, they correlate data and try to extract as much information as possible based on the specified rules. Nibbles ensure for a mapping of one or more objects to another group of objects. Where bits would trigger on objects, Nibbles can trigger on sets of objects. This makes it possible to map a single object to N objects (1-to-N mapping), but also map multiple objects to multiple objects (N-to-N mapping).
+Nibbles process the data in OpenKAT, they correlate data and try to extract as much information as possible based on the specified rules. Nibbles ensure for a mapping of one or more objects to another group of objects. Where bits would trigger on objects, Nibbles can trigger on sets of objects. This makes it possible to map a single object to N objects (1-to-N mapping), but also map multiple objects to multiple objects (N-to-M mapping).
 
 **Limitation example of Bits**
 One of the limitations from Bits was that if one of the bits (business rules) would identify an open port in network A, and for network B this port would identify as closed, how would you classify the port? With Bits it was not possible to correctly identify data mismatches and decide upon this. Nibbles allow you to detect these differences in data observations. If there are any inconsistencies, this could other Nibbles to be triggered to resolve the inconsistency.
