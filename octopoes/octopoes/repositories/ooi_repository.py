@@ -3,12 +3,16 @@ from __future__ import annotations
 import json
 import re
 from collections import Counter
+from collections.abc import Iterable
 from datetime import datetime
+from itertools import product
 from typing import Any, Literal, cast
 
 import structlog
 from bits.definitions import BitDefinition
 from httpx import HTTPStatusError, codes
+from jmespath import search
+from nibbles.definitions import NibbleDefinition
 from pydantic import RootModel, TypeAdapter
 
 from octopoes.config.settings import (
@@ -159,7 +163,16 @@ class OOIRepository(Repository):
     def list_related(self, ooi: OOI, path: Path, valid_time: datetime) -> list[OOI]:
         raise NotImplementedError
 
-    def query(self, query: Query, valid_time: datetime) -> list[OOI | tuple]:
+    def query(self, query: str | Query, valid_time: datetime) -> list[OOI | tuple]:
+        raise NotImplementedError
+
+    def nibble_query(
+        self,
+        ooi: OOI | None,
+        nibble: NibbleDefinition,
+        valid_time: datetime,
+        arguments: list[Reference | None] | None = None,
+    ) -> Iterable[Iterable[Any]]:
         raise NotImplementedError
 
 
@@ -237,7 +250,7 @@ class XTDBOOIRepository(OOIRepository):
     @classmethod
     def deserialize(cls, data: dict[str, Any]) -> OOI:
         if "object_type" not in data:
-            raise ValueError("Data is missing object_type")
+            raise ValueError("OOI data is missing object_type")
 
         # pop global attributes
         object_cls = type_by_name(data.pop("object_type"))
@@ -248,6 +261,36 @@ class XTDBOOIRepository(OOIRepository):
         stripped = {key.split("/")[1]: value for key, value in data.items()}
         stripped["user_id"] = user_id
         return object_cls.model_validate(stripped)
+
+    @classmethod
+    def parse_as(cls, type_: type | list[type], obj: dict | list | set | Any) -> tuple | frozenset | Any:
+        """
+        parse_as takes a type and a serialized object and tries to turn it into the supplied type or the closest
+        hashable relative
+        for instance:
+            parse_as(int, "6") -> 6
+            parse_as(str, "6") -> "6"
+        see test_ooi_repository.py for more examples
+        """
+        if isinstance(obj, dict):
+            # assume the dictionary is the serialized object
+            if isinstance(type_, list):
+                type_ = type_[0]
+            if issubclass(type_, OOI):
+                return cls.deserialize(obj)
+            else:
+                return type_(**obj)
+        elif isinstance(obj, list):
+            # list --> tuple
+            if isinstance(type_, list):
+                return tuple(cls.parse_as(type_t, o) for o, type_t in zip(obj, type_))
+            else:
+                return tuple(cls.parse_as(type_, o) for o in obj)
+        else:
+            # assume a simple type
+            if isinstance(type_, list):
+                type_ = type_[0]
+            return type_(obj)
 
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
         try:
@@ -860,3 +903,37 @@ class XTDBOOIRepository(OOIRepository):
             parsed_results.append(tuple(parsed_result))
 
         return parsed_results
+
+    def nibble_query(
+        self,
+        ooi: OOI | None,
+        nibble: NibbleDefinition,
+        valid_time: datetime,
+        arguments: list[Reference | None] | None = None,
+    ) -> Iterable[Iterable[Any]]:
+        if nibble.query is None:
+            return [{ooi}]
+        else:
+            if arguments is None:
+                if ooi is not None:
+                    first = True
+                    arguments = [
+                        ooi.reference
+                        if sgn.object_type == type_by_name(ooi.get_ooi_type()) and (first and not (first := False))
+                        else None
+                        for sgn in nibble.signature
+                    ]
+                else:
+                    arguments = [None for _ in nibble.signature]
+            query = nibble.query if isinstance(nibble.query, str) else nibble.query(arguments)
+            data = self.session.client.query(query, valid_time)
+            objects = [
+                {self.parse_as(element.object_type, obj) for obj in search(element.parser, data)}
+                for element in nibble.signature
+            ]
+            objects = [
+                obj if obj else ({None} if element.optional else set())
+                for obj, element in zip(objects, nibble.signature)
+            ]
+
+            return list(product(*objects))

@@ -37,6 +37,8 @@ class OriginRepository(Repository):
         source: Reference | None = None,
         result: Reference | None = None,
         method: str | list[str] | None = None,
+        parameters_hash: int | None = None,
+        parameters_references: list[Reference] | None = None,
         origin_type: OriginType | list[OriginType] | set[OriginType] | None = None,
     ) -> list[Origin]:
         raise NotImplementedError
@@ -77,6 +79,8 @@ class XTDBOriginRepository(OriginRepository):
         source: Reference | None = None,
         result: Reference | None = None,
         method: str | list[str] | None = None,
+        parameters_hash: int | None = None,
+        parameters_references: list[Reference] | None = None,
         origin_type: OriginType | list[OriginType] | set[OriginType] | None = None,
     ) -> list[Origin]:
         where_parameters: dict[str, str | list[str]] = {"type": Origin.__name__}
@@ -92,6 +96,12 @@ class XTDBOriginRepository(OriginRepository):
 
         if method:
             where_parameters["method"] = method
+
+        if parameters_hash:
+            where_parameters["parameters_hash"] = str(parameters_hash)
+
+        if parameters_references:
+            where_parameters["parameters_references"] = [str(pr) for pr in parameters_references]
 
         if origin_type:
             if isinstance(origin_type, OriginType):
