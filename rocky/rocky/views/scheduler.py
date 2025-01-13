@@ -51,8 +51,8 @@ class SchedulerView(OctopoesView):
 
     report_schedule_form_recurrence_choice = ReportRecurrenceChoiceForm  # once or repeat
 
-    report_parent_name_form = ReportNameForm  # name format
-    report_child_name_form = AssetReportNameForm  # asset name format
+    report_name_form = ReportNameForm  # name format
+    report_asset_name_form = AssetReportNameForm  # asset name format
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -100,11 +100,11 @@ class SchedulerView(OctopoesView):
     def get_report_schedule_form_recurrence_choice(self):
         return self.report_schedule_form_recurrence_choice(self.request.POST)
 
-    def get_report_parent_name_form(self):
-        return self.report_parent_name_form()
+    def get_report_name_form(self):
+        return self.report_name_form()
 
-    def get_report_child_name_form(self):
-        return self.report_child_name_form()
+    def get_report_asset_name_form(self):
+        return self.report_asset_name_form()
 
     def get_task_details(self, task_id: str) -> Task | None:
         try:
