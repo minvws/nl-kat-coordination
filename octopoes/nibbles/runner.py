@@ -179,16 +179,16 @@ class NibblesRunner:
         nibblet_nibbles = {self.nibbles[nibblet.method] for nibblet in nibblets if nibblet.method in self.nibbles}
 
         for nibble in filter(
-            lambda nibb: any(isinstance(ooi, sgn.object_type) for sgn in nibb.signature)
-            and nibb not in nibblet_nibbles,
+            lambda nibbly: nibbly.enabled
+            and nibbly not in nibblet_nibbles
+            and any(isinstance(ooi, t) for t in nibbly.triggers),
             self.nibbles.values(),
         ):
-            if nibble.enabled:
-                if len(nibble.signature) > 1:
-                    self._write(valid_time)
-                args = self.ooi_repository.nibble_query(ooi, nibble, valid_time)
-                results = {tuple(arg): set(flatten([nibble(arg)])) for arg in args}
-                return_value |= {nibble.id: results}
+            if len(nibble.signature) > 1:
+                self._write(valid_time)
+            args = self.ooi_repository.nibble_query(ooi, nibble, valid_time)
+            results = {tuple(arg): set(flatten([nibble(arg)])) for arg in args}
+            return_value |= {nibble.id: results}
         self.cache = merge_results(self.cache, {ooi: return_value})
         return return_value
 

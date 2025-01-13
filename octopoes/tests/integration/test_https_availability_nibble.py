@@ -62,7 +62,6 @@ def test_https_availability_query(xtdb_octopoes_service: OctopoesService, event_
 
     port443 = IPPort(port=443, address=ip_address.reference, protocol=Protocol.TCP)
     xtdb_octopoes_service.ooi_repository.save(port443, valid_time)
-
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 0

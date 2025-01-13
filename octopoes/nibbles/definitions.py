@@ -53,6 +53,10 @@ class NibbleDefinition(BaseModel):
     def _ini(self) -> dict[str, Any]:
         return {"id": self.id, "enabled": self.enabled, "checksum": self._checksum}
 
+    @property
+    def triggers(self) -> set[type[OOI]]:
+        return {sgn.object_type for sgn in self.signature if issubclass(sgn.object_type, OOI)}
+
 
 def get_nibble_definitions() -> dict[str, NibbleDefinition]:
     nibble_definitions = {}
