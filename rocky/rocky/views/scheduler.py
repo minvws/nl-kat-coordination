@@ -7,8 +7,8 @@ from django.http import Http404, JsonResponse
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import Boefje, Normalizer
 from reports.forms import (
-    ChildReportNameForm,
-    ParentReportNameForm,
+    AssetReportNameForm,
+    ReportNameForm,
     ReportRecurrenceChoiceForm,
     ReportScheduleStartDateChoiceForm,
     ReportScheduleStartDateForm,
@@ -51,8 +51,8 @@ class SchedulerView(OctopoesView):
 
     report_schedule_form_recurrence_choice = ReportRecurrenceChoiceForm  # once or repeat
 
-    report_parent_name_form = ParentReportNameForm  # parent name format
-    report_child_name_form = ChildReportNameForm  # child name format
+    report_parent_name_form = ReportNameForm  # name format
+    report_child_name_form = AssetReportNameForm  # asset name format
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)

@@ -122,17 +122,13 @@ class CustomReportScheduleForm(BaseRockyForm):
     )
 
 
-class ParentReportNameForm(BaseRockyForm):
-    parent_report_name = forms.CharField(
+class ReportNameForm(BaseRockyForm):
+    report_name = forms.CharField(
         label=_("Report name format"), required=False, initial="${report_type} for ${oois_count} objects"
     )
 
 
-class ChildReportNameForm(BaseRockyForm):
-    child_report_name = forms.CharField(
+class AssetReportNameForm(BaseRockyForm):
+    asset_report_name = forms.CharField(
         label=_("Subreports name format"), required=True, initial="${report_type} for ${ooi}"
     )
-
-
-class ReportNameForm(ParentReportNameForm, ChildReportNameForm):
-    pass

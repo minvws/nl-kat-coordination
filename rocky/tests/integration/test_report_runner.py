@@ -18,7 +18,7 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
     recipe = ReportRecipe(
         recipe_id="abc4e52b-812c-4cc2-8196-35fb8efc63ca",
         report_name_format="Concatenated report for ${oois_count} objects",
-        subreport_name_format="${report_type} for ${ooi} in %Y",
+        asset_report_name_format="${report_type} for ${ooi} in %Y",
         input_recipe={"input_oois": [oois["hostnames"][0].reference, oois["hostnames"][1].reference]},
         asset_report_types=["dns-report"],
         cron_expression="* * * * *",

@@ -275,13 +275,11 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
     def create_report_recipe(
         self,
         report_name_format: str,
-        subreport_name_format: str,
+        asset_report_name_format: str,
         report_type: str | None,
         schedule: str,
-        query: dict[str, Any] | None,
+        query: Any | None,
     ) -> ReportRecipe:
-        input_recipe: dict[str, Any] = {}
-
         if query:
             input_recipe = {"query": query}
         else:
@@ -290,7 +288,7 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         report_recipe = ReportRecipe(
             recipe_id=uuid4(),
             report_name_format=report_name_format,
-            subreport_name_format=subreport_name_format,
+            asset_report_name_format=asset_report_name_format,
             input_recipe=input_recipe,
             report_type=report_type,
             asset_report_types=self.get_report_type_ids(),
@@ -535,8 +533,8 @@ class ReportFinalSettingsView(BaseReportView, SchedulerView, TemplateView):
         context["report_schedule_form_start_date"] = self.get_report_schedule_form_start_date_time_recurrence()
         context["report_schedule_form_recurrence_choice"] = self.get_report_schedule_form_recurrence_choice()
 
-        context["report_parent_name_form"] = self.get_report_parent_name_form()
-        context["report_child_name_form"] = self.get_report_child_name_form()
+        context["report_parent_name_form"] = self.get_report_name_form()
+        context["report_child_name_form"] = self.get_report_asset_name_form()
 
         context["is_scheduled_report"] = self.is_a_scheduled_report
 
@@ -562,8 +560,8 @@ class SaveReportView(BaseReportView, SchedulerView):
                 + urlencode({"report_id": report_ooi.reference})
             )
         elif self.is_scheduled_report():
-            report_name_format = request.POST.get("parent_report_name", "")
-            subreport_name_format = request.POST.get("child_report_name", "")
+            report_name_format = request.POST.get("report_name", "")
+            asset_report_name_format = request.POST.get("asset_report_name", "")
             object_selection = request.POST.get("object_selection", "")
 
             form = ReportScheduleStartDateForm(request.POST)
@@ -585,13 +583,13 @@ class SaveReportView(BaseReportView, SchedulerView):
             report_type = None
             if self.report_type is not None:
                 report_type = self.report_type.id
-            elif not self.report_type and subreport_name_format:
+            elif not self.report_type and asset_report_name_format:
                 report_type = ConcatenatedReport.id
 
             schedule = self.convert_recurrence_to_cron_expressions(recurrence, start_datetime)
 
             report_recipe = self.create_report_recipe(
-                report_name_format, subreport_name_format, report_type, schedule, query
+                report_name_format, asset_report_name_format, report_type, schedule, query
             )
 
             self.create_report_schedule(report_recipe, start_datetime)

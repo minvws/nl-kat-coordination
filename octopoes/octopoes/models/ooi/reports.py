@@ -82,6 +82,12 @@ class HydratedReport(BaseReport):
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return f"HydratedReport for recipe {reference.tokenized.report_recipe}"
 
+    def to_report(self) -> Report:
+        as_dict = self.model_dump(exclude={"input_oois", "object_type"})
+        as_dict["input_oois"] = [input_ooi.reference for input_ooi in self.input_oois]
+
+        return Report.model_validate(as_dict)
+
 
 class ReportRecipe(OOI):
     object_type: Literal["ReportRecipe"] = "ReportRecipe"
@@ -89,7 +95,7 @@ class ReportRecipe(OOI):
     recipe_id: UUID
 
     report_name_format: str
-    subreport_name_format: str | None = None
+    asset_report_name_format: str | None = None
 
     input_recipe: dict[str, Any]  # can contain a query which maintains a live set of OOIs or manually picked OOIs.
     report_type: str | None = None

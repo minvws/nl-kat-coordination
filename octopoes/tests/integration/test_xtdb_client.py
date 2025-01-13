@@ -525,3 +525,7 @@ def test_query_children_of_reports(
         xtdb_ooi_repository.serialize(report)
         | {"Report/input_oois": [xtdb_ooi_repository.serialize(child), xtdb_ooi_repository.serialize(child2)]}
     ] in results
+
+    hydrated_report = octopoes_api_connector.get_report(report.reference, valid_time)
+    assert hydrated_report.to_report() == report
+    assert hydrated_report.input_oois == [child, child2]
