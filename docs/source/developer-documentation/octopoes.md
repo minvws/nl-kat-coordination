@@ -650,3 +650,42 @@ The unit tests `octopoes/tests` are run using
 ```shell
 python -m unittest discover octopoes/tests
 ```
+
+## Nibbles
+
+**What are Nibbles?**
+Nibbles are the flexible replacement for bits. We learned a lot on what does and doesn't work around bits and ran into some limitations. The Nibbles are solving these limitations. We hope that the Nibbles are 4 times as efficient as bits, but this isn't officially benchmarked (and is more of a bits-Nibbles joke ;)).
+
+Nibbles process the data in OpenKAT, they correlate data and try to extract as much information as possible based on the specified rules. Nibbles ensure for a mapping of one or more objects to another group of objects. Where bits would trigger on objects, Nibbles can trigger on sets of objects. This makes it possible to map a single object to N objects (1-to-N mapping), but also map multiple objects to multiple objects (N-to-M mapping).
+
+**Limitation example of Bits**
+One of the limitations from Bits was that if one of the bits (business rules) would identify an open port in network A, and for network B this port would identify as closed, how would you classify the port? With Bits it was not possible to correctly identify data mismatches and decide upon this. Nibbles allow you to detect these differences in data observations. If there are any inconsistencies, this could other Nibbles to be triggered to resolve the inconsistency.
+
+**How are Nibbles better than Bits?**
+Nibbles are a successor for bits, all the mistakes and issues we learned from Bits should be solved with Nibbles.
+
+- Dynamic loading from the user interface. This allows a user to enable, run or add Nibbles from the web interface, instead of having to edit the code.
+- Mapping of objects: Bits would trigger if a specific object (ooi) was loaded. This required a lot of recalculation of Bits, which is not cost effective. With Nibbles, as soon as data is added to the XTDB database, the Nibbles will pick this up and handle accordingly. This should speed things up and allows for more extensive querying.
+- Objects do not require a relation: it is now possible to search for specific objects (e.g. give me all URLs with port 80 open) and return all data. With bits it was not possible to query this kind of information, as the parameters (such as URL and port) were only accessible in the bit and not on the overall dataset.
+- Automatic updates: if a nibble gets updated, the affects are automatically recalculated.
+- Visual representation: it is now possible to get a better visual representation in a graph on which inputs are available for Nibbles and how they relate to each other.
+- Efficient: using Nibbles it is much more efficient to query for the right data and even make queries that were not previously possible. Nibbles also reduce the number of read and writes to XTDB, which reduces the database load.
+
+**How can I use Nibbles?**
+Nibbles are enabled by default. Users can choose to enable or disable the Nibbles themselves and determine where objects originated from and which Nibbles are also applicable on an object or set of objects.
+
+Nibbles are accessible from the web interface, to allow for enabling, disabling, editing and adding of Nibbles.
+
+Using the XTDB EDN query language you can perform queries for Nibbles. You can query a set of objects and process this in your nibble, including all possible combinations on the queried set (of objects). One of the downsides is that this could result in a large number of queries that are structurally the same, but are slightly different (e.g. flags that are different). It is therefore important to properly document your queries to still comprehend them in the future (and make it easier to catch bugs).
+
+The `xtdb-cli` tool can be used to query on XTDB for Nibbles. The query below searches all variables where the object type is an URL:
+
+```shell
+octopoes/tools/xtdb-cli.py query '{:query {:find [(pull ?var [*])] :where [[?var :object_type "URL"]]}}'
+```
+
+Make it visually pretty with jq:
+
+```shell
+octopoes/tools/xtdb-cli.py query '{:query {:find [(pull ?var [*])] :where [[?var :object_type "URL"]]}}' | jq
+```
