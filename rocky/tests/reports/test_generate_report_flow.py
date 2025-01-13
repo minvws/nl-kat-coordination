@@ -260,7 +260,7 @@ def test_save_generate_report_view_scheduled(
                 "start_date": "2024-01-01",
                 "start_time": "10:10",
                 "recurrence": "daily",
-                "parent_report_name": [f"DNS report for {len(listed_hostnames)} objects"],
+                "report_name": [f"DNS report for {len(listed_hostnames)} objects"],
             },
         ),
         client_member.user,

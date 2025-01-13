@@ -273,7 +273,7 @@ def test_save_aggregate_report_view_scheduled(
                 "start_date": "2024-01-01",
                 "start_time": "10:10",
                 "recurrence": "weekly",
-                "parent_report_name": ["Scheduled Aggregate Report %x"],
+                "report_name": ["Scheduled Aggregate Report %x"],
             },
         ),
         client_member.user,
