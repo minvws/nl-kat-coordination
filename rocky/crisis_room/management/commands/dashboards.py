@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -79,3 +80,4 @@ class Command(BaseCommand):
         organizations = Organization.objects.all()
         for organization in organizations:
             get_or_create_default_dashboard(organization)
+            logging.info("Dashboard created for organization %s", organization.name)

@@ -34,18 +34,57 @@ The output of this report, for each organization, is shown in this section.
 The default settings for this report recipe are:
 
 - report_name_format = ``Crisis Room Aggregate Report``
-- ooi_types =  ``["IPAddressV6", "Hostname", "IPAddressV4"]``
-- scan_level = ``[1, 2, 3]``
+- ooi_types =  ``["IPAddressV6", "Hostname", "IPAddressV4", "URL"]``
+- scan_level = ``[1, 2, 3, 4]``
 - scan_type = ``["declared"]``
 - report_types = ``["systems-report", "findings-report"]``
 - cron_expression = ``0 * * * *`` (every hour)
 
 It is possible to update the report recipe*. To do this:
 
-- Go to "Reports"
-- Click on the tab "Scheduled"
+- Go to "Reports"- Click on the tab "Scheduled"
 - Look for the "Criris Room Aggregate Report"
 - Open the row
 - Click on "Edit report recipe"
 
 *\*Note: if you want to update the report recipe, you have to do this for every organization.*
+
+Create a Findings Dashboard for Your Organization
+=================================================
+
+OpenKAT automates the process of creating findings dashboards for your organization.
+
+Steps to Create a Findings Dashboard:
+--------------------------------------
+
+1. **Install OpenKAT or Add a New Organization:**
+   Ensure that you have OpenKAT installed or a new organization has been added to your setup.
+
+2. **Navigate to Your OpenKAT Installation Directory:**
+   Open a terminal and change to the OpenKAT installation folder:
+
+   .. code-block:: bash
+
+      cd nl-kat-coordination
+
+3. **Go to the 'rocky' Folder:**
+   Within the OpenKAT directory, enter the ``rocky`` folder:
+
+   .. code-block:: bash
+
+      cd rocky
+
+4. **Run the Dashboard Creation Command:**
+   Execute the following command to create the findings dashboard:
+
+   .. code-block:: bash
+
+      make dashboards
+
+What Happens After Running the Command:
+---------------------------------------
+
+- The system will automatically search for all installed organizations.
+- A **recipe** for the findings dashboard will be generated.
+- A **scheduled task** will be created to generate findings reports every hour.
+- Findings will be **added to the organization’s crisis room** for easy access and monitoring.

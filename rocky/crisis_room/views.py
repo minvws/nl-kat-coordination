@@ -10,7 +10,7 @@ from pydantic import TypeAdapter
 from reports.report_types.findings_report.report import SEVERITY_OPTIONS
 from tools.models import Organization, OrganizationMember
 
-from crisis_room.management.commands.dashboard import FINDINGS_DASHBOARD_NAME
+from crisis_room.management.commands.dashboards import FINDINGS_DASHBOARD_NAME
 from crisis_room.models import DashboardData
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
@@ -139,7 +139,7 @@ class CrisisRoom(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("crisis_room"), "text": "CRISIS ROOM"}]
+        context["breadcrumbs"] = [{"url": reverse("crisis_room"), "text": "Crisis "}]
         context["organizations_dashboards"] = self.organizations_findings
         context["organizations_findings_summary"] = self.organizations_findings_summary
         return context

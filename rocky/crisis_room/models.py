@@ -23,7 +23,6 @@ class DashboardData(models.Model):
     template = models.CharField(blank=True, max_length=126, default="findings_report/report.html")
     position = models.IntegerField(
         blank=True,
-        max_length=126,
         default=1,
         validators=[MinValueValidator(1), MaxValueValidator(16)],
         help_text=_(

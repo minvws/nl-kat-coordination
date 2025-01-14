@@ -35,7 +35,6 @@ class Migration(migrations.Migration):
                         blank=True,
                         default=1,
                         help_text="Where on the dashboard do you want to show the data? Position 1 is the most top level and the max position is 16.",
-                        max_length=126,
                         validators=[
                             django.core.validators.MinValueValidator(1),
                             django.core.validators.MaxValueValidator(16),
