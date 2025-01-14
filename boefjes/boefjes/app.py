@@ -81,44 +81,37 @@ class SchedulerWorkerManager(WorkerManager):
                 raise
 
     def _fill_queue(self, task_queue: Queue, queue_type: WorkerManager.Queue) -> None:
+        if task_queue.qsize() > self.settings.pool_size:
+            time.sleep(self.settings.worker_heartbeat)
+            return
+
         logger.debug("Popping from queue %s", queue_type.value)
 
         try:
-            response = self.scheduler_client.pop_item(queue_type.value)
+            p_item = self.scheduler_client.pop_item(queue_type.value)
         except (HTTPError, ValidationError):
             logger.exception("Popping task from scheduler failed, sleeping 10 seconds")
-            time.sleep(10)
+            time.sleep(self.settings.worker_heartbeat)
             return
 
-        # TODO: check
-        if not response:
-            logger.debug("Queue %s empty", queue_type.value)
-            time.sleep(10)
+        if p_item is None:
+            time.sleep(self.settings.worker_heartbeat)
             return
 
-        # TODO: check
-        if response.count == 0:
-            logger.debug("Queue %s empty", queue_type.value)
-            time.sleep(10)
-            return
+        logger.info("Handling task[%s]", p_item.data.id)
 
-        for p_item in response.results:
-            logger.info("Handling task[%s]", p_item.data.id)
+        try:
+            task_queue.put(p_item)
+            logger.info("Dispatched task[%s]", p_item.data.id)
+        except:  # noqa
+            logger.exception("Exiting worker...")
+            logger.info("Patching scheduler task[id=%s] to %s", p_item.data.id, TaskStatus.FAILED.value)
 
             try:
-                task_queue.put(p_item)
-                logger.info("Dispatched task[%s]", p_item.data.id)
-            except:  # noqa
-                logger.exception("Exiting worker...")
-                logger.info("Patching scheduler task[id=%s] to %s", p_item.data.id, TaskStatus.FAILED.value)
-
-                try:
-                    self.scheduler_client.patch_task(p_item.id, TaskStatus.FAILED)
-                    logger.info(
-                        "Set task status to %s in the scheduler for task[id=%s]", TaskStatus.FAILED, p_item.data.id
-                    )
-                except HTTPError:
-                    logger.exception("Could not patch scheduler task to %s", TaskStatus.FAILED.value)
+                self.scheduler_client.patch_task(p_item.id, TaskStatus.FAILED)
+                logger.info("Set task status to %s in the scheduler for task[id=%s]", TaskStatus.FAILED, p_item.data.id)
+            except HTTPError:
+                logger.exception("Could not patch scheduler task to %s", TaskStatus.FAILED.value)
 
     def _check_workers(self) -> None:
         new_workers = []

@@ -52,7 +52,7 @@ class SchedulerClientInterface:
     def get_queues(self) -> list[Queue]:
         raise NotImplementedError()
 
-    def pop_item(self, scheduler_id: str) -> PaginatedTasksResponse | None:
+    def pop_item(self, scheduler_id: str) -> Task | None:
         raise NotImplementedError()
 
     def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
@@ -78,17 +78,12 @@ class SchedulerAPIClient(SchedulerClientInterface):
     def _verify_response(response: Response) -> None:
         response.raise_for_status()
 
-    def get_queues(self) -> list[Queue]:
-        response = self._session.get("/queues")
-        self._verify_response(response)
-
-        return TypeAdapter(list[Queue]).validate_json(response.content)
-
-    def pop_item(self, scheduler_id: str) -> PaginatedTasksResponse | None:
+    def pop_item(self, scheduler_id: str) -> Task | None:
         response = self._session.post(f"/schedulers/{scheduler_id}/pop?limit=1")
         self._verify_response(response)
 
-        return TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
+        page = TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
+        return TypeAdapter(Task | None).validate_json(page.results[0]) if page else None
 
     def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
         response = self._session.post(f"/schedulers/{scheduler_id}/pop", json=filters)
