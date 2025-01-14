@@ -124,10 +124,7 @@ def test_two_processes_cleanup_unfinished_tasks(
     """
 
     manager.scheduler_client = MockSchedulerClient(
-        get_dummy_data("scheduler/queues_response.json"),
-        3 * [get_dummy_data("scheduler/pop_response_boefje.json")],
-        [],
-        tmp_path / "patch_task_log",
+        3 * [get_dummy_data("scheduler/pop_response_boefje.json")], [], tmp_path / "patch_task_log"
     )
     manager.settings.pool_size = 2
     manager.task_queue = Manager().Queue()
@@ -151,10 +148,11 @@ def test_two_processes_cleanup_unfinished_tasks(
     }
 
     # Tasks (one with the same id) was still unhandled the queue and pushed back to the scheduler by the main process
-    assert manager.scheduler_client._pushed_items["70da7d4f-f41f-4940-901b-d98a92e9014b"].scheduler_id == "boefje-_dev"
-    assert json.loads(
-        manager.scheduler_client._pushed_items["70da7d4f-f41f-4940-901b-d98a92e9014b"].json()
-    ) == json.loads(get_dummy_data("scheduler/pop_response_boefje.json"))
+    assert manager.scheduler_client._pushed_items["70da7d4f-f41f-4940-901b-d98a92e9014b"].scheduler_id == "boefje"
+    assert (
+        json.loads(manager.scheduler_client._pushed_items["70da7d4f-f41f-4940-901b-d98a92e9014b"].json())
+        == json.loads(get_dummy_data("scheduler/pop_response_boefje.json")).get("results")[0]
+    )
 
 
 def test_normalizer_queue(manager: SchedulerWorkerManager, item_handler: MockHandler) -> None:
@@ -168,7 +166,6 @@ def test_normalizer_queue(manager: SchedulerWorkerManager, item_handler: MockHan
 
 def test_null(manager: SchedulerWorkerManager, tmp_path: Path, item_handler: MockHandler):
     manager.scheduler_client = MockSchedulerClient(
-        get_dummy_data("scheduler/queues_response.json"),
         3 * [get_dummy_data("scheduler/pop_response_boefje.json")],
         [get_dummy_data("scheduler/pop_response_normalizer.json")],
         tmp_path / "patch_task_log",
