@@ -94,7 +94,7 @@ def save_report_data(
 
     input_data = {
         "input_data": {
-            "input_oois": [ooi.primary_key for ooi in oois],
+            "input_oois": oois,
             "report_types": recipe.asset_report_types,
             "plugins": report_plugins_union([get_report_by_id(type_id) for type_id in recipe.asset_report_types]),
         }
@@ -202,7 +202,7 @@ def save_aggregate_report_data(
     now = datetime.now(timezone.utc)
     input_data = {
         "input_data": {
-            "input_oois": [ooi.primary_key for ooi in oois],
+            "input_oois": oois,
             "report_types": recipe.asset_report_types,
             "plugins": report_plugins_union([get_report_by_id(type_id) for type_id in recipe.asset_report_types]),
         }

@@ -83,7 +83,6 @@
                                         </thead>
                                         <tbody>
                                             {% for report in schedule.reports %}
-                                                {{ report.dict }}
                                                 <tr>
                                                     <td>
                                                         <a href="{% url "view_report" organization.code %}?report_id={{ report.reference }}&observed_at={{ report.observed_at|date:"Y-m-d H:i:s:u" }}"
