@@ -19,9 +19,10 @@ from rocky.scheduler import ReportTask, ScheduleRequest, scheduler_client
 FINDINGS_DASHBOARD_NAME = "Crisis Room Findings Dashboard"
 
 
-def get_or_create_default_dashboard(organization: Organization):
+def get_or_create_default_dashboard(organization: Organization) -> bool:
     valid_time = datetime.now(timezone.utc)
     is_scheduler_ready_for_schedule = is_scheduler_enabled(organization)
+    created = False
 
     if is_scheduler_ready_for_schedule:
         path = Path(__file__).parent / "recipe_seeder.json"
@@ -39,6 +40,7 @@ def get_or_create_default_dashboard(organization: Organization):
 
         dashboard_data.findings_dashboard = True
         dashboard_data.save()
+    return created
 
 
 def create_organization_recipe(
@@ -79,5 +81,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         organizations = Organization.objects.all()
         for organization in organizations:
-            get_or_create_default_dashboard(organization)
-            logging.info("Dashboard created for organization %s", organization.name)
+            created = get_or_create_default_dashboard(organization)
+            if created:
+                logging.info("Dashboard created for organization %s", organization.name)
