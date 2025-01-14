@@ -3,7 +3,7 @@
   "name": "Wappalyzer",
   "description": "Checks HTTP responses for Software versions.",
   "consumes": [
-    "openkat-http/response"
+    "application/json+har"
   ],
   "produces": [
     "Software",
