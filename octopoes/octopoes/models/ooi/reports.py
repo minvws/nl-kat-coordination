@@ -1,8 +1,8 @@
 from datetime import datetime
-from typing import Any, Literal
+from typing import Any, Literal, Annotated
 from uuid import UUID
 
-from pydantic import AliasGenerator, ConfigDict, Field
+from pydantic import AliasGenerator, ConfigDict, Field, BeforeValidator
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -94,8 +94,8 @@ class ReportRecipe(OOI):
 
     recipe_id: UUID
 
-    report_name_format: str
-    asset_report_name_format: str | None = None
+    report_name_format: Annotated[str, BeforeValidator(lambda x: x.strip()), Field(min_length=1)]
+    asset_report_name_format: Annotated[str, BeforeValidator(lambda x: x.strip()), Field(min_length=1)]
 
     input_recipe: dict[str, Any]  # can contain a query which maintains a live set of OOIs or manually picked OOIs.
     report_type: str | None = None
