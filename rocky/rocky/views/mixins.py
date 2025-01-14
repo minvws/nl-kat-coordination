@@ -333,7 +333,7 @@ class FindingList:
 class HydratedReport:
     parent_report: Report
     asset_reports: list[Report] | None
-    total_children_reports: int
+    total_asset_reports: int
     total_objects: int
     report_type_summary: dict[str, int]
 
@@ -404,7 +404,7 @@ class ReportList:
             hydrated_report.parent_report = report
             asset_reports = report.input_oois
             hydrated_report.asset_reports = asset_reports
-            hydrated_report.total_children_reports = len(asset_reports)
+            hydrated_report.total_asset_reports = len(asset_reports)
             hydrated_report.total_objects = len({asset_report.input_ooi for asset_report in asset_reports})
             hydrated_report.report_type_summary = self.report_type_summary(asset_reports)
 

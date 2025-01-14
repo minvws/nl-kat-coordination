@@ -673,7 +673,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
             return ["multi_report.html"]
         return ["generate_report.html"]
 
-    def get_children_reports(self) -> list[ReportOOI]:
+    def get_asset_reports(self) -> list[ReportOOI]:
         return [
             child
             for x in REPORTS
@@ -767,9 +767,9 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     ]:
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
 
-        children_reports = self.get_children_reports()
+        asset_reports = self.get_asset_reports()
 
-        for report in children_reports:
+        for report in asset_reports:
             bytes_data = self.get_report_data_from_bytes(report)
             for ooi in report.input_oois:
                 report_data.setdefault(report.report_type, {})[ooi] = {
@@ -778,7 +778,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                     "report_name": report.name,
                 } | bytes_data["input_data"]
         oois = self.get_input_oois(self.report_ooi.input_oois)
-        report_type_ids = {child_report.report_type for child_report in children_reports}
+        report_type_ids = {child_report.report_type for child_report in asset_reports}
         report_types = self.get_report_types(report_type_ids)
         plugins = self.get_plugins(self.get_report_data_from_bytes(self.report_ooi)["input_data"]["plugins"])
 
