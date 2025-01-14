@@ -46,5 +46,5 @@ class DashboardData(models.Model):
 
     def __str__(self) -> str:
         if self.dashboard:
-            return f"{self.dashboard.name} for organization {self.dashboard.organization}"
+            return str(self.dashboard)
         return super().__str__()
