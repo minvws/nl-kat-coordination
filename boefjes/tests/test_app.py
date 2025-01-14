@@ -56,7 +56,6 @@ def test_two_processes(manager: SchedulerWorkerManager, item_handler: MockHandle
 
 def test_two_processes_exception(manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path) -> None:
     manager.scheduler_client = MockSchedulerClient(
-        get_dummy_data("scheduler/queues_response.json"),
         [get_dummy_data("scheduler/should_crash.json")],
         [get_dummy_data("scheduler/pop_response_normalizer.json")],
         tmp_path / "patch_task_log",
@@ -72,7 +71,6 @@ def test_two_processes_exception(manager: SchedulerWorkerManager, item_handler: 
 
 def test_two_processes_handler_exception(manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path) -> None:
     manager.scheduler_client = MockSchedulerClient(
-        get_dummy_data("scheduler/queues_response.json"),
         [get_dummy_data("scheduler/pop_response_boefje.json")] + 2 * [get_dummy_data("scheduler/should_crash.json")],
         [get_dummy_data("scheduler/pop_response_normalizer.json")],
         tmp_path / "patch_task_log",
