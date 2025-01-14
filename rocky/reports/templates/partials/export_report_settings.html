@@ -52,12 +52,9 @@
                     </button>
                 {% else %}
                     {% include "partials/report_names_header.html" with recurrence=True %}
-                    {% include "partials/form/fieldset.html" with fields=report_parent_name_form %}
+                    {% include "partials/form/fieldset.html" with fields=report_name_form %}
+                    {% include "partials/form/fieldset.html" with fields=report_asset_name_form %}
 
-                    {% if reports|length > 1 %}
-                        {% include "partials/form/fieldset.html" with fields=report_child_name_form %}
-
-                    {% endif %}
                     <button type="submit" form="generate_report">
                         {% translate "Generate report" %}<span class="icon ti-chevron-right" aria-hidden="true"></span>
                     </button>

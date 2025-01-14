@@ -156,9 +156,6 @@ def create_asset_reports(
                 )
             )
 
-            if not asset_report_name or asset_report_name.isspace():
-                asset_report_name = ConcatenatedReport.name
-
             asset_report_input = get_input_data(input_data, ooi, report_type)
             asset_raw_id = bytes_client.upload_raw(
                 raw=ReportDataDict({"report_data": data["data"]} | asset_report_input).model_dump_json().encode(),
@@ -216,7 +213,6 @@ def save_aggregate_report_data(
         raw=ReportDataDict(post_processed_data | input_data).model_dump_json().encode(),
         manual_mime_types={"openkat/report"},
     )
-
     report_name = now.strftime(
         Template(recipe.report_name_format).safe_substitute(
             report_type=str(AggregateOrganisationReport.name), oois_count=str(len(oois))
