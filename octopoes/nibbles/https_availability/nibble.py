@@ -9,7 +9,7 @@ def query(targets: list[Reference | None]) -> str:
         return f"""
                 {{
                     :query {{
-                        :find [(pull ?ipaddress [*]) (pull ?ipport80 [*]) (pull ?website [*]) (count ?ipport443)]
+                        :find [(pull ?ipaddress [*]) (pull ?ipport80 [*]) (pull ?website [*]) (- (count ?ipport443) 1)]
                         :where [
                             {" ".join(statements)}
                         ]
