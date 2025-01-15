@@ -100,7 +100,7 @@ def query(targets: list[Reference | None]) -> str:
 
 
 NIBBLE = NibbleDefinition(
-    id="disallowed-csp-hostnames",
+    id="disallowed_csp_hostnames",
     signature=[
         NibbleParameter(object_type=HTTPHeaderHostname, parser="[*][?object_type == 'HTTPHeaderHostname'][]"),
         NibbleParameter(object_type=Config, parser="[*][?object_type == 'Config'][]", optional=True),
