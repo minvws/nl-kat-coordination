@@ -168,4 +168,4 @@ class EventManager:
     def _connect(self) -> None:
         self.channel = self.channel_factory(self.queue_uri)
         self.channel.queue_declare(queue=f"{self.client}__scan_profile_increments", durable=True)
-        self.channel.queue_declare(queue=f"scan_profile_mutations", durable=True)
+        self.channel.queue_declare(queue="scan_profile_mutations", durable=True)
