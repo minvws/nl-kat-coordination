@@ -2,7 +2,6 @@ from nibbles.definitions import NibbleDefinition, NibbleParameter
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname, Network
 from octopoes.models.ooi.findings import Finding
-from octopoes.models.ooi.web import Website
 
 finding_types = [
     "KAT-WEBSERVER-NO-IPV6",
@@ -95,9 +94,8 @@ def query(targets: list[Reference | None]) -> str:
 NIBBLE = NibbleDefinition(
     id="internet_nl",
     signature=[
-        NibbleParameter(object_type=Hostname, parser="[*][?object_type == 'IPPort'][]"),
-        NibbleParameter(object_type=list[Website], parser="[[*][?object_type == 'Website'][]]", additional={Website}),
-        NibbleParameter(object_type=list[Finding], parser="[[*][?object_type == 'Findings'][]]", additional={Finding}),
+        NibbleParameter(object_type=Hostname, parser="[*][?object_type == 'Hostname'][]"),
+        NibbleParameter(object_type=list[Finding], parser="[[*][?object_type == 'Finding'][]]", additional={Finding}),
     ],
     query=query,
 )

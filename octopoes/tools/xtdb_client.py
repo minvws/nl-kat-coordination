@@ -41,7 +41,7 @@ class XTDBClient:
         valid_time: datetime.datetime | None = None,
         tx_time: datetime.datetime | None = None,
         tx_id: int | None = None,
-    ) -> str:
+    ) -> JsonValue:
         params = {}
         if valid_time is not None:
             params["valid-time"] = valid_time.isoformat()
@@ -52,7 +52,6 @@ class XTDBClient:
 
         res = self._client.post("/query", params=params, content=query, headers={"Content-Type": "application/edn"})
 
-        return res.text
         return res.json()
 
     def entity(

@@ -284,6 +284,9 @@ class XTDBOOIRepository(OOIRepository):
             # list --> tuple
             if isinstance(type_, list):
                 return tuple(cls.parse_as(type_t, o) for o, type_t in zip(obj, type_))
+            elif hasattr(type_, "__origin__") and hasattr(type_, "__args__") and type_.__origin__ is list:
+                t = [type_.__args__[0]] * len(obj)
+                return tuple(cls.parse_as(t, o) for o, t in zip(obj, t))
             else:
                 return tuple(cls.parse_as(type_, o) for o in obj)
         else:
@@ -926,7 +929,6 @@ class XTDBOOIRepository(OOIRepository):
                 else:
                     arguments = [None for _ in nibble.signature]
             query = nibble.query if isinstance(nibble.query, str) else nibble.query(arguments)
-            breakpoint()
             data = self.session.client.query(query, valid_time)
             objects = [
                 {self.parse_as(element.object_type, obj) for obj in search(element.parser, data)}
