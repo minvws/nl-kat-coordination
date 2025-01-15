@@ -32,7 +32,11 @@ def query(targets: list[Reference | None]) -> str:
         return f"""
                 {{
                     :query {{
-                        :find [(pull ?hostname [*]) (pull ?finding [*])]
+                        :find [
+                                (pull ?hostname [*])
+                                (pull ?website [*])
+                                (pull ?finding [*])
+                              ]
                         :where [
                             {" ".join(statements)}
                         ]
@@ -42,54 +46,23 @@ def query(targets: list[Reference | None]) -> str:
 
     base_query = [
         """
+            [?hostname :object_type "Hostname"]
             [?website :Website/hostname ?hostname]
-            [?finding :Finding/ooi ?ooi]
-            (or
-                (or
-                    (and
-                        [?ooi :Hostname/primary_key ?hostname]
-                    )
-                    (and
-                        [(identity nil) ?ooi]
-                    )
+            (or-join [?finding]
+                [?finding :Finding/ooi ?hostname]
+                (and
+                    [?hostnamehttpurl :HostnameHTTPURL/netloc ?hostname]
+                    [?finding :Finding/ooi ?hostnamehttpurl]
                 )
-                (or
-                    (and
-                        [?ooi :HTTPResource/website ?website]
-                        [?website :Website/hostname ?hostname]
-                    )
-                    (and
-                        [(identity nil) ?ooi]
-                        [(identity nil) ?website]
-                    )
+                [?finding :Finding/ooi ?website]
+                (and
+                    [?resource :HTTPResource/website ?website]
+                    [?finding :Finding/ooi ?resource]
                 )
-                (or
-                    (and
-                        [?ooi :HTTPHeader/website ?resource]
-                        [?resource :HTTPResource/website ?website]
-                        [?website :Website/hostname ?hostname]
-                    )
-                    (and
-                        [(identity nil) ?ooi]
-                        [(identity nil) ?resource]
-                        [(identity nil) ?website]
-                    )
-                )
-                (or
-                    (and
-                        [?ooi :Website/hostname ?hostname]
-                    )
-                    (and
-                        [(identity nil) ?ooi]
-                    )
-                )
-                (or
-                    (and
-                        [?ooi :HostnameHTTPURL/hostname ?hostname]
-                    )
-                    (and
-                        [(identity nil) ?ooi]
-                    )
+                (and
+                    [?header :HTTPHeader/resource ?resource]
+                    [?resource :HTTPResource/website ?website]
+                    [?finding :Finding/ooi ?header]
                 )
             )
         """
@@ -106,12 +79,12 @@ def query(targets: list[Reference | None]) -> str:
         target_reference = Reference.from_str("|".join(tokens))
         if tokens[0] == "Hostname":
             hostname = target_reference.tokenized
+        elif tokens[0] in {"HostnameHTTPURL", "Website"}:
+            hostname = target_reference.tokenized.hostname
         elif tokens[0] == "HTTPResource":
             hostname = target_reference.tokenized.website.hostname
         elif tokens[0] == "HTTPHeader":
             hostname = target_reference.tokenized.resource.website.hostname
-        elif tokens[0] in {"Website", "HostnameHTTPURL"}:
-            hostname = target_reference.tokenized.hostname
         else:
             raise ValueError()
         hostname_pk = Hostname(name=hostname.name, network=Network(name=hostname.network.name).reference).reference
