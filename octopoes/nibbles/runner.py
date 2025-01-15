@@ -179,9 +179,7 @@ class NibblesRunner:
         nibblet_nibbles = {self.nibbles[nibblet.method] for nibblet in nibblets if nibblet.method in self.nibbles}
 
         for nibble in filter(
-            lambda nibbly: nibbly.enabled
-            and nibbly not in nibblet_nibbles
-            and any(isinstance(ooi, t) for t in nibbly.triggers),
+            lambda x: x.enabled and x not in nibblet_nibbles and any(isinstance(ooi, t) for t in x.triggers),
             self.nibbles.values(),
         ):
             if len(nibble.signature) > 1:
