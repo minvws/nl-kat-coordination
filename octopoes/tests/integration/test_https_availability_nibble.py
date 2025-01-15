@@ -58,7 +58,15 @@ def test_https_availability_query(xtdb_octopoes_service: OctopoesService, event_
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 1
+    assert (
+        xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).items[0].description
+        == "HTTP port is open, but HTTPS port is not open"
+    )
     assert xtdb_octopoes_service.ooi_repository.list_oois({KATFindingType}, valid_time).count == 1
+    assert (
+        xtdb_octopoes_service.ooi_repository.list_oois({KATFindingType}, valid_time).items[0].id
+        == "KAT-HTTPS-NOT-AVAILABLE"
+    )
 
     port443 = IPPort(port=443, address=ip_address.reference, protocol=Protocol.TCP)
     xtdb_octopoes_service.ooi_repository.save(port443, valid_time)
