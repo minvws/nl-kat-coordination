@@ -10,18 +10,12 @@ from uuid import UUID
 import alembic.config
 import pytest
 from fastapi.testclient import TestClient
-from octopoes.api.models import Declaration, Observation
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI
-from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network
-from octopoes.models.ooi.service import IPService, Service
 from pydantic import TypeAdapter
 from sqlalchemy.orm import sessionmaker
 
 from boefjes.app import SchedulerWorkerManager
 from boefjes.clients.bytes_client import BytesAPIClient
-from boefjes.clients.scheduler_client import PaginatedTasksResponse, Queue, SchedulerClientInterface, Task, TaskStatus
+from boefjes.clients.scheduler_client import PaginatedTasksResponse, SchedulerClientInterface, Task, TaskStatus
 from boefjes.config import Settings, settings
 from boefjes.dependencies.plugins import PluginService, get_plugin_service
 from boefjes.job_handler import bytes_api_client
@@ -44,6 +38,12 @@ from boefjes.sql.organisation_storage import SQLOrganisationStorage, get_organis
 from boefjes.sql.plugin_storage import SQLPluginStorage
 from boefjes.storage.interfaces import OrganisationNotFound
 from boefjes.storage.memory import ConfigStorageMemory, OrganisationStorageMemory, PluginStorageMemory
+from octopoes.api.models import Declaration, Observation
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import OOI
+from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network
+from octopoes.models.ooi.service import IPService, Service
 from tests.loading import get_dummy_data
 
 
