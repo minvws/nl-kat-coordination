@@ -919,13 +919,14 @@ class XTDBOOIRepository(OOIRepository):
                     first = True
                     arguments = [
                         ooi.reference
-                        if sgn.object_type == type_by_name(ooi.get_ooi_type()) and (first and not (first := False))
+                        if type_by_name(ooi.get_ooi_type()) in sgn.triggers and (first and not (first := False))
                         else None
                         for sgn in nibble.signature
                     ]
                 else:
                     arguments = [None for _ in nibble.signature]
             query = nibble.query if isinstance(nibble.query, str) else nibble.query(arguments)
+            breakpoint()
             data = self.session.client.query(query, valid_time)
             objects = [
                 {self.parse_as(element.object_type, obj) for obj in search(element.parser, data)}

@@ -59,9 +59,9 @@ def query(
     client: XTDBClient = ctx.obj["client"]
 
     if edn:
-        click.echo(json.dumps(client.query(edn, valid_time, tx_time, tx_id)))
+        click.echo(client.query(edn, valid_time, tx_time, tx_id))
     else:
-        click.echo(json.dumps(client.query(valid_time=valid_time, tx_time=tx_time, tx_id=tx_id)))
+        click.echo(client.query(valid_time=valid_time, tx_time=tx_time, tx_id=tx_id))
 
 
 @cli.command(help="List all keys in node")
