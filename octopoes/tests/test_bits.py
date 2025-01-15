@@ -42,7 +42,7 @@ def test_url_extracted_by_oois_in_headers_relative_path(http_resource_https):
 def test_finding_generated_when_443_not_open_and_80_is_open():
     port_80 = IPPort(address="fake", protocol="tcp", port=80)
     website = Website(ip_service="fake", hostname="fake")
-    results = list(run_https_availability(None, port_80, website, 1))
+    results = list(run_https_availability(None, port_80, website, 0))
     finding = [result for result in results if isinstance(result, Finding)][0]
     assert finding.description == "HTTP port is open, but HTTPS port is not open"
     katfindingtype = [result for result in results if not isinstance(result, Finding)][0]
