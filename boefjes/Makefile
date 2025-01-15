@@ -69,14 +69,12 @@ check:
 
 ci-docker-compose := docker compose --project-directory . -f .ci/docker-compose.yml
 
-
-test: itest ## Run all tests.
-
-itest: ## Run the integration tests.
-	$(ci-docker-compose) build
-	$(ci-docker-compose) down --remove-orphans
-	$(ci-docker-compose) run --rm katalogus_integration
-	$(ci-docker-compose) stop
+test: ## Run the unit tests.
+ifneq ($(file),)
+	$(ci-docker-compose) run --rm katalogus_tests python -m pytest -v tests/${file} $(if $(function),-k $(function))
+else
+	$(ci-docker-compose) run --rm katalogus_tests python -m pytest -v tests
+endif
 
 migration_bench:  ## Run the migration benchmark.
 	$(ci-docker-compose) build
