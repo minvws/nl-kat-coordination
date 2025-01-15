@@ -37,7 +37,7 @@ def test_boefje_input_running(api, tmp_path):
     assert response.status_code == 200
     assert response.json() == {
         "task_id": "70da7d4f-f41f-4940-901b-d98a92e9014b",
-        "output_url": "http://placeholder:1234/api/v0/tasks/70da7d4f-f41f-4940-901b-d98a92e9014b",
+        "output_url": "http://placeholder:8006/api/v0/tasks/70da7d4f-f41f-4940-901b-d98a92e9014b",
         "boefje_meta": {
             "arguments": {"oci_arguments": []},
             "boefje": {"id": "dns-records", "version": None},
