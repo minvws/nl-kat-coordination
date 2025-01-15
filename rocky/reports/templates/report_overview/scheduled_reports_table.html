@@ -26,7 +26,13 @@
                 {% for schedule in scheduled_reports %}
                     {% if schedule.recipe %}
                         <tr>
-                            <td class="nowrap">{{ schedule.recipe.report_name_format }}</td>
+                            <td class="nowrap">
+                                {% if schedule.reports.0.input_oois|length > 1 %}
+                                    {{ schedule.recipe.report_name_format }}
+                                {% else %}
+                                    {{ schedule.recipe.asset_report_name_format }}
+                                {% endif %}
+                            </td>
                             <td>
                                 <ul class="tags horizontal-view">
                                     {% if schedule.recipe.report_type == "aggregate-organisation-report" %}
@@ -85,23 +91,24 @@
                                             {% for report in schedule.reports %}
                                                 <tr>
                                                     <td>
-                                                        {% if report.input_oois|length == 0 %}
-                                                            {{ report.name }}
-                                                        {% else %}
+                                                        {% if report.input_oois|length > 1 %}
                                                             <a href="{% url "view_report" organization.code %}?report_id={{ report.reference }}&observed_at={{ report.observed_at|date:"Y-m-d H:i:s:u" }}"
                                                                title="{% translate "Show report details" %}">{{ report.name }}</a>
+                                                        {% else %}
+                                                            <a href="{% url "view_report" organization.code %}?report_id={{ report.input_oois.0.reference }}&observed_at={{ report.input_oois.0.observed_at|date:"Y-m-d H:i:s:u" }}"
+                                                               title="{% translate "Show report details" %}">{{ report.input_oois.0.name }}</a>
                                                         {% endif %}
                                                     </td>
                                                     <td>
-                                                        {% if report.input_oois|length == 1 %}
-                                                            {% with ooi=report.input_oois.0 %}
+                                                        {% if report.input_oois|length > 1 %}
+                                                            {{ report.input_oois|length }} {% translate "objects" %}
+                                                        {% else %}
+                                                            {% with ooi=report.input_oois.0.input_ooi %}
                                                                 <a href="{% ooi_url 'ooi_detail' ooi organization.code query=ooi.mandatory_fields %}">{{ ooi|human_readable }}</a>
                                                             {% endwith %}
-                                                        {% else %}
-                                                            {{ report.input_oois|length }} {% translate "objects" %}
                                                         {% endif %}
                                                     </td>
-                                                    <td class="nowrap">{{ report.observed_at|date }}</td>
+                                                    <td>{{ report.reference_date|date }}</td>
                                                 </tr>
                                             {% endfor %}
                                         </tbody>
