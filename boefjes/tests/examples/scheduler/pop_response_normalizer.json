@@ -6,7 +6,8 @@
     {
       "id": "60da7d4ff41f4940901bd98a92e9014b",
       "priority": 1,
-      "scheduler_id": "normalizer-_dev",
+      "scheduler_id": "normalizer",
+      "organisation": "_dev",
       "schedule_id": null,
       "status": "dispatched",
       "type": "normalizer",
