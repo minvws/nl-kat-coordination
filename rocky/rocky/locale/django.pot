@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-08 17:32+0000\n"
+"POT-Creation-Date: 2025-01-15 13:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -609,6 +609,10 @@ msgstr ""
 #: katalogus/client.py
 #, python-format
 msgid "An HTTP %d error occurred. Check logs for more info."
+msgstr ""
+
+#: katalogus/client.py
+msgid "An HTTP error occurred. Check logs for more info."
 msgstr ""
 
 #: katalogus/client.py
@@ -1634,10 +1638,6 @@ msgid "Account setup"
 msgstr ""
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
-msgid "Accounts"
-msgstr ""
-
-#: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Organization setup with separate accounts:"
 msgstr ""
 
@@ -2490,7 +2490,7 @@ msgid "Report name format"
 msgstr ""
 
 #: reports/forms.py
-msgid "Subreports name format"
+msgid "AssetReports name format"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -2770,6 +2770,10 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/report.html
 #: reports/report_types/multi_organization_report/vulnerabilities.html
 msgid "No CVEs have been found."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.py
+msgid "Aggregate Organisation Report"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
@@ -4776,6 +4780,10 @@ msgstr ""
 
 #: tools/forms/ooi.py
 msgid "Clearance Level"
+msgstr ""
+
+#: tools/forms/ooi.py
+msgid "Next scan"
 msgstr ""
 
 #: tools/forms/ooi.py
@@ -7349,6 +7357,10 @@ msgstr ""
 #: rocky/views/scan_profile.py
 #, python-brace-format
 msgid "Can not reset scan level. Scan level of {ooi_name} not declared"
+msgstr ""
+
+#: rocky/views/scans.py
+msgid "Scans"
 msgstr ""
 
 #: rocky/views/scheduler.py

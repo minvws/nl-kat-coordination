@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_unicode_slug
 from django.utils.translation import gettext_lazy as _
-from httpx import HTTPStatusError, Response, codes
+from httpx import HTTPError, HTTPStatusError, Response, codes
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import AfterValidator, BaseModel, Field, field_serializer, field_validator
@@ -56,7 +56,7 @@ class Plugin(BaseModel):
     #  make sense out of it: for which organization is this plugin in fact enabled?
     enabled: bool
 
-    def can_scan(self, member) -> bool:
+    def can_scan(self, member: OrganizationMember) -> bool:
         return member.has_perm("tools.can_scan_organization")
 
 
@@ -73,7 +73,7 @@ class Boefje(Plugin):
 
     # use a custom field_serializer for `consumes`
     @field_serializer("consumes")
-    def serialize_consumes(self, consumes: set[type[OOI]]):
+    def serialize_consumes(self, consumes: set[type[OOI]]) -> set[str]:
         return {ooi_class.get_ooi_type() for ooi_class in consumes}
 
     @field_validator("boefje_schema")
@@ -89,7 +89,7 @@ class Boefje(Plugin):
 
         return boefje_schema
 
-    def can_scan(self, member) -> bool:
+    def can_scan(self, member: OrganizationMember) -> bool:
         return super().can_scan(member) and member.has_clearance_level(self.scan_level.value)
 
 
@@ -99,7 +99,7 @@ class Normalizer(Plugin):
 
     # use a custom field_serializer for `produces`
     @field_serializer("produces")
-    def serialize_produces(self, produces: set[type[OOI]]):
+    def serialize_produces(self, produces: set[type[OOI]]) -> set[str]:
         return {ooi_class.get_ooi_type() for ooi_class in produces}
 
 
@@ -125,6 +125,13 @@ class KATalogusHTTPStatusError(KATalogusError):
         self.error = error
 
         super().__init__(_("An HTTP %d error occurred. Check logs for more info.").format(error.response.status_code))
+
+
+class KATalogusHTTPError(KATalogusError):
+    def __init__(self, error: httpx.HTTPError):
+        self.error = error
+
+        super().__init__(_("An HTTP error occurred. Check logs for more info."))
 
 
 class DuplicatePluginError(KATalogusError):
@@ -164,6 +171,8 @@ def verify_response(response: Response) -> None:
             raise KATalogusNotAllowedError("Access to resource not allowed")
 
         raise KATalogusHTTPStatusError(error) from error
+    except HTTPError as error:
+        raise KATalogusError("KATalogus request failed") from error
 
 
 class KATalogusClient:
@@ -213,18 +222,21 @@ class KATalogusClient:
         return response.json()
 
     def upsert_plugin_settings(self, organization_code: str, plugin_id: str, values: dict) -> None:
+        logger.info("Adding plugin settings", event_code=800023, plugin=plugin_id)
         self.session.put(f"/v1/organisations/{quote(organization_code)}/{quote(plugin_id)}/settings", json=values)
 
         logger.info("Upsert plugin settings", plugin_id=plugin_id)
 
     def delete_plugin_settings(self, organization_code: str, plugin_id: str) -> None:
+        logger.info("Deleting plugin settings", event_code=800024, plugin=plugin_id)
         self.session.delete(f"/v1/organisations/{quote(organization_code)}/{quote(plugin_id)}/settings")
 
-        logger.info("Delete plugin settings", plugin_id=plugin_id)
+        logger.info("Deleted plugin settings", plugin_id=plugin_id)
 
     def clone_all_configuration_to_organization(self, from_organization: str, to_organization: str):
         to_organization = quote(to_organization)
         from_organization = quote(from_organization)
+        logger.info("Cloning organization settings", event_code=910000, to_organization_code=to_organization)
         response = self.session.post(f"/v1/organisations/{from_organization}/settings/clone/{to_organization}")
 
         return response
@@ -236,12 +248,15 @@ class KATalogusClient:
         return self.get_plugins(organization_code, plugin_type="boefje")
 
     def enable_plugin(self, organization_code: str, plugin: Plugin) -> None:
+        logger.info("Enabling plugin", event_code=800021, plugin=plugin.id)
+
         self._patch_plugin_state(organization_code, plugin.id, True)
 
     def enable_boefje_by_id(self, organization_code: str, boefje_id: str) -> None:
         self.enable_plugin(organization_code, self.get_plugin(organization_code, boefje_id))
 
     def disable_plugin(self, organization_code: str, plugin: Plugin) -> None:
+        logger.info("Disabling plugin", event_code=800022, plugin=plugin.id)
         self._patch_plugin_state(organization_code, plugin.id, False)
 
     def get_enabled_boefjes(self, organization_code: str) -> list[Plugin]:
@@ -257,6 +272,7 @@ class KATalogusClient:
 
     def create_plugin(self, organization_code: str, plugin: Plugin) -> None:
         try:
+            logger.info("Creating boefje", event_code=800025, boefje=plugin)
             response = self.session.post(
                 f"/v1/organisations/{quote(organization_code)}/plugins",
                 headers={"Content-Type": "application/json"},
@@ -272,6 +288,7 @@ class KATalogusClient:
 
     def edit_plugin(self, organization_code: str, plugin: Plugin) -> None:
         try:
+            logger.info("Editing boefje", event_code=800026, boefje=plugin.id)
             response = self.session.patch(
                 f"/v1/organisations/{quote(organization_code)}/boefjes/{plugin.id}",
                 content=plugin.model_dump_json(exclude_none=True),

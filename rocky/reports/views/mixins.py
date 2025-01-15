@@ -87,9 +87,6 @@ def save_report_data(
     report_data: dict,
     recipe: ReportRecipe,
 ) -> Report | None:
-    if len(report_data) == 0:
-        return None
-
     now = datetime.now(timezone.utc)
 
     input_data = {

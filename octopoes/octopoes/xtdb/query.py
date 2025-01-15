@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field, replace
 from uuid import UUID, uuid4
 
@@ -76,7 +78,7 @@ class Query:
     _offset: int | None = None
     _order_by: tuple[Aliased, bool] | None = None
 
-    def where(self, ooi_type: Ref, **kwargs) -> "Query":
+    def where(self, ooi_type: Ref, **kwargs) -> Query:
         new = self._copy()
 
         for field_name, value in kwargs.items():
@@ -84,7 +86,7 @@ class Query:
 
         return new
 
-    def where_in(self, ooi_type: Ref, **kwargs: list[str]) -> "Query":
+    def where_in(self, ooi_type: Ref, **kwargs: list[str]) -> Query:
         """Allows for filtering on multiple values for a specific field."""
         new = self._copy()
 
@@ -99,7 +101,7 @@ class Query:
         return new._compile(separator="\n    ")
 
     @classmethod
-    def from_path(cls, path: Path) -> "Query":
+    def from_path(cls, path: Path) -> Query:
         """
         Create a query from a Path.
 
@@ -152,7 +154,7 @@ class Query:
 
         return query
 
-    def pull(self, ooi_type: Ref, *, fields: str = "[*]") -> "Query":
+    def pull(self, ooi_type: Ref, *, fields: str = "[*]") -> Query:
         """By default, we pull the target type. But when using find, count, etc., you have to pull explicitly."""
         new = self._copy()
 
@@ -160,7 +162,7 @@ class Query:
 
         return new
 
-    def find(self, item: Ref, *, index: int | None = None) -> "Query":
+    def find(self, item: Ref, *, index: int | None = None) -> Query:
         """Add a find clause, so we can select specific fields in a query to be returned as well."""
         if index is None:
             return replace(self, _find_clauses=self._find_clauses + [self._get_object_alias(item)])
@@ -169,7 +171,7 @@ class Query:
             find_clauses.insert(index, self._get_object_alias(item))
             return replace(self, _find_clauses=find_clauses)
 
-    def count(self, ooi_type: Ref | None = None) -> "Query":
+    def count(self, ooi_type: Ref | None = None) -> Query:
         if ooi_type:
             return replace(self, _find_clauses=self._find_clauses + [f"(count {self._get_object_alias(ooi_type)})"])
         else:
@@ -177,19 +179,19 @@ class Query:
                 self, _find_clauses=self._find_clauses + [f"(count {self._get_object_alias(self.result_type)})"]
             )
 
-    def limit(self, limit: int) -> "Query":
+    def limit(self, limit: int) -> Query:
         return replace(self, _limit=limit)
 
-    def offset(self, offset: int) -> "Query":
+    def offset(self, offset: int) -> Query:
         return replace(self, _offset=offset)
 
-    def order_by(self, ref: Aliased, ascending: bool = True) -> "Query":
+    def order_by(self, ref: Aliased, ascending: bool = True) -> Query:
         return replace(self, _order_by=(ref, ascending))
 
-    def _copy(self) -> "Query":
+    def _copy(self) -> Query:
         return replace(self)
 
-    def _where_field_is(self, ref: Ref, field_name: str, value: Ref | str | set[str]) -> None:
+    def _where_field_is(self, ref: Ref, field_name: str, value: Ref | str | set[str] | bool) -> None:
         """
         We need isinstance(value, type) checks to verify value is an OOIType, as issubclass() fails on non-classes:
 
@@ -326,7 +328,7 @@ class Query:
     def _to_object_type_statement(self, ref: Ref, other_type: type[OOI]) -> str:
         return f'[ {self._get_object_alias(ref)} :object_type "{other_type.get_object_type()}" ]'
 
-    def _compile_where_clauses(self, *, separator=" ") -> str:
+    def _compile_where_clauses(self, *, separator: str = " ") -> str:
         """Sorted and deduplicated where clauses, since they are both idempotent and commutative"""
 
         return separator + separator.join(sorted(set(self._where_clauses)))
@@ -334,7 +336,7 @@ class Query:
     def _compile_find_clauses(self) -> str:
         return " ".join(self._find_clauses)
 
-    def _compile(self, *, separator=" ") -> str:
+    def _compile(self, *, separator: str = " ") -> str:
         result_ooi_type = self.result_type.type if isinstance(self.result_type, Aliased) else self.result_type
 
         self._where_clauses.append(self._assert_type(self.result_type, result_ooi_type))
@@ -374,7 +376,7 @@ class Query:
     def __str__(self) -> str:
         return self._compile()
 
-    def __eq__(self, other: object):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Query):
             return NotImplemented
 

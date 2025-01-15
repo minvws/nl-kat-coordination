@@ -4,8 +4,8 @@
 <section>
     <div>
         <h2>{% translate "Configuration" %}</h2>
-        <p class="emphasized">{% translate "Set up the required plugins for this report." %}</p>
-        {% if selected_oois and selected_report_types %}
+        <p>{% translate "Set up the required plugins for this report." %}</p>
+        {% if selected_report_types %}
             {% include "partials/return_button.html" with btn_text="Change selection" %}
             {% include "partials/plugin_overview_table.html" %}
 

@@ -73,6 +73,11 @@ class ReportRecipeViewSet(OrganizationAPIMixin, viewsets.ModelViewSet):
 
         return self.get_paginated_response(serializer.data)
 
+    # The HTML renderer wants this to be defined, but doesn't seem to use what
+    # is returned.
+    def get_queryset(self):
+        return []
+
     def get_object(self) -> ReportRecipe:
         pk = self.kwargs["pk"]
 
@@ -85,9 +90,7 @@ class ReportRecipeViewSet(OrganizationAPIMixin, viewsets.ModelViewSet):
 
         return recipe
 
-    def get_schedule_id(self) -> str | None:
-        pk = self.kwargs["pk"]
-
+    def get_schedule_id(self, pk: str) -> str | None:
         filters = {"filters": [{"column": "data", "field": "report_recipe_id", "operator": "eq", "value": pk}]}
 
         response = self.scheduler_client.post_schedule_search(filters)
@@ -98,10 +101,25 @@ class ReportRecipeViewSet(OrganizationAPIMixin, viewsets.ModelViewSet):
         return str(response.results[0].id)
 
     def perform_create(self, serializer: ReportRecipeSerializer) -> None:
-        deadline_at = serializer.validated_data.pop("start_date", datetime.now(timezone.utc).date().isoformat())
-        recipe_id = uuid4()
+        data = serializer.validated_data
 
-        report_recipe = ReportRecipe.model_validate({"recipe_id": recipe_id, **serializer.validated_data})
+        deadline_at = data.pop("start_date", None)
+
+        update = False
+        if "recipe_id" in data:
+            # Update the already existing recipe if a recipe with this id already exists.
+            try:
+                self.octopoes_api_connector.get(
+                    Reference.from_str(f"ReportRecipe|{data['recipe_id']}"), valid_time=self.valid_time
+                )
+            except ObjectNotFoundException:
+                pass
+            else:
+                update = True
+        else:
+            data["recipe_id"] = uuid4()
+
+        report_recipe = ReportRecipe.model_validate(data)
 
         create_ooi(
             api_connector=self.octopoes_api_connector,
@@ -110,24 +128,39 @@ class ReportRecipeViewSet(OrganizationAPIMixin, viewsets.ModelViewSet):
             observed_at=self.valid_time,
         )
 
-        report_task = ReportTask(
-            organisation_id=self.organization.code, report_recipe_id=str(report_recipe.recipe_id)
-        ).model_dump()
+        if update:
+            schedule_id = self.get_schedule_id(str(data["recipe_id"]))
+            if not schedule_id:
+                raise APIException("Schedule for recipe does not exist")
 
-        schedule_request = ScheduleRequest(
-            scheduler_id=f"report-{self.organization.code}",
-            data=report_task,
-            schedule=report_recipe.cron_expression,
-            deadline_at=deadline_at,
-        )
+            if deadline_at:
+                self.scheduler_client.patch_schedule(
+                    schedule_id, params={"schedule": report_recipe.cron_expression, "deadline_at": deadline_at}
+                )
+            else:
+                self.scheduler_client.patch_schedule(schedule_id, params={"schedule": report_recipe.cron_expression})
+        else:
+            report_task = ReportTask(
+                organisation_id=self.organization.code, report_recipe_id=str(report_recipe.recipe_id)
+            ).model_dump()
 
-        self.scheduler_client.post_schedule(schedule=schedule_request)
+            if not deadline_at:
+                deadline_at = datetime.now(timezone.utc).date().isoformat()
+
+            schedule_request = ScheduleRequest(
+                scheduler_id=f"report-{self.organization.code}",
+                data=report_task,
+                schedule=report_recipe.cron_expression,
+                deadline_at=deadline_at,
+            )
+
+            self.scheduler_client.post_schedule(schedule=schedule_request)
 
         # This will make DRF return the new instance with the generated id
         serializer.instance = report_recipe
 
     def perform_update(self, serializer: ReportRecipeSerializer) -> None:
-        schedule_id = self.get_schedule_id()
+        schedule_id = self.get_schedule_id(self.kwargs["pk"])
         if not schedule_id:
             raise APIException("Schedule for recipe does not exist")
 
@@ -149,7 +182,7 @@ class ReportRecipeViewSet(OrganizationAPIMixin, viewsets.ModelViewSet):
         serializer.instance = report_recipe
 
     def perform_destroy(self, instance: ReportRecipe) -> None:
-        schedule_id = self.get_schedule_id()
+        schedule_id = self.get_schedule_id(self.kwargs["pk"])
 
         # If we would return an error here this would mean we can never delete a
         # recipe in octopoes that doesn't have a schedule anymore. This could
