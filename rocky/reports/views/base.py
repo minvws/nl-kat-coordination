@@ -294,13 +294,8 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         return {"query": query}
 
     def create_report_recipe(
-        self,
-        report_name_format: str,
-        asset_report_name_format: str,
-        report_type: str | None,
-        schedule: str | None,
+        self, report_name_format: str, asset_report_name_format: str, report_type: str | None, schedule: str | None
     ) -> ReportRecipe:
-
         report_recipe = ReportRecipe(
             recipe_id=uuid4(),
             report_name_format=report_name_format,
