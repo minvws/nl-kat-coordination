@@ -23,7 +23,7 @@ def query(targets: list[Reference | None]) -> str:
             [?ipservice :IPService/ip_port ?ipport80]
             [?ipport80 :IPPort/port 80]
             [?ipport80 :IPPort/address ?ipaddress]
-            (or
+            (or-join [?ipport443]
                (and [?ipport443 :IPPort/address ?ipaddress][?ipport443 :IPPort/port 443])
                [(identity nil) ?ipport443]
             )
