@@ -27,7 +27,7 @@
                     {% if schedule.recipe %}
                         <tr>
                             <td class="nowrap">
-                                {% if schedule.reports.0.input_oois|length > 1 %}
+                                {% if schedule.recipe.report_type != "concatenated-report" or schedule.reports.0.input_oois|length > 1 %}
                                     {{ schedule.recipe.report_name_format }}
                                 {% else %}
                                     {{ schedule.recipe.asset_report_name_format }}
