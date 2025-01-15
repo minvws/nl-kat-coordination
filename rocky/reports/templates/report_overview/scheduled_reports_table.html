@@ -100,15 +100,15 @@
                                                         {% endif %}
                                                     </td>
                                                     <td>
-                                                        {% if report.input_oois|length == 1 %}
-                                                            {% with ooi=report.input_oois.0 %}
+                                                        {% if report.input_oois|length > 1 %}
+                                                            {{ report.input_oois|length }} {% translate "objects" %}
+                                                        {% else %}
+                                                            {% with ooi=report.input_oois.0.input_ooi %}
                                                                 <a href="{% ooi_url 'ooi_detail' ooi organization.code query=ooi.mandatory_fields %}">{{ ooi|human_readable }}</a>
                                                             {% endwith %}
-                                                        {% else %}
-                                                            {{ report.input_oois|length }} {% translate "objects" %}
                                                         {% endif %}
                                                     </td>
-                                                    <td class="nowrap">{{ report.observed_at|date }}</td>
+                                                    <td>{{ report.reference_date|date }}</td>
                                                 </tr>
                                             {% endfor %}
                                         </tbody>
