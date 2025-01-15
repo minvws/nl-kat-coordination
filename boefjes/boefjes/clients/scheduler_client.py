@@ -83,7 +83,10 @@ class SchedulerAPIClient(SchedulerClientInterface):
         self._verify_response(response)
 
         page = TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
-        return TypeAdapter(Task | None).validate_json(page.results[0]) if page else None
+        if page.count == 0:
+            return None
+
+        return page.results[0]
 
     def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
         response = self._session.post(f"/schedulers/{scheduler_id}/pop", json=filters)
