@@ -48,15 +48,7 @@ def ip_generator():
 
 
 def test_https_availability_query(xtdb_ooi_repository: XTDBOOIRepository, event_manager: Mock, valid_time: datetime):
-    query = ('{ :query { :find [(pull ?ipaddress [*]) (pull ?ipport80 [*]) (pull ?website [*]) (- (count ?ipport443) 1)] :where ['
-             '[?website   :Website/ip_service ?ip_service]'
-             '[?ipservice :IPService/ip_port ?ipport80]'
-             '[?ipport80  :IPPort/port 80]'
-             '[?ipport80  :IPPort/address ?ipaddress] '
-             '(or-join [?ipport443] '
-                 '(and [?ipport443 :IPPort/address ?ipaddress] [?ipport443 :IPPort/port 443] )'
-                 '[(identity nil) ?ipport443]'
-             ')]}}')
+    query = https_availability.query([None] * 4)
     ip = ip_generator()
 
     first_ip = create_port(xtdb_ooi_repository, next(ip), 80, valid_time)
