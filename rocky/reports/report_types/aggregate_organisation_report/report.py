@@ -440,14 +440,14 @@ class AggregateOrganisationReport(AggregateReport):
 
 def aggregate_reports(
     connector: OctopoesAPIConnector,
-    input_ooi_references: list[OOI],
+    input_oois: list[OOI],
     selected_report_types: list[str],
     valid_time: datetime,
     organization_code: str,
 ) -> tuple[AggregateOrganisationReport, dict[str, Any], dict[str, Any], list[str]]:
     by_type: dict[str, list[str]] = {}
 
-    for ooi in input_ooi_references:
+    for ooi in input_oois:
         if ooi.get_object_type() not in by_type:
             by_type[ooi.get_object_type()] = []
 
