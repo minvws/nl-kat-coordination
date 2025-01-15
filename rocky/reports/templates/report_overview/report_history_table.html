@@ -97,9 +97,15 @@
                                        {% if "all" in selected_reports %}disabled{% endif %}>
                             </td>
                             <td class="report_name">
-                                <a id="report_name_{{ report.parent_report.reference|slugify }}"
-                                   href="{% url "view_report" organization.code %}?report_id={{ report.parent_report.reference }}&observed_at={{ report.parent_report.observed_at|date:"Y-m-d H:i:s:u" }}"
-                                   title="{% translate "Shows parent report details" %}">{{ report.parent_report.name }}</a>
+                                {% if report.asset_reports|length > 1 %}
+                                    <a id="report_name_{{ report.parent_report.reference|slugify }}"
+                                       href="{% url "view_report" organization.code %}?report_id={{ report.parent_report.reference }}&observed_at={{ report.parent_report.observed_at|date:"Y-m-d H:i:s:u" }}"
+                                       title="{% translate "Shows parent report details" %}">{{ report.parent_report.name }}</a>
+                                {% elif report.asset_reports|length == 1 %}
+                                    <a id="report_name_{{ report.asset_reports.0.reference|slugify }}"
+                                       href="{% url "view_report" organization.code %}?report_id={{ report.asset_reports.0.reference }}&observed_at={{ report.asset_reports.0.observed_at|date:"Y-m-d H:i:s:u" }}"
+                                       title="{% translate "Shows parent report details" %}">{{ report.asset_reports.0.name }}</a>
+                                {% endif %}
                             </td>
                             <td class="report_types">
                                 <ul class="tags horizontal-view">

@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from typing import Any
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import structlog
 from django.contrib import messages
@@ -65,24 +65,22 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
             for schedule in report_schedules:
                 if schedule["data"]:
                     recipe_id = schedule["data"]["report_recipe_id"]
-                    # TODO: This is a workaround to get the recipes and reports.
-                    #  We should create an endpoint for this in octopoes
-                    recipe_ooi_tree = self.get_recipe_ooi_tree(recipe_id)
-                    if recipe_ooi_tree is not None:
-                        recipe_tree = recipe_ooi_tree.store.values()
-                        recipe_ooi = next(ooi for ooi in recipe_tree if isinstance(ooi, ReportRecipe))
-                        report_oois = [ooi for ooi in recipe_tree if isinstance(ooi, Report)]
-                        report_oois.sort(key=lambda ooi: ooi.date_generated, reverse=True)
-                        recipes.append(
-                            {
-                                "schedule_id": schedule["id"],
-                                "enabled": schedule["enabled"],
-                                "recipe": recipe_ooi,
-                                "cron": schedule["schedule"],
-                                "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
-                                "reports": report_oois,
-                            }
-                        )
+                    report_recipe = self.octopoes_api_connector.get(
+                        Reference.from_str(f"ReportRecipe|{recipe_id}"), valid_time=datetime.now(timezone.utc)
+                    )
+                    reports = self.octopoes_api_connector.list_reports(
+                        valid_time=self.observed_at, recipe_id=UUID(recipe_id)
+                    ).items
+                    recipes.append(
+                        {
+                            "schedule_id": schedule["id"],
+                            "enabled": schedule["enabled"],
+                            "recipe": report_recipe,
+                            "cron": schedule["schedule"],
+                            "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
+                            "reports": reports,
+                        }
+                    )
 
         return recipes
 
