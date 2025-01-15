@@ -150,7 +150,7 @@ class ScheduleRequest(BaseModel):
 
     scheduler_id: str
     data: dict
-    schedule: str
+    schedule: str | None
     deadline_at: str
 
 

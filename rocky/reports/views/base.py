@@ -15,7 +15,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import TemplateView
+from django.views.generic import FormView, TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
 from katalogus.client import Boefje, KATalogus, KATalogusError, Plugin
 from pydantic import RootModel, TypeAdapter
@@ -271,28 +271,41 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
     def get_observed_at(self):
         return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
 
-    def is_scheduled_report(self) -> bool:
-        recurrence_choice = self.request.POST.get("choose_recurrence", "once")
-        return recurrence_choice == "repeat"
+    def is_single_report(self) -> bool:
+        return len(self.get_report_type_ids()) == 1
+
+    def get_input_recipe(self):
+        object_selection = self.request.POST.get("object_selection", "")
+        query = {}
+
+        if object_selection == "query":
+            query = {
+                "ooi_types": [t.__name__ for t in self.get_ooi_types()],
+                "scan_level": self.get_ooi_scan_levels(),
+                "scan_type": self.get_ooi_profile_types(),
+                "search_string": self.search_string,
+                "order_by": self.order_by,
+                "asc_desc": self.sorting_order,
+            }
+
+        if not query:
+            return {"input_oois": self.get_ooi_pks()}
+
+        return {"query": query}
 
     def create_report_recipe(
         self,
         report_name_format: str,
         asset_report_name_format: str,
         report_type: str | None,
-        schedule: str,
-        query: Any | None,
+        schedule: str | None,
     ) -> ReportRecipe:
-        if query:
-            input_recipe = {"query": query}
-        else:
-            input_recipe = {"input_oois": self.get_ooi_pks()}
 
         report_recipe = ReportRecipe(
             recipe_id=uuid4(),
             report_name_format=report_name_format,
             asset_report_name_format=asset_report_name_format,
-            input_recipe=input_recipe,
+            input_recipe=self.get_input_recipe(),
             report_type=report_type,
             asset_report_types=self.get_report_type_ids(),
             cron_expression=schedule,
@@ -315,12 +328,32 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
             }
         }
 
+    def get_initial_report_names(self) -> tuple[str, str]:
+        oois = self.get_total_oois()
+        is_single_report = self.is_single_report()
+
+        if oois == 1 and is_single_report:
+            return ("${report_type} for ${ooi}", "Report")
+        if oois == 1 and not is_single_report:
+            return ("${report_type} for ${ooi}", "${report_type} for ${ooi}")
+        if oois > 1:
+            return ("${report_type} for ${oois_count} objects", "${report_type} for ${ooi}")
+        return ("Report", "Report")
+
+    def get_parent_report_type(self):
+        if self.report_type is not None:
+            return self.report_type.id
+        if not self.is_single_report():
+            return ConcatenatedReport.id
+        return self.report_type
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         context["all_oois_selected"] = self.all_oois_selected()
         context["selected_oois"] = self.selected_oois
         context["selected_report_types"] = self.selected_report_types
+        context["is_single_report"] = self.is_single_report()
         context["object_selection"] = self.request.POST.get("object_selection", "")
 
         return context
@@ -480,146 +513,55 @@ class ReportPluginView(BaseReportView, TemplateView):
 class ReportFinalSettingsView(BaseReportView, SchedulerView, TemplateView):
     report_type: type[BaseReport] | None = None
     task_type = "report"
-    is_a_scheduled_report = False
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.get_report_type_ids():
             messages.error(request, self.NONE_REPORT_TYPE_SELECTION_MESSAGE)
             return PostRedirect(self.get_previous())
-
-        self.is_a_scheduled_report = self.is_scheduled_report()
-
         return super().get(request, *args, **kwargs)
-
-    @staticmethod
-    def create_report_names(oois: list[OOI], report_types: list[type[BaseReport]]) -> dict[str, str]:
-        reports = {}
-        oois_count = len(oois)
-        report_types_count = len(report_types)
-        ooi = oois[0].human_readable if oois else None
-        report_type = report_types[0].name
-
-        # Create name for parent report
-        if not (report_types_count == 1 and oois_count == 1):
-            if report_types_count > 1 and oois_count != 1:
-                name = _("Concatenated Report for {oois_count} objects").format(
-                    report_type=report_type, oois_count=oois_count
-                )
-            elif report_types_count > 1 and oois_count == 1:
-                name = _("Concatenated Report for {ooi}").format(ooi=ooi)
-            elif report_types_count == 1 and oois_count != 1:
-                name = _("{report_type} for {oois_count} objects").format(
-                    report_type=report_type, oois_count=oois_count
-                )
-            reports[name] = ""
-
-        # Create name for subreports or single reports
-        for ooi in oois:
-            for report_type_ in report_types:
-                name = _("{report_type} for {ooi}").format(report_type=report_type_.name, ooi=ooi.human_readable)
-                reports[name] = ""
-
-        return reports
-
-    def get_report_names(self) -> dict[str, str] | list[str]:
-        if self.report_type is not None and self.report_type == AggregateOrganisationReport:
-            return [_("Aggregate Report")]
-        if self.report_type is not None and self.report_type == MultiOrganizationReport:
-            return [_("Sector Report")]
-
-        return self.create_report_names(self.get_oois(), self.get_report_types())
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["reports"] = self.get_report_names()
-
+        context["initial_report_names"] = self.get_initial_report_names()
         context["report_schedule_form_start_date"] = self.get_report_schedule_form_start_date_time_recurrence()
         context["report_schedule_form_recurrence_choice"] = self.get_report_schedule_form_recurrence_choice()
-
-        context["report_name_form"] = self.get_report_name_form()
-        context["report_asset_name_form"] = self.get_report_asset_name_form()
-
-        context["is_scheduled_report"] = self.is_a_scheduled_report
-
-        context["created_at"] = datetime.now()
         return context
 
 
-class SaveReportView(BaseReportView, SchedulerView):
+class SaveReportView(BaseReportView, SchedulerView, FormView):
     task_type = "report"
+    form_class = ReportScheduleStartDateForm
 
-    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        old_report_names = request.POST.getlist("old_report_name")
-        report_names = request.POST.getlist("report_name", [])
-        reference_dates = request.POST.getlist("reference_date")
+    def form_invalid(self, form):
+        """
+        We need to overwrite this as FormView renders invalid forms with a get request,
+        we need to adapt it using Postredirect, returning invalid form.
+        """
 
-        if not self.is_scheduled_report() and report_names:
-            final_report_names = list(zip(old_report_names, self.finalise_report_names(report_names, reference_dates)))
-            report_ooi = self.save_report(final_report_names)
+        return PostRedirect(self.get_current())
 
-            return redirect(
-                reverse("view_report", kwargs={"organization_code": self.organization.code})
-                + "?"
-                + urlencode({"report_id": report_ooi.reference})
-            )
-        elif self.is_scheduled_report():
-            report_name_format = request.POST.get("report_name", "")
-            asset_report_name_format = request.POST.get("asset_report_name", "")
-            object_selection = request.POST.get("object_selection", "")
+    def form_valid(self, form):
+        start_datetime = form.cleaned_data["start_datetime"]
+        recurrence = form.cleaned_data["recurrence"]
 
-            form = ReportScheduleStartDateForm(request.POST)
-            if form.is_valid():
-                start_datetime = form.cleaned_data["start_datetime"]
-                recurrence = form.cleaned_data["recurrence"]
+        schedule = (
+            self.convert_recurrence_to_cron_expressions(recurrence, start_datetime)
+            if recurrence is not None and recurrence != "once"
+            else None
+        )
 
-            query = {}
-            if object_selection == "query":
-                query = {
-                    "ooi_types": [t.__name__ for t in self.get_ooi_types()],
-                    "scan_level": self.get_ooi_scan_levels(),
-                    "scan_type": self.get_ooi_profile_types(),
-                    "search_string": self.search_string,
-                    "order_by": self.order_by,
-                    "asc_desc": self.sorting_order,
-                }
+        parent_report_type = self.get_parent_report_type()
 
-            report_type = None
-            if self.report_type is not None:
-                report_type = self.report_type.id
-            elif not self.report_type and asset_report_name_format:
-                report_type = ConcatenatedReport.id
+        parent_report_name_format = self.request.POST.get("parent_report_name_format", "")
+        subreport_name_format = self.request.POST.get("subreport_name_format")
 
-            schedule = self.convert_recurrence_to_cron_expressions(recurrence, start_datetime)
+        report_recipe = self.create_report_recipe(
+            parent_report_name_format, subreport_name_format, parent_report_type, schedule
+        )
 
-            report_recipe = self.create_report_recipe(
-                report_name_format, asset_report_name_format, report_type, schedule, query
-            )
+        self.create_report_schedule(report_recipe, start_datetime)
 
-            self.create_report_schedule(report_recipe, start_datetime)
-
-            return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
-
-        messages.error(request, _("Empty name should not be possible."))
-        return PostRedirect(self.get_previous())
-
-    @staticmethod
-    def finalise_report_names(report_names: list[str], reference_dates: list[str]) -> list[str]:
-        final_report_names = []
-
-        if len(report_names) == len(reference_dates):
-            for index, report_name in enumerate(report_names):
-                date_format = ""
-                if reference_dates[index] and reference_dates[index] != "":
-                    date_format = " - "
-                    if reference_dates[index] == "week":
-                        date_format += _("Week %W, %Y")
-                    else:
-                        date_format += reference_dates[index]
-                final_report_name = f"{report_name} {date_format}".strip()
-                final_report_names.append(final_report_name)
-        if not final_report_names:
-            return report_names
-        return final_report_names
+        return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 
 
 class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
