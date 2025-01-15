@@ -1,5 +1,6 @@
 from datetime import datetime
 from enum import Enum
+from typing import Any
 
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
@@ -23,7 +24,7 @@ class OrganizationSettingsView(
     template_name = "organizations/organization_settings.html"
     permission_required = "tools.view_organization"
 
-    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         """Perform actions based on action type"""
         action = request.POST.get("action")
         if not self.request.user.has_perm("tools.can_recalculate_bits"):

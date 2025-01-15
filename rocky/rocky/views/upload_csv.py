@@ -11,12 +11,13 @@ from django.urls import reverse
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
+from httpx import HTTPError
 from pydantic import ValidationError
 from tools.forms.upload_csv import CSV_ERRORS
 from tools.forms.upload_oois import UploadOOICSVForm
 
 from octopoes.api.models import Declaration
-from octopoes.models import Reference
+from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 from octopoes.models.ooi.web import URL
@@ -79,7 +80,7 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         context["criteria"] = CSV_CRITERIA
         return context
 
-    def get_or_create_reference(self, ooi_type_name: str, value: str | None):
+    def get_or_create_reference(self, ooi_type_name: str, value: str | None) -> OOI:
         ooi_type_name = next(filter(lambda x: x.casefold() == ooi_type_name.casefold(), self.ooi_types.keys()))
 
         # get from cache
@@ -100,7 +101,7 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
 
         return ooi
 
-    def get_ooi_from_csv(self, ooi_type_name: str, values: dict[str, str]):
+    def get_ooi_from_csv(self, ooi_type_name: str, values: dict[str, str]) -> tuple[OOI, int | None]:
         key = "clearance"
         level = int(values[key]) if key in values and values[key] in CLEARANCE_VALUES else None
         ooi_type = self.ooi_types[ooi_type_name]["type"]
@@ -110,7 +111,7 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
             if field not in self.skip_properties
         ]
 
-        kwargs = {}
+        kwargs: dict[str, Any] = {}
         for field, is_reference, required in ooi_fields:
             if is_reference and required:
                 try:
@@ -158,15 +159,14 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
 
         csv_data = io.StringIO(csv_raw_data.decode("UTF-8"))
         rows_with_error = []
+        oois = []
         try:
             for row_number, row in enumerate(csv.DictReader(csv_data, delimiter=",", quotechar='"'), start=1):
                 if not row:
                     continue  # skip empty lines
                 try:
                     ooi, level = self.get_ooi_from_csv(object_type, row)
-                    self.octopoes_api_connector.save_declaration(
-                        Declaration(ooi=ooi, valid_time=datetime.now(timezone.utc), task_id=task_id)
-                    )
+                    oois.append(Declaration(ooi=ooi, valid_time=datetime.now(timezone.utc), task_id=task_id))
                     if isinstance(level, int):
                         self.raise_clearance_level(ooi.reference, level)
                 except ValidationError:
@@ -179,3 +179,8 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
             self.add_success_notification(_("Object(s) successfully added."))
         except (csv.Error, IndexError):
             return self.add_error_notification(CSV_ERRORS["csv_error"])
+
+        try:
+            self.octopoes_api_connector.save_many_declarations(oois)
+        except HTTPError:
+            return self.add_error_notification("Failed to save data from the CSV")

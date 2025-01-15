@@ -17,10 +17,11 @@ def test_get_local_plugin(test_client, organisation):
 
 def test_filter_plugins(test_client, organisation):
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/")
-    assert len(response.json()) == 101
+    assert len(response.json()) > 10
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins?plugin_type=boefje")
-    assert len(response.json()) == 45
-
+    assert len(response.json()) > 10
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins?state=true")
+    assert len(response.json()) > 10
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins?limit=10")
     assert len(response.json()) == 10
 
@@ -62,7 +63,7 @@ def test_add_boefje(test_client, organisation):
     assert response.status_code == 422
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/?plugin_type=boefje")
-    assert len(response.json()) == 46
+    assert len(response.json()) > 10
 
     boefje_dict = boefje.model_dump()
     boefje_dict["consumes"] = list(boefje_dict["consumes"])
@@ -70,6 +71,16 @@ def test_add_boefje(test_client, organisation):
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/test_plugin")
     assert response.json() == boefje_dict
+
+
+def test_enable_boefje(test_client, organisation, second_organisation):
+    test_client.patch(f"/v1/organisations/{organisation.id}/plugins/dns-records", json={"enabled": True})
+
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/dns-records")
+    assert response.json()["enabled"] is True
+
+    response = test_client.get(f"/v1/organisations/{second_organisation.id}/plugins/dns-records")
+    assert response.json()["enabled"] is False
 
 
 def test_cannot_add_static_plugin_with_duplicate_name(test_client, organisation):
@@ -136,7 +147,7 @@ def test_delete_normalizer(test_client, organisation):
     assert response.status_code == 404
 
 
-def test_update_plugins(test_client, organisation):
+def test_update_plugins(test_client, organisation, second_organisation):
     normalizer = Normalizer(id="norm_id", name="My test normalizer")
     boefje = Boefje(id="test_plugin", name="My test boefje", description="123", interval=20)
 

@@ -1,4 +1,3 @@
-import contextlib
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Literal
@@ -17,7 +16,6 @@ from boefjes.sql.plugin_storage import create_plugin_storage
 from boefjes.storage.interfaces import (
     ConfigStorage,
     DuplicatePlugin,
-    NotFound,
     PluginNotFound,
     PluginStorage,
     SettingsNotConformingToSchema,
@@ -45,8 +43,15 @@ class PluginService:
 
     def get_all(self, organisation_id: str) -> list[PluginType]:
         all_plugins = self._get_all_without_enabled()
+        plugin_states = self.config_storage.get_states_for_organisation(organisation_id)
 
-        return [self._set_plugin_enabled(plugin, organisation_id) for plugin in all_plugins.values()]
+        for plugin in all_plugins.values():
+            if plugin.id not in plugin_states:
+                continue
+
+            all_plugins[plugin.id] = plugin.model_copy(update={"enabled": plugin_states[plugin.id]})
+
+        return list(all_plugins.values())
 
     def _get_all_without_enabled(self) -> dict[str, PluginType]:
         all_plugins = {plugin.id: plugin for plugin in self.plugin_storage.get_all()}
@@ -216,12 +221,6 @@ class PluginService:
                 validate(instance=all_settings, schema=schema)
             except ValidationError as e:
                 raise SettingsNotConformingToSchema(plugin_id, e.message) from e
-
-    def _set_plugin_enabled(self, plugin: PluginType, organisation_id: str) -> PluginType:
-        with contextlib.suppress(KeyError, NotFound):
-            plugin.enabled = self.config_storage.is_enabled_by_id(plugin.id, organisation_id)
-
-        return plugin
 
 
 def get_plugin_service() -> Iterator[PluginService]:

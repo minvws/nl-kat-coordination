@@ -87,9 +87,6 @@ def save_report_data(
     report_data: dict,
     recipe: ReportRecipe,
 ) -> Report | None:
-    if len(report_data) == 0:
-        return None
-
     now = datetime.now(timezone.utc)
 
     input_data = {
@@ -278,7 +275,7 @@ class SaveGenerateReportMixin(BaseReportView):
 
 
 class SaveAggregateReportMixin(BaseReportView):
-    def save_report(self, report_names: list) -> Report:
+    def save_report(self, report_names: list) -> Report | None:
         aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
             self.octopoes_api_connector,
             self.get_oois(),

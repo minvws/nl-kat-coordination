@@ -135,7 +135,16 @@ class OOIRepository(Repository):
         raise NotImplementedError
 
     def list_findings(
-        self, severities, valid_time, exclude_muted, only_muted, offset, limit, search_string, order_by, asc_desc
+        self,
+        severities: set[RiskLevelSeverity],
+        valid_time: datetime,
+        exclude_muted: bool = False,
+        only_muted: bool = False,
+        offset: int = DEFAULT_OFFSET,
+        limit: int = DEFAULT_LIMIT,
+        search_string: str | None = None,
+        order_by: Literal["score", "finding_type"] = "score",
+        asc_desc: Literal["asc", "desc"] = "desc",
     ) -> Paginated[Finding]:
         raise NotImplementedError
 
@@ -700,10 +709,10 @@ class XTDBOOIRepository(OOIRepository):
         self,
         severities: set[RiskLevelSeverity],
         valid_time: datetime,
-        exclude_muted=False,
-        only_muted=False,
-        offset=DEFAULT_OFFSET,
-        limit=DEFAULT_LIMIT,
+        exclude_muted: bool = False,
+        only_muted: bool = False,
+        offset: int = DEFAULT_OFFSET,
+        limit: int = DEFAULT_LIMIT,
         search_string: str | None = None,
         order_by: Literal["score", "finding_type"] = "score",
         asc_desc: Literal["asc", "desc"] = "desc",

@@ -6,9 +6,8 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-from httpx import HTTPError
-from katalogus.client import get_katalogus
-from tools.view_helpers import PostRedirect
+from katalogus.client import KATalogusHTTPError, KATalogusNotAllowedError, get_katalogus
+from tools.view_helpers import Breadcrumb, PostRedirect
 
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
@@ -25,7 +24,7 @@ from reports.views.view_helpers import GenerateReportStepsMixin
 
 
 class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
-    def build_breadcrumbs(self):
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
@@ -110,15 +109,15 @@ class ExportSetupGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenerat
         if not selected_plugins:
             return super().post(request, *args, **kwargs)
 
-        if not self.organization_member.has_perm("tools.can_enable_disable_boefje"):
-            messages.error(request, _("You do not have the required permissions to enable plugins."))
-            return PostRedirect(self.get_previous())
-
         client = get_katalogus(self.organization_member)
+
         for selected_plugin in selected_plugins:
             try:
                 client.enable_boefje_by_id(selected_plugin)
-            except HTTPError:
+            except KATalogusNotAllowedError:
+                messages.error(request, _("You do not have the required permissions to enable plugins."))
+                return PostRedirect(self.get_previous())
+            except KATalogusHTTPError:
                 messages.error(
                     request,
                     _("An error occurred while enabling {}. The plugin is not available.").format(selected_plugin),

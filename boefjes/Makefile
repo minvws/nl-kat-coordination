@@ -40,6 +40,7 @@ images:  # Build the images for the containerized boefjes
 	# docker build -f images/base.Dockerfile -t ghcr.io/minvws/openkat/dns-records --build-arg BOEFJE_PATH=./boefjes/plugins/kat_dns .
 	docker build -f ./boefjes/plugins/kat_dnssec/boefje.Dockerfile -t ghcr.io/minvws/openkat/dns-sec:latest .
 	docker build -f ./boefjes/plugins/kat_nmap_tcp/boefje.Dockerfile -t ghcr.io/minvws/openkat/nmap:latest  .
+	docker build -f ./boefjes/plugins/kat_export_http/boefje.Dockerfile -t ghcr.io/minvws/openkat/export-http:latest .
 
 
 ##
@@ -75,12 +76,19 @@ itest: ## Run the integration tests.
 	$(ci-docker-compose) build
 	$(ci-docker-compose) down --remove-orphans
 	$(ci-docker-compose) run --rm katalogus_integration
-	$(ci-docker-compose) down
+	$(ci-docker-compose) stop
 
-bench:  ## Run the report benchmark.
+migration_bench:  ## Run the migration benchmark.
 	$(ci-docker-compose) build
 	$(ci-docker-compose) down --remove-orphans
 	$(ci-docker-compose) run --rm migration_bench
+	$(ci-docker-compose) stop
+
+bench:  ## Run the other benchmarks
+	$(ci-docker-compose) build
+	$(ci-docker-compose) down --remove-orphans
+	$(ci-docker-compose) run --rm katalogus_integration \
+	python -m cProfile -o .ci/bench_$$(date +%Y_%m_%d-%H:%M:%S).pstat -m pytest -m slow --no-cov tests/integration
 	$(ci-docker-compose) stop
 
 debian12:

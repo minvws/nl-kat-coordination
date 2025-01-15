@@ -57,10 +57,10 @@ def get_runnable_module_from_package(package: str, module_file: str, *, paramete
 class BoefjeResource:
     """Represents a Boefje package that we can run. Throws a ModuleException if any validation fails."""
 
-    def __init__(self, path: Path, package: str):
+    def __init__(self, path: Path, package: str, path_hash: str):
         self.path = path
         self.boefje: Boefje = Boefje.model_validate_json(path.joinpath(BOEFJE_DEFINITION_FILE).read_text())
-        self.boefje.runnable_hash = get_runnable_hash(self.path)
+        self.boefje.runnable_hash = path_hash
         self.boefje.produces = self.boefje.produces.union(set(_default_mime_types(self.boefje)))
         self.module: Runnable | None = None
 
@@ -86,7 +86,7 @@ class NormalizerResource:
         self.module = get_runnable_module_from_package(package, ENTRYPOINT_NORMALIZERS, parameter_count=2)
 
 
-def get_runnable_hash(path: Path) -> str:
+def hash_path(path: Path) -> str:
     """Returns sha256(file1 + file2 + ...) of all files in the given path."""
 
     folder_hash = hashlib.sha256()
@@ -102,7 +102,7 @@ def get_runnable_hash(path: Path) -> str:
     return folder_hash.hexdigest()
 
 
-def _default_mime_types(boefje: Boefje):
+def _default_mime_types(boefje: Boefje) -> set:
     mime_types = {f"boefje/{boefje.id}"}
 
     if boefje.version is not None:

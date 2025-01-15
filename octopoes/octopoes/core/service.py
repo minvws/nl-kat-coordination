@@ -143,7 +143,7 @@ class OctopoesService:
 
     def get_ooi_tree(
         self, reference: Reference, valid_time: datetime, search_types: set[type[OOI]] | None = None, depth: int = 1
-    ):
+    ) -> ReferenceTree:
         tree = self.ooi_repository.get_tree(reference, valid_time, search_types, depth)
         self._populate_scan_profiles(tree.store.values(), valid_time)
         return tree
@@ -257,7 +257,7 @@ class OctopoesService:
             logger.exception("Error running inference", exc_info=e)
 
     @staticmethod
-    def check_path_level(path_level: int | None, current_level: int):
+    def check_path_level(path_level: int | None, current_level: int) -> bool:
         return path_level is not None and path_level >= current_level
 
     def recalculate_scan_profiles(self, valid_time: datetime) -> None:
@@ -295,9 +295,7 @@ class OctopoesService:
                 }
 
                 temp_next_ooi_set = set()
-                for ooi_type_ in grouped_per_type:
-                    current_ooi_set = grouped_per_type[ooi_type_]
-
+                for ooi_type_, current_ooi_set in grouped_per_type.items():
                     # find paths to neighbours higher or equal than current processing level
                     paths = get_paths_to_neighours(ooi_type_)
                     paths = {
@@ -381,7 +379,7 @@ class OctopoesService:
         )
         logger.info("Recalculated scan profiles")
 
-    def process_event(self, event: DBEvent):
+    def process_event(self, event: DBEvent) -> None:
         # handle event
         event_handler_name = f"_on_{event.operation_type.value}_{event.entity_type}"
         handler: Callable[[DBEvent], None] | None = getattr(self, event_handler_name)
