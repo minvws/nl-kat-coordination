@@ -152,10 +152,6 @@ class App:
 
     def _collect_metrics(self) -> None:
         """Collect application metrics throughout the application."""
-
-        # FIXME:: can be queries instead of a loop
-        # Collect the queue size of the schedulers, and the status counts of
-        # the tasks for each scheduler.
         for s in self.schedulers.values():
             qsize = self.ctx.datastores.pq_store.qsize(s.scheduler_id)
             self.ctx.metrics_qsize.labels(scheduler_id=s.scheduler_id).set(qsize)

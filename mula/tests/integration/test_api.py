@@ -712,7 +712,10 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         response = self.client.get("/tasks/stats")
         self.assertEqual(200, response.status_code)
 
-        response = self.client.get(f"/tasks/stats/{self.first_item_api.get('scheduler_id')}")
+        response = self.client.get(f"/tasks/stats?scheduler_id={self.first_item_api.get('scheduler_id')}")
+        self.assertEqual(200, response.status_code)
+
+        response = self.client.get(f"/tasks/stats?organisation_id={self.first_item_api.get('organisation_id')}")
         self.assertEqual(200, response.status_code)
 
 
