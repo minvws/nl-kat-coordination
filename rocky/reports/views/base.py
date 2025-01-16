@@ -204,7 +204,11 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
                 scan_profile_type=self.get_ooi_profile_types(),
             ).items
 
-        return [self.get_single_ooi(pk=ooi_pk) for ooi_pk in self.get_ooi_selection()]
+        return list(
+            self.octopoes_api_connector.load_objects_bulk(
+                [Reference.from_str(x) for x in self.get_ooi_selection()], self.observed_at
+            ).values()
+        )
 
     def get_ooi_filter_forms(self) -> dict[str, Form]:
         return {
