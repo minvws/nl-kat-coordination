@@ -238,7 +238,8 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         ]
 
     def get_report_types_for_generate_report(self):
-        if self.object_selection == "query":
+        object_selection = self.request.POST.get("object_selection", "")
+        if object_selection == "query":
             report_types = get_report_types_for_ooi_types(self.get_ooi_types())
         else:
             report_types = get_report_types_for_oois(self.selected_oois)

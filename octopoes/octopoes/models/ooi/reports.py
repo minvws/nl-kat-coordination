@@ -101,6 +101,6 @@ class ReportRecipe(OOI):
     report_type: str | None = None
     asset_report_types: list[str]
 
-    cron_expression: str | None
+    cron_expression: str | None = None
 
     _natural_key_attrs = ["recipe_id"]

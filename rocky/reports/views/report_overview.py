@@ -9,6 +9,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
+from httpx import HTTPStatusError
 from pydantic import TypeAdapter, ValidationError
 from tools.ooi_helpers import create_ooi
 
@@ -46,16 +47,21 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
     task_type = "report"
     context_object_name = "scheduled_reports"
 
-    def get_recipe_ooi_tree(self, ooi_pk: str) -> ReportRecipe | None:
+    def get_recipe_ooi(self, recipe_id: str) -> ReportRecipe:
         try:
-            return self.octopoes_api_connector.get_tree(
-                Reference.from_str(f"ReportRecipe|{ooi_pk}"),
-                valid_time=self.observed_at,
-                depth=1,
-                types={ReportRecipe, Report},
+            return self.octopoes_api_connector.get(
+                Reference.from_str(f"ReportRecipe|{recipe_id}"), valid_time=self.observed_at
             )
-        except ObjectNotFoundException:
-            return messages.error(self.request, f"Report recipe with id {ooi_pk} not found.")
+        except (HTTPStatusError, ObjectNotFoundException):
+            return []
+
+    def get_reports(self, recipe_id: str) -> list[Report]:
+        try:
+            return self.octopoes_api_connector.list_reports(
+                valid_time=self.observed_at, recipe_id=UUID(recipe_id)
+            ).items
+        except (HTTPStatusError, ObjectNotFoundException):
+            return []
 
     def get_queryset(self) -> list[dict[str, Any]]:
         report_schedules = self.get_report_schedules()
@@ -65,12 +71,9 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
             for schedule in report_schedules:
                 if schedule["data"]:
                     recipe_id = schedule["data"]["report_recipe_id"]
-                    report_recipe = self.octopoes_api_connector.get(
-                        Reference.from_str(f"ReportRecipe|{recipe_id}"), valid_time=datetime.now(timezone.utc)
-                    )
-                    reports = self.octopoes_api_connector.list_reports(
-                        valid_time=self.observed_at, recipe_id=UUID(recipe_id)
-                    ).items
+
+                    report_recipe = self.get_recipe_ooi(recipe_id)
+
                     recipes.append(
                         {
                             "schedule_id": schedule["id"],
@@ -78,16 +81,11 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
                             "recipe": report_recipe,
                             "cron": schedule["schedule"],
                             "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
-                            "reports": reports,
+                            "reports": self.get_reports(recipe_id),
                         }
                     )
 
         return recipes
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["total_oois"] = len(self.object_list)
-        return context
 
 
 class ScheduledReportsEnableDisableView(BreadcrumbsReportOverviewView, SchedulerView, ListView):
