@@ -16,15 +16,14 @@ The clearance level of this boefje only shares those objects that were chosen th
 point. If the boefje clearance level is lowered to level 2, the chosen objects are forwarded to the API endpoint. Giving this boefje a clearance level of 0 will sent all chosen objects to the API endpoint, this includes the objects that have clearance level 0.
 
 Steps to use this boefje:
+
 #. Go to the KATalogus and open the 'Export to HTTP API' boefje.
 #. Scroll down to the Container image and Variants section.
 #. Click on the button 'Add variant'.
 #. Fill out the form for creating a Boefje variant. You can find more information HERE. `#TODO: Add link to information page boefje variant.` The sub-items below are the minimum required items to be added/changed in this form.
-
    #. Name: Use a descriptive name, like "API export all URLs L4" to quickly see from the KATalogus page what this boefje exports.
    #. Input object type: The Input Object types are the objects that you want to export to the API endpoint. Use the SHIFT + mouseclick to select one or more objects.
    #. Clearance level: set the clearance level required before the chosen input objects types can be exported.
-
 #. Click the 'Create variant' button.
 #. Go to the Katalogus and click on your newly created Boefje variant.
 #. Click the 'Configure settings' button.
