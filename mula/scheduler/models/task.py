@@ -46,19 +46,13 @@ class Task(BaseModel):
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
-
-    scheduler_id: str | None = None
-
+    scheduler_id: str
     schedule_id: uuid.UUID | None = None
-
+    organisation: str
     priority: int | None = 0
-
     status: TaskStatus = TaskStatus.PENDING
-
     type: str | None = None
-
     hash: str | None = Field(None, max_length=32)
-
     data: dict = Field(default_factory=dict)
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -69,24 +63,18 @@ class TaskDB(Base):
     __tablename__ = "tasks"
 
     id = Column(GUID, primary_key=True)
-
     scheduler_id = Column(String, nullable=False)
-
     schedule_id = Column(GUID, ForeignKey("schedules.id", ondelete="SET NULL"), nullable=True)
-    schedule = relationship("ScheduleDB", back_populates="tasks")
-
+    organisation = Column(String, nullable=False)
     type = Column(String, nullable=False)
-
     hash = Column(String(32), index=True)
-
     priority = Column(Integer)
-
     data = Column(JSONB, nullable=False)
-
     status = Column(Enum(TaskStatus), nullable=False, default=TaskStatus.PENDING)
 
-    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    schedule = relationship("ScheduleDB", back_populates="tasks")
 
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     modified_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
 
 

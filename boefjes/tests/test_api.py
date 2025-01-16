@@ -11,7 +11,6 @@ from tests.loading import get_dummy_data
 
 def _mocked_scheduler_client(tmp_path: Path):
     return MockSchedulerClient(
-        queue_response=get_dummy_data("scheduler/queues_response.json"),
         boefje_responses=[get_dummy_data("scheduler/pop_response_boefje_no_ooi.json")],
         normalizer_responses=[],
         log_path=tmp_path / "patch_task_log",

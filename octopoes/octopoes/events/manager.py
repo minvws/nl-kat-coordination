@@ -26,6 +26,7 @@ class ScanProfileMutation(BaseModel):
     operation: OperationType
     primary_key: str
     value: AbstractOOI | None = None
+    client_id: str
 
 
 thread_local = threading.local()
@@ -126,7 +127,9 @@ class EventManager:
             )
 
         # publish mutations
-        mutation = ScanProfileMutation(operation=event.operation_type, primary_key=event.primary_key)
+        mutation = ScanProfileMutation(
+            operation=event.operation_type, primary_key=event.primary_key, client_id=event.client
+        )
 
         if event.operation_type != OperationType.DELETE:
             mutation.value = AbstractOOI(
@@ -137,7 +140,7 @@ class EventManager:
 
         self.channel.basic_publish(
             "",
-            f"{event.client}__scan_profile_mutations",
+            "scan_profile_mutations",
             mutation.model_dump_json().encode(),
             properties=pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent),
         )
@@ -165,4 +168,4 @@ class EventManager:
     def _connect(self) -> None:
         self.channel = self.channel_factory(self.queue_uri)
         self.channel.queue_declare(queue=f"{self.client}__scan_profile_increments", durable=True)
-        self.channel.queue_declare(queue=f"{self.client}__scan_profile_mutations", durable=True)
+        self.channel.queue_declare(queue="scan_profile_mutations", durable=True)
