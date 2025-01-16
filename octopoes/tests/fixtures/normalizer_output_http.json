@@ -42,6 +42,27 @@
       "resource": "HTTPResource|internet|1.1.1.1|tcp|80|http|internet|example.com|http|internet|example.com|80|/",
       "key": "strict-transport-security",
       "value": "max-age=31536000; includeSubDomains"
+    },
+    {
+      "website": "Website|internet|1.1.1.1|tcp|80|http|internet|example.com",
+      "object_type": "HTTPResource",
+      "web_url": "HostnameHTTPURL|http|internet|example.com|80|/",
+      "user_id": null
+    },
+    {
+      "network": "Network|internet",
+      "object_type": "HostnameHTTPURL",
+      "scheme": "http",
+      "path": "/",
+      "user_id": null,
+      "port": 80,
+      "netloc": "Hostname|internet|example.com"
+    },
+    {
+      "ip_service": "IPService|internet|1.1.1.1|tcp|80|http",
+      "object_type": "Website",
+      "user_id": null,
+      "hostname": "Hostname|internet|example.com"
     }
   ],
   "valid_time": "2019-01-01T00:00:00+00:00",

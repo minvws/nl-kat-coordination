@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from enum import Enum, IntEnum
 from typing import Any, ClassVar, Literal, TypeAlias, TypeVar
 
@@ -239,7 +240,17 @@ class OOI(BaseModel):
         return str(value)
 
     def __hash__(self):
-        return hash(self.primary_key)
+        def freeze(items: Iterable[Any | Iterable[Any | None] | None]) -> Iterable[int]:
+            for item in items:
+                if isinstance(item, Iterable) and not (isinstance(item, str | bytes)):
+                    if isinstance(item, dict):
+                        yield from freeze(item.items())
+                    else:
+                        yield from freeze(item)
+                else:
+                    yield hash(item)
+
+        return hash(tuple(freeze(self.model_dump().items())))
 
 
 OOIClassType = TypeVar("OOIClassType")
