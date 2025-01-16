@@ -325,16 +325,7 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         }
 
     def get_initial_report_names(self) -> tuple[str, str]:
-        oois = self.get_total_oois()
-        is_single_report = self.is_single_report()
-
-        if oois == 1 and is_single_report:
-            return ("${report_type} for ${ooi}", "Report")
-        if oois == 1 and not is_single_report:
-            return ("${report_type} for ${ooi}", "${report_type} for ${ooi}")
-        if oois > 1:
-            return ("${report_type} for ${oois_count} objects", "${report_type} for ${ooi}")
-        return ("Report", "Report")
+        return ("${report_type} for ${oois_count} objects", "${report_type} for ${ooi}")
 
     def get_parent_report_type(self):
         if self.report_type is not None:
