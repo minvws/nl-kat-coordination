@@ -63,12 +63,14 @@
                     </div>
                 </dl>
             </div>
-            <div class="button-container">
-                <a href="{% url "step_report" organization.code %}?{{ request.GET.urlencode }}"
-                   class="button">{% translate "Start scanning" %}</a>
-                <a href="{% url "complete_onboarding" organization.code %}"
-                   class="button ghost">{% translate "Skip onboarding" %}</a>
-            </div>
+            <form method="post" class="inline">
+                {% csrf_token %}
+                <div class="button-container">
+                    <button type="submit">{% translate "Start scanning" %}</button>
+                    <a href="{% url "complete_onboarding" organization.code %}"
+                       class="button ghost">{% translate "Skip onboarding" %}</a>
+                </div>
+            </form>
         </section>
     </main>
 {% endblock content %}
