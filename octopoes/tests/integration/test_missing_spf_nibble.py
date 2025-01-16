@@ -98,7 +98,7 @@ def test_missing_spf_nibble_non_tld(xtdb_octopoes_service: OctopoesService, even
     nibbler.nibbles = {missing_spf_nibble.id: missing_spf_nibble}
     network = Network(name="internet")
     xtdb_octopoes_service.ooi_repository.save(network, valid_time)
-    hostname = Hostname(name="example.com", network=network.reference)
+    hostname = Hostname(name="example.example.com", network=network.reference)
     xtdb_octopoes_service.ooi_repository.save(hostname, valid_time)
 
     event_manager.complete_process_events(xtdb_octopoes_service)
