@@ -23,7 +23,7 @@ Steps to use this boefje:
 
 #. Click on the button 'Add variant'.
 
-#. Fill out the form for creating a Boefje variant. You can find more information HERE. `#TODO: Add link to information page boefje variant.` The sub-items below are the minimum required items to be added/changed in this form.
+#. Fill out the form for creating a Boefje variant. You can find more information HERE. #TODO: Add link to information page boefje variant. The sub-items below are the minimum required items to be added/changed in this form.
 
     #. Name: Use a descriptive name, like "API export all URLs L4" to quickly see from the KATalogus page what this boefje exports.
 
