@@ -164,3 +164,7 @@ class OOIRepositoryTest(TestCase):
             [network, url, network]
         )
         assert self.repository.parse_as(Network, [pull(network), pull(url), pull(url)]) == tuple([network, url, url])
+
+        assert self.repository.parse_as(list[Network], [pull(network), pull(network), pull(network)]) == tuple(
+            [network, network, network]
+        )

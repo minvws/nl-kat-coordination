@@ -284,6 +284,9 @@ class XTDBOOIRepository(OOIRepository):
             # list --> tuple
             if isinstance(type_, list):
                 return tuple(cls.parse_as(type_t, o) for o, type_t in zip(obj, type_))
+            elif hasattr(type_, "__origin__") and hasattr(type_, "__args__") and type_.__origin__ is list:
+                t = [type_.__args__[0]] * len(obj)
+                return tuple(cls.parse_as(t, o) for o, t in zip(obj, t))
             else:
                 return tuple(cls.parse_as(type_, o) for o in obj)
         else:
@@ -919,7 +922,7 @@ class XTDBOOIRepository(OOIRepository):
                     first = True
                     arguments = [
                         ooi.reference
-                        if sgn.object_type == type_by_name(ooi.get_ooi_type()) and (first and not (first := False))
+                        if type_by_name(ooi.get_ooi_type()) in sgn.triggers and (first and not (first := False))
                         else None
                         for sgn in nibble.signature
                     ]
