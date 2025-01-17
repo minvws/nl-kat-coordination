@@ -14,7 +14,8 @@ class OOITreeView(BaseOOIDetailView, TemplateView):
     connector_form_class = OoiTreeSettingsForm
 
     def get_tree_dict(self):
-        return create_object_tree_item_from_ref(self.tree.root, self.tree.store)
+        tree = self.get_ooi_tree()
+        return create_object_tree_item_from_ref(tree.root, tree.store)
 
     def get_filtered_tree(self, tree_dict: dict) -> dict:
         filtered_types = self.request.GET.getlist("ooi_type", [])
