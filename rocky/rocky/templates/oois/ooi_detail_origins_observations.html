@@ -14,6 +14,7 @@
                         <th>{% translate "Source" %}</th>
                         <th>{% translate "Task ID" %}</th>
                         <th>{% translate "When" %}</th>
+                        <th>{% translate "Normalizer" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,6 +47,12 @@
                                     <span>{% translate "Warning:" %}</span>
                                 {% endif %}
                                 <span title="{{ observation.normalizer.raw_data.boefje_meta.ended_at }} UTC">{{ observation.normalizer.raw_data.boefje_meta.ended_at|naturaltime }}</span>
+                            </td>
+                            <td>
+                                {% if observation.normalizer.normalizer.id %}
+                                    <a href="{% url 'normalizer_detail' organization_code=organization.code plugin_id=observation.normalizer.normalizer.id %}"
+                                       title="{{ observation.normalizer.normalizer.id }}">{{ observation.normalizer.normalizer.id }}</a>
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}

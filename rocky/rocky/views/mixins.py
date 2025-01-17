@@ -518,7 +518,9 @@ class SingleOOIMixin(OctopoesView):
 
 
 class SingleOOITreeMixin(SingleOOIMixin):
-    tree: ReferenceTree
+    @cached_property
+    def tree(self) -> ReferenceTree:
+        return self.get_ooi_tree(depth=1)
 
     def get_depth(self):
         try:
@@ -526,7 +528,7 @@ class SingleOOITreeMixin(SingleOOIMixin):
         except ValueError:
             return DEPTH_DEFAULT
 
-    def get_ooi(self, pk: str | None = None, observed_at: datetime | None = None) -> OOI:
+    def get_ooi_tree(self, pk: str | None = None, observed_at: datetime | None = None, depth: int | None = None) -> OOI:
         if pk is None:
             pk = self.get_ooi_id()
 
@@ -534,14 +536,14 @@ class SingleOOITreeMixin(SingleOOIMixin):
             observed_at = self.observed_at
 
         ref = Reference.from_str(pk)
-        depth = self.get_depth()
+        depth = depth or self.get_depth()
 
         try:
-            self.tree = self.octopoes_api_connector.get_tree(ref, valid_time=observed_at, depth=depth)
+            tree = self.octopoes_api_connector.get_tree(ref, valid_time=observed_at, depth=depth)
         except Exception as e:
             self.handle_connector_exception(e)
 
-        return self.tree.store[str(self.tree.root.reference)]
+        return tree
 
 
 class SeveritiesMixin:
