@@ -37,10 +37,11 @@
             <div>
                 {% if not ooi|is_finding and not ooi|is_finding_type %}
                     {% include "oois/ooi_detail_findings_overview.html" with severity_summary=findings_severity_summary severity_summary_totals=severity_summary_totals %}
+                
                 {% endif %}
             </div>
             <div>
-                <h2>{% translate "Scan" %} {% translate "using boefjes" %}</h2>
+                <h2>{% translate "Scan" %} {{ ooi.human_readable }} {% translate "using boefjes" %}</h2>
                 {% if enabled_boefjes_available %}
                     <div class="horizontal-view">
                         <div>
