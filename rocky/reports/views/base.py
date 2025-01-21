@@ -230,7 +230,8 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         ]
 
     def get_report_types_for_generate_report(self):
-        if self.object_selection == "query":
+        object_selection = self.request.POST.get("object_selection", "")
+        if object_selection == "query":
             report_types = get_report_types_for_ooi_types(self.get_ooi_types())
         else:
             report_types = get_report_types_for_oois(self.selected_oois)
@@ -286,19 +287,15 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         return {"query": query}
 
     def create_report_recipe(
-        self,
-        report_name_format: str,
-        subreport_name_format: str,
-        parent_report_type: str,
-        schedule: str | None,
+        self, report_name_format: str, asset_report_name_format: str, report_type: str | None, schedule: str | None
     ) -> ReportRecipe:
         report_recipe = ReportRecipe(
             recipe_id=uuid4(),
             report_name_format=report_name_format,
-            subreport_name_format=subreport_name_format,
+            asset_report_name_format=asset_report_name_format,
             input_recipe=self.get_input_recipe(),
-            parent_report_type=parent_report_type,
-            report_types=self.get_report_type_ids(),
+            report_type=report_type,
+            asset_report_types=self.get_report_type_ids(),
             cron_expression=schedule,
         )
         create_ooi(
@@ -320,16 +317,7 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         }
 
     def get_initial_report_names(self) -> tuple[str, str]:
-        oois = self.get_total_oois()
-        is_single_report = self.is_single_report()
-
-        if oois == 1 and is_single_report:
-            return ("${report_type} for ${ooi}", "")
-        if oois == 1 and not is_single_report:
-            return ("${report_type} for ${ooi}", "${report_type} for ${ooi}")
-        if oois > 1:
-            return ("${report_type} for ${oois_count} objects", "${report_type} for ${ooi}")
-        return ("", "")
+        return ("${report_type} for ${oois_count} object(s)", "${report_type} for ${ooi}")
 
     def get_parent_report_type(self):
         if self.report_type is not None:
@@ -513,7 +501,6 @@ class ReportFinalSettingsView(BaseReportView, SchedulerView, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["initial_report_names"] = self.get_initial_report_names()
         context["report_schedule_form_start_date"] = self.get_report_schedule_form_start_date_time_recurrence()
         context["report_schedule_form_recurrence_choice"] = self.get_report_schedule_form_recurrence_choice()
         return context

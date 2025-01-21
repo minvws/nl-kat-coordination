@@ -333,10 +333,10 @@ class OnboardingSetupScanOOIDetailView(
         return scheduler_client(organization.code).is_scheduler_ready(scheduler_id)
 
     def post(self, request, *args, **kwargs):
-        parent_report_name_format, subreport_name_format = self.get_initial_report_names()
+        report_name_format, asset_report_name_format = self.get_initial_report_names()
         parent_report_type = self.get_parent_report_type()
         report_recipe = self.create_report_recipe(
-            parent_report_name_format, subreport_name_format, parent_report_type, None
+            report_name_format, asset_report_name_format, parent_report_type, None
         )
         if self.is_scheduler_enabled(self.organization):
             self.create_report_schedule(report_recipe, datetime.now(timezone.utc))
