@@ -222,8 +222,11 @@ def test_save_aggregate_report_view(
                 "observed_at": valid_time.strftime("%Y-%m-%d"),
                 "ooi": listed_hostnames,
                 "report_type": ["systems-report", "dns-report"],
-                "old_report_name": ["Aggregate Report"],
-                "report_name": ["Testing a new name for Aggregate Report"],
+                "start_date": "2024-01-01",
+                "start_time": "10:10",
+                "recurrence": "once",
+                "parent_report_name_format": "${report_type} for ${oois_count} objects",
+                "subreport_name_format": "${report_type} for ${ooi}",
             },
         ),
         client_member.user,
@@ -232,7 +235,7 @@ def test_save_aggregate_report_view(
     response = SaveAggregateReportView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 302  # after post follows redirect, this to first create report ID
-    assert "report_id=Report" in response.url
+    assert "/reports/scheduled-reports/" in response.url
 
 
 def test_save_aggregate_report_view_scheduled(
@@ -269,11 +272,11 @@ def test_save_aggregate_report_view_scheduled(
                 "observed_at": valid_time.strftime("%Y-%m-%d"),
                 "ooi": listed_hostnames,
                 "report_type": ["systems-report", "vulnerability-report"],
-                "choose_recurrence": "repeat",
                 "start_date": "2024-01-01",
                 "start_time": "10:10",
-                "recurrence": "weekly",
-                "report_name": ["Scheduled Aggregate Report %x"],
+                "recurrence": "once",
+                "parent_report_name_format": "${report_type} for ${oois_count} object(s)",
+                "subreport_name_format": "${report_type} for ${ooi}",
             },
         ),
         client_member.user,
