@@ -380,13 +380,16 @@ class SchedulerClient:
     def health(self) -> ServiceHealth:
         return ServiceHealth.model_validate_json(self._get("/health", return_type="content"))
 
-    def _get_task_stats(self, scheduler_id: str) -> dict:
+    def _get_task_stats(self, scheduler_id: str, organisation_id: str | None) -> dict:
         """Return task stats for specific scheduler."""
-        return self._get(f"/tasks/stats/{scheduler_id}")  # type: ignore
+        if organisation_id is None:
+            return self._get(f"/tasks/stats?=scheduler_id={scheduler_id}")  # type: ignore
+
+        return self._get(f"/tasks/stats?=scheduler_id={scheduler_id}&organisation_id={organisation_id}")  # type: ignore
 
     def get_task_stats(self, task_type: str) -> dict:
         """Return task stats for specific task type."""
-        return self._get_task_stats(scheduler_id=f"{task_type}-{self.organization_code}")
+        return self._get_task_stats(scheduler_id=task_type, organisation_id=self.organization_code)
 
     @staticmethod
     def _merge_stat_dicts(dicts: list[dict]) -> dict:
@@ -397,6 +400,7 @@ class SchedulerClient:
                 stat_sum[timeslot].update(counts)
         return dict(stat_sum)
 
+    # TODO: update
     def get_combined_schedulers_stats(self, scheduler_ids: list) -> dict:
         """Return merged stats for a set of scheduler ids."""
         return SchedulerClient._merge_stat_dicts(
