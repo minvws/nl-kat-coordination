@@ -62,11 +62,10 @@ class App:
             * api server
         """
         self.start_schedulers()
+        self.start_server(self.schedulers)
 
         if self.ctx.config.collect_metrics:
             self.start_collectors()
-
-        self.start_server(self.schedulers)
 
         # Main thread
         while not self.stop_event.is_set():
@@ -94,11 +93,6 @@ class App:
         for s in self.schedulers.values():
             s.run()
 
-    def start_collectors(self) -> None:
-        thread.ThreadRunner(
-            name="App-metrics_collector", target=self._collect_metrics, stop_event=self.stop_event, interval=10
-        ).start()
-
     def start_server(
         self,
         schedulers: dict[
@@ -111,6 +105,11 @@ class App:
     ) -> None:
         self.server = server.Server(self.ctx, schedulers)
         thread.ThreadRunner(name="App-server", target=self.server.run, stop_event=self.stop_event, loop=False).start()
+
+    def start_collectors(self) -> None:
+        thread.ThreadRunner(
+            name="App-metrics_collector", target=self._collect_metrics, stop_event=self.stop_event, interval=10
+        ).start()
 
     def shutdown(self) -> None:
         """Shutdown the scheduler application, and all threads."""

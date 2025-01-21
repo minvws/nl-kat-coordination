@@ -34,14 +34,12 @@ class ReportScheduler(Scheduler):
         scheduled.
         """
         # Rescheduling
-        self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-reschedule", target=self.process_rescheduling, interval=60.0
-        )
+        self.run_in_thread(name=f"ReportScheduler-rescheduling", target=self.process_rescheduling, interval=60.0)
         self.logger.info(
             "Report scheduler started", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
         )
 
-    @tracer.start_as_current_span(name="process_rescheduling")
+    @tracer.start_as_current_span(name="ReportScheduler.process_rescheduling")
     def process_rescheduling(self):
         schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
             filters=filters.FilterRequest(
@@ -62,9 +60,7 @@ class ReportScheduler(Scheduler):
             report_task = models.ReportTask.model_validate(schedule.data)
             report_tasks.append(report_task)
 
-        with futures.ThreadPoolExecutor(
-            thread_name_prefix=f"ReportScheduler-TPE-{self.scheduler_id}-rescheduling"
-        ) as executor:
+        with futures.ThreadPoolExecutor(thread_name_prefix=f"TPE-{self.scheduler_id}-rescheduling") as executor:
             for report_task in report_tasks:
                 executor.submit(
                     self.push_report_task,
@@ -75,7 +71,7 @@ class ReportScheduler(Scheduler):
                 )
 
     @exception_handler
-    @tracer.start_as_current_span("push_report_task")
+    @tracer.start_as_current_span("ReportScheduler.push_report_task")
     def push_report_task(
         self, report_task: models.ReportTask, organisation_id: str, create_schedule: bool, caller: str = ""
     ) -> None:

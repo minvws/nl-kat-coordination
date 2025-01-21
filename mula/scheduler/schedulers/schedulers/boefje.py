@@ -69,7 +69,7 @@ class BoefjeScheduler(Scheduler):
             "Boefje scheduler started", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
         )
 
-    @tracer.start_as_current_span("process_mutations")
+    @tracer.start_as_current_span("BoefjeScheduler.process_mutations")
     def process_mutations(self, body: bytes) -> None:
         """Create tasks for oois that have a scan level change.
 
@@ -78,7 +78,6 @@ class BoefjeScheduler(Scheduler):
         """
         try:
             # Convert body into a ScanProfileMutation
-            self.logger.info(body)
             mutation = models.ScanProfileMutation.model_validate_json(body)
             self.logger.debug(
                 "Received scan level mutation %s for: %s",
@@ -165,9 +164,7 @@ class BoefjeScheduler(Scheduler):
                 )
             )
 
-        with futures.ThreadPoolExecutor(
-            thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-mutations"
-        ) as executor:
+        with futures.ThreadPoolExecutor(thread_name_prefix=f"TPE-{self.scheduler_id}-mutations") as executor:
             for boefje_task in boefje_tasks:
                 executor.submit(
                     self.push_boefje_task,
@@ -177,7 +174,7 @@ class BoefjeScheduler(Scheduler):
                     self.process_mutations.__name__,
                 )
 
-    @tracer.start_as_current_span("process_new_boefjes")
+    @tracer.start_as_current_span("BoefjeScheduler.process_new_boefjes")
     def process_new_boefjes(self) -> None:
         """When new boefjes are added or enabled we find the ooi's that
         boefjes can run on, and create tasks for it."""
@@ -217,15 +214,13 @@ class BoefjeScheduler(Scheduler):
                 )
                 continue
 
-        with futures.ThreadPoolExecutor(
-            thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-new_boefjes"
-        ) as executor:
+        with futures.ThreadPoolExecutor(thread_name_prefix=f"TPE-{self.scheduler_id}-new_boefjes") as executor:
             for boefje_task, org_id in boefje_tasks:
                 executor.submit(
                     self.push_boefje_task, boefje_task, org_id, self.create_schedule, self.process_new_boefjes.__name__
                 )
 
-    @tracer.start_as_current_span("process_rescheduling")
+    @tracer.start_as_current_span("BoefjeScheduler.process_rescheduling")
     def process_rescheduling(self):
         try:
             schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
@@ -246,9 +241,7 @@ class BoefjeScheduler(Scheduler):
             self.logger.exception("Error occurred while processing rescheduling", scheduler_id=self.scheduler_id)
             return
 
-        with futures.ThreadPoolExecutor(
-            thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-rescheduling"
-        ) as executor:
+        with futures.ThreadPoolExecutor(thread_name_prefix=f"TPE-{self.scheduler_id}-rescheduling") as executor:
             for schedule in schedules:
                 try:
                     boefje_task = models.BoefjeTask.model_validate(schedule.data)
@@ -363,7 +356,7 @@ class BoefjeScheduler(Scheduler):
                 )
 
     @exception_handler
-    @tracer.start_as_current_span("push_boefje_task")
+    @tracer.start_as_current_span("BoefjeScheduler.push_boefje_task")
     def push_boefje_task(
         self, boefje_task: models.BoefjeTask, organisation_id: str, create_schedule: bool = True, caller: str = ""
     ) -> None:

@@ -4,6 +4,7 @@ from types import SimpleNamespace
 from typing import Any, Literal
 
 from opentelemetry import trace
+from pydantic import ValidationError
 
 from scheduler import clients, context, models
 from scheduler.clients.errors import ExternalServiceError
@@ -58,7 +59,7 @@ class NormalizerScheduler(Scheduler):
         )
 
     # TODO: exception handling
-    @tracer.start_as_current_span("process_raw_data")
+    @tracer.start_as_current_span("NormalizerScheduler.process_raw_data")
     def process_raw_data(self, body: bytes) -> None:
         """Create tasks for the received raw data.
 
@@ -66,14 +67,18 @@ class NormalizerScheduler(Scheduler):
             latest_raw_data: A `RawData` object that was received from the
             message queue.
         """
-        # Convert body into a RawDataReceivedEvent
-        latest_raw_data = models.RawDataReceivedEvent.model_validate_json(body)
-        self.logger.debug(
-            "Received raw data %s",
-            latest_raw_data.raw_data.id,
-            raw_data_id=latest_raw_data.raw_data.id,
-            scheduler_id=self.scheduler_id,
-        )
+        try:
+            # Convert body into a RawDataReceivedEvent
+            latest_raw_data = models.RawDataReceivedEvent.model_validate_json(body)
+            self.logger.debug(
+                "Received raw data %s",
+                latest_raw_data.raw_data.id,
+                raw_data_id=latest_raw_data.raw_data.id,
+                scheduler_id=self.scheduler_id,
+            )
+        except ValidationError:
+            self.logger.exception("Failed to validate raw data", scheduler_id=self.scheduler_id)
+            return
 
         # Check if the raw data doesn't contain an error mime-type,
         # we don't need to create normalizers when the raw data returned
@@ -86,14 +91,17 @@ class NormalizerScheduler(Scheduler):
             )
             return
 
-        # TODO: deduplication
-        # Get all normalizers for the mime types of the raw data
-        normalizers = []
+        # Get all unique normalizers for the mime types of the raw data
+        normalizers = {}
         for mime_type in latest_raw_data.raw_data.mime_types:
             normalizers_by_mime_type = self.get_normalizers_for_mime_type(
                 mime_type.get("value"), latest_raw_data.organization
             )
-            normalizers.extend(normalizers_by_mime_type)
+            self.logger.debug("Found normalizers for mime type", mime_type=mime_type.get("value"))
+            for normalizer in normalizers_by_mime_type:
+                normalizers[normalizer.id] = normalizer
+
+        normalizers = list(normalizers.values())
 
         self.logger.debug(
             "Found normalizers for raw data",
@@ -120,16 +128,14 @@ class NormalizerScheduler(Scheduler):
             )
             normalizer_tasks.append(normalizer_task)
 
-        with futures.ThreadPoolExecutor(
-            thread_name_prefix=f"NormalizerScheduler-TPE-{self.scheduler_id}-raw_data"
-        ) as executor:
+        with futures.ThreadPoolExecutor(thread_name_prefix=f"TPE-{self.scheduler_id}-raw_data") as executor:
             for normalizer_task in normalizer_tasks:
                 executor.submit(
                     self.push_normalizer_task, normalizer_task, latest_raw_data.organization, self.create_schedule
                 )
 
     @exception_handler
-    @tracer.start_as_current_span("push_normalizer_task")
+    @tracer.start_as_current_span("NormalizerScheduler.push_normalizer_task")
     def push_normalizer_task(
         self, normalizer_task: models.NormalizerTask, organisation_id: str, create_schedule: bool, caller: str = ""
     ) -> None:
