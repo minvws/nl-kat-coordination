@@ -62,6 +62,7 @@ Findings
 The findings page gives an overview of all findings found by KAT. The filter section can be used to apply various filters to show specific findings (e.g. critical findings only) and/or hosts. The search bar can be used to search for specific findings or hosts. Clicking on a finding shows more information on this finding. Each finding can be viewed in the tree or graph by clicking the corresponding icons behind the finding.
 
 Findings can have one of the following risk levels:
+
 * **Critical:** critical findings may pose an immediate risk to the organization. The recommendation is generally to fix these findings immediately.
 * **High:** high findings may pose an immediate risk to the organization. The recommendation is generally to fix these as soon as possible.
 * **Medium:** medium findings may pose a risk to the organization. These findings can usually be picked up within maintenance windows and/or be scheduled work.
