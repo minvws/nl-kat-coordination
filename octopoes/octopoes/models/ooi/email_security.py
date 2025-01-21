@@ -10,6 +10,13 @@ from octopoes.models.persistence import ReferenceField
 
 
 class DNSSPFRecord(OOI):
+    """Returns the DNS SPF record.
+
+    Functions:
+    natural_keys: returns property of the class.
+    format_reference_human_readable: returns the title text for objects on the object details page.
+    """
+
     object_type: Literal["DNSSPFRecord"] = "DNSSPFRecord"
     value: str
     ttl: int | None = None
@@ -32,6 +39,10 @@ class DNSSPFRecord(OOI):
 
 
 class MechanismQualifier(Enum):
+    """Returns the SPF Mechanism Qualifiers: allow' fail, softfail or neutral
+    to specify how e-mail should be handled.
+    """
+
     ALLOW = "+"
     FAIL = "-"
     SOFTFAIL = "~"
@@ -48,11 +59,18 @@ class MechanismQualifier(Enum):
 
 
 class DNSSPFMechanism(OOI):
+    """Returns the DNS SPF Mechanism
+
+    SPF Mechanisms may be: all, a, ipv4, ipv6, mx, ptr, exists or include.
+    """
+
     spf_record: Reference = ReferenceField(DNSSPFRecord, max_inherit_scan_level=1)
     mechanism: str
 
 
 class DNSSPFMechanismIP(DNSSPFMechanism):
+    """Returns the DNS SPF Mechanism for IPs."""
+
     object_type: Literal["DNSSPFMechanismIP"] = "DNSSPFMechanismIP"
 
     ip: Reference = ReferenceField(IPAddress)
@@ -71,6 +89,8 @@ class DNSSPFMechanismIP(DNSSPFMechanism):
 
 
 class DNSSPFMechanismHostname(DNSSPFMechanism):
+    """Returns the DNS SPF Mechanism for Hostnames."""
+
     object_type: Literal["DNSSPFMechanismHostname"] = "DNSSPFMechanismHostname"
 
     hostname: Reference = ReferenceField(Hostname)
@@ -89,6 +109,8 @@ class DNSSPFMechanismHostname(DNSSPFMechanism):
 
 
 class DNSSPFMechanismNetBlock(DNSSPFMechanism):
+    """Returns the DNS SPF Mechanism for net blocks."""
+
     object_type: Literal["DNSSPFMechanismNetBlock"] = "DNSSPFMechanismNetBlock"
 
     netblock: Reference = ReferenceField(NetBlock)
@@ -108,6 +130,8 @@ class DNSSPFMechanismNetBlock(DNSSPFMechanism):
 
 
 class DMARCTXTRecord(OOI):
+    """Returns the DMARC TXT record for a hostname."""
+
     object_type: Literal["DMARCTXTRecord"] = "DMARCTXTRecord"
     value: str
     ttl: int | None
@@ -122,6 +146,8 @@ class DMARCTXTRecord(OOI):
 
 
 class DKIMExists(OOI):
+    """Returns the the DKIM exists object if a DKIM record was identified."""
+
     object_type: Literal["DKIMExists"] = "DKIMExists"
     hostname: Reference = ReferenceField(Hostname)
 
@@ -134,6 +160,8 @@ class DKIMExists(OOI):
 
 
 class DKIMSelector(OOI):
+    """Returns the DKIM Selector object if present."""
+
     object_type: Literal["DKIMSelector"] = "DKIMSelector"
     selector: str
     hostname: Reference = ReferenceField(Hostname)
@@ -147,6 +175,8 @@ class DKIMSelector(OOI):
 
 
 class DKIMKey(OOI):
+    """Returns the value of the DKIM key."""
+
     object_type: Literal["DKIMKey"] = "DKIMKey"
     key: str
     dkim_selector: Reference = ReferenceField(DKIMSelector)
