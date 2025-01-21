@@ -22,7 +22,7 @@ from tools.ooi_helpers import create_ooi
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, PostRedirect, url_with_querystring
 
 from octopoes.models import OOI, Reference
-from octopoes.models.ooi.reports import Report as ReportOOI
+from octopoes.models.ooi.reports import BaseReport as ReportOOI, AssetReport
 from octopoes.models.ooi.reports import ReportRecipe
 from reports.forms import OOITypeMultiCheckboxForReportForm, ReportScheduleStartDateForm
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
@@ -596,15 +596,8 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
             return ["multi_report.html"]
         return ["generate_report.html"]
 
-    def get_asset_reports(self) -> list[ReportOOI]:
-        return [
-            child
-            for x in REPORTS
-            for child in self.octopoes_api_connector.query(
-                "Report.<parent_report[is Report]", valid_time=self.observed_at, source=self.report_ooi.reference
-            )
-            if child.report_type == x.id
-        ]
+    def get_asset_reports(self) -> list[AssetReport]:
+        return self.octopoes_api_connector.get_report(self.report_ooi.reference, self.observed_at).input_oois
 
     def get_input_oois(self, ooi_pks: list[str]) -> list[type[OOI]]:
         return [
@@ -694,12 +687,11 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         for report in asset_reports:
             bytes_data = self.get_report_data_from_bytes(report)
-            for ooi in report.input_oois:
-                report_data.setdefault(report.report_type, {})[ooi] = {
-                    "data": bytes_data["report_data"],
-                    "template": report.template,
-                    "report_name": report.name,
-                } | bytes_data["input_data"]
+            report_data.setdefault(report.report_type, {})[report.input_ooi] = {
+                "data": bytes_data["report_data"],
+                "template": report.template,
+                "report_name": report.name,
+            } | bytes_data["input_data"]
         oois = self.get_input_oois(self.report_ooi.input_oois)
         report_type_ids = {child_report.report_type for child_report in asset_reports}
         report_types = self.get_report_types(report_type_ids)

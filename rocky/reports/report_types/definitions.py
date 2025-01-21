@@ -118,7 +118,7 @@ class Report(BaseReport):
         for input_ooi, ip_hostname in self.octopoes_api_connector.query_many(
             "IPAddress.<address[is ResolvedHostname].hostname", valid_time, ip_refs
         ):
-            if input_ooi not in hostnames_by_input_ooi:
+            if input_ooi.reference not in hostnames_by_input_ooi:
                 hostnames_by_input_ooi[input_ooi] = []
 
             hostnames_by_input_ooi[input_ooi].append(ip_hostname.reference)

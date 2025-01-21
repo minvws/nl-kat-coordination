@@ -17,7 +17,7 @@ logger = structlog.get_logger(__name__)
 
 
 class SaveGenerateReportMixin(BaseReportView):
-    def save_report(self, report_names: list) -> Report | None:
+    def save_report(self, report_names: list) -> Report | None:  # TODO: fix naming
         error_reports, report_data = collect_reports(
             self.observed_at,
             self.octopoes_api_connector,
