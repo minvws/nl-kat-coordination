@@ -28,7 +28,7 @@ Steps to use this boefje:
 
    #. Name: Use a descriptive name, like "API export all URLs L4" to quickly see from the KATalogus page what this boefje exports.
 
-   #. Input object type: The Input Object types are the objects that you want to export to the API endpoint. Use the SHIFT + mouseclick to select one or more object tyes.
+   #. Input object type: The Input Object types are the objects that you want to export to the API endpoint. Use the SHIFT + mouseclick to select one or more object types.
 
    #. Clearance level: set the clearance level required before the chosen input objects types can be exported.
 
