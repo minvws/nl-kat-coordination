@@ -52,7 +52,7 @@ class ReportRecurrenceChoiceForm(BaseRockyForm):
 class ReportScheduleStartDateForm(BaseRockyForm):
     start_date = forms.DateField(
         label=_("Start date"),
-        widget=DateInput(format="%Y-%m-%d", attrs={"form": "generate_report"}),
+        widget=DateInput(format="%Y-%m-%d"),
         initial=lambda: datetime.now(tz=timezone.utc).date(),
         required=True,
         input_formats=["%Y-%m-%d"],
