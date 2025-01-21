@@ -45,7 +45,10 @@
                             <tr>
                                 <td>{{ organization.name }}</td>
                                 <td>{{ organization.code }}</td>
-                                <td>{% include "organizations/organization_tags.html" %}</td>
+                                <td>
+                                    {% include "organizations/organization_tags.html" %}
+
+                                </td>
                                 {% if perms.tools.change_organization %}
                                     <td>
                                         {% spaceless %}
