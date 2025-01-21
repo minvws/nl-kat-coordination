@@ -1,4 +1,3 @@
-from collections import defaultdict
 from collections.abc import Iterable, Mapping, Sequence
 from datetime import datetime, timezone
 from operator import attrgetter
@@ -18,7 +17,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
 from katalogus.client import Boefje, KATalogus, KATalogusError, Plugin
-from pydantic import RootModel, TypeAdapter
+from pydantic import TypeAdapter
 from tools.ooi_helpers import create_ooi
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, PostRedirect, url_with_querystring
 
@@ -54,17 +53,6 @@ def get_selection(request: HttpRequest, pre_selection: Mapping[str, str | Sequen
 
 
 logger = structlog.get_logger(__name__)
-
-
-class ReportDataDict(RootModel):
-    root: Any
-
-    class Config:
-        arbitrary_types_allowed = True
-
-
-def recursive_dict():
-    return defaultdict(recursive_dict)
 
 
 class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
