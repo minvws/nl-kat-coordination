@@ -270,7 +270,7 @@ class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
 
     paginate_by = 150
     breadcrumbs_step = 2
-    context_object_name = "subreports"
+    context_object_name = "asset_reports"
     paginator = RockyPaginator
     template_name = "report_overview/subreports.html"
 
@@ -284,5 +284,5 @@ class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["total_oois"] = len(self.object_list)
-        context["parent_report_id"] = self.report_id
+        context["report_id"] = self.report_id
         return context

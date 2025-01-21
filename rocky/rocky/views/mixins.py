@@ -350,14 +350,14 @@ class ReportList:
         self._count = None
         self.parent_report_id = parent_report_id
 
-        self.subreports = None
+        self.asset_reports = None
         if self.parent_report_id and self.parent_report_id is not None:
-            self.subreports = self.get_subreports(self.parent_report_id)
+            self.asset_reports = self.get_asset_reports(self.parent_report_id)
 
     @cached_property
     def count(self) -> int:
-        if self.subreports is not None:
-            return len(self.subreports)
+        if self.asset_reports is not None:
+            return len(self.asset_reports)
         return self.octopoes_connector.list_reports(valid_time=self.valid_time, limit=0).count
 
     def __len__(self):
@@ -370,8 +370,8 @@ class ReportList:
             if key.stop:
                 limit = key.stop - offset
 
-            if self.subreports is not None:
-                return self.subreports[offset : offset + limit]
+            if self.asset_reports is not None:
+                return self.asset_reports[offset : offset + limit]
 
             reports = self.octopoes_connector.list_reports(valid_time=self.valid_time, offset=offset, limit=limit).items
 
@@ -379,21 +379,14 @@ class ReportList:
 
         raise NotImplementedError("ReportList only supports slicing")
 
-    def get_subreports(self, report_id: str) -> list[tuple[str, Report]]:
+    def get_asset_reports(self, report_id: str) -> list[tuple[str, Report]]:
         """
-        Get child reports with parent id.
+        Get asset reports with parent id.
         """
-        # TODO: is better to use query over query_many as we use one parent id.
-        # query will only return 50 items as we do not have pagination (offset and limit)
-        # yet implemented for query requests. We use query_many to get more then 50 items at once.
+        asset_reports = self.octopoes_connector.get_report(report_id, self.valid_time).input_oois
+        asset_reports = sorted(asset_reports, key=lambda x: (x.report_type, x.input_ooi))
 
-        subreports = self.octopoes_connector.query_many(
-            "Report.<parent_report [is Report]", self.valid_time, [report_id]
-        )
-
-        subreports = sorted(subreports, key=lambda x: (x[1].report_type, x[1].input_oois))
-
-        return subreports
+        return asset_reports
 
     def hydrate_report_list(self, reports: list[AssetReport]) -> list[HydratedReport]:
         hydrated_reports: list[HydratedReport] = []
