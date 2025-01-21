@@ -1,6 +1,7 @@
 from dataclasses import asdict
 
-from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
+from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
+from reports.runner.report_runner import aggregate_reports
 from reports.report_types.definitions import MultiReport, Report
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.report_types.systems_report.report import SystemReport, SystemType

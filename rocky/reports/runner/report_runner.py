@@ -4,6 +4,8 @@ from typing import Any
 
 import structlog
 from django.conf import settings
+from pydantic import RootModel
+
 from tools.models import Organization
 from tools.ooi_helpers import create_ooi
 
@@ -12,12 +14,11 @@ from octopoes.models import Reference, ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
 from octopoes.models.ooi.reports import AssetReport, Report, ReportRecipe
 from octopoes.models.types import OOIType, type_by_name
-from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
+from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import BaseReport, SubReportPlugins, report_plugins_union
 from reports.report_types.helpers import get_report_by_id
 from reports.runner.models import ReportRunner
-from reports.views.base import ReportDataDict
 from rocky.bytes_client import BytesClient
 from rocky.scheduler import ReportTask
 
@@ -55,7 +56,7 @@ class LocalReportRunner(ReportRunner):
                 asc_desc=query["asc_desc"],
             ).items
 
-        ooi_pks = [ooi for ooi in oois]
+        ooi_pks = [ooi.reference for ooi in oois]
 
         self.bytes_client.organization = report_task.organisation_id
 
@@ -90,7 +91,9 @@ class LocalReportRunner(ReportRunner):
         self.bytes_client.organization = None
 
 
-def collect_reports(valid_time: datetime, octopoes_connector: OctopoesAPIConnector, input_oois: list[str], report_types):
+def collect_reports(
+    valid_time: datetime, octopoes_connector: OctopoesAPIConnector, input_oois: list[str], report_types
+):
     error_reports = []
     report_data: dict[str, dict[str, dict[str, Any]]] = {}
     by_type: dict[str, list[str]] = {}
@@ -257,15 +260,15 @@ def create_asset_reports(
     for report_type_id, ooi_data in report_data.items():
         report_type = get_report_by_id(report_type_id)
 
-        for ooi, data in ooi_data.items():
-            ooi_human_readable = Reference.from_str(ooi).human_readable
+        for ooi_reference, data in ooi_data.items():
+            ooi_human_readable = ooi_reference.human_readable
             asset_report_name = now.strftime(
                 Template(recipe.asset_report_name_format).safe_substitute(
                     ooi=ooi_human_readable, report_type=report_type.name
                 )
             )
 
-            asset_report_input = get_input_data(input_data, ooi, report_type)
+            asset_report_input = get_input_data(input_data, ooi_reference, report_type)
             asset_raw_id = bytes_client.upload_raw(
                 raw=ReportDataDict({"report_data": data["data"]} | asset_report_input).model_dump_json().encode(),
                 manual_mime_types={"openkat/report"},
@@ -282,7 +285,7 @@ def create_asset_reports(
                 data_raw_id=asset_raw_id,
                 date_generated=now,
                 reference_date=observed_at,
-                input_ooi=ooi,
+                input_ooi=ooi_reference,
                 observed_at=observed_at,
             )
             asset_reports.append(asset_report)
@@ -301,3 +304,30 @@ def get_input_data(input_data: dict[str, Any], ooi: str, report_type: type[BaseR
     }
 
     return {"input_data": {"input_oois": [ooi], "report_types": [report_type.id], "plugins": child_plugins}}
+
+
+class ReportDataDict(RootModel):
+    root: Any
+
+    class Config:
+        arbitrary_types_allowed = True
+
+
+def aggregate_reports(
+    connector: OctopoesAPIConnector,
+    input_oois: list[str],
+    selected_report_types: list[str],
+    valid_time: datetime,
+    organization_code: str,
+) -> tuple[AggregateOrganisationReport, dict[str, Any], dict[str, Any], list[str]]:
+    all_types = [
+        t
+        for t in AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
+        if t.id in selected_report_types
+    ]
+
+    errors, report_data = collect_reports(valid_time, connector, input_oois, all_types)
+    aggregate_report = AggregateOrganisationReport(connector)
+    post_processed_data = aggregate_report.post_process_data(report_data, valid_time, organization_code)
+
+    return aggregate_report, post_processed_data, report_data, errors

@@ -126,7 +126,7 @@ class SchedulerView(OctopoesView):
                 scheduler_id=self.scheduler_id,
                 data=report_task,
                 schedule=report_recipe.cron_expression,
-                deadline_at=str(deadline_at),
+                deadline_at=deadline_at.isoformat(),
             )
 
             submit_schedule = self.scheduler_client.post_schedule(schedule=schedule_request)

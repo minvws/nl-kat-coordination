@@ -27,10 +27,10 @@
                     {% if schedule.recipe %}
                         <tr>
                             <td class="nowrap">
-                                {% if schedule.recipe.report_type != "concatenated-report" or schedule.reports.0.input_oois|length > 1 %}
-                                    {{ schedule.recipe.report_name_format }}
-                                {% else %}
+                                {% if schedule.recipe.report_type == "concatenated-report" and schedule.reports.0.input_oois|length == 1 %}
                                     {{ schedule.recipe.asset_report_name_format }}
+                                {% else %}
+                                    {{ schedule.recipe.report_name_format }}
                                 {% endif %}
                             </td>
                             <td>
@@ -42,7 +42,9 @@
                                     {% else %}
                                         {% for report_type in schedule.recipe.asset_report_types %}
                                             {% if forloop.counter0 < 2 %}
-                                                <li class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</li>
+                                                <li>
+                                                    <span class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</span>
+                                                </li>
                                             {% endif %}
                                             {% if forloop.counter0 == 2 %}
                                                 <li class="label tags-color-grey-2">+ {{ schedule.recipe.asset_report_types|length|add:"-2" }}</li>
@@ -51,13 +53,7 @@
                                     {% endif %}
                                 </ul>
                             </td>
-                            <td class="nowrap">
-                                {% if not schedule.enabled %}
-                                    -
-                                {% else %}
-                                    {{ schedule.deadline_at }}
-                                {% endif %}
-                            </td>
+                            <td class="nowrap">{{ schedule.deadline_at }}</td>
                             <td class="nowrap">
                                 {% if schedule.cron is None %}
                                     {% translate "Once" %}
@@ -72,7 +68,7 @@
                                     <span class="label system-tag color-3">{% translate "Disabled" %}</span>
                                 {% endif %}
                             </td>
-                            <td class="actions sticky-cell">
+                            <td class="nowrap actions sticky-cell">
                                 <button class="expando-button"
                                         data-icon-open-class="icon ti-chevron-down"
                                         data-icon-close-class="icon ti-chevron-up"

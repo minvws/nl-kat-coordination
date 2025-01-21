@@ -2442,6 +2442,10 @@ msgid "Recurrence"
 msgstr ""
 
 #: reports/forms.py
+msgid "No recurrence, just once"
+msgstr ""
+
+#: reports/forms.py
 msgid "Daily"
 msgstr ""
 
@@ -3059,6 +3063,7 @@ msgstr ""
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
@@ -3724,16 +3729,41 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-msgid ""
-"Please choose a start date, time and recurrence for scheduling your "
-"report(s). If you select a date on the 28th-31st of the month, it will "
-"always be scheduled on the last day of the month."
+#: reports/templates/report_overview/report_history_table.html
+msgid "Report name"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
 msgid ""
-"The date you select will be the reference date for the data set for your "
-"report. Please allow for up to 24 hours for your report to be ready."
+"Define a custom name format for your report(s). This format will be applied "
+"to all generated (sub)reports."
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+#, python-brace-format
+msgid ""
+"To make the report names more descriptive, you can include placeholders for "
+"the object name, the report type and/or the reference date. For subreports "
+"and reports over a single object, use the placeholder \"${ooi}\" for the "
+"object name, \"${report_type}\" for the report type and use a <a "
+"href=\"https://strftime.org/\" target=\"_blank\" rel=\"noopener\">Python "
+"strftime code</a> for the reference date. For reports over multiple objects, "
+"use \"${oois_count}\" for the number of objects in the report."
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+#, python-format, python-brace-format
+msgid ""
+"For example, the format \"${report_type} for ${ooi} at %%x\" could generate: "
+"\"DNS Report for example.com at 01/01/25\"."
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Report name format"
+msgstr ""
+
+#: reports/templates/partials/export_report_settings.html
+msgid "Subreports name format"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -3838,44 +3868,6 @@ msgstr ""
 msgid "Year"
 msgstr ""
 
-#: reports/templates/partials/report_names_header.html
-#: reports/templates/report_overview/report_history_table.html
-msgid "Report name"
-msgstr ""
-
-#: reports/templates/partials/report_names_header.html
-msgid ""
-"Define a custom name format for your report(s). This format will be applied "
-"to all generated (sub)reports."
-msgstr ""
-
-#: reports/templates/partials/report_names_header.html
-#, python-brace-format
-msgid ""
-"To make the report names more descriptive, you can include placeholders for "
-"the object name, the report type and/or the reference date. For subreports "
-"and reports over a single object, use the placeholder \"${ooi}\" for the "
-"object name, \"${report_type}\" for the report type and use a <a "
-"href=\"https://strftime.org/\" target=\"_blank\" rel=\"noopener\">Python "
-"strftime code</a> for the reference date. For reports over multiple objects, "
-"use \"${oois_count}\" for the number of objects in the report."
-msgstr ""
-
-#: reports/templates/partials/report_names_header.html
-#, python-format, python-brace-format
-msgid ""
-"For example, the format \"${report_type} for ${ooi} at %%x\" could generate: "
-"\"DNS Report for example.com at 01/01/25\"."
-msgstr ""
-
-#: reports/templates/partials/report_names_header.html
-msgid ""
-"Give your report(s) a custom name and optionally add the reports' reference "
-"date to the name. To do so you can select a standard option or use a <a "
-"href=\"https://strftime.org/\" target=\"_blank\" rel=\"noopener\">Python "
-"strftime code</a> in the report name."
-msgstr ""
-
 #: reports/templates/partials/report_navigation.html
 msgid "Report Navigation"
 msgstr ""
@@ -3884,7 +3876,7 @@ msgstr ""
 msgid "Generate Report"
 msgstr ""
 
-#: reports/templates/partials/report_navigation.html reports/views/base.py
+#: reports/templates/partials/report_navigation.html
 msgid "Aggregate Report"
 msgstr ""
 
@@ -4332,6 +4324,10 @@ msgid "Schedule status"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Once"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Scheduled Reports:"
 msgstr ""
 
@@ -4482,38 +4478,6 @@ msgstr ""
 
 #: reports/views/base.py
 msgid "Select at least one report type to proceed."
-msgstr ""
-
-#: reports/views/base.py
-#, python-brace-format
-msgid "Concatenated Report for {oois_count} objects"
-msgstr ""
-
-#: reports/views/base.py
-#, python-brace-format
-msgid "Concatenated Report for {ooi}"
-msgstr ""
-
-#: reports/views/base.py
-#, python-brace-format
-msgid "{report_type} for {oois_count} objects"
-msgstr ""
-
-#: reports/views/base.py
-#, python-brace-format
-msgid "{report_type} for {ooi}"
-msgstr ""
-
-#: reports/views/base.py
-msgid "Sector Report"
-msgstr ""
-
-#: reports/views/base.py
-msgid "Empty name should not be possible."
-msgstr ""
-
-#: reports/views/base.py
-msgid "Week %W, %Y"
 msgstr ""
 
 #: reports/views/mixins.py
