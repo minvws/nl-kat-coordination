@@ -17,6 +17,8 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
+
+from integration.conftest import valid_time
 from katalogus.client import Boefje, KATalogus, KATalogusError, Plugin
 from pydantic import RootModel, TypeAdapter
 from tools.ooi_helpers import create_ooi
@@ -204,7 +206,9 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
                 scan_profile_type=self.get_ooi_profile_types(),
             ).items
 
-        return [self.get_single_ooi(pk=ooi_pk) for ooi_pk in self.get_ooi_selection()]
+        return list(self.octopoes_api_connector.load_objects_bulk(
+            [Reference.from_str(x) for x in self.get_ooi_selection()], self.observed_at
+        ).values())
 
     def get_ooi_filter_forms(self) -> dict[str, Form]:
         return {
