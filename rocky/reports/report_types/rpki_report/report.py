@@ -27,7 +27,7 @@ class RPKIReport(Report):
     template_path = "rpki_report/report.html"
     label_style = "4-light"
 
-    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+    def collect_data(self, input_oois: Iterable[Reference], valid_time: datetime) -> dict[Reference, dict[str, Any]]:
         ips_by_input_ooi = self.to_ips(input_oois, valid_time)
         all_ips = list({ip for key, ips in ips_by_input_ooi.items() for ip in ips})
         finding_types_by_source = self.group_finding_types_by_source(

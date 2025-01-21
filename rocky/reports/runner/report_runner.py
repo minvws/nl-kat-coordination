@@ -5,7 +5,6 @@ from typing import Any
 import structlog
 from django.conf import settings
 from pydantic import RootModel
-
 from tools.models import Organization
 from tools.ooi_helpers import create_ooi
 
@@ -92,14 +91,14 @@ class LocalReportRunner(ReportRunner):
 
 
 def collect_reports(
-    valid_time: datetime, octopoes_connector: OctopoesAPIConnector, input_oois: list[str], report_types
+    valid_time: datetime, octopoes_connector: OctopoesAPIConnector, input_oois: list[Reference], report_types
 ):
     error_reports = []
     report_data: dict[str, dict[str, dict[str, Any]]] = {}
     by_type: dict[str, list[str]] = {}
 
     for ooi in input_oois:
-        ooi_type = Reference.from_str(ooi).class_
+        ooi_type = ooi.class_
 
         if ooi_type not in by_type:
             by_type[ooi_type] = []
@@ -315,7 +314,7 @@ class ReportDataDict(RootModel):
 
 def aggregate_reports(
     connector: OctopoesAPIConnector,
-    input_oois: list[str],
+    input_oois: list[Reference],
     selected_report_types: list[str],
     valid_time: datetime,
     organization_code: str,

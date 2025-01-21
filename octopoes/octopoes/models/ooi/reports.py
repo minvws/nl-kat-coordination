@@ -1,8 +1,8 @@
 from datetime import datetime
-from typing import Any, Literal, Annotated
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
-from pydantic import AliasGenerator, ConfigDict, Field, BeforeValidator
+from pydantic import AliasGenerator, BeforeValidator, ConfigDict, Field
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField

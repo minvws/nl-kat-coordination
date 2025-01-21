@@ -5,6 +5,7 @@ from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
+from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
@@ -25,7 +26,7 @@ class IPv6Report(Report):
     template_path = "ipv6_report/report.html"
     label_style = "4-light"
 
-    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+    def collect_data(self, input_oois: Iterable[Reference], valid_time: datetime) -> dict[Reference, dict[str, Any]]:
         """
         For hostnames, check whether they point to ipv6 addresses.
         For ip addresses, check all hostnames that point to them, and check whether they point to ipv6 addresses.
