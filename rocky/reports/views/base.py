@@ -22,14 +22,13 @@ from tools.ooi_helpers import create_ooi
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, PostRedirect, url_with_querystring
 
 from octopoes.models import OOI, Reference
-from octopoes.models.ooi.reports import BaseReport as ReportOOI, AssetReport
-from octopoes.models.ooi.reports import ReportRecipe
+from octopoes.models.ooi.reports import AssetReport, ReportRecipe
+from octopoes.models.ooi.reports import BaseReport as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm, ReportScheduleStartDateForm
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import AggregateReport, BaseReport, Report, report_plugins_union
 from reports.report_types.helpers import (
-    REPORTS,
     get_ooi_types_from_aggregate_report,
     get_ooi_types_with_report,
     get_report_by_id,
@@ -502,7 +501,8 @@ class ReportFinalSettingsView(BaseReportView, SchedulerView, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["report_schedule_form_start_date"] = self.get_report_schedule_form_start_date_time_recurrence()
-        context["report_schedule_form_recurrence_choice"] = self.get_report_schedule_form_recurrence_choice()
+        context["report_name_form"] = self.get_report_name_form()
+        context["report_asset_name_form"] = self.get_report_asset_name_form()
         return context
 
 
@@ -528,14 +528,12 @@ class SaveReportView(BaseReportView, SchedulerView, FormView):
             else None
         )
 
-        parent_report_type = self.get_parent_report_type()
+        report_type = self.get_parent_report_type()
 
-        parent_report_name_format = self.request.POST.get("parent_report_name_format", "")
-        subreport_name_format = self.request.POST.get("subreport_name_format")
+        report_name_format = self.request.POST.get("report_name", "Report")
+        asset_report_name_format = self.request.POST.get("asset_report_name", "Report")
 
-        report_recipe = self.create_report_recipe(
-            parent_report_name_format, subreport_name_format, parent_report_type, schedule
-        )
+        report_recipe = self.create_report_recipe(report_name_format, asset_report_name_format, report_type, schedule)
 
         self.create_report_schedule(report_recipe, start_datetime)
 
