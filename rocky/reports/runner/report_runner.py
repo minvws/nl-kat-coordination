@@ -56,7 +56,7 @@ class LocalReportRunner(ReportRunner):
                 asc_desc=query["asc_desc"],
             ).items
 
-        ooi_pks = [ooi for ooi in oois]
+        ooi_pks = [ooi.reference for ooi in oois]
 
         self.bytes_client.organization = report_task.organisation_id
 
@@ -260,15 +260,15 @@ def create_asset_reports(
     for report_type_id, ooi_data in report_data.items():
         report_type = get_report_by_id(report_type_id)
 
-        for ooi, data in ooi_data.items():
-            ooi_human_readable = Reference.from_str(ooi).human_readable
+        for ooi_reference, data in ooi_data.items():
+            ooi_human_readable = ooi_reference.human_readable
             asset_report_name = now.strftime(
                 Template(recipe.asset_report_name_format).safe_substitute(
                     ooi=ooi_human_readable, report_type=report_type.name
                 )
             )
 
-            asset_report_input = get_input_data(input_data, ooi, report_type)
+            asset_report_input = get_input_data(input_data, ooi_reference, report_type)
             asset_raw_id = bytes_client.upload_raw(
                 raw=ReportDataDict({"report_data": data["data"]} | asset_report_input).model_dump_json().encode(),
                 manual_mime_types={"openkat/report"},
@@ -285,7 +285,7 @@ def create_asset_reports(
                 data_raw_id=asset_raw_id,
                 date_generated=now,
                 reference_date=observed_at,
-                input_ooi=ooi,
+                input_ooi=ooi_reference,
                 observed_at=observed_at,
             )
             asset_reports.append(asset_report)
