@@ -71,7 +71,7 @@ Findings can have one of the following risk levels:
 * **Unknown:** OpenKAT was unable to determine the risk level for this finding. The reason for this could be that no classification has been given yet (e.g. CVE which hasn't been classified), or OpenKAT was not able to properly determine the impact on your environment. These findings usually require that the user determines the impact.
 * **Pending:** pending risk findings do not have an assigned risk level (yet). Usually this means that the normalizer hasn't parsed these findings yet. Check the Normalizer section on the Tasks page to see if the KAT Finding Types normalizer is scheduled.
 
-**Note on risk levels:** Risk severities only look at individual risks of findings. Attackers can always chain (combine) vulnerabilities (e.g. with a low and/or medium risk level) and combine this into a critical risk. These types of findings are **not** indicated by OpenKAT. These types of attacks generally come forth during penetration testing.
+**Note on risk levels:** Risk severities only look at individual risks of findings. Attackers can possibly chain (combine) vulnerabilities (e.g. with a low and/or medium risk level) and combine them to form a more complex attack and possibly more critical risk. These types of findings are **not** indicated by OpenKAT. These types of attacks are generally spotted during human executed penetration testing.
 
 A finding is also an object in the data model. This simply means that the finding can also be found on the Objects page.
 
