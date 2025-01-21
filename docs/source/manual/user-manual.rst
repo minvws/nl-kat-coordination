@@ -61,6 +61,17 @@ Findings
 
 The findings page gives an overview of all findings found by KAT. The filter section can be used to apply various filters to show specific findings (e.g. critical findings only) and/or hosts. The search bar can be used to search for specific findings or hosts. Clicking on a finding shows more information on this finding. Each finding can be viewed in the tree or graph by clicking the corresponding icons behind the finding.
 
+Findings can have one of the following risk levels:
+* **Critical:** critical findings may pose an immediate risk to the organization. The recommendation is generally to fix these findings immediately.
+* **High:** high findings may pose an immediate risk to the organization. The recommendation is generally to fix these as soon as possible.
+* **Medium:** medium findings may pose a risk to the organization. These findings can usually be picked up within maintenance windows and/or be scheduled work.
+* **Low:** low risk findings may pose a risk to the orgazitation. These findings usually leak information and can be picked up within maintenance windows and/or be scheduled work.
+* **Recommendations:** recommendation risk findings may pose a risk to the organization. These usually are configurations and settings can could be adjusted to improve the security of your environment.
+* **Unknown:** OpenKAT was unable to determine the risk level for this finding. The reason for this could be that no classification has been given yet (e.g. CVE which hasn't been classified), or OpenKAT was not able to properly determine the impact on your environment. These findings usually require that the user determines the impact.
+* **Pending:** pending risk findings do not have an assigned risk level (yet). Usually this means that the normalizer hasn't parsed these findings yet. Check the Normalizer section on the Tasks page to see if the KAT Finding Types normalizer is scheduled.
+
+**Note on findings:** Risk severities only look at individual risks of findings. Attackers can always chain (combine) vulnerabilities (e.g. with a low and/or medium risk level) and combine this into a critical risk. These types of findings are **not** indicated by OpenKAT. These types of attacks generally come forth during penetration testing.
+
 A finding is also an object in the data model. This simply means that the finding can also be found on the Objects page.
 
 .. image:: img/findings.png
