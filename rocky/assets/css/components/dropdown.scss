@@ -30,7 +30,9 @@
     border-radius: var(--border-radius-s);
     border: 1px solid var(--colors-grey-200);
     background-color: var(--colors-white);
-
+    max-height: 90vh;
+    overflow-x: scroll;
+    
     > ul {
       margin: 0;
       width: 100%;
