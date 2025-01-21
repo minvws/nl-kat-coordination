@@ -4,9 +4,6 @@ from typing import Any
 import structlog
 from django.utils.translation import gettext_lazy as _
 
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI
-from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
 from reports.report_types.definitions import AggregateReport
 from reports.report_types.ipv6_report.report import IPv6Report
@@ -18,7 +15,6 @@ from reports.report_types.safe_connections_report.report import SafeConnectionsR
 from reports.report_types.systems_report.report import SystemReport, SystemType
 from reports.report_types.vulnerability_report.report import VulnerabilityReport
 from reports.report_types.web_system_report.report import WebSystemReport
-from reports.runner.report_runner import collect_reports
 from rocky.views.health import flatten_health, get_rocky_health
 
 logger = structlog.get_logger(__name__)
@@ -451,23 +447,3 @@ class AggregateOrganisationReport(AggregateReport):
         report_data = {key: value for key, value in report_data.items() if value}
 
         return report_data
-
-
-def aggregate_reports(
-    connector: OctopoesAPIConnector,
-    input_oois: list[str],
-    selected_report_types: list[str],
-    valid_time: datetime,
-    organization_code: str,
-) -> tuple[AggregateOrganisationReport, dict[str, Any], dict[str, Any], list[str]]:
-    all_types = [
-        t
-        for t in AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
-        if t.id in selected_report_types
-    ]
-
-    errors, report_data = collect_reports(valid_time, connector, input_oois, all_types)
-    aggregate_report = AggregateOrganisationReport(connector)
-    post_processed_data = aggregate_report.post_process_data(report_data, valid_time, organization_code)
-
-    return aggregate_report, post_processed_data, report_data, errors

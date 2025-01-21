@@ -1,5 +1,6 @@
 import pytest
-from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
+from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
+from reports.runner.report_runner import aggregate_reports
 
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
