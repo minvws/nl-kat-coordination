@@ -125,7 +125,7 @@ class CustomReportScheduleForm(BaseRockyForm):
 
 class ReportNameForm(BaseRockyForm):
     report_name = forms.CharField(
-        label=_("Report name format"), required=True, initial="${report_type} for ${oois_count} object(s)"
+        label=_("Report name format"), required=True, initial="${report_type} for ${oois_count} objects"
     )
 
 

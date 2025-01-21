@@ -316,7 +316,7 @@ def _create_asset_report(
         data_raw_id=asset_raw_id,
         date_generated=now,
         reference_date=observed_at,
-        input_ooi=ooi,
+        input_ooi=Reference.from_str(ooi),
         observed_at=observed_at,
     )
     create_ooi(octopoes_api_connector, bytes_client, asset_report, observed_at)
