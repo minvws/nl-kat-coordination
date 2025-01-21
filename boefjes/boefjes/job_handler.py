@@ -151,7 +151,7 @@ class BoefjeHandler(Handler):
             )
             boefje_results = [
                 (
-                    {"error/boefje"}, 
+                    {"error/boefje"},
                     f"Error running boefje ({boefje_meta.id}) due to settings/schema mismatch: {0}".format(
                         json.dumps(plugin.boefje_schema)
                     ),
