@@ -193,7 +193,7 @@ as the plugins will take some time before they have gathered and analyzed all da
 Check the Tasks page to verify that all tasks have completed.
 
 Report naming
-=======
+=============
 Reports can be named dynamically based on their input objects and report type.
 This is done through a templating language defined through the following examples.
 
