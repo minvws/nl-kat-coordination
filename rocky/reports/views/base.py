@@ -546,7 +546,8 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.report_ooi = self.get_report_ooi(request.GET.get("report_id"))
+
+        self.report_ooi = self.get_report_ooi()
         self.report_data, self.input_oois, self.report_types, self.plugins = self.get_report_data()
 
     def get(self, request, *args, **kwargs):
@@ -580,8 +581,14 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
             else datetime.now(timezone.utc).replace(hour=23, minute=59, second=59, microsecond=999999)
         )
 
-    def get_report_ooi(self, ooi_pk: str) -> ReportOOI:
-        return self.octopoes_api_connector.get_report(Reference.from_str(ooi_pk), valid_time=self.custom_observed_at)
+    def get_report_ooi(self) -> ReportOOI:
+        if "asset_report_id" in self.request.GET:
+            ooi_pk = self.request.GET.get("asset_report_id")
+            return self.octopoes_api_connector.get(Reference.from_str(ooi_pk), valid_time=self.custom_observed_at)
+
+        return self.octopoes_api_connector.get_report(
+            Reference.from_str(self.request.GET.get("report_id")), valid_time=self.custom_observed_at
+        )
 
     def get_template_names(self):
         if self.report_ooi.report_type and issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
@@ -651,7 +658,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         report_data[self.report_ooi.report_type] = {}
 
         for ooi in oois:
-            report_data[self.report_ooi.report_type][ooi] = {
+            report_data[self.report_ooi.report_type][ooi.primary_key] = {
                 "data": report_data["report_data"],
                 "template": self.report_ooi.template,
                 "report_name": self.report_ooi.name,
@@ -712,22 +719,16 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         context["report_types"] = self.report_types
         context["plugins"] = self.plugins
-
-        context["report_download_pdf_url"] = url_with_querystring(
-            reverse("view_report_pdf", kwargs={"organization_code": self.organization.code}), True, **self.request.GET
-        )
         context["report_download_json_url"] = url_with_querystring(
             reverse("view_report", kwargs={"organization_code": self.organization.code}),
             True,
             **dict(json="true", **self.request.GET),
         )
+        context["report_download_pdf_url"] = url_with_querystring(
+            reverse("view_report_pdf", kwargs={"organization_code": self.organization.code}), True, **self.request.GET
+        )
 
         return context
-
-
-class AssetReportView(ViewReportView):
-    def get_report_ooi(self, ooi_pk: str) -> ReportOOI:
-        return self.octopoes_api_connector.get(Reference.from_str(ooi_pk), valid_time=self.custom_observed_at)
 
 
 class ViewReportPDFView(ViewReportView, WeasyTemplateResponseMixin):

@@ -8,7 +8,7 @@ from reports.views.aggregate_report import (
     SaveAggregateReportView,
     SetupScanAggregateReportView,
 )
-from reports.views.base import AssetReportView, ReportsLandingView, ViewReportPDFView, ViewReportView
+from reports.views.base import ReportsLandingView, ViewReportPDFView, ViewReportView
 from reports.views.generate_report import (
     ExportSetupGenerateReportView,
     LandingGenerateReportView,
@@ -48,7 +48,6 @@ urlpatterns = [
 # View report urls
 urlpatterns += [
     path("view", ViewReportView.as_view(), name="view_report"),
-    path("asset-report/view", AssetReportView.as_view(), name="asset_report_view"),
     path("view/pdf/", ViewReportPDFView.as_view(), name="view_report_pdf"),
     path("view/json/", ViewReportView.as_view(), name="view_report_json"),
 ]
