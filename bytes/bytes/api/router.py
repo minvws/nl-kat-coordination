@@ -1,5 +1,4 @@
 from base64 import b64decode, b64encode
-from importlib.metadata import files
 from uuid import UUID
 
 import structlog

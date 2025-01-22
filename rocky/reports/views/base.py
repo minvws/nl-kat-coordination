@@ -22,7 +22,7 @@ from tools.ooi_helpers import create_ooi
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, PostRedirect, url_with_querystring
 
 from octopoes.models import OOI, Reference
-from octopoes.models.ooi.reports import AssetReport, ReportRecipe, HydratedReport
+from octopoes.models.ooi.reports import AssetReport, HydratedReport, ReportRecipe
 from octopoes.models.ooi.reports import BaseReport as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm, ReportScheduleStartDateForm
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport

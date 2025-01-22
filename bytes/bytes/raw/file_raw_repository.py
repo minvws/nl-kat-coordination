@@ -77,7 +77,10 @@ class FileRawRepository(RawRepository):
 
     def get_raws(self, raw_metas_pairs: list[tuple[UUID, BoefjeMeta]]):
         try:
-            raws = [(self._raw_file_path(raw_id, boefje_meta).read_bytes(), boefje_meta) for raw_id, boefje_meta in raw_metas_pairs]
+            raws = [
+                (self._raw_file_path(raw_id, boefje_meta).read_bytes(), boefje_meta)
+                for raw_id, boefje_meta in raw_metas_pairs
+            ]
         except FileNotFoundError:
             raise BytesFileNotFoundException()
 
