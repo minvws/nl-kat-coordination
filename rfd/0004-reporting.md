@@ -31,7 +31,7 @@ A few of those considerations are:
 - Replace all dictionary-parsing magic with a dataframe-like API.
 95% of the reporting data is based on the data type "Finding + OOI".
 Most dictionary logic could probably be replaced using a dataframe-like API,
-meaning writing `findings_df.groub_by("objec_type")` instead of a doubly nested loop.
+meaning writing `findings_df.groub_by("object_type")` instead of a doubly nested loop.
 - Have a better data type for the return value of reports. We should be able to do better than `dict[str, dict[str, Any]]`.
 
 ---
@@ -48,8 +48,9 @@ I believe this was not a good idea, because:
 - It forces us to talk to Octopoes a lot and duplicate a lot of report data.
 - Although we are updating the data structure, we had to special-case everywhere for these "subreports"/"asset_reports".
 - Report reusing has become less intuitive because asset reports can change, hence concatenated reports could change.
+- Report.input_oois cannot give us the amount of input_oois because we now have an asset report per ooi per report type. 
 
----
+---x
 
 Fast-forward to now and we have decided to reuse Report OOIs [https://github.com/minvws/nl-kat-coordination/issues/3729].
 Although I disagreed with the plan due to the possible consequences,
@@ -59,7 +60,7 @@ but feel that I am working on a feature that others will have difficulty underst
 ## The Issue at Hand
 
 The two biggest challenges in reporting are usually: _defining the right metrics_ and _performance_.
-I think the current design makes both challenges unreasonably harder because it is overcomplicated.
+I think the current design makes both challenges unreasonably hard.
 
 **Performance** will become challenging because:
 - We are saving duplicate data
