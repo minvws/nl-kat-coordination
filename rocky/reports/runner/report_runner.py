@@ -178,7 +178,6 @@ def create_asset_reports(
     report_data: dict,
 ):
     asset_reports = []
-    name_fmt = lambda template, ooi, _type: now.strftime(Template(template).safe_substitute(ooi=ooi, report_type=_type))
 
     for report_type_id, ooi_data in report_data.items():
         report_type = get_report_by_id(report_type_id)
@@ -200,7 +199,7 @@ def create_asset_reports(
             )
 
             asset_report = AssetReport(
-                name=name_fmt(recipe.asset_report_name_format, reference.human_readable, report_type.name),
+                name=format_name(recipe.asset_report_name_format, reference.human_readable, report_type.name, now),
                 report_type=report_type_id,
                 report_recipe=recipe.reference,
                 template=report_type.template_path,
@@ -217,6 +216,10 @@ def create_asset_reports(
             asset_reports.append(asset_report)
 
     return asset_reports
+
+
+def format_name(template, ooi, _type, valid_time):
+    return valid_time.strftime(Template(template).safe_substitute(ooi=ooi, report_type=_type))
 
 
 class ReportDataDict(RootModel):
