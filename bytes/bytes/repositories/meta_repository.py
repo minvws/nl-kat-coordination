@@ -52,7 +52,7 @@ class RawDataFilter(BaseModel):
             query = query.filter(RawFileInDB.mime_types.contains([m.value for m in self.mime_types]))
 
         if self.raw_ids:
-            query = query.filter(RawFileInDB.id.in_(self.raw_ids))
+            query = query.filter(RawFileInDB.id.in_([x.hex for x in self.raw_ids]))
 
         return query.offset(self.offset).limit(self.limit)
 
@@ -91,7 +91,7 @@ class MetaDataRepository:
     def get_raw(self, query_filter: RawDataFilter) -> list[RawDataMeta]:
         raise NotImplementedError()
 
-    def get_raws(self, query_filter: RawDataFilter) -> list[RawData]:
+    def get_raws(self, query_filter: RawDataFilter) -> list[tuple[UUID, RawData]]:
         raise NotImplementedError()
 
     def has_raw(self, boefje_meta: BoefjeMeta, mime_types: list[MimeType]) -> bool:

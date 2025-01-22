@@ -8,7 +8,7 @@ from uuid import UUID
 import httpx
 from httpx import HTTPError, HTTPStatusError
 
-from bytes.api.models import BoefjeOutput
+from bytes.api.models import BoefjeOutput, File
 from bytes.models import BoefjeMeta, NormalizerMeta, RawDataMeta
 from bytes.repositories.meta_repository import BoefjeMetaFilter, NormalizerMetaFilter, RawDataFilter
 
@@ -167,11 +167,11 @@ class BytesAPIClient:
         return response.json()  # type: ignore
 
     @retry_with_login
-    def get_raws(self, query_filter: RawDataFilter) -> dict[str, str]:
+    def get_raws(self, query_filter: RawDataFilter) -> list[File]:
         params = query_filter.model_dump(exclude_none=True)
         params["mime_types"] = [m.value for m in query_filter.mime_types]
 
         response = self.client.get("/bytes/raws", params=params)
         self._verify_response(response)
 
-        return response.json()  # type: ignore
+        return response.json().get("files", [])

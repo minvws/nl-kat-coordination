@@ -249,8 +249,8 @@ def get_raw(
     return meta_repository.get_raw(query_filter)
 
 
-@router.get("/raws", response_model=list[RawDataMeta], tags=[RAW_TAG])
-def get_raw(
+@router.get("/raws", response_model=BoefjeOutput, tags=[RAW_TAG])
+def get_raws(
     organization: str | None = None,
     boefje_meta_id: UUID | None = None,
     raw_ids: list[UUID] | None = Query(None),
@@ -276,7 +276,9 @@ def get_raw(
 
     raws = meta_repository.get_raws(query_filter)
 
-    return BoefjeOutput(files=[File(name="", content=b64encode(raw.value)) for raw in raws])
+    return BoefjeOutput(
+        files=[File(name=raw_id, content=b64encode(raw.value), tags=raw.mime_types) for raw_id, raw in raws]
+    )
 
 
 @router.get("/mime_types", response_model=dict[str, int], tags=[RAW_TAG])

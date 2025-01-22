@@ -1,5 +1,5 @@
 import uuid
-from base64 import b64encode
+from base64 import b64encode, b64decode
 
 import httpx
 import pytest
@@ -307,17 +307,14 @@ def test_get_many_actual_raw_files(bytes_api_client: BytesAPIClient) -> None:
     first_id = bytes_api_client.save_raw(boefje_meta.id, raw, mime_types)
     second_id = bytes_api_client.save_raw(boefje_meta.id, second_raw, second_mime_types)
 
-    result = bytes_api_client.get_raws(RawDataFilter(raw_ids=[]))
+    result = bytes_api_client.get_raws(RawDataFilter(raw_ids=[first_id], limit=10))
     assert len(result) == 1
+    assert b64decode(result[0]["content"]) == raw
 
-    result = bytes_api_client.get_raws(RawDataFilter(raw_ids=[first_id]))
-    assert len(result) == 1
-    assert result[0] == raw
-
-    result = bytes_api_client.get_raws(RawDataFilter(raw_ids=[first_id, second_id]))
+    result = bytes_api_client.get_raws(RawDataFilter(raw_ids=[first_id, second_id], limit=10))
     assert len(result) == 2
-    assert result[0] == raw
-    assert result[1] == second_raw
+    assert b64decode(result[0]["content"]) == raw
+    assert b64decode(result[1]["content"]) == second_raw
 
 
 def test_raw_mimes(bytes_api_client: BytesAPIClient) -> None:

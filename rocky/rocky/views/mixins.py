@@ -27,7 +27,7 @@ from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
-from octopoes.models.ooi.reports import AssetReport, Report
+from octopoes.models.ooi.reports import AssetReport, Report, HydratedReport
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import get_relations
@@ -371,7 +371,7 @@ class ReportList:
             if key.stop:
                 limit = key.stop - offset
 
-            if self.asset_reports is not None:
+            if self.asset_reports is not None:  # TODO: this probably isn't right?
                 return self.asset_reports[offset : offset + limit]
 
             reports = self.octopoes_connector.list_reports(valid_time=self.valid_time, offset=offset, limit=limit).items
@@ -380,21 +380,19 @@ class ReportList:
 
         raise NotImplementedError("ReportList only supports slicing")
 
-    def hydrate_report_list(self, reports: list[AssetReport]) -> list[EnrichedReport]:
+    def hydrate_report_list(self, reports: list[HydratedReport]) -> list[EnrichedReport]:
         hydrated_reports: list[EnrichedReport] = []
 
         for report in reports:
             hydrated_report = EnrichedReport()
 
             hydrated_report.report = report
-            asset_reports = report.input_oois
-            hydrated_report.asset_reports = asset_reports
-            hydrated_report.total_asset_reports = len(asset_reports)
-            hydrated_report.total_objects = len({asset_report.input_ooi for asset_report in asset_reports})
-            hydrated_report.report_type_summary = self.report_type_summary(asset_reports)
+            hydrated_report.asset_reports = sorted(report.input_oois[:5], key=attrgetter("name"))
+            hydrated_report.total_asset_reports = len(report.input_oois)
+            hydrated_report.total_objects = len({asset_report.input_ooi for asset_report in report.input_oois})
+            hydrated_report.report_type_summary = self.report_type_summary(report.input_oois)
 
             # We want to show only 5 children reports
-            hydrated_report.asset_reports = sorted(asset_reports[:5], key=attrgetter("name"))
             hydrated_reports.append(hydrated_report)
 
         return hydrated_reports

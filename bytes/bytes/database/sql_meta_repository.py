@@ -140,7 +140,7 @@ class SQLMetaDataRepository(MetaDataRepository):
 
         return [to_raw_meta(raw_file_in_db) for raw_file_in_db in query]
 
-    def get_raws(self, query_filter: RawDataFilter) -> list[RawData]:
+    def get_raws(self, query_filter: RawDataFilter) -> list[tuple[uuid.UUID, RawData]]:
         logger.debug("Querying raw data: %s", query_filter.model_dump_json())
         query = self.session.query(RawFileInDB)
         query = query_filter.apply(query)
