@@ -97,7 +97,7 @@
                                                             <a href="{% url "view_report" organization.code %}?report_id={{ report.reference }}&observed_at={{ report.observed_at|date:"Y-m-d H:i:s:u" }}"
                                                                title="{% translate "Show report details" %}">{{ report.name }}</a>
                                                         {% else %}
-                                                            <a href="{% url "view_report" organization.code %}?report_id={{ report.input_oois.0.reference }}&observed_at={{ report.input_oois.0.observed_at|date:"Y-m-d H:i:s:u" }}"
+                                                            <a href="{% url "asset_report_view" organization.code %}?report_id={{ report.input_oois.0.reference }}&observed_at={{ report.input_oois.0.observed_at|date:"Y-m-d H:i:s:u" }}"
                                                                title="{% translate "Show report details" %}">{{ report.input_oois.0.name }}</a>
                                                         {% endif %}
                                                     </td>

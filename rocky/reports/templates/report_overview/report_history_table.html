@@ -103,7 +103,7 @@
                                        title="{% translate "Shows parent report details" %}">{{ report.parent_report.name }}</a>
                                 {% elif report.asset_reports|length == 1 %}
                                     <a id="report_name_{{ report.asset_reports.0.reference|slugify }}"
-                                       href="{% url "view_report" organization.code %}?report_id={{ report.asset_reports.0.reference }}&observed_at={{ report.asset_reports.0.observed_at|date:"Y-m-d H:i:s:u" }}"
+                                       href="{% url "asset_report_view" organization.code %}?report_id={{ report.asset_reports.0.reference }}&observed_at={{ report.asset_reports.0.observed_at|date:"Y-m-d H:i:s:u" }}"
                                        title="{% translate "Shows parent report details" %}">{{ report.asset_reports.0.name }}</a>
                                 {% endif %}
                             </td>

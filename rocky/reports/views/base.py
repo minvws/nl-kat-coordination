@@ -321,9 +321,7 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
     def get_parent_report_type(self):
         if self.report_type is not None:
             return self.report_type.id
-        if not self.is_single_report():
-            return ConcatenatedReport.id
-        return self.report_type
+        return ConcatenatedReport.id
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -648,11 +646,11 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         report_types = self.get_report_types(report_data["input_data"]["report_types"])
         plugins = self.get_plugins(report_data["input_data"]["plugins"])
-        oois = self.get_input_oois(self.report_ooi.input_oois)
+        oois = self.get_input_oois(report_data["input_data"]["input_oois"])
 
         report_data[self.report_ooi.report_type] = {}
 
-        for ooi in self.report_ooi.input_oois:
+        for ooi in oois:
             report_data[self.report_ooi.report_type][ooi] = {
                 "data": report_data["report_data"],
                 "template": self.report_ooi.template,
@@ -725,6 +723,11 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         )
 
         return context
+
+
+class AssetReportView(ViewReportView):
+    def get_report_ooi(self, ooi_pk: str) -> ReportOOI:
+        return self.octopoes_api_connector.get(Reference.from_str(ooi_pk), valid_time=self.custom_observed_at)
 
 
 class ViewReportPDFView(ViewReportView, WeasyTemplateResponseMixin):
