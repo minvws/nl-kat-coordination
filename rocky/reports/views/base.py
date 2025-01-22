@@ -632,11 +632,13 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
             )
         return report_types
 
-    def get_report_data_from_bytes(self, report: ReportOOI) -> dict[str, Any]:
+    def get_report_data_from_bytes(self, reports: list[ReportOOI]) -> list[tuple[str, dict[str, Any]]]:
         self.bytes_client.login()
 
-        return TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
-            self.bytes_client.get_raw(raw_id=report.data_raw_id)
+        return TypeAdapter(
+            list[tuple[str, dict[str, Any]]], config={"arbitrary_types_allowed": True}
+        ).validate_json(
+            self.bytes_client.get_raws(self.organization.code, raw_ids=[report.data_raw_id for report in reports])
         )
 
     def get_report_data_single_report(
@@ -644,7 +646,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     ) -> tuple[
         dict[str, dict[str, dict[str, Any]]], list[AssetReport], list[dict[str, Any]], list[dict[str, list[Plugin]]]
     ]:
-        report_data: dict[str, Any] = self.get_report_data_from_bytes(self.report_ooi)
+        report_data: dict[str, Any] = self.get_report_data_from_bytes([self.report_ooi])[0][1]
 
         report_types = self.get_report_types(report_data["input_data"]["report_types"])
         plugins = self.get_plugins(report_data["input_data"]["plugins"])
@@ -665,7 +667,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     ) -> tuple[
         dict[str, dict[str, dict[str, Any]]], list[AssetReport], list[dict[str, Any]], list[dict[str, list[Plugin]]]
     ]:
-        report_data = self.get_report_data_from_bytes(self.report_ooi)
+        report_data = self.get_report_data_from_bytes([self.report_ooi])[0][1]
         report_types = self.get_report_types(report_data["input_data"]["report_types"])
         plugins = self.get_plugins(report_data["input_data"]["plugins"])
 
@@ -681,7 +683,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         asset_reports = self.get_asset_reports()
 
         for report in asset_reports:
-            bytes_data = self.get_report_data_from_bytes(report)
+            bytes_data = self.get_report_data_from_bytes([report])[0][1]
             report_data.setdefault(report.report_type, {})[report.input_ooi] = {
                 "data": bytes_data["report_data"],
                 "template": report.template,
@@ -690,7 +692,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         report_type_ids = {child_report.report_type for child_report in asset_reports}
         report_types = self.get_report_types(report_type_ids)
-        plugins = self.get_plugins(self.get_report_data_from_bytes(self.report_ooi)["input_data"]["plugins"])
+        plugins = self.get_plugins(self.get_report_data_from_bytes([self.report_ooi])[0][1]["input_data"]["plugins"])
 
         return report_data, self.report_ooi.input_oois, report_types, plugins
 

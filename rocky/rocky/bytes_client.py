@@ -1,5 +1,5 @@
 import uuid
-from base64 import b64encode
+from base64 import b64encode, b64decode
 from collections.abc import Set
 from datetime import datetime, timezone
 
@@ -16,6 +16,9 @@ logger = structlog.get_logger("bytes_client")
 
 
 class BytesClient:
+    # More than 100 raw files per Boefje run is very unlikely at this stage, but eventually we can start paginating
+    RAW_FILES_LIMIT = 100
+
     def __init__(self, base_url: str, username: str, password: str, organization: str | None):
         self.credentials = {"username": username, "password": password}
         self.session = httpx.Client(base_url=base_url, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT)
@@ -131,21 +134,24 @@ class BytesClient:
 
         return response.content
 
-    def get_raws(self, query_filter) -> dict[str, str]:
-        params = query_filter.model_dump(exclude_none=True)
-        params["mime_types"] = [m.value for m in query_filter.mime_types]
+    def get_raws(self, organization_code: str, raw_ids: list[uuid.UUID | str]) -> list[tuple[str, bytes]]:
+        params: dict[str, str | int] = {
+            "limit": len(raw_ids),
+            "organization": organization_code,
+            "raw_ids": organization_code,
+        }
 
         response = self.session.get("/bytes/raws", params=params)
-        self._verify_response(response)
+        response.raise_for_status()
 
-        return response.json()  # type: ignore
+        return [(file["name"], b64decode(file["content"])) for file in response.json().get("files", [])]
 
     def get_raw_metas(self, boefje_meta_id: uuid.UUID, organization_code: str) -> list:
         # More than 100 raw files per Boefje run is very unlikely at this stage, but eventually we can start paginating
-        raw_files_limit = 100
+
         params: dict[str, str | int] = {
             "boefje_meta_id": str(boefje_meta_id),
-            "limit": raw_files_limit,
+            "limit": self.RAW_FILES_LIMIT,
             "organization": str(self.organization),
         }
 
@@ -156,7 +162,7 @@ class BytesClient:
         metas = [raw_meta for raw_meta in metas if raw_meta["boefje_meta"]["organization"] == organization_code]
         if not metas:
             raise Http404
-        if len(metas) >= raw_files_limit:
+        if len(metas) >= self.RAW_FILES_LIMIT:
             logger.warning("Reached raw file limit for current view.")
 
         return metas
