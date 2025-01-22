@@ -352,7 +352,8 @@ class ReportList:
 
         self.asset_reports = None
         if self.parent_report_id and self.parent_report_id is not None:
-            self.asset_reports = self.get_asset_reports(self.parent_report_id)
+            asset_reports = self.octopoes_connector.get_report(self.parent_report_id, self.valid_time).input_oois
+            self.asset_reports = sorted(asset_reports, key=lambda x: (x.report_type, x.input_ooi))
 
     @cached_property
     def count(self) -> int:
@@ -378,15 +379,6 @@ class ReportList:
             return self.hydrate_report_list(reports)
 
         raise NotImplementedError("ReportList only supports slicing")
-
-    def get_asset_reports(self, report_id: str) -> list[tuple[str, Report]]:
-        """
-        Get asset reports with parent id.
-        """
-        asset_reports = self.octopoes_connector.get_report(report_id, self.valid_time).input_oois
-        asset_reports = sorted(asset_reports, key=lambda x: (x.report_type, x.input_ooi))
-
-        return asset_reports
 
     def hydrate_report_list(self, reports: list[AssetReport]) -> list[HydratedReport]:
         hydrated_reports: list[HydratedReport] = []
