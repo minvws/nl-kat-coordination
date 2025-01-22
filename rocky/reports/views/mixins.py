@@ -8,12 +8,7 @@ from tools.ooi_helpers import create_ooi
 from octopoes.models.ooi.reports import Report
 from reports.report_types.helpers import REPORTS
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
-from reports.runner.report_runner import (
-    ReportDataDict,
-    aggregate_reports,
-    collect_reports,
-    save_report_data,
-)
+from reports.runner.report_runner import ReportDataDict, aggregate_reports, collect_reports, save_report_data
 from reports.views.base import BaseReportView
 
 logger = structlog.get_logger(__name__)

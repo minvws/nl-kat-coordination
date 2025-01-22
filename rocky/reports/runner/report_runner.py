@@ -14,7 +14,7 @@ from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
 from octopoes.models.ooi.reports import AssetReport, Report, ReportRecipe
 from octopoes.models.types import OOIType, type_by_name
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
-from reports.report_types.definitions import report_plugins_union, ReportPlugins
+from reports.report_types.definitions import ReportPlugins, report_plugins_union
 from reports.report_types.helpers import get_report_by_id
 from reports.runner.models import ReportRunner
 from rocky.bytes_client import BytesClient
@@ -38,7 +38,7 @@ class LocalReportRunner(ReportRunner):
         recipe = connector.get(Reference.from_str(f"ReportRecipe|{report_task.report_recipe_id}"), valid_time)
 
         if input_oois := recipe.input_recipe.get("input_oois"):
-            ooi_pks = list(set(Reference.from_str(ooi) for ooi in input_oois))
+            ooi_pks = list({Reference.from_str(ooi) for ooi in input_oois})
         elif query := recipe.input_recipe.get("query"):
             oois = connector.list_objects(
                 types={type_by_name(ooi_type) for ooi_type in query["ooi_types"]},
@@ -50,7 +50,7 @@ class LocalReportRunner(ReportRunner):
                 asc_desc=query["asc_desc"],
             ).items
 
-            ooi_pks = list(set(ooi.reference for ooi in oois))
+            ooi_pks = list({ooi.reference for ooi in oois})
         else:
             raise ValueError("Invalid recipe: no input_oois or query found")
 
@@ -66,14 +66,7 @@ class LocalReportRunner(ReportRunner):
 
         self.bytes_client.organization = organization.code
         save_report_data(
-            self.bytes_client,
-            valid_time,
-            connector,
-            organization,
-            ooi_pks,
-            report_data,
-            recipe,
-            additional_input_data,
+            self.bytes_client, valid_time, connector, organization, ooi_pks, report_data, recipe, additional_input_data
         )
         self.bytes_client.organization = None
 
@@ -136,20 +129,14 @@ def save_report_data(
 
     now = datetime.now(timezone.utc)
     plugins = report_plugins_union([get_report_by_id(type_id) for type_id in recipe.asset_report_types])
-    input_data = {
-        "input_data": {
-            "input_oois": oois,
-            "report_types": recipe.asset_report_types,
-            "plugins": plugins,
-        }
-    }
+    input_data = {"input_data": {"input_oois": oois, "report_types": recipe.asset_report_types, "plugins": plugins}}
 
     asset_reports = create_asset_reports(
         bytes_client, plugins, now, observed_at, octopoes_api_connector, organization, recipe, report_data
     )
     raw_id = bytes_client.upload_raw(
         raw=ReportDataDict(input_data | additional_input_data).model_dump_json().encode(),
-        manual_mime_types={"openkat/report"}
+        manual_mime_types={"openkat/report"},
     )
 
     report_type_name = str(get_report_by_id(recipe.report_type).name)
@@ -191,7 +178,6 @@ def create_asset_reports(
     report_data: dict,
 ):
     asset_reports = []
-    name_fmt = lambda template, ooi, _type: now.strftime(Template(template).safe_substitute(ooi=ooi, report_type=_type))
 
     for report_type_id, ooi_data in report_data.items():
         report_type = get_report_by_id(report_type_id)
@@ -204,7 +190,7 @@ def create_asset_reports(
                     "plugins": {
                         "required": [p for p in plugins["required"] if p in report_type.plugins["required"]],
                         "optional": [p for p in plugins["optional"] if p in report_type.plugins["optional"]],
-                    }
+                    },
                 }
             }
             asset_raw_id = bytes_client.upload_raw(
@@ -213,7 +199,7 @@ def create_asset_reports(
             )
 
             asset_report = AssetReport(
-                name=name_fmt(recipe.asset_report_name_format, reference.human_readable, report_type.name),
+                name=format_name(recipe.asset_report_name_format, reference.human_readable, report_type.name, now),
                 report_type=report_type_id,
                 report_recipe=recipe.reference,
                 template=report_type.template_path,
@@ -230,6 +216,10 @@ def create_asset_reports(
             asset_reports.append(asset_report)
 
     return asset_reports
+
+
+def format_name(template, ooi, _type, valid_time):
+    return valid_time.strftime(Template(template).safe_substitute(ooi=ooi, report_type=_type))
 
 
 class ReportDataDict(RootModel):
