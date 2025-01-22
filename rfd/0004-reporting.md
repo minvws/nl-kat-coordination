@@ -36,21 +36,20 @@ meaning writing `findings_df.groub_by("object_type")` instead of a doubly nested
 
 ---
 
-Fast-forward a few months and we are designing a new feature on top of our reports: saving reports.
+Fast-forward a few months and we are designing a new feature on top of our reports: saving reports
 [
     https://github.com/minvws/nl-kat-coordination/issues/2397
-]
+].
 Since we designed a flow in which users can select both oois and report types independently,
 we reserved a special place for reports with just one report type and one OOI in our data model.
 I believe this was not a good idea, because:
 - I see no significant use-case
-- It adds a significant amount of complexity.
+- It adds a generous amount of complexity.
 - It forces us to talk to Octopoes a lot and duplicate a lot of report data.
-- Although we are updating the data structure, we had to special-case everywhere for these "subreports"/"asset_reports".
-- Report reusing has become less intuitive because asset reports can change, hence concatenated reports could change.
-- Report.input_oois cannot give us the amount of input_oois because we now have an asset report per ooi per report type. 
+- It made us special-case everywhere for these "subreports"/"asset_reports" (being fixed as we speak).
 
----x
+
+---
 
 Fast-forward to now and we have decided to reuse Report OOIs [https://github.com/minvws/nl-kat-coordination/issues/3729].
 Although I disagreed with the plan due to the possible consequences,
@@ -66,11 +65,18 @@ I think the current design makes both challenges unreasonably hard.
 - We are saving duplicate data
 - We are doing a lot of extra API calls to save the data
 - We are aggregating in python-time instead of database-time, and no one understand that code properly anymore.
+- We have to fetch "len(input_oois) x len(asset_report_types)" amount of raw files just to show a concatenated report.
 
-**Defining the right metrics** will become challenging because,
-again, most don't understand the logic. Those who do will tell you changing an aggregated metric will take a week.
-In short, it's impossible to properly iterate on the value of the contents of a report,
-if all our efforts have to go into making them not break in the first place. 
+**Defining the right metrics** will become challenging because, again, most don't understand the logic.
+Those who do will tell you changing an aggregated metric will take a week.
+
+The design is still unintuitive since:
+- Report.input_oois does not give us the original oois because we have an asset report per ooi per report type.
+- Because of report reusing subreports change independently, hence input data of concatenated reports changes over time.
+- Some reports pull from the database (I should say API though), some use a Report, some process AssetReports
+
+In short, it's too difficult to properly iterate on the value of the contents of a report
+when all our efforts have to go into making them not break in the first place. 
 
 ## Proposal
 
