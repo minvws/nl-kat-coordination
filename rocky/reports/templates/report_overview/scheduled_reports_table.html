@@ -80,12 +80,13 @@
                         <tr class="expando-row">
                             <td colspan="6">
                                 {% if schedule.reports %}
+                                    <h5>{% translate "Recent reports" %}</h5>
                                     <table>
                                         <caption class="visually-hidden">{% translate "Scheduled Reports:" %}</caption>
                                         <thead>
                                             <tr>
                                                 <th scope="col" class="nowrap">{% translate "Name" %}</th>
-                                                <th scope="col">{% translate "Input" %}</th>
+                                                <th scope="col">{% translate "Input objects" %}</th>
                                                 <th scope="col" class="nowrap">{% translate "Reference date" %}</th>
                                             </tr>
                                         </thead>
@@ -102,14 +103,13 @@
                                                         {% endif %}
                                                     </td>
                                                     <td>
+                                                        {{ report.total_objects }}
                                                         {% if report.input_oois|length == 1 or schedule.recipe.input_recipe.input_oois|length == 1 %}
                                                             {% with ooi=report.input_oois.0.input_ooi %}
                                                                 <a href="{% ooi_url 'ooi_detail' ooi organization.code query=ooi.mandatory_fields %}">{{ ooi|human_readable }}</a>
                                                             {% endwith %}
-                                                        {% elif schedule.recipe.input_recipe.input_oois %}
-                                                            {{ schedule.recipe.input_recipe.input_oois|length }} {% translate "objects" %}
                                                         {% else %}
-                                                            -
+                                                            {{ schedule.recipe.input_recipe.input_oois|length }} {% translate "objects" %}
                                                         {% endif %}
                                                     </td>
                                                     <td>{{ report.reference_date|date }}</td>
