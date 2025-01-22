@@ -1,3 +1,4 @@
+import json
 from collections.abc import Iterable, Mapping, Sequence
 from datetime import datetime, timezone
 from operator import attrgetter
@@ -641,9 +642,8 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     def get_report_data_from_bytes(self, reports: list[ReportOOI]) -> list[tuple[str, dict[str, Any]]]:
         self.bytes_client.login()
 
-        return TypeAdapter(list[tuple[str, dict[str, Any]]], config={"arbitrary_types_allowed": True}).validate_json(
-            self.bytes_client.get_raws(self.organization.code, raw_ids=[report.data_raw_id for report in reports])
-        )
+        bytes_datas = self.bytes_client.get_raws(self.organization.code, raw_ids=[report.data_raw_id for report in reports])
+        return [(x[0], json.loads(x[1])) for x in bytes_datas]
 
     def get_report_data_single_report(
         self,
@@ -688,14 +688,11 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         asset_reports = self.get_asset_reports()
         bytes_datas = {key: value for key, value in self.get_report_data_from_bytes(asset_reports)}
 
-        for report in asset_reports:
-            bytes_data = bytes_datas[report.data_raw_id]
         ooi_pks = set()
 
         for report in asset_reports:
             ooi_pks.add(report.input_ooi)
-
-            bytes_data = self.get_report_data_from_bytes(report)
+            bytes_data = bytes_datas[report.data_raw_id]
             report_data.setdefault(report.report_type, {})[report.input_ooi] = {
                 "data": bytes_data["report_data"],
                 "template": report.template,

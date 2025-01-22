@@ -138,7 +138,7 @@ class BytesClient:
         params: dict[str, str | int] = {
             "limit": len(raw_ids),
             "organization": organization_code,
-            "raw_ids": organization_code,
+            "raw_ids": raw_ids,
         }
 
         response = self.session.get("/bytes/raws", params=params)
