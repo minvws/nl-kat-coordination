@@ -103,7 +103,7 @@
                                        title="{% translate "Shows parent report details" %}">{{ report.report.name }}</a>
                                 {% elif report.asset_reports|length == 1 %}
                                     <a id="report_name_{{ report.asset_reports.0.reference|slugify }}"
-                                       href="{% url "view_report" organization.code %}?report_id={{ report.asset_reports.0.reference }}&observed_at={{ report.asset_reports.0.observed_at|date:"Y-m-d H:i:s:u" }}"
+                                       href="{% url "view_report" organization.code %}?asset_report_id={{ report.asset_reports.0.reference }}&observed_at={{ report.asset_reports.0.observed_at|date:"Y-m-d H:i:s:u" }}"
                                        title="{% translate "Shows parent report details" %}">{{ report.asset_reports.0.name }}</a>
                                 {% endif %}
                             </td>
@@ -211,7 +211,7 @@
                                                         <a href="{% ooi_url 'ooi_detail' asset_report.input_ooi organization.code %}">{{ asset_report.input_ooi|human_readable }}</a>
                                                     </td>
                                                     <td>
-                                                        <a href="{% url "view_report" organization.code %}?report_id={{ asset_report }}&observed_at={{ asset_report.observed_at|date:"Y-m-d H:i:s:u" }}"
+                                                        <a href="{% url "view_report" organization.code %}?asset_report_id={{ asset_report }}&observed_at={{ asset_report.observed_at|date:"Y-m-d H:i:s:u" }}"
                                                            title="{% translate "Shows asset report details" %}">{{ asset_report.name }}</a>
                                                     </td>
                                                 </tr>
