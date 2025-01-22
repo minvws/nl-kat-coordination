@@ -131,7 +131,7 @@ class BytesClient:
 
         return response.content
 
-    def get_raws(self, query_filter: RawDataFilter) -> dict[str, str]:
+    def get_raws(self, query_filter) -> dict[str, str]:
         params = query_filter.model_dump(exclude_none=True)
         params["mime_types"] = [m.value for m in query_filter.mime_types]
 
