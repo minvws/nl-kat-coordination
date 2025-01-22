@@ -1,5 +1,5 @@
 import uuid
-from base64 import b64encode, b64decode
+from base64 import b64decode, b64encode
 from collections.abc import Set
 from datetime import datetime, timezone
 
@@ -135,11 +135,7 @@ class BytesClient:
         return response.content
 
     def get_raws(self, organization_code: str, raw_ids: list[uuid.UUID | str]) -> list[tuple[str, bytes]]:
-        params: dict[str, str | int] = {
-            "limit": len(raw_ids),
-            "organization": organization_code,
-            "raw_ids": raw_ids,
-        }
+        params: dict[str, str | int] = {"limit": len(raw_ids), "organization": organization_code, "raw_ids": raw_ids}
 
         response = self.session.get("/bytes/raws", params=params)
         response.raise_for_status()
