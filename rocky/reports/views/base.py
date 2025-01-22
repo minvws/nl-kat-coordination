@@ -681,9 +681,10 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
 
         asset_reports = self.get_asset_reports()
+        bytes_datas = {key: value for key, value in self.get_report_data_from_bytes(asset_reports)}
 
         for report in asset_reports:
-            bytes_data = self.get_report_data_from_bytes([report])[0][1]
+            bytes_data = bytes_datas[report.data_raw_id]
             report_data.setdefault(report.report_type, {})[report.input_ooi] = {
                 "data": bytes_data["report_data"],
                 "template": report.template,
