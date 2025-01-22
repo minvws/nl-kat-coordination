@@ -127,12 +127,11 @@ def save_report_data(
     if additional_input_data is None:
         additional_input_data = {}
 
-    now = datetime.now(timezone.utc)
     plugins = report_plugins_union([get_report_by_id(type_id) for type_id in recipe.asset_report_types])
     input_data = {"input_data": {"input_oois": oois, "report_types": recipe.asset_report_types, "plugins": plugins}}
 
     asset_reports = create_asset_reports(
-        bytes_client, plugins, now, observed_at, octopoes_api_connector, organization, recipe, report_data
+        bytes_client, plugins, observed_at, observed_at, octopoes_api_connector, organization, recipe, report_data
     )
     raw_id = bytes_client.upload_raw(
         raw=ReportDataDict(input_data | additional_input_data).model_dump_json().encode(),
@@ -140,7 +139,7 @@ def save_report_data(
     )
 
     report_type_name = str(get_report_by_id(recipe.report_type).name)
-    report_name = now.strftime(
+    report_name = observed_at.strftime(
         Template(recipe.report_name_format).safe_substitute(oois_count=str(len(oois)), report_type=report_type_name)
     )
 
@@ -155,7 +154,7 @@ def save_report_data(
         organization_name=organization.name,
         organization_tags=[tag.name for tag in organization.tags.all()],
         data_raw_id=raw_id,
-        date_generated=now,
+        date_generated=observed_at,
         reference_date=observed_at,
         input_oois=[asset_report.reference for asset_report in asset_reports],
         observed_at=observed_at,

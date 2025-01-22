@@ -330,8 +330,8 @@ class FindingList:
         raise NotImplementedError("FindingList only supports slicing")
 
 
-class HydratedReport:
-    parent_report: Report
+class EnrichedReport:
+    report: Report
     asset_reports: list[Report] | None
     total_asset_reports: int
     total_objects: int
@@ -364,7 +364,7 @@ class ReportList:
     def __len__(self):
         return self.count
 
-    def __getitem__(self, key: int | slice) -> Sequence[HydratedReport | tuple[str, Report]]:
+    def __getitem__(self, key: int | slice) -> Sequence[EnrichedReport | tuple[str, Report]]:
         if isinstance(key, slice):
             offset = key.start or 0
             limit = self.HARD_LIMIT
@@ -380,13 +380,13 @@ class ReportList:
 
         raise NotImplementedError("ReportList only supports slicing")
 
-    def hydrate_report_list(self, reports: list[AssetReport]) -> list[HydratedReport]:
-        hydrated_reports: list[HydratedReport] = []
+    def hydrate_report_list(self, reports: list[AssetReport]) -> list[EnrichedReport]:
+        hydrated_reports: list[EnrichedReport] = []
 
         for report in reports:
-            hydrated_report = HydratedReport()
+            hydrated_report = EnrichedReport()
 
-            hydrated_report.parent_report = report
+            hydrated_report.report = report
             asset_reports = report.input_oois
             hydrated_report.asset_reports = asset_reports
             hydrated_report.total_asset_reports = len(asset_reports)

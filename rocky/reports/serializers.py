@@ -1,12 +1,12 @@
 from rest_framework import serializers
 
-from rocky.views.mixins import HydratedReport
+from rocky.views.mixins import EnrichedReport
 
 
 class ReportSerializer(serializers.BaseSerializer):
     def to_representation(self, instance):
-        if isinstance(instance, HydratedReport):
-            report = instance.parent_report
+        if isinstance(instance, EnrichedReport):
+            report = instance.report
         else:
             report = instance
         return {

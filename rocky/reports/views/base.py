@@ -22,7 +22,7 @@ from tools.ooi_helpers import create_ooi
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, PostRedirect, url_with_querystring
 
 from octopoes.models import OOI, Reference
-from octopoes.models.ooi.reports import AssetReport, ReportRecipe
+from octopoes.models.ooi.reports import AssetReport, ReportRecipe, HydratedReport
 from octopoes.models.ooi.reports import BaseReport as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm, ReportScheduleStartDateForm
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
@@ -582,7 +582,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
             else datetime.now(timezone.utc).replace(hour=23, minute=59, second=59, microsecond=999999)
         )
 
-    def get_report_ooi(self, ooi_pk: str) -> ReportOOI:
+    def get_report_ooi(self, ooi_pk: str) -> HydratedReport:
         return self.octopoes_api_connector.get_report(Reference.from_str(ooi_pk), valid_time=self.custom_observed_at)
 
     def get_template_names(self):
@@ -635,6 +635,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
     def get_report_data_from_bytes(self, report: ReportOOI) -> dict[str, Any]:
         self.bytes_client.login()
+
         return TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
             self.bytes_client.get_raw(raw_id=report.data_raw_id)
         )
@@ -642,13 +643,12 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     def get_report_data_single_report(
         self,
     ) -> tuple[
-        dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]], list[dict[str, list[Plugin]]]
+        dict[str, dict[str, dict[str, Any]]], list[AssetReport], list[dict[str, Any]], list[dict[str, list[Plugin]]]
     ]:
         report_data: dict[str, Any] = self.get_report_data_from_bytes(self.report_ooi)
 
         report_types = self.get_report_types(report_data["input_data"]["report_types"])
         plugins = self.get_plugins(report_data["input_data"]["plugins"])
-        oois = self.get_input_oois(self.report_ooi.input_oois)
 
         report_data[self.report_ooi.report_type] = {}
 
@@ -659,25 +659,23 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                 "report_name": self.report_ooi.name,
             } | report_data["input_data"]
 
-        return report_data, oois, report_types, plugins
+        return report_data, self.report_ooi.input_oois, report_types, plugins
 
     def get_report_data_aggregate_report_or_multi_report(
         self,
     ) -> tuple[
-        dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]], list[dict[str, list[Plugin]]]
+        dict[str, dict[str, dict[str, Any]]], list[AssetReport], list[dict[str, Any]], list[dict[str, list[Plugin]]]
     ]:
         report_data = self.get_report_data_from_bytes(self.report_ooi)
-
-        oois = self.get_input_oois(self.report_ooi.input_oois)
         report_types = self.get_report_types(report_data["input_data"]["report_types"])
         plugins = self.get_plugins(report_data["input_data"]["plugins"])
 
-        return report_data, oois, report_types, plugins
+        return report_data, self.report_ooi.input_oois, report_types, plugins
 
     def get_report_data_concatenated_report(
         self,
     ) -> tuple[
-        dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]], list[dict[str, list[Plugin]]]
+        dict[str, dict[str, dict[str, Any]]], list[AssetReport], list[dict[str, Any]], list[dict[str, list[Plugin]]]
     ]:
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
 
@@ -690,12 +688,12 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                 "template": report.template,
                 "report_name": report.name,
             } | bytes_data["input_data"]
-        oois = self.get_input_oois(self.report_ooi.input_oois)
+
         report_type_ids = {child_report.report_type for child_report in asset_reports}
         report_types = self.get_report_types(report_type_ids)
         plugins = self.get_plugins(self.get_report_data_from_bytes(self.report_ooi)["input_data"]["plugins"])
 
-        return report_data, oois, report_types, plugins
+        return report_data, self.report_ooi.input_oois, report_types, plugins
 
     def get_report_data(self):
         if issubclass(get_report_by_id(self.report_ooi.report_type), ConcatenatedReport):
