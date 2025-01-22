@@ -12,7 +12,6 @@ from reports.runner.report_runner import (
     ReportDataDict,
     aggregate_reports,
     collect_reports,
-    save_aggregate_report_data,
     save_report_data,
 )
 from reports.views.base import BaseReportView
@@ -72,16 +71,15 @@ class SaveAggregateReportMixin(BaseReportView):
             }
             messages.add_message(self.request, messages.ERROR, error_message)
 
-        return save_aggregate_report_data(
+        return save_report_data(
             self.bytes_client,
             self.get_observed_at(),
             self.octopoes_api_connector,
             self.organization,
             self.get_oois(),
             report_data,
-            post_processed_data,
-            aggregate_report,
             "",  # TODO: fix recipe
+            post_processed_data,
         )
 
 
