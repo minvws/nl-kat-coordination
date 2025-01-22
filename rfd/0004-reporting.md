@@ -86,8 +86,3 @@ This will save us at least one future refactor.
 
 I thoroughly believe the use-cases we might lose with this change are worth sacrificing for the time saved on future work on reporting,
 let alone the performance challenges it will save us when we will have to report on thousands of organisations.
-
-## Footnotes
-
-{ Footnotes should be used to provide references to external sources or to
-provide additional information. }
