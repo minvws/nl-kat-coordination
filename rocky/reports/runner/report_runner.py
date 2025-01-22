@@ -121,9 +121,6 @@ def save_report_data(
     recipe: ReportRecipe,
     additional_input_data: dict | None = None,
 ) -> Report | None:
-    if len(report_data) == 0:
-        return None
-
     if additional_input_data is None:
         additional_input_data = {}
 
