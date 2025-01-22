@@ -3,14 +3,17 @@ from datetime import datetime, timezone
 import structlog
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
-
-from reports.runner.report_runner import collect_reports, save_report_data, save_aggregate_report_data, ReportDataDict, \
-    aggregate_reports
 from tools.ooi_helpers import create_ooi
 
 from octopoes.models.ooi.reports import Report
 from reports.report_types.helpers import REPORTS
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
+from reports.runner.report_runner import (
+    ReportDataDict,
+    aggregate_reports,
+    collect_reports,
+    save_report_data,
+)
 from reports.views.base import BaseReportView
 
 logger = structlog.get_logger(__name__)
@@ -52,7 +55,7 @@ class SaveAggregateReportMixin(BaseReportView):
     def save_report(self, report_names: list) -> Report | None:
         aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
             self.octopoes_api_connector,
-            self.get_oois(),
+            [ooi.reference for ooi in self.get_oois()],
             self.get_report_type_ids(),
             self.observed_at,
             self.organization.code,
@@ -68,16 +71,15 @@ class SaveAggregateReportMixin(BaseReportView):
             }
             messages.add_message(self.request, messages.ERROR, error_message)
 
-        return save_aggregate_report_data(
+        return save_report_data(
             self.bytes_client,
             self.get_observed_at(),
             self.octopoes_api_connector,
             self.organization,
             self.get_oois(),
             report_data,
-            post_processed_data,
-            aggregate_report,
             "",  # TODO: fix recipe
+            post_processed_data,
         )
 
 

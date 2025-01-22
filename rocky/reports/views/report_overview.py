@@ -64,24 +64,27 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
     def get_queryset(self) -> list[dict[str, Any]]:
         report_schedules = self.get_report_schedules()
 
+        if not report_schedules:
+            return []
+
         recipes = []
-        if report_schedules:
-            for schedule in report_schedules:
-                if schedule["data"]:
-                    recipe_id = schedule["data"]["report_recipe_id"]
+        for schedule in report_schedules:
+            if not schedule["data"]:
+                continue
 
-                    report_recipe = self.get_recipe_ooi(recipe_id)
-
-                    recipes.append(
-                        {
-                            "schedule_id": schedule["id"],
-                            "enabled": schedule["enabled"],
-                            "recipe": report_recipe,
-                            "cron": schedule["schedule"],
-                            "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
-                            "reports": self.get_reports(recipe_id),
-                        }
-                    )
+            recipe_id = schedule["data"]["report_recipe_id"]
+            report_recipe = self.get_recipe_ooi(recipe_id)
+            reports = self.get_reports(recipe_id)
+            recipes.append(
+                {
+                    "schedule_id": schedule["id"],
+                    "enabled": schedule["enabled"],
+                    "recipe": report_recipe,
+                    "cron": schedule["schedule"],
+                    "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
+                    "reports": reports,
+                }
+            )
 
         return recipes
 
@@ -268,7 +271,7 @@ class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
 
     paginate_by = 150
     breadcrumbs_step = 2
-    context_object_name = "subreports"
+    context_object_name = "asset_reports"
     paginator = RockyPaginator
     template_name = "report_overview/subreports.html"
 
@@ -282,5 +285,5 @@ class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["total_oois"] = len(self.object_list)
-        context["parent_report_id"] = self.report_id
+        context["report_id"] = self.report_id
         return context

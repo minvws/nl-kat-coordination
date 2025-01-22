@@ -102,12 +102,14 @@
                                                         {% endif %}
                                                     </td>
                                                     <td>
-                                                        {% if report.input_oois|length > 1 %}
-                                                            {{ report.input_oois|length }} {% translate "objects" %}
-                                                        {% else %}
+                                                        {% if report.input_oois|length == 1 or schedule.recipe.input_recipe.input_oois|length == 1 %}
                                                             {% with ooi=report.input_oois.0.input_ooi %}
                                                                 <a href="{% ooi_url 'ooi_detail' ooi organization.code query=ooi.mandatory_fields %}">{{ ooi|human_readable }}</a>
                                                             {% endwith %}
+                                                        {% elif schedule.recipe.input_recipe.input_oois %}
+                                                            {{ schedule.recipe.input_recipe.input_oois|length }} {% translate "objects" %}
+                                                        {% else %}
+                                                            -
                                                         {% endif %}
                                                     </td>
                                                     <td>{{ report.reference_date|date }}</td>
