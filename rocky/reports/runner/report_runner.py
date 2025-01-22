@@ -38,7 +38,7 @@ class LocalReportRunner(ReportRunner):
         recipe = connector.get(Reference.from_str(f"ReportRecipe|{report_task.report_recipe_id}"), valid_time)
 
         if input_oois := recipe.input_recipe.get("input_oois"):
-            ooi_pks = [Reference.from_str(ooi) for ooi in input_oois]
+            ooi_pks = list(set(Reference.from_str(ooi) for ooi in input_oois))
         elif query := recipe.input_recipe.get("query"):
             oois = connector.list_objects(
                 types={type_by_name(ooi_type) for ooi_type in query["ooi_types"]},
@@ -50,7 +50,7 @@ class LocalReportRunner(ReportRunner):
                 asc_desc=query["asc_desc"],
             ).items
 
-            ooi_pks = [ooi.reference for ooi in oois]
+            ooi_pks = list(set(ooi.reference for ooi in oois))
         else:
             raise ValueError("Invalid recipe: no input_oois or query found")
 
