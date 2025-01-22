@@ -44,41 +44,32 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
     task_type = "report"
     context_object_name = "scheduled_reports"
 
-    def get_recipe_ooi_tree(self, ooi_pk: str) -> ReportRecipe | None:
-        try:
-            return self.octopoes_api_connector.get_tree(
-                Reference.from_str(f"ReportRecipe|{ooi_pk}"),
-                valid_time=self.observed_at,
-                depth=1,
-                types={ReportRecipe, Report},
-            )
-        except ObjectNotFoundException:
-            return messages.error(self.request, f"Report recipe with id {ooi_pk} not found.")
-
     def get_queryset(self) -> list[dict[str, Any]]:
         report_schedules = self.get_report_schedules()
 
+        if not report_schedules:
+            return []
+
         recipes = []
-        if report_schedules:
-            for schedule in report_schedules:
-                if schedule["data"]:
-                    recipe_id = schedule["data"]["report_recipe_id"]
-                    report_recipe = self.octopoes_api_connector.get(
-                        Reference.from_str(f"ReportRecipe|{recipe_id}"), valid_time=datetime.now(timezone.utc)
-                    )
-                    reports = self.octopoes_api_connector.list_reports(
-                        valid_time=self.observed_at, recipe_id=UUID(recipe_id)
-                    ).items
-                    recipes.append(
-                        {
-                            "schedule_id": schedule["id"],
-                            "enabled": schedule["enabled"],
-                            "recipe": report_recipe,
-                            "cron": schedule["schedule"],
-                            "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
-                            "reports": reports,
-                        }
-                    )
+        for schedule in report_schedules:
+            if not schedule["data"]:
+                continue
+
+            recipe_id = schedule["data"]["report_recipe_id"]
+            report_recipe = self.octopoes_api_connector.get(
+                Reference.from_str(f"ReportRecipe|{recipe_id}"), valid_time=datetime.now(timezone.utc)
+            )
+            reports = self.octopoes_api_connector.list_reports(valid_time=self.observed_at, recipe_id=UUID(recipe_id))
+            recipes.append(
+                {
+                    "schedule_id": schedule["id"],
+                    "enabled": schedule["enabled"],
+                    "recipe": report_recipe,
+                    "cron": schedule["schedule"],
+                    "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
+                    "reports": reports.items,
+                }
+            )
 
         return recipes
 
