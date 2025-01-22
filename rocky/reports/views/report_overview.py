@@ -28,7 +28,7 @@ class BreadcrumbsReportOverviewView(ReportBreadcrumbs):
         breadcrumbs = super().build_breadcrumbs()
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
-        breadcrumbs += [{"url": reverse("subreports", kwargs=kwargs) + selection, "text": _("Subreports")}]
+        breadcrumbs += [{"url": reverse("subreports", kwargs=kwargs) + selection, "text": _("Asset reports")}]
         return breadcrumbs
 
 

@@ -92,15 +92,15 @@
                                 <input type="checkbox"
                                        class="report-checkbox"
                                        name="report"
-                                       value="{{ report.parent_report.reference }}"
+                                       value="{{ report.report.reference }}"
                                        {% if report.id in selected_reports or "all" in selected_reports %}checked{% endif %}
                                        {% if "all" in selected_reports %}disabled{% endif %}>
                             </td>
                             <td class="report_name">
                                 {% if report.asset_reports|length > 1 %}
-                                    <a id="report_name_{{ report.parent_report.reference|slugify }}"
-                                       href="{% url "view_report" organization.code %}?report_id={{ report.parent_report.reference }}&observed_at={{ report.parent_report.observed_at|date:"Y-m-d H:i:s:u" }}"
-                                       title="{% translate "Shows parent report details" %}">{{ report.parent_report.name }}</a>
+                                    <a id="report_name_{{ report.report.reference|slugify }}"
+                                       href="{% url "view_report" organization.code %}?report_id={{ report.report.reference }}&observed_at={{ report.report.observed_at|date:"Y-m-d H:i:s:u" }}"
+                                       title="{% translate "Shows parent report details" %}">{{ report.report.name }}</a>
                                 {% elif report.asset_reports|length == 1 %}
                                     <a id="report_name_{{ report.asset_reports.0.reference|slugify }}"
                                        href="{% url "view_report" organization.code %}?report_id={{ report.asset_reports.0.reference }}&observed_at={{ report.asset_reports.0.observed_at|date:"Y-m-d H:i:s:u" }}"
@@ -109,7 +109,7 @@
                             </td>
                             <td class="report_types">
                                 <ul class="tags horizontal-view">
-                                    {% if report.parent_report.report_type == "concatenated-report" or report.parent_report.report_type is None %}
+                                    {% if report.report.report_type == "concatenated-report" or report.report.report_type is None %}
                                         {% for report_type, total_objects in report.report_type_summary.items %}
                                             {% if forloop.counter0 < 2 %}
                                                 <li>
@@ -124,20 +124,20 @@
                                         {% endfor %}
                                     {% else %}
                                         <li>
-                                            <span class="label tags-color-{{ report.parent_report.report_type|get_report_type_label_style }}">{{ report.parent_report.report_type|get_report_type_name }}</span>
+                                            <span class="label tags-color-{{ report.report.report_type|get_report_type_label_style }}">{{ report.report.report_type|get_report_type_name }}</span>
                                         </li>
                                     {% endif %}
                                 </ul>
                             </td>
                             <td class="report_oois">
                                 {% if report.total_objects == 1 %}
-                                    <a href="{% ooi_url "ooi_detail" report.parent_report.input_oois.0.input_ooi organization.code query=ooi.mandatory_fields %}">{{ report.parent_report.input_oois.0.input_ooi|human_readable }}</a>
+                                    <a href="{% ooi_url "ooi_detail" report.report.input_oois.0.input_ooi organization.code query=ooi.mandatory_fields %}">{{ report.report.input_oois.0.input_ooi|human_readable }}</a>
                                 {% else %}
                                     {{ report.total_objects }}
                                 {% endif %}
                             </td>
-                            <td class="nowrap report_reference_date">{{ report.parent_report.observed_at|date }}</td>
-                            <td class="nowrap report_creation_date">{{ report.parent_report.date_generated }}</td>
+                            <td class="nowrap report_reference_date">{{ report.report.observed_at|date }}</td>
+                            <td class="nowrap report_creation_date">{{ report.report.date_generated }}</td>
                             <td>
                                 {% if report.total_asset_reports > 1 %}
                                     <button type="button"
@@ -220,7 +220,7 @@
                                     </table>
                                     <div class="button-container">
                                         {% if report.total_asset_reports > 5 %}
-                                            <a href="{% url "subreports" organization.code %}?report_id={{ report.parent_report.reference }}"
+                                            <a href="{% url "subreports" organization.code %}?report_id={{ report.report.reference }}"
                                                class="button">{% translate "View all asset reports" %}</a>
                                         {% endif %}
                                     </div>

@@ -321,9 +321,8 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
     def get_parent_report_type(self):
         if self.report_type is not None:
             return self.report_type.id
-        if not self.is_single_report():
-            return ConcatenatedReport.id
-        return self.report_type
+
+        return ConcatenatedReport.id
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
