@@ -15,4 +15,4 @@ class RawRepository:
         raise NotImplementedError()
 
     def get_raws(self, raw_metas_pairs: list[tuple[UUID, BoefjeMeta]]) -> list[tuple[UUID, RawData]]:
-        pass
+        raise NotImplementedError()

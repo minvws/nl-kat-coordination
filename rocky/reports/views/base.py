@@ -24,6 +24,7 @@ from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, PostRedirect, url_w
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.reports import AssetReport, ReportRecipe
 from octopoes.models.ooi.reports import BaseReport as ReportOOI
+from octopoes.models.types import OOIType
 from reports.forms import OOITypeMultiCheckboxForReportForm, ReportScheduleStartDateForm
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.concatenated_report.report import ConcatenatedReport
@@ -602,10 +603,12 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     def get_asset_reports(self) -> list[AssetReport]:
         return self.octopoes_api_connector.get_report(self.report_ooi.reference, self.observed_at).input_oois
 
-    def get_input_oois(self, ooi_pks: list[str]) -> list[type[OOI]]:
-        return [
-            self.octopoes_api_connector.get(Reference.from_str(ooi), valid_time=self.observed_at) for ooi in ooi_pks
-        ]
+    def get_input_oois(self, ooi_pks: list[str]) -> list[OOIType]:
+        return list(
+            self.octopoes_api_connector.load_objects_bulk(
+                {Reference.from_str(ooi) for ooi in ooi_pks}, valid_time=self.observed_at
+            ).values()
+        )
 
     def get_plugins(self, plugins_dict: dict[str, list[str]]) -> list[dict[str, list[Plugin]]]:
         plugins: dict[str, list[Plugin]] = {"required": [], "optional": []}
