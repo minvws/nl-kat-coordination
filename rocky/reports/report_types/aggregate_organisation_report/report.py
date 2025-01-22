@@ -69,7 +69,7 @@ class AggregateOrganisationReport(AggregateReport):
                 if input_ooi not in data:
                     data[input_ooi] = {}
 
-                data[input_ooi][report_id] = item
+                data[input_ooi][report_id] = item["data"]
 
         for input_ooi, reports_data in data.items():
             for report_id, report_specific_data in reports_data.items():

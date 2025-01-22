@@ -157,11 +157,21 @@ class BytesAPIClient:
         return RawDataMeta.model_validate(response.json())
 
     @retry_with_login
-    def get_raws(self, query_filter: RawDataFilter) -> dict[str, str]:
+    def get_raw_metas(self, query_filter: RawDataFilter) -> dict[str, str]:
         params = query_filter.model_dump(exclude_none=True)
         params["mime_types"] = [m.value for m in query_filter.mime_types]
 
         response = self.client.get("/bytes/raw", params=params)
+        self._verify_response(response)
+
+        return response.json()  # type: ignore
+
+    @retry_with_login
+    def get_raws(self, query_filter: RawDataFilter) -> dict[str, str]:
+        params = query_filter.model_dump(exclude_none=True)
+        params["mime_types"] = [m.value for m in query_filter.mime_types]
+
+        response = self.client.get("/bytes/raws", params=params)
         self._verify_response(response)
 
         return response.json()  # type: ignore
