@@ -75,6 +75,14 @@ class FileRawRepository(RawRepository):
         contents = file_path.read_bytes()
         return RawData(value=self.file_middleware.decode(contents), boefje_meta=boefje_meta)
 
+    def get_raws(self, raw_metas_pairs: list[tuple[UUID, BoefjeMeta]]):
+        try:
+            raws = [(self._raw_file_path(raw_id, boefje_meta).read_bytes(), boefje_meta) for raw_id, boefje_meta in raw_metas_pairs]
+        except FileNotFoundError:
+            raise BytesFileNotFoundException()
+
+        return [RawData(value=self.file_middleware.decode(raw), boefje_meta=boefje_meta) for raw, boefje_meta in raws]
+
     def _raw_file_path(self, raw_id: UUID, boefje_meta: BoefjeMeta) -> Path:
         return self.base_path / boefje_meta.organization / self._index(raw_id) / str(raw_id)
 

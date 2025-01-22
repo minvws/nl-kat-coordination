@@ -131,6 +131,15 @@ class BytesClient:
 
         return response.content
 
+    def get_raws(self, query_filter: RawDataFilter) -> dict[str, str]:
+        params = query_filter.model_dump(exclude_none=True)
+        params["mime_types"] = [m.value for m in query_filter.mime_types]
+
+        response = self.session.get("/bytes/raws", params=params)
+        self._verify_response(response)
+
+        return response.json()  # type: ignore
+
     def get_raw_metas(self, boefje_meta_id: uuid.UUID, organization_code: str) -> list:
         # More than 100 raw files per Boefje run is very unlikely at this stage, but eventually we can start paginating
         raw_files_limit = 100
