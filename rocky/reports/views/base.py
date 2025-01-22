@@ -687,15 +687,18 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
 
         asset_reports = self.get_asset_reports()
+        ooi_pks = set()
 
         for report in asset_reports:
+            ooi_pks.add(report.input_ooi)
+
             bytes_data = self.get_report_data_from_bytes(report)
             report_data.setdefault(report.report_type, {})[report.input_ooi] = {
                 "data": bytes_data["report_data"],
                 "template": report.template,
                 "report_name": report.name,
             } | bytes_data["input_data"]
-        oois = self.get_input_oois(self.report_ooi.input_oois)
+        oois = self.get_input_oois(list(ooi_pks))
         report_type_ids = {child_report.report_type for child_report in asset_reports}
         report_types = self.get_report_types(report_type_ids)
         plugins = self.get_plugins(self.get_report_data_from_bytes(self.report_ooi)["input_data"]["plugins"])
