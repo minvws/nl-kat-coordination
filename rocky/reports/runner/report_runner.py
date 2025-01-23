@@ -6,7 +6,6 @@ import structlog
 from django.conf import settings
 from pydantic import RootModel
 
-from integration.conftest import octopoes_api_connector
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from tools.models import Organization
 from tools.ooi_helpers import create_ooi
