@@ -94,22 +94,21 @@
                                             {% for report in schedule.reports %}
                                                 <tr>
                                                     <td>
-                                                        {% if report.input_oois|length > 1 %}
-                                                            <a href="{% url "view_report" organization.code %}?report_id={{ report.reference }}&observed_at={{ report.observed_at|date:"Y-m-d H:i:s:u" }}"
-                                                               title="{% translate "Show report details" %}">{{ report.name }}</a>
-                                                        {% else %}
+                                                        {% if report.input_oois|length == 1 %}
                                                             <a href="{% url "view_report" organization.code %}?asset_report_id={{ report.input_oois.0.reference }}&observed_at={{ report.input_oois.0.observed_at|date:"Y-m-d H:i:s:u" }}"
                                                                title="{% translate "Show report details" %}">{{ report.input_oois.0.name }}</a>
+                                                        {% else %}
+                                                            <a href="{% url "view_report" organization.code %}?report_id={{ report.reference }}&observed_at={{ report.observed_at|date:"Y-m-d H:i:s:u" }}"
+                                                               title="{% translate "Show report details" %}">{{ report.name }}</a>
                                                         {% endif %}
                                                     </td>
                                                     <td>
-                                                        {{ report.total_objects }}
                                                         {% if report.input_oois|length == 1 or schedule.recipe.input_recipe.input_oois|length == 1 %}
                                                             {% with ooi=report.input_oois.0.input_ooi %}
                                                                 <a href="{% ooi_url 'ooi_detail' ooi organization.code query=ooi.mandatory_fields %}">{{ ooi|human_readable }}</a>
                                                             {% endwith %}
                                                         {% else %}
-                                                            {{ schedule.recipe.input_recipe.input_oois|length }} {% translate "objects" %}
+                                                            {{ schedule.total_oois }} {% translate "objects" %}
                                                         {% endif %}
                                                     </td>
                                                     <td>{{ report.reference_date|date }}</td>

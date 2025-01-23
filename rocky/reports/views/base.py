@@ -669,7 +669,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                 "report_name": self.report_ooi.name,
             } | report_data["input_data"]
 
-        return report_data, self.report_ooi.input_oois, report_types, plugins
+        return report_data, oois, report_types, plugins
 
     def get_report_data_aggregate_report_or_multi_report(
         self,
@@ -679,8 +679,9 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         report_data = self.get_report_data_from_bytes([self.report_ooi])[0][1]
         report_types = self.get_report_types(report_data["input_data"]["report_types"])
         plugins = self.get_plugins(report_data["input_data"]["plugins"])
+        oois = self.get_input_oois(list({asset_ooi.input_ooi for asset_ooi in self.report_ooi.input_oois}))
 
-        return report_data, self.report_ooi.input_oois, report_types, plugins
+        return report_data, oois, report_types, plugins
 
     def get_report_data_concatenated_report(
         self,
