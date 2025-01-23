@@ -419,6 +419,8 @@ class Scheduler(abc.ABC):
         return None
 
     def calculate_deadline(self, task: models.Task) -> datetime:
+        """The default deadline calculation for a task, when the
+        auto_calculate_deadline attribute is set to True"""
         # We at least delay a job by the grace period
         minimum = self.ctx.config.pq_grace_period
         deadline = datetime.now(timezone.utc) + timedelta(seconds=minimum)

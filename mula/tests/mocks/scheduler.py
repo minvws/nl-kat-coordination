@@ -1,7 +1,6 @@
 import time
 
 from scheduler import schedulers
-
 from tests.utils import functions
 
 from . import listener

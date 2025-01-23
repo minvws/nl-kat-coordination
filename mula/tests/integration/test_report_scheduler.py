@@ -4,7 +4,6 @@ from unittest import mock
 
 from scheduler import config, models, schedulers, storage
 from scheduler.storage import stores
-
 from tests.factories import OrganisationFactory
 
 
