@@ -19,7 +19,7 @@ def test_web_report(octopoes_api_connector: OctopoesAPIConnector, valid_time):
     seed_system(octopoes_api_connector, valid_time)
 
     report = WebSystemReport(octopoes_api_connector)
-    input_ooi = "Hostname|test|example.com"
+    input_ooi = Reference.from_str("Hostname|test|example.com")
     data = report.collect_data([input_ooi], valid_time)[input_ooi]
 
     assert data["input_ooi"] == input_ooi
@@ -62,7 +62,7 @@ def test_system_report(octopoes_api_connector: OctopoesAPIConnector, valid_time)
     seed_system(octopoes_api_connector, valid_time)
 
     report = SystemReport(octopoes_api_connector)
-    input_ooi = "Hostname|test|example.com"
+    input_ooi = Reference.from_str("Hostname|test|example.com")
     data = report.collect_data([input_ooi], valid_time)[input_ooi]
 
     assert data["input_ooi"] == input_ooi

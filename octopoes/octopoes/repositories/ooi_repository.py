@@ -162,7 +162,9 @@ class OOIRepository(Repository):
     def list_related(self, ooi: OOI, path: Path, valid_time: datetime) -> list[OOI]:
         raise NotImplementedError
 
-    def query(self, query: Query, valid_time: datetime, to_type: OOI | None = None) -> list[OOI | tuple]:
+    def query(
+        self, query: str | Query, valid_time: datetime, to_type: type[OOI] | None = None
+    ) -> list[OOI | tuple | dict[Any, Any]]:
         raise NotImplementedError
 
 
@@ -862,7 +864,7 @@ class XTDBOOIRepository(OOIRepository):
 
         results = self.session.client.query(query, valid_time=valid_time)
 
-        parsed_results: list[OOI | tuple | dict[Any, Any]] = []
+        parsed_results: list[dict[Any, Any] | OOI | tuple] = []
         for result in results:
             parsed_result = []
 
@@ -871,7 +873,7 @@ class XTDBOOIRepository(OOIRepository):
                     try:
                         parsed_result.append(self.deserialize(item, to_type))
                     except (ValueError, TypeError):
-                        parsed_result.append(item)
+                        parsed_result.append(item)  # type: ignore
                 else:
                     parsed_result.append(item)
 

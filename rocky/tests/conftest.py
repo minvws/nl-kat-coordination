@@ -1,3 +1,5 @@
+import uuid
+
 import binascii
 import json
 import logging
@@ -1067,10 +1069,19 @@ def plugin_schema_no_required():
         },
     }
 
+recipe = ReportRecipe(
+    report_type="concatenated-report",
+    recipe_id=uuid.uuid4(),
+    report_name_format="test",
+    asset_report_name_format="test",
+    cron_expression="* * * *",
+    input_recipe={},
+    asset_report_types=[],
+)
 
 parent_report = [
     Report(
-        object_type="Report",
+        report_recipe=recipe.reference,
         scan_profile=None,
         user_id=None,
         primary_key="Report|e821aaeb-a6bd-427f-b064-e46837911a5d",
@@ -1090,7 +1101,7 @@ parent_report = [
 
 subreports = [
     Report(
-        object_type="Report",
+        report_recipe=recipe.reference,
         scan_profile=None,
         user_id=None,
         primary_key="Report|1730b72f-b115-412e-ad44-dae6ab3edff9",
@@ -1108,7 +1119,7 @@ subreports = [
         observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
     ),
     Report(
-        object_type="Report",
+        report_recipe=recipe.reference,
         scan_profile=None,
         user_id=None,
         primary_key="Report|463c7f72-fef9-42ef-baf9-f10fcfb91abe",
@@ -1128,7 +1139,7 @@ subreports = [
         has_parent=True,
     ),
     Report(
-        object_type="Report",
+        report_recipe=recipe.reference,
         scan_profile=None,
         user_id=None,
         primary_key="Report|47a28977-04c6-43b6-9705-3c5f0c955833",
@@ -1146,7 +1157,7 @@ subreports = [
         observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
     ),
     Report(
-        object_type="Report",
+        report_recipe=recipe.reference,
         scan_profile=None,
         user_id=None,
         primary_key="Report|57c8f1b9-da3e-48ca-acb1-554e6966b4aa",
@@ -1164,7 +1175,7 @@ subreports = [
         observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
     ),
     Report(
-        object_type="Report",
+        report_recipe=recipe.reference,
         scan_profile=None,
         user_id=None,
         primary_key="Report|8075a64c-1acb-44b8-8376-b68d4ee972e5",
@@ -1182,7 +1193,7 @@ subreports = [
         observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
     ),
     Report(
-        object_type="Report",
+        report_recipe=recipe.reference,
         scan_profile=None,
         user_id=None,
         primary_key="Report|8f3c6b75-b237-4c9a-8d9b-7745f3708d4a",
@@ -1200,7 +1211,7 @@ subreports = [
         observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
     ),
     Report(
-        object_type="Report",
+        report_recipe=recipe.reference,
         scan_profile=None,
         user_id=None,
         primary_key="Report|8f3c6b75-b237-4c9a-8d9b-7745f3708d4a",
@@ -1221,7 +1232,7 @@ subreports = [
 
 dns_report = [
     Report(
-        object_type="Report",
+        report_recipe=recipe.reference,
         scan_profile=None,
         primary_key="Report|e821aaeb-a6bd-427f-b064-e46837913b4d",
         name="DNS Report",

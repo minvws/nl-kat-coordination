@@ -215,7 +215,7 @@ class Query:
 
         if (
             field_name not in ooi_type.model_fields
-            and field_name != "xt/id"
+            and field_name != "id"
             and (
                 ooi_type not in abstract_types
                 or not any(field_name in concrete_type.model_fields for concrete_type in ooi_type.strict_subclasses())
@@ -261,7 +261,7 @@ class Query:
     def _where_field_in(self, ref: Ref, field_name: str, values: Iterable[str]) -> None:
         ooi_type = ref.type if isinstance(ref, Aliased) else ref
 
-        if field_name not in ooi_type.model_fields and field_name != "xt/id":
+        if field_name not in ooi_type.model_fields and field_name != "id":
             raise InvalidField(f'"{field_name}" is not a field of {ooi_type.get_object_type()}')
 
         new_values = []
@@ -314,7 +314,7 @@ class Query:
     def _or_statement_for_multiple_values(
         self, from_alias: str, ooi_types: list[type[OOI]], field_name: str, to_aliases: list[str]
     ) -> str:
-        if field_name == "xt/id":  # Generic field for XTDB entities. TODO: refactor
+        if field_name == "id":  # Generic field for XTDB entities. TODO: refactor
             relationships = [self._relationship(from_alias, "xt", "id", to_alias) for to_alias in to_aliases]
         else:
             relationships = [
