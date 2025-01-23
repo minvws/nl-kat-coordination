@@ -7,7 +7,7 @@
 
 {% if scheduled_reports %}
     <p class="de-emphasized">
-        {% blocktranslate with length=scheduled_reports|length total=total_schedules %}Showing {{ length }} of {{ total }} schedules{% endblocktranslate %}
+        {% blocktranslate with length=scheduled_reports|length total=total_report_schedules %}Showing {{ length }} of {{ total }} schedules{% endblocktranslate %}
     </p>
     <div class="horizontal-scroll sticky-column">
         <table>
@@ -36,8 +36,9 @@
                             <td>
                                 <ul class="tags horizontal-view">
                                     {% if schedule.recipe.report_type == "aggregate-organisation-report" %}
-                                        <li class="label tags-color-{{ schedule.recipe.report_type|get_report_type_label_style }}">
-                                            {{ schedule.recipe.report_type|get_report_type_name }}
+                                        <li>
+                                            <span class="label tags-color-{{ schedule.recipe.report_type|get_report_type_label_style }}">
+                                            {{ schedule.recipe.report_type|get_report_type_name }}</span>
                                         </li>
                                     {% else %}
                                         {% for report_type in schedule.recipe.asset_report_types %}
