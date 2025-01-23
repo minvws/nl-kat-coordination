@@ -43,63 +43,50 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
 
     first_asset_calls = [
         {
-            'report_data': {
-                    'input_ooi': 'Hostname|test|example.com',
-                    'records': [],
-                    'security': {
-                        'spf': True,
-                        'dkim': True,
-                        'dmarc': True,
-                        'dnssec': True,
-                        'caa': True,
-                    },
-                    'finding_types': []
+            "report_data": {
+                "input_ooi": "Hostname|test|example.com",
+                "records": [],
+                "security": {"spf": True, "dkim": True, "dmarc": True, "dnssec": True, "caa": True},
+                "finding_types": [],
             },
-            'input_data': {
-                'input_oois': ['Hostname|test|example.com'],
-                'report_types': ['dns-report'],
-                'plugins': {'required': {'dns-records', 'dns-sec'}, 'optional': ['dns-zone']}
-            }
-        }, {
-            'report_data': {
-                    'input_ooi': 'Hostname|test|a.example.com',
-                    'records': [],
-                    'security': {
-                        'spf': True,
-                        'dkim': True,
-                        'dmarc': True,
-                        'dnssec': True,
-                        'caa': True,
-                    },
-                    'finding_types': []
+            "input_data": {
+                "input_oois": ["Hostname|test|example.com"],
+                "report_types": ["dns-report"],
+                "plugins": {"required": {"dns-records", "dns-sec"}, "optional": ["dns-zone"]},
             },
-            'input_data': {
-                'input_oois': ['Hostname|test|a.example.com'],
-                'report_types': ['dns-report'],
-                'plugins': {'required': {'dns-records', 'dns-sec'}, 'optional': ['dns-zone']}
-            }
-        }
+        },
+        {
+            "report_data": {
+                "input_ooi": "Hostname|test|a.example.com",
+                "records": [],
+                "security": {"spf": True, "dkim": True, "dmarc": True, "dnssec": True, "caa": True},
+                "finding_types": [],
+            },
+            "input_data": {
+                "input_oois": ["Hostname|test|a.example.com"],
+                "report_types": ["dns-report"],
+                "plugins": {"required": {"dns-records", "dns-sec"}, "optional": ["dns-zone"]},
+            },
+        },
     ]
     assert data in first_asset_calls
     assert data2 in first_asset_calls
 
     data_report = {
-        'input_data':
-            {
-                'input_oois': [
-                    'AssetReport|Hostname|test|example.com|dns-report',
-                    'AssetReport|Hostname|test|a.example.com|dns-report',
-                ],
-                'report_types': ['dns-report'],
-                'plugins': {
-                    'required': {'dns-records', 'dns-sec'},
-                    'optional': ['dns-zone']
-                }
-            }
+        "input_data": {
+            "input_oois": [
+                "AssetReport|Hostname|test|example.com|dns-report",
+                "AssetReport|Hostname|test|a.example.com|dns-report",
+            ],
+            "report_types": ["dns-report"],
+            "plugins": {"required": {"dns-records", "dns-sec"}, "optional": ["dns-zone"]},
+        }
     }
 
     report_data = json.loads(report_runner.bytes_client.upload_raw.mock_calls[2].kwargs["raw"])
-    report_data["input_data"]["plugins"]["required"] = set(report_data["input_data"]["plugins"]["required"])  # ordering issues
+    report_data["input_data"]["plugins"]["required"] = set(
+        report_data["input_data"]["plugins"]["required"]
+    )  # ordering issues
 
     assert report_data == data_report
 

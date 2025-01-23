@@ -15,7 +15,7 @@ from tools.ooi_helpers import create_ooi
 
 from octopoes.models import OOI, Reference
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.ooi.reports import AssetReport, Report, ReportRecipe, HydratedReport
+from octopoes.models.ooi.reports import AssetReport, HydratedReport, Report, ReportRecipe
 from reports.views.base import ReportBreadcrumbs, get_selection
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import OctopoesView, ReportList

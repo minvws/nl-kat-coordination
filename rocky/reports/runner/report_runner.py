@@ -132,7 +132,8 @@ def save_report_data(
     input_data = {
         "input_data": {
             "input_oois": [asset_report.reference for asset_report in asset_reports],
-            "report_types": recipe.asset_report_types, "plugins": plugins,
+            "report_types": recipe.asset_report_types,
+            "plugins": plugins,
         }
     }
 
@@ -140,7 +141,6 @@ def save_report_data(
         raw=ReportDataDict(input_data | additional_input_data).model_dump_json().encode(),
         manual_mime_types={"openkat/report"},
     )
-
 
     report_type_name = str(get_report_by_id(recipe.report_type).name)
     report_name = observed_at.strftime(
