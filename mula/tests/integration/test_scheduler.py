@@ -4,11 +4,11 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
-from structlog.testing import capture_logs
-
 from scheduler import config, models, storage
 from scheduler.schedulers.queue import InvalidItemError, NotAllowedError, QueueEmptyError, QueueFullError
 from scheduler.storage import stores
+from structlog.testing import capture_logs
+
 from tests.mocks import item as mock_item
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
