@@ -669,7 +669,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                 "report_name": self.report_ooi.name,
             } | report_data["input_data"]
 
-        return report_data, self.report_ooi.input_oois, report_types, plugins
+        return report_data, oois, report_types, plugins
 
     def get_report_data_aggregate_report_or_multi_report(
         self,

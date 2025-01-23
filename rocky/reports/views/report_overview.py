@@ -83,6 +83,9 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
                     "cron": schedule["schedule"],
                     "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
                     "reports": reports,
+                    "total_oois": len(
+                        {asset_report.input_ooi for report in reports for asset_report in report.input_oois}
+                    ),
                 }
             )
 

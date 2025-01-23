@@ -108,7 +108,7 @@
                                                                 <a href="{% ooi_url 'ooi_detail' ooi organization.code query=ooi.mandatory_fields %}">{{ ooi|human_readable }}</a>
                                                             {% endwith %}
                                                         {% else %}
-                                                            {{ schedule.recipe.input_recipe.input_oois|length }} {% translate "objects" %}
+                                                            {{ schedule.total_oois }} {% translate "objects" %}
                                                         {% endif %}
                                                     </td>
                                                     <td>{{ report.reference_date|date }}</td>
