@@ -93,7 +93,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["total_schedules"] = len(self.object_list)
+        context["total_report_schedules"] = len(self.object_list)
         return context
 
 
