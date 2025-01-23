@@ -212,9 +212,13 @@ class Query:
         ooi_type = ref.type if isinstance(ref, Aliased) else ref
         abstract_types = get_abstract_types()
 
-        if field_name not in ooi_type.model_fields and field_name != "xt/id" and (
-            ooi_type not in abstract_types
-            or not any(field_name in concrete_type.model_fields for concrete_type in ooi_type.strict_subclasses())
+        if (
+            field_name not in ooi_type.model_fields
+            and field_name != "xt/id"
+            and (
+                ooi_type not in abstract_types
+                or not any(field_name in concrete_type.model_fields for concrete_type in ooi_type.strict_subclasses())
+            )
         ):
             raise InvalidField(f'"{field_name}" is not a field of {ooi_type.get_object_type()}')
 
@@ -310,10 +314,7 @@ class Query:
         self, from_alias: str, ooi_types: list[type[OOI]], field_name: str, to_aliases: list[str]
     ) -> str:
         if field_name == "xt/id":  # Generic field for XTDB entities. TODO: refactor
-            relationships = [
-                self._relationship(from_alias, "xt", "id", to_alias)
-                for to_alias in to_aliases
-            ]
+            relationships = [self._relationship(from_alias, "xt", "id", to_alias) for to_alias in to_aliases]
         else:
             relationships = [
                 self._relationship(from_alias, ooi_type.get_object_type(), field_name, to_alias)
