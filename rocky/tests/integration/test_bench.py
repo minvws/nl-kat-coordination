@@ -24,7 +24,7 @@ def test_aggregate_report_benchmark(octopoes_api_connector, valid_time, organiza
     ]
     _, data, _, _ = aggregate_reports(
         octopoes_api_connector,
-        [Hostname(name=f"{x}.com", network=Network(name="test").reference) for x in hostname_range],
+        [Hostname(name=f"{x}.com", network=Network(name="test").reference).reference for x in hostname_range],
         reports,
         valid_time,
         organization.code,

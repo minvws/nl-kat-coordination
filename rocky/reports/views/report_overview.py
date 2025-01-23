@@ -15,7 +15,7 @@ from tools.ooi_helpers import create_ooi
 
 from octopoes.models import OOI, Reference
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.ooi.reports import AssetReport, Report, ReportRecipe
+from octopoes.models.ooi.reports import AssetReport, Report, ReportRecipe, HydratedReport
 from reports.views.base import ReportBreadcrumbs, get_selection
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import OctopoesView, ReportList
@@ -45,7 +45,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
     task_type = "report"
     context_object_name = "scheduled_reports"
 
-    def get_recipe_ooi(self, recipe_id: str) -> ReportRecipe:
+    def get_recipe_ooi(self, recipe_id: str) -> ReportRecipe | None:
         try:
             return self.octopoes_api_connector.get(
                 Reference.from_str(f"ReportRecipe|{recipe_id}"), valid_time=self.observed_at
@@ -53,7 +53,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
         except (HTTPStatusError, ObjectNotFoundException):
             return None
 
-    def get_reports(self, recipe_id: str) -> list[Report]:
+    def get_reports(self, recipe_id: str) -> list[HydratedReport]:
         try:
             return self.octopoes_api_connector.list_reports(
                 valid_time=self.observed_at, recipe_id=UUID(recipe_id)
@@ -166,7 +166,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
     def get_queryset(self) -> ReportList:
         return ReportList(self.octopoes_api_connector, valid_time=self.observed_at)
 
-    def get_report_ooi(self, ooi_pk: str) -> Report | AssetReport:
+    def get_report_ooi(self, ooi_pk: str) -> HydratedReport:
         return self.octopoes_api_connector.get_report(ooi_pk, valid_time=datetime.now(timezone.utc))
 
     def run_bulk_actions(self) -> None:

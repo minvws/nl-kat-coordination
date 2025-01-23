@@ -450,6 +450,7 @@ def seed_report(
     name: str, valid_time, ooi_repository, origin_repository, input_reports: list[AssetReport] | None = None
 ) -> Report:
     recipe = ReportRecipe(
+        report_type="concatenated-report",
         recipe_id=uuid.uuid4(),
         report_name_format="test",
         asset_report_name_format="test",
@@ -501,6 +502,7 @@ def seed_asset_report(
     name: str, valid_time, ooi_repository, origin_repository, input_ooi: str = "testref"
 ) -> AssetReport:
     recipe = ReportRecipe(
+        report_type="concatenated-report",
         recipe_id=uuid.uuid4(),
         report_name_format="test",
         asset_report_name_format="test",

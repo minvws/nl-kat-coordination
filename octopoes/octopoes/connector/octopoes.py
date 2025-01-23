@@ -295,7 +295,7 @@ class OctopoesAPIConnector:
         limit: int = DEFAULT_LIMIT,
         recipe_id: UUID | None = None,
     ) -> Paginated[HydratedReport]:
-        params = {"valid_time": str(valid_time), "offset": offset, "limit": limit}
+        params: dict[str, str | int] = {"valid_time": str(valid_time), "offset": offset, "limit": limit}
 
         if recipe_id:
             params["recipe_id"] = recipe_id.hex

@@ -194,7 +194,7 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
 
         return list(
             self.octopoes_api_connector.load_objects_bulk(
-                [Reference.from_str(x) for x in self.get_ooi_selection()], self.observed_at
+                {Reference.from_str(x) for x in self.get_ooi_selection()}, self.observed_at
             ).values()
         )
 

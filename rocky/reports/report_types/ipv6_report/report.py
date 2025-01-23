@@ -37,7 +37,7 @@ class IPv6Report(Report):
         query = "Hostname.<hostname[is ResolvedHostname].address"
         ips = self.group_by_source(self.octopoes_api_connector.query_many(query, valid_time, all_hostnames))
 
-        result: dict[str, dict[str, Any]] = {ooi: {} for ooi in input_oois}
+        result: dict[Reference, dict[str, Any]] = {ooi: {} for ooi in input_oois}
         for input_ooi, hostnames in hostnames_by_input_ooi.items():
             result[input_ooi] = {
                 hostname_ref.tokenized.name: {

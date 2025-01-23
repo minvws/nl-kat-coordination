@@ -29,7 +29,7 @@ from octopoes.models.pagination import Paginated
 from octopoes.models.path import Direction, Path, Segment, get_paths_to_neighours
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceNode, ReferenceTree
-from octopoes.models.types import OOIType, get_concrete_types, get_relation, get_relations, to_concrete, type_by_name
+from octopoes.models.types import get_concrete_types, get_relation, get_relations, to_concrete, type_by_name
 from octopoes.repositories.repository import Repository
 from octopoes.xtdb import Datamodel, FieldSet, ForeignKey
 from octopoes.xtdb.client import OperationType as XTDBOperationType
@@ -162,7 +162,9 @@ class OOIRepository(Repository):
     def list_related(self, ooi: OOI, path: Path, valid_time: datetime) -> list[OOI]:
         raise NotImplementedError
 
-    def query(self, query: Query, valid_time: datetime, to_type: OOI | None = None) -> list[OOI | tuple]:
+    def query(
+        self, query: str | Query, valid_time: datetime, to_type: type[OOI] | None = None
+    ) -> list[OOI | tuple | dict[Any, Any]]:
         raise NotImplementedError
 
 
@@ -238,7 +240,7 @@ class XTDBOOIRepository(OOIRepository):
         return export
 
     @classmethod
-    def deserialize(cls, data: dict[str, Any], to_type: OOIType | None = None) -> OOI:
+    def deserialize(cls, data: dict[str, Any], to_type: type[OOI] | None = None) -> OOI:
         if "object_type" not in data:
             raise ValueError("Data is missing object_type")
 
@@ -305,8 +307,7 @@ class XTDBOOIRepository(OOIRepository):
         if not references:
             return []
 
-        query = Query().where_in(OOI, **{"xt/id": references}).pull(OOI, fields="[* {:_reference [*]}]")
-        # breakpoint()
+        query = Query().where_in(OOI, id=references).pull(OOI, fields="[* {:_reference [*]}]")
         return [self.deserialize(x[0]) for x in self.session.client.query(query, valid_time)]
 
     def list_oois(
@@ -850,7 +851,9 @@ class XTDBOOIRepository(OOIRepository):
 
         return result
 
-    def query(self, query: str | Query, valid_time: datetime, to_type: OOIType | None = None) -> list[OOI | tuple]:
+    def query(
+        self, query: str | Query, valid_time: datetime, to_type: type[OOI] | None = None
+    ) -> list[OOI | tuple | dict[Any, Any]]:
         """
         Performs the given query and returns the query results at the provided valid_time.
 
@@ -861,7 +864,7 @@ class XTDBOOIRepository(OOIRepository):
 
         results = self.session.client.query(query, valid_time=valid_time)
 
-        parsed_results: list[OOI | tuple] = []
+        parsed_results: list[dict[Any, Any] | OOI | tuple] = []
         for result in results:
             parsed_result = []
 
@@ -870,7 +873,7 @@ class XTDBOOIRepository(OOIRepository):
                     try:
                         parsed_result.append(self.deserialize(item, to_type))
                     except (ValueError, TypeError):
-                        parsed_result.append(item)
+                        parsed_result.append(item)  # type: ignore
                 else:
                     parsed_result.append(item)
 

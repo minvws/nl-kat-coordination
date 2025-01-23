@@ -3,7 +3,7 @@ from datetime import datetime
 
 import pytest
 
-from octopoes.models import ScanLevel, DeclaredScanProfile
+from octopoes.models import DeclaredScanProfile, ScanLevel
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 from octopoes.models.pagination import Paginated
@@ -27,7 +27,11 @@ def test_list_oois(xtdb_ooi_repository: XTDBOOIRepository, valid_time: datetime)
     assert xtdb_ooi_repository.list_oois({Network}, valid_time) == Paginated(count=0, items=[])
 
 
-def test_load_bulk(xtdb_ooi_repository: XTDBOOIRepository, xtdb_scan_profile_repository: XTDBScanProfileRepository, valid_time: datetime):
+def test_load_bulk(
+    xtdb_ooi_repository: XTDBOOIRepository,
+    xtdb_scan_profile_repository: XTDBScanProfileRepository,
+    valid_time: datetime,
+):
     network = Network(name="test")
     xtdb_ooi_repository.save(network, valid_time)
 
@@ -39,9 +43,15 @@ def test_load_bulk(xtdb_ooi_repository: XTDBOOIRepository, xtdb_scan_profile_rep
 
     xtdb_ooi_repository.session.commit()
 
-    xtdb_scan_profile_repository.save(None, DeclaredScanProfile(reference=network.reference, level=ScanLevel.L2), valid_time)
-    xtdb_scan_profile_repository.save(None, DeclaredScanProfile(reference=network2.reference, level=ScanLevel.L2), valid_time)
-    xtdb_scan_profile_repository.save(None, DeclaredScanProfile(reference=network3.reference, level=ScanLevel.L2), valid_time)
+    xtdb_scan_profile_repository.save(
+        None, DeclaredScanProfile(reference=network.reference, level=ScanLevel.L2), valid_time
+    )
+    xtdb_scan_profile_repository.save(
+        None, DeclaredScanProfile(reference=network2.reference, level=ScanLevel.L2), valid_time
+    )
+    xtdb_scan_profile_repository.save(
+        None, DeclaredScanProfile(reference=network3.reference, level=ScanLevel.L2), valid_time
+    )
     xtdb_scan_profile_repository.commit()
 
     networks = xtdb_ooi_repository.load_bulk({network.reference, network2.reference, network3.reference}, valid_time)

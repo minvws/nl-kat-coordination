@@ -135,7 +135,11 @@ class BytesClient:
         return response.content
 
     def get_raws(self, organization_code: str, raw_ids: list[uuid.UUID | str]) -> list[tuple[str, bytes]]:
-        params: dict[str, str | int] = {"limit": len(raw_ids), "organization": organization_code, "raw_ids": raw_ids}
+        params: dict[str, str | int | list[str]] = {
+            "limit": len(raw_ids),
+            "organization": organization_code,
+            "raw_ids": [str(raw_id) for raw_id in raw_ids]
+        }
 
         response = self.session.get("/bytes/raws", params=params)
         response.raise_for_status()
