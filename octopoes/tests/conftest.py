@@ -452,6 +452,7 @@ def seed_report(
     recipe = ReportRecipe(
         recipe_id=uuid.uuid4(),
         report_name_format="test",
+        asset_report_name_format="test",
         cron_expression="* * * *",
         input_recipe={},
         asset_report_types=[],
@@ -502,6 +503,7 @@ def seed_asset_report(
     recipe = ReportRecipe(
         recipe_id=uuid.uuid4(),
         report_name_format="test",
+        asset_report_name_format="test",
         cron_expression="* * * *",
         input_recipe={},
         asset_report_types=[],

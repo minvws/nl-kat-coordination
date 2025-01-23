@@ -250,9 +250,13 @@ class XTDBOOIRepository(OOIRepository):
         stripped = {
             key.split("/")[1]: value
             for key, value in data.items()
-            if key not in [cls.pk_prefix, "user_id", "object_type"]
+            if key not in [cls.pk_prefix, "user_id", "object_type", "_reference"]
         }
         stripped["user_id"] = user_id
+
+        if scan_profiles := data.get("_reference", []):
+            stripped["scan_profile"] = scan_profiles[0]
+
         return object_cls.model_validate(stripped)
 
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
@@ -298,7 +302,11 @@ class XTDBOOIRepository(OOIRepository):
         return {ooi.primary_key: ooi for ooi in oois}
 
     def load_bulk_as_list(self, references: set[Reference], valid_time: datetime) -> list[OOI]:
-        query = generate_pull_query(FieldSet.ALL_FIELDS, {self.pk_prefix: list(map(str, references))})
+        if not references:
+            return []
+
+        query = Query().where_in(OOI, **{"xt/id": references}).pull(OOI, fields="[* {:_reference [*]}]")
+        # breakpoint()
         return [self.deserialize(x[0]) for x in self.session.client.query(query, valid_time)]
 
     def list_oois(
