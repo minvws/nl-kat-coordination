@@ -103,8 +103,10 @@ def test_history(octopoes_api_connector: OctopoesAPIConnector):
     assert len(octopoes_api_connector.get_history(network.reference, limit=2)) == 2
 
     # Test that moving the offset with 1 shifts the result set
-    assert (octopoes_api_connector.get_history(network.reference, offset=0, limit=2)[1] ==
-            octopoes_api_connector.get_history(network.reference, offset=1, limit=2)[0])
+    assert (
+        octopoes_api_connector.get_history(network.reference, offset=0, limit=2)[1]
+        == octopoes_api_connector.get_history(network.reference, offset=1, limit=2)[0]
+    )
     assert len(octopoes_api_connector.get_history(network.reference, offset=2, limit=10)) == 1
     assert len(octopoes_api_connector.get_history(network.reference, offset=2, limit=1)) == 1
 
