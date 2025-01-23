@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-11 11:14+0000\n"
+"POT-Creation-Date: 2025-01-23 20:12+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1093,7 +1093,6 @@ msgstr ""
 
 #: katalogus/templates/partials/plugin_settings_required.html
 #: rocky/templates/findings/finding_add.html
-#: rocky/templates/partials/ooi_detail_related_object.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Add"
 msgstr ""
@@ -3055,7 +3054,6 @@ msgstr ""
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
-#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
@@ -6437,11 +6435,11 @@ msgid "Related objects"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_related_object.html
-msgid "No related objects added to"
+msgid "No related object known for"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_related_object.html
-msgid "Use the button below to add a related object."
+msgid "Add related"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
@@ -6737,13 +6735,12 @@ msgid "Manually added"
 msgstr ""
 
 #: rocky/templates/tasks/ooi_detail_task_list.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "There are no tasks for"
+msgid "There have been no tasks"
 msgstr ""
 
 #: rocky/templates/tasks/ooi_detail_task_list.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "List of tasks for"
+#: rocky/templates/tasks/partials/tab_navigation.html
+msgid "List of tasks"
 msgstr ""
 
 #: rocky/templates/tasks/partials/stats.html
@@ -6762,10 +6759,6 @@ msgstr ""
 msgid "Could not load stats, Scheduler error."
 msgstr ""
 
-#: rocky/templates/tasks/partials/tab_navigation.html
-msgid "List of tasks"
-msgstr ""
-
 #: rocky/templates/tasks/partials/task_actions.html
 msgid "Yielded objects"
 msgstr ""
@@ -6776,6 +6769,14 @@ msgstr ""
 
 #: rocky/templates/tasks/partials/task_actions.html
 msgid "Download task data"
+msgstr ""
+
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "There are no tasks for"
+msgstr ""
+
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "List of tasks for"
 msgstr ""
 
 #: rocky/templates/two_factor/_wizard_actions.html
