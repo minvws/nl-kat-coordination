@@ -37,16 +37,52 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
     assert report_runner.bytes_client.upload_raw.mock_calls[2].kwargs["manual_mime_types"] == {"openkat/report"}
 
     data = json.loads(report_runner.bytes_client.upload_raw.mock_calls[0].kwargs["raw"])
+    data2 = json.loads(report_runner.bytes_client.upload_raw.mock_calls[1].kwargs["raw"])
     data["input_data"]["plugins"]["required"] = set(data["input_data"]["plugins"]["required"])  # ordering issues
 
-    assert data == {
-        "input_data": {
-            "input_oois": ["Hostname|test|example.com", "Hostname|test|a.example.com"],
-            "report_types": ["dns-report"],
-            "plugins": {"required": {"dns-sec", "dns-records"}, "optional": ["dns-zone"]},
+    first_asset_calls = [
+        {
+            'report_data': {
+                    'input_ooi': 'Hostname|test|example.com',
+                    'records': [],
+                    'security': {
+                        'spf': True,
+                        'dkim': True,
+                        'dmarc': True,
+                        'dnssec': True,
+                        'caa': True,
+                    },
+                    'finding_types': []
+            },
+            'input_data': {
+                'input_oois': ['Hostname|test|example.com'],
+                'report_types': ['dns-report'],
+                'plugins': {'required': {'dns-records', 'dns-sec'}, 'optional': ['dns-zone']}
+            }
+        }, {
+            'report_data': {
+                    'input_ooi': 'Hostname|test|a.example.com',
+                    'records': [],
+                    'security': {
+                        'spf': True,
+                        'dkim': True,
+                        'dmarc': True,
+                        'dnssec': True,
+                        'caa': True,
+                    },
+                    'finding_types': []
+            },
+            'input_data': {
+                'input_oois': ['Hostname|test|a.example.com'],
+                'report_types': ['dns-report'],
+                'plugins': {'required': {'dns-records', 'dns-sec'}, 'optional': ['dns-zone']}
+            }
         }
-    }
+    ]
+    assert data in first_asset_calls
+    assert data2 in first_asset_calls
 
+    breakpoint()
     # The order of the OOIs being processed is not guaranteed, so this is a simple workaround
     both_calls = [
         {

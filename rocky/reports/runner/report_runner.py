@@ -125,11 +125,17 @@ def save_report_data(
         additional_input_data = {}
 
     plugins = report_plugins_union([get_report_by_id(type_id) for type_id in recipe.asset_report_types])
-    input_data = {"input_data": {"input_oois": oois, "report_types": recipe.asset_report_types, "plugins": plugins}}
 
     asset_reports = create_asset_reports(
         bytes_client, plugins, observed_at, observed_at, octopoes_api_connector, organization, recipe, report_data
     )
+    input_data = {
+        "input_data": {
+            "input_oois": [asset_report.reference for asset_report in asset_reports],
+            "report_types": recipe.asset_report_types, "plugins": plugins,
+        }
+    }
+
     raw_id = bytes_client.upload_raw(
         raw=ReportDataDict(input_data | additional_input_data).model_dump_json().encode(),
         manual_mime_types={"openkat/report"},
@@ -172,7 +178,7 @@ def create_asset_reports(
     organization: Organization,
     recipe: ReportRecipe,
     report_data: dict,
-):
+) -> list[AssetReport]:
     asset_reports = []
 
     for report_type_id, ooi_data in report_data.items():
