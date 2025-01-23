@@ -5,6 +5,9 @@ from typing import Any
 import structlog
 from django.conf import settings
 from pydantic import RootModel
+
+from integration.conftest import octopoes_api_connector
+from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from tools.models import Organization
 from tools.ooi_helpers import create_ooi
 
@@ -60,6 +63,12 @@ class LocalReportRunner(ReportRunner):
             _, additional_input_data, report_data, report_errors = aggregate_reports(
                 connector, ooi_pks, recipe.asset_report_types, valid_time, report_task.organisation_id
             )
+        elif recipe.report_type == MultiOrganizationReport.id:
+            report_data_multi = collect_report_data(connector, ooi_pks, valid_time)
+            report_data = {
+                MultiOrganizationReport.id: report_data_multi
+            }
+            additional_input_data = MultiOrganizationReport(connector).post_process_data(report_data_multi)
         else:
             report_types = [get_report_by_id(report_type_id) for report_type_id in recipe.asset_report_types]
             error_reports, report_data = collect_reports(valid_time, connector, ooi_pks, report_types)
