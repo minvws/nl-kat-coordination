@@ -39,6 +39,7 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
     data = json.loads(report_runner.bytes_client.upload_raw.mock_calls[0].kwargs["raw"])
     data2 = json.loads(report_runner.bytes_client.upload_raw.mock_calls[1].kwargs["raw"])
     data["input_data"]["plugins"]["required"] = set(data["input_data"]["plugins"]["required"])  # ordering issues
+    data2["input_data"]["plugins"]["required"] = set(data2["input_data"]["plugins"]["required"])  # ordering issues
 
     first_asset_calls = [
         {
@@ -82,52 +83,34 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
     assert data in first_asset_calls
     assert data2 in first_asset_calls
 
-    breakpoint()
-    # The order of the OOIs being processed is not guaranteed, so this is a simple workaround
-    both_calls = [
-        {
-            "report_data": {
-                "input_ooi": "Hostname|test|example.com",
-                "records": [],
-                "security": {"spf": True, "dkim": True, "dmarc": True, "dnssec": True, "caa": True},
-                "finding_types": [],
-            },
-            "input_data": {
-                "input_oois": ["Hostname|test|example.com"],
-                "report_types": ["dns-report"],
-                "plugins": {"required": {"dns-sec", "dns-records"}, "optional": ["dns-zone"]},
-            },
-        },
-        {
-            "report_data": {
-                "input_ooi": "Hostname|test|a.example.com",
-                "records": [],
-                "security": {"spf": True, "dkim": True, "dmarc": True, "dnssec": True, "caa": True},
-                "finding_types": [],
-            },
-            "input_data": {
-                "input_oois": ["Hostname|test|a.example.com"],
-                "report_types": ["dns-report"],
-                "plugins": {"required": {"dns-sec", "dns-records"}, "optional": ["dns-zone"]},
-            },
-        },
-    ]
+    data_report = {
+        'input_data':
+            {
+                'input_oois': [
+                    'AssetReport|Hostname|test|example.com|dns-report',
+                    'AssetReport|Hostname|test|a.example.com|dns-report',
+                ],
+                'report_types': ['dns-report'],
+                'plugins': {
+                    'required': {'dns-records', 'dns-sec'},
+                    'optional': ['dns-zone']
+                }
+            }
+    }
 
-    data_1 = json.loads(report_runner.bytes_client.upload_raw.mock_calls[1].kwargs["raw"])
-    data_1["input_data"]["plugins"]["required"] = set(data_1["input_data"]["plugins"]["required"])  # ordering issues
-    data_2 = json.loads(report_runner.bytes_client.upload_raw.mock_calls[2].kwargs["raw"])
-    data_2["input_data"]["plugins"]["required"] = set(data_2["input_data"]["plugins"]["required"])  # ordering issues
+    report_data = json.loads(report_runner.bytes_client.upload_raw.mock_calls[2].kwargs["raw"])
+    report_data["input_data"]["plugins"]["required"] = set(report_data["input_data"]["plugins"]["required"])  # ordering issues
 
-    assert data_1 in both_calls
-    assert data_2 in both_calls
+    assert report_data == data_report
 
     reports = octopoes_api_connector.list_reports(valid_time)
     assert reports.count == 1
-    report, subreports = reports.items[0]
-    assert len(subreports) == 2
 
-    assert report.name == "Concatenated report for 2 objects"
-    assert f"DNS Report for a.example.com in {date.today().year}" in {x.name for x in subreports}
+    assert reports.items[0].name == "Concatenated report for 2 objects"
+    asset_reports = reports.items[0].input_oois
+    assert len(asset_reports) == 2
+
+    assert f"DNS Report for a.example.com in {date.today().year}" in {x.name for x in asset_reports}
 
     # FIXME: the naming logic in reports/views/mixins.py 107-112 is not right. We expect to find example.com in this
     #  set, but instead only find a.example.com because when ooi_name is 'example.com', the check:

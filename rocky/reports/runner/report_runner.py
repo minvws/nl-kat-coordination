@@ -141,6 +141,7 @@ def save_report_data(
         manual_mime_types={"openkat/report"},
     )
 
+
     report_type_name = str(get_report_by_id(recipe.report_type).name)
     report_name = observed_at.strftime(
         Template(recipe.report_name_format).safe_substitute(oois_count=str(len(oois)), report_type=report_type_name)
@@ -190,8 +191,8 @@ def create_asset_reports(
                     "input_oois": [reference],
                     "report_types": [report_type.id],
                     "plugins": {
-                        "required": [p for p in plugins["required"] if p in report_type.plugins["required"]],
-                        "optional": [p for p in plugins["optional"] if p in report_type.plugins["optional"]],
+                        "required": {p for p in plugins["required"] if p in report_type.plugins["required"]},
+                        "optional": {p for p in plugins["optional"] if p in report_type.plugins["optional"]},
                     },
                 }
             }
