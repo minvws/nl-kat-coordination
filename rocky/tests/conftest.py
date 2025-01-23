@@ -1,8 +1,7 @@
-import uuid
-
 import binascii
 import json
 import logging
+import uuid
 from datetime import datetime, timezone
 from ipaddress import IPv4Address, IPv6Address
 from os import urandom
@@ -1068,6 +1067,7 @@ def plugin_schema_no_required():
             },
         },
     }
+
 
 recipe = ReportRecipe(
     report_type="concatenated-report",

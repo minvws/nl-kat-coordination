@@ -5,6 +5,9 @@ from typing import Any
 import structlog
 from django.conf import settings
 from pydantic import RootModel
+
+from integration.conftest import octopoes_api_connector
+from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from tools.models import Organization
 from tools.ooi_helpers import create_ooi
 
@@ -60,6 +63,12 @@ class LocalReportRunner(ReportRunner):
             _, additional_input_data, report_data, report_errors = aggregate_reports(
                 connector, ooi_pks, recipe.asset_report_types, valid_time, report_task.organisation_id
             )
+        elif recipe.report_type == MultiOrganizationReport.id:
+            report_data_multi = collect_report_data(connector, ooi_pks, valid_time)
+            report_data = {
+                MultiOrganizationReport.id: report_data_multi
+            }
+            additional_input_data = MultiOrganizationReport(connector).post_process_data(report_data_multi)
         else:
             report_types = [get_report_by_id(report_type_id) for report_type_id in recipe.asset_report_types]
             error_reports, report_data = collect_reports(valid_time, connector, ooi_pks, report_types)
@@ -125,11 +134,18 @@ def save_report_data(
         additional_input_data = {}
 
     plugins = report_plugins_union([get_report_by_id(type_id) for type_id in recipe.asset_report_types])
-    input_data = {"input_data": {"input_oois": oois, "report_types": recipe.asset_report_types, "plugins": plugins}}
 
     asset_reports = create_asset_reports(
         bytes_client, plugins, observed_at, observed_at, octopoes_api_connector, organization, recipe, report_data
     )
+    input_data = {
+        "input_data": {
+            "input_oois": [asset_report.reference for asset_report in asset_reports],
+            "report_types": recipe.asset_report_types,
+            "plugins": plugins,
+        }
+    }
+
     raw_id = bytes_client.upload_raw(
         raw=ReportDataDict(input_data | additional_input_data).model_dump_json().encode(),
         manual_mime_types={"openkat/report"},
@@ -172,7 +188,7 @@ def create_asset_reports(
     organization: Organization,
     recipe: ReportRecipe,
     report_data: dict,
-):
+) -> list[AssetReport]:
     asset_reports = []
 
     for report_type_id, ooi_data in report_data.items():
@@ -184,8 +200,8 @@ def create_asset_reports(
                     "input_oois": [reference],
                     "report_types": [report_type.id],
                     "plugins": {
-                        "required": [p for p in plugins["required"] if p in report_type.plugins["required"]],
-                        "optional": [p for p in plugins["optional"] if p in report_type.plugins["optional"]],
+                        "required": {p for p in plugins["required"] if p in report_type.plugins["required"]},
+                        "optional": {p for p in plugins["optional"] if p in report_type.plugins["optional"]},
                     },
                 }
             }
