@@ -91,6 +91,11 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
 
         return recipes
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["total_schedules"] = len(self.object_list)
+        return context
+
 
 class ScheduledReportsEnableDisableView(BreadcrumbsReportOverviewView, SchedulerView, ListView):
     """
@@ -262,7 +267,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["total_oois"] = len(self.object_list)
+        context["total_reports"] = len(self.object_list)
         context["selected_reports"] = self.request.GET.getlist("report", [])
         return context
 
