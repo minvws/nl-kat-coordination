@@ -15,7 +15,7 @@ from tools.ooi_helpers import create_ooi
 
 from octopoes.models import OOI, Reference
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.ooi.reports import AssetReport, Report, ReportRecipe, HydratedReport
+from octopoes.models.ooi.reports import AssetReport, HydratedReport, Report, ReportRecipe
 from reports.views.base import ReportBreadcrumbs, get_selection
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import OctopoesView, ReportList
@@ -251,7 +251,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
             messages.error(self.request, _("Report names and reports does not match."))
 
         for index, report_id in enumerate(report_references):
-            report_ooi = self.get_report_ooi(report_id)
+            report_ooi = self.get_report_ooi(report_id).to_report()
             report_ooi.name = report_names[index]
 
             try:
