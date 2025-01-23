@@ -7,7 +7,7 @@ import pytest
 
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
+from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel, EmptyScanProfile
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.dns.records import DNSAAAARecord, DNSARecord, DNSMXRecord, DNSNSRecord
 from octopoes.models.ooi.dns.zone import Hostname
@@ -77,6 +77,13 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
         len(octopoes_api_connector.list_origins(origin_type=OriginType.DECLARATION, valid_time=valid_time))
         == len(hostnames) + 1
     )
+
+    bulk_hostnames = octopoes_api_connector.load_objects_bulk({x.reference for x in hostnames}, valid_time)
+
+    assert len(bulk_hostnames) == 10
+
+    for hostname in hostnames:
+        assert bulk_hostnames[hostname.reference].scan_profile is not None
 
 
 def test_history(octopoes_api_connector: OctopoesAPIConnector):
