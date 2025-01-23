@@ -251,7 +251,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
             messages.error(self.request, _("Report names and reports does not match."))
 
         for index, report_id in enumerate(report_references):
-            report_ooi = self.get_report_ooi(report_id)
+            report_ooi = self.get_report_ooi(report_id).to_report()
             report_ooi.name = report_names[index]
 
             try:
