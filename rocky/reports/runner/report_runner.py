@@ -12,7 +12,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference, ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
 from octopoes.models.ooi.reports import AssetReport, Report, ReportRecipe
-from octopoes.models.types import OOIType, type_by_name
+from octopoes.models.types import type_by_name
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.definitions import ReportPlugins, report_plugins_union
 from reports.report_types.helpers import get_report_by_id
@@ -54,7 +54,7 @@ class LocalReportRunner(ReportRunner):
         else:
             raise ValueError("Invalid recipe: no input_oois or query found")
 
-        additional_input_data = {}
+        additional_input_data: dict[str, Any] = {}
 
         if recipe.report_type == AggregateOrganisationReport.id:
             _, additional_input_data, report_data, report_errors = aggregate_reports(
@@ -116,7 +116,7 @@ def save_report_data(
     observed_at: datetime,
     octopoes_api_connector: OctopoesAPIConnector,
     organization: Organization,
-    oois: list[OOIType],
+    oois: list[Reference],
     report_data: dict,
     recipe: ReportRecipe,
     additional_input_data: dict | None = None,

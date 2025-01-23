@@ -402,6 +402,6 @@ def test_generic_OOI_query(mocker):
 
     query.pull(OOI, fields="[* {:_reference [*]}]")
     assert (
-        str(query)
-        == '{:query {:find [(pull OOI [* {:_reference [*]}])] :where [ (or [ OOI :xt/id "test" ] [ OOI :xt/id "test2" ] )]}}'
+        str(query) == "{:query {:find [(pull OOI [* {:_reference [*]}])] "
+        ':where [ (or [ OOI :xt/id "test" ] [ OOI :xt/id "test2" ] )]}}'
     )

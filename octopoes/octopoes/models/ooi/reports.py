@@ -34,7 +34,7 @@ class BaseReport(OOI):
     data_raw_id: str
 
     observed_at: datetime
-    report_recipe: Reference | None = ReferenceField("ReportRecipe", default=None)
+    report_recipe: Reference = ReferenceField("ReportRecipe")
 
 
 class AssetReport(BaseReport):
@@ -98,7 +98,7 @@ class ReportRecipe(OOI):
     asset_report_name_format: Annotated[str, BeforeValidator(lambda x: x.strip()), Field(min_length=1)]
 
     input_recipe: dict[str, Any]  # can contain a query which maintains a live set of OOIs or manually picked OOIs.
-    report_type: str | None = None
+    report_type: Annotated[str, BeforeValidator(lambda x: x.strip()), Field(min_length=1)]
     asset_report_types: list[str]
 
     cron_expression: str | None = None

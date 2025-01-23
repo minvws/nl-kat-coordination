@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass, field, replace
 from uuid import UUID, uuid4
 
@@ -70,7 +71,7 @@ class Query:
     '
     """
 
-    result_type: Ref | None = OOI
+    result_type: Ref = OOI
 
     _where_clauses: list[str] = field(default_factory=list)
     _find_clauses: list[str] = field(default_factory=list)
@@ -86,7 +87,7 @@ class Query:
 
         return new
 
-    def where_in(self, ooi_type: Ref, **kwargs: list[str]) -> Query:
+    def where_in(self, ooi_type: Ref, **kwargs: Iterable[str]) -> Query:
         """Allows for filtering on multiple values for a specific field."""
         new = self._copy()
 
@@ -174,7 +175,7 @@ class Query:
     def count(self, ooi_type: Ref | None = None) -> Query:
         if ooi_type:
             return replace(self, _find_clauses=self._find_clauses + [f"(count {self._get_object_alias(ooi_type)})"])
-        elif self.result_type:
+        else:
             return replace(
                 self, _find_clauses=self._find_clauses + [f"(count {self._get_object_alias(self.result_type)})"]
             )
@@ -257,7 +258,7 @@ class Query:
 
         self._add_where_statement(ref, field_name, self._get_object_alias(value))
 
-    def _where_field_in(self, ref: Ref, field_name: str, values: list[str]) -> None:
+    def _where_field_in(self, ref: Ref, field_name: str, values: Iterable[str]) -> None:
         ooi_type = ref.type if isinstance(ref, Aliased) else ref
 
         if field_name not in ooi_type.model_fields and field_name != "xt/id":
