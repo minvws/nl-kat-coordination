@@ -8,7 +8,7 @@ license = "EUPL"
 [tool.poetry.dependencies]
 python = "^3.10"
 beautifulsoup4 = "^4.11.2"
-Django = "^5.0.10"
+Django = "^5.0.11"
 django-two-factor-auth = "^1.14.0"
 django-environ = "^0.11.2"
 jsonschema = "^4.17.0"
