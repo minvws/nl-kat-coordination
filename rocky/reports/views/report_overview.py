@@ -75,13 +75,14 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
             recipe_id = schedule["data"]["report_recipe_id"]
             report_recipe = self.get_recipe_ooi(recipe_id)
             reports = self.get_reports(recipe_id)
+            schedule_datetime = schedule["deadline_at"]
             recipes.append(
                 {
                     "schedule_id": schedule["id"],
                     "enabled": schedule["enabled"],
                     "recipe": report_recipe,
                     "cron": schedule["schedule"],
-                    "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
+                    "deadline_at": datetime.fromisoformat(schedule["deadline_at"]) if schedule_datetime else "",
                     "reports": reports,
                     "total_oois": len(
                         {asset_report.input_ooi for report in reports for asset_report in report.input_oois}
