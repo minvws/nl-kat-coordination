@@ -337,6 +337,65 @@ class APISchedulerEndpointTestCase(APITemplateTestCase):
         get_item = self.client.get(f"/tasks/{initial_item_id}")
         self.assertEqual(get_item.json().get("status"), models.TaskStatus.DISPATCHED.name.lower())
 
+    def test_pop_queue_multiple(self):
+        # Add one task to the queue
+        first_item = create_task_in(1, self.organisation.id)
+        response = self.client.post(f"/schedulers/{self.scheduler.scheduler_id}/push", data=first_item)
+        first_item_id = response.json().get("id")
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+        # Add second item to the queue
+        second_item = create_task_in(2, self.organisation.id)
+        response = self.client.post(f"/schedulers/{self.scheduler.scheduler_id}/push", data=second_item)
+        second_item_id = response.json().get("id")
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(2, self.scheduler.queue.qsize())
+
+        # Should get two items, and queue should be empty
+        response = self.client.post(f"/schedulers/{self.scheduler.scheduler_id}/pop")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, response.json().get("count"))
+        self.assertEqual(first_item_id, response.json().get("results")[0].get("id"))
+        self.assertEqual(second_item_id, response.json().get("results")[1].get("id"))
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+        # Status of the items should be DISPATCHED
+        get_first_item = self.client.get(f"/tasks/{first_item_id}")
+        get_second_item = self.client.get(f"/tasks/{second_item_id}")
+        self.assertEqual(get_first_item.json().get("status"), models.TaskStatus.DISPATCHED.name.lower())
+        self.assertEqual(get_second_item.json().get("status"), models.TaskStatus.DISPATCHED.name.lower())
+
+    def test_pop_queue_multiple_pagination(self):
+        # Add 10 tasks to the queue
+        for i in range(10):
+            item = create_task_in(1, self.organisation.id)
+            response = self.client.post(f"/schedulers/{self.scheduler.scheduler_id}/push", data=item)
+            self.assertEqual(response.status_code, 201)
+
+        # Should get 5 items, and queue should have 5 items
+        response = self.client.post(f"/schedulers/{self.scheduler.scheduler_id}/pop?limit=5")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(10, response.json().get("count"))
+        self.assertEqual(5, self.scheduler.queue.qsize())
+        self.assertEqual(5, len(response.json().get("results")))
+
+        # Status of the items should be DISPATCHED
+        for item in response.json().get("results"):
+            get_item = self.client.get(f"/tasks/{item.get('id')}")
+            self.assertEqual(get_item.json().get("status"), models.TaskStatus.DISPATCHED.name.lower())
+
+        # Should get 5 items, and queue should be empty
+        response = self.client.post(f"/schedulers/{self.scheduler.scheduler_id}/pop?limit=5")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(5, response.json().get("count"))
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+        # Status of the items should be DISPATCHED
+        for item in response.json().get("results"):
+            get_item = self.client.get(f"/tasks/{item.get('id')}")
+            self.assertEqual(get_item.json().get("status"), models.TaskStatus.DISPATCHED.name.lower())
+
     def test_pop_queue_not_found(self):
         mock_id = uuid.uuid4()
         response = self.client.post(f"/schedulers/{mock_id}/pop")

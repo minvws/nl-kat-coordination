@@ -34,7 +34,7 @@ class ReportScheduler(Scheduler):
         scheduled.
         """
         # Rescheduling
-        self.run_in_thread(name=f"ReportScheduler-rescheduling", target=self.process_rescheduling, interval=60.0)
+        self.run_in_thread(name="ReportScheduler-rescheduling", target=self.process_rescheduling, interval=60.0)
         self.logger.info(
             "Report scheduler started", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
         )
