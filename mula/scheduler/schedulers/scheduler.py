@@ -350,8 +350,8 @@ class Scheduler(abc.ABC):
 
         # When a Schedule does not have a schedule (cron expression), we
         # calculate the deadline when a Schedules specified a way to calculate
-        # this. Otherwise we set the deadline to make sure the Schedule will
-        # not continue to be processed.
+        # this. Otherwise we set the deadline to None make sure the Schedule
+        # will not continue to be processed.
         if schedule_db.schedule is not None:
             schedule_db.deadline_at = cron.next_run(schedule_db.schedule)
         elif self.auto_calculate_deadline:
