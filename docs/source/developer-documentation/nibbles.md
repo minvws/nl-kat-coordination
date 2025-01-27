@@ -247,6 +247,8 @@ The process of creating a nibble involves the following steps:
 5. **Step 5**: Writing the Jmespath query
 6. **Step 6**: Writing the nibble code
 
+TODO: Explain process per step.
+
 ### 4.2 Nibble Query Template
 
 Most of the times, the hardest part of writing a nibble is creating the appropriate nibble query.
