@@ -45,11 +45,20 @@ nibbles are a replacement for bits, offering a different and improved approach. 
 
 ### 1.1 Description
 
+Nibbles are a flexible replacement for bits designed to process changes in the graph efficiently. Unlike bits, nibbles leverage a signature-based system to extract and operate on complex data sets without being bound to a single input object type. This design enhances their ability to handle more complex data structures, enabling more flexibility across use cases.
+The concept of a nibble revolves around its signature, which defines the input data types required for its execution. By utilizing queries to determine input objects dynamically, nibbles minimize redundant operations and try to focus on relevant data.
+
+Key features of nibbles include:
+
+- **Dynamic Input Determination:** Input data is selected based on queries
+- **Flexibility and Scalability:** Nibbles can handle more complex data structures without sacrificing efficiency
+- **Reduced Redundancy:** By eliminating unnecessary runs, nibbles ensure performance
+
 ### 1.2 Main Idea and Flow
 
 #### Flow (without cache)
 
-The main flow looks something like this:
+The main flow looks something like this, oversimplified for understanding:
 
 1. New OOI is created
 2. Search for all nibbles that match the OOI type in its signature.
@@ -58,7 +67,7 @@ The main flow looks something like this:
    2. Extract all objects in the nibble's signature from the query results using JMESPath.
    3. Create a cross-product of all extracted objects.
    4. Start nibble runs for each combination in the cross-product.
-   5. Add all new OOIs to a list
+   5. Add all new OOIs to a stack.
 4. When all nibble runs are complete, write the OOIs in the list to the database.
 
 Now this is already a very performant way of running inferences, since we only write to the database once. However, we can do (and do) better.
@@ -74,7 +83,7 @@ Nibbles use caching to improve performance. The flow with cache looks like this:
    2. Extract all objects in the nibble's signature from the query results using JMESPath.
    3. Create a cross-product of all extracted objects.
    4. Start nibble runs for each combination in the cross-product.
-   5. Add all new OOIs to a list
+   5. Add all new OOIs to a stack.
 4. **When done, recursively search for all nibbles that match the new OOIs in their signature.**
 5. **Go to step 3 for all OOIs.**
 6. When all nibble runs are complete, write the results to the database.
@@ -246,3 +255,25 @@ The general query template for most trivial nibbles is as follows. The template 
 ```
 
 This template assumes that the primary key of one of the required objects is known. The primary key can usually be found in the `:primary_key` attribute of the object.
+
+## 5. Performance
+
+### 5.1 What Did We Already Do?
+
+#### Caching
+
+As mentioned earlier, nibbles use caching to improve performance. The caching step works for nibbles that have only one nibbleParameter. We are planning to upgrade nibbles in the future to cache all other nibbles as well.
+Caching currently works by recursively searching for all nibbles that match the new OOIs in their signature and recalculating.
+
+#### Hashing
+
+To reduce unnecessary nibble runs, a parameter_hash has been implemented within the nibble origin. This mechanism ensures that when the input to a nibble run remains unchanged, the output is assumed to be unchanged as well, and the run can be skipped.
+
+Here’s how it works:
+
+1. **Hash Calculation:** Before saving results in the nibble origin, a hash of the input parameters is computed. These inputs are OOIs but can include other objects as defined in the nibble signature.
+2. **Impact Check on Input:** When a new OOI is created or an existing OOI is updated, the nibble query and JMESPath extraction are performed. Before initiating the nibble run, we check whether the creation or update affected the nibble input by comparing hashes.
+3. **Hash Comparison:** If the new hash matches the previously stored hash, it means the input has not changed. Consequently, the nibble run is skipped, avoiding unnecessary processing.
+
+For example: lets consider a nibble that counts the number of `KAT-UNCOMMON-PORT` `Finding`s on all `IPAddress` objects that are in a `DNSZone`. Now consider that we add a `Finding` to the `IPAddress` that is not a `KAT-UNCOMMON-PORT` `Finding`.
+We run the nibble query, extract the count using Jmespath and find the count has not changed and such the hash also has not changed. The nibble run is skipped.
