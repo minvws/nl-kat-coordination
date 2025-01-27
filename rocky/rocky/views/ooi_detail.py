@@ -91,19 +91,21 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
         context["ooi"] = self.ooi
 
         context.update(self.get_origins(self.ooi.reference, self.organization))
+        if context["inferences"]:
+            inference_params = self.octopoes_api_connector.list_origin_parameters(
+                {inference.origin.id for inference in context["inferences"]}, self.observed_at
+            )
+            inference_params_per_inference = defaultdict(list)
+            for inference_param in inference_params:
+                inference_params_per_inference[inference_param.origin_id].append(inference_param)
 
-        inference_params = self.octopoes_api_connector.list_origin_parameters(
-            {inference.origin.id for inference in context["inferences"]}, self.observed_at
-        )
-        inference_params_per_inference = defaultdict(list)
-        for inference_param in inference_params:
-            inference_params_per_inference[inference_param.origin_id].append(inference_param)
+            inference_origin_params: list[tuple] = []
+            for inference in context["inferences"]:
+                inference_origin_params.append((inference, inference_params_per_inference[inference.origin.id]))
 
-        inference_origin_params: list[tuple] = []
-        for inference in context["inferences"]:
-            inference_origin_params.append((inference, inference_params_per_inference[inference.origin.id]))
-
-        context["inference_origin_params"] = inference_origin_params
+            context["inference_origin_params"] = inference_origin_params
+        else:
+            context["inference_origin_params"] = None
         context["member"] = self.organization_member
 
         # TODO: generic solution to render ooi fields properly: https://github.com/minvws/nl-kat-coordination/issues/145
