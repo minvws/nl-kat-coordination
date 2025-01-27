@@ -194,52 +194,36 @@ Check the Tasks page to verify that all tasks have completed.
 
 Report naming
 =============
+When creating a report, two name formats are needed, one for the overall report and one for the underlying asset reports.
+Every asset report consists of one input object and one report type (e.g. a DNS report for mispo.es).
+The overall report contains all the asset reports and also has its own name.
+
 Reports can be named dynamically based on their input objects and report type.
-This is done through a templating language defined through the following examples.
+The following placeholders can be used to create dynamic report names:
 
-For Single Reports and Concatenated reports we have:
+.. list-table:: Name format
+   :widths: 25 50 50
+   :header-rows: 1
 
-1 report_type and 1 OOI:
- Template: "{report_type} for {ooi}"
+   * - Placeholder
+     - (Overall) report name format
+     - Asset report name format
+   * - ${report_type}
+     - Results in the report type of the overall report, depending on the flow that has been selected. Eg. 'Concatenated Report', 'Aggregate Report' or 'Multi Report'.
+     - Results in the report type of the asset report. E.g. 'DNS Report', 'Mail Report', 'Vulnerability Report'.
+   * - ${ooi}
+     - If there's only one input object selected, this will show the input object. If multiple input objects have been selected, this placeholder will remain visible.
+     - Always results in the input object of the asset report.
+   * - ${oois_count}
+     - Returns the total number of all underlying asset reports.
+     - Always returns '1', since an asset report consists of 1 input object and 1 report type.
 
- Example output: "DNS Report for mispo.es"
+The pre-filled name formats are as follows:
 
->1 report_types and 1 OOI:
- Template: "Concatenated Report for {ooi}"
+- For the (overall) report: '${report_type} for ${oois_count}', which may result in, for example, 'Aggregate Report for 16 objects'
+- For the asset reports: '${report_type} for ${ooi}', which will result in a different name for each asset report. E.g. 'DNS Report for mispo.es'
 
- Example output: "Concatenated Report for mispo.es"
-report_type and >1 OOIs:
- "{report_type} for {n} objects"
-
- Example output: "DNS Report for 3 objects"
-
->1 report_types and >1 OOIs:
- Template: "Concatenated Report for {n} objects"
-
- Example output: "Concatenated Report for 5 objects"
-
-====
-
-For Aggregate Reports and Concatenated Reports we have:
-
-1 OOI:
- Template: "Aggregate Report for {ooi}"
-
- Example output: "Aggregate Report for mispo.es"
-
->1 OOIs:
- "Aggregate Report for {n} objects"
-
- Example output: "Aggregate Report for 6 objects"
-
-====
-
-For Multi Reports we have:
-
-Any amount of OOIs:
- Template: "Multi Report for {n} objects"
-
- Example output: "Multi Report for 2 objects"
+Besides these placeholders, it is also possible to use Python Strftime formats. For example, '%x' results in '01/01/25' and '%X' results in '07:06:05'.
 
 
 Plugins
