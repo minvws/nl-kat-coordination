@@ -164,10 +164,12 @@ graph TD
     Definitions -.-> Nibbler
     Service -.-> Nibbler
     API -.-> Nibbler
-    Nibbler <--> OOI_Repository_Query
-    A[XTDB] --> OOI_Repository_Query
-    OOI_Repository_Query <--> JMESPath
-    Nibbler --> B[XTDB]
+    Nibbler <--> ORNQ[OOI Repository Nibble Query]
+    A[XTDB] -->|JMESPath| ORNQ[OOI Repository Nibble Query]
+    Nibbler --> OR[OOI Repository]
+    Nibbler --> ORR[Origin Repository]
+    OR[OOI Repository] --> A[XTDB]
+    ORR[Origin Repository] --> A[XTDB]
 ```
 
 The nibble runner (nibbler) is typically invoked through [service.py](octopoes/core/service.py), or through the [API](octopoes/api/router.py) by nibble grouped calls.
