@@ -60,7 +60,7 @@ class ReportScheduleStartDateForm(BaseRockyForm):
 
     start_time = forms.TimeField(
         label=_("Start time (UTC)"),
-        widget=forms.TimeInput(format="%H:%M", attrs={"form": "generate_report"}),
+        widget=forms.TimeInput(format="%H:%M", attrs={"type": "time"}),
         initial=lambda: datetime.now(tz=timezone.utc).time(),
         required=True,
         input_formats=["%H:%M"],
@@ -70,7 +70,13 @@ class ReportScheduleStartDateForm(BaseRockyForm):
         label=_("Recurrence"),
         required=True,
         widget=forms.Select(attrs={"form": "generate_report"}),
-        choices=[("daily", _("Daily")), ("weekly", _("Weekly")), ("monthly", _("Monthly")), ("yearly", _("Yearly"))],
+        choices=[
+            ("once", _("No recurrence, just once")),
+            ("daily", _("Daily")),
+            ("weekly", _("Weekly")),
+            ("monthly", _("Monthly")),
+            ("yearly", _("Yearly")),
+        ],
     )
 
     def clean(self):
@@ -121,19 +127,3 @@ class CustomReportScheduleForm(BaseRockyForm):
     end_date = forms.DateField(
         label=_(""), widget=forms.HiddenInput(), initial=lambda: datetime.now(tz=timezone.utc).date(), required=False
     )
-
-
-class ParentReportNameForm(BaseRockyForm):
-    parent_report_name = forms.CharField(
-        label=_("Report name format"), required=False, initial="${report_type} for ${oois_count} objects"
-    )
-
-
-class ChildReportNameForm(BaseRockyForm):
-    child_report_name = forms.CharField(
-        label=_("Subreports name format"), required=True, initial="${report_type} for ${ooi}"
-    )
-
-
-class ReportNameForm(ParentReportNameForm, ChildReportNameForm):
-    pass

@@ -8,6 +8,7 @@ Welcome to the OpenKAT documentation!
    :caption: Contents
 
    introduction/index
+   katalogus/index
    manual/index
    modules/index
    installation-and-deployment/index

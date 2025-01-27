@@ -61,6 +61,6 @@ class ReportRecipe(OOI):
     parent_report_type: str | None = None
     report_types: list[str]
 
-    cron_expression: str
+    cron_expression: str | None = None
 
     _natural_key_attrs = ["recipe_id"]
