@@ -146,9 +146,9 @@ Since nibbles use a query to decide the input, we can either use the query langu
 
 The nibble implementation is composed out of the following components:
 
-- [Definitions](../../../octopoes/octopoes/nibbles/definitions.py)
+- [Definitions](../../../octopoes/nibbles/definitions.py)
   Where most defining structures are defined
-- Nibble Runner: [nibbler](../../../octopoes/octopoes/nibbles/runner.py)
+- Nibble Runner: [nibbler](../../../octopoes/nibbles/runner.py)
   Where the main nibble runner (nibbler) and helper functions are implemented
 - OOI Repositories [nibble query](../../../octopoes/octopoes/repositories/ooi_repository.py)
   Where nibble queries are processed
