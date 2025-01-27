@@ -126,8 +126,10 @@ def test_save_multi_report(
                 "observed_at": valid_time.strftime("%Y-%m-%d"),
                 "ooi": oois_selection,
                 "report_type": ["multi-organization-report"],
-                "old_report_name": ["Sector Report"],
-                "report_name": ["Sector Report"],
+                "start_date": "2024-01-01",
+                "start_time": "10:10",
+                "recurrence": "once",
+                "parent_report_name_format": "${report_type} for ${oois_count} objects",
             },
         ),
         client_member.user,
@@ -136,7 +138,7 @@ def test_save_multi_report(
     response = MultiReportView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 302  # after post follows redirect, this to first create report ID
-    assert "report_id=Report" in response.url
+    assert "/reports/scheduled-reports/" in response.url
 
 
 def test_view_multi_report(
