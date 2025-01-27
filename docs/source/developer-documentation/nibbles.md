@@ -307,3 +307,5 @@ Here’s how it works:
 
 For example: lets consider a nibble that counts the number of `KAT-UNCOMMON-PORT` `Finding`s on all `IPAddress` objects that are in a `DNSZone`. Now consider that we add a `Finding` to the `IPAddress` that is not a `KAT-UNCOMMON-PORT` `Finding`.
 We run the nibble query, extract the count using Jmespath and find the count has not changed and such the hash also has not changed. The nibble run is skipped.
+
+To implement this correctly and to decrease the amount of nibble runs as much as possible, the hashing of these OOIs has to be deterministic. In the example: if the hashing of the `DNSZone` is not deterministic, the nibble run will not always be correctly skipped.
