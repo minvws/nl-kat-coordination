@@ -172,7 +172,7 @@ graph TD
     ORR[Origin Repository] --> A[XTDB]
 ```
 
-The nibble runner (nibbler) is typically invoked through [service.py](octopoes/core/service.py), or through the [API](octopoes/api/router.py) by nibble grouped calls.
+The nibble runner (nibbler) is typically invoked through [service.py](../../../octopoes/octopoes/core/service.py), or through the [API](../../../octopoes/octopoes/api/router.py) by nibble grouped calls.
 
 ### 3.2 Structure of a Nibble
 
