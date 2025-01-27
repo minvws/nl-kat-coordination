@@ -144,6 +144,34 @@ Since nibbles use a query to decide the input, we can either use the query langu
 
 ### 3.1 Architecture
 
+The nibble implementation is composed out of the following components:
+
+- [Definitions](octopoes/nibbles/definitions.py)
+  Where most defining structures are defined
+- Nibble Runner: [nibbler](octopoes/nibbles/runner.py)
+  Where the main nibble runner (nibbler) and helper functions are implemented
+- OOI Repositories [nibble query](octopoes/repositories/ooi_repository.py)
+  Where nibble queries are processed
+- Nibble Origins: [nibblet](octopoes/models/origin.py)
+  Where nibble origins (nibblets) are defined
+- The [Nibble Repository](octopoes/repositories/nibble_repository.py)
+  Where global nibble configurations are stored (when using multiple nibblers)
+
+The components interact schematically as such:
+
+```mermaid
+graph TD
+    Definitions -.-> Nibbler
+    Service -.-> Nibbler
+    API -.-> Nibbler
+    Nibbler <--> OOI_Repository_Query
+    A[XTDB] --> OOI_Repository_Query
+    OOI_Repository_Query <--> JMESPath
+    Nibbler --> B[XTDB]
+```
+
+The nibble runner (nibbler) is typically invoked through [service.py](octopoes/core/service.py), or through the [API](octopoes/api/router.py) by nibble grouped calls.
+
 ### 3.2 Structure of a Nibble
 
 #### Nibble file structure
@@ -267,7 +295,7 @@ Caching currently works by recursively searching for all nibbles that match the 
 
 #### Hashing
 
-To reduce unnecessary nibble runs, a parameter_hash has been implemented within the nibble origin. This mechanism ensures that when the input to a nibble run remains unchanged, the output is assumed to be unchanged as well, and the run can be skipped.
+To reduce unnecessary nibble runs, a parameter_hash has been implemented within the nibble origin (nibblet). This mechanism ensures that when the input to a nibble run remains unchanged, the output is assumed to be unchanged as well, and the run can be skipped.
 
 Here’s how it works:
 
