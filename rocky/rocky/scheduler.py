@@ -7,7 +7,7 @@ import time
 import uuid
 from enum import Enum
 from functools import cached_property
-from typing import Any
+from typing import Any, Literal
 
 import httpx
 import structlog
@@ -193,8 +193,9 @@ class PaginatedSchedulesResponse(BaseModel):
 
 class SchedulerResponse(BaseModel):
     id: str
-    enabled: bool
-    priority_queue: dict[str, Any]
+    type: Literal[BoefjeTask.type | NormalizerTask.type | ReportTask.type]  # type: ignore
+    item_type: BoefjeTask | NormalizerTask | ReportTask
+    qsize: int
     last_activity: str | None
 
 
@@ -321,7 +322,8 @@ class SchedulerClient:
                     time.sleep(interval)
                     continue
                 raise SchedulerHTTPError()
-        return SchedulerResponse.model_validate_json(res.content).enabled
+
+        return scheduler_id in SchedulerResponse.model_validate_json(res.content).type
 
     def patch_schedule(self, schedule_id: str, params: dict[str, Any]) -> None:
         try:

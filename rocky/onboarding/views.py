@@ -329,8 +329,7 @@ class OnboardingSetupScanOOIDetailView(
 
     @staticmethod
     def is_scheduler_enabled(organization: Organization) -> bool:
-        scheduler_id = f"report-{organization.code}"
-        return scheduler_client(organization.code).is_scheduler_ready(scheduler_id)
+        return scheduler_client(organization.code).is_scheduler_ready(scheduler_id="report")
 
     def post(self, request, *args, **kwargs):
         parent_report_name_format, subreport_name_format = self.get_initial_report_names()
