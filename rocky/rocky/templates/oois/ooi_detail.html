@@ -101,6 +101,7 @@
                     </div>
                 {% else %}
                     <div class="system">
+                        {% if not enabled_boefjes_available %}
                             <p>
                                 {% translate "There are no boefjes enabled to scan an OOI of type" %} "{{ ooi.get_ooi_type }}". {% translate "See" %} <a href="{% url "katalogus" organization.code %}">KAT-alogus</a> {% translate "to find and enable boefjes that can scan within the current level." %}
                             </p>
