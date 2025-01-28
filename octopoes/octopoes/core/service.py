@@ -267,12 +267,14 @@ class OctopoesService:
         all_declared_scan_profiles = set()
         inherited_scan_profiles = {}
         assigned_scan_levels: dict[Reference, ScanLevel] = {}
-
+        source_scan_profile_references = set()
+        
         # fill profile caches
         for scan_profile in all_scan_profiles:
             if isinstance(scan_profile, DeclaredScanProfile):
                 all_declared_scan_profiles.update(scan_profile)
                 assigned_scan_levels[scan_profile.reference] = scan_profile.level
+                source_scan_profile_references.update(scan_profile.reference)
             elif isinstance(scan_profile, InheritedScanProfile)
                 inherited_scan_profiles[scan_profile.reference] = scan_profile
 
@@ -327,7 +329,6 @@ class OctopoesService:
 
         # Save all assigned scan levels
         update_count = 0
-        source_scan_profile_references = {sp.reference for sp in all_declared_scan_profiles}
         for reference, scan_level in assigned_scan_levels.items():
             # Skip source scan profiles
             if reference in source_scan_profile_references:
