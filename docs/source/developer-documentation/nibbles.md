@@ -60,7 +60,7 @@ Key features of nibbles include:
 
 The main flow looks something like this, oversimplified for understanding:
 
-1. New OOI is created
+1. New OOI (Object Of Interest) is created
 2. Search for all nibbles that match the OOI type in its signature.
 3. For each nibble that is found:
    1. Run a query using the primary key of the new OOI.
