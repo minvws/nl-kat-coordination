@@ -264,21 +264,17 @@ class OctopoesService:
         # fetch all scan profiles
         all_scan_profiles = self.scan_profile_repository.list_scan_profiles(None, valid_time=valid_time)
 
-        # cache all declared
-        all_declared_scan_profiles = {
-            scan_profile for scan_profile in all_scan_profiles if isinstance(scan_profile, DeclaredScanProfile)
-        }
-        # cache all inherited
-        inherited_scan_profiles = {
-            scan_profile.reference: scan_profile
-            for scan_profile in all_scan_profiles
-            if isinstance(scan_profile, InheritedScanProfile)
-        }
+        all_declared_scan_profiles = set()
+        inherited_scan_profiles = {}
+        assigned_scan_levels: dict[Reference, ScanLevel] = {}
 
-        # track all scan level assignments
-        assigned_scan_levels: dict[Reference, ScanLevel] = {
-            scan_profile.reference: scan_profile.level for scan_profile in all_declared_scan_profiles
-        }
+        # fill profile caches
+        for scan_profile in all_scan_profiles:
+            if isinstance(scan_profile, DeclaredScanProfile):
+                all_declared_scan_profiles.update(scan_profile)
+                assigned_scan_levels[scan_profile.reference] = scan_profile.level
+            elif isinstance(scan_profile, InheritedScanProfile)
+                inherited_scan_profiles[scan_profile.reference] = scan_profile
 
         for current_level in range(4, 0, -1):
             # start point: all scan profiles with current level + all higher scan levels
