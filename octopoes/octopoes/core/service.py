@@ -264,10 +264,10 @@ class OctopoesService:
         # fetch all scan profiles
         all_scan_profiles = self.scan_profile_repository.list_scan_profiles(None, valid_time=valid_time)
 
-        all_declared_scan_profiles = set()
-        inherited_scan_profiles = {}
+        all_declared_scan_profiles: set[DeclaredScanProfile] = set()
+        inherited_scan_profiles: dict[Reference, InheritedScanProfile] = {}
         assigned_scan_levels: dict[Reference, ScanLevel] = {}
-        source_scan_profile_references = set()
+        source_scan_profile_references: set[Reference] = set()
 
         # fill profile caches
         for scan_profile in all_scan_profiles:
