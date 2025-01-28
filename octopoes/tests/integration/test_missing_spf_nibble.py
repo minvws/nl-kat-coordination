@@ -109,3 +109,41 @@ def test_missing_spf_nibble_non_tld(xtdb_octopoes_service: OctopoesService, even
 
     assert (xtdb_hostname, None, None) in result[hostname][missing_spf_nibble.id]
     assert len(result[hostname][missing_spf_nibble.id][(xtdb_hostname, None, None)]) == 0
+
+
+def test_multiple_objects_queries(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
+    xtdb_octopoes_service.nibbler.disable()
+
+    hosts = ["example.com", "mispo.es", "potato.xxx"]
+    hostnames = []
+    for i in range(3):
+        network = Network(name="internet" + str(i))
+        xtdb_octopoes_service.ooi_repository.save(network, valid_time)
+        hostname = Hostname(name=hosts[i], network=network.reference)
+        xtdb_octopoes_service.ooi_repository.save(hostname, valid_time)
+        hostnames.append(hostname)
+
+    nx_domain = NXDOMAIN(hostname=hostnames[-1].reference)
+    xtdb_octopoes_service.ooi_repository.save(nx_domain, valid_time)
+
+    txt_record = DNSTXTRecord(hostname=hostnames[0].reference, value="test")
+    xtdb_octopoes_service.ooi_repository.save(txt_record, valid_time)
+    spf_record = DNSSPFRecord(dns_txt_record=txt_record.reference, value="test")
+    xtdb_octopoes_service.ooi_repository.save(spf_record, valid_time)
+
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    result = list(xtdb_octopoes_service.ooi_repository.nibble_query(nx_domain, missing_spf_nibble, valid_time))
+    assert list(result[0]) == [hostnames[-1], None, nx_domain]
+
+    result = list(xtdb_octopoes_service.ooi_repository.nibble_query(hostnames[-1], missing_spf_nibble, valid_time))
+    assert list(result[0]) == [hostnames[-1], None, nx_domain]
+
+    result = list(xtdb_octopoes_service.ooi_repository.nibble_query(hostnames[0], missing_spf_nibble, valid_time))
+    assert list(result[0]) == [hostnames[0], spf_record, None]
+
+    result = list(xtdb_octopoes_service.ooi_repository.nibble_query(spf_record, missing_spf_nibble, valid_time))
+    assert list(result[0]) == [hostnames[0], spf_record, None]
+
+    result = list(xtdb_octopoes_service.ooi_repository.nibble_query(hostnames[1], missing_spf_nibble, valid_time))
+    assert list(result[0]) == [hostnames[1], None, None]
