@@ -14,5 +14,6 @@ RUN if test -f requirements.txt; then pip install -r requirements.txt; fi
 COPY ./images/oci_adapter.py .
 COPY $BOEFJE_PATH $BOEFJE_PATH
 
-ENTRYPOINT ["/usr/local/bin/python", "-m", "oci_adapter"]
 USER nonroot
+
+ENTRYPOINT ["/usr/local/bin/python", "-m", "oci_adapter"]
