@@ -797,6 +797,17 @@ files = [
 ]
 
 [[package]]
+name = "jcs"
+version = "0.2.1"
+description = "JCS - JSON Canonicalization"
+optional = false
+python-versions = ">=3.6.2"
+files = [
+    {file = "jcs-0.2.1-py3-none-any.whl", hash = "sha256:e23a3e1de60f832d33cd811bb9c3b3be79219cdf95f63b88f0972732c3fa8476"},
+    {file = "jcs-0.2.1.tar.gz", hash = "sha256:9f20360b2f3b0a410d65493b448f96306d80e37fb46283f3f4aa5db2c7c1472b"},
+]
+
+[[package]]
 name = "jmespath-community"
 version = "1.1.3"
 description = "JSON Matching Expressions"
@@ -2347,4 +2358,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "e41ab6fe70fe531c50ec680a5620b21e7b5fac4eb45b9841eff945234a445ff2"
+content-hash = "f79d45fed4bf27cd7d15665c1ca25ba5ac85911d4de10abaa89afea63fec62c6"
