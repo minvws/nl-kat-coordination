@@ -1,6 +1,9 @@
+from unittest.mock import ANY, call
+
 from django.urls import resolve, reverse
 from pytest_django.asserts import assertContains
 
+from octopoes.models import Reference
 from octopoes.models.tree import ReferenceTree
 from rocky.views.ooi_tree import OOITreeView
 from tests.conftest import setup_request
@@ -30,7 +33,13 @@ def test_ooi_tree(rf, client_member, mock_organization_view_octopoes):
     response = OOITreeView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
-    assert mock_organization_view_octopoes().get_tree.call_count == 1
+    mock_organization_view_octopoes().get_tree.assert_has_calls(
+        [
+            call(Reference("Network|testnetwork"), valid_time=ANY, depth=1),
+            call(Reference("Network|testnetwork"), valid_time=ANY, depth=9),
+        ]
+    )
+
     assertContains(response, "testnetwork")
     assertContains(response, "KAT-000")
 
