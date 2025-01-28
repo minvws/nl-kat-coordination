@@ -380,7 +380,7 @@ class SchedulerClient:
     def health(self) -> ServiceHealth:
         return ServiceHealth.model_validate_json(self._get("/health", return_type="content"))
 
-    def _get_task_stats(self, scheduler_id: str, organisation_id: str | None) -> dict:
+    def _get_task_stats(self, scheduler_id: str, organisation_id: str | None = None) -> dict:
         """Return task stats for specific scheduler."""
         if organisation_id is None:
             return self._get(f"/tasks/stats?=scheduler_id={scheduler_id}")  # type: ignore
@@ -400,11 +400,10 @@ class SchedulerClient:
                 stat_sum[timeslot].update(counts)
         return dict(stat_sum)
 
-    # TODO: update
     def get_combined_schedulers_stats(self, scheduler_ids: list) -> dict:
         """Return merged stats for a set of scheduler ids."""
         return SchedulerClient._merge_stat_dicts(
-            dicts=[self._get_task_stats(scheduler_id=scheduler_id) for scheduler_id in scheduler_ids]
+            dicts=[self._get_task_stats(scheduler_id) for scheduler_id in scheduler_ids]
         )
 
     def _get(self, path: str, return_type: str = "json") -> dict | bytes:
