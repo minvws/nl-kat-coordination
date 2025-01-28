@@ -35,13 +35,36 @@ def migration_6f99834a4a5a() -> Session:
         (2, encrypter.encode('{"key1": "val1", "key2": "val2"}'), "dns-records", 2),
         (3, encrypter.encode('{"key2": "val2", "key3": "val3"}'), "nmap", 1),
     ]
-    query = f"INSERT INTO settings (id, values, plugin_id, organisation_pk) values {','.join(map(str, entries))}"  # noqa: S608
-
-    engine.execute(text(query))
+    query = text(
+        "INSERT INTO settings (id, values, plugin_id, organisation_pk) "
+        "VALUES (:id, :values, :plugin_id, :organisation_pk)"
+    )
+    for entry in entries:
+        engine.execute(
+            query,
+            {
+                "id": entry[0],
+                "values": entry[1],
+                "plugin_id": entry[2],
+                "organisation_pk": entry[3]
+            }
+        )
 
     entries = [(1, "dns-records", True, 1), (2, "nmap-udp", True, 1)]
-    query = f"INSERT INTO plugin_state (id, plugin_id, enabled, organisation_pk) values {','.join(map(str, entries))}"  # noqa: S608
-    engine.execute(text(query))
+    query = text(
+        "INSERT INTO plugin_state (id, plugin_id, enabled, organisation_pk) "
+        "VALUES (:id, :plugin_id, :enabled, :organisation_pk)"
+    )
+    for entry in entries:
+        engine.execute(
+            query,
+            {
+                "id": entry[0],
+                "plugin_id": entry[1],
+                "enabled": entry[2],
+                "organisation_pk": entry[3]
+            }
+        )
 
     yield session
     session.commit()
@@ -59,8 +82,20 @@ def test_fail_on_wrong_plugin_ids(migration_6f99834a4a5a):
         (4, encrypter.encode('{"key2": "val2", "key3": "val3"}'), "test-unknown-plugin-id", 1),
         (5, encrypter.encode('{"key1": "val1"}'), "kat_nmap_normalize", 2),
     ]
-    query = f"INSERT INTO settings (id, values, plugin_id, organisation_pk) values {','.join(map(str, entries))}"  # noqa: S608
-    session.execute(text(query))
+    query = text(
+        "INSERT INTO settings (id, values, plugin_id, organisation_pk) "
+        "VALUES (:id, :values, :plugin_id, :organisation_pk)"
+    )
+    for entry in entries:
+        session.execute(
+            query,
+            {
+                "id": entry[0],
+                "values": entry[1],
+                "plugin_id": entry[2],
+                "organisation_pk": entry[3]
+            }
+        )
     session.commit()
     session.close()
 

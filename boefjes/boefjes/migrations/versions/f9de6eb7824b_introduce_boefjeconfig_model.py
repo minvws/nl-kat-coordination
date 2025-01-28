@@ -67,7 +67,7 @@ def upgrade() -> None:
     query = """
     SELECT DISTINCT s.plugin_id FROM settings s left join boefje b on b.plugin_id = s.plugin_id
         where b.plugin_id IS NULL
-    """  # noqa: S608
+    """
 
     to_insert: list[Boefje] = []
 
@@ -80,7 +80,7 @@ def upgrade() -> None:
         if local_plugins[plugin_id].type != "boefje":
             raise ValueError(f"Settings for normalizer or bit found: {plugin_id}. Remove these entries first.")
 
-        res = connection.execute(f"SELECT id FROM boefje where plugin_id = '{plugin_id}'")  # noqa: S608
+        res = connection.execute("SELECT id FROM boefje where plugin_id = %s", (plugin_id))
         if res.fetchone() is not None:
             continue  # The Boefje already exists
 
@@ -122,7 +122,7 @@ def upgrade() -> None:
             logger.warning("Unknown plugin id found: %s. You might have to re-enable the plugin!", plugin_id)
             continue
 
-        res = connection.execute(f"SELECT id FROM boefje where plugin_id = '{plugin_id}'")  # noqa: S608
+        res = connection.execute("SELECT id FROM boefje where plugin_id = %s", (plugin_id))
         if res.fetchone() is not None:
             continue  # The Boefje already exists
 
@@ -145,7 +145,7 @@ def upgrade() -> None:
         for boefje in to_insert
     ]
     query = """INSERT INTO boefje (plugin_id, name, description, scan_level, consumes, produces, environment_keys,
-        oci_image, oci_arguments, version) values %s"""  # noqa: S608
+        oci_image, oci_arguments, version) values %s"""
 
     with connection.begin():
         cursor = connection.connection.cursor()
@@ -155,7 +155,7 @@ def upgrade() -> None:
     query = """
     SELECT DISTINCT p.plugin_id FROM plugin_state p left join normalizer n on n.plugin_id = p.plugin_id
         where n.plugin_id IS NULL
-    """  # noqa: S608
+    """
 
     for plugin_id_output in connection.execute(query).fetchall():
         plugin_id = plugin_id_output[0]
@@ -163,7 +163,7 @@ def upgrade() -> None:
             logger.warning("Unknown plugin id found: %s. You might have to re-enable the plugin!", plugin_id)
             continue
 
-        res = connection.execute(f"SELECT id FROM normalizer where plugin_id = '{plugin_id}'")  # noqa: S608
+        res = connection.execute("SELECT id FROM normalizer where plugin_id = %s", (plugin_id))
         if res.fetchone() is not None:
             continue  # The Normalizer already exists
 
@@ -183,7 +183,7 @@ def upgrade() -> None:
         for normalizer in normalizers_to_insert
     ]
     query = """INSERT INTO normalizer (plugin_id, name, description, consumes, produces, environment_keys, version)
-        values %s"""  # noqa: S608
+        values %s"""
 
     with connection.begin():
         cursor = connection.connection.cursor()

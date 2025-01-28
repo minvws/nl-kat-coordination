@@ -44,8 +44,20 @@ def test_setting_to_settings_json(migration_197672984df0):
 
     encrypter = create_encrypter()
     entries = _collect_entries(encrypter)
-    query = f"INSERT INTO setting (key, value, organisation_pk, plugin_id) values {','.join(map(str, entries))}"  # noqa: S608
-    session.get_bind().execute(text(query))
+    query = text(
+        "INSERT INTO setting (key, value, organisation_pk, plugin_id) "
+        "VALUES (:key, :value, :organisation_pk, :plugin_id)"
+    )
+    for entry in entries:
+        session.get_bind().execute(
+            query,
+            {
+                "key": entry[0],
+                "value": entry[1],
+                "organisation_pk": entry[2],
+                "plugin_id": entry[3]
+            }
+        )
 
     alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "cd34fdfafdaf"])
 
