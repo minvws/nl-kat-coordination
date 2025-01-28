@@ -272,9 +272,9 @@ class OctopoesService:
         # fill profile caches
         for scan_profile in all_scan_profiles:
             if isinstance(scan_profile, DeclaredScanProfile):
-                all_declared_scan_profiles.update(scan_profile)
+                all_declared_scan_profiles.add(scan_profile)
                 assigned_scan_levels[scan_profile.reference] = scan_profile.level
-                source_scan_profile_references.update(scan_profile.reference)
+                source_scan_profile_references.add(scan_profile.reference)
             elif isinstance(scan_profile, InheritedScanProfile):
                 inherited_scan_profiles[scan_profile.reference] = scan_profile
 
