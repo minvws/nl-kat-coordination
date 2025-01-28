@@ -12,7 +12,7 @@ class Reference(str):
     @classmethod
     def parse(cls, ref_str: str) -> tuple[str, str]:
         object_type, *natural_key_parts = ref_str.split("|", 1)
-        return object_type, natural_key_parts[0] if natural_key_parts else ''
+        return object_type, natural_key_parts[0] if natural_key_parts else ""
 
     @property
     def class_(self) -> str:
