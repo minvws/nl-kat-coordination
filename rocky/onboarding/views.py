@@ -338,7 +338,7 @@ class OnboardingSetupScanOOIDetailView(
             parent_report_name_format, subreport_name_format, parent_report_type, None
         )
         if self.is_scheduler_enabled(self.organization):
-            self.create_report_schedule(report_recipe, datetime.now(timezone.utc))
+            self.create_report_schedule(self.organization.code, report_recipe, datetime.now(timezone.utc))
 
         return redirect(
             reverse("step_report", kwargs={"organization_code": self.organization.code})

@@ -7,7 +7,7 @@ import time
 import uuid
 from enum import Enum
 from functools import cached_property
-from typing import Any, Literal
+from typing import Any
 
 import httpx
 import structlog
@@ -151,6 +151,7 @@ class ScheduleRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     scheduler_id: str
+    organisation: str
     data: dict
     schedule: str | None = None
     deadline_at: str
@@ -193,8 +194,8 @@ class PaginatedSchedulesResponse(BaseModel):
 
 class SchedulerResponse(BaseModel):
     id: str
-    type: Literal[BoefjeTask.type | NormalizerTask.type | ReportTask.type]  # type: ignore
-    item_type: BoefjeTask | NormalizerTask | ReportTask
+    type: str
+    item_type: str
     qsize: int
     last_activity: str | None
 
@@ -322,8 +323,8 @@ class SchedulerClient:
                     time.sleep(interval)
                     continue
                 raise SchedulerHTTPError()
-
-        return scheduler_id in SchedulerResponse.model_validate_json(res.content).type
+        scheduler_response = SchedulerResponse.model_validate_json(res.content)
+        return scheduler_id == scheduler_response.id
 
     def patch_schedule(self, schedule_id: str, params: dict[str, Any]) -> None:
         try:
@@ -338,6 +339,7 @@ class SchedulerClient:
             res = self._client.post("/schedules", json=schedule.model_dump(exclude_none=True))
             res.raise_for_status()
             logger.info("Schedule created", event_code=800081, schedule=schedule)
+
             return ScheduleResponse.model_validate_json(res.content)
         except (ValidationError, HTTPStatusError, ConnectError):
             raise SchedulerValidationError(extra_message="Report schedule failed: ")
