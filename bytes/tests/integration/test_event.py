@@ -7,7 +7,7 @@ from tests.loading import get_raw_data_meta
 
 
 def test_event_published_successfully(event_manager: RabbitMQEventManager) -> None:
-    test_organization = "event-test"
+    test_organization = "test"
     raw_data_meta = get_raw_data_meta()
 
     # We use an isolated queue this way to not conflict with other integration tests
