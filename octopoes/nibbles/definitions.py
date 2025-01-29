@@ -4,7 +4,7 @@ import pkgutil
 from collections.abc import Callable, Iterable
 from pathlib import Path
 from types import MethodType, ModuleType
-from typing import Any
+from typing import Any, get_origin
 
 import structlog
 from pydantic import BaseModel
@@ -34,7 +34,11 @@ class NibbleParameter(BaseModel):
 
     @property
     def triggers(self) -> set[type[OOI]]:
-        if isinstance(self.object_type, type) and issubclass(self.object_type, OOI):
+        if (
+            isinstance(self.object_type, type)
+            and get_origin(self.object_type) is None
+            and issubclass(self.object_type, OOI)
+        ):
             return {self.object_type} | self.additional
         else:
             return self.additional
