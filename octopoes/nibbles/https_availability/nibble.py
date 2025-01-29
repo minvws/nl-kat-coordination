@@ -23,7 +23,7 @@ def query(targets: list[Reference | None]) -> str:
             [?ipservice :IPService/ip_port ?ipport80]
             [?ipport80 :IPPort/port 80]
             [?ipport80 :IPPort/address ?ipaddress]
-            (or
+            (or-join [?ipport443 ?ipaddress]
                (and [?ipport443 :IPPort/address ?ipaddress][?ipport443 :IPPort/port 443])
                [(identity nil) ?ipport443]
             )
@@ -31,7 +31,8 @@ def query(targets: list[Reference | None]) -> str:
     ]
 
     ref_queries = [
-        f'[?ipaddress :IPAddress/primary_key "{str(targets[0])}"]',
+        f'(or [?ipaddress :IPAddressV4/primary_key "{str(targets[0])}"]\
+[?ipaddress :IPAddressV6/primary_key "{str(targets[0])}"])',
         f'[?ipport80 :IPPort/primary_key "{str(targets[1])}"]',
         f'[?website :Website/primary_key "{str(targets[2])}"]',
     ]
