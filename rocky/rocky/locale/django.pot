@@ -6751,10 +6751,6 @@ msgstr ""
 msgid "Could not load stats, Scheduler error."
 msgstr ""
 
-#: rocky/templates/tasks/partials/tab_navigation.html
-msgid "List of tasks"
-msgstr ""
-
 #: rocky/templates/tasks/partials/task_actions.html
 msgid "Yielded objects"
 msgstr ""
