@@ -4,6 +4,7 @@ from itertools import permutations
 from unittest.mock import Mock
 
 import pytest
+from jmespath import search
 from nibbles.internetnl.nibble import NIBBLE as internetnl
 from nibbles.internetnl.nibble import query
 
@@ -121,11 +122,43 @@ def test_internetnl_nibble_query(xtdb_octopoes_service: OctopoesService, event_m
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     edn = query([None, None])
-    print(edn)
     result = xtdb_octopoes_service.ooi_repository.session.client.query(edn)
-    print(result)
+    assert (
+        len(
+            {
+                xtdb_octopoes_service.ooi_repository.parse_as(Hostname, obj)
+                for obj in search(internetnl.signature[0].parser, result)
+            }
+        )
+        == 3
+    )
+    assert (
+        len(
+            {
+                xtdb_octopoes_service.ooi_repository.parse_as(list[Finding], obj)
+                for obj in search(internetnl.signature[1].parser, result)
+            }.pop()
+        )
+        == 6
+    )
 
     edn = query([Reference.from_str("Hostname|internet|www.x1.xyz"), None])
-    print(edn)
     result = xtdb_octopoes_service.ooi_repository.session.client.query(edn)
-    print(result)
+    assert (
+        len(
+            {
+                xtdb_octopoes_service.ooi_repository.parse_as(Hostname, obj)
+                for obj in search(internetnl.signature[0].parser, result)
+            }
+        )
+        == 1
+    )
+    assert (
+        len(
+            {
+                xtdb_octopoes_service.ooi_repository.parse_as(list[Finding], obj)
+                for obj in search(internetnl.signature[1].parser, result)
+            }.pop()
+        )
+        == 2
+    )
