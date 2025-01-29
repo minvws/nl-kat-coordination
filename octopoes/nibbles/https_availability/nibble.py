@@ -31,7 +31,8 @@ def query(targets: list[Reference | None]) -> str:
     ]
 
     ref_queries = [
-        f'(or [?ipaddress :IPAddressV4/primary_key "{str(targets[0])}"] [?ipaddress :IPAddressV6/primary_key "{str(targets[0])}"])',
+        f'(or [?ipaddress :IPAddressV4/primary_key "{str(targets[0])}"]\
+[?ipaddress :IPAddressV6/primary_key "{str(targets[0])}"])',
         f'[?ipport80 :IPPort/primary_key "{str(targets[1])}"]',
         f'[?website :Website/primary_key "{str(targets[2])}"]',
     ]

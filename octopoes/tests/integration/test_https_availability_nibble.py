@@ -4,7 +4,8 @@ from itertools import permutations
 from unittest.mock import Mock
 
 import pytest
-from nibbles.https_availability.nibble import NIBBLE as https_availability, query
+from nibbles.https_availability.nibble import NIBBLE as https_availability
+from nibbles.https_availability.nibble import query
 
 from octopoes.core.service import OctopoesService
 from octopoes.models.ooi.dns.zone import Hostname
@@ -20,7 +21,9 @@ if os.environ.get("CI") != "1":
 STATIC_IP = ".".join(4 * ["1"])
 
 
-def create_port(xtdb_ooi_repository: XTDBOOIRepository, refs: tuple, ip: str, port: int, valid_time: datetime) -> IPAddressV4:
+def create_port(
+    xtdb_ooi_repository: XTDBOOIRepository, refs: tuple, ip: str, port: int, valid_time: datetime
+) -> IPAddressV4:
     network, hostname, service = refs
     ip = IPAddressV4(address=ip, network=network)
     port = IPPort(port=port, address=ip.reference, protocol=Protocol.TCP)
