@@ -396,11 +396,10 @@ class SchedulerClient:
 
         return TypeAdapter(list[Queue]).validate_json(response.content)
 
-    def pop_item(self, scheduler_id: str) -> Task | None:
+    def pop_item(self, scheduler_id: str) -> PaginatedTasksResponse:
         response = self._client.post(f"/schedulers/{scheduler_id}/pop")
         response.raise_for_status()
-
-        return TypeAdapter(Task | None).validate_json(response.content)
+        return PaginatedTasksResponse.model_validate_json(response.content)
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
         response = self._client.patch(f"/tasks/{task_id}", json={"status": status.value})
