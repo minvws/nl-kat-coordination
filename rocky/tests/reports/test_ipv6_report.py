@@ -9,7 +9,7 @@ def test_ipv6_report_hostname_with_ipv6(mock_octopoes_api_connector, valid_time,
 
     report = IPv6Report(mock_octopoes_api_connector)
 
-    data = report.collect_data([str(hostname.reference)], valid_time)[str(hostname.reference)]
+    data = report.collect_data([hostname.reference], valid_time)[hostname.reference]
 
     assert data[hostname.name] == {"enabled": True}
 
@@ -22,7 +22,7 @@ def test_ipv6_report_hostname_without_ipv6(mock_octopoes_api_connector, valid_ti
 
     report = IPv6Report(mock_octopoes_api_connector)
 
-    data = report.collect_data([str(hostname.reference)], valid_time)[str(hostname.reference)]
+    data = report.collect_data([hostname.reference], valid_time)[hostname.reference]
 
     assert data[hostname.name] == {"enabled": False}
 
@@ -36,7 +36,7 @@ def test_ipv6_report_ipv4_without_ipv6(mock_octopoes_api_connector, valid_time, 
 
     report = IPv6Report(mock_octopoes_api_connector)
 
-    data = report.collect_data([str(ipaddressv4.reference)], valid_time)[str(ipaddressv4.reference)]
+    data = report.collect_data([ipaddressv4.reference], valid_time)[ipaddressv4.reference]
 
     assert data[hostname.name] == {"enabled": False}
 
@@ -50,7 +50,7 @@ def test_ipv6_report_ipv4_with_ipv6(mock_octopoes_api_connector, valid_time, hos
 
     report = IPv6Report(mock_octopoes_api_connector)
 
-    data = report.collect_data([str(ipaddressv4.reference)], valid_time)[str(ipaddressv4.reference)]
+    data = report.collect_data([ipaddressv4.reference], valid_time)[ipaddressv4.reference]
 
     assert data[hostname.name] == {"enabled": True}
 
