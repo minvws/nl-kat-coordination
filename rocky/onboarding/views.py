@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from account.forms import MemberRegistrationForm, OnboardingOrganizationUpdateForm, OrganizationForm
@@ -339,7 +339,7 @@ class OnboardingSetupScanOOIDetailView(
             report_name_format, asset_report_name_format, parent_report_type, None
         )
         if self.is_scheduler_enabled(self.organization):
-            self.create_report_schedule(report_recipe, datetime.now(timezone.utc))
+            self.create_report_schedule(report_recipe, datetime.now(timezone.utc) + timedelta(minutes=2))
 
         return redirect(
             reverse("step_report", kwargs={"organization_code": self.organization.code})
