@@ -47,7 +47,7 @@ def query(targets: list[Reference | None]) -> str:
         """
             [?hostname :object_type "Hostname"]
             [?website :Website/hostname ?hostname]
-            (or-join [?finding]
+            (or-join [?finding ?hostname ?website]
                 [?finding :Finding/ooi ?hostname]
                 (and
                     [?hostnamehttpurl :HostnameHTTPURL/netloc ?hostname]
