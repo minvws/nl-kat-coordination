@@ -4,7 +4,6 @@ from pathlib import Path
 
 import alembic.config
 import pytest
-from pika.amqp_object import Method
 from pydantic import ValidationError
 from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient

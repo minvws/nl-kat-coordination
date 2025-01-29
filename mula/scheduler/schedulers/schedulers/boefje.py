@@ -1,7 +1,6 @@
 import uuid
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
-from types import SimpleNamespace
 from typing import Any, Literal
 
 from opentelemetry import trace
