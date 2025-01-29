@@ -6,8 +6,6 @@ EXPOSE 8000
 ARG USER_UID=1000
 ARG USER_GID=1000
 
-ENTRYPOINT ["/app/scheduler/entrypoint.sh"]
-
 RUN groupadd --gid "$USER_GID" scheduler
 RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" scheduler
 
@@ -24,6 +22,8 @@ RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip \
     && if [ "$ENVIRONMENT" = "dev" ]; then pip install -r requirements-dev.txt; fi
 
 USER scheduler
+
+ENTRYPOINT ["/app/scheduler/entrypoint.sh"]
 
 CMD ["python", "-m", "scheduler"]
 
