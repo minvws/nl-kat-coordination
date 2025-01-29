@@ -10,7 +10,7 @@ import structlog
 from pydantic import BaseModel
 from xxhash import xxh3_128_hexdigest as xxh3
 
-from octopoes.models import OOI, Reference
+from octopoes.models import OOI, Reference, ScanLevel
 
 NIBBLES_DIR = Path(__file__).parent
 NIBBLE_ATTR_NAME = "NIBBLE"
@@ -50,6 +50,7 @@ class NibbleDefinition(BaseModel):
     query: str | Callable[[list[Reference | None]], str] | None = None
     enabled: bool = True
     additional: set[type[OOI]] = set()
+    minimal_scan_level: ScanLevel | None = None
     _payload: MethodType | None = None
     _checksum: str | None = None
 

@@ -395,6 +395,17 @@ class OctopoesService:
         )
         logger.info("Recalculated scan profiles")
 
+    def nibblet_toggle_phantom_result(self, origin_id: str, valid_time: datetime) -> None:
+        origin = self.origin_repository.get(origin_id, valid_time)
+        if origin.origin_type == OriginType.NIBBLET and origin.phantom_result is not None:
+            if origin.result and not origin.phantom_result:
+                origin.phantom_result = self.ooi_repository.load_bulk_as_list(set(origin.result), valid_time)
+                origin.result = []
+            elif origin.phantom_result and not origin.result:
+                origin.result = [result.reference for result in origin.phantom_result]
+                origin.phantom_result = []
+            self.origin_repository.save(origin, valid_time)
+
     def process_event(self, event: DBEvent) -> None:
         # handle event
         event_handler_name = f"_on_{event.operation_type.value}_{event.entity_type}"
