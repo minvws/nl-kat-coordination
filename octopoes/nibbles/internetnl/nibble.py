@@ -67,27 +67,30 @@ def query(targets: list[Reference | None]) -> str:
         """
     ]
 
+    null_query = '{:query {:find [(pull ?var [])] :where [[?var :object_type ""]]}}'
     sgn = "".join(str(int(isinstance(target, Reference))) for target in targets)
     ref_query = ["[?hostname :Hostname/primary_key]"]
-    if sgn == "100":
+    if sgn.startswith("1"):
         ref_query = [f'[?hostname :Hostname/primary_key "{str(targets[0])}"]']
-    elif sgn == "010":
-        ref_query = [f'[?hostname :Hostname/primary_key "{str(targets[1]).split("|")[-1]}"]']
-    elif sgn == "001":
-        tokens = str(targets[2]).split("|")[1:-1]
-        target_reference = Reference.from_str("|".join(tokens))
-        if tokens[0] == "Hostname":
-            hostname = target_reference.tokenized
-        elif tokens[0] in {"HostnameHTTPURL", "Website"}:
-            hostname = target_reference.tokenized.hostname
-        elif tokens[0] == "HTTPResource":
-            hostname = target_reference.tokenized.website.hostname
-        elif tokens[0] == "HTTPHeader":
-            hostname = target_reference.tokenized.resource.website.hostname
+    elif sgn.endswith("1"):
+        ref = str(targets[1]).split("|")
+        if ref[-1] == "KAT-INTERNETNL":
+            return null_query
         else:
-            raise ValueError()
-        hostname_pk = Hostname(name=hostname.name, network=Network(name=hostname.network.name).reference).reference
-        ref_query = [f'[?hostname :Hostname/primary_key "{str(hostname_pk)}"]']
+            tokens = ref[1:-1]
+            target_reference = Reference.from_str("|".join(tokens))
+            if tokens[0] == "Hostname":
+                hostname = target_reference.tokenized
+            elif tokens[0] in {"HostnameHTTPURL", "Website"}:
+                hostname = target_reference.tokenized.hostname
+            elif tokens[0] == "HTTPResource":
+                hostname = target_reference.tokenized.website.hostname
+            elif tokens[0] == "HTTPHeader":
+                hostname = target_reference.tokenized.resource.website.hostname
+            else:
+                return null_query
+            hostname_pk = Hostname(name=hostname.name, network=Network(name=hostname.network.name).reference).reference
+            ref_query = [f'[?hostname :Hostname/primary_key "{str(hostname_pk)}"]']
     return pull(ref_query + base_query)
 
 

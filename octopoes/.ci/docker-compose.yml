@@ -17,7 +17,7 @@ services:
       args:
         ENVIRONMENT: dev
       context: .
-    command: pytest -s tests/integration/test_internetnl_nibble.py --timeout=300
+    command: pytest tests/integration --timeout=300
     depends_on:
       - xtdb
       - ci_octopoes

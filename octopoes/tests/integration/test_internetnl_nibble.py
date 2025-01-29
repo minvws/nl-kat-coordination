@@ -18,7 +18,7 @@ if os.environ.get("CI") != "1":
 STATIC_IP = ".".join((4 * "1 ").split())
 
 
-def test_internetnl_query(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
+def test_internetnl_nibble(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
     xtdb_octopoes_service.nibbler.nibbles = {internetnl.id: internetnl}
 
     network = Network(name="internet")

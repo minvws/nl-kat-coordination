@@ -1,8 +1,11 @@
-import json
 from collections.abc import Iterable
 from datetime import datetime
+from enum import Enum
+from ipaddress import IPv4Address, IPv6Address
 from typing import Any
 
+import jcs
+from pydantic import AnyUrl, BaseModel
 from xxhash import xxh3_128_hexdigest as xxh3
 
 from nibbles.definitions import NibbleDefinition, get_nibble_definitions
@@ -51,21 +54,39 @@ def flatten(items: Iterable[Any | Iterable[Any | None] | None]) -> Iterable[OOI]
             continue
 
 
+def serialize(obj: Any) -> str:
+    """
+    Serialize arbitrary objects
+    """
+
+    def breakdown(obj: Any) -> Iterable[str]:
+        """
+        Breakdown Iterable objects so they can be `model_dump`'ed
+        """
+        if isinstance(obj, Iterable) and not isinstance(obj, str | bytes):
+            if isinstance(obj, dict):
+                yield jcs.canonicalize(obj).decode()
+            else:
+                for item in obj:
+                    yield from breakdown(item)
+        else:
+            if isinstance(obj, BaseModel):
+                yield serialize(obj.model_dump())
+            elif isinstance(obj, Enum):
+                yield jcs.canonicalize(obj.value).decode()
+            elif isinstance(obj, AnyUrl | IPv6Address | IPv4Address | Reference):
+                yield jcs.canonicalize(str(obj)).decode()
+            else:
+                yield jcs.canonicalize(obj).decode()
+
+    return "|".join(breakdown(obj))
+
+
 def nibble_hasher(data: Iterable, additional: str | None = None) -> str:
     """
     Hash the nibble generated data with its content together with the nibble checksum
     """
-    return xxh3(
-        "".join(
-            [
-                json.dumps(json.loads(ooi.model_dump_json()), sort_keys=True)
-                if isinstance(ooi, OOI)
-                else json.dumps(ooi, sort_keys=True)
-                for ooi in data
-            ]
-        )
-        + (additional or "")
-    )
+    return xxh3("|".join([serialize(ooi) for ooi in data]) + (additional or ""))
 
 
 class NibblesRunner:
@@ -78,9 +99,6 @@ class NibblesRunner:
         self.nibble_repository = nibble_repository
         self.nibbles: dict[str, NibbleDefinition] = get_nibble_definitions()
         self.federated: bool = False
-
-    def __del__(self):
-        self._write(datetime.now())
 
     def update_nibbles(self, valid_time: datetime, new_nibbles: dict[str, NibbleDefinition] = get_nibble_definitions()):
         old_checksums = {nibble.id: nibble._checksum for nibble in self.nibbles.values()}
