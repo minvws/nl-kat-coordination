@@ -4,7 +4,7 @@ import pkgutil
 from collections.abc import Callable, Iterable
 from pathlib import Path
 from types import MethodType, ModuleType
-from typing import Any
+from typing import Any, get_origin
 
 import structlog
 from pydantic import BaseModel
@@ -19,9 +19,10 @@ logger = structlog.get_logger(__name__)
 
 
 class NibbleParameter(BaseModel):
-    object_type: type[Any]
+    object_type: Any
     parser: str = "[]"
     optional: bool = False
+    additional: set[type[OOI]] = set()
 
     def __eq__(self, other):
         if isinstance(other, NibbleParameter):
@@ -31,12 +32,24 @@ class NibbleParameter(BaseModel):
         else:
             return False
 
+    @property
+    def triggers(self) -> set[type[OOI]]:
+        if (
+            isinstance(self.object_type, type)
+            and get_origin(self.object_type) is None
+            and issubclass(self.object_type, OOI)
+        ):
+            return {self.object_type} | self.additional
+        else:
+            return self.additional
+
 
 class NibbleDefinition(BaseModel):
     id: str
     signature: list[NibbleParameter]
     query: str | Callable[[list[Reference | None]], str] | None = None
     enabled: bool = True
+    additional: set[type[OOI]] = set()
     _payload: MethodType | None = None
     _checksum: str | None = None
 
@@ -52,6 +65,10 @@ class NibbleDefinition(BaseModel):
     @property
     def _ini(self) -> dict[str, Any]:
         return {"id": self.id, "enabled": self.enabled, "checksum": self._checksum}
+
+    @property
+    def triggers(self) -> set[type[OOI]]:
+        return set.union(*[sgn.triggers for sgn in self.signature]) | self.additional
 
 
 def get_nibble_definitions() -> dict[str, NibbleDefinition]:
