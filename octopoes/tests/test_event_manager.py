@@ -80,7 +80,7 @@ def test_event_manager_create_empty_scan_profile(mocker, empty_scan_profile):
         "scan_profile_mutations",
         b'{"operation":"create","primary_key":"test_reference","value":{"primary_key":"test_reference",'
         b'"object_type":"test_reference","scan_profile":{"scan_profile_type":"empty","reference":"test_reference",'
-        b'"level":0,"user_id":null}}, "client_id": "test"}',
+        b'"level":0,"user_id":null}},"client_id":"test"}',
         properties=pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent),
     )
 
@@ -180,6 +180,6 @@ def test_event_manager_delete_empty_scan_profile(mocker, empty_scan_profile):
     channel_mock.basic_publish.assert_called_once_with(
         "",
         "scan_profile_mutations",
-        b'{"operation":"delete","primary_key":"test_reference","value":null, "client_id": "test"}',
+        b'{"operation":"delete","primary_key":"test_reference","value":null,"client_id":"test"}',
         properties=pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent),
     )
