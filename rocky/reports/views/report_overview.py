@@ -82,7 +82,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
                     "enabled": schedule["enabled"],
                     "recipe": report_recipe,
                     "cron": schedule["schedule"],
-                    "deadline_at": datetime.fromisoformat(schedule["deadline_at"]) if schedule_datetime else "",
+                    "deadline_at": datetime.fromisoformat(schedule_datetime) if schedule_datetime else "asap",
                     "reports": reports,
                     "total_oois": len(
                         {asset_report.input_ooi for report in reports for asset_report in report.input_oois}
@@ -236,7 +236,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
         deadline_at = datetime.now(timezone.utc).isoformat()
         report_recipe_id = str(report_ooi.report_recipe.tokenized.recipe_id)
         filters = {
-            "filters": [{"column": "data", "field": "report_recipe_id", "operator": "eq", "value": report_recipe_id}]
+            "filters": [{"column": "data", "field": "report_recipe_id", "operator": "==", "value": report_recipe_id}]
         }
         schedule_id = str(self.get_schedule_with_filters(filters).id)
         self.scheduler_client.patch_schedule(schedule_id=schedule_id, params={"deadline_at": deadline_at})
