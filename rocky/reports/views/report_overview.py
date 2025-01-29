@@ -15,7 +15,7 @@ from tools.ooi_helpers import create_ooi
 
 from octopoes.models import OOI, Reference
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.ooi.reports import AssetReport, Report, ReportRecipe, HydratedReport
+from octopoes.models.ooi.reports import AssetReport, HydratedReport, Report, ReportRecipe
 from reports.views.base import ReportBreadcrumbs, get_selection
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import OctopoesView, ReportList
@@ -75,13 +75,14 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
             recipe_id = schedule["data"]["report_recipe_id"]
             report_recipe = self.get_recipe_ooi(recipe_id)
             reports = self.get_reports(recipe_id)
+            deadline_at = schedule["deadline_at"]
             recipes.append(
                 {
                     "schedule_id": schedule["id"],
                     "enabled": schedule["enabled"],
                     "recipe": report_recipe,
                     "cron": schedule["schedule"],
-                    "deadline_at": datetime.fromisoformat(schedule["deadline_at"]),
+                    "deadline_at": datetime.fromisoformat(deadline_at) if deadline_at else "asap",
                     "reports": reports,
                     "total_oois": len(
                         {asset_report.input_ooi for report in reports for asset_report in report.input_oois}
@@ -235,7 +236,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
         deadline_at = datetime.now(timezone.utc).isoformat()
         report_recipe_id = str(report_ooi.report_recipe.tokenized.recipe_id)
         filters = {
-            "filters": [{"column": "data", "field": "report_recipe_id", "operator": "eq", "value": report_recipe_id}]
+            "filters": [{"column": "data", "field": "report_recipe_id", "operator": "==", "value": report_recipe_id}]
         }
         schedule_id = str(self.get_schedule_with_filters(filters).id)
         self.scheduler_client.patch_schedule(schedule_id=schedule_id, params={"deadline_at": deadline_at})
