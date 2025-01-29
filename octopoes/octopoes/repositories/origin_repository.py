@@ -24,9 +24,6 @@ class OriginRepository(Repository):
     def get(self, origin_id: str, valid_time: datetime) -> Origin:
         raise NotImplementedError
 
-    def toggle_phantom_result(self, origin_id: str, valid_time: datetime) -> None:
-        raise NotImplementedError
-
     def save(self, origin: Origin, valid_time: datetime) -> None:
         raise NotImplementedError
 
