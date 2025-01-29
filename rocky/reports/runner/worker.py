@@ -76,7 +76,7 @@ class SchedulerWorkerManager(WorkerManager):
             return
 
         try:
-            queues = self.scheduler.get_queues()
+            queues = self.scheduler.get_scheduler("report")
         except HTTPError:
             # Scheduler is having issues, so make note of it and try again
             logger.exception("Getting the queues from the scheduler failed")

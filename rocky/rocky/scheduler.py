@@ -308,7 +308,7 @@ class SchedulerClient:
         except ConnectError:
             raise SchedulerConnectError()
 
-    def is_scheduler_ready(self, scheduler_id: str) -> bool:
+    def get_scheduler(self, scheduler_id: str) -> SchedulerResponse:
         """Max trials is 100 seconds"""
         trials = 0
         interval = 10  # in seconds
@@ -323,8 +323,8 @@ class SchedulerClient:
                     time.sleep(interval)
                     continue
                 raise SchedulerHTTPError()
-        scheduler_response = SchedulerResponse.model_validate_json(res.content)
-        return scheduler_id == scheduler_response.id
+
+        return SchedulerResponse.model_validate_json(res.content)
 
     def patch_schedule(self, schedule_id: str, params: dict[str, Any]) -> None:
         try:

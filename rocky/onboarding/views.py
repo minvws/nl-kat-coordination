@@ -39,7 +39,6 @@ from onboarding.view_helpers import (
 )
 from rocky.exceptions import RockyError
 from rocky.messaging import clearance_level_warning_dns_report
-from rocky.scheduler import scheduler_client
 from rocky.views.indemnification_add import IndemnificationAddView
 from rocky.views.ooi_view import SingleOOIMixin, SingleOOITreeMixin
 from rocky.views.scheduler import SchedulerView
@@ -327,9 +326,9 @@ class OnboardingSetupScanOOIDetailView(
     permission_required = "tools.can_scan_organization"
     task_type = "report"
 
-    @staticmethod
-    def is_scheduler_enabled(organization: Organization) -> bool:
-        return scheduler_client(organization.code).is_scheduler_ready(scheduler_id="report")
+    def is_scheduler_enabled(self) -> bool:
+        report_scheduler = self.scheduler_client.get_scheduler(scheduler_id="report")
+        return report_scheduler.id == "report"
 
     def post(self, request, *args, **kwargs):
         parent_report_name_format, subreport_name_format = self.get_initial_report_names()
@@ -337,7 +336,7 @@ class OnboardingSetupScanOOIDetailView(
         report_recipe = self.create_report_recipe(
             parent_report_name_format, subreport_name_format, parent_report_type, None
         )
-        if self.is_scheduler_enabled(self.organization):
+        if self.is_scheduler_enabled():
             self.create_report_schedule(self.organization.code, report_recipe, datetime.now(timezone.utc))
 
         return redirect(
