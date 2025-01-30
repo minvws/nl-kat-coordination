@@ -46,7 +46,8 @@
                                     <th scope="col">{% translate "Scan level" %}</th>
                                     <th scope="col">{% translate "Status" %}</th>
                                     <th scope="col">{% translate "Age" %}</th>
-                                    <th scope="col">{% translate "Scan frequency" %}</th>
+                                    <th scope="col">{% translate "Scan interval" %}</th>
+                                    <th scope="col">{% translate "Run on" %}</th>
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
@@ -84,6 +85,9 @@
                                                     {% translate "Default system scan frequency" %}
                                                 {% endif %}
                                             </span>
+                                        </td>
+                                        <td>
+                                            <span title="{{ variant.run_on }}">{{ variant.run_on }}</span>
                                         </td>
                                         <td class="actions">
                                             <button class="expando-button"
