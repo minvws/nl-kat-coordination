@@ -206,7 +206,7 @@ class BoefjeScheduler(Scheduler):
 
                         boefje_tasks.append((boefje_task, org.id))
             except ExternalServiceError:
-                self.logger.exception(
+                self.logger.warning(
                     "Error occurred while processing new boefjes",
                     organisation_id=org.id,
                     scheduler_id=self.scheduler_id,
@@ -427,6 +427,7 @@ class BoefjeScheduler(Scheduler):
             boefje_id=boefje_task.boefje.id,
             ooi_primary_key=boefje_task.input_ooi,
             scheduler_id=self.scheduler_id,
+            organisation_id=organisation_id,
             caller=caller,
         )
 

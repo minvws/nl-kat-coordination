@@ -178,6 +178,7 @@ class NormalizerScheduler(Scheduler):
             normalizer_id=normalizer_task.normalizer.id,
             raw_data_id=normalizer_task.raw_data.id,
             scheduler_id=self.scheduler_id,
+            organisation_id=organisation_id,
             caller=caller,
         )
 

@@ -91,10 +91,11 @@ class ReportScheduler(Scheduler):
         self.push_item_to_queue_with_timeout(task, self.max_tries)
 
         self.logger.info(
-            "Report task pushed to queue",
+            "Created report task",
             task_id=task.id,
             task_hash=task.hash,
             scheduler_id=self.scheduler_id,
+            organisation_id=organisation_id,
             caller=caller,
         )
 
