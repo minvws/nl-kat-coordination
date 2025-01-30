@@ -17,6 +17,7 @@ from octopoes.xtdb.query_builder import generate_pull_query
 
 scan_profile_adapter = TypeAdapter(ScanProfile)
 
+
 class ScanProfileRepository(Repository):
     def __init__(self, event_manager: EventManager):
         self.event_manager = event_manager
