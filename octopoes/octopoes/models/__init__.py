@@ -11,8 +11,7 @@ from pydantic_core.core_schema import ValidationInfo
 class Reference(str):
     @classmethod
     def parse(cls, ref_str: str) -> tuple[str, str]:
-        object_type, *natural_key_parts = ref_str.split("|", 1)
-        return object_type, natural_key_parts[0] if natural_key_parts else ""
+        return ref_str.split("|", 1)
 
     @property
     def class_(self) -> str:
