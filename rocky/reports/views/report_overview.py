@@ -173,6 +173,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
     def run_bulk_actions(self) -> None:
         action = self.request.POST.get("action", "")
         report_references = self.request.POST.getlist("report_reference", [])
+        logger.error("Report_references: %s", report_references)
 
         if action == "rename":
             return self.rename_reports(report_references)
@@ -252,7 +253,13 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
             messages.error(self.request, _("Report names and reports does not match."))
 
         for index, report_id in enumerate(report_references):
-            report_ooi = self.get_report_ooi(report_id).to_report()
+            report_ooi = self.get_report_ooi(report_id)
+
+            if len(report_ooi.input_oois) == 1:
+                report_ooi = report_ooi.input_oois[0]
+            else:
+                report_ooi = report_ooi.to_report()
+
             report_ooi.name = report_names[index]
 
             try:
