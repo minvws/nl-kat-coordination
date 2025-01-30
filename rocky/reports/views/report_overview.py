@@ -253,23 +253,18 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
             messages.error(self.request, _("Report names and reports does not match."))
 
         for index, report_id in enumerate(report_references):
-            report_ooi = self.get_report_ooi(report_id)
-
+            report_ooi = self.get_report_ooi(report_id).to_report()
+            report_ooi.name = report_names[index]
             try:
-                if len(report_ooi.input_oois) > 1:
-                    report_ooi = report_ooi.to_report()
-                    report_ooi.name = report_names[index]
-                    create_ooi(self.octopoes_api_connector, self.bytes_client, report_ooi, datetime.now(timezone.utc))
-                else:
-                    error_reports.append(f'AssetReport "{report_ooi.input_oois[0].name}"')
+                create_ooi(self.octopoes_api_connector, self.bytes_client, report_ooi, datetime.now(timezone.utc))
             except ValidationError:
-                error_reports.append(f'Report "{report_ooi.name}"')
+                error_reports.append(f'"{report_ooi.name}"')
 
         if not error_reports:
             logger.info("Reports created", event_code=800071, reports=report_references)
             return messages.success(self.request, _("Reports successfully renamed."))
 
-        return messages.error(self.request, _("{} could not be renamed.").format(", ".join(error_reports)))
+        return messages.error(self.request, _("Report {} could not be renamed.").format(", ".join(error_reports)))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

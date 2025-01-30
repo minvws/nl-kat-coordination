@@ -1073,7 +1073,6 @@ recipe = ReportRecipe(
     report_type="concatenated-report",
     recipe_id=uuid.uuid4(),
     report_name_format="test",
-    asset_report_name_format="test",
     cron_expression="* * * *",
     input_recipe={},
     asset_report_types=[],
@@ -1287,7 +1286,6 @@ def report_recipe():
     return ReportRecipe(
         recipe_id="744d054e-9c70-4f18-ad27-122cfc1b7903",
         report_name_format="Test Report Name Format",
-        asset_report_name_format="Test Subreport Name Format",
         input_recipe={"input_oois": ["Hostname|internet|mispo.es"]},
         asset_report_types=["dns-report"],
         cron_expression="0 0 * * *",

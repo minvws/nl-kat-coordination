@@ -48,7 +48,6 @@ def test_ooi_edit_report_recipe_post(
                 "user": client_member.user.email,
                 "recipe_id": report_recipe.recipe_id,
                 "report_name_format": report_recipe.report_name_format,
-                "asset_report_name_format": report_recipe.asset_report_name_format,
                 "input_recipe": json.dumps(report_recipe.input_recipe),
                 "asset_report_types": json.dumps(report_recipe.asset_report_types),
                 "cron_expression": report_recipe.cron_expression,
