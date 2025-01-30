@@ -6,7 +6,7 @@
         <button type="button"
                 aria-controls="user-profile"
                 aria-expanded="false"
-                class="dropdown-button">
+                class="dropdown-button user-icon">
             {% if user.full_name %}
                 {{ user.full_name|slice:"1"|upper }}
             {% else %}
