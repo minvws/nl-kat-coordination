@@ -130,6 +130,7 @@ class BoefjeIn(BaseModel):
     boefje_schema: dict | None = None
     cron: str | None = None
     interval: int | None = None
+    run_on: list[str] | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
 

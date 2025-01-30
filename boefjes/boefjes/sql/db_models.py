@@ -72,6 +72,7 @@ class BoefjeInDB(SQL_BASE):
     schema = Column(types.JSON(), nullable=True)
     cron = Column(types.String(length=128), nullable=True)
     interval = Column(types.Integer, nullable=True)
+    run_on = Column(types.ARRAY(types.String(length=128)), nullable=True)
 
     # Image specifications
     oci_image = Column(types.String(length=256), nullable=True)

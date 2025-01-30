@@ -67,6 +67,7 @@ class Boefje(Plugin):
     options: list[str] | None = None
     runnable_hash: str | None = None
     interval: int | None = None
+    run_on: list[str] | None = None
     boefje_schema: dict | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
@@ -426,6 +427,7 @@ def parse_boefje(boefje: dict) -> Boefje:
         created=boefje.get("created"),
         description=boefje.get("description"),
         interval=boefje.get("interval"),
+        run_on=boefje.get("run_on"),
         enabled=boefje["enabled"],
         type=boefje["type"],
         scan_level=scan_level,
