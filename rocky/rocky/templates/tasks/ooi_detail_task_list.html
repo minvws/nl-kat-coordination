@@ -8,7 +8,6 @@
         {% include "tasks/partials/task_filter.html" with clear_filter_url=this_url %}
 
     {% else %}
-        <p class="emphasized">{% translate "List of tasks" %}</p>
         {% include "tasks/partials/task_filter.html" with clear_filter_url=this_url %}
 
         <table rf-selector="table-scan-history">
