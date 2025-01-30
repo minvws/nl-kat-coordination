@@ -40,6 +40,10 @@ form {
     }
   }
 
+  .hidden-input {
+    display: none;
+  }
+
   @media (min-width: $breakpoint-filter) {
     .filter-fields-direction {
       &.row {

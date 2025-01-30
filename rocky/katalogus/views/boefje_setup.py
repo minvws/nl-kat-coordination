@@ -88,7 +88,14 @@ class AddBoefjeVariantView(BoefjeSetupView):
         initial["consumes"] = consumes
         initial["produces"] = ", ".join(self.plugin.produces)
         initial["scan_level"] = self.plugin.scan_level
-        initial["interval"] = self.plugin.interval
+        initial["interval_number"] = self.plugin.interval
+        initial["interval_frequency"] = "minutes"
+        initial["run_on"] = self.plugin.run_on
+
+        if self.plugin.interval:
+            initial["choose_scan_type"] = "interval"
+        elif self.plugin.run_on:
+            initial["choose_scan_type"] = "run_on"
 
         return initial
 
@@ -157,7 +164,14 @@ class EditBoefjeView(BoefjeSetupView):
         initial["consumes"] = consumes
         initial["produces"] = ", ".join(self.plugin.produces)
         initial["scan_level"] = self.plugin.scan_level
-        initial["interval"] = self.plugin.interval
+        initial["interval_number"] = self.plugin.interval
+        initial["interval_frequency"] = "minutes"
+        initial["run_on"] = self.plugin.run_on
+
+        if self.plugin.interval:
+            initial["choose_scan_type"] = "interval"
+        elif self.plugin.run_on:
+            initial["choose_scan_type"] = "run_on"
 
         return initial
 
@@ -211,7 +225,10 @@ def create_boefje_with_form_data(form_data, plugin_id: str, created: str | None)
     consumes = [] if not form_data["consumes"] else form_data["consumes"].strip("[]").replace("'", "").split(", ")
     produces = [] if not form_data["produces"] else form_data["produces"].split(",")
     produces = {p.strip() for p in produces}
-    interval = int(form_data.get("interval") or 0) or None
+    logger.error("Run on form_data: %s", form_data["run_on"])
+    run_on = None if not form_data["run_on"] else [form_data["run_on"]]
+    logger.error("Run_on: %s", run_on)
+    interval = get_interval_minutes(int(form_data.get("interval_number")) or 0, form_data["interval_frequency"])
     input_objects = set()
 
     for input_object in consumes:
@@ -223,6 +240,7 @@ def create_boefje_with_form_data(form_data, plugin_id: str, created: str | None)
         created=created,
         description=form_data["description"],
         interval=interval,
+        run_on=run_on,
         enabled=False,
         type="boefje",
         scan_level=form_data["scan_level"],
@@ -232,3 +250,22 @@ def create_boefje_with_form_data(form_data, plugin_id: str, created: str | None)
         oci_image=form_data["oci_image"],
         oci_arguments=arguments,
     )
+
+
+def get_interval_minutes(interval_number, interval_frequency) -> int:
+    interval_minutes = 0
+    if interval_number == 0:
+        return None
+
+    if interval_frequency == "minutes":
+        interval_minutes = interval_number
+    elif interval_frequency == "hours":
+        interval_minutes = interval_number * 60
+    elif interval_frequency == "days":
+        interval_minutes = interval_number * 60 * 24
+    elif interval_frequency == "weeks":
+        interval_minutes = interval_number * 60 * 24 * 7
+    elif interval_frequency == "years":
+        interval_minutes = interval_number * 60 * 24 * 365
+
+    return int(interval_minutes)
