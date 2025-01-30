@@ -15,18 +15,15 @@
                 {% get_language_info for language as lang %}
                 {% if LANGUAGE_CODE != language %}
                     <li>
-                        <button form="set-language" type="submit" name="language" value={{ language }}>
-                            {{ lang.name_local.title }}
-                        </button>
+                        <form action="{% url "set_language" %}" method="post" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" name="language" value={{ language }}>
+                                {{ lang.name_local.title }}
+                            </button>
+                        </form>
                     </li>
                 {% endif %}
             {% endfor %}
         </ul>
     </div>
 </div>
-<form id="set-language"
-      action="{% url "set_language" %}"
-      method="post"
-      class="inline">
-    {% csrf_token %}
-</form>
