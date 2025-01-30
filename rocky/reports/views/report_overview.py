@@ -55,11 +55,14 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
                 types={ReportRecipe, Report},
             )
         except ObjectNotFoundException:
-            return messages.error(self.request, f"Report recipe with id {ooi_pk} not found.")
+            return None
 
     def get_queryset(self) -> list[dict[str, Any]]:
-        report_schedules = self.get_report_schedules()
-
+        report_schedules = [
+            org_schedule
+            for org_schedule in self.get_report_schedules()
+            if org_schedule.get("organisation") == self.organization.code
+        ]
         recipes = []
         if report_schedules:
             for schedule in report_schedules:
