@@ -15,6 +15,7 @@ from octopoes.xtdb.client import OperationType as XTDBOperationType
 from octopoes.xtdb.client import XTDBSession
 from octopoes.xtdb.query_builder import generate_pull_query
 
+scan_profile_adapter = TypeAdapter(ScanProfile)
 
 class ScanProfileRepository(Repository):
     def __init__(self, event_manager: EventManager):
@@ -41,7 +42,6 @@ class ScanProfileRepository(Repository):
 class XTDBScanProfileRepository(ScanProfileRepository):
     object_type = "ScanProfile"
     pk_prefix = "xt/id"
-    typeadapter = TypeAdapter(ScanProfile)
 
     def __init__(self, event_manager: EventManager, session: XTDBSession):
         super().__init__(event_manager)
@@ -63,7 +63,7 @@ class XTDBScanProfileRepository(ScanProfileRepository):
 
     @classmethod
     def deserialize(cls, data: dict[str, Any]) -> ScanProfileBase:
-        return cls.typeadapter.validate_python(data)
+        return scan_profile_adapter.validate_python(data)
 
     def list_scan_profiles(self, scan_profile_type: str | None, valid_time: datetime) -> list[ScanProfileBase]:
         where = {"type": self.object_type}
