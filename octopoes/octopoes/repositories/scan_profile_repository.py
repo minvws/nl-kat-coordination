@@ -41,6 +41,7 @@ class ScanProfileRepository(Repository):
 class XTDBScanProfileRepository(ScanProfileRepository):
     object_type = "ScanProfile"
     pk_prefix = "xt/id"
+    typeadapter = TypeAdapter(ScanProfile) # 
 
     def __init__(self, event_manager: EventManager, session: XTDBSession):
         super().__init__(event_manager)
@@ -62,7 +63,7 @@ class XTDBScanProfileRepository(ScanProfileRepository):
 
     @classmethod
     def deserialize(cls, data: dict[str, Any]) -> ScanProfileBase:
-        return TypeAdapter(ScanProfile).validate_python(data)
+        return cls.typeadapter.validate_python(data)
 
     def list_scan_profiles(self, scan_profile_type: str | None, valid_time: datetime) -> list[ScanProfileBase]:
         where = {"type": self.object_type}
