@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-23 20:12+0000\n"
+"POT-Creation-Date: 2025-01-30 09:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5800,6 +5800,7 @@ msgid "Or if you have the authorization, upgrade the clearance level of"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_add_related_object.html
+#: rocky/templates/partials/ooi_detail_related_object.html
 msgid "Add related object"
 msgstr ""
 
@@ -6438,10 +6439,6 @@ msgstr ""
 msgid "No related object known for"
 msgstr ""
 
-#: rocky/templates/partials/ooi_detail_related_object.html
-msgid "Add related"
-msgstr ""
-
 #: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Generate Findings Report"
 msgstr ""
@@ -6738,11 +6735,6 @@ msgstr ""
 msgid "There have been no tasks"
 msgstr ""
 
-#: rocky/templates/tasks/ooi_detail_task_list.html
-#: rocky/templates/tasks/partials/tab_navigation.html
-msgid "List of tasks"
-msgstr ""
-
 #: rocky/templates/tasks/partials/stats.html
 msgid "Task statistics - Last 24 hours"
 msgstr ""
@@ -6757,6 +6749,10 @@ msgstr ""
 
 #: rocky/templates/tasks/partials/stats.html
 msgid "Could not load stats, Scheduler error."
+msgstr ""
+
+#: rocky/templates/tasks/partials/tab_navigation.html
+msgid "List of tasks"
 msgstr ""
 
 #: rocky/templates/tasks/partials/task_actions.html
