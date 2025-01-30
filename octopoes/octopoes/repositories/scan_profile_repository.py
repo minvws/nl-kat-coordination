@@ -41,7 +41,7 @@ class ScanProfileRepository(Repository):
 class XTDBScanProfileRepository(ScanProfileRepository):
     object_type = "ScanProfile"
     pk_prefix = "xt/id"
-    typeadapter = TypeAdapter(ScanProfile) # 
+    typeadapter = TypeAdapter(ScanProfile)
 
     def __init__(self, event_manager: EventManager, session: XTDBSession):
         super().__init__(event_manager)
