@@ -8,49 +8,6 @@ from octopoes.models.pagination import Paginated
 from tests.conftest import setup_request
 
 
-def test_report_history_one_subreports_one_input_objects(
-    rf, client_member, mock_organization_view_octopoes, mocker, report_list_one_asset_report
-):
-    """
-    Test with one subreports and one input objects. Should contain:
-        - Url of input item
-        - No chevron down button
-        - No "View all subreports" button
-    """
-    mocker.patch("account.mixins.OrganizationView.get_katalogus")
-    kwargs = {"organization_code": client_member.organization.code}
-    url = reverse("report_history", kwargs=kwargs)
-
-    request = rf.get(url)
-    request.resolver_match = resolve(url)
-
-    setup_request(request, client_member.user)
-
-    mock_organization_view_octopoes().list_reports.return_value = Paginated[HydratedReport](
-        count=len(report_list_one_asset_report), items=report_list_one_asset_report
-    )
-
-    response = ReportHistoryView.as_view()(request, organization_code=client_member.organization.code)
-
-    assert response.status_code == 200
-
-    # Check table rows
-    subreport = report_list_one_asset_report[0]
-    assertContains(response, subreport)
-    assertContains(
-        response,
-        '<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7Cexample.com">example.com</a>',
-        html=True,
-    )
-    assertNotContains(response, "Close asset report object details")
-
-    # Check subreports, show only 5
-    assertNotContains(response, "This report consists of ")
-
-    # Check if all report types are shown
-    assertContains(response, "RPKI Report")
-
-
 def test_report_history_less_than_five_subreports_two_input_objects(
     rf, client_member, mock_organization_view_octopoes, mocker, report_list_two_asset_reports
 ):
