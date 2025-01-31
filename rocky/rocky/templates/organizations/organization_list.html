@@ -2,7 +2,6 @@
 
 {% load i18n %}
 {% load static %}
-{% load compress %}
 
 {% block content %}
     {% include "header.html" %}
@@ -25,7 +24,7 @@
                                     <th>{% translate "Name" %}</th>
                                     <th>{% translate "Code" %}</th>
                                     <th>{% translate "Tags" %}</th>
-                                    <th>{% translate "Members" %}</th>
+                                    <th>{% translate "Settings" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -41,7 +40,11 @@
                                             {% include "organizations/organization_tags.html" %}
 
                                         </td>
-                                        <td>{{ organization.member_count }}</td>
+                                        <td>
+                                            <a href="{% url 'organization_settings' organization_code=organization.code %}">
+                                                <button class="icon ti-edit action-button">Settings</button>
+                                            </a>
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -67,9 +70,3 @@
         </section>
     </main>
 {% endblock content %}
-{% block html_at_end_body %}
-    {{ block.super }}
-    {% compress js %}
-        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
-    {% endcompress %}
-{% endblock html_at_end_body %}

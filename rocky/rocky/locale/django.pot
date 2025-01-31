@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-23 14:27+0000\n"
+"POT-Creation-Date: 2025-01-31 11:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1015,6 +1015,7 @@ msgstr ""
 #: katalogus/templates/plugin_settings_list.html
 #: katalogus/views/katalogus_settings.py tools/view_helpers.py
 #: rocky/templates/header.html
+#: rocky/templates/organizations/organization_list.html
 msgid "Settings"
 msgstr ""
 
@@ -1093,7 +1094,6 @@ msgstr ""
 
 #: katalogus/templates/partials/plugin_settings_required.html
 #: rocky/templates/findings/finding_add.html
-#: rocky/templates/partials/ooi_detail_related_object.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Add"
 msgstr ""
@@ -1218,6 +1218,7 @@ msgstr ""
 #: katalogus/templates/plugin_container_image.html
 #: reports/report_types/tls_report/report.html
 #: reports/templates/partials/plugin_overview_table.html
+#: reports/templates/tasks/report_task_list.html
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 #: rocky/templates/tasks/ooi_detail_task_list.html
@@ -1285,6 +1286,7 @@ msgstr ""
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/subreports_table.html
+#: reports/templates/tasks/report_task_list.html
 msgid "Creation date"
 msgstr ""
 
@@ -2304,6 +2306,7 @@ msgid "Enable and start scan"
 msgstr ""
 
 #: onboarding/templates/step_4_report.html
+#: reports/report_types/concatenated_report/report.py
 msgid "Report"
 msgstr ""
 
@@ -2491,10 +2494,6 @@ msgstr ""
 
 #: reports/forms.py
 msgid "Report name format"
-msgstr ""
-
-#: reports/forms.py
-msgid "Asset reports name format"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -2976,10 +2975,6 @@ msgid ""
 "information systems (RIS). DICOM servers store and manage patient-specific "
 "medical images, like X-rays, CT scans, and MRIs, utilizing a standardized "
 "format."
-msgstr ""
-
-#: reports/report_types/concatenated_report/report.py
-msgid "Concatenated Report"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -3736,16 +3731,15 @@ msgstr ""
 #: reports/templates/partials/export_report_settings.html
 #, python-format, python-brace-format
 msgid ""
-"When generating reports, we use default naming formats to make the process "
-"consistent and efficient. The parent report follows the format "
-"'${report_type} for ${oois_count}' objects, and each asset report uses "
-"'${report_type} for ${ooi}'. These placeholders automatically adapt based on "
-"the report details. You can customize the names by adding prefixes, "
-"suffixes, or other formats like '%%W' for the week number, using options "
-"from <a href=\"https://strftime.org/\" target=\"_blank\" "
-"rel=\"noopener\">Python strftime code</a>. However, please note that "
-"removing placeholders will apply the same custom name to all asset reports "
-"when created."
+"When generating reports, it is possible to give the report a name. The name "
+"can be static or dynamic. The default format for a report is '${report_type} "
+"for ${oois_count} objects'. These placeholders automatically adapt based on "
+"the report details. This format could for example return 'Aggregate Report "
+"for 15 objects'. Another placeholder that can be used is '${ooi}', which "
+"will show the name of the object when there is only one object. You can also "
+"customize the name by adding prefixes, suffixes, or other formats like '%%W' "
+"for the week number, using options from <a href=\"https://strftime.org/\" "
+"target=\"_blank\" rel=\"noopener\">Python strftime code</a>."
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -4216,6 +4210,7 @@ msgid "Showing %(length)s of %(total)s reports"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/tasks/report_task_list.html
 msgid "Reports:"
 msgstr ""
 
@@ -4239,14 +4234,14 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                                    This report consists of %(counter)s asset "
+"                                This report consists of %(counter)s asset "
 "report with the following report type and object:\n"
-"                                "
+"                            "
 msgid_plural ""
 "\n"
-"                                    This report consists of %(counter)s asset "
+"                                This report consists of %(counter)s asset "
 "reports with the following report types and objects:\n"
-"                                "
+"                            "
 msgstr[0] ""
 msgstr[1] ""
 
@@ -4278,6 +4273,14 @@ msgstr ""
 
 #: reports/templates/report_overview/report_overview_navigation.html
 msgid "History"
+msgstr ""
+
+#: reports/templates/report_overview/report_overview_navigation.html
+#: rocky/templates/header.html rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
+#: rocky/views/task_detail.py rocky/views/tasks.py
+msgid "Tasks"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports.html
@@ -4423,6 +4426,28 @@ msgstr ""
 msgid ""
 "There are no required or optional plugins needed for the selected report "
 "types."
+msgstr ""
+
+#: reports/templates/tasks/report_task_list.html
+msgid "Reports tasks"
+msgstr ""
+
+#: reports/templates/tasks/report_task_list.html
+msgid "On this page you can see all report tasks."
+msgstr ""
+
+#: reports/templates/tasks/report_task_list.html
+#, python-format
+msgid "Showing %(length)s of %(total)s tasks"
+msgstr ""
+
+#: reports/templates/tasks/report_task_list.html
+msgid "Recipe ID"
+msgstr ""
+
+#: reports/templates/tasks/report_task_list.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+msgid "Modified date"
 msgstr ""
 
 #: reports/views/aggregate_report.py
@@ -5009,7 +5034,6 @@ msgid "new"
 msgstr ""
 
 #: tools/view_helpers.py rocky/templates/header.html
-#: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/views/organization_member_edit.py
 msgid "Members"
@@ -5573,13 +5597,6 @@ msgstr ""
 msgid "Crisis room"
 msgstr ""
 
-#: rocky/templates/header.html rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/ooi_detail_task_list.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-#: rocky/views/task_detail.py rocky/views/tasks.py
-msgid "Tasks"
-msgstr ""
-
 #: rocky/templates/health.html
 msgid "Health Checks"
 msgstr ""
@@ -5796,6 +5813,7 @@ msgid "Or if you have the authorization, upgrade the clearance level of"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_add_related_object.html
+#: rocky/templates/partials/ooi_detail_related_object.html
 msgid "Add related object"
 msgstr ""
 
@@ -6431,11 +6449,7 @@ msgid "Related objects"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_related_object.html
-msgid "No related objects added to"
-msgstr ""
-
-#: rocky/templates/partials/ooi_detail_related_object.html
-msgid "Use the button below to add a related object."
+msgid "No related object known for"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
@@ -6706,10 +6720,6 @@ msgstr ""
 msgid "Created date"
 msgstr ""
 
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-msgid "Modified date"
-msgstr ""
-
 #: rocky/templates/tasks/normalizers.html
 msgid "There are no tasks for normalizers"
 msgstr ""
@@ -6731,13 +6741,7 @@ msgid "Manually added"
 msgstr ""
 
 #: rocky/templates/tasks/ooi_detail_task_list.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "There are no tasks for"
-msgstr ""
-
-#: rocky/templates/tasks/ooi_detail_task_list.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "List of tasks for"
+msgid "There have been no tasks"
 msgstr ""
 
 #: rocky/templates/tasks/partials/stats.html
@@ -6770,6 +6774,14 @@ msgstr ""
 
 #: rocky/templates/tasks/partials/task_actions.html
 msgid "Download task data"
+msgstr ""
+
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "There are no tasks for"
+msgstr ""
+
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "List of tasks for"
 msgstr ""
 
 #: rocky/templates/two_factor/_wizard_actions.html
