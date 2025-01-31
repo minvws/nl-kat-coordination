@@ -7,7 +7,7 @@ from rocky.views.tasks import SchedulerListView
 class ReportTaskListView(SchedulerView, SchedulerListView, PageActionsView):
     template_name = "tasks/report_task_list.html"
     paginator_class = RockyPaginator
-    paginate_by = 50
+    paginate_by = 25
     context_object_name = "report_task_list"
     task_type = "report"
 
