@@ -23,18 +23,17 @@
                 <h2>{% translate "Report name" %}</h2>
                 <p>
                     {% blocktranslate trimmed %}
-                        When generating reports, we use default naming formats to make the process consistent
-                        and efficient. The parent report follows the format '${report_type} for ${oois_count}' objects,
-                        and each asset report uses '${report_type} for ${ooi}'. These placeholders automatically
-                        adapt based on the report details. You can customize the names by adding prefixes, suffixes,
+                        When generating reports, it is possible to give the report a name. The name
+                        can be static or dynamic. The default format for a report is '${report_type} for
+                        ${oois_count} objects'. These placeholders automatically adapt based on the report details.
+                        This format could for example return 'Aggregate Report for 15 objects'.
+                        Another placeholder that can be used is '${ooi}', which will show the name of the object when
+                        there is only one object. You can also customize the name by adding prefixes, suffixes,
                         or other formats like '%W' for the week number, using options from
                         <a href="https://strftime.org/" target="_blank" rel="noopener">Python strftime code</a>.
-                        However, please note that removing placeholders will apply the same custom name to
-                        all asset reports when created.
                     {% endblocktranslate %}
                 </p>
                 {% include "partials/form/fieldset.html" with fields=report_name_form %}
-                {% include "partials/form/fieldset.html" with fields=report_asset_name_form %}
 
                 <button type="submit" form="generate_report">
                     {% translate "Generate report" %}<span class="icon ti-chevron-right" aria-hidden="true"></span>

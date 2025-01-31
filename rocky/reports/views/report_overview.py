@@ -173,6 +173,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
     def run_bulk_actions(self) -> None:
         action = self.request.POST.get("action", "")
         report_references = self.request.POST.getlist("report_reference", [])
+        logger.error("Report_references: %s", report_references)
 
         if action == "rename":
             return self.rename_reports(report_references)
@@ -254,7 +255,6 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
         for index, report_id in enumerate(report_references):
             report_ooi = self.get_report_ooi(report_id).to_report()
             report_ooi.name = report_names[index]
-
             try:
                 create_ooi(self.octopoes_api_connector, self.bytes_client, report_ooi, datetime.now(timezone.utc))
             except ValidationError:
