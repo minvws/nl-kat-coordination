@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-23 14:27+0000\n"
+"POT-Creation-Date: 2025-01-31 11:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1015,6 +1015,7 @@ msgstr ""
 #: katalogus/templates/plugin_settings_list.html
 #: katalogus/views/katalogus_settings.py tools/view_helpers.py
 #: rocky/templates/header.html
+#: rocky/templates/organizations/organization_list.html
 msgid "Settings"
 msgstr ""
 
@@ -2303,6 +2304,7 @@ msgid "Enable and start scan"
 msgstr ""
 
 #: onboarding/templates/step_4_report.html
+#: reports/report_types/concatenated_report/report.py
 msgid "Report"
 msgstr ""
 
@@ -2490,10 +2492,6 @@ msgstr ""
 
 #: reports/forms.py
 msgid "Report name format"
-msgstr ""
-
-#: reports/forms.py
-msgid "Asset reports name format"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -2977,10 +2975,6 @@ msgid ""
 "format."
 msgstr ""
 
-#: reports/report_types/concatenated_report/report.py
-msgid "Concatenated Report"
-msgstr ""
-
 #: reports/report_types/dns_report/report.html
 msgid "Records found"
 msgstr ""
@@ -3062,6 +3056,7 @@ msgstr ""
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
@@ -3734,16 +3729,15 @@ msgstr ""
 #: reports/templates/partials/export_report_settings.html
 #, python-format, python-brace-format
 msgid ""
-"When generating reports, we use default naming formats to make the process "
-"consistent and efficient. The parent report follows the format "
-"'${report_type} for ${oois_count}' objects, and each asset report uses "
-"'${report_type} for ${ooi}'. These placeholders automatically adapt based on "
-"the report details. You can customize the names by adding prefixes, "
-"suffixes, or other formats like '%%W' for the week number, using options "
-"from <a href=\"https://strftime.org/\" target=\"_blank\" "
-"rel=\"noopener\">Python strftime code</a>. However, please note that "
-"removing placeholders will apply the same custom name to all asset reports "
-"when created."
+"When generating reports, it is possible to give the report a name. The name "
+"can be static or dynamic. The default format for a report is '${report_type} "
+"for ${oois_count} objects'. These placeholders automatically adapt based on "
+"the report details. This format could for example return 'Aggregate Report "
+"for 15 objects'. Another placeholder that can be used is '${ooi}', which "
+"will show the name of the object when there is only one object. You can also "
+"customize the name by adding prefixes, suffixes, or other formats like '%%W' "
+"for the week number, using options from <a href=\"https://strftime.org/\" "
+"target=\"_blank\" rel=\"noopener\">Python strftime code</a>."
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -4237,14 +4231,14 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                                    This report consists of %(counter)s asset "
+"                                This report consists of %(counter)s asset "
 "report with the following report type and object:\n"
-"                                "
+"                            "
 msgid_plural ""
 "\n"
-"                                    This report consists of %(counter)s asset "
+"                                This report consists of %(counter)s asset "
 "reports with the following report types and objects:\n"
-"                                "
+"                            "
 msgstr[0] ""
 msgstr[1] ""
 
@@ -5007,7 +5001,6 @@ msgid "new"
 msgstr ""
 
 #: tools/view_helpers.py rocky/templates/header.html
-#: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/views/organization_member_edit.py
 msgid "Members"
