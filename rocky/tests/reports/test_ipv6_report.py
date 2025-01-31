@@ -64,6 +64,6 @@ def test_ipv6_report_ipv6_wit_ipv6(mock_octopoes_api_connector, valid_time, host
 
     report = IPv6Report(mock_octopoes_api_connector)
 
-    data = report.collect_data([str(ipaddressv6.reference)], valid_time)[str(ipaddressv6.reference)]
+    data = report.collect_data([ipaddressv6.reference], valid_time)[ipaddressv6.reference]
 
     assert data[hostname.name] == {"enabled": True}

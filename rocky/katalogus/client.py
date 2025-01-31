@@ -1,6 +1,6 @@
 import json
 from io import BytesIO
-from typing import Annotated
+from typing import Annotated, Literal
 from urllib.parse import quote
 
 import httpx
