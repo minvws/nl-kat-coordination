@@ -133,9 +133,3 @@ class ReportNameForm(BaseRockyForm):
     report_name = forms.CharField(
         label=_("Report name format"), required=True, initial="${report_type} for ${oois_count} objects"
     )
-
-
-class AssetReportNameForm(BaseRockyForm):
-    asset_report_name = forms.CharField(
-        label=_("Asset reports name format"), required=True, initial="${report_type} for ${ooi}"
-    )

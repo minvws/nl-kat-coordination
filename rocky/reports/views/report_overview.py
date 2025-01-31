@@ -168,11 +168,12 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
         return ReportList(self.octopoes_api_connector, valid_time=self.observed_at)
 
     def get_report_ooi(self, ooi_pk: str) -> HydratedReport:
-        return self.octopoes_api_connector.get_report(ooi_pk, valid_time=datetime.now(timezone.utc))
+        return self.octopoes_api_connector.get_report(ooi_pk, valid_time=self.observed_at)
 
     def run_bulk_actions(self) -> None:
         action = self.request.POST.get("action", "")
         report_references = self.request.POST.getlist("report_reference", [])
+        logger.error("Report_references: %s", report_references)
 
         if action == "rename":
             return self.rename_reports(report_references)
@@ -254,7 +255,6 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
         for index, report_id in enumerate(report_references):
             report_ooi = self.get_report_ooi(report_id).to_report()
             report_ooi.name = report_names[index]
-
             try:
                 create_ooi(self.octopoes_api_connector, self.bytes_client, report_ooi, datetime.now(timezone.utc))
             except ValidationError:
@@ -289,7 +289,7 @@ class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
         self.report_id = self.request.GET.get("report_id")
 
     def get_queryset(self) -> ReportList:
-        return ReportList(self.octopoes_api_connector, valid_time=self.observed_at, parent_report_id=self.report_id)
+        return ReportList(self.octopoes_api_connector, valid_time=self.observed_at, report_id=self.report_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

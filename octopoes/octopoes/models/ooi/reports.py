@@ -95,7 +95,6 @@ class ReportRecipe(OOI):
     recipe_id: UUID
 
     report_name_format: Annotated[str, BeforeValidator(lambda x: x.strip()), Field(min_length=1)]
-    asset_report_name_format: Annotated[str, BeforeValidator(lambda x: x.strip()), Field(min_length=1)]
 
     input_recipe: dict[str, Any]  # can contain a query which maintains a live set of OOIs or manually picked OOIs.
     report_type: Annotated[str, BeforeValidator(lambda x: x.strip()), Field(min_length=1)]

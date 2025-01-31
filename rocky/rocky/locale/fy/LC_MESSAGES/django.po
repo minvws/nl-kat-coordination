@@ -4612,10 +4612,10 @@ msgstr "Details subrapporten :"
 #: reports/templates/report_overview/report_history_table.html
 #, python-format
 msgid ""
-"This report consist of %(counter)s subreport with the following report type "
+"This report consists of %(counter)s subreport with the following report type "
 "and object."
 msgid_plural ""
-"This report consist of %(counter)s subreports with the following report "
+"This report consists of %(counter)s subreports with the following report "
 "types and objects."
 msgstr[0] ""
 msgstr[1] ""

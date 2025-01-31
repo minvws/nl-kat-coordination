@@ -287,12 +287,11 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         return {"query": query}
 
     def create_report_recipe(
-        self, report_name_format: str, asset_report_name_format: str, report_type: str | None, schedule: str | None
+        self, report_name_format: str, report_type: str | None, schedule: str | None
     ) -> ReportRecipe:
         report_recipe = ReportRecipe(
             recipe_id=uuid4(),
             report_name_format=report_name_format,
-            asset_report_name_format=asset_report_name_format,
             input_recipe=self.get_input_recipe(),
             report_type=report_type,
             asset_report_types=self.get_report_type_ids(),
@@ -316,8 +315,8 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
             }
         }
 
-    def get_initial_report_names(self) -> tuple[str, str]:
-        return ("${report_type} for ${oois_count} objects", "${report_type} for ${ooi}")
+    def get_initial_report_name(self) -> str:
+        return "${report_type} for ${oois_count} objects"
 
     def get_parent_report_type(self):
         if self.report_type is not None:
@@ -501,7 +500,6 @@ class ReportFinalSettingsView(BaseReportView, SchedulerView, TemplateView):
         context = super().get_context_data(**kwargs)
         context["report_schedule_form_start_date"] = self.get_report_schedule_form_start_date_time_recurrence()
         context["report_name_form"] = self.get_report_name_form()
-        context["report_asset_name_form"] = self.get_report_asset_name_form()
         return context
 
 
@@ -530,9 +528,8 @@ class SaveReportView(BaseReportView, SchedulerView, FormView):
         report_type = self.get_parent_report_type()
 
         report_name_format = self.request.POST.get("report_name", "Report")
-        asset_report_name_format = self.request.POST.get("asset_report_name", "Report")
 
-        report_recipe = self.create_report_recipe(report_name_format, asset_report_name_format, report_type, schedule)
+        report_recipe = self.create_report_recipe(report_name_format, report_type, schedule)
 
         self.create_report_schedule(report_recipe, start_datetime)
 

@@ -5,8 +5,6 @@ from typing import Any
 import structlog
 from django.conf import settings
 from pydantic import RootModel
-
-from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from tools.models import Organization
 from tools.ooi_helpers import create_ooi
 
@@ -18,6 +16,7 @@ from octopoes.models.types import type_by_name
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.definitions import ReportPlugins, report_plugins_union
 from reports.report_types.helpers import get_report_by_id
+from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.runner.models import ReportRunner
 from rocky.bytes_client import BytesClient
 from rocky.scheduler import ReportTask
@@ -64,9 +63,7 @@ class LocalReportRunner(ReportRunner):
             )
         elif recipe.report_type == MultiOrganizationReport.id:
             report_data_multi = collect_report_data(connector, ooi_pks, valid_time)
-            report_data = {
-                MultiOrganizationReport.id: report_data_multi
-            }
+            report_data = {MultiOrganizationReport.id: report_data_multi}
             additional_input_data = MultiOrganizationReport(connector).post_process_data(report_data_multi)
         else:
             report_types = [get_report_by_id(report_type_id) for report_type_id in recipe.asset_report_types]
@@ -210,7 +207,7 @@ def create_asset_reports(
             )
 
             asset_report = AssetReport(
-                name=format_name(recipe.asset_report_name_format, reference.human_readable, report_type.name, now),
+                name=f"{report_type.name} for {reference.human_readable}",
                 report_type=report_type_id,
                 report_recipe=recipe.reference,
                 template=report_type.template_path,
@@ -227,10 +224,6 @@ def create_asset_reports(
             asset_reports.append(asset_report)
 
     return asset_reports
-
-
-def format_name(template, ooi, _type, valid_time):
-    return valid_time.strftime(Template(template).safe_substitute(ooi=ooi, report_type=_type))
 
 
 class ReportDataDict(RootModel):

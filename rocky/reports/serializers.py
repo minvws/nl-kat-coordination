@@ -22,7 +22,6 @@ class ReportSerializer(serializers.BaseSerializer):
 class ReportRecipeSerializer(serializers.Serializer):
     id = serializers.UUIDField(source="recipe_id", required=False)
     report_name_format = serializers.CharField()
-    asset_report_name_format = serializers.CharField(required=False)
 
     input_recipe = serializers.DictField()
     asset_report_types = serializers.ListField(child=serializers.CharField())

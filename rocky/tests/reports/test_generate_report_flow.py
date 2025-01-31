@@ -215,7 +215,6 @@ def test_save_generate_report_view(
                 "start_time": "10:10",
                 "recurrence": "once",
                 "parent_report_name_format": "${report_type} for ${oois_count} objects",
-                "subreport_name_format": "${report_type} for ${ooi}",
             },
         ),
         client_member.user,

@@ -7,7 +7,7 @@ def test_mail_report_no_findings(mock_octopoes_api_connector, valid_time, hostna
 
     report = MailReport(mock_octopoes_api_connector)
 
-    data = report.collect_data([str(hostname.reference)], valid_time)[str(hostname.reference)]
+    data = report.collect_data([hostname.reference], valid_time)[hostname.reference]
 
     assert len(data["finding_types"]) == 0
     assert data["number_of_hostnames"] == 1
@@ -24,7 +24,7 @@ def test_mail_report_spf_finding(mock_octopoes_api_connector, valid_time, hostna
 
     report = MailReport(mock_octopoes_api_connector)
 
-    data = report.collect_data([str(hostname.reference)], valid_time)[str(hostname.reference)]
+    data = report.collect_data([hostname.reference], valid_time)[hostname.reference]
 
     assert len(data["finding_types"]) == 1
     assert data["number_of_hostnames"] == 1
@@ -44,7 +44,7 @@ def test_mail_report_dkim_finding(
 
     report = MailReport(mock_octopoes_api_connector)
 
-    data = report.collect_data([str(ipaddressv4.reference)], valid_time)[str(ipaddressv4.reference)]
+    data = report.collect_data([ipaddressv4.reference], valid_time)[ipaddressv4.reference]
 
     assert len(data["finding_types"]) == 1
     assert data["number_of_hostnames"] == 1
@@ -64,7 +64,7 @@ def test_mail_report_dmarc_finding(
 
     report = MailReport(mock_octopoes_api_connector)
 
-    data = report.collect_data([str(ipaddressv4.reference)], valid_time)[str(ipaddressv4.reference)]
+    data = report.collect_data([ipaddressv4.reference], valid_time)[ipaddressv4.reference]
 
     assert len(data["finding_types"]) == 1
     assert data["number_of_hostnames"] == 1
@@ -90,7 +90,7 @@ def test_mail_report_multiple_findings(
 
     report = MailReport(mock_octopoes_api_connector)
 
-    data = report.collect_data([str(hostname.reference)], valid_time)[str(hostname.reference)]
+    data = report.collect_data([hostname.reference], valid_time)[hostname.reference]
 
     assert len(data["finding_types"]) == 3
     assert data["number_of_hostnames"] == 1

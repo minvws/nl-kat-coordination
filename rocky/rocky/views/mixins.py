@@ -342,17 +342,17 @@ class ReportList:
     HARD_LIMIT = 99_999_999
 
     def __init__(
-        self, octopoes_connector: OctopoesAPIConnector, valid_time: datetime, parent_report_id: str | None = None
+        self, octopoes_connector: OctopoesAPIConnector, valid_time: datetime, report_id: str | None = None
     ):
         self.octopoes_connector = octopoes_connector
         self.valid_time = valid_time
         self.ordered = True
         self._count = None
-        self.parent_report_id = parent_report_id
-
+        self.report_id = report_id
         self.asset_reports = None
-        if self.parent_report_id and self.parent_report_id is not None:
-            asset_reports = self.octopoes_connector.get_report(self.parent_report_id, self.valid_time).input_oois
+
+        if self.report_id and self.report_id is not None:
+            asset_reports = self.octopoes_connector.get_report(self.report_id, self.valid_time).input_oois
             self.asset_reports = sorted(asset_reports, key=lambda x: (x.report_type, x.input_ooi))
 
     @cached_property
@@ -371,31 +371,31 @@ class ReportList:
             if key.stop:
                 limit = key.stop - offset
 
-            if self.asset_reports is not None:  # TODO: this probably isn't right?
+            if self.asset_reports is not None:
                 return self.asset_reports[offset : offset + limit]
 
             reports = self.octopoes_connector.list_reports(valid_time=self.valid_time, offset=offset, limit=limit).items
 
-            return self.hydrate_report_list(reports)
+            return self.enriched_report_list(reports)
 
         raise NotImplementedError("ReportList only supports slicing")
 
-    def hydrate_report_list(self, reports: list[HydratedReport]) -> list[EnrichedReport]:
-        hydrated_reports: list[EnrichedReport] = []
+    def enriched_report_list(self, reports: list[HydratedReport]) -> list[EnrichedReport]:
+        enriched_reports: list[EnrichedReport] = []
 
         for report in reports:
-            hydrated_report = EnrichedReport()
+            enriched_report = EnrichedReport()
 
-            hydrated_report.report = report
-            hydrated_report.asset_reports = sorted(report.input_oois[:5], key=attrgetter("name"))
-            hydrated_report.total_asset_reports = len(report.input_oois)
-            hydrated_report.total_objects = len({asset_report.input_ooi for asset_report in report.input_oois})
-            hydrated_report.report_type_summary = self.report_type_summary(report.input_oois)
+            enriched_report.report = report
+            enriched_report.asset_reports = sorted(report.input_oois[:5], key=attrgetter("name"))
+            enriched_report.total_asset_reports = len(report.input_oois)
+            enriched_report.total_objects = len({asset_report.input_ooi for asset_report in report.input_oois})
+            enriched_report.report_type_summary = self.report_type_summary(report.input_oois)
 
             # We want to show only 5 children reports
-            hydrated_reports.append(hydrated_report)
+            enriched_reports.append(enriched_report)
 
-        return hydrated_reports
+        return enriched_reports
 
     @staticmethod
     def report_type_summary(reports: list[AssetReport]) -> dict[str, int]:
