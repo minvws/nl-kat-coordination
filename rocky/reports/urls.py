@@ -31,6 +31,7 @@ from reports.views.report_overview import (
     ScheduledReportsView,
     SubreportView,
 )
+from reports.views.report_tasks import ReportTaskListView
 
 # Report overview urls
 urlpatterns = [
@@ -43,6 +44,7 @@ urlpatterns = [
     ),
     path("report-history/", ReportHistoryView.as_view(), name="report_history"),
     path("report-history/subreports", SubreportView.as_view(), name="subreports"),
+    path("report-tasks", ReportTaskListView.as_view(), name="report_tasks"),
 ]
 
 # View report urls

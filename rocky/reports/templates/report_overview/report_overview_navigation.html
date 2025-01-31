@@ -9,6 +9,9 @@
             <li {% if active == "history" %}aria-current="page"{% endif %}>
                 <a href="{% url 'report_history' organization.code %}">{% translate "History" %}</a>
             </li>
+            <li {% if active == "tasks" %}aria-current="page"{% endif %}>
+                <a href="{% url 'report_tasks' organization.code %}">{% translate "Tasks" %}</a>
+            </li>
         </ul>
     </nav>
 </div>
