@@ -81,13 +81,21 @@
                                             <span title="{{ variant.interval }}">
                                                 {% if variant.interval %}
                                                     {{ variant.interval }} {% translate "minutes" %}
+                                                {% elif variant.run_on %}
+                                                    -
                                                 {% else %}
                                                     {% translate "Default system scan frequency" %}
                                                 {% endif %}
                                             </span>
                                         </td>
                                         <td>
-                                            <span title="{{ variant.run_on }}">{{ variant.run_on }}</span>
+                                            <span title="{{ variant.run_on }}">
+                                                {% if variant.run_on %}
+                                                    {% for type in variant.run_on %}{{ type|capfirst }}{% endfor %}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </span>
                                         </td>
                                         <td class="actions">
                                             <button class="expando-button"

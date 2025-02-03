@@ -93,9 +93,9 @@ class AddBoefjeVariantView(BoefjeSetupView):
         initial["run_on"] = self.plugin.run_on
 
         if self.plugin.interval:
-            initial["choose_scan_type"] = "interval"
+            initial["scan_type"] = "interval"
         elif self.plugin.run_on:
-            initial["choose_scan_type"] = "run_on"
+            initial["scan_type"] = "run_on"
 
         return initial
 
@@ -169,9 +169,9 @@ class EditBoefjeView(BoefjeSetupView):
         initial["run_on"] = self.plugin.run_on
 
         if self.plugin.interval:
-            initial["choose_scan_type"] = "interval"
+            initial["scan_type"] = "interval"
         elif self.plugin.run_on:
-            initial["choose_scan_type"] = "run_on"
+            initial["scan_type"] = "run_on"
 
         return initial
 
@@ -225,10 +225,14 @@ def create_boefje_with_form_data(form_data, plugin_id: str, created: str | None)
     consumes = [] if not form_data["consumes"] else form_data["consumes"].strip("[]").replace("'", "").split(", ")
     produces = [] if not form_data["produces"] else form_data["produces"].split(",")
     produces = {p.strip() for p in produces}
-    logger.error("Run on form_data: %s", form_data["run_on"])
-    run_on = None if not form_data["run_on"] else [form_data["run_on"]]
-    logger.error("Run_on: %s", run_on)
-    interval = get_interval_minutes(int(form_data.get("interval_number")) or 0, form_data["interval_frequency"])
+    interval = None
+    run_on = None
+
+    if form_data["scan_type"] == "interval" and form_data.get("interval_number"):
+        interval = get_interval_minutes(int(form_data["interval_number"]), form_data["interval_frequency"])
+    elif form_data["scan_type"] == "run_on":
+        run_on = [form_data["run_on"]]
+
     input_objects = set()
 
     for input_object in consumes:

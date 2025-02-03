@@ -291,10 +291,9 @@ class KATalogusClient:
         try:
             logger.info("Editing boefje", event_code=800026, boefje=plugin.id)
             response = self.session.patch(
-                f"/v1/organisations/{quote(organization_code)}/boefjes/{plugin.id}",
-                content=plugin.model_dump_json(exclude_none=True),
+                f"/v1/organisations/{quote(organization_code)}/boefjes/{plugin.id}", content=plugin.model_dump_json()
             )
-            if response.status_code == codes.CREATED:
+            if response.status_code == codes.NO_CONTENT:
                 logger.info("Plugin %s updated", plugin.name)
             else:
                 logger.info("Plugin %s could not be updated", plugin.name)
