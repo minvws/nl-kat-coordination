@@ -8,7 +8,12 @@ for (var i = 0; i < toggle_all_btn.length; i++) {
 }
 
 function toggleCheckboxes(name, value) {
-  var checkboxes = document.getElementsByName(name);
+  var namepattern = new RegExp("^[a-zA-Z ]*$");
+  if (!namepattern.test(name);){ // is our 'name' a css query?
+    var checkboxes = document.querySelectorAll(name);
+  } else {
+    var checkboxes = document.getElementsByName(name);
+  }
   for (var i = 0; i < checkboxes.length; i++) {
     if (checkboxes[i].tagName == "INPUT" && checkboxes[i].type == "checkbox") {
       checkboxes[i].checked = value;
