@@ -7,6 +7,7 @@ from typing import Any, cast
 
 from django.utils.translation import gettext_lazy as _
 
+from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
@@ -57,7 +58,7 @@ class NameServerSystemReport(Report):
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "name_server_report/report.html"
 
-    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+    def collect_data(self, input_oois: Iterable[Reference], valid_time: datetime) -> dict[Reference, dict[str, Any]]:
         hostnames_by_input_ooi = self.to_hostnames(input_oois, valid_time)
         all_hostnames = list({h for key, hostnames in hostnames_by_input_ooi.items() for h in hostnames})
 
