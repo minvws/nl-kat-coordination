@@ -140,7 +140,8 @@ class BaseOOIDetailView(BreadcrumbsMixin, SingleOOITreeMixin, ConnectorFormMixin
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.ooi = self.get_ooi()
+        tree = self.tree
+        self.ooi = tree.store[tree.root.reference]
 
     def get_current_ooi(self) -> OOI | None:
         """
@@ -150,7 +151,7 @@ class BaseOOIDetailView(BreadcrumbsMixin, SingleOOITreeMixin, ConnectorFormMixin
         if self.observed_at.date() == now.date():
             return self.ooi
         try:
-            return self.get_ooi(pk=self.get_ooi_id(), observed_at=now)
+            return self.get_ooi_tree(self.get_ooi_id(), observed_at=now).store[self.get_ooi_id()]
         except Http404:
             return None
 
