@@ -12,9 +12,6 @@ from octopoes.models.persistence import ReferenceField
 class DNSSPFRecord(OOI):
     """Returns the DNS SPF record.
 
-    Functions:
-    natural_keys: returns property of the class.
-    format_reference_human_readable: returns the title text for objects on the object details page.
     """
 
     object_type: Literal["DNSSPFRecord"] = "DNSSPFRecord"
