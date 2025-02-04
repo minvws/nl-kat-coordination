@@ -35,6 +35,7 @@
                             <tr>
                                 <th>{% translate "Name" %}</th>
                                 <th>{% translate "Code" %}</th>
+                                <th>{% translate "Tags" %}</th>
                                 {% if perms.tools.change_organization %}
                                     <th>{% translate "Edit" %}</th>
                                 {% endif %}
@@ -44,6 +45,10 @@
                             <tr>
                                 <td>{{ organization.name }}</td>
                                 <td>{{ organization.code }}</td>
+                                <td>
+                                    {% include "organizations/organization_tags.html" %}
+
+                                </td>
                                 {% if perms.tools.change_organization %}
                                     <td>
                                         {% spaceless %}

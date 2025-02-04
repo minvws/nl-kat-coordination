@@ -1093,7 +1093,6 @@ msgstr ""
 
 #: katalogus/templates/partials/plugin_settings_required.html
 #: rocky/templates/findings/finding_add.html
-#: rocky/templates/partials/ooi_detail_related_object.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Add"
 msgstr ""
@@ -5833,6 +5832,7 @@ msgid "Or if you have the authorization, upgrade the clearance level of"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_add_related_object.html
+#: rocky/templates/partials/ooi_detail_related_object.html
 msgid "Add related object"
 msgstr ""
 
@@ -6468,11 +6468,7 @@ msgid "Related objects"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_related_object.html
-msgid "No related objects added to"
-msgstr ""
-
-#: rocky/templates/partials/ooi_detail_related_object.html
-msgid "Use the button below to add a related object."
+msgid "No related object known for"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
@@ -6768,13 +6764,7 @@ msgid "Manually added"
 msgstr ""
 
 #: rocky/templates/tasks/ooi_detail_task_list.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "There are no tasks for"
-msgstr ""
-
-#: rocky/templates/tasks/ooi_detail_task_list.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "List of tasks for"
+msgid "There have been no tasks"
 msgstr ""
 
 #: rocky/templates/tasks/partials/stats.html
@@ -6807,6 +6797,14 @@ msgstr ""
 
 #: rocky/templates/tasks/partials/task_actions.html
 msgid "Download task data"
+msgstr ""
+
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "There are no tasks for"
+msgstr ""
+
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "List of tasks for"
 msgstr ""
 
 #: rocky/templates/two_factor/_wizard_actions.html
