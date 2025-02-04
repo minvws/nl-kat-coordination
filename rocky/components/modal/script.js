@@ -66,6 +66,30 @@ export function showModalBasedOnAnchor(id) {
   }
 }
 
+document.addEventListener("DOMContentLoaded", function () {
+  const deleteButton = document.getElementById("deleteRecipe");
+  deleteButton.addEventListener("click", function () {
+    const url = deleteButton.getAttribute("data-url");
+    const csrfToken = deleteButton.getAttribute("data-csrf-token");
+
+    fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          location.reload();
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  });
+});
+
 addEventListener("hashchange", function () {
   let id = window.location.toString().split("#")[1];
   showModalBasedOnAnchor(id);
