@@ -288,9 +288,7 @@ class Query:
             self._where_clauses.append(self._assert_type(ref, ooi_type))
 
         if field_name == "id":
-            self._where_clauses.append(
-                self._relationship(self._get_object_alias(ref), "xt", field_name, to_alias)
-            )
+            self._where_clauses.append(self._relationship(self._get_object_alias(ref), "xt", field_name, to_alias))
         else:
             self._where_clauses.append(
                 self._relationship(self._get_object_alias(ref), ooi_type.get_object_type(), field_name, to_alias)
