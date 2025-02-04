@@ -96,7 +96,13 @@ class NormalizerScheduler(Scheduler):
             normalizers_by_mime_type = self.get_normalizers_for_mime_type(
                 mime_type.get("value"), latest_raw_data.organization
             )
-            self.logger.debug("Found normalizers for mime type", mime_type=mime_type.get("value"))
+
+            self.logger.debug(
+                "Found normalizers for mime type",
+                mime_type=mime_type.get("value"),
+                normalizers=normalizers_by_mime_type,
+            )
+
             for normalizer in normalizers_by_mime_type:
                 normalizers[normalizer.id] = normalizer
 
@@ -125,6 +131,7 @@ class NormalizerScheduler(Scheduler):
             normalizer_task = models.NormalizerTask(
                 normalizer=models.Normalizer.model_validate(normalizer.model_dump()), raw_data=latest_raw_data.raw_data
             )
+
             normalizer_tasks.append(normalizer_task)
 
         with futures.ThreadPoolExecutor(thread_name_prefix=f"TPE-{self.scheduler_id}-raw_data") as executor:
