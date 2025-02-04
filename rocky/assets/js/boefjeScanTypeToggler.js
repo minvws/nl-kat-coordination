@@ -1,4 +1,4 @@
-function toggleElements(value) {
+function toggleScanType(value) {
   const intervalNumber = document.querySelector(
     "label[for='id_interval_number']",
   ).parentElement;
@@ -22,15 +22,17 @@ function toggleElements(value) {
   }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+function boefjeScanTypeToggler() {
   const radioButtons = document.querySelectorAll(".radio-choice");
   const selectedRadio = Array.from(radioButtons).find((radio) => radio.checked);
 
-  toggleElements(selectedRadio ? selectedRadio.value : null);
+  toggleScanType(selectedRadio ? selectedRadio.value : null);
 
   radioButtons.forEach(function (radio) {
     radio.addEventListener("change", function () {
-      toggleElements(radio.value);
+      toggleScanType(radio.value);
     });
   });
-});
+}
+
+document.addEventListener("DOMContentLoaded", boefjeScanTypeToggler);
