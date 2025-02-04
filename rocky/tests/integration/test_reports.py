@@ -1,10 +1,11 @@
 from dataclasses import asdict
 
-from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
+from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.definitions import MultiReport, Report
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.report_types.systems_report.report import SystemReport, SystemType
 from reports.report_types.web_system_report.report import WebSystemReport
+from reports.runner.report_runner import aggregate_reports
 
 from octopoes.api.models import Declaration
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -18,7 +19,7 @@ def test_web_report(octopoes_api_connector: OctopoesAPIConnector, valid_time):
     seed_system(octopoes_api_connector, valid_time)
 
     report = WebSystemReport(octopoes_api_connector)
-    input_ooi = "Hostname|test|example.com"
+    input_ooi = Reference.from_str("Hostname|test|example.com")
     data = report.collect_data([input_ooi], valid_time)[input_ooi]
 
     assert data["input_ooi"] == input_ooi
@@ -61,7 +62,7 @@ def test_system_report(octopoes_api_connector: OctopoesAPIConnector, valid_time)
     seed_system(octopoes_api_connector, valid_time)
 
     report = SystemReport(octopoes_api_connector)
-    input_ooi = "Hostname|test|example.com"
+    input_ooi = Reference.from_str("Hostname|test|example.com")
     data = report.collect_data([input_ooi], valid_time)[input_ooi]
 
     assert data["input_ooi"] == input_ooi

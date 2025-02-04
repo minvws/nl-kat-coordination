@@ -140,6 +140,15 @@ class SQLMetaDataRepository(MetaDataRepository):
 
         return [to_raw_meta(raw_file_in_db) for raw_file_in_db in query]
 
+    def get_raws(self, query_filter: RawDataFilter) -> list[tuple[uuid.UUID, RawData]]:
+        logger.debug("Querying raw data: %s", query_filter.model_dump_json())
+        query = self.session.query(RawFileInDB)
+        query = query_filter.apply(query)
+
+        raw_metas_pairs = [(raw_meta.id, to_boefje_meta(raw_meta.boefje_meta)) for raw_meta in query]
+
+        return self.raw_repository.get_raws(raw_metas_pairs)
+
     def get_raw_by_id(self, raw_id: uuid.UUID) -> RawData:
         raw_in_db: RawFileInDB | None = self.session.get(RawFileInDB, str(raw_id))
 
