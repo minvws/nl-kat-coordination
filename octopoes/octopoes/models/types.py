@@ -61,7 +61,7 @@ from octopoes.models.ooi.network import (
     Network,
 )
 from octopoes.models.ooi.question import Question
-from octopoes.models.ooi.reports import Report, ReportData, ReportRecipe
+from octopoes.models.ooi.reports import AssetReport, HydratedReport, Report, ReportData, ReportRecipe
 from octopoes.models.ooi.scans import ExternalScan
 from octopoes.models.ooi.service import IPService, Service, TLSCipher
 from octopoes.models.ooi.software import Software, SoftwareInstance
@@ -164,6 +164,8 @@ ConcreteOOIType = (
     | ReportsType
     | ScanType
     | Report
+    | HydratedReport
+    | AssetReport
     | GeographicPoint
     | ReportRecipe
 )

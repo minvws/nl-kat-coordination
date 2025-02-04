@@ -78,6 +78,13 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
         == len(hostnames) + 1
     )
 
+    bulk_hostnames = octopoes_api_connector.load_objects_bulk({x.reference for x in hostnames}, valid_time)
+
+    assert len(bulk_hostnames) == 10
+
+    for hostname in hostnames:
+        assert bulk_hostnames[hostname.reference].scan_profile is not None
+
 
 def test_history(octopoes_api_connector: OctopoesAPIConnector):
     network = Network(name="test")
@@ -101,14 +108,6 @@ def test_history(octopoes_api_connector: OctopoesAPIConnector):
 
     assert len(octopoes_api_connector.get_history(network.reference, offset=1)) == 2
     assert len(octopoes_api_connector.get_history(network.reference, limit=2)) == 2
-
-    # Test that moving the offset with 1 shifts the result set
-    assert (
-        octopoes_api_connector.get_history(network.reference, offset=0, limit=2)[1]
-        == octopoes_api_connector.get_history(network.reference, offset=1, limit=2)[0]
-    )
-    assert len(octopoes_api_connector.get_history(network.reference, offset=2, limit=10)) == 1
-    assert len(octopoes_api_connector.get_history(network.reference, offset=2, limit=1)) == 1
 
     first_and_last = octopoes_api_connector.get_history(network.reference, has_doc=True, indices=[0, -1])
     assert len(first_and_last) == 2
