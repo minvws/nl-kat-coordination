@@ -132,7 +132,8 @@ this so it used the serialized input OOI.
 
 #### Usage of environment field
 
-This is not used directly from the BoefjeMeta, but this
+This is not used directly from the BoefjeMeta argument in `run`, but the
+provided variables are set environment variables are set and the boefje
 
 #### Usage of started_at, endated_at, boefje and runnable_hash fields
 
