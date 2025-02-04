@@ -286,9 +286,15 @@ class Query:
 
         if ooi_type != OOI:
             self._where_clauses.append(self._assert_type(ref, ooi_type))
-        self._where_clauses.append(
-            self._relationship(self._get_object_alias(ref), ooi_type.get_object_type(), field_name, to_alias)
-        )
+
+        if field_name == "id":
+            self._where_clauses.append(
+                self._relationship(self._get_object_alias(ref), "xt", field_name, to_alias)
+            )
+        else:
+            self._where_clauses.append(
+                self._relationship(self._get_object_alias(ref), ooi_type.get_object_type(), field_name, to_alias)
+            )
 
     def _add_or_statement_for_abstract_types(self, ref: Ref, field_name: str, to_alias: str) -> None:
         ooi_type = ref.type if isinstance(ref, Aliased) else ref
