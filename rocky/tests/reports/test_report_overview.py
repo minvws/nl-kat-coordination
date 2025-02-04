@@ -1,11 +1,11 @@
 from uuid import uuid4
 
-from octopoes.models.ooi.reports import HydratedReport
-from octopoes.models.pagination import Paginated
 from pytest_django.asserts import assertContains
 from reports.views.report_overview import ReportHistoryView
 
 from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.ooi.reports import HydratedReport
+from octopoes.models.pagination import Paginated
 from tests.conftest import setup_request
 
 
@@ -44,12 +44,7 @@ def test_report_overview_rename_reports(
 
     request = setup_request(
         rf.post(
-            "report_history",
-            {
-                "action": "rename",
-                "report_name": new_name,
-                "report_reference": report.primary_key,
-            },
+            "report_history", {"action": "rename", "report_name": new_name, "report_reference": report.primary_key}
         ),
         client_member.user,
     )
@@ -114,7 +109,13 @@ def test_report_overview_delete_reports(rf, client_member, mock_organization_vie
 
 
 def test_report_overview_rerun_reports(
-    rf, client_member, mock_organization_view_octopoes, mock_bytes_client, get_report_input_data_from_bytes, report_list, mock_scheduler
+    rf,
+    client_member,
+    mock_organization_view_octopoes,
+    mock_bytes_client,
+    get_report_input_data_from_bytes,
+    report_list,
+    mock_scheduler,
 ):
     """
     Rerun a report
@@ -127,7 +128,7 @@ def test_report_overview_rerun_reports(
 
     mock_organization_view_octopoes().get.return_value = concatenated_report
     mock_bytes_client().get_raws.return_value = [
-        ("7b305f0d-c0a7-4ad5-af1e-31f81fc229c2", get_report_input_data_from_bytes),
+        ("7b305f0d-c0a7-4ad5-af1e-31f81fc229c2", get_report_input_data_from_bytes)
     ]
     mock_bytes_client().upload_raw.return_value = str(uuid4())
     mock_organization_view_octopoes().query.return_value = concatenated_report.input_oois
@@ -141,8 +142,9 @@ def test_report_overview_rerun_reports(
 
     assert response.status_code == 200
 
-    assert list(request._messages)[0].message == ("Rerun successful. "
-                                                  "It may take a moment before the new report has been generated.")
+    assert list(request._messages)[0].message == (
+        "Rerun successful. It may take a moment before the new report has been generated."
+    )
 
     assertContains(response, concatenated_report.name)
 
@@ -164,8 +166,9 @@ def test_aggregate_report_has_asset_reports(
     assertContains(response, "expando-button icon ti-chevron-down")
 
     assertContains(
-        response, f"This report consists of {len(aggregate_report.input_oois)} asset reports with the "
-                  f"following report types and objects:"
+        response,
+        f"This report consists of {len(aggregate_report.input_oois)} asset reports with the "
+        f"following report types and objects:",
     )
 
     assertContains(response, f"Asset reports (5/{len(aggregate_report.input_oois)})", html=True)

@@ -1,5 +1,4 @@
 import json
-from datetime import date
 
 from reports.runner.report_runner import LocalReportRunner
 
@@ -73,19 +72,19 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
 
     data_report = {
         "input_data": {
-            "input_oois": [
+            "input_oois": {
                 "AssetReport|Hostname|test|example.com|dns-report",
                 "AssetReport|Hostname|test|a.example.com|dns-report",
-            ],
+            },
             "report_types": ["dns-report"],
             "plugins": {"required": {"dns-records", "dns-sec"}, "optional": ["dns-zone"]},
         }
     }
 
     report_data = json.loads(report_runner.bytes_client.upload_raw.mock_calls[2].kwargs["raw"])
-    report_data["input_data"]["plugins"]["required"] = set(
-        report_data["input_data"]["plugins"]["required"]
-    )  # ordering issues
+    # ordering issues
+    report_data["input_data"]["plugins"]["required"] = set(report_data["input_data"]["plugins"]["required"])
+    report_data["input_data"]["input_oois"] = set(report_data["input_data"]["input_oois"])
 
     assert report_data == data_report
 
@@ -96,7 +95,7 @@ def test_run_report_task(octopoes_api_connector: OctopoesAPIConnector, report_ru
     asset_reports = reports.items[0].input_oois
     assert len(asset_reports) == 2
 
-    assert f"DNS Report for a.example.com in {date.today().year}" in {x.name for x in asset_reports}
+    assert "DNS Report for a.example.com" in {x.name for x in asset_reports}
 
     # FIXME: the naming logic in reports/views/mixins.py 107-112 is not right. We expect to find example.com in this
     #  set, but instead only find a.example.com because when ooi_name is 'example.com', the check:
