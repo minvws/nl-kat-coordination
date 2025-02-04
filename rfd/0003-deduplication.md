@@ -1,4 +1,11 @@
-# Deduplication of boefjes between organization
+---
+authors: Jeroen Dekkers (@dekkers )
+state: draft
+discussion: https://github.com/minvws/nl-kat-coordination/pull/4051
+labels: boefjes
+---
+
+# RFD 0004: Deduplication of boefjes between organization
 
 The goal of deduplication of boefjes is to avoid doing multiple scans in similar
 organizations for the same assets. When a large number of organizations have the
