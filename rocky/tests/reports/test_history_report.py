@@ -48,7 +48,8 @@ def test_report_history_less_than_five_subreports_two_input_objects(
     child_report_2 = report_list_two_asset_reports[0].input_oois[1]
     assertContains(response, f"{total_subreports}/{total_subreports}")
     assertContains(
-        response, f"This report consists of {total_subreports} asset reports with the following report types and objects:"
+        response,
+        f"This report consists of {total_subreports} asset reports with the following report types and objects:",
     )
     assertNotContains(
         response,
@@ -113,7 +114,8 @@ def test_report_history_more_than_five_asset_reports_one_input_object(
     child_report_6 = report_list_six_asset_reports[0].input_oois[5]
     assertContains(response, f"5/{total_subreports}")
     assertContains(
-        response, f"This report consists of {total_subreports} asset reports with the following report types and objects:"
+        response,
+        f"This report consists of {total_subreports} asset reports with the following report types and objects:",
     )
     assertContains(
         response,

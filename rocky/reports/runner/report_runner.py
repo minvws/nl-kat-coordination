@@ -62,7 +62,7 @@ class LocalReportRunner(ReportRunner):
                 connector, ooi_pks, recipe.asset_report_types, valid_time, report_task.organisation_id
             )
         elif recipe.report_type == MultiOrganizationReport.id:
-            report_data_multi = collect_report_data(connector, ooi_pks, valid_time)
+            report_data_multi = collect_report_data(connector, [str(x) for x in ooi_pks], valid_time)
             report_data = {MultiOrganizationReport.id: report_data_multi}
             additional_input_data = MultiOrganizationReport(connector).post_process_data(report_data_multi)
         else:

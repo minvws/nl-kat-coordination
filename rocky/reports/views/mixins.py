@@ -5,7 +5,10 @@ from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from tools.ooi_helpers import create_ooi
 
+from octopoes.models import Reference
 from octopoes.models.ooi.reports import Report
+from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
+from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.helpers import REPORTS
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.runner.report_runner import ReportDataDict, aggregate_reports, collect_reports, save_report_data
@@ -19,7 +22,7 @@ class SaveGenerateReportMixin(BaseReportView):
         error_reports, report_data = collect_reports(
             self.observed_at,
             self.octopoes_api_connector,
-            self.get_ooi_pks(),
+            [Reference.from_str(ref) for ref in self.get_ooi_pks()],
             [x for x in self.get_report_types() if x in REPORTS],
         )
 
@@ -28,9 +31,9 @@ class SaveGenerateReportMixin(BaseReportView):
             self.observed_at,
             self.octopoes_api_connector,
             self.organization,
-            self.get_oois(),
+            [x.reference for x in self.get_oois()],
             report_data,
-            "Onboarding",  # TODO: Fix recipe
+            self.create_report_recipe("${report_type} for ${oois_count} objects", ConcatenatedReport.name, None),
         )
 
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
@@ -71,9 +74,11 @@ class SaveAggregateReportMixin(BaseReportView):
             self.get_observed_at(),
             self.octopoes_api_connector,
             self.organization,
-            self.get_oois(),
+            [ooi.reference for ooi in self.get_oois()],
             report_data,
-            "",  # TODO: fix recipe
+            self.create_report_recipe(
+                "${report_type} for ${oois_count} objects", AggregateOrganisationReport.name, None
+            ),
             post_processed_data,
         )
 

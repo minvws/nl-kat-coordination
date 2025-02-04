@@ -392,10 +392,10 @@ def test_parse_path_concrete_fields_or_abstract_types():
 def test_generic_OOI_query(mocker):
     mocker.patch("uuid.uuid4", return_value=UUID("311d6399-4bb4-4830-b077-661cc3f4f2c1"))
 
-    query = Query().where(OOI, **{"xt/id": "test"})
-    assert str(query) == '{:query {:find [(pull OOI [*])] :where [ [ OOI :OOI/xt/id "test" ]]}}'
+    query = Query().where(OOI, id="test")
+    assert str(query) == '{:query {:find [(pull OOI [*])] :where [ [ OOI :xt/id "test" ]]}}'
 
-    query = Query().where_in(OOI, **{"xt/id": ["test", "test2"]})
+    query = Query().where_in(OOI, id=["test", "test2"])
     assert (
         str(query) == '{:query {:find [(pull OOI [*])] :where [ (or [ OOI :xt/id "test" ] [ OOI :xt/id "test2" ] )]}}'
     )

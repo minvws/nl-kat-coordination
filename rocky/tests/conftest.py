@@ -2,11 +2,11 @@ import binascii
 import json
 import logging
 import uuid
+from collections.abc import Iterator
 from datetime import datetime, timezone
 from ipaddress import IPv4Address, IPv6Address
 from os import urandom
 from pathlib import Path
-from typing import Iterator
 from unittest.mock import MagicMock, patch
 from uuid import UUID
 
@@ -21,7 +21,6 @@ from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from httpx import Response
 from katalogus.client import Boefje, parse_plugin
-from reports.runner.report_runner import create_asset_reports
 from tools.enums import SCAN_LEVEL
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 
@@ -35,7 +34,7 @@ from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Referenc
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
-from octopoes.models.ooi.reports import Report, ReportData, ReportRecipe, AssetReport, HydratedReport
+from octopoes.models.ooi.reports import AssetReport, HydratedReport, Report, ReportData, ReportRecipe
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
@@ -1100,7 +1099,7 @@ def create_asset_report(
     report_type,
     template,
     uuid_iterator: Iterator,
-    input_ooi = "Hostname|internet|example.com",
+    input_ooi="Hostname|internet|example.com",
     organization_code: str = "test",
     organization_name: str = "Test Organization",
 ) -> AssetReport:
@@ -1142,20 +1141,24 @@ def create_report(
     )
 
 
-ids = iter([
-    UUID("acbd2250-85f4-471a-ab70-ba1750280194"),
-    UUID("ba2d86b8-aca8-4009-adc0-e3d59ea34904"),
-    UUID("3d2ea955-13c1-46f6-81f3-edfe72d8af0b"),
-    UUID("fe4d0f5d-5447-47d3-952d-74544c8a9d8d"),
-    UUID("3ca35c20-1139-4bf4-a11a-a0b83f3c48ff"),
-    UUID("1e419bee-672f-4561-b3b9-f47bd6ce60b7"),
-    UUID("1e419bee-672f-4561-b3b9-f47bd6ce60b7"),
-])
+ids = iter(
+    [
+        UUID("acbd2250-85f4-471a-ab70-ba1750280194"),
+        UUID("ba2d86b8-aca8-4009-adc0-e3d59ea34904"),
+        UUID("3d2ea955-13c1-46f6-81f3-edfe72d8af0b"),
+        UUID("fe4d0f5d-5447-47d3-952d-74544c8a9d8d"),
+        UUID("3ca35c20-1139-4bf4-a11a-a0b83f3c48ff"),
+        UUID("1e419bee-672f-4561-b3b9-f47bd6ce60b7"),
+        UUID("1e419bee-672f-4561-b3b9-f47bd6ce60b7"),
+    ]
+)
 
 
 assets = [
     create_asset_report("RPKI Report", "rpki-report", "rpki_report/report.html", ids),
-    create_asset_report("Safe Connections Report", "safe-connections-report", "safe_connections_report/report.html", ids),
+    create_asset_report(
+        "Safe Connections Report", "safe-connections-report", "safe_connections_report/report.html", ids
+    ),
     create_asset_report("System Report", "systems-report", "systems_report/report.html", ids),
     create_asset_report("Mail Report", "mail-report", "mail_report/report.html", ids),
     create_asset_report("IPv6 Report", "ipv6-report", "ipv6_report/report.html", ids),
@@ -1164,7 +1167,7 @@ assets = [
 ]
 
 dns_report = create_asset_report(
-    "DNS Report", "dns-report", "dns_report/report.html", iter(["a5ccf97b-d4e9-442d-85bf-84e739b63da9s"]),
+    "DNS Report", "dns-report", "dns_report/report.html", iter(["a5ccf97b-d4e9-442d-85bf-84e739b63da9s"])
 )
 
 
@@ -1177,9 +1180,9 @@ def report_list_one_asset_report():
 @pytest.fixture
 def report_list_two_asset_reports():
     uuids = iter(["acbd2250-85f4-471a-ab70-ba17502801a"])
-    return [create_report(
-        "Concatenated test report", "concatenated-report", "report.html", [assets[5], assets[6]], uuids
-    )]
+    return [
+        create_report("Concatenated test report", "concatenated-report", "report.html", [assets[5], assets[6]], uuids)
+    ]
 
 
 @pytest.fixture
@@ -1408,7 +1411,11 @@ def reports_more_input_oois():
     references = [f"Hostname|internet|example{i}.com" for i in range(1, 9)]
     sc_name = "Safe Connections Report"
 
-    return create_report("Test Parent Report", "concatenated-report", "report.html", [
+    return create_report(
+        "Test Parent Report",
+        "concatenated-report",
+        "report.html",
+        [
             create_asset_report("RPKI Report", "rpki-report", "rpki_report/report.html", uuids, references[0]),
             create_asset_report("RPKI Report", "rpki-report", "rpki_report/report.html", uuids, references[1]),
             create_asset_report("RPKI Report", "rpki-report", "rpki_report/report.html", uuids, references[2]),
@@ -1425,7 +1432,8 @@ def reports_more_input_oois():
             create_asset_report(
                 sc_name, "safe-connections-report", "safe_connections_report/report.html", uuids, references[7]
             ),
-        ], iter(["a5ccf97b-d4e9-442d-85bf-84e739b6d3ed"])
+        ],
+        iter(["a5ccf97b-d4e9-442d-85bf-84e739b6d3ed"]),
     )
 
 
@@ -1628,9 +1636,7 @@ def get_aggregate_report_from_bytes():
 def report_data_ooi_org_a(organization, get_multi_report_data_minvws):
     return ReportData(
         scan_profile=EmptyScanProfile(
-            scan_profile_type="empty",
-            reference=Reference(f"ReportData|{organization.code}"),
-            level=ScanLevel.L0,
+            scan_profile_type="empty", reference=Reference(f"ReportData|{organization.code}"), level=ScanLevel.L0
         ),
         organization_code=organization.code,
         organization_name=organization.name,
@@ -1643,9 +1649,7 @@ def report_data_ooi_org_a(organization, get_multi_report_data_minvws):
 def report_data_ooi_org_b(organization_b, get_multi_report_data_mispoes):
     return ReportData(
         scan_profile=EmptyScanProfile(
-            scan_profile_type="empty",
-            reference=Reference(f"ReportData|{organization_b.code}"),
-            level=ScanLevel.L0,
+            scan_profile_type="empty", reference=Reference(f"ReportData|{organization_b.code}"), level=ScanLevel.L0
         ),
         organization_code=organization_b.code,
         organization_name=organization_b.name,
@@ -1678,26 +1682,28 @@ def multi_report_ooi(report_data_ooi_org_a, report_data_ooi_org_b):
 
 @pytest.fixture
 def report_list():
-    asset_ids = iter([
-        "27e8fa60-4675-4c22-b7a7-76152fc520b8",
-        "775d62df-edf9-4c19-91cc-2cc1586a8111",
-        "6ea4268f-f8c9-4ccd-9f81-efb2bf60b215",
-        "fa648efe-7724-41cd-96c0-2c0d48b631bc",
-        "d2623e9f-3f56-4c4f-b01c-abf4a6f5794d",
-        "ba8e864a-770f-4a18-90d4-d7b8fba054ac",
-        "771190cb-a570-4ddf-bf10-2b7cb6d7b852",
-        "ef007438-6266-40c5-981b-a59a5e59d2a4",
-        "e545a488-de8a-4750-8056-6a3b354d011f",
-        "af8c8999-530d-45d5-a8b8-c823ee3c24b7",
-        "7b305f0d-c0a7-4ad5-af1e-31f81fc229c2",
-    ])
+    asset_ids = iter(
+        [
+            "27e8fa60-4675-4c22-b7a7-76152fc520b8",
+            "775d62df-edf9-4c19-91cc-2cc1586a8111",
+            "6ea4268f-f8c9-4ccd-9f81-efb2bf60b215",
+            "fa648efe-7724-41cd-96c0-2c0d48b631bc",
+            "d2623e9f-3f56-4c4f-b01c-abf4a6f5794d",
+            "ba8e864a-770f-4a18-90d4-d7b8fba054ac",
+            "771190cb-a570-4ddf-bf10-2b7cb6d7b852",
+            "ef007438-6266-40c5-981b-a59a5e59d2a4",
+            "e545a488-de8a-4750-8056-6a3b354d011f",
+            "af8c8999-530d-45d5-a8b8-c823ee3c24b7",
+            "7b305f0d-c0a7-4ad5-af1e-31f81fc229c2",
+        ]
+    )
 
     def asset_report(name, report_type, template):
         return create_asset_report(name, report_type, template, asset_ids, "Hostname|internet|minvws.nl")
 
     asset_reports = [
         asset_report(
-            "Safe Connections Report for minvws.nl", "safe-connections-report", "safe_connections_report/report.html",
+            "Safe Connections Report for minvws.nl", "safe-connections-report", "safe_connections_report/report.html"
         ),
         asset_report("DNS Report for minvws.nl", "dns-report", "dns_report/report.html"),
         asset_report("Name Server Report for minvws.nl", "name-server-report", "name_server_report/report.html"),
@@ -1714,16 +1720,21 @@ def report_list():
     return Paginated(
         count=3,
         items=[
-                create_report(
-                    "Concatenated Report for minvws.nl", "concatenated-report", "report.html", [create_asset_report(
-                            "Findings Report for minvws.nl",
-                            "findings-report",
-                            "findings_report/report.html",
-                            iter(["3300354d-530f-4ecf-8485-e120f43ba3f1"]),
-                            "Hostname|internet|minvws.nl",
-                        )
-                    ], iter(["3300354d-530f-4ecf-8485-e120f43ba3f1"])
-                ),
+            create_report(
+                "Concatenated Report for minvws.nl",
+                "concatenated-report",
+                "report.html",
+                [
+                    create_asset_report(
+                        "Findings Report for minvws.nl",
+                        "findings-report",
+                        "findings_report/report.html",
+                        iter(["3300354d-530f-4ecf-8485-e120f43ba3f1"]),
+                        "Hostname|internet|minvws.nl",
+                    )
+                ],
+                iter(["3300354d-530f-4ecf-8485-e120f43ba3f1"]),
+            ),
             create_report(
                 "Aggregate Report",
                 "aggregate-organisation-report",
@@ -1779,17 +1790,19 @@ def get_report_input_data_from_bytes():
 
 @pytest.fixture
 def aggregate_report_with_sub_reports():
-    ids = iter([
-        "a534b4d5-5dba-4ddc-9b77-970675ae4b1c",
-        "0bdea8eb-7ac0-46ef-ad14-ea3b0bfe1030",
-        "53d5452c-9e67-42d2-9cb0-3b684d8967a2",
-        "a218ca79-47de-4473-a93d-54d14baadd98",
-        "3779f5b0-3adf-41c8-9630-8eed8a857ae6",
-        "851feeab-7036-48f6-81ef-599467c52457",
-        "1e259fce-3cd7-436f-b233-b4ae24a8f11b",
-        "50a9e4df-3b69-4ad8-b798-df626162db5a",
-        "5faa3364-c8b2-4b9c-8cc8-99d8f19ccf8a",
-    ])
+    ids = iter(
+        [
+            "a534b4d5-5dba-4ddc-9b77-970675ae4b1c",
+            "0bdea8eb-7ac0-46ef-ad14-ea3b0bfe1030",
+            "53d5452c-9e67-42d2-9cb0-3b684d8967a2",
+            "a218ca79-47de-4473-a93d-54d14baadd98",
+            "3779f5b0-3adf-41c8-9630-8eed8a857ae6",
+            "851feeab-7036-48f6-81ef-599467c52457",
+            "1e259fce-3cd7-436f-b233-b4ae24a8f11b",
+            "50a9e4df-3b69-4ad8-b798-df626162db5a",
+            "5faa3364-c8b2-4b9c-8cc8-99d8f19ccf8a",
+        ]
+    )
 
     def asset_report(name: str, report_type: str, template: str):
         return create_asset_report(name, report_type, template, ids, "Hostname|internet|mispo.es", "_rieven", "Rieven")

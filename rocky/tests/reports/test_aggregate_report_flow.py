@@ -297,7 +297,7 @@ def test_json_download_aggregate_report(
 ):
     mock_organization_view_octopoes().get_report.return_value = get_aggregate_report_ooi
     mock_bytes_client().get_raws.return_value = [
-        ("7b305f0d-c0a7-4ad5-af1e-31f81fc229c2", get_aggregate_report_from_bytes),
+        ("7b305f0d-c0a7-4ad5-af1e-31f81fc229c2", get_aggregate_report_from_bytes)
     ]
 
     request = setup_request(
