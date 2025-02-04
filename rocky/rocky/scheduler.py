@@ -151,6 +151,7 @@ class ScheduleRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     scheduler_id: str
+    organisation: str
     data: dict
     schedule: str | None = None
     deadline_at: str
@@ -166,7 +167,6 @@ class ScheduleResponse(BaseModel):
     data: dict
     enabled: bool
     schedule: str | None
-    tasks: list[Task]
     deadline_at: datetime.datetime | None
     created_at: datetime.datetime
     modified_at: datetime.datetime
@@ -193,9 +193,10 @@ class PaginatedSchedulesResponse(BaseModel):
 
 class SchedulerResponse(BaseModel):
     id: str
-    enabled: bool
-    priority_queue: dict[str, Any]
-    last_activity: str | None
+    type: str
+    item_type: str
+    qsize: int
+    last_activity: datetime.datetime | None = None
 
 
 class LazyTaskList:
@@ -321,7 +322,7 @@ class SchedulerClient:
                     time.sleep(interval)
                     continue
                 raise SchedulerHTTPError()
-        return SchedulerResponse.model_validate_json(res.content).enabled
+        return True
 
     def patch_schedule(self, schedule_id: str, params: dict[str, Any]) -> None:
         try:
@@ -332,8 +333,10 @@ class SchedulerClient:
             raise SchedulerHTTPError()
 
     def post_schedule(self, schedule: ScheduleRequest) -> ScheduleResponse:
+        logger.info("Creating schedule", schedule=schedule)
         try:
             res = self._client.post("/schedules", json=schedule.model_dump(exclude_none=True))
+            logger.info(res.content)
             res.raise_for_status()
             logger.info("Schedule created", event_code=800081, schedule=schedule)
             return ScheduleResponse.model_validate_json(res.content)

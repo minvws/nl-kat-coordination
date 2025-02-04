@@ -5,16 +5,15 @@ from typing import Any
 from django.contrib import messages
 from django.http import Http404, JsonResponse
 from django.utils.translation import gettext_lazy as _
-from katalogus.client import Boefje, Normalizer
-from reports.forms import ReportRecurrenceChoiceForm, ReportScheduleStartDateChoiceForm, ReportScheduleStartDateForm
-from tools.forms.scheduler import TaskFilterForm
-
 from octopoes.models import OOI
 from octopoes.models.ooi.reports import ReportRecipe
+
+from katalogus.client import Boefje, Normalizer
+from reports.forms import ReportRecurrenceChoiceForm, ReportScheduleStartDateChoiceForm, ReportScheduleStartDateForm
 from rocky.scheduler import Boefje as SchedulerBoefje
+from rocky.scheduler import BoefjeTask, LazyTaskList
+from rocky.scheduler import Normalizer as SchedulerNormalizer
 from rocky.scheduler import (
-    BoefjeTask,
-    LazyTaskList,
     NormalizerTask,
     RawData,
     ReportTask,
@@ -25,8 +24,8 @@ from rocky.scheduler import (
     Task,
     scheduler_client,
 )
-from rocky.scheduler import Normalizer as SchedulerNormalizer
 from rocky.views.mixins import OctopoesView
+from tools.forms.scheduler import TaskFilterForm
 
 
 def get_date_time(date: str | None) -> datetime | None:
@@ -109,6 +108,7 @@ class SchedulerView(OctopoesView):
 
             schedule_request = ScheduleRequest(
                 scheduler_id=self.scheduler_id,
+                organisation=self.organization.code,
                 data=report_task,
                 schedule=report_recipe.cron_expression,
                 deadline_at=deadline_at.isoformat(),

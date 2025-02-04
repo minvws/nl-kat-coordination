@@ -1,24 +1,24 @@
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from account.mixins import OrganizationAPIMixin
 from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
+from octopoes.models import Reference
+from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.ooi.reports import ReportRecipe
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from structlog import get_logger
-from tools.ooi_helpers import create_ooi
-from tools.view_helpers import url_with_querystring
 
-from octopoes.models import Reference
-from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.ooi.reports import ReportRecipe
+from account.mixins import OrganizationAPIMixin
 from reports.serializers import ReportRecipeSerializer, ReportSerializer
 from rocky.scheduler import ReportTask, ScheduleRequest
 from rocky.views.mixins import ReportList
+from tools.ooi_helpers import create_ooi
+from tools.view_helpers import url_with_querystring
 
 logger = get_logger(__name__)
 
@@ -148,7 +148,8 @@ class ReportRecipeViewSet(OrganizationAPIMixin, viewsets.ModelViewSet):
                 deadline_at = datetime.now(timezone.utc).date().isoformat()
 
             schedule_request = ScheduleRequest(
-                scheduler_id=f"report-{self.organization.code}",
+                scheduler_id="report",
+                organisation=self.organization.code,
                 data=report_task,
                 schedule=report_recipe.cron_expression,
                 deadline_at=deadline_at,
