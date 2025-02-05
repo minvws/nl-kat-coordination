@@ -7,7 +7,7 @@ from octopoes.models.ooi.web import URL, HTTPHeader, HTTPHeaderURL, Website
 
 
 def test_url_extracted_by_oois_in_headers_url():
-    header = HTTPHeader(resource="resouce|url", key="Location", value="https://www.example.com/")
+    header = HTTPHeader(resource="resource|url", key="Location", value="https://www.example.com/")
 
     results = list(run_oois_in_headers(header, [], {}))
 
