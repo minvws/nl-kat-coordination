@@ -132,7 +132,7 @@ def _cached_resolve_normalizers(path: Path) -> dict[str, NormalizerResource]:
 
     for path, package in paths_and_packages:
         try:
-            normalizer_resources.append(get_normalizer_resource(path, package, hash(path)))
+            normalizer_resources.append(get_normalizer_resource(path, package, hash_path(path)))
         except ModuleException as exc:
             logger.exception(exc)
 
