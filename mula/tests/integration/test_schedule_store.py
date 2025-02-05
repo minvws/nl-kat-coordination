@@ -208,6 +208,9 @@ class ScheduleStoreTestCase(unittest.TestCase):
         self.assertIsNotNone(is_task_deleted)
         self.assertIsNone(is_task_deleted.schedule_id)
 
+    # NOTE: skipping this test until task relationship is re-enabled, disabled
+    # it for now when we use the model relationship
+    @unittest.skip("Disabled until task relationship is re-enabled")
     def test_relationship_schedule_tasks(self):
         # Arrange
         scheduler_id = "test_scheduler_id"

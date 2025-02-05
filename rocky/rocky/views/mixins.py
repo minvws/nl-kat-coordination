@@ -27,7 +27,7 @@ from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
-from octopoes.models.ooi.reports import Report
+from octopoes.models.ooi.reports import AssetReport, HydratedReport, Report
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import get_relations
@@ -330,10 +330,10 @@ class FindingList:
         raise NotImplementedError("FindingList only supports slicing")
 
 
-class HydratedReport:
-    parent_report: Report
-    children_reports: list[Report] | None
-    total_children_reports: int
+class EnrichedReport:
+    report: Report
+    asset_reports: list[Report] | None
+    total_asset_reports: int
     total_objects: int
     report_type_summary: dict[str, int]
 
@@ -341,110 +341,70 @@ class HydratedReport:
 class ReportList:
     HARD_LIMIT = 99_999_999
 
-    def __init__(
-        self, octopoes_connector: OctopoesAPIConnector, valid_time: datetime, parent_report_id: str | None = None
-    ):
+    def __init__(self, octopoes_connector: OctopoesAPIConnector, valid_time: datetime, report_id: str | None = None):
         self.octopoes_connector = octopoes_connector
         self.valid_time = valid_time
         self.ordered = True
         self._count = None
-        self.parent_report_id = parent_report_id
+        self.report_id = report_id
+        self.asset_reports = None
 
-        self.subreports = None
-        if self.parent_report_id and self.parent_report_id is not None:
-            self.subreports = self.get_subreports(self.parent_report_id)
+        if self.report_id and self.report_id is not None:
+            asset_reports = self.octopoes_connector.get_report(self.report_id, self.valid_time).input_oois
+            self.asset_reports = sorted(asset_reports, key=lambda x: (x.report_type, x.input_ooi))
 
     @cached_property
     def count(self) -> int:
-        if self.subreports is not None:
-            return len(self.subreports)
+        if self.asset_reports is not None:
+            return len(self.asset_reports)
         return self.octopoes_connector.list_reports(valid_time=self.valid_time, limit=0).count
 
     def __len__(self):
         return self.count
 
-    def __getitem__(self, key: int | slice) -> Sequence[HydratedReport | tuple[str, Report]]:
+    def __getitem__(self, key: int | slice) -> Sequence[EnrichedReport | tuple[str, Report]]:
         if isinstance(key, slice):
             offset = key.start or 0
             limit = self.HARD_LIMIT
             if key.stop:
                 limit = key.stop - offset
 
-            if self.subreports is not None:
-                return self.subreports[offset : offset + limit]
+            if self.asset_reports is not None:
+                return self.asset_reports[offset : offset + limit]
 
             reports = self.octopoes_connector.list_reports(valid_time=self.valid_time, offset=offset, limit=limit).items
 
-            return self.hydrate_report_list(reports)
+            return self.enriched_report_list(reports)
 
         raise NotImplementedError("ReportList only supports slicing")
 
-    def get_subreports(self, report_id: str) -> list[tuple[str, Report]]:
-        """
-        Get child reports with parent id.
-        """
-        # TODO: is better to use query over query_many as we use one parent id.
-        # query will only return 50 items as we do not have pagination (offset and limit)
-        # yet implemented for query requests. We use query_many to get more then 50 items at once.
-
-        subreports = self.octopoes_connector.query_many(
-            "Report.<parent_report [is Report]", self.valid_time, [report_id]
-        )
-
-        subreports = sorted(subreports, key=lambda x: (x[1].report_type, x[1].input_oois))
-
-        return subreports
-
-    def hydrate_report_list(self, reports: list[tuple[Report, list[Report | None]]]) -> list[HydratedReport]:
-        hydrated_reports: list[HydratedReport] = []
+    def enriched_report_list(self, reports: list[HydratedReport]) -> list[EnrichedReport]:
+        enriched_reports: list[EnrichedReport] = []
 
         for report in reports:
-            hydrated_report: HydratedReport = HydratedReport()
+            enriched_report = EnrichedReport()
 
-            parent_report, children_reports = report
-            filtered_children_reports: list[Report] = list(filter(None, children_reports))
+            enriched_report.report = report
+            enriched_report.asset_reports = sorted(report.input_oois[:5], key=attrgetter("name"))
+            enriched_report.total_asset_reports = len(report.input_oois)
+            enriched_report.total_objects = len({asset_report.input_ooi for asset_report in report.input_oois})
+            enriched_report.report_type_summary = self.report_type_summary(report.input_oois)
 
-            hydrated_report.total_children_reports = len(filtered_children_reports)
+            # We want to show only 5 children reports
+            enriched_reports.append(enriched_report)
 
-            if len(parent_report.input_oois) > 0:
-                hydrated_report.total_objects = len(parent_report.input_oois)
-            else:
-                hydrated_report.total_objects = len(self.get_children_input_oois(filtered_children_reports))
-
-            hydrated_report.report_type_summary = self.report_type_summary(filtered_children_reports)
-
-            if not parent_report.has_parent:
-                hydrated_children_reports: list[Report] = []
-                for child_report in filtered_children_reports:
-                    if str(child_report.parent_report) == str(parent_report):
-                        hydrated_children_reports.append(child_report)
-                    if len(hydrated_children_reports) >= 5:  # We want to show only 5 children reports
-                        break
-
-                hydrated_report.children_reports = sorted(hydrated_children_reports, key=attrgetter("name"))
-
-            hydrated_report.parent_report = parent_report
-            hydrated_reports.append(hydrated_report)
-
-        return hydrated_reports
+        return enriched_reports
 
     @staticmethod
-    def get_children_input_oois(children_reports: list[Report]) -> set[str]:
-        return {input_ooi for child_report in children_reports for input_ooi in child_report.input_oois}
-
-    @staticmethod
-    def report_type_summary(reports: list[Report]) -> dict[str, int]:
+    def report_type_summary(reports: list[AssetReport]) -> dict[str, int]:
         """
         Calculates per report type how many objects it consumed.
         """
 
         summary: dict[str, int] = {}
-        report_types: set[str] = {report.report_type for report in reports}
 
-        for report_type in sorted(report_types):
-            summary[report_type] = sum(
-                [len(report.input_oois) for report in reports if report_type == report.report_type]
-            )
+        for report_type in sorted({report.report_type for report in reports}):
+            summary[report_type] = len([report for report in reports if report.report_type == report_type])
 
         return summary
 
@@ -518,7 +478,9 @@ class SingleOOIMixin(OctopoesView):
 
 
 class SingleOOITreeMixin(SingleOOIMixin):
-    tree: ReferenceTree
+    @cached_property
+    def tree(self) -> ReferenceTree:
+        return self.get_ooi_tree(depth=1)
 
     def get_depth(self):
         try:
@@ -526,7 +488,7 @@ class SingleOOITreeMixin(SingleOOIMixin):
         except ValueError:
             return DEPTH_DEFAULT
 
-    def get_ooi(self, pk: str | None = None, observed_at: datetime | None = None) -> OOI:
+    def get_ooi_tree(self, pk: str | None = None, observed_at: datetime | None = None, depth: int | None = None) -> OOI:
         if pk is None:
             pk = self.get_ooi_id()
 
@@ -534,14 +496,14 @@ class SingleOOITreeMixin(SingleOOIMixin):
             observed_at = self.observed_at
 
         ref = Reference.from_str(pk)
-        depth = self.get_depth()
+        depth = depth or self.get_depth()
 
         try:
-            self.tree = self.octopoes_api_connector.get_tree(ref, valid_time=observed_at, depth=depth)
+            tree = self.octopoes_api_connector.get_tree(ref, valid_time=observed_at, depth=depth)
         except Exception as e:
             self.handle_connector_exception(e)
 
-        return self.tree.store[str(self.tree.root.reference)]
+        return tree
 
 
 class SeveritiesMixin:

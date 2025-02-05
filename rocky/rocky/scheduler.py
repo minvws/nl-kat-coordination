@@ -167,7 +167,6 @@ class ScheduleResponse(BaseModel):
     data: dict
     enabled: bool
     schedule: str | None
-    tasks: list[Task]
     deadline_at: datetime.datetime | None
     created_at: datetime.datetime
     modified_at: datetime.datetime
@@ -197,7 +196,7 @@ class SchedulerResponse(BaseModel):
     type: str
     item_type: str
     qsize: int
-    last_activity: str | None
+    last_activity: datetime.datetime | None = None
 
 
 class LazyTaskList:
@@ -335,8 +334,10 @@ class SchedulerClient:
             raise SchedulerHTTPError()
 
     def post_schedule(self, schedule: ScheduleRequest) -> ScheduleResponse:
+        logger.info("Creating schedule", schedule=schedule)
         try:
             res = self._client.post("/schedules", json=schedule.model_dump(exclude_none=True))
+            logger.info(res.content)
             res.raise_for_status()
             logger.info("Schedule created", event_code=800081, schedule=schedule)
 

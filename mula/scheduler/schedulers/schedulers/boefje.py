@@ -1,7 +1,6 @@
 import uuid
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
-from types import SimpleNamespace
 from typing import Any, Literal
 
 from opentelemetry import trace
@@ -36,7 +35,7 @@ class BoefjeScheduler(Scheduler):
                 configuration, external services connections).
         """
         super().__init__(ctx=ctx, scheduler_id=self.ID, create_schedule=True, auto_calculate_deadline=True)
-        self.ranker = rankers.BoefjeRanker(self.ctx)
+        self.ranker = rankers.BoefjeRankerTimeBased(self.ctx)
 
     def run(self) -> None:
         """The run method is called when the scheduler is started. It will
@@ -207,7 +206,7 @@ class BoefjeScheduler(Scheduler):
 
                         boefje_tasks.append((boefje_task, org.id))
             except ExternalServiceError:
-                self.logger.exception(
+                self.logger.warning(
                     "Error occurred while processing new boefjes",
                     organisation_id=org.id,
                     scheduler_id=self.scheduler_id,
@@ -417,8 +416,7 @@ class BoefjeScheduler(Scheduler):
             data=boefje_task.model_dump(),
         )
 
-        latest_task = self.ctx.datastores.task_store.get_latest_task_by_hash(boefje_task.hash)
-        task.priority = self.ranker.rank(SimpleNamespace(latest_task=latest_task, task=boefje_task))
+        task.priority = self.ranker.rank(task)
 
         self.push_item_to_queue_with_timeout(item=task, max_tries=self.max_tries, create_schedule=create_schedule)
 
@@ -429,6 +427,7 @@ class BoefjeScheduler(Scheduler):
             boefje_id=boefje_task.boefje.id,
             ooi_primary_key=boefje_task.input_ooi,
             scheduler_id=self.scheduler_id,
+            organisation_id=organisation_id,
             caller=caller,
         )
 

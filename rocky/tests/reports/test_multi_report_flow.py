@@ -150,9 +150,10 @@ def test_view_multi_report(
     multi_report_ooi,
     get_multi_report_post_processed_data,
 ):
-    mock_organization_view_octopoes().get.return_value = multi_report_ooi
-    mock_bytes_client().get_raw.return_value = json.dumps(get_multi_report_post_processed_data).encode("utf-8")
-    mock_organization_view_octopoes().query.return_value = []  # no child reports
+    mock_organization_view_octopoes().get_report.return_value = multi_report_ooi
+    mock_bytes_client().get_raws.return_value = [
+        ("7b305f0d-c0a7-4ad5-af1e-31f81fc229c2", json.dumps(get_multi_report_post_processed_data).encode("utf-8"))
+    ]
 
     request = setup_request(rf.get("view_report", {"report_id": f"{multi_report_ooi.primary_key}"}), client_member.user)
 
