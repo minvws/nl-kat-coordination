@@ -10,7 +10,6 @@ from sqlalchemy.sql import func
 from scheduler.utils import GUID, cron
 
 from .base import Base
-from .task import Task
 
 
 class Schedule(BaseModel):
