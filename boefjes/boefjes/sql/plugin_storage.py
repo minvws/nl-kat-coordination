@@ -4,7 +4,7 @@ import structlog
 from sqlalchemy.orm import Session
 
 from boefjes.config import Settings, settings
-from boefjes.models import Boefje, Normalizer, PluginType
+from boefjes.models import Boefje, Normalizer, PluginType, RunOn
 from boefjes.sql.db import ObjectNotFoundException, session_managed_iterator
 from boefjes.sql.db_models import BoefjeInDB, NormalizerInDB
 from boefjes.sql.session import SessionMixin
@@ -109,7 +109,7 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             schema=boefje.boefje_schema,
             cron=boefje.cron,
             interval=boefje.interval,
-            run_on=boefje.run_on,
+            run_on=boefje.run_on.value if boefje.run_on else None,
             oci_image=boefje.oci_image,
             oci_arguments=boefje.oci_arguments,
             version=boefje.version,
@@ -153,7 +153,7 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             boefje_schema=boefje_in_db.schema,
             cron=boefje_in_db.cron,
             interval=boefje_in_db.interval,
-            run_on=boefje_in_db.run_on,
+            run_on=RunOn(boefje_in_db.run_on) if boefje_in_db.run_on else None,
             oci_image=boefje_in_db.oci_image,
             oci_arguments=boefje_in_db.oci_arguments,
             version=boefje_in_db.version,

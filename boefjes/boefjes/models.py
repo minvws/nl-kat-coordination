@@ -1,5 +1,5 @@
 import datetime
-from enum import Enum
+from enum import Enum, auto
 from typing import Literal
 
 from croniter import croniter
@@ -11,6 +11,12 @@ from pydantic import BaseModel, Field, field_validator
 class Organisation(BaseModel):
     id: str
     name: str
+
+
+class RunOn(Enum):
+    CREATE = "create"
+    UPDATE = "update"
+    ALL = "all"
 
 
 class Plugin(BaseModel):
@@ -34,7 +40,7 @@ class Boefje(Plugin):
     boefje_schema: dict | None = None
     cron: str | None = None
     interval: int | None = None
-    run_on: list[str] | None = None
+    run_on: RunOn | None = None
     runnable_hash: str | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)

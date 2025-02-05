@@ -21,6 +21,7 @@ from scheduler.models import (
     Task,
     TaskStatus,
 )
+from scheduler.models.ooi import RunOn
 from scheduler.schedulers import Scheduler
 from scheduler.schedulers.queue import PriorityQueue, QueueFullError
 from scheduler.schedulers.rankers import BoefjeRanker
@@ -190,9 +191,9 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        with futures.ThreadPoolExecutor(
+        with (futures.ThreadPoolExecutor(
             thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-mutations"
-        ) as executor:
+        ) as executor):
             for boefje in boefjes:
                 # Is the boefje allowed to run on the ooi?
                 if not self.has_boefje_permission_to_run(boefje, ooi):
@@ -210,13 +211,9 @@ class BoefjeScheduler(Scheduler):
                 run_task = True
 
                 # What type of run boefje is it?
-                if boefje.run_on:
+                if boefje.run_on and mutation.operation != MutationOperationType.DELETE:
                     create_schedule = False
-                    run_task = False
-                    if mutation.operation == MutationOperationType.CREATE:
-                        run_task = "create" in boefje.run_on
-                    elif mutation.operation == MutationOperationType.UPDATE:
-                        run_task = "update" in boefje.run_on
+                    run_task = mutation.operation.value == boefje.run_on.value or boefje.run_on == RunOn.ALL
 
                 if not run_task:
                     self.logger.debug(
