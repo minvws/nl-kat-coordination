@@ -9,12 +9,16 @@ for (var i = 0; i < toggle_all_btn.length; i++) {
 
 function toggleCheckboxes(name, value) {
   // can start with a underscore or Aa-Zz, followed by other numbers, letters, dashes or underscores
-  var namepattern = new RegExp("^[A-Za-z_][A-Za-z0-9_-]*$");
+  const namepattern = /^[A-Za-z_][A-Za-z0-9_-]*$/;
+  let checkboxes = false;
   if (!namepattern.test(name)) {
     // is our 'name' a css query?
-    var checkboxes = document.querySelectorAll(name);
+    checkboxes = document.querySelectorAll(name);
   } else {
-    var checkboxes = document.getElementsByName(name);
+    checkboxes = document.getElementsByName(name);
+  }
+  if (!checkboxes){
+    return false;
   }
   for (var i = 0; i < checkboxes.length; i++) {
     if (checkboxes[i].tagName == "INPUT" && checkboxes[i].type == "checkbox") {
