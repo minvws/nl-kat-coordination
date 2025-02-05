@@ -9,7 +9,7 @@ def test_medium_bad_ciphers():
     address = IPAddressV4(address="8.8.8.8", network="network|fake")
     port = IPPort(address=address.reference, protocol="tcp", port=22)
     ip_service = IPService(ip_port=port.reference, service=Service(name="https").reference)
-    cipher = TLSCipher(e
+    cipher = TLSCipher(
         ip_service=ip_service.reference,
         suites={
             "TLSv1.3": [
