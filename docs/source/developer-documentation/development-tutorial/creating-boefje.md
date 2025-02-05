@@ -2,8 +2,6 @@
 
 There are two ways to create a Boefje. The first is to create a Boefje with the User Interface (UI). The second option is to create it in the backend.
 
-.. \_boefje-variants:
-
 ## Boefje variants
 
 Boefje variants are Boefjes that use the same container image. In OpenKAT, all Boefjes with the same container image will be seen as 'variants' of each other and will be shown together on those Boefje detail pages.

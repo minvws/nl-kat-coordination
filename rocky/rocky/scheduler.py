@@ -164,7 +164,7 @@ class ScheduleResponse(BaseModel):
     enabled: bool
     schedule: str | None
     tasks: list[Task]
-    deadline_at: datetime.datetime
+    deadline_at: datetime.datetime | None
     created_at: datetime.datetime
     modified_at: datetime.datetime
 
