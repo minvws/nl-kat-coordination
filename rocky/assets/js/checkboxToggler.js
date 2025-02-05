@@ -17,7 +17,7 @@ function toggleCheckboxes(name, value) {
   } else {
     checkboxes = document.getElementsByName(name);
   }
-  if (!checkboxes){
+  if (!checkboxes) {
     return false;
   }
   for (var i = 0; i < checkboxes.length; i++) {
