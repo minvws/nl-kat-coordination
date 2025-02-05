@@ -10,7 +10,7 @@ from pydantic_core.core_schema import ValidationInfo
 
 class Reference(str):
     @classmethod
-    def parse(cls, ref_str: str) -> tuple[str, str]:
+    def parse(cls, ref_str: str) -> list[str]:
         return ref_str.split("|", 1)
 
     @property
