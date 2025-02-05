@@ -1,4 +1,4 @@
-cefrom bits.https_availability.https_availability import run as run_https_availability
+from bits.https_availability.https_availability import run as run_https_availability
 from bits.oois_in_headers.oois_in_headers import run as run_oois_in_headers
 
 from octopoes.models.ooi.findings import Finding
