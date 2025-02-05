@@ -90,7 +90,7 @@ class AddBoefjeVariantView(BoefjeSetupView):
         initial["scan_level"] = self.plugin.scan_level
         initial["interval_number"] = self.plugin.interval
         initial["interval_frequency"] = "minutes"
-        initial["run_on"] = self.plugin.run_on
+        initial["run_on"] = "-".join(self.plugin.run_on)
 
         if self.plugin.interval:
             initial["scan_type"] = "interval"
@@ -166,7 +166,7 @@ class EditBoefjeView(BoefjeSetupView):
         initial["scan_level"] = self.plugin.scan_level
         initial["interval_number"] = self.plugin.interval
         initial["interval_frequency"] = "minutes"
-        initial["run_on"] = self.plugin.run_on
+        initial["run_on"] = "-".join(self.plugin.run_on)
 
         if self.plugin.interval:
             initial["scan_type"] = "interval"
@@ -231,7 +231,7 @@ def create_boefje_with_form_data(form_data, plugin_id: str, created: str | None)
     if form_data["scan_type"] == "interval" and form_data.get("interval_number"):
         interval = get_interval_minutes(int(form_data["interval_number"]), form_data["interval_frequency"])
     elif form_data["scan_type"] == "run_on":
-        run_on = [form_data["run_on"]]
+        run_on = form_data["run_on"].split("-")
 
     input_objects = set()
 

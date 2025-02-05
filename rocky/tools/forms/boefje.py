@@ -23,7 +23,7 @@ INTERVAL_CHOICES = [
     ("weeks", "weeks"),
     ("years", "years"),
 ]
-OBJECT_CHANGE_CHOICES = [("create", "Creation"), ("update", "Change"), ("create, update", "Creation and change")]
+OBJECT_CHANGE_CHOICES = [("create", "Creation"), ("update", "Change"), ("create-update", "Creation and change")]
 
 
 class BoefjeSetupForm(BaseRockyForm):

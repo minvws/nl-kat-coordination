@@ -91,7 +91,7 @@
                                         <td>
                                             <span title="{{ variant.run_on }}">
                                                 {% if variant.run_on %}
-                                                    {% for type in variant.run_on %}{{ type|capfirst }}{% endfor %}
+                                                    {{ variant.run_on|join:", "|capfirst }}
                                                 {% else %}
                                                     -
                                                 {% endif %}
