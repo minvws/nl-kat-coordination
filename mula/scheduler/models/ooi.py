@@ -12,7 +12,6 @@ class MutationOperationType(Enum):
 class RunOn(Enum):
     CREATE = MutationOperationType.CREATE.value
     UPDATE = MutationOperationType.UPDATE.value
-    ALL = "all"
 
 
 class ScanProfile(BaseModel):
