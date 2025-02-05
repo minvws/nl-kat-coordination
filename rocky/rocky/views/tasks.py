@@ -80,7 +80,7 @@ class NormalizersTaskListView(TaskListView):
         ]
 
         # Search for the corresponding Boefje names and add those to the task_list
-        task_list = context["task_list"]
+        task_list = context.get("task_list", [])
         ids = [
             task.data.raw_data.boefje_meta.boefje.id
             for task in task_list
@@ -96,19 +96,15 @@ class NormalizersTaskListView(TaskListView):
         return context
 
 
-class ReportsTaskListView(SchedulerView, SchedulerListView, PageActionsView):
+class ReportsTaskListView(TaskListView):
     template_name = "tasks/report_tasks.html"
-    paginator_class = RockyPaginator
     paginate_by = 25
     context_object_name = "report_task_list"
     task_type = "report"
 
-    def get_queryset(self):
-        return self.get_task_list()
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["total_report_tasks"] = len(self.object_list)
+
         context["breadcrumbs"] = [
             {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")},
             {
