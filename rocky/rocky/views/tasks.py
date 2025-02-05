@@ -52,6 +52,18 @@ class BoefjesTaskListView(TaskListView):
     template_name = "tasks/boefjes.html"
     task_type = "boefje"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["breadcrumbs"] = [
+            {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")},
+            {
+                "url": reverse("boefjes_task_list", kwargs={"organization_code": self.organization.code}),
+                "text": _("Boefjes"),
+            },
+        ]
+        return context
+
 
 class NormalizersTaskListView(TaskListView):
     template_name = "tasks/normalizers.html"
@@ -59,6 +71,13 @@ class NormalizersTaskListView(TaskListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")},
+            {
+                "url": reverse("normalizers_task_list", kwargs={"organization_code": self.organization.code}),
+                "text": _("Normalizers"),
+            },
+        ]
 
         # Search for the corresponding Boefje names and add those to the task_list
         task_list = context["task_list"]
@@ -74,6 +93,29 @@ class NormalizersTaskListView(TaskListView):
             boefje_id = task.data.raw_data.boefje_meta.boefje.id
             task.data.raw_data.boefje_meta.boefje.name = plugin_dict[boefje_id] if boefje_id != "manual" else "Manual"
 
+        return context
+
+
+class ReportsTaskListView(SchedulerView, SchedulerListView, PageActionsView):
+    template_name = "tasks/report_tasks.html"
+    paginator_class = RockyPaginator
+    paginate_by = 25
+    context_object_name = "report_task_list"
+    task_type = "report"
+
+    def get_queryset(self):
+        return self.get_task_list()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["total_report_tasks"] = len(self.object_list)
+        context["breadcrumbs"] = [
+            {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")},
+            {
+                "url": reverse("reports_task_list", kwargs={"organization_code": self.organization.code}),
+                "text": _("Reports"),
+            },
+        ]
         return context
 
 
