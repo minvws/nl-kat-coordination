@@ -5890,6 +5890,11 @@ msgid "When"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
+#: rocky/templates/tasks/normalizers.html
+msgid "Normalizer"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html
 msgid "This scan was manually created."
 msgstr ""
 
@@ -6704,10 +6709,6 @@ msgstr ""
 
 #: rocky/templates/tasks/normalizers.html
 msgid "List of tasks for normalizers"
-msgstr ""
-
-#: rocky/templates/tasks/normalizers.html
-msgid "Normalizer"
 msgstr ""
 
 #: rocky/templates/tasks/normalizers.html
