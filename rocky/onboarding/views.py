@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from account.forms import MemberRegistrationForm, OnboardingOrganizationUpdateForm, OrganizationForm
@@ -332,13 +332,11 @@ class OnboardingSetupScanOOIDetailView(
         return scheduler_client(organization.code).is_scheduler_ready("report")
 
     def post(self, request, *args, **kwargs):
-        parent_report_name_format, subreport_name_format = self.get_initial_report_names()
+        report_name_format = self.get_initial_report_name()
         parent_report_type = self.get_parent_report_type()
-        report_recipe = self.create_report_recipe(
-            parent_report_name_format, subreport_name_format, parent_report_type, None
-        )
+        report_recipe = self.create_report_recipe(report_name_format, parent_report_type, None)
         if self.is_scheduler_enabled(self.organization):
-            self.create_report_schedule(report_recipe, datetime.now(timezone.utc))
+            self.create_report_schedule(report_recipe, datetime.now(timezone.utc) + timedelta(minutes=2))
 
         return redirect(
             reverse("step_report", kwargs={"organization_code": self.organization.code})
@@ -384,10 +382,11 @@ class OnboardingReportView(
             )
 
             if reports:
+                asset_reports = reports[0].input_oois
                 return redirect(
                     reverse("view_report", kwargs={"organization_code": self.organization.code})
                     + "?"
-                    + urlencode({"report_id": reports[0].reference})
+                    + urlencode({"asset_report_id": asset_reports[0]})
                 )
         return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 
