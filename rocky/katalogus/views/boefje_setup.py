@@ -256,7 +256,7 @@ def create_boefje_with_form_data(form_data, plugin_id: str, created: str | None)
     )
 
 
-def get_interval_minutes(interval_number, interval_frequency) -> int:
+def get_interval_minutes(interval_number, interval_frequency) -> int | None:
     if interval_frequency == "minutes":
         return int(interval_number)
     if interval_frequency == "hours":

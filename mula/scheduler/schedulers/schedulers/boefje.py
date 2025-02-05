@@ -191,9 +191,9 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        with (futures.ThreadPoolExecutor(
+        with futures.ThreadPoolExecutor(
             thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-mutations"
-        ) as executor):
+        ) as executor:
             for boefje in boefjes:
                 # Is the boefje allowed to run on the ooi?
                 if not self.has_boefje_permission_to_run(boefje, ooi):
