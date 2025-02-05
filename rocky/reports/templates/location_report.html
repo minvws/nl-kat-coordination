@@ -1,0 +1,25 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block head %}
+    {{ block.super }}
+    <link rel="stylesheet"
+          href="https://unpkg.com/maplibre-gl@4.5.0/dist/maplibre-gl.css">
+{% endblock head %}
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1" class="choose-report">
+        <section>
+            <div class="geoip-map"></div>
+        </section>
+    </main>
+{% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    <script src="https://unpkg.com/maplibre-gl@4.5.0/dist/maplibre-gl.js"
+            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "js/geoIP.js" %}" nonce="{{ request.csp_nonce }}"></script>
+{% endblock html_at_end_body %}
