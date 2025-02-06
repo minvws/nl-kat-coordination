@@ -84,19 +84,20 @@ class AllTaskListView(SchedulerListView, PageActionsView):
     client = scheduler_client(None)
     task_filter_form = TaskFilterForm
 
+    def get_all_organizations_tasks(self) -> dict[str, dict[str, list[dict[str, str | list[str]]]]]:
+        if not self.request.user.is_anonymous:
+            organizations = [org.code for org in self.request.user.organizations]
+            return {"filters": {"filters": [{"column": "organisation", "operator": "in", "value": organizations}]}}
+        return {}
+
     def get_queryset(self):
         task_type = self.request.GET.get("type", self.task_type)
-        self.schedulers = [f"{task_type}-{o.code}" for o in self.request.user.organizations]
+        self.schedulers = [task_type]
         form_data = self.task_filter_form(self.request.GET).data.dict()
-        kwargs = {k: v for k, v in form_data.items() if v}
+        kwargs = {k: v for k, v in form_data.items() if v} | self.get_all_organizations_tasks()
 
         try:
-            return LazyTaskList(
-                self.client,
-                task_type=task_type,
-                filters={"filters": [{"column": "scheduler_id", "operator": "in", "value": self.schedulers}]},
-                **kwargs,
-            )
+            return LazyTaskList(self.client, task_type=task_type, **kwargs)
 
         except HTTPError as error:
             error_message = _(f"Fetching tasks failed: no connection with scheduler: {error}")
