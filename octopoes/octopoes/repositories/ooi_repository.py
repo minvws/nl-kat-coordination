@@ -10,7 +10,7 @@ from uuid import UUID
 import structlog
 from bits.definitions import BitDefinition
 from httpx import HTTPStatusError, codes
-from pydantic import RootModel, TypeAdapter
+from pydantic import RootModel, TypeAdapter, ValidationError
 
 from octopoes.config.settings import (
     DEFAULT_LIMIT,
@@ -240,12 +240,17 @@ class XTDBOOIRepository(OOIRepository):
         return export
 
     @classmethod
-    def deserialize(cls, data: dict[str, Any], to_type: type[OOI] | None = None) -> OOI:
+    def deserialize(
+        cls, 
+        data: 
+        dict[str, Any], 
+        to_type: type[OOI] | None = None, 
+        skip_errors: bool = False
+    ) -> OOI:
         if "object_type" not in data:
             raise ValueError("Data is missing object_type")
 
-        object_cls = type_by_name(data["object_type"])
-        object_cls = to_type or object_cls
+        object_cls = to_type or type_by_name(data["object_type"])
         user_id = data.get("user_id")
 
         # remove type prefixes
@@ -259,7 +264,19 @@ class XTDBOOIRepository(OOIRepository):
         if scan_profiles := data.get("_reference", []):
             stripped["scan_profile"] = scan_profiles[0]
 
-        return object_cls.model_validate(stripped)
+        try:
+           return object_cls.model_validate(stripped)
+        except ValidationError as error:
+           if skip_errors:
+                logger.error(
+                    "An OOI could not be validated due to a mismatch between the database and the current models. PK: %r on (wanted) type %s. Validation error: %r",
+                    stripped["primary_key"],
+                    object_cls,
+                    error
+                )
+                return False
+           raise error
+
 
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
         try:
@@ -308,7 +325,7 @@ class XTDBOOIRepository(OOIRepository):
             return []
 
         query = Query().where_in(OOI, id=references).pull(OOI, fields="[* {:_reference [*]}]")
-        return [self.deserialize(x[0]) for x in self.session.client.query(query, valid_time)]
+        return [deserialized for x in self.session.client.query(query, valid_time) if (deserialized := self.deserialize(data=x[0], skip_errors=True)) != False]
 
     def list_oois(
         self,
@@ -385,7 +402,7 @@ class XTDBOOIRepository(OOIRepository):
         )
 
         res = self.session.client.query(data_query, valid_time)
-        oois = [self.deserialize(x[0]) for x in res]
+        oois = [deserialized for x in res if (deserialized := self.deserialize(data=x[0], skip_errors=True)) != False]
         return Paginated(count=count, items=oois)
 
     def list_oois_by_object_types(self, types: set[type[OOI]], valid_time: datetime) -> list[OOI]:
@@ -400,7 +417,7 @@ class XTDBOOIRepository(OOIRepository):
                     :in-args [[{object_types}]]
                 }}
         """.format(object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)))
-        return [self.deserialize(x[0]) for x in self.session.client.query(data_query, valid_time)]
+        return [deserialized for x in self.session.client.query(data_query, valid_time) if (deserialized := self.deserialize(data=x[0], skip_errors=True)) != False]
 
     def list_random(
         self, valid_time: datetime, amount: int = 1, scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER
