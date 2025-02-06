@@ -21,7 +21,7 @@ class RunOnDB(Enum):
     CREATE_UPDATE = "create_update"
 
     @classmethod
-    def from_run_ons(cls, run_ons: list[RunOn] | None):
+    def from_run_ons(cls, run_ons: list[RunOn] | None) -> Self | None:
         if run_ons is None:
             return None
 
