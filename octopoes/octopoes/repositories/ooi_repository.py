@@ -240,13 +240,7 @@ class XTDBOOIRepository(OOIRepository):
         return export
 
     @classmethod
-    def deserialize(
-        cls, 
-        data: 
-        dict[str, Any], 
-        to_type: type[OOI] | None = None, 
-        skip_errors: bool = False
-    ) -> OOI:
+    def deserialize(cls, data: dict[str, Any], to_type: type[OOI] | None = None, skip_errors: bool = False) -> OOI:
         if "object_type" not in data:
             raise ValueError("Data is missing object_type")
 
@@ -265,9 +259,9 @@ class XTDBOOIRepository(OOIRepository):
             stripped["scan_profile"] = scan_profiles[0]
 
         try:
-           return object_cls.model_validate(stripped)
+            return object_cls.model_validate(stripped)
         except ValidationError as error:
-           if skip_errors:
+            if skip_errors:
                 logger.error(
                     "An OOI could not be validated due to a mismatch between the database and the current models. PK: %r on (wanted) type %s. Validation error: %r",
                     stripped["primary_key"],
@@ -275,8 +269,7 @@ class XTDBOOIRepository(OOIRepository):
                     error
                 )
                 return False
-           raise error
-
+            raise error
 
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
         try:
@@ -325,7 +318,11 @@ class XTDBOOIRepository(OOIRepository):
             return []
 
         query = Query().where_in(OOI, id=references).pull(OOI, fields="[* {:_reference [*]}]")
-        return [deserialized for x in self.session.client.query(query, valid_time) if (deserialized := self.deserialize(data=x[0], skip_errors=True)) != False]
+        return [
+            deserialized
+            for x in self.session.client.query(query, valid_time)
+            if (deserialized := self.deserialize(data=x[0], skip_errors=True)) != False
+        ]
 
     def list_oois(
         self,
@@ -417,7 +414,11 @@ class XTDBOOIRepository(OOIRepository):
                     :in-args [[{object_types}]]
                 }}
         """.format(object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)))
-        return [deserialized for x in self.session.client.query(data_query, valid_time) if (deserialized := self.deserialize(data=x[0], skip_errors=True)) != False]
+        return [
+            deserialized
+            for x in self.session.client.query(data_query, valid_time)
+            if (deserialized := self.deserialize(data=x[0], skip_errors=True)) != False
+        ]
 
     def list_random(
         self, valid_time: datetime, amount: int = 1, scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER
