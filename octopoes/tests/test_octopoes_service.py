@@ -80,8 +80,8 @@ def test_on_update_origin(octopoes_service, valid_time):
     )
 
 
-@pytest.mark.parametrize("new_data", [EmptyScanProfile(reference="test_reference"), None])
-@pytest.mark.parametrize("old_data", [EmptyScanProfile(reference="test_reference"), None])
+@pytest.mark.parametrize("new_data", [EmptyScanProfile(reference="test|reference"), None])
+@pytest.mark.parametrize("old_data", [EmptyScanProfile(reference="test|reference"), None])
 def test_on_create_scan_profile(octopoes_service, new_data, old_data, bit_runner: MagicMock):
     octopoes_service.origin_repository.list_origins.return_value = [
         Origin(
@@ -104,7 +104,7 @@ def test_on_create_scan_profile(octopoes_service, new_data, old_data, bit_runner
         valid_time=valid_time,
         old_data=old_data,
         new_data=new_data,
-        reference="test_reference",
+        reference="test|reference",
         client="_dev",
     )
 

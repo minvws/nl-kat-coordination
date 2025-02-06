@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-31 11:22+0000\n"
+"POT-Creation-Date: 2025-02-06 13:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1156,13 +1156,13 @@ msgstr ""
 
 #: katalogus/templates/partials/plugins_navigation.html
 #: rocky/templates/scan.html rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/partials/tab_navigation.html
+#: rocky/templates/tasks/partials/tab_navigation.html rocky/views/tasks.py
 msgid "Boefjes"
 msgstr ""
 
 #: katalogus/templates/partials/plugins_navigation.html
 #: rocky/templates/tasks/normalizers.html
-#: rocky/templates/tasks/partials/tab_navigation.html
+#: rocky/templates/tasks/partials/tab_navigation.html rocky/views/tasks.py
 msgid "Normalizers"
 msgstr ""
 
@@ -1218,6 +1218,7 @@ msgstr ""
 #: katalogus/templates/plugin_container_image.html
 #: reports/report_types/tls_report/report.html
 #: reports/templates/partials/plugin_overview_table.html
+#: reports/templates/tasks/report_tasks_list.html
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 #: rocky/templates/tasks/ooi_detail_task_list.html
@@ -1285,6 +1286,7 @@ msgstr ""
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/subreports_table.html
+#: reports/templates/tasks/report_tasks_list.html
 msgid "Creation date"
 msgstr ""
 
@@ -1856,6 +1858,8 @@ msgstr ""
 #: onboarding/templates/step_2a_choose_report_info.html
 #: reports/templates/report_overview/report_overview_header.html
 #: reports/views/base.py rocky/templates/header.html
+#: rocky/templates/tasks/partials/tab_navigation.html
+#: rocky/templates/tasks/report_tasks.html rocky/views/tasks.py
 msgid "Reports"
 msgstr ""
 
@@ -4007,6 +4011,10 @@ msgid "This report type requires the following plugins to be enabled:"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
+msgid "Toggle all required plugins"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
 msgid "Show enabled plugins"
 msgstr ""
 
@@ -4020,6 +4028,10 @@ msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "The following plugins are optional to generate the report:"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "Toggle all optional plugins"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -4208,6 +4220,7 @@ msgid "Showing %(length)s of %(total)s reports"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/tasks/report_tasks_list.html
 msgid "Reports:"
 msgstr ""
 
@@ -4415,6 +4428,15 @@ msgstr ""
 msgid ""
 "There are no required or optional plugins needed for the selected report "
 "types."
+msgstr ""
+
+#: reports/templates/tasks/report_tasks_list.html
+msgid "Recipe ID"
+msgstr ""
+
+#: reports/templates/tasks/report_tasks_list.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+msgid "Modified date"
 msgstr ""
 
 #: reports/views/aggregate_report.py
@@ -5564,8 +5586,8 @@ msgstr ""
 msgid "Crisis room"
 msgstr ""
 
-#: rocky/templates/header.html rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/header.html rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/tasks/partials/tasks_overview_header.html
 #: rocky/templates/tasks/plugin_detail_task_list.html
 #: rocky/views/task_detail.py rocky/views/tasks.py
 msgid "Tasks"
@@ -5887,6 +5909,11 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 msgid "When"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html
+#: rocky/templates/tasks/normalizers.html
+msgid "Normalizer"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
@@ -6666,17 +6693,6 @@ msgid "Input object"
 msgstr ""
 
 #: rocky/templates/tasks/boefjes.html
-#, python-format
-msgid ""
-"\n"
-"                        An overview of the tasks for %(organization)s. Tasks "
-"are divided in Boefjes and Normalizers.\n"
-"                        Boefjes scan objects and Normalizers dispatch on the "
-"output mime-type.\n"
-"                    "
-msgstr ""
-
-#: rocky/templates/tasks/boefjes.html
 msgid "There are no tasks for boefjes"
 msgstr ""
 
@@ -6694,20 +6710,12 @@ msgstr ""
 msgid "Created date"
 msgstr ""
 
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-msgid "Modified date"
-msgstr ""
-
 #: rocky/templates/tasks/normalizers.html
 msgid "There are no tasks for normalizers"
 msgstr ""
 
 #: rocky/templates/tasks/normalizers.html
 msgid "List of tasks for normalizers"
-msgstr ""
-
-#: rocky/templates/tasks/normalizers.html
-msgid "Normalizer"
 msgstr ""
 
 #: rocky/templates/tasks/normalizers.html
@@ -6754,12 +6762,33 @@ msgstr ""
 msgid "Download task data"
 msgstr ""
 
+#: rocky/templates/tasks/partials/tasks_overview_header.html
+#, python-format
+msgid ""
+"\n"
+"            An overview of the tasks for %(organization)s. Tasks are divided "
+"in Boefjes, Normalizers and Reports.\n"
+"            Boefjes scan objects and Normalizers dispatch on the output mime-"
+"type. Additionally, there is a Report\n"
+"            tasks. This task aggregates and presents findings from both "
+"Boefjes and Normalizers.\n"
+"        "
+msgstr ""
+
 #: rocky/templates/tasks/plugin_detail_task_list.html
 msgid "There are no tasks for"
 msgstr ""
 
 #: rocky/templates/tasks/plugin_detail_task_list.html
 msgid "List of tasks for"
+msgstr ""
+
+#: rocky/templates/tasks/report_tasks.html
+msgid "There are no tasks for reports"
+msgstr ""
+
+#: rocky/templates/tasks/report_tasks.html
+msgid "List of tasks for reports"
 msgstr ""
 
 #: rocky/templates/two_factor/_wizard_actions.html
