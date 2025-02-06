@@ -327,6 +327,7 @@ def task() -> Task:
             "hash": "19ed51514b37d42f79c5e95469956b05",
             "scheduler_id": "boefje-test",
             "schedule_id": None,
+            "organisation": "test",
             "type": "boefje",
             "priority": 1,
             "data": {
