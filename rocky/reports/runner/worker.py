@@ -81,30 +81,27 @@ class SchedulerWorkerManager(WorkerManager):
             time.sleep(self.poll_interval)
             return
 
-        if p_item.count == 0:
+        if not p_item:
             logger.debug("Queue empty, sleeping %f seconds", self.poll_interval)
             time.sleep(self.poll_interval)
             return
 
-        p_items = p_item.results
+        logger.info("Handling task[%s]", p_item.id)
 
-        for p_item in p_items:
-            logger.info("Handling task[%s]", p_item.id)
+        try:
+            task_queue.put(p_item)
+            logger.info("Dispatched task[%s]", p_item.id)
+        except:  # noqa
+            logger.error("Exiting worker...")
+            logger.info("Patching scheduler task[id=%s] to %s", p_item.id, TaskStatus.FAILED.value)
 
             try:
-                task_queue.put(p_item)
-                logger.info("Dispatched task[%s]", p_item.id)
-            except:  # noqa
-                logger.error("Exiting worker...")
-                logger.info("Patching scheduler task[id=%s] to %s", p_item.id, TaskStatus.FAILED.value)
+                self.scheduler.patch_task(p_item.id, TaskStatus.FAILED)
+                logger.info("Set task status to %s in the scheduler for task[id=%s]", TaskStatus.FAILED, p_item.id)
+            except HTTPError:
+                logger.error("Could not patch scheduler task to %s", TaskStatus.FAILED.value)
 
-                try:
-                    self.scheduler.patch_task(p_item.id, TaskStatus.FAILED)
-                    logger.info("Set task status to %s in the scheduler for task[id=%s]", TaskStatus.FAILED, p_item.id)
-                except HTTPError:
-                    logger.error("Could not patch scheduler task to %s", TaskStatus.FAILED.value)
-
-                raise
+            raise
 
     def _check_workers(self) -> None:
         new_workers = []
