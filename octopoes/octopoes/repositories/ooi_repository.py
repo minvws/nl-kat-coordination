@@ -240,7 +240,7 @@ class XTDBOOIRepository(OOIRepository):
         return export
 
     @classmethod
-    def deserialize(cls, data: dict[str, Any], to_type: type[OOI] | None = None, skip_errors: bool = False) -> OOI:
+    def deserialize(cls, data: dict[str, Any], to_type: type[OOI] | None = None, skip_errors: bool = False) -> OOI | bool:
         if "object_type" not in data:
             raise ValueError("Data is missing object_type")
 
@@ -263,7 +263,7 @@ class XTDBOOIRepository(OOIRepository):
         except ValidationError as error:
             if skip_errors:
                 logger.error(
-                    """An OOI could not be validated due to a mismatch between the database and the current models. 
+                    """An OOI could not be validated due to a mismatch between the database and the current models.
                     PK: %r on (wanted) type %s. Validation error: %r""",
                     stripped["primary_key"],
                     object_cls,
