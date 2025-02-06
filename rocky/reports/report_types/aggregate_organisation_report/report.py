@@ -4,9 +4,6 @@ from typing import Any
 import structlog
 from django.utils.translation import gettext_lazy as _
 
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI
-from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
 from reports.report_types.definitions import AggregateReport
 from reports.report_types.ipv6_report.report import IPv6Report
@@ -42,7 +39,9 @@ class AggregateOrganisationReport(AggregateReport):
     }
     template_path = "aggregate_organisation_report/report.html"
 
-    def post_process_data(self, data: dict[str, Any], valid_time: datetime, organization_code: str) -> dict[str, Any]:
+    def post_process_data(
+        self, report_data: dict[str, Any], valid_time: datetime, organization_code: str
+    ) -> dict[str, Any]:
         systems: dict[str, dict[str, Any]] = {"services": {}}
         services = {}
         open_ports = {}
@@ -57,6 +56,20 @@ class AggregateOrganisationReport(AggregateReport):
         safe_connections_ips = {}
         recommendations = []
         total_systems_basic_security = 0
+
+        # For consistency with reporting but backward compatibility with this logic, we flipped the data in report_data,
+        # so we need to change it back from
+        # report_id => input_ooi => {data}
+        # to
+        # input_ooi => report_id => {data}
+        data: dict[str, dict[str, Any]] = {}
+
+        for report_id, report_datas in report_data.items():
+            for input_ooi, item in report_datas.items():
+                if input_ooi not in data:
+                    data[input_ooi] = {}
+
+                data[input_ooi][report_id] = item["data"]
 
         for input_ooi, reports_data in data.items():
             for report_id, report_specific_data in reports_data.items():
@@ -436,48 +449,3 @@ class AggregateOrganisationReport(AggregateReport):
         report_data = {key: value for key, value in report_data.items() if value}
 
         return report_data
-
-
-def aggregate_reports(
-    connector: OctopoesAPIConnector,
-    input_ooi_references: list[OOI],
-    selected_report_types: list[str],
-    valid_time: datetime,
-    organization_code: str,
-) -> tuple[AggregateOrganisationReport, dict[str, Any], dict[str, Any], list[str]]:
-    by_type: dict[str, list[str]] = {}
-
-    for ooi in input_ooi_references:
-        if ooi.get_object_type() not in by_type:
-            by_type[ooi.get_object_type()] = []
-
-        by_type[ooi.get_object_type()].append(str(ooi.reference))
-
-    all_types = [
-        t
-        for t in AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
-        if t.id in selected_report_types
-    ]
-    report_data: dict[str, Any] = {}
-    errors = []
-
-    for report_type in all_types:
-        oois = {x for ooi_type in report_type.input_ooi_types for x in by_type.get(ooi_type.get_object_type(), [])}
-
-        try:
-            results = report_type(connector).collect_data(oois, valid_time)
-        except ObjectNotFoundException:
-            logger.error("Object not found")
-            errors.append(report_type.id)
-            continue
-
-        for ooi_str, data in results.items():
-            if ooi_str not in report_data:
-                report_data[ooi_str] = {}
-
-            report_data[ooi_str][report_type.id] = data
-
-    aggregate_report = AggregateOrganisationReport(connector)
-    post_processed_data = aggregate_report.post_process_data(report_data, valid_time, organization_code)
-
-    return aggregate_report, post_processed_data, report_data, errors

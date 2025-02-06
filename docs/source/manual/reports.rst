@@ -183,7 +183,47 @@ The table below gives an overview of the elements that can be found in each repo
 
 Report flow
 ===========
-On the Reports page you can generate new reports and get an overview of all generated reports. With the button 'Generate report' you get into the Report flow wizard, which can be used to choose your report, objects and plugins that are required for the report. There are two ways to select objects. You can manually select objects, which will be static. Or you can select a live set of objects by continuing with the selected filters. The selected objects will then always be based on the selected filters at the time of generating the report. and  Please note that enabling plugins during the report flow wizard will result in inaccurate data, as the plugins will take some time before they have gathered and analyzed all data. Check the Tasks page to verify that all tasks have completed.
+On the Reports page you can generate new reports and get an overview of all generated reports.
+With the button 'Generate report' you get into the Report flow wizard, which can be used to choose your report, objects and plugins that are required for the report.
+There are two ways to select objects. You can manually select objects, which will be static.
+Or you can select a live set of objects by continuing with the selected filters.
+The selected objects will then always be based on the selected filters at the time of generating the report.
+And please note that enabling plugins during the report flow wizard will result in inaccurate data,
+as the plugins will take some time before they have gathered and analyzed all data.
+Check the Tasks page to verify that all tasks have completed.
+
+Report naming
+=============
+When creating a report, two name formats are needed, one for the overall report and one for the underlying asset reports.
+Every asset report consists of one input object and one report type (e.g. a DNS report for mispo.es).
+The overall report contains all the asset reports and also has its own name.
+
+Reports can be named dynamically based on their input objects and report type.
+The following placeholders can be used to create dynamic report names:
+
+.. list-table:: Name format
+   :widths: 25 50 50
+   :header-rows: 1
+
+   * - Placeholder
+     - (Overall) report name format
+     - Asset report name format
+   * - ${report_type}
+     - Results in the report type of the overall report, depending on the flow that has been selected. Eg. 'Concatenated Report', 'Aggregate Report' or 'Multi Report'.
+     - Results in the report type of the asset report. E.g. 'DNS Report', 'Mail Report', 'Vulnerability Report'.
+   * - ${ooi}
+     - If there's only one input object selected, this will show the input object. If multiple input objects have been selected, this placeholder will remain visible.
+     - Always results in the input object of the asset report.
+   * - ${oois_count}
+     - Returns the total number of all underlying asset reports.
+     - Always returns '1', since an asset report consists of 1 input object and 1 report type.
+
+The pre-filled name formats are as follows:
+
+- For the (overall) report: '${report_type} for ${oois_count}', which may result in, for example, 'Aggregate Report for 16 objects'
+- For the asset reports: '${report_type} for ${ooi}', which will result in a different name for each asset report. E.g. 'DNS Report for mispo.es'
+
+Besides these placeholders, it is also possible to use Python Strftime formats. For example, '%x' results in '01/01/25' and '%X' results in '07:06:05'.
 
 
 Plugins

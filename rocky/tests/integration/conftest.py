@@ -240,5 +240,5 @@ def hostname_oois():
             name="example.com",
             dns_zone=Reference("DNSZone|test|example.com"),
             registered_domain=None,
-        )
+        ).reference
     ]

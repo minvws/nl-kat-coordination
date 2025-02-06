@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 11:06+0000\n"
+"POT-Creation-Date: 2025-02-04 16:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1015,6 +1015,7 @@ msgstr ""
 #: katalogus/templates/plugin_settings_list.html
 #: katalogus/views/katalogus_settings.py tools/view_helpers.py
 #: rocky/templates/header.html
+#: rocky/templates/organizations/organization_list.html
 msgid "Settings"
 msgstr ""
 
@@ -2307,6 +2308,7 @@ msgid "Enable and start scan"
 msgstr ""
 
 #: onboarding/templates/step_4_report.html
+#: reports/report_types/concatenated_report/report.py
 msgid "Report"
 msgstr ""
 
@@ -2490,6 +2492,10 @@ msgstr ""
 
 #: reports/forms.py
 msgid "After"
+msgstr ""
+
+#: reports/forms.py
+msgid "Report name format"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -2973,10 +2979,6 @@ msgid ""
 "format."
 msgstr ""
 
-#: reports/report_types/concatenated_report/report.py
-msgid "Concatenated Report"
-msgstr ""
-
 #: reports/report_types/dns_report/report.html
 msgid "Records found"
 msgstr ""
@@ -3058,6 +3060,7 @@ msgstr ""
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
@@ -3728,36 +3731,17 @@ msgid "Report name"
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-msgid ""
-"Define a custom name format for your report(s). This format will be applied "
-"to all generated (sub)reports."
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-#, python-brace-format
-msgid ""
-"To make the report names more descriptive, you can include placeholders for "
-"the object name, the report type and/or the reference date. For subreports "
-"and reports over a single object, use the placeholder \"${ooi}\" for the "
-"object name, \"${report_type}\" for the report type and use a <a "
-"href=\"https://strftime.org/\" target=\"_blank\" rel=\"noopener\">Python "
-"strftime code</a> for the reference date. For reports over multiple objects, "
-"use \"${oois_count}\" for the number of objects in the report."
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
 #, python-format, python-brace-format
 msgid ""
-"For example, the format \"${report_type} for ${ooi} at %%x\" could generate: "
-"\"DNS Report for example.com at 01/01/25\"."
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Report name format"
-msgstr ""
-
-#: reports/templates/partials/export_report_settings.html
-msgid "Subreports name format"
+"When generating reports, it is possible to give the report a name. The name "
+"can be static or dynamic. The default format for a report is '${report_type} "
+"for ${oois_count} objects'. These placeholders automatically adapt based on "
+"the report details. This format could for example return 'Aggregate Report "
+"for 15 objects'. Another placeholder that can be used is '${ooi}', which "
+"will show the name of the object when there is only one object. You can also "
+"customize the name by adding prefixes, suffixes, or other formats like '%%W' "
+"for the week number, using options from <a href=\"https://strftime.org/\" "
+"target=\"_blank\" rel=\"noopener\">Python strftime code</a>."
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -4027,6 +4011,10 @@ msgid "This report type requires the following plugins to be enabled:"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
+msgid "Toggle all required plugins"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
 msgid "Show enabled plugins"
 msgstr ""
 
@@ -4040,6 +4028,10 @@ msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "The following plugins are optional to generate the report:"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "Toggle all optional plugins"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -4156,6 +4148,8 @@ msgstr ""
 
 #: reports/templates/report_overview/modal_partials/delete_modal.html
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Input objects"
 msgstr ""
 
@@ -4220,7 +4214,7 @@ msgid ""
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/report_overview/subreports.html
 #, python-format
 msgid "Showing %(length)s of %(total)s reports"
 msgstr ""
@@ -4230,48 +4224,48 @@ msgid "Reports:"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "Input Objects"
-msgstr ""
-
-#: reports/templates/report_overview/report_history_table.html
 msgid "Shows parent report details"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "Close children report object details"
+msgid "Close asset report object details"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "Open children report object details"
+msgid "Open asset report object details"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "Subreports details:"
+msgid "Asset reports details:"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
 #, python-format
 msgid ""
-"This report consist of %(counter)s subreport with the following report type "
-"and object."
+"\n"
+"                                This report consists of %(counter)s asset "
+"report with the following report type and object:\n"
+"                            "
 msgid_plural ""
-"This report consist of %(counter)s subreports with the following report "
-"types and objects."
+"\n"
+"                                This report consists of %(counter)s asset "
+"reports with the following report types and objects:\n"
+"                            "
 msgstr[0] ""
 msgstr[1] ""
 
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/subreports_header.html
 #: reports/views/report_overview.py
-msgid "Subreports"
+msgid "Asset reports"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "Shows subreport details"
+msgid "Shows asset report details"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "View all subreports"
+msgid "View all asset reports"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
@@ -4302,6 +4296,11 @@ msgid ""
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
+#, python-format
+msgid "Showing %(length)s of %(total)s schedules"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Scheduled reports:"
 msgstr ""
 
@@ -4318,11 +4317,11 @@ msgid "Once"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
-msgid "Scheduled Reports:"
+msgid "Recent reports"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
-msgid "Input"
+msgid "Scheduled Reports:"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
@@ -4345,11 +4344,6 @@ msgstr ""
 msgid "No scheduled reports have been generated yet."
 msgstr ""
 
-#: reports/templates/report_overview/subreports.html
-#, python-format
-msgid "Showing %(length)s of %(total)s subreports"
-msgstr ""
-
 #: reports/templates/report_overview/subreports_header.html
 msgid "Back to Reports History"
 msgstr ""
@@ -4364,7 +4358,7 @@ msgid "Shows report details"
 msgstr ""
 
 #: reports/templates/report_overview/subreports_table.html
-msgid "Subreports:"
+msgid "Asset reports:"
 msgstr ""
 
 #: reports/templates/report_overview/subreports_table.html
@@ -4510,11 +4504,13 @@ msgstr ""
 #: reports/views/report_overview.py
 msgid ""
 "Multi organization reports cannot be rescheduled. It consists of imported "
-"data from different organizations and not based on new generated data."
+"data from different organizations and is not based on newly generated data."
 msgstr ""
 
 #: reports/views/report_overview.py
-msgid "Rerun successful"
+msgid ""
+"Rerun successful. It may take a moment before the new report has been "
+"generated."
 msgstr ""
 
 #: reports/views/report_overview.py
@@ -5045,7 +5041,6 @@ msgid "new"
 msgstr ""
 
 #: tools/view_helpers.py rocky/templates/header.html
-#: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/views/organization_member_edit.py
 msgid "Members"
@@ -5935,6 +5930,11 @@ msgid "When"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
+#: rocky/templates/tasks/normalizers.html
+msgid "Normalizer"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html
 msgid "This scan was manually created."
 msgstr ""
 
@@ -6749,10 +6749,6 @@ msgstr ""
 
 #: rocky/templates/tasks/normalizers.html
 msgid "List of tasks for normalizers"
-msgstr ""
-
-#: rocky/templates/tasks/normalizers.html
-msgid "Normalizer"
 msgstr ""
 
 #: rocky/templates/tasks/normalizers.html
