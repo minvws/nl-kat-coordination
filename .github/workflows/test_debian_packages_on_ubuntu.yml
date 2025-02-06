@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         dist: [ubuntu]
-        package: [bytes, boefjes, rocky, keiko, octopoes, mula]
+        package: [bytes, boefjes, rocky, octopoes, mula]
     runs-on: ubuntu-latest
 
     steps:
@@ -160,11 +160,6 @@ jobs:
         with:
           name: kat-mula_${{ env.RELEASE_VERSION }}_ubuntu.deb
 
-      - name: Download Keiko artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: kat-keiko_${{ env.RELEASE_VERSION }}_ubuntu.deb
-
       - name: Download Octopoes artifact
         uses: actions/download-artifact@v4
         with:
@@ -213,17 +208,12 @@ jobs:
           sudo sed -i "s/BYTES_PASSWORD=\$/BYTES_PASSWORD=$(sudo grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/mula.conf
 
       - name: Restart KAT
-        run: sudo systemctl restart kat-rocky kat-rocky-worker kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
+        run: sudo systemctl restart kat-rocky kat-rocky-worker kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-octopoes kat-octopoes-worker
 
       - name: Setup accounts in Rocky
         run: |
           DJANGO_SUPERUSER_PASSWORD=robotpassword sudo -E -u kat rocky-cli createsuperuser --noinput --email robot@localhost --full_name "Mr. Robot"
           sudo -u kat rocky-cli setup_dev_account
-
-      - name: Check Keiko API health or print response and logs
-        run: |
-          for i in {1..15}; do curl -s http://localhost:8005/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
-          if [ $s != 0 ]; then echo $(curl -v http://localhost:8005/health) || true && journalctl --no-pager -u kat-keiko.service && exit $s ; fi
 
       - name: Check Bytes API health or print response and logs
         run: |
