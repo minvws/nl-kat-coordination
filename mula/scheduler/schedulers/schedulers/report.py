@@ -87,40 +87,6 @@ class ReportScheduler(Scheduler):
         ) as executor:
             for schedule in schedules:
                 report_task = ReportTask.model_validate(schedule.data)
-
-                # When the schedule has no schedule (cron expression), but a
-                # task is already executed for this schedule we should not run
-                # the task again
-                if schedule.schedule is None:
-                    try:
-                        _, count = self.ctx.datastores.task_store.get_tasks(
-                            scheduler_id=self.scheduler_id,
-                            task_type=report_task.type,
-                            filters=filters.FilterRequest(
-                                filters=[
-                                    filters.Filter(column="hash", operator="eq", value=report_task.hash),
-                                    filters.Filter(column="schedule_id", operator="eq", value=str(schedule.id)),
-                                ]
-                            ),
-                        )
-                        if count > 0:
-                            self.logger.debug(
-                                "Schedule has no schedule, but task already executed",
-                                schedule_id=schedule.id,
-                                scheduler_id=self.scheduler_id,
-                                organisation_id=self.organisation.id,
-                            )
-                            continue
-                    except storage.errors.StorageError as exc_db:
-                        self.logger.error(
-                            "Could not get latest task by hash %s",
-                            report_task.hash,
-                            scheduler_id=self.scheduler_id,
-                            organisation_id=self.organisation.id,
-                            exc_info=exc_db,
-                        )
-                        continue
-
                 executor.submit(self.push_report_task, report_task, self.push_tasks_for_rescheduling.__name__)
 
     def push_report_task(self, report_task: ReportTask, caller: str = "") -> None:
