@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-05 10:56+0000\n"
+"POT-Creation-Date: 2025-02-06 13:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4011,6 +4011,10 @@ msgid "This report type requires the following plugins to be enabled:"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
+msgid "Toggle all required plugins"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
 msgid "Show enabled plugins"
 msgstr ""
 
@@ -4024,6 +4028,10 @@ msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "The following plugins are optional to generate the report:"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "Toggle all optional plugins"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
