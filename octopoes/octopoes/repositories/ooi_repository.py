@@ -263,10 +263,11 @@ class XTDBOOIRepository(OOIRepository):
         except ValidationError as error:
             if skip_errors:
                 logger.error(
-                    "An OOI could not be validated due to a mismatch between the database and the current models. PK: %r on (wanted) type %s. Validation error: %r",
+                    """An OOI could not be validated due to a mismatch between the database and the current models. 
+                    PK: %r on (wanted) type %s. Validation error: %r""",
                     stripped["primary_key"],
                     object_cls,
-                    error
+                    error,
                 )
                 return False
             raise error
@@ -321,7 +322,7 @@ class XTDBOOIRepository(OOIRepository):
         return [
             deserialized
             for x in self.session.client.query(query, valid_time)
-            if (deserialized := self.deserialize(data=x[0], skip_errors=True)) != False
+            if (deserialized := self.deserialize(data=x[0], skip_errors=True))
         ]
 
     def list_oois(
@@ -399,7 +400,7 @@ class XTDBOOIRepository(OOIRepository):
         )
 
         res = self.session.client.query(data_query, valid_time)
-        oois = [deserialized for x in res if (deserialized := self.deserialize(data=x[0], skip_errors=True)) != False]
+        oois = [deserialized for x in res if (deserialized := self.deserialize(data=x[0], skip_errors=True))]
         return Paginated(count=count, items=oois)
 
     def list_oois_by_object_types(self, types: set[type[OOI]], valid_time: datetime) -> list[OOI]:
@@ -417,7 +418,7 @@ class XTDBOOIRepository(OOIRepository):
         return [
             deserialized
             for x in self.session.client.query(data_query, valid_time)
-            if (deserialized := self.deserialize(data=x[0], skip_errors=True)) != False
+            if (deserialized := self.deserialize(data=x[0], skip_errors=True))
         ]
 
     def list_random(
