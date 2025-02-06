@@ -324,7 +324,7 @@ class XTDBOOIRepository(OOIRepository):
         return [
             deserialized
             for x in self.session.client.query(query, valid_time)
-            if (deserialized := self.deserialize(data=x[0], skip_errors=True))
+            if (deserialized := self.deserialize(data=x[0], skip_errors=True)) is not False
         ]
 
     def list_oois(
