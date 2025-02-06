@@ -531,7 +531,7 @@ class SaveReportView(BaseReportView, SchedulerView, FormView):
 
         report_recipe = self.create_report_recipe(report_name_format, report_type, schedule)
 
-        self.create_report_schedule(self.organization.code, report_recipe, start_datetime)
+        self.create_report_schedule(report_recipe, start_datetime)
 
         return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 

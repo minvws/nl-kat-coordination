@@ -3,7 +3,6 @@ from __future__ import annotations
 import collections
 import datetime
 import logging
-import time
 import uuid
 from enum import Enum
 from functools import cached_property
@@ -191,14 +190,6 @@ class PaginatedSchedulesResponse(BaseModel):
     results: list[ScheduleResponse]
 
 
-class SchedulerResponse(BaseModel):
-    id: str
-    type: str
-    item_type: str
-    qsize: int
-    last_activity: datetime.datetime | None = None
-
-
 class LazyTaskList:
     HARD_LIMIT = 500
 
@@ -306,24 +297,6 @@ class SchedulerClient:
             return PaginatedSchedulesResponse.model_validate_json(res.content)
         except ConnectError:
             raise SchedulerConnectError()
-
-    def get_scheduler(self, scheduler_id: str) -> SchedulerResponse:
-        """Max trials is 100 seconds"""
-        trials = 0
-        interval = 10  # in seconds
-        while trials < 10:
-            try:
-                res = self._client.get(f"/schedulers/{scheduler_id}")
-                res.raise_for_status()
-                break
-            except HTTPStatusError as http_error:
-                if http_error.response.status_code == codes.NOT_FOUND:
-                    trials += 1
-                    time.sleep(interval)
-                    continue
-                raise SchedulerHTTPError()
-
-        return SchedulerResponse.model_validate_json(res.content)
 
     def patch_schedule(self, schedule_id: str, params: dict[str, Any]) -> None:
         try:

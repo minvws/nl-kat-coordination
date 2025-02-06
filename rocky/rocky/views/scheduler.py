@@ -118,9 +118,7 @@ class SchedulerView(OctopoesView):
         except SchedulerTaskNotFound:
             raise Http404()
 
-    def create_report_schedule(
-        self, organization_code: str, report_recipe: ReportRecipe, deadline_at: datetime
-    ) -> ScheduleResponse | None:
+    def create_report_schedule(self, report_recipe: ReportRecipe, deadline_at: datetime) -> ScheduleResponse | None:
         try:
             report_task = ReportTask(
                 organisation_id=self.organization.code, report_recipe_id=str(report_recipe.recipe_id)
@@ -128,7 +126,7 @@ class SchedulerView(OctopoesView):
 
             schedule_request = ScheduleRequest(
                 scheduler_id=self.scheduler_id,
-                organisation=organization_code,
+                organisation=self.organization.code,
                 data=report_task,
                 schedule=report_recipe.cron_expression,
                 deadline_at=deadline_at.isoformat(),

@@ -326,18 +326,12 @@ class OnboardingSetupScanOOIDetailView(
     permission_required = "tools.can_scan_organization"
     task_type = "report"
 
-    def is_scheduler_enabled(self) -> bool:
-        report_scheduler = self.scheduler_client.get_scheduler(scheduler_id="report")
-        return report_scheduler.id == "report"
-
     def post(self, request, *args, **kwargs):
         report_name_format = self.get_initial_report_name()
         parent_report_type = self.get_parent_report_type()
         report_recipe = self.create_report_recipe(report_name_format, parent_report_type, None)
-        if self.is_scheduler_enabled():
-            self.create_report_schedule(
-                self.organization.code, report_recipe, datetime.now(timezone.utc) + timedelta(minutes=2)
-            )
+
+        self.create_report_schedule(report_recipe, datetime.now(timezone.utc) + timedelta(minutes=2))
 
         return redirect(
             reverse("step_report", kwargs={"organization_code": self.organization.code})
