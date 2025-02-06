@@ -187,12 +187,12 @@ def http_resource_https(hostname, ipaddressv4, network):
 
 @pytest.fixture
 def empty_scan_profile():
-    return EmptyScanProfile(reference="test_reference")
+    return EmptyScanProfile(reference="test|reference")
 
 
 @pytest.fixture
 def declared_scan_profile():
-    return DeclaredScanProfile(reference="test_reference", level=2)
+    return DeclaredScanProfile(reference="test|reference", level=2)
 
 
 @pytest.fixture
