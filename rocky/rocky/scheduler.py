@@ -396,10 +396,19 @@ class SchedulerClient:
         return TypeAdapter(list[Queue]).validate_json(response.content)
 
     def pop_item(self, scheduler_id: str) -> Task | None:
-        response = self._client.post(f"/schedulers/{scheduler_id}/pop")
+        response = self._client.post(f"/schedulers/{scheduler_id}/pop?limit=1")
         response.raise_for_status()
 
-        return TypeAdapter(Task | None).validate_json(response.content)
+        page = TypeAdapter(Task | None).validate_json(response.content)
+        if page.count == 0 or len(page.results):
+            return None
+
+        return page.results[0]
+
+    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
+        response = self._client.post(f"/schedulers/{scheduler_id}/pop", json=filters)
+
+        return TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
         response = self._client.patch(f"/tasks/{task_id}", json={"status": status.value})
