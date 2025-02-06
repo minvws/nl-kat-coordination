@@ -314,6 +314,43 @@ class SchedulerTestCase(unittest.TestCase):
             datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1),
         )
 
+    def test_post_push_schedule_is_none(self):
+        """When a schedule is not provided, the deadline should be set to None"""
+        # Arrange
+        first_item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
+
+        schedule = models.Schedule(scheduler_id=self.scheduler.scheduler_id, hash=first_item.hash, data=first_item.data)
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
+
+        first_item.schedule_id = schedule_db.id
+        self.mock_ctx.datastores.task_store.update_task(first_item)
+
+        # Act
+        self.scheduler.push_item_to_queue(first_item)
+
+        # Assert:
+        self.assertIsNone(schedule_db.deadline_at)
+
+    def test_post_push_schedule_auto_calculate_deadline(self):
+        """When a schedule is not provided, and auto_calculate_deadline is True, the deadline should be set"""
+        # Arrange
+        self.scheduler.auto_calculate_deadline = True
+
+        first_item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
+
+        schedule = models.Schedule(scheduler_id=self.scheduler.scheduler_id, hash=first_item.hash, data=first_item.data)
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
+
+        first_item.schedule_id = schedule_db.id
+        self.mock_ctx.datastores.task_store.update_task(first_item)
+
+        # Act
+        self.scheduler.push_item_to_queue(first_item)
+
+        # Assert: Check if the deadline_at is set correctly
+        schedule_db_updated = self.mock_ctx.datastores.schedule_store.get_schedule(first_item.schedule_id)
+        self.assertIsNotNone(schedule_db_updated.deadline_at)
+
     def test_post_pop(self):
         """When a task is popped from the queue, it should be removed from the database"""
         # Arrange
