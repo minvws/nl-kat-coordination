@@ -14,6 +14,7 @@ XSS_CAPABLE_TYPES = ["text/html", "application/xhtml+xml", "application/xml", "t
 
 DEPRECATED_DIRECTIVES = ["block-all-mixed-content", "prefetch-src"]
 
+
 def is_xss_capable(content_type: str) -> bool:
     """Determine if the content type indicates XSS capability."""
     main_type = content_type.split(";")[0].strip().lower()
