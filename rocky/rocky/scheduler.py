@@ -3,6 +3,7 @@ from __future__ import annotations
 import collections
 import datetime
 import logging
+import time
 import uuid
 from enum import Enum
 from functools import cached_property
@@ -150,7 +151,7 @@ class ScheduleRequest(BaseModel):
 
     scheduler_id: str
     data: dict
-    schedule: str
+    schedule: str | None = None
     deadline_at: str
 
 
@@ -163,7 +164,7 @@ class ScheduleResponse(BaseModel):
     enabled: bool
     schedule: str | None
     tasks: list[Task]
-    deadline_at: datetime.datetime
+    deadline_at: datetime.datetime | None
     created_at: datetime.datetime
     modified_at: datetime.datetime
 
@@ -185,6 +186,13 @@ class PaginatedSchedulesResponse(BaseModel):
     next: str | None = None
     previous: str | None = None
     results: list[ScheduleResponse]
+
+
+class SchedulerResponse(BaseModel):
+    id: str
+    enabled: bool
+    priority_queue: dict[str, Any]
+    last_activity: str | None
 
 
 class LazyTaskList:
@@ -294,6 +302,23 @@ class SchedulerClient:
             return PaginatedSchedulesResponse.model_validate_json(res.content)
         except ConnectError:
             raise SchedulerConnectError()
+
+    def is_scheduler_ready(self, scheduler_id: str) -> bool:
+        """Max trials is 100 seconds"""
+        trials = 0
+        interval = 10  # in seconds
+        while trials < 10:
+            try:
+                res = self._client.get(f"/schedulers/{scheduler_id}")
+                res.raise_for_status()
+                break
+            except HTTPStatusError as http_error:
+                if http_error.response.status_code == codes.NOT_FOUND:
+                    trials += 1
+                    time.sleep(interval)
+                    continue
+                raise SchedulerHTTPError()
+        return SchedulerResponse.model_validate_json(res.content).enabled
 
     def patch_schedule(self, schedule_id: str, params: dict[str, Any]) -> None:
         try:

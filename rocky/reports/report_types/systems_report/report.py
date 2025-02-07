@@ -6,6 +6,7 @@ from typing import Any
 from django.utils.translation import gettext_lazy as _
 from strenum import StrEnum
 
+from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
@@ -56,7 +57,7 @@ class SystemReport(Report):
     template_path = "systems_report/report.html"
     label_style = "6-light"
 
-    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+    def collect_data(self, input_oois: Iterable[Reference], valid_time: datetime) -> dict[Reference, dict[str, Any]]:
         ips_by_input_ooi = self.to_ips(input_oois, valid_time)
         all_ips = list({ip for key, ips in ips_by_input_ooi.items() for ip in ips})
 

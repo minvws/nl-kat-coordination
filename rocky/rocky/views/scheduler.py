@@ -7,8 +7,7 @@ from django.http import Http404, JsonResponse
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import Boefje, Normalizer
 from reports.forms import (
-    ChildReportNameForm,
-    ParentReportNameForm,
+    ReportNameForm,
     ReportRecurrenceChoiceForm,
     ReportScheduleStartDateChoiceForm,
     ReportScheduleStartDateForm,
@@ -51,8 +50,7 @@ class SchedulerView(OctopoesView):
 
     report_schedule_form_recurrence_choice = ReportRecurrenceChoiceForm  # once or repeat
 
-    report_parent_name_form = ParentReportNameForm  # parent name format
-    report_child_name_form = ChildReportNameForm  # child name format
+    report_name_form = ReportNameForm  # name format
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -100,11 +98,8 @@ class SchedulerView(OctopoesView):
     def get_report_schedule_form_recurrence_choice(self):
         return self.report_schedule_form_recurrence_choice(self.request.POST)
 
-    def get_report_parent_name_form(self):
-        return self.report_parent_name_form()
-
-    def get_report_child_name_form(self):
-        return self.report_child_name_form()
+    def get_report_name_form(self):
+        return self.report_name_form()
 
     def get_task_details(self, task_id: str) -> Task | None:
         try:
@@ -126,7 +121,7 @@ class SchedulerView(OctopoesView):
                 scheduler_id=self.scheduler_id,
                 data=report_task,
                 schedule=report_recipe.cron_expression,
-                deadline_at=str(deadline_at),
+                deadline_at=deadline_at.isoformat(),
             )
 
             submit_schedule = self.scheduler_client.post_schedule(schedule=schedule_request)

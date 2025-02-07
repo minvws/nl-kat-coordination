@@ -1,5 +1,1 @@
-packaging/deb/data/etc/kat/* etc/kat
-packaging/deb/data/usr/* usr
-templates/* /etc/kat/keiko/templates
-glossaries/* /etc/kat/keiko/glossaries
-assets/* /etc/kat/keiko/assets
+removekeiko.sh usr/bin
