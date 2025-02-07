@@ -46,6 +46,7 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
                 form.add_error("name", ("Boefje with this name does already exist. Please choose another name."))
             return self.form_invalid(form)
 
+
 class AddBoefjeView(BoefjeSetupView):
     """View where the user can create a new Boefje"""
 
