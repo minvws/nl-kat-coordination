@@ -90,11 +90,10 @@ class AddBoefjeVariantView(BoefjeSetupView):
         initial["scan_level"] = self.plugin.scan_level
         initial["interval_number"] = self.plugin.interval
         initial["interval_frequency"] = "minutes"
-        initial["run_on"] = "-".join(self.plugin.run_on)
+        initial["run_on"] = "-".join(self.plugin.run_on) if self.plugin.run_on else None
 
-        if self.plugin.interval:
-            initial["scan_type"] = "interval"
-        elif self.plugin.run_on:
+        initial["scan_type"] = "interval"
+        if self.plugin.run_on:
             initial["scan_type"] = "run_on"
 
         return initial
@@ -166,11 +165,10 @@ class EditBoefjeView(BoefjeSetupView):
         initial["scan_level"] = self.plugin.scan_level
         initial["interval_number"] = self.plugin.interval
         initial["interval_frequency"] = "minutes"
-        initial["run_on"] = "-".join(self.plugin.run_on)
+        initial["run_on"] = "-".join(self.plugin.run_on) if self.plugin.run_on else None
 
-        if self.plugin.interval:
-            initial["scan_type"] = "interval"
-        elif self.plugin.run_on:
+        initial["scan_type"] = "interval"
+        if self.plugin.run_on:
             initial["scan_type"] = "run_on"
 
         return initial
