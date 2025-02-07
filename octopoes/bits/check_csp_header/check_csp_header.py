@@ -72,10 +72,10 @@ def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[
 
     for deprecated_directive in DEPRECATED_DIRECTIVES:
         if deprecated_directive in csp_header:
-        findings.append(f"Deprecated CSP directive found: {deprecated_directive}")
+            findings.append(f"Deprecated CSP directive found: {deprecated_directive}")
 
     if "report-uri" in csp_header:
-        findings.append("""Deprecated CSP directive found. report-uri is superseeded by report-to: 
+        findings.append("""Deprecated CSP directive found. report-uri is superseded by report-to:
         https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri""")
 
     policies = [policy.strip().split(" ") for policy in csp_header.split(";")]
