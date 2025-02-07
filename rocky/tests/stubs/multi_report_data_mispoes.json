@@ -512,13 +512,6 @@
       "version": "0.0.1.dev1",
       "additional": "None",
       "results": []
-    },
-    {
-      "service": "keiko",
-      "healthy": true,
-      "version": "0.0.1.dev1",
-      "additional": "None",
-      "results": []
     }
   ],
   "total_systems": 1,

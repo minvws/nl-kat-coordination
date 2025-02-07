@@ -9,7 +9,6 @@ Complete list with environment settings for each module, generated from Pydantic
 
    boefjes
    bytes
-   keiko
    mula
    octopoes
    rocky

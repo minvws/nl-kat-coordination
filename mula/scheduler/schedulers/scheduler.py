@@ -342,21 +342,22 @@ class Scheduler(abc.ABC):
 
         item.schedule_id = schedule_db.id
 
-        # Set the cron schedule based on the item, default this is None.
-        # We do this because we want to explicitly set the cron schedule. When
-        # a schedule already has a cron expression, this will not be updated
-        # unless this is specifically overridden in a subclass.
+        # Determine the cron expression, either from the overridden set_cron()
+        # or explicitly set.
         cron_expr = self.set_cron(item)
         if cron_expr is not None:
             schedule_db.schedule = cron_expr
 
-        # If the schedule has a cron schedule, we calculate the next run
-        # based on the cron schedule, otherwise we calculate the deadline
-        # based on the item.
+        # When a Schedule does not have a schedule (cron expression), we
+        # calculate the deadline when a Schedules specified a way to calculate
+        # this. Otherwise we set the deadline to None make sure the Schedule
+        # will not continue to be processed.
         if schedule_db.schedule is not None:
             schedule_db.deadline_at = cron.next_run(schedule_db.schedule)
         elif self.auto_calculate_deadline:
             schedule_db.deadline_at = self.calculate_deadline(item)
+        else:
+            schedule_db.deadline_at = None
 
         self.ctx.datastores.schedule_store.update_schedule(schedule_db)
         self.ctx.datastores.task_store.update_task(item)
@@ -418,6 +419,8 @@ class Scheduler(abc.ABC):
         return None
 
     def calculate_deadline(self, task: models.Task) -> datetime:
+        """The default deadline calculation for a task, when the
+        auto_calculate_deadline attribute is set to True"""
         # We at least delay a job by the grace period
         minimum = self.ctx.config.pq_grace_period
         deadline = datetime.now(timezone.utc) + timedelta(seconds=minimum)
