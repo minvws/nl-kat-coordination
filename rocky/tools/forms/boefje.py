@@ -84,7 +84,7 @@ class BoefjeSetupForm(BaseRockyForm):
         widget=forms.Select(
             choices=OBJECT_CHANGE_CHOICES,
             attrs={
-                "description": _("Choose weather a the Boefje should run after creating and/or changing an object. "),
+                "description": _("Choose weather the Boefje should run after creating and/or changing an object. "),
                 "class": "runon_selector run_on"
             },
         ),
