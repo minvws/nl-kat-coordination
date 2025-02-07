@@ -59,7 +59,9 @@ class BoefjeSetupForm(BaseRockyForm):
     scan_type = forms.CharField(
         required=False,
         label=_("Scan type"),
-        widget=forms.RadioSelect(choices=SCAN_TYPE_CHOICES, attrs={"class": "radio-choice", "data-choicegroup": "runon_selector"}),
+        widget=forms.RadioSelect(
+            choices=SCAN_TYPE_CHOICES, attrs={"class": "radio-choice", "data-choicegroup": "runon_selector"}
+        ),
         help_text=BOEFJE_RUN_ON_HELP_TEXT,
     )
     interval_number = forms.CharField(
@@ -71,12 +73,14 @@ class BoefjeSetupForm(BaseRockyForm):
                     "Specify the scanning interval for this Boefje. The default is 24 hours. "
                     "For example: 5 minutes will let the Boefje scan every 5 minutes."
                 ),
-                "class": "runon_selector interval"
+                "class": "runon_selector interval",
             }
         ),
     )
     interval_frequency = forms.CharField(
-        required=False, label=_("Interval frequency"), widget=forms.Select(choices=INTERVAL_CHOICES, attrs={"class": "runon_selector interval"})
+        required=False,
+        label=_("Interval frequency"),
+        widget=forms.Select(choices=INTERVAL_CHOICES, attrs={"class": "runon_selector interval"}),
     )
     run_on = forms.CharField(
         required=False,
@@ -85,7 +89,7 @@ class BoefjeSetupForm(BaseRockyForm):
             choices=OBJECT_CHANGE_CHOICES,
             attrs={
                 "description": _("Choose weather the Boefje should run after creating and/or changing an object. "),
-                "class": "runon_selector run_on"
+                "class": "runon_selector run_on",
             },
         ),
     )
