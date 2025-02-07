@@ -37,9 +37,9 @@ function initChoiceTogglers() {
     form.addEventListener("change", function (event) {
       let tag = event.target;
       if (tag.tagName == "INPUT" && tag.classList.contains("radio-choice")) {
-        let visible_group = tag.value;
         let toggle_group = tag.dataset.choicegroup;
-        toggleChoice(tag.form, visible_group, visible_group);
+        let visible_group = tag.value;
+        toggleChoice(tag.form, toggle_group, visible_group);
       }
     });
   });
