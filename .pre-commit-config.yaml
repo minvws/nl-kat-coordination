@@ -100,7 +100,6 @@ repos:
         exclude: |
           (?x)(
           ^boefjes/tools |
-          ^keiko/templates |
           ^mula/whitelist\.py$ |
           ^mula/scripts |
           ^octopoes/tools |
@@ -129,8 +128,6 @@ repos:
           ^boefjes/boefjes/plugins/kat_wappalyzer/data/.*.json |
           ^boefjes/tests/examples/inputs/cve-result-without-cvss.json |
           ^boefjes/tests/examples |
-          ^keiko/glossaries |
-          ^keiko/templates/.*/template.tex$ |
           ^rocky/assets/js/vendor |
           ^rocky/assets/css/themes/soft/fonts/tabler-icons/tabler-icons.scss$ |
           ^rocky/tests/stubs |

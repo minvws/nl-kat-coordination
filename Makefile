@@ -112,7 +112,6 @@ ubuntu22.04-build-image:
 CHECKSUM_CMD = $(if $(filter $(UNAME), Darwin), shasum -a 256, sha256sum --quiet)
 
 docs:
-	$(call build-settings-doc,keiko,keiko.settings,keiko,Keiko)
 	$(call build-settings-doc,octopoes,octopoes.config.settings,octopoes,Octopoes)
 	$(call build-settings-doc,boefjes,boefjes.config,boefjes,Boefjes)
 	$(call build-settings-doc,bytes,bytes.config,bytes,Bytes)
@@ -124,7 +123,7 @@ docs:
 	echo "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539  docs/source/_static/d3.min.js" | $(CHECKSUM_CMD) --check || exit 1
 	echo "0d2b6f2361e7e0ce466a6ed458e03daa5584b42ef6926c3beb62eb64670ca261  docs/source/_static/mermaid.min.js" | $(CHECKSUM_CMD) --check || exit 1
 
-	PYTHONPATH=$(PYTHONPATH):boefjes/:bytes/:keiko/:mula/:octopoes/ sphinx-build -b html --fail-on-warning docs/source docs/_build
+	PYTHONPATH=$(PYTHONPATH):boefjes/:bytes/:mula/:octopoes/ sphinx-build -b html --fail-on-warning docs/source docs/_build
 
 
 poetry-dependencies:

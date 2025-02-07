@@ -1471,7 +1471,6 @@ def rocky_health():
             ServiceHealth(service="katalogus", healthy=True, version="0.0.1-development", additional=None, results=[]),
             ServiceHealth(service="scheduler", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
             ServiceHealth(service="bytes", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
-            ServiceHealth(service="keiko", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
         ],
     )
 
@@ -1610,7 +1609,6 @@ def get_aggregate_report_from_bytes():
             },
             {"service": "scheduler", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
             {"service": "bytes", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
-            {"service": "keiko", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
         ],
         "config_oois": [],
         "input_data": {
