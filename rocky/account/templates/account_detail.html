@@ -64,9 +64,11 @@
                             {% if tcl < 0 %}
                                 <p>
                                     {% blocktranslate %}
-                            You don't have any clearance to scan objects.<br>
-                            Get in contact with the admin to give you the necessary clearance level.
-                        {% endblocktranslate %}
+                                        {% filter force_escape %}
+                                            You don't have any clearance to scan objects.<br>
+                                            Get in contact with the admin to give you the necessary clearance level.
+                                        {% endfilter %}
+                                    {% endblocktranslate %}
                                 </p>
                             {% elif tcl >= 0 and tcl == acl %}
                                 <p>
@@ -77,25 +79,30 @@
                                    aria-label="{% translate "Explanation OOI Clearance" %}">
                                     {% translate "You can withdraw this at anytime you like, but know that you won't be able to change clearance levels anymore when you do." %}
                                 </p>
-                                {% blocktranslate asvar btn_text_withdraw_tcl %}
-                            Withdraw L{{acl}} clearance and responsibility
-                    {% endblocktranslate %}
+                                    {% blocktranslate asvar btn_text_withdraw_tcl %}
+                                        {% filter force_escape %}
+                                            Withdraw L{{acl}} clearance and responsibility
+                                        {% endfilter %}
+                                    {% endblocktranslate %}
                                 {% include "partials/single_action_form.html" with btn_text=btn_text_withdraw_tcl action="withdraw_acceptance" key="member_id" value=organization_member.id btn_class="ghost" %}
-
                             {% else %}
                                 <p class="explanation"
                                    role="group"
                                    aria-label="{% translate "Explanation OOI clearance" %}">
                                     {% blocktranslate trimmed %}
-                                        You are granted clearance for level L{{ tcl }} by your admin.
-                                        Before you can change OOI clearance levels up to this level,
-                                        you need to accept this permission.
-                                        Remember: <strong>with great power comes great responsibility.</strong>
+                                        {% filter force_escape %}
+                                            You are granted clearance for level L{{ tcl }} by your admin.
+                                            Before you can change OOI clearance levels up to this level,
+                                            you need to accept this permission.
+                                            Remember: <strong>with great power comes great responsibility.</strong>
+                                        {% endfilter %}
                                     {% endblocktranslate %}
                                 </p>
-                                {% blocktranslate asvar btn_text_accept_tcl %}
-                        Accept level L{{tcl}} clearance and responsibility
-                    {% endblocktranslate %}
+                                    {% blocktranslate asvar btn_text_accept_tcl %}
+                                        {% filter force_escape %}
+                                            Accept level L{{tcl}} clearance and responsibility
+                                            {% endfilter %}
+                                    {% endblocktranslate %}
                                 {% include "partials/single_action_form.html" with btn_text=btn_text_accept_tcl action="accept_clearance" key="member_id" value=organization_member.id btn_class="ghost" %}
 
                             {% endif %}

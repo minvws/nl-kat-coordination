@@ -2,6 +2,7 @@ from functools import cached_property
 
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.password_validation import validate_password
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models.functions import Lower
@@ -27,6 +28,7 @@ class KATUserManager(BaseUserManager):
         if not email:
             raise ValueError(_("The Email must be set"))
         user = self.model(email=email, **extra_fields)
+        validate_password(password, user=user)
         user.set_password(password)
         user.save()
         return user

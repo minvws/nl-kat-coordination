@@ -1,5 +1,5 @@
 from django.utils.functional import Promise
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from tools.enums import SCAN_LEVEL
@@ -49,7 +49,7 @@ OBSERVED_AT_HELP_TEXT = _(
     "Select a datetime to change the view to represent that moment in time."
 )
 
-BOEFJE_CONTAINER_IMAGE_HELP_TEXT = mark_safe(
+BOEFJE_CONTAINER_IMAGE_HELP_TEXT = format_html(
     _(
         "<p>The name of the Docker image. For example: <i>'ghcr.io/minvws/openkat/nmap'</i>. "
         "In OpenKAT, all Boefjes with the same container image will be seen as 'variants' and will be "
@@ -57,7 +57,7 @@ BOEFJE_CONTAINER_IMAGE_HELP_TEXT = mark_safe(
     )
 )
 
-BOEFJE_DESCRIPTION_HELP_TEXT = mark_safe(
+BOEFJE_DESCRIPTION_HELP_TEXT = format_html(
     _(
         "<p>A description of the Boefje explaining in short what it can do. "
         "This will both be displayed inside the KAT-alogus and on the Boefje details page.</p> "
@@ -70,7 +70,7 @@ BOEFJE_CONSUMES_HELP_TEXT = _(
     "and then click the items you want to select. "
 )
 
-BOEFJE_SCHEMA_HELP_TEXT = mark_safe(
+BOEFJE_SCHEMA_HELP_TEXT = format_html(
     _(
         "<p>If any other settings are needed for your Boefje, add these as a JSON Schema, "
         "otherwise, leave the field empty or 'null'.</p> "
@@ -83,14 +83,14 @@ BOEFJE_SCHEMA_HELP_TEXT = mark_safe(
     )
 )
 
-BOEFJE_PRODUCES_HELP_TEXT = mark_safe(
+BOEFJE_PRODUCES_HELP_TEXT = format_html(
     _(
         "<p>Add a set of mime types that are produced by this Boefje, separated by commas. "
         "For example: <i>'text/html'</i>, <i>'image/jpeg'</i> or <i>'boefje/{boefje-id}'</i></p> "
         "<p>These output mime types will be shown on the Boefje detail page as information for other users. </p> "
     )
 )
-BOEFJE_SCAN_LEVEL_HELP_TEXT = mark_safe(
+BOEFJE_SCAN_LEVEL_HELP_TEXT = format_html(
     _(
         "<p>Select a clearance level for your Boefje. For more information about the different "
         "clearance levels please check the "

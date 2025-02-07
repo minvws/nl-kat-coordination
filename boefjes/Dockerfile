@@ -5,7 +5,7 @@ FROM python:$PYTHON_VERSION AS dev
 ARG USER_UID=1000
 ARG USER_GID=1000
 
-#FIXME entrypoint not working when moved to USER nonroot
+# FIXME: entrypoint not working when moved to USER nonroot
 ENTRYPOINT ["/app/boefjes/entrypoint.sh"]
 
 # Create a nonroot group with the specified GID

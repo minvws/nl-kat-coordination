@@ -18,6 +18,7 @@ ENV GRANIAN_THREADS=4
 ARG USER_UID=1000
 ARG USER_GID=1000
 
+# FIXME: entrypoint not working when moved to USER nonroot
 ENTRYPOINT ["/app/rocky/entrypoint.sh"]
 
 RUN groupadd --gid "$USER_GID" rocky
