@@ -127,3 +127,7 @@ class CustomReportScheduleForm(BaseRockyForm):
     end_date = forms.DateField(
         label=_(""), widget=forms.HiddenInput(), initial=lambda: datetime.now(tz=timezone.utc).date(), required=False
     )
+
+
+class ReportScheduleDeleteForm(BaseRockyForm):
+    report_recipe = forms.HiddenInput()

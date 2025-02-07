@@ -8,13 +8,14 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import ListView
+from django.views.generic import FormView, ListView
 from pydantic import TypeAdapter, ValidationError
 from tools.ooi_helpers import create_ooi
 
 from octopoes.models import OOI, Reference
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.reports import Report, ReportRecipe
+from reports.forms import ReportScheduleDeleteForm
 from reports.report_types.aggregate_organisation_report.report import aggregate_reports
 from reports.report_types.helpers import get_report_by_id
 from reports.views.base import ReportBreadcrumbs, ReportDataDict, get_selection
@@ -90,6 +91,15 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
         context = super().get_context_data(**kwargs)
         context["total_oois"] = len(self.object_list)
         return context
+
+
+class ScheduledReportsDeleteView(FormView):
+    form_class = ReportScheduleDeleteForm
+    success_url = reverse("scheduled_reports")
+
+    def form_valid(self, form):
+        form.cleaned_data
+        return super().form_valid(form)
 
 
 class ScheduledReportsEnableDisableView(BreadcrumbsReportOverviewView, SchedulerView, ListView):
