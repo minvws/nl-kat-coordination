@@ -161,8 +161,16 @@ class EditBoefjeView(BoefjeSetupView):
         return initial
 
     def form_valid(self, form):
+        form_data = form.cleaned_data
+        plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
+
         try:
-            super().form_valid(request, form)
+            self.get_katalogus().edit_plugin(plugin)
+            return super().form_valid(form)
+        except DuplicatePluginError as error:
+            if "name" in error.message:
+                form.add_error("name", ("Boefje with this name does already exist. Please choose another name."))
+            return self.form_invalid(form)
         except KATalogusNotAllowedError:
             form.add_error(
                 "name",
