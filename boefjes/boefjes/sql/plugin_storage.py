@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from boefjes.config import Settings, settings
 from boefjes.models import Boefje, Normalizer, PluginType
 from boefjes.sql.db import ObjectNotFoundException, session_managed_iterator
-from boefjes.sql.db_models import BoefjeInDB, NormalizerInDB
+from boefjes.sql.db_models import BoefjeInDB, NormalizerInDB, RunOnDB
 from boefjes.sql.session import SessionMixin
 from boefjes.storage.interfaces import NotAllowed, PluginNotFound, PluginStorage
 
@@ -98,6 +98,7 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
 
     @staticmethod
     def to_boefje_in_db(boefje: Boefje, pk: int | None = None) -> BoefjeInDB:
+        run_on_db = RunOnDB.from_run_ons(boefje.run_on)
         boefje = BoefjeInDB(
             plugin_id=boefje.id,
             created=boefje.created,
@@ -109,6 +110,7 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             schema=boefje.boefje_schema,
             cron=boefje.cron,
             interval=boefje.interval,
+            run_on=run_on_db.value if run_on_db is not None else None,
             oci_image=boefje.oci_image,
             oci_arguments=boefje.oci_arguments,
             version=boefje.version,
@@ -152,6 +154,7 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             boefje_schema=boefje_in_db.schema,
             cron=boefje_in_db.cron,
             interval=boefje_in_db.interval,
+            run_on=RunOnDB(boefje_in_db.run_on).to_run_ons() if boefje_in_db.run_on else None,
             oci_image=boefje_in_db.oci_image,
             oci_arguments=boefje_in_db.oci_arguments,
             version=boefje_in_db.version,

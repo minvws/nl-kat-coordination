@@ -15,6 +15,7 @@ from boefjes.dependencies.plugins import (
     get_plugins_filter_parameters,
 )
 from boefjes.models import FilterParameters, PaginationParameters, PluginType
+from boefjes.sql.db_models import RunOn
 from boefjes.sql.plugin_storage import get_plugin_storage
 from boefjes.storage.interfaces import DuplicatePlugin, IntegrityError, NotAllowed, PluginStorage
 
@@ -130,6 +131,7 @@ class BoefjeIn(BaseModel):
     boefje_schema: dict | None = None
     cron: str | None = None
     interval: int | None = None
+    run_on: list[RunOn] | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
 

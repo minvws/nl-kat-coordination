@@ -34,10 +34,6 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
             + self.query_params
         )
 
-
-class AddBoefjeView(BoefjeSetupView):
-    """View where the user can create a new Boefje"""
-
     def form_valid(self, form):
         form_data = form.cleaned_data
         plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
@@ -49,6 +45,10 @@ class AddBoefjeView(BoefjeSetupView):
             if "name" in error.message:
                 form.add_error("name", ("Boefje with this name does already exist. Please choose another name."))
             return self.form_invalid(form)
+
+
+class AddBoefjeView(BoefjeSetupView):
+    """View where the user can create a new Boefje"""
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -88,21 +88,15 @@ class AddBoefjeVariantView(BoefjeSetupView):
         initial["consumes"] = consumes
         initial["produces"] = ", ".join(self.plugin.produces)
         initial["scan_level"] = self.plugin.scan_level
-        initial["interval"] = self.plugin.interval
+        initial["interval_number"] = self.plugin.interval
+        initial["interval_frequency"] = "minutes"
+        initial["run_on"] = "-".join(self.plugin.run_on) if self.plugin.run_on else None
+
+        initial["scan_type"] = "interval"
+        if self.plugin.run_on:
+            initial["scan_type"] = "run_on"
 
         return initial
-
-    def form_valid(self, form):
-        form_data = form.cleaned_data
-        plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
-
-        try:
-            self.get_katalogus().create_plugin(plugin)
-            return super().form_valid(form)
-        except DuplicatePluginError as error:
-            if "name" in error.message:
-                form.add_error("name", ("Boefje with this name does already exist. Please choose another name."))
-            return self.form_invalid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -157,7 +151,13 @@ class EditBoefjeView(BoefjeSetupView):
         initial["consumes"] = consumes
         initial["produces"] = ", ".join(self.plugin.produces)
         initial["scan_level"] = self.plugin.scan_level
-        initial["interval"] = self.plugin.interval
+        initial["interval_number"] = self.plugin.interval
+        initial["interval_frequency"] = "minutes"
+        initial["run_on"] = "-".join(self.plugin.run_on) if self.plugin.run_on else None
+
+        initial["scan_type"] = "interval"
+        if self.plugin.run_on:
+            initial["scan_type"] = "run_on"
 
         return initial
 
@@ -211,7 +211,14 @@ def create_boefje_with_form_data(form_data, plugin_id: str, created: str | None)
     consumes = [] if not form_data["consumes"] else form_data["consumes"].strip("[]").replace("'", "").split(", ")
     produces = [] if not form_data["produces"] else form_data["produces"].split(",")
     produces = {p.strip() for p in produces}
-    interval = int(form_data.get("interval") or 0) or None
+    interval = None
+    run_on = None
+
+    if form_data["scan_type"] == "interval" and form_data.get("interval_number"):
+        interval = get_interval_minutes(int(form_data["interval_number"]), form_data["interval_frequency"])
+    elif form_data["scan_type"] == "run_on":
+        run_on = form_data["run_on"].split("-")
+
     input_objects = set()
 
     for input_object in consumes:
@@ -223,6 +230,7 @@ def create_boefje_with_form_data(form_data, plugin_id: str, created: str | None)
         created=created,
         description=form_data["description"],
         interval=interval,
+        run_on=run_on,
         enabled=False,
         type="boefje",
         scan_level=form_data["scan_level"],
@@ -232,3 +240,18 @@ def create_boefje_with_form_data(form_data, plugin_id: str, created: str | None)
         oci_image=form_data["oci_image"],
         oci_arguments=arguments,
     )
+
+
+def get_interval_minutes(interval_number, interval_frequency) -> int | None:
+    if interval_frequency == "minutes":
+        return int(interval_number)
+    if interval_frequency == "hours":
+        return int(interval_number * 60)
+    if interval_frequency == "days":
+        return int(interval_number * 60 * 24)
+    if interval_frequency == "weeks":
+        return int(interval_number * 60 * 24 * 7)
+    if interval_frequency == "years":
+        return int(interval_number * 60 * 24 * 365)
+
+    return None

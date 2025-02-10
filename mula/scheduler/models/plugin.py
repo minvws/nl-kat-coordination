@@ -2,6 +2,8 @@ import datetime
 
 from pydantic import BaseModel
 
+from scheduler.models.ooi import RunOn
+
 
 class Plugin(BaseModel):
     id: str
@@ -19,4 +21,4 @@ class Plugin(BaseModel):
     produces: list[str]
     cron: str | None = None
     interval: int | None = None
-    run_on: list[str] | None = None
+    run_on: list[RunOn] | None = None

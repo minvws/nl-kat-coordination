@@ -5,8 +5,5 @@
   "consumes": [],
   "scan_level": 4,
   "oci_image": "ghcr.io/minvws/openkat/export-http:latest",
-  "run_on": [
-    "create",
-    "update"
-  ]
+  "run_on": ["create", "update"]
 }

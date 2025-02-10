@@ -9,11 +9,21 @@ from tools.forms.settings import (
     BOEFJE_CONTAINER_IMAGE_HELP_TEXT,
     BOEFJE_DESCRIPTION_HELP_TEXT,
     BOEFJE_PRODUCES_HELP_TEXT,
+    BOEFJE_RUN_ON_HELP_TEXT,
     BOEFJE_SCAN_LEVEL_HELP_TEXT,
     BOEFJE_SCHEMA_HELP_TEXT,
 )
 
 OOI_TYPE_CHOICES = sorted((ooi_type.get_object_type(), ooi_type.get_object_type()) for ooi_type in ALL_TYPES)
+SCAN_TYPE_CHOICES = [("interval", "Run on interval, every:"), ("run_on", "Run on object creation/change:")]
+INTERVAL_CHOICES = [
+    ("minutes", "minutes"),
+    ("hours", "hours"),
+    ("days", "days"),
+    ("weeks", "weeks"),
+    ("years", "years"),
+]
+OBJECT_CHANGE_CHOICES = [("create", "Creation"), ("update", "Change"), ("create-update", "Creation and change")]
 
 
 class BoefjeSetupForm(BaseRockyForm):
@@ -46,15 +56,40 @@ class BoefjeSetupForm(BaseRockyForm):
         widget=forms.Select(choices=SCAN_LEVEL.choices),
         help_text=BOEFJE_SCAN_LEVEL_HELP_TEXT,
     )
-    interval = forms.CharField(
+    scan_type = forms.CharField(
         required=False,
-        label=_("Scan frequency"),
+        label=_("Scan type"),
+        widget=forms.RadioSelect(
+            choices=SCAN_TYPE_CHOICES, attrs={"class": "radio-choice", "data-choicegroup": "runon_selector"}
+        ),
+        help_text=BOEFJE_RUN_ON_HELP_TEXT,
+    )
+    interval_number = forms.CharField(
+        required=False,
+        label=_("Interval amount"),
         widget=forms.TextInput(
             attrs={
                 "description": _(
-                    "Specify the scanning frequency for this Boefje in minutes. The default is 24 hours. "
-                    "For example: 5 minutes will let the boefje scan every 5 minutes."
-                )
+                    "Specify the scanning interval for this Boefje. The default is 24 hours. "
+                    "For example: 5 minutes will let the Boefje scan every 5 minutes."
+                ),
+                "class": "runon_selector interval",
             }
+        ),
+    )
+    interval_frequency = forms.CharField(
+        required=False,
+        label=_("Interval frequency"),
+        widget=forms.Select(choices=INTERVAL_CHOICES, attrs={"class": "runon_selector interval"}),
+    )
+    run_on = forms.CharField(
+        required=False,
+        label=_("Object creation/change"),
+        widget=forms.Select(
+            choices=OBJECT_CHANGE_CHOICES,
+            attrs={
+                "description": _("Choose weather the Boefje should run after creating and/or changing an object. "),
+                "class": "runon_selector run_on",
+            },
         ),
     )

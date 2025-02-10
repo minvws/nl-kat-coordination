@@ -9,6 +9,11 @@ class MutationOperationType(Enum):
     DELETE = "delete"
 
 
+class RunOn(Enum):
+    CREATE = MutationOperationType.CREATE.value
+    UPDATE = MutationOperationType.UPDATE.value
+
+
 class ScanProfile(BaseModel):
     level: int
     reference: str

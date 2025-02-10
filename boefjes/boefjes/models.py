@@ -1,11 +1,24 @@
 import datetime
 from enum import Enum
+from functools import total_ordering
 from typing import Literal
 
 from croniter import croniter
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import BaseModel, Field, field_validator
+
+
+# This makes the RunOn sortable when in a list. This is convenient for e.g. the RunOnDB.from_run_ons method, that now
+# does not have to take the ordering of a boefje.run_on into account in its match statement. This is especially handy
+# once we introduce more RunOn values such as DELETE.
+@total_ordering
+class RunOn(Enum):
+    CREATE = "create"
+    UPDATE = "update"
+
+    def __lt__(self, other):
+        return self.value < other.value
 
 
 class Organisation(BaseModel):
@@ -34,6 +47,7 @@ class Boefje(Plugin):
     boefje_schema: dict | None = None
     cron: str | None = None
     interval: int | None = None
+    run_on: list[RunOn] | None = None
     runnable_hash: str | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)

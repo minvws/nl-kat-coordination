@@ -21,6 +21,7 @@ from scheduler.models import (
     Task,
     TaskStatus,
 )
+from scheduler.models.ooi import RunOn
 from scheduler.schedulers import Scheduler
 from scheduler.schedulers.queue import PriorityQueue, QueueFullError
 from scheduler.schedulers.rankers import BoefjeRanker
@@ -214,9 +215,9 @@ class BoefjeScheduler(Scheduler):
                     create_schedule = False
                     run_task = False
                     if mutation.operation == MutationOperationType.CREATE:
-                        run_task = "create" in boefje.run_on
+                        run_task = RunOn.CREATE in boefje.run_on
                     elif mutation.operation == MutationOperationType.UPDATE:
-                        run_task = "update" in boefje.run_on
+                        run_task = RunOn.UPDATE in boefje.run_on
 
                 if not run_task:
                     self.logger.debug(
