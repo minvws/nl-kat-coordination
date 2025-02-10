@@ -1,4 +1,4 @@
-from collections import defaultdict
+import json
 from collections.abc import Iterable, Mapping, Sequence
 from datetime import datetime, timezone
 from operator import attrgetter
@@ -18,19 +18,18 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
 from katalogus.client import Boefje, KATalogus, KATalogusError, Plugin
-from pydantic import RootModel, TypeAdapter
 from tools.ooi_helpers import create_ooi
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, PostRedirect, url_with_querystring
 
 from octopoes.models import OOI, Reference
-from octopoes.models.ooi.reports import Report as ReportOOI
-from octopoes.models.ooi.reports import ReportRecipe
+from octopoes.models.ooi.reports import AssetReport, ReportRecipe
+from octopoes.models.ooi.reports import BaseReport as ReportOOI
+from octopoes.models.types import OOIType
 from reports.forms import OOITypeMultiCheckboxForReportForm, ReportScheduleStartDateForm
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import AggregateReport, BaseReport, Report, report_plugins_union
 from reports.report_types.helpers import (
-    REPORTS,
     get_ooi_types_from_aggregate_report,
     get_ooi_types_with_report,
     get_report_by_id,
@@ -54,17 +53,6 @@ def get_selection(request: HttpRequest, pre_selection: Mapping[str, str | Sequen
 
 
 logger = structlog.get_logger(__name__)
-
-
-class ReportDataDict(RootModel):
-    root: Any
-
-    class Config:
-        arbitrary_types_allowed = True
-
-
-def recursive_dict():
-    return defaultdict(recursive_dict)
 
 
 class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
@@ -204,7 +192,11 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
                 scan_profile_type=self.get_ooi_profile_types(),
             ).items
 
-        return [self.get_single_ooi(pk=ooi_pk) for ooi_pk in self.get_ooi_selection()]
+        return list(
+            self.octopoes_api_connector.load_objects_bulk(
+                {Reference.from_str(x) for x in self.get_ooi_selection()}, self.observed_at
+            ).values()
+        )
 
     def get_ooi_filter_forms(self) -> dict[str, Form]:
         return {
@@ -238,7 +230,8 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         ]
 
     def get_report_types_for_generate_report(self):
-        if self.object_selection == "query":
+        object_selection = self.request.POST.get("object_selection", "")
+        if object_selection == "query":
             report_types = get_report_types_for_ooi_types(self.get_ooi_types())
         else:
             report_types = get_report_types_for_oois(self.selected_oois)
@@ -294,19 +287,14 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         return {"query": query}
 
     def create_report_recipe(
-        self,
-        report_name_format: str,
-        subreport_name_format: str | None,
-        parent_report_type: str | None,
-        schedule: str | None,
+        self, report_name_format: str, report_type: str | None, schedule: str | None
     ) -> ReportRecipe:
         report_recipe = ReportRecipe(
             recipe_id=uuid4(),
             report_name_format=report_name_format,
-            subreport_name_format=subreport_name_format,
             input_recipe=self.get_input_recipe(),
-            parent_report_type=parent_report_type,
-            report_types=self.get_report_type_ids(),
+            report_type=report_type,
+            asset_report_types=self.get_report_type_ids(),
             cron_expression=schedule,
         )
         create_ooi(
@@ -327,24 +315,13 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
             }
         }
 
-    def get_initial_report_names(self) -> tuple[str, str]:
-        oois = self.get_total_oois()
-        is_single_report = self.is_single_report()
-
-        if oois == 1 and is_single_report:
-            return ("${report_type} for ${ooi}", "")
-        if oois == 1 and not is_single_report:
-            return ("${report_type} for ${ooi}", "${report_type} for ${ooi}")
-        if oois > 1:
-            return ("${report_type} for ${oois_count} objects", "${report_type} for ${ooi}")
-        return ("", "")
+    def get_initial_report_name(self) -> str:
+        return "${report_type} for ${oois_count} objects"
 
     def get_parent_report_type(self):
         if self.report_type is not None:
             return self.report_type.id
-        if not self.is_single_report():
-            return ConcatenatedReport.id
-        return self.report_type
+        return ConcatenatedReport.id
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -521,9 +498,8 @@ class ReportFinalSettingsView(BaseReportView, SchedulerView, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["initial_report_names"] = self.get_initial_report_names()
         context["report_schedule_form_start_date"] = self.get_report_schedule_form_start_date_time_recurrence()
-        context["report_schedule_form_recurrence_choice"] = self.get_report_schedule_form_recurrence_choice()
+        context["report_name_form"] = self.get_report_name_form()
         return context
 
 
@@ -549,14 +525,11 @@ class SaveReportView(BaseReportView, SchedulerView, FormView):
             else None
         )
 
-        parent_report_type = self.get_parent_report_type()
+        report_type = self.get_parent_report_type()
 
-        parent_report_name_format = self.request.POST.get("parent_report_name_format", "")
-        subreport_name_format = self.request.POST.get("subreport_name_format")
+        report_name_format = self.request.POST.get("report_name", "Report")
 
-        report_recipe = self.create_report_recipe(
-            parent_report_name_format, subreport_name_format, parent_report_type, schedule
-        )
+        report_recipe = self.create_report_recipe(report_name_format, report_type, schedule)
 
         self.create_report_schedule(report_recipe, start_datetime)
 
@@ -571,7 +544,8 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.report_ooi = self.get_report_ooi(request.GET.get("report_id"))
+
+        self.report_ooi = self.get_report_ooi()
         self.report_data, self.input_oois, self.report_types, self.plugins = self.get_report_data()
 
     def get(self, request, *args, **kwargs):
@@ -605,8 +579,14 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
             else datetime.now(timezone.utc).replace(hour=23, minute=59, second=59, microsecond=999999)
         )
 
-    def get_report_ooi(self, ooi_pk: str) -> ReportOOI:
-        return self.octopoes_api_connector.get(Reference.from_str(f"{ooi_pk}"), valid_time=self.custom_observed_at)
+    def get_report_ooi(self) -> ReportOOI:
+        if "asset_report_id" in self.request.GET:
+            ooi_pk = self.request.GET.get("asset_report_id")
+            return self.octopoes_api_connector.get(Reference.from_str(ooi_pk), valid_time=self.custom_observed_at)
+
+        return self.octopoes_api_connector.get_report(
+            Reference.from_str(self.request.GET.get("report_id")), valid_time=self.custom_observed_at
+        )
 
     def get_template_names(self):
         if self.report_ooi.report_type and issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
@@ -617,20 +597,15 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
             return ["multi_report.html"]
         return ["generate_report.html"]
 
-    def get_children_reports(self) -> list[ReportOOI]:
-        return [
-            child
-            for x in REPORTS
-            for child in self.octopoes_api_connector.query(
-                "Report.<parent_report[is Report]", valid_time=self.observed_at, source=self.report_ooi.reference
-            )
-            if child.report_type == x.id
-        ]
+    def get_asset_reports(self) -> list[AssetReport]:
+        return self.octopoes_api_connector.get_report(self.report_ooi.reference, self.observed_at).input_oois
 
-    def get_input_oois(self, ooi_pks: list[str]) -> list[type[OOI]]:
-        return [
-            self.octopoes_api_connector.get(Reference.from_str(ooi), valid_time=self.observed_at) for ooi in ooi_pks
-        ]
+    def get_input_oois(self, ooi_pks: list[str]) -> list[OOIType]:
+        return list(
+            self.octopoes_api_connector.load_objects_bulk(
+                {Reference.from_str(ooi) for ooi in ooi_pks}, valid_time=self.observed_at
+            ).values()
+        )
 
     def get_plugins(self, plugins_dict: dict[str, list[str]]) -> list[dict[str, list[Plugin]]]:
         plugins: dict[str, list[Plugin]] = {"required": [], "optional": []}
@@ -663,27 +638,29 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
             )
         return report_types
 
-    def get_report_data_from_bytes(self, report: ReportOOI) -> dict[str, Any]:
+    def get_report_data_from_bytes(self, reports: list[ReportOOI]) -> list[tuple[str, dict[str, Any]]]:
         self.bytes_client.login()
-        return TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
-            self.bytes_client.get_raw(raw_id=report.data_raw_id)
+
+        bytes_datas = self.bytes_client.get_raws(
+            self.organization.code, raw_ids=[report.data_raw_id for report in reports]
         )
+        return [(x[0], json.loads(x[1])) for x in bytes_datas]
 
     def get_report_data_single_report(
         self,
     ) -> tuple[
-        dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]], list[dict[str, list[Plugin]]]
+        dict[str, dict[str, dict[str, Any]]], list[AssetReport], list[dict[str, Any]], list[dict[str, list[Plugin]]]
     ]:
-        report_data: dict[str, Any] = self.get_report_data_from_bytes(self.report_ooi)
+        report_data: dict[str, Any] = self.get_report_data_from_bytes([self.report_ooi])[0][1]
 
         report_types = self.get_report_types(report_data["input_data"]["report_types"])
         plugins = self.get_plugins(report_data["input_data"]["plugins"])
-        oois = self.get_input_oois(self.report_ooi.input_oois)
+        oois = self.get_input_oois(report_data["input_data"]["input_oois"])
 
         report_data[self.report_ooi.report_type] = {}
 
-        for ooi in self.report_ooi.input_oois:
-            report_data[self.report_ooi.report_type][ooi] = {
+        for ooi in oois:
+            report_data[self.report_ooi.report_type][ooi.primary_key] = {
                 "data": report_data["report_data"],
                 "template": self.report_ooi.template,
                 "report_name": self.report_ooi.name,
@@ -694,37 +671,39 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     def get_report_data_aggregate_report_or_multi_report(
         self,
     ) -> tuple[
-        dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]], list[dict[str, list[Plugin]]]
+        dict[str, dict[str, dict[str, Any]]], list[AssetReport], list[dict[str, Any]], list[dict[str, list[Plugin]]]
     ]:
-        report_data = self.get_report_data_from_bytes(self.report_ooi)
-
-        oois = self.get_input_oois(self.report_ooi.input_oois)
+        report_data = self.get_report_data_from_bytes([self.report_ooi])[0][1]
         report_types = self.get_report_types(report_data["input_data"]["report_types"])
         plugins = self.get_plugins(report_data["input_data"]["plugins"])
+        oois = self.get_input_oois(list({asset_ooi.input_ooi for asset_ooi in self.report_ooi.input_oois}))
 
         return report_data, oois, report_types, plugins
 
     def get_report_data_concatenated_report(
         self,
     ) -> tuple[
-        dict[str, dict[str, dict[str, Any]]], list[type[OOI]], list[dict[str, Any]], list[dict[str, list[Plugin]]]
+        dict[str, dict[str, dict[str, Any]]], list[AssetReport], list[dict[str, Any]], list[dict[str, list[Plugin]]]
     ]:
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
 
-        children_reports = self.get_children_reports()
+        asset_reports = self.get_asset_reports()
+        bytes_datas = {key: value for key, value in self.get_report_data_from_bytes(asset_reports)}
 
-        for report in children_reports:
-            bytes_data = self.get_report_data_from_bytes(report)
-            for ooi in report.input_oois:
-                report_data.setdefault(report.report_type, {})[ooi] = {
-                    "data": bytes_data["report_data"],
-                    "template": report.template,
-                    "report_name": report.name,
-                } | bytes_data["input_data"]
-        oois = self.get_input_oois(self.report_ooi.input_oois)
-        report_type_ids = {child_report.report_type for child_report in children_reports}
+        ooi_pks = set()
+
+        for report in asset_reports:
+            ooi_pks.add(report.input_ooi)
+            bytes_data = bytes_datas[report.data_raw_id]
+            report_data.setdefault(report.report_type, {})[report.input_ooi] = {
+                "data": bytes_data["report_data"],
+                "template": report.template,
+                "report_name": report.name,
+            } | bytes_data["input_data"]
+        oois = self.get_input_oois(list(ooi_pks))
+        report_type_ids = {child_report.report_type for child_report in asset_reports}
         report_types = self.get_report_types(report_type_ids)
-        plugins = self.get_plugins(self.get_report_data_from_bytes(self.report_ooi)["input_data"]["plugins"])
+        plugins = self.get_plugins(self.get_report_data_from_bytes([self.report_ooi])[0][1]["input_data"]["plugins"])
 
         return report_data, oois, report_types, plugins
 
@@ -745,14 +724,13 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         context["report_types"] = self.report_types
         context["plugins"] = self.plugins
-
-        context["report_download_pdf_url"] = url_with_querystring(
-            reverse("view_report_pdf", kwargs={"organization_code": self.organization.code}), True, **self.request.GET
-        )
         context["report_download_json_url"] = url_with_querystring(
             reverse("view_report", kwargs={"organization_code": self.organization.code}),
             True,
             **dict(json="true", **self.request.GET),
+        )
+        context["report_download_pdf_url"] = url_with_querystring(
+            reverse("view_report_pdf", kwargs={"organization_code": self.organization.code}), True, **self.request.GET
         )
 
         return context

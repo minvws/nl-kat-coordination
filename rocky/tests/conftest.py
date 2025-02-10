@@ -1,6 +1,8 @@
 import binascii
 import json
 import logging
+import uuid
+from collections.abc import Iterator
 from datetime import datetime, timezone
 from ipaddress import IPv4Address, IPv6Address
 from os import urandom
@@ -32,7 +34,7 @@ from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Referenc
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
-from octopoes.models.ooi.reports import Report, ReportData, ReportRecipe
+from octopoes.models.ooi.reports import AssetReport, HydratedReport, Report, ReportData, ReportRecipe
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
@@ -42,7 +44,7 @@ from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
 from rocky.health import ServiceHealth
-from rocky.scheduler import PaginatedTasksResponse, Task
+from rocky.scheduler import PaginatedTasksResponse, ReportTask, Task, TaskStatus
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
 
@@ -427,8 +429,6 @@ def url(network) -> URL:
         scan_profile=DeclaredScanProfile(
             scan_profile_type="declared", reference=Reference("URL|testnetwork|http://example.com/"), level=ScanLevel.L1
         ),
-        user_id=None,
-        primary_key="URL|testnetwork|http://example.com/",
         network=network.reference,
         raw="http://example.com",
         web_url=Reference("HostnameHTTPURL|http|testnetwork|example.com|80|/"),
@@ -1068,223 +1068,150 @@ def plugin_schema_no_required():
     }
 
 
-parent_report = [
-    Report(
-        object_type="Report",
-        scan_profile=None,
-        user_id=None,
-        primary_key="Report|e821aaeb-a6bd-427f-b064-e46837911a5d",
-        name="Test Parent Report",
-        report_type="concatenated-report",
-        template="report.html",
+recipe = ReportRecipe(
+    report_type="concatenated-report",
+    recipe_id=uuid.uuid4(),
+    report_name_format="test",
+    cron_expression="* * * *",
+    input_recipe={},
+    asset_report_types=[],
+)
+
+parent_report = HydratedReport(
+    report_recipe=recipe.reference,
+    primary_key="Report|e821aaeb-a6bd-427f-b064-e46837911a5d",
+    name="Test Parent Report",
+    report_type="concatenated-report",
+    template="report.html",
+    date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+    reference_date=datetime(2024, 1, 1, 23, 59, 59, 999999),
+    input_oois=[],
+    organization_code="test_organization",
+    organization_name="Test Organization",
+    organization_tags=[],
+    data_raw_id="a5ccf97b-d4e9-442d-85bf-84e739b6d3ed",
+    observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+)
+
+
+def create_asset_report(
+    name,
+    report_type,
+    template,
+    uuid_iterator: Iterator,
+    input_ooi="Hostname|internet|example.com",
+    organization_code: str = "test",
+    organization_name: str = "Test Organization",
+) -> AssetReport:
+    return AssetReport(
+        report_recipe=recipe.reference,
+        name=name,
+        report_type=report_type,
+        template=template,
         date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
-        input_oois=[],
-        report_id=UUID("e821aaeb-a6bd-427f-b064-e46837911a5d"),
-        organization_code="test_organization",
-        organization_name="Test Organization",
+        reference_date=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_ooi=input_ooi,
+        organization_code=organization_code,
+        organization_name=organization_name,
         organization_tags=[],
-        data_raw_id="a5ccf97b-d4e9-442d-85bf-84e739b6d3ed",
+        data_raw_id=str(next(uuid_iterator)),
         observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
-        parent_report=None,
-        has_parent=False,
     )
-]
 
-subreports = [
-    Report(
-        object_type="Report",
-        scan_profile=None,
-        user_id=None,
-        primary_key="Report|1730b72f-b115-412e-ad44-dae6ab3edff9",
-        name="RPKI Report",
-        report_type="rpki-report",
-        template="rpki_report/report.html",
-        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
-        input_oois=[Reference("Hostname|internet|example.com")],
-        report_id=UUID("1730b72f-b115-412e-ad44-dae6ab3edff9"),
-        organization_code="test_organization",
-        organization_name="Test Organization",
-        organization_tags=[],
-        data_raw_id="acbd2250-85f4-471a-ab70-ba1750280194",
-        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
-        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
-        has_parent=True,
-    ),
-    Report(
-        object_type="Report",
-        scan_profile=None,
-        user_id=None,
-        primary_key="Report|463c7f72-fef9-42ef-baf9-f10fcfb91abe",
-        name="Safe Connections Report",
-        report_type="safe-connections-report",
-        template="safe_connections_report/report.html",
-        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
-        input_oois=[Reference("Hostname|internet|example.com")],
-        report_id=UUID("463c7f72-fef9-42ef-baf9-f10fcfb91abe"),
-        organization_code="test_organization",
-        organization_name="Test Organization",
-        organization_tags=[],
-        data_raw_id="ba2d86b8-aca8-4009-adc0-e3d59ea34904",
-        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
-        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
-        has_parent=True,
-    ),
-    Report(
-        object_type="Report",
-        scan_profile=None,
-        user_id=None,
-        primary_key="Report|47a28977-04c6-43b6-9705-3c5f0c955833",
-        name="System Report",
-        report_type="systems-report",
-        template="systems_report/report.html",
-        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
-        input_oois=[Reference("Hostname|internet|example.com")],
-        report_id=UUID("47a28977-04c6-43b6-9705-3c5f0c955833"),
-        organization_code="test_organization",
-        organization_name="Test Organization",
-        organization_tags=[],
-        data_raw_id="3d2ea955-13c1-46f6-81f3-edfe72d8af0b",
-        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
-        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
-        has_parent=True,
-    ),
-    Report(
-        object_type="Report",
-        scan_profile=None,
-        user_id=None,
-        primary_key="Report|57c8f1b9-da3e-48ca-acb1-554e6966b4aa",
-        name="Mail Report",
-        report_type="mail-report",
-        template="mail_report/report.html",
-        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
-        input_oois=[Reference("Hostname|internet|example.com")],
-        report_id=UUID("57c8f1b9-da3e-48ca-acb1-554e6966b4aa"),
-        organization_code="test_organization",
-        organization_name="Test Organization",
-        organization_tags=[],
-        data_raw_id="fe4d0f5d-5447-47d3-952d-74544c8a9d8d",
-        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
-        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
-        has_parent=True,
-    ),
-    Report(
-        object_type="Report",
-        scan_profile=None,
-        user_id=None,
-        primary_key="Report|8075a64c-1acb-44b8-8376-b68d4ee972e5",
-        name="IPv6 Report",
-        report_type="ipv6-report",
-        template="ipv6_report/report.html",
-        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
-        input_oois=[Reference("Hostname|internet|example.com")],
-        report_id=UUID("8075a64c-1acb-44b8-8376-b68d4ee972e5"),
-        organization_code="test_organization",
-        organization_name="Test Organization",
-        organization_tags=[],
-        data_raw_id="3ca35c20-1139-4bf4-a11a-a0b83f3c48ff",
-        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
-        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
-        has_parent=True,
-    ),
-    Report(
-        object_type="Report",
-        scan_profile=None,
-        user_id=None,
-        primary_key="Report|8f3c6b75-b237-4c9a-8d9b-7745f3708d4a",
-        name="Web System Report",
-        report_type="web-system-report",
-        template="web_system_report/report.html",
-        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
-        input_oois=[Reference("Hostname|internet|example.com")],
-        report_id=UUID("8f3c6b75-b237-4c9a-8d9b-7745f3708d4a"),
-        organization_code="test_organization",
-        organization_name="Test Organization",
-        organization_tags=[],
-        data_raw_id="1e419bee-672f-4561-b3b9-f47bd6ce60b7",
-        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
-        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
-        has_parent=True,
-    ),
-    Report(
-        object_type="Report",
-        scan_profile=None,
-        user_id=None,
-        primary_key="Report|8f3c6b75-b237-4c9a-8d9b-7745f3708d4a",
-        name="Web System Report",
-        report_type="web-system-report",
-        template="web_system_report/report.html",
-        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
-        input_oois=[Reference("Hostname|internet|example2.com")],
-        report_id=UUID("8f3c6b75-b237-4c9a-8d9b-7745f3708d4a"),
-        organization_code="test_organization",
-        organization_name="Test Organization",
-        organization_tags=[],
-        data_raw_id="1e419bee-672f-4561-b3b9-f47bd6ce60b7",
-        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
-        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
-        has_parent=True,
-    ),
-]
 
-dns_report = [
-    Report(
-        object_type="Report",
-        scan_profile=None,
-        primary_key="Report|e821aaeb-a6bd-427f-b064-e46837913b4d",
-        name="DNS Report",
-        report_type="dns-report",
-        template="dns_report/report.html",
+def create_report(
+    name, report_type, template, asset_reports: list[AssetReport] | None, uuid_iterator: Iterator | None
+) -> HydratedReport:
+    if asset_reports is None:
+        asset_reports = []
+
+    return HydratedReport(
+        report_recipe=recipe.reference,
+        name=name,
+        report_type=report_type,
+        template=template,
         date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
-        input_oois=[],
-        report_id=UUID("e821aaeb-a6bd-427f-b064-e46837911a5d"),
-        organization_code="test_organization",
+        reference_date=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_oois=asset_reports,
+        organization_code="test",
         organization_name="Test Organization",
         organization_tags=[],
-        data_raw_id="a5ccf97b-d4e9-442d-85bf-84e739b63da9s",
+        data_raw_id=str(next(uuid_iterator)),
         observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
-        parent_report=None,
-        has_parent=False,
     )
+
+
+ids = iter(
+    [
+        UUID("acbd2250-85f4-471a-ab70-ba1750280194"),
+        UUID("ba2d86b8-aca8-4009-adc0-e3d59ea34904"),
+        UUID("3d2ea955-13c1-46f6-81f3-edfe72d8af0b"),
+        UUID("fe4d0f5d-5447-47d3-952d-74544c8a9d8d"),
+        UUID("3ca35c20-1139-4bf4-a11a-a0b83f3c48ff"),
+        UUID("1e419bee-672f-4561-b3b9-f47bd6ce60b7"),
+        UUID("1e419bee-672f-4561-b3b9-f47bd6ce60b7"),
+    ]
+)
+
+
+assets = [
+    create_asset_report("RPKI Report", "rpki-report", "rpki_report/report.html", ids),
+    create_asset_report(
+        "Safe Connections Report", "safe-connections-report", "safe_connections_report/report.html", ids
+    ),
+    create_asset_report("System Report", "systems-report", "systems_report/report.html", ids),
+    create_asset_report("Mail Report", "mail-report", "mail_report/report.html", ids),
+    create_asset_report("IPv6 Report", "ipv6-report", "ipv6_report/report.html", ids),
+    create_asset_report("Web System Report", "web-system-report", "web_system_report/report.html", ids),
+    create_asset_report("Web System Report", "web-system-report", "web_system_report/report.html", ids),
 ]
 
-
-@pytest.fixture
-def report_list_one_subreport():
-    return [(subreports[0], [])]
-
-
-@pytest.fixture
-def report_list_two_subreports():
-    return [(parent_report[0], [subreports[5], subreports[6]])]
+dns_report = create_asset_report(
+    "DNS Report", "dns-report", "dns_report/report.html", iter(["a5ccf97b-d4e9-442d-85bf-84e739b63da9s"])
+)
 
 
 @pytest.fixture
-def report_list_six_subreports():
+def report_list_one_asset_report():
+    uuids = iter(["acbd2250-85f4-471a-ab70-ba17502801e"])
+    return [create_report("Concatenated test report", "concatenated-report", "report.html", [assets[0]], uuids)]
+
+
+@pytest.fixture
+def report_list_two_asset_reports():
+    uuids = iter(["acbd2250-85f4-471a-ab70-ba17502801a"])
     return [
-        (parent_report[0], [subreports[0], subreports[1], subreports[2], subreports[3], subreports[4], subreports[5]])
+        create_report("Concatenated test report", "concatenated-report", "report.html", [assets[5], assets[6]], uuids)
     ]
 
 
 @pytest.fixture
-def get_subreports() -> list[tuple[str, Report]]:
+def report_list_six_asset_reports():
+    uuids = iter(["acbd2250-85f4-471a-ab70-ba17502801a"])
+    asset_reports = [assets[0], assets[1], assets[2], assets[3], assets[4], assets[5]]
+    return [create_report("Concatenated test report", "concatenated-report", "report.html", asset_reports, uuids)]
+
+
+@pytest.fixture
+def get_asset_reports() -> list[tuple[str, Report]]:
     return [
-        (parent_report[0].primary_key, subreports[0]),
-        (parent_report[0].primary_key, subreports[1]),
-        (parent_report[0].primary_key, subreports[2]),
-        (parent_report[0].primary_key, subreports[3]),
-        (parent_report[0].primary_key, subreports[4]),
-        (parent_report[0].primary_key, subreports[5]),
+        (parent_report.primary_key, assets[0]),
+        (parent_report.primary_key, assets[1]),
+        (parent_report.primary_key, assets[2]),
+        (parent_report.primary_key, assets[3]),
+        (parent_report.primary_key, assets[4]),
+        (parent_report.primary_key, assets[5]),
     ]
 
 
 @pytest.fixture
 def report_recipe():
     return ReportRecipe(
+        report_type="concatenated-report",
         recipe_id="744d054e-9c70-4f18-ad27-122cfc1b7903",
         report_name_format="Test Report Name Format",
-        subreport_name_format="Test Subreport Name Format",
         input_recipe={"input_oois": ["Hostname|internet|mispo.es"]},
-        report_types=["dns-report"],
+        asset_report_types=["dns-report"],
         cron_expression="0 0 * * *",
     )
 
@@ -1480,114 +1407,34 @@ def paginated_task_list(task):
 
 @pytest.fixture
 def reports_more_input_oois():
-    return [
-        (
-            Report(
-                object_type="Report",
-                scan_profile=None,
-                primary_key="Report|e821aaeb-a6bd-427f-b064-e46837911a5d",
-                name="Test Parent Report",
-                report_type="concatenated-report",
-                template="report.html",
-                date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
-                input_oois=[],
-                report_id=UUID("e821aaeb-a6bd-427f-b064-e46837911a5d"),
-                organization_code="test_organization",
-                organization_name="Test Organization",
-                organization_tags=[],
-                data_raw_id="a5ccf97b-d4e9-442d-85bf-84e739b6d3ed",
-                observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
-                parent_report=None,
-                has_parent=False,
+    uuids = iter([f"acbd2250-85f4-471a-ab70-ba175028019{i}" for i in range(1, 9)])
+    references = [f"Hostname|internet|example{i}.com" for i in range(1, 9)]
+    sc_name = "Safe Connections Report"
+
+    return create_report(
+        "Test Parent Report",
+        "concatenated-report",
+        "report.html",
+        [
+            create_asset_report("RPKI Report", "rpki-report", "rpki_report/report.html", uuids, references[0]),
+            create_asset_report("RPKI Report", "rpki-report", "rpki_report/report.html", uuids, references[1]),
+            create_asset_report("RPKI Report", "rpki-report", "rpki_report/report.html", uuids, references[2]),
+            create_asset_report("RPKI Report", "rpki-report", "rpki_report/report.html", uuids, references[3]),
+            create_asset_report(
+                sc_name, "safe-connections-report", "safe_connections_report/report.html", uuids, references[4]
             ),
-            [
-                Report(
-                    object_type="Report",
-                    scan_profile=None,
-                    primary_key="Report|1730b72f-b115-412e-ad44-dae6ab3edff7",
-                    name="RPKI Report",
-                    report_type="rpki-report",
-                    template="rpki_report/report.html",
-                    date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
-                    input_oois=[
-                        Reference("Hostname|internet|example1.com"),
-                        Reference("Hostname|internet|example2.com"),
-                    ],
-                    report_id=UUID("1730b72f-b115-412e-ad44-dae6ab3edff7"),
-                    organization_code="test_organization",
-                    organization_name="Test Organization",
-                    organization_tags=[],
-                    data_raw_id="acbd2250-85f4-471a-ab70-ba1750280192",
-                    observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
-                    parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
-                    has_parent=True,
-                ),
-                Report(
-                    object_type="Report",
-                    scan_profile=None,
-                    primary_key="Report|1730b72f-b115-412e-ad44-dae6ab3edff9",
-                    name="RPKI Report",
-                    report_type="rpki-report",
-                    template="rpki_report/report.html",
-                    date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
-                    input_oois=[
-                        Reference("Hostname|internet|example3.com"),
-                        Reference("Hostname|internet|example4.com"),
-                    ],
-                    report_id=UUID("1730b72f-b115-412e-ad44-dae6ab3edff9"),
-                    organization_code="test_organization",
-                    organization_name="Test Organization",
-                    organization_tags=[],
-                    data_raw_id="acbd2250-85f4-471a-ab70-ba1750280194",
-                    observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
-                    parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
-                    has_parent=True,
-                ),
-                Report(
-                    object_type="Report",
-                    scan_profile=None,
-                    primary_key="Report|463c7f72-fef9-42ef-baf9-f10fcfb91abf",
-                    name="Safe Connections Report",
-                    report_type="safe-connections-report",
-                    template="safe_connections_report/report.html",
-                    date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
-                    input_oois=[
-                        Reference("Hostname|internet|example5.com"),
-                        Reference("Hostname|internet|example6.com"),
-                    ],
-                    report_id=UUID("463c7f72-fef9-42ef-baf9-f10fcfb91abf"),
-                    organization_code="test_organization",
-                    organization_name="Test Organization",
-                    organization_tags=[],
-                    data_raw_id="ba2d86b8-aca8-4009-adc0-e3d59ea34906",
-                    observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
-                    parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
-                    has_parent=True,
-                ),
-                Report(
-                    object_type="Report",
-                    scan_profile=None,
-                    primary_key="Report|463c7f72-fef9-42ef-baf9-f10fcfb91abe",
-                    name="Safe Connections Report",
-                    report_type="safe-connections-report",
-                    template="safe_connections_report/report.html",
-                    date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
-                    input_oois=[
-                        Reference("Hostname|internet|example7.com"),
-                        Reference("Hostname|internet|example8.com"),
-                    ],
-                    report_id=UUID("463c7f72-fef9-42ef-baf9-f10fcfb91abe"),
-                    organization_code="test_organization",
-                    organization_name="Test Organization",
-                    organization_tags=[],
-                    data_raw_id="ba2d86b8-aca8-4009-adc0-e3d59ea34904",
-                    observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
-                    parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
-                    has_parent=True,
-                ),
-            ],
-        )
-    ]
+            create_asset_report(
+                sc_name, "safe-connections-report", "safe_connections_report/report.html", uuids, references[5]
+            ),
+            create_asset_report(
+                sc_name, "safe-connections-report", "safe_connections_report/report.html", uuids, references[6]
+            ),
+            create_asset_report(
+                sc_name, "safe-connections-report", "safe_connections_report/report.html", uuids, references[7]
+            ),
+        ],
+        iter(["a5ccf97b-d4e9-442d-85bf-84e739b6d3ed"]),
+    )
 
 
 @pytest.fixture
@@ -1624,7 +1471,6 @@ def rocky_health():
             ServiceHealth(service="katalogus", healthy=True, version="0.0.1-development", additional=None, results=[]),
             ServiceHealth(service="scheduler", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
             ServiceHealth(service="bytes", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
-            ServiceHealth(service="keiko", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
         ],
     )
 
@@ -1632,19 +1478,13 @@ def rocky_health():
 @pytest.fixture
 def boefje_dns_records():
     return Boefje(
+        type="boefje",
         id="dns-records",
         name="DnsRecords",
-        version=None,
-        authors=None,
-        created=None,
         description="Fetch the DNS record(s) of a hostname",
-        related=[],
         enabled=True,
-        type="boefje",
         scan_level=SCAN_LEVEL.L1,
         consumes={Hostname},
-        options=None,
-        runnable_hash=None,
         produces={"boefje/dns-records"},
         boefje_schema={},
         oci_image="ghcr.io/test/image:123",
@@ -1655,20 +1495,13 @@ def boefje_dns_records():
 @pytest.fixture
 def boefje_nmap_tcp():
     return Boefje(
+        type="boefje",
         id="nmap",
         name="Nmap TCP",
-        version=None,
-        authors=None,
-        created=None,
         description="Defaults to top 250 TCP ports. Includes service detection.",
-        environment_keys=None,
-        related=[],
         enabled=True,
-        type="boefje",
         scan_level=SCAN_LEVEL.L2,
         consumes={IPAddressV4, IPAddressV6},
-        options=None,
-        runnable_hash=None,
         produces={"boefje/nmap"},
         boefje_schema={},
         oci_image="ghcr.io/test/image:123",
@@ -1696,28 +1529,24 @@ def drf_redteam_client(create_drf_client, redteamuser):
 
 @pytest.fixture
 def get_aggregate_report_ooi():
-    return Report(
-        object_type="Report",
+    return HydratedReport(
         scan_profile=EmptyScanProfile(
             scan_profile_type="empty",
             reference=Reference("Report|6a073ba0-46d3-451c-a7f8-46923c2b841b"),
             level=ScanLevel.L0,
-            user_id=None,
         ),
-        primary_key="Report|6a073ba0-46d3-451c-a7f8-46923c2b841b",
         name="Aggregate Report",
         report_type="aggregate-organisation-report",
         template="aggregate_organisation_report/report.html",
         date_generated=datetime(2024, 9, 3, 14, 14, 46, 999999),
-        input_oois=["Hostname|internet|mispo.es"],
-        report_id=UUID("6a073ba0-46d3-451c-a7f8-46923c2b841b"),
+        input_oois=[],
         organization_code="_test",
         organization_name="Test Organization",
         organization_tags=[],
         data_raw_id="250cf43e-bfe2-4249-b493-a12921cb79f6",
         observed_at=datetime(2024, 9, 3, 14, 14, 45, 999999),
-        parent_report=None,
-        has_parent=False,
+        reference_date=datetime(2024, 9, 3, 14, 14, 45, 999999),
+        report_recipe=recipe.reference,
     )
 
 
@@ -1780,7 +1609,6 @@ def get_aggregate_report_from_bytes():
             },
             {"service": "scheduler", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
             {"service": "bytes", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
-            {"service": "keiko", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
         ],
         "config_oois": [],
         "input_data": {
@@ -1805,15 +1633,9 @@ def get_aggregate_report_from_bytes():
 @pytest.fixture
 def report_data_ooi_org_a(organization, get_multi_report_data_minvws):
     return ReportData(
-        object_type="ReportData",
         scan_profile=EmptyScanProfile(
-            scan_profile_type="empty",
-            reference=Reference(f"ReportData|{organization.code}"),
-            level=ScanLevel.L0,
-            user_id=None,
+            scan_profile_type="empty", reference=Reference(f"ReportData|{organization.code}"), level=ScanLevel.L0
         ),
-        user_id=None,
-        primary_key=f"ReportData|{organization.code}",
         organization_code=organization.code,
         organization_name=organization.name,
         organization_tags=[],
@@ -1824,15 +1646,9 @@ def report_data_ooi_org_a(organization, get_multi_report_data_minvws):
 @pytest.fixture
 def report_data_ooi_org_b(organization_b, get_multi_report_data_mispoes):
     return ReportData(
-        object_type="ReportData",
         scan_profile=EmptyScanProfile(
-            scan_profile_type="empty",
-            reference=Reference(f"ReportData|{organization_b.code}"),
-            level=ScanLevel.L0,
-            user_id=None,
+            scan_profile_type="empty", reference=Reference(f"ReportData|{organization_b.code}"), level=ScanLevel.L0
         ),
-        user_id=None,
-        primary_key=f"ReportData|{organization_b.code}",
         organization_code=organization_b.code,
         organization_name=organization_b.name,
         organization_tags=[],
@@ -1842,326 +1658,97 @@ def report_data_ooi_org_b(organization_b, get_multi_report_data_mispoes):
 
 @pytest.fixture
 def multi_report_ooi(report_data_ooi_org_a, report_data_ooi_org_b):
-    return Report(
-        object_type="Report",
-        scan_profile=None,
-        user_id=None,
-        primary_key="Report|79f43c90-e554-4cb7-a922-82f92b57c3a7",
+    reports = [
+        create_asset_report("test", "test", "test", iter(["7b305f0d-c0a7-4ad5-af1e-31f81fc229c2"])),
+        create_asset_report("test", "test", "test", iter(["7b305f0d-c0a7-4ad5-af1e-31f81fc229c3"])),
+    ]
+    return HydratedReport(
         name="Sector Report",
         report_type="multi-organization-report",
         template="multi_organization_report/report.html",
         date_generated=datetime(2024, 10, 18, 14, 14, 46, 999999),
-        input_oois=[report_data_ooi_org_a.primary_key, report_data_ooi_org_b.primary_key],
-        report_id=UUID("79f43c90-e554-4cb7-a922-82f92b57c3a7"),
+        input_oois=reports,
         organization_code=report_data_ooi_org_a.organization_code,
         organization_name=report_data_ooi_org_a.organization_name,
         organization_tags=[],
         data_raw_id="bb4d5271-b273-4af4-a25a-83ba0c4fed63",
         observed_at=datetime(2024, 10, 18, 14, 14, 45, 999999),
-        parent_report=None,
-        report_recipe=None,
-        has_parent=False,
+        reference_date=datetime(2024, 10, 18, 14, 14, 45, 999999),
+        report_recipe=recipe.reference,
     )
 
 
 @pytest.fixture
 def report_list():
-    report_list: Paginated[tuple[Report, list[Report | None]]] = Paginated(
+    asset_ids = iter(
+        [
+            "27e8fa60-4675-4c22-b7a7-76152fc520b8",
+            "775d62df-edf9-4c19-91cc-2cc1586a8111",
+            "6ea4268f-f8c9-4ccd-9f81-efb2bf60b215",
+            "fa648efe-7724-41cd-96c0-2c0d48b631bc",
+            "d2623e9f-3f56-4c4f-b01c-abf4a6f5794d",
+            "ba8e864a-770f-4a18-90d4-d7b8fba054ac",
+            "771190cb-a570-4ddf-bf10-2b7cb6d7b852",
+            "ef007438-6266-40c5-981b-a59a5e59d2a4",
+            "e545a488-de8a-4750-8056-6a3b354d011f",
+            "af8c8999-530d-45d5-a8b8-c823ee3c24b7",
+            "7b305f0d-c0a7-4ad5-af1e-31f81fc229c2",
+        ]
+    )
+
+    def asset_report(name, report_type, template):
+        return create_asset_report(name, report_type, template, asset_ids, "Hostname|internet|minvws.nl")
+
+    asset_reports = [
+        asset_report(
+            "Safe Connections Report for minvws.nl", "safe-connections-report", "safe_connections_report/report.html"
+        ),
+        asset_report("DNS Report for minvws.nl", "dns-report", "dns_report/report.html"),
+        asset_report("Name Server Report for minvws.nl", "name-server-report", "name_server_report/report.html"),
+        asset_report("Vulnerability Report for minvws.nl", "vulnerability-report", "vulnerability_report/report.html"),
+        asset_report("Web System Report for minvws.nl", "web-system-report", "web_system_report/report.html"),
+        asset_report("Mail Report for minvws.nl", "mail-report", "mail_report/report.html"),
+        asset_report("System Report for minvws.nl", "systems-report", "systems_report/report.html"),
+        asset_report("IPv6 Report for minvws.nl", "ipv6-report", "ipv6_report/report.html"),
+        asset_report("Open Ports Report for minvws.nl", "open-ports-report", "open_ports_report/report.html"),
+        asset_report("Findings Report for minvws.nl", "findings-report", "findings_report/report.html"),
+        asset_report("RPKI Report for minvws.nl", "rpki-report", "rpki_report/report.html"),
+    ]
+
+    return Paginated(
         count=3,
         items=[
-            (
-                Report(
-                    object_type="Report",
-                    scan_profile=None,
-                    user_id=None,
-                    primary_key="Report|f22f5195-3fde-44d1-b0d5-f74c1b27c984",
-                    name="Findings Report for minvws.nl",
-                    report_type="findings-report",
-                    template="findings_report/report.html",
-                    date_generated=datetime(2024, 11, 7, 15, 33, 55, 999999),
-                    input_oois=["Hostname|internet|minvws.nl"],
-                    report_id=UUID("f22f5195-3fde-44d1-b0d5-f74c1b27c984"),
-                    organization_code="test",
-                    organization_name="Test Organization",
-                    organization_tags=[],
-                    data_raw_id="3300354d-530f-4ecf-8485-e120f43ba3f1",
-                    observed_at=datetime(2024, 11, 7, 23, 59, 59, 999999),
-                    parent_report=None,
-                    report_recipe=None,
-                    has_parent=False,
-                ),
-                [],
-            ),
-            (
-                Report(
-                    object_type="Report",
-                    scan_profile=None,
-                    user_id=None,
-                    primary_key="Report|c0e2c072-c57e-484c-b283-f4e0d1a2132c",
-                    name="Aggregate Report",
-                    report_type="aggregate-organisation-report",
-                    template="aggregate_organisation_report/report.html",
-                    date_generated=datetime(2024, 11, 7, 15, 32, 29, 999999),
-                    input_oois=["Hostname|internet|minvws.nl"],
-                    report_id=UUID("c0e2c072-c57e-484c-b283-f4e0d1a2132c"),
-                    organization_code="test",
-                    organization_name="Test Organization",
-                    organization_tags=[],
-                    data_raw_id="7e888ca9-cebc-4d6e-9f2c-5b45fa7101d4",
-                    observed_at=datetime(2024, 11, 7, 15, 32, 29, 999999),
-                    parent_report=None,
-                    report_recipe=None,
-                    has_parent=False,
-                ),
-                [],
-            ),
-            (
-                Report(
-                    object_type="Report",
-                    scan_profile=None,
-                    user_id=None,
-                    primary_key="Report|99b5d510-d886-43a7-a29e-9973ddccfe67",
-                    name="Concatenated Report for minvws.nl",
-                    report_type="concatenated-report",
-                    template="report.html",
-                    date_generated=datetime(2024, 11, 7, 14, 12, 4, 999999),
-                    input_oois=["Hostname|internet|minvws.nl"],
-                    report_id=UUID("99b5d510-d886-43a7-a29e-9973ddccfe67"),
-                    organization_code="test",
-                    organization_name="Test Organization",
-                    organization_tags=[],
-                    data_raw_id="eb5c1226-7ab0-4e3f-8b41-7ab7016fa3fd",
-                    observed_at=datetime(2024, 11, 7, 23, 59, 59, 999999),
-                    parent_report=None,
-                    report_recipe=None,
-                    has_parent=False,
-                ),
+            create_report(
+                "Concatenated Report for minvws.nl",
+                "concatenated-report",
+                "report.html",
                 [
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|27f71380-7154-49af-846d-6b44bc944ec6",
-                        name="Safe Connections Report for minvws.nl",
-                        report_type="safe-connections-report",
-                        template="safe_connections_report/report.html",
-                        date_generated=datetime(2024, 11, 7, 14, 12, 18, 999999),
-                        input_oois=["Hostname|internet|minvws.nl"],
-                        report_id=UUID("27f71380-7154-49af-846d-6b44bc944ec6"),
-                        organization_code="test",
-                        organization_name="Test Organization",
-                        organization_tags=[],
-                        data_raw_id="27e8fa60-4675-4c22-b7a7-76152fc520b8",
-                        observed_at=datetime(2024, 11, 7, 23, 59, 59, 999999),
-                        parent_report=Reference("Report|99b5d510-d886-43a7-a29e-9973ddccfe67"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|4c627e99-76bf-4bcc-b1be-9b3e42a1e5b4",
-                        name="DNS Report for minvws.nl",
-                        report_type="dns-report",
-                        template="dns_report/report.html",
-                        date_generated=datetime(2024, 11, 7, 14, 12, 6, 999999),
-                        input_oois=["Hostname|internet|minvws.nl"],
-                        report_id=UUID("4c627e99-76bf-4bcc-b1be-9b3e42a1e5b4"),
-                        organization_code="test",
-                        organization_name="Test Organization",
-                        organization_tags=[],
-                        data_raw_id="775d62df-edf9-4c19-91cc-2cc1586a8111",
-                        observed_at=datetime(2024, 11, 7, 23, 59, 59, 999999),
-                        parent_report=Reference("Report|99b5d510-d886-43a7-a29e-9973ddccfe67"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|546f82ed-a6f1-4d06-8716-9c88fa0c5a79",
-                        name="Name Server Report for minvws.nl",
-                        report_type="name-server-report",
-                        template="name_server_report/report.html",
-                        date_generated=datetime(2024, 11, 7, 14, 12, 13, 999999),
-                        input_oois=["Hostname|internet|minvws.nl"],
-                        report_id=UUID("546f82ed-a6f1-4d06-8716-9c88fa0c5a79"),
-                        organization_code="test",
-                        organization_name="Test Organization",
-                        organization_tags=[],
-                        data_raw_id="6ea4268f-f8c9-4ccd-9f81-efb2bf60b215",
-                        observed_at=datetime(2024, 11, 7, 23, 59, 59, 999999),
-                        parent_report=Reference("Report|99b5d510-d886-43a7-a29e-9973ddccfe67"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|59d57dbd-c486-4ad4-9e72-287ecace5a7a",
-                        name="Vulnerability Report for minvws.nl",
-                        report_type="vulnerability-report",
-                        template="vulnerability_report/report.html",
-                        date_generated=datetime(2024, 11, 7, 14, 12, 21, 999999),
-                        input_oois=["Hostname|internet|minvws.nl"],
-                        report_id=UUID("59d57dbd-c486-4ad4-9e72-287ecace5a7a"),
-                        organization_code="test",
-                        organization_name="Test Organization",
-                        organization_tags=[],
-                        data_raw_id="efa648ef-7724-41cd-96c0-2c0d48b631bc",
-                        observed_at=datetime(2024, 11, 7, 23, 59, 59, 999999),
-                        parent_report=Reference("Report|99b5d510-d886-43a7-a29e-9973ddccfe67"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|65c12422-0663-466c-8beb-cf4aff891852",
-                        name="Web System Report for minvws.nl",
-                        report_type="web-system-report",
-                        template="web_system_report/report.html",
-                        date_generated=datetime(2024, 11, 7, 14, 12, 22, 999999),
-                        input_oois=["Hostname|internet|minvws.nl"],
-                        report_id=UUID("65c12422-0663-466c-8beb-cf4aff891852"),
-                        organization_code="test",
-                        organization_name="Test Organization",
-                        organization_tags=[],
-                        data_raw_id="d2623e9f-3f56-4c4f-b01c-abf4a6f5794d",
-                        observed_at=datetime(2024, 11, 7, 23, 59, 59, 999999),
-                        parent_report=Reference("Report|99b5d510-d886-43a7-a29e-9973ddccfe67"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|6f431e79-c913-447f-abf8-5b3b2e4ddd04",
-                        name="Mail Report for minvws.nl",
-                        report_type="mail-report",
-                        template="mail_report/report.html",
-                        date_generated=datetime(2024, 11, 7, 14, 12, 11, 999999),
-                        input_oois=["Hostname|internet|minvws.nl"],
-                        report_id=UUID("6f431e79-c913-447f-abf8-5b3b2e4ddd04"),
-                        organization_code="test",
-                        organization_name="Test Organization",
-                        organization_tags=[],
-                        data_raw_id="ba8e864a-770f-4a18-90d4-d7b8fba054ac",
-                        observed_at=datetime(2024, 11, 7, 23, 59, 59, 999999),
-                        parent_report=Reference("Report|99b5d510-d886-43a7-a29e-9973ddccfe67"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|9546466a-cb7d-4086-94cb-4f15aa2d8200",
-                        name="System Report for minvws.nl",
-                        report_type="systems-report",
-                        template="systems_report/report.html",
-                        date_generated=datetime(2024, 11, 7, 14, 12, 19, 999999),
-                        input_oois=["Hostname|internet|minvws.nl"],
-                        report_id=UUID("9546466a-cb7d-4086-94cb-4f15aa2d8200"),
-                        organization_code="test",
-                        organization_name="Test Organization",
-                        organization_tags=[],
-                        data_raw_id="771190cb-a570-4ddf-bf10-2b7cb6d7b852",
-                        observed_at=datetime(2024, 11, 7, 23, 59, 59, 999999),
-                        parent_report=Reference("Report|99b5d510-d886-43a7-a29e-9973ddccfe67"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|a5c8f206-cc74-4271-bd1a-231f9499e001",
-                        name="IPv6 Report for minvws.nl",
-                        report_type="ipv6-report",
-                        template="ipv6_report/report.html",
-                        date_generated=datetime(2024, 11, 7, 14, 12, 9, 999999),
-                        input_oois=["Hostname|internet|minvws.nl"],
-                        report_id=UUID("a5c8f206-cc74-4271-bd1a-231f9499e001"),
-                        organization_code="test",
-                        organization_name="Test Organization",
-                        organization_tags=[],
-                        data_raw_id="ef007438-6266-40c5-981b-a59a5e59d2a4",
-                        observed_at=datetime(2024, 11, 7, 23, 59, 59, 999999),
-                        parent_report=Reference("Report|99b5d510-d886-43a7-a29e-9973ddccfe67"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|c7095b19-9367-4432-96de-675caa51b621",
-                        name="Open Ports Report for minvws.nl",
-                        report_type="open-ports-report",
-                        template="open_ports_report/report.html",
-                        date_generated=datetime(2024, 11, 7, 14, 12, 14, 999999),
-                        input_oois=["Hostname|internet|minvws.nl"],
-                        report_id=UUID("c7095b19-9367-4432-96de-675caa51b621"),
-                        organization_code="test",
-                        organization_name="Test Organization",
-                        organization_tags=[],
-                        data_raw_id="e545a488-de8a-4750-8056-6a3b354d011f",
-                        observed_at=datetime(2024, 11, 7, 23, 59, 59, 999999),
-                        parent_report=Reference("Report|99b5d510-d886-43a7-a29e-9973ddccfe67"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|ec3592c3-1258-49a0-a76c-0c361f31d3ab",
-                        name="Findings Report for minvws.nl",
-                        report_type="findings-report",
-                        template="findings_report/report.html",
-                        date_generated=datetime(2024, 11, 7, 14, 12, 8, 999999),
-                        input_oois=["Hostname|internet|minvws.nl"],
-                        report_id=UUID("ec3592c3-1258-49a0-a76c-0c361f31d3ab"),
-                        organization_code="test",
-                        organization_name="Test Organization",
-                        organization_tags=[],
-                        data_raw_id="af8c8999-530d-45d5-a8b8-c823ee3c24b7",
-                        observed_at=datetime(2024, 11, 7, 23, 59, 59, 999999),
-                        parent_report=Reference("Report|99b5d510-d886-43a7-a29e-9973ddccfe67"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|f12bf3e3-0e51-4ab8-bb99-5b7dba3d9a6c",
-                        name="RPKI Report for minvws.nl",
-                        report_type="rpki-report",
-                        template="rpki_report/report.html",
-                        date_generated=datetime(2024, 11, 7, 14, 12, 16, 999999),
-                        input_oois=["Hostname|internet|minvws.nl"],
-                        report_id=UUID("f12bf3e3-0e51-4ab8-bb99-5b7dba3d9a6c"),
-                        organization_code="test",
-                        organization_name="Test Organization",
-                        organization_tags=[],
-                        data_raw_id="7b305f0d-c0a7-4ad5-af1e-31f81fc229c2",
-                        observed_at=datetime(2024, 11, 7, 23, 59, 59, 999999),
-                        parent_report=Reference("Report|99b5d510-d886-43a7-a29e-9973ddccfe67"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
+                    create_asset_report(
+                        "Findings Report for minvws.nl",
+                        "findings-report",
+                        "findings_report/report.html",
+                        iter(["3300354d-530f-4ecf-8485-e120f43ba3f1"]),
+                        "Hostname|internet|minvws.nl",
+                    )
                 ],
+                iter(["3300354d-530f-4ecf-8485-e120f43ba3f1"]),
+            ),
+            create_report(
+                "Aggregate Report",
+                "aggregate-organisation-report",
+                "aggregate_organisation_report/report.html",
+                [],
+                iter(["7e888ca9-cebc-4d6e-9f2c-5b45fa7101d4"]),
+            ),
+            create_report(
+                "Concatenated Report for minvws.nl",
+                "concatenated-report",
+                "report.html",
+                asset_reports,
+                iter(["eb5c1226-7ab0-4e3f-8b41-7ab7016fa3fd"]),
             ),
         ],
     )
-    return report_list
 
 
 @pytest.fixture
@@ -2201,213 +1788,84 @@ def get_report_input_data_from_bytes():
 
 @pytest.fixture
 def aggregate_report_with_sub_reports():
-    aggregate_report: Paginated[tuple[Report, list[Report | None]]] = Paginated(
-        count=1,
-        items=[
-            (
-                Report(
-                    object_type="Report",
-                    scan_profile=None,
-                    user_id=None,
-                    primary_key="Report|23820a64-db8f-41b7-b045-031338fbb91d",
-                    name="Aggregate Report",
-                    report_type="aggregate-organisation-report",
-                    template="aggregate_organisation_report/report.html",
-                    date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
-                    input_oois=["Hostname|internet|mispo.es"],
-                    report_id=UUID("23820a64-db8f-41b7-b045-031338fbb91d"),
-                    organization_code="_rieven",
-                    organization_name="Rieven",
-                    organization_tags=[],
-                    data_raw_id="3a362cd7-6348-4e91-8a6f-4cd83f9f6a83",
-                    observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
-                    parent_report=None,
-                    report_recipe=None,
-                    has_parent=False,
+    ids = iter(
+        [
+            "a534b4d5-5dba-4ddc-9b77-970675ae4b1c",
+            "0bdea8eb-7ac0-46ef-ad14-ea3b0bfe1030",
+            "53d5452c-9e67-42d2-9cb0-3b684d8967a2",
+            "a218ca79-47de-4473-a93d-54d14baadd98",
+            "3779f5b0-3adf-41c8-9630-8eed8a857ae6",
+            "851feeab-7036-48f6-81ef-599467c52457",
+            "1e259fce-3cd7-436f-b233-b4ae24a8f11b",
+            "50a9e4df-3b69-4ad8-b798-df626162db5a",
+            "5faa3364-c8b2-4b9c-8cc8-99d8f19ccf8a",
+        ]
+    )
+
+    def asset_report(name: str, report_type: str, template: str):
+        return create_asset_report(name, report_type, template, ids, "Hostname|internet|mispo.es", "_rieven", "Rieven")
+
+    aggregate_report = HydratedReport(
+        name="Aggregate Report",
+        report_type="aggregate-organisation-report",
+        template="aggregate_organisation_report/report.html",
+        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
+        input_oois=[
+            asset_report("Mail Report", "mail-report", "mail_report/report.html"),
+            asset_report("IPv6 Report", "ipv6-report", "ipv6_report/report.html"),
+            asset_report("RPKI Report", "rpki-report", "rpki_report/report.html"),
+            asset_report("Web System Report", "web-system-report", "web_system_report/report.html"),
+            asset_report("Open Ports Report", "open-ports-report", "open_ports_report/report.html"),
+            asset_report("Vulnerability Report", "vulnerability-report", "vulnerability_report/report.html"),
+            asset_report("System Report", "systems-report", "systems_report/report.html"),
+            asset_report("Name Server Report", "name-server-report", "name_server_report/report.html"),
+        ],
+        organization_code="_rieven",
+        organization_name="Rieven",
+        organization_tags=[],
+        data_raw_id="3a362cd7-6348-4e91-8a6f-4cd83f9f6a83",
+        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
+        reference_date=datetime(2024, 11, 21, 10, 7, 7, 441043),
+        report_recipe=recipe.reference,
+    )
+
+    return Paginated(count=1, items=[aggregate_report])
+
+
+@pytest.fixture
+def reports_task_list():
+    return PaginatedTasksResponse(
+        count=2,
+        next=None,
+        previous=None,
+        results=[
+            Task(
+                id=UUID("7f9d5b00-dbab-45f3-93a6-dd44cc20c359"),
+                scheduler_id="report-_rieven",
+                schedule_id="86032b20-f7ae-4a48-9093-87ec5a56e939",
+                priority=1738747928,
+                status=TaskStatus.FAILED,
+                type="report",
+                hash="8f73ee4346118b7814711eba8ebb13d8",
+                data=ReportTask(
+                    type="report", organisation_id="_rieven", report_recipe_id="3f5c1a46-1969-49b7-b402-4676fb59ca4b"
                 ),
-                [
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|28c7b15e-6dda-49e8-a101-41df3124287e",
-                        name="Mail Report",
-                        report_type="mail-report",
-                        template="mail_report/report.html",
-                        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
-                        input_oois=["Hostname|internet|mispo.es"],
-                        report_id=UUID("28c7b15e-6dda-49e8-a101-41df3124287e"),
-                        organization_code="_rieven",
-                        organization_name="Rieven",
-                        organization_tags=[],
-                        data_raw_id="a534b4d5-5dba-4ddc-9b77-970675ae4b1c",
-                        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
-                        parent_report=Reference("Report|23820a64-db8f-41b7-b045-031338fbb91d"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|2a56737f-492f-424b-88cc-0029ce2a444b",
-                        name="IPv6 Report",
-                        report_type="ipv6-report",
-                        template="ipv6_report/report.html",
-                        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
-                        input_oois=["Hostname|internet|mispo.es"],
-                        report_id=UUID("2a56737f-492f-424b-88cc-0029ce2a444b"),
-                        organization_code="_rieven",
-                        organization_name="Rieven",
-                        organization_tags=[],
-                        data_raw_id="0bdea8eb-7ac0-46ef-ad14-ea3b0bfe1030",
-                        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
-                        parent_report=Reference("Report|23820a64-db8f-41b7-b045-031338fbb91d"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|4ec12350-7552-40de-8c9f-f75ac04b99cb",
-                        name="RPKI Report",
-                        report_type="rpki-report",
-                        template="rpki_report/report.html",
-                        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
-                        input_oois=["Hostname|internet|mispo.es"],
-                        report_id=UUID("4ec12350-7552-40de-8c9f-f75ac04b99cb"),
-                        organization_code="_rieven",
-                        organization_name="Rieven",
-                        organization_tags=[],
-                        data_raw_id="53d5452c-9e67-42d2-9cb0-3b684d8967a2",
-                        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
-                        parent_report=Reference("Report|23820a64-db8f-41b7-b045-031338fbb91d"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|8137a050-f897-45ce-a695-fd21c63e2e5c",
-                        name="Safe Connections Report",
-                        report_type="safe-connections-report",
-                        template="safe_connections_report/report.html",
-                        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
-                        input_oois=["Hostname|internet|mispo.es"],
-                        report_id=UUID("8137a050-f897-45ce-a695-fd21c63e2e5c"),
-                        organization_code="_rieven",
-                        organization_name="Rieven",
-                        organization_tags=[],
-                        data_raw_id="a218ca79-47de-4473-a93d-54d14baadd98",
-                        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
-                        parent_report=Reference("Report|23820a64-db8f-41b7-b045-031338fbb91d"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|9ca7ad01-e19e-42c9-9361-751db4399b94",
-                        name="Web System Report",
-                        report_type="web-system-report",
-                        template="web_system_report/report.html",
-                        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
-                        input_oois=["Hostname|internet|mispo.es"],
-                        report_id=UUID("9ca7ad01-e19e-42c9-9361-751db4399b94"),
-                        organization_code="_rieven",
-                        organization_name="Rieven",
-                        organization_tags=[],
-                        data_raw_id="3779f5b0-3adf-41c8-9630-8eed8a857ae6",
-                        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
-                        parent_report=Reference("Report|23820a64-db8f-41b7-b045-031338fbb91d"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|a76878ba-55e0-4971-b645-63cfdfd34e78",
-                        name="Open Ports Report",
-                        report_type="open-ports-report",
-                        template="open_ports_report/report.html",
-                        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
-                        input_oois=["Hostname|internet|mispo.es"],
-                        report_id=UUID("a76878ba-55e0-4971-b645-63cfdfd34e78"),
-                        organization_code="_rieven",
-                        organization_name="Rieven",
-                        organization_tags=[],
-                        data_raw_id="851feeab-7036-48f6-81ef-599467c52457",
-                        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
-                        parent_report=Reference("Report|23820a64-db8f-41b7-b045-031338fbb91d"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|ad33bbf1-bd35-4cb4-a61d-ebe1409e2f67",
-                        name="Vulnerability Report",
-                        report_type="vulnerability-report",
-                        template="vulnerability_report/report.html",
-                        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
-                        input_oois=["Hostname|internet|mispo.es"],
-                        report_id=UUID("ad33bbf1-bd35-4cb4-a61d-ebe1409e2f67"),
-                        organization_code="_rieven",
-                        organization_name="Rieven",
-                        organization_tags=[],
-                        data_raw_id="1e259fce-3cd7-436f-b233-b4ae24a8f11b",
-                        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
-                        parent_report=Reference("Report|23820a64-db8f-41b7-b045-031338fbb91d"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|bd26a0c0-92c2-4323-977d-a10bd90619e7",
-                        name="System Report",
-                        report_type="systems-report",
-                        template="systems_report/report.html",
-                        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
-                        input_oois=["Hostname|internet|mispo.es"],
-                        report_id=UUID("bd26a0c0-92c2-4323-977d-a10bd90619e7"),
-                        organization_code="_rieven",
-                        organization_name="Rieven",
-                        organization_tags=[],
-                        data_raw_id="50a9e4df-3b69-4ad8-b798-df626162db5a",
-                        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
-                        parent_report=Reference("Report|23820a64-db8f-41b7-b045-031338fbb91d"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
-                    Report(
-                        object_type="Report",
-                        scan_profile=None,
-                        user_id=None,
-                        primary_key="Report|d8fcaa8f-65ca-4304-a18c-078767b37bcb",
-                        name="Name Server Report",
-                        report_type="name-server-report",
-                        template="name_server_report/report.html",
-                        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
-                        input_oois=["Hostname|internet|mispo.es"],
-                        report_id=UUID("d8fcaa8f-65ca-4304-a18c-078767b37bcb"),
-                        organization_code="_rieven",
-                        organization_name="Rieven",
-                        organization_tags=[],
-                        data_raw_id="5faa3364-c8b2-4b9c-8cc8-99d8f19ccf8a",
-                        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
-                        parent_report=Reference("Report|23820a64-db8f-41b7-b045-031338fbb91d"),
-                        report_recipe=None,
-                        has_parent=True,
-                    ),
-                ],
-            )
+                created_at=datetime(2025, 2, 5, 9, 32, 8, 325523),
+                modified_at=datetime(2025, 2, 5, 9, 32, 8, 325526),
+            ),
+            Task(
+                id=UUID("9e23611d-36c2-4972-82f0-077bcb1a8941"),
+                scheduler_id="report-_rieven",
+                schedule_id="bd821e6e-6680-4215-8557-e049deeb0175",
+                priority=1738684879,
+                status=TaskStatus.COMPLETED,
+                type="report",
+                hash="5fc17aa4a8ff4874203446a106b4d5bb",
+                data=ReportTask(
+                    type="report", organisation_id="_rieven", report_recipe_id="451a676d-91f8-4366-ac24-d1a47205181d"
+                ),
+                created_at=datetime(2025, 2, 4, 16, 1, 19, 951925),
+                modified_at=datetime(2025, 2, 4, 16, 1, 19, 951927),
+            ),
         ],
     )
-    return aggregate_report

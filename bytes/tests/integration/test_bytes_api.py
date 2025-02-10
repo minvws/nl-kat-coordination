@@ -1,5 +1,5 @@
 import uuid
-from base64 import b64encode
+from base64 import b64decode, b64encode
 
 import httpx
 import pytest
@@ -262,7 +262,7 @@ def test_save_raw_with_one_mime_type(bytes_api_client: BytesAPIClient) -> None:
     assert retrieved_raw == raw
     assert (
         len(
-            bytes_api_client.get_raws(
+            bytes_api_client.get_raw_metas(
                 RawDataFilter(boefje_meta_id=boefje_meta.id, normalized=False, mime_types=[MimeType(value="bad/mime")])
             )
         )
@@ -296,6 +296,27 @@ def test_save_raw_no_mime_types(bytes_api_client: BytesAPIClient) -> None:
     assert get_raw_without_mime_type_response.content == raw
 
 
+def test_get_many_actual_raw_files(bytes_api_client: BytesAPIClient) -> None:
+    boefje_meta = get_boefje_meta(meta_id=uuid.uuid4())
+    bytes_api_client.save_boefje_meta(boefje_meta)
+    mime_types = ["text/kat-test", "text/html"]
+    second_mime_types = ["text/kat-test", "text/status-code"]
+
+    raw = b"test 123456"
+    second_raw = b"second test 200"
+    first_id = bytes_api_client.save_raw(boefje_meta.id, raw, mime_types)
+    second_id = bytes_api_client.save_raw(boefje_meta.id, second_raw, second_mime_types)
+
+    result = bytes_api_client.get_raws(RawDataFilter(raw_ids=[first_id], limit=10))
+    assert len(result) == 1
+    assert b64decode(result[0]["content"]) == raw
+
+    result = bytes_api_client.get_raws(RawDataFilter(raw_ids=[first_id, second_id], limit=10))
+    assert len(result) == 2
+    assert b64decode(result[0]["content"]) == raw
+    assert b64decode(result[1]["content"]) == second_raw
+
+
 def test_raw_mimes(bytes_api_client: BytesAPIClient) -> None:
     boefje_meta = get_boefje_meta(meta_id=uuid.uuid4())
     bytes_api_client.save_boefje_meta(boefje_meta)
@@ -317,7 +338,7 @@ def test_raw_mimes(bytes_api_client: BytesAPIClient) -> None:
     assert bytes_api_client.get_raw(first_id) == raw
     assert bytes_api_client.get_raw(second_id) == second_raw
 
-    retrieved_raws = bytes_api_client.get_raws(
+    retrieved_raws = bytes_api_client.get_raw_metas(
         RawDataFilter(
             boefje_meta_id=boefje_meta.id, normalized=False, mime_types=[MimeType(value=x) for x in mime_types]
         )
@@ -325,13 +346,13 @@ def test_raw_mimes(bytes_api_client: BytesAPIClient) -> None:
     assert len(retrieved_raws) == 1
     assert {x["value"] for x in retrieved_raws[0]["mime_types"]} == set(mime_types)
 
-    retrieved_raws = bytes_api_client.get_raws(
+    retrieved_raws = bytes_api_client.get_raw_metas(
         RawDataFilter(boefje_meta_id=boefje_meta.id, normalized=False, mime_types=[MimeType(value="text/html")])
     )
     assert len(retrieved_raws) == 1
     assert {x["value"] for x in retrieved_raws[0]["mime_types"]} == set(mime_types)
 
-    retrieved_raws = bytes_api_client.get_raws(
+    retrieved_raws = bytes_api_client.get_raw_metas(
         RawDataFilter(boefje_meta_id=boefje_meta.id, normalized=False, mime_types=[MimeType(value="bad/mime")])
     )
     assert len(retrieved_raws) == 0
@@ -342,7 +363,7 @@ def test_raw_mimes(bytes_api_client: BytesAPIClient) -> None:
         mime_types=[MimeType(value="text/kat-test")],
         limit=3,
     )
-    retrieved_raws = bytes_api_client.get_raws(query_filter)
+    retrieved_raws = bytes_api_client.get_raw_metas(query_filter)
 
     assert len(retrieved_raws) == 2
     assert (

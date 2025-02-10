@@ -53,7 +53,7 @@ def test_event_manager_create_empty_scan_profile(mocker, empty_scan_profile):
         operation_type=OperationType.CREATE,
         valid_time=datetime(2023, 1, 1),
         new_data=empty_scan_profile,
-        reference="test_reference",
+        reference="test|reference",
         client="test",
     )
     manager.publish(event)
@@ -67,8 +67,8 @@ def test_event_manager_create_empty_scan_profile(mocker, empty_scan_profile):
                 "valid_time": "2023-01-01T00:00:00",
                 "client": "test",
                 "old_data": None,
-                "new_data": {"scan_profile_type": "empty", "reference": "test_reference", "level": 0, "user_id": None},
-                "reference": "test_reference",
+                "new_data": {"scan_profile_type": "empty", "reference": "test|reference", "level": 0, "user_id": None},
+                "reference": "test|reference",
             },
         ),
         queue="queue",
@@ -78,8 +78,8 @@ def test_event_manager_create_empty_scan_profile(mocker, empty_scan_profile):
     channel_mock.basic_publish.assert_called_once_with(
         "",
         "test__scan_profile_mutations",
-        b'{"operation":"create","primary_key":"test_reference","value":{"primary_key":"test_reference",'
-        b'"object_type":"test_reference","scan_profile":{"scan_profile_type":"empty","reference":"test_reference",'
+        b'{"operation":"create","primary_key":"test|reference","value":{"primary_key":"test|reference",'
+        b'"object_type":"test","scan_profile":{"scan_profile_type":"empty","reference":"test|reference",'
         b'"level":0,"user_id":null}}}',
         properties=pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent),
     )
@@ -95,7 +95,7 @@ def test_event_manager_create_declared_scan_profile(mocker, declared_scan_profil
         operation_type=OperationType.CREATE,
         valid_time=datetime(2023, 1, 1),
         new_data=declared_scan_profile,
-        reference="test_reference",
+        reference="test|reference",
         client="test",
     )
     manager.publish(event)
@@ -111,11 +111,11 @@ def test_event_manager_create_declared_scan_profile(mocker, declared_scan_profil
                 "old_data": None,
                 "new_data": {
                     "scan_profile_type": "declared",
-                    "reference": "test_reference",
+                    "reference": "test|reference",
                     "level": 2,
                     "user_id": None,
                 },
-                "reference": "test_reference",
+                "reference": "test|reference",
             },
         ),
         queue="queue",
@@ -127,18 +127,18 @@ def test_event_manager_create_declared_scan_profile(mocker, declared_scan_profil
         mocker.call(
             "",
             "test__scan_profile_increments",
-            b'{"primary_key": "test_reference", "object_type": "test_reference",'
-            b'"scan_profile": {"scan_profile_type": "declared", "reference": "test_reference",\
+            b'{"primary_key": "test|reference", "object_type": "test",'
+            b'"scan_profile": {"scan_profile_type": "declared", "reference": "test|reference",\
             "level": 2, "user_id": None}}',
             properties=pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent),
         ),
         mocker.call(
             "",
             "test__scan_profile_mutations",
-            b'{"operation": "create", "primary_key": "test_reference", '
-            b'"value": {"primary_key": "test_reference", '
-            b'"object_type": "test_reference", '
-            b'"scan_profile": {"scan_profile_type": "declared", "reference": "test_reference",\
+            b'{"operation": "create", "primary_key": "test|reference", '
+            b'"value": {"primary_key": "test|reference", '
+            b'"object_type": "test", '
+            b'"scan_profile": {"scan_profile_type": "declared", "reference": "test|reference",\
             "level": 2, "user_id": None}}}',
             properties=pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent),
         ),
@@ -155,7 +155,7 @@ def test_event_manager_delete_empty_scan_profile(mocker, empty_scan_profile):
         operation_type=OperationType.DELETE,
         valid_time=datetime(2023, 1, 1),
         old_data=empty_scan_profile,
-        reference="test_reference",
+        reference="test|reference",
         client="test",
     )
     manager.publish(event)
@@ -168,9 +168,9 @@ def test_event_manager_delete_empty_scan_profile(mocker, empty_scan_profile):
                 "operation_type": "delete",
                 "valid_time": "2023-01-01T00:00:00",
                 "client": "test",
-                "old_data": {"scan_profile_type": "empty", "reference": "test_reference", "level": 0, "user_id": None},
+                "old_data": {"scan_profile_type": "empty", "reference": "test|reference", "level": 0, "user_id": None},
                 "new_data": None,
-                "reference": "test_reference",
+                "reference": "test|reference",
             },
         ),
         queue="queue",
@@ -180,6 +180,6 @@ def test_event_manager_delete_empty_scan_profile(mocker, empty_scan_profile):
     channel_mock.basic_publish.assert_called_once_with(
         "",
         "test__scan_profile_mutations",
-        b'{"operation":"delete","primary_key":"test_reference","value":null}',
+        b'{"operation":"delete","primary_key":"test|reference","value":null}',
         properties=pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent),
     )

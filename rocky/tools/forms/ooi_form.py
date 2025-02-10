@@ -180,7 +180,16 @@ class ClearanceFilterForm(BaseRockyForm):
     )
 
 
-_EXCLUDED_OOI_TYPES = ("Finding", "FindingType", "Report")
+_EXCLUDED_OOI_TYPES = (
+    "Finding",
+    "FindingType",
+    "Report",
+    "AssetReport",
+    "BaseReport",
+    "ReportRecipe",
+    "ReportData",
+    "HydratedReport",
+)
 
 SORTED_OOI_TYPES = sorted(
     [

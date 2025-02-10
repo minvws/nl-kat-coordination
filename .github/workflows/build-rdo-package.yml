@@ -123,7 +123,6 @@ jobs:
           BYTES_PASSWORD: password
           BYTES_USERNAME: username
           KATALOGUS_API: http://katalogus:8000
-          KEIKO_API: http://keiko:8000
           OCTOPOES_API: http://octopoes_api:80
           SCHEDULER_API: http://scheduler:8000
           SECRET_KEY: whatever
@@ -200,28 +199,6 @@ jobs:
         run: tar -cvzf ${{ env.PKGDIR }}/boefjes_${{ env.RELEASE_VERSION }}.tar.gz .
         working-directory: ./boefjes
 
-      # Keiko
-      - name: Keiko Create /var/lib/html
-        run: sudo rm -rfv /var/lib/html; sudo mkdir -p /var/www/html ; sudo chown `id -u`:`id -g` /var/www/html
-
-      - name: Keiko copy project to run location.
-        run: cp -rv * /var/www/html
-        working-directory: ./keiko
-
-      - name: Keiko Create env
-        run: python${{ matrix.python_version }} -m venv /var/www/html/.venv
-
-      - name: Keiko Install requirements
-        run: source .venv/bin/activate; pip install --upgrade pip; find . -name requirements.txt | xargs -L 1 pip install -r
-        working-directory: /var/www/html
-
-      - name: Keiko Create archive
-        run: tar -zcvf ${{ env.PKGDIR }}/katkeiko_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}.tar.gz -C /var/www/html/ .venv
-
-      - name: Keiko Create katkeiko release
-        run: tar -cvzf ${{ env.PKGDIR }}/katkeiko_${{ env.RELEASE_VERSION }}.tar.gz .
-        working-directory: ./keiko
-
       # Common / Uploads
       - name: Octopoes Upload whl package
         uses: actions/upload-artifact@v4
@@ -288,15 +265,3 @@ jobs:
         with:
           name: boefjes_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}
           path: ${{ env.PKGDIR }}/boefjes_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}.tar.gz
-
-      - name: Keiko Upload tar
-        uses: actions/upload-artifact@v4
-        with:
-          name: katkeiko_${{ env.RELEASE_VERSION }}
-          path: ${{ env.PKGDIR }}/katkeiko_${{ env.RELEASE_VERSION }}.tar.gz
-
-      - name: Keiko Upload venv tar
-        uses: actions/upload-artifact@v4
-        with:
-          name: katkeiko_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}
-          path: ${{ env.PKGDIR }}/katkeiko_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}.tar.gz
