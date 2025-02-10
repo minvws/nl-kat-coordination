@@ -1,4 +1,4 @@
-from base64 import b64decode
+from base64 import b64decode, b64encode
 from uuid import UUID
 
 import structlog
@@ -8,7 +8,7 @@ from fastapi.responses import Response
 from httpx import codes
 from starlette.responses import JSONResponse
 
-from bytes.api.models import BoefjeOutput
+from bytes.api.models import BoefjeOutput, File
 from bytes.auth import authenticate_token
 from bytes.config import get_settings
 from bytes.database.sql_meta_repository import MetaIntegrityError, ObjectNotFoundException, create_meta_data_repository
@@ -226,6 +226,7 @@ def get_raw(
     organization: str | None = None,
     boefje_meta_id: UUID | None = None,
     normalized: bool | None = None,
+    raw_ids: list[UUID] | None = Query(None),
     limit: int = 1,
     mime_types: list[str] | None = Query(None),
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
@@ -237,6 +238,7 @@ def get_raw(
     query_filter = RawDataFilter(
         organization=organization,
         boefje_meta_id=boefje_meta_id,
+        raw_ids=raw_ids,
         normalized=normalized,
         mime_types=parsed_mime_types,
         limit=limit,
@@ -245,6 +247,38 @@ def get_raw(
     logger.info("mime_types: %s", parsed_mime_types)
 
     return meta_repository.get_raw(query_filter)
+
+
+@router.get("/raws", response_model=BoefjeOutput, tags=[RAW_TAG])
+def get_raws(
+    organization: str | None = None,
+    boefje_meta_id: UUID | None = None,
+    raw_ids: list[UUID] | None = Query(None),
+    normalized: bool | None = None,
+    limit: int = 1,
+    mime_types: list[str] | None = Query(None),
+    meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
+) -> BoefjeOutput:
+    """Get a filtered list of RawData"""
+
+    parsed_mime_types = [] if mime_types is None else [MimeType(value=mime_type) for mime_type in mime_types]
+
+    query_filter = RawDataFilter(
+        organization=organization,
+        boefje_meta_id=boefje_meta_id,
+        raw_ids=raw_ids,
+        normalized=normalized,
+        mime_types=parsed_mime_types,
+        limit=limit,
+    )
+
+    logger.info("mime_types: %s", parsed_mime_types)
+
+    raws = meta_repository.get_raws(query_filter)
+
+    return BoefjeOutput(
+        files=[File(name=raw_id, content=b64encode(raw.value), tags=raw.mime_types) for raw_id, raw in raws]
+    )
 
 
 @router.get("/mime_types", response_model=dict[str, int], tags=[RAW_TAG])

@@ -12,7 +12,6 @@ from katalogus.health import get_katalogus_health
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from rocky.bytes_client import get_bytes_client
 from rocky.health import ServiceHealth
-from rocky.keiko import keiko_client
 from rocky.scheduler import SchedulerError, scheduler_client
 from rocky.version import __version__
 
@@ -60,23 +59,12 @@ def get_scheduler_health(organization_code: str) -> ServiceHealth:
     return scheduler_health
 
 
-def get_keiko_health() -> ServiceHealth:
-    try:
-        return keiko_client.health()
-    except HTTPError:
-        logger.exception("Error while retrieving Keiko health state")
-        return ServiceHealth(
-            service="keiko", healthy=False, additional="Could not connect to Keiko. Service is possibly down"
-        )
-
-
 def get_rocky_health(organization_code: str, octopoes_api_connector: OctopoesAPIConnector) -> ServiceHealth:
     services = [
         get_octopoes_health(octopoes_api_connector),
         get_katalogus_health(),
         get_scheduler_health(organization_code),
         get_bytes_health(),
-        get_keiko_health(),
     ]
 
     services_healthy = all(service.healthy for service in services)

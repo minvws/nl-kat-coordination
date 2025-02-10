@@ -66,7 +66,7 @@
 
     </div>
     <p class="de-emphasized">
-        {% blocktranslate with length=reports|length total=total_oois %}Showing {{ length }} of {{ total }} reports{% endblocktranslate %}
+        {% blocktranslate with length=reports|length total=total_reports %}Showing {{ length }} of {{ total }} reports{% endblocktranslate %}
     </p>
     <div class="horizontal-scroll sticky-column">
         <form class="inline layout-wide">
@@ -79,150 +79,146 @@
                         </th>
                         <th scope="col">{% translate "Name" %}</th>
                         <th scope="col">{% translate "Report type" %}</th>
-                        <th scope="col" class="nowrap">{% translate "Input Objects" %}</th>
+                        <th scope="col" class="nowrap">{% translate "Input objects" %}</th>
                         <th scope="col" class="nowrap">{% translate "Reference date" %}</th>
                         <th scope="col" class="nowrap">{% translate "Creation date" %}</th>
-                        {% if report.children_reports %}<th scope="col" class="visually-hidden actions sticky-cell">Details</th>{% endif %}
+                        <th scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for report in reports %}
-                        <tr>
-                            <td>
-                                <input type="checkbox"
-                                       class="report-checkbox"
-                                       name="report"
-                                       value="{{ report.parent_report.reference }}"
-                                       {% if report.id in selected_reports or "all" in selected_reports %}checked{% endif %}
-                                       {% if "all" in selected_reports %}disabled{% endif %}>
-                            </td>
-                            <td class="report_name">
-                                <a id="report_name_{{ report.parent_report.reference|slugify }}"
-                                   href="{% url "view_report" organization.code %}?report_id={{ report.parent_report.reference }}&observed_at={{ report.parent_report.observed_at|date:"Y-m-d H:i:s:u" }}"
-                                   title="{% translate "Shows parent report details" %}">{{ report.parent_report.name }}</a>
-                            </td>
-                            <td class="report_types">
-                                <ul class="tags horizontal-view">
-                                    {% if report.parent_report.report_type == "concatenated-report" or report.parent_report.report_type is None %}
-                                        {% for report_type, total_objects in report.report_type_summary.items %}
-                                            {% if forloop.counter0 < 2 %}
-                                                <li>
-                                                    <span class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</span>
-                                                </li>
-                                            {% endif %}
-                                            {% if forloop.counter0 == 2 %}
-                                                <li>
-                                                    <span class="label tags-color-grey-2">+ {{ report.report_type_summary|length|add:"-2" }}</span>
-                                                </li>
-                                            {% endif %}
-                                        {% endfor %}
+                        {% if report.total_asset_reports >= 1 %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox"
+                                           class="report-checkbox"
+                                           name="report"
+                                           value="{{ report.report.reference }}"
+                                           {% if report.id in selected_reports or "all" in selected_reports %}checked{% endif %}
+                                           {% if "all" in selected_reports %}disabled{% endif %}>
+                                </td>
+                                <td class="report_name">
+                                    <a id="report_name_{{ report.report.reference|slugify }}"
+                                       href="{% url "view_report" organization.code %}?report_id={{ report.report.reference }}&observed_at={{ report.report.observed_at|date:"Y-m-d H:i:s:u" }}"
+                                       title="{% translate "Shows parent report details" %}">{{ report.report.name }}</a>
+                                </td>
+                                <td class="report_types">
+                                    <ul class="tags horizontal-view">
+                                        {% if report.report.report_type == "concatenated-report" or report.report.report_type is None %}
+                                            {% for report_type, total_objects in report.report_type_summary.items %}
+                                                {% if forloop.counter0 < 2 %}
+                                                    <li>
+                                                        <span class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</span>
+                                                    </li>
+                                                {% endif %}
+                                                {% if forloop.counter0 == 2 %}
+                                                    <li>
+                                                        <span class="label tags-color-grey-2">+ {{ report.report_type_summary|length|add:"-2" }}</span>
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <li>
+                                                <span class="label tags-color-{{ report.report.report_type|get_report_type_label_style }}">{{ report.report.report_type|get_report_type_name }}</span>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </td>
+                                <td class="report_oois">
+                                    {% if report.total_objects == 1 %}
+                                        <a href="{% ooi_url "ooi_detail" report.report.input_oois.0.input_ooi organization.code query=ooi.mandatory_fields %}">{{ report.report.input_oois.0.input_ooi|human_readable }}</a>
                                     {% else %}
-                                        <li>
-                                            <span class="label tags-color-{{ report.parent_report.report_type|get_report_type_label_style }}">{{ report.parent_report.report_type|get_report_type_name }}</span>
-                                        </li>
+                                        {{ report.total_objects }}
                                     {% endif %}
-                                </ul>
-                            </td>
-                            <td class="report_oois">
-                                {% if report.parent_report.input_oois|length == 1 %}
-                                    <a href="{% ooi_url "ooi_detail" report.parent_report.input_oois.0 organization.code query=ooi.mandatory_fields %}">{{ report.parent_report.input_oois.0|human_readable }}</a>
-                                {% elif report.total_objects == 1 %}
-                                    <a href="{% ooi_url 'ooi_detail' report.children_reports.0.input_oois.0 organization.code query=ooi.mandatory_fields %}">{{ report.children_reports.0.input_oois.0|human_readable }}</a>
-                                {% else %}
-                                    {{ report.total_objects }}
-                                {% endif %}
-                            </td>
-                            <td class="nowrap report_reference_date">{{ report.parent_report.observed_at|date }}</td>
-                            <td class="nowrap report_creation_date">{{ report.parent_report.date_generated }}</td>
-                            {% if report.children_reports %}
-                                <td class="sticky-cell">
+                                </td>
+                                <td class="nowrap report_reference_date">{{ report.report.observed_at|date }}</td>
+                                <td class="nowrap report_creation_date">{{ report.report.date_generated }}</td>
+                                <td>
                                     <button type="button"
                                             class="expando-button icon ti-chevron-down"
                                             data-icon-open-class="icon ti-chevron-down"
                                             data-icon-close-class="icon ti-chevron-up"
-                                            data-close-label="{% translate "Close children report object details" %}"
+                                            data-close-label="{% translate "Close asset report object details" %}"
                                             aria-expanded="false">
-                                        {% translate "Open children report object details" %}
+                                        {% translate "Open asset report object details" %}
                                     </button>
-                                </td>
-                            {% endif %}
-                        </tr>
-                        {% if report.children_reports %}
-                            <tr class="expando-row">
-                                <td colspan="6">
-                                    <table>
-                                        <caption class="visually-hidden">{% translate "Subreports details:" %}</caption>
-                                        <h5>{% translate "Report types" %}</h5>
-                                        <p>
-                                            {% blocktranslate trimmed count counter=report.total_children_reports %}
-                                                This report consist of {{ counter }} subreport with the following report type and object.
-                                            {% plural %}
-                                                This report consist of {{ counter }} subreports with the following report types and objects.
-                                            {% endblocktranslate %}
-                                        </p>
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">{% translate "Report type" %}</th>
-                                                <th scope="col">{% translate "Objects" %}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for report_type, total_objects in report.report_type_summary.items %}
-                                                <tr>
-                                                    <td>
-                                                        <ul class="tags horizontal-view">
-                                                            <li>
-                                                                <span class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</span>
-                                                            </li>
-                                                        </ul>
-                                                    </td>
-                                                    <td>{{ total_objects }}</td>
-                                                </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                    <table>
-                                        <h5>
-                                            {% translate "Subreports" %}
-                                            ({{ report.children_reports|length }}/{{ report.total_children_reports }})
-                                        </h5>
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">{% translate "Report type" %}</th>
-                                                <th scope="col">{% translate "Object" %}</th>
-                                                <th scope="col">{% translate "Report name" %}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for child_report in report.children_reports %}
-                                                <tr>
-                                                    <td>
-                                                        <ul class="tags horizontal-view">
-                                                            <li>
-                                                                <span class="label tags-color-{{ child_report.report_type|get_report_type_label_style }}">{{ child_report.report_type|get_report_type_name }}</span>
-                                                            </li>
-                                                        </ul>
-                                                    </td>
-                                                    <td>
-                                                        <a href="{% ooi_url 'ooi_detail' child_report.input_oois.0 organization.code %}">{{ child_report.input_oois.0|human_readable }}</a>
-                                                    </td>
-                                                    <td>
-                                                        <a href="{% url "view_report" organization.code %}?report_id={{ child_report }}&observed_at={{ child_report.observed_at|date:"Y-m-d H:i:s:u" }}"
-                                                           title="{% translate "Shows subreport details" %}">{{ child_report.name }}</a>
-                                                    </td>
-                                                </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                    <div class="button-container">
-                                        {% if report.total_children_reports > 5 %}
-                                            <a href="{% url "subreports" organization.code %}?report_id={{ report.parent_report.reference }}"
-                                               class="button">{% translate "View all subreports" %}</a>
-                                        {% endif %}
-                                    </div>
                                 </td>
                             </tr>
                         {% endif %}
+                        <tr class="expando-row">
+                            <td colspan="6">
+                                <table>
+                                    <caption class="visually-hidden">{% translate "Asset reports details:" %}</caption>
+                                    <h5>{% translate "Report types" %}</h5>
+                                    <p>
+                                        {% blocktranslate count counter=report.total_asset_reports %}
+                                This report consists of {{counter}} asset report with the following report type and object:
+                            {% plural %}
+                                This report consists of {{counter}} asset reports with the following report types and objects:
+                            {% endblocktranslate %}
+                                    </p>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">{% translate "Report type" %}</th>
+                                            <th scope="col">{% translate "Objects" %}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for report_type, total_objects in report.report_type_summary.items %}
+                                            <tr>
+                                                <td>
+                                                    <ul class="tags horizontal-view">
+                                                        <li>
+                                                            <span class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</span>
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                                <td>{{ total_objects }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <table>
+                                    <h5>
+                                        {% translate "Asset reports" %}
+                                        ({{ report.asset_reports|length }}/{{ report.total_asset_reports }})
+                                    </h5>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">{% translate "Report type" %}</th>
+                                            <th scope="col">{% translate "Object" %}</th>
+                                            <th scope="col">{% translate "Report name" %}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for asset_report in report.asset_reports %}
+                                            <tr>
+                                                <td>
+                                                    <ul class="tags horizontal-view">
+                                                        <li>
+                                                            <span class="label tags-color-{{ asset_report.report_type|get_report_type_label_style }}">{{ asset_report.report_type|get_report_type_name }}</span>
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                                <td>
+                                                    <a href="{% ooi_url 'ooi_detail' asset_report.input_ooi organization.code %}">{{ asset_report.input_ooi|human_readable }}</a>
+                                                </td>
+                                                <td>
+                                                    <a href="{% url "view_report" organization.code %}?asset_report_id={{ asset_report }}&observed_at={{ asset_report.observed_at|date:"Y-m-d H:i:s:u" }}"
+                                                       title="{% translate "Shows asset report details" %}">{{ asset_report.name }}</a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <div class="button-container">
+                                    {% if report.total_asset_reports > 5 %}
+                                        <a href="{% url "subreports" organization.code %}?report_id={{ report.report.reference }}"
+                                           class="button">{% translate "View all asset reports" %}</a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>

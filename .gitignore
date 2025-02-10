@@ -439,7 +439,6 @@ nl-kat-*
 # Automatically generated markdown files for the environment variables
 docs/source/installation-and-deployment/environment-settings/boefjes.md
 docs/source/installation-and-deployment/environment-settings/bytes.md
-docs/source/installation-and-deployment/environment-settings/keiko.md
 docs/source/installation-and-deployment/environment-settings/mula.md
 docs/source/installation-and-deployment/environment-settings/octopoes.md
 
