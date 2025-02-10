@@ -43,7 +43,6 @@ The relevant services for OpenKAT:
 
 * kat-mula.service
 * kat-octopoes.service
-* kat-keiko.service
 * kat-rocky.service
 * kat-rocky-worker.service
 * kat-boefjes.service

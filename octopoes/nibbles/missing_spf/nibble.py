@@ -8,94 +8,73 @@ from octopoes.models.ooi.email_security import DNSSPFRecord
 def spf_query(targets: list[Reference | None]) -> str:
     def pull(statements: list[str]) -> str:
         return f"""
-                {{
-                    :query {{
-                        :find [(pull ?hostname [*]) (pull ?spf [*]) (pull ?nx [*])] :where [
-                            {" ".join(statements)}
-                        ]
-                    }}
+            {{
+                :query {{
+                    :find [(pull ?var [*])] :where [
+                        {" ".join(statements)}
+
+                        (or-join [?var ?hostname]
+                            [?var :Hostname/primary_key ?hostname]
+                            (and
+                                [?var :DNSSPFRecord/dns_txt_record ?txt]
+                                [?txt :DNSTXTRecord/hostname ?hostname]
+                            )
+                            [?var :NXDOMAIN/hostname ?hostname]
+                        )
+                    ]
                 }}
+            }}
         """
 
-    optional_spf = """
-        (or
-            (and
-                [?spf :object_type "DNSSPFRecord"]
-                [?spf :DNSSPFRecord/dns_txt_record ?txt]
-                [?txt :DNSTXTRecord/hostname ?hostname]
-            )
-            (and
-                [(identity nil) ?spf]
-                [(identity nil) ?txt]
-            )
-        )
-    """
-    optional_nx = """
-        (or
-            (and
-                [?nx :object_type "NXDOMAIN"]
-                [?nx :NXDOMAIN/hostname ?hostname]
-            )
-            (and
-                [(identity nil) ?nx]
-            )
-        )
-    """
     sgn = "".join(str(int(isinstance(target, Reference))) for target in targets)
     if sgn == "100":
         return pull(
             [
                 f"""
-            [?hostname :object_type "Hostname"]
-            [?hostname :Hostname/primary_key "{str(targets[0])}"]
-            """
+                    [?hostname :Hostname/primary_key "{str(targets[0])}"]
+                """
             ]
-            + [optional_spf, optional_nx]
         )
     elif sgn == "010":
         return pull(
             [
                 f"""
-                [?spf :object_type "DNSSPFRecord"]
-                [?spf :DNSSPFRecord/primary_key "{str(targets[1])}"]
-                [?spf :DNSSPFRecord/dns_txt_record ?txt]
-                [?txt :DNSTXTRecord/hostname ?hostname]
-            """
+                    [?spf :DNSSPFRecord/primary_key "{str(targets[1])}"]
+                    [?spf :DNSSPFRecord/dns_txt_record ?txt]
+                    [?txt :DNSTXTRecord/hostname ?hostname]
+                """
             ]
-            + [optional_nx]
         )
     elif sgn == "001":
         return pull(
             [
                 f"""
-                [?nx :object_type "NXDOMAIN"]
-                [?nx :NXDOMAIN/primary_key "{str(targets[2])}"]
-                [?nx :NXDOMAIN/hostname ?hostname]
-            """
+                    [?nx :NXDOMAIN/primary_key "{str(targets[2])}"]
+                    [?nx :NXDOMAIN/hostname ?hostname]
+                """
             ]
-            + [optional_spf]
         )
     elif sgn == "111":
-        return pull(
-            [
-                f"""
-                [?hostname :object_type "Hostname"]
-                [?hostname :Hostname/primary_key "{str(targets[0])}"]
-                [?spf :object_type "DNSSPFRecord"]
-                [?spf :DNSSPFRecord/primary_key "{str(targets[1])}"]
-                [?nx :object_type "NXDOMAIN"]
-                [?nx :NXDOMAIN/primary_key "{str(targets[2])}"]
-            """
-            ]
-        )
+        return f"""
+            {{
+                :query {{
+                    :find [(pull ?var [*])] :where [
+                        (or-join [?var]
+                            [?var :Hostname/primary_key "{str(targets[0])}"]
+                            [?var :DNSSPFRecord/primary_key "{str(targets[1])}"]
+                            [?var :NXDOMAIN/primary_key "{str(targets[2])}"]
+                        )
+                    ]
+                 }}
+            }}
+        """
     else:
         return pull(
             [
                 """
-                [?hostname :object_type "Hostname"]
-            """
+                    [?hostname :Hostname/object_type "Hostname"]
+                """
             ]
-            + [optional_spf, optional_nx]
         )
 
 
