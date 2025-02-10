@@ -21,7 +21,7 @@ class ScheduleStore:
         self,
         scheduler_id: str | None = None,
         schedule_hash: str | None = None,
-        enabled: bool | None = True,  # FIXME: None?
+        enabled: bool | None = None,
         min_deadline_at: datetime | None = None,
         max_deadline_at: datetime | None = None,
         min_created_at: datetime | None = None,

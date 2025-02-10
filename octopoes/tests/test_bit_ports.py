@@ -5,7 +5,7 @@ from octopoes.models.ooi.network import IPAddressV4, IPPort
 
 
 def test_port_classification_tcp_80():
-    address = IPAddressV4(address="8.8.8.8", network="fake")
+    address = IPAddressV4(address="8.8.8.8", network="network|fake")
     port = IPPort(address=address.reference, protocol="tcp", port=80)
     results = list(run_port_classification(address, [port], {}))
 
@@ -13,7 +13,7 @@ def test_port_classification_tcp_80():
 
 
 def test_port_classification_udp_53():
-    address = IPAddressV4(address="8.8.8.8", network="fake")
+    address = IPAddressV4(address="8.8.8.8", network="network|fake")
     port = IPPort(address=address.reference, protocol="tcp", port=53)
     results = list(run_port_classification(address, [port], {}))
 
@@ -21,7 +21,7 @@ def test_port_classification_udp_53():
 
 
 def test_port_classification_tcp_22():
-    address = IPAddressV4(address="8.8.8.8", network="fake")
+    address = IPAddressV4(address="8.8.8.8", network="network|fake")
     port = IPPort(address=address.reference, protocol="tcp", port=22)
     results = list(run_port_classification(address, [port], {}))
 
@@ -32,7 +32,7 @@ def test_port_classification_tcp_22():
 
 
 def test_port_classification_tcp_5432():
-    address = IPAddressV4(address="8.8.8.8", network="fake")
+    address = IPAddressV4(address="8.8.8.8", network="network|fake")
     port = IPPort(address=address.reference, protocol="tcp", port=5432)
     results = list(run_port_classification(address, [port], {}))
 
@@ -43,7 +43,7 @@ def test_port_classification_tcp_5432():
 
 
 def test_port_classification_tcp_12345():
-    address = IPAddressV4(address="8.8.8.8", network="fake")
+    address = IPAddressV4(address="8.8.8.8", network="network|fake")
     port = IPPort(address=address.reference, protocol="tcp", port=12345)
     results = list(run_port_classification(address, [port], {}))
 
@@ -54,7 +54,7 @@ def test_port_classification_tcp_12345():
 
 
 def test_port_classification_tcp_3306_with_config():
-    address = IPAddressV4(address="8.8.8.8", network="fake")
+    address = IPAddressV4(address="8.8.8.8", network="network|fake")
     port = IPPort(address=address.reference, protocol="tcp", port=3306)
     results = list(run_port_classification(address, [port], {"db_tcp_ports": "1234"}))
 
@@ -65,7 +65,7 @@ def test_port_classification_tcp_3306_with_config():
 
 
 def test_port_classification_udp_80():
-    address = IPAddressV4(address="8.8.8.8", network="fake")
+    address = IPAddressV4(address="8.8.8.8", network="network|fake")
     port = IPPort(address=address.reference, protocol="udp", port=80)
     results = list(run_port_classification(address, [port], {}))
 
