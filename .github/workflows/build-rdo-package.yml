@@ -203,7 +203,7 @@ jobs:
       - name: Octopoes Upload whl package
         uses: actions/upload-artifact@v4
         with:
-          name: "octopoes-${{env.RELEASE_VERSION}}"
+          name: "octopoes-${{env.RELEASE_VERSION}}_python${{ matrix.python_version }}"
           path: "${{ github.workspace }}/octopoes/dist/octopoes*.whl"
 
       - name: Octopoes Upload venv tar
