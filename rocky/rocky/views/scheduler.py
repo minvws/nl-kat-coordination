@@ -63,7 +63,14 @@ class SchedulerView(OctopoesView):
             "task_type": self.task_type,
             "plugin_id": None,  # plugin_id present and set at plugin detail
             **self.get_task_filter_form_data(),
-        }
+        } | self.get_organization_specific_tasks()
+
+    def get_organization_specific_tasks(self) -> dict[str, dict[str, list[dict[str, str]]]]:
+        if self.organization.code:
+            return {
+                "filters": {"filters": [{"column": "organisation", "operator": "==", "value": self.organization.code}]}
+            }
+        return {}
 
     def get_task_filter_form_data(self) -> dict[str, Any]:
         form_data = self.get_task_filter_form().data.dict()

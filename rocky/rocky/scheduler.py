@@ -3,7 +3,6 @@ from __future__ import annotations
 import collections
 import datetime
 import logging
-import time
 import uuid
 from enum import Enum
 from functools import cached_property
@@ -191,14 +190,6 @@ class PaginatedSchedulesResponse(BaseModel):
     results: list[ScheduleResponse]
 
 
-class SchedulerResponse(BaseModel):
-    id: str
-    type: str
-    item_type: str
-    qsize: int
-    last_activity: datetime.datetime | None = None
-
-
 class LazyTaskList:
     HARD_LIMIT = 500
 
@@ -307,23 +298,6 @@ class SchedulerClient:
         except ConnectError:
             raise SchedulerConnectError()
 
-    def is_scheduler_ready(self, scheduler_id: str) -> bool:
-        """Max trials is 100 seconds"""
-        trials = 0
-        interval = 10  # in seconds
-        while trials < 10:
-            try:
-                res = self._client.get(f"/schedulers/{scheduler_id}")
-                res.raise_for_status()
-                break
-            except HTTPStatusError as http_error:
-                if http_error.response.status_code == codes.NOT_FOUND:
-                    trials += 1
-                    time.sleep(interval)
-                    continue
-                raise SchedulerHTTPError()
-        return True
-
     def patch_schedule(self, schedule_id: str, params: dict[str, Any]) -> None:
         try:
             response = self._client.patch(f"/schedules/{schedule_id}", json=params)
@@ -339,6 +313,7 @@ class SchedulerClient:
             logger.info(res.content)
             res.raise_for_status()
             logger.info("Schedule created", event_code=800081, schedule=schedule)
+
             return ScheduleResponse.model_validate_json(res.content)
         except (ValidationError, HTTPStatusError, ConnectError):
             raise SchedulerValidationError(extra_message="Report schedule failed: ")
@@ -437,10 +412,10 @@ class SchedulerClient:
                 stat_sum[timeslot].update(counts)
         return dict(stat_sum)
 
-    def get_combined_schedulers_stats(self, scheduler_ids: list) -> dict:
+    def get_combined_schedulers_stats(self, scheduler_id: str, organization_codes: list[str]) -> dict:
         """Return merged stats for a set of scheduler ids."""
         return SchedulerClient._merge_stat_dicts(
-            dicts=[self._get_task_stats(scheduler_id) for scheduler_id in scheduler_ids]
+            dicts=[self._get_task_stats(scheduler_id, org_code) for org_code in organization_codes]
         )
 
     def _get(self, path: str, return_type: str = "json") -> dict | bytes:
