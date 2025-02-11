@@ -1,0 +1,36 @@
+{
+    "keiko_version": "0.0.1.dev1",
+    "valid_time": "2023-11-07 23:59:59.999999+00:00",
+    "report_source_value": "DKIM Exists on antagonist.nl",
+    "report_source_type": "DKIMExists",
+    "report_url": "http://localhost:8000/nl/_rieven/objects/report/?observed_at=2023-11-07&depth=1&ooi_id=DKIMExists%7Cinternet%7Cantagonist.nl",
+    "findings_grouped": {},
+    "meta": {
+        "total": 0,
+        "total_by_severity": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0,
+            "recommendation": 0,
+            "pending": 0,
+            "unknown": 0
+        },
+        "total_by_finding_type": {},
+        "total_finding_types": 0,
+        "total_by_severity_per_finding_type": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0,
+            "recommendation": 0,
+            "pending": 0,
+            "unknown": 0
+        }
+    },
+    "filters": {
+        "observed_at": "2023-11-07",
+        "ooi": "DKIMExists|internet|antagonist.nl",
+        "depth": 1
+    }
+}

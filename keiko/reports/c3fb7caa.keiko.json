@@ -1,0 +1,1408 @@
+{
+    "keiko_version": "0.0.1.dev1",
+    "meta": {
+        "total": 47,
+        "total_by_severity": {
+            "critical": 0,
+            "high": 0,
+            "medium": 29,
+            "low": 13,
+            "recommendation": 4,
+            "pending": 1,
+            "unknown": 0
+        },
+        "total_by_finding_type": {
+            "KAT-NO-DKIM": 1,
+            "KAT-NO-DMARC": 3,
+            "KAT-NO-DNSSEC": 10,
+            "KAT-NO-SPF": 1,
+            "RetireJS-jquerymigrate-f3a3": 2,
+            "RetireJS-jquerymigrate-f901": 2,
+            "CVE-2016-10735": 2,
+            "CVE-2018-14040": 2,
+            "CVE-2018-14041": 2,
+            "CVE-2018-14042": 2,
+            "CVE-2019-8331": 2,
+            "KAT-INVALID-RPKI": 8,
+            "KAT-NO-RPKI": 1,
+            "KAT-WEBSERVER-NO-IPV6": 4,
+            "KAT-EXPIRED-RPKI": 1,
+            "KAT-NAMESERVER-NO-IPV6": 4
+        },
+        "total_finding_types": 16,
+        "total_by_severity_per_finding_type": {
+            "critical": 0,
+            "high": 0,
+            "medium": 11,
+            "low": 3,
+            "recommendation": 1,
+            "pending": 1,
+            "unknown": 0
+        }
+    },
+    "findings_grouped": {
+        "KAT-NO-DKIM": {
+            "list": [
+                {
+                    "id": "Finding|Hostname|internet|mispo.es|KAT-NO-DKIM",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NO-DKIM @ mispo.es",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This hostname does not support DKIM records",
+                    "reproduce": null,
+                    "ooi": "Hostname|internet|mispo.es",
+                    "finding_type": {
+                        "id": "KAT-NO-DKIM",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NO-DKIM",
+                        "object_type": "KATFindingType",
+                        "description": "This hostname does not support a DKIM record.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": "Set a DKIM record to protect your domain.",
+                        "risk_score": 6.9,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                }
+            ],
+            "finding_type": {
+                "id": "KAT-NO-DKIM",
+                "ooi_type": "KATFindingType",
+                "human_readable": "KAT-NO-DKIM",
+                "object_type": "KATFindingType",
+                "description": "This hostname does not support a DKIM record.",
+                "source": null,
+                "impact": null,
+                "recommendation": "Set a DKIM record to protect your domain.",
+                "risk_score": 6.9,
+                "risk_severity": "medium",
+                "findings": []
+            }
+        },
+        "KAT-NO-DMARC": {
+            "list": [
+                {
+                    "id": "Finding|Hostname|internet|domaindiscount24.net|KAT-NO-DMARC",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NO-DMARC @ domaindiscount24.net",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This hostname does not have a DMARC record",
+                    "reproduce": null,
+                    "ooi": "Hostname|internet|domaindiscount24.net",
+                    "finding_type": {
+                        "id": "KAT-NO-DMARC",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NO-DMARC",
+                        "object_type": "KATFindingType",
+                        "description": "This hostname does not have a DMARC record.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": "Set a DMARC record to protect your domain.",
+                        "risk_score": 6.9,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|Hostname|internet|mispo.es|KAT-NO-DMARC",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NO-DMARC @ mispo.es",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This hostname does not have a DMARC record",
+                    "reproduce": null,
+                    "ooi": "Hostname|internet|mispo.es",
+                    "finding_type": {
+                        "id": "KAT-NO-DMARC",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NO-DMARC",
+                        "object_type": "KATFindingType",
+                        "description": "This hostname does not have a DMARC record.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": "Set a DMARC record to protect your domain.",
+                        "risk_score": 6.9,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|Hostname|internet|rieven.com|KAT-NO-DMARC",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NO-DMARC @ rieven.com",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This hostname does not have a DMARC record",
+                    "reproduce": null,
+                    "ooi": "Hostname|internet|rieven.com",
+                    "finding_type": {
+                        "id": "KAT-NO-DMARC",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NO-DMARC",
+                        "object_type": "KATFindingType",
+                        "description": "This hostname does not have a DMARC record.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": "Set a DMARC record to protect your domain.",
+                        "risk_score": 6.9,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                }
+            ],
+            "finding_type": {
+                "id": "KAT-NO-DMARC",
+                "ooi_type": "KATFindingType",
+                "human_readable": "KAT-NO-DMARC",
+                "object_type": "KATFindingType",
+                "description": "This hostname does not have a DMARC record.",
+                "source": null,
+                "impact": null,
+                "recommendation": "Set a DMARC record to protect your domain.",
+                "risk_score": 6.9,
+                "risk_severity": "medium",
+                "findings": []
+            }
+        },
+        "KAT-NO-DNSSEC": {
+            "list": [
+                {
+                    "id": "Finding|Hostname|internet|domaindiscount24.net|KAT-NO-DNSSEC",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NO-DNSSEC @ domaindiscount24.net",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "Domain domaindiscount24.net is not signed with DNSSEC.",
+                    "reproduce": null,
+                    "ooi": "Hostname|internet|domaindiscount24.net",
+                    "finding_type": {
+                        "id": "KAT-NO-DNSSEC",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NO-DNSSEC",
+                        "object_type": "KATFindingType",
+                        "description": "The provided domain does not have DNSSEC enabled.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": "Enable DNSSEC on your name servers.",
+                        "risk_score": 6.9,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|Hostname|internet|mispo.es|KAT-NO-DNSSEC",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NO-DNSSEC @ mispo.es",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "Domain mispo.es is not signed with DNSSEC.",
+                    "reproduce": null,
+                    "ooi": "Hostname|internet|mispo.es",
+                    "finding_type": {
+                        "id": "KAT-NO-DNSSEC",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NO-DNSSEC",
+                        "object_type": "KATFindingType",
+                        "description": "The provided domain does not have DNSSEC enabled.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": "Enable DNSSEC on your name servers.",
+                        "risk_score": 6.9,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|Hostname|internet|ngrane.com|KAT-NO-DNSSEC",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NO-DNSSEC @ ngrane.com",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "Domain ngrane.com is not signed with DNSSEC.",
+                    "reproduce": null,
+                    "ooi": "Hostname|internet|ngrane.com",
+                    "finding_type": {
+                        "id": "KAT-NO-DNSSEC",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NO-DNSSEC",
+                        "object_type": "KATFindingType",
+                        "description": "The provided domain does not have DNSSEC enabled.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": "Enable DNSSEC on your name servers.",
+                        "risk_score": 6.9,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|Hostname|internet|ns1.domaindiscount24.net|KAT-NO-DNSSEC",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NO-DNSSEC @ ns1.domaindiscount24.net",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "Domain ns1.domaindiscount24.net is not signed with DNSSEC.",
+                    "reproduce": null,
+                    "ooi": "Hostname|internet|ns1.domaindiscount24.net",
+                    "finding_type": {
+                        "id": "KAT-NO-DNSSEC",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NO-DNSSEC",
+                        "object_type": "KATFindingType",
+                        "description": "The provided domain does not have DNSSEC enabled.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": "Enable DNSSEC on your name servers.",
+                        "risk_score": 6.9,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|Hostname|internet|ns1.ngrane.com|KAT-NO-DNSSEC",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NO-DNSSEC @ ns1.ngrane.com",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "Domain ns1.ngrane.com is not signed with DNSSEC.",
+                    "reproduce": null,
+                    "ooi": "Hostname|internet|ns1.ngrane.com",
+                    "finding_type": {
+                        "id": "KAT-NO-DNSSEC",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NO-DNSSEC",
+                        "object_type": "KATFindingType",
+                        "description": "The provided domain does not have DNSSEC enabled.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": "Enable DNSSEC on your name servers.",
+                        "risk_score": 6.9,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|Hostname|internet|ns2.domaindiscount24.net|KAT-NO-DNSSEC",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NO-DNSSEC @ ns2.domaindiscount24.net",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "Domain ns2.domaindiscount24.net is not signed with DNSSEC.",
+                    "reproduce": null,
+                    "ooi": "Hostname|internet|ns2.domaindiscount24.net",
+                    "finding_type": {
+                        "id": "KAT-NO-DNSSEC",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NO-DNSSEC",
+                        "object_type": "KATFindingType",
+                        "description": "The provided domain does not have DNSSEC enabled.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": "Enable DNSSEC on your name servers.",
+                        "risk_score": 6.9,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|Hostname|internet|ns2.ngrane.com|KAT-NO-DNSSEC",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NO-DNSSEC @ ns2.ngrane.com",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "Domain ns2.ngrane.com is not signed with DNSSEC.",
+                    "reproduce": null,
+                    "ooi": "Hostname|internet|ns2.ngrane.com",
+                    "finding_type": {
+                        "id": "KAT-NO-DNSSEC",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NO-DNSSEC",
+                        "object_type": "KATFindingType",
+                        "description": "The provided domain does not have DNSSEC enabled.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": "Enable DNSSEC on your name servers.",
+                        "risk_score": 6.9,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|Hostname|internet|ns3.domaindiscount24.net|KAT-NO-DNSSEC",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NO-DNSSEC @ ns3.domaindiscount24.net",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "Domain ns3.domaindiscount24.net is not signed with DNSSEC.",
+                    "reproduce": null,
+                    "ooi": "Hostname|internet|ns3.domaindiscount24.net",
+                    "finding_type": {
+                        "id": "KAT-NO-DNSSEC",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NO-DNSSEC",
+                        "object_type": "KATFindingType",
+                        "description": "The provided domain does not have DNSSEC enabled.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": "Enable DNSSEC on your name servers.",
+                        "risk_score": 6.9,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|Hostname|internet|rieven.com|KAT-NO-DNSSEC",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NO-DNSSEC @ rieven.com",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "Domain rieven.com is not signed with DNSSEC.",
+                    "reproduce": null,
+                    "ooi": "Hostname|internet|rieven.com",
+                    "finding_type": {
+                        "id": "KAT-NO-DNSSEC",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NO-DNSSEC",
+                        "object_type": "KATFindingType",
+                        "description": "The provided domain does not have DNSSEC enabled.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": "Enable DNSSEC on your name servers.",
+                        "risk_score": 6.9,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|Hostname|internet|www.mispo.es|KAT-NO-DNSSEC",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NO-DNSSEC @ www.mispo.es",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "Domain www.mispo.es is not signed with DNSSEC.",
+                    "reproduce": null,
+                    "ooi": "Hostname|internet|www.mispo.es",
+                    "finding_type": {
+                        "id": "KAT-NO-DNSSEC",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NO-DNSSEC",
+                        "object_type": "KATFindingType",
+                        "description": "The provided domain does not have DNSSEC enabled.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": "Enable DNSSEC on your name servers.",
+                        "risk_score": 6.9,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                }
+            ],
+            "finding_type": {
+                "id": "KAT-NO-DNSSEC",
+                "ooi_type": "KATFindingType",
+                "human_readable": "KAT-NO-DNSSEC",
+                "object_type": "KATFindingType",
+                "description": "The provided domain does not have DNSSEC enabled.",
+                "source": null,
+                "impact": null,
+                "recommendation": "Enable DNSSEC on your name servers.",
+                "risk_score": 6.9,
+                "risk_severity": "medium",
+                "findings": []
+            }
+        },
+        "KAT-NO-SPF": {
+            "list": [
+                {
+                    "id": "Finding|Hostname|internet|mispo.es|KAT-NO-SPF",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NO-SPF @ mispo.es",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This hostname does not have an SPF record",
+                    "reproduce": null,
+                    "ooi": "Hostname|internet|mispo.es",
+                    "finding_type": {
+                        "id": "KAT-NO-SPF",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NO-SPF",
+                        "object_type": "KATFindingType",
+                        "description": "This hostname does not have an SPF record.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": "Set an SPF record to protect your domain.",
+                        "risk_score": 6.9,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                }
+            ],
+            "finding_type": {
+                "id": "KAT-NO-SPF",
+                "ooi_type": "KATFindingType",
+                "human_readable": "KAT-NO-SPF",
+                "object_type": "KATFindingType",
+                "description": "This hostname does not have an SPF record.",
+                "source": null,
+                "impact": null,
+                "recommendation": "Set an SPF record to protect your domain.",
+                "risk_score": 6.9,
+                "risk_severity": "medium",
+                "findings": []
+            }
+        },
+        "RetireJS-jquerymigrate-f3a3": {
+            "list": [
+                {
+                    "id": "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|jQuery Migrate|1.0.0||RetireJS-jquerymigrate-f3a3",
+                    "ooi_type": "Finding",
+                    "human_readable": "RetireJS-jquerymigrate-f3a3 @ jQuery Migrate 1.0.0 @ https://mispo.es:443/",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This JavaScript Library has known vulnerabilities",
+                    "reproduce": null,
+                    "ooi": "SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|jQuery Migrate|1.0.0|",
+                    "finding_type": {
+                        "id": "RetireJS-jquerymigrate-f3a3",
+                        "ooi_type": "RetireJSFindingType",
+                        "human_readable": "RetireJS-jquerymigrate-f3a3",
+                        "object_type": "RetireJSFindingType",
+                        "description": "cross-site-scripting. More information at: http://blog.jquery.com/2013/05/01/jquery-migrate-1-2-0-released/ or https://github.com/jquery/jquery-migrate/issues/36",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": null,
+                        "risk_score": 6.9,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|www.mispo.es|443|/|Software|jQuery Migrate|1.0.0||RetireJS-jquerymigrate-f3a3",
+                    "ooi_type": "Finding",
+                    "human_readable": "RetireJS-jquerymigrate-f3a3 @ jQuery Migrate 1.0.0 @ https://www.mispo.es:443/",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This JavaScript Library has known vulnerabilities",
+                    "reproduce": null,
+                    "ooi": "SoftwareInstance|HostnameHTTPURL|https|internet|www.mispo.es|443|/|Software|jQuery Migrate|1.0.0|",
+                    "finding_type": {
+                        "id": "RetireJS-jquerymigrate-f3a3",
+                        "ooi_type": "RetireJSFindingType",
+                        "human_readable": "RetireJS-jquerymigrate-f3a3",
+                        "object_type": "RetireJSFindingType",
+                        "description": "cross-site-scripting. More information at: http://blog.jquery.com/2013/05/01/jquery-migrate-1-2-0-released/ or https://github.com/jquery/jquery-migrate/issues/36",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": null,
+                        "risk_score": 6.9,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                }
+            ],
+            "finding_type": {
+                "id": "RetireJS-jquerymigrate-f3a3",
+                "ooi_type": "RetireJSFindingType",
+                "human_readable": "RetireJS-jquerymigrate-f3a3",
+                "object_type": "RetireJSFindingType",
+                "description": "cross-site-scripting. More information at: http://blog.jquery.com/2013/05/01/jquery-migrate-1-2-0-released/ or https://github.com/jquery/jquery-migrate/issues/36",
+                "source": null,
+                "impact": null,
+                "recommendation": null,
+                "risk_score": 6.9,
+                "risk_severity": "medium",
+                "findings": []
+            }
+        },
+        "RetireJS-jquerymigrate-f901": {
+            "list": [
+                {
+                    "id": "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|jQuery Migrate|1.0.0||RetireJS-jquerymigrate-f901",
+                    "ooi_type": "Finding",
+                    "human_readable": "RetireJS-jquerymigrate-f901 @ jQuery Migrate 1.0.0 @ https://mispo.es:443/",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This JavaScript Library has known vulnerabilities",
+                    "reproduce": null,
+                    "ooi": "SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|jQuery Migrate|1.0.0|",
+                    "finding_type": {
+                        "id": "RetireJS-jquerymigrate-f901",
+                        "ooi_type": "RetireJSFindingType",
+                        "human_readable": "RetireJS-jquerymigrate-f901",
+                        "object_type": "RetireJSFindingType",
+                        "description": "Selector interpreted as HTML. More information at: http://bugs.jquery.com/ticket/11290 or http://research.insecurelabs.org/jquery/test/",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": null,
+                        "risk_score": 6.9,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|www.mispo.es|443|/|Software|jQuery Migrate|1.0.0||RetireJS-jquerymigrate-f901",
+                    "ooi_type": "Finding",
+                    "human_readable": "RetireJS-jquerymigrate-f901 @ jQuery Migrate 1.0.0 @ https://www.mispo.es:443/",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This JavaScript Library has known vulnerabilities",
+                    "reproduce": null,
+                    "ooi": "SoftwareInstance|HostnameHTTPURL|https|internet|www.mispo.es|443|/|Software|jQuery Migrate|1.0.0|",
+                    "finding_type": {
+                        "id": "RetireJS-jquerymigrate-f901",
+                        "ooi_type": "RetireJSFindingType",
+                        "human_readable": "RetireJS-jquerymigrate-f901",
+                        "object_type": "RetireJSFindingType",
+                        "description": "Selector interpreted as HTML. More information at: http://bugs.jquery.com/ticket/11290 or http://research.insecurelabs.org/jquery/test/",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": null,
+                        "risk_score": 6.9,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                }
+            ],
+            "finding_type": {
+                "id": "RetireJS-jquerymigrate-f901",
+                "ooi_type": "RetireJSFindingType",
+                "human_readable": "RetireJS-jquerymigrate-f901",
+                "object_type": "RetireJSFindingType",
+                "description": "Selector interpreted as HTML. More information at: http://bugs.jquery.com/ticket/11290 or http://research.insecurelabs.org/jquery/test/",
+                "source": null,
+                "impact": null,
+                "recommendation": null,
+                "risk_score": 6.9,
+                "risk_severity": "medium",
+                "findings": []
+            }
+        },
+        "CVE-2016-10735": {
+            "list": [
+                {
+                    "id": "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2016-10735",
+                    "ooi_type": "Finding",
+                    "human_readable": "CVE-2016-10735 @ Bootstrap 3.3.7 @ https://mispo.es:443/",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This JavaScript Library has known vulnerabilities",
+                    "reproduce": null,
+                    "ooi": "SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap",
+                    "finding_type": {
+                        "id": "CVE-2016-10735",
+                        "ooi_type": "CVEFindingType",
+                        "human_readable": "CVE-2016-10735",
+                        "object_type": "CVEFindingType",
+                        "description": "In Bootstrap 3.x before 3.4.0 and 4.x-beta before 4.0.0-beta.2, XSS is possible in the data-target attribute, a different vulnerability than CVE-2018-14041.",
+                        "source": "https://cve.circl.lu/cve/CVE-2016-10735",
+                        "impact": null,
+                        "recommendation": null,
+                        "risk_score": 6.1,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|www.mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2016-10735",
+                    "ooi_type": "Finding",
+                    "human_readable": "CVE-2016-10735 @ Bootstrap 3.3.7 @ https://www.mispo.es:443/",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This JavaScript Library has known vulnerabilities",
+                    "reproduce": null,
+                    "ooi": "SoftwareInstance|HostnameHTTPURL|https|internet|www.mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap",
+                    "finding_type": {
+                        "id": "CVE-2016-10735",
+                        "ooi_type": "CVEFindingType",
+                        "human_readable": "CVE-2016-10735",
+                        "object_type": "CVEFindingType",
+                        "description": "In Bootstrap 3.x before 3.4.0 and 4.x-beta before 4.0.0-beta.2, XSS is possible in the data-target attribute, a different vulnerability than CVE-2018-14041.",
+                        "source": "https://cve.circl.lu/cve/CVE-2016-10735",
+                        "impact": null,
+                        "recommendation": null,
+                        "risk_score": 6.1,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                }
+            ],
+            "finding_type": {
+                "id": "CVE-2016-10735",
+                "ooi_type": "CVEFindingType",
+                "human_readable": "CVE-2016-10735",
+                "object_type": "CVEFindingType",
+                "description": "In Bootstrap 3.x before 3.4.0 and 4.x-beta before 4.0.0-beta.2, XSS is possible in the data-target attribute, a different vulnerability than CVE-2018-14041.",
+                "source": "https://cve.circl.lu/cve/CVE-2016-10735",
+                "impact": null,
+                "recommendation": null,
+                "risk_score": 6.1,
+                "risk_severity": "medium",
+                "findings": []
+            }
+        },
+        "CVE-2018-14040": {
+            "list": [
+                {
+                    "id": "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2018-14040",
+                    "ooi_type": "Finding",
+                    "human_readable": "CVE-2018-14040 @ Bootstrap 3.3.7 @ https://mispo.es:443/",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This JavaScript Library has known vulnerabilities",
+                    "reproduce": null,
+                    "ooi": "SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap",
+                    "finding_type": {
+                        "id": "CVE-2018-14040",
+                        "ooi_type": "CVEFindingType",
+                        "human_readable": "CVE-2018-14040",
+                        "object_type": "CVEFindingType",
+                        "description": "In Bootstrap before 4.1.2, XSS is possible in the collapse data-parent attribute.",
+                        "source": "https://cve.circl.lu/cve/CVE-2018-14040",
+                        "impact": null,
+                        "recommendation": null,
+                        "risk_score": 6.1,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|www.mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2018-14040",
+                    "ooi_type": "Finding",
+                    "human_readable": "CVE-2018-14040 @ Bootstrap 3.3.7 @ https://www.mispo.es:443/",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This JavaScript Library has known vulnerabilities",
+                    "reproduce": null,
+                    "ooi": "SoftwareInstance|HostnameHTTPURL|https|internet|www.mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap",
+                    "finding_type": {
+                        "id": "CVE-2018-14040",
+                        "ooi_type": "CVEFindingType",
+                        "human_readable": "CVE-2018-14040",
+                        "object_type": "CVEFindingType",
+                        "description": "In Bootstrap before 4.1.2, XSS is possible in the collapse data-parent attribute.",
+                        "source": "https://cve.circl.lu/cve/CVE-2018-14040",
+                        "impact": null,
+                        "recommendation": null,
+                        "risk_score": 6.1,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                }
+            ],
+            "finding_type": {
+                "id": "CVE-2018-14040",
+                "ooi_type": "CVEFindingType",
+                "human_readable": "CVE-2018-14040",
+                "object_type": "CVEFindingType",
+                "description": "In Bootstrap before 4.1.2, XSS is possible in the collapse data-parent attribute.",
+                "source": "https://cve.circl.lu/cve/CVE-2018-14040",
+                "impact": null,
+                "recommendation": null,
+                "risk_score": 6.1,
+                "risk_severity": "medium",
+                "findings": []
+            }
+        },
+        "CVE-2018-14041": {
+            "list": [
+                {
+                    "id": "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2018-14041",
+                    "ooi_type": "Finding",
+                    "human_readable": "CVE-2018-14041 @ Bootstrap 3.3.7 @ https://mispo.es:443/",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This JavaScript Library has known vulnerabilities",
+                    "reproduce": null,
+                    "ooi": "SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap",
+                    "finding_type": {
+                        "id": "CVE-2018-14041",
+                        "ooi_type": "CVEFindingType",
+                        "human_readable": "CVE-2018-14041",
+                        "object_type": "CVEFindingType",
+                        "description": "In Bootstrap before 4.1.2, XSS is possible in the data-target property of scrollspy.",
+                        "source": "https://cve.circl.lu/cve/CVE-2018-14041",
+                        "impact": null,
+                        "recommendation": null,
+                        "risk_score": 6.1,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|www.mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2018-14041",
+                    "ooi_type": "Finding",
+                    "human_readable": "CVE-2018-14041 @ Bootstrap 3.3.7 @ https://www.mispo.es:443/",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This JavaScript Library has known vulnerabilities",
+                    "reproduce": null,
+                    "ooi": "SoftwareInstance|HostnameHTTPURL|https|internet|www.mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap",
+                    "finding_type": {
+                        "id": "CVE-2018-14041",
+                        "ooi_type": "CVEFindingType",
+                        "human_readable": "CVE-2018-14041",
+                        "object_type": "CVEFindingType",
+                        "description": "In Bootstrap before 4.1.2, XSS is possible in the data-target property of scrollspy.",
+                        "source": "https://cve.circl.lu/cve/CVE-2018-14041",
+                        "impact": null,
+                        "recommendation": null,
+                        "risk_score": 6.1,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                }
+            ],
+            "finding_type": {
+                "id": "CVE-2018-14041",
+                "ooi_type": "CVEFindingType",
+                "human_readable": "CVE-2018-14041",
+                "object_type": "CVEFindingType",
+                "description": "In Bootstrap before 4.1.2, XSS is possible in the data-target property of scrollspy.",
+                "source": "https://cve.circl.lu/cve/CVE-2018-14041",
+                "impact": null,
+                "recommendation": null,
+                "risk_score": 6.1,
+                "risk_severity": "medium",
+                "findings": []
+            }
+        },
+        "CVE-2018-14042": {
+            "list": [
+                {
+                    "id": "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2018-14042",
+                    "ooi_type": "Finding",
+                    "human_readable": "CVE-2018-14042 @ Bootstrap 3.3.7 @ https://mispo.es:443/",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This JavaScript Library has known vulnerabilities",
+                    "reproduce": null,
+                    "ooi": "SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap",
+                    "finding_type": {
+                        "id": "CVE-2018-14042",
+                        "ooi_type": "CVEFindingType",
+                        "human_readable": "CVE-2018-14042",
+                        "object_type": "CVEFindingType",
+                        "description": "In Bootstrap before 4.1.2, XSS is possible in the data-container property of tooltip.",
+                        "source": "https://cve.circl.lu/cve/CVE-2018-14042",
+                        "impact": null,
+                        "recommendation": null,
+                        "risk_score": 6.1,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|www.mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2018-14042",
+                    "ooi_type": "Finding",
+                    "human_readable": "CVE-2018-14042 @ Bootstrap 3.3.7 @ https://www.mispo.es:443/",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This JavaScript Library has known vulnerabilities",
+                    "reproduce": null,
+                    "ooi": "SoftwareInstance|HostnameHTTPURL|https|internet|www.mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap",
+                    "finding_type": {
+                        "id": "CVE-2018-14042",
+                        "ooi_type": "CVEFindingType",
+                        "human_readable": "CVE-2018-14042",
+                        "object_type": "CVEFindingType",
+                        "description": "In Bootstrap before 4.1.2, XSS is possible in the data-container property of tooltip.",
+                        "source": "https://cve.circl.lu/cve/CVE-2018-14042",
+                        "impact": null,
+                        "recommendation": null,
+                        "risk_score": 6.1,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                }
+            ],
+            "finding_type": {
+                "id": "CVE-2018-14042",
+                "ooi_type": "CVEFindingType",
+                "human_readable": "CVE-2018-14042",
+                "object_type": "CVEFindingType",
+                "description": "In Bootstrap before 4.1.2, XSS is possible in the data-container property of tooltip.",
+                "source": "https://cve.circl.lu/cve/CVE-2018-14042",
+                "impact": null,
+                "recommendation": null,
+                "risk_score": 6.1,
+                "risk_severity": "medium",
+                "findings": []
+            }
+        },
+        "CVE-2019-8331": {
+            "list": [
+                {
+                    "id": "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2019-8331",
+                    "ooi_type": "Finding",
+                    "human_readable": "CVE-2019-8331 @ Bootstrap 3.3.7 @ https://mispo.es:443/",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This JavaScript Library has known vulnerabilities",
+                    "reproduce": null,
+                    "ooi": "SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap",
+                    "finding_type": {
+                        "id": "CVE-2019-8331",
+                        "ooi_type": "CVEFindingType",
+                        "human_readable": "CVE-2019-8331",
+                        "object_type": "CVEFindingType",
+                        "description": "In Bootstrap before 3.4.1 and 4.3.x before 4.3.1, XSS is possible in the tooltip or popover data-template attribute.",
+                        "source": "https://cve.circl.lu/cve/CVE-2019-8331",
+                        "impact": null,
+                        "recommendation": null,
+                        "risk_score": 6.1,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|www.mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2019-8331",
+                    "ooi_type": "Finding",
+                    "human_readable": "CVE-2019-8331 @ Bootstrap 3.3.7 @ https://www.mispo.es:443/",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This JavaScript Library has known vulnerabilities",
+                    "reproduce": null,
+                    "ooi": "SoftwareInstance|HostnameHTTPURL|https|internet|www.mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap",
+                    "finding_type": {
+                        "id": "CVE-2019-8331",
+                        "ooi_type": "CVEFindingType",
+                        "human_readable": "CVE-2019-8331",
+                        "object_type": "CVEFindingType",
+                        "description": "In Bootstrap before 3.4.1 and 4.3.x before 4.3.1, XSS is possible in the tooltip or popover data-template attribute.",
+                        "source": "https://cve.circl.lu/cve/CVE-2019-8331",
+                        "impact": null,
+                        "recommendation": null,
+                        "risk_score": 6.1,
+                        "risk_severity": "medium",
+                        "findings": []
+                    }
+                }
+            ],
+            "finding_type": {
+                "id": "CVE-2019-8331",
+                "ooi_type": "CVEFindingType",
+                "human_readable": "CVE-2019-8331",
+                "object_type": "CVEFindingType",
+                "description": "In Bootstrap before 3.4.1 and 4.3.x before 4.3.1, XSS is possible in the tooltip or popover data-template attribute.",
+                "source": "https://cve.circl.lu/cve/CVE-2019-8331",
+                "impact": null,
+                "recommendation": null,
+                "risk_score": 6.1,
+                "risk_severity": "medium",
+                "findings": []
+            }
+        },
+        "KAT-INVALID-RPKI": {
+            "list": [
+                {
+                    "id": "Finding|IPAddressV4|internet|109.234.111.81|KAT-INVALID-RPKI",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-INVALID-RPKI @ 109.234.111.81",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "The IP address does not have a valid route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                    "reproduce": null,
+                    "ooi": "IPAddressV4|internet|109.234.111.81",
+                    "finding_type": {
+                        "id": "KAT-INVALID-RPKI",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-INVALID-RPKI",
+                        "object_type": "KATFindingType",
+                        "description": "The IP address does not have a valid route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                        "source": null,
+                        "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
+                        "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired.",
+                        "risk_score": 3.9,
+                        "risk_severity": "low",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|IPAddressV4|internet|134.209.85.72|KAT-INVALID-RPKI",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-INVALID-RPKI @ 134.209.85.72",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "The IP address does not have a valid route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                    "reproduce": null,
+                    "ooi": "IPAddressV4|internet|134.209.85.72",
+                    "finding_type": {
+                        "id": "KAT-INVALID-RPKI",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-INVALID-RPKI",
+                        "object_type": "KATFindingType",
+                        "description": "The IP address does not have a valid route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                        "source": null,
+                        "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
+                        "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired.",
+                        "risk_score": 3.9,
+                        "risk_severity": "low",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|IPAddressV4|internet|144.217.35.18|KAT-INVALID-RPKI",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-INVALID-RPKI @ 144.217.35.18",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "The IP address does not have a valid route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                    "reproduce": null,
+                    "ooi": "IPAddressV4|internet|144.217.35.18",
+                    "finding_type": {
+                        "id": "KAT-INVALID-RPKI",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-INVALID-RPKI",
+                        "object_type": "KATFindingType",
+                        "description": "The IP address does not have a valid route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                        "source": null,
+                        "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
+                        "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired.",
+                        "risk_score": 3.9,
+                        "risk_severity": "low",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|IPAddressV4|internet|66.206.3.125|KAT-INVALID-RPKI",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-INVALID-RPKI @ 66.206.3.125",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "The IP address does not have a valid route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                    "reproduce": null,
+                    "ooi": "IPAddressV4|internet|66.206.3.125",
+                    "finding_type": {
+                        "id": "KAT-INVALID-RPKI",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-INVALID-RPKI",
+                        "object_type": "KATFindingType",
+                        "description": "The IP address does not have a valid route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                        "source": null,
+                        "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
+                        "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired.",
+                        "risk_score": 3.9,
+                        "risk_severity": "low",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|IPAddressV4|internet|94.23.153.36|KAT-INVALID-RPKI",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-INVALID-RPKI @ 94.23.153.36",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "The IP address does not have a valid route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                    "reproduce": null,
+                    "ooi": "IPAddressV4|internet|94.23.153.36",
+                    "finding_type": {
+                        "id": "KAT-INVALID-RPKI",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-INVALID-RPKI",
+                        "object_type": "KATFindingType",
+                        "description": "The IP address does not have a valid route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                        "source": null,
+                        "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
+                        "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired.",
+                        "risk_score": 3.9,
+                        "risk_severity": "low",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|IPAddressV6|internet|2001:41d0:c:388:94:23:153:36|KAT-INVALID-RPKI",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-INVALID-RPKI @ 2001:41d0:c:388:94:23:153:36",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "The IP address does not have a valid route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                    "reproduce": null,
+                    "ooi": "IPAddressV6|internet|2001:41d0:c:388:94:23:153:36",
+                    "finding_type": {
+                        "id": "KAT-INVALID-RPKI",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-INVALID-RPKI",
+                        "object_type": "KATFindingType",
+                        "description": "The IP address does not have a valid route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                        "source": null,
+                        "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
+                        "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired.",
+                        "risk_score": 3.9,
+                        "risk_severity": "low",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|IPAddressV6|internet|2604:4500:c:3:66:206:3:125|KAT-INVALID-RPKI",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-INVALID-RPKI @ 2604:4500:c:3:66:206:3:125",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "The IP address does not have a valid route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                    "reproduce": null,
+                    "ooi": "IPAddressV6|internet|2604:4500:c:3:66:206:3:125",
+                    "finding_type": {
+                        "id": "KAT-INVALID-RPKI",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-INVALID-RPKI",
+                        "object_type": "KATFindingType",
+                        "description": "The IP address does not have a valid route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                        "source": null,
+                        "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
+                        "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired.",
+                        "risk_score": 3.9,
+                        "risk_severity": "low",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|IPAddressV6|internet|2607:5300:60:5e1c:144:217:35:18|KAT-INVALID-RPKI",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-INVALID-RPKI @ 2607:5300:60:5e1c:144:217:35:18",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "The IP address does not have a valid route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                    "reproduce": null,
+                    "ooi": "IPAddressV6|internet|2607:5300:60:5e1c:144:217:35:18",
+                    "finding_type": {
+                        "id": "KAT-INVALID-RPKI",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-INVALID-RPKI",
+                        "object_type": "KATFindingType",
+                        "description": "The IP address does not have a valid route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                        "source": null,
+                        "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
+                        "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired.",
+                        "risk_score": 3.9,
+                        "risk_severity": "low",
+                        "findings": []
+                    }
+                }
+            ],
+            "finding_type": {
+                "id": "KAT-INVALID-RPKI",
+                "ooi_type": "KATFindingType",
+                "human_readable": "KAT-INVALID-RPKI",
+                "object_type": "KATFindingType",
+                "description": "The IP address does not have a valid route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                "source": null,
+                "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
+                "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired.",
+                "risk_score": 3.9,
+                "risk_severity": "low",
+                "findings": []
+            }
+        },
+        "KAT-NO-RPKI": {
+            "list": [
+                {
+                    "id": "Finding|IPAddressV4|internet|31.187.70.163|KAT-NO-RPKI",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NO-RPKI @ 31.187.70.163",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "The IP address does not have a route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                    "reproduce": null,
+                    "ooi": "IPAddressV4|internet|31.187.70.163",
+                    "finding_type": {
+                        "id": "KAT-NO-RPKI",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NO-RPKI",
+                        "object_type": "KATFindingType",
+                        "description": "The IP address does not have a route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                        "source": null,
+                        "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
+                        "recommendation": "Work on implementing RPKI for your IP addresses. This may involve creating Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses.",
+                        "risk_score": 3.9,
+                        "risk_severity": "low",
+                        "findings": []
+                    }
+                }
+            ],
+            "finding_type": {
+                "id": "KAT-NO-RPKI",
+                "ooi_type": "KATFindingType",
+                "human_readable": "KAT-NO-RPKI",
+                "object_type": "KATFindingType",
+                "description": "The IP address does not have a route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+                "source": null,
+                "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
+                "recommendation": "Work on implementing RPKI for your IP addresses. This may involve creating Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses.",
+                "risk_score": 3.9,
+                "risk_severity": "low",
+                "findings": []
+            }
+        },
+        "KAT-WEBSERVER-NO-IPV6": {
+            "list": [
+                {
+                    "id": "Finding|Hostname|internet|domaindiscount24.net|KAT-WEBSERVER-NO-IPV6",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-WEBSERVER-NO-IPV6 @ domaindiscount24.net",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "There are no webservers with an IPv6 address.",
+                    "reproduce": null,
+                    "ooi": "Hostname|internet|domaindiscount24.net",
+                    "finding_type": {
+                        "id": "KAT-WEBSERVER-NO-IPV6",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-WEBSERVER-NO-IPV6",
+                        "object_type": "KATFindingType",
+                        "description": "For this website there is no web server with an IPv6 address available.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": "Add an IPv6 address for at least one web server that has no IPv6 address yet.",
+                        "risk_score": 3.9,
+                        "risk_severity": "low",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|Hostname|internet|mispo.es|KAT-WEBSERVER-NO-IPV6",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-WEBSERVER-NO-IPV6 @ mispo.es",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "There are no webservers with an IPv6 address.",
+                    "reproduce": null,
+                    "ooi": "Hostname|internet|mispo.es",
+                    "finding_type": {
+                        "id": "KAT-WEBSERVER-NO-IPV6",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-WEBSERVER-NO-IPV6",
+                        "object_type": "KATFindingType",
+                        "description": "For this website there is no web server with an IPv6 address available.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": "Add an IPv6 address for at least one web server that has no IPv6 address yet.",
+                        "risk_score": 3.9,
+                        "risk_severity": "low",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|Hostname|internet|ngrane.com|KAT-WEBSERVER-NO-IPV6",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-WEBSERVER-NO-IPV6 @ ngrane.com",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "There are no webservers with an IPv6 address.",
+                    "reproduce": null,
+                    "ooi": "Hostname|internet|ngrane.com",
+                    "finding_type": {
+                        "id": "KAT-WEBSERVER-NO-IPV6",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-WEBSERVER-NO-IPV6",
+                        "object_type": "KATFindingType",
+                        "description": "For this website there is no web server with an IPv6 address available.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": "Add an IPv6 address for at least one web server that has no IPv6 address yet.",
+                        "risk_score": 3.9,
+                        "risk_severity": "low",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|Hostname|internet|rieven.com|KAT-WEBSERVER-NO-IPV6",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-WEBSERVER-NO-IPV6 @ rieven.com",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "There are no webservers with an IPv6 address.",
+                    "reproduce": null,
+                    "ooi": "Hostname|internet|rieven.com",
+                    "finding_type": {
+                        "id": "KAT-WEBSERVER-NO-IPV6",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-WEBSERVER-NO-IPV6",
+                        "object_type": "KATFindingType",
+                        "description": "For this website there is no web server with an IPv6 address available.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": "Add an IPv6 address for at least one web server that has no IPv6 address yet.",
+                        "risk_score": 3.9,
+                        "risk_severity": "low",
+                        "findings": []
+                    }
+                }
+            ],
+            "finding_type": {
+                "id": "KAT-WEBSERVER-NO-IPV6",
+                "ooi_type": "KATFindingType",
+                "human_readable": "KAT-WEBSERVER-NO-IPV6",
+                "object_type": "KATFindingType",
+                "description": "For this website there is no web server with an IPv6 address available.",
+                "source": null,
+                "impact": null,
+                "recommendation": "Add an IPv6 address for at least one web server that has no IPv6 address yet.",
+                "risk_score": 3.9,
+                "risk_severity": "low",
+                "findings": []
+            }
+        },
+        "KAT-EXPIRED-RPKI": {
+            "list": [
+                {
+                    "id": "Finding|IPAddressV4|internet|31.187.70.163|KAT-EXPIRED-RPKI",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-EXPIRED-RPKI @ 31.187.70.163",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": null,
+                    "reproduce": null,
+                    "ooi": "IPAddressV4|internet|31.187.70.163",
+                    "finding_type": {
+                        "id": "KAT-EXPIRED-RPKI",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-EXPIRED-RPKI",
+                        "object_type": "KATFindingType",
+                        "description": null,
+                        "source": null,
+                        "impact": null,
+                        "recommendation": null,
+                        "risk_score": 0.0,
+                        "risk_severity": "pending",
+                        "findings": []
+                    }
+                }
+            ],
+            "finding_type": {
+                "id": "KAT-EXPIRED-RPKI",
+                "ooi_type": "KATFindingType",
+                "human_readable": "KAT-EXPIRED-RPKI",
+                "object_type": "KATFindingType",
+                "description": null,
+                "source": null,
+                "impact": null,
+                "recommendation": null,
+                "risk_score": 0.0,
+                "risk_severity": "pending",
+                "findings": []
+            }
+        },
+        "KAT-NAMESERVER-NO-IPV6": {
+            "list": [
+                {
+                    "id": "Finding|DNSNSRecord|internet|ngrane.com|ns1.ngrane.com.|KAT-NAMESERVER-NO-IPV6",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NAMESERVER-NO-IPV6 @ ngrane.com NS ns1.ngrane.com.",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This nameserver has no ipv6 address",
+                    "reproduce": null,
+                    "ooi": "DNSNSRecord|internet|ngrane.com|ns1.ngrane.com.",
+                    "finding_type": {
+                        "id": "KAT-NAMESERVER-NO-IPV6",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NAMESERVER-NO-IPV6",
+                        "object_type": "KATFindingType",
+                        "description": "This nameserver does not have an ipv6 address.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": null,
+                        "risk_score": 0.0,
+                        "risk_severity": "recommendation",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|DNSNSRecord|internet|ngrane.com|ns2.ngrane.com.|KAT-NAMESERVER-NO-IPV6",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NAMESERVER-NO-IPV6 @ ngrane.com NS ns2.ngrane.com.",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This nameserver has no ipv6 address",
+                    "reproduce": null,
+                    "ooi": "DNSNSRecord|internet|ngrane.com|ns2.ngrane.com.",
+                    "finding_type": {
+                        "id": "KAT-NAMESERVER-NO-IPV6",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NAMESERVER-NO-IPV6",
+                        "object_type": "KATFindingType",
+                        "description": "This nameserver does not have an ipv6 address.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": null,
+                        "risk_score": 0.0,
+                        "risk_severity": "recommendation",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|DNSNSRecord|internet|rieven.com|ns1.ngrane.com.|KAT-NAMESERVER-NO-IPV6",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NAMESERVER-NO-IPV6 @ rieven.com NS ns1.ngrane.com.",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This nameserver has no ipv6 address",
+                    "reproduce": null,
+                    "ooi": "DNSNSRecord|internet|rieven.com|ns1.ngrane.com.",
+                    "finding_type": {
+                        "id": "KAT-NAMESERVER-NO-IPV6",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NAMESERVER-NO-IPV6",
+                        "object_type": "KATFindingType",
+                        "description": "This nameserver does not have an ipv6 address.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": null,
+                        "risk_score": 0.0,
+                        "risk_severity": "recommendation",
+                        "findings": []
+                    }
+                },
+                {
+                    "id": "Finding|DNSNSRecord|internet|rieven.com|ns2.ngrane.com.|KAT-NAMESERVER-NO-IPV6",
+                    "ooi_type": "Finding",
+                    "human_readable": "KAT-NAMESERVER-NO-IPV6 @ rieven.com NS ns2.ngrane.com.",
+                    "object_type": "Finding",
+                    "proof": null,
+                    "description": "This nameserver has no ipv6 address",
+                    "reproduce": null,
+                    "ooi": "DNSNSRecord|internet|rieven.com|ns2.ngrane.com.",
+                    "finding_type": {
+                        "id": "KAT-NAMESERVER-NO-IPV6",
+                        "ooi_type": "KATFindingType",
+                        "human_readable": "KAT-NAMESERVER-NO-IPV6",
+                        "object_type": "KATFindingType",
+                        "description": "This nameserver does not have an ipv6 address.",
+                        "source": null,
+                        "impact": null,
+                        "recommendation": null,
+                        "risk_score": 0.0,
+                        "risk_severity": "recommendation",
+                        "findings": []
+                    }
+                }
+            ],
+            "finding_type": {
+                "id": "KAT-NAMESERVER-NO-IPV6",
+                "ooi_type": "KATFindingType",
+                "human_readable": "KAT-NAMESERVER-NO-IPV6",
+                "object_type": "KATFindingType",
+                "description": "This nameserver does not have an ipv6 address.",
+                "source": null,
+                "impact": null,
+                "recommendation": null,
+                "risk_score": 0.0,
+                "risk_severity": "recommendation",
+                "findings": []
+            }
+        }
+    },
+    "valid_time": "2024-02-08 23:59:59.999999+00:00",
+    "report_source_type": "Organisatie",
+    "report_source_value": "Rieven",
+    "filters": {
+        "observed_at": "2024-02-08",
+        "severities": [],
+        "exclude_muted": true,
+        "only_muted": false
+    },
+    "report_url": "http://localhost:8000/nl/_rieven/findings/?observed_at=2024-02-08"
+}

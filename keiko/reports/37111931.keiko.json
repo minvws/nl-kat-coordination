@@ -1,0 +1,36 @@
+{
+    "keiko_version": "0.0.1.dev1",
+    "meta": {
+        "total": 0,
+        "total_by_severity": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0,
+            "recommendation": 0,
+            "pending": 0,
+            "unknown": 0
+        },
+        "total_by_finding_type": {},
+        "total_finding_types": 0,
+        "total_by_severity_per_finding_type": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0,
+            "recommendation": 0,
+            "pending": 0,
+            "unknown": 0
+        }
+    },
+    "findings_grouped": {},
+    "valid_time": "2023-10-25 15:52:18.666864+00:00",
+    "report_source_type": "Question",
+    "report_source_value": "Question|/bit/port-classification-ip|internet",
+    "filters": {
+        "observed_at": "2023-10-25",
+        "ooi": "Question|/bit/port-classification-ip|internet",
+        "depth": 9
+    },
+    "report_url": "http://localhost:8000/nl/_rieven/objects/report/?observed_at=2023-10-25&depth=9&ooi_id=Question%7C%2Fbit%2Fport-classification-ip%7Cinternet"
+}
