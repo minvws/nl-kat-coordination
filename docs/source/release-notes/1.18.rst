@@ -2,9 +2,9 @@
 OpenKAT 1.18 - Sneeuwkat
 ============================================
 
-This release adds report scheduling, which implements periodic report generation. Combined with our new Dashboarding system partials from reports can be selected and added to custom user-defined dashboards. Changing the interval of a report will automatically update the dashboards to their latest information. Dashboard and Report data also hold historical versions availble. Future versions will see new User-interfaces to move back and forth in time and comporate these datasets against one another hilighting changes and trends.
+This release adds report scheduling, which implements periodic report generation. Combined with our new Dashboarding system partials from reports can be selected and added to custom user-defined dashboards. Changing the interval of a report will automatically update the dashboards to their latest information. Dashboard and Report data also hold historical versions available. Future versions will see new User-interfaces to move back and forth in time and comporate these datasets against one another highlighting changes and trends.
 We also included a new HTTP export boefje that you can use to export all objects in the graph to an external api either on interval (eg, every hour), or using our new Run-On functionality when the OOI is either created or changed. This can be very useful to alert when new findings are created or when their score is updated.
-There's also a new S3 backend for Bytes and various new boefjes, normalizers and fixes to bits fro our growing community. Thanks!
+There's also a new S3 backend for Bytes and various new boefjes, normalizers and fixes to bits from our growing community. Thanks!
 
 The language Tamil has been added via the hard work of a communitee volunteer. Since we have not yet tested it ourselves its currently only available if you add it to the languages list manually.
 If you want to add a language to OpenKAT, or just help translate smaller parts, please take a look at our weblate: https://hosted.weblate.org/projects/openkat/nl-kat-coordination/ any help is much appreciated!
@@ -12,7 +12,7 @@ If you want to add a language to OpenKAT, or just help translate smaller parts, 
 In total 30 contributors have made 267 commits to Main in which 1,332 Files where changed.
 
 New Features and Bug fixes
-============
+==========================
 
 * Feature: improve settings and environment logic and phase out redundant environment keys by @Donnype in #3384
 * feat: adds notification styling and icons by @HeleenSG in #3461
@@ -28,7 +28,7 @@ New Features and Bug fixes
 * Dont yield all snyk findings when no version was found by @noamblitz in #3431
 * Handle empty normalizer results by @Donnype in #3482
 * Fix enabling normalizers from Rocky by @Donnype in #3481
-* Fix report types selection not being overriden by @Rieven in #3436
+* Fix report types selection not being overridden by @Rieven in #3436
 * Add new Boefje by @madelondohmen in #3400
 * Fix hanging upload of large files by @noamblitz in #3489
 * Check if the task is still running according to the scheduler before changing the status by @Donnype in #3506
@@ -64,7 +64,7 @@ New Features and Bug fixes
 * Refactor and fix faulty save_origin exception code by @originalsouth in #3577
 * Dont show manual tasks in normalizer list by @noamblitz in #3580
 * Update a Boefje by @madelondohmen in #3521
-* Explicitely use the fork context for multiprocessing to fix running boefjes on macOS by @Donnype in #3576
+* Explicitly use the fork context for multiprocessing to fix running boefjes on macOS by @Donnype in #3576
 * fix: button style by @HeleenSG in #3565
 * Use stdlib instead of dateutil to parse ISO datetime by @dekkers in #3590
 * Do not store the hypothetically produced mime-types always by @Donnype in #3583
@@ -109,7 +109,7 @@ New Features and Bug fixes
 * Fix description on plugin page when all plugins are enabled by @madelondohmen in #3644
 * Fix for downloading PDF by @madelondohmen in #3664
 * Fix sorting plugins list by @Rieven in #3659
-* fix the boefje id check for uuid's. A cleaner match regex would problably be better. by @underdarknl in #3665
+* fix the boefje id check for uuid's. A cleaner match regex would probably be better. by @underdarknl in #3665
 * Fix table in DNS Report by @madelondohmen in #3650
 * Pass bytes instead of string to BytesClient.upload_raw() by @Donnype in #3670
 * make some things look better by @Rieven in #3661
@@ -146,7 +146,7 @@ New Features and Bug fixes
 * Fix scheduled Aggregate Report naming by @madelondohmen in #3748
 * Fixes for dropdowns by @Rieven in #3732
 * Exclude Report from ooi list by @Rieven in #3768
-* Fix reports with orginization tags by @noamblitz in #3790
+* Fix reports with organization tags by @noamblitz in #3790
 * Silence staticfiles warning by @dekkers in #3795
 * Add configurable httpx request timeout and increase default by @dekkers in #3786
 * fix: Long links within tables by @HeleenSG in #3724
@@ -223,7 +223,7 @@ New Features and Bug fixes
 * Upsert report recipe in REST API by @dekkers in #3968
 * Translations update from Hosted Weblate by @weblate in #3984
 * Fix test_report_runner.py by @originalsouth in #4003
-* minor changes to onboarding, remove header, make prefered route more visible. by @underdarknl in #3986
+* minor changes to onboarding, remove header, make preferred route more visible. by @underdarknl in #3986
 * Move the NXDomain catch to look at the results now that we dont raise… by @underdarknl in #3997
 * Add SPF optional machnism qualifier to model and parser. fix Human readable formatting for various mechanisms by @underdarknl in #3999
 * Changes to schedule all reports, even for once by @Rieven in #3840
@@ -246,7 +246,7 @@ New Features and Bug fixes
 * Add run-on to Boefje Setup page by @madelondohmen in #4061
 
 Documentation
-============
+=============
 
 * Docs/update userguide objects tasks members settings by @stephanie0x00 in #3957
 * Add risk level severities to docs by @stephanie0x00 in #4037
@@ -269,11 +269,11 @@ Documentation
 * Add descriptions to katalogus by @stephanie0x00 in #3545
 
 Dependency Updates
-============
+==================
 
 * Bump cryptography from 42.0.8 to 43.0.1 in /bytes by @dependabot in #3473
 * Bump django from 5.0.10 to 5.0.11 in /rocky by @dependabot in #4025
-* Bump django from 5.0.9 to 5.0.10 in /rocky by @dependabot in #3940* 
+* Bump django from 5.0.9 to 5.0.10 in /rocky by @dependabot in #3940*
 * Bump SonarSource/sonarcloud-github-action from 3.1.0 to 4.0.0 by @dependabot in #4001
 * Bump python-multipart from 0.0.9 to 0.0.18 in /bytes by @dependabot in #3925
 * Remove sigrid workflows by @dekkers in #3920
