@@ -1,7 +1,7 @@
 {% load i18n %}
 
 {% if organizations_dashboards %}
-    {% if organizations_findings_summary.total_finding_types != 0 %}
+    {% if organizations_findings_summary and organizations_findings_summary.total_finding_types != 0 %}
         <section>
             <div>
                 <div>
