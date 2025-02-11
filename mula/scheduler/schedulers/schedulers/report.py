@@ -54,9 +54,6 @@ class ReportScheduler(Scheduler):
         # Create report tasks for the schedules
         report_tasks = []
         for schedule in schedules:
-            if not self.has_schedule_permission_to_run(schedule):
-                continue
-
             report_task = models.ReportTask.model_validate(schedule.data)
             report_tasks.append(report_task)
 
@@ -98,25 +95,3 @@ class ReportScheduler(Scheduler):
             organisation_id=organisation_id,
             caller=caller,
         )
-
-    def has_schedule_permission_to_run(self, schedule: models.Schedule) -> bool:
-        """Check if the schedule has permission to run.
-
-        Args:
-            schedule (models.Schedule): Schedule to check.
-
-        Returns:
-            bool: True if the schedule has permission to run, False otherwise.
-        """
-        report_task = models.ReportTask.model_validate(schedule.data)
-        _, count = self.ctx.datastores.task_store.get_tasks(
-            scheduler_id=self.scheduler_id,
-            task_type=report_task.type,
-            filters=filters.FilterRequest(
-                filters=[
-                    filters.Filter(column="hash", operator="eq", value=report_task.hash),
-                    filters.Filter(column="schedule_id", operator="eq", value=str(schedule.id)),
-                ]
-            ),
-        )
-        return not count

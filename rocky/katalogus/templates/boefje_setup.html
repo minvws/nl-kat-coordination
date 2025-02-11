@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load static %}
+{% load compress %}
 
 {% block content %}
     {% include "header.html" %}
@@ -46,3 +47,9 @@
         </section>
     </main>
 {% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    {% compress js %}
+        <script src="{% static "js/choiceToggle.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
+{% endblock html_at_end_body %}

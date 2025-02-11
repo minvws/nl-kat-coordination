@@ -8,6 +8,8 @@ from pydantic import ValidationError
 
 from scheduler import clients, context, models, utils
 from scheduler.clients.errors import ExternalServiceError
+from scheduler.models import MutationOperationType
+from scheduler.models.ooi import RunOn
 from scheduler.schedulers import Scheduler, rankers
 from scheduler.schedulers.errors import exception_handler
 from scheduler.storage import filters
@@ -140,10 +142,10 @@ class BoefjeScheduler(Scheduler):
             if boefje.run_on:
                 create_schedule = False
                 run_task = False
-                if mutation.operation == models.MutationOperationType.CREATE:
-                    run_task = "create" in boefje.run_on
-                elif mutation.operation == models.MutationOperationType.UPDATE:
-                    run_task = "update" in boefje.run_on
+                if mutation.operation == MutationOperationType.CREATE:
+                    run_task = RunOn.CREATE in boefje.run_on
+                elif mutation.operation == MutationOperationType.UPDATE:
+                    run_task = RunOn.UPDATE in boefje.run_on
 
             if not run_task:
                 self.logger.debug(
@@ -179,7 +181,7 @@ class BoefjeScheduler(Scheduler):
         boefjes can run on, and create tasks for it."""
         boefje_tasks = []
 
-        # TODO:: this should be optimized see #3357
+        # TODO: this should be optimized see #3357
         try:
             orgs = self.ctx.services.katalogus.get_organisations()
         except ExternalServiceError:
