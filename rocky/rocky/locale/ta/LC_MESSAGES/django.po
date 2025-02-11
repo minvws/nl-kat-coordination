@@ -1326,9 +1326,13 @@ msgstr "நிலை"
 msgid "Age"
 msgstr "அகவை"
 
-#: katalogus/templates/plugin_container_image.html tools/forms/boefje.py
-msgid "Scan frequency"
-msgstr "அதிர்வெண் ச்கேன்"
+#: katalogus/templates/plugin_container_image.html
+msgid "Scan interval"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "Run on"
+msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
 msgid "current"
@@ -5145,13 +5149,32 @@ msgid "Output mime types"
 msgstr "வெளியீட்டு மைம் வகைகள்"
 
 #: tools/forms/boefje.py
-msgid ""
-"Specify the scanning frequency for this Boefje in minutes. The default is 24 "
-"hours. For example: 5 minutes will let the boefje scan every 5 minutes."
+msgid "Scan type"
 msgstr ""
-"இந்த போஃப்சேவுக்கான ச்கேனிங் அதிர்வெண்ணை நிமிடங்களில் குறிப்பிடவும். இயல்புநிலை 24 "
-"மணிநேரம். உதாரணமாக: ஒவ்வொரு 5 நிமிடங்களுக்கும் 5 நிமிடங்கள் போஃப்சே ச்கேன் செய்ய "
-"அனுமதிக்கும்."
+
+#: tools/forms/boefje.py
+msgid "Interval amount"
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid ""
+"Specify the scanning interval for this Boefje. The default is 24 hours. For "
+"example: 5 minutes will let the Boefje scan every 5 minutes."
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid "Interval frequency"
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid "Object creation/change"
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid ""
+"Choose weather a the Boefje should run after creating and/or changing an "
+"object. "
+msgstr ""
 
 #: tools/forms/finding_type.py
 msgid "KAT-ID"
@@ -5519,6 +5542,12 @@ msgstr ""
 "<p> உங்கள் போஃப்சேவுக்கு இசைவு நிலையைத் தேர்ந்தெடுக்கவும். வெவ்வேறு இசைவு நிலைகளைப் "
 "பற்றிய கூடுதல் தகவலுக்கு, <a href='https://docs.openkat.nl/manual/usermanual."
 "html#scan-levels-clearance-indemnities'> ஆவணங்களில் </a> காணலாம்.</p> "
+
+#: tools/forms/settings.py
+msgid ""
+"Choose when this Boefje will scan objects. It can run on a given interval or "
+"it can run every time an object has been created or changed. "
+msgstr ""
 
 #: tools/forms/settings.py
 msgid "Depth of the tree."
@@ -8165,6 +8194,17 @@ msgstr "மூல கோப்பை பைட்டுகளில் பதி
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "மூல கோப்பு வெற்றிகரமாக சேர்க்கப்பட்டது."
+
+#~ msgid "Scan frequency"
+#~ msgstr "அதிர்வெண் ச்கேன்"
+
+#~ msgid ""
+#~ "Specify the scanning frequency for this Boefje in minutes. The default is "
+#~ "24 hours. For example: 5 minutes will let the boefje scan every 5 minutes."
+#~ msgstr ""
+#~ "இந்த போஃப்சேவுக்கான ச்கேனிங் அதிர்வெண்ணை நிமிடங்களில் குறிப்பிடவும். இயல்புநிலை 24 "
+#~ "மணிநேரம். உதாரணமாக: ஒவ்வொரு 5 நிமிடங்களுக்கும் 5 நிமிடங்கள் போஃப்சே ச்கேன் செய்ய "
+#~ "அனுமதிக்கும்."
 
 #, python-format
 #~ msgid ""
