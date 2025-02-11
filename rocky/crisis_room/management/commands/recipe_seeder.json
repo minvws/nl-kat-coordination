@@ -1,6 +1,5 @@
 {
   "report_name_format": "Crisis Room Aggregate Report",
-  "subreport_name_format": "Findings Report for ${ooi}",
   "input_recipe": {
     "query": {
       "ooi_types": [
@@ -23,8 +22,8 @@
       "asc_desc": "desc"
     }
   },
-  "parent_report_type": "aggregate-organisation-report",
-  "report_types": [
+  "report_type": "aggregate-organisation-report",
+  "asset_report_types": [
     "systems-report",
     "findings-report"
   ],

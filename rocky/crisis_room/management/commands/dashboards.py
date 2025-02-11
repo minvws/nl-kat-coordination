@@ -34,7 +34,7 @@ def get_or_create_default_dashboard(organization: Organization) -> bool:
         dashboard_data, created = DashboardData.objects.get_or_create(dashboard=dashboard)
         if created:
             recipe = create_organization_recipe(valid_time, organization, recipe_default)
-            dashboard_data.recipe = recipe.primary_key
+            dashboard_data.recipe = recipe.recipe_id
             schedule_request = create_schedule_request(valid_time, organization, recipe)
             scheduler_client(organization.code).post_schedule(schedule=schedule_request)
 

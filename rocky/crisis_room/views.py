@@ -1,11 +1,13 @@
 from datetime import datetime, timezone
 from typing import Any
+from uuid import UUID
 
 import structlog
 from django.conf import settings
 from django.http.request import HttpRequest
 from django.urls import reverse
 from django.views.generic import TemplateView
+from httpx import HTTPStatusError
 from pydantic import TypeAdapter
 from reports.report_types.findings_report.report import SEVERITY_OPTIONS
 from tools.models import Organization, OrganizationMember
@@ -13,7 +15,8 @@ from tools.models import Organization, OrganizationMember
 from crisis_room.management.commands.dashboards import FINDINGS_DASHBOARD_NAME
 from crisis_room.models import DashboardData
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import Reference
+from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.ooi.reports import HydratedReport
 from rocky.bytes_client import BytesClient, get_bytes_client
 
 logger = structlog.get_logger(__name__)
@@ -48,10 +51,13 @@ class DashboardService:
         )
 
     @staticmethod
-    def get_reports(valid_time: datetime, octopoes_client: OctopoesAPIConnector, recipe_id: str):
-        return octopoes_client.query(
-            "ReportRecipe.<report_recipe[is Report]", valid_time=valid_time, source=Reference.from_str(recipe_id)
-        )
+    def get_reports(
+        observed_at: datetime, octopoes_api_connector: OctopoesAPIConnector, recipe_id: str
+    ) -> list[HydratedReport]:
+        try:
+            return octopoes_api_connector.list_reports(valid_time=observed_at, recipe_id=UUID(recipe_id)).items
+        except (HTTPStatusError, ObjectNotFoundException):
+            return []
 
     @staticmethod
     def get_report_bytes_data(bytes_client: BytesClient, data_raw_id: str):
