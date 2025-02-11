@@ -7,7 +7,6 @@ from unittest import mock
 from scheduler import config, models, storage
 from scheduler.schedulers.queue import InvalidItemError, QueueEmptyError, QueueFullError
 from scheduler.storage import stores
-
 from tests.factories import OrganisationFactory
 from tests.mocks import item as mock_item
 from tests.mocks import queue as mock_queue
@@ -324,9 +323,16 @@ class SchedulerTestCase(unittest.TestCase):
     def test_post_push_schedule_is_none(self):
         """When a schedule is not provided, the deadline should be set to None"""
         # Arrange
-        first_item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
+        first_item = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id, organisation=self.organisation.id, priority=1
+        )
 
-        schedule = models.Schedule(scheduler_id=self.scheduler.scheduler_id, hash=first_item.hash, data=first_item.data)
+        schedule = models.Schedule(
+            scheduler_id=self.scheduler.scheduler_id,
+            organisation=self.organisation.id,
+            hash=first_item.hash,
+            data=first_item.data,
+        )
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         first_item.schedule_id = schedule_db.id
@@ -343,9 +349,16 @@ class SchedulerTestCase(unittest.TestCase):
         # Arrange
         self.scheduler.auto_calculate_deadline = True
 
-        first_item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
+        first_item = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id, organisation=self.organisation.id, priority=1
+        )
 
-        schedule = models.Schedule(scheduler_id=self.scheduler.scheduler_id, hash=first_item.hash, data=first_item.data)
+        schedule = models.Schedule(
+            scheduler_id=self.scheduler.scheduler_id,
+            organisation=self.organisation.id,
+            hash=first_item.hash,
+            data=first_item.data,
+        )
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         first_item.schedule_id = schedule_db.id
