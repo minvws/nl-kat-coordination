@@ -4,6 +4,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 from scheduler import clients, config, models, schedulers, storage
+from scheduler.models.ooi import RunOn
 from scheduler.storage import stores
 from structlog.testing import capture_logs
 
@@ -1283,7 +1284,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=["create"])
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=[RunOn.CREATE])
         mutation = models.ScanProfileMutation(
             operation=models.MutationOperationType.CREATE, primary_key=ooi.primary_key, value=ooi
         ).model_dump_json()
@@ -1320,7 +1321,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=["create", "update"])
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=[RunOn.CREATE, RunOn.UPDATE])
         mutation = models.ScanProfileMutation(
             operation=models.MutationOperationType.CREATE, primary_key=ooi.primary_key, value=ooi
         ).model_dump_json()
@@ -1357,7 +1358,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=["update"])
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=[RunOn.UPDATE])
         mutation = models.ScanProfileMutation(
             operation=models.MutationOperationType.CREATE, primary_key=ooi.primary_key, value=ooi
         ).model_dump_json()
@@ -1381,7 +1382,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=[])
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=None)
         mutation = models.ScanProfileMutation(
             operation=models.MutationOperationType.CREATE, primary_key=ooi.primary_key, value=ooi
         ).model_dump_json()
@@ -1419,7 +1420,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=["create"])
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=[RunOn.CREATE])
         mutation = models.ScanProfileMutation(
             operation=models.MutationOperationType.UPDATE, primary_key=ooi.primary_key, value=ooi
         ).model_dump_json()
@@ -1443,7 +1444,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=["create", "update"])
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=[RunOn.CREATE, RunOn.UPDATE])
         mutation = models.ScanProfileMutation(
             operation=models.MutationOperationType.UPDATE, primary_key=ooi.primary_key, value=ooi
         ).model_dump_json()
@@ -1480,7 +1481,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=["update"])
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=[RunOn.UPDATE])
         mutation = models.ScanProfileMutation(
             operation=models.MutationOperationType.UPDATE, primary_key=ooi.primary_key, value=ooi
         ).model_dump_json()
@@ -1517,7 +1518,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=[])
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type], run_on=None)
         mutation = models.ScanProfileMutation(
             operation=models.MutationOperationType.UPDATE, primary_key=ooi.primary_key, value=ooi
         ).model_dump_json()
