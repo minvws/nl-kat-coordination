@@ -249,6 +249,14 @@ The process of creating a nibble involves the following steps:
 2. **Step 2**: Choosing the right objects
 3. **Step 3**: Defining the nibble
 4. **Step 4**: Writing the nibble query
+   While writing the nibble query, it is important to consider to write all of the following possible combination:
+
+   - Only one of the NibbleParameters is known
+   - All of the NibbleParameters are known
+   - None of the NibbleParameters are known
+
+   Nibble queries should be written for all of these situations.
+
 5. **Step 5**: Writing the Jmespath query
 6. **Step 6**: Writing the nibble code
 
