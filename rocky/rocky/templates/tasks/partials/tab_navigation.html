@@ -17,6 +17,11 @@
                     <a href="{% url 'all_normalizers_task_list' %}">{% translate "Normalizers" %}</a>
                 {% endif %}
             </li>
+            <li {% if view == "report_tasks" %}aria-current="page"{% endif %}>
+                {% if organization %}
+                    <a href="{% url 'reports_task_list' organization.code %}">{% translate "Reports" %}</a>
+                {% endif %}
+            </li>
         </ul>
     </nav>
 </div>

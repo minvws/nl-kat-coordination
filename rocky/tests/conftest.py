@@ -44,7 +44,7 @@ from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
 from rocky.health import ServiceHealth
-from rocky.scheduler import PaginatedTasksResponse, Task
+from rocky.scheduler import PaginatedTasksResponse, ReportTask, Task, TaskStatus
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
 
@@ -1472,7 +1472,6 @@ def rocky_health():
             ServiceHealth(service="katalogus", healthy=True, version="0.0.1-development", additional=None, results=[]),
             ServiceHealth(service="scheduler", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
             ServiceHealth(service="bytes", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
-            ServiceHealth(service="keiko", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
         ],
     )
 
@@ -1611,7 +1610,6 @@ def get_aggregate_report_from_bytes():
             },
             {"service": "scheduler", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
             {"service": "bytes", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
-            {"service": "keiko", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
         ],
         "config_oois": [],
         "input_data": {
@@ -1833,3 +1831,42 @@ def aggregate_report_with_sub_reports():
     )
 
     return Paginated(count=1, items=[aggregate_report])
+
+
+@pytest.fixture
+def reports_task_list():
+    return PaginatedTasksResponse(
+        count=2,
+        next=None,
+        previous=None,
+        results=[
+            Task(
+                id=UUID("7f9d5b00-dbab-45f3-93a6-dd44cc20c359"),
+                scheduler_id="report-_rieven",
+                schedule_id="86032b20-f7ae-4a48-9093-87ec5a56e939",
+                priority=1738747928,
+                status=TaskStatus.FAILED,
+                type="report",
+                hash="8f73ee4346118b7814711eba8ebb13d8",
+                data=ReportTask(
+                    type="report", organisation_id="_rieven", report_recipe_id="3f5c1a46-1969-49b7-b402-4676fb59ca4b"
+                ),
+                created_at=datetime(2025, 2, 5, 9, 32, 8, 325523),
+                modified_at=datetime(2025, 2, 5, 9, 32, 8, 325526),
+            ),
+            Task(
+                id=UUID("9e23611d-36c2-4972-82f0-077bcb1a8941"),
+                scheduler_id="report-_rieven",
+                schedule_id="bd821e6e-6680-4215-8557-e049deeb0175",
+                priority=1738684879,
+                status=TaskStatus.COMPLETED,
+                type="report",
+                hash="5fc17aa4a8ff4874203446a106b4d5bb",
+                data=ReportTask(
+                    type="report", organisation_id="_rieven", report_recipe_id="451a676d-91f8-4366-ac24-d1a47205181d"
+                ),
+                created_at=datetime(2025, 2, 4, 16, 1, 19, 951925),
+                modified_at=datetime(2025, 2, 4, 16, 1, 19, 951927),
+            ),
+        ],
+    )
