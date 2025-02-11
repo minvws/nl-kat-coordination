@@ -99,6 +99,12 @@ BOEFJE_SCAN_LEVEL_HELP_TEXT = mark_safe(
     )
 )
 
+BOEFJE_RUN_ON_HELP_TEXT = _(
+    "Choose when this Boefje will scan objects. "
+    "It can run on a given interval or it can run every time an object "
+    "has been created or changed. "
+)
+
 DEPTH_DEFAULT = 9
 DEPTH_MAX = 15
 DEPTH_HELP_TEXT = _("Depth of the tree.")

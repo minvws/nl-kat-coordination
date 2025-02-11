@@ -16,7 +16,6 @@ The container images can be found here:
 - https://github.com/minvws/nl-kat-mula/pkgs/container/nl-kat-mula
 - https://github.com/minvws/nl-kat-octopoes/pkgs/container/nl-kat-octopoes
 - https://github.com/minvws/nl-kat-rocky/pkgs/container/nl-kat-rocky
-- https://github.com/minvws/nl-kat-keiko/pkgs/container/nl-kat-keiko
 
 ## Setup
 
