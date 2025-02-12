@@ -374,7 +374,7 @@ class SchedulerClient:
         response = self._client.post(f"/schedulers/{scheduler_id}/pop?limit=1")
         response.raise_for_status()
 
-        page = TypeAdapter(Task | None).validate_json(response.content)
+        page = TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
         if page.count == 0 or len(page.results):
             return None
 
