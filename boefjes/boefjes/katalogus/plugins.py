@@ -70,6 +70,12 @@ def list_plugins(
     # filter plugins by scan level for boefje plugins
     plugins = [plugin for plugin in plugins if plugin.type != "boefje" or plugin.scan_level >= filter_params.scan_level]
 
+    if filter_params.consumes is not None:
+        plugins = [plugin for plugin in plugins if filter_params.consumes.issubset(set(plugin.consumes))]
+
+    if filter_params.produces is not None:
+        plugins = [plugin for plugin in plugins if filter_params.produces.issubset(set(plugin.produces))]
+
     if pagination_params.limit is None:
         return plugins[pagination_params.offset :]
 

@@ -141,12 +141,6 @@ class App:
             scheduler_boefje.run()
             scheduler_report.run()
 
-        if additions:
-            # Flush katalogus caches when new organisations are added
-            self.ctx.services.katalogus.flush_caches()
-
-            self.logger.debug("Added %s organisations to scheduler", len(additions), additions=sorted(additions))
-
     @tracer.start_as_current_span("collect_metrics")
     def collect_metrics(self) -> None:
         """Collect application metrics
