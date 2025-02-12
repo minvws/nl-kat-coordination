@@ -58,7 +58,7 @@ jobs:
           path: ${{ matrix.module['name'] }}-coverage-unit
 
       - name: Fix coverage report sources
-        uses: Mudlet/xmlstarlet-action@master
+        uses: Mudlet/xmlstarlet-action@9866e85e774e0fb50bc49de15274d005b5a69f0e # master
         with:
           args: edit --inplace --update "coverage/sources" --value "/github/workspace/${{ matrix.module['name'] }}/" "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
 
@@ -89,6 +89,6 @@ jobs:
           pattern: "*-coverage-unit-fixed"
 
       - name: SonarCloud
-        uses: SonarSource/sonarcloud-github-action@v4.0.0
+        uses: SonarSource/sonarcloud-github-action@02ef91109b2d589e757aefcfb2854c2783fd7b19 # v4.0.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
