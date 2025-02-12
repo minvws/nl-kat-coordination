@@ -379,3 +379,8 @@ class OctopoesAPIConnector:
 
         res = self.session.get(f"/{self.client}/nibbles/retrieve", params=params)
         return res.json()
+
+    def list_nibbles(self) -> list[str]:
+        """List all available nibbles"""
+        res = self.session.get(f"/{self.client}/nibbles")
+        return res.json()
