@@ -54,6 +54,20 @@
                 <td class="number">{{ data.total_by_severity_per_finding_type.recommendation }}</td>
                 <td class="number">{{ data.total_by_severity.recommendation }}</td>
             </tr>
+            <tr>
+                <td>
+                    <span class="pending">Pending</span>
+                </td>
+                <td class="number">{{ data.total_by_severity_per_finding_type.pending }}</td>
+                <td class="number">{{ data.total_by_severity.pending }}</td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="unknown">Unknown</span>
+                </td>
+                <td class="number">{{ data.total_by_severity_per_finding_type.unknown }}</td>
+                <td class="number">{{ data.total_by_severity.unknown }}</td>
+            </tr>
             <tfoot>
                 <tr>
                     <td>Total</td>

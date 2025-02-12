@@ -82,10 +82,10 @@ class DashboardService:
             recipe_id = data.recipe
 
             # get reports with recipe id
+            # TODO: change this method to get_report, since there's only one report that belongs to a recipe_id
             reports = self.get_reports(self.observed_at, octopoes_client, recipe_id)
 
             if reports:
-                reports.sort(key=lambda ooi: ooi.date_generated, reverse=True)
                 report = reports[0]
                 report_data_from_bytes = self.get_report_bytes_data(bytes_client, report.data_raw_id)
                 report_data = self.get_organizations_findings(report_data_from_bytes)
