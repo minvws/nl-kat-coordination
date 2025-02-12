@@ -29,7 +29,16 @@
 
             <div class="content">
                 <ul>
-                    {% for nibble in object_list %}<li>{{ nibble }}</li>{% endfor %}
+                    {% for nibble in object_list %}
+                        <li>
+                            {{ nibble }} -
+                            {% if nibble in enabled_nibbles %}
+                                Enabled
+                            {% else %}
+                                Disabled
+                            {% endif %}
+                        </li>
+                    {% endfor %}
                 </ul>
             </div>
         </section>

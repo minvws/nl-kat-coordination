@@ -384,3 +384,9 @@ class OctopoesAPIConnector:
         """List all available nibbles"""
         res = self.session.get(f"/{self.client}/nibbles")
         return res.json()
+
+    def list_enabled_nibbles(self, enabled: bool = True) -> list[str]:
+        """List enabled or disabled nibbles"""
+        params = {"enabled": enabled}
+        res = self.session.get(f"/{self.client}/nibbles/status", params=params)
+        return res.json()

@@ -20,4 +20,5 @@ class NibblesView(OctopoesView, ListView):
         context["breadcrumbs"] = [
             {"url": reverse("katalogus", kwargs={"organization_code": self.organization.code}), "text": _("KAT-alogus")}
         ]
+        context["enabled_nibbles"] = self.octopoes_api_connector.list_enabled_nibbles()
         return context
