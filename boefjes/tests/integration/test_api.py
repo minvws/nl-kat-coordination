@@ -54,6 +54,20 @@ def test_cannot_add_plugin_reserved_id(test_client, organisation):
     assert response.json() == {"detail": "Duplicate plugin: a plugin with this id already exists"}
 
 
+def test_get_organisation_api(test_client, organisation):
+    response = test_client.get(f"/v1/organisations")
+    assert response.status_code == 200
+    assert response.json() == {"test": {"id": "test", "name": "Test org"}}
+
+    response = test_client.get(f"/v1/organisations/{organisation.id}")
+    assert response.status_code == 200
+    assert response.json() == {"id": "test", "name": "Test org"}
+
+    response = test_client.get(f"/v1/organisations/nonexistent")
+    assert response.status_code == 404
+    assert response.json() == {"message": "Organisation with id 'nonexistent' not found"}
+
+
 def test_add_boefje(test_client, organisation):
     boefje = Boefje(id="test_plugin", name="My test boefje", static=False)
     response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
