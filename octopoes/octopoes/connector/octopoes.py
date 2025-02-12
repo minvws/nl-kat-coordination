@@ -390,3 +390,9 @@ class OctopoesAPIConnector:
         params = {"enabled": enabled}
         res = self.session.get(f"/{self.client}/nibbles/status", params=params)
         return res.json()
+
+    def toggle_nibbles(self, nibble_ids: list[str], state: bool) -> list[str]:
+        """Toggle nibbles enabled/disabled state"""
+        params: dict[str, bool | list[str]] = {"state": state, "nibble_ids": nibble_ids}
+        res = self.session.get(f"/{self.client}/nibbles/select", params=params)
+        return res.json()

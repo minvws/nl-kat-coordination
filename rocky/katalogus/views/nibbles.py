@@ -1,8 +1,22 @@
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import ListView
+from django.views.generic import ListView, View
 
 from rocky.views.mixins import OctopoesView
+
+
+class NibblesToggleView(OctopoesView, View):
+    def post(self, request, *args, **kwargs):
+        nibble_id = str(kwargs.get("nibble_id", ""))
+        new_state = kwargs.get("state") == "enable"
+        self.octopoes_api_connector.toggle_nibbles([nibble_id], new_state)
+        return HttpResponseRedirect(
+            reverse(
+                "nibbles_list",
+                kwargs={"organization_code": self.organization.code, "view_type": request.GET.get("view_type", "grid")},
+            )
+        )
 
 
 class NibblesView(OctopoesView, ListView):

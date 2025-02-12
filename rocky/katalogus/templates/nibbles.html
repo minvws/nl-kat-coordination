@@ -34,8 +34,20 @@
                             {{ nibble }} -
                             {% if nibble in enabled_nibbles %}
                                 Enabled
+                                <form method="post"
+                                      class="inline"
+                                      action="{% url 'nibbles_toggle' organization.code nibble 'disable' %}?view_type={{ view_type }}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="button ghost">Disable</button>
+                                </form>
                             {% else %}
                                 Disabled
+                                <form method="post"
+                                      class="inline"
+                                      action="{% url 'nibbles_toggle' organization.code nibble 'enable' %}?view_type={{ view_type }}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="button ghost">Enable</button>
+                                </form>
                             {% endif %}
                         </li>
                     {% endfor %}
