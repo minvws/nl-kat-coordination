@@ -102,15 +102,15 @@ class ScheduledReportsDeleteView(SchedulerView):
     task_type = "report"
 
     def post(self, request, *args, **kwargs):
-        recipe_pk = request.POST.get("report_recipe")
-        schedule_id = request.POST.get("schedule_id")
+        recipe_pk = request.POST.get("report_recipe", "")
+        schedule_id = request.POST.get("schedule_id", "")
 
-        if recipe_pk is not None and schedule_id is not None:
+        if recipe_pk and schedule_id:
             self.delete_report_schedule(schedule_id)
             self.octopoes_api_connector.delete(
                 Reference.from_str(f"{recipe_pk}"), valid_time=datetime.now(timezone.utc)
             )
-            messages.success(self.request, _("'Recipe {} deleted succesfully'").format(recipe_pk))
+            messages.success(self.request, _("Recipe '{}' deleted successfully").format(recipe_pk))
         else:
             messages.error(self.request, _("Schedule not found"))
 
