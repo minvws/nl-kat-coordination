@@ -44,3 +44,39 @@ DAST
 ----
 
 We currently do not have a DAST tool in place, but we are looking into the possibilities to implement this in the future.
+
+Security of the application
+===========================
+
+Modern browser have many security features build in that can be enabled by sending the correct headers or setting configuration settings. 
+To allow this OpenKAT is designed to support these settings.
+Below is an overview the design choices and best practices that can be used when configuring OpenKAT.
+
+Security headers
+----------------
+
+For the security headers settings, see the hardening page, which can be found at: :ref:`installation-and-deployment/hardening:Security headers`.
+
+Security cookies
+----------------
+
+To make sure cookies are secure we follow best practices from the OWASP ASVS standard.
+
+Our cookies are:
+
+=========== ========== ======================= ========== ======== ======== ======== ======= ======== ======== ========
+is_session  name       used for                domain     path     expires  HttpOnly Secure  SameSite __HOST   Entropy
+=========== ========== ======================= ========== ======== ======== ======== ======= ======== ======== ========
+True        sessionid  User session management DOMAIN     /        1 hour   True     True    Strict   False    144+
+False       csrftoken  CSRF protection         DOMAIN     /        1 day    False*   True    Strict   False    151+
+=========== ========== ======================= ========== ======== ======== ======== ======= ======== ======== ========
+
+\* needed to be called by JavaScript.
+\+ Determined with BurpSuite Sequencer.
+
+iRealisate Secure Development Path (iSDP)
+=========================================
+
+At the Ministerie van Volksgezondheid, Welzijn en Sport (VWS) we use the iRealisate Secure Development Path (iSDP) to ensure that the code we write is secure.
+It is based on the OWASP ASVS standard. When completed the results will be shared on this documentation page.
+
