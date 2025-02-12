@@ -63,6 +63,9 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
 
+    permissions:
+      contents: read
+
     env:
       PGPASSWORD: postgres # No password prompt
 
