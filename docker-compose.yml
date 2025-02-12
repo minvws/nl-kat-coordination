@@ -239,21 +239,6 @@ services:
       - octopoes_api
       - katalogus
 
-  keiko:
-    restart: unless-stopped
-    build:
-      context: keiko/
-      target: dev
-    ports:
-      - "127.0.0.1:8005:8000"
-    command: uvicorn keiko.app:api --host 0.0.0.0 --port 8000 --reload --reload-dir /app/keiko/keiko
-    env_file:
-      - .env-defaults
-      - .env
-    volumes:
-      - ./keiko:/app/keiko
-      - keiko-reports:/reports
-
   jaeger:
     profiles:
       - monitoring
@@ -294,7 +279,6 @@ networks:
 volumes:
   postgres-data:
   bytes-data:
-  keiko-reports:
   xtdb-data:
   jaeger-data:
   prometheus-data:
