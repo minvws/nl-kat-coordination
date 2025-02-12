@@ -375,7 +375,7 @@ class SchedulerClient:
         response.raise_for_status()
 
         page = TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
-        if page.count == 0 or len(page.results):
+        if page.count == 0 or len(page.results) == 0:
             return None
 
         return page.results[0]
