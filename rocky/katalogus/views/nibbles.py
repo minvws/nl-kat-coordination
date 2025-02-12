@@ -6,6 +6,17 @@ from django.views.generic import ListView, View
 from rocky.views.mixins import OctopoesView
 
 
+class NibblesRegisterView(OctopoesView, View):
+    def post(self, request, *args, **kwargs):
+        self.octopoes_api_connector.register_nibbles()
+        return HttpResponseRedirect(
+            reverse(
+                "nibbles_list",
+                kwargs={"organization_code": self.organization.code, "view_type": request.GET.get("view_type", "grid")},
+            )
+        )
+
+
 class NibblesToggleView(OctopoesView, View):
     def post(self, request, *args, **kwargs):
         nibble_id = str(kwargs.get("nibble_id", ""))

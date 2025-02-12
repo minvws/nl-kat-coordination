@@ -396,3 +396,7 @@ class OctopoesAPIConnector:
         params: dict[str, bool | list[str]] = {"state": state, "nibble_ids": nibble_ids}
         res = self.session.get(f"/{self.client}/nibbles/select", params=params)
         return res.json()
+
+    def register_nibbles(self) -> None:
+        """Register nibbles"""
+        self.session.get(f"/{self.client}/nibbles/register")
