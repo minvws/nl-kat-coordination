@@ -8,14 +8,13 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import FormView, ListView
+from django.views.generic import ListView
 from pydantic import TypeAdapter, ValidationError
 from tools.ooi_helpers import create_ooi
 
 from octopoes.models import OOI, Reference
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.reports import Report, ReportRecipe
-from reports.forms import ReportScheduleDeleteForm
 from reports.report_types.aggregate_organisation_report.report import aggregate_reports
 from reports.report_types.helpers import get_report_by_id
 from reports.views.base import ReportBreadcrumbs, ReportDataDict, get_selection
@@ -47,7 +46,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
     task_type = "report"
     context_object_name = "scheduled_reports"
 
-    def get_recipe_ooi_tree(self, ooi_pk: str) -> ReportRecipe | None:
+    def get_recipe_ooi_tree(self, ooi_pk: str) -> ReportRecipe:
         try:
             return self.octopoes_api_connector.get_tree(
                 Reference.from_str(f"ReportRecipe|{ooi_pk}"),
@@ -56,7 +55,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
                 types={ReportRecipe, Report},
             )
         except ObjectNotFoundException:
-            return messages.error(self.request, f"Report recipe with id {ooi_pk} not found.")
+            return None
 
     def get_queryset(self) -> list[dict[str, Any]]:
         report_schedules = self.get_report_schedules()
@@ -93,13 +92,23 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
         return context
 
 
-class ScheduledReportsDeleteView(FormView):
-    form_class = ReportScheduleDeleteForm
-    success_url = reverse("scheduled_reports")
+class ScheduledReportsDeleteView(SchedulerView):
+    task_type = "report"
 
-    def form_valid(self, form):
-        form.cleaned_data
-        return super().form_valid(form)
+    def post(self, request, *args, **kwargs):
+        recipe_pk = request.POST.get("report_recipe")
+        schedule_id = request.POST.get("schedule_id")
+
+        if recipe_pk is not None and schedule_id is not None:
+            self.delete_report_schedule(schedule_id)
+            self.octopoes_api_connector.delete(
+                Reference.from_str(f"{recipe_pk}"), valid_time=datetime.now(timezone.utc)
+            )
+            messages.success(self.request, _("'Recipe {} deleted succesfully'").format(recipe_pk))
+        else:
+            messages.error(self.request, _("Schedule not found"))
+
+        return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 
 
 class ScheduledReportsEnableDisableView(BreadcrumbsReportOverviewView, SchedulerView, ListView):

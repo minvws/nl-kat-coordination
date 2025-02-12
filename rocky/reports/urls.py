@@ -27,6 +27,7 @@ from reports.views.multi_report import (
 )
 from reports.views.report_overview import (
     ReportHistoryView,
+    ScheduledReportsDeleteView,
     ScheduledReportsEnableDisableView,
     ScheduledReportsView,
     SubreportView,
@@ -36,6 +37,7 @@ from reports.views.report_overview import (
 urlpatterns = [
     path("", ReportsLandingView.as_view(), name="reports"),
     path("scheduled-reports/", ScheduledReportsView.as_view(), name="scheduled_reports"),
+    path("delete-scheduled-reports/", ScheduledReportsDeleteView.as_view(), name="delete_scheduled_reports"),
     path(
         "scheduled-reports/enable-disable",
         ScheduledReportsEnableDisableView.as_view(),

@@ -13,8 +13,9 @@
 <form id="delete-form"
       class="inline"
       method="post"
-      action="{% url 'delete_report_recipe' %}">
+      action="{% url 'delete_scheduled_reports' organization.code %}">
     {% csrf_token %}
+    <input type="hidden" name="schedule_id" value="{{ schedule_id }}" />
     <input type="hidden" name="report_recipe" value="{{ recipe_id }}" />
 </form>
 {% endfill %}
