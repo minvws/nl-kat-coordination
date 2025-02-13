@@ -3,6 +3,7 @@ from enum import Enum
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, UniqueConstraint, types
 from sqlalchemy.orm import relationship
 
+from boefjes.models import RunOn
 from boefjes.sql.db import SQL_BASE
 
 
@@ -12,6 +13,36 @@ class ScanLevel(Enum):
     L2 = 2
     L3 = 3
     L4 = 4
+
+
+class RunOnDB(Enum):
+    CREATE = "create"
+    UPDATE = "update"
+    CREATE_UPDATE = "create_update"
+
+    @classmethod
+    def from_run_ons(cls, run_ons: list[RunOn] | None):
+        if run_ons is None:
+            return None
+
+        match sorted(run_ons):
+            case [RunOn.CREATE]:
+                return cls.CREATE
+            case [RunOn.UPDATE]:
+                return cls.UPDATE
+            case [RunOn.CREATE, RunOn.UPDATE]:
+                return cls.CREATE_UPDATE
+            case _:
+                return None
+
+    def to_run_ons(self) -> list[RunOn]:
+        match self:
+            case RunOnDB.CREATE:
+                return [RunOn.CREATE]
+            case RunOnDB.UPDATE:
+                return [RunOn.UPDATE]
+            case RunOnDB.CREATE_UPDATE:
+                return [RunOn.CREATE, RunOn.UPDATE]
 
 
 class OrganisationInDB(SQL_BASE):
@@ -72,6 +103,7 @@ class BoefjeInDB(SQL_BASE):
     schema = Column(types.JSON(), nullable=True)
     cron = Column(types.String(length=128), nullable=True)
     interval = Column(types.Integer, nullable=True)
+    run_on = Column(types.Enum(*[x.value for x in RunOnDB], name="run_on"), nullable=True)
 
     # Image specifications
     oci_image = Column(types.String(length=256), nullable=True)

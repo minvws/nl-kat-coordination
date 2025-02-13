@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from account.forms import MemberRegistrationForm, OnboardingOrganizationUpdateForm, OrganizationForm
@@ -18,13 +18,12 @@ from httpx import HTTPError
 from katalogus.client import Plugin
 from reports.report_types.definitions import ReportPlugins
 from reports.report_types.dns_report.report import DNSReport
-from reports.views.base import get_selection
-from reports.views.generate_report import SaveGenerateReportMixin
+from reports.views.base import BaseReportView, get_selection
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization, OrganizationMember
 from tools.ooi_helpers import get_or_create_ooi
 from tools.view_helpers import Breadcrumb
 
-from octopoes.models import OOI
+from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 from octopoes.models.ooi.web import URL
@@ -40,8 +39,10 @@ from onboarding.view_helpers import (
 )
 from rocky.exceptions import RockyError
 from rocky.messaging import clearance_level_warning_dns_report
+from rocky.scheduler import scheduler_client
 from rocky.views.indemnification_add import IndemnificationAddView
 from rocky.views.ooi_view import SingleOOIMixin, SingleOOITreeMixin
+from rocky.views.scheduler import SchedulerView
 
 User = get_user_model()
 
@@ -310,9 +311,11 @@ class OnboardingSetupScanSelectPluginsView(
 
 class OnboardingSetupScanOOIDetailView(
     OrganizationPermissionRequiredMixin,
-    SingleOOITreeMixin,
     IntroductionStepsMixin,
     OnboardingBreadcrumbsMixin,
+    SingleOOIMixin,
+    BaseReportView,
+    SchedulerView,
     TemplateView,
 ):
     """
@@ -322,6 +325,32 @@ class OnboardingSetupScanOOIDetailView(
     template_name = "step_3c_setup_scan_ooi_detail.html"
     current_step = 3
     permission_required = "tools.can_scan_organization"
+    task_type = "report"
+
+    @staticmethod
+    def is_scheduler_enabled(organization: Organization) -> bool:
+        scheduler_id = f"report-{organization.code}"
+        return scheduler_client(organization.code).is_scheduler_ready(scheduler_id)
+
+    def post(self, request, *args, **kwargs):
+        report_name_format = self.get_initial_report_name()
+        parent_report_type = self.get_parent_report_type()
+        report_recipe = self.create_report_recipe(report_name_format, parent_report_type, None)
+        if self.is_scheduler_enabled(self.organization):
+            self.create_report_schedule(report_recipe, datetime.now(timezone.utc) + timedelta(minutes=2))
+
+        return redirect(
+            reverse("step_report", kwargs={"organization_code": self.organization.code})
+            + get_selection(self.request, {"recipe_id": report_recipe.primary_key})
+        )
+
+    def get_ooi_pks(self) -> list[str]:
+        ooi = self.get_ooi(self.request.GET.get("ooi", ""))
+        hostname_ooi = [Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network)]
+        return [hostname_ooi[0].primary_key]
+
+    def get_report_type_ids(self) -> list[str]:
+        return [self.request.GET.get("report_type", "")]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -330,7 +359,7 @@ class OnboardingSetupScanOOIDetailView(
 
 
 class OnboardingReportView(
-    OrganizationPermissionRequiredMixin, SaveGenerateReportMixin, IntroductionStepsMixin, SingleOOIMixin, TemplateView
+    OrganizationPermissionRequiredMixin, IntroductionStepsMixin, SingleOOIMixin, BaseReportView, TemplateView
 ):
     """
     10. The user already started the scan and is now waiting till scans are finished to generate the report.
@@ -341,32 +370,26 @@ class OnboardingReportView(
     current_step = 4
     permission_required = "tools.can_scan_organization"
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.selected_oois = self.get_ooi_pks()
-        self.selected_report_types = self.get_report_type_ids()
-
-    def get_ooi_pks(self) -> list[str]:
-        ooi = self.get_ooi(self.request.GET.get("ooi", ""))
-        hostname_ooi = [Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network)]
-        return [hostname_ooi[0].primary_key]
-
-    def get_report_type_ids(self) -> list[str]:
-        return [self.request.GET.get("report_type", "")]
-
     def post(self, request, *args, **kwargs):
         self.set_member_onboarded()
 
-        report_ooi = self.save_report([("Onboarding Report", "Onboarding Report")])
+        recipe_id = request.GET.get("recipe_id", "")
 
-        if report_ooi:
-            return redirect(
-                reverse("view_report", kwargs={"organization_code": self.organization.code})
-                + "?"
-                + urlencode({"report_id": report_ooi.reference})
+        if recipe_id:
+            reports = self.octopoes_api_connector.query(
+                "ReportRecipe.<report_recipe[is Report]",
+                valid_time=datetime.now(timezone.utc),
+                source=Reference.from_str(recipe_id),
             )
 
-        return self.get(request, *args, **kwargs)
+            if reports:
+                asset_reports = reports[0].input_oois
+                return redirect(
+                    reverse("view_report", kwargs={"organization_code": self.organization.code})
+                    + "?"
+                    + urlencode({"asset_report_id": asset_reports[0]})
+                )
+        return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 
     def set_member_onboarded(self):
         member = OrganizationMember.objects.get(user=self.request.user, organization=self.organization)
