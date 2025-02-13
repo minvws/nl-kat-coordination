@@ -296,7 +296,7 @@ Dependency Updates
 Upgrading
 =========
 
-Keiko has been removed. You can safely uninstall / remove the various keiko packages/services and or containers.
+Keiko has been removed. You can safely uninstall / remove the various Keiko packages/services and/or containers.
 
 Debian packages
 ---------------
