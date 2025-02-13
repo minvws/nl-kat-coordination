@@ -32,7 +32,7 @@ UPDATE schedules SET organisation = data->>'organisation_id' WHERE data->>'organ
 UPDATE tasks SET organisation = data->>'organization' WHERE type = 'boefje';
 UPDATE tasks SET organisation = data->'raw_data'->'boefje_meta'->>'organization' WHERE type = 'normalizer';
 UPDATE tasks SET organisation = data->>'organisation_id' WHERE type = 'report';
-"""
+"""  # noqa: E501
         )
     )
 
