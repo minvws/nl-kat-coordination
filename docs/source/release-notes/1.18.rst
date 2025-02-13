@@ -2,7 +2,9 @@
 OpenKAT 1.18 - Sneeuwkat
 ============================================
 
-This release adds report scheduling, which implements periodic report generation. Combined with our new Dashboarding system partials from reports can be selected and added to custom user-defined dashboards. Changing the interval of a report will automatically update the dashboards to their latest information. Dashboard and Report data also hold historical versions available. Future versions will see new User-interfaces to move back and forth in time and comporate these datasets against one another highlighting changes and trends.
+This release adds report scheduling, which implements periodic report generation: by adding an interval to a report, it will automatically update with the latest information. With our new Dashboarding feature, these reports can be added to custom dashboards.
+
+Dashboard and Report data also have historical versions available. Future versions of the user interface will include moving back and forth in time and comparing these historic versions, highlighting changes and trends.
 We also included a new HTTP export boefje that you can use to export all objects in the graph to an external api either on interval (eg, every hour), or using our new Run-On functionality when the OOI is either created or changed. This can be very useful to alert when new findings are created or when their score is updated.
 There's also a new S3 backend for Bytes and various new boefjes, normalizers and fixes to bits from our growing community. Thanks!
 
