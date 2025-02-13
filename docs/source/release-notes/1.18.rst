@@ -8,7 +8,7 @@ Dashboard and Report data also have historical versions available. Future versio
 We also included a new HTTP export boefje that you can use to export all objects in the graph to an external API either on an interval (e.g. every hour), or when the OOI is either created or changed, using our new Run-On functionality. This can be used to alert that findings have been created or their score has been updated.
 There's also a new S3 backend for Bytes and various new boefjes, normalizers and fixes to bits from our growing community. Thanks!
 
-The language Tamil has been added via the hard work of a communitee volunteer. Since we have not yet tested it ourselves its currently only available if you add it to the languages list manually.
+The language Tamil has been added via the hard work of a communitee volunteer. Since we have not yet tested it ourselves, it's currently only available if you add it to the languages list manually.
 If you want to add a language to OpenKAT, or just help translate smaller parts, please take a look at our weblate: https://hosted.weblate.org/projects/openkat/nl-kat-coordination/ any help is much appreciated!
 
 In total 30 contributors have made 267 commits to Main in which 1,332 Files where changed.
