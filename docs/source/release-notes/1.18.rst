@@ -5,7 +5,7 @@ OpenKAT 1.18 - Sneeuwkat
 This release adds report scheduling, which implements periodic report generation: by adding an interval to a report, it will automatically update with the latest information. With our new Dashboarding feature, these reports can be added to custom dashboards.
 
 Dashboard and Report data also have historical versions available. Future versions of the user interface will include moving back and forth in time and comparing these historic versions, highlighting changes and trends.
-We also included a new HTTP export boefje that you can use to export all objects in the graph to an external api either on interval (eg, every hour), or using our new Run-On functionality when the OOI is either created or changed. This can be very useful to alert when new findings are created or when their score is updated.
+We also included a new HTTP export boefje that you can use to export all objects in the graph to an external API either on an interval (e.g. every hour), or when the OOI is either created or changed, using our new Run-On functionality. This can be used to alert that findings have been created or their score has been updated.
 There's also a new S3 backend for Bytes and various new boefjes, normalizers and fixes to bits from our growing community. Thanks!
 
 The language Tamil has been added via the hard work of a communitee volunteer. Since we have not yet tested it ourselves its currently only available if you add it to the languages list manually.
