@@ -38,4 +38,4 @@ def test_delete_schedule_no_recipe(
     response = ScheduledReportsDeleteView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 302
-    assert list(request._messages)[0].message == "Schedule not found"
+    assert list(request._messages)[0].message == "No schedule or recipe selected"
