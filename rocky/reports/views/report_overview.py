@@ -112,7 +112,7 @@ class ScheduledReportsDeleteView(SchedulerView):
             )
             messages.success(self.request, _("Recipe '{}' deleted successfully").format(recipe_pk))
         else:
-            messages.error(self.request, _("Schedule not found"))
+            messages.error(self.request, _("No schedule or recipe selected"))
 
         return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 
