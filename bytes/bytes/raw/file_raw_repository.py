@@ -8,8 +8,9 @@ from uuid import UUID
 import structlog
 from boto3 import set_stream_logger as set_boto3_stream_logger
 from boto3.session import Session as BotoSession
+from fastapi import Depends
 
-from bytes.config import Settings
+from bytes.config import Settings, get_settings
 from bytes.models import BoefjeMeta, RawData
 from bytes.raw.middleware import FileMiddleware, make_middleware
 from bytes.repositories.raw_repository import BytesFileNotFoundException, RawRepository
@@ -21,7 +22,7 @@ if TYPE_CHECKING:
     from mypy_boto3_s3.service_resource import Bucket
 
 
-def create_raw_repository(settings: Settings) -> RawRepository:
+def create_raw_repository(settings: Settings = Depends(get_settings)) -> RawRepository:
     if settings.s3_bucket_name or settings.s3_bucket_prefix:
         return S3RawRepository(
             make_middleware(),

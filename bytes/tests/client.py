@@ -7,7 +7,9 @@ from uuid import UUID
 
 import httpx
 from httpx import HTTPError, HTTPStatusError
+from starlette.testclient import TestClient
 
+from bytes.api import app
 from bytes.api.models import BoefjeOutput, File
 from bytes.models import BoefjeMeta, NormalizerMeta, RawDataMeta
 from bytes.repositories.meta_repository import BoefjeMetaFilter, NormalizerMetaFilter, RawDataFilter
@@ -32,10 +34,10 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
     return typing.cast(ClientSessionMethod, wrapper)
 
 
-class BytesAPIClient:
-    def __init__(self, base_url: str, username: str, password: str):
-        self.client = httpx.Client(
-            base_url=base_url, headers={"User-Agent": f"bytes-api-client/{BYTES_API_CLIENT_VERSION}"}
+class BytesTestAPIClient:
+    def __init__(self, username: str, password: str):
+        self.client = TestClient(
+            app, headers={"User-Agent": f"bytes-api-client/{BYTES_API_CLIENT_VERSION}"}
         )
         self._credentials = {"username": username, "password": password}
 

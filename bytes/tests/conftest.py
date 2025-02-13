@@ -18,7 +18,7 @@ from bytes.repositories.hash_repository import HashRepository
 from bytes.timestamping.in_memory import InMemoryHashRepository
 from bytes.timestamping.pastebin import PastebinHashRepository
 from bytes.timestamping.rfc3161 import RFC3161HashRepository
-from tests.client import BytesAPIClient
+from tests.client import BytesTestAPIClient
 
 
 @pytest.fixture
@@ -85,11 +85,11 @@ def meta_repository(
 
 
 @pytest.fixture
-def bytes_api_client(settings) -> Iterator[BytesAPIClient]:
+def bytes_api_client(settings) -> Iterator[BytesTestAPIClient]:
     alembicArgs = ["--config", "/app/bytes/bytes/alembic.ini", "--raiseerr", "upgrade", "head"]
     alembic.config.main(argv=alembicArgs)
 
-    client = BytesAPIClient("http://ci_bytes:8000", settings.username, settings.password)
+    client = BytesTestAPIClient(settings.username, settings.password)
     client.login()
 
     yield client

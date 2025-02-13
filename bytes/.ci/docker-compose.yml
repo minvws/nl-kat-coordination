@@ -24,28 +24,14 @@ services:
         USER_GID: 1001
     command: pytest -vv tests/integration
     depends_on:
-      - ci_bytes
-    env_file:
-      - .ci/.env.test
-    volumes:
-      - .:/app/bytes
-
-  ci_bytes:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        ENVIRONMENT: dev
-    command: uvicorn bytes.api:app --host 0.0.0.0
-    depends_on:
       ci_rabbitmq:
         condition: service_healthy
       ci_bytes-db:
         condition: service_started
-    volumes:
-      - .:/app/bytes
     env_file:
       - .ci/.env.test
+    volumes:
+      - .:/app/bytes
 
   ci_rabbitmq:
     image: "docker.io/library/rabbitmq:3.12-management"
