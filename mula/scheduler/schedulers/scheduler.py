@@ -1,4 +1,5 @@
 import abc
+import contextlib
 import random
 import threading
 import time
@@ -15,6 +16,8 @@ from scheduler.schedulers.queue.errors import InvalidItemError, NotAllowedError,
 from scheduler.utils import cron, thread
 
 tracer = trace.get_tracer(__name__)
+
+INTERNET_BOEFJES = ["shodan", "adr-finding-types", "adr-validator", "cve-finding-types", "cwe-finding-types"]
 
 
 class Scheduler(abc.ABC):
@@ -196,6 +199,47 @@ class Scheduler(abc.ABC):
 
         self.push_item_to_queue(item, create_schedule=create_schedule)
 
+    def _hydrate_task_for_queue(self, task: models.Task):
+        hydrated_task = task.model_copy()
+        hydrated_task.status = models.TaskStatus.QUEUED
+
+        if hydrated_task.type is None:
+            hydrated_task.type = self.ITEM_TYPE.type
+
+        # If the task is a boefjetask, set requirements and network to see where it is supposed to be ran
+        if hydrated_task.type == models.BoefjeTask.type:
+            ooi: models.OOI | None = None
+            with contextlib.suppress(Exception):  # TODO: is it ok to say httpx.HTTPStatusError here?
+                ooi = self.ctx.services.octopoes.get_object(
+                    hydrated_task.data["organization"], hydrated_task.data["input_ooi"]
+                )
+
+            # If the ooi exists (TODO: ask if it is possible to not exist) and the ooi has
+            # a network attribute. Create boefje requirements
+            if ooi and ooi.network:
+                requirements: list[str] = []
+
+                if ooi.object_type == "IPAddressV4":
+                    requirements.append("ipv4")
+                elif ooi.object_type == "IPAddressV6":
+                    requirements.append("ipv6")
+
+                hydrated_task.data["requirements"] = requirements
+                hydrated_task.data["network"] = ooi.network
+
+                if hydrated_task.data["boefje"]["id"] in INTERNET_BOEFJES and ooi.network != "Network|internet":
+                    raise Exception(
+                        "Attempted to make a Task with an OOI that does not lie on the internet with a boefje that\
+                        only works with internet access"
+                    )
+
+        else:
+            # If the task is not of type boefje, we add the type of task to the requirements
+            # e.g. normalizers get "normalizer"
+            hydrated_task.data["requirements"] = [hydrated_task.type]
+
+        return hydrated_task
+
     def push_item_to_queue(self, item: models.Task, create_schedule: bool = True) -> models.Task:
         """Push a Task to the queue.
 
@@ -218,9 +262,7 @@ class Scheduler(abc.ABC):
             raise NotAllowedError("Scheduler is disabled")
 
         try:
-            if item.type is None:
-                item.type = self.ITEM_TYPE.type
-            item.status = models.TaskStatus.QUEUED
+            item = self._hydrate_task_for_queue(item)
             item = self.queue.push(item)
         except NotAllowedError as exc:
             self.logger.warning(
