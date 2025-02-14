@@ -327,6 +327,7 @@ def task() -> Task:
             "hash": "19ed51514b37d42f79c5e95469956b05",
             "scheduler_id": "boefje-test",
             "schedule_id": None,
+            "organisation": "test",
             "type": "boefje",
             "priority": 1,
             "data": {
@@ -1471,7 +1472,6 @@ def rocky_health():
             ServiceHealth(service="katalogus", healthy=True, version="0.0.1-development", additional=None, results=[]),
             ServiceHealth(service="scheduler", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
             ServiceHealth(service="bytes", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
-            ServiceHealth(service="keiko", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
         ],
     )
 
@@ -1610,7 +1610,6 @@ def get_aggregate_report_from_bytes():
             },
             {"service": "scheduler", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
             {"service": "bytes", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
-            {"service": "keiko", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
         ],
         "config_oois": [],
         "input_data": {
@@ -1845,6 +1844,7 @@ def reports_task_list():
                 id=UUID("7f9d5b00-dbab-45f3-93a6-dd44cc20c359"),
                 scheduler_id="report-_rieven",
                 schedule_id="86032b20-f7ae-4a48-9093-87ec5a56e939",
+                organisation="test",
                 priority=1738747928,
                 status=TaskStatus.FAILED,
                 type="report",
@@ -1859,6 +1859,7 @@ def reports_task_list():
                 id=UUID("9e23611d-36c2-4972-82f0-077bcb1a8941"),
                 scheduler_id="report-_rieven",
                 schedule_id="bd821e6e-6680-4215-8557-e049deeb0175",
+                organisation="test 2",
                 priority=1738684879,
                 status=TaskStatus.COMPLETED,
                 type="report",

@@ -3,12 +3,11 @@ name: Build docs artifact for PR
 on:
   pull_request:
     paths:
-      # We generate documentation for boefje, bytes, keiko, mula and octopoes
+      # We generate documentation for boefje, bytes, mula and octopoes
       # from code so the workflow should also depend on it.
       - "boefje/**"
       - "bytes/**"
       - "docs/**"
-      - "keiko/**"
       - "mula/**"
       - "octopoes/**"
       - "requirements.txt"
