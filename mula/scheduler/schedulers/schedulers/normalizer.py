@@ -1,62 +1,39 @@
 import uuid
-from collections.abc import Callable
 from concurrent import futures
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, Literal
 
-import structlog
 from opentelemetry import trace
+from pydantic import ValidationError
 
 from scheduler import clients, context, models
 from scheduler.clients.errors import ExternalServiceError
-from scheduler.models import Normalizer, NormalizerTask, Organisation, Plugin, RawDataReceivedEvent, Task, TaskStatus
-from scheduler.schedulers import Scheduler
-from scheduler.schedulers.queue import PriorityQueue, QueueFullError
-from scheduler.schedulers.rankers import NormalizerRanker
+from scheduler.schedulers import Scheduler, rankers
+from scheduler.schedulers.errors import exception_handler
 
 tracer = trace.get_tracer(__name__)
 
 
 class NormalizerScheduler(Scheduler):
-    """A KAT specific implementation of a Normalizer scheduler. It extends
-    the `Scheduler` class by adding a `organisation` attribute.
+    """Scheduler implementation for the creation of NormalizerTask models.
 
     Attributes:
-        logger: A logger instance.
-        organisation: The organisation that this scheduler is for.
+        ranker: The ranker to calculate the priority of a task.
     """
 
-    ITEM_TYPE: Any = NormalizerTask
+    ID: Literal["normalizer"] = "normalizer"
+    TYPE: models.SchedulerType = models.SchedulerType.NORMALIZER
+    ITEM_TYPE: Any = models.NormalizerTask
 
-    def __init__(
-        self,
-        ctx: context.AppContext,
-        scheduler_id: str,
-        organisation: Organisation,
-        queue: PriorityQueue | None = None,
-        callback: Callable[..., None] | None = None,
-    ):
-        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
-        self.organisation: Organisation = organisation
+    def __init__(self, ctx: context.AppContext):
+        """Initializes the NormalizerScheduler.
 
-        self.queue = queue or PriorityQueue(
-            pq_id=scheduler_id,
-            maxsize=ctx.config.pq_maxsize,
-            item_type=self.ITEM_TYPE,
-            allow_priority_updates=True,
-            pq_store=ctx.datastores.pq_store,
-        )
-
-        super().__init__(
-            ctx=ctx,
-            queue=self.queue,
-            scheduler_id=scheduler_id,
-            callback=callback,
-            create_schedule=False,
-            auto_calculate_deadline=False,
-        )
-
-        self.ranker = NormalizerRanker(ctx=self.ctx)
+        Args:
+            ctx (context.AppContext): Application context of shared data (e.g.
+                configuration, external services connections).
+        """
+        super().__init__(ctx=ctx, scheduler_id=self.ID, create_schedule=False, auto_calculate_deadline=False)
+        self.ranker = rankers.NormalizerRanker(ctx=self.ctx)
 
     def run(self) -> None:
         """The run method is called when the scheduler is started. It will
@@ -68,166 +45,113 @@ class NormalizerScheduler(Scheduler):
         for each normalizer that is registered for the mime type of the raw
         file.
         """
-        listener = clients.RawData(
+        self.listeners["raw_data"] = clients.RawData(
             dsn=str(self.ctx.config.host_raw_data),
-            queue=f"{self.organisation.id}__raw_file_received",
-            func=self.push_tasks_for_received_raw_data,
+            queue="raw_file_received",
+            func=self.process_raw_data,
             prefetch_count=self.ctx.config.rabbitmq_prefetch_count,
         )
 
-        self.listeners["raw_data"] = listener
-
-        self.run_in_thread(
-            name=f"NormalizerScheduler-{self.scheduler_id}-raw_file",
-            target=self.listeners["raw_data"].listen,
-            loop=False,
-        )
+        self.run_in_thread(name="NormalizerScheduler-raw_file", target=self.listeners["raw_data"].listen, loop=False)
 
         self.logger.info(
-            "Normalizer scheduler started for %s",
-            self.organisation.id,
-            organisation_id=self.organisation.id,
-            scheduler_id=self.scheduler_id,
-            item_type=self.queue.item_type.__name__,
+            "Normalizer scheduler started", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
         )
 
-    @tracer.start_as_current_span("normalizer_push_task_for_received_raw_data")
-    def push_tasks_for_received_raw_data(self, body: bytes) -> None:
+    @tracer.start_as_current_span("NormalizerScheduler.process_raw_data")
+    def process_raw_data(self, body: bytes) -> None:
         """Create tasks for the received raw data.
 
         Args:
             latest_raw_data: A `RawData` object that was received from the
             message queue.
         """
-        # Convert body into a RawDataReceivedEvent
-        latest_raw_data = RawDataReceivedEvent.model_validate_json(body)
-
-        self.logger.debug(
-            "Received raw data %s",
-            latest_raw_data.raw_data.id,
-            raw_data_id=latest_raw_data.raw_data.id,
-            organisation_id=self.organisation.id,
-            scheduler_id=self.scheduler_id,
-        )
+        try:
+            # Convert body into a RawDataReceivedEvent
+            latest_raw_data = models.RawDataReceivedEvent.model_validate_json(body)
+            self.logger.debug(
+                "Received raw data %s",
+                latest_raw_data.raw_data.id,
+                raw_data_id=latest_raw_data.raw_data.id,
+                scheduler_id=self.scheduler_id,
+            )
+        except ValidationError:
+            self.logger.exception("Failed to validate raw data", scheduler_id=self.scheduler_id)
+            return
 
         # Check if the raw data doesn't contain an error mime-type,
         # we don't need to create normalizers when the raw data returned
         # an error.
-        for mime_type in latest_raw_data.raw_data.mime_types:
-            if mime_type.get("value", "").startswith("error/"):
-                self.logger.debug(
-                    "Skipping raw data %s with error mime type",
-                    latest_raw_data.raw_data.id,
-                    mime_type=mime_type.get("value"),
-                    raw_data_id=latest_raw_data.raw_data.id,
-                    organisation_id=self.organisation.id,
-                    scheduler_id=self.scheduler_id,
-                )
-                return
+        if self.has_raw_data_errors(latest_raw_data.raw_data):
+            self.logger.debug(
+                "Skipping raw data %s with error mime type",
+                latest_raw_data.raw_data.id,
+                raw_data_id=latest_raw_data.raw_data.id,
+            )
+            return
 
-        # Get all normalizers for the mime types of the raw data
-        normalizers: dict[str, Plugin] = {}
+        # Get all unique normalizers for the mime types of the raw data
+        normalizers: dict[str, models.Plugin] = {}
         for mime_type in latest_raw_data.raw_data.mime_types:
-            normalizers_by_mime_type: list[Plugin] = self.get_normalizers_for_mime_type(mime_type.get("value"))
+            normalizers_by_mime_type = self.get_normalizers_for_mime_type(
+                mime_type.get("value"), latest_raw_data.organization
+            )
+
+            self.logger.debug(
+                "Found normalizers for mime type",
+                mime_type=mime_type.get("value"),
+                normalizers=normalizers_by_mime_type,
+            )
 
             for normalizer in normalizers_by_mime_type:
                 normalizers[normalizer.id] = normalizer
 
-        if not normalizers:
-            self.logger.debug(
-                "No normalizers found for raw data %s",
-                latest_raw_data.raw_data.id,
-                raw_data_id=latest_raw_data.raw_data.id,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-            )
+        unique_normalizers = list(normalizers.values())
 
-        with futures.ThreadPoolExecutor(
-            thread_name_prefix=f"NormalizerScheduler-TPE-{self.scheduler_id}-raw_data"
-        ) as executor:
-            for normalizer in normalizers.values():
-                if not self.has_normalizer_permission_to_run(normalizer):
-                    self.logger.debug(
-                        "Normalizer is not allowed to run: %s",
-                        normalizer.id,
-                        normalizer_id=normalizer.id,
-                        organisation_id=self.organisation.id,
-                        scheduler_id=self.scheduler_id,
-                    )
-                    continue
-
-                normalizer_task = NormalizerTask(
-                    normalizer=Normalizer.model_validate(normalizer.model_dump()), raw_data=latest_raw_data.raw_data
-                )
-
-                executor.submit(
-                    self.push_normalizer_task, normalizer_task, self.push_tasks_for_received_raw_data.__name__
-                )
-
-    @tracer.start_as_current_span("normalizer_push_task")
-    def push_normalizer_task(self, normalizer_task: models.NormalizerTask, caller: str = "") -> None:
-        """Given a normalizer and raw data, create a task and push it to the
-        queue.
-
-        Args:
-            normalizer: The normalizer to create a task for.
-            raw_data: The raw data to create a task for.
-            caller: The name of the function that called this function, used for logging.
-        """
         self.logger.debug(
-            "Pushing normalizer task",
-            task_id=normalizer_task.id,
-            normalizer_id=normalizer_task.normalizer.id,
-            organisation_id=self.organisation.id,
+            "Found normalizers for raw data",
+            raw_data_id=latest_raw_data.raw_data.id,
+            mime_types=[mime_type.get("value") for mime_type in latest_raw_data.raw_data.mime_types],
+            normalizers=[normalizer.id for normalizer in unique_normalizers],
             scheduler_id=self.scheduler_id,
-            caller=caller,
         )
 
-        try:
-            plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
-                normalizer_task.normalizer.id, self.organisation.id
-            )
-            if not self.has_normalizer_permission_to_run(plugin):
+        # Create tasks for the normalizers
+        normalizer_tasks = []
+        for normalizer in unique_normalizers:
+            if not self.has_normalizer_permission_to_run(normalizer):
                 self.logger.debug(
-                    "Task is not allowed to run: %s",
-                    normalizer_task.id,
-                    task_id=normalizer_task.id,
-                    organisation_id=self.organisation.id,
+                    "Normalizer is not allowed to run: %s",
+                    normalizer.id,
+                    normalizer_id=normalizer.id,
                     scheduler_id=self.scheduler_id,
-                    caller=caller,
                 )
-                return
-        except ExternalServiceError:
-            self.logger.warning(
-                "Could not get plugin by id: %s",
-                normalizer_task.normalizer.id,
-                task_id=normalizer_task.id,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-                caller=caller,
-            )
-            return
+                continue
 
-        try:
-            if self.has_normalizer_task_started_running(normalizer_task):
-                self.logger.debug(
-                    "Task is still running: %s",
-                    normalizer_task.id,
-                    task_id=normalizer_task.id,
-                    organisation_id=self.organisation.id,
-                    scheduler_id=self.scheduler_id,
-                    caller=caller,
+            normalizer_task = models.NormalizerTask(
+                normalizer=models.Normalizer.model_validate(normalizer.model_dump()), raw_data=latest_raw_data.raw_data
+            )
+
+            normalizer_tasks.append(normalizer_task)
+
+        with futures.ThreadPoolExecutor(thread_name_prefix=f"TPE-{self.scheduler_id}-raw_data") as executor:
+            for normalizer_task in normalizer_tasks:
+                executor.submit(
+                    self.push_normalizer_task, normalizer_task, latest_raw_data.organization, self.create_schedule
                 )
-                return
-        except Exception:
-            self.logger.warning(
-                "Could not check if task is running: %s",
+
+    @exception_handler
+    @tracer.start_as_current_span("NormalizerScheduler.push_normalizer_task")
+    def push_normalizer_task(
+        self, normalizer_task: models.NormalizerTask, organisation_id: str, create_schedule: bool, caller: str = ""
+    ) -> None:
+        if self.has_normalizer_task_started_running(normalizer_task):
+            self.logger.debug(
+                "Task is still running: %s",
                 normalizer_task.id,
                 task_id=normalizer_task.id,
-                organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
-                exc_info=True,
             )
             return
 
@@ -236,37 +160,23 @@ class NormalizerScheduler(Scheduler):
                 "Task is already on queue: %s",
                 normalizer_task.id,
                 task_id=normalizer_task.id,
-                organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
             )
             return
 
-        score = self.ranker.rank(SimpleNamespace(raw_data=normalizer_task.raw_data, task=normalizer_task))
-
-        task = Task(
+        task = models.Task(
             id=normalizer_task.id,
             scheduler_id=self.scheduler_id,
-            type=self.ITEM_TYPE.type,
-            priority=score,
+            organisation=organisation_id,
+            type=normalizer_task.type,
             hash=normalizer_task.hash,
             data=normalizer_task.model_dump(),
         )
 
-        try:
-            self.push_item_to_queue_with_timeout(item=task, max_tries=self.max_tries)
-        except QueueFullError:
-            self.logger.warning(
-                "Could not add task to queue, queue was full: %s",
-                task.id,
-                task_id=task.id,
-                queue_qsize=self.queue.qsize(),
-                queue_maxsize=self.queue.maxsize,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-                caller=caller,
-            )
-            return
+        task.priority = self.ranker.rank(SimpleNamespace(raw_data=normalizer_task.raw_data, task=normalizer_task))
+
+        self.push_item_to_queue_with_timeout(task, self.max_tries, create_schedule=create_schedule)
 
         self.logger.info(
             "Created normalizer task",
@@ -274,15 +184,15 @@ class NormalizerScheduler(Scheduler):
             task_hash=task.hash,
             normalizer_id=normalizer_task.normalizer.id,
             raw_data_id=normalizer_task.raw_data.id,
-            organisation_id=self.organisation.id,
             scheduler_id=self.scheduler_id,
+            organisation_id=organisation_id,
             caller=caller,
         )
 
-    def push_item_to_queue(self, item: Task, create_schedule: bool = True) -> Task:
+    def push_item_to_queue(self, item: models.Task, create_schedule: bool = True) -> models.Task:
         """Some normalizer scheduler specific logic before pushing the item to the
         queue."""
-        normalizer_task = NormalizerTask.model_validate(item.data)
+        normalizer_task = models.NormalizerTask.model_validate(item.data)
 
         # Check if id's are unique and correctly set. Same id's are necessary
         # for the task runner.
@@ -294,8 +204,7 @@ class NormalizerScheduler(Scheduler):
 
         return super().push_item_to_queue(item=item, create_schedule=create_schedule)
 
-    @tracer.start_as_current_span("normalizer_has_normalizer_permission_to_run")
-    def has_normalizer_permission_to_run(self, normalizer: Plugin) -> bool:
+    def has_normalizer_permission_to_run(self, normalizer: models.Plugin) -> bool:
         """Check if the task is allowed to run.
 
         Args:
@@ -306,18 +215,13 @@ class NormalizerScheduler(Scheduler):
         """
         if not normalizer.enabled:
             self.logger.debug(
-                "Normalizer: %s is disabled",
-                normalizer.id,
-                normalizer_id=normalizer.id,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
+                "Normalizer: %s is disabled", normalizer.id, normalizer_id=normalizer.id, scheduler_id=self.scheduler_id
             )
             return False
 
         return True
 
-    @tracer.start_as_current_span("normalizer_has_normalizer_task_started_running")
-    def has_normalizer_task_started_running(self, task: NormalizerTask) -> bool:
+    def has_normalizer_task_started_running(self, task: models.NormalizerTask) -> bool:
         """Check if the same task is already running.
 
         Args:
@@ -328,33 +232,32 @@ class NormalizerScheduler(Scheduler):
         """
         # Get the last tasks that have run or are running for the hash
         # of this particular NormalizerTask.
-        try:
-            task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
-        except Exception as exc_db:
-            self.logger.error(
-                "Could not get latest task by hash: %s",
-                task.hash,
-                task_id=task.id,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-                exc_info=exc_db,
-            )
-            raise exc_db
+        task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
 
         # Is task still running according to the datastore?
-        if task_db is not None and task_db.status not in [TaskStatus.COMPLETED, TaskStatus.FAILED]:
+        if task_db is not None and task_db.status not in [models.TaskStatus.COMPLETED, models.TaskStatus.FAILED]:
             self.logger.debug(
                 "Task is still running, according to the datastore",
                 task_id=task_db.id,
                 task_hash=task.hash,
-                organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
             )
             return True
 
         return False
 
-    def get_normalizers_for_mime_type(self, mime_type: str) -> list[Plugin]:
+    def has_raw_data_errors(self, raw_data: models.RawData) -> bool:
+        """Check if the raw data contains errors.
+
+        Args:
+            raw_data: The raw data to check.
+
+        Returns:
+            True if the raw data contains errors, False otherwise.
+        """
+        return any(mime_type.get("value", "").startswith("error/") for mime_type in raw_data.mime_types)
+
+    def get_normalizers_for_mime_type(self, mime_type: str, organisation: str) -> list[models.Plugin]:
         """Get available normalizers for a given mime type.
 
         Args:
@@ -364,37 +267,17 @@ class NormalizerScheduler(Scheduler):
             A list of Plugins of type normalizer for the given mime type.
         """
         try:
-            normalizers = self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(
-                self.organisation.id, mime_type
-            )
+            normalizers = self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(organisation, mime_type)
         except ExternalServiceError:
-            self.logger.warning(
-                "Could not get normalizers for mime_type: %s [mime_type=%s, organisation_id=%s, scheduler_id=%s]",
-                mime_type,
-                mime_type,
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            return []
-
-        if normalizers is None:
-            self.logger.debug(
-                "No normalizer found for mime_type: %s",
+            self.logger.error(
+                "Failed to get normalizers for mime type %s",
                 mime_type,
                 mime_type=mime_type,
-                organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
             )
             return []
 
-        self.logger.debug(
-            "Found %d normalizers for mime_type: %s",
-            len(normalizers),
-            mime_type,
-            mime_type=mime_type,
-            normalizers=[normalizer.id for normalizer in normalizers],
-            organisation_=self.organisation.id,
-            scheduler_id=self.scheduler_id,
-        )
+        if normalizers is None:
+            return []
 
         return normalizers

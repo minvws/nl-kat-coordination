@@ -21,25 +21,23 @@ FINDINGS_DASHBOARD_NAME = "Crisis Room Findings Dashboard"
 
 def get_or_create_default_dashboard(organization: Organization) -> bool:
     valid_time = datetime.now(timezone.utc)
-    is_scheduler_ready_for_schedule = is_scheduler_enabled(organization)
     created = False
+    path = Path(__file__).parent / "recipe_seeder.json"
 
-    if is_scheduler_ready_for_schedule:
-        path = Path(__file__).parent / "recipe_seeder.json"
-        with path.open("r") as recipe_seeder:
-            recipe_default = json.load(recipe_seeder)
+    with path.open("r") as recipe_seeder:
+        recipe_default = json.load(recipe_seeder)
 
-        dashboard, _ = Dashboard.objects.get_or_create(name=FINDINGS_DASHBOARD_NAME, organization=organization)
+    dashboard, _ = Dashboard.objects.get_or_create(name=FINDINGS_DASHBOARD_NAME, organization=organization)
 
-        dashboard_data, created = DashboardData.objects.get_or_create(dashboard=dashboard)
-        if created:
-            recipe = create_organization_recipe(valid_time, organization, recipe_default)
-            dashboard_data.recipe = recipe.recipe_id
-            schedule_request = create_schedule_request(valid_time, organization, recipe)
-            scheduler_client(organization.code).post_schedule(schedule=schedule_request)
+    dashboard_data, created = DashboardData.objects.get_or_create(dashboard=dashboard)
+    if created:
+        recipe = create_organization_recipe(valid_time, organization, recipe_default)
+        dashboard_data.recipe = recipe.recipe_id
+        schedule_request = create_schedule_request(valid_time, organization, recipe)
+        scheduler_client(organization.code).post_schedule(schedule=schedule_request)
 
-        dashboard_data.findings_dashboard = True
-        dashboard_data.save()
+    dashboard_data.findings_dashboard = True
+    dashboard_data.save()
     return created
 
 
@@ -57,11 +55,6 @@ def create_organization_recipe(
     return report_recipe
 
 
-def is_scheduler_enabled(organization: Organization) -> bool:
-    scheduler_id = f"report-{organization.code}"
-    return scheduler_client(organization.code).is_scheduler_ready(scheduler_id)
-
-
 def create_schedule_request(
     start_datetime: datetime, organization: Organization, report_recipe: ReportRecipe
 ) -> ScheduleRequest:
@@ -71,6 +64,7 @@ def create_schedule_request(
 
     return ScheduleRequest(
         scheduler_id=f"report-{organization.code}",
+        organisation=organization.code,
         data=report_task,
         schedule=report_recipe.cron_expression,
         deadline_at=start_datetime.isoformat(),
