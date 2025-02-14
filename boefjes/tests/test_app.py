@@ -71,11 +71,16 @@ def test_two_processes_exception(manager: SchedulerWorkerManager, item_handler: 
 
 def test_two_processes_handler_exception(manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path) -> None:
     manager.scheduler_client = MockSchedulerClient(
-        [get_dummy_data("scheduler/pop_response_boefje.json")] + 2 * [get_dummy_data("scheduler/should_crash.json")],
+        [
+            get_dummy_data("scheduler/pop_response_boefje.json"),
+            get_dummy_data("scheduler/should_crash.json"),
+            get_dummy_data("scheduler/should_crash_2.json"),
+        ],
         [get_dummy_data("scheduler/pop_response_normalizer.json")],
         tmp_path / "patch_task_log",
     )
 
+    item_handler.sleep_time = 0.1
     manager.settings.pool_size = 2
     manager.task_queue = Manager().Queue()
     with pytest.raises(KeyboardInterrupt):
@@ -94,20 +99,17 @@ def test_two_processes_handler_exception(manager: SchedulerWorkerManager, item_h
     # We expect the first two patches to set the task status to running of both task and then process 1 to finish, as
     # the exception has been set up with a small delay.
     assert len(patched_tasks) == 6
-    assert sorted(patched_tasks[:3]) == sorted(
-        [
-            ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),  # Process 1
-            ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),  # Process 1
-            ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running"),  # Process 2
-        ]
+    assert sorted(patched_tasks[:2]) == sorted(
+        [("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"), ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running")]
     )
 
     # The process completing status then to be set to completed/failed for both tasks.
-    assert sorted(patched_tasks[3:]) == sorted(
+    assert sorted(patched_tasks[2:]) == sorted(
         [
-            ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running"),  # Process 1
-            ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed"),  # Process 2
-            ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed"),  # Process 1
+            ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed"),
+            ("2071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running"),
+            ("2071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed"),
+            ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
         ]
     )
 

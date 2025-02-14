@@ -252,9 +252,4 @@ def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_leve
             LocalNormalizerJobRunner(local_repository), bytes_api_client, settings.scan_profile_whitelist
         )
 
-    return SchedulerWorkerManager(
-        item_handler,
-        SchedulerAPIClient(str(settings.scheduler_api)),  # Do not share a session between workers
-        settings,
-        log_level,
-    )
+    return SchedulerWorkerManager(item_handler, SchedulerAPIClient(str(settings.scheduler_api)), settings, log_level)

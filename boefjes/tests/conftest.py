@@ -89,6 +89,7 @@ class MockSchedulerClient(SchedulerClientInterface):
                 self._tasks[str(p_item.id)] = self._task_from_id(p_item.id)
                 return p_item
         except IndexError:
+            time.sleep(3 * self.sleep_time)
             raise self.raise_on_empty_queue
 
     def patch_task(self, task_id: UUID, status: TaskStatus) -> None:
@@ -122,7 +123,8 @@ class MockHandler(Handler):
     def handle(self, item: BoefjeMeta | NormalizerMeta):
         time.sleep(self.sleep_time)
 
-        if str(item.id) == "9071c9fd-2b9f-440f-a524-ef1ca4824fd4":
+        if str(item.id) in ["9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "2071c9fd-2b9f-440f-a524-ef1ca4824fd4"]:
+            time.sleep(self.sleep_time)
             raise self.exception()
 
         self.queue.put(item)
