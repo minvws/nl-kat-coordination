@@ -5,10 +5,10 @@ from types import SimpleNamespace
 from unittest import mock
 
 from scheduler import config, models, storage
-from scheduler.schedulers.queue import InvalidItemError, NotAllowedError, QueueEmptyError, QueueFullError
+from scheduler.schedulers.queue import InvalidItemError, QueueEmptyError, QueueFullError
 from scheduler.storage import stores
-from structlog.testing import capture_logs
 
+from tests.factories import OrganisationFactory
 from tests.mocks import item as mock_item
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
@@ -49,6 +49,9 @@ class SchedulerTestCase(unittest.TestCase):
             ctx=self.mock_ctx, scheduler_id=identifier, queue=queue, create_schedule=True
         )
 
+        # Organisation
+        self.organisation = OrganisationFactory()
+
     def tearDown(self):
         self.scheduler.stop()
         models.Base.metadata.drop_all(self.dbconn.engine)
@@ -58,7 +61,9 @@ class SchedulerTestCase(unittest.TestCase):
         # Arrange
         items = []
         for i in range(10):
-            item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=i + 1)
+            item = functions.create_task(
+                scheduler_id=self.scheduler.scheduler_id, organisation=self.organisation.id, priority=i + 1
+            )
             items.append(item)
 
         # Act
@@ -84,7 +89,9 @@ class SchedulerTestCase(unittest.TestCase):
 
     def test_push_item_to_queue(self):
         # Arrange
-        item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
+        item = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id, organisation=self.organisation.id, priority=1
+        )
 
         # Act
         self.scheduler.push_item_to_queue(item)
@@ -108,7 +115,9 @@ class SchedulerTestCase(unittest.TestCase):
         # Arrange
         self.scheduler.create_schedule = False
 
-        item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
+        item = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id, organisation=self.organisation.id, priority=1
+        )
 
         # Act
         self.scheduler.push_item_to_queue(item)
@@ -130,7 +139,9 @@ class SchedulerTestCase(unittest.TestCase):
 
     def test_push_item_to_queue_full(self):
         # Arrange
-        item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
+        item = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id, organisation=self.organisation.id, priority=1
+        )
 
         self.scheduler.queue.maxsize = 1
 
@@ -147,7 +158,9 @@ class SchedulerTestCase(unittest.TestCase):
 
     def test_push_item_to_queue_invalid(self):
         # Arrange
-        item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
+        item = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id, organisation=self.organisation.id, priority=1
+        )
         item.data = {"invalid": "data"}
 
         # Assert
@@ -156,16 +169,24 @@ class SchedulerTestCase(unittest.TestCase):
 
     def test_pop_item_from_queue(self):
         # Arrange
-        item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
+        item = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id, organisation=self.organisation.id, priority=1
+        )
 
         self.scheduler.push_item_to_queue(item)
 
         # Act
-        popped_item = self.scheduler.pop_item_from_queue()
+        popped_items, count = self.scheduler.pop_item_from_queue()
 
         # Assert
         self.assertEqual(0, self.scheduler.queue.qsize())
-        self.assertEqual(item.id, popped_item.id)
+        self.assertEqual(1, count)
+        self.assertEqual(1, len(popped_items))
+        self.assertEqual(popped_items[0].id, item.id)
+
+        # Status should be dispatched
+        task_db = self.mock_ctx.datastores.task_store.get_task(str(item.id))
+        self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
 
     def test_pop_item_from_queue_empty(self):
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -175,7 +196,9 @@ class SchedulerTestCase(unittest.TestCase):
     def test_post_push(self):
         """When a task is added to the queue, it should be added to the database"""
         # Arrange
-        item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
+        item = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id, organisation=self.organisation.id, priority=1
+        )
 
         # Act
         self.scheduler.push_item_to_queue(item)
@@ -207,7 +230,9 @@ class SchedulerTestCase(unittest.TestCase):
 
     def test_post_push_schedule_enabled(self):
         # Arrange
-        item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
+        item = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id, organisation=self.organisation.id, priority=1
+        )
 
         # Act
         self.scheduler.push_item_to_queue(item)
@@ -237,35 +262,11 @@ class SchedulerTestCase(unittest.TestCase):
         # grace period
         self.assertGreater(schedule_db.deadline_at, datetime.now(timezone.utc))
 
-    def test_post_push_schedule_disabled(self):
-        # Arrange
-        first_item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
-
-        # Act
-        first_item_db = self.scheduler.push_item_to_queue(first_item)
-
-        initial_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(first_item_db.schedule_id)
-
-        # Pop
-        self.scheduler.pop_item_from_queue()
-
-        # Disable this schedule
-        initial_schedule_db.enabled = False
-        self.mock_ctx.datastores.schedule_store.update_schedule(initial_schedule_db)
-
-        # Act
-        second_item = first_item_db.model_copy()
-        second_item.id = uuid.uuid4()
-        second_item_db = self.scheduler.push_item_to_queue(second_item)
-
-        with capture_logs() as cm:
-            self.scheduler.post_push(second_item_db)
-
-        self.assertIn("is disabled, not updating deadline", cm[-1].get("event"))
-
     def test_post_push_schedule_update_schedule(self):
         # Arrange
-        first_item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
+        first_item = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id, organisation=self.organisation.id, priority=1
+        )
 
         # Act
         first_item_db = self.scheduler.push_item_to_queue(first_item)
@@ -294,10 +295,16 @@ class SchedulerTestCase(unittest.TestCase):
     def test_post_push_schedule_is_not_none(self):
         """When a schedule is provided, it should be used to set the deadline"""
         # Arrange
-        first_item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
+        first_item = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id, organisation=self.organisation.id, priority=1
+        )
 
         schedule = models.Schedule(
-            scheduler_id=self.scheduler.scheduler_id, schedule="0 0 * * *", hash=first_item.hash, data=first_item.data
+            scheduler_id=self.scheduler.scheduler_id,
+            organisation=self.organisation.id,
+            schedule="0 0 * * *",
+            hash=first_item.hash,
+            data=first_item.data,
         )
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
@@ -317,9 +324,16 @@ class SchedulerTestCase(unittest.TestCase):
     def test_post_push_schedule_is_none(self):
         """When a schedule is not provided, the deadline should be set to None"""
         # Arrange
-        first_item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
+        first_item = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id, organisation=self.organisation.id, priority=1
+        )
 
-        schedule = models.Schedule(scheduler_id=self.scheduler.scheduler_id, hash=first_item.hash, data=first_item.data)
+        schedule = models.Schedule(
+            scheduler_id=self.scheduler.scheduler_id,
+            organisation=self.organisation.id,
+            hash=first_item.hash,
+            data=first_item.data,
+        )
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         first_item.schedule_id = schedule_db.id
@@ -336,9 +350,16 @@ class SchedulerTestCase(unittest.TestCase):
         # Arrange
         self.scheduler.auto_calculate_deadline = True
 
-        first_item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
+        first_item = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id, organisation=self.organisation.id, priority=1
+        )
 
-        schedule = models.Schedule(scheduler_id=self.scheduler.scheduler_id, hash=first_item.hash, data=first_item.data)
+        schedule = models.Schedule(
+            scheduler_id=self.scheduler.scheduler_id,
+            organisation=self.organisation.id,
+            hash=first_item.hash,
+            data=first_item.data,
+        )
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         first_item.schedule_id = schedule_db.id
@@ -354,10 +375,8 @@ class SchedulerTestCase(unittest.TestCase):
     def test_post_pop(self):
         """When a task is popped from the queue, it should be removed from the database"""
         # Arrange
-        item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-            task=functions.create_task(self.scheduler.scheduler_id),
+        item = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id, organisation=self.organisation.id, priority=1
         )
 
         # Act
@@ -381,101 +400,3 @@ class SchedulerTestCase(unittest.TestCase):
         task_db = self.mock_ctx.datastores.task_store.get_task(str(item.id))
         self.assertEqual(task_db.id, item.id)
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
-
-    def test_disable_scheduler(self):
-        # Arrange: start scheduler
-        self.scheduler.run()
-
-        # Arrange: add tasks
-        item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
-        self.scheduler.push_item_to_queue(item)
-
-        # Assert: task should be on priority queue
-        pq_item = self.scheduler.queue.peek(0)
-        self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(pq_item.id, item.id)
-
-        # Assert: task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task(str(item.id))
-        self.assertEqual(task_db.id, item.id)
-        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
-
-        # Assert: listeners should be running
-        self.assertGreater(len(self.scheduler.listeners), 0)
-
-        # Assert: threads should be running
-        self.assertGreater(len(self.scheduler.threads), 0)
-
-        # Act
-        self.scheduler.disable()
-
-        # Listeners should be stopped
-        self.assertEqual(0, len(self.scheduler.listeners))
-
-        # Threads should be stopped
-        self.assertEqual(0, len(self.scheduler.threads))
-
-        # Queue should be empty
-        self.assertEqual(0, self.scheduler.queue.qsize())
-
-        # All tasks on queue should be set to CANCELLED
-        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(self.scheduler.scheduler_id)
-        for task in tasks:
-            self.assertEqual(task.status, models.TaskStatus.CANCELLED)
-
-        # Scheduler should be disabled
-        self.assertFalse(self.scheduler.is_enabled())
-
-        with self.assertRaises(NotAllowedError):
-            self.scheduler.push_item_to_queue(item)
-
-    def test_enable_scheduler(self):
-        # Arrange: start scheduler
-        self.scheduler.run()
-
-        # Arrange: add tasks
-        item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
-        self.scheduler.push_item_to_queue(item)
-
-        # Assert: listeners should be running
-        self.assertGreater(len(self.scheduler.listeners), 0)
-
-        # Assert: threads should be running
-        self.assertGreater(len(self.scheduler.threads), 0)
-
-        # Disable scheduler first
-        self.scheduler.disable()
-
-        # Listeners should be stopped
-        self.assertEqual(0, len(self.scheduler.listeners))
-
-        # Threads should be stopped
-        self.assertEqual(0, len(self.scheduler.threads))
-
-        # Queue should be empty
-        self.assertEqual(0, self.scheduler.queue.qsize())
-
-        # All tasks on queue should be set to CANCELLED
-        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(self.scheduler.scheduler_id)
-        for task in tasks:
-            self.assertEqual(task.status, models.TaskStatus.CANCELLED)
-
-        # Re-enable scheduler
-        self.scheduler.enable()
-
-        # Threads should be started
-        self.assertGreater(len(self.scheduler.threads), 0)
-
-        # Scheduler should be enabled
-        self.assertTrue(self.scheduler.is_enabled())
-
-        # Push item to the queue
-        self.scheduler.push_item_to_queue(item)
-
-        # Assert: task should be on priority queue
-        pq_item = self.scheduler.queue.peek(0)
-        self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(pq_item.id, item.id)
-
-        # Stop the scheduler
-        self.scheduler.stop()
