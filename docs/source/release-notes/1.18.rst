@@ -303,10 +303,11 @@ Keiko has been removed. You can safely uninstall / remove the various Keiko pack
 Removing / Stopping Keiko
 -------------------------
 When using docker:
-
 .. code-block:: sh
 
-`docker stop nl-kat-coordination-keiko-1`
+docker stop nl-kat-coordination-keiko-1
+docker container rm nl-kat-coordination-keiko-1
+docker rmi nl-kat-coordination-keiko
 
 When using Debian packages:
 
