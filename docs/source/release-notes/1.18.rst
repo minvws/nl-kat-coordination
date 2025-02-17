@@ -11,6 +11,8 @@ There's also a new S3 backend for Bytes and various new boefjes, normalizers and
 The language Tamil has been added via the hard work of a communitee volunteer. Since we have not yet tested it ourselves, it's currently only available if you add it to the languages list manually.
 If you want to add a language to OpenKAT, or just help translate smaller parts, please take a look at our weblate: https://hosted.weblate.org/projects/openkat/nl-kat-coordination/ any help is much appreciated!
 
+The Keiko module (formerly used to generate reports Via LaTeX) has been removed as we are now using full html reports that can also be exported as PDF.
+
 In total 30 contributors have made 267 commits to Main in which 1,332 Files where changed.
 
 New Features and Bug fixes
@@ -297,6 +299,26 @@ Upgrading
 =========
 
 Keiko has been removed. You can safely uninstall / remove the various Keiko packages/services and/or containers.
+
+Removing / Stopping Keiko
+-------------------------
+When using docker:
+
+.. code-block:: sh
+
+`docker stop nl-kat-coordination-keiko-1`
+
+When using Debian packages:
+
+as root / sudo:
+.. code-block:: sh
+
+systemctl stop kat-keiko
+systemctl disable kat-keiko
+rm /etc/systemd/system/kat-keiko.service
+rm /etc/kat/keiko.conf
+systemcml daemon-reload
+
 
 Debian packages
 ---------------
