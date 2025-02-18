@@ -37,14 +37,14 @@ class StoreTestCase(unittest.TestCase):
         self.dbconn.engine.dispose()
 
     def test_create_task(self):
-        task = functions.create_task(scheduler_id=self.organisation.id)
+        task = functions.create_task(scheduler_id=self.organisation.id, organisation=self.organisation.id)
         created_task = self.mock_ctx.datastores.task_store.create_task(task)
         self.assertIsNotNone(created_task)
 
     def test_get_tasks(self):
         # Arrange
         for i in range(5):
-            task = functions.create_task(scheduler_id=self.organisation.id)
+            task = functions.create_task(scheduler_id=self.organisation.id, organisation=self.organisation.id)
             self.mock_ctx.datastores.task_store.create_task(task)
 
         # Act
@@ -57,7 +57,7 @@ class StoreTestCase(unittest.TestCase):
     def get_tasks_by_type(self):
         # Arrange
         for i in range(5):
-            task = functions.create_task(scheduler_id=self.organisation.id)
+            task = functions.create_task(scheduler_id=self.organisation.id, organisation=self.organisation.id)
             self.mock_ctx.datastores.task_store.create_task(task)
 
         # Act
@@ -74,7 +74,9 @@ class StoreTestCase(unittest.TestCase):
         hashes = []
         data = functions.create_test_model()
         for i in range(5):
-            task = functions.create_task(scheduler_id=self.organisation.id, data=data)
+            task = functions.create_task(
+                scheduler_id=self.organisation.id, organisation=self.organisation.id, data=data
+            )
             self.mock_ctx.datastores.task_store.create_task(task)
             hashes.append(task.hash)
 
@@ -89,7 +91,7 @@ class StoreTestCase(unittest.TestCase):
 
     def test_get_task(self):
         # Arrange
-        task = functions.create_task(scheduler_id=self.organisation.id)
+        task = functions.create_task(scheduler_id=self.organisation.id, organisation=self.organisation.id)
         created_task = self.mock_ctx.datastores.task_store.create_task(task)
 
         # Act
@@ -103,7 +105,9 @@ class StoreTestCase(unittest.TestCase):
         hashes = []
         data = functions.create_test_model()
         for i in range(5):
-            task = functions.create_task(scheduler_id=self.organisation.id, data=data)
+            task = functions.create_task(
+                scheduler_id=self.organisation.id, organisation=self.organisation.id, data=data
+            )
             self.mock_ctx.datastores.task_store.create_task(task)
             hashes.append(task.hash)
 
@@ -118,7 +122,7 @@ class StoreTestCase(unittest.TestCase):
 
     def test_update_task(self):
         # Arrange
-        task = functions.create_task(scheduler_id=self.organisation.id)
+        task = functions.create_task(scheduler_id=self.organisation.id, organisation=self.organisation.id)
         created_task = self.mock_ctx.datastores.task_store.create_task(task)
 
         # Act
@@ -131,7 +135,7 @@ class StoreTestCase(unittest.TestCase):
 
     def test_cancel_task(self):
         # Arrange
-        task = functions.create_task(scheduler_id=self.organisation.id)
+        task = functions.create_task(scheduler_id=self.organisation.id, organisation=self.organisation.id)
         created_task = self.mock_ctx.datastores.task_store.create_task(task)
 
         # Act
@@ -163,6 +167,7 @@ class StoreTestCase(unittest.TestCase):
                 data = functions.create_test_model()
                 task = models.Task(
                     scheduler_id=self.organisation.id,
+                    organisation=self.organisation.id,
                     priority=1,
                     status=status,
                     type=functions.TestModel.type,
@@ -203,6 +208,7 @@ class StoreTestCase(unittest.TestCase):
                 data = functions.create_test_model()
                 task = models.Task(
                     scheduler_id=self.organisation.id,
+                    organisation=self.organisation.id,
                     priority=1,
                     status=status,
                     type=functions.TestModel.type,

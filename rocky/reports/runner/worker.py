@@ -8,7 +8,6 @@ from queue import Queue
 import structlog
 from django.conf import settings
 from httpx import HTTPError
-from pydantic import ValidationError
 
 from reports.runner.models import ReportRunner, WorkerManager
 from reports.runner.report_runner import LocalReportRunner
@@ -76,57 +75,33 @@ class SchedulerWorkerManager(WorkerManager):
             return
 
         try:
-            queues = self.scheduler.get_queues()
+            p_item = self.scheduler.pop_item("report")
         except HTTPError:
-            # Scheduler is having issues, so make note of it and try again
-            logger.exception("Getting the queues from the scheduler failed")
-            time.sleep(self.poll_interval)  # But not immediately
+            logger.exception("Popping task from scheduler failed")
+            time.sleep(self.poll_interval)
             return
 
-        # We do not target a specific queue since we start one runtime for all organisations
-        # and queue ids contain the organisation_id
-        queues = [q for q in queues if q.id.startswith("report") and q.size > 0]
-
-        logger.debug("Found queues: %s", [queue.id for queue in queues])
-
-        all_queues_empty = True
-
-        for queue in queues:
-            logger.debug("Popping from queue %s", queue.id)
-
-            try:
-                p_item = self.scheduler.pop_item(queue.id)
-            except (HTTPError, ValidationError):
-                logger.error("Popping task from scheduler failed")
-                time.sleep(self.poll_interval)
-                continue
-
-            if not p_item:
-                logger.debug("Queue %s empty", queue.id)
-                continue
-
-            all_queues_empty = False
-
-            logger.info("Handling task[%s]", p_item.id)
-
-            try:
-                task_queue.put(p_item)
-                logger.info("Dispatched task[%s]", p_item.id)
-            except:  # noqa
-                logger.error("Exiting worker...")
-                logger.info("Patching scheduler task[id=%s] to %s", p_item.id, TaskStatus.FAILED.value)
-
-                try:
-                    self.scheduler.patch_task(p_item.id, TaskStatus.FAILED)
-                    logger.info("Set task status to %s in the scheduler for task[id=%s]", TaskStatus.FAILED, p_item.id)
-                except HTTPError:
-                    logger.error("Could not patch scheduler task to %s", TaskStatus.FAILED.value)
-
-                raise
-
-        if all_queues_empty:
-            logger.debug("All queues empty, sleeping %f seconds", self.poll_interval)
+        if not p_item:
+            logger.debug("Queue empty, sleeping %f seconds", self.poll_interval)
             time.sleep(self.poll_interval)
+            return
+
+        logger.info("Handling task[%s]", p_item.id)
+
+        try:
+            task_queue.put(p_item)
+            logger.info("Dispatched task[%s]", p_item.id)
+        except:  # noqa
+            logger.error("Exiting worker...")
+            logger.info("Patching scheduler task[id=%s] to %s", p_item.id, TaskStatus.FAILED.value)
+
+            try:
+                self.scheduler.patch_task(p_item.id, TaskStatus.FAILED)
+                logger.info("Set task status to %s in the scheduler for task[id=%s]", TaskStatus.FAILED, p_item.id)
+            except HTTPError:
+                logger.error("Could not patch scheduler task to %s", TaskStatus.FAILED.value)
+
+            raise
 
     def _check_workers(self) -> None:
         new_workers = []
