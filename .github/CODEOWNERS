@@ -1,3 +1,2 @@
-# These owners will be the default owners for everything in
-# the repo. Unless a later match takes precedence,
 * @minvws/kat-managers
+.github/CODEOWNERS @minvws/irealisatie-operations
