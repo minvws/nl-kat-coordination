@@ -1,8 +1,8 @@
 # Brenno de Winter <brenno@dewinter.com>, 2023.
 # Darwinkel <Darwinkel@users.noreply.github.com>, 2023.
-# jan klopper <jan@underdark.nl>, 2023, 2024.
+# jan klopper <jan@underdark.nl>, 2023, 2024, 2025.
 # LibreTranslate <noreply-mt-libretranslate@weblate.org>, 2023, 2024.
-# Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2023, 2024.
+# Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2023, 2024, 2025.
 # 跨性别 <github@lgbt.sh>, 2023.
 # Madelon Dohmen <maddohmen@hotmail.com>, 2023, 2024, 2025.
 # PAUL MICHIEL VAN DER BLONK <blonkm@gmail.com>, 2024.
@@ -15,8 +15,9 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-02-06 13:51+0000\n"
-"PO-Revision-Date: 2025-02-06 18:02+0000\n"
-"Last-Translator: Madelon Dohmen <maddohmen@hotmail.com>\n"
+"PO-Revision-Date: 2025-02-11 13:01+0000\n"
+"Last-Translator: Weblate Translation Memory <noreply-mt-weblate-translation-"
+"memory@weblate.org>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
 "coordination/nl/>\n"
 "Language: nl\n"
@@ -678,6 +679,7 @@ msgstr ""
 #: katalogus/client.py
 msgid "An HTTP error occurred. Check logs for more info."
 msgstr ""
+"Er is een HTTP-fout opgetreden. Controleer de logboeken voor meer informatie."
 
 #: katalogus/client.py
 msgid "Boefje with this name already exists."
@@ -1353,9 +1355,13 @@ msgstr "Status"
 msgid "Age"
 msgstr "Leeftijd"
 
-#: katalogus/templates/plugin_container_image.html tools/forms/boefje.py
-msgid "Scan frequency"
-msgstr "Scanfrequentie"
+#: katalogus/templates/plugin_container_image.html
+msgid "Scan interval"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "Run on"
+msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
 msgid "current"
@@ -1562,7 +1568,7 @@ msgstr "Instellingen configureren"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Overview of settings"
-msgstr "Instellingenoverzicht"
+msgstr "Overzicht van instellingen"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Variable"
@@ -2817,7 +2823,7 @@ msgstr "Herhaling"
 
 #: reports/forms.py
 msgid "No recurrence, just once"
-msgstr ""
+msgstr "Geen herhaling, maar één keer"
 
 #: reports/forms.py
 msgid "Daily"
@@ -3161,7 +3167,7 @@ msgstr "Kwetsbaarheden"
 #: reports/report_types/aggregate_organisation_report/report.html
 #: reports/report_types/aggregate_organisation_report/report_design.html
 msgid "Vulnerabilities found are grouped per system."
-msgstr "Gevonden kwetsbaarheden zijn per systeem gegroepeerd."
+msgstr "Gevonden kwetsbaarheden zijn gegroepeerd per systeem."
 
 #: reports/report_types/aggregate_organisation_report/report.html
 #: reports/report_types/multi_organization_report/vulnerabilities.html
@@ -3191,7 +3197,7 @@ msgstr "kwetsbaarheden op dit systeem"
 
 #: reports/report_types/aggregate_organisation_report/summary.html
 msgid "Critical Vulnerabilities"
-msgstr "Kritische kwetsbaarheden"
+msgstr "Kritieke kwetsbaarheden"
 
 #: reports/report_types/aggregate_organisation_report/summary.html
 msgid "IPs scanned"
@@ -3486,7 +3492,7 @@ msgstr "Nee"
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 msgid "Other findings found"
-msgstr "Andere bevindingen gevonden"
+msgstr "Andere gevonden bevindingen"
 
 #: reports/report_types/dns_report/report.html
 #: rocky/templates/findings/finding_list.html
@@ -3718,7 +3724,7 @@ msgstr "Rapport downloaden"
 
 #: reports/report_types/multi_organization_report/introduction.html
 msgid "This is the OpenKAT"
-msgstr "Dit is de OpenKAT"
+msgstr "Dit is het OpenKAT"
 
 #: reports/report_types/multi_organization_report/introduction.html
 msgid "Created with date from: "
@@ -3811,7 +3817,7 @@ msgstr "Open poorten"
 
 #: reports/report_types/multi_organization_report/open_ports.html
 msgid "Occurrences (IP addresses)"
-msgstr "Aantal (IP-adressen)"
+msgstr "Voorkomingen (IP-adressen)"
 
 #: reports/report_types/multi_organization_report/open_ports.html
 #: reports/templates/summary/service_health.html
@@ -3952,7 +3958,7 @@ msgstr "Open-poortenrapport"
 
 #: reports/report_types/open_ports_report/report.py
 msgid "Find open ports of IP addresses"
-msgstr "Zoek open poorten van IP-adressen"
+msgstr "Zoek open poorten op IP-adressen"
 
 #: reports/report_types/rpki_report/report.html
 msgid ""
@@ -3985,7 +3991,7 @@ msgstr "RPKI-record bestaat niet."
 #: reports/report_types/rpki_report/report.html
 #: reports/report_types/safe_connections_report/report.html
 msgid "No IPs have been found on this system."
-msgstr "Er zijn geen IP’s op dit systeem gevonden."
+msgstr "Er zijn geen IP’s voor dit systeem gevonden."
 
 #: reports/report_types/rpki_report/report.py
 msgid "RPKI Report"
@@ -4193,7 +4199,7 @@ msgstr ""
 
 #: reports/report_types/web_system_report/report.html
 msgid "Web system compliance"
-msgstr "Compliance websysteem"
+msgstr "Compliance webservers"
 
 #: reports/report_types/web_system_report/report.html
 msgid "CSP Present"
@@ -4233,7 +4239,7 @@ msgstr "Certificaat verloopt niet binnenkort"
 
 #: reports/report_types/web_system_report/report.html
 msgid "No webservers have been found on this system."
-msgstr "Er zijn geen webservers op dit systeem gevonden."
+msgstr "Er zijn geen webservers op gevonden dit systeem."
 
 #: reports/report_types/web_system_report/report.py
 msgid "Web System Report"
@@ -4246,7 +4252,7 @@ msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
 msgid "Report schedule"
-msgstr "Rapportschema"
+msgstr "Rapport-agenda"
 
 #: reports/templates/partials/export_report_settings.html
 msgid ""
@@ -4310,7 +4316,7 @@ msgstr "Overzicht"
 
 #: reports/templates/partials/plugin_overview_table.html
 msgid "Plugin overview table"
-msgstr "Plug-inoverzichtstabel"
+msgstr "Plugin-overzichtstabel"
 
 #: reports/templates/partials/plugin_overview_table.html
 #: reports/templates/partials/report_setup_scan.html
@@ -4443,7 +4449,7 @@ msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "Continue with live set"
-msgstr "Doorgaan met liveset"
+msgstr "Doorgaan met live set"
 
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/report_asset_overview.html
@@ -4537,8 +4543,7 @@ msgid ""
 "that don't have their requirements met will be skipped."
 msgstr ""
 "Bepaalde plug-ins zijn verplicht, omdat ze cruciaal zijn voor een "
-"rapporttype. Rapporten die de vereisten niet hebben, zullen worden "
-"overgeslagen."
+"rapporttype. Rapporten die niet voldoen, zullen worden overgeslagen."
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Warning! Before you proceed read the following points:"
@@ -5168,12 +5173,32 @@ msgid "Output mime types"
 msgstr "Uitvoer mimetypes"
 
 #: tools/forms/boefje.py
-msgid ""
-"Specify the scanning frequency for this Boefje in minutes. The default is 24 "
-"hours. For example: 5 minutes will let the boefje scan every 5 minutes."
+msgid "Scan type"
 msgstr ""
-"Bepaal de scannerfrequentie voor dit Boefje in minuten. De standaard is 24 "
-"uur. Bijvoorbeeld: 5 minuten laat het boefje om de 5 minuten scannen."
+
+#: tools/forms/boefje.py
+msgid "Interval amount"
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid ""
+"Specify the scanning interval for this Boefje. The default is 24 hours. For "
+"example: 5 minutes will let the Boefje scan every 5 minutes."
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid "Interval frequency"
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid "Object creation/change"
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid ""
+"Choose weather a the Boefje should run after creating and/or changing an "
+"object. "
+msgstr ""
 
 #: tools/forms/finding_type.py
 msgid "KAT-ID"
@@ -5543,6 +5568,12 @@ msgstr ""
 "over de verschillende vrijwaringsniveaus de <a href='https://docs.openkat.nl/"
 "manual/usermanual.html#scan-levels-clearance-indemnities'> documentatie</a>."
 "</p> "
+
+#: tools/forms/settings.py
+msgid ""
+"Choose when this Boefje will scan objects. It can run on a given interval or "
+"it can run every time an object has been created or changed. "
+msgstr ""
 
 #: tools/forms/settings.py
 msgid "Depth of the tree."
@@ -8230,6 +8261,16 @@ msgstr "Raw-bestand kan niet naar Bytes worden geüpload: %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Raw-bestand met succes toegevoegd."
+
+#~ msgid "Scan frequency"
+#~ msgstr "Scanfrequentie"
+
+#~ msgid ""
+#~ "Specify the scanning frequency for this Boefje in minutes. The default is "
+#~ "24 hours. For example: 5 minutes will let the boefje scan every 5 minutes."
+#~ msgstr ""
+#~ "Bepaal de scannerfrequentie voor dit Boefje in minuten. De standaard is "
+#~ "24 uur. Bijvoorbeeld: 5 minuten laat het boefje om de 5 minuten scannen."
 
 #, python-format
 #~ msgid ""
