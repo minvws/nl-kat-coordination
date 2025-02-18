@@ -56,7 +56,7 @@ class ScheduleDB(Base):
     data = Column(JSONB, nullable=False)
     enabled = Column(Boolean, nullable=False, default=True)
     schedule = Column(String, nullable=True)
-    tasks = relationship("TaskDB", back_populates="schedule")
+    tasks = relationship("TaskDB", back_populates="schedule", cascade="save-update, merge", passive_deletes=True)
 
     deadline_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
