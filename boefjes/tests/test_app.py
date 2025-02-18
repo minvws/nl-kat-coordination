@@ -56,7 +56,6 @@ def test_two_processes(manager: SchedulerWorkerManager, item_handler: MockHandle
 
 def test_two_processes_exception(manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path) -> None:
     manager.scheduler_client = MockSchedulerClient(
-        get_dummy_data("scheduler/queues_response.json"),
         [get_dummy_data("scheduler/should_crash.json")],
         [get_dummy_data("scheduler/pop_response_normalizer.json")],
         tmp_path / "patch_task_log",
@@ -72,12 +71,16 @@ def test_two_processes_exception(manager: SchedulerWorkerManager, item_handler: 
 
 def test_two_processes_handler_exception(manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path) -> None:
     manager.scheduler_client = MockSchedulerClient(
-        get_dummy_data("scheduler/queues_response.json"),
-        [get_dummy_data("scheduler/pop_response_boefje.json")] + 2 * [get_dummy_data("scheduler/should_crash.json")],
+        [
+            get_dummy_data("scheduler/pop_response_boefje.json"),
+            get_dummy_data("scheduler/should_crash.json"),
+            get_dummy_data("scheduler/should_crash_2.json"),
+        ],
         [get_dummy_data("scheduler/pop_response_normalizer.json")],
         tmp_path / "patch_task_log",
     )
 
+    item_handler.sleep_time = 0.1
     manager.settings.pool_size = 2
     manager.task_queue = Manager().Queue()
     with pytest.raises(KeyboardInterrupt):
@@ -96,20 +99,17 @@ def test_two_processes_handler_exception(manager: SchedulerWorkerManager, item_h
     # We expect the first two patches to set the task status to running of both task and then process 1 to finish, as
     # the exception has been set up with a small delay.
     assert len(patched_tasks) == 6
-    assert sorted(patched_tasks[:3]) == sorted(
-        [
-            ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),  # Process 1
-            ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),  # Process 1
-            ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running"),  # Process 2
-        ]
+    assert sorted(patched_tasks[:2]) == sorted(
+        [("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"), ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running")]
     )
 
     # The process completing status then to be set to completed/failed for both tasks.
-    assert sorted(patched_tasks[3:]) == sorted(
+    assert sorted(patched_tasks[2:]) == sorted(
         [
-            ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running"),  # Process 1
-            ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed"),  # Process 2
-            ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed"),  # Process 1
+            ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed"),
+            ("2071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running"),
+            ("2071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed"),
+            ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
         ]
     )
 
@@ -126,10 +126,7 @@ def test_two_processes_cleanup_unfinished_tasks(
     """
 
     manager.scheduler_client = MockSchedulerClient(
-        get_dummy_data("scheduler/queues_response.json"),
-        3 * [get_dummy_data("scheduler/pop_response_boefje.json")],
-        [],
-        tmp_path / "patch_task_log",
+        3 * [get_dummy_data("scheduler/pop_response_boefje.json")], [], tmp_path / "patch_task_log"
     )
     manager.settings.pool_size = 2
     manager.task_queue = Manager().Queue()
@@ -153,10 +150,11 @@ def test_two_processes_cleanup_unfinished_tasks(
     }
 
     # Tasks (one with the same id) was still unhandled the queue and pushed back to the scheduler by the main process
-    assert manager.scheduler_client._pushed_items["70da7d4f-f41f-4940-901b-d98a92e9014b"].scheduler_id == "boefje-_dev"
-    assert json.loads(
-        manager.scheduler_client._pushed_items["70da7d4f-f41f-4940-901b-d98a92e9014b"].json()
-    ) == json.loads(get_dummy_data("scheduler/pop_response_boefje.json"))
+    assert manager.scheduler_client._pushed_items["70da7d4f-f41f-4940-901b-d98a92e9014b"].scheduler_id == "boefje"
+    assert (
+        json.loads(manager.scheduler_client._pushed_items["70da7d4f-f41f-4940-901b-d98a92e9014b"].json())
+        == json.loads(get_dummy_data("scheduler/pop_response_boefje.json")).get("results")[0]
+    )
 
 
 def test_normalizer_queue(manager: SchedulerWorkerManager, item_handler: MockHandler) -> None:
@@ -170,7 +168,6 @@ def test_normalizer_queue(manager: SchedulerWorkerManager, item_handler: MockHan
 
 def test_null(manager: SchedulerWorkerManager, tmp_path: Path, item_handler: MockHandler):
     manager.scheduler_client = MockSchedulerClient(
-        get_dummy_data("scheduler/queues_response.json"),
         3 * [get_dummy_data("scheduler/pop_response_boefje.json")],
         [get_dummy_data("scheduler/pop_response_normalizer.json")],
         tmp_path / "patch_task_log",
