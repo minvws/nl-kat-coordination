@@ -96,6 +96,7 @@ class Katalogus(HTTPService):
 
         return TypeAdapter(list[Plugin]).validate_python(**response.json())
 
+    @exception_handler
     def get_normalizers_by_org_id_and_type(self, organisation_id: str, ooi_type: str) -> list[Plugin]:
         url = f"{self.host}/v1/organisations/{organisation_id}/plugins/"
         response = self.get(url, params={"type": "normalizer", "produces": [ooi_type]})
