@@ -946,7 +946,13 @@ class XTDBOOIRepository(OOIRepository):
                     first = True
                     arguments = [
                         ooi.reference
-                        if type_by_name(ooi.get_ooi_type()) in sgn.triggers and (first and not (first := False))
+                        if (
+                            any(
+                                issubclass(type_by_name(ooi.get_ooi_type()), trigger_class)
+                                for trigger_class in sgn.triggers
+                            )
+                            and (first and not (first := False))
+                        )
                         else None
                         for sgn in nibble.signature
                     ]
