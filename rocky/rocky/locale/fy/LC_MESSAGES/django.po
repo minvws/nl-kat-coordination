@@ -1345,9 +1345,13 @@ msgstr "Status"
 msgid "Age"
 msgstr "Leeftiid"
 
-#: katalogus/templates/plugin_container_image.html tools/forms/boefje.py
-msgid "Scan frequency"
-msgstr "Scanfrekwinsje"
+#: katalogus/templates/plugin_container_image.html
+msgid "Scan interval"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "Run on"
+msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
 msgid "current"
@@ -4922,9 +4926,31 @@ msgid "Output mime types"
 msgstr ""
 
 #: tools/forms/boefje.py
+msgid "Scan type"
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid "Interval amount"
+msgstr ""
+
+#: tools/forms/boefje.py
 msgid ""
-"Specify the scanning frequency for this Boefje in minutes. The default is 24 "
-"hours. For example: 5 minutes will let the boefje scan every 5 minutes."
+"Specify the scanning interval for this Boefje. The default is 24 hours. For "
+"example: 5 minutes will let the Boefje scan every 5 minutes."
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid "Interval frequency"
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid "Object creation/change"
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid ""
+"Choose weather a the Boefje should run after creating and/or changing an "
+"object. "
 msgstr ""
 
 #: tools/forms/finding_type.py
@@ -5264,6 +5290,12 @@ msgid ""
 "different clearance levels please check the <a href='https://docs.openkat.nl/"
 "manual/usermanual.html#scan-levels-clearance-indemnities'> documentation</a>."
 "</p> "
+msgstr ""
+
+#: tools/forms/settings.py
+msgid ""
+"Choose when this Boefje will scan objects. It can run on a given interval or "
+"it can run every time an object has been created or changed. "
 msgstr ""
 
 #: tools/forms/settings.py
@@ -7740,6 +7772,9 @@ msgstr "Raw-bestân kin net nei Bytes oplaad wurde: %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Raw-bestân mei sukses tafoege."
+
+#~ msgid "Scan frequency"
+#~ msgstr "Scanfrekwinsje"
 
 #~ msgid "Concatenated Report"
 #~ msgstr "Gearfoege rapport"

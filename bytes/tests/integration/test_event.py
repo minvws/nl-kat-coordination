@@ -7,7 +7,7 @@ from tests.loading import get_raw_data_meta
 
 
 def test_event_published_successfully(event_manager: RabbitMQEventManager) -> None:
-    test_organization = "event-test"
+    test_organization = "test"
     raw_data_meta = get_raw_data_meta()
 
     # We use an isolated queue this way to not conflict with other integration tests
@@ -23,5 +23,5 @@ def test_event_published_successfully(event_manager: RabbitMQEventManager) -> No
     event_manager.connection.channel().basic_ack(method.delivery_tag)
 
     assert response["organization"] == test_organization
-    assert response["raw_data"] == json.loads(event.raw_data.json())
+    assert response["raw_data"] == json.loads(event.raw_data.model_dump_json())
     assert response["created_at"] == "2000-10-10T10:00:00"

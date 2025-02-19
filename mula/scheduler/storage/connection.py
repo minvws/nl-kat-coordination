@@ -10,7 +10,7 @@ from scheduler.storage.errors import StorageError
 
 class DBConn:
     def __init__(self, dsn: str, pool_size: int = 25):
-        self.logger: structlog.BoundLogger = structlog.get_logger(__name__)
+        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
 
         self.dsn = dsn
         self.pool_size = pool_size

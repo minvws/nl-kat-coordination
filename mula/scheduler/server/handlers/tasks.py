@@ -35,14 +35,6 @@ class TaskAPI:
         )
 
         self.api.add_api_route(
-            path="/tasks/stats/{scheduler_id}",
-            endpoint=self.stats,
-            methods=["GET"],
-            status_code=status.HTTP_200_OK,
-            description="Get task status counts for a scheduler in last 24 hours",
-        )
-
-        self.api.add_api_route(
             path="/tasks/{task_id}",
             endpoint=self.get,
             methods=["GET"],
@@ -163,5 +155,7 @@ class TaskAPI:
 
         return updated_task
 
-    def stats(self, scheduler_id: str | None = None) -> dict[str, dict[str, int]] | None:
-        return self.ctx.datastores.task_store.get_status_count_per_hour(scheduler_id)
+    def stats(
+        self, scheduler_id: str | None = None, organisation_id: str | None = None
+    ) -> dict[str, dict[str, int]] | None:
+        return self.ctx.datastores.task_store.get_status_count_per_hour(scheduler_id, organisation_id)

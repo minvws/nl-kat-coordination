@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath, IPvAnyAddress, PostgresDsn, conint
+from pydantic import AnyHttpUrl, Field, FilePath, IPvAnyAddress, PostgresDsn, conint
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 from pydantic_settings.sources import EnvSettingsSource
 
@@ -62,9 +62,6 @@ class Settings(BaseSettings):
         description="Whitelist for normalizer ids allowed to produce scan profiles, including a maximum level.",
         examples=['{"kat_external_db_normalize": 3, "kat_dns_normalize": 1}'],
     )
-
-    # Queue configuration
-    queue_uri: AmqpDsn = Field(..., description="KAT queue URI", examples=["amqp://"], validation_alias="QUEUE_URI")
 
     katalogus_db_uri: PostgresDsn = Field(
         ...,

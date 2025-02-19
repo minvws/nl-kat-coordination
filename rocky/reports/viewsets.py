@@ -148,7 +148,8 @@ class ReportRecipeViewSet(OrganizationAPIMixin, viewsets.ModelViewSet):
                 deadline_at = datetime.now(timezone.utc).date().isoformat()
 
             schedule_request = ScheduleRequest(
-                scheduler_id=f"report-{self.organization.code}",
+                scheduler_id="report",
+                organisation=self.organization.code,
                 data=report_task,
                 schedule=report_recipe.cron_expression,
                 deadline_at=deadline_at,

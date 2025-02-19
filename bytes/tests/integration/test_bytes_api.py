@@ -227,7 +227,7 @@ def test_raw(bytes_api_client: BytesAPIClient, event_manager: RabbitMQEventManag
 
     assert retrieved_raw == raw
 
-    method, properties, body = event_manager.connection.channel().basic_get("test__raw_file_received")
+    method, properties, body = event_manager.connection.channel().basic_get("raw_file_received")
     event_manager.connection.channel().basic_ack(method.delivery_tag)
 
     assert str(boefje_meta.id) in body.decode()
@@ -244,7 +244,7 @@ def test_raw_big(bytes_api_client: BytesAPIClient, event_manager: RabbitMQEventM
 
     assert retrieved_raw == raw
 
-    method, properties, body = event_manager.connection.channel().basic_get("test__raw_file_received")
+    method, properties, body = event_manager.connection.channel().basic_get("raw_file_received")
     event_manager.connection.channel().basic_ack(method.delivery_tag)
 
     assert str(boefje_meta.id) in body.decode()

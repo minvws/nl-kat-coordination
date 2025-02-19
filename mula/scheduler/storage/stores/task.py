@@ -136,7 +136,9 @@ class TaskStore:
 
     @retry()
     @exception_handler
-    def get_status_count_per_hour(self, scheduler_id: str | None = None) -> dict[str, dict[str, int]] | None:
+    def get_status_count_per_hour(
+        self, scheduler_id: str | None = None, organisation_id: str | None = None
+    ) -> dict[str, dict[str, int]] | None:
         with self.dbconn.session.begin() as session:
             query = (
                 session.query(
@@ -152,6 +154,9 @@ class TaskStore:
             if scheduler_id is not None:
                 query = query.filter(models.TaskDB.scheduler_id == scheduler_id)
 
+            if organisation_id is not None:
+                query = query.filter(models.TaskDB.organisation == organisation_id)
+
             results = query.all()
 
             response: dict[str, dict[str, int]] = {}
@@ -166,7 +171,9 @@ class TaskStore:
 
     @retry()
     @exception_handler
-    def get_status_counts(self, scheduler_id: str | None = None) -> dict[str, int] | None:
+    def get_status_counts(
+        self, scheduler_id: str | None = None, organisation_id: str | None = None
+    ) -> dict[str, int] | None:
         with self.dbconn.session.begin() as session:
             query = (
                 session.query(models.TaskDB.status, func.count(models.TaskDB.id).label("count"))
@@ -176,6 +183,9 @@ class TaskStore:
 
             if scheduler_id is not None:
                 query = query.filter(models.TaskDB.scheduler_id == scheduler_id)
+
+            if organisation_id is not None:
+                query = query.filter(models.TaskDB.organisation == organisation_id)
 
             results = query.all()
 

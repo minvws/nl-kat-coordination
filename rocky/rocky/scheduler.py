@@ -3,7 +3,6 @@ from __future__ import annotations
 import collections
 import datetime
 import logging
-import time
 import uuid
 from enum import Enum
 from functools import cached_property
@@ -125,6 +124,7 @@ class Task(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     scheduler_id: str
     schedule_id: str | None = None
+    organisation: str
     priority: int
     status: TaskStatus | None = TaskStatus.PENDING
     type: str | None = None
@@ -150,6 +150,7 @@ class ScheduleRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     scheduler_id: str
+    organisation: str
     data: dict
     schedule: str | None = None
     deadline_at: str
@@ -159,11 +160,12 @@ class ScheduleResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
+    scheduler_id: str
+    organisation: str
     hash: str
     data: dict
     enabled: bool
     schedule: str | None
-    tasks: list[Task]
     deadline_at: datetime.datetime | None
     created_at: datetime.datetime
     modified_at: datetime.datetime
@@ -186,13 +188,6 @@ class PaginatedSchedulesResponse(BaseModel):
     next: str | None = None
     previous: str | None = None
     results: list[ScheduleResponse]
-
-
-class SchedulerResponse(BaseModel):
-    id: str
-    enabled: bool
-    priority_queue: dict[str, Any]
-    last_activity: str | None
 
 
 class LazyTaskList:
@@ -303,23 +298,6 @@ class SchedulerClient:
         except ConnectError:
             raise SchedulerConnectError()
 
-    def is_scheduler_ready(self, scheduler_id: str) -> bool:
-        """Max trials is 100 seconds"""
-        trials = 0
-        interval = 10  # in seconds
-        while trials < 10:
-            try:
-                res = self._client.get(f"/schedulers/{scheduler_id}")
-                res.raise_for_status()
-                break
-            except HTTPStatusError as http_error:
-                if http_error.response.status_code == codes.NOT_FOUND:
-                    trials += 1
-                    time.sleep(interval)
-                    continue
-                raise SchedulerHTTPError()
-        return SchedulerResponse.model_validate_json(res.content).enabled
-
     def patch_schedule(self, schedule_id: str, params: dict[str, Any]) -> None:
         try:
             response = self._client.patch(f"/schedules/{schedule_id}", json=params)
@@ -329,10 +307,13 @@ class SchedulerClient:
             raise SchedulerHTTPError()
 
     def post_schedule(self, schedule: ScheduleRequest) -> ScheduleResponse:
+        logger.info("Creating schedule", schedule=schedule)
         try:
             res = self._client.post("/schedules", json=schedule.model_dump(exclude_none=True))
+            logger.info(res.content)
             res.raise_for_status()
             logger.info("Schedule created", event_code=800081, schedule=schedule)
+
             return ScheduleResponse.model_validate_json(res.content)
         except (ValidationError, HTTPStatusError, ConnectError):
             raise SchedulerValidationError(extra_message="Report schedule failed: ")
@@ -367,7 +348,7 @@ class SchedulerClient:
     def push_task(self, item: Task) -> None:
         try:
             res = self._client.post(
-                f"/queues/{item.scheduler_id}/push",
+                f"/schedulers/{item.scheduler_id}/push",
                 content=item.model_dump_json(exclude_none=True),
                 headers={"Content-Type": "application/json"},
             )
@@ -389,11 +370,20 @@ class SchedulerClient:
 
         return TypeAdapter(list[Queue]).validate_json(response.content)
 
-    def pop_item(self, queue: str) -> Task | None:
-        response = self._client.post(f"/queues/{queue}/pop")
+    def pop_item(self, scheduler_id: str) -> Task | None:
+        response = self._client.post(f"/schedulers/{scheduler_id}/pop?limit=1")
         response.raise_for_status()
 
-        return TypeAdapter(Task | None).validate_json(response.content)
+        page = TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
+        if page.count == 0 or len(page.results) == 0:
+            return None
+
+        return page.results[0]
+
+    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
+        response = self._client.post(f"/schedulers/{scheduler_id}/pop", json=filters)
+
+        return TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
         response = self._client.patch(f"/tasks/{task_id}", json={"status": status.value})
@@ -402,13 +392,16 @@ class SchedulerClient:
     def health(self) -> ServiceHealth:
         return ServiceHealth.model_validate_json(self._get("/health", return_type="content"))
 
-    def _get_task_stats(self, scheduler_id: str) -> dict:
+    def _get_task_stats(self, scheduler_id: str, organisation_id: str | None = None) -> dict:
         """Return task stats for specific scheduler."""
-        return self._get(f"/tasks/stats/{scheduler_id}")  # type: ignore
+        if organisation_id is None:
+            return self._get(f"/tasks/stats?=scheduler_id={scheduler_id}")  # type: ignore
+
+        return self._get(f"/tasks/stats?=scheduler_id={scheduler_id}&organisation_id={organisation_id}")  # type: ignore
 
     def get_task_stats(self, task_type: str) -> dict:
         """Return task stats for specific task type."""
-        return self._get_task_stats(scheduler_id=f"{task_type}-{self.organization_code}")
+        return self._get_task_stats(scheduler_id=task_type, organisation_id=self.organization_code)
 
     @staticmethod
     def _merge_stat_dicts(dicts: list[dict]) -> dict:
@@ -419,10 +412,10 @@ class SchedulerClient:
                 stat_sum[timeslot].update(counts)
         return dict(stat_sum)
 
-    def get_combined_schedulers_stats(self, scheduler_ids: list) -> dict:
+    def get_combined_schedulers_stats(self, scheduler_id: str, organization_codes: list[str]) -> dict:
         """Return merged stats for a set of scheduler ids."""
         return SchedulerClient._merge_stat_dicts(
-            dicts=[self._get_task_stats(scheduler_id=scheduler_id) for scheduler_id in scheduler_ids]
+            dicts=[self._get_task_stats(scheduler_id, org_code) for org_code in organization_codes]
         )
 
     def _get(self, path: str, return_type: str = "json") -> dict | bytes:

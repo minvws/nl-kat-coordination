@@ -63,7 +63,7 @@ class Katalogus(HTTPService):
 
             self.plugin_cache.expiration_enabled = True
 
-        self.logger.debug("Flushed the katalogus plugin cache for organisations")
+        self.logger.debug("Flushed the katalogus plugin cache for organisations", plugin_cache=self.plugin_cache.cache)
 
     def flush_boefje_cache(self) -> None:
         """boefje.consumes -> plugin type boefje"""
@@ -99,7 +99,9 @@ class Katalogus(HTTPService):
 
             self.boefje_cache.expiration_enabled = True
 
-        self.logger.debug("Flushed the katalogus boefje type cache for organisations")
+        self.logger.debug(
+            "Flushed the katalogus boefje type cache for organisations", boefje_cache=self.boefje_cache.cache
+        )
 
     def flush_normalizer_cache(self) -> None:
         """normalizer.consumes -> plugin type normalizer"""
@@ -129,7 +131,10 @@ class Katalogus(HTTPService):
 
             self.normalizer_cache.expiration_enabled = True
 
-        self.logger.debug("Flushed the katalogus normalizer type cache for organisations")
+        self.logger.debug(
+            "Flushed the katalogus normalizer type cache for organisations",
+            normalizer_cache=self.normalizer_cache.cache,
+        )
 
     @exception_handler
     def get_boefjes(self) -> list[Boefje]:
@@ -203,6 +208,8 @@ class Katalogus(HTTPService):
                 return dict_utils.deep_get(self.plugin_cache, [organisation_id, plugin_id])
 
         try:
+            if self.plugin_cache.is_empty():
+                self.flush_plugin_cache()
             return _get_from_cache()
         except dict_utils.ExpiredError:
             self.flush_plugin_cache()
@@ -214,6 +221,8 @@ class Katalogus(HTTPService):
                 return dict_utils.deep_get(self.boefje_cache, [organisation_id, boefje_type])
 
         try:
+            if self.boefje_cache.is_empty():
+                self.flush_boefje_cache()
             return _get_from_cache()
         except dict_utils.ExpiredError:
             self.flush_boefje_cache()
@@ -225,6 +234,8 @@ class Katalogus(HTTPService):
                 return dict_utils.deep_get(self.normalizer_cache, [organisation_id, normalizer_type])
 
         try:
+            if self.normalizer_cache.is_empty():
+                self.flush_normalizer_cache()
             return _get_from_cache()
         except dict_utils.ExpiredError:
             self.flush_normalizer_cache()

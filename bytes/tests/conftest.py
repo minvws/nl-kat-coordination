@@ -105,5 +105,8 @@ def raw_repository(tmp_path: Path) -> FileRawRepository:
 
 
 @pytest.fixture
-def event_manager(settings: Settings) -> RabbitMQEventManager:
-    return RabbitMQEventManager(str(settings.queue_uri))
+def event_manager(settings: Settings) -> Iterator[RabbitMQEventManager]:
+    manager = RabbitMQEventManager(str(settings.queue_uri))
+    manager.channel.queue_delete("raw_file_received")
+
+    yield manager

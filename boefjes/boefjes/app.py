@@ -85,60 +85,33 @@ class SchedulerWorkerManager(WorkerManager):
             time.sleep(self.settings.worker_heartbeat)
             return
 
+        logger.debug("Popping from queue %s", queue_type.value)
+
         try:
-            queues = self.scheduler_client.get_queues()
-        except HTTPError:
-            # Scheduler is having issues, so make note of it and try again
-            logger.exception("Getting the queues from the scheduler failed")
-            time.sleep(self.settings.poll_interval)  # But not immediately
+            p_item = self.scheduler_client.pop_item(queue_type.value)
+        except (HTTPError, ValidationError):
+            logger.exception("Popping task from scheduler failed, sleeping 10 seconds")
+            time.sleep(self.settings.worker_heartbeat)
             return
 
-        # We do not target a specific queue since we start one runtime for all organisations
-        # and queue ids contain the organisation_id
-        queues = [q for q in queues if q.id.startswith(queue_type.value) and q.size > 0]
+        if p_item is None:
+            time.sleep(self.settings.worker_heartbeat)
+            return
 
-        logger.debug("Found queues: %s", [queue.id for queue in queues])
+        logger.info("Handling task[%s]", p_item.data.id)
 
-        all_queues_empty = True
-
-        for queue in queues:
-            logger.debug("Popping from queue %s", queue.id)
-
-            try:
-                p_item = self.scheduler_client.pop_item(queue.id)
-            except (HTTPError, ValidationError):
-                logger.exception("Popping task from scheduler failed, sleeping 10 seconds")
-                time.sleep(10)
-                continue
-
-            if not p_item:
-                logger.debug("Queue %s empty", queue.id)
-                continue
-
-            all_queues_empty = False
-
-            logger.info("Handling task[%s]", p_item.data.id)
+        try:
+            task_queue.put(p_item)
+            logger.info("Dispatched task[%s]", p_item.data.id)
+        except:  # noqa
+            logger.exception("Exiting worker...")
+            logger.info("Patching scheduler task[id=%s] to %s", p_item.data.id, TaskStatus.FAILED.value)
 
             try:
-                task_queue.put(p_item)
-                logger.info("Dispatched task[%s]", p_item.data.id)
-            except:  # noqa
-                logger.exception("Exiting worker...")
-                logger.info("Patching scheduler task[id=%s] to %s", p_item.data.id, TaskStatus.FAILED.value)
-
-                try:
-                    self.scheduler_client.patch_task(p_item.id, TaskStatus.FAILED)
-                    logger.info(
-                        "Set task status to %s in the scheduler for task[id=%s]", TaskStatus.FAILED, p_item.data.id
-                    )
-                except HTTPError:
-                    logger.exception("Could not patch scheduler task to %s", TaskStatus.FAILED.value)
-
-                raise
-
-        if all_queues_empty:
-            logger.debug("All queues empty, sleeping %f seconds", self.settings.poll_interval)
-            time.sleep(self.settings.poll_interval)
+                self.scheduler_client.patch_task(p_item.id, TaskStatus.FAILED)
+                logger.info("Set task status to %s in the scheduler for task[id=%s]", TaskStatus.FAILED, p_item.data.id)
+            except HTTPError:
+                logger.exception("Could not patch scheduler task to %s", TaskStatus.FAILED.value)
 
     def _check_workers(self) -> None:
         new_workers = []
@@ -279,9 +252,4 @@ def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_leve
             LocalNormalizerJobRunner(local_repository), bytes_api_client, settings.scan_profile_whitelist
         )
 
-    return SchedulerWorkerManager(
-        item_handler,
-        SchedulerAPIClient(str(settings.scheduler_api)),  # Do not share a session between workers
-        settings,
-        log_level,
-    )
+    return SchedulerWorkerManager(item_handler, SchedulerAPIClient(str(settings.scheduler_api)), settings, log_level)
