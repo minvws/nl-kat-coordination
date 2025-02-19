@@ -42,28 +42,56 @@
             {% endif %}
             <div>
                 <h2>{% translate "Scan" %} {% translate "using boefjes" %}</h2>
-                {% if enabled_boefjes_available %}
+                {% if not organization_indemnification %}
+                    <p class="warning"
+                       role="group"
+                       aria-label="{% translate "indemnification warning" %}">
+                        {% url "organization_settings" organization.code as organization_settings %}
+                        {% blocktranslate %}
+                            <strong>Warning:</strong>
+                            Indemnification is not set for this organization.
+                            Go to the <a href="{{ organization_settings }}">organization settings page</a> to add one.
+                        {% endblocktranslate %}
+                    </p>
+                {% elif not perms.tools.can_scan_organization %}
+                    <p class="warning"
+                       role="group"
+                       aria-label="{% translate "Permission warning" %}">
+                        {% blocktranslate %}
+                            <strong>Warning:</strong>
+                            You don't have the proper permission at the organizational level to scan objects.
+                            Contact your administrator.
+                        {% endblocktranslate %}
+                    </p>
+                {% elif ooi.scan_profile.level > member.max_clearance_level %}
+                    <p class="warning"
+                       role="group"
+                       aria-label="{% translate "Scan warning" %}">
+                        {% url "account_detail" organization.code as account_details %}
+                        {% blocktranslate %}
+                            <strong>Warning:</strong>
+                            You are unable to scan. Your permission to set clearance level for {{ooi}} is maximum {{member.max_clearance_level}}
+                            Go to your <a href="{{account_details}}">account details</a> to view your clearance level.
+                        {% endblocktranslate %}
+                    </p>
+                {% elif boefjes %}
                     <div class="horizontal-view">
                         <div>
-                            {% if member.max_clearance_level > 0 and organization_indemnification %}
-                                <form id="show_all_boefjes"
-                                      method="get"
-                                      action="#show_all_boefjes"
-                                      class="inline">
-                                    <input type="hidden" name="ooi_id" value="{{ ooi }}">
-                                    {% include "partials/form/form_errors.html" with form=possible_boefjes_filter_form %}
+                            <form id="show_all_boefjes"
+                                  method="get"
+                                  action="#show_all_boefjes"
+                                  class="inline">
+                                <input type="hidden" name="ooi_id" value="{{ ooi }}">
+                                {% include "partials/form/form_errors.html" with form=possible_boefjes_filter_form %}
 
-                                    {% for field in possible_boefjes_filter_form %}
-                                        <fieldset>
-                                            {{ field }}
-                                        </fieldset>
-                                    {% endfor %}
-                                </form>
-                            {% endif %}
+                                {% for field in possible_boefjes_filter_form %}
+                                    <fieldset>
+                                        {{ field }}
+                                    </fieldset>
+                                {% endfor %}
+                            </form>
                         </div>
                     </div>
-                {% endif %}
-                {% if boefjes %}
                     <div class="horizontal-scroll">
                         <table>
                             <caption class="visually-hidden">{% translate "Boefjes overview" %}</caption>
@@ -88,36 +116,19 @@
                                             {% include "partials/scan_level_indicator.html" with value=boefje.scan_level.value %}
 
                                         </td>
-                                        {% if perms.tools.can_scan_organization %}
-                                            <td>
-                                                {% include "partials/single_action_form.html" with btn_text="Start Scan" action="start_scan" key="boefje_id" value=boefje.id %}
+                                        <td>
+                                            {% include "partials/single_action_form.html" with btn_text="Start Scan" action="start_scan" key="boefje_id" value=boefje.id %}
 
-                                            </td>
-                                        {% endif %}
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 {% else %}
-                    <div class="system">
-                        {% if not enabled_boefjes_available %}
-                            <p>
-                                {% translate "There are no boefjes enabled to scan an OOI of type" %} "{{ ooi.get_ooi_type }}". {% translate "See" %} <a href="{% url "katalogus" organization.code %}">KAT-alogus</a> {% translate "to find and enable boefjes that can scan within the current level." %}
-                            </p>
-                        {% else %}
-                            <div>
-                                <p>
-                                    {% translate "There are no boefjes available within the current clearance level of" %} "{{ ooi.scan_profile.human_readable }}".
-                                    <br>
-                                    {% translate "See" %} <a href="{% url "katalogus" organization.code %}">KAT-alogus</a> {% translate "to find and enable boefjes that can scan within the current level." %}
-                                </p>
-                                <p>
-                                    <a href="{% ooi_url 'scan_profile_detail' ooi.primary_key organization.code query=mandatory_fields %}">{% translate "Or if you have the authorization, upgrade the clearance level of" %} "{{ ooi.human_readable }}".</a>
-                                </p>
-                            </div>
-                        {% endif %}
-                    </div>
+                    <p>
+                        {% translate "There are no boefjes enabled to scan an OOI of type" %} "{{ ooi.get_ooi_type }}". {% translate "See" %} <a href="{% url "katalogus" organization.code %}">KAT-alogus</a> {% translate "to find and enable boefjes that can scan within the current level." %}
+                    </p>
                 {% endif %}
             </div>
         </section>
