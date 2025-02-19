@@ -5,7 +5,8 @@ from octopoes.models.ooi.findings import FindingType
 
 def query(targets: list[Reference | None]) -> str:
     ooi_type = targets[0].split("|")[0] if targets[0] else None
-    return f"""
+    if ooi_type:
+        return f"""
                 {{
                     :query {{
                         :find[(pull ?findingtype[*])]
@@ -16,6 +17,19 @@ def query(targets: list[Reference | None]) -> str:
                     }}
                 }}
     """
+    else:
+        return """
+                {
+                    :query {
+                        :find[(pull ?findingtype[*])]
+                        :where
+                        [
+                            [?findingtype :object_type ?object_type]
+                            [(clojure.string/includes? ?object_type "FindingType")]
+                        ]
+                    }
+                }
+            """
 
 
 NIBBLE = NibbleDefinition(
