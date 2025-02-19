@@ -20,7 +20,7 @@ def query(targets: list[Reference | None]) -> str:
 NIBBLE = NibbleDefinition(
     id="default-findingtype-risk",
     signature=[
-        NibbleParameter(object_type=FindingType, parser="[*][?object_type == 'FindingType'][]"),
+        NibbleParameter(object_type=FindingType, parser="[*][?object_type == 'KATFindingType'][]"),
         NibbleParameter(object_type=int, parser="[*][?object_type == 'KATFindingType'][] | [length(@)]"),
     ],
     query=query,
