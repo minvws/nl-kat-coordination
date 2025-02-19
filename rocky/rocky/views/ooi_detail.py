@@ -82,15 +82,14 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
         """
         filtered_boefjes = []
 
-        if self.indemnification_present:
-            filtered_boefjes = [
-                boefje
-                for boefje in boefjes
-                if boefje
-                and boefje.enabled
-                and self.ooi.__class__ in boefje.consumes
-                and self.ooi.scan_profile.level >= boefje.scan_level.value
-            ]
+        filtered_boefjes = [
+            boefje
+            for boefje in boefjes
+            if boefje
+            and boefje.enabled
+            and self.ooi.__class__ in boefje.consumes
+            and self.ooi.scan_profile.level >= boefje.scan_level.value
+        ]
         return filtered_boefjes
 
     def get_boefjes_exceeding_ooi_clearance_level(self, boefjes: list[Plugin]) -> list[Plugin]:
@@ -98,12 +97,11 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
 
         filtered_boefjes = []
 
-        if self.indemnification_present:
-            filtered_boefjes = [
-                boefje
-                for boefje in boefjes
-                if boefje and boefje.enabled and boefje.scan_level.value > self.ooi.scan_profile.level
-            ]
+        filtered_boefjes = [
+            boefje
+            for boefje in boefjes
+            if boefje and boefje.enabled and boefje.scan_level.value > self.ooi.scan_profile.level
+        ]
 
         return filtered_boefjes
 
