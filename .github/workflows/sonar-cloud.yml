@@ -25,7 +25,7 @@ jobs:
     permissions:
       contents: read
     uses: minvws/nl-kat-coordination/.github/workflows/rocky-tests.yml@main
-  boefjes-tests: 
+  boefjes-tests:
     permissions:
       contents: read
     uses: minvws/nl-kat-coordination/.github/workflows/boefjes-tests.yml@main
@@ -86,6 +86,7 @@ jobs:
   sonar-cloud:
     permissions:
       contents: read
+      pull-requests: write
     runs-on: ubuntu-24.04
 
     needs:
