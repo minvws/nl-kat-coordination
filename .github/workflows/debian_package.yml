@@ -11,6 +11,7 @@ on:
 
 jobs:
   changes:
+    permissions: {}
     runs-on: ubuntu-22.04
     outputs:
       packages: ${{ steps.filter.outputs.changes }}
@@ -45,6 +46,8 @@ jobs:
               - '.github/workflows/debian_package.yml'
 
   build:
+    permissions:
+      contents: read
     needs: changes
     if: ${{ github.event_name == 'push' || (needs.changes.outputs.packages != '[]' && needs.changes.outputs.packages != '') }}
     strategy:

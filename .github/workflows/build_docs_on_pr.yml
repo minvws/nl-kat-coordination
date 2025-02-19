@@ -18,6 +18,8 @@ on:
 
 jobs:
   build-artifact:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

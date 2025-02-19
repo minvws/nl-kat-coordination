@@ -19,6 +19,9 @@ on:
 
 jobs:
   create_container_image:
+    permissions:
+      contents: read
+      packages: write
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
