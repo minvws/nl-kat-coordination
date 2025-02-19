@@ -86,22 +86,30 @@ class Katalogus(HTTPService):
         except httpx.HTTPStatusError as e:
             if e.response.status_code == httpx.codes.NOT_FOUND:
                 return None
-
             raise
 
     @exception_handler
     def get_boefjes_by_type_and_org_id(self, ooi_type: str, organisation_id: str) -> list[Plugin]:
-        url = f"{self.host}/v1/organisations/{organisation_id}/plugins/"
-        response = self.get(url, params={"type": "boefje", "consumes": [ooi_type]})
+        url = f"{self.host}/v1/organisations/{organisation_id}/plugins"
 
-        return TypeAdapter(list[Plugin]).validate_python(**response.json())
+        try:
+            response = self.get(url, params={"type": "boefje", "consumes": [ooi_type]})
+            return [Plugin(**plugin) for plugin in response.json()]
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == httpx.codes.NOT_FOUND:
+                return []
+            raise
 
     @exception_handler
     def get_normalizers_by_org_id_and_type(self, organisation_id: str, ooi_type: str) -> list[Plugin]:
-        url = f"{self.host}/v1/organisations/{organisation_id}/plugins/"
-        response = self.get(url, params={"type": "normalizer", "produces": [ooi_type]})
-
-        return TypeAdapter(list[Plugin]).validate_python(**response.json())
+        url = f"{self.host}/v1/organisations/{organisation_id}/plugins"
+        try:
+            response = self.get(url, params={"type": "normalizer", "produces": [ooi_type]})
+            return [Plugin(**plugin) for plugin in response.json()]
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == httpx.codes.NOT_FOUND:
+                return []
+            raise
 
     def get_new_boefjes_by_org_id(self, organisation_id: str) -> list[Plugin]:
         with self.new_boefjes_cache_lock:
