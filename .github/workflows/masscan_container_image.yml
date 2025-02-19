@@ -22,9 +22,6 @@ env:
 jobs:
   build-masscan-image:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     steps:
       - name: Checkout repository
