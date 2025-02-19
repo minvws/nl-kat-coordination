@@ -326,8 +326,12 @@ class SchedulerClient:
             logger.info("Schedule created", event_code=800081, schedule=schedule)
 
             return ScheduleResponse.model_validate_json(res.content)
-        except (ValidationError, HTTPStatusError, ConnectError):
+        except ValidationError:
             raise SchedulerValidationError(extra_message="Report schedule failed: ")
+        except HTTPStatusError:
+            raise SchedulerHTTPError()
+        except ConnectError:
+            raise SchedulerConnectError()
 
     def delete_schedule(self, schedule_id: str) -> None:
         try:

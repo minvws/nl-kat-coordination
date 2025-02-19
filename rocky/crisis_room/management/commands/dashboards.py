@@ -19,7 +19,9 @@ from rocky.scheduler import ReportTask, ScheduleRequest, scheduler_client
 FINDINGS_DASHBOARD_NAME = "Crisis Room Findings Dashboard"
 
 
-def get_or_create_default_dashboard(organization: Organization) -> bool:
+def get_or_create_default_dashboard(
+    organization: Organization, octopoes_client: OctopoesAPIConnector | None = None
+) -> bool:
     valid_time = datetime.now(timezone.utc)
     created = False
     path = Path(__file__).parent / "recipe_seeder.json"
@@ -31,7 +33,7 @@ def get_or_create_default_dashboard(organization: Organization) -> bool:
 
     dashboard_data, created = DashboardData.objects.get_or_create(dashboard=dashboard)
     if created:
-        recipe = create_organization_recipe(valid_time, organization, recipe_default)
+        recipe = create_organization_recipe(octopoes_client, valid_time, organization, recipe_default)
         dashboard_data.recipe = recipe.recipe_id
         schedule_request = create_schedule_request(valid_time, organization, recipe)
         scheduler_client(organization.code).post_schedule(schedule=schedule_request)
@@ -42,13 +44,18 @@ def get_or_create_default_dashboard(organization: Organization) -> bool:
 
 
 def create_organization_recipe(
-    valid_time: datetime, organization: Organization, recipe_default: dict[str, Any]
+    octopoes_client: OctopoesAPIConnector | None,
+    valid_time: datetime,
+    organization: Organization,
+    recipe_default: dict[str, Any],
 ) -> ReportRecipe:
     report_recipe = ReportRecipe(recipe_id=uuid4(), **recipe_default)
 
-    octopoes_client = OctopoesAPIConnector(
-        settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
-    )
+    if octopoes_client is None:
+        octopoes_client = OctopoesAPIConnector(
+            settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+        )
+
     bytes_client = get_bytes_client(organization.code)
 
     create_ooi(api_connector=octopoes_client, bytes_client=bytes_client, ooi=report_recipe, observed_at=valid_time)
@@ -63,7 +70,7 @@ def create_schedule_request(
     ).model_dump()
 
     return ScheduleRequest(
-        scheduler_id=f"report-{organization.code}",
+        scheduler_id="report",
         organisation=organization.code,
         data=report_task,
         schedule=report_recipe.cron_expression,
