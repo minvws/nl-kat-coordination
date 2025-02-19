@@ -5,7 +5,7 @@ from datetime import datetime
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from jsonschema.validators import Draft202012Validator
-from katalogus.client import Plugin
+from katalogus.client import Boefje
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.forms.scheduler import OOIDetailTaskFilterForm
 from tools.ooi_helpers import format_display
@@ -73,16 +73,8 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
     def get_boefjes_filter_form(self):
         return PossibleBoefjesFilterForm(self.request.GET)
 
-    def get_boefjes_for_ooi(self, boefjes: list[Plugin]) -> list[Plugin]:
-        """Get Boefjes that matches OOI based on:
-        - If scanning is possible based on indemnification
-        - Boefjes that are enabled.
-        - Boefjes that that can consume OOI based on object type (ooi type).
-        - Boefjes that can scan OOI, therefore OOI clearance level must be equal or greater than Boefje scan level.
-        """
-        filtered_boefjes = []
-
-        filtered_boefjes = [
+    def get_boefjes_for_ooi(self, boefjes: list[Boefje]) -> list[Boefje]:
+        return [
             boefje
             for boefje in boefjes
             if boefje
@@ -90,20 +82,15 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
             and self.ooi.__class__ in boefje.consumes
             and self.ooi.scan_profile.level >= boefje.scan_level.value
         ]
-        return filtered_boefjes
 
-    def get_boefjes_exceeding_ooi_clearance_level(self, boefjes: list[Plugin]) -> list[Plugin]:
+    def get_boefjes_exceeding_ooi_clearance_level(self, boefjes: list[Boefje]) -> list[Boefje]:
         """Get Boefjes that exceeds OOI clearance level"""
 
-        filtered_boefjes = []
-
-        filtered_boefjes = [
+        return [
             boefje
             for boefje in boefjes
             if boefje and boefje.enabled and boefje.scan_level.value > self.ooi.scan_profile.level
         ]
-
-        return filtered_boefjes
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

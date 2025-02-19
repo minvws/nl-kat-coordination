@@ -121,7 +121,7 @@
                                             {% if not organization_indemnification or not perms.tools.can_scan_organization or member.max_clearance_level < ooi.scan_profile.level %}
                                                 {% translate "Unable to start scan. See warning for details." %}
                                             {% elif ooi.scan_profile.level < boefje.scan_level.value %}
-                                                <button class="disabled">{% translate "Start scan" %}</button>
+                                                <button type="button" class="disabled">{% translate "Start scan" %}</button>
                                             {% else %}
                                                 {% include "partials/single_action_form.html" with btn_text="Start Scan" action="start_scan" key="boefje_id" value=boefje.id %}
 
