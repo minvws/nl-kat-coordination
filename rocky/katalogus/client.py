@@ -391,7 +391,7 @@ class KATalogus:
         return self._katalogus_client.disable_plugin(self._member.organization.code, plugin)
 
     def get_enabled_boefjes(self) -> list[Plugin]:
-        return self._katalogus_client.get_plugins(self._member.organization.code, plugin_type="boefje", enabled=True)
+        return self._katalogus_client.get_plugins(self._member.organization.code, plugin_type="boefje", state=True)
 
     def get_cover(self, plugin_id: str) -> BytesIO:
         return self._katalogus_client.get_cover(self._member.organization.code, plugin_id)
