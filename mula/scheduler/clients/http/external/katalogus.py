@@ -1,7 +1,6 @@
 import threading
 
 import httpx
-from pydantic import TypeAdapter
 
 from scheduler.clients.errors import exception_handler
 from scheduler.clients.http import HTTPService
@@ -93,7 +92,7 @@ class Katalogus(HTTPService):
         url = f"{self.host}/v1/organisations/{organisation_id}/plugins"
 
         try:
-            response = self.get(url, params={"type": "boefje", "consumes": [ooi_type]})
+            response = self.get(url, params={"plugin_type": "boefje", "consumes": [ooi_type]})
             return [Plugin(**plugin) for plugin in response.json()]
         except httpx.HTTPStatusError as e:
             if e.response.status_code == httpx.codes.NOT_FOUND:
@@ -104,7 +103,7 @@ class Katalogus(HTTPService):
     def get_normalizers_by_org_id_and_type(self, organisation_id: str, ooi_type: str) -> list[Plugin]:
         url = f"{self.host}/v1/organisations/{organisation_id}/plugins"
         try:
-            response = self.get(url, params={"type": "normalizer", "produces": [ooi_type]})
+            response = self.get(url, params={"plugin_type": "normalizer", "produces": [ooi_type]})
             return [Plugin(**plugin) for plugin in response.json()]
         except httpx.HTTPStatusError as e:
             if e.response.status_code == httpx.codes.NOT_FOUND:
