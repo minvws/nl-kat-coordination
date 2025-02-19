@@ -21,6 +21,9 @@ on:
 
 jobs:
   build_containerized_boefjes:
+    permissions:
+      contents: read
+      packages: write
     strategy:
       matrix:
         include:
