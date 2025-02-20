@@ -97,6 +97,7 @@ class APISchedulerEndpointTestCase(APITemplateTestCase):
         # response of the post request
         response_get_schedule = self.client.get(f"/schedules/{response_post.json().get('schedule_id')}")
         self.assertEqual(200, response_get_schedule.status_code)
+        self.assertEqual(response_post.json().get("schedule_id"), response_get_schedule.json().get("id"))
 
     def test_push_incorrect_item_type(self):
         response = self.client.post(
@@ -1115,3 +1116,34 @@ class APIScheduleEndpointTestCase(APITemplateTestCase):
         # Schedule should be deleted
         response = self.client.get(f"/schedules/{self.first_schedule.id}")
         self.assertEqual(404, response.status_code)
+
+    def test_delete_schedule_task_schedule_id(self):
+        item = create_task_in(1, self.organisation.id)
+        response_post = self.client.post(f"/schedulers/{self.scheduler.scheduler_id}/push", data=item)
+        self.assertEqual(201, response_post.status_code)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertIsNotNone(response_post.json().get("id"))
+
+        # Task should be created
+        response_get_task = self.client.get(f"/tasks/{response_post.json().get('id')}")
+        self.assertEqual(200, response_get_task.status_code)
+        self.assertEqual(response_post.json().get("id"), response_get_task.json().get("id"))
+
+        # Schedule should be created, and schedule_id should be in the
+        # response of the post request
+        response_get_schedule = self.client.get(f"/schedules/{response_post.json().get('schedule_id')}")
+        self.assertEqual(200, response_get_schedule.status_code)
+        self.assertEqual(response_post.json().get("schedule_id"), response_get_schedule.json().get("id"))
+
+        # Delete the schedule
+        response_delete = self.client.delete(f"/schedules/{response_post.json().get('schedule_id')}")
+        self.assertEqual(204, response_delete.status_code)
+
+        # Schedule should be deleted
+        response_get_schedule = self.client.get(f"/schedules/{response_post.json().get('schedule_id')}")
+        self.assertEqual(404, response_get_schedule.status_code)
+
+        # schedule_id should be removed from the task
+        response_get_task = self.client.get(f"/tasks/{response_post.json().get('id')}")
+        self.assertEqual(200, response_get_task.status_code)
+        self.assertIsNone(response_get_task.json().get("schedule_id"))
