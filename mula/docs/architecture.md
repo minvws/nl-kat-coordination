@@ -3,18 +3,13 @@
 ## Purpose
 
 The _scheduler_ is tasked with populating and maintaining a priority queues of
-ranked tasks, and can be popped off through HTTP API calls. The scheduler is
+tasks, and can be popped off through HTTP API calls. The scheduler is
 designed to be extensible, such that you're able to create your own rules for
 the population, scheduling, and prioritization of tasks.
 
-In the implementation of the scheduler within OpenKAT is tasked with
-scheduling and populating the priority queues of 'boefje', 'normalizer' and
+In the implementation of the scheduler within OpenKAT the scheduler is tasked
+with scheduling and populating the priority queues of `boefje`, `normalizer` and
 `report` tasks.
-
-Because of the use of a priority queue we can differentiate between tasks that
-are to be executed first, e.g. tasks created by the user get precedence over
-tasks that are created by the internal rescheduling processes within the
-scheduler.
 
 In this document we will outline how the scheduler operates within KAT, how
 internal systems function and how external services use it.
@@ -34,43 +29,75 @@ combines data from the `Octopoes`, `Katalogus`, `Bytes` and `RabbitMQ` systems.
 
 External services used and for what purpose:
 
-- Octopoes; retrieval of ooi information
-
 - RabbitMQ; messaging queues to notify the scheduler of scan level changes
   and the creation of raw files from bytes
+
+- Rocky; interfaces with the scheduler through its rest api
+
+- Octopoes; retrieval of ooi information
 
 - Katalogus; retrieval of plugin and organization information
 
 - Bytes; retrieval of raw file information
 
-- Rocky; interfaces with the scheduler through its rest api
+```mermaid
+flowchart TB
+    subgraph "External informational services"
+        Octopoes["Octopoes<br/>[system]"]
+        Katalogus["Katalogus<br/>[system]"]
+        Bytes["Bytes<br/>[system]"]
+    end
+    subgraph "Task creation services"
+        Rocky["Rocky<br/>[webapp]"]
+        RabbitMQ["RabbitMQ<br/>[message broker]"]
+    end
 
-![scheduler_system.svg](./img/scheduler_system.svg)
+    Scheduler["Scheduler<br/>[system]"]
+
+    subgraph "Task handling services"
+        TaskRunner["Task Runner<br/>[software system]"]
+    end
+
+    Rocky-->Scheduler
+    RabbitMQ-->Scheduler
+
+    Octopoes-->Scheduler
+    Katalogus-->Scheduler
+    Bytes-->Scheduler
+
+
+    Scheduler--"Pop task of queue"-->TaskRunner
+```
 
 ### C3 Component level
 
 When we take a closer look at the `scheduler` system itself we can identify
-several components. The `SchedulerApp` directs the creation and maintenance
-of a multitude of schedulers.
+several components. The `App` directs the creation and maintenance
+of several schedulers. And the `API` that is responsible for interfacing with
+the `Scheduler` system.
 
-| Scheduler                         |                              Schedulers |
-| :-------------------------------- | --------------------------------------: |
-| ![scheduler](./img/scheduler.svg) | ![schedulers.svg](./img/schedulers.svg) |
+```mermaid
+flowchart TB
+    subgraph "**Scheduler**<br/>[system]"
+        direction TB
+        subgraph Server["**API**<br/>[component]<br/>REST API"]
+        end
+        subgraph App["**App**<br/>[component]<br/>Main python application"]
+        end
+        Server-->App
+    end
+```
 
-Typically in a OpenKAT installation 3 scheduler will be created per organisation:
+Typically in a OpenKAT installation 3 scheduler will be created
 
 1. _boefje scheduler_
 2. _normalizer scheduler_
 3. _report scheduler_
 
 Each scheduler type implements it's own priority queue, and can implement it's
-own processes of populating, and prioritization of its tasks.
-
-![queue.svg](./img/queue.svg)
-
-Interaction with the scheduler and access to the internals of the
-`SchedulerApp` can be accessed by the `Server` which implements a HTTP REST API
-interface.
+own processes of populating, and prioritization of its tasks. Interaction with
+the scheduler and access to the internals of the `App` can be achieved by
+interfacing with the `Server`. Which implements a HTTP REST API interface.
 
 ## Dataflows
 
@@ -92,7 +119,22 @@ responsible for maintaining a queue of tasks for `Task Runners` to pick up and
 process. A `Scheduler` is responsible for creating `Task` objects and pushing
 them onto the queue.
 
-![tasks.svg](./img/tasks.svg)
+```mermaid
+flowchart LR
+    subgraph "**Scheduler**<br/>[system]"
+        direction LR
+        subgraph Scheduler["**Scheduler**<br/>[component]<br/>"]
+            direction LR
+            Process["Task creation process"]
+            subgraph PriorityQueue["PriorityQueue"]
+                Task0
+                Task1[...]
+                TaskN
+            end
+        end
+        Process-->PriorityQueue
+    end
+```
 
 The `PriorityQueue` derives its state from the state of the `Task` objects that
 are persisted in the database. In other words, the current state of the
@@ -102,13 +144,16 @@ are persisted in the database. In other words, the current state of the
 
 A `Task` object contains the following fields:
 
-- `scheduler_id` - The id of the scheduler for which this task is created
-- `schedule_id` - Optional, the id of the `Schedule` that created the task
-- `priority` - The priority of the task
-- `status` - The status of the task
-- `type` - The type of the task
-- `data` - A JSON object containing the task data
-- `hash` - A unique hash generated by specific fields from the task data
+| Field          | Description                                                   |
+| -------------- | ------------------------------------------------------------- |
+| `scheduler_id` | The id of the scheduler for which this task is created        |
+| `schedule_id`  | Optional, the id of the `Schedule` that created the task      |
+| `priority`     | The priority of the task                                      |
+| `organisation` | The organisation for which the task is created                |
+| `status`       | The status of the task                                        |
+| `type`         | The type of the task                                          |
+| `data`         | A JSON object containing the task data                        |
+| `hash`         | A unique hash generated by specific fields from the task data |
 
 Important to note is the `data` field contains the object that a `Task Runner`
 will use to execute the task. This field is a JSON field that allows any object
@@ -119,6 +164,35 @@ pushed. This is the same for the other schedulers.
 By doing this, it allows the scheduler to wrap whatever object within a `Task`,
 and as a result we're able to create and extend more types of schedulers that
 are not specifically bound to a type.
+
+A json representation of a `Task` object, for example a `BoefjeTask` object
+as the `data` field:
+
+```json
+{
+  "scheduler_id": "1",
+  "schedule_id": "1",
+  "priority": 1,
+  "organisation": "openkat-corp",
+  "status": "PENDING",
+  "type": "boefje",
+  "data": {
+    "ooi": "internet",
+    "boefje": {
+      "id": "dns-zone",
+      "scan_level": 1
+    }
+  },
+  "hash": "a1b2c3d4e5f6g7h8i9j0"
+}
+```
+
+A `Task` is a one-time execution of a task and is a unique instance of task that
+is present in the `data` object. This means that you will encounter several
+instances of the same task. We generate a unique hash for each task by hashing
+specific fields from the `data` object. This hash is used to identify the task
+within the `PriorityQueue` and is used to check if the same task is already on
+the queue.
 
 This approach ensures that the historical record of each task's execution is
 distinct, providing a clear and isolated view of each instance of the task's
@@ -153,29 +227,28 @@ that `Scheduler` can create `Schedule` objects for its `Task` objects. A
 `Schedule` object is a way to define when a `Task` should be executed
 automatically on a recurring schedule by the `Scheduler`.
 
-A `Schedule` will use the 'blueprint' that is defined in its `data` field (this
+A `Schedule` will use the _'blueprint'_ that is defined in its `data` field (this
 is the same as the `data` field of a `Task`) to generate a `Task` object to be
 pushed on the queue of a `Scheduler`.
 
-![schedules.svg](./img/schedules.svg)
-
 A `Schedule` object contains the following fields:
 
-- `scheduler_id` - The id of the scheduler that created the schedule
-- `schedule` - A cron expression that defines when the task should be
-  executed, this is used to update the value of `deadline_at`
-- `deadline_at` - A timestamp that defines when the task should be executed
-- `data` - A JSON object containing data for the schedule (this is the same as
-  the `data` field in the `Task` object)
-- `hash` - A unique hash generated by specific fields from the schedule data
+| Field          | Description                                                                                                        |
+| -------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `scheduler_id` | The id of the scheduler that created the schedule                                                                  |
+| `schedule`     | A cron expression that defines when the task should be executed, this is used to update the value of `deadline_at` |
+| `deadline_at`  | A timestamp that defines when the task should be executed                                                          |
+| `data`         | A JSON object containing data for the schedule (this is the same as the `data` field in the `Task` object)         |
+| `hash`         | A unique hash generated by specific fields from the schedule data                                                  |
 
 A `Scheduler` can be extended by a process that checks if the `deadline_at`
 of a `Schedule` has passed, and if so, creates a `Task` object for the
 `Scheduler` to push onto the queue.
 
-When the `Task` object is pushed onto the queue, the new `deadline_at` value
-of the `Schedule` is calculated using the cron expression defined in the
-`schedule` field.
+Typically when the `Task` object is pushed onto the queue, the new
+`deadline_at` value of the `Schedule` is calculated using the cron expression
+defined in the `schedule` field. Refer to the specific `Scheduler` for more
+information on how this is implemented.
 
 ### `BoefjeScheduler`
 
@@ -221,21 +294,46 @@ Before a `BoefjeTask` and pushed on the queue we will check the following:
 
 #### Processes
 
-![boefje_scheduler.svg](./img/boefje_scheduler.svg)
+```mermaid
+flowchart LR
+    subgraph "**Scheduler**<br/>[system]"
+        direction LR
+        subgraph BoefjeScheduler["**BoefjeScheduler**<br/>[component]<br/>"]
+            direction LR
+            ProcessManual["Manual"]
+            ProcessMutations["Mutations"]
+            ProcessNewBoefjes["NewBoefjes"]
+            ProcessRescheduling["Rescheduling"]
+            subgraph PriorityQueue["PriorityQueue"]
+                Task0
+                Task1[...]
+                TaskN
+            end
+            ProcessManual-->PriorityQueue
+            ProcessMutations-->PriorityQueue
+            ProcessNewBoefjes-->PriorityQueue
+            ProcessRescheduling-->PriorityQueue
+        end
+    end
+```
 
 In order to create a `BoefjeTask` and trigger the dataflow we described above
-we have 4 different processes running in threads within a `BoefjeScheduler`
+we have 3 different processes running in threads within a `BoefjeScheduler`
 that can create boefje tasks. Namely:
 
-1. scan profile mutations
-2. enabling of boefjes
-3. rescheduling of prior tasks
-4. manual scan job
+| Process                 | Description                                                                                        |
+| ----------------------- | -------------------------------------------------------------------------------------------------- |
+| `process_mutations`     | scan profile mutations received from RabbitMQ indicating that the scan level of an OOI has changed |
+| `process_new_boefjes`   | enabling of boefjes will result in gathering of OOI's on which the boefje can be used              |
+| `process_rescheduling ` | rescheduling of prior tasks                                                                        |
+
+Additionally, a boefje task creation can be triggered by a manual scan job that
+is created by the user in Rocky.
 
 ##### 1. Scan profile mutations
 
 When a scan level is increased on an OOI
-(`schedulers.boefje.push_tasks_for_scan_profile_mutations`) a message is pushed
+(`schedulers.boefje.process_mutations`) a message is pushed
 on the RabbitMQ `{organization_id}__scan_profile_mutations` queue. The scheduler
 continuously checks if new messages are posted on the queue. The resulting tasks
 from this process will get the second highest priority of 2 on the queue.
@@ -336,7 +434,22 @@ queue we will check the following:
 
 #### Processes
 
-![normalizer_scheduler.svg](./img/normalizer_scheduler.svg)
+```mermaid
+flowchart LR
+    subgraph "**Scheduler**<br/>[system]"
+        direction LR
+        subgraph NormalizerScheduler["**NormalizerScheduler**<br/>[component]<br/>"]
+            direction LR
+            ProcessRawData["RawData"]
+            subgraph PriorityQueue["PriorityQueue"]
+                Task0
+                Task1[...]
+                TaskN
+            end
+            ProcessRawData-->PriorityQueue
+        end
+    end
+```
 
 The following processes within a `NormalizerScheduler` will create a
 `NormalizerTask` tasks:
@@ -345,7 +458,7 @@ The following processes within a `NormalizerScheduler` will create a
 
 ##### 1. Raw file creation in Bytes
 
-When a raw file is created (`schedulers.normalizer.create_tasks_for_raw_data`)
+When a raw file is created (`schedulers.normalizer.process_raw_data`)
 
 - The `NormalizerScheduler` retrieves raw files that have been created in Bytes
   from a message queue.
@@ -365,7 +478,22 @@ picked up and processed by the report task runner.
 
 #### Processes
 
-![report_scheduler.svg](./img/report_scheduler.svg)
+```mermaid
+flowchart LR
+    subgraph "**Scheduler**<br/>[system]"
+        direction LR
+        subgraph ReportScheduler["**ReportScheduler**<br/>[component]<br/>"]
+            direction LR
+            ProcessRescheduling["Rescheduling"]
+            subgraph PriorityQueue["PriorityQueue"]
+                Task0
+                Task1[...]
+                TaskN
+            end
+            ProcessRescheduling-->PriorityQueue
+        end
+    end
+```
 
 The `ReportScheduler` will create a `ReportTask` for the `Task` that is
 associated with a `Schedule` object.
