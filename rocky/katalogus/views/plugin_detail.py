@@ -66,7 +66,9 @@ class PluginDetailView(TaskListView, PluginSettingsListView):
 
     def get_task_filters(self) -> dict[str, str | datetime | None]:
         filters = super().get_task_filters()
-        filters["plugin_id"] = self.plugin.id  # fetch only tasks for a specific plugin by id
+        filters["filters"]["filters"].append(
+            {"column": "data", "field": f"{self.task_type}__id", "operator": "==", "value": self.plugin.id}
+        )
         return filters
 
     def get_oois(self, selected_oois: list[str]) -> dict[str, Any]:
