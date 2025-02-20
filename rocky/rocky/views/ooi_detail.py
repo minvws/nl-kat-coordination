@@ -102,7 +102,7 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
 
         filter_form = self.get_boefjes_filter_form()
 
-        # The user checkboxing the show boefjes that exceeds clearance level
+        # When a user wants to view boefjes that can't scan ooi, because the ooi does not have enough clearance level.
         if self.ooi.scan_profile and filter_form.is_valid() and filter_form.cleaned_data["show_all"]:
             exceeding_boefjes = self.get_boefjes_exceeding_ooi_clearance_level(enabled_boefjes)
 
