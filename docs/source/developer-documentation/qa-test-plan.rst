@@ -73,6 +73,8 @@ Document QA notes
 ====================
 The QA notes template is pasted in the PR and filled in with a description of the bugs, including any screenshots and reproducing steps. This is a mandatory step, as the next time the PR is QAed it might not be as clear on what/where the bug occurred and it is useful for future reference. 
 
+The template for QA notes can be found in ```docs/source/templates/pull_request_template_review_qa.md```
+
 On occasion
 ===========
 
