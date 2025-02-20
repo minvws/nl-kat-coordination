@@ -77,8 +77,7 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
         return [
             boefje
             for boefje in boefjes
-            if boefje
-            and boefje.enabled
+            if boefje.enabled
             and self.ooi.__class__ in boefje.consumes
             and self.ooi.scan_profile.level >= boefje.scan_level.value
         ]
