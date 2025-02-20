@@ -50,10 +50,10 @@ class AppContext:
         root_logger.setLevel(log_level)
         for handler in logging.getLogger().handlers:
             if handler.name == "console":
-                logging.info("test2")
                 handler.setLevel(log_level)
 
-        logging.debug("test")
+        uvicorn_logger = logging.getLogger("uvicorn.access")
+        uvicorn_logger.setLevel("INFO")
 
         # Check if we enabled structured logging in the configuration
         if self.config.logging_format == "json":
