@@ -45,6 +45,16 @@ class AppContext:
         with Path(self.config.log_cfg).open("rt", encoding="utf-8") as f:
             logging.config.dictConfig(json.load(f))
 
+        log_level = logging.getLevelName(self.config.log_level)
+        root_logger = logging.getLogger()
+        root_logger.setLevel(log_level)
+        for handler in logging.getLogger().handlers:
+            if handler.name == "console":
+                logging.info("test2")
+                handler.setLevel(log_level)
+
+        logging.debug("test")
+
         # Check if we enabled structured logging in the configuration
         if self.config.logging_format == "json":
             structlog.configure(
@@ -102,7 +112,11 @@ class AppContext:
                     structlog.dev.set_exc_info,
                     structlog.stdlib.PositionalArgumentsFormatter(),
                     structlog.processors.TimeStamper("iso", utc=False),
-                    structlog.dev.ConsoleRenderer(),
+                    structlog.dev.ConsoleRenderer(
+                        exception_formatter=structlog.dev.rich_traceback
+                        if self.config.log_rich_exceptions
+                        else structlog.dev.plain_traceback
+                    ),
                 ],
                 context_class=dict,
                 # `logger_factory` is used to create wrapped loggers that are used
