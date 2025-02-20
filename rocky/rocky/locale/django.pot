@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-06 13:51+0000\n"
+"POT-Creation-Date: 2025-02-20 13:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4611,7 +4611,7 @@ msgstr ""
 
 #: tools/forms/boefje.py
 msgid ""
-"Choose weather a the Boefje should run after creating and/or changing an "
+"Choose weather the Boefje should run after creating and/or changing an "
 "object. "
 msgstr ""
 
@@ -5805,6 +5805,57 @@ msgstr ""
 msgid "using boefjes"
 msgstr ""
 
+#: rocky/templates/oois/ooi_detail.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "indemnification warning"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#, python-format
+msgid ""
+"\n"
+"                            <strong>Warning:</strong>\n"
+"                            Indemnification is not set for this "
+"organization.\n"
+"                            Go to the <a "
+"href=\"%(organization_settings)s\">organization settings page</a> to add "
+"one.\n"
+"                        "
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail.html
+msgid "Permission warning"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail.html
+msgid ""
+"\n"
+"                            <strong>Warning:</strong>\n"
+"                            You don't have the proper permission at the "
+"organizational level to scan objects.\n"
+"                            Contact your administrator.\n"
+"                        "
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail.html
+msgid "Scan warning"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail.html
+#, python-format
+msgid ""
+"\n"
+"                            <strong>Warning:</strong>\n"
+"                            You are unable to scan. Your permission to set "
+"clearance level for %(ooi)s is too low.\n"
+"                            Go to your <a "
+"href=\"%(account_details)s\">account details</a> to view your clearance "
+"level.\n"
+"                        "
+msgstr ""
+
 #: rocky/templates/oois/ooi_detail.html rocky/templates/scan.html
 msgid "Boefjes overview"
 msgstr ""
@@ -5821,6 +5872,14 @@ msgid "Scan profile"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail.html
+msgid "Unable to start scan. See warning for details."
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail.html
+msgid "Start scan"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail.html
 msgid "There are no boefjes enabled to scan an OOI of type"
 msgstr ""
 
@@ -5830,14 +5889,6 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_detail.html
 msgid "to find and enable boefjes that can scan within the current level."
-msgstr ""
-
-#: rocky/templates/oois/ooi_detail.html
-msgid "There are no boefjes available within the current clearance level of"
-msgstr ""
-
-#: rocky/templates/oois/ooi_detail.html
-msgid "Or if you have the authorization, upgrade the clearance level of"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_add_related_object.html
@@ -6078,24 +6129,6 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_summary.html
 msgid "shows the same objects."
-msgstr ""
-
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/organizations/organization_settings.html
-msgid "indemnification warning"
-msgstr ""
-
-#: rocky/templates/organizations/organization_crisis_room.html
-#, python-format
-msgid ""
-"\n"
-"                            <strong>Warning:</strong>\n"
-"                            Indemnification is not set for this "
-"organization.\n"
-"                            Go to the <a "
-"href=\"%(organization_settings)s\">organization settings page</a> to add "
-"one.\n"
-"                        "
 msgstr ""
 
 #: rocky/templates/organizations/organization_crisis_room.html

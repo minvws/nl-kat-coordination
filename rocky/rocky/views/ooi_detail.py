@@ -79,6 +79,7 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
             for boefje in boefjes
             if boefje.enabled
             and self.ooi.__class__ in boefje.consumes
+            and self.ooi.scan_profile is not None
             and self.ooi.scan_profile.level >= boefje.scan_level.value
         ]
 
@@ -88,7 +89,10 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
         return [
             boefje
             for boefje in boefjes
-            if boefje and boefje.enabled and boefje.scan_level.value > self.ooi.scan_profile.level
+            if boefje
+            and boefje.enabled
+            and self.ooi.scan_profile is not None
+            and boefje.scan_level.value > self.ooi.scan_profile.level
         ]
 
     def get_context_data(self, **kwargs):
