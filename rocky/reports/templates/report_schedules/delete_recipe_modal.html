@@ -10,10 +10,7 @@
         You will find previously generated reports in the report history tab.
   {% endblocktranslate %}
 </p>
-<form id="delete-form"
-      class="inline"
-      method="post"
-      action="{% url 'delete_scheduled_reports' organization.code %}">
+<form id="delete-form" class="inline" method="post">
     {% csrf_token %}
     <input type="hidden" name="schedule_id" value="{{ schedule_id }}" />
     <input type="hidden" name="report_recipe" value="{{ recipe_id }}" />

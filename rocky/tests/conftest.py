@@ -44,7 +44,7 @@ from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
 from rocky.health import ServiceHealth
-from rocky.scheduler import PaginatedTasksResponse, ReportTask, Task, TaskStatus
+from rocky.scheduler import PaginatedTasksResponse, ReportTask, ScheduleResponse, Task, TaskStatus
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
 
@@ -1907,33 +1907,36 @@ def scheduled_report_recipe():
 @pytest.fixture
 def scheduled_reports_list():
     return [
-        {
-            "id": "7706ebc1-b24b-44fb-a7b3-9a44d80b2644",
-            "scheduler_id": "report-_rieven",
-            "hash": "bb5708d2f82e11cc5cda3aef54190f2e",
-            "data": {
+        ScheduleResponse(
+            id=UUID("7706ebc1-b24b-44fb-a7b3-9a44d80b2644"),
+            hash="bb5708d2f82e11cc5cda3aef54190f2e",
+            data={
                 "type": "report",
                 "organisation_id": "_rieven",
                 "report_recipe_id": "3fed7d00-6261-4ad1-b08f-9b91434aa41e",
             },
-            "enabled": True,
-            "schedule": None,
-            "tasks": [
-                {
-                    "id": "a4ce1db8-5d1c-4f04-ac3f-48a7c1c23c91",
-                    "scheduler_id": "report-_rieven",
-                    "schedule_id": "7706ebc1-b24b-44fb-a7b3-9a44d80b2644",
-                    "priority": 1739365306,
-                    "status": "completed",
-                    "type": "report",
-                    "hash": "bb5708d2f82e11cc5cda3aef54190f2e",
-                    "data": {"organisation_id": "_rieven", "report_recipe_id": "3fed7d00-6261-4ad1-b08f-9b91434aa41e"},
-                    "created_at": "2025-02-12T13:01:46.206390Z",
-                    "modified_at": "2025-02-12T13:01:46.206394Z",
-                }
+            enabled=True,
+            schedule=None,
+            tasks=[
+                Task(
+                    id=UUID("a4ce1db8-5d1c-4f04-ac3f-48a7c1c23c91"),
+                    scheduler_id="report-_rieven",
+                    schedule_id="7706ebc1-b24b-44fb-a7b3-9a44d80b2644",
+                    priority=1739365306,
+                    status=TaskStatus.COMPLETED,
+                    type="report",
+                    hash="bb5708d2f82e11cc5cda3aef54190f2e",
+                    data=ReportTask(
+                        type="report",
+                        organisation_id="_rieven",
+                        report_recipe_id="3fed7d00-6261-4ad1-b08f-9b91434aa41e",
+                    ),
+                    created_at=datetime(2025, 2, 12, 16, 1, 19, 951925),
+                    modified_at=datetime(2025, 2, 12, 16, 1, 19, 951925),
+                )
             ],
-            "deadline_at": None,
-            "created_at": "2025-02-12T13:00:57.216278Z",
-            "modified_at": "2025-02-12T13:00:57.216282Z",
-        }
+            deadline_at=None,
+            created_at=datetime(2025, 2, 12, 16, 1, 19, 951925),
+            modified_at=datetime(2025, 2, 12, 16, 1, 19, 951925),
+        )
     ]
