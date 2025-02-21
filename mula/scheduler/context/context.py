@@ -124,7 +124,6 @@ class AppContext:
             source=f"scheduler/{scheduler.__version__}",
             timeout=self.config.katalogus_request_timeout,
             pool_connections=self.config.katalogus_pool_connections,
-            cache_ttl=self.config.katalogus_cache_ttl,
         )
 
         bytes_service = clients.Bytes(
@@ -184,7 +183,6 @@ class AppContext:
                 "pq_maxsize": str(self.config.pq_maxsize),
                 "pq_grace_period": str(self.config.pq_grace_period),
                 "pq_max_random_objects": str(self.config.pq_max_random_objects),
-                "katalogus_cache_ttl": str(self.config.katalogus_cache_ttl),
                 "monitor_organisations_interval": str(self.config.monitor_organisations_interval),
             }
         )
