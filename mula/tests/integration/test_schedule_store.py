@@ -185,7 +185,9 @@ class ScheduleStoreTestCase(unittest.TestCase):
         self.assertEqual(is_schedule_deleted, None)
 
     def test_delete_schedule_ondelete(self):
-        """When a schedule is deleted, its tasks should NOT be deleted."""
+        """When a schedule is deleted, its tasks should NOT be deleted.
+        The schedule_id on the tasks should be set to NULL.
+        """
         # Arrange
         scheduler_id = "test_scheduler_id"
         task = functions.create_task(scheduler_id=scheduler_id, organisation=self.organisation.id, priority=1)
@@ -197,12 +199,16 @@ class ScheduleStoreTestCase(unittest.TestCase):
         task.schedule_id = schedule_db.id
         task_db = self.mock_ctx.datastores.task_store.create_task(task)
 
+        # Assert
+        self.assertIsNotNone(self.mock_ctx.datastores.task_store.get_task(task_db.id).schedule_id)
+
         # Act
         self.mock_ctx.datastores.schedule_store.delete_schedule(schedule_db.id)
 
         # Assert
         is_schedule_deleted = self.mock_ctx.datastores.schedule_store.get_schedule(schedule_db.id)
         self.assertEqual(is_schedule_deleted, None)
+        self.assertIsNone(self.mock_ctx.datastores.task_store.get_task(task_db.id).schedule_id)
 
         is_task_deleted = self.mock_ctx.datastores.task_store.get_task(task_db.id)
         self.assertIsNotNone(is_task_deleted)
