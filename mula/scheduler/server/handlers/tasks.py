@@ -63,61 +63,10 @@ class TaskAPI:
         limit: int = 10,
         min_created_at: datetime.datetime | None = None,
         max_created_at: datetime.datetime | None = None,
-        input_ooi: str | None = None,  # FIXME: deprecated
-        plugin_id: str | None = None,  # FIXME: deprecated
         filters: storage.filters.FilterRequest | None = None,
     ) -> Any:
         if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
             raise BadRequestError("min_created_at must be less than max_created_at")
-
-        # FIXME: deprecated; backwards compatibility for rocky that uses the
-        # input_ooi and plugin_id parameters.
-        f_req = filters or storage.filters.FilterRequest(filters={})
-        if input_ooi is not None:
-            if task_type == "boefje":
-                f_ooi = {
-                    "and": [storage.filters.Filter(column="data", field="input_ooi", operator="eq", value=input_ooi)]
-                }
-            elif task_type == "normalizer":
-                f_ooi = {
-                    "and": [
-                        storage.filters.Filter(
-                            column="data", field="raw_data__boefje_meta__input_ooi", operator="eq", value=input_ooi
-                        )
-                    ]
-                }
-            else:
-                f_ooi = {
-                    "or": [
-                        storage.filters.Filter(column="data", field="input_ooi", operator="eq", value=input_ooi),
-                        storage.filters.Filter(
-                            column="data", field="raw_data__boefje_meta__input_ooi", operator="eq", value=input_ooi
-                        ),
-                    ]
-                }
-
-            f_req.filters.update(f_ooi)  # type: ignore
-
-        if plugin_id is not None:
-            if task_type == "boefje":
-                f_plugin = {
-                    "and": [storage.filters.Filter(column="data", field="boefje__id", operator="eq", value=plugin_id)]
-                }
-            elif task_type == "normalizer":
-                f_plugin = {
-                    "and": [
-                        storage.filters.Filter(column="data", field="normalizer__id", operator="eq", value=plugin_id)
-                    ]
-                }
-            else:
-                f_plugin = {
-                    "or": [
-                        storage.filters.Filter(column="data", field="boefje__id", operator="eq", value=plugin_id),
-                        storage.filters.Filter(column="data", field="normalizer__id", operator="eq", value=plugin_id),
-                    ]
-                }
-
-            f_req.filters.update(f_plugin)  # type: ignore
 
         results, count = self.ctx.datastores.task_store.get_tasks(
             scheduler_id=scheduler_id,
@@ -127,7 +76,7 @@ class TaskAPI:
             limit=limit,
             min_created_at=min_created_at,
             max_created_at=max_created_at,
-            filters=f_req,
+            filters=filters,
         )
 
         return utils.paginate(request, results, count, offset, limit)
