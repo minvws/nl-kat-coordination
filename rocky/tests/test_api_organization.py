@@ -46,15 +46,27 @@ express_organizations = pluralized(express_organization)
 class TestOrganizationViewSet(ViewSetTest):
     @pytest.fixture
     def organizations(self):
-        with patch("katalogus.client.KATalogusClient"), patch("rocky.signals.OctopoesAPIConnector"):
-            return [
-                Organization.objects.create(name="Test Organization 1", code="test1", tags=["tag1", "tag2"]),
-                Organization.objects.create(name="Test Organization 2", code="test2"),
-            ]
+        created_organizations = []
+        organizations = [
+            {"name": "Test Organization 1", "code": "test1", "tags": ["tag1", "tag2"]},
+            {"name": "Test Organization 2", "code": "test2"},
+        ]
+
+        for org in organizations:
+            with (
+                patch("katalogus.client.KATalogusClient"),
+                patch("rocky.signals.OctopoesAPIConnector"),
+                patch("crisis_room.management.commands.dashboards.scheduler_client"),
+                patch("crisis_room.management.commands.dashboards.get_bytes_client"),
+            ):
+                created_organizations.append(Organization.objects.create(**org))
+
+        return created_organizations
 
     organization = lambda_fixture(lambda organizations: organizations[0])
 
     list_url = lambda_fixture(lambda: url_for("organization-list"))
+
     detail_url = lambda_fixture(lambda organization: url_for("organization-detail", organization.pk))
 
     client = lambda_fixture("drf_admin_client")

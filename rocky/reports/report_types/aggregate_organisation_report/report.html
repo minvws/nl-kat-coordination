@@ -103,6 +103,21 @@
                     </div>
                 </section>
             {% endif %}
+            {% if data.findings %}
+                <section id="findings">
+                    <div>
+                        <h2>{% translate "Findings" %}</h2>
+                        <p>
+                            {% blocktranslate %}
+                                This chapter contains information about the findings that have been identified
+                                for this organization.
+                            {% endblocktranslate%}
+                        </p>
+                        {% include "findings_report/report.html" with data=data.findings %}
+
+                    </div>
+                </section>
+            {% endif %}
         </div>
         <div class="chapter-numbers report-content type-a">
             {% include "aggregate_organisation_report/appendix.html" %}
