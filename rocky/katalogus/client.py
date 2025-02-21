@@ -261,7 +261,7 @@ class KATalogusClient:
         self._patch_plugin_state(organization_code, plugin.id, False)
 
     def get_enabled_boefjes(self, organization_code: str) -> list[Plugin]:
-        return self.get_plugins(organization_code, plugin_type="boefje", enabled=True)
+        return self.get_plugins(organization_code, plugin_type="boefje", state=True)
 
     def get_cover(self, organization_code: str, plugin_id: str) -> BytesIO:
         # TODO: does not need to be organization-specific
@@ -391,7 +391,7 @@ class KATalogus:
         return self._katalogus_client.disable_plugin(self._member.organization.code, plugin)
 
     def get_enabled_boefjes(self) -> list[Plugin]:
-        return self._katalogus_client.get_plugins(self._member.organization.code, plugin_type="boefje", enabled=True)
+        return self._katalogus_client.get_plugins(self._member.organization.code, plugin_type="boefje", state=True)
 
     def get_cover(self, plugin_id: str) -> BytesIO:
         return self._katalogus_client.get_cover(self._member.organization.code, plugin_id)
