@@ -51,6 +51,7 @@ DEBUG = env.bool("DEBUG", False)
 
 # Logging format ("text" or "json")
 LOGGING_FORMAT = env("LOGGING_FORMAT", default="text")
+LOG_RICH_EXCEPTIONS = env.bool("LOG_RICH_EXCEPTIONS", False)
 
 LOGGING = {
     "version": 1,
@@ -59,7 +60,13 @@ LOGGING = {
         "json_formatter": {"()": structlog.stdlib.ProcessorFormatter, "processor": structlog.processors.JSONRenderer()},
         "plain_console": {
             "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.dev.ConsoleRenderer(colors=True, pad_level=False),
+            "processor": structlog.dev.ConsoleRenderer(
+                colors=True,
+                pad_level=False,
+                exception_formatter=structlog.dev.rich_traceback
+                if LOG_RICH_EXCEPTIONS
+                else structlog.dev.plain_traceback,
+            ),
         },
     },
     "handlers": {
