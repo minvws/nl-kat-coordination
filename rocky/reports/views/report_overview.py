@@ -92,6 +92,25 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
 
         return recipes
 
+    def post(self, request, *args, **kwargs):
+        recipe_pk = request.POST.get("report_recipe", "")
+        schedule_id = request.POST.get("schedule_id", "")
+
+        if recipe_pk and schedule_id:
+            self.delete_report_schedule(schedule_id)
+            try:
+                self.octopoes_api_connector.delete(
+                    Reference.from_str(f"{recipe_pk}"), valid_time=datetime.now(timezone.utc)
+                )
+                messages.success(self.request, _("Recipe '{}' deleted successfully").format(recipe_pk))
+            except ObjectNotFoundException:
+                messages.error(self.request, _("Recipe not found."))
+
+        else:
+            messages.error(self.request, _("No schedule or recipe selected"))
+
+        return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["total_report_schedules"] = len(self.object_list)
