@@ -39,7 +39,7 @@ opentelemetry-util-http = "^0.49b2"
 pyjwt = "^2.8.0"
 fastapi-slim = "^0.115.2"
 structlog = "^24.2.0"
-cryptography = "^43.0.1"
+cryptography = "^44.0.1"
 boto3 = "^1.35.15"
 
 [tool.poetry.group.dev.dependencies]

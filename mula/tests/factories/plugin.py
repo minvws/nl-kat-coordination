@@ -1,5 +1,6 @@
 from factory import Factory, LazyFunction, Sequence, fuzzy
 from scheduler.models import Plugin
+from scheduler.models.ooi import RunOn
 
 
 class PluginFactory(Factory):
@@ -13,4 +14,4 @@ class PluginFactory(Factory):
     enabled: bool = True
     cron: str | None = None
     interval: int | None = None
-    run_on: list[str] | None = None
+    run_on: RunOn | None = None
