@@ -38,7 +38,7 @@
                 {% translate "Created from recipe:" %} <a href="{% ooi_url "ooi_detail" recipe_ooi.primary_key organization.code %}">{{ recipe_ooi.primary_key }}</a>
             </p>
             <p>
-                {% translate "Recipe created by:" %} <strong>{{ recipe_ooi|get_user }}</strong>
+                {% translate "Recipe created by:" %} <strong>{{ recipe_ooi|get_user_full_name }}</strong>
             </p>
         </div>
     </div>

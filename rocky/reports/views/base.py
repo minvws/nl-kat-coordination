@@ -17,13 +17,11 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
-from httpx import HTTPStatusError
 from katalogus.client import Boefje, KATalogus, KATalogusError, Plugin
 from tools.ooi_helpers import create_ooi
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, PostRedirect, url_with_querystring
 
 from octopoes.models import OOI, Reference
-from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.reports import AssetReport, ReportRecipe
 from octopoes.models.ooi.reports import BaseReport as ReportOOI
 from octopoes.models.types import OOIType
@@ -593,10 +591,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         )
 
     def get_recipe_ooi(self, recipe_id: str) -> ReportRecipe | None:
-        try:
-            return self.octopoes_api_connector.get(Reference.from_str(recipe_id), valid_time=self.observed_at)
-        except (HTTPStatusError, ObjectNotFoundException):
-            return None
+        return self.octopoes_api_connector.get(Reference.from_str(recipe_id), valid_time=self.observed_at)
 
     def get_template_names(self):
         if self.report_ooi.report_type and issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
