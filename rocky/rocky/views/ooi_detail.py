@@ -67,7 +67,9 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
 
     def get_task_filters(self) -> dict[str, str | datetime | None]:
         filters = super().get_task_filters()
-        filters["input_ooi"] = self.ooi.primary_key  # shows only tasks for this particular ooi
+        filters["filters"]["filters"].append(
+            {"column": "data", "field": "input_ooi", "operator": "==", "value": str(self.ooi)}
+        )
         return filters
 
     def get_boefjes_filter_form(self):

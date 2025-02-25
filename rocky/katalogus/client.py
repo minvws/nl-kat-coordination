@@ -242,10 +242,10 @@ class KATalogusClient:
 
         return response
 
-    def get_normalizers(self, organization_code: str) -> list[Plugin]:
+    def get_normalizers(self, organization_code: str) -> list[Normalizer]:
         return self.get_plugins(organization_code, plugin_type="normalizer")
 
-    def get_boefjes(self, organization_code: str) -> list[Plugin]:
+    def get_boefjes(self, organization_code: str) -> list[Boefje]:
         return self.get_plugins(organization_code, plugin_type="boefje")
 
     def enable_plugin(self, organization_code: str, plugin: Plugin) -> None:
@@ -261,7 +261,7 @@ class KATalogusClient:
         self._patch_plugin_state(organization_code, plugin.id, False)
 
     def get_enabled_boefjes(self, organization_code: str) -> list[Plugin]:
-        return self.get_plugins(organization_code, plugin_type="boefje", enabled=True)
+        return self.get_plugins(organization_code, plugin_type="boefje", state=True)
 
     def get_cover(self, organization_code: str, plugin_id: str) -> BytesIO:
         # TODO: does not need to be organization-specific
@@ -366,10 +366,10 @@ class KATalogus:
             self._member.organization.code, to_organization
         )
 
-    def get_normalizers(self) -> list[Plugin]:
+    def get_normalizers(self) -> list[Normalizer]:
         return self._katalogus_client.get_normalizers(self._member.organization.code)
 
-    def get_boefjes(self) -> list[Plugin]:
+    def get_boefjes(self) -> list[Boefje]:
         return self._katalogus_client.get_boefjes(self._member.organization.code)
 
     def enable_plugin(self, plugin: Plugin) -> None:
