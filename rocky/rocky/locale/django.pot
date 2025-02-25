@@ -2816,9 +2816,13 @@ msgid "Created on:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/report_types/aggregate_organisation_report/report_design.html
 #: reports/templates/partials/report_header.html
-msgid "Created by:"
+msgid "Created from recipe:"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
+#: reports/templates/partials/report_header.html
+msgid "Recipe created by:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
@@ -2921,6 +2925,10 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
 msgid "Observed at:"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report_design.html
+msgid "Created by:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
