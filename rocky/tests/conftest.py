@@ -1912,6 +1912,8 @@ def scheduled_reports_list():
     return [
         ScheduleResponse(
             id=UUID("7706ebc1-b24b-44fb-a7b3-9a44d80b2644"),
+            scheduler_id="report",
+            organisation="test",
             hash="bb5708d2f82e11cc5cda3aef54190f2e",
             data={
                 "type": "report",
@@ -1920,24 +1922,6 @@ def scheduled_reports_list():
             },
             enabled=True,
             schedule=None,
-            tasks=[
-                Task(
-                    id=UUID("a4ce1db8-5d1c-4f04-ac3f-48a7c1c23c91"),
-                    scheduler_id="report-_rieven",
-                    schedule_id="7706ebc1-b24b-44fb-a7b3-9a44d80b2644",
-                    priority=1739365306,
-                    status=TaskStatus.COMPLETED,
-                    type="report",
-                    hash="bb5708d2f82e11cc5cda3aef54190f2e",
-                    data=ReportTask(
-                        type="report",
-                        organisation_id="_rieven",
-                        report_recipe_id="3fed7d00-6261-4ad1-b08f-9b91434aa41e",
-                    ),
-                    created_at=datetime(2025, 2, 12, 16, 1, 19, 951925),
-                    modified_at=datetime(2025, 2, 12, 16, 1, 19, 951925),
-                )
-            ],
             deadline_at=None,
             created_at=datetime(2025, 2, 12, 16, 1, 19, 951925),
             modified_at=datetime(2025, 2, 12, 16, 1, 19, 951925),
