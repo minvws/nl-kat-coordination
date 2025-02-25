@@ -78,6 +78,13 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
         == len(hostnames) + 1
     )
 
+    bulk_hostnames = octopoes_api_connector.load_objects_bulk({x.reference for x in hostnames}, valid_time)
+
+    assert len(bulk_hostnames) == 10
+
+    for hostname in hostnames:
+        assert bulk_hostnames[hostname.reference].scan_profile is not None
+
 
 def test_history(octopoes_api_connector: OctopoesAPIConnector):
     network = Network(name="test")

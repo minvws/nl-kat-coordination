@@ -7,7 +7,7 @@
 
 {% if scheduled_reports %}
     <p class="de-emphasized">
-        {% blocktranslate with length=scheduled_reports|length total=total_oois %}Showing {{ length }} of {{ total }} reports{% endblocktranslate %}
+        {% blocktranslate with length=scheduled_reports|length total=total_report_schedules %}Showing {{ length }} of {{ total }} schedules{% endblocktranslate %}
     </p>
     <div class="horizontal-scroll sticky-column">
         <table>
@@ -19,7 +19,7 @@
                     <th scope="col">{% translate "Scheduled for" %}</th>
                     <th scope="col">{% translate "Recurrence" %}</th>
                     <th scope="col">{% translate "Schedule status" %}</th>
-                    <th scope="col" class="actions sticky-cell visually-hidden">Details</th>
+                    <th scope="col">{% translate "Details" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -29,30 +29,33 @@
                             <td class="nowrap">{{ schedule.recipe.report_name_format }}</td>
                             <td>
                                 <ul class="tags horizontal-view">
-                                    {% if schedule.recipe.parent_report_type == "aggregate-organisation-report" %}
-                                        <li class="label tags-color-{{ schedule.recipe.parent_report_type|get_report_type_label_style }}">
-                                            {{ schedule.recipe.parent_report_type|get_report_type_name }}
+                                    {% if schedule.recipe.report_type == "aggregate-organisation-report" %}
+                                        <li>
+                                            <span class="label tags-color-{{ schedule.recipe.report_type|get_report_type_label_style }}">
+                                            {{ schedule.recipe.report_type|get_report_type_name }}</span>
                                         </li>
                                     {% else %}
-                                        {% for report_type in schedule.recipe.report_types %}
+                                        {% for report_type in schedule.recipe.asset_report_types %}
                                             {% if forloop.counter0 < 2 %}
-                                                <li class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</li>
+                                                <li>
+                                                    <span class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</span>
+                                                </li>
                                             {% endif %}
                                             {% if forloop.counter0 == 2 %}
-                                                <li class="label tags-color-grey-2">+ {{ schedule.recipe.report_types|length|add:"-2" }}</li>
+                                                <li class="label tags-color-grey-2">+ {{ schedule.recipe.asset_report_types|length|add:"-2" }}</li>
                                             {% endif %}
                                         {% endfor %}
                                     {% endif %}
                                 </ul>
                             </td>
+                            <td class="nowrap">{{ schedule.deadline_at }}</td>
                             <td class="nowrap">
-                                {% if not schedule.enabled %}
-                                    -
+                                {% if schedule.cron is None %}
+                                    {% translate "Once" %}
                                 {% else %}
-                                    {{ schedule.deadline_at }}
+                                    {{ schedule.cron|get_cron_description }}
                                 {% endif %}
                             </td>
-                            <td class="nowrap">{{ schedule.cron|get_cron_description }}</td>
                             <td class="nowrap">
                                 {% if schedule.enabled %}
                                     <span class="label system-tag color-2">{% translate "Enabled" %}</span>
@@ -60,7 +63,7 @@
                                     <span class="label system-tag color-3">{% translate "Disabled" %}</span>
                                 {% endif %}
                             </td>
-                            <td class="actions sticky-cell">
+                            <td class="nowrap actions sticky-cell">
                                 <button class="expando-button"
                                         data-icon-open-class="icon ti-chevron-down"
                                         data-icon-close-class="icon ti-chevron-up"
@@ -72,12 +75,13 @@
                         <tr class="expando-row">
                             <td colspan="6">
                                 {% if schedule.reports %}
+                                    <h5>{% translate "Recent reports" %}</h5>
                                     <table>
                                         <caption class="visually-hidden">{% translate "Scheduled Reports:" %}</caption>
                                         <thead>
                                             <tr>
                                                 <th scope="col" class="nowrap">{% translate "Name" %}</th>
-                                                <th scope="col">{% translate "Input" %}</th>
+                                                <th scope="col">{% translate "Input objects" %}</th>
                                                 <th scope="col" class="nowrap">{% translate "Reference date" %}</th>
                                             </tr>
                                         </thead>
@@ -85,23 +89,24 @@
                                             {% for report in schedule.reports %}
                                                 <tr>
                                                     <td>
-                                                        {% if report.input_oois|length == 0 %}
-                                                            {{ report.name }}
+                                                        {% if report.input_oois|length == 1 %}
+                                                            <a href="{% url "view_report" organization.code %}?asset_report_id={{ report.input_oois.0.reference }}&observed_at={{ report.input_oois.0.observed_at|date:"Y-m-d H:i:s:u" }}"
+                                                               title="{% translate "Show report details" %}">{{ report.input_oois.0.name }}</a>
                                                         {% else %}
                                                             <a href="{% url "view_report" organization.code %}?report_id={{ report.reference }}&observed_at={{ report.observed_at|date:"Y-m-d H:i:s:u" }}"
                                                                title="{% translate "Show report details" %}">{{ report.name }}</a>
                                                         {% endif %}
                                                     </td>
                                                     <td>
-                                                        {% if report.input_oois|length == 1 %}
-                                                            {% with ooi=report.input_oois.0 %}
+                                                        {% if report.input_oois|length == 1 or schedule.recipe.input_recipe.input_oois|length == 1 %}
+                                                            {% with ooi=report.input_oois.0.input_ooi %}
                                                                 <a href="{% ooi_url 'ooi_detail' ooi organization.code query=ooi.mandatory_fields %}">{{ ooi|human_readable }}</a>
                                                             {% endwith %}
                                                         {% else %}
-                                                            {{ report.input_oois|length }} {% translate "objects" %}
+                                                            {{ schedule.total_oois }} {% translate "objects" %}
                                                         {% endif %}
                                                     </td>
-                                                    <td class="nowrap">{{ report.observed_at|date }}</td>
+                                                    <td>{{ report.reference_date|date }}</td>
                                                 </tr>
                                             {% endfor %}
                                         </tbody>

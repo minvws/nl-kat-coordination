@@ -9,15 +9,7 @@
 
     <main id="main-content">
         <section>
-            <div>
-                <h1>{% translate "Tasks" %}</h1>
-                <p class="emphasized">
-                    {% blocktranslate %}
-                        An overview of the tasks for {{ organization }}. Tasks are divided in Boefjes and Normalizers.
-                        Boefjes scan objects and Normalizers dispatch on the output mime-type.
-                    {% endblocktranslate%}
-                </p>
-            </div>
+            {% include "tasks/partials/tasks_overview_header.html" %}
             {% include "tasks/partials/tab_navigation.html" with view="boefjes_tasks" %}
 
             {% if not task_list %}

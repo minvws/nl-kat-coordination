@@ -5,6 +5,7 @@ import re
 from collections import Counter
 from datetime import datetime
 from typing import Any, Literal, cast
+from uuid import UUID
 
 import structlog
 from bits.definitions import BitDefinition
@@ -23,7 +24,7 @@ from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
-from octopoes.models.ooi.reports import Report
+from octopoes.models.ooi.reports import HydratedReport, Report, ReportRecipe
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Direction, Path, Segment, get_paths_to_neighours
 from octopoes.models.transaction import TransactionRecord
@@ -147,10 +148,12 @@ class OOIRepository(Repository):
     ) -> Paginated[Finding]:
         raise NotImplementedError
 
-    def list_reports(self, valid_time, offset, limit) -> Paginated[Report]:
+    def list_reports(
+        self, valid_time: datetime, offset: int, limit: int, recipe_id: UUID | None = None
+    ) -> Paginated[HydratedReport]:
         raise NotImplementedError
 
-    def get_report(self, report_id) -> Report:
+    def get_report(self, valid_time: datetime, report_id: str | Reference) -> HydratedReport:
         raise NotImplementedError
 
     def get_bit_configs(self, source: OOI, bit_definition: BitDefinition, valid_time: datetime) -> list[Config]:
@@ -159,7 +162,9 @@ class OOIRepository(Repository):
     def list_related(self, ooi: OOI, path: Path, valid_time: datetime) -> list[OOI]:
         raise NotImplementedError
 
-    def query(self, query: Query, valid_time: datetime) -> list[OOI | tuple]:
+    def query(
+        self, query: str | Query, valid_time: datetime, to_type: type[OOI] | None = None
+    ) -> list[OOI | tuple | dict[Any, Any]]:
         raise NotImplementedError
 
 
@@ -235,18 +240,25 @@ class XTDBOOIRepository(OOIRepository):
         return export
 
     @classmethod
-    def deserialize(cls, data: dict[str, Any]) -> OOI:
+    def deserialize(cls, data: dict[str, Any], to_type: type[OOI] | None = None) -> OOI:
         if "object_type" not in data:
             raise ValueError("Data is missing object_type")
 
-        # pop global attributes
-        object_cls = type_by_name(data.pop("object_type"))
-        data.pop(cls.pk_prefix)
-        user_id = data.pop("user_id", None)
+        object_cls = type_by_name(data["object_type"])
+        object_cls = to_type or object_cls
+        user_id = data.get("user_id")
 
         # remove type prefixes
-        stripped = {key.split("/")[1]: value for key, value in data.items()}
+        stripped = {
+            key.split("/")[1]: value
+            for key, value in data.items()
+            if key not in [cls.pk_prefix, "user_id", "object_type", "_reference"]
+        }
         stripped["user_id"] = user_id
+
+        if scan_profiles := data.get("_reference", []):
+            stripped["scan_profile"] = scan_profiles[0]
+
         return object_cls.model_validate(stripped)
 
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
@@ -292,7 +304,10 @@ class XTDBOOIRepository(OOIRepository):
         return {ooi.primary_key: ooi for ooi in oois}
 
     def load_bulk_as_list(self, references: set[Reference], valid_time: datetime) -> list[OOI]:
-        query = generate_pull_query(FieldSet.ALL_FIELDS, {self.pk_prefix: list(map(str, references))})
+        if not references:
+            return []
+
+        query = Query().where_in(OOI, id=references).pull(OOI, fields="[* {:_reference [*]}]")
         return [self.deserialize(x[0]) for x in self.session.client.query(query, valid_time)]
 
     def list_oois(
@@ -800,57 +815,66 @@ class XTDBOOIRepository(OOIRepository):
                 new_data[new_key] = value
         return new_data
 
-    def list_reports(self, valid_time, offset, limit) -> Paginated[tuple[Report, list[Report | None]]]:
-        count_query = """
-                            {
-                                :query {
-                                    :find [(count ?report)]
-                                    :where [[?report :object_type "Report"]
-                                        [?report :Report/has_parent false]]
-                                }
-                            }
-                        """
-        count_results = self.session.client.query(count_query, valid_time)
-        count = 0
-        if count_results and count_results[0]:
-            count = count_results[0][0]
-
+    def list_reports(
+        self, valid_time: datetime, offset: int, limit: int, recipe_id: UUID | None = None
+    ) -> Paginated[HydratedReport]:
         date = Aliased(Report, field="date_generated")
-        query = (
-            Query(Report)
-            .pull(Report, fields="[* {:Report/_parent_report [*]}]")
-            .find(date)
-            .where(Report, has_parent=False, date_generated=date)
-            .order_by(date, ascending=False)
-            .limit(limit)
-            .offset(offset)
-        )
+        query = Query(Report).where(Report, date_generated=date)
 
-        results = [
-            (
-                self.simplify_keys(x[0]),
-                (
-                    [self.simplify_keys(y) for y in x[0]["Report/_parent_report"]]
-                    if "Report/_parent_report" in x[0]
-                    else []
-                ),
-            )
-            for x in self.session.client.query(query)
-        ]
+        if recipe_id:
+            query = query.where(ReportRecipe, recipe_id=str(recipe_id))
+            query = query.where(Report, report_recipe=ReportRecipe)
 
-        return Paginated(count=count, items=results)
+        count_results = self.query(query.count(), valid_time)
+        count = 0 if not count_results else count_results[0]
 
-    def query(self, query: str | Query, valid_time: datetime) -> list[OOI | tuple]:
+        query = query.pull(Report, fields="[* {:Report/input_oois [*]}]").order_by(date, ascending=False)
+
+        # XTDB requires the field ordered on to be returned in a find statement, see e.g. the discussion here:
+        # https://github.com/xtdb/xtdb/issues/418
+        results = self.query(query.find(date).limit(limit).offset(offset), valid_time, HydratedReport)
+
+        # Remove the date from the results
+        return Paginated(count=count, items=[results[0] for results in results])
+
+    def get_report(self, valid_time: datetime, report_id: str | Reference) -> HydratedReport:
+        query = Query(Report).where(Report, primary_key=str(report_id))
+        results = self.query(query.pull(Report, fields="[* {:Report/input_oois [*]}]"), valid_time, HydratedReport)
+
+        if not results:
+            raise ObjectNotFoundException(report_id)
+
+        result = results[0]
+
+        if not isinstance(result, HydratedReport):
+            raise ValueError("Invalid query result")
+
+        return result
+
+    def query(
+        self, query: str | Query, valid_time: datetime, to_type: type[OOI] | None = None
+    ) -> list[OOI | tuple | dict[Any, Any]]:
+        """
+        Performs the given query and returns the query results at the provided valid_time.
+
+        At this point, the query can return both OOIs or more complex structures, see for example the query-many
+        endpoint. For backward compatibility, we try to deserialize oois whenever we expect that to be possible, but
+        when we are going to improve and extend query capabilities, deserialization should be moved outside this method.
+        """
+
         results = self.session.client.query(query, valid_time=valid_time)
 
-        parsed_results: list[OOI | tuple] = []
+        parsed_results: list[dict[Any, Any] | OOI | tuple] = []
         for result in results:
             parsed_result = []
 
             for item in result:
-                try:
-                    parsed_result.append(self.deserialize(item))
-                except (ValueError, TypeError):
+                if isinstance(item, dict):
+                    try:
+                        parsed_result.append(self.deserialize(item, to_type))
+                    except (ValueError, TypeError):
+                        parsed_result.append(item)  # type: ignore
+                else:
                     parsed_result.append(item)
 
             if len(parsed_result) == 1:
