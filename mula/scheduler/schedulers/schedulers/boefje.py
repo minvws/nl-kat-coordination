@@ -3,6 +3,7 @@ from concurrent import futures
 from datetime import datetime, timedelta, timezone
 from typing import Any, Literal
 
+import limits
 from opentelemetry import trace
 from pydantic import ValidationError
 
@@ -23,6 +24,7 @@ class BoefjeScheduler(Scheduler):
 
     Attributes:
         ranker: The ranker to calculate the priority of a task.
+        rate_limiter: ...
     """
 
     ID: Literal["boefje"] = "boefje"
@@ -38,6 +40,7 @@ class BoefjeScheduler(Scheduler):
         """
         super().__init__(ctx=ctx, scheduler_id=self.ID, create_schedule=True, auto_calculate_deadline=True)
         self.ranker = rankers.BoefjeRankerTimeBased(self.ctx)
+        self.rate_limiter = limits.strategies.MovinWindowRateLimiter(limits.storage.MemoryStorage())
 
     def run(self) -> None:
         """The run method is called when the scheduler is started. It will
@@ -65,6 +68,7 @@ class BoefjeScheduler(Scheduler):
         self.run_in_thread(name="BoefjeScheduler-mutations", target=self.listeners["mutations"].listen, loop=False)
         self.run_in_thread(name="BoefjeScheduler-new_boefjes", target=self.process_new_boefjes, interval=60.0)
         self.run_in_thread(name="BoefjeScheduler-rescheduling", target=self.process_rescheduling, interval=60.0)
+        self.run_in_thread(name="BoefjeScheduler-delayed", target=self.process_delayed, interval=60.0)
 
         self.logger.info(
             "Boefje scheduler started", scheduler_id=self.scheduler_id, item_type=self.queue.item_type.__name__
@@ -356,6 +360,50 @@ class BoefjeScheduler(Scheduler):
                     self.process_rescheduling.__name__,
                 )
 
+    @tracer.start_as_current_span("BoefjeScheduler.process_delayed")
+    def process_delayed(self):
+        try:
+            delayed_tasks, _ = self.ctx.datastores.task_store.get_tasks(
+                scheduler_id=self.scheduler_id, status=models.TaskStatus.DELAYED
+            )
+            if not delayed_tasks:
+                self.logger.debug("No delayed tasks found", scheduler_id=self.scheduler_id)
+                return
+        except StorageError:
+            self.logger.debug("Error occurred while processing delayed tasks", scheduler_id=self.scheduler_id)
+            return
+
+        with futures.ThreadPoolExecutor(thread_name_prefix=f"TPE-{self.scheduler_id}-delayed") as executor:
+            for delayed_task in delayed_tasks:
+                try:
+                    boefje_task = models.BoefjeTask.model_validate(delayed_task.data)
+
+                    if not self.has_boefje_task_hit_rate_limit(boefje_task, hit=False):
+                        self.logger.debug(
+                            "Boefje task has hit rate limit, skipping",
+                            task_id=delayed_task.id,
+                            scheduler_id=self.scheduler_id,
+                        )
+                        continue
+
+                    # TODO: more checks?
+
+                except (StorageError, ValidationError, ExternalServiceError):
+                    self.logger.exception(
+                        "Error occurred while processing delayed tasks",
+                        task_id=delayed_task.id,
+                        scheduler_id=self.scheduler_id,
+                    )
+                    continue
+
+                executor.submit(
+                    self.push_boefje_task,
+                    boefje_task,
+                    delayed_task.organisation,
+                    self.create_schedule,
+                    self.process_delayed.__name__,
+                )
+
     @exception_handler
     @tracer.start_as_current_span("BoefjeScheduler.push_boefje_task")
     def push_boefje_task(
@@ -640,6 +688,41 @@ class BoefjeScheduler(Scheduler):
             return False
 
         return True
+
+    # TODO: implement
+    def has_boefje_task_hit_rate_limit(self, task: models.BoefjeTask, hit: bool) -> bool:
+        """Check if the boefje task has hit the rate limit.
+
+        Args:
+            task: The BoefjeTask to check.
+            hit: Whether the rate limit has been hit.
+
+        Returns:
+            True if the rate limit has been hit, False otherwise.
+        """
+        if (rate_limit := task.boefje.rate_limit) is None:
+            raise ValueError("Rate limit is not set for boefje")
+
+        # TODO: exception checking from limits
+        parsed_rate_limit = limits.parse(rate_limit.interval)  # type: ignore[union-attr]
+        if parsed_rate_limit is None:
+            raise ValueError(f"Failed to parse rate limit: {rate_limit.interval}")
+
+        can_consume = self.rate_limiter.test(parsed_rate_limit, rate_limit.identifier)
+        if not can_consume:
+            self.logger.debug(
+                "Boefje task has hit rate limit",
+                task_id=task.id,
+                rate_limit=rate_limit.interval,
+                scheduler_id=self.scheduler_id,
+            )
+            return True
+
+        # When we can consume, we hit the rate limiter
+        if hit:
+            self.rate_limiter.hit(parsed_rate_limit, rate_limit.identifier)
+
+        return False
 
     def get_boefjes_for_ooi(self, ooi: models.OOI, organisation: str) -> list[models.Plugin]:
         """Get available all boefjes (enabled and disabled) for an ooi.
