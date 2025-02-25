@@ -24,6 +24,9 @@ in the same KAT install earlier while the user might not have access to this
 organization. This might be a problem for certain usage of OpenKAT, so
 deduplication should be a setting that can be turned off.
 
+Usage of previous raw files can also only be used if they are not older than the
+requested interval in the requesting organization.
+
 ## Nonfunctional requirements
 
 The primary goal is currently to not run the same boefje again for a different
@@ -88,7 +91,7 @@ dictionary with those values:
 def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
 ```
 
-### Arguments that are passed to boefjes that need to be considered for dedupliation
+### Arguments that are passed to boefjes that need to be considered for deduplication
 
 To make sure we only do deduplication on boefje tasks that really are the same
 we should be more strict to what we pass to the boefje as input. We've been
@@ -98,10 +101,10 @@ BoefjeMeta as input to each boefje.
 #### Usage of arguments field
 
 This is used by almost every boefje and the main way to specify on what the
-boefje should run. This is the serialized ooi, the result of calling `serialize`
+boefje should run. This is the serialized OOI, the result of calling `serialize`
 on an OOI.
 
-It might be better to provide the serialized ooi as `input_ooi` argument to the
+It might be better to provide the serialized OOI as `input_ooi` argument to the
 boefje `run` to make it more clear what the contents of the field is, see below
 for the proposed signature.
 
@@ -137,7 +140,7 @@ provided variables are set environment variables are set and the boefje
 
 #### Usage of started_at, endated_at, boefje and runnable_hash fields
 
-This isn't used by any boefje and can be safely removed.
+This isn't used by any boefje and can be safely removed from the boefje arguments.
 
 #### Boefje signature / arguments
 
@@ -190,7 +193,14 @@ deduplication is turned on and environment variables are passed to the boefje
 runner we need to return an error because the user needs to know that the passed
 variables aren't used.
 
-#### Deduplication algorithm
+### Valid time
+
+If we deduplicate boefje, we need to add the output which a certain valid time.
+Using the current time doesn't seem right, because the boefje task was run
+earlier. But using the earlier time means we need to create and object with an
+older valid time which might complicate inference.
+
+#### Deduplication algorithm option 1
 
 A possible algorithm for deduplication could be:
 
@@ -209,14 +219,21 @@ boefje settings. If we store which organizations have the same settings and
 which have different settings, we don't have to fetch this information for every
 boefje task.
 
-Another option might be to do deduplication after a boefje task has finished
-execution. When the task has finished, we could check which other organizations
-have the same input OOI and settings and also save the raw file for all the
-other organizations. This might be more difficult to implement however.
+#### Deduplication algorithm option 2
 
-### Valid time
+The goal is of OpenKAT is to do continuous monitoring. This means that most of
+the time we are scanning an already existing OOI. For deduplication this means
+that the common scenario is that a certain OOI might in a large number of
+organizations, the scenario that a new OOI is added that already exists in
+another organization is probably less common.
 
-If we deduplicate boefje, we need to add the output which a certain valid time.
-Using the current time doesn't seem right, because the boefje task was run
-earlier. But using the earlier time means we need to create and object with an
-older valid time which might complicate inference.
+We can take advantage of this by checking all other organizations for the same
+OOIs either before or after a boefje has run. The big advantage of doing
+deduplication this way is that the raw file has just been created and we don't
+need to insert data from the past or insert data with a different valid date
+than the date of the raw file.
+
+A way to optimize this might be to mark whether an OOI also exists in a
+different organization. This can be done when OOIs are created, updated and
+deleted instead of doing that check on every boefje run. We might also do
+something similar when environment settings are updated.
