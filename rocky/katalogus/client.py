@@ -67,6 +67,7 @@ class Boefje(Plugin):
     options: list[str] | None = None
     runnable_hash: str | None = None
     interval: int | None = None
+    run_on: list[str] | None = None
     boefje_schema: dict | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
@@ -260,7 +261,7 @@ class KATalogusClient:
         self._patch_plugin_state(organization_code, plugin.id, False)
 
     def get_enabled_boefjes(self, organization_code: str) -> list[Plugin]:
-        return self.get_plugins(organization_code, plugin_type="boefje", enabled=True)
+        return self.get_plugins(organization_code, plugin_type="boefje", state=True)
 
     def get_cover(self, organization_code: str, plugin_id: str) -> BytesIO:
         # TODO: does not need to be organization-specific
@@ -290,10 +291,9 @@ class KATalogusClient:
         try:
             logger.info("Editing boefje", event_code=800026, boefje=plugin.id)
             response = self.session.patch(
-                f"/v1/organisations/{quote(organization_code)}/boefjes/{plugin.id}",
-                content=plugin.model_dump_json(exclude_none=True),
+                f"/v1/organisations/{quote(organization_code)}/boefjes/{plugin.id}", content=plugin.model_dump_json()
             )
-            if response.status_code == codes.CREATED:
+            if response.status_code == codes.NO_CONTENT:
                 logger.info("Plugin %s updated", plugin.name)
             else:
                 logger.info("Plugin %s could not be updated", plugin.name)
@@ -391,7 +391,7 @@ class KATalogus:
         return self._katalogus_client.disable_plugin(self._member.organization.code, plugin)
 
     def get_enabled_boefjes(self) -> list[Plugin]:
-        return self._katalogus_client.get_plugins(self._member.organization.code, plugin_type="boefje", enabled=True)
+        return self._katalogus_client.get_plugins(self._member.organization.code, plugin_type="boefje", state=True)
 
     def get_cover(self, plugin_id: str) -> BytesIO:
         return self._katalogus_client.get_cover(self._member.organization.code, plugin_id)
@@ -426,6 +426,7 @@ def parse_boefje(boefje: dict) -> Boefje:
         created=boefje.get("created"),
         description=boefje.get("description"),
         interval=boefje.get("interval"),
+        run_on=boefje.get("run_on"),
         enabled=boefje["enabled"],
         type=boefje["type"],
         scan_level=scan_level,

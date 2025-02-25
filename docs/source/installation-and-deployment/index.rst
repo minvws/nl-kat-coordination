@@ -18,7 +18,6 @@ Contains documentation for developers and contributors.
    nginx
    s3-buckets
    debugging-troubleshooting
-   latex
    environment-settings/index
    external-authentication
    cveapi
