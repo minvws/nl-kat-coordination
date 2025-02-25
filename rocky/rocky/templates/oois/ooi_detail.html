@@ -112,7 +112,7 @@
                                         <td class="nowrap">
                                             <a href="{% url "boefje_detail" organization_code=organization.code plugin_id=boefje.id %}?ooi_id={{ ooi }}">{{ boefje.name }}</a>
                                         </td>
-                                        <td>{{ boefje.description }}</td>
+                                        <td class="nowrap">{{ boefje.description }}</td>
                                         <td class="nowrap">
                                             {% include "partials/scan_level_indicator.html" with value=boefje.scan_level.value %}
 
