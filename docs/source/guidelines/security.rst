@@ -33,7 +33,7 @@ The following languages are enabled within our CodeQL scan:
 
 **SonarQube Cloud**
 
-SonarQbue Cloud is used to scan for the code quality, it also looks for Security Hotspots, which are lines of code that may contain vulnerabilities.
+SonarQube Cloud is used to scan for the code quality, it also looks for Security Hotspots, which are lines of code that may contain vulnerabilities.
 
 Secret scanning
 ---------------
