@@ -1,19 +1,27 @@
 from datetime import datetime, timezone
 from string import Template
+from typing import Any
 
+import structlog
 from django.conf import settings
+from pydantic import RootModel
 from tools.models import Organization
+from tools.ooi_helpers import create_ooi
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference, ScanLevel, ScanProfileType
+from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
+from octopoes.models.ooi.reports import AssetReport, Report, ReportRecipe
 from octopoes.models.types import type_by_name
-from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
-from reports.report_types.definitions import report_plugins_union
+from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
+from reports.report_types.definitions import ReportPlugins, report_plugins_union
 from reports.report_types.helpers import get_report_by_id
+from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.runner.models import ReportRunner
-from reports.views.mixins import collect_reports, save_aggregate_report_data, save_report_data
 from rocky.bytes_client import BytesClient
 from rocky.scheduler import ReportTask
+
+logger = structlog.get_logger(__name__)
 
 
 class LocalReportRunner(ReportRunner):
@@ -22,114 +30,224 @@ class LocalReportRunner(ReportRunner):
         self.valid_time = valid_time
 
     def run(self, report_task: ReportTask) -> None:
+        organization = Organization.objects.get(code=report_task.organisation_id)
+        # TODO: https://github.com/minvws/nl-kat-coordination/issues/4014
         valid_time = self.valid_time or datetime.now(timezone.utc)
-
         connector = OctopoesAPIConnector(
             settings.OCTOPOES_API, report_task.organisation_id, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
         )
-        recipe_ref = Reference.from_str(f"ReportRecipe|{report_task.report_recipe_id}")
-        recipe = connector.get(recipe_ref, valid_time)
-
-        report_types = [get_report_by_id(report_type_id) for report_type_id in recipe.report_types]
-        oois = []
-        now = datetime.now(timezone.utc)
+        recipe = connector.get(Reference.from_str(f"ReportRecipe|{report_task.report_recipe_id}"), valid_time)
 
         if input_oois := recipe.input_recipe.get("input_oois"):
-            for ooi_id in input_oois:
-                ooi = connector.get(Reference.from_str(ooi_id), valid_time)
-                oois.append(ooi)
+            ooi_pks = list({Reference.from_str(ooi) for ooi in input_oois})
         elif query := recipe.input_recipe.get("query"):
-            types = {type_by_name(t) for t in query["ooi_types"]}
-            scan_level = {ScanLevel(cl) for cl in query["scan_level"]}
-            scan_type = {ScanProfileType(t) for t in query["scan_type"]}
-
             oois = connector.list_objects(
-                types=types,
+                types={type_by_name(ooi_type) for ooi_type in query["ooi_types"]},
                 valid_time=datetime.now(tz=timezone.utc),
-                scan_level=scan_level,
-                scan_profile_type=scan_type,
+                scan_level={ScanLevel(level) for level in query["scan_level"]},
+                scan_profile_type={ScanProfileType(scan_type) for scan_type in query["scan_type"]},
                 search_string=query["search_string"],
                 order_by=query["order_by"],
                 asc_desc=query["asc_desc"],
             ).items
 
-        oois_count = len(oois)
-        ooi_pks = [ooi.primary_key for ooi in oois]
-
-        self.bytes_client.organization = report_task.organisation_id
-
-        if recipe.parent_report_type == AggregateOrganisationReport.id:
-            parent_report_name = now.strftime(
-                Template(recipe.report_name_format).safe_substitute(
-                    report_type=str(AggregateOrganisationReport.name), oois_count=str(oois_count)
-                )
-            )
-            report_type_ids = [report.id for report in report_types]
-
-            if "${ooi}" in parent_report_name and oois_count == 1:
-                parent_report_name = Template(parent_report_name).safe_substitute(ooi=oois[0].human_readable)
-
-            aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
-                connector, oois, report_type_ids, valid_time, report_task.organisation_id
-            )
-            save_aggregate_report_data(
-                self.bytes_client,
-                connector,
-                Organization.objects.get(code=report_task.organisation_id),
-                valid_time,
-                ooi_pks,
-                {
-                    "input_data": {
-                        "input_oois": ooi_pks,
-                        "report_types": recipe.report_types,
-                        "plugins": report_plugins_union(report_types),
-                    }
-                },
-                parent_report_name,
-                report_data,
-                post_processed_data,
-                aggregate_report,
-                recipe_ref,
-            )
+            ooi_pks = list({ooi.reference for ooi in oois})
         else:
-            subreport_names = []
+            raise ValueError("Invalid recipe: no input_oois or query found")
+
+        additional_input_data: dict[str, Any] = {}
+
+        if recipe.report_type == AggregateOrganisationReport.id:
+            _, additional_input_data, report_data, report_errors = aggregate_reports(
+                connector, ooi_pks, recipe.asset_report_types, valid_time, report_task.organisation_id
+            )
+        elif recipe.report_type == MultiOrganizationReport.id:
+            report_data_multi = collect_report_data(connector, [str(x) for x in ooi_pks], valid_time)
+            report_data = {MultiOrganizationReport.id: report_data_multi}
+            additional_input_data = MultiOrganizationReport(connector).post_process_data(report_data_multi)
+        else:
+            report_types = [get_report_by_id(report_type_id) for report_type_id in recipe.asset_report_types]
             error_reports, report_data = collect_reports(valid_time, connector, ooi_pks, report_types)
 
-            for report_type_id, data in report_data.items():
-                report_type = get_report_by_id(report_type_id)
+        self.bytes_client.organization = organization.code
+        save_report_data(
+            self.bytes_client, valid_time, connector, organization, ooi_pks, report_data, recipe, additional_input_data
+        )
+        self.bytes_client.organization = None
 
-                for ooi in data:
-                    ooi_human_readable = Reference.from_str(ooi).human_readable
-                    subreport_name = now.strftime(
-                        Template(recipe.subreport_name_format).safe_substitute(
-                            ooi=ooi_human_readable, report_type=str(report_type.name)
-                        )
-                    )
-                    subreport_names.append((subreport_name, subreport_name))
 
-            parent_report_name = now.strftime(
-                Template(recipe.report_name_format).safe_substitute(oois_count=str(oois_count))
+def collect_reports(
+    valid_time: datetime, octopoes_connector: OctopoesAPIConnector, input_oois: list[Reference], report_types
+):
+    error_reports = []
+    report_data: dict[str, dict[str, dict[str, Any]]] = {}
+    by_type: dict[str, list[str]] = {}
+
+    for ooi in input_oois:
+        ooi_type = ooi.class_
+
+        if ooi_type not in by_type:
+            by_type[ooi_type] = []
+
+        by_type[ooi_type].append(ooi)
+
+    for report_class in report_types:
+        oois = {ooi for ooi_type in report_class.input_ooi_types for ooi in by_type.get(ooi_type.get_object_type(), [])}
+
+        try:
+            results = report_class(octopoes_connector).collect_data(oois, valid_time)
+        except ObjectNotFoundException:
+            error_reports.append(report_class.id)
+            continue
+        except TypeNotFound:
+            error_reports.append(report_class.id)
+            continue
+
+        for ooi, data in results.items():
+            if report_class.id not in report_data:
+                report_data[report_class.id] = {}
+
+            report_data[report_class.id][ooi] = {
+                "data": data,
+                "template": report_class.template_path,
+                "report_name": report_class.name,
+            }
+
+    return error_reports, report_data
+
+
+def save_report_data(
+    bytes_client: BytesClient,
+    observed_at: datetime,
+    octopoes_api_connector: OctopoesAPIConnector,
+    organization: Organization,
+    oois: list[Reference],
+    report_data: dict,
+    recipe: ReportRecipe,
+    additional_input_data: dict | None = None,
+) -> Report | None:
+    if additional_input_data is None:
+        additional_input_data = {}
+
+    plugins = report_plugins_union([get_report_by_id(type_id) for type_id in recipe.asset_report_types])
+
+    asset_reports = create_asset_reports(
+        bytes_client, plugins, observed_at, observed_at, octopoes_api_connector, organization, recipe, report_data
+    )
+    input_data = {
+        "input_data": {
+            "input_oois": [asset_report.reference for asset_report in asset_reports],
+            "report_types": recipe.asset_report_types,
+            "plugins": plugins,
+        }
+    }
+
+    raw_id = bytes_client.upload_raw(
+        raw=ReportDataDict(input_data | additional_input_data).model_dump_json().encode(),
+        manual_mime_types={"openkat/report"},
+    )
+
+    report_type_name = str(get_report_by_id(recipe.report_type).name)
+    report_name = observed_at.strftime(
+        Template(recipe.report_name_format).safe_substitute(oois_count=str(len(oois)), report_type=report_type_name)
+    )
+
+    if len(oois) == 1:
+        report_name = Template(report_name).safe_substitute(ooi=oois[0].human_readable)
+
+    report_ooi = Report(
+        name=report_name,
+        report_type=recipe.report_type,
+        template=get_report_by_id(recipe.report_type).template_path,
+        organization_code=organization.code,
+        organization_name=organization.name,
+        organization_tags=[tag.name for tag in organization.tags.all()],
+        data_raw_id=raw_id,
+        date_generated=observed_at,
+        reference_date=observed_at,
+        input_oois=[asset_report.reference for asset_report in asset_reports],
+        observed_at=observed_at,
+        report_recipe=recipe.reference,
+    )
+
+    create_ooi(octopoes_api_connector, bytes_client, report_ooi, observed_at)
+    logger.info("Report created [report_type=%s]", recipe.report_type, event_code=800071, report=report_ooi)
+    return report_ooi
+
+
+def create_asset_reports(
+    bytes_client: BytesClient,
+    plugins: ReportPlugins,
+    now: datetime,
+    observed_at: datetime,
+    octopoes_api_connector: OctopoesAPIConnector,
+    organization: Organization,
+    recipe: ReportRecipe,
+    report_data: dict,
+) -> list[AssetReport]:
+    asset_reports = []
+
+    for report_type_id, ooi_data in report_data.items():
+        report_type = get_report_by_id(report_type_id)
+
+        for reference, data in ooi_data.items():
+            asset_report_input = {
+                "input_data": {
+                    "input_oois": [reference],
+                    "report_types": [report_type.id],
+                    "plugins": {
+                        "required": {p for p in plugins["required"] if p in report_type.plugins["required"]},
+                        "optional": {p for p in plugins["optional"] if p in report_type.plugins["optional"]},
+                    },
+                }
+            }
+            asset_raw_id = bytes_client.upload_raw(
+                raw=ReportDataDict({"report_data": data["data"]} | asset_report_input).model_dump_json().encode(),
+                manual_mime_types={"openkat/report"},
             )
 
-            if "${ooi}" in parent_report_name and oois_count == 1:
-                parent_report_name = Template(parent_report_name).safe_substitute(ooi=ooi[0].human_readable)
-
-            save_report_data(
-                self.bytes_client,
-                valid_time,
-                connector,
-                Organization.objects.get(code=report_task.organisation_id),
-                {
-                    "input_data": {
-                        "input_oois": ooi_pks,
-                        "report_types": recipe.report_types,
-                        "plugins": report_plugins_union(report_types),
-                    }
-                },
-                report_data,
-                subreport_names,
-                parent_report_name,
-                recipe_ref,
+            asset_report = AssetReport(
+                name=f"{report_type.name} for {reference.human_readable}",
+                report_type=report_type_id,
+                report_recipe=recipe.reference,
+                template=report_type.template_path,
+                organization_code=organization.code,
+                organization_name=organization.name,
+                organization_tags=[tag.name for tag in organization.tags.all()],
+                data_raw_id=asset_raw_id,
+                date_generated=now,
+                reference_date=observed_at,
+                input_ooi=reference,
+                observed_at=observed_at,
             )
+            create_ooi(octopoes_api_connector, bytes_client, asset_report, observed_at)
+            asset_reports.append(asset_report)
 
-            self.bytes_client.organization = None
+    return asset_reports
+
+
+class ReportDataDict(RootModel):
+    root: Any
+
+    class Config:
+        arbitrary_types_allowed = True
+
+
+def aggregate_reports(
+    connector: OctopoesAPIConnector,
+    input_oois: list[Reference],
+    selected_report_types: list[str],
+    valid_time: datetime,
+    organization_code: str,
+) -> tuple[AggregateOrganisationReport, dict[str, Any], dict[str, Any], list[str]]:
+    all_types = [
+        t
+        for t in AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
+        if t.id in selected_report_types
+    ]
+
+    errors, report_data = collect_reports(valid_time, connector, input_oois, all_types)
+    aggregate_report = AggregateOrganisationReport(connector)
+    post_processed_data = aggregate_report.post_process_data(report_data, valid_time, organization_code)
+
+    return aggregate_report, post_processed_data, report_data, errors

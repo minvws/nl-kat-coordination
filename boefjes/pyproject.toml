@@ -18,12 +18,13 @@ pynacl = "^1.5.0"
 sqlalchemy = "^1.4.48"
 python-dateutil = "^2.8.2"
 pydantic-settings = "^2.2.1"
-opentelemetry-sdk = "^1.28.2"
-opentelemetry-exporter-otlp-proto-grpc = "^1.28.2"
-opentelemetry-instrumentation-fastapi = "^0.49b2"
-opentelemetry-instrumentation-psycopg2 = "^0.49b2"
-opentelemetry-instrumentation-requests = "^0.49b2"
-opentelemetry-instrumentation = "^0.49b2"
+opentelemetry-sdk = "^1.29.0"
+opentelemetry-exporter-otlp-proto-grpc = "^1.29.0"
+opentelemetry-instrumentation-fastapi = "^0.50b0"
+opentelemetry-instrumentation-psycopg2 = "^0.50b0"
+opentelemetry-instrumentation-requests = "^0.50b0"
+opentelemetry-instrumentation = "^0.50b0"
+# required by kat_snyk, kat_crt_sh, kat_crt_sh boefjes
 requests = "^2.32.1"
 # required by kat_burpsuite, kat_webpage_analysis/find_images_in_html normalizer
 beautifulsoup4 = "4.11.1"
@@ -36,9 +37,11 @@ validators = "0.20.0"
 # required by kat_nmap boefje
 python-libnmap = "0.7.3"
 # required by kat_ssl_certificates boefje
-cryptography = "^43.0.1"
+cryptography = "^44.0.1"
 # required by kat_webpage_analysis
-python-wappalyzer = {git = "https://github.com/chorsley/python-Wappalyzer.git", rev = "0.4.0"}
+forcediphttpsadapter = "1.1.0"
+# required by kat_webpage_analysis (forcediphttpsadapter)
+urllib3 = "^2.1.0"
 # required by kat_wpscan
 wpscan-out-parse = "1.9.3"
 # required by kat_rpki
@@ -48,18 +51,21 @@ defusedxml = "^0.7.1"
 # required by kat_webpage_analysis/check_images normalizer
 pillow = "^10.3.0"
 httpx = "^0.27.0"
-opentelemetry-api = "^1.28.2"
-opentelemetry-exporter-otlp-proto-common = "^1.28.2"
-opentelemetry-instrumentation-asgi = "^0.49b2"
-opentelemetry-instrumentation-dbapi = "^0.49b2"
-opentelemetry-proto = "^1.28.2"
-opentelemetry-semantic-conventions = "^0.49b2"
-opentelemetry-util-http = "^0.49b2"
+opentelemetry-api = "^1.29.0"
+opentelemetry-exporter-otlp-proto-common = "^1.29.0"
+opentelemetry-instrumentation-asgi = "^0.50b0"
+opentelemetry-instrumentation-dbapi = "^0.50b0"
+opentelemetry-proto = "^1.29.0"
+opentelemetry-semantic-conventions = "^0.50b0"
+opentelemetry-util-http = "^0.50b0"
 fastapi-slim = "^0.115.2"
 structlog = "^24.2.0"
 # required by kat_maxmind_geoip
 maxminddb = "^2.6.2"
-croniter = "^5.0.1"
+# required by kat_wappalyzer
+tanimachi = "^0.0.6"
+cpe = "^1.3.1"
+croniter = "^6.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.0"
@@ -80,7 +86,6 @@ markers = ["slow: marks tests as slow"]
 addopts = "-m 'not slow'"
 env = [
     "D:KATALOGUS_DB_URI=postgresql://postgres:postgres@ci_katalogus-db:5432/ci_katalogus",
-    "D:QUEUE_URI=amqp://placeholder",
     "D:BOEFJES_API=http://placeholder:8006",
     "D:KATALOGUS_API=http://placeholder:8000",
     "D:OCTOPOES_API=http://placeholder:8001",

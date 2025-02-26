@@ -204,8 +204,6 @@ def test_save_generate_report_view(
         count=len(listed_hostnames), items=listed_hostnames
     )
 
-    old_report_names = [f"DNS report for {ooi.name}" for ooi in listed_hostnames]
-
     request = setup_request(
         rf.post(
             "generate_report_view",
@@ -213,8 +211,10 @@ def test_save_generate_report_view(
                 "observed_at": valid_time.strftime("%Y-%m-%d"),
                 "ooi": listed_hostnames,
                 "report_type": "dns-report",
-                "old_report_name": old_report_names,
-                "report_name": [f"DNS report for {len(listed_hostnames)} objects"],
+                "start_date": "2024-01-01",
+                "start_time": "10:10",
+                "recurrence": "once",
+                "parent_report_name_format": "${report_type} for ${oois_count} objects",
             },
         ),
         client_member.user,
@@ -223,7 +223,7 @@ def test_save_generate_report_view(
     response = SaveGenerateReportView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 302  # after post follows redirect, this to first create report ID
-    assert "report_id=Report" in response.url
+    assert "/reports/scheduled-reports/" in response.url
 
 
 def test_save_generate_report_view_scheduled(
@@ -260,7 +260,7 @@ def test_save_generate_report_view_scheduled(
                 "start_date": "2024-01-01",
                 "start_time": "10:10",
                 "recurrence": "daily",
-                "parent_report_name": [f"DNS report for {len(listed_hostnames)} objects"],
+                "report_name": [f"DNS report for {len(listed_hostnames)} objects"],
             },
         ),
         client_member.user,

@@ -6,7 +6,7 @@
     "HTTPResource"
   ],
   "produces": [
-    "openkat-http/response",
+    "application/json+har",
     "openkat-http/headers",
     "openkat-http/body",
     "application/javascript",
