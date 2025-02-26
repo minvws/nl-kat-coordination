@@ -218,6 +218,7 @@ class NibblesRunner:
                         origin_type=OriginType.NIBBLET,
                         source=source_ooi.reference,
                         result=[ooi.reference for ooi in result],
+                        phantom_result=[],
                         parameters_hash=nibble_hasher(arg, self.nibbles[nibble_id]._checksum),
                         parameters_references=[a.reference if isinstance(a, OOI) else None for a in arg],
                     )
