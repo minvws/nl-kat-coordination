@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from typing import Any
 from urllib import parse
 
@@ -103,5 +104,15 @@ def ooi_type(reference_string: str) -> str:
 
 
 @register.filter
+def get_datetime(date_str: str) -> datetime:
+    return datetime.fromisoformat(date_str)
+
+
+@register.filter
+def get_first_seen(occurrences: dict) -> datetime:
+    first_seen_list = [datetime.fromisoformat(occurrence["first_seen"]) for occurrence in occurrences]
+    return min(first_seen_list)
+
+
 def get_user_full_name(ooi: OOI) -> str:
     return KATUser.objects.get(id=ooi.user_id).get_full_name()

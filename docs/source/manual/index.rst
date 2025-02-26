@@ -8,5 +8,6 @@ An overview of all KAT functionality, from a user perspective.
    :caption: Contents
 
    user-manual
+   crisis-room
    reports
    normalizers

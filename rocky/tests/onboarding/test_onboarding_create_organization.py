@@ -18,8 +18,12 @@ def test_onboarding_create_organization(rf, superuser_member, mock_models_katalo
 
 
 def test_onboarding_create_organization_already_exist_katalogus(
-    rf, superuser, mock_katalogus_client, mock_models_octopoes
+    rf, superuser, mock_katalogus_client, mock_models_octopoes, mocker
 ):
+    mocker.patch("katalogus.client.KATalogusClient")
+    mocker.patch("rocky.signals.OctopoesAPIConnector")
+    mocker.patch("crisis_room.management.commands.dashboards.scheduler_client")
+    mocker.patch("crisis_room.management.commands.dashboards.get_bytes_client")
     request = setup_request(
         rf.post("step_organization_setup", {"name": "Test Organization", "code": "test"}), superuser
     )
