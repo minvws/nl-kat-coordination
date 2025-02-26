@@ -159,7 +159,6 @@ The contents of the folder MyOrganisation are: ::
  drwxr-xr-x 6 root root 4,0K apr  3 14:27 .
  drwxrwxr-x 4 user user 4,0K apr  3 14:27 ..
  drwxr-xr-x 2 root root 4,0K apr  3 14:27 nl-kat-coordination_bytes-data
- drwxr-xr-x 2 root root 4,0K apr  3 14:27 nl-kat-coordination_keiko-reports
  drwxr-xr-x 2 root root 4,0K apr  3 14:27 nl-kat-coordination_postgres-data
  drwxr-xr-x 2 root root 4,0K apr  3 14:27 nl-kat-coordination_xtdb-data
 

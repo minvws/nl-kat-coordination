@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-25 09:27+0000\n"
-"PO-Revision-Date: 2024-11-22 17:00+0000\n"
+"POT-Creation-Date: 2025-02-06 13:51+0000\n"
+"PO-Revision-Date: 2024-12-20 18:00+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
 "Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/nl-kat-"
 "coordination/fy/>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.9-dev\n"
+"X-Generator: Weblate 5.9.2-dev\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -670,6 +670,10 @@ msgstr ""
 "Der is in HTTP-%d-flater bard. Kontrolearje de lochboeken foar mear ynfo."
 
 #: katalogus/client.py
+msgid "An HTTP error occurred. Check logs for more info."
+msgstr ""
+
+#: katalogus/client.py
 msgid "Boefje with this name already exists."
 msgstr "Boefje mei dizze namme bestiet al."
 
@@ -1105,6 +1109,7 @@ msgstr "In oersjoch fan alle beskikbere ynstekkers."
 #: katalogus/templates/plugin_settings_list.html
 #: katalogus/views/katalogus_settings.py tools/view_helpers.py
 #: rocky/templates/header.html
+#: rocky/templates/organizations/organization_list.html
 msgid "Settings"
 msgstr "Ynstellingen"
 
@@ -1198,7 +1203,6 @@ msgstr "Ferplichte ynstellingen"
 
 #: katalogus/templates/partials/plugin_settings_required.html
 #: rocky/templates/findings/finding_add.html
-#: rocky/templates/partials/ooi_detail_related_object.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Add"
 msgstr "Tafoegje"
@@ -1261,13 +1265,13 @@ msgstr "Ynstekkersnavigaasje"
 
 #: katalogus/templates/partials/plugins_navigation.html
 #: rocky/templates/scan.html rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/partials/tab_navigation.html
+#: rocky/templates/tasks/partials/tab_navigation.html rocky/views/tasks.py
 msgid "Boefjes"
 msgstr "Boefkes"
 
 #: katalogus/templates/partials/plugins_navigation.html
 #: rocky/templates/tasks/normalizers.html
-#: rocky/templates/tasks/partials/tab_navigation.html
+#: rocky/templates/tasks/partials/tab_navigation.html rocky/views/tasks.py
 msgid "Normalizers"
 msgstr "Normalizers"
 
@@ -1329,6 +1333,7 @@ msgstr "Oersjoch fan farianten"
 #: katalogus/templates/plugin_container_image.html
 #: reports/report_types/tls_report/report.html
 #: reports/templates/partials/plugin_overview_table.html
+#: reports/templates/tasks/report_tasks_list.html
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 #: rocky/templates/tasks/ooi_detail_task_list.html
@@ -1340,9 +1345,13 @@ msgstr "Status"
 msgid "Age"
 msgstr "Leeftiid"
 
-#: katalogus/templates/plugin_container_image.html tools/forms/boefje.py
-msgid "Scan frequency"
-msgstr "Scanfrekwinsje"
+#: katalogus/templates/plugin_container_image.html
+msgid "Scan interval"
+msgstr ""
+
+#: katalogus/templates/plugin_container_image.html
+msgid "Run on"
+msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
 msgid "current"
@@ -1396,6 +1405,7 @@ msgstr "Boefje-ID"
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/subreports_table.html
+#: reports/templates/tasks/report_tasks_list.html
 msgid "Creation date"
 msgstr "Oanmaakdatum"
 
@@ -1818,10 +1828,6 @@ msgid "Account setup"
 msgstr "Account ynstelle"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
-msgid "Accounts"
-msgstr "Accounts"
-
-#: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Organization setup with separate accounts:"
 msgstr "Organisaasje ynstelle mei aparte accounts:"
 
@@ -2072,6 +2078,8 @@ msgstr "Kies in rapport – Yntroduksje"
 #: onboarding/templates/step_2a_choose_report_info.html
 #: reports/templates/report_overview/report_overview_header.html
 #: reports/views/base.py rocky/templates/header.html
+#: rocky/templates/tasks/partials/tab_navigation.html
+#: rocky/templates/tasks/report_tasks.html rocky/views/tasks.py
 msgid "Reports"
 msgstr "Rapporten"
 
@@ -2595,6 +2603,7 @@ msgid "Enable and start scan"
 msgstr "Ynskeakelje en scan starte"
 
 #: onboarding/templates/step_4_report.html
+#: reports/report_types/concatenated_report/report.py
 msgid "Report"
 msgstr "Rapport"
 
@@ -2728,12 +2737,16 @@ msgstr "Startdatum"
 
 #: reports/forms.py
 msgid "Start time (UTC)"
-msgstr ""
+msgstr "Starttiid (UTC)"
 
 #: reports/forms.py
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Recurrence"
 msgstr "Werhelling"
+
+#: reports/forms.py
+msgid "No recurrence, just once"
+msgstr ""
 
 #: reports/forms.py
 msgid "Daily"
@@ -2782,10 +2795,6 @@ msgstr "Nei"
 #: reports/forms.py
 msgid "Report name format"
 msgstr "Rapportnammeformaat"
-
-#: reports/forms.py
-msgid "Subreports name format"
-msgstr "Subrapportnammeformaat"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/report_types/multi_organization_report/appendix.html
@@ -2890,6 +2899,9 @@ msgid ""
 "strong> are taken as a starting point, assets that are not in bold were "
 "found by OpenKAT itself."
 msgstr ""
+"In oersjoch fan de hânmjittich frijwarre scande assets. <strong>Fet drukte</"
+"strong> assets binne as startpunt nommen, net fet drukte assets binne troch "
+"OpenKAT sels fûn."
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
 #: reports/templates/partials/report_sidemenu.html
@@ -2901,6 +2913,8 @@ msgid ""
 "In this chapter, first a table of compliance checks is displayed, followed "
 "by a detailed examination of compliance issues for each component."
 msgstr ""
+"Yn dit haadstik wurdt earst in tabel mei compliancekontrôlen toand en dernei "
+"wurde per ûnderdiel de complianceproblemen taljochte."
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
 msgid "Overview of the basic security status"
@@ -2912,6 +2926,9 @@ msgid ""
 "assets. Basic security in order. In principle, all values in this table "
 "should be checked off."
 msgstr ""
+"Dizze tabel jout in oersjoch fan de basisbefeiligingsstatus fan de bekende "
+"assets. Basisbefeiliging op oarde. Yn prinsipe soene alle wearden yn dizze "
+"tabel ôffinkt wêze moatte."
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
 msgid "Basic security status"
@@ -3066,6 +3083,10 @@ msgstr "Fûne kwetsberheden binne per systeem groepearre."
 msgid "No CVEs have been found."
 msgstr "Der binne gjin CVE’s fûn."
 
+#: reports/report_types/aggregate_organisation_report/report.py
+msgid "Aggregate Organisation Report"
+msgstr "Organisaasjerapport gearstalle"
+
 #: reports/report_types/aggregate_organisation_report/report_design.html
 msgid "Observed at:"
 msgstr "Sjoen op:"
@@ -3112,6 +3133,8 @@ msgid ""
 "This table shows which checks were performed. Following that, the compliance "
 "issues, if any, are shown for each %(type)s Server."
 msgstr ""
+"Dizze tabel lit sjen hokker kontrôles útfierd binne. Dêrnei wurde foar elke "
+"%(type)s-server de eventuele complianceproblemen werjûn."
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
 msgid "Check overview"
@@ -3266,10 +3289,6 @@ msgid ""
 "format."
 msgstr ""
 
-#: reports/report_types/concatenated_report/report.py
-msgid "Concatenated Report"
-msgstr "Gearfoege rapport"
-
 #: reports/report_types/dns_report/report.html
 msgid "Records found"
 msgstr "Fûne records"
@@ -3316,6 +3335,9 @@ msgid ""
 "The security measures table below shows which DNS relating security measures "
 "are enabled based on the contents of the DNS records."
 msgstr ""
+"De folgjende befeiligingstabel toant oan hokker DNS-relatearre "
+"feilichheidsmaatregelen aktivearre binne neffens de ynhâld fan de DNS-"
+"gegevens."
 
 #: reports/report_types/dns_report/report.html
 msgid "Yes"
@@ -3351,6 +3373,7 @@ msgstr "Befining"
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
@@ -3381,6 +3404,8 @@ msgid ""
 "DNS reports focus on domain name system configuration and potential "
 "weaknesses."
 msgstr ""
+"DNS-rapporten jouwe ynsjoch yn de domeinnammesysteemkonfiguraasje en "
+"potinsjele swakheden."
 
 #: reports/report_types/findings_report/report.html
 msgid ""
@@ -3416,7 +3441,7 @@ msgstr "Earst sjoen"
 #: reports/report_types/findings_report/report.html
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid "No findings have been identified yet."
-msgstr ""
+msgstr "Der binne noch gjin befiningen identifisearre."
 
 #: reports/report_types/findings_report/report.py
 msgid "Findings Report"
@@ -3480,7 +3505,7 @@ msgstr "Mailrapport"
 #: reports/report_types/mail_report/report.py
 msgid ""
 "System specific Mail Report that focusses on IP addresses and hostnames."
-msgstr ""
+msgstr "Systeemspesifyk Mailrapport dat fokust op IP-adressen en hostnammen."
 
 #: reports/report_types/multi_organization_report/asset_overview.html
 msgid "Overview of included assets"
@@ -4035,16 +4060,22 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-msgid ""
-"Please choose a start date, time and recurrence for scheduling your "
-"report(s). If you select a date on the 28th-31st of the month, it will "
-"always be scheduled on the last day of the month."
-msgstr ""
+#: reports/templates/report_overview/report_history_table.html
+msgid "Report name"
+msgstr "Rapportnamme"
 
 #: reports/templates/partials/export_report_settings.html
+#, python-format, python-brace-format
 msgid ""
-"The date you select will be the reference date for the data set for your "
-"report. Please allow for up to 24 hours for your report to be ready."
+"When generating reports, it is possible to give the report a name. The name "
+"can be static or dynamic. The default format for a report is '${report_type} "
+"for ${oois_count} objects'. These placeholders automatically adapt based on "
+"the report details. This format could for example return 'Aggregate Report "
+"for 15 objects'. Another placeholder that can be used is '${ooi}', which "
+"will show the name of the object when there is only one object. You can also "
+"customize the name by adding prefixes, suffixes, or other formats like '%%W' "
+"for the week number, using options from <a href=\"https://strftime.org/\" "
+"target=\"_blank\" rel=\"noopener\">Python strftime code</a>."
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
@@ -4116,7 +4147,7 @@ msgstr ""
 
 #: reports/templates/partials/report_names_form.html
 msgid "Report names:"
-msgstr ""
+msgstr "Rapportnammen:"
 
 #: reports/templates/partials/report_names_form.html
 #: rocky/templates/partials/form/field_input.html
@@ -4125,93 +4156,56 @@ msgstr "(Fereaske)"
 
 #: reports/templates/partials/report_names_form.html
 msgid "Add reference date"
-msgstr ""
+msgstr "Referinsjedatum tafoegje"
 
 #: reports/templates/partials/report_names_form.html
+#: reports/templates/report_overview/modal_partials/rename_modal.html
 #: rocky/views/scan_profile.py
 msgid "Reset"
-msgstr ""
+msgstr "Opnij ynstelle"
 
 #: reports/templates/partials/report_names_form.html
 msgid "No reference date"
-msgstr ""
+msgstr "Gjin referinsjedatum"
 
 #: reports/templates/partials/report_names_form.html
 msgid "Day"
-msgstr ""
+msgstr "Dei"
 
 #: reports/templates/partials/report_names_form.html
 msgid "Week"
-msgstr ""
+msgstr "Wike"
 
 #: reports/templates/partials/report_names_form.html
 msgid "Month"
-msgstr ""
+msgstr "Moanne"
 
 #: reports/templates/partials/report_names_form.html
 msgid "Year"
-msgstr ""
-
-#: reports/templates/partials/report_names_header.html
-#: reports/templates/report_overview/report_history_table.html
-msgid "Report name"
-msgstr ""
-
-#: reports/templates/partials/report_names_header.html
-msgid ""
-"Define a custom name format for your report(s). This format will be applied "
-"to all generated (sub)reports."
-msgstr ""
-
-#: reports/templates/partials/report_names_header.html
-#, python-brace-format
-msgid ""
-"To make the report names more descriptive, you can include placeholders for "
-"the object name, the report type and/or the reference date. For subreports "
-"and reports over a single object, use the placeholder \"${ooi}\" for the "
-"object name, \"${report_type}\" for the report type and use a <a "
-"href=\"https://strftime.org/\" target=\"_blank\" rel=\"noopener\">Python "
-"strftime code</a> for the reference date. For reports over multiple objects, "
-"use \"${oois_count}\" for the number of objects in the report."
-msgstr ""
-
-#: reports/templates/partials/report_names_header.html
-#, python-format, python-brace-format
-msgid ""
-"For example, the format \"${report_type} for ${ooi} at %%x\" could generate: "
-"\"DNS Report for example.com at 01/01/25\"."
-msgstr ""
-
-#: reports/templates/partials/report_names_header.html
-msgid ""
-"Give your report(s) a custom name and optionally add the reports' reference "
-"date to the name. To do so you can select a standard option or use a <a "
-"href=\"https://strftime.org/\" target=\"_blank\" rel=\"noopener\">Python "
-"strftime code</a> in the report name."
-msgstr ""
+msgstr "Jier"
 
 #: reports/templates/partials/report_navigation.html
 msgid "Report Navigation"
-msgstr ""
+msgstr "Rapportnavigaasje"
 
 #: reports/templates/partials/report_navigation.html
 msgid "Generate Report"
 msgstr "Rapport generearje"
 
-#: reports/templates/partials/report_navigation.html reports/views/base.py
+#: reports/templates/partials/report_navigation.html
 msgid "Aggregate Report"
 msgstr "Rapport aggregearje"
 
 #: reports/templates/partials/report_navigation.html
 msgid "Multi Report"
-msgstr ""
+msgstr "Multi-rapport"
 
 #: reports/templates/partials/report_ooi_list.html
 #, python-format
 msgid "Select object (%(total_oois)s)"
 msgid_plural "Select objects (%(total_oois)s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Selektearje objekt (%(total_oois)s)"
+msgstr[1] "Selektearje objekten (%(total_oois)s)"
 
 #: reports/templates/partials/report_ooi_list.html
 msgid ""
@@ -4244,37 +4238,37 @@ msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "Continue with live set"
-msgstr ""
+msgstr "Trochgean mei liveset"
 
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/report_asset_overview.html
 msgid "No objects found."
-msgstr ""
+msgstr "Gjin objekten fûn."
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "Go to the object page"
-msgstr ""
+msgstr "Gean nei de objektside"
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "objects selected"
-msgstr ""
+msgstr "objekten selektearre"
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "Deselect all objects"
-msgstr ""
+msgstr "Alle objekten deselektearje"
 
 #: reports/templates/partials/report_ooi_list.html
 #: rocky/templates/oois/ooi_list.html
 #, python-format
 msgid "Showing %(length)s of %(total)s objects"
-msgstr ""
+msgstr "%(length)s fan %(total)s objekten toand"
 
 #: reports/templates/partials/report_ooi_list.html
 #, python-format
 msgid "Select all %(total_oois)s object"
 msgid_plural "Select all %(total_oois)s objects"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Selektearje %(total_oois)s objekt"
+msgstr[1] "Selektearje alle %(total_oois)s objekten"
 
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/report_overview/report_history_table.html
@@ -4291,22 +4285,22 @@ msgstr "Objekten"
 #: reports/templates/summary/ooi_selection.html
 #: rocky/templates/oois/ooi_list.html
 msgid "Clearance type"
-msgstr ""
+msgstr "Frijwarringstype"
 
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/partials/report_types_selection.html
 msgid "Continue with selection"
-msgstr ""
+msgstr "Trochgean mei seleksje"
 
 #: reports/templates/partials/report_setup_scan.html
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 #: reports/views/multi_report.py
 msgid "Configuration"
-msgstr ""
+msgstr "Konfiguraasje"
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Set up the required plugins for this report."
-msgstr ""
+msgstr "Konfigurearje de nedige ynstekkers foar dit rapport."
 
 #: reports/templates/partials/report_setup_scan.html
 #: reports/templates/summary/selected_plugins.html
@@ -4318,6 +4312,8 @@ msgid ""
 "KAT will be able to generate a full report when all the required and "
 "suggested boefjes are enabled."
 msgstr ""
+"KAT kin in folslein rapport produsearje as alle ferplichte en foarstelde "
+"Boefjes ynskeakele binne."
 
 #: reports/templates/partials/report_setup_scan.html
 msgid ""
@@ -4334,7 +4330,7 @@ msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Warning! Before you proceed read the following points:"
-msgstr ""
+msgstr "Warskôging! Lês de folgjende punten eardat jo trochgean:"
 
 #: reports/templates/partials/report_setup_scan.html
 msgid ""
@@ -4348,53 +4344,61 @@ msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Good job! All required plugins are enabled."
-msgstr ""
+msgstr "Goed dien. Alle fereaske ynstekkers binne ynskeakele."
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "This report type requires the following plugins to be enabled:"
+msgstr "Dit rapport fereasket dat de folgjende ynstekkers ynskeakele binne:"
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "Toggle all required plugins"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Show enabled plugins"
-msgstr ""
+msgstr "Ynskeakele ynstekkers toane"
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "There are no required plugins."
-msgstr ""
+msgstr "Der binne gjin fereaske ynstekkers."
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Good job! All suggested plugins are enabled."
-msgstr ""
+msgstr "Goed dien! Alle fereaske ynstekkers binne ynskeakele."
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "The following plugins are optional to generate the report:"
+msgstr "De folgjende ynstekkers binne opsjoneel om it rapport te generearjen:"
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "Toggle all optional plugins"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Hide suggested plugins"
-msgstr ""
+msgstr "Foarstelde ynstekkers ferstopje"
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Show more suggested plugins"
-msgstr ""
+msgstr "Mear foarstelde ynstekkers toane"
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "There are no optional plugins."
-msgstr ""
+msgstr "Der binne gjin opsjonele ynstekkers."
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Enable plugins and continue"
-msgstr ""
+msgstr "Ynstekkers ynskeakelje en trochgean"
 
 #: reports/templates/partials/report_severity_totals.html
 #: reports/templates/partials/report_severity_totals_table.html
 msgid "Findings overview"
-msgstr ""
+msgstr "Befiningenoersjoch"
 
 #: reports/templates/partials/report_severity_totals_table.html
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Total per severity overview"
-msgstr ""
+msgstr "Oersjoch totalen per earnst"
 
 #: reports/templates/partials/report_sidemenu.html
 msgid "Selected Objects"
@@ -4402,7 +4406,7 @@ msgstr "Selektearre objekten"
 
 #: reports/templates/partials/report_sidemenu.html
 msgid "Selected Plugins"
-msgstr ""
+msgstr "Selektearre ynstekkers"
 
 #: reports/templates/partials/report_sidemenu.html
 msgid "Used Config Objects"
@@ -4410,7 +4414,7 @@ msgstr "Brûkte konfiguraasjeobjekten"
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Choose report types"
-msgstr ""
+msgstr "Kies rapporttypen"
 
 #: reports/templates/partials/report_types_selection.html
 msgid ""
@@ -4426,41 +4430,41 @@ msgstr ""
 #, python-format
 msgid "Selected object (%(total_oois)s)"
 msgid_plural "Selected objects (%(total_oois)s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Selektearre objekt (%(total_oois)s)"
+msgstr[1] "Selektearre objekten (%(total_oois)s)"
 
 #: reports/templates/partials/report_types_selection.html
 #, python-format
 msgid "You have selected %(total_oois)s object in previous step."
 msgid_plural "You have selected %(total_oois)s objects in previous step."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Jo hawwe yn de foarige stap %(total_oois)s objekt selektearre."
+msgstr[1] "Jo hawwe yn de foarige stap %(total_oois)s objekten selektearre."
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Change selection"
-msgstr ""
+msgstr "Seleksje oanpasse"
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Available report types"
-msgstr ""
+msgstr "Beskikbere rapporttypen"
 
 #: reports/templates/partials/report_types_selection.html
 msgid "All report types that are available for your selection."
-msgstr ""
+msgstr "Alle rapporten dy’t beskikber binne foar jo seleksje."
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Toggle all report types"
-msgstr ""
+msgstr "Selektearje alle rapporttypen"
 
 #: reports/templates/partials/return_button.html
 #, python-format
 msgid "%(btn_text)s"
-msgstr ""
+msgstr "%(btn_text)s"
 
 #: reports/templates/report_overview/modal_partials/delete_modal.html
 #: reports/templates/report_overview/modal_partials/share_modal.html
 msgid "Delete the following report(s):"
-msgstr ""
+msgstr "Smyt de folgjende rapport(en) fuort:"
 
 #: reports/templates/report_overview/modal_partials/delete_modal.html
 #: reports/templates/report_overview/modal_partials/share_modal.html
@@ -4484,8 +4488,10 @@ msgstr ""
 
 #: reports/templates/report_overview/modal_partials/delete_modal.html
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Input objects"
-msgstr ""
+msgstr "Objekten ynfiere"
 
 #: reports/templates/report_overview/modal_partials/delete_modal.html
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
@@ -4493,12 +4499,12 @@ msgstr ""
 #: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/report_overview/subreports_table.html
 msgid "Reference date"
-msgstr ""
+msgstr "Referinsjedatum"
 
 #: reports/templates/report_overview/modal_partials/enable_disable_schedule_modal.html
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Disable schedule"
-msgstr ""
+msgstr "Skema útskeakelje"
 
 #: reports/templates/report_overview/modal_partials/enable_disable_schedule_modal.html
 #, python-format
@@ -4513,16 +4519,16 @@ msgstr ""
 
 #: reports/templates/report_overview/modal_partials/rename_modal.html
 msgid "Rename the following report(s):"
-msgstr ""
+msgstr "Jou de folgjende rapport(en) in oare namme:"
 
 #: reports/templates/report_overview/modal_partials/rename_modal.html
 #: reports/templates/report_overview/report_history_table.html
 msgid "Rename"
-msgstr ""
+msgstr "Omneame"
 
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
 msgid "Rerun the following report(s):"
-msgstr ""
+msgstr "Generearje de folgjende rapport(en) opnij:"
 
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
 msgid ""
@@ -4535,96 +4541,95 @@ msgstr ""
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
 #: reports/templates/report_overview/report_history_table.html
 msgid "Rerun"
-msgstr ""
+msgstr "Opnij generearje"
 
 #: reports/templates/report_overview/report_history.html
 msgid "Reports history"
-msgstr ""
+msgstr "Rapportskiednis"
 
 #: reports/templates/report_overview/report_history.html
 msgid ""
 "On this page you can see all the reports that have been generated in the "
 "past. To create a new report, click the 'Generate Report' button."
 msgstr ""
+"Op dizze side sjogge jo alle rapporten dy’t yn it ferline generearre binne. "
+"Om in nij rapport te meitsjen, klik de knop ‘Rapport generearje’."
 
 #: reports/templates/report_overview/report_history_table.html
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/report_overview/subreports.html
 #, python-format
 msgid "Showing %(length)s of %(total)s reports"
-msgstr ""
+msgstr "%(length)s fan %(total)s rapporten toand"
 
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/tasks/report_tasks_list.html
 msgid "Reports:"
 msgstr "Rapporten:"
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "Input Objects"
-msgstr ""
-
-#: reports/templates/report_overview/report_history_table.html
 msgid "Shows parent report details"
+msgstr "Boppelizzende rapportdetails toane"
+
+#: reports/templates/report_overview/report_history_table.html
+msgid "Close asset report object details"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "Close children report object details"
+msgid "Open asset report object details"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "Open children report object details"
-msgstr ""
-
-#: reports/templates/report_overview/report_history_table.html
-msgid "Subreports details:"
+msgid "Asset reports details:"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
 #, python-format
 msgid ""
 "\n"
-"                                        This report consist of %(counter)s "
-"subreport with the following report type and object.\n"
-"                                    "
+"                                This report consists of %(counter)s asset "
+"report with the following report type and object:\n"
+"                            "
 msgid_plural ""
 "\n"
-"                                        This report consist of %(counter)s "
-"subreports with the following report types and objects.\n"
-"                                    "
+"                                This report consists of %(counter)s asset "
+"reports with the following report types and objects:\n"
+"                            "
 msgstr[0] ""
 msgstr[1] ""
 
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/subreports_header.html
 #: reports/views/report_overview.py
-msgid "Subreports"
+msgid "Asset reports"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "Shows subreport details"
+msgid "Shows asset report details"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "View all subreports"
+msgid "View all asset reports"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
 msgid "No reports have been generated yet."
-msgstr ""
+msgstr "Der binne noch gjin rapporten generearre."
 
 #: reports/templates/report_overview/report_overview_header.html
 msgid "Overview of reports"
-msgstr ""
+msgstr "Oersjocht fan rapporten"
 
 #: reports/templates/report_overview/report_overview_navigation.html
 msgid "Scheduled"
-msgstr ""
+msgstr "Pland"
 
 #: reports/templates/report_overview/report_overview_navigation.html
 msgid "History"
-msgstr ""
+msgstr "Skiednis"
 
 #: reports/templates/report_overview/scheduled_reports.html
 msgid "Scheduled reports"
-msgstr ""
+msgstr "Ynplande rapporten"
 
 #: reports/templates/report_overview/scheduled_reports.html
 msgid ""
@@ -4634,72 +4639,76 @@ msgid ""
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
-msgid "Scheduled reports:"
+#, python-format
+msgid "Showing %(length)s of %(total)s schedules"
 msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Scheduled reports:"
+msgstr "Ynplande rapporten:"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Scheduled for"
-msgstr ""
+msgstr "Ynpland foar"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Schedule status"
+msgstr "Skemastatus"
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Once"
+msgstr ""
+
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Recent reports"
 msgstr ""
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Scheduled Reports:"
-msgstr ""
-
-#: reports/templates/report_overview/scheduled_reports_table.html
-msgid "Input"
-msgstr ""
+msgstr "Ynplande rapporten:"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Show report details"
-msgstr ""
+msgstr "Rapportdetails toane"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "objects"
-msgstr ""
+msgstr "objekten"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Edit report recipe"
-msgstr ""
+msgstr "Rapportresept bewurkje"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Enable schedule"
-msgstr ""
+msgstr "Skema ynskeakelje"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "No scheduled reports have been generated yet."
-msgstr ""
-
-#: reports/templates/report_overview/subreports.html
-#, python-format
-msgid "Showing %(length)s of %(total)s subreports"
-msgstr ""
+msgstr "Der binne noch gjin plande rapporten generearre."
 
 #: reports/templates/report_overview/subreports_header.html
 msgid "Back to Reports History"
-msgstr ""
+msgstr "Werom nei rapportskiednis"
 
 #: reports/templates/report_overview/subreports_header.html
 msgid "An overview of all underlying reports of"
-msgstr ""
+msgstr "In oersjocht fan alle ûnderlizzende rapporten fan"
 
 #: reports/templates/report_overview/subreports_header.html
 #: reports/templates/report_overview/subreports_table.html
 msgid "Shows report details"
-msgstr ""
+msgstr "Rapportdetails toane"
 
 #: reports/templates/report_overview/subreports_table.html
-msgid "Subreports:"
+msgid "Asset reports:"
 msgstr ""
 
 #: reports/templates/report_overview/subreports_table.html
 #: rocky/templates/tasks/boefjes.html
 #: rocky/templates/tasks/plugin_detail_task_list.html
 msgid "Input Object"
-msgstr ""
+msgstr "Inputobjekt"
 
 #: reports/templates/summary/report_asset_overview.html
 msgid ""
@@ -4717,7 +4726,7 @@ msgstr ""
 
 #: reports/templates/summary/report_asset_overview.html
 msgid "No report types found."
-msgstr ""
+msgstr "Gjin rapporttypen fûn."
 
 #: reports/templates/summary/selected_plugins.html
 msgid ""
@@ -4763,6 +4772,15 @@ msgid ""
 "types."
 msgstr ""
 
+#: reports/templates/tasks/report_tasks_list.html
+msgid "Recipe ID"
+msgstr ""
+
+#: reports/templates/tasks/report_tasks_list.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+msgid "Modified date"
+msgstr ""
+
 #: reports/views/aggregate_report.py
 msgid "Aggregate report"
 msgstr "Aggregearje rapport"
@@ -4796,38 +4814,6 @@ msgstr "Selektearje op syn minst ien OOI om troch te gean."
 
 #: reports/views/base.py
 msgid "Select at least one report type to proceed."
-msgstr ""
-
-#: reports/views/base.py
-#, python-brace-format
-msgid "Concatenated Report for {oois_count} objects"
-msgstr ""
-
-#: reports/views/base.py
-#, python-brace-format
-msgid "Concatenated Report for {ooi}"
-msgstr ""
-
-#: reports/views/base.py
-#, python-brace-format
-msgid "{report_type} for {oois_count} objects"
-msgstr ""
-
-#: reports/views/base.py
-#, python-brace-format
-msgid "{report_type} for {ooi}"
-msgstr ""
-
-#: reports/views/base.py
-msgid "Sector Report"
-msgstr ""
-
-#: reports/views/base.py
-msgid "Empty name should not be possible."
-msgstr ""
-
-#: reports/views/base.py
-msgid "Week %W, %Y"
 msgstr ""
 
 #: reports/views/mixins.py
@@ -4870,11 +4856,13 @@ msgstr ""
 #: reports/views/report_overview.py
 msgid ""
 "Multi organization reports cannot be rescheduled. It consists of imported "
-"data from different organizations and not based on new generated data."
+"data from different organizations and is not based on newly generated data."
 msgstr ""
 
 #: reports/views/report_overview.py
-msgid "Rerun successful"
+msgid ""
+"Rerun successful. It may take a moment before the new report has been "
+"generated."
 msgstr ""
 
 #: reports/views/report_overview.py
@@ -4938,9 +4926,31 @@ msgid "Output mime types"
 msgstr ""
 
 #: tools/forms/boefje.py
+msgid "Scan type"
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid "Interval amount"
+msgstr ""
+
+#: tools/forms/boefje.py
 msgid ""
-"Specify the scanning frequency for this Boefje in minutes. The default is 24 "
-"hours. For example: 5 minutes will let the boefje scan every 5 minutes."
+"Specify the scanning interval for this Boefje. The default is 24 hours. For "
+"example: 5 minutes will let the Boefje scan every 5 minutes."
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid "Interval frequency"
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid "Object creation/change"
+msgstr ""
+
+#: tools/forms/boefje.py
+msgid ""
+"Choose weather a the Boefje should run after creating and/or changing an "
+"object. "
 msgstr ""
 
 #: tools/forms/finding_type.py
@@ -5095,6 +5105,10 @@ msgstr ""
 #: tools/forms/ooi.py
 msgid "Clearance Level"
 msgstr "Frijwarringsnivo"
+
+#: tools/forms/ooi.py
+msgid "Next scan"
+msgstr ""
 
 #: tools/forms/ooi.py
 msgid "Show objects that don't meet the Boefjes scan level."
@@ -5279,6 +5293,12 @@ msgid ""
 msgstr ""
 
 #: tools/forms/settings.py
+msgid ""
+"Choose when this Boefje will scan objects. It can run on a given interval or "
+"it can run every time an object has been created or changed. "
+msgstr ""
+
+#: tools/forms/settings.py
 msgid "Depth of the tree."
 msgstr ""
 
@@ -5373,7 +5393,6 @@ msgid "new"
 msgstr ""
 
 #: tools/view_helpers.py rocky/templates/header.html
-#: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/views/organization_member_edit.py
 msgid "Members"
@@ -5937,8 +5956,8 @@ msgstr ""
 msgid "Crisis room"
 msgstr ""
 
-#: rocky/templates/header.html rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/header.html rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/tasks/partials/tasks_overview_header.html
 #: rocky/templates/tasks/plugin_detail_task_list.html
 #: rocky/views/task_detail.py rocky/views/tasks.py
 msgid "Tasks"
@@ -6160,6 +6179,7 @@ msgid "Or if you have the authorization, upgrade the clearance level of"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_add_related_object.html
+#: rocky/templates/partials/ooi_detail_related_object.html
 msgid "Add related object"
 msgstr ""
 
@@ -6260,6 +6280,11 @@ msgstr ""
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 msgid "When"
 msgstr ""
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html
+#: rocky/templates/tasks/normalizers.html
+msgid "Normalizer"
+msgstr "Normalizer"
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 msgid "This scan was manually created."
@@ -6795,11 +6820,7 @@ msgid "Related objects"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_related_object.html
-msgid "No related objects added to"
-msgstr ""
-
-#: rocky/templates/partials/ooi_detail_related_object.html
-msgid "Use the button below to add a related object."
+msgid "No related object known for"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
@@ -7042,17 +7063,6 @@ msgid "Input object"
 msgstr ""
 
 #: rocky/templates/tasks/boefjes.html
-#, python-format
-msgid ""
-"\n"
-"                        An overview of the tasks for %(organization)s. Tasks "
-"are divided in Boefjes and Normalizers.\n"
-"                        Boefjes scan objects and Normalizers dispatch on the "
-"output mime-type.\n"
-"                    "
-msgstr ""
-
-#: rocky/templates/tasks/boefjes.html
 msgid "There are no tasks for boefjes"
 msgstr ""
 
@@ -7070,10 +7080,6 @@ msgstr ""
 msgid "Created date"
 msgstr ""
 
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-msgid "Modified date"
-msgstr ""
-
 #: rocky/templates/tasks/normalizers.html
 msgid "There are no tasks for normalizers"
 msgstr ""
@@ -7081,10 +7087,6 @@ msgstr ""
 #: rocky/templates/tasks/normalizers.html
 msgid "List of tasks for normalizers"
 msgstr ""
-
-#: rocky/templates/tasks/normalizers.html
-msgid "Normalizer"
-msgstr "Normalizer"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "Boefje input OOI"
@@ -7095,13 +7097,7 @@ msgid "Manually added"
 msgstr ""
 
 #: rocky/templates/tasks/ooi_detail_task_list.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "There are no tasks for"
-msgstr ""
-
-#: rocky/templates/tasks/ooi_detail_task_list.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "List of tasks for"
+msgid "There have been no tasks"
 msgstr ""
 
 #: rocky/templates/tasks/partials/stats.html
@@ -7134,6 +7130,35 @@ msgstr ""
 
 #: rocky/templates/tasks/partials/task_actions.html
 msgid "Download task data"
+msgstr ""
+
+#: rocky/templates/tasks/partials/tasks_overview_header.html
+#, python-format
+msgid ""
+"\n"
+"            An overview of the tasks for %(organization)s. Tasks are divided "
+"in Boefjes, Normalizers and Reports.\n"
+"            Boefjes scan objects and Normalizers dispatch on the output mime-"
+"type. Additionally, there is a Report\n"
+"            tasks. This task aggregates and presents findings from both "
+"Boefjes and Normalizers.\n"
+"        "
+msgstr ""
+
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "There are no tasks for"
+msgstr ""
+
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "List of tasks for"
+msgstr ""
+
+#: rocky/templates/tasks/report_tasks.html
+msgid "There are no tasks for reports"
+msgstr ""
+
+#: rocky/templates/tasks/report_tasks.html
+msgid "List of tasks for reports"
 msgstr ""
 
 #: rocky/templates/two_factor/_wizard_actions.html
@@ -7677,6 +7702,10 @@ msgstr ""
 msgid "Can not reset scan level. Scan level of {ooi_name} not declared"
 msgstr ""
 
+#: rocky/views/scans.py
+msgid "Scans"
+msgstr ""
+
 #: rocky/views/scheduler.py
 msgid "Your report has been scheduled."
 msgstr ""
@@ -7743,6 +7772,63 @@ msgstr "Raw-bestân kin net nei Bytes oplaad wurde: %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Raw-bestân mei sukses tafoege."
+
+#~ msgid "Scan frequency"
+#~ msgstr "Scanfrekwinsje"
+
+#~ msgid "Concatenated Report"
+#~ msgstr "Gearfoege rapport"
+
+#~ msgid ""
+#~ "Define a custom name format for your report(s). This format will be "
+#~ "applied to all generated (sub)reports."
+#~ msgstr ""
+#~ "Definiearje in oanpast nammesjabloan foar jo rapport. Dit sjabloan sil "
+#~ "tapast wurde op alle generearre (sub)rapporten."
+
+#~ msgid "Subreports name format"
+#~ msgstr "Subrapportnammeformaat"
+
+#~ msgid "Input Objects"
+#~ msgstr "Input objekten"
+
+#~ msgid "Close children report object details"
+#~ msgstr "Underlizzende rapportobjektdetails slute"
+
+#~ msgid "Open children report object details"
+#~ msgstr "Underlizzende rapportobjektdetails iepenje"
+
+#~ msgid "Subreports details:"
+#~ msgstr "Details subrapporten :"
+
+#~ msgid "Subreports"
+#~ msgstr "Subrapporten"
+
+#~ msgid "Shows subreport details"
+#~ msgstr "Subrapportdetails toane"
+
+#~ msgid "View all subreports"
+#~ msgstr "Alle subrapporten besjen"
+
+#~ msgid "Input"
+#~ msgstr "Ynfier"
+
+#, python-format
+#~ msgid "Showing %(length)s of %(total)s subreports"
+#~ msgstr "%(length)s fan %(total)s subrapporten toand"
+
+#~ msgid "Subreports:"
+#~ msgstr "Subrapporten:"
+
+#~ msgid "Accounts"
+#~ msgstr "Accounts"
+
+#~ msgid ""
+#~ "The date you select will be the reference date for the data set for your "
+#~ "report. Please allow for up to 24 hours for your report to be ready."
+#~ msgstr ""
+#~ "De datum dy’t jo kieze sil de referinsjedatum wêze foar de gegevensset "
+#~ "foar jo rapport. It kin oant 24 oeren duorje eardat jo rapport ree is."
 
 #~ msgid "No findings have been found."
 #~ msgstr "Der binne gjin befiningen fûn."

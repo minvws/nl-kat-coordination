@@ -21,7 +21,7 @@ jobs:
     uses: minvws/nl-kat-coordination/.github/workflows/boefjes-tests.yml@main
 
   fix-coverage-reports:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     needs:
       - octopoes-tests
@@ -72,7 +72,7 @@ jobs:
           path: "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
 
   sonar-cloud:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     needs:
       - fix-coverage-reports
@@ -89,6 +89,6 @@ jobs:
           pattern: "*-coverage-unit-fixed"
 
       - name: SonarCloud
-        uses: SonarSource/sonarcloud-github-action@v3.1.0
+        uses: SonarSource/sonarcloud-github-action@v4.0.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

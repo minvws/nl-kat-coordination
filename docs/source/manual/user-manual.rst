@@ -79,35 +79,73 @@ One or more findings can be selected. The textbox at the bottom allows for a des
 Objects
 -------
 
-The Objects page lists all the objects in Octopus. For each object there is information about:
+The Objects page lists all the objects in Octopoes. Objects can be anything, like DNS records, hostnames, URLs, software, software versions, ports, etc. It is any piece of information that is found by the normalizers, bits and boefjes. On a new installation you'll see the following objects by default:
 
-- properties
-- relationship with other objects
-- findings
-- level of safeguarding
+.. image:: img/objects-clean-install.png
+  :alt: overview of default objects
 
-The objects page is a practical page to find information about a host or system. The objects can be filtered and a report per object can be easily created and exported.
+The table gives an overview on the following items:
+- Object: this is the piece of data that was identified, such as a port, software version, hostname, etc.
+- Object type: this shows how this object is labelled.
+- Clearance level: this shows the clearance level of this object.
+- Clearance type: this shows what kind of clearance level is set on the object. See `Object clearances` __ below for more information.
 
-.. image:: img/findingsreportperobject.png
-  :alt: findings per object
+The objects can be filtered by object types, clearance levels and clearance types. The search functionality can also be used to search for specific objects, such as hostnames.
 
-The object detail page provides more information about a specific object, such as the number of findings for this object. More information can be requested per finding:
+More information on objects is provided by clicking on the object. This will give an overview page with all information for the specific object. The object details page is further described below.
 
-.. image:: img/findingdetail.png
-  :alt: finding detail
+
+Object clearances
+-----------------
+Each object has a clearance type. The clearance type tells how the object was added to the Objects list. The following object types are available:
+
+- Declared: declared objects were added by the user.
+- Inherited: inherited objects were identified through propagation and the parsing of bits and normalizers. This means there is a relation to other object(s).
+- Empty: empyth objects do not have a relation to other objects.
+
+The objects below show different clearance types for various objects. The hostname `mispo.es` was manually added and thus is `declared`. The DNS zone is `inherited` based on the DNS zone boefje.
+
+.. image:: img/objects-clearance-types.png
+  :alt: different object clearance types
+
+Object details
+--------------
+Object details can be found by clicking on an object on the Objects page. Object details provide data on that specific object and how it relates to other objects. The following detail tabs are available:
+
+- Overview: the overview tab gives object details, it's declaration, related objects (objects that are somehow related), tasks that ran on this object, findings that are applicable to this object and a list of boefjes that can scan this object.
+- Tree: the tree tab shows how all objects are related to this object. The point of view will be from the specific object. Thus the view for a hostname will be slightly different than the tree view for an IP address. Filters can be applied to the tree view.
+- Graph: the graph tab visually shows how the objects are connected using lines. The graph is interactive, meaning you can click on objects in the graph. Filters can be applied to the graph view.
+- Clearance level: the clearance level can be changed on the clearance level tab. This tab also shows the clearance type (declared, inherited, empty) and the inheritance tree for the object.
+- Findings: the findings tab shows all findings that are linked to this object. Different objects have different findings, meaning that the Findings tab for a hostname is likely different from the findings tab for an IP address.
+
+
+.. image:: img/object-details.png
+  :alt: object detail page
 
 Tasks
 -----
 
-The scans of KAT can be found on the Tasks page as tasks. A task is created per boefje and per normalizer, with a status. Per task, the object is displayed and the json with metadata can be downloaded. This includes the hash of the scan performed.
+All tasks can be found on the Tasks page. A task is created for each job that needs to be performed, such as running a boefje, normalizer or for generating a report. Each task is performed on an object (such as a hostname, finding, DNS records, etc.) and tasks have a status to show if the task is completed, scheduled, queued, etc. Each task contains meta and raw data that can be downloaded. This is the output, error message, proof, security hashes, etc. that belongs to the boefje or normalizer. Tasks can also be rescheduled and filtered to find specific tasks.
 
-.. image:: img/boefjes.png
-  :alt: tasks
+Tasks are organised between the boefje and normalizer tabs. The image below shows what the boefje tab could look like.
+
+.. image:: img/tasks-boefjes.png
+  :alt: overview of boefje tasks
+
+The image below shows the normalizer tasks by clicking on the normalizer tab.
+
+.. image:: img/tasks-normalizers.png
+  :alt: overview of normalizer tasks
+
+The normalizer tab has a special functionality called 'yielded objects'. If the normalizer was able to extract new data (points) this will result in new yielded objects. As an example below, the DNS records for the hostname `mispo.es` are parsed. The normalizer identifies various DNS records (A, NS, MX, SOA) and other information and creates objects for each of the identified information. This information is now also available to other tools to be parsed, if possible.
+
+.. image:: img/tasks-normalizer-yielded-objects.png
+  :alt: yielded objects for normalizers
 
 Members
 -------
 
-The Members page allows for usermanagement and is visible to users who have the rights to do this.
+The Members page allows for user management and is visible to users who have the rights to do this. When you have sufficient rights you can add new users either manually or through a file upload (CSV). This page also shows the accepted and assigned clearance levels to each user and whether or not the user is active.
 
 .. image:: img/members.png
   :alt: Members page
@@ -115,11 +153,12 @@ The Members page allows for usermanagement and is visible to users who have the 
 Settings
 --------
 
-The Settings page shows general information and its settings:
+The Settings page shows general information and its settings. In some cases you might want to add tags to the organisation or decide to manually run all bits. This can be done from the settings page. If you created a new organization, you can also add the indemnification on this page.
 
 * Organization data
 * Indemnification
 * Rerun all bits on the current dataset
+* Tags
 
 .. image:: img/settings.png
   :alt: Settings page
@@ -460,6 +499,75 @@ Based on the report, object and safeguard, select the relevant boefjes for your 
 
 The scan is an ongoing process, looking for information based on derivation and logical connections in the data model. The results of the scan appear over time, any findings can be viewed by object, at Findings and in the Crisis Room. In each context, reports can also be generated.
 
+
+Questions & Configs
+===================
+OpenKAT can be used to customise OpenKAT to your own company policies and industry standards. This will allow you to set your security more or less strict depending on your needs and wishes. This can be done using the Question objects on the Objects page. By default no policies are applied. In order to set an policy you have to answer the policy questions and apply these. After applying the questions a Config is created which contains all the answers to your Questions. OpenKAT reads the applied Config files and ensures that all observations are measured against your applied policy.
+
+To summarize: your personal policy is stored in Configs. In order to create a Config you have to answer the Questions. After answering all questions the Config is automatically generated and applied. Questions consist of a JSON schema, which is rendered as a form in the web interface.
+
+Currently the following pre-defined policies are available:
+
+- Disallowed hostnames in the CSP header
+- Objects in the HTTP headers
+- Port classification
+
+
+Disallowed CSP hostnames
+------------------------
+
+**Why is this question introduced?**
+Websites often load scripts and content from external servers (e.g. jQuery from a Content Delivery Network (CDN) like Cloudflare). This can be dangerous as you have limited control over the content that is inside the scripts that these external servers are serving. This Question allows you to check if the hostname in the CSP is allowed by your policy.
+
+**What are the risks?**
+Loading external content from websites you do not have control over could result in supply chain attacks. Attackers could serve malicious code (scripts) on CDN networks that is then automatically loaded into the browser of each website visitor.
+
+**Limitations**
+This question looks only for bad hostnames that are provided by the user (denylist). This means that findings for bad hostnames in the CSP header are only shown for those domains that are added to the list.
+
+**Examples**
+Provide hostnames which are unwanted, separate each hostname by a comma. You can specify the main domain (`bad.com`), subdomains are automatically taken into account (`script.bad.com`).
+
+.. code-block:: RST
+
+   E.g. evil.com, bad.evil.com, attacker.com.
+
+OOIs in headers
+---------------
+
+**Why is this question introduced?**
+Some websites like SSO portals result in new objects on the Objects page for each time a boefje visited the website with a new session token. By specifying which session parameters are used the number of objects will be limited to only the paths on the server.
+
+**What are the risks?**
+There is no direct impact. This question helps reduce the number of duplicate items in the Objects list and thus helps in getting a better overview.
+
+**Limitations**
+It only checks for parameters in the URL, headers are ignored. There is currently no way to specify the parameters per hostname.
+
+**Examples**
+Provide the URL parameter that is to be ignored, separate each parameter by a comma. URL parameters can be found in the URL bar after the `?` sign. They are the values after the `&` and before the `=` signs.
+
+The URL is: `https://example.com/index.php?session_id=12346&search=meow <dontredirect>`_ . This URL has two parameters:`session_id` and `search`, which both have a value (`123456` and `meow`). The parameter and value for `session_id=123456` are expected to clutter the Objects list, as for each new session the value `123456` is different. The next time you visit the website this might be `session_id=43215` and the next time `session_id=958367`. You can reduce the object clutter by adding the parameter `session_id` to the list as this will be the same for each session. Adding the value `123456` will not work, as this will be different each time.
+
+
+
+Port mapping
+------------
+
+**Why is this question introduced?**
+Maps open ports into specific categories based on the services in your environment. You can specify common TCP and UDP ports which will not trigger a finding (such as e-mail server ports). By adding ports to the database (db) and system administrator (sa) lists you tell OpenKAT which ports are likely used in your network. Depending on your port mapping OpenKAT will show different findings if the port is detected. The `aggregate_findings` functionality allows you to group findings by IP address rather than treating them as separate ports.
+
+**What are the risks?**
+There is no direct impact. This question helps to tune findings to your own demands. Having good insights in your network helps with risk mitigation.
+
+**Limitations**
+If a port is added to multiple lists the finding for the first list is shown. If a port is added to both sa_tcp_ports and db_tcp_ports, then the finding relating to the system administrator ports is shown, as this is the first in the list.
+
+**Examples**
+Enter ports separated by a comma. Such as: 21,22,3389.
+
+.. image:: img/question-port-mapping.png
+  :alt: Port mapping order
 
 Trusted timestamps in OpenKAT
 =============================

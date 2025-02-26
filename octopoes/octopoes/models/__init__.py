@@ -11,8 +11,8 @@ from pydantic_core.core_schema import ValidationInfo
 class Reference(str):
     @classmethod
     def parse(cls, ref_str: str) -> tuple[str, str]:
-        object_type, *natural_key_parts = ref_str.split("|")
-        return object_type, "|".join(natural_key_parts)
+        object_type, natural_key_parts = ref_str.split("|", 1)
+        return object_type, natural_key_parts
 
     @property
     def class_(self) -> str:
@@ -200,7 +200,7 @@ class OOI(BaseModel):
                 if isinstance(value, dict):
                     node[key] = hydrate(value)
                 else:
-                    node[key] = natural_key_parts.pop(0)
+                    node[key] = natural_key_parts.pop(0) if natural_key_parts else value
             return node
 
         return PrimaryKeyToken.model_validate(hydrate(token_tree))
@@ -236,8 +236,7 @@ class OOI(BaseModel):
             return value.value
         if isinstance(value, int | float):
             return value
-        else:
-            return str(value)
+        return str(value)
 
     def __hash__(self):
         return hash(self.primary_key)
@@ -288,7 +287,7 @@ def build_token_tree(ooi_class: type[OOI]) -> dict[str, dict | str]:
             # combine trees
             tokens[attribute] = {key: value_ for tree in trees for key, value_ in tree.items()}
         else:
-            tokens[attribute] = ""
+            tokens[attribute] = field.default
     return tokens
 
 

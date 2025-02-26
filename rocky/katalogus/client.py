@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_unicode_slug
 from django.utils.translation import gettext_lazy as _
-from httpx import HTTPStatusError, Response, codes
+from httpx import HTTPError, HTTPStatusError, Response, codes
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import AfterValidator, BaseModel, Field, field_serializer, field_validator
@@ -67,6 +67,7 @@ class Boefje(Plugin):
     options: list[str] | None = None
     runnable_hash: str | None = None
     interval: int | None = None
+    run_on: list[str] | None = None
     boefje_schema: dict | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
@@ -127,6 +128,13 @@ class KATalogusHTTPStatusError(KATalogusError):
         super().__init__(_("An HTTP %d error occurred. Check logs for more info.").format(error.response.status_code))
 
 
+class KATalogusHTTPError(KATalogusError):
+    def __init__(self, error: httpx.HTTPError):
+        self.error = error
+
+        super().__init__(_("An HTTP error occurred. Check logs for more info."))
+
+
 class DuplicatePluginError(KATalogusError):
     def __init__(self, error_message: str):
         super().__init__(error_message)
@@ -164,6 +172,8 @@ def verify_response(response: Response) -> None:
             raise KATalogusNotAllowedError("Access to resource not allowed")
 
         raise KATalogusHTTPStatusError(error) from error
+    except HTTPError as error:
+        raise KATalogusError("KATalogus request failed") from error
 
 
 class KATalogusClient:
@@ -213,18 +223,21 @@ class KATalogusClient:
         return response.json()
 
     def upsert_plugin_settings(self, organization_code: str, plugin_id: str, values: dict) -> None:
+        logger.info("Adding plugin settings", event_code=800023, plugin=plugin_id)
         self.session.put(f"/v1/organisations/{quote(organization_code)}/{quote(plugin_id)}/settings", json=values)
 
         logger.info("Upsert plugin settings", plugin_id=plugin_id)
 
     def delete_plugin_settings(self, organization_code: str, plugin_id: str) -> None:
+        logger.info("Deleting plugin settings", event_code=800024, plugin=plugin_id)
         self.session.delete(f"/v1/organisations/{quote(organization_code)}/{quote(plugin_id)}/settings")
 
-        logger.info("Delete plugin settings", plugin_id=plugin_id)
+        logger.info("Deleted plugin settings", plugin_id=plugin_id)
 
     def clone_all_configuration_to_organization(self, from_organization: str, to_organization: str):
         to_organization = quote(to_organization)
         from_organization = quote(from_organization)
+        logger.info("Cloning organization settings", event_code=910000, to_organization_code=to_organization)
         response = self.session.post(f"/v1/organisations/{from_organization}/settings/clone/{to_organization}")
 
         return response
@@ -236,16 +249,19 @@ class KATalogusClient:
         return self.get_plugins(organization_code, plugin_type="boefje")
 
     def enable_plugin(self, organization_code: str, plugin: Plugin) -> None:
+        logger.info("Enabling plugin", event_code=800021, plugin=plugin.id)
+
         self._patch_plugin_state(organization_code, plugin.id, True)
 
     def enable_boefje_by_id(self, organization_code: str, boefje_id: str) -> None:
         self.enable_plugin(organization_code, self.get_plugin(organization_code, boefje_id))
 
     def disable_plugin(self, organization_code: str, plugin: Plugin) -> None:
+        logger.info("Disabling plugin", event_code=800022, plugin=plugin.id)
         self._patch_plugin_state(organization_code, plugin.id, False)
 
     def get_enabled_boefjes(self, organization_code: str) -> list[Plugin]:
-        return self.get_plugins(organization_code, plugin_type="boefje", enabled=True)
+        return self.get_plugins(organization_code, plugin_type="boefje", state=True)
 
     def get_cover(self, organization_code: str, plugin_id: str) -> BytesIO:
         # TODO: does not need to be organization-specific
@@ -257,6 +273,7 @@ class KATalogusClient:
 
     def create_plugin(self, organization_code: str, plugin: Plugin) -> None:
         try:
+            logger.info("Creating boefje", event_code=800025, boefje=plugin)
             response = self.session.post(
                 f"/v1/organisations/{quote(organization_code)}/plugins",
                 headers={"Content-Type": "application/json"},
@@ -272,11 +289,11 @@ class KATalogusClient:
 
     def edit_plugin(self, organization_code: str, plugin: Plugin) -> None:
         try:
+            logger.info("Editing boefje", event_code=800026, boefje=plugin.id)
             response = self.session.patch(
-                f"/v1/organisations/{quote(organization_code)}/boefjes/{plugin.id}",
-                content=plugin.model_dump_json(exclude_none=True),
+                f"/v1/organisations/{quote(organization_code)}/boefjes/{plugin.id}", content=plugin.model_dump_json()
             )
-            if response.status_code == codes.CREATED:
+            if response.status_code == codes.NO_CONTENT:
                 logger.info("Plugin %s updated", plugin.name)
             else:
                 logger.info("Plugin %s could not be updated", plugin.name)
@@ -374,7 +391,7 @@ class KATalogus:
         return self._katalogus_client.disable_plugin(self._member.organization.code, plugin)
 
     def get_enabled_boefjes(self) -> list[Plugin]:
-        return self._katalogus_client.get_plugins(self._member.organization.code, plugin_type="boefje", enabled=True)
+        return self._katalogus_client.get_plugins(self._member.organization.code, plugin_type="boefje", state=True)
 
     def get_cover(self, plugin_id: str) -> BytesIO:
         return self._katalogus_client.get_cover(self._member.organization.code, plugin_id)
@@ -409,6 +426,7 @@ def parse_boefje(boefje: dict) -> Boefje:
         created=boefje.get("created"),
         description=boefje.get("description"),
         interval=boefje.get("interval"),
+        run_on=boefje.get("run_on"),
         enabled=boefje["enabled"],
         type=boefje["type"],
         scan_level=scan_level,

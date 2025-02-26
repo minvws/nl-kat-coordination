@@ -419,6 +419,20 @@
     "impact": "E-mail from this domain can potentially be spoofed if DMARC is not (properly) implemented in combination with DKIM and SPF.",
     "recommendation": "Fix the syntax of the SPF record."
   },
+  "KAT-EXPENSIVE-SPF": {
+    "description": "This SPF record contains an expensive SPF construction.",
+    "source": "https://www.rfc-editor.org/rfc/rfc7208#section-4.6.4",
+    "risk": "low",
+    "impact": "Various recipient mailservers might not perform all requested lookups and bounce email because of missed allowed addresses, or bounce mail entirely due to too many dns lookups.",
+    "recommendation": "Consolidate the SPF record, remove unneeded lookups and mechanisms."
+  },
+  "KAT-DEPRECATED-SPF-MECHANISM": {
+    "description": "This SPF record contains a deprecated SPF mechanism.",
+    "source": "https://www.rfc-editor.org/rfc/rfc7208#section-5.5",
+    "risk": "low",
+    "impact": "Deprecated mechanism is used. It should not be used.",
+    "recommendation": "Fix the SPF record, remove deprecated mechanisms."
+  },
   "SUB-DOMAIN-TAKEOVER": {
     "description": "Subdomain takeover is when an attacker takes control of an unused or improperly configured subdomain, potentially accessing sensitive information or conducting phishing attacks.",
     "source": "https://developer.mozilla.org/en-US/docs/Web/Security/Subdomain_takeovers",

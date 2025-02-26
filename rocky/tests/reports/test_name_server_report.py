@@ -10,7 +10,7 @@ def test_name_server_report_no_hostname(mock_octopoes_api_connector, valid_time,
 
     report = NameServerSystemReport(mock_octopoes_api_connector)
 
-    data = report.collect_data([str(ipaddressv4.reference)], valid_time)[str(ipaddressv4.reference)]
+    data = report.collect_data([ipaddressv4.reference], valid_time)[ipaddressv4.reference]
 
     assert len(data["name_server_checks"].checks) == 0
     assert data["name_server_checks"].has_dnssec == 0
@@ -30,7 +30,7 @@ def test_name_server_report_no_finding_types(mock_octopoes_api_connector, valid_
 
     report = NameServerSystemReport(mock_octopoes_api_connector)
 
-    data = report.collect_data([str(hostname.reference)], valid_time)[str(hostname.reference)]
+    data = report.collect_data([hostname.reference], valid_time)[hostname.reference]
 
     assert len(data["name_server_checks"].checks) == 1
     assert data["name_server_checks"].has_dnssec == 1
@@ -74,7 +74,7 @@ def test_name_server_report_multiple_finding_types(
 
     report = NameServerSystemReport(mock_octopoes_api_connector)
 
-    data = report.collect_data([str(ipaddressv4.reference)], valid_time)[str(ipaddressv4.reference)]
+    data = report.collect_data([ipaddressv4.reference], valid_time)[ipaddressv4.reference]
 
     assert len(data["name_server_checks"].checks) == 1
     assert data["name_server_checks"].has_dnssec == 0
