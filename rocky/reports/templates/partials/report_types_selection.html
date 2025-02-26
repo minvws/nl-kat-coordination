@@ -21,11 +21,18 @@
             {% endblocktranslate %}
         </h2>
         <p>
-            {% blocktranslate trimmed count counter=oois|length %}
-                You have selected {{ total_oois }} object in previous step.
-            {% plural %}
-                You have selected {{ total_oois }} objects in previous step.
-            {% endblocktranslate %}
+            {% if object_selection == "query" %}
+                {% blocktranslate %}
+                    You have selected a live set in the previous step. Based on the current
+                    dataset, this live set results in {{ total_oois }} objects.
+                {% endblocktranslate %}
+            {% else %}
+                {% blocktranslate trimmed count counter=oois|length %}
+                    You have selected {{ total_oois }} object in the previous step.
+                {% plural %}
+                    You have selected {{ total_oois }} objects in the previous step.
+                {% endblocktranslate %}
+            {% endif %}
         </p>
         {% if not all_oois_selected %}
             {% include "summary/ooi_selection.html" %}
