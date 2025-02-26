@@ -23,9 +23,6 @@ def query(targets: list[Reference | None]) -> str:
                                         [?config :Config/bit_id "oois-in-headers"]
                                     )
                                     (and
-                                        [(identity nil) ?resource]
-                                        [(identity nil) ?url]
-                                        [(identity nil) ?network]
                                         [(identity nil) ?config]
                                     )
                                 )
