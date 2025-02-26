@@ -22,6 +22,7 @@ from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from httpx import Response
 from katalogus.client import Boefje, parse_plugin
+from reports.report_types.findings_report.report import FindingsReport
 from tools.enums import SCAN_LEVEL
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 
@@ -95,7 +96,10 @@ def create_user(django_user_model, email, password, name, device_name, superuser
 def create_organization(name, organization_code):
     katalogus_client = "katalogus.client.KATalogusClient"
     octopoes_node = "rocky.signals.OctopoesAPIConnector"
-    with patch(katalogus_client), patch(octopoes_node):
+    scheduler_client = "crisis_room.management.commands.dashboards.scheduler_client"
+    bytes_client = "crisis_room.management.commands.dashboards.get_bytes_client"
+
+    with patch(katalogus_client), patch(octopoes_node), patch(scheduler_client), patch(bytes_client):
         return Organization.objects.create(name=name, code=organization_code)
 
 
@@ -1877,8 +1881,12 @@ def reports_task_list():
 
 @pytest.fixture
 def dashboard_data(client_member, client_member_b):
-    recipe_id_a = "ReportRecipe|7ebcdb32-e7f2-4c2d-840a-d7b8e6b37616"
-    recipe_id_b = "ReportRecipe|c41bbf9a-7102-4b6b-b256-b3036e106316"
+    # make sure that no dashboards exist to test this particular set
+    Dashboard.objects.all().delete()
+    DashboardData.objects.all().delete()
+
+    recipe_id_a = "7ebcdb32-e7f2-4c2d-840a-d7b8e6b37616"
+    recipe_id_b = "c41bbf9a-7102-4b6b-b256-b3036e106316"
 
     dashboard_a = Dashboard.objects.create(
         name="Crisis Room Findings Dashboard", organization=client_member.organization
@@ -1898,11 +1906,25 @@ def findings_reports(client_member, client_member_b):
     bytes_raw_id_a = "62258c3d-89b2-4fde-a2e0-d78715a174e6"
     bytes_raw_id_b = "1b887350-0afb-4786-b587-4323cd8e4180"
 
-    recipe_id_a = "ReportRecipe|7ebcdb32-e7f2-4c2d-840a-d7b8e6b37616"
-    recipe_id_b = "ReportRecipe|c41bbf9a-7102-4b6b-b256-b3036e106316"
+    recipe_id_a = "7ebcdb32-e7f2-4c2d-840a-d7b8e6b37616"
+    recipe_id_b = "c41bbf9a-7102-4b6b-b256-b3036e106316"
 
-    report_a = Report(
-        object_type="Report",
+    asset_report_a = create_asset_report(
+        name="Findings Report for mispo.es",
+        report_type=FindingsReport.id,
+        template=FindingsReport.template_path,
+        uuid_iterator=iter(["a5ccf97b-d4e9-442d-85bf-84e739b63da9s"]),
+    )
+
+    asset_report_b = create_asset_report(
+        name="Findings Report for mispo.es",
+        report_type=FindingsReport.id,
+        template=FindingsReport.template_path,
+        uuid_iterator=iter(["a5ccf97b-d4e9-442d-85bf-84e739b63da9l"]),
+    )
+
+    report_a = HydratedReport(
+        object_type="HydratedReport",
         scan_profile=None,
         user_id=None,
         primary_key="Report|9a0fd1f4-ba2b-4800-ade8-7f17f099e179",
@@ -1910,7 +1932,8 @@ def findings_reports(client_member, client_member_b):
         report_type="aggregate-organisation-report",
         template="aggregate_organisation_report/report.html",
         date_generated=datetime(2024, 12, 23, 12, 0, 32, 730678),
-        input_oois=["Hostname|internet|mispo.es"],
+        reference_date=datetime(2024, 12, 23, 12, 0, 32, 730678),
+        input_oois=[asset_report_a],
         report_id=UUID("9a0fd1f4-ba2b-4800-ade8-7f17f099e179"),
         organization_code=client_member.organization.code,
         organization_name=client_member.organization.name,
@@ -1922,8 +1945,8 @@ def findings_reports(client_member, client_member_b):
         has_parent=False,
     )
 
-    report_b = Report(
-        object_type="Report",
+    report_b = HydratedReport(
+        object_type="HydratedReport",
         scan_profile=None,
         user_id=None,
         primary_key="Report|2b871ed0-44e5-4375-85af-4a1cf44145f7",
@@ -1931,7 +1954,8 @@ def findings_reports(client_member, client_member_b):
         report_type="aggregate-organisation-report",
         template="aggregate_organisation_report/report.html",
         date_generated=datetime(2024, 12, 23, 11, 0, 32, 447950),
-        input_oois=["Hostname|internet|mispo.es"],
+        reference_date=datetime(2024, 12, 23, 11, 0, 32, 447950),
+        input_oois=[asset_report_b],
         report_id=UUID("2b871ed0-44e5-4375-85af-4a1cf44145f7"),
         organization_code=client_member_b.organization.code,
         organization_name=client_member_b.organization.name,
@@ -1943,7 +1967,9 @@ def findings_reports(client_member, client_member_b):
         has_parent=False,
     )
 
-    return [report_a, report_b]
+    reports = [report_a, report_b]
+
+    return Paginated(count=len(reports), items=reports)
 
 
 @pytest.fixture
@@ -2139,8 +2165,8 @@ def findings_dashboard_mock_data(dashboard_data, findings_reports, findings_repo
     dashboard_data_a = dashboard_data[0]
     dashboard_data_b = dashboard_data[1]
 
-    report_a = findings_reports[0]
-    report_b = findings_reports[1]
+    report_a = findings_reports.items[0]
+    report_b = findings_reports.items[1]
 
     report_data_a = findings_report_bytes_data[0]
     report_data_b = findings_report_bytes_data[1]

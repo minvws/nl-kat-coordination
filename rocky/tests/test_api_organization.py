@@ -91,6 +91,18 @@ class TestOrganizationViewSet(ViewSetTest):
         def mock_katalogus(self, mocker):
             mocker.patch("katalogus.client.KATalogusClient")
 
+        @pytest.fixture(autouse=True)
+        def mock_octopoes(self, mocker):
+            mocker.patch("rocky.signals.OctopoesAPIConnector")
+
+        @pytest.fixture(autouse=True)
+        def mock_scheduler(self, mocker):
+            mocker.patch("crisis_room.management.commands.dashboards.scheduler_client")
+
+        @pytest.fixture(autouse=True)
+        def mock_bytes(self, mocker):
+            mocker.patch("crisis_room.management.commands.dashboards.get_bytes_client")
+
         def test_it_creates_new_organization(self, initial_ids, json):
             expected = initial_ids | {json["id"]}
             actual = set(Organization.objects.values_list("id", flat=True))

@@ -83,7 +83,7 @@
                                                 <td>
                                                     <a href="{% ooi_url 'ooi_detail' occurrence.finding.ooi organization.code %}">{{ occurrence.finding.ooi|human_readable }}</a>
                                                 </td>
-                                                <td>{{ occurrence.first_seen|get_date }}</td>
+                                                <td>{{ occurrence.first_seen|get_datetime }}</td>
                                             </tr>
                                         {% endfor %}
                                     </tbody>
