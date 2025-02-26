@@ -1,0 +1,18 @@
+{
+  "title": "Arguments",
+  "type": "object",
+  "properties": {
+    "HTTP_PROXY": {
+      "title": "HTTP_PROXY",
+      "maxLength": 512,
+      "type": "string",
+      "description": "The full URL for the proxy.\nE.g. \"http://user:pass@127.0.0.1:8080/\""
+    },
+    "USERAGENT": {
+      "title": "USERAGENT",
+      "maxLength": 256,
+      "type": "string"
+    }
+  },
+  "required": []
+}
