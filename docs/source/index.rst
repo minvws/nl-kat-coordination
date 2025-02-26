@@ -12,6 +12,7 @@ Welcome to the OpenKAT documentation!
    modules/index
    installation-and-deployment/index
    developer-documentation/index
+   security-compliance/index
    ux-design/index
    release-notes/index
    guidelines/index
