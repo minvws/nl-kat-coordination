@@ -9,7 +9,6 @@ from unittest import mock
 from scheduler import config, models, storage
 from scheduler.schedulers.queue import InvalidItemError, ItemNotFoundError, NotAllowedError, QueueEmptyError
 from scheduler.storage import stores
-
 from tests.mocks import queue as mock_queue
 from tests.utils import functions
 
@@ -386,6 +385,9 @@ class PriorityQueueTestCase(unittest.TestCase):
         self.pq.push(second_item)
 
         event = threading.Event()
+
+        # Create a queue to store the popped items, used for asserting
+        # the correct order of the items.
         queue = _queue.Queue()
 
         # This function is similar to the pop() function of the queue, but
@@ -394,6 +396,8 @@ class PriorityQueueTestCase(unittest.TestCase):
             with self.pq.lock:
                 items, _ = self.pq_store.pop(self.pq.pq_id, None)
 
+                # Signal that we hold the lock, and keep the lock for a while
+                # before releasing it.
                 event.set()
                 time.sleep(5)
 
@@ -402,10 +406,13 @@ class PriorityQueueTestCase(unittest.TestCase):
                 queue.put(items[0])
 
         def second_pop(event):
-            # Wait for thread 1 to set the event before continuing
+            # Wait for thread 1 to set the event before continuing, we
+            # ensure that thread 1 has the lock.
             event.wait()
 
+            # This should block until the lock is released
             items, _ = self.pq.pop()
+
             queue.put(items[0])
 
         # Act; with thread 1 we will create a lock on the queue, and then with
@@ -436,6 +443,9 @@ class PriorityQueueTestCase(unittest.TestCase):
         self.pq.push(second_item)
 
         event = threading.Event()
+
+        # Create a queue to store the popped items, used for asserting
+        # the correct order of the items.
         queue = _queue.Queue()
 
         # This function is similar to the pop() function of the queue, but
@@ -443,6 +453,8 @@ class PriorityQueueTestCase(unittest.TestCase):
         def first_pop(event):
             items, _ = self.pq_store.pop(self.pq.pq_id, None)
 
+            # Signal that we hold the lock, and keep the lock for a while
+            # before releasing it.
             event.set()
             time.sleep(5)
 
@@ -451,10 +463,13 @@ class PriorityQueueTestCase(unittest.TestCase):
             queue.put(items[0])
 
         def second_pop(event):
-            # Wait for thread 1 to set the event before continuing
+            # Wait for thread 1 to set the event before continuing, we
+            # ensure that thread 1 has the lock.
             event.wait()
 
+            # This should block until the lock is released
             items, _ = self.pq.pop()
+
             queue.put(items[0])
 
         # Act; with thread 1 we won't create a lock, and then with thread 2 we
