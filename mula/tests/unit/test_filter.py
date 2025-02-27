@@ -2,12 +2,11 @@ import json
 import os
 import unittest
 
+from scheduler.storage.filters import Filter, FilterRequest, apply_filter
 from sqlalchemy import Boolean, Column, Float, ForeignKey, Integer, String, create_engine
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
-
-from scheduler.storage.filters import Filter, FilterRequest, apply_filter
 
 Base = declarative_base()
 
