@@ -50,6 +50,9 @@ def apply_filter(entity: DeclarativeBase, query: Query, filter_request: FilterRe
             # e.g. Model.selected_attr["nested_field"] this will return a
             # sqlalchemy.sql.elements.BinaryExpression whose type defaults to
             # JSON.
+
+            # If a nested field is being selected we need to traverse the nested
+            # fields and return the correct expression.
             if len(filter_field.split("__")) > 1:
                 for nested_field in filter_field.split("__"):
                     if hasattr(entity_attr, "property") and isinstance(entity_attr.property, RelationshipProperty):
