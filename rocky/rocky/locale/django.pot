@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-27 07:55+0000\n"
+"POT-Creation-Date: 2025-02-25 14:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -587,6 +587,7 @@ msgstr ""
 #: katalogus/templates/confirmation_clone_settings.html
 #: katalogus/templates/plugin_settings_delete.html
 #: reports/templates/report_overview/modal_partials/enable_disable_schedule_modal.html
+#: reports/templates/report_schedules/delete_recipe_modal.html
 #: rocky/templates/oois/ooi_delete.html
 #: rocky/templates/oois/ooi_mute_finding.html
 #: rocky/templates/organizations/organization_edit.html
@@ -1389,6 +1390,7 @@ msgstr ""
 #: katalogus/views/plugin_settings_delete.py
 #: reports/templates/report_overview/modal_partials/delete_modal.html
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: rocky/templates/admin/delete_confirmation.html rocky/views/ooi_delete.py
 msgid "Delete"
 msgstr ""
@@ -4343,6 +4345,20 @@ msgstr ""
 msgid "Input Object"
 msgstr ""
 
+#: reports/templates/report_schedules/delete_recipe_modal.html
+msgid "Delete report recipe"
+msgstr ""
+
+#: reports/templates/report_schedules/delete_recipe_modal.html
+msgid ""
+"\n"
+"        Deleting this report recipe means it will be permanently deleted.\n"
+"        It will not be possible anymore to see or enable the schedule.\n"
+"        You will find previously generated reports in the report history "
+"tab.\n"
+"  "
+msgstr ""
+
 #: reports/templates/summary/report_asset_overview.html
 msgid ""
 "The objects listed in the table below were used to generate this report. For "
@@ -4461,6 +4477,18 @@ msgstr ""
 
 #: reports/views/multi_report.py
 msgid "View report"
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid "Recipe '{}' deleted successfully"
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid "Recipe not found."
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid "No schedule or recipe selected"
 msgstr ""
 
 #: reports/views/report_overview.py
