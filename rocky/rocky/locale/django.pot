@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-27 10:13+0000\n"
+"POT-Creation-Date: 2025-02-27 10:26+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5872,10 +5872,10 @@ msgstr ""
 #: rocky/templates/oois/ooi_detail.html
 #, python-format
 msgid ""
-"<strong>Warning:</strong> You are unable to scan. Your permission to set "
-"clearance level for %(ooi)s is too low. Go to your <a "
-"href=\"%(account_details)s\">account details</a> to manage your clearance "
-"level."
+"<strong>Warning:</strong> You are not allowed to scan this OOI. Your maximum "
+"clearance level is %(member_clearance_level)s and this OOI has level "
+"%(boefje_scan_level)s. Go to your <a href=\"%(account_details)s\">account "
+"details</a> to manage your clearance level."
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail.html rocky/templates/scan.html
