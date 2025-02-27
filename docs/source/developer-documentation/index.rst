@@ -18,3 +18,4 @@ Contains documentation for developers and contributors.
    octopoes-research
    reports
    development-tutorial/index
+   qa-test-plan
