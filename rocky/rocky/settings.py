@@ -44,11 +44,7 @@ BYTES_API = env.url("BYTES_API").geturl()
 BYTES_USERNAME = env("BYTES_USERNAME")
 BYTES_PASSWORD = env("BYTES_PASSWORD")
 
-KEIKO_API = env.url("KEIKO_API").geturl()
-# Report generation timeout in seconds
-KEIKO_REPORT_TIMEOUT = env.int("KEIKO_REPORT_TIMEOUT", 60)
 ROCKY_REPORT_PERMALINKS = env.bool("ROCKY_REPORT_PERMALINKS", True)
-FEATURE_REPORTS = env.bool("FEATURE_REPORTS", False)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", False)
@@ -334,7 +330,7 @@ def immutable_file_test(path, url):
 
 
 WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
-WHITENOISE_KEEP_ONLY_HASHED_FILES = True
+WHITENOISE_KEEP_ONLY_HASHED_FILES = False
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "crisis_room"
@@ -431,6 +427,8 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": DEFAULT_AUTHENTICATION_CLASSES,
     "DEFAULT_PERMISSION_CLASSES": ["rocky.permissions.KATModelPermissions"],
     "DEFAULT_RENDERER_CLASSES": DEFAULT_RENDERER_CLASSES,
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 100,
     "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler",
 }
 
@@ -493,3 +491,12 @@ POOL_SIZE = env.int("POOL_SIZE", default=2)
 POLL_INTERVAL = env.int("POLL_INTERVAL", default=10)
 # Seconds to wait before checking the workers when queues are full
 WORKER_HEARTBEAT = env.int("WORKER_HEARTBEAT", default=5)
+
+# In production deployments the staticfiles are coming from the collected static
+# files in the static directory. We should not ship all those files also in
+# their original location, but Django will complain if a directory in
+# STATICFILES_DIRS does not exist. We silence the warning here to prevent the
+# warning from confusing users.
+SILENCED_SYSTEM_CHECKS = ["staticfiles.W004"]
+
+ROCKY_OUTGOING_REQUEST_TIMEOUT = env.int("ROCKY_OUTGOING_REQUEST_TIMEOUT", default=30)

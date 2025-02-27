@@ -15,15 +15,21 @@ from sqlalchemy.orm import sessionmaker
 
 from boefjes.app import SchedulerWorkerManager
 from boefjes.clients.bytes_client import BytesAPIClient
-from boefjes.clients.scheduler_client import Queue, SchedulerClientInterface, Task, TaskStatus
+from boefjes.clients.scheduler_client import PaginatedTasksResponse, SchedulerClientInterface, Task, TaskStatus
 from boefjes.config import Settings, settings
 from boefjes.dependencies.plugins import PluginService, get_plugin_service
 from boefjes.job_handler import bytes_api_client
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
-from boefjes.katalogus.organisations import check_organisation_exists
 from boefjes.katalogus.root import app
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
-from boefjes.local_repository import LocalPluginRepository, get_local_repository
+from boefjes.local_repository import (
+    LocalPluginRepository,
+    _cached_resolve_boefjes,
+    _cached_resolve_normalizers,
+    get_boefje_resource,
+    get_local_repository,
+    get_normalizer_resource,
+)
 from boefjes.models import Organisation
 from boefjes.runtime_interfaces import Handler, WorkerManager
 from boefjes.sql.config_storage import SQLConfigStorage, create_encrypter
@@ -44,7 +50,6 @@ from tests.loading import get_dummy_data
 class MockSchedulerClient(SchedulerClientInterface):
     def __init__(
         self,
-        queue_response: bytes,
         boefje_responses: list[bytes],
         normalizer_responses: list[bytes],
         log_path: Path,
@@ -52,7 +57,6 @@ class MockSchedulerClient(SchedulerClientInterface):
         iterations_to_wait_for_exception: int = 0,
         sleep_time: float = 0.1,
     ):
-        self.queue_response = queue_response
         self.boefje_responses = boefje_responses
         self.normalizer_responses = normalizer_responses
 
@@ -67,26 +71,25 @@ class MockSchedulerClient(SchedulerClientInterface):
         self._popped_items: dict[str, Task] = multiprocessing.Manager().dict()
         self._pushed_items: dict[str, Task] = multiprocessing.Manager().dict()
 
-    def get_queues(self) -> list[Queue]:
-        time.sleep(self.sleep_time)
-        return TypeAdapter(list[Queue]).validate_json(self.queue_response)
-
     def pop_item(self, queue: str) -> Task | None:
         time.sleep(self.sleep_time)
 
         try:
             if WorkerManager.Queue.BOEFJES.value in queue:
-                p_item = TypeAdapter(Task).validate_json(self.boefje_responses.pop(0))
+                response = TypeAdapter(PaginatedTasksResponse).validate_json(self.boefje_responses.pop(0))
+                p_item = response.results[0]
                 self._popped_items[str(p_item.id)] = p_item
                 self._tasks[str(p_item.id)] = self._task_from_id(p_item.id)
                 return p_item
 
             if WorkerManager.Queue.NORMALIZERS.value in queue:
-                p_item = TypeAdapter(Task).validate_json(self.normalizer_responses.pop(0))
+                response = TypeAdapter(PaginatedTasksResponse).validate_json(self.normalizer_responses.pop(0))
+                p_item = response.results[0]
                 self._popped_items[str(p_item.id)] = p_item
                 self._tasks[str(p_item.id)] = self._task_from_id(p_item.id)
                 return p_item
         except IndexError:
+            time.sleep(3 * self.sleep_time)
             raise self.raise_on_empty_queue
 
     def patch_task(self, task_id: UUID, status: TaskStatus) -> None:
@@ -120,13 +123,22 @@ class MockHandler(Handler):
     def handle(self, item: BoefjeMeta | NormalizerMeta):
         time.sleep(self.sleep_time)
 
-        if str(item.id) == "9071c9fd-2b9f-440f-a524-ef1ca4824fd4":
+        if str(item.id) in ["9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "2071c9fd-2b9f-440f-a524-ef1ca4824fd4"]:
+            time.sleep(self.sleep_time)
             raise self.exception()
 
         self.queue.put(item)
 
     def get_all(self) -> list[BoefjeMeta | NormalizerMeta]:
         return [self.queue.get() for _ in range(self.queue.qsize())]
+
+
+@pytest.fixture(autouse=True)
+def clear_caches():
+    get_boefje_resource.cache_clear()
+    get_normalizer_resource.cache_clear()
+    _cached_resolve_boefjes.cache_clear()
+    _cached_resolve_normalizers.cache_clear()
 
 
 @pytest.fixture
@@ -137,7 +149,6 @@ def item_handler(tmp_path: Path):
 @pytest.fixture
 def manager(item_handler: MockHandler, tmp_path: Path) -> SchedulerWorkerManager:
     scheduler_client = MockSchedulerClient(
-        queue_response=get_dummy_data("scheduler/queues_response.json"),
         boefje_responses=[
             get_dummy_data("scheduler/pop_response_boefje.json"),
             get_dummy_data("scheduler/pop_response_boefje_2.json"),
@@ -225,6 +236,11 @@ def test_organisation():
 
 
 @pytest.fixture
+def second_test_organisation():
+    return Organisation(id="test2", name="Test org2")
+
+
+@pytest.fixture
 def mock_plugin_service(mock_local_repository, test_organisation) -> PluginService:
     storage = ConfigStorageMemory()
     storage.upsert(test_organisation.id, "test_plugin", {"DUMMY_VAR": "123"})
@@ -238,6 +254,14 @@ def organisation(organisation_storage, test_organisation) -> Organisation:
         repo.create(test_organisation)
 
     return test_organisation
+
+
+@pytest.fixture
+def second_organisation(organisation_storage, second_test_organisation) -> Organisation:
+    with organisation_storage as repo:
+        repo.create(second_test_organisation)
+
+    return second_test_organisation
 
 
 @pytest.fixture
@@ -255,7 +279,6 @@ def unit_test_client(mock_plugin_service) -> TestClient:
 
     app.dependency_overrides[get_organisations_store] = lambda: _store
     app.dependency_overrides[get_plugin_service] = get_service
-    app.dependency_overrides[check_organisation_exists] = lambda: None
 
     yield client
 

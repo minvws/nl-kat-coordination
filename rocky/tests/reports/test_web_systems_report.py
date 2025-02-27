@@ -21,7 +21,7 @@ def test_web_report_no_findings(mock_octopoes_api_connector, valid_time, hostnam
 
     report = WebSystemReport(mock_octopoes_api_connector)
 
-    data = report.collect_data([str(hostname.reference)], valid_time)[str(hostname.reference)]
+    data = report.collect_data([hostname.reference], valid_time)[hostname.reference]
 
     assert bool(data["web_checks"])
 
@@ -52,7 +52,7 @@ def test_web_report_all_findings(
 
     report = WebSystemReport(mock_octopoes_api_connector)
 
-    data = report.collect_data([str(hostname.reference)], valid_time)[str(hostname.reference)]
+    data = report.collect_data([hostname.reference], valid_time)[hostname.reference]
 
     checks = data["web_checks"]
 

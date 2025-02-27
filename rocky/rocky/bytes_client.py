@@ -1,5 +1,5 @@
 import uuid
-from base64 import b64encode
+from base64 import b64decode, b64encode
 from collections.abc import Set
 from datetime import datetime, timezone
 
@@ -16,9 +16,12 @@ logger = structlog.get_logger("bytes_client")
 
 
 class BytesClient:
-    def __init__(self, base_url: str, username: str, password: str, organization: str):
+    # More than 100 raw files per Boefje run is very unlikely at this stage, but eventually we can start paginating
+    RAW_FILES_LIMIT = 100
+
+    def __init__(self, base_url: str, username: str, password: str, organization: str | None):
         self.credentials = {"username": username, "password": password}
-        self.session = httpx.Client(base_url=base_url)
+        self.session = httpx.Client(base_url=base_url, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT)
         self.organization = organization
 
     def health(self) -> ServiceHealth:
@@ -28,14 +31,14 @@ class BytesClient:
         return ServiceHealth.model_validate(response.json())
 
     @staticmethod
-    def raw_from_declarations(declarations: list[Declaration]):
+    def raw_from_declarations(declarations: list[Declaration]) -> bytes:
         json_string = f"[{','.join([declaration.model_dump_json() for declaration in declarations])}]"
 
         return json_string.encode("utf-8")
 
     def add_manual_proof(
         self, normalizer_id: uuid.UUID, raw: bytes, manual_mime_types: Set[str] = frozenset({"manual/ooi"})
-    ):
+    ) -> None:
         """Per convention for a generic normalizer, we add a raw list of declarations, not a single declaration"""
 
         self.login()
@@ -131,12 +134,24 @@ class BytesClient:
 
         return response.content
 
+    def get_raws(self, organization_code: str, raw_ids: list[uuid.UUID | str]) -> list[tuple[str, bytes]]:
+        params: dict[str, str | int | list[str]] = {
+            "limit": len(raw_ids),
+            "organization": organization_code,
+            "raw_ids": [str(raw_id) for raw_id in raw_ids],
+        }
+
+        response = self.session.get("/bytes/raws", params=params)
+        response.raise_for_status()
+
+        return [(file["name"], b64decode(file["content"])) for file in response.json().get("files", [])]
+
     def get_raw_metas(self, boefje_meta_id: uuid.UUID, organization_code: str) -> list:
         # More than 100 raw files per Boefje run is very unlikely at this stage, but eventually we can start paginating
-        raw_files_limit = 100
+
         params: dict[str, str | int] = {
             "boefje_meta_id": str(boefje_meta_id),
-            "limit": raw_files_limit,
+            "limit": self.RAW_FILES_LIMIT,
             "organization": str(self.organization),
         }
 
@@ -147,7 +162,7 @@ class BytesClient:
         metas = [raw_meta for raw_meta in metas if raw_meta["boefje_meta"]["organization"] == organization_code]
         if not metas:
             raise Http404
-        if len(metas) >= raw_files_limit:
+        if len(metas) >= self.RAW_FILES_LIMIT:
             logger.warning("Reached raw file limit for current view.")
 
         return metas

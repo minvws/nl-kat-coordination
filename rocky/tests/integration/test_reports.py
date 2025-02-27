@@ -1,10 +1,11 @@
 from dataclasses import asdict
 
-from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
+from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.definitions import MultiReport, Report
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.report_types.systems_report.report import SystemReport, SystemType
 from reports.report_types.web_system_report.report import WebSystemReport
+from reports.runner.report_runner import aggregate_reports
 
 from octopoes.api.models import Declaration
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -18,7 +19,7 @@ def test_web_report(octopoes_api_connector: OctopoesAPIConnector, valid_time):
     seed_system(octopoes_api_connector, valid_time)
 
     report = WebSystemReport(octopoes_api_connector)
-    input_ooi = "Hostname|test|example.com"
+    input_ooi = Reference.from_str("Hostname|test|example.com")
     data = report.collect_data([input_ooi], valid_time)[input_ooi]
 
     assert data["input_ooi"] == input_ooi
@@ -61,7 +62,7 @@ def test_system_report(octopoes_api_connector: OctopoesAPIConnector, valid_time)
     seed_system(octopoes_api_connector, valid_time)
 
     report = SystemReport(octopoes_api_connector)
-    input_ooi = "Hostname|test|example.com"
+    input_ooi = Reference.from_str("Hostname|test|example.com")
     data = report.collect_data([input_ooi], valid_time)[input_ooi]
 
     assert data["input_ooi"] == input_ooi
@@ -239,10 +240,8 @@ def test_multi_report(
 
     reports = AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
     report_ids = [report_type.id for report_type in reports]
-    _, data, report_data, _ = aggregate_reports(
-        octopoes_api_connector, hostname_oois, report_ids, valid_time, organization.code
-    )
-    _, data_2, report_data_2, _ = aggregate_reports(
+    _, data, _, _ = aggregate_reports(octopoes_api_connector, hostname_oois, report_ids, valid_time, organization.code)
+    _, data_2, _, _ = aggregate_reports(
         octopoes_api_connector_2, hostname_oois, report_ids, valid_time, organization.code
     )
 
@@ -250,13 +249,13 @@ def test_multi_report(
         organization_code=octopoes_api_connector.client,
         organization_name="Test name",
         organization_tags=["test1"],
-        data={"post_processed_data": data, "report_data": report_data},
+        data=data,
     )
     report_data_object_2 = ReportData(
         organization_code=octopoes_api_connector_2.client,
         organization_name="Name2",
         organization_tags=["test1", "test2", "test3"],
-        data={"post_processed_data": data_2, "report_data": report_data_2},
+        data=data_2,
     )
 
     # Save second organization info in the first organization

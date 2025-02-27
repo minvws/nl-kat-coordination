@@ -3,15 +3,22 @@ name: Build docs artifact for PR
 on:
   pull_request:
     paths:
+      # We generate documentation for boefje, bytes, mula and octopoes
+      # from code so the workflow should also depend on it.
+      - "boefje/**"
+      - "bytes/**"
       - "docs/**"
+      - "mula/**"
+      - "octopoes/**"
       - "requirements.txt"
+      - ".github/workflows/build_docs_on_pr.yml"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   build-artifact:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

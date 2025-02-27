@@ -1,11 +1,10 @@
-from typing import Any
-
+from django.utils.functional import Promise
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from tools.enums import SCAN_LEVEL
 
-Choice = tuple[Any, str]
+Choice = tuple[str, Promise]
 Choices = list[Choice]
 ChoicesGroup = tuple[str, Choices]
 ChoicesGroups = list[ChoicesGroup]
@@ -98,6 +97,12 @@ BOEFJE_SCAN_LEVEL_HELP_TEXT = mark_safe(
         "<a href='https://docs.openkat.nl/manual/usermanual.html#scan-levels-clearance-indemnities'> "
         "documentation</a>.</p> "
     )
+)
+
+BOEFJE_RUN_ON_HELP_TEXT = _(
+    "Choose when this Boefje will scan objects. "
+    "It can run on a given interval or it can run every time an object "
+    "has been created or changed. "
 )
 
 DEPTH_DEFAULT = 9

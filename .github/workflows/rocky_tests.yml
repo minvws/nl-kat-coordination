@@ -10,10 +10,12 @@ on:
     paths:
       - octopoes/**
       - rocky/**
+      - .github/workflows/rocky_test.yml
   pull_request:
     paths:
       - octopoes/**
       - rocky/**
+      - .github/workflows/rocky_test.yml
 
 jobs:
   test:
@@ -22,7 +24,7 @@ jobs:
       matrix:
         version: ["3.10", "3.11"]
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code

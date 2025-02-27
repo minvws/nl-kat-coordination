@@ -2,7 +2,7 @@
 What is OpenKAT?
 ================
 
-OpenKAT aims to monitor, record and analyze the status of information systems. The basic premise is that many of the major security incidents are caused by small errors and known vulnerabilities, and that if you can find them in time your systems and infrastructure become a lot more secure.
+OpenKAT aims to monitor, record and analyze the status of information systems. The basic premise is that many of the major security incidents are caused by small errors and known vulnerabilities, and if you find them and resolve them in time your systems and infrastructure become a lot more secure.
 
 OpenKAT scans, collects, analyzes and reports in an ongoing process:
 
@@ -11,7 +11,7 @@ OpenKAT scans, collects, analyzes and reports in an ongoing process:
 
 OpenKAT scans networks, finds vulnerabilities and creates accessible reports. It integrates the most widely used network tools and scanning software into a modular framework, accesses external databases such as shodan, and combines the information from all these sources into clear reports. It also includes lots of cat hair.
 
-OpenKAT is useful if you want to monitor a complex system and want to know whether it contains known vulnerabilities or configuration errors. Due to its modular structure and extensibility, OpenKAT can be applied in a multitude of situations. You can customize it and put it to your own use.
+OpenKAT is useful if you want to monitor a complex system and know whether it contains known vulnerabilities or configuration errors. Due to its modular structure and extensibility, OpenKAT can be applied in different situations. You can customize it and put it to your own use.
 
 Documentation
 =============
@@ -62,7 +62,7 @@ The tools addressed by OpenKAT may have their own license, from the OS/S domain 
 Contact
 =======
 
-There several options to contact the OpenKAT team:
+There are several options to contact the OpenKAT team:
 
 - Direct contact: meedoen@openkat.nl
 - `Github Discussions <https://github.com/minvws/nl-kat-coordination/discussions>`_
@@ -73,10 +73,10 @@ There several options to contact the OpenKAT team:
 Privacy
 =======
 
-OpenKAT is not designed to collect private information and it does not act on any private information that its finds. Some information considered to be personally identifying information might be collected through one or more of OpenKAT's plugins and subsequently stored, but only if that information was accessible to OpenKAT. E.g. a phone number or email address listed on a website might end up being collected as part of OpenKAT normal data collection. This data might then be stored for a long time because OpenKAT stores 'proofs' of its actions. No email or phone number models are present and as such they won't be processed into objects by OpenKAT.
-An OpenKAT installation requires user accounts for users to be able to login. These accounts (and all data OpenKAT works with) are stored only on the OpenKAT installation itself and are not shared with other parties or outside of your OpenKAT install.
+OpenKAT is not designed to collect private information and it does not act on any private information that it finds. Some information considered to be personally identifiable information, may be collected through one or more of OpenKAT's plugins and subsequently stored, but only if that information has been accessible to OpenKAT. For example, a phone number or email address listed on a website might end up being collected as part of OpenKAT normal data collection. These data might then be stored for a long period of time, because OpenKAT stores evidence of its actions. No email or phone number models are present and as such they won't be processed into objects by OpenKAT.
+An OpenKAT installation requires user accounts for users to be able to log in. These accounts (and all data OpenKAT works with) are stored only on the OpenKAT installation itself, and are not shared with any other parties or outside of your OpenKAT install.
 
 Security
 ========
 
-OpenKAT is designed to be secure by default in its production setup. In the development setup some debugging flags are enabled by default and it will not include TLS out of the box. To setup a secure production OpenKAT install, please follow the `Production setup guidelines <https://docs.openkat.nl/installation_and_deployment/install.html#production-environments>`_ and `Hardening guidelines <https://docs.openkat.nl/installation_and_deployment/hardening.html>`_.
+OpenKAT is designed to be secure by default in its production setup. In the development setup some debugging flags are enabled by default and it will not include TLS out of the box. To set up a secure production OpenKAT install, please follow the `Production setup guidelines <https://docs.openkat.nl/installation-and-deployment/install.html#production-environments>`_ and `Hardening guidelines <https://docs.openkat.nl/installation-and-deployment/hardening.html>`_.

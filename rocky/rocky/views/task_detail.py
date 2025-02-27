@@ -55,7 +55,9 @@ class BoefjeTaskDetailView(TaskDetailView):
 
 
 class NormalizerTaskJSONView(TaskDetailView):
+    task_type = "normalizer"
     plugin_type = "normalizer"
+    template_name = "tasks/normalizer_task_detail.html"
 
     def get(self, request, *args, **kwargs) -> JsonResponse | HttpResponse:
         task = self.get_json_task_details()

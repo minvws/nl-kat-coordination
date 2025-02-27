@@ -12,12 +12,14 @@ on:
       - "**/requirements-dev.txt"
       - "**/pyproject.toml"
       - "**/poetry.lock"
+      - ".github/workflows/check_poetry_dependencies.yml"
   pull_request:
     paths:
       - "**/requirements.txt"
       - "**/requirements-dev.txt"
       - "**/pyproject.toml"
       - "**/poetry.lock"
+      - ".github/workflows/check_poetry_dependencies.yml"
 
 jobs:
   poetry-dependencies:
@@ -26,7 +28,7 @@ jobs:
       # added or changed files to the repository.
       contents: write
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 

@@ -5,7 +5,7 @@ from ipaddress import IPv6Address, ip_address
 TOP_PORTS_DEFAULT = 250
 
 
-def run(boefje_meta: dict):
+def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     top_ports_key = "TOP_PORTS"
     if boefje_meta["boefje"]["id"] == "nmap-udp":
         top_ports_key = "TOP_PORTS_UDP"
@@ -18,4 +18,8 @@ def run(boefje_meta: dict):
         cmd.append("-6")
 
     cmd.extend(["-oX", "-", str(ip)])
-    return [({"openkat/nmap-output"}, subprocess.run(cmd, capture_output=True).stdout.decode())]
+    output = subprocess.run(cmd, capture_output=True)
+
+    output.check_returncode()
+
+    return [({"openkat/nmap-output"}, output.stdout.decode())]

@@ -1,12 +1,16 @@
 from typing import Any
 
+from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView
+from httpx import HTTPError
+from katalogus.client import get_katalogus
+from tools.view_helpers import Breadcrumb, PostRedirect
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
-from reports.report_types.helpers import get_ooi_types_from_aggregate_report
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
     OOISelectionView,
@@ -22,7 +26,7 @@ from reports.views.view_helpers import AggregateReportStepsMixin
 
 
 class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
-    def build_breadcrumbs(self):
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
@@ -60,7 +64,7 @@ class OOISelectionAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggr
     template_name = "aggregate_report/select_oois.html"
     breadcrumbs_step = 3
     current_step = 1
-    ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
+    report_type = AggregateOrganisationReport
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -69,7 +73,7 @@ class OOISelectionAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggr
 
 
 class ReportTypesSelectionAggregateReportView(
-    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportTypeSelectionView
+    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportTypeSelectionView, TemplateView
 ):
     """
     Shows all possible report types from a list of Objects.
@@ -80,7 +84,6 @@ class ReportTypesSelectionAggregateReportView(
     breadcrumbs_step = 4
     current_step = 2
     report_type = AggregateOrganisationReport
-    ooi_types = get_ooi_types_from_aggregate_report(report_type)
 
 
 class SetupScanAggregateReportView(
@@ -93,6 +96,7 @@ class SetupScanAggregateReportView(
     template_name = "aggregate_report/setup_scan.html"
     breadcrumbs_step = 5
     current_step = 3
+    report_type = AggregateOrganisationReport
 
 
 class ExportSetupAggregateReportView(
@@ -107,6 +111,28 @@ class ExportSetupAggregateReportView(
     current_step = 4
     report_type = AggregateOrganisationReport
 
+    def post(self, request, *args, **kwargs):
+        selected_plugins = request.POST.getlist("plugin", [])
+
+        if not selected_plugins:
+            return super().post(request, *args, **kwargs)
+
+        if not self.organization_member.has_perm("tools.can_enable_disable_boefje"):
+            messages.error(request, _("You do not have the required permissions to enable plugins."))
+            return PostRedirect(self.get_previous())
+
+        client = get_katalogus(self.organization_member)
+        for selected_plugin in selected_plugins:
+            try:
+                client.enable_boefje_by_id(selected_plugin)
+            except HTTPError:
+                messages.error(
+                    request,
+                    _("An error occurred while enabling {}. The plugin is not available.").format(selected_plugin),
+                )
+                return self.post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
+
 
 class SaveAggregateReportView(SaveAggregateReportMixin, BreadcrumbsAggregateReportView, SaveReportView):
     """
@@ -116,3 +142,4 @@ class SaveAggregateReportView(SaveAggregateReportMixin, BreadcrumbsAggregateRepo
     template_name = "aggregate_report.html"
     breadcrumbs_step = 6
     current_step = 5
+    report_type = AggregateOrganisationReport

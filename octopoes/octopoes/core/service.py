@@ -143,7 +143,7 @@ class OctopoesService:
 
     def get_ooi_tree(
         self, reference: Reference, valid_time: datetime, search_types: set[type[OOI]] | None = None, depth: int = 1
-    ):
+    ) -> ReferenceTree:
         tree = self.ooi_repository.get_tree(reference, valid_time, search_types, depth)
         self._populate_scan_profiles(tree.store.values(), valid_time)
         return tree
@@ -158,7 +158,7 @@ class OctopoesService:
                 or (origin.origin_type == OriginType.INFERENCE and origin.source == reference)
             )
         ):
-            self.ooi_repository.delete(reference, valid_time)
+            self.ooi_repository.delete_if_exists(reference, valid_time)
 
     def save_origin(
         self, origin: Origin, oois: list[OOI], valid_time: datetime, end_valid_time: datetime | None = None
@@ -177,6 +177,19 @@ class OctopoesService:
             elif origin.origin_type == OriginType.AFFIRMATION:
                 logger.debug("Affirmation source %s already deleted", origin.source)
                 return
+
+        if origin.origin_type == OriginType.AFFIRMATION and not any(
+            other_origin
+            for other_origin in self.origin_repository.list_origins(
+                origin_type={OriginType.DECLARATION, OriginType.OBSERVATION, OriginType.INFERENCE},
+                valid_time=valid_time,
+                result=origin.source,
+            )
+            if not (other_origin.origin_type == OriginType.INFERENCE and [other_origin.source] == other_origin.result)
+        ):
+            logger.debug("Affirmation source %s seems dangling, deleting", origin.source)
+            self.ooi_repository.delete_if_exists(origin.source, valid_time)
+            return
 
         for ooi in oois:
             self.ooi_repository.save(ooi, valid_time=valid_time, end_valid_time=end_valid_time)
@@ -244,28 +257,26 @@ class OctopoesService:
             logger.exception("Error running inference", exc_info=e)
 
     @staticmethod
-    def check_path_level(path_level: int | None, current_level: int):
+    def check_path_level(path_level: int | None, current_level: int) -> bool:
         return path_level is not None and path_level >= current_level
 
     def recalculate_scan_profiles(self, valid_time: datetime) -> None:
         # fetch all scan profiles
         all_scan_profiles = self.scan_profile_repository.list_scan_profiles(None, valid_time=valid_time)
 
-        # cache all declared
-        all_declared_scan_profiles = {
-            scan_profile for scan_profile in all_scan_profiles if isinstance(scan_profile, DeclaredScanProfile)
-        }
-        # cache all inherited
-        inherited_scan_profiles = {
-            scan_profile.reference: scan_profile
-            for scan_profile in all_scan_profiles
-            if isinstance(scan_profile, InheritedScanProfile)
-        }
+        all_declared_scan_profiles: set[DeclaredScanProfile] = set()
+        inherited_scan_profiles: dict[Reference, InheritedScanProfile] = {}
+        assigned_scan_levels: dict[Reference, ScanLevel] = {}
+        source_scan_profile_references: set[Reference] = set()
 
-        # track all scan level assignments
-        assigned_scan_levels: dict[Reference, ScanLevel] = {
-            scan_profile.reference: scan_profile.level for scan_profile in all_declared_scan_profiles
-        }
+        # fill profile caches
+        for scan_profile in all_scan_profiles:
+            if isinstance(scan_profile, DeclaredScanProfile):
+                all_declared_scan_profiles.add(scan_profile)
+                assigned_scan_levels[scan_profile.reference] = scan_profile.level
+                source_scan_profile_references.add(scan_profile.reference)
+            elif isinstance(scan_profile, InheritedScanProfile):
+                inherited_scan_profiles[scan_profile.reference] = scan_profile
 
         for current_level in range(4, 0, -1):
             # start point: all scan profiles with current level + all higher scan levels
@@ -282,9 +293,7 @@ class OctopoesService:
                 }
 
                 temp_next_ooi_set = set()
-                for ooi_type_ in grouped_per_type:
-                    current_ooi_set = grouped_per_type[ooi_type_]
-
+                for ooi_type_, current_ooi_set in grouped_per_type.items():
                     # find paths to neighbours higher or equal than current processing level
                     paths = get_paths_to_neighours(ooi_type_)
                     paths = {
@@ -320,7 +329,6 @@ class OctopoesService:
 
         # Save all assigned scan levels
         update_count = 0
-        source_scan_profile_references = {sp.reference for sp in all_declared_scan_profiles}
         for reference, scan_level in assigned_scan_levels.items():
             # Skip source scan profiles
             if reference in source_scan_profile_references:
@@ -368,7 +376,7 @@ class OctopoesService:
         )
         logger.info("Recalculated scan profiles")
 
-    def process_event(self, event: DBEvent):
+    def process_event(self, event: DBEvent) -> None:
         # handle event
         event_handler_name = f"_on_{event.operation_type.value}_{event.entity_type}"
         handler: Callable[[DBEvent], None] | None = getattr(self, event_handler_name)

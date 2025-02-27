@@ -9,9 +9,11 @@ on:
       - "*"
     paths:
       - mula/**
+      - .github/workflows/mula_test.yml
   pull_request:
     paths:
       - mula/**
+      - .github/workflows/mula_test.yml
 
 jobs:
   test:
@@ -20,7 +22,7 @@ jobs:
       matrix:
         version: ["3.10", "3.11"]
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     env:
       COMPOSE_FILE: .ci/docker-compose.yml
 

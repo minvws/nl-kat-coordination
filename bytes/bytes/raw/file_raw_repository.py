@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import logging
 from pathlib import Path
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 import structlog
@@ -12,6 +15,10 @@ from bytes.raw.middleware import FileMiddleware, make_middleware
 from bytes.repositories.raw_repository import BytesFileNotFoundException, RawRepository
 
 logger = structlog.get_logger(__name__)
+
+
+if TYPE_CHECKING:
+    from mypy_boto3_s3.service_resource import Bucket
 
 
 def create_raw_repository(settings: Settings) -> RawRepository:
@@ -68,6 +75,20 @@ class FileRawRepository(RawRepository):
         contents = file_path.read_bytes()
         return RawData(value=self.file_middleware.decode(contents), boefje_meta=boefje_meta)
 
+    def get_raws(self, raw_metas_pairs: list[tuple[UUID, BoefjeMeta]]) -> list[tuple[UUID, RawData]]:
+        try:
+            raws = [
+                (raw_id, self._raw_file_path(raw_id, boefje_meta).read_bytes(), boefje_meta)
+                for raw_id, boefje_meta in raw_metas_pairs
+            ]
+        except FileNotFoundError:
+            raise BytesFileNotFoundException()
+
+        return [
+            (raw_id, RawData(value=self.file_middleware.decode(raw), boefje_meta=boefje_meta))
+            for raw_id, raw, boefje_meta in raws
+        ]
+
     def _raw_file_path(self, raw_id: UUID, boefje_meta: BoefjeMeta) -> Path:
         return self.base_path / boefje_meta.organization / self._index(raw_id) / str(raw_id)
 
@@ -87,7 +108,7 @@ class S3RawRepository(RawRepository):
         set_boto3_stream_logger("", logging.WARNING)
         self._s3resource = BotoSession().resource("s3")
 
-    def get_or_create_bucket(self, organization: str):
+    def get_or_create_bucket(self, organization: str) -> Bucket:
         # Create a bucket, and if it exists already return that instead
         bucket_name = f"{self.s3_bucket_prefix}{organization}" if self.bucket_per_org else self.s3_bucket_name
 
