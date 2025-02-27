@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-25 15:02+0000\n"
+"POT-Creation-Date: 2025-02-27 07:55+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3754,10 +3754,7 @@ msgstr ""
 
 #: reports/templates/partials/report_header.html
 #, python-format
-msgid ""
-"\n"
-"                    This sector contains %(length)s scanned organizations.\n"
-"                "
+msgid "This sector contains %(length)s scanned organizations."
 msgstr ""
 
 #: reports/templates/partials/report_header.html
@@ -3774,11 +3771,7 @@ msgstr ""
 
 #: reports/templates/partials/report_header.html
 #, python-format
-msgid ""
-"\n"
-"                    A total of %(total)s critical vulnerabilities have been "
-"identified.\n"
-"                "
+msgid "A total of %(total)s critical vulnerabilities have been identified."
 msgstr ""
 
 #: reports/templates/partials/report_introduction.html
