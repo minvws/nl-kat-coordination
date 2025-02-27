@@ -2,6 +2,7 @@ import json
 from typing import Any
 from urllib import parse
 
+from account.models import KATUser
 from django import template
 
 from octopoes.models import OOI, Reference, ScanLevel
@@ -99,3 +100,8 @@ def clearance_level(ooi: OOI) -> ScanLevel:
 @register.filter
 def ooi_type(reference_string: str) -> str:
     return Reference.from_str(reference_string).class_
+
+
+@register.filter
+def get_user_full_name(ooi: OOI) -> str:
+    return KATUser.objects.get(id=ooi.user_id).get_full_name()

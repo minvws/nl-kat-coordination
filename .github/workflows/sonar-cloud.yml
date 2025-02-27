@@ -21,7 +21,7 @@ jobs:
     uses: minvws/nl-kat-coordination/.github/workflows/boefjes-tests.yml@main
 
   fix-coverage-reports:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     needs:
       - octopoes-tests
@@ -72,7 +72,7 @@ jobs:
           path: "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
 
   sonar-cloud:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     needs:
       - fix-coverage-reports

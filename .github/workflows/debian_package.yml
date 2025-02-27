@@ -11,7 +11,7 @@ on:
 
 jobs:
   changes:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       packages: ${{ steps.filter.outputs.changes }}
     steps:
@@ -29,9 +29,6 @@ jobs:
               - '.github/workflows/debian_package.yml'
             cveapi:
               - 'cveapi/**'
-              - '.github/workflows/debian_package.yml'
-            keiko:
-              - 'keiko/**'
               - '.github/workflows/debian_package.yml'
             mula:
               - 'mula/**'
@@ -52,11 +49,11 @@ jobs:
       matrix:
         dist: [debian12, ubuntu22.04]
         # On main, release branches and tags we always want to build all the packages
-        package: ${{ github.event_name == 'push' && fromJSON('["boefjes", "bytes", "cveapi", "keiko", "mula", "octopoes", "rocky"]') || fromJSON(needs.changes.outputs.packages) }}
+        package: ${{ github.event_name == 'push' && fromJSON('["boefjes", "bytes", "cveapi", "mula", "octopoes", "rocky"]') || fromJSON(needs.changes.outputs.packages) }}
         exclude:
           - package: cveapi
             dist: ubuntu22.04
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       PKG_NAME: kat-${{ matrix.package }}
 
@@ -70,7 +67,6 @@ jobs:
           cp _version.py boefjes/boefjes/version.py
           cp _version.py boefjes/boefjes/katalogus/version.py
           cp _version.py bytes/bytes/version.py
-          cp _version.py keiko/keiko/version.py
           cp _version.py mula/scheduler/version.py
           cp _version.py octopoes/octopoes/version.py
           cp _version.py rocky/rocky/version.py
