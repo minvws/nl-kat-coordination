@@ -3,27 +3,28 @@ name: Boefjes Run the test suite
 on:
   push:
     branches:
-      - 'main'
-      - 'release-*'
+      - "main"
+      - "release-*"
     tags:
-      - '*'
+      - "*"
     paths:
       - boefjes/**
       - octopoes/**
+      - .github/workflows/boefjes_test.yml
   pull_request:
     paths:
       - boefjes/**
       - octopoes/**
+      - .github/workflows/boefjes_test.yml
 
 jobs:
   Tests:
-
     strategy:
       fail-fast: false
       matrix:
-        version: [ '3.10', '3.11' ]
+        version: ["3.10", "3.11"]
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     env:
       COMPOSE_FILE: .ci/docker-compose.yml
 
@@ -33,13 +34,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.version }}
-          cache: 'pip' # caching pip dependencies
+          cache: "pip" # caching pip dependencies
 
       - name: Install pip
         run: python3 -m pip install --upgrade pip
 
       - name: Install dev requirements
-        run: pip install -r requirements-dev.txt
+        run: grep -v git+https:// requirements-dev.txt | pip install -r /dev/stdin && grep git+https:// requirements-dev.txt | pip install -r /dev/stdin
         working-directory: ./boefjes
 
       - name: Install requirements

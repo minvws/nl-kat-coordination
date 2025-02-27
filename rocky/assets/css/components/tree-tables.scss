@@ -8,7 +8,7 @@ table {
     }
 
     th {
-      >div {
+      > div {
         display: flex;
         justify-content: space-between;
       }
@@ -26,12 +26,11 @@ table {
               padding-left: calc(16px + #{$i * 16}px);
             }
           }
-
         }
       }
 
       &.folded {
-        >td {
+        > td {
           background-color: #cccccc;
           overflow: hidden;
 
@@ -47,18 +46,18 @@ table {
   }
 }
 
-.toggle-table-body:not(:checked)+table.tree-view tbody {
+.toggle-table-body:not(:checked) + table.tree-view tbody {
   display: none;
 }
 
-.toggle-table-body+table.tree-view>thead label {
+.toggle-table-body + table.tree-view > thead label {
   cursor: pointer;
 }
 
-.toggle-table-body:checked+table.tree-view>thead .ro-icon.open {
+.toggle-table-body:checked + table.tree-view > thead .ro-icon.open {
   display: none;
 }
 
-.toggle-table-body:not(:checked)+table.tree-view>thead .ro-icon.close {
+.toggle-table-body:not(:checked) + table.tree-view > thead .ro-icon.close {
   display: none;
 }

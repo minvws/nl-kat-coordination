@@ -1,15 +1,20 @@
 import hashlib
+import json
 from enum import Enum
 from importlib import import_module
 from inspect import isfunction, signature
+from json import JSONDecodeError
 from pathlib import Path
 from typing import Protocol
 
-from boefjes.katalogus.models import Boefje, Normalizer
+from jsonschema.exceptions import SchemaError
+
+from boefjes.models import Boefje, Normalizer
 
 BOEFJES_DIR = Path(__file__).parent
 
 BOEFJE_DEFINITION_FILE = "boefje.json"
+SCHEMA_FILE = "schema.json"
 NORMALIZER_DEFINITION_FILE = "normalizer.json"
 ENTRYPOINT_BOEFJES = "main.py"
 ENTRYPOINT_NORMALIZERS = "normalize.py"
@@ -52,12 +57,23 @@ def get_runnable_module_from_package(package: str, module_file: str, *, paramete
 class BoefjeResource:
     """Represents a Boefje package that we can run. Throws a ModuleException if any validation fails."""
 
-    def __init__(self, path: Path, package: str):
+    def __init__(self, path: Path, package: str, path_hash: str):
         self.path = path
-        self.boefje: Boefje = Boefje.parse_file(path / BOEFJE_DEFINITION_FILE)
-        self.boefje.runnable_hash = get_runnable_hash(self.path)
+        self.boefje: Boefje = Boefje.model_validate_json(path.joinpath(BOEFJE_DEFINITION_FILE).read_text())
+        self.boefje.runnable_hash = path_hash
         self.boefje.produces = self.boefje.produces.union(set(_default_mime_types(self.boefje)))
-        self.module = get_runnable_module_from_package(package, ENTRYPOINT_BOEFJES, parameter_count=1)
+        self.module: Runnable | None = None
+
+        if self.boefje.oci_image is None and (path / ENTRYPOINT_BOEFJES).exists():
+            self.module = get_runnable_module_from_package(package, ENTRYPOINT_BOEFJES, parameter_count=1)
+
+        if (path / SCHEMA_FILE).exists():
+            try:
+                self.boefje.boefje_schema = json.load((path / SCHEMA_FILE).open())
+            except JSONDecodeError as e:
+                raise ModuleException("Invalid schema file") from e
+            except SchemaError as e:
+                raise ModuleException("Invalid schema") from e
 
 
 class NormalizerResource:
@@ -65,12 +81,12 @@ class NormalizerResource:
 
     def __init__(self, path: Path, package: str):
         self.path = path
-        self.normalizer = Normalizer.parse_file(path / NORMALIZER_DEFINITION_FILE)
+        self.normalizer = Normalizer.model_validate_json(path.joinpath(NORMALIZER_DEFINITION_FILE).read_text())
         self.normalizer.consumes.append(f"normalizer/{self.normalizer.id}")
         self.module = get_runnable_module_from_package(package, ENTRYPOINT_NORMALIZERS, parameter_count=2)
 
 
-def get_runnable_hash(path: Path) -> str:
+def hash_path(path: Path) -> str:
     """Returns sha256(file1 + file2 + ...) of all files in the given path."""
 
     folder_hash = hashlib.sha256()
@@ -86,7 +102,7 @@ def get_runnable_hash(path: Path) -> str:
     return folder_hash.hexdigest()
 
 
-def _default_mime_types(boefje: Boefje):
+def _default_mime_types(boefje: Boefje) -> set:
     mime_types = {f"boefje/{boefje.id}"}
 
     if boefje.version is not None:

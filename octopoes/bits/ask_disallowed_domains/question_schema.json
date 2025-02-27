@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "/bit/disallowed-csp-hostnames",
+  "type": "object",
+  "default": {},
+  "required": [],
+  "properties": {
+    "disallowed_hostnames": {
+      "description": "Comma separated list of disallowed hostnames in CSP headers",
+      "type": "string",
+      "pattern": "^(\\s*(,*)[^,]+,?\\s*)*$",
+      "default": "githubpages.com,github.io,jsdelivr.com,cdn.skypack.dev,unpkg.com"
+    },
+    "disallow_url_shorteners": {
+      "description": "Do you want to disallow url shorteners in csp headers?",
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

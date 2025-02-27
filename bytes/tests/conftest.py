@@ -60,7 +60,7 @@ def pastebin_hash_repository(settings: Settings) -> HashRepository:
 @pytest.fixture
 def mock_hash_repository(settings: Settings) -> HashRepository:
     if settings.rfc3161_cert_file and settings.rfc3161_provider:
-        return RFC3161HashRepository(settings.rfc3161_cert_file.read_bytes(), settings.rfc3161_provider)
+        return RFC3161HashRepository(settings.rfc3161_cert_file.read_bytes(), str(settings.rfc3161_provider))
 
     return InMemoryHashRepository(signing_provider_url="https://test")
 
@@ -89,11 +89,7 @@ def bytes_api_client(settings) -> Iterator[BytesAPIClient]:
     alembicArgs = ["--config", "/app/bytes/bytes/alembic.ini", "--raiseerr", "upgrade", "head"]
     alembic.config.main(argv=alembicArgs)
 
-    client = BytesAPIClient(
-        "http://ci_bytes:8000",
-        settings.username,
-        settings.password,
-    )
+    client = BytesAPIClient("http://ci_bytes:8000", settings.username, settings.password)
     client.login()
 
     yield client
@@ -109,5 +105,8 @@ def raw_repository(tmp_path: Path) -> FileRawRepository:
 
 
 @pytest.fixture
-def event_manager(settings: Settings) -> RabbitMQEventManager:
-    return RabbitMQEventManager(str(settings.queue_uri))
+def event_manager(settings: Settings) -> Iterator[RabbitMQEventManager]:
+    manager = RabbitMQEventManager(str(settings.queue_uri))
+    manager.channel.queue_delete("raw_file_received")
+
+    yield manager

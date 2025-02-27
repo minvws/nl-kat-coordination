@@ -1,11 +1,11 @@
 import dataclasses
-import logging
 
+import structlog
 from django.core.serializers.json import DjangoJSONEncoder
 
 from octopoes.models import OOI
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def debug_json_keys(data: dict, path: list) -> None:
@@ -20,7 +20,10 @@ class JSONEncoder(DjangoJSONEncoder):
     def default(self, o):
         if isinstance(o, OOI):
             return str(o)
-        elif dataclasses.is_dataclass(o):
+        elif dataclasses.is_dataclass(o) and not isinstance(o, type):
+            # is_dataclass return True if o is a dataclass or an instance, but
+            # asdict only accept instances, so we need to add the "not
+            # isinstance(o, type)" to make sure o is an instance not a class.
             return dataclasses.asdict(o)
         else:
             return super().default(o)

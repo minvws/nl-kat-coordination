@@ -22,7 +22,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 
     # Default ports
     ports = (11112, 104, 2761, 2762)
-    results = {"open_ports": []}
+    results: dict[str, list[int]] = {"open_ports": []}
 
     # Attempt to establish connection and post result
     for port in ports:

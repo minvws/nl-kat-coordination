@@ -13,7 +13,7 @@
     </p>
 {% endif %}
 {% if data.rpki_ips %}
-    {% if show_heading or show_introduction %}
+    {% if show_heading or generate_report %}
         <p>
             {% blocktranslate trimmed %}
                 This section contains basic security information about resource public key
@@ -25,14 +25,14 @@
         </p>
         <p>
             {% blocktranslate trimmed %}
-                The RPKI report shows if an RPKI route announcement was available for
+                The RPKI Report shows if an RPKI route announcement was available for
                 the system and if this announcement is not expired.
             {% endblocktranslate %}
         </p>
     {% endif %}
     <div class="horizontal-scroll">
         <table>
-            <caption class="visually-hidden">{% translate "RPKI compliance:" %}</caption>
+            <caption class="visually-hidden">{% translate "RPKI compliance" %}</caption>
             <thead>
                 <tr>
                     <th>{% translate "Check" %}</th>
@@ -52,7 +52,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>{% translate "RPKI Not expired" %}</td>
+                    <td>{% translate "RPKI valid" %}</td>
                     <td>
                         {% if data.number_of_valid != data.number_of_ips %}
                             <span class="icon incomplete"></span>
@@ -69,7 +69,7 @@
         {% if not info.valid or not info.exists %}
             <h5>{{ ip }}</h5>
             <table>
-                <caption class="visually-hidden">{% translate "RPKI compliance:" %}</caption>
+                <caption class="visually-hidden">{% translate "RPKI compliance" %}</caption>
                 <thead>
                     <tr>
                         <th>{% translate "Compliance issue" %}</th>

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum, IntEnum
-from typing import Any, ClassVar, Literal, TypeVar
+from typing import Any, ClassVar, Literal, TypeAlias, TypeVar
 
 from pydantic import BaseModel, GetCoreSchemaHandler, RootModel
 from pydantic_core import CoreSchema, core_schema
@@ -11,8 +11,8 @@ from pydantic_core.core_schema import ValidationInfo
 class Reference(str):
     @classmethod
     def parse(cls, ref_str: str) -> tuple[str, str]:
-        object_type, *natural_key_parts = ref_str.split("|")
-        return object_type, "|".join(natural_key_parts)
+        object_type, natural_key_parts = ref_str.split("|", 1)
+        return object_type, natural_key_parts
 
     @property
     def class_(self) -> str:
@@ -43,12 +43,12 @@ class Reference(str):
         return core_schema.with_info_after_validator_function(cls.validate, core_schema.str_schema())
 
     @classmethod
-    def validate(cls, v, info: ValidationInfo):
+    def validate(cls, v: str, info: ValidationInfo) -> Any:
         if not isinstance(v, str):
             raise TypeError("string required")
         return cls(str(v))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Reference({super().__repr__()})"
 
     @classmethod
@@ -77,6 +77,7 @@ class ScanProfileBase(BaseModel):
     scan_profile_type: str
     reference: Reference
     level: ScanLevel
+    user_id: int | None = None
 
     def __eq__(self, other):
         if isinstance(other, ScanProfileBase) and self.__class__ == other.__class__:
@@ -111,6 +112,7 @@ class OOI(BaseModel):
     object_type: str
 
     scan_profile: ScanProfile | None = None
+    user_id: int | None = None
 
     _natural_key_attrs: ClassVar[list[str]] = []
     _reverse_relation_names: ClassVar[dict[str, str]] = {}
@@ -122,7 +124,7 @@ class OOI(BaseModel):
     def model_post_init(self, __context: Any) -> None:  # noqa: F841
         self.primary_key = self.primary_key or f"{self.get_object_type()}|{self.natural_key}"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.primary_key
 
     @classmethod
@@ -189,19 +191,19 @@ class OOI(BaseModel):
         return cls._reverse_relation_names.get(attr, f"{cls.get_object_type()}_{attr}")
 
     @classmethod
-    def get_tokenized_primary_key(cls, natural_key: str):
+    def get_tokenized_primary_key(cls, natural_key: str) -> PrimaryKeyToken:
         token_tree = build_token_tree(cls)
         natural_key_parts = natural_key.split("|")
 
-        def hydrate(node) -> dict | str:
+        def hydrate(node: dict[str, dict | str]) -> dict | str:
             for key, value in node.items():
                 if isinstance(value, dict):
                     node[key] = hydrate(value)
                 else:
-                    node[key] = natural_key_parts.pop(0)
+                    node[key] = natural_key_parts.pop(0) if natural_key_parts else value
             return node
 
-        return PrimaryKeyToken.parse_obj(hydrate(token_tree))
+        return PrimaryKeyToken.model_validate(hydrate(token_tree))
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
@@ -210,6 +212,31 @@ class OOI(BaseModel):
     @classmethod
     def traversable(cls) -> bool:
         return cls._traversable
+
+    def serialize(self) -> SerializedOOI:
+        serialized_oois = {}
+        for key, value in self:
+            if key not in self.model_fields:
+                continue
+            serialized_oois[key] = self._serialize_value(value, self.model_fields[key].is_required())
+        return serialized_oois
+
+    def _serialize_value(self, value: Any, required: bool) -> SerializedOOIValue:
+        if isinstance(value, list):
+            return [self._serialize_value(item, required) for item in value]
+        if isinstance(value, Reference):
+            try:
+                return value.tokenized.root
+            except AttributeError:
+                if required:
+                    raise
+
+                return None
+        if isinstance(value, Enum):
+            return value.value
+        if isinstance(value, int | float):
+            return value
+        return str(value)
 
     def __hash__(self):
         return hash(self.primary_key)
@@ -228,10 +255,10 @@ def format_id_short(id_: str) -> str:
 class PrimaryKeyToken(RootModel):
     root: dict[str, str | PrimaryKeyToken]
 
-    def __getattr__(self, item) -> Any:
+    def __getattr__(self, item: str) -> Any:
         return self.root[item]
 
-    def __getitem__(self, item) -> Any:
+    def __getitem__(self, item: str) -> Any:
         return self.root[item]
 
 
@@ -260,5 +287,9 @@ def build_token_tree(ooi_class: type[OOI]) -> dict[str, dict | str]:
             # combine trees
             tokens[attribute] = {key: value_ for tree in trees for key, value_ in tree.items()}
         else:
-            tokens[attribute] = ""
+            tokens[attribute] = field.default
     return tokens
+
+
+SerializedOOIValue: TypeAlias = None | str | int | float | dict[str, str | PrimaryKeyToken] | list["SerializedOOIValue"]
+SerializedOOI: TypeAlias = dict[str, SerializedOOIValue]

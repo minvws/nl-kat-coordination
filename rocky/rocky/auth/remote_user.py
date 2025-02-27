@@ -1,11 +1,10 @@
-import logging
-
+import structlog
 from django.conf import settings
 from django.contrib.auth.backends import RemoteUserBackend as BaseRemoteUserBackend
 from django.contrib.auth.models import Group
 from tools.models import Organization, OrganizationMember
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class RemoteUserBackend(BaseRemoteUserBackend):

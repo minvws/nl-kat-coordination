@@ -3,10 +3,10 @@ name: Rocky Create container image
 on:
   push:
     branches:
-      - 'main'
-      - 'release-*'
+      - "main"
+      - "release-*"
     tags:
-      - '*'
+      - "*"
     paths:
       - octopoes/**
       - rocky/**
@@ -19,7 +19,7 @@ on:
 
 jobs:
   create_container_image:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -53,7 +53,7 @@ jobs:
           cp _version.py rocky/rocky/version.py
 
       - name: Build container image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           # We don't use git context because that doesn't process .dockerignore
           # https://github.com/docker/cli/issues/2827

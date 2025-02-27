@@ -1,5 +1,4 @@
 from datetime import datetime
-from logging import getLogger
 from typing import Any
 
 from django.utils.translation import gettext_lazy as _
@@ -9,8 +8,6 @@ from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.service import IPService, TLSCipher
 from reports.report_types.definitions import Report
 
-logger = getLogger(__name__)
-
 CIPHER_FINDINGS = ["KAT-RECOMMENDATION-BAD-CIPHER", "KAT-MEDIUM-BAD-CIPHER", "KAT-CRITICAL-BAD-CIPHER"]
 TREE_DEPTH = 3
 
@@ -18,10 +15,11 @@ TREE_DEPTH = 3
 class TLSReport(Report):
     id = "tls-report"
     name = _("TLS Report")
-    description: str = _("TLS reports assess the security of data encryption and transmission protocols.")
-    plugins = {"required": ["testssl-sh-ciphers"], "optional": []}
+    description: str = _("TLS Report assesses the security of data encryption and transmission protocols.")
+    plugins = {"required": {"testssl-sh-ciphers"}, "optional": set()}
     input_ooi_types = {IPService}
     template_path = "tls_report/report.html"
+    label_style = "3-light"
 
     def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         suites: dict = {}

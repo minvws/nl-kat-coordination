@@ -1,20 +1,26 @@
 {% load i18n %}
+{% load ooi_extra %}
 
 <section class="introduction" id="introduction">
     <div>
         <div class="horizontal-view toolbar">
-            <h1>{% translate "OpenKAT Report" %}</h1>
+            <h1>{{ report_ooi.name }}</h1>
             <div class="dropdown">
-                <button aria-controls="export-add" class="dropdown-button ghost">
+                <button aria-controls="download-report"
+                        aria-expanded="false"
+                        class="dropdown-button ghost">
                     {% translate "Export" %}<span aria-hidden="true" class="icon ti-chevron-down"></span>
                 </button>
-                <ul id="export-add" aria-expanded="false" class="dropdown-list">
-                    <li>
-                        <a href="{{ report_download_url }}"
-                           target="_blank"
-                           rel="noopener noreferrer">{% translate "Download report" %}</a>
-                    </li>
-                </ul>
+                <div id="download-report" class="dropdown-list">
+                    <ul>
+                        <li>
+                            <a href="{{ report_download_pdf_url }}" target="_blank"><span class="icon ti-download" aria-hidden="true"></span>{% translate "Download report" %} (PDF)</a>
+                        </li>
+                        <li>
+                            <a href="{{ report_download_json_url }}" target="_blank"><span class="icon ti-download" aria-hidden="true"></span>{% translate "Download report" %} (JSON)</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
         <div>
@@ -23,13 +29,16 @@
                 {% translate "All selected report types for the selected objects are displayed one below the other." %}
             </p>
             <p>
-                {% translate "Created with data from" %}: <strong>{{ observed_at }} {{ TIME_ZONE }}</strong>
+                {% translate "Created with data from:" %} <strong>{{ report_ooi.observed_at|date }}</strong>
             </p>
             <p>
-                {% translate "Created on" %}<strong>: {{ created_at }}</strong>
+                {% translate "Created on:" %} <strong>{{ report_ooi.date_generated|date }}</strong>
             </p>
             <p>
-                {% translate "Created by:" %} <strong>{{ organization_member.user.full_name }}</strong>
+                {% translate "Created from recipe:" %} <a href="{% ooi_url "ooi_detail" recipe_ooi.primary_key organization.code %}">{{ recipe_ooi.primary_key }}</a>
+            </p>
+            <p>
+                {% translate "Recipe created by:" %} <strong>{{ recipe_ooi|get_user_full_name }}</strong>
             </p>
         </div>
     </div>

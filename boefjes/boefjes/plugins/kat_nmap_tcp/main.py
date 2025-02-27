@@ -1,42 +1,25 @@
+import os
+import subprocess
 from ipaddress import IPv6Address, ip_address
-from os import getenv
 
-import docker
-
-from boefjes.job_models import BoefjeMeta
-
-NMAP_IMAGE = "instrumentisto/nmap:latest"
-TOP_PORTS_MAX = 65535
 TOP_PORTS_DEFAULT = 250
-TOP_PORTS_MIN = 1
 
 
-def run_nmap(args: list[str]) -> str:
-    """Run Nmap in Docker."""
-    client = docker.from_env()
-    return client.containers.run(NMAP_IMAGE, args, remove=True).decode()
+def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
+    top_ports_key = "TOP_PORTS"
+    if boefje_meta["boefje"]["id"] == "nmap-udp":
+        top_ports_key = "TOP_PORTS_UDP"
 
+    top_ports = int(os.getenv(top_ports_key, TOP_PORTS_DEFAULT))
+    cmd = ["nmap"] + boefje_meta["arguments"]["oci_arguments"] + ["--top-ports", str(top_ports)]
 
-def build_nmap_arguments(host: str, top_ports: int) -> list[str]:
-    """Returns Nmap arguments to use based on protocol and top_ports for host."""
-    ip = ip_address(host)
-    args = ["--open", "-T4", "-Pn", "-r", "-v10", "-sV", "-sS", "--top-ports", str(top_ports)]
-
+    ip = ip_address(boefje_meta["arguments"]["input"]["address"])
     if isinstance(ip, IPv6Address):
-        args.append("-6")
+        cmd.append("-6")
 
-    args.extend(["-oX", "-", host])
+    cmd.extend(["-oX", "-", str(ip)])
+    output = subprocess.run(cmd, capture_output=True)
 
-    return args
+    output.check_returncode()
 
-
-def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
-    """Build Nmap arguments and return results to normalizer."""
-    top_ports = int(getenv("TOP_PORTS", TOP_PORTS_DEFAULT))
-
-    return [
-        (
-            set(),
-            run_nmap(args=build_nmap_arguments(host=boefje_meta.arguments["input"]["address"], top_ports=top_ports)),
-        )
-    ]
+    return [({"openkat/nmap-output"}, output.stdout.decode())]

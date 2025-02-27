@@ -1,16 +1,16 @@
-import logging
+from collections.abc import Iterator
 
+import structlog
 from sqlalchemy.orm import Session
 
 from boefjes.config import Settings, settings
-from boefjes.katalogus.models import Organisation, Repository
-from boefjes.katalogus.storage.interfaces import OrganisationNotFound, OrganisationStorage
-from boefjes.sql.db import ObjectNotFoundException
-from boefjes.sql.db_models import OrganisationInDB, RepositoryInDB
-from boefjes.sql.repository_storage import SQLRepositoryStorage
+from boefjes.models import Organisation
+from boefjes.sql.db import ObjectNotFoundException, session_managed_iterator
+from boefjes.sql.db_models import OrganisationInDB
 from boefjes.sql.session import SessionMixin
+from boefjes.storage.interfaces import OrganisationNotFound, OrganisationStorage
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class SQLOrganisationStorage(SessionMixin, OrganisationStorage):
@@ -30,26 +30,10 @@ class SQLOrganisationStorage(SessionMixin, OrganisationStorage):
         return {organisation.id: self.to_organisation(organisation) for organisation in query.all()}
 
     def create(self, organisation: Organisation) -> None:
-        logger.info("Saving organisation: %s", organisation.json())
+        logger.info("Saving organisation: %s", organisation.model_dump_json())
 
         organisation_in_db = self.to_organisation_in_db(organisation)
         self.session.add(organisation_in_db)
-
-    def add_repository(self, organisation_id: str, repository_id: str) -> None:
-        logger.info(
-            "Adding repository to organisation: %s -> %s",
-            organisation_id,
-            repository_id,
-        )
-
-        organisation_in_db = self._db_instance_by_id(organisation_id)
-        repo_in_db = self._db_repo_instance_by_id(repository_id)
-        organisation_in_db.repositories.append(repo_in_db)
-
-    def get_repositories(self, organisation_id: str) -> list[Repository]:
-        instance = self._db_instance_by_id(organisation_id)
-
-        return [SQLRepositoryStorage.to_repository(repo) for repo in instance.repositories]
 
     def delete_by_id(self, organisation_id: str) -> None:
         instance = self._db_instance_by_id(organisation_id)
@@ -66,28 +50,18 @@ class SQLOrganisationStorage(SessionMixin, OrganisationStorage):
 
         return instance
 
-    def _db_repo_instance_by_id(self, repository_id: str) -> RepositoryInDB:
-        instance = self.session.query(RepositoryInDB).filter(RepositoryInDB.id == repository_id).first()
-
-        if instance is None:
-            raise ObjectNotFoundException(RepositoryInDB, repository_id=repository_id)
-
-        return instance
-
     @staticmethod
     def to_organisation_in_db(organisation: Organisation) -> OrganisationInDB:
-        return OrganisationInDB(
-            id=organisation.id,
-            name=organisation.name,
-        )
+        return OrganisationInDB(id=organisation.id, name=organisation.name)
 
     @staticmethod
     def to_organisation(organisation_in_db: OrganisationInDB) -> Organisation:
-        return Organisation(
-            id=organisation_in_db.id,
-            name=organisation_in_db.name,
-        )
+        return Organisation(id=organisation_in_db.id, name=organisation_in_db.name)
 
 
-def create_organisation_storage(session) -> SQLOrganisationStorage:
+def create_organisation_storage(session: Session) -> SQLOrganisationStorage:
     return SQLOrganisationStorage(session, settings)
+
+
+def get_organisations_store() -> Iterator[OrganisationStorage]:
+    yield from session_managed_iterator(create_organisation_storage)

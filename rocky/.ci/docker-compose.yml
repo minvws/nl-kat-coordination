@@ -35,7 +35,7 @@ services:
       - .env.test
 
   ci_rocky-db:
-    image: postgres:15
+    image: docker.io/library/postgres:15
     env_file:
       - .env.test
 
@@ -52,13 +52,13 @@ services:
       - .env.test
 
   xtdb:
-    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.8"
+    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.1.0"
 
   rabbitmq:
     restart: on-failure
-    image: "rabbitmq:3.12-management"
+    image: "docker.io/library/rabbitmq:3.12-management"
     healthcheck:
-      test: [ "CMD", "rabbitmqctl", "status" ]
+      test: ["CMD", "rabbitmqctl", "status"]
       interval: 5s
       retries: 4
     env_file:

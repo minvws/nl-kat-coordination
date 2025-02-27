@@ -1,0 +1,12 @@
+{% load i18n %}
+
+<div class="fifty-fifty">
+    <div>
+        <h1>{% translate "Reports" %}</h1>
+        <p class="emphasized">{% translate "Overview of reports" %}</p>
+    </div>
+    <div class="horizontal-view toolbar">
+        <a class="button ghost"
+           href="{% url 'generate_report_landing' organization.code %}">{% translate "Generate report" %}</a>
+    </div>
+</div>

@@ -3,32 +3,32 @@ name: Check Poetry dependencies
 on:
   push:
     branches:
-      - 'main'
-      - 'release-*'
+      - "main"
+      - "release-*"
     tags:
-      - '*'
+      - "*"
     paths:
-      - '**/requirements.txt'
-      - '**/requirements-dev.txt'
-      - '**/pyproject.toml'
-      - '**/poetry.lock'
+      - "**/requirements.txt"
+      - "**/requirements-dev.txt"
+      - "**/pyproject.toml"
+      - "**/poetry.lock"
+      - ".github/workflows/check_poetry_dependencies.yml"
   pull_request:
     paths:
-      - '**/requirements.txt'
-      - '**/requirements-dev.txt'
-      - '**/pyproject.toml'
-      - '**/poetry.lock'
-
+      - "**/requirements.txt"
+      - "**/requirements-dev.txt"
+      - "**/pyproject.toml"
+      - "**/poetry.lock"
+      - ".github/workflows/check_poetry_dependencies.yml"
 
 jobs:
   poetry-dependencies:
-
     permissions:
       # Give the default GITHUB_TOKEN write permission to commit and push the
       # added or changed files to the repository.
       contents: write
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 

@@ -6,8 +6,9 @@
     "HTTPResource"
   ],
   "produces": [
-    "openkat-http/full",
+    "application/json+har",
     "openkat-http/headers",
+    "openkat-http/body",
     "application/javascript",
     "application/javascript",
     "application/json",
@@ -139,9 +140,6 @@
     "video/webm",
     "video/x-msvideo",
     "video/x-sgi-movie"
-  ],
-  "environment_keys": [
-    "USERAGENT"
   ],
   "scan_level": 2
 }

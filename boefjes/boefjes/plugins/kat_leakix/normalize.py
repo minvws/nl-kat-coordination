@@ -2,10 +2,9 @@ import ipaddress
 import json
 import re
 from collections.abc import Iterable
-from collections.abc import Iterable as Iterable_
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, Reference
+from boefjes.job_models import NormalizerOutput
+from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType
 from octopoes.models.ooi.network import (
@@ -36,11 +35,10 @@ SEVERITY_LEAKSTAGE_MAPPING = {
 }
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable_[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     results = json.loads(raw)
 
-    boefje_meta = normalizer_meta.raw_data.boefje_meta
-    pk_ooi = Reference.from_str(boefje_meta.input_ooi)
+    pk_ooi_reference = Reference.from_str(input_ooi["primary_key"])
     network_reference = Network(name="internet").reference
 
     for event in results:
@@ -50,7 +48,7 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable_[OOI]:
         # TODO: ssh, ssl
 
         # reset loop
-        event_ooi_reference = pk_ooi
+        event_ooi_reference = pk_ooi_reference
 
         # Autonomous System
         as_ooi = None
@@ -59,7 +57,7 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable_[OOI]:
             yield as_ooi
 
         if event["ip"]:
-            for ooi in list(handle_ip(event, network_reference, as_ooi.reference)):
+            for ooi in list(handle_ip(event, network_reference, as_ooi.reference if as_ooi else None)):
                 yield ooi
             # we only need the last ooi's reference
             event_ooi_reference = ooi.reference
@@ -107,10 +105,7 @@ def handle_ip(event, network_reference, as_ooi_reference):
 
     if as_ooi_reference and len(netblock_range) == 2:
         yield block_type(
-            network=network_reference,
-            start_ip=ip_ooi.reference,
-            mask=netblock_range[1],
-            announced_by=as_ooi_reference,
+            network=network_reference, start_ip=ip_ooi.reference, mask=netblock_range[1], announced_by=as_ooi_reference
         )
 
     # Store port
@@ -197,9 +192,9 @@ def handle_tag(event, software_ooi_reference=None, ip_port_ooi_reference=None):
     # Tags (CVE's)
     if isinstance(event.get("tags"), Iterable):
         for tag in event.get("tags", {}):
-            if re.match("cve-[0-9]{4}-[0-9]{4,6}", tag):
+            if re.match(r"cve-\d{4}-\d{4,6}", tag):
                 ft = CVEFindingType(id=tag)
                 cve_ooi = software_ooi_reference if software_ooi_reference else ip_port_ooi_reference
-                f = Finding(finding_type=ft.reference, ooi=cve_ooi.reference)
+                f = Finding(finding_type=ft.reference, ooi=cve_ooi)
                 yield ft
                 yield f

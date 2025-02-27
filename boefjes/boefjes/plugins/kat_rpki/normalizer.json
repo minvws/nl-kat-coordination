@@ -1,7 +1,9 @@
 {
   "id": "kat_rpki_normalize",
+  "name": "RPKI",
+  "description": "Parses RPKI data into findings.",
   "consumes": [
-    "boefje/rpki"
+    "rpki/results"
   ],
   "produces": [
     "Finding",

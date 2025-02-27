@@ -1,5 +1,3 @@
-from datetime import datetime, timezone
-
 from crisis_room.views import CrisisRoomView, OrganizationFindingCountPerSeverity
 from django.urls import resolve, reverse
 from pytest_django.asserts import assertContains
@@ -12,16 +10,14 @@ def test_crisis_room(rf, client_member, mock_crisis_room_octopoes):
     request = setup_request(rf.get("crisis_room"), client_member.user)
     request.resolver_match = resolve(reverse("crisis_room"))
 
-    mock_crisis_room_octopoes().count_findings_by_severity.return_value = {
-        "medium": 1,
-        "critical": 0,
-    }
+    mock_crisis_room_octopoes().count_findings_by_severity.return_value = {"medium": 1, "critical": 0}
 
     response = CrisisRoomView.as_view()(request)
 
     assert response.status_code == 200
+
     assertContains(response, '<a href="/en/test/findings/?severity=medium">1</a>', html=True)
-    assertContains(response, '<td><span class="critical">Critical</span></td><td class="number">0</td>', html=True)
+    assertContains(response, "<dd>0</dd>", html=True)
 
     assert mock_crisis_room_octopoes().count_findings_by_severity.call_count == 1
 
@@ -31,13 +27,17 @@ def test_crisis_room_observed_at(rf, client_member, mock_crisis_room_octopoes):
     request.resolver_match = resolve(reverse("crisis_room"))
     response = CrisisRoomView.as_view()(request)
     assert response.status_code == 200
-    assertContains(response, "Jan 01, 2021")
+    assertContains(response, "Jan 01, 2021")  # Next to title crisis room
+    assertContains(response, "2021-01-01")  # Date Widget
 
+
+def test_crisis_room_observed_at_bad_format(rf, client_member, mock_crisis_room_octopoes):
     request = setup_request(rf.get("crisis_room", {"observed_at": "2021-bad-format"}), client_member.user)
     request.resolver_match = resolve(reverse("crisis_room"))
     response = CrisisRoomView.as_view()(request)
     assert response.status_code == 200
-    assertContains(response, datetime.now(timezone.utc).date().strftime("%b %d, %Y"))
+    assertContains(response, "Can not parse date, falling back to show current date.")
+    assertContains(response, "Enter a valid date.")
 
 
 def test_org_finding_count_total():
@@ -49,18 +49,16 @@ def test_crisis_room_error(rf, client_user_two_organizations, mock_crisis_room_o
     request.resolver_match = resolve(reverse("crisis_room"))
 
     mock_crisis_room_octopoes().count_findings_by_severity.side_effect = [
-        {
-            "medium": 1,
-            "critical": 0,
-        },
+        {"medium": 1, "critical": 0},
         ConnectorException("error"),
     ]
 
     response = CrisisRoomView.as_view()(request)
 
     assert response.status_code == 200
+
     assertContains(response, '<a href="/en/test/findings/?severity=medium">1</a>', html=True)
-    assertContains(response, '<td><span class="critical">Critical</span></td><td class="number">0</td>', html=True)
+    assertContains(response, "<dd>0</dd>", html=True)
 
     messages = list(request._messages)
     assert (

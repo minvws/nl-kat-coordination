@@ -3,7 +3,7 @@ import json
 import logging
 from collections.abc import Iterable, Iterator
 
-from boefjes.job_models import NormalizerMeta
+from boefjes.job_models import NormalizerOutput
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, PortState, Protocol
 
@@ -33,19 +33,19 @@ def get_ip_ports_and_service(ip_with_ports: dict, network: Network, netblock: Re
         yield ip_port
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     """Parse Masscan JSON and yield relevant network, IPs and ports."""
     try:
-        raw = json.loads(raw) if raw else []
+        results = json.loads(raw) if raw else []
     except json.decoder.JSONDecodeError:
         # Masscan tends to forget to close the json with "]" if the wait window passed.
-        raw = json.loads(raw.decode() + "]") if raw else []
+        results = json.loads(raw.decode() + "]") if raw else []
 
     # Relevant network object is received from the normalizer_meta.
-    network = Network(name=normalizer_meta.raw_data.boefje_meta.arguments["input"]["network"]["name"])
+    network = Network(name=input_ooi["network"]["name"])
 
-    netblock_ref = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
+    netblock_ref = Reference.from_str(input_ooi["primary_key"])
 
     logging.info("Parsing %d Masscan IPs for %s.", len(raw), network)
-    for ip_with_ports in raw:
+    for ip_with_ports in results:
         yield from get_ip_ports_and_service(ip_with_ports=ip_with_ports, network=network, netblock=netblock_ref)

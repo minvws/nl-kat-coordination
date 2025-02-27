@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from enum import Enum
 from functools import total_ordering
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import AnyUrl
+from pydantic import AnyUrl, StringConstraints
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -24,10 +26,10 @@ class RiskLevelSeverity(Enum):
     # unknown = the third party has been contacted, but third party has not determined the risk level (yet)
     UNKNOWN = "unknown"
 
-    def __gt__(self, other: "RiskLevelSeverity") -> bool:
+    def __gt__(self, other: RiskLevelSeverity) -> bool:
         return severity_order.index(self.value) > severity_order.index(other.value)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.value
 
 
@@ -57,13 +59,19 @@ class ADRFindingType(FindingType):
 class CVEFindingType(FindingType):
     object_type: Literal["CVEFindingType"] = "CVEFindingType"
 
+    id: Annotated[str, StringConstraints(strip_whitespace=True, to_upper=True)]
+
 
 class CWEFindingType(FindingType):
     object_type: Literal["CWEFindingType"] = "CWEFindingType"
 
+    id: Annotated[str, StringConstraints(strip_whitespace=True, to_upper=True)]
+
 
 class CAPECFindingType(FindingType):
     object_type: Literal["CAPECFindingType"] = "CAPECFindingType"
+
+    id: Annotated[str, StringConstraints(strip_whitespace=True, to_upper=True)]
 
 
 class RetireJSFindingType(FindingType):
@@ -72,6 +80,8 @@ class RetireJSFindingType(FindingType):
 
 class SnykFindingType(FindingType):
     object_type: Literal["SnykFindingType"] = "SnykFindingType"
+
+    id: Annotated[str, StringConstraints(strip_whitespace=True, to_upper=True)]
 
 
 class KATFindingType(FindingType):

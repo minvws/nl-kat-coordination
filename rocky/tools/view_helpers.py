@@ -1,15 +1,15 @@
 import uuid
 from datetime import date, datetime, timezone
-from typing import TypedDict
+from typing import Any, TypedDict
 from urllib.parse import urlencode, urlparse, urlunparse
 
-from django.contrib import messages
 from django.http import HttpRequest
+from django.http.response import HttpResponseRedirectBase
 from django.urls.base import reverse, reverse_lazy
+from django.utils.functional import Promise
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models.types import OOI_TYPES
-from rocky.scheduler import PrioritizedItem, SchedulerError, client
 from tools.models import Organization
 
 
@@ -18,7 +18,7 @@ def convert_date_to_datetime(d: date) -> datetime:
     return datetime.combine(d, datetime.max.time(), tzinfo=timezone.utc)
 
 
-def get_mandatory_fields(request, params: list[str] | None = None):
+def get_mandatory_fields(request: HttpRequest, params: list[str] | None = None) -> list:
     mandatory_fields = []
 
     if not params:
@@ -38,7 +38,7 @@ def generate_job_id():
     return str(uuid.uuid4())
 
 
-def url_with_querystring(path, doseq=False, **kwargs) -> str:
+def url_with_querystring(path: str, doseq: bool = False, /, **kwargs: Any) -> str:
     parsed_route = urlparse(path)
 
     return str(
@@ -55,7 +55,7 @@ def url_with_querystring(path, doseq=False, **kwargs) -> str:
     )
 
 
-def get_ooi_url(routename: str, ooi_id: str, organization_code: str, **kwargs) -> str:
+def get_ooi_url(routename: str, ooi_id: str, organization_code: str, **kwargs: Any) -> str:
     if ooi_id:
         kwargs["ooi_id"] = ooi_id
 
@@ -68,7 +68,7 @@ def get_ooi_url(routename: str, ooi_id: str, organization_code: str, **kwargs) -
     return url_with_querystring(reverse(routename, kwargs={"organization_code": organization_code}), **kwargs)
 
 
-def existing_ooi_type(ooi_type: str):
+def existing_ooi_type(ooi_type: str) -> bool:
     if not ooi_type:
         return False
 
@@ -76,7 +76,7 @@ def existing_ooi_type(ooi_type: str):
 
 
 class Breadcrumb(TypedDict):
-    text: str
+    text: str | Promise
     url: str
 
 
@@ -130,35 +130,31 @@ class OrganizationBreadcrumbsMixin(BreadcrumbsMixin):
 class OrganizationDetailBreadcrumbsMixin(BreadcrumbsMixin):
     organization: Organization
 
-    def build_breadcrumbs(self):
-        breadcrumbs = [
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
+        return [
             {
                 "url": reverse("organization_settings", kwargs={"organization_code": self.organization.code}),
                 "text": _("Settings"),
-            },
+            }
         ]
-
-        return breadcrumbs
 
 
 class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin):
     organization: Organization
 
-    def build_breadcrumbs(self):
-        breadcrumbs = [
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
+        return [
             {
                 "url": reverse("organization_member_list", kwargs={"organization_code": self.organization.code}),
                 "text": _("Members"),
-            },
+            }
         ]
-
-        return breadcrumbs
 
 
 class ObjectsBreadcrumbsMixin(BreadcrumbsMixin):
     organization: Organization
 
-    def build_breadcrumbs(self):
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         return [
             {
                 "url": reverse_lazy("ooi_list", kwargs={"organization_code": self.organization.code}),
@@ -167,54 +163,5 @@ class ObjectsBreadcrumbsMixin(BreadcrumbsMixin):
         ]
 
 
-def schedule_task(request: HttpRequest, organization_code: str, p_item: PrioritizedItem) -> None:
-    try:
-        # Remove id attribute of both p_item and p_item.data, since the
-        # scheduler will create a new task with new id's. However, pydantic
-        # requires an id attribute to be present in its definition and the
-        # default set to None when the attribute is optional, otherwise it
-        # will not serialize the id if it is not present in the definition.
-        if hasattr(p_item, "id"):
-            delattr(p_item, "id")
-
-        if hasattr(p_item.data, "id"):
-            delattr(p_item.data, "id")
-
-        client.push_task(f"{p_item.data.type}-{organization_code}", p_item)
-    except SchedulerError as error:
-        messages.error(request, error.message)
-    else:
-        messages.success(
-            request,
-            _(
-                "Your task is scheduled and will soon be started in the background. "
-                "Results will be added to the object list when they are in. "
-                "It may take some time, a refresh of the page may be needed to show the results."
-            ),
-        )
-
-
-# FIXME: Tasks should be (re)created with supplied data, not by fetching prior
-# task info from the scheduler. Task data should be available from the context
-# from which the task is created.
-def reschedule_task(request: HttpRequest, organization_code: str, task_id: str) -> None:
-    try:
-        task = client.get_task_details(organization_code, task_id)
-    except SchedulerError as error:
-        messages.error(request, error.message)
-        return
-
-    if not task:
-        messages.error(request, _("Task not found."))
-        return
-
-    try:
-        new_p_item = PrioritizedItem(
-            data=task.p_item.data,
-            priority=1,
-        )
-
-        schedule_task(request, organization_code, new_p_item)
-    except SchedulerError as error:
-        messages.error(request, error.message)
-        return
+class PostRedirect(HttpResponseRedirectBase):
+    status_code = 307

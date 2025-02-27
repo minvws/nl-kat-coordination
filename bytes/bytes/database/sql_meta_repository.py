@@ -1,7 +1,7 @@
-import logging
 import uuid
 from collections.abc import Iterator
 
+import structlog
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
@@ -17,7 +17,7 @@ from bytes.repositories.raw_repository import RawRepository
 from bytes.timestamping.hashing import hash_data
 from bytes.timestamping.provider import create_hash_repository
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class SQLMetaDataRepository(MetaDataRepository):
@@ -56,7 +56,7 @@ class SQLMetaDataRepository(MetaDataRepository):
         return to_boefje_meta(boefje_meta_in_db)
 
     def get_boefje_meta(self, query_filter: BoefjeMetaFilter) -> list[BoefjeMeta]:
-        logger.debug("Querying boefje meta: %s", query_filter.json())
+        logger.debug("Querying boefje meta: %s", query_filter.model_dump_json())
 
         query = self.session.query(BoefjeMetaInDB).filter(BoefjeMetaInDB.organization == query_filter.organization)
 
@@ -86,7 +86,7 @@ class SQLMetaDataRepository(MetaDataRepository):
         return to_normalizer_meta(normalizer_meta_in_db)
 
     def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> list[NormalizerMeta]:
-        logger.debug("Querying normalizer meta: %s", query_filter.json())
+        logger.debug("Querying normalizer meta: %s", query_filter.model_dump_json())
 
         query = self.session.query(NormalizerMetaInDB)
 
@@ -134,11 +134,20 @@ class SQLMetaDataRepository(MetaDataRepository):
         return raw_file_in_db.id
 
     def get_raw(self, query_filter: RawDataFilter) -> list[RawDataMeta]:
-        logger.debug("Querying raw data: %s", query_filter.json())
+        logger.debug("Querying raw data: %s", query_filter.model_dump_json())
         query = self.session.query(RawFileInDB)
         query = query_filter.apply(query)
 
         return [to_raw_meta(raw_file_in_db) for raw_file_in_db in query]
+
+    def get_raws(self, query_filter: RawDataFilter) -> list[tuple[uuid.UUID, RawData]]:
+        logger.debug("Querying raw data: %s", query_filter.model_dump_json())
+        query = self.session.query(RawFileInDB)
+        query = query_filter.apply(query)
+
+        raw_metas_pairs = [(raw_meta.id, to_boefje_meta(raw_meta.boefje_meta)) for raw_meta in query]
+
+        return self.raw_repository.get_raws(raw_metas_pairs)
 
     def get_raw_by_id(self, raw_id: uuid.UUID) -> RawData:
         raw_in_db: RawFileInDB | None = self.session.get(RawFileInDB, str(raw_id))
@@ -177,7 +186,7 @@ class SQLMetaDataRepository(MetaDataRepository):
         return {organization_id: count for organization_id, count in query}
 
     def get_raw_file_count_per_mime_type(self, query_filter: RawDataFilter) -> dict[str, int]:
-        logger.debug("Querying count raw data per mime type: %s", query_filter.json())
+        logger.debug("Querying count raw data per mime type: %s", query_filter.model_dump_json())
         query = self.session.query(func.unnest(RawFileInDB.mime_types), func.count()).group_by(
             func.unnest(RawFileInDB.mime_types)
         )
@@ -229,7 +238,7 @@ def create_meta_data_repository() -> Iterator[MetaDataRepository]:
 
 
 class ObjectNotFoundException(Exception):
-    def __init__(self, cls: type[SQL_BASE], **kwargs):
+    def __init__(self, cls: type[SQL_BASE], **kwargs: str):
         super().__init__(f"The object of type {cls} was not found for query parameters {kwargs}")
 
 
@@ -282,10 +291,7 @@ def to_normalizer_meta(normalizer_meta_in_db: NormalizerMetaInDB) -> NormalizerM
 
     return NormalizerMeta(
         id=normalizer_meta_in_db.id,
-        normalizer=Normalizer(
-            id=normalizer_meta_in_db.normalizer_id,
-            version=normalizer_meta_in_db.normalizer_version,
-        ),
+        normalizer=Normalizer(id=normalizer_meta_in_db.normalizer_id, version=normalizer_meta_in_db.normalizer_version),
         started_at=normalizer_meta_in_db.started_at,
         ended_at=normalizer_meta_in_db.ended_at,
         raw_data=raw_meta,

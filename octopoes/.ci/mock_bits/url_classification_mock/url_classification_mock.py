@@ -7,7 +7,7 @@ from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from octopoes.models.ooi.web import URL, HostnameHTTPURL, IPAddressHTTPURL, WebScheme
 
 
-def run(url: URL, additional_oois: list, config: dict[str, str]) -> Iterator[OOI]:
+def run(url: URL, additional_oois: list, config: dict) -> Iterator[OOI]:
     if url.raw.scheme == "http" or url.raw.scheme == "https":
         port = url.raw.port
         if port is None:
@@ -18,12 +18,7 @@ def run(url: URL, additional_oois: list, config: dict[str, str]) -> Iterator[OOI
 
         path = url.raw.path if url.raw.path is not None else "/"
 
-        default_args = {
-            "network": url.network,
-            "scheme": WebScheme(url.raw.scheme),
-            "port": port,
-            "path": path,
-        }
+        default_args = {"network": url.network, "scheme": WebScheme(url.raw.scheme), "port": port, "path": path}
         try:
             addr = ip_address(url.raw.host)
         except ValueError:

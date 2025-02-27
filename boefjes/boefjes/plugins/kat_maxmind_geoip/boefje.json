@@ -1,0 +1,10 @@
+{
+  "id": "maxmind",
+  "name": "Maxmind",
+  "description": "Fetch geolocation information for an IP address from Maxmind. Requires a MaxMind API key.",
+  "consumes": [
+    "IPAddressV4",
+    "IPAddressV6"
+  ],
+  "scan_level": 1
+}

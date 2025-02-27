@@ -4,6 +4,8 @@ services:
       context: .
       args:
         ENVIRONMENT: dev
+        USER_UID: 1001
+        USER_GID: 1001
     volumes:
       - .:/app/scheduler
     env_file:
@@ -17,6 +19,8 @@ services:
       context: .
       args:
         ENVIRONMENT: dev
+        USER_UID: 1001
+        USER_GID: 1001
     volumes:
       - .:/app/scheduler
     env_file:
@@ -28,7 +32,9 @@ services:
       - ci_rabbitmq
 
   ci_postgres:
-    image: postgres:15
+    image: docker.io/library/postgres:15
+    command:
+      ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]
     healthcheck:
       test: ["CMD", "gosu", "postgres", "pg_isready"]
       interval: 3s
@@ -41,11 +47,11 @@ services:
       - ../init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
 
   ci_rabbitmq:
-    image: "rabbitmq:3.12-management"
+    image: "docker.io/library/rabbitmq:3.12-management"
     volumes:
       - ./.ci/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     healthcheck:
-      test: [ "CMD", "rabbitmqctl", "status" ]
+      test: ["CMD", "rabbitmqctl", "status"]
       interval: 5s
       retries: 4
 
@@ -75,7 +81,7 @@ services:
       target: dev
       args:
         ENVIRONMENT: dev
-    command: uvicorn boefjes.katalogus.api:app --host 0.0.0.0
+    command: uvicorn boefjes.katalogus.root:app --host 0.0.0.0
     ports:
       - "127.0.0.1:8003:8000"
     env_file:

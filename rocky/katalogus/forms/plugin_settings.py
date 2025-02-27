@@ -1,3 +1,5 @@
+from typing import Any
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from jsonschema.validators import Draft202012Validator
@@ -9,11 +11,9 @@ MAX_SETTINGS_VALUE_LENGTH = 128
 class PluginSchemaForm(forms.Form):
     """This Form takes a plugin schema and turn all settings of schema into form fields."""
 
-    error_messages = {
-        "required": _("This field is required."),
-    }
+    error_messages = {"required": _("This field is required.")}
 
-    def __init__(self, plugin_schema: dict, values: dict, *args, **kwargs):
+    def __init__(self, plugin_schema: dict, values: dict, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.plugin_schema = plugin_schema
         self.values = values
@@ -43,7 +43,9 @@ class PluginSchemaForm(forms.Form):
 
         # The form assigns "" and in some scenario's null to all unfilled (optional) fields
         cleaned_data = {
-            key: value for key, value in cleaned_data.items() if value is not None and value != ""  # noqa: PLC1901
+            key: value
+            for key, value in cleaned_data.items()
+            if value is not None and value != ""  # noqa: PLC1901
         }
 
         validator = Draft202012Validator(self.plugin_schema)

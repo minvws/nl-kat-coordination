@@ -1,0 +1,8 @@
+{
+  "id": "dummy_oci_boefje_no_main",
+  "name": "dummy",
+  "description": "",
+  "consumes": [],
+  "produces": [],
+  "oci_image": "openkat/test"
+}

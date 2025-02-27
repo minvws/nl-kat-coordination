@@ -16,6 +16,7 @@ from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Referenc
 from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import IPAddressV6
+from octopoes.models.ooi.reports import AssetReport, Report, ReportRecipe
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import URL, HTTPHeader, SecurityTXT
 from octopoes.models.origin import Origin, OriginType
@@ -142,10 +143,7 @@ def dns_zone(network, ooi_repository, hostname, scan_profile_repository, valid_t
 @pytest.fixture
 def hostname(network, ooi_repository, scan_profile_repository, valid_time):
     return add_ooi(
-        Hostname(name="example.com", network=network.reference),
-        ooi_repository,
-        scan_profile_repository,
-        valid_time,
+        Hostname(name="example.com", network=network.reference), ooi_repository, scan_profile_repository, valid_time
     )
 
 
@@ -189,12 +187,12 @@ def http_resource_https(hostname, ipaddressv4, network):
 
 @pytest.fixture
 def empty_scan_profile():
-    return EmptyScanProfile(reference="test_reference")
+    return EmptyScanProfile(reference="test|reference")
 
 
 @pytest.fixture
 def declared_scan_profile():
-    return DeclaredScanProfile(reference="test_reference", level=2)
+    return DeclaredScanProfile(reference="test|reference", level=2)
 
 
 @pytest.fixture
@@ -421,8 +419,9 @@ def seed_system(xtdb_ooi_repository: XTDBOOIRepository, xtdb_origin_repository: 
 
     network_origin = Origin(
         origin_type=OriginType.DECLARATION,
-        method="manual",
+        method="kat_manual_csv",
         source=network.reference,
+        source_method="manual",
         result=[network.reference],
         task_id=uuid.uuid4(),
     )
@@ -433,6 +432,7 @@ def seed_system(xtdb_ooi_repository: XTDBOOIRepository, xtdb_origin_repository: 
         origin_type=OriginType.OBSERVATION,
         method="",
         source=network.reference,
+        source_method="manual",
         result=[ooi.reference for ooi in oois],
         task_id=uuid.uuid4(),
     )
@@ -444,3 +444,106 @@ def seed_system(xtdb_ooi_repository: XTDBOOIRepository, xtdb_origin_repository: 
 
     xtdb_origin_repository.commit()
     xtdb_ooi_repository.commit()
+
+
+def seed_report(
+    name: str, valid_time, ooi_repository, origin_repository, input_reports: list[AssetReport] | None = None
+) -> Report:
+    recipe = ReportRecipe(
+        report_type="concatenated-report",
+        recipe_id=uuid.uuid4(),
+        report_name_format="test",
+        cron_expression="* * * *",
+        input_recipe={},
+        asset_report_types=[],
+    )
+    report = Report(
+        name=name,
+        date_generated=valid_time,
+        organization_code="code",
+        organization_name="name",
+        organization_tags=["tag1", "tag2"],
+        data_raw_id="raw",
+        observed_at=valid_time,
+        reference_date=valid_time,
+        report_recipe=recipe.reference,
+        input_oois=[input_report.reference for input_report in input_reports] if input_reports else [],
+        report_type="concatenated-report",
+    )
+    report_origin = Origin(
+        origin_type=OriginType.DECLARATION,
+        method="manual",
+        source=report.reference,
+        result=[report.reference],
+        task_id=uuid.uuid4(),
+    )
+    recipe_origin = Origin(
+        origin_type=OriginType.DECLARATION,
+        method="manual",
+        source=recipe.reference,
+        result=[recipe.reference],
+        task_id=uuid.uuid4(),
+    )
+
+    ooi_repository.save(recipe, valid_time=valid_time)
+    origin_repository.save(recipe_origin, valid_time=valid_time)
+
+    ooi_repository.save(report, valid_time=valid_time)
+    origin_repository.save(report_origin, valid_time=valid_time)
+
+    origin_repository.commit()
+    ooi_repository.commit()
+
+    return report
+
+
+def seed_asset_report(
+    name: str, valid_time, ooi_repository, origin_repository, input_ooi: str = "testref"
+) -> AssetReport:
+    recipe = ReportRecipe(
+        report_type="concatenated-report",
+        recipe_id=uuid.uuid4(),
+        report_name_format="test",
+        cron_expression="* * * *",
+        input_recipe={},
+        asset_report_types=[],
+    )
+
+    asset_report = AssetReport(
+        name=name,
+        date_generated=valid_time,
+        report_recipe=recipe.reference,
+        organization_code="code",
+        organization_name="name",
+        organization_tags=["tag1", "tag2"],
+        data_raw_id="raw",
+        reference_date=valid_time,
+        observed_at=valid_time,
+        input_ooi=input_ooi,
+        report_type="system-report",
+    )
+    report_origin = Origin(
+        origin_type=OriginType.DECLARATION,
+        method="manual",
+        source=asset_report.reference,
+        result=[asset_report.reference],
+        task_id=uuid.uuid4(),
+    )
+    recipe_origin = Origin(
+        origin_type=OriginType.DECLARATION,
+        method="manual",
+        source=recipe.reference,
+        result=[recipe.reference],
+        task_id=uuid.uuid4(),
+    )
+
+    ooi_repository.save(recipe, valid_time=valid_time)
+    origin_repository.save(recipe_origin, valid_time=valid_time)
+
+    ooi_repository.save(asset_report, valid_time=valid_time)
+    origin_repository.save(report_origin, valid_time=valid_time)
+
+    origin_repository.commit()
+    ooi_repository.commit()
+
+    return asset_report

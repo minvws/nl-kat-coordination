@@ -1,10 +1,9 @@
 from datetime import datetime
 from http import HTTPStatus
-from logging import getLogger
 from typing import Any
 
 from httpx import HTTPStatusError
-from pydantic import parse_obj_as
+from pydantic import TypeAdapter
 
 from octopoes.events.events import OperationType, ScanProfileDBEvent
 from octopoes.events.manager import EventManager
@@ -16,7 +15,7 @@ from octopoes.xtdb.client import OperationType as XTDBOperationType
 from octopoes.xtdb.client import XTDBSession
 from octopoes.xtdb.query_builder import generate_pull_query
 
-logger = getLogger(__name__)
+scan_profile_adapter = TypeAdapter(ScanProfile)
 
 
 class ScanProfileRepository(Repository):
@@ -53,28 +52,25 @@ class XTDBScanProfileRepository(ScanProfileRepository):
         self.session.commit()
 
     @classmethod
-    def format_id(cls, ooi_reference: Reference):
+    def format_id(cls, ooi_reference: Reference) -> str:
         return f"{cls.object_type}|{ooi_reference}"
 
     @classmethod
     def serialize(cls, scan_profile: ScanProfile) -> dict[str, Any]:
-        data = scan_profile.dict()
+        data = scan_profile.model_dump()
         data[cls.pk_prefix] = cls.format_id(scan_profile.reference)
         data["type"] = cls.object_type
         return data
 
     @classmethod
     def deserialize(cls, data: dict[str, Any]) -> ScanProfileBase:
-        return parse_obj_as(ScanProfile, data)
+        return scan_profile_adapter.validate_python(data)
 
     def list_scan_profiles(self, scan_profile_type: str | None, valid_time: datetime) -> list[ScanProfileBase]:
         where = {"type": self.object_type}
         if scan_profile_type is not None:
             where["scan_profile_type"] = scan_profile_type
-        query = generate_pull_query(
-            FieldSet.ALL_FIELDS,
-            where,
-        )
+        query = generate_pull_query(FieldSet.ALL_FIELDS, where)
         results = self.session.client.query(query, valid_time=valid_time)
         return [self.deserialize(r[0]) for r in results]
 

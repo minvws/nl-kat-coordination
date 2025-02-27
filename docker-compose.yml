@@ -1,7 +1,7 @@
 services:
   rabbitmq:
     restart: unless-stopped
-    image: "rabbitmq:3.12-management"
+    image: "docker.io/library/rabbitmq:3.12-management"
     ports:
       - "127.0.0.1:5672:5672"
       - "127.0.0.1:15672:15672"
@@ -15,7 +15,7 @@ services:
 
   postgres:
     restart: unless-stopped
-    image: postgres:15
+    image: docker.io/library/postgres:15
     shm_size: 256MB
     ports:
       - "127.0.0.1:5432:5432"
@@ -23,6 +23,9 @@ services:
       test: ["CMD", "gosu", "postgres", "pg_isready"]
       interval: 10s
       retries: 10
+    # Django runserver does not limit the number of threads. We need to increase
+    # the maximum number of connection to make sure that we don't hit the limit.
+    command: -c max_connections=500
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
@@ -108,7 +111,7 @@ services:
       - .env-defaults
       - .env
     environment:
-      - BOEFJE_DOCKER_NETWORK=${COMPOSE_PROJECT_NAME:-nl-kat-coordination}_default
+      - BOEFJES_DOCKER_NETWORK=${COMPOSE_PROJECT_NAME:-nl-kat-coordination}_default
 
   normalizer:
     restart: unless-stopped
@@ -154,6 +157,27 @@ services:
       - GITPOD_WORKSPACE_URL=${GITPOD_WORKSPACE_URL:-}
       - GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN=${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:-}
 
+  rocky_worker:
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    build:
+      context: .
+      dockerfile: rocky/Dockerfile
+      target: dev
+      args:
+        ENVIRONMENT: dev
+    command: worker
+    volumes:
+      - ./rocky:/app/rocky
+      - ./octopoes/octopoes:/app/rocky/octopoes
+    env_file:
+      - .env-defaults
+      - .env
+    environment:
+      - GITPOD_WORKSPACE_URL=${GITPOD_WORKSPACE_URL:-}
+      - GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN=${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:-}
+
   bytes:
     restart: unless-stopped
     depends_on:
@@ -183,7 +207,7 @@ services:
       target: dev
       args:
         ENVIRONMENT: dev
-    command: uvicorn boefjes.katalogus.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/boefjes/boefjes/katalogus
+    command: uvicorn boefjes.katalogus.root:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/boefjes/boefjes/katalogus
     volumes:
       - ./boefjes:/app/boefjes
       - ./octopoes/octopoes:/app/boefjes/octopoes
@@ -215,26 +239,11 @@ services:
       - octopoes_api
       - katalogus
 
-  keiko:
-    restart: unless-stopped
-    build:
-      context: keiko/
-      target: dev
-    ports:
-      - "127.0.0.1:8005:8000"
-    command: uvicorn keiko.app:api --host 0.0.0.0 --port 8000 --reload --reload-dir /app/keiko/keiko
-    env_file:
-      - .env-defaults
-      - .env
-    volumes:
-      - ./keiko:/app/keiko
-      - keiko-reports:/reports
-
   jaeger:
     profiles:
       - monitoring
     restart: unless-stopped
-    image: jaegertracing/all-in-one:1.48
+    image: docker.io/jaegertracing/all-in-one:1.48
     environment:
       COLLECTOR_ZIPKIN_HOST_PORT: 9411
       COLLECTOR_OTLP_ENABLED: "true"
@@ -251,7 +260,7 @@ services:
     profiles:
       - monitoring
     restart: unless-stopped
-    image: prom/prometheus:v2.50.1
+    image: docker.io/prom/prometheus:v2.50.1
     ports:
       - "127.0.0.1:9090:9090"
     volumes:
@@ -270,7 +279,6 @@ networks:
 volumes:
   postgres-data:
   bytes-data:
-  keiko-reports:
   xtdb-data:
   jaeger-data:
   prometheus-data:

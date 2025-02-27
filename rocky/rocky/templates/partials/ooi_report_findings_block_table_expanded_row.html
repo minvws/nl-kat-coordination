@@ -9,7 +9,7 @@
         <h1>{% translate "Finding details" %}</h1>
         {% if finding_type.risk_severity == 'unknown' %}
             <p class="warning" role="group" aria-label="{% translate "warning" %}">
-                <span>{% translate "Warning" %}:</span>
+                <span>{% translate "Warning:" %}</span>
                 {% blocktranslate trimmed %}
                     The severity of this findingtype has not (yet) been determined by the data source. This situation requires
                     manual investigation of the severity.

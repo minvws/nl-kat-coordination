@@ -15,7 +15,10 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python_version: ["3.10", "3.11"]
 
     # Generic bits
     steps:
@@ -26,8 +29,8 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-          cache: 'pip'
+          python-version: ${{ matrix.python_version }}
+          cache: "pip"
 
       - name: Prep Install requirements
         run: sudo apt install gettext -y
@@ -38,7 +41,7 @@ jobs:
       - name: Prep Configure git
         run: git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
 
-    # Octopoes
+      # Octopoes
       - name: Octopoes Create /var/lib/html
         run: sudo rm -rfv /var/lib/html; sudo mkdir -p /var/www/html ; sudo chown `id -u`:`id -g` /var/www/html
 
@@ -48,18 +51,18 @@ jobs:
 
       - name: Octopoes Build whl package
         run: |
-          python3.10 -m pip install build
-          python3.10 -m build
+          python${{ matrix.python_version }} -m pip install build
+          python${{ matrix.python_version }} -m build
         working-directory: ./octopoes
 
       - name: Octopoes Create env
-        run: python3.10 -m venv /var/www/html/.venv
+        run: python${{ matrix.python_version }} -m venv /var/www/html/.venv
 
       - name: Octopoes Install requirements
         run: cd /var/www/html; source .venv/bin/activate; pip install --upgrade pip; pip install --requirement requirements.txt
 
       - name: Octopoes Create venv archive
-        run: tar -zcvf ${{ env.PKGDIR }}/octopoes_venv_${{ env.RELEASE_VERSION }}.tar.gz -C /var/www/html/ .venv
+        run: tar -zcvf ${{ env.PKGDIR }}/octopoes_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}.tar.gz -C /var/www/html/ .venv
 
       - name: Octopoes Enable production logging config
         run: mv prod.logging.yml logging.yml
@@ -75,7 +78,7 @@ jobs:
       - name: Octopoes Cleanup
         run: sudo rm -rfv /var/www/html/
 
-  # Rocky
+      # Rocky
       - name: Rocky Create /var/lib/html
         run: sudo rm -rfv /var/lib/html; sudo mkdir -p /var/www/html ; sudo chown `id -u`:`id -g` /var/www/html
 
@@ -84,13 +87,13 @@ jobs:
         working-directory: ./rocky
 
       - name: Rocky Create env
-        run: python3.10 -m venv /var/www/html/.venv
+        run: python${{ matrix.python_version }} -m venv /var/www/html/.venv
 
       - name: Rocky Install requirements
         run: cd /var/www/html; source .venv/bin/activate; pip install --upgrade pip; grep -v git+https:// requirements.txt | pip install -r /dev/stdin ; grep git+https:// requirements.txt | pip install -r /dev/stdin; pip install ${{ github.workspace }}/octopoes/dist/octopoes*.whl
 
       - name: Rocky Create rocky_venv tarball
-        run: tar -zcvf ${{ env.PKGDIR }}/rocky_venv_${{ env.RELEASE_VERSION }}.tar.gz -C /var/www/html/ .venv
+        run: tar -zcvf ${{ env.PKGDIR }}/rocky_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}.tar.gz -C /var/www/html/ .venv
 
       - name: Rocky Run nvm install
         run: nvm install v16
@@ -113,14 +116,13 @@ jobs:
         working-directory: ./rocky
 
       - name: Rocky Compilemessages
-        run: /var/www/html/.venv/bin/python3.10 manage.py collectstatic && /var/www/html/.venv/bin/python3.10 manage.py compress && /var/www/html/.venv/bin/python3.10 manage.py compilemessages
+        run: /var/www/html/.venv/bin/python${{ matrix.python_version }} manage.py collectstatic && /var/www/html/.venv/bin/python${{ matrix.python_version }} manage.py compress && /var/www/html/.venv/bin/python${{ matrix.python_version }} manage.py compilemessages
         working-directory: ./rocky
         env:
           BYTES_API: http://bytes:8000
           BYTES_PASSWORD: password
           BYTES_USERNAME: username
           KATALOGUS_API: http://katalogus:8000
-          KEIKO_API: http://keiko:8000
           OCTOPOES_API: http://octopoes_api:80
           SCHEDULER_API: http://scheduler:8000
           SECRET_KEY: whatever
@@ -129,7 +131,7 @@ jobs:
         run: tar -cvzf ${{ env.PKGDIR }}/rocky_${{ env.RELEASE_VERSION }}.tar.gz --exclude node_modules --exclude rocky_venv* --exclude=.git* --exclude .parcel-cache --exclude Dockerfile .
         working-directory: ./rocky
 
-  # Bytes
+      # Bytes
       - name: Bytes Create /var/lib/html
         run: sudo rm -rfv /var/lib/html; sudo mkdir -p /var/www/html ; sudo chown `id -u`:`id -g` /var/www/html
 
@@ -138,7 +140,7 @@ jobs:
         working-directory: ./bytes
 
       - name: Bytes Create env
-        run: python3.10 -m venv /var/www/html/.venv
+        run: python${{ matrix.python_version }} -m venv /var/www/html/.venv
 
       - name: Bytes Install requirements
         run: cd /var/www/html; source .venv/bin/activate; pip install --upgrade pip; pip install --requirement requirements.txt
@@ -148,9 +150,9 @@ jobs:
         working-directory: ./bytes
 
       - name: Bytes Create bytes venv package
-        run: tar -zcvf ${{ env.PKGDIR }}/bytes_venv_${{ env.RELEASE_VERSION }}.tar.gz -C /var/www/html/ .venv
+        run: tar -zcvf ${{ env.PKGDIR }}/bytes_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}.tar.gz -C /var/www/html/ .venv
 
-  # Mula / Scheduler
+      # Mula / Scheduler
       - name: Mula Create /var/lib/html
         run: sudo rm -rfv /var/lib/html; sudo mkdir -p /var/www/html ; sudo chown `id -u`:`id -g` /var/www/html
 
@@ -159,23 +161,23 @@ jobs:
         working-directory: ./mula
 
       - name: Mula Create env
-        run: python3.10 -m venv /var/www/html/.venv
+        run: python${{ matrix.python_version }} -m venv /var/www/html/.venv
 
       - name: Create scheduler release archive
         run: tar -cvzf ${{ env.PKGDIR }}/scheduler_${{ env.RELEASE_VERSION }}.tar.gz --exclude=./.git* --exclude=Makefile --exclude=Dockerfile --exclude=requirements* --exclude=tests .
         working-directory: ./mula
 
       - name: Create virtual env
-        run: python3.10 -m venv /var/www/html/.venv
+        run: python${{ matrix.python_version }} -m venv /var/www/html/.venv
 
       - name: Install requirements
         run: source .venv/bin/activate; pip install --upgrade pip; pip install --requirement requirements.txt
         working-directory: /var/www/html
 
       - name: Create venv archive
-        run: tar -zcvf ${{ env.PKGDIR }}/scheduler_venv_${{ env.RELEASE_VERSION }}.tar.gz -C /var/www/html/ .venv
+        run: tar -zcvf ${{ env.PKGDIR }}/scheduler_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}.tar.gz -C /var/www/html/ .venv
 
-  # Boefjes
+      # Boefjes
       - name: Boefjes Create /var/lib/html
         run: sudo rm -rfv /var/lib/html; sudo mkdir -p /var/www/html ; sudo chown `id -u`:`id -g` /var/www/html
 
@@ -184,53 +186,31 @@ jobs:
         working-directory: ./boefjes
 
       - name: Boefjes Create env
-        run: python3.10 -m venv /var/www/html/.venv
+        run: python${{ matrix.python_version }} -m venv /var/www/html/.venv
 
       - name: Install requirements
-        run: source .venv/bin/activate; pip install --upgrade pip; find . -name requirements.txt | xargs -L 1 pip install -r; pip install ${{ github.workspace }}/octopoes/dist/octopoes*.whl
+        run: source .venv/bin/activate; pip install --upgrade pip; grep -v git+https:// requirements.txt | pip install -r /dev/stdin ; grep git+https:// requirements.txt | pip install -r /dev/stdin; pip install ${{ github.workspace }}/octopoes/dist/octopoes*.whl
         working-directory: /var/www/html
 
       - name: Create archive
-        run: tar -zcvf ${{ env.PKGDIR }}/boefjes_venv_${{ env.RELEASE_VERSION }}.tar.gz -C /var/www/html/ .venv
+        run: tar -zcvf ${{ env.PKGDIR }}/boefjes_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}.tar.gz -C /var/www/html/ .venv
 
       - name: Create boefjes release
         run: tar -cvzf ${{ env.PKGDIR }}/boefjes_${{ env.RELEASE_VERSION }}.tar.gz .
         working-directory: ./boefjes
 
-  # Keiko
-      - name: Keiko Create /var/lib/html
-        run: sudo rm -rfv /var/lib/html; sudo mkdir -p /var/www/html ; sudo chown `id -u`:`id -g` /var/www/html
-
-      - name: Keiko copy project to run location.
-        run: cp -rv * /var/www/html
-        working-directory: ./keiko
-
-      - name: Keiko Create env
-        run: python3.10 -m venv /var/www/html/.venv
-
-      - name: Keiko Install requirements
-        run: source .venv/bin/activate; pip install --upgrade pip; find . -name requirements.txt | xargs -L 1 pip install -r
-        working-directory: /var/www/html
-
-      - name: Keiko Create archive
-        run: tar -zcvf ${{ env.PKGDIR }}/katkeiko_venv_${{ env.RELEASE_VERSION }}.tar.gz -C /var/www/html/ .venv
-
-      - name: Keiko Create katkeiko release
-        run: tar -cvzf ${{ env.PKGDIR }}/katkeiko_${{ env.RELEASE_VERSION }}.tar.gz .
-        working-directory: ./keiko
-
-  # Common / Uploads
+      # Common / Uploads
       - name: Octopoes Upload whl package
         uses: actions/upload-artifact@v4
         with:
-          name: "octopoes-${{env.RELEASE_VERSION}}"
+          name: "octopoes-${{env.RELEASE_VERSION}}_python${{ matrix.python_version }}"
           path: "${{ github.workspace }}/octopoes/dist/octopoes*.whl"
 
       - name: Octopoes Upload venv tar
         uses: actions/upload-artifact@v4
         with:
-          name: octopoes_venv_${{ env.RELEASE_VERSION }}
-          path: ${{ env.PKGDIR }}/octopoes_venv_${{ env.RELEASE_VERSION }}.tar.gz
+          name: octopoes_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}
+          path: ${{ env.PKGDIR }}/octopoes_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}.tar.gz
 
       - name: Octopoes Upload octopoes tar
         uses: actions/upload-artifact@v4
@@ -247,8 +227,8 @@ jobs:
       - name: Rocky Upload venv tar
         uses: actions/upload-artifact@v4
         with:
-          name: rocky_venv_${{ env.RELEASE_VERSION }}
-          path: ${{ env.PKGDIR }}/rocky_venv_${{ env.RELEASE_VERSION }}.tar.gz
+          name: rocky_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}
+          path: ${{ env.PKGDIR }}/rocky_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}.tar.gz
 
       - name: Bytes Upload bytes tar
         uses: actions/upload-artifact@v4
@@ -259,8 +239,8 @@ jobs:
       - name: Bytes Upload bytes venv tar
         uses: actions/upload-artifact@v4
         with:
-          name: bytes_venv_${{ env.RELEASE_VERSION }}
-          path: ${{ env.PKGDIR }}/bytes_venv_${{ env.RELEASE_VERSION }}.tar.gz
+          name: bytes_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}
+          path: ${{ env.PKGDIR }}/bytes_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}.tar.gz
 
       - name: Upload scheduler release
         uses: actions/upload-artifact@v4
@@ -271,8 +251,8 @@ jobs:
       - name: Upload venv archive
         uses: actions/upload-artifact@v4
         with:
-          name: scheduler_venv_${{ env.RELEASE_VERSION }}
-          path: ${{ env.PKGDIR }}/scheduler_venv_${{ env.RELEASE_VERSION }}.tar.gz
+          name: scheduler_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}
+          path: ${{ env.PKGDIR }}/scheduler_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}.tar.gz
 
       - name: Upload boefjes tar
         uses: actions/upload-artifact@v4
@@ -283,17 +263,5 @@ jobs:
       - name: Upload venv tar
         uses: actions/upload-artifact@v4
         with:
-          name: boefjes_venv_${{ env.RELEASE_VERSION }}
-          path: ${{ env.PKGDIR }}/boefjes_venv_${{ env.RELEASE_VERSION }}.tar.gz
-
-      - name: Keiko Upload tar
-        uses: actions/upload-artifact@v4
-        with:
-          name: katkeiko_${{ env.RELEASE_VERSION }}
-          path: ${{ env.PKGDIR }}/katkeiko_${{ env.RELEASE_VERSION }}.tar.gz
-
-      - name: Keiko Upload venv tar
-        uses: actions/upload-artifact@v4
-        with:
-          name: katkeiko_venv_${{ env.RELEASE_VERSION }}
-          path: ${{ env.PKGDIR }}/katkeiko_venv_${{ env.RELEASE_VERSION }}.tar.gz
+          name: boefjes_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}
+          path: ${{ env.PKGDIR }}/boefjes_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}.tar.gz

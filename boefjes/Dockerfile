@@ -6,8 +6,8 @@ ARG USER_GID=1000
 
 ENTRYPOINT ["/app/boefjes/entrypoint.sh"]
 
-RUN groupadd --gid $USER_GID nonroot
-RUN adduser --disabled-password --gecos '' --uid $USER_UID --gid $USER_GID nonroot
+RUN groupadd --gid "$USER_GID" nonroot
+RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" nonroot
 
 WORKDIR /app/boefjes
 ENV PATH=/home/nonroot/.local/bin:${PATH}
@@ -18,8 +18,12 @@ COPY boefjes/requirements-dev.txt boefjes/requirements.txt .
 
 RUN --mount=type=cache,target=/root/.cache \
     pip install --upgrade pip \
-    && pip install -r requirements.txt \
-    && if [ "$ENVIRONMENT" = "dev" ]; then pip install -r requirements-dev.txt; fi
+    && if [ "$ENVIRONMENT" = "dev" ]; \
+    then \
+    pip install -r requirements-dev.txt; \
+    else \
+    pip install -r requirements.txt; \
+    fi
 
 FROM dev
 

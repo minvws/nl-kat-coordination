@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from uuid import uuid4
 
+from django.forms import Form
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
@@ -33,9 +34,7 @@ FINDING_TYPES_PREFIXES = {
 }
 
 
-def get_finding_type_from_id(
-    finding_type_id: str,
-) -> FindingType:
+def get_finding_type_from_id(finding_type_id: str) -> FindingType:
     finding_type_id = finding_type_id.upper()
 
     prefix = finding_type_id.upper().split("-")[0]
@@ -67,10 +66,7 @@ class FindingAddView(BaseOOIFormView):
         return context
 
     def get_form_kwargs(self):
-        kwargs = {
-            "connector": self.octopoes_api_connector,
-            "ooi_list": self.get_ooi_options(),
-        }
+        kwargs = {"connector": self.octopoes_api_connector, "ooi_list": self.get_ooi_options()}
         kwargs.update(super().get_form_kwargs())
 
         if "ooi_class" in kwargs:
@@ -78,7 +74,7 @@ class FindingAddView(BaseOOIFormView):
 
         return kwargs
 
-    def get_form(self, form_class=None) -> FindingAddForm:
+    def get_form(self, form_class: type[Form] | None = None) -> FindingAddForm:
         if form_class is None:
             form_class = self.get_form_class()
 

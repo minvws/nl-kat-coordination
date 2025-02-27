@@ -1,17 +1,15 @@
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
-from logging import getLogger
 from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 from strenum import StrEnum
 
+from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
-
-logger = getLogger(__name__)
 
 
 class SystemType(StrEnum):
@@ -47,20 +45,19 @@ SERVICE_MAPPING = {
 }
 
 
-SOFTWARE_MAPPING = {
-    "DICOM": SystemType.DICOM,
-}
+SOFTWARE_MAPPING = {"DICOM": SystemType.DICOM}
 
 
 class SystemReport(Report):
     id = "systems-report"
     name = _("System Report")
     description = _("Combine IP addresses, hostnames and services into systems.")
-    plugins = {"required": ["dns-records", "nmap"], "optional": ["nmap-udp"]}
+    plugins = {"required": {"dns-records", "nmap"}, "optional": {"nmap-udp"}}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "systems_report/report.html"
+    label_style = "6-light"
 
-    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+    def collect_data(self, input_oois: Iterable[Reference], valid_time: datetime) -> dict[Reference, dict[str, Any]]:
         ips_by_input_ooi = self.to_ips(input_oois, valid_time)
         all_ips = list({ip for key, ips in ips_by_input_ooi.items() for ip in ips})
 
@@ -89,9 +86,7 @@ class SystemReport(Report):
         }
         websites_by_source = self.group_by_source(
             self.octopoes_api_connector.query_many(
-                "IPAddress.<address[is IPPort].<ip_port [is IPService].<ip_service [is Website]",
-                valid_time,
-                all_ips,
+                "IPAddress.<address[is IPPort].<ip_port [is IPService].<ip_service [is Website]", valid_time, all_ips
             )
         )
 

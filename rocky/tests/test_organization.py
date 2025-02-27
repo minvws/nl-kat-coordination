@@ -21,7 +21,7 @@ AMOUNT_OF_TEST_ORGANIZATIONS = 50
 
 @pytest.fixture
 def bulk_organizations(active_member, blocked_member):
-    with patch("katalogus.client.KATalogusClientV1"), patch("tools.models.OctopoesAPIConnector"):
+    with patch("katalogus.client.KATalogusClient"), patch("rocky.signals.OctopoesAPIConnector"):
         organizations = []
         for i in range(1, AMOUNT_OF_TEST_ORGANIZATIONS):
             org = Organization.objects.create(name=f"Test Organization {i}", code=f"test{i}", tags=f"test-tag{i}")
@@ -67,33 +67,30 @@ def test_add_organization_page(rf, superuser_member):
     assertContains(response, "Organization setup")
 
 
-def test_add_organization_submit_success(rf, superuser_member, mocker, mock_models_octopoes):
-    mocker.patch("katalogus.client.KATalogusClientV1")
-    request = setup_request(
-        rf.post(
-            "organization_add",
-            {"name": "neworg", "code": "norg"},
-        ),
-        superuser_member.user,
-    )
+def test_add_organization_submit_success(rf, superuser_member, mocker, mock_models_octopoes, log_output):
+    mocker.patch("katalogus.client.KATalogusClient")
+    request = setup_request(rf.post("organization_add", {"name": "neworg", "code": "norg"}), superuser_member.user)
     response = OrganizationAddView.as_view()(request, organization_code=superuser_member.organization.code)
     assert response.status_code == 302
 
     messages = list(request._messages)
     assert "Organization added successfully" in messages[0].message
 
+    organization_created_log = log_output.entries[-3]
+    organization_member_created_log = log_output.entries[-2]
+    assert organization_created_log["event"] == "%s %s created"
+    assert organization_created_log["object"] == "neworg"
+    assert organization_created_log["object_type"] == "Organization"
+    assert organization_member_created_log["event"] == "%s %s created"
+    assert organization_member_created_log["object"] == "superuser@openkat.nl"
+    assert organization_member_created_log["object_type"] == "OrganizationMember"
+
 
 def test_add_organization_submit_katalogus_down(rf, superuser_member, mocker):
     mock_requests = mocker.patch("katalogus.client.httpx")
     mock_requests.Client().get.side_effect = RequestError("KATalogus is down")
 
-    request = setup_request(
-        rf.post(
-            "organization_add",
-            {"name": "neworg", "code": "norg"},
-        ),
-        superuser_member.user,
-    )
+    request = setup_request(rf.post("organization_add", {"name": "neworg", "code": "norg"}), superuser_member.user)
     response = OrganizationAddView.as_view()(request, organization_code=superuser_member.organization.code)
     assert response.status_code == 302
 
@@ -106,13 +103,7 @@ def test_add_organization_submit_katalogus_exception(rf, superuser_member, mock_
     httpx_mock.add_response(status_code=404)  # mocking organization page
     httpx_mock.add_exception(RequestError("KATalogus is down"))  # mocking KATalogus API
 
-    request = setup_request(
-        rf.post(
-            "organization_add",
-            {"name": "new", "code": "newcode"},
-        ),
-        superuser_member.user,
-    )
+    request = setup_request(rf.post("organization_add", {"name": "new", "code": "newcode"}), superuser_member.user)
     response = OrganizationAddView.as_view()(request, organization_code=superuser_member.organization.code)
     assert response.status_code == 302
 
@@ -123,13 +114,7 @@ def test_add_organization_submit_katalogus_exception(rf, superuser_member, mock_
 def test_add_organization_submit_katalogus_not_healthy(rf, superuser_member, httpx_mock):
     httpx_mock.add_response(status_code=200, json={"service": "test", "healthy": False})
 
-    request = setup_request(
-        rf.post(
-            "organization_add",
-            {"name": "neworg", "code": "norg"},
-        ),
-        superuser_member.user,
-    )
+    request = setup_request(rf.post("organization_add", {"name": "neworg", "code": "norg"}), superuser_member.user)
     response = OrganizationAddView.as_view()(request, organization_code=superuser_member.organization.code)
     assert response.status_code == 302
 
@@ -208,8 +193,7 @@ def test_organization_filtered_member_list(rf, superuser_member, new_member, blo
     # Test with every filter option checked (new, active, blocked and unblocked)
     request3 = setup_request(
         rf.get(
-            "organization_member_list",
-            {"client_status": ["new", "active"], "blocked_status": ["blocked", "unblocked"]},
+            "organization_member_list", {"client_status": ["new", "active"], "blocked_status": ["blocked", "unblocked"]}
         ),
         superuser_member.user,
     )
@@ -296,14 +280,11 @@ def test_admin_rights_edits_organization(rf, admin_member):
 def test_admin_edits_organization(rf, admin_member, mocker):
     """Admin editing organization values"""
     request = setup_request(
-        rf.post(
-            "organization_edit",
-            {"name": "This organization name has been edited", "tags": "tag1,tag2"},
-        ),
+        rf.post("organization_edit", {"name": "This organization name has been edited", "tags": "tag1,tag2"}),
         admin_member.user,
     )
-    mocker.patch("katalogus.client.KATalogusClientV1")
-    mocker.patch("tools.models.OctopoesAPIConnector")
+    mocker.patch("katalogus.client.KATalogusClient")
+    mocker.patch("rocky.signals.OctopoesAPIConnector")
     response = OrganizationEditView.as_view()(
         request, organization_code=admin_member.organization.code, pk=admin_member.organization.id
     )
@@ -324,12 +305,9 @@ def test_admin_edits_organization(rf, admin_member, mocker):
 
 
 def test_organization_code_validator_from_view(rf, superuser_member, mocker, mock_models_octopoes):
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
     request = setup_request(
-        rf.post(
-            "organization_add",
-            {"name": "DENIED LIST CHECK", "code": DENY_ORGANIZATION_CODES[0]},
-        ),
+        rf.post("organization_add", {"name": "DENIED LIST CHECK", "code": DENY_ORGANIZATION_CODES[0]}),
         superuser_member.user,
     )
 
@@ -344,7 +322,7 @@ def test_organization_code_validator_from_view(rf, superuser_member, mocker, moc
 
 @pytest.mark.django_db
 def test_organization_code_validator_from_model(mocker, mock_models_octopoes):
-    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("katalogus.client.KATalogusClient")
     with pytest.raises(ValidationError):
         Organization.objects.create(name="Test", code=DENY_ORGANIZATION_CODES[0])
 
@@ -421,8 +399,7 @@ def test_organization_list_perms(rf, superuser_member, admin_member, client_memb
     )
 
     response_admin = OrganizationListView.as_view()(
-        setup_request(rf.get("organization_list"), admin_member.user),
-        organization_code=admin_member.organization.code,
+        setup_request(rf.get("organization_list"), admin_member.user), organization_code=admin_member.organization.code
     )
 
     response_client = OrganizationListView.as_view()(
@@ -455,8 +432,7 @@ def test_organization_edit_view(request, member, rf):
     member = request.getfixturevalue(member)
 
     response = OrganizationSettingsView.as_view()(
-        setup_request(rf.get("organization_settings"), member.user),
-        organization_code=member.organization.code,
+        setup_request(rf.get("organization_settings"), member.user), organization_code=member.organization.code
     )
 
     assert response.status_code == 200
@@ -470,6 +446,5 @@ def test_organization_edit_perms_on_settings_view(request, member, rf):
 
     with pytest.raises(PermissionDenied):
         OrganizationSettingsView.as_view()(
-            setup_request(rf.get("organization_settings"), member.user),
-            organization_code=member.organization.code,
+            setup_request(rf.get("organization_settings"), member.user), organization_code=member.organization.code
         )

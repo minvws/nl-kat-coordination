@@ -1,11 +1,17 @@
 /* Form fieldset required */
 
 form.horizontal-view div.required {
-    label {
-        margin-top: calc(var(--form-horizontal-view-fieldset-nota-bene-required-margin-bottom) + var(--form-input-min-height) / 2);
-    }
+  --nota-bene-height: calc(
+    var(--form-horizontal-view-fieldset-nota-bene-required-margin-bottom) +
+      1.75rem /* Nota bene line height */
+  );
+  --input-height-quarter: calc(var(--form-input-min-height) * 0.25);
 
-    select+div+.help-button {
-        margin-top: 2rem;
-    }
+  label {
+    margin-top: calc(var(--nota-bene-height) + var(--input-height-quarter));
+  }
+
+  select + div + .help-button {
+    margin-top: 2rem;
+  }
 }

@@ -3,24 +3,30 @@ name: Build docs artifact for PR
 on:
   pull_request:
     paths:
+      # We generate documentation for boefje, bytes, mula and octopoes
+      # from code so the workflow should also depend on it.
+      - "boefje/**"
+      - "bytes/**"
       - "docs/**"
+      - "mula/**"
+      - "octopoes/**"
       - "requirements.txt"
+      - ".github/workflows/build_docs_on_pr.yml"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   build-artifact:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-
       - name: Checkout code
         uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
           python-version: 3.11
-          cache: 'pip' # caching pip dependencies
+          cache: "pip" # caching pip dependencies
 
       - name: Install pip dependencies
         run: pip install -r requirements.txt
@@ -32,4 +38,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: "github-pages-no-deploy"
-          path: 'docs/_build'
+          path: "docs/_build"

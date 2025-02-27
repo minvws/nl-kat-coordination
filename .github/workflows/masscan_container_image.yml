@@ -4,24 +4,24 @@ on:
   workflow_dispatch: {}
   push:
     branches:
-      - 'main'
-      - 'release-*'
+      - "main"
+      - "release-*"
     tags:
-      - '*'
+      - "*"
     paths:
-      - 'boefjes/images/masscan/Dockerfile'
-      - '.github/workflows/masscan_container_image.yml'
+      - "boefjes/images/masscan/Dockerfile"
+      - ".github/workflows/masscan_container_image.yml"
   pull_request:
     paths:
-      - 'boefjes/images/masscan/Dockerfile'
-      - '.github/workflows/masscan_container_image.yml'
+      - "boefjes/images/masscan/Dockerfile"
+      - ".github/workflows/masscan_container_image.yml"
 
 env:
   REGISTRY: ghcr.io
 
 jobs:
   build-masscan-image:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write
@@ -55,7 +55,7 @@ jobs:
             type=sha
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./boefjes/images/masscan
           push: true

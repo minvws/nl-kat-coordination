@@ -1,5 +1,5 @@
 import sqlalchemy
-from sqlalchemy.orm import RelationshipProperty
+from sqlalchemy.orm import DeclarativeBase, RelationshipProperty
 from sqlalchemy.orm.query import Query
 from sqlalchemy.sql.elements import BinaryExpression
 
@@ -10,7 +10,7 @@ from .filters import FilterRequest
 from .operators import FILTER_OPERATORS
 
 
-def apply_filter(entity, query: Query, filter_request: FilterRequest) -> Query:
+def apply_filter(entity: DeclarativeBase, query: Query, filter_request: FilterRequest) -> Query:
     """Apply the filter criteria to a SQLAlchemy query.
 
     Args:
@@ -22,7 +22,7 @@ def apply_filter(entity, query: Query, filter_request: FilterRequest) -> Query:
         A filtered SQLAlchemy query.
     """
     if not isinstance(filter_request.filters, dict):
-        raise ValueError("Filter request must be a dict")
+        raise FilterError("Filter request must be a dict")
 
     for operator in filter_request.filters:
         expressions = []

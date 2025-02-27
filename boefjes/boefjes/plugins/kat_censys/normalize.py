@@ -2,8 +2,8 @@ import json
 import urllib.parse
 from collections.abc import Iterable
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, Reference
+from boefjes.job_models import NormalizerOutput
+from octopoes.models import Reference
 from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPPort, Network, PortState, Protocol
@@ -12,9 +12,9 @@ from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import HTTPHeader, HTTPResource, IPAddressHTTPURL, Website
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     results = json.loads(raw)
-    ip_ooi_reference = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
+    ip_ooi_reference = Reference.from_str(input_ooi["primary_key"])
 
     network_reference = Network(name=ip_ooi_reference.tokenized.network.name).reference
     ip = results["ip"]
@@ -46,11 +46,7 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
             elif "subject" in certificate["leaf_data"]:
                 so = certificate["leaf_data"]["subject_dn"]
                 cert_subject = "C={}, ST={}, O={}, OU={}, CN={}".format(
-                    so["country"],
-                    so["province"],
-                    so["organization"],
-                    so["organizational_unit"],
-                    so["common_name"],
+                    so["country"], so["province"], so["organization"], so["organizational_unit"], so["common_name"]
                 )
             else:
                 cert_subject = "n/a"
@@ -89,9 +85,7 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
                         url = urllib.parse.urlparse(scan["http"]["request"]["uri"])
                         port = 443 if url.scheme == "https" else 80
                         ip_port = IPPort(
-                            address=ip_ooi_reference,
-                            protocol=Protocol[scan["transport_protocol"]],
-                            port=port,
+                            address=ip_ooi_reference, protocol=Protocol[scan["transport_protocol"]], port=port
                         )
                         yield ip_port
 
@@ -111,19 +105,12 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
                         # todo: implement `HTTPResource.redirects_to` if available
                         http_resource = HTTPResource(
                             website=Website(
-                                ip_service=IPService(
-                                    ip_port=ip_port.reference,
-                                    service=service.reference,
-                                ).reference,
+                                ip_service=IPService(ip_port=ip_port.reference, service=service.reference).reference,
                                 hostname=hostname.reference,
                             ).reference,
                             web_url=web_url.reference,
                         )
                         yield http_resource
 
-                        http_header = HTTPHeader(
-                            resource=http_resource.reference,
-                            key=header_field,
-                            value=value,
-                        )
+                        http_header = HTTPHeader(resource=http_resource.reference, key=header_field, value=value)
                         yield http_header

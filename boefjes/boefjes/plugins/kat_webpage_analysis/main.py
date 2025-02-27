@@ -9,6 +9,7 @@ from forcediphttpsadapter.adapters import ForcedIPHTTPSAdapter
 from requests import Session
 
 from boefjes.job_models import BoefjeMeta
+from boefjes.plugins.kat_webpage_analysis.har.requests import create_har_object
 
 ALLOWED_CONTENT_TYPES = mimetypes.types_map.values()
 
@@ -39,15 +40,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
             else:
                 url_parts = url_parts._replace(netloc=f"[{ip}]") if addr.version == 6 else url_parts._replace(netloc=ip)
 
-            uri = urlunsplit(
-                [
-                    url_parts.scheme,
-                    url_parts.netloc,
-                    url_parts.path,
-                    url_parts.query,
-                    url_parts.fragment,
-                ]
-            )
+            uri = urlunsplit([url_parts.scheme, url_parts.netloc, url_parts.path, url_parts.query, url_parts.fragment])
 
     body_mimetypes = {"openkat-http/body"}
     try:
@@ -62,12 +55,14 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
             body_mimetypes.add(content_type)
 
         # Pick up the content type for the body from the server and split away encodings to make normalization easier
-        content_type = content_type.split(";")
-        if content_type[0] in ALLOWED_CONTENT_TYPES:
-            body_mimetypes.add(content_type[0])
+        content_type_splitted = content_type.split(";")
+        if content_type_splitted[0] in ALLOWED_CONTENT_TYPES:
+            body_mimetypes.add(content_type_splitted[0])
+
+    har = json.dumps(create_har_object(response))
 
     return [
-        ({"openkat-http/full"}, f"{response.headers}\n\n{response.content}"),
+        ({"application/json+har"}, har.encode()),
         ({"openkat-http/headers"}, json.dumps(dict(response.headers))),
         (body_mimetypes, response.content),
     ]
@@ -75,10 +70,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 
 def do_request(hostname: str, session: Session, uri: str, useragent: str):
     response = session.get(
-        uri,
-        headers={"Host": hostname, "User-Agent": useragent},
-        verify=False,
-        allow_redirects=False,
+        uri, headers={"Host": hostname, "User-Agent": useragent}, verify=False, allow_redirects=False
     )
 
     return response

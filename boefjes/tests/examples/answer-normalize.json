@@ -14,9 +14,6 @@
     "mime_types": [
       {
         "value": "answer"
-      },
-      {
-        "value": "/bit/port-classification-ip"
       }
     ]
   },

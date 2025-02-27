@@ -4,7 +4,7 @@ on:
   workflow_dispatch: {}
   push:
     branches:
-      - 'main'
+      - "main"
     paths:
       - "packaging"
       - ".github/workflows/build-debian-docker-image.yml"
@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         dist: [debian12, ubuntu22.04]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write
@@ -51,7 +51,7 @@ jobs:
             type=sha
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./packaging/${{ matrix.dist }}
           push: true

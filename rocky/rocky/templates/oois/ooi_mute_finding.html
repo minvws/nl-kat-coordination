@@ -9,12 +9,12 @@
     <main id="main-content">
         <section>
             <div class="layout-form">
-                <h1>{% translate "Mute finding" %}: {{ ooi.human_readable }}</h1>
+                <h1>{% translate "Mute finding:" %} {{ ooi.human_readable }}</h1>
                 <p>{% translate "Give a reason below why you want to mute this finding." %}</p>
                 <form action="{% url 'ooi_add' ooi_type=ooi_type organization_code=organization.code %}"
                       novalidate
                       method="post"
-                      class="horizontal-view help">
+                      class="help">
                     {% csrf_token %}
                     {% translate "Mute finding" as fieldset_legend %}
                     {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}

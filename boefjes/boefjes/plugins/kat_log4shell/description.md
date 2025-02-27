@@ -22,7 +22,7 @@ Currently, output needs to be verified from the `REPLY_FQDN`. In the future Log4
 {
   "id": "random-uuid",
   "organization": "_dev",
-  "input_ooi":"URL|internet|127.0.0.1|tcp|443|http|internet|test.test.test|/",
+  "input_ooi": "URL|internet|127.0.0.1|tcp|443|http|internet|test.test.test|/",
   "arguments": {
     "url": "https://test.test.test/"
   },
@@ -31,7 +31,6 @@ Currently, output needs to be verified from the `REPLY_FQDN`. In the future Log4
     "boefjes": []
   }
 }
-
 ```
 
 ### Boefje structure

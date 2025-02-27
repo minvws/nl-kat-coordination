@@ -3,6 +3,9 @@ services:
     build:
       args:
         ENVIRONMENT: dev
+        PYTHON_VERSION: "3.10"
+        USER_UID: 1001
+        USER_GID: 1001
       context: .
       dockerfile: Dockerfile
     command: pytest tests/unit
@@ -17,13 +20,15 @@ services:
       dockerfile: Dockerfile
       args:
         ENVIRONMENT: dev
+        USER_UID: 1001
+        USER_GID: 1001
     command: pytest -vv tests/integration
     depends_on:
       - ci_bytes
     env_file:
       - .ci/.env.test
     volumes:
-    - .:/app/bytes
+      - .:/app/bytes
 
   ci_bytes:
     build:
@@ -43,15 +48,15 @@ services:
       - .ci/.env.test
 
   ci_rabbitmq:
-    image: "rabbitmq:3.12-management"
+    image: "docker.io/library/rabbitmq:3.12-management"
     volumes:
       - ./.ci/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     healthcheck:
-      test: [ "CMD", "rabbitmqctl", "status" ]
+      test: ["CMD", "rabbitmqctl", "status"]
       interval: 5s
       retries: 4
 
   ci_bytes-db:
-    image: postgres:15
+    image: docker.io/library/postgres:15
     env_file:
       - .ci/.env.test

@@ -1,23 +1,28 @@
 import json
 from collections.abc import Iterable
+from ipaddress import ip_address
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, Reference
+from boefjes.job_models import NormalizerOutput
+from octopoes.models import Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     results = json.loads(raw)
-    ooi = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
+    ooi = Reference.from_str(input_ooi["primary_key"])
 
-    if not results["exists"]:
-        ft = KATFindingType(id="KAT-NO-RPKI")
-        f = Finding(finding_type=ft.reference, ooi=ooi)
-        yield ft
-        yield f
+    address = ip_address(ooi.tokenized.address)
 
-    if not results.get("valid") and not results.get("notexpired"):
-        ft = KATFindingType(id="KAT-EXPIRED-RPKI")
-        f = Finding(finding_type=ft.reference, ooi=ooi)
-        yield ft
-        yield f
+    # if the address is private, we do not need a ROA
+    if address.is_global:
+        if not results["exists"]:
+            ft = KATFindingType(id="KAT-NO-RPKI")
+            f = Finding(finding_type=ft.reference, ooi=ooi)
+            yield ft
+            yield f
+
+        if results["invalid_bgp_entries"]:
+            ft = KATFindingType(id="KAT-INVALID-RPKI")
+            f = Finding(finding_type=ft.reference, ooi=ooi)
+            yield ft
+            yield f

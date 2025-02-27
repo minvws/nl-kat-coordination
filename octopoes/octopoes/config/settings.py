@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath
 from pydantic_settings import BaseSettings, EnvSettingsSource, PydanticBaseSettingsSource, SettingsConfigDict
@@ -19,9 +19,7 @@ if os.getenv("DOCS"):
 
 
 class BackwardsCompatibleEnvSettings(EnvSettingsSource):
-    backwards_compatibility_mapping = {
-        "LOG_CFG": "OCTOPOES_LOG_CFG",
-    }
+    backwards_compatibility_mapping = {"LOG_CFG": "OCTOPOES_LOG_CFG"}
 
     def __call__(self) -> dict[str, Any]:
         d: dict[str, Any] = {}
@@ -68,6 +66,12 @@ class Settings(BaseSettings):
         None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
     )
 
+    logging_format: Literal["text", "json"] = Field("text", description="Logging format")
+
+    outgoing_request_timeout: int = Field(30, description="Timeout for outgoing HTTP requests")
+
+    workers: int = Field(4, description="Number of Octopoes Celery workers")
+
     model_config = SettingsConfigDict(env_prefix="OCTOPOES_")
 
     @classmethod
@@ -80,7 +84,7 @@ class Settings(BaseSettings):
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
         backwards_compatible_settings = BackwardsCompatibleEnvSettings(settings_cls)
-        return env_settings, init_settings, file_secret_settings, backwards_compatible_settings
+        return (env_settings, init_settings, file_secret_settings, backwards_compatible_settings)
 
 
 DEFAULT_SCAN_LEVEL_FILTER = {scan_level for scan_level in ScanLevel}
@@ -88,4 +92,5 @@ DEFAULT_SCAN_PROFILE_TYPE_FILTER = {scan_profile_type for scan_profile_type in S
 DEFAULT_SEVERITY_FILTER = {severity for severity in RiskLevelSeverity}
 DEFAULT_LIMIT = 50
 DEFAULT_OFFSET = 0
-QUEUE_NAME_OCTOPOES: str = "octopoes"
+QUEUE_NAME_OCTOPOES = "octopoes"
+GATHER_BIT_METRICS = False

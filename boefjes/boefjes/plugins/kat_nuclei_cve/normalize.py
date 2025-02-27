@@ -1,18 +1,18 @@
 import json
 from collections.abc import Iterable
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, Reference
+from boefjes.job_models import NormalizerOutput
+from octopoes.models import Reference
 from octopoes.models.ooi.findings import CVEFindingType, Finding
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
-    url_reference = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
+    url_reference = Reference.from_str(input_ooi["primary_key"])
     if raw:
         for line in raw.splitlines():
             # Extract and parse values
             data = json.loads(line)
-            id_ = data["info"]["classification"]["cve-id"][0]
+            id_ = data["info"]["classification"]["cve-id"][0].upper()
             description = data["info"]["description"]
             curl_command = data["curl-command"]
 

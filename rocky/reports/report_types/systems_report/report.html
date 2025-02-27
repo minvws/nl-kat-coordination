@@ -2,10 +2,10 @@
 
 {% if data.services %}
     <div class="horizontal-scroll">
-        {% if show_introduction %}
+        {% if generate_report %}
             <p>
                 {% blocktranslate trimmed %}
-                    The system report provides an overview of the system types (types of
+                    The System Report provides an overview of the system types (types of
                     similar services) that were identified for each system. The following
                     system types can be identified: DNS servers, Web servers, Mail servers
                     and those classified as 'Other' servers. Each hostname and/or IP
@@ -15,7 +15,7 @@
             </p>
         {% endif %}
         <table>
-            <caption class="visually-hidden">{% translate "Selected assets:" %}</caption>
+            <caption class="visually-hidden">{% translate "Selected assets" %}</caption>
             <thead>
                 <tr>
                     <th scope="col">{% translate "IP address" %}</th>
@@ -26,10 +26,13 @@
             <tbody>
                 {% for ip, ip_services in data.services.items %}
                     <tr>
-                        <td>{{ ip.tokenized.address }}</td>
+                        <td>{{ ip|human_readable }}</td>
                         <td>
                             {% if ip_services.hostnames %}
-                                {{ ip_services.hostnames|join:", " }}
+                                {% for hostname in ip_services.hostnames %}
+                                    {{ hostname|human_readable }}
+                                    {% if not forloop.last %},{% endif %}
+                                {% endfor %}
                             {% else %}
                                 -
                             {% endif %}

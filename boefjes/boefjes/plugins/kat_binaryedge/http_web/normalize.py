@@ -2,25 +2,20 @@ import ipaddress
 import json
 from collections.abc import Iterable
 
-from boefjes.job_models import NormalizerMeta
-from boefjes.plugins.kat_binaryedge.services.normalize import get_name_from_cpe
-from octopoes.models import OOI, Reference
+from boefjes.job_models import NormalizerOutput
+from boefjes.plugins.helpers import cpe_to_name_version
+from octopoes.models import Reference
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, PortState, Protocol
 from octopoes.models.ooi.software import Software, SoftwareInstance
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     results = json.loads(raw)
-    boefje_meta = normalizer_meta.raw_data.boefje_meta
-    input_ = boefje_meta.arguments["input"]
-    pk_ooi = Reference.from_str(boefje_meta.input_ooi)
+    pk_ooi = Reference.from_str(input_ooi["primary_key"])
     network = Network(name="internet").reference
 
     # Structure based on https://docs.binaryedge.io/modules/<accepted_modules_name>/
-    accepted_modules = (
-        "webv2",
-        " web-enrich",
-    )  # http/https: deprecated, so not implemented.
+    accepted_modules = ("webv2", " web-enrich")  # http/https: deprecated, so not implemented.
     for scan in results["results"]:
         module = scan["origin"]["type"]
         if module not in accepted_modules:
@@ -30,29 +25,18 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
         protocol = scan["target"]["protocol"]
         ip = scan["target"]["ip"]
 
-        if input_["object_type"] in ["IPAddressV4", "IPAddressV6"]:
+        if input_ooi["object_type"] in ["IPAddressV4", "IPAddressV6"]:
             ip_ref = pk_ooi
         else:
             ipvx = ipaddress.ip_address(ip)
             if ipvx.version == 4:
-                ip_ooi = IPAddressV4(
-                    address=ip,
-                    network=network,
-                )
+                ip_ooi = IPAddressV4(address=ip, network=network)
             else:
-                ip_ooi = IPAddressV6(
-                    address=ip,
-                    network=network,
-                )
+                ip_ooi = IPAddressV6(address=ip, network=network)
             yield ip_ooi
             ip_ref = ip_ooi.reference
 
-        ip_port_ooi = IPPort(
-            address=ip_ref,
-            protocol=Protocol(protocol),
-            port=port_nr,
-            state=PortState("open"),
-        )
+        ip_port_ooi = IPPort(address=ip_ref, protocol=Protocol(protocol), port=port_nr, state=PortState("open"))
         yield ip_port_ooi
 
         if module == "webv2":
@@ -66,7 +50,8 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
 
             for app in response.get("apps", {}):
                 if "cpe" in app:
-                    software_ooi = Software(name=get_name_from_cpe(app["cpe"]), cpe=app["cpe"])
+                    name, version = cpe_to_name_version(cpe=app["cpe"])
+                    software_ooi = Software(name=name, version=version, cpe=app["cpe"])
                     yield software_ooi
                     yield SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
                 else:
@@ -74,17 +59,11 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
                     if "version" in app:
                         software_ooi = Software(name=software_name, version=app["version"])
                         yield software_ooi
-                        yield SoftwareInstance(
-                            ooi=ip_port_ooi.reference,
-                            software=software_ooi.reference,
-                        )
+                        yield SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
                     else:
                         software_ooi = Software(name=software_name)
                         yield software_ooi
-                        yield SoftwareInstance(
-                            ooi=ip_port_ooi.reference,
-                            software=software_ooi.reference,
-                        )
+                        yield SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
         elif module == "web-enrich":
             # (potential) TODO:
             # * http_version [string]
@@ -96,9 +75,8 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
             for potential_software in data:
                 # Check all values for 'cpe'
                 if isinstance(potential_software, dict) and "cpe" in potential_software:
-                    software_ooi = Software(
-                        name=get_name_from_cpe(potential_software["cpe"]), cpe=potential_software["cpe"]
-                    )
+                    name, version = cpe_to_name_version(cpe=potential_software["cpe"])
+                    software_ooi = Software(name=name, version=version, cpe=potential_software["cpe"])
                     yield software_ooi
                     yield SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
 

@@ -20,7 +20,7 @@ from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.path import Path as OctopoesPath
 from octopoes.xtdb.client import XTDBSession
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stdout, level=logging.INFO, force=True)
 
 
 @click.command()
@@ -44,11 +44,7 @@ def run_bit(start_pdb, organization_code, bit_id, ooi):
 
     bit_definition = get_bit_definitions()[bit_id]
 
-    bit_instance = Origin(
-        origin_type=OriginType.INFERENCE,
-        method=bit_id,
-        source=ooi.reference,
-    )
+    bit_instance = Origin(origin_type=OriginType.INFERENCE, method=bit_id, source=ooi.reference)
 
     try:
         try:
