@@ -530,5 +530,11 @@
     "source": "Check the nameservers of the host or iprange manually.",
     "impact": "No resolving can be done for this IP or host. This might cause problems for mailservers or slow down connections.",
     "recommendation": "Verify that the listed nameservers are reachable and have valid hostnames."
+  },
+  "KAT-OUTDATED-SOFTWARE": {
+    "description": "A newer version of existing software has been found.",
+    "risk": "recommendation",
+    "impact": "Depending on what software is outdated this can be critical.",
+    "recommendation": "Inspect the software version, determine if additional measures need to be taken and install updates to reduce the attack surface."
   }
 }
