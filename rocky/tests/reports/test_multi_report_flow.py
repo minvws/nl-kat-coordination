@@ -161,19 +161,18 @@ def test_view_multi_report(
     assert response.status_code == 200
 
     assertContains(response, "Sector Report")
-    assertContains(response, "This is the OpenKAT Sector Report")
+    assertContains(response, "This is the OpenKAT report")
 
     assertContains(
         response,
-        f'<p>Created with date from: <strong>{multi_report_ooi.date_generated.strftime("%b. %d, %Y")}</strong></p>',
+        f'<p>Created with data from: <strong>{multi_report_ooi.date_generated.strftime("%b. %d, %Y")}</strong></p>',
         html=True,
     )
     assertContains(
         response,
-        f'<p>Created with date from: <strong>{multi_report_ooi.date_generated.strftime("%b. %d, %Y")}</strong></p>',
+        f'<p>Created with data from: <strong>{multi_report_ooi.date_generated.strftime("%b. %d, %Y")}</strong></p>',
         html=True,
     )
-    assertContains(response, f"<p>Created by: <strong>{client_member.user.full_name}</strong></p>", html=True)
     assertContains(
         response,
         "<p>This sector contains 2 scanned organizations. The basic security scores are around 71%. "

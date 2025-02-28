@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-06 13:51+0000\n"
+"POT-Creation-Date: 2025-02-28 10:32+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2661,41 +2661,6 @@ msgstr ""
 msgid "server"
 msgstr ""
 
-#: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/templates/partials/report_header.html
-#: rocky/templates/partials/ooi_list_toolbar.html
-msgid "Export"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/introduction.html
-msgid "Download PDF"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/introduction.html
-msgid "Download JSON"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/templates/partials/report_header.html
-msgid "This is the OpenKAT report for organization"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/templates/partials/report_header.html
-msgid "Created with data from:"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/templates/partials/report_header.html
-msgid "Created on:"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/report_types/aggregate_organisation_report/report_design.html
-#: reports/templates/partials/report_header.html
-msgid "Created by:"
-msgstr ""
-
 #: reports/report_types/aggregate_organisation_report/recommendations.html
 #: reports/report_types/multi_organization_report/recommendations.html
 #: reports/templates/partials/report_sidemenu.html
@@ -2787,6 +2752,10 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
 msgid "Observed at:"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report_design.html
+msgid "Created by:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
@@ -3245,55 +3214,6 @@ msgstr ""
 #: reports/report_types/multi_organization_report/basic_security_details.html
 #: reports/report_types/safe_connections_report/report.html
 msgid "services are compliant"
-msgstr ""
-
-#: reports/report_types/multi_organization_report/introduction.html
-#: reports/templates/partials/report_header.html
-msgid "Download report"
-msgstr ""
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "This is the OpenKAT"
-msgstr ""
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "Created with date from: "
-msgstr ""
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "Created on: "
-msgstr ""
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "Created by: "
-msgstr ""
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "This sector contains"
-msgstr ""
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "scanned organizations."
-msgstr ""
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "Of these organizations"
-msgstr ""
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "organizations have tag"
-msgstr ""
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "The basic security scores are around "
-msgstr ""
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "A total of "
-msgstr ""
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid " critical vulnerabilities have been identified."
 msgstr ""
 
 #: reports/report_types/multi_organization_report/ipv6.html
@@ -3798,9 +3718,52 @@ msgid "Ready"
 msgstr ""
 
 #: reports/templates/partials/report_header.html
+#: rocky/templates/partials/ooi_list_toolbar.html
+msgid "Export"
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid "Download report"
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid "This is the OpenKAT report for organization"
+msgstr ""
+
+#: reports/templates/partials/report_header.html
 msgid ""
 "All selected report types for the selected objects are displayed one below "
 "the other."
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid "Created with data from:"
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid "Created on:"
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+#, python-format
+msgid "This sector contains %(length)s scanned organizations."
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid "Of these organizations"
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid "organizations have tag"
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid "The basic security scores are around "
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+#, python-format
+msgid "A total of %(total)s critical vulnerabilities have been identified."
 msgstr ""
 
 #: reports/templates/partials/report_introduction.html
@@ -4611,7 +4574,7 @@ msgstr ""
 
 #: tools/forms/boefje.py
 msgid ""
-"Choose weather a the Boefje should run after creating and/or changing an "
+"Choose weather the Boefje should run after creating and/or changing an "
 "object. "
 msgstr ""
 
