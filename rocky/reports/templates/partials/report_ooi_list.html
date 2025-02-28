@@ -24,7 +24,7 @@
         {% include "partials/ooi_list_filters.html" %}
 
         <div>
-            <strong>{% translate "Selected filters:" %}</strong>
+            <strong>{% translate "Applied filters:" %}</strong>
             <ul>
                 {% for filter, value in active_filters.items %}
                     <li>
@@ -33,7 +33,6 @@
                 {% endfor %}
             </ul>
         </div>
-        <h2>{% translate "Object preview" %}</h2>
         <p>
             {% blocktranslate %}
                 Based on the current dataset, your selected filters result in the following objects.
@@ -128,33 +127,36 @@
                     {% include "partials/list_paginator.html" %}
 
                 {% endif %}
-                <div class="button-container">
-                    <form novalidate
-                          method="post"
-                          action="{{ next }}"
-                          class="inline layout-wide checkboxes_required">
-                        {% csrf_token %}
-                        {% include "forms/report_form_fields.html" %}
+            </div>
+        </form>
+        <form id="live_set"
+              novalidate
+              method="post"
+              action="{{ next }}"
+              class="inline layout-wide checkboxes_required">
+            {% csrf_token %}
+            {% include "forms/report_form_fields.html" %}
 
-                        <input type="hidden" name="ooi" value="all">
-                        <button type="submit"
-                                class="button select_all_objects_element"
-                                name="object_selection"
-                                value="query">
-                            {% translate "Continue with live set" %}<span class="icon ti-chevron-right"></span>
-                        </button>
-                    </form>
-                    {% if ooi_list %}
-                        <button type="submit"
-                                class="button ghost"
-                                name="object_selection"
-                                value="selection">
-                            {% translate "Continue with selection" %}<span class="icon ti-chevron-right"></span>
-                        </button>
-                    {% endif %}
-                </div>
-            </form>
-        </div>
+            <input type="hidden" name="ooi" value="all">
+        </form>
+    </div>
+    <div class="button-container">
+        <button form="live_set"
+                type="submit"
+                class="button select_all_objects_element"
+                name="object_selection"
+                value="query">
+            {% translate "Continue with live set" %}<span class="icon ti-chevron-right"></span>
+        </button>
+        {% if ooi_list %}
+            <button form="object_table_form"
+                    type="submit"
+                    class="button ghost"
+                    name="object_selection"
+                    value="selection">
+                {% translate "Continue with selection" %}<span class="icon ti-chevron-right"></span>
+            </button>
+        {% endif %}
     </div>
 </section>
 <form novalidate id="select_all_objects_form" class="inline" method="get">

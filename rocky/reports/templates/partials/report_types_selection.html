@@ -26,6 +26,16 @@
                     You have selected a live set in the previous step. Based on the current
                     dataset, this live set results in {{ total_oois }} objects.
                 {% endblocktranslate %}
+                <div>
+                    <strong>{% translate "Applied filters:" %}</strong>
+                    <ul>
+                        {% for filter, value in active_filters.items %}
+                            <li>
+                                <strong>{{ filter }}</strong> {{ value }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             {% else %}
                 {% blocktranslate trimmed count counter=oois|length %}
                     You have selected {{ total_oois }} object in the previous step.
