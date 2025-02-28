@@ -37,14 +37,6 @@
             <p>
                 {% translate "Created on:" %} <strong>{{ report_ooi.date_generated|date }}</strong>
             </p>
-            {% if report_ooi.report_type != "multi-organization-report" %}
-                <p>
-                    {% translate "Created from recipe:" %} <a href="{% ooi_url "ooi_detail" recipe_ooi.primary_key organization.code %}">{{ recipe_ooi.primary_key }}</a>
-                </p>
-                <p>
-                    {% translate "Recipe created by:" %} <strong>{{ recipe_ooi|get_user_full_name }}</strong>
-                </p>
-            {% endif %}
         </div>
         {% if report_ooi.report_type == "multi-organization-report" %}
             <p>
