@@ -60,7 +60,7 @@ def test_spf_discovery_with_identifier():
     dnstxt_record = DNSTXTRecord(
         hostname=Reference.from_str("Hostname|internet|example1.com"),
         value="v=spf1 a:example.com mx mx:deferrals.domain.com ptr:otherdomain.com "
-        "exists:%i.example.com ?include:example2.com ~all",
+        "exists:%{i}.example.com ?include:example2.com ~all",
     )
     results = list(run(dnstxt_record, [], {}))
 
