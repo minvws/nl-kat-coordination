@@ -1,7 +1,6 @@
 import datetime
 import os
 import uuid
-from enum import Enum
 from typing import Any
 from functools import cache
 
@@ -10,17 +9,16 @@ import structlog
 from httpx import Client, HTTPError, HTTPTransport, Response
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
-from pydantic import TypeAdapter
+from pydantic import TypeAdapter, BaseModel
 
 from boefjes.config import settings
 from boefjes.dependencies.plugins import PluginService
-from boefjes.worker.interfaces import Queue, SchedulerClientInterface, Task, TaskStatus
-from boefjes.worker.job_models import BoefjeMeta
+from boefjes.worker.interfaces import Queue, Task, TaskStatus
 from boefjes.storage.interfaces import SettingsNotConformingToSchema
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
-from boefjes.worker.job_models import BoefjeMeta, NormalizerMeta
+from boefjes.worker.job_models import BoefjeMeta
 
 logger = structlog.get_logger(__name__)
 

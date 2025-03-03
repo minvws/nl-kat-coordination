@@ -12,7 +12,6 @@ import structlog
 from jsonschema.exceptions import SchemaError
 
 from .models import PluginType, Boefje, Normalizer
-from .job_models import Boefje
 
 logger = structlog.get_logger(__name__)
 

@@ -13,7 +13,7 @@ from pydantic import TypeAdapter
 from sqlalchemy.orm import sessionmaker
 
 from boefjes.clients.bytes_client import BytesAPIClient
-from boefjes.clients.scheduler_client import PaginatedTasksResponse, SchedulerClientInterface, Task, TaskStatus
+from boefjes.clients.scheduler_client import PaginatedTasksResponse
 from boefjes.config import settings
 from boefjes.dependencies.plugins import PluginService, get_plugin_service
 from boefjes.job_handler import bytes_api_client
