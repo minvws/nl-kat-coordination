@@ -21,7 +21,7 @@ def run(input_ooi: DNSTXTRecord, additional_oois: list, config: dict[str, Any]) 
         spf_value = input_ooi.value.replace("%{d}", input_ooi.hostname.tokenized.name)
 
         # remove exists:%i mechanisms
-        spf_value = re.sub(r"exists:%i[^\s]+", "", spf_value)
+        spf_value = re.sub(r"exists:%{[^\s]+", "", spf_value)
 
         parsed = parse(spf_value)
         # check if spf record passes the internet.nl parser
