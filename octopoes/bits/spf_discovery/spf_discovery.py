@@ -1,3 +1,4 @@
+import re
 from collections.abc import Iterator
 from typing import Any
 
@@ -17,7 +18,11 @@ from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 
 def run(input_ooi: DNSTXTRecord, additional_oois: list, config: dict[str, Any]) -> Iterator[OOI]:
     if input_ooi.value.startswith("v=spf1"):
-        spf_value = input_ooi.value.replace("%(d)", input_ooi.hostname.tokenized.name)
+        spf_value = input_ooi.value.replace("%{d}", input_ooi.hostname.tokenized.name)
+
+        # remove exists:%i mechanisms
+        spf_value = re.sub(r"exists:%{[^\s]+", "", spf_value)
+
         parsed = parse(spf_value)
         # check if spf record passes the internet.nl parser
         if parsed is not None:
