@@ -206,8 +206,10 @@ def create_asset_reports(
                 manual_mime_types={"openkat/report"},
             )
 
+            input_ooi = reference if not hasattr(reference, "human_readable") else reference.human_readable
+
             asset_report = AssetReport(
-                name=f"{report_type.name} for {reference.human_readable}",
+                name=f"{report_type.name} for {input_ooi}",
                 report_type=report_type_id,
                 report_recipe=recipe.reference,
                 template=report_type.template_path,
