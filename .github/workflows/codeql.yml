@@ -2,10 +2,9 @@ name: "CodeQL OpenKAT"
 
 on:
   push:
-    branches:
-      - "main"
-      - "release-*"
+    branches: [main, release-*, feature/*]
   pull_request:
+    branches: ["main"]
   schedule:
     # Weekly on Sunday.
     - cron: "30 1 * * 0"
