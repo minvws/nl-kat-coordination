@@ -77,10 +77,6 @@ SPAN_EXPORT_GRPC_ENDPOINT=
 BYTES_USERNAME=
 BYTES_PASSWORD=
 
-# The lifetime of the katalogus cache in seconds.
-# Default: 30
-SCHEDULER_KATALOGUS_CACHE_TTL=
-
 # Interval in seconds of the execution of the `monitor_organisations` method
 # of the scheduler application to check newly created or removed organisations
 # from katalogus. It updates the organisations, their plugins, and the

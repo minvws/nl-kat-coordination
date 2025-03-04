@@ -46,11 +46,6 @@ class RabbitMQTestCase(unittest.TestCase):
         # Make sure the listener is running
         self.assertTrue(thread.is_alive())
 
-        # Stop the listener
-        listener_.channel.stop_consuming()
-        listener_.channel.close()
-        listener_.connection.close()
-
         # Call stop on the listener
         listener_.stop()
 
