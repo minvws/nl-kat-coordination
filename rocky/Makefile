@@ -50,21 +50,21 @@ bench: testclean ## Run the report benchmark.
 	python -m cProfile -o .ci/bench_$$(date +%Y_%m_%d-%H:%M:%S).pstat -m pytest -m slow --no-cov tests/integration
 
 export_migrations:
-	python manage.py export_migrations contenttypes 0001
-	python manage.py export_migrations auth 0001
-	python manage.py export_migrations admin 0001
-	python manage.py export_migrations sessions 0001
-	python manage.py export_migrations two_factor 0001
-	python manage.py export_migrations otp_static 0001
-	python manage.py export_migrations otp_totp 0001
-	python manage.py export_migrations tools 0001
-	python manage.py export_migrations fmea 0001
-	python manage.py export_migrations accounts 0001
+	python3 manage.py export_migrations contenttypes 0001
+	python3 manage.py export_migrations auth 0001
+	python3 manage.py export_migrations admin 0001
+	python3 manage.py export_migrations sessions 0001
+	python3 manage.py export_migrations two_factor 0001
+	python3 manage.py export_migrations otp_static 0001
+	python3 manage.py export_migrations otp_totp 0001
+	python3 manage.py export_migrations tools 0001
+	python3 manage.py export_migrations fmea 0001
+	python3 manage.py export_migrations accounts 0001
 
 languages:
-	# Extracts strings to `.pot` file which should be translated
-  # Note that the creation of `.po` files is delegated to another tool (Weblate)
-	python manage.py makemessages -i "venv/*" -i "build/*" -i "octopoes/*" -i "node_modules/*" --verbosity 2 --add-location file -a --keep-pot
+# Extracts strings to `.pot` file which should be translated
+# Note that the creation of `.po` files is delegated to another tool (Weblate)
+	python3 manage.py makemessages -i "venv/*" -i "build/*" -i "octopoes/*" -i "node_modules/*" --verbosity 2 --add-location file -a --keep-pot
 
 lang: languages
 
@@ -117,7 +117,7 @@ test-rf: # Usage: `make test-rf headless=<bool>`
 	pip3 install robotframework robotframework-browser robotframework-debuglibrary robotframework-otp robotframework-postgresqldb
 	rfbrowser init
 
-	# Test fresh login while creating all users and running report generation as the superadmin
+# Test fresh login while creating all users and running report generation as the superadmin
 	docker exec -it nl-kat-coordination_rocky_1 make test-prepare
 	robot -d tests/robot/results-complete_onboarding -v headless:$(headless) tests/robot/complete_onboarding
 
