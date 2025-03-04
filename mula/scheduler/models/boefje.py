@@ -5,12 +5,18 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 
+class RateLimit(BaseModel):
+    identifier: str
+    interval: str
+
+
 class Boefje(BaseModel):
     """Boefje representation."""
 
     id: str
-    name: str | None = Field(default=None)
-    version: str | None = Field(default=None)
+    name: str | None = None
+    version: str | None = None
+    rate_limit: RateLimit | None = None
 
 
 class BoefjeMeta(BaseModel):
