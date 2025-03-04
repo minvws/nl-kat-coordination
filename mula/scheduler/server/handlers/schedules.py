@@ -6,7 +6,7 @@ import fastapi
 import structlog
 from fastapi import Body
 
-from scheduler import context, models, schedulers, storage
+from scheduler import context, schedulers, storage
 from scheduler.server import serializers, utils
 from scheduler.server.errors import BadRequestError, ConflictError, NotFoundError, ValidationError
 
@@ -31,7 +31,7 @@ class ScheduleAPI:
             path="/schedules",
             endpoint=self.create,
             methods=["POST"],
-            response_model=models.Schedule,
+            response_model=serializers.Schedule,
             status_code=201,
             description="Create a schedule",
         )
@@ -40,7 +40,7 @@ class ScheduleAPI:
             path="/schedules/{schedule_id}",
             endpoint=self.get,
             methods=["GET"],
-            response_model=models.Schedule,
+            response_model=serializers.Schedule,
             status_code=200,
             description="Get a schedule",
         )
@@ -49,7 +49,7 @@ class ScheduleAPI:
             path="/schedules/{schedule_id}",
             endpoint=self.patch,
             methods=["PATCH"],
-            response_model=models.Schedule,
+            response_model=serializers.Schedule,
             response_model_exclude_unset=True,
             status_code=200,
             description="Update a schedule",
@@ -110,7 +110,7 @@ class ScheduleAPI:
             raise BadRequestError("Either deadline_at or schedule must be provided")
 
         try:
-            new_schedule = models.Schedule(**schedule.model_dump())
+            new_schedule = serializers.Schedule(**schedule.model_dump())
         except ValueError as exc:
             raise ValidationError(exc)
 
@@ -156,7 +156,7 @@ class ScheduleAPI:
 
         # Validate schedule, model_copy() does not validate the model
         try:
-            models.Schedule(**updated_schedule.dict())
+            serializers.Schedule(**updated_schedule.dict())
         except ValueError:
             raise ValidationError("validation error")
 

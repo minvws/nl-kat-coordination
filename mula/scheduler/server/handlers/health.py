@@ -1,10 +1,12 @@
+from re import X
 from typing import Any
 
 import fastapi
 import structlog
 from fastapi import status
 
-from scheduler import context, models, version
+from scheduler import context, version
+from scheduler.server import serializers
 
 
 class HealthAPI:
@@ -17,13 +19,13 @@ class HealthAPI:
             path="/health",
             endpoint=self.health,
             methods=["GET"],
-            response_model=models.ServiceHealth,
+            response_model=serializers.ServiceHealth,
             status_code=status.HTTP_200_OK,
             description="Health check endpoint",
         )
 
-    def health(self, externals: bool = False) -> Any:
-        response = models.ServiceHealth(service="scheduler", healthy=True, version=version.__version__)
+    def health(self, externals: bool = False) -> serializers.ServiceHealth:
+        response = serializers.ServiceHealth(service="scheduler", healthy=True, version=version.__version__)
 
         if externals:
             for service in self.ctx.services.__dict__.values():

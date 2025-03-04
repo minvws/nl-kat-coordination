@@ -6,7 +6,7 @@ import fastapi
 import structlog
 from fastapi import status
 
-from scheduler import context, models, storage
+from scheduler import context, storage
 from scheduler.server import serializers, utils
 from scheduler.server.errors import BadRequestError, NotFoundError
 
@@ -38,7 +38,7 @@ class TaskAPI:
             path="/tasks/{task_id}",
             endpoint=self.get,
             methods=["GET"],
-            response_model=models.Task,
+            response_model=serializers.Task,
             status_code=status.HTTP_200_OK,
             description="Get a task",
         )
@@ -47,7 +47,7 @@ class TaskAPI:
             path="/tasks/{task_id}",
             endpoint=self.patch,
             methods=["PATCH"],
-            response_model=models.Task,
+            response_model=serializers.Task,
             response_model_exclude_unset=True,
             status_code=status.HTTP_200_OK,
             description="Update a task",

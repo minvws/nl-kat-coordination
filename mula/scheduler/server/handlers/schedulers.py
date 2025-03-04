@@ -4,7 +4,7 @@ import fastapi
 import structlog
 from fastapi import status
 
-from scheduler import context, models, schedulers, storage
+from scheduler import context, schedulers, storage
 from scheduler.schedulers.queue import NotAllowedError, QueueFullError
 from scheduler.server import serializers, utils
 from scheduler.server.errors import BadRequestError, ConflictError, NotFoundError, TooManyRequestsError
@@ -39,7 +39,7 @@ class SchedulerAPI:
             path="/schedulers/{scheduler_id}/push",
             endpoint=self.push,
             methods=["POST"],
-            response_model=models.Task,
+            response_model=serializers.Task,
             status_code=status.HTTP_201_CREATED,
             description="Push a task to a scheduler",
         )
@@ -77,7 +77,7 @@ class SchedulerAPI:
 
         # Update status for popped items
         self.ctx.datastores.pq_store.bulk_update_status(
-            scheduler_id, [item.id for item in results], models.TaskStatus.DISPATCHED
+            scheduler_id, [item.id for item in results], serializers.TaskStatus.DISPATCHED
         )
 
         return utils.paginate(request, results, count, offset, limit)
@@ -95,7 +95,7 @@ class SchedulerAPI:
             item.scheduler_id = scheduler_id
 
         # Load default values
-        new_item = models.Task(**item.model_dump(exclude_unset=True))
+        new_item = serializers.Task(**item.model_dump(exclude_unset=True))
 
         try:
             pushed_item = s.push_item_to_queue(new_item)
