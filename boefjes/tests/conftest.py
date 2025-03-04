@@ -36,7 +36,7 @@ from boefjes.sql.organisation_storage import SQLOrganisationStorage, get_organis
 from boefjes.sql.plugin_storage import SQLPluginStorage
 from boefjes.storage.interfaces import OrganisationNotFound
 from boefjes.storage.memory import ConfigStorageMemory, OrganisationStorageMemory, PluginStorageMemory
-from boefjes.worker.interfaces import Handler, Queue, SchedulerClientInterface, Task, TaskStatus
+from boefjes.worker.interfaces import Handler, SchedulerClientInterface, Task, TaskStatus
 from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
