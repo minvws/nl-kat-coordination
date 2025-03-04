@@ -4,6 +4,8 @@ from urllib import parse
 
 from account.models import KATUser
 from django import template
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import OOI, Reference, ScanLevel
 from octopoes.models.ooi.findings import Finding, FindingType
@@ -104,4 +106,7 @@ def ooi_type(reference_string: str) -> str:
 
 @register.filter
 def get_user_full_name(ooi: OOI) -> str:
-    return KATUser.objects.get(id=ooi.user_id).get_full_name()
+    try:
+        return KATUser.objects.get(id=ooi.user_id).get_full_name()
+    except ObjectDoesNotExist:
+        return _("Unknown user")
