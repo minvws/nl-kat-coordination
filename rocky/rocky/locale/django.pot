@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-05 08:40+0000\n"
+"POT-Creation-Date: 2025-03-05 14:05+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4097,6 +4097,10 @@ msgid ""
 "                    dataset, this live set results in %(total_oois)s "
 "objects.\n"
 "                "
+msgstr ""
+
+#: reports/templates/partials/report_types_selection.html
+msgid "No filters applied"
 msgstr ""
 
 #: reports/templates/partials/report_types_selection.html
