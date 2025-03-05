@@ -2,7 +2,7 @@ import enum
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 
 
 class TaskStatus(str, enum.Enum):
@@ -29,10 +29,7 @@ class TaskStatus(str, enum.Enum):
     CANCELLED = "cancelled"
 
 
-# NOTE: model added for support of partial updates
 class Task(BaseModel):
-    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
-
     id: uuid.UUID | None = None
     scheduler_id: str | None = None
     schedule_id: uuid.UUID | None = None
@@ -47,8 +44,6 @@ class Task(BaseModel):
 
 
 class TaskPatch(BaseModel):
-    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
-
     id: uuid.UUID | None = None
     scheduler_id: str | None = None
     schedule_id: uuid.UUID | None = None
