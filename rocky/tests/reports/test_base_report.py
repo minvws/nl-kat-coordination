@@ -52,4 +52,4 @@ def test_aggregate_report_choose_report_types(
 
     assert response.status_code == 200
     total_objects = str(len(listed_hostnames))
-    assertContains(response, f"You have selected {total_objects} objects in previous step.")
+    assertContains(response, f"You have selected {total_objects} objects in the previous step.")

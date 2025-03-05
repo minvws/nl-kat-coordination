@@ -39,7 +39,7 @@ def test_multi_report_select_oois(
 
     total_objects = str(len(oois_selection))
 
-    assertContains(response, f"You have selected {total_objects} objects in previous step.")
+    assertContains(response, f"You have selected {total_objects} objects in the previous step.")
 
 
 def test_multi_report_change_ooi_selection(

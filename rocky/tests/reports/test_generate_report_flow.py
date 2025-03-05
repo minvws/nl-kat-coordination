@@ -36,7 +36,7 @@ def test_select_all_oois_post_to_select_report_types(
 
     assert response.status_code == 200
     total_objects = str(len(listed_hostnames))
-    assertContains(response, f"You have selected {total_objects} objects in previous step.")
+    assertContains(response, f"You have selected {total_objects} objects in the previous step.")
 
 
 def test_select_some_oois_post_to_select_report_types(
@@ -68,7 +68,7 @@ def test_select_some_oois_post_to_select_report_types(
 
     total_objects = str(len(selection))
 
-    assertContains(response, f"You have selected {total_objects} objects in previous step.")
+    assertContains(response, f"You have selected {total_objects} objects in the previous step.")
 
 
 def test_change_ooi_selection_for_none_selection(
