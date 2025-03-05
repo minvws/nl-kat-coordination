@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-05 14:05+0000\n"
+"POT-Creation-Date: 2025-03-05 14:32+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3877,10 +3877,8 @@ msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
 msgid ""
-"\n"
-"                Based on the current dataset, your selected filters result "
-"in the following objects.\n"
-"            "
+"Based on the current dataset, your selected filters result in the following "
+"objects."
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
@@ -3931,13 +3929,9 @@ msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
 msgid ""
-"\n"
-"                                Reports matching the selected filters will "
-"be empty at this moment in time.\n"
-"                                Future reports may contain data. It is still "
-"possible to generate the\n"
-"                                (potentially empty) report.\n"
-"                            "
+"Reports matching the selected filters will be empty at this moment in time. "
+"Future reports may contain data. It is still possible to generate the "
+"(potentially empty) report."
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
@@ -4091,12 +4085,8 @@ msgstr[1] ""
 #: reports/templates/partials/report_types_selection.html
 #, python-format
 msgid ""
-"\n"
-"                    You have selected a live set in the previous step. Based "
-"on the current\n"
-"                    dataset, this live set results in %(total_oois)s "
-"objects.\n"
-"                "
+"You have selected a live set in the previous step. Based on the current "
+"dataset, this live set results in %(total_oois)s objects."
 msgstr ""
 
 #: reports/templates/partials/report_types_selection.html

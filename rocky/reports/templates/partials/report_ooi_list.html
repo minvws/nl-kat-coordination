@@ -38,7 +38,7 @@
             </div>
         {% endif %}
         <p>
-            {% blocktranslate %}
+            {% blocktranslate trimmed %}
                 Based on the current dataset, your selected filters result in the following objects.
             {% endblocktranslate %}
         </p>
@@ -120,7 +120,7 @@
                     <div class="explanation">
                         <div>
                             <span>{% translate "Report(s) may be empty due to no objects in the selected filters." %}</span>
-                            {% blocktranslate %}
+                            {% blocktranslate trimmed %}
                                 Reports matching the selected filters will be empty at this moment in time.
                                 Future reports may contain data. It is still possible to generate the
                                 (potentially empty) report.
