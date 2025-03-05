@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-05 15:04+0000\n"
+"POT-Creation-Date: 2025-03-05 15:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -368,7 +368,7 @@ msgstr ""
 
 #: account/templates/account_detail.html
 msgid ""
-"You don't have any clearance to scan objects.<br> Get in contact with the "
+"You don't have any clearance to scan objects. <br> Get in contact with the "
 "admin to give you the necessary clearance level."
 msgstr ""
 
@@ -2114,18 +2114,18 @@ msgstr ""
 #, python-format
 msgid ""
 "Unfortunately you cannot continue the onboarding. </br> Your administrator "
-"has trusted you with a clearance level of <strong>L%(tcl)s</strong>.</br> "
+"has trusted you with a clearance level of <strong>L%(tcl)s</strong>. </br> "
 "You need at least a clearance level of "
 "<strong>L%(dns_report_least_clearance_level)s</strong> to scan "
-"<strong>%(ooi)s</strong></br> Contact your administrator to receive a higher "
-"clearance."
+"<strong>%(ooi)s</strong> </br> Contact your administrator to receive a "
+"higher clearance."
 msgstr ""
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #, python-format
 msgid ""
 "Your administrator has trusted you with a clearance level of "
-"<strong>L%(tcl)s</strong>.</br> You must first accept this clearance level "
+"<strong>L%(tcl)s</strong>. </br> You must first accept this clearance level "
 "to continue."
 msgstr ""
 
@@ -2133,7 +2133,7 @@ msgstr ""
 #, python-format
 msgid ""
 "Your administrator has <strong>trusted</strong> you with a clearance level "
-"of <strong>L%(tcl)s</strong>.</br> You have also <strong>acknowledged</"
+"of <strong>L%(tcl)s</strong>. </br> You have also <strong>acknowledged</"
 "strong> to use this clearance level of <strong>L%(acl)s</strong>."
 msgstr ""
 
