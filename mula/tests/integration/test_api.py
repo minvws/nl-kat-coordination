@@ -7,10 +7,10 @@ from unittest import mock
 from urllib.parse import quote
 
 from fastapi.testclient import TestClient
+
 from scheduler import config, models, server, storage, utils
 from scheduler.server import serializers
 from scheduler.storage import stores
-
 from tests.factories import OrganisationFactory
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
@@ -98,6 +98,15 @@ class APISchedulerEndpointTestCase(APITemplateTestCase):
         response_get_schedule = self.client.get(f"/schedules/{response_post.json().get('schedule_id')}")
         self.assertEqual(200, response_get_schedule.status_code)
         self.assertEqual(response_post.json().get("schedule_id"), response_get_schedule.json().get("id"))
+
+    def test_push_queue_malformed_item(self):
+        item = create_task_in(1, self.organisation.id)
+        item_payload = json.loads(item)
+        item_payload["extra_field"] = "extra"
+
+        response = self.client.post(f"/schedulers/{self.scheduler.scheduler_id}/push", json=item_payload)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {"detail": "Bad request error occurred: malformed item"})
 
     def test_push_incorrect_item_type(self):
         response = self.client.post(
@@ -213,26 +222,26 @@ class APISchedulerEndpointTestCase(APITemplateTestCase):
 
         # Add one task to the queue
         initial_item = create_task_in(1, self.organisation.id)
-        response = self.client.post(f"/schedulers/{self.scheduler.scheduler_id}/push", data=initial_item)
-        self.assertEqual(response.status_code, 201)
+        response_first = self.client.post(f"/schedulers/{self.scheduler.scheduler_id}/push", data=initial_item)
+        self.assertEqual(response_first.status_code, 201)
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Update the item
-        updated_item = serializers.Task(**response.json())
+        updated_item = serializers.Task(**response_first.json())
         updated_item.data["name"] = "updated-name"
 
         # Try to update the item through the api
-        response = self.client.post(
+        response_second = self.client.post(
             f"/schedulers/{self.scheduler.scheduler_id}/push", data=updated_item.model_dump_json()
         )
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response_second.status_code, 201)
 
         # The queue should have one item
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Check if the item on the queue is the updated item
-        self.assertEqual(response.json().get("data").get("id"), str(self.scheduler.queue.peek(0).data.get("id")))
-        self.assertEqual(response.json().get("data").get("name"), "updated-name")
+        self.assertEqual(response_second.json().get("data").get("id"), str(self.scheduler.queue.peek(0).data.get("id")))
+        self.assertEqual(response_second.json().get("data").get("name"), "updated-name")
 
     def test_push_priority_updates_not_allowed(self):
         # Set queue to no allow updates

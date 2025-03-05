@@ -2,7 +2,7 @@ import enum
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class TaskStatus(str, enum.Enum):
@@ -58,6 +58,9 @@ class TaskPatch(BaseModel):
 
 
 class TaskPush(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: uuid.UUID | None = None
     scheduler_id: str | None = None
     organisation: str
     priority: int | None = None
