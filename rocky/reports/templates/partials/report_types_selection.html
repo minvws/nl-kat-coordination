@@ -29,11 +29,15 @@
                 <div>
                     <strong>{% translate "Applied filters:" %}</strong>
                     <ul>
-                        {% for filter, value in active_filters.items %}
-                            <li>
-                                <strong>{{ filter }}</strong> {{ value }}
-                            </li>
-                        {% endfor %}
+                        {% if active_filters %}
+                            {% for filter, value in active_filters.items %}
+                                <li>
+                                    <strong>{{ filter }}</strong> {{ value }}
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li>{% translate "No filters applied" %}</li>
+                        {% endif %}
                     </ul>
                 </div>
             {% else %}

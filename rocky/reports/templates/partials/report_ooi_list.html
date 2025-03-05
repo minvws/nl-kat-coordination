@@ -25,16 +25,18 @@
 
     </div>
     <div>
-        <div>
-            <strong>{% translate "Applied filters:" %}</strong>
-            <ul>
-                {% for filter, value in active_filters.items %}
-                    <li>
-                        <strong>{{ filter }}</strong> {{ value }}
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
+        {% if active_filters %}
+            <div>
+                <strong>{% translate "Applied filters:" %}</strong>
+                <ul>
+                    {% for filter, value in active_filters.items %}
+                        <li>
+                            <strong>{{ filter }}</strong> {{ value }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
         <p>
             {% blocktranslate %}
                 Based on the current dataset, your selected filters result in the following objects.
