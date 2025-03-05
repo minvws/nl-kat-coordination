@@ -7,7 +7,9 @@
 
 {% if scheduled_reports %}
     <p class="de-emphasized">
-        {% blocktranslate with length=scheduled_reports|length total=total_report_schedules %}Showing {{ length }} of {{ total }} schedules{% endblocktranslate %}
+        {% blocktranslate with length=scheduled_reports|length total=total_report_schedules trimmed %}
+            Showing {{ length }} of {{ total }} schedules
+        {% endblocktranslate %}
     </p>
     <div class="horizontal-scroll sticky-column">
         <table>
