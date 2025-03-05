@@ -4,14 +4,17 @@
 {% fill 'header' %}{% translate "Delete the following report(s):" %}{% endfill %}
 {% fill 'content' %}
 <p>
-    {% blocktranslate %}
-      Deleted reports are removed in the view from the moment of deletion. The report can still be accessed on timestamps before the deletion. Only the report is removed from the view, not the data it is based on.
-  {% endblocktranslate %}
+    {% blocktranslate trimmed %}
+        Deleted reports are removed in the view from the moment of deletion.
+        The report can still be accessed on timestamps before the deletion.
+        Only the report is removed from the view, not the data it is based on.
+    {% endblocktranslate %}
 </p>
 <p>
-    {% blocktranslate %}
-      It is still possible to generate a new report for same date. If the report is part of a combined report, it will remain available in the combined report.
-  {% endblocktranslate %}
+    {% blocktranslate trimmed %}
+        It is still possible to generate a new report for same date.
+        If the report is part of a combined report, it will remain available in the combined report.
+    {% endblocktranslate %}
 </p>
 <form id="delete-form" class="inline layout-wide" method="post">
     {% csrf_token %}
