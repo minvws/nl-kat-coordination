@@ -1,6 +1,3 @@
-from re import X
-from typing import Any
-
 import fastapi
 import structlog
 from fastapi import status

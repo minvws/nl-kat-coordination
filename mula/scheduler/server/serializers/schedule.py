@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -6,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class Schedule(BaseModel):
     model_config = ConfigDict(from_attributes=True, validate_assignment=True)
 
-    id: str
+    id: uuid.UUID
     scheduler_id: str
     organisation: str
     hash: str | None

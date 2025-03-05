@@ -1,10 +1,8 @@
-from typing import Any
-
 import fastapi
 import structlog
 from fastapi import status
 
-from scheduler import context, schedulers, storage
+from scheduler import context, models, schedulers, storage
 from scheduler.schedulers.queue import NotAllowedError, QueueFullError
 from scheduler.server import serializers, utils
 from scheduler.server.errors import BadRequestError, ConflictError, NotFoundError, TooManyRequestsError
@@ -56,7 +54,7 @@ class SchedulerAPI:
     def list(self) -> list[serializers.Scheduler]:
         return [serializers.Scheduler(**s.dict()) for s in self.schedulers.values()]
 
-    def get(self, scheduler_id: str) -> Any:
+    def get(self, scheduler_id: str) -> serializers.Scheduler:
         s = self.schedulers.get(scheduler_id)
         if s is None:
             raise NotFoundError(f"Scheduler {scheduler_id} not found")
@@ -82,7 +80,7 @@ class SchedulerAPI:
 
         return utils.paginate(request, results, count, offset, limit)
 
-    def push(self, scheduler_id: str, item: serializers.TaskPush) -> Any:
+    def push(self, scheduler_id: str, item: serializers.TaskPush) -> serializers.Task:
         s = self.schedulers.get(scheduler_id)
         if s is None:
             raise NotFoundError(f"Scheduler {scheduler_id} not found")
@@ -95,7 +93,7 @@ class SchedulerAPI:
             item.scheduler_id = scheduler_id
 
         # Load default values
-        new_item = serializers.Task(**item.model_dump(exclude_unset=True))
+        new_item = models.Task(**item.model_dump(exclude_unset=True))
 
         try:
             pushed_item = s.push_item_to_queue(new_item)
