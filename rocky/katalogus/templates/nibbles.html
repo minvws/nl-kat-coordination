@@ -28,12 +28,6 @@
             {% include "partials/katalogus_toolbar.html" %}
 
             <div class="content">
-                <form method="post"
-                      class="inline"
-                      action="{% url 'nibbles_register' organization_code=organization.code %}?view_type={{ view_type }}">
-                    {% csrf_token %}
-                    <button type="submit" class="button ghost">{% translate "Register" %}</button>
-                </form>
                 <ul>
                     {% for nibble in object_list %}
                         <li>
