@@ -15,7 +15,7 @@ from .models import PluginType, Boefje, Normalizer
 
 logger = structlog.get_logger(__name__)
 
-BOEFJES_DIR = Path(__file__).parent
+BOEFJES_DIR = Path(__file__).parent.parent / "plugins"
 BOEFJE_DEFINITION_FILE = "boefje.json"
 SCHEMA_FILE = "schema.json"
 NORMALIZER_DEFINITION_FILE = "normalizer.json"
