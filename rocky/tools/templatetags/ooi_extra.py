@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Any
 from urllib import parse
 
+from account.models import KATUser
 from django import template
 
 from octopoes.models import OOI, Reference, ScanLevel
@@ -103,7 +104,7 @@ def ooi_type(reference_string: str) -> str:
 
 
 @register.filter
-def get_date(date_str: str) -> datetime:
+def get_datetime(date_str: str) -> datetime:
     return datetime.fromisoformat(date_str)
 
 
@@ -111,3 +112,7 @@ def get_date(date_str: str) -> datetime:
 def get_first_seen(occurrences: dict) -> datetime:
     first_seen = min(occurrences, key=lambda occurrence: occurrence["first_seen"])["first_seen"]
     return datetime.fromisoformat(first_seen)
+
+
+def get_user_full_name(ooi: OOI) -> str:
+    return KATUser.objects.get(id=ooi.user_id).get_full_name()

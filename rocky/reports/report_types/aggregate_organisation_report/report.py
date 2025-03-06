@@ -65,7 +65,7 @@ class AggregateOrganisationReport(AggregateReport):
         # report_id => input_ooi => {data}
         # to
         # input_ooi => report_id => {data}
-        data: dict[str, dict[str, Any]] = {}
+        data: dict[str, Any] = {}
 
         for report_id, report_datas in report_data.items():
             for input_ooi, item in report_datas.items():

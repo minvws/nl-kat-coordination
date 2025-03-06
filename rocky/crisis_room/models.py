@@ -21,7 +21,7 @@ class DashboardData(models.Model):
     dashboard = models.ForeignKey(Dashboard, on_delete=models.SET_NULL, null=True)
     recipe = models.CharField(blank=False, max_length=126)
     template = models.CharField(blank=True, max_length=126, default="findings_report/report.html")
-    position = models.IntegerField(
+    position = models.PositiveSmallIntegerField(
         blank=True,
         default=1,
         validators=[MinValueValidator(1), MaxValueValidator(16)],
