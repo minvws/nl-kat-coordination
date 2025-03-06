@@ -1,4 +1,3 @@
-import base64
 import multiprocessing
 import uuid
 from datetime import datetime, timezone
@@ -15,9 +14,9 @@ from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient
 from boefjes.config import settings
 from boefjes.dependencies.plugins import get_plugin_service
+from boefjes.worker.interfaces import BoefjeOutput, Queue, StatusEnum, Task, TaskStatus
 from boefjes.worker.job_models import BoefjeMeta
 from boefjes.worker.repository import _default_mime_types
-from boefjes.worker.interfaces import TaskStatus, StatusEnum, BoefjeOutput, Queue, Task
 
 app = FastAPI(title="Boefje API")
 logger = structlog.get_logger(__name__)
@@ -124,6 +123,7 @@ def get_task(task_id, scheduler_client):
 
 # The "scheduler proxy" endpoints
 
+
 @app.get("/api/v0/scheduler/queues", response_model=list[Queue], tags=["scheduler"])
 def get_queues(scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client)) -> list[Queue]:
     return scheduler_client.get_queues()
@@ -135,12 +135,16 @@ def pop_task(queue_id: str, scheduler_client: SchedulerAPIClient = Depends(get_s
 
 
 @app.post("/api/v0/scheduler/queues/{queue_id}/push", tags=["scheduler"])
-def push_item(queue_id: str, p_item: Task, scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client)) -> None:
+def push_item(
+    queue_id: str, p_item: Task, scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client)
+) -> None:
     return scheduler_client.push_item(p_item)
 
 
 @app.patch("/api/v0/scheduler/tasks/{task_id}", tags=["scheduler"])
-def patch_task(task_id: uuid.UUID, status: TaskStatus, scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client)) -> None:
+def patch_task(
+    task_id: uuid.UUID, status: TaskStatus, scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client)
+) -> None:
     return scheduler_client.patch_task(task_id, status)
 
 

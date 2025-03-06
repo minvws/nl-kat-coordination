@@ -6,9 +6,9 @@ import structlog
 from sqlalchemy.orm import sessionmaker
 
 from boefjes.clients.scheduler_client import SchedulerAPIClient
-from boefjes.config import settings, Settings
+from boefjes.config import Settings, settings
 from boefjes.dependencies.plugins import PluginService
-from boefjes.job_handler import CompositeBoefjeHandler, bytes_api_client, DockerBoefjeHandler, NormalizerHandler
+from boefjes.job_handler import CompositeBoefjeHandler, DockerBoefjeHandler, NormalizerHandler, bytes_api_client
 from boefjes.local.runner import LocalNormalizerJobRunner
 from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.db import get_engine
@@ -16,7 +16,7 @@ from boefjes.sql.plugin_storage import create_plugin_storage
 from boefjes.worker.boefje_handler import BoefjeHandler
 from boefjes.worker.boefje_runner import LocalBoefjeJobRunner
 from boefjes.worker.interfaces import Handler
-from boefjes.worker.manager import WorkerManager, SchedulerWorkerManager
+from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
 from boefjes.worker.repository import get_local_repository
 
 with settings.log_cfg.open() as f:

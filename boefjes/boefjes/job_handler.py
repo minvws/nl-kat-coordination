@@ -10,10 +10,10 @@ from httpx import HTTPError
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient, get_octopoes_api_connector
 from boefjes.config import settings
-from boefjes.worker.boefje_handler import BoefjeHandler
-from boefjes.worker.job_models import BoefjeMeta
 from boefjes.normalizer_interfaces import NormalizerJobRunner
+from boefjes.worker.boefje_handler import BoefjeHandler
 from boefjes.worker.interfaces import Handler, Task, TaskStatus
+from boefjes.worker.job_models import BoefjeMeta
 from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference, ScanLevel

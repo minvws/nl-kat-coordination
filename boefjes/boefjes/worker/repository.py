@@ -11,7 +11,7 @@ from typing import Protocol
 import structlog
 from jsonschema.exceptions import SchemaError
 
-from .models import PluginType, Boefje, Normalizer
+from .models import Boefje, Normalizer, PluginType
 
 logger = structlog.get_logger(__name__)
 

@@ -2,8 +2,6 @@ from collections.abc import Iterable
 
 import structlog
 
-from boefjes.worker.job_models import InvalidReturnValueNormalizer, NormalizerMeta, ObservationsWithoutInputOOI
-from boefjes.worker.repository import LocalPluginRepository
 from boefjes.normalizer_interfaces import NormalizerJobRunner
 from boefjes.normalizer_models import (
     NormalizerAffirmation,
@@ -13,6 +11,8 @@ from boefjes.normalizer_models import (
     NormalizerResults,
 )
 from boefjes.worker.interfaces import JobRuntimeError
+from boefjes.worker.job_models import InvalidReturnValueNormalizer, NormalizerMeta, ObservationsWithoutInputOOI
+from boefjes.worker.repository import LocalPluginRepository
 from octopoes.models import OOI, DeclaredScanProfile
 
 logger = structlog.get_logger(__name__)

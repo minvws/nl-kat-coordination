@@ -8,10 +8,9 @@ from pydantic import ValidationError
 
 from boefjes.config import Settings
 from boefjes.job_handler import NormalizerHandler
-from boefjes.worker.job_models import NormalizerMeta
 from boefjes.worker.interfaces import Task, TaskStatus
+from boefjes.worker.job_models import NormalizerMeta
 from octopoes.models import DeclaredScanProfile
-
 from tests.loading import get_dummy_data
 
 RAW_DATA = json.dumps(

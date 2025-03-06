@@ -1,7 +1,7 @@
 import docker
 
-from boefjes.worker.job_models import BoefjeMeta
 from boefjes.plugins.helpers import get_file_from_container
+from boefjes.worker.job_models import BoefjeMeta
 
 PLAYWRIGHT_IMAGE = "mcr.microsoft.com/playwright:latest"
 BROWSER = "chromium"

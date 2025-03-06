@@ -1,24 +1,24 @@
 import datetime
 import os
 import uuid
-from typing import Any
 from functools import cache
+from typing import Any
 
 import httpx
 import structlog
 from httpx import Client, HTTPError, HTTPTransport, Response
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
-from pydantic import TypeAdapter, BaseModel
+from pydantic import BaseModel, TypeAdapter
 
 from boefjes.config import settings
 from boefjes.dependencies.plugins import PluginService
-from boefjes.worker.interfaces import Queue, Task, TaskStatus
 from boefjes.storage.interfaces import SettingsNotConformingToSchema
+from boefjes.worker.interfaces import Queue, Task, TaskStatus
+from boefjes.worker.job_models import BoefjeMeta
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
-from boefjes.worker.job_models import BoefjeMeta
 
 logger = structlog.get_logger(__name__)
 
@@ -44,7 +44,9 @@ class SchedulerClientInterface:
 
 class SchedulerAPIClient(SchedulerClientInterface):
     def __init__(self, plugin_service: PluginService, base_url: str):
-        self._session = Client(base_url=base_url, transport=HTTPTransport(retries=6), timeout=settings.outgoing_request_timeout)
+        self._session = Client(
+            base_url=base_url, transport=HTTPTransport(retries=6), timeout=settings.outgoing_request_timeout
+        )
         self.plugin_service = plugin_service
 
     @staticmethod

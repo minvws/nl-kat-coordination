@@ -6,8 +6,8 @@ import docker
 from docker.errors import APIError
 from requests.exceptions import RequestException
 
-from boefjes.worker.job_models import BoefjeMeta
 from boefjes.plugins.helpers import get_file_from_container
+from boefjes.worker.job_models import BoefjeMeta
 
 SSL_TEST_IMAGE = "drwetter/testssl.sh:3.2"
 

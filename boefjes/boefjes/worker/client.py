@@ -1,10 +1,10 @@
 import uuid
 
-from httpx import HTTPTransport, Client, Response
+from httpx import Client, HTTPTransport, Response
 from pydantic import TypeAdapter
 
 # A deliberate relative import to make this module self-contained
-from .interfaces import Queue, Task, TaskStatus, SchedulerClientInterface, BoefjeStorageInterface, BoefjeOutput
+from .interfaces import BoefjeOutput, BoefjeStorageInterface, Queue, SchedulerClientInterface, Task, TaskStatus
 
 
 class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):

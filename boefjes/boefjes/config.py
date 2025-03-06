@@ -14,6 +14,7 @@ BASE_DIR: Path = Path(__file__).parent.resolve()
 if os.getenv("DOCS"):
     BASE_DIR = Path("../")
 
+
 class EncryptionMiddleware(Enum):
     IDENTITY = "IDENTITY"
     NACL_SEALBOX = "NACL_SEALBOX"

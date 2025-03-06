@@ -6,11 +6,11 @@ from pathlib import Path
 import click
 import structlog
 
-from .client import BoefjeAPIClient
 from .boefje_handler import BoefjeHandler
 from .boefje_runner import LocalBoefjeJobRunner
+from .client import BoefjeAPIClient
+from .manager import SchedulerWorkerManager, WorkerManager
 from .repository import get_local_repository
-from .manager import WorkerManager, SchedulerWorkerManager
 
 logging_format = os.getenv("LOGGING_FORMAT", "text")
 log_cfg = Path(os.getenv("LOG_CFG", "logging.json"))

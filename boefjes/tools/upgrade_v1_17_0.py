@@ -17,13 +17,13 @@ from boefjes.api import get_bytes_client
 from boefjes.clients.scheduler_client import get_octopoes_api_connector
 from boefjes.config import settings
 from boefjes.dependencies.plugins import PluginService
-from boefjes.worker.repository import get_local_repository
-from boefjes.worker.models import Boefje
 from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.db import get_engine
 from boefjes.sql.organisation_storage import create_organisation_storage
 from boefjes.sql.plugin_storage import create_plugin_storage
 from boefjes.storage.interfaces import OrganisationStorage
+from boefjes.worker.models import Boefje
+from boefjes.worker.repository import get_local_repository
 from octopoes.models.origin import OriginType
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))

@@ -2,9 +2,9 @@ import os
 
 import structlog
 
-from .repository import LocalPluginRepository
 from .interfaces import JobRuntimeError
 from .job_models import BoefjeMeta
+from .repository import LocalPluginRepository
 
 logger = structlog.get_logger(__name__)
 

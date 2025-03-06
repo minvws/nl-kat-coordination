@@ -1,16 +1,14 @@
 import typing
 import uuid
-from base64 import b64encode
 from collections.abc import Callable
 from functools import wraps
 from typing import Any
-from uuid import UUID
 
 import structlog
 from httpx import Client, HTTPStatusError, HTTPTransport, Response
 
 from boefjes.config import settings
-from boefjes.worker.interfaces import BoefjeStorageInterface, BoefjeOutput
+from boefjes.worker.interfaces import BoefjeOutput, BoefjeStorageInterface
 from boefjes.worker.job_models import BoefjeMeta, NormalizerMeta, RawDataMeta
 
 BYTES_API_CLIENT_VERSION = "0.3"

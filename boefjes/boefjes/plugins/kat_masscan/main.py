@@ -3,8 +3,8 @@ import os
 
 import docker
 
-from boefjes.worker.job_models import BoefjeMeta
 from boefjes.plugins.helpers import get_file_from_container
+from boefjes.worker.job_models import BoefjeMeta
 
 IMAGE = "ghcr.io/minvws/nl-kat-masscan-build-image:latest"
 FILE_PATH = "/tmp/output.json"  # noqa: S108

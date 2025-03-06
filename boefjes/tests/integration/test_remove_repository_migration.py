@@ -6,9 +6,9 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session, sessionmaker
 
 from boefjes.config import settings
-from boefjes.worker.models import Organisation
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
+from boefjes.worker.models import Organisation
 
 pytestmark = pytest.mark.skipif(os.environ.get("CI") != "1", reason="Needs a CI database.")
 

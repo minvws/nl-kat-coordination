@@ -17,10 +17,18 @@ from boefjes.clients.scheduler_client import PaginatedTasksResponse
 from boefjes.config import settings
 from boefjes.dependencies.plugins import PluginService, get_plugin_service
 from boefjes.job_handler import bytes_api_client
-from boefjes.worker.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.katalogus.root import app
 from boefjes.local.runner import LocalNormalizerJobRunner
+from boefjes.sql.config_storage import SQLConfigStorage, create_encrypter
+from boefjes.sql.db import SQL_BASE, get_engine
+from boefjes.sql.organisation_storage import SQLOrganisationStorage, get_organisations_store
+from boefjes.sql.plugin_storage import SQLPluginStorage
+from boefjes.storage.interfaces import OrganisationNotFound
+from boefjes.storage.memory import ConfigStorageMemory, OrganisationStorageMemory, PluginStorageMemory
 from boefjes.worker.boefje_runner import LocalBoefjeJobRunner
+from boefjes.worker.interfaces import Handler, SchedulerClientInterface, Task, TaskStatus
+from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
+from boefjes.worker.models import Organisation
 from boefjes.worker.repository import (
     LocalPluginRepository,
     _cached_resolve_boefjes,
@@ -29,15 +37,6 @@ from boefjes.worker.repository import (
     get_local_repository,
     get_normalizer_resource,
 )
-from boefjes.worker.models import Organisation
-from boefjes.sql.config_storage import SQLConfigStorage, create_encrypter
-from boefjes.sql.db import SQL_BASE, get_engine
-from boefjes.sql.organisation_storage import SQLOrganisationStorage, get_organisations_store
-from boefjes.sql.plugin_storage import SQLPluginStorage
-from boefjes.storage.interfaces import OrganisationNotFound
-from boefjes.storage.memory import ConfigStorageMemory, OrganisationStorageMemory, PluginStorageMemory
-from boefjes.worker.interfaces import Handler, SchedulerClientInterface, Task, TaskStatus
-from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI

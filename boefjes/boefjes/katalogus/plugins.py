@@ -15,9 +15,9 @@ from boefjes.dependencies.plugins import (
     get_plugins_filter_parameters,
 )
 from boefjes.sql.db_models import RunOn
-from boefjes.worker.models import FilterParameters, PaginationParameters, PluginType
 from boefjes.sql.plugin_storage import get_plugin_storage
 from boefjes.storage.interfaces import DuplicatePlugin, IntegrityError, NotAllowed, PluginStorage
+from boefjes.worker.models import FilterParameters, PaginationParameters, PluginType
 
 router = APIRouter(prefix="/organisations/{organisation_id}", tags=["plugins"])
 

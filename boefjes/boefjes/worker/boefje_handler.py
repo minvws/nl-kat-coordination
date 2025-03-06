@@ -1,12 +1,11 @@
 import traceback
 from base64 import b64encode
-from datetime import datetime, timezone
 
 import structlog
 
-from .interfaces import Handler, Task, BoefjeStorageInterface, File, StatusEnum, BoefjeOutput
-from .job_models import BoefjeMeta
 from .boefje_runner import LocalBoefjeJobRunner
+from .interfaces import BoefjeOutput, BoefjeStorageInterface, File, Handler, StatusEnum, Task
+from .job_models import BoefjeMeta
 
 logger = structlog.get_logger(__name__)
 
@@ -58,10 +57,14 @@ class BoefjeHandler(Handler):
                     else:
                         valid_mimetypes.add(mimetype)
 
-                files.append(File(
-                    content=(b64encode(output) if isinstance(output, bytes) else b64encode(output.encode())).decode(),
-                    tags=valid_mimetypes,  # default mime-types are added through the API
-                ))
+                files.append(
+                    File(
+                        content=(
+                            b64encode(output) if isinstance(output, bytes) else b64encode(output.encode())
+                        ).decode(),
+                        tags=valid_mimetypes,  # default mime-types are added through the API
+                    )
+                )
 
             boefje_output = BoefjeOutput(status=StatusEnum.FAILED if failed else StatusEnum.COMPLETED, files=files)
             raw_file_ids = self.boefje_storage.save_raws(boefje_meta.id, boefje_output)
