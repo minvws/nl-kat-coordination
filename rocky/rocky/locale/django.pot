@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-04 14:40+0000\n"
+"POT-Creation-Date: 2025-03-05 14:32+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -812,7 +812,6 @@ msgid "Selected objects"
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
-#: reports/templates/partials/report_ooi_list.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/summary/ooi_selection.html
 #: rocky/templates/oois/ooi_list.html
@@ -1977,7 +1976,6 @@ msgid ""
 msgstr ""
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
-#: reports/templates/partials/report_ooi_list.html
 msgid "Create object"
 msgstr ""
 
@@ -3745,11 +3743,8 @@ msgid "Multi Report"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-#, python-format
-msgid "Select object (%(total_oois)s)"
-msgid_plural "Select objects (%(total_oois)s)"
-msgstr[0] ""
-msgstr[1] ""
+msgid "Object selection"
+msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
 msgid ""
@@ -3770,16 +3765,14 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Continue with live set"
+#: reports/templates/partials/report_types_selection.html
+msgid "Applied filters:"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-#: reports/templates/summary/report_asset_overview.html
-msgid "No objects found."
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
-msgid "Go to the object page"
+msgid ""
+"Based on the current dataset, your selected filters result in the following "
+"objects."
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
@@ -3815,9 +3808,28 @@ msgid "Objects"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
+msgid "Object name"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html
 #: rocky/templates/oois/ooi_list.html
 msgid "Clearance type"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "Report(s) may be empty due to no objects in the selected filters."
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid ""
+"Reports matching the selected filters will be empty at this moment in time. "
+"Future reports may contain data. It is still possible to generate the "
+"(potentially empty) report."
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "Continue with live set"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
@@ -3966,8 +3978,19 @@ msgstr[1] ""
 
 #: reports/templates/partials/report_types_selection.html
 #, python-format
-msgid "You have selected %(total_oois)s object in previous step."
-msgid_plural "You have selected %(total_oois)s objects in previous step."
+msgid ""
+"You have selected a live set in the previous step. Based on the current "
+"dataset, this live set results in %(total_oois)s objects."
+msgstr ""
+
+#: reports/templates/partials/report_types_selection.html
+msgid "No filters applied"
+msgstr ""
+
+#: reports/templates/partials/report_types_selection.html
+#, python-format
+msgid "You have selected %(total_oois)s object in the previous step."
+msgid_plural "You have selected %(total_oois)s objects in the previous step."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -4242,6 +4265,10 @@ msgid ""
 "each object in the table it additionally shows the clearance level and "
 "whether or not the object was added by a user ('Declared') or indirectly "
 "identified through another service or system ('Inherited')."
+msgstr ""
+
+#: reports/templates/summary/report_asset_overview.html
+msgid "No objects found."
 msgstr ""
 
 #: reports/templates/summary/report_asset_overview.html
