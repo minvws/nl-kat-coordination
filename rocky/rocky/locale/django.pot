@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-05 15:06+0000\n"
+"POT-Creation-Date: 2025-03-04 14:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4928,6 +4928,10 @@ msgstr ""
 
 #: tools/models.py
 msgid "new"
+msgstr ""
+
+#: tools/templatetags/ooi_extra.py
+msgid "Unknown user"
 msgstr ""
 
 #: tools/view_helpers.py rocky/templates/header.html
