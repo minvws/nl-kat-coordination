@@ -45,6 +45,7 @@ from rocky.views.tasks import (
     AllNormalizersTaskListView,
     BoefjesTaskListView,
     NormalizersTaskListView,
+    ReportsTaskListView,
 )
 from rocky.views.upload_csv import UploadCSV
 from rocky.views.upload_raw import UploadRaw
@@ -135,6 +136,7 @@ urlpatterns += i18n_patterns(
     path("<organization_code>/tasks/boefjes", BoefjesTaskListView.as_view(), name="boefjes_task_list"),
     path("<organization_code>/tasks/boefjes/<task_id>", BoefjeTaskDetailView.as_view(), name="boefje_task_view"),
     path("<organization_code>/tasks/normalizers", NormalizersTaskListView.as_view(), name="normalizers_task_list"),
+    path("<organization_code>/tasks/reports", ReportsTaskListView.as_view(), name="reports_task_list"),
     path(
         "<organization_code>/tasks/normalizers/<task_id>", NormalizerTaskJSONView.as_view(), name="normalizer_task_view"
     ),

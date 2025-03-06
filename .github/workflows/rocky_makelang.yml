@@ -17,7 +17,9 @@ on:
 
 jobs:
   makelang:
-    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -48,7 +50,6 @@ jobs:
           BYTES_PASSWORD: password
           BYTES_USERNAME: username
           KATALOGUS_API: http://katalogus:8000
-          KEIKO_API: http://keiko:8000
           OCTOPOES_API: http://octopoes_api:80
           SCHEDULER_API: http://scheduler:8000
           SECRET_KEY: whatever

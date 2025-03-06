@@ -27,7 +27,7 @@ from octopoes.models import OOI, Reference, ScanLevel, ScanProfile, ScanProfileB
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
-from octopoes.models.ooi.reports import Report
+from octopoes.models.ooi.reports import HydratedReport
 from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Path as ObjectPath
@@ -463,14 +463,18 @@ def list_reports(
     limit: int = DEFAULT_LIMIT,
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-) -> Paginated[tuple[Report, list[Report | None]]]:
-    res = octopoes.ooi_repository.list_reports(valid_time, offset, limit)
-    return res
+    recipe_id: uuid.UUID | None = Query(None),
+) -> Paginated[HydratedReport]:
+    return octopoes.ooi_repository.list_reports(valid_time, offset, limit, recipe_id)
 
 
 @router.get("/reports/{report_id}", tags=["Reports"])
-def get_report(report_id: str, octopoes: OctopoesService = Depends(octopoes_service)):
-    return octopoes.ooi_repository.get_report(report_id)
+def get_report(
+    report_id: str,
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+) -> HydratedReport:
+    return octopoes.ooi_repository.get_report(valid_time, report_id)
 
 
 @router.get("/findings/count_by_severity", tags=["Findings"])

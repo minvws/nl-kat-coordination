@@ -39,7 +39,7 @@ def test_select_all_oois_post_to_select_report_types(
 
     assert response.status_code == 200
     total_objects = str(len(listed_hostnames))
-    assertContains(response, f"You have selected {total_objects} objects in previous step.")
+    assertContains(response, f"You have selected {total_objects} objects in the previous step.")
 
 
 def test_select_some_oois_post_to_select_report_types(
@@ -71,7 +71,37 @@ def test_select_some_oois_post_to_select_report_types(
 
     total_objects = str(len(selection))
 
-    assertContains(response, f"You have selected {total_objects} objects in previous step.")
+    assertContains(response, f"You have selected {total_objects} objects in the previous step.")
+
+
+def test_select_query_post_to_select_report_types(
+    rf, client_member, valid_time, mock_organization_view_octopoes, listed_hostnames
+):
+    """
+    Will send the query to the report type selection page.
+    """
+
+    mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
+        count=len(listed_hostnames), items=listed_hostnames
+    )
+
+    request = setup_request(
+        rf.post(
+            "aggregate_report_select_report_types",
+            {"observed_at": valid_time.strftime("%Y-%m-%d"), "object_selection": "query"},
+        ),
+        client_member.user,
+    )
+
+    response = ReportTypesSelectionAggregateReportView.as_view()(
+        request, organization_code=client_member.organization.code
+    )
+
+    assert response.status_code == 200
+    assert response.context_data["selected_oois"] == []
+
+    assertContains(response, "You have selected a live set in the previous step.")
+    assertContains(response, "this live set results in 0 objects.")
 
 
 def test_change_ooi_selection_for_none_selection(
@@ -93,6 +123,7 @@ def test_change_ooi_selection_for_none_selection(
 
     assert response.status_code == 200
     assert response.context_data["selected_oois"] == []
+    assert list(request._messages)[0].message == "Select at least one OOI to proceed."
 
 
 def test_change_ooi_selection_with_ooi_selection(
@@ -226,7 +257,6 @@ def test_save_aggregate_report_view(
                 "start_time": "10:10",
                 "recurrence": "once",
                 "parent_report_name_format": "${report_type} for ${oois_count} objects",
-                "subreport_name_format": "${report_type} for ${ooi}",
             },
         ),
         client_member.user,
@@ -275,8 +305,7 @@ def test_save_aggregate_report_view_scheduled(
                 "start_date": "2024-01-01",
                 "start_time": "10:10",
                 "recurrence": "once",
-                "parent_report_name_format": "${report_type} for ${oois_count} objects",
-                "subreport_name_format": "${report_type} for ${ooi}",
+                "parent_report_name_format": "${report_type} for ${oois_count} object(s)",
             },
         ),
         client_member.user,
@@ -297,9 +326,10 @@ def test_json_download_aggregate_report(
     mock_bytes_client,
     mock_katalogus_client,
 ):
-    mock_organization_view_octopoes().get.return_value = get_aggregate_report_ooi
-    mock_bytes_client().get_raw.return_value = get_aggregate_report_from_bytes
-    mock_organization_view_octopoes().query.return_value = []
+    mock_organization_view_octopoes().get_report.return_value = get_aggregate_report_ooi
+    mock_bytes_client().get_raws.return_value = [
+        ("7b305f0d-c0a7-4ad5-af1e-31f81fc229c2", get_aggregate_report_from_bytes)
+    ]
 
     request = setup_request(
         rf.get("view_report_json", {"json": "true", "report_id": f"{get_aggregate_report_ooi.primary_key}"}),

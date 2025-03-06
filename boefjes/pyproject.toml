@@ -13,7 +13,7 @@ jsonschema = "^4.17.0"
 pydantic = "^2.7.1"
 docker = "^7.1.0"
 uvicorn = "^0.29.0"
-psycopg2 = "^2.9.6"
+psycopg2 = "^2.9.10"
 pynacl = "^1.5.0"
 sqlalchemy = "^1.4.48"
 python-dateutil = "^2.8.2"
@@ -46,7 +46,7 @@ python-libnmap = "0.7.3"
 # required by kat_shodan boefje
 shodan = "1.25.0"
 # required by kat_ssl_certificates boefje
-cryptography = "^43.0.1"
+cryptography = "^44.0.1"
 # required by kat_webpage_analysis
 forcediphttpsadapter = "1.1.0"
 # required by kat_webpage_analysis (forcediphttpsadapter)
@@ -97,7 +97,6 @@ markers = ["slow: marks tests as slow"]
 addopts = "-m 'not slow'"
 env = [
     "D:KATALOGUS_DB_URI=postgresql://postgres:postgres@ci_katalogus-db:5432/ci_katalogus",
-    "D:QUEUE_URI=amqp://placeholder",
     "D:BOEFJES_API=http://placeholder:8006",
     "D:KATALOGUS_API=http://placeholder:8000",
     "D:OCTOPOES_API=http://placeholder:8001",

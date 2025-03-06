@@ -34,7 +34,7 @@ opentelemetry-instrumentation-psycopg2 = "^0.50b0"
 whitenoise = { extras = ["brotli"], version = "^6.5.0" }
 opentelemetry-instrumentation = "^0.50b0"
 opentelemetry-instrumentation-fastapi = "^0.50b0"
-granian = "^1.3.2"
+granian = "^1.7.6"
 django-components = "^0.88"
 
 # These used in octopoes parts that are used by rocky
@@ -69,7 +69,6 @@ factory-boy = "^3.2.1"
 django-admin-auto-tests = { git = "https://github.com/dekkers/django-admin-auto-tests", rev = "f6eb4cbb9112b5aa933313d79e4da823adb41e1e" }
 
 # Robot Framework dependencies
-robotframework-tidy = "^4.14.0"
 robotframework = "^7.1.1"
 robotframework-browser = "^19.0.1"
 robotframework-debuglibrary = "^2.5.0"

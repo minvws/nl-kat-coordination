@@ -13,8 +13,16 @@ class OOITreeView(BaseOOIDetailView, TemplateView):
     template_name = "oois/ooi_tree.html"
     connector_form_class = OoiTreeSettingsForm
 
+    def __init__(self):
+        super().__init__()
+        self._tree_dict = None
+
     def get_tree_dict(self):
-        return create_object_tree_item_from_ref(self.tree.root, self.tree.store)
+        if self._tree_dict is None:
+            tree = self.get_ooi_tree()
+            self._tree_dict = create_object_tree_item_from_ref(tree.root, tree.store)
+
+        return self._tree_dict
 
     def get_filtered_tree(self, tree_dict: dict) -> dict:
         filtered_types = self.request.GET.getlist("ooi_type", [])

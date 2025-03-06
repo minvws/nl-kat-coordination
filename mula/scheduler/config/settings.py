@@ -77,8 +77,6 @@ class Settings(BaseSettings):
         10, description="The maximum number of connections to save in the pool for the octopoes api"
     )
 
-    katalogus_cache_ttl: int = Field(30, description="The lifetime of the katalogus cache in seconds")
-
     katalogus_request_timeout: int = Field(
         10, description="The timeout in seconds for the requests to the katalogus api"
     )
@@ -130,7 +128,7 @@ class Settings(BaseSettings):
     )
 
     # Queue settings
-    pq_maxsize: int = Field(1000, description="How many items a priority queue can hold (0 is infinite)")
+    pq_maxsize: int = Field(0, description="How many items a priority queue can hold (0 is infinite)")
 
     pq_interval: int = Field(
         60, description="Interval in seconds of the execution of the `` method of the `scheduler.Scheduler` class"

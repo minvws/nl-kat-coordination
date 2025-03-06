@@ -15,6 +15,7 @@ from boefjes.dependencies.plugins import (
     get_plugins_filter_parameters,
 )
 from boefjes.models import FilterParameters, PaginationParameters, PluginType
+from boefjes.sql.db_models import RunOn
 from boefjes.sql.plugin_storage import get_plugin_storage
 from boefjes.storage.interfaces import DuplicatePlugin, IntegrityError, NotAllowed, PluginStorage
 
@@ -68,6 +69,12 @@ def list_plugins(
 
     # filter plugins by scan level for boefje plugins
     plugins = [plugin for plugin in plugins if plugin.type != "boefje" or plugin.scan_level >= filter_params.scan_level]
+
+    if filter_params.consumes is not None:
+        plugins = [plugin for plugin in plugins if filter_params.consumes.intersection(set(plugin.consumes))]
+
+    if filter_params.produces is not None:
+        plugins = [plugin for plugin in plugins if filter_params.produces.intersection(set(plugin.produces))]
 
     if pagination_params.limit is None:
         return plugins[pagination_params.offset :]
@@ -130,6 +137,7 @@ class BoefjeIn(BaseModel):
     boefje_schema: dict | None = None
     cron: str | None = None
     interval: int | None = None
+    run_on: list[RunOn] | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
 
