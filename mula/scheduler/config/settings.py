@@ -45,9 +45,15 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="SCHEDULER_")
 
     # Application settings
-    debug: bool = Field(False, alias="DEBUG", description="Enables/disables global debugging mode")
-
     log_cfg: Path = Field(BASE_DIR / "logging.json", description="Path to the logging configuration file")
+    log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = Field(
+        "INFO", alias="LOG_LEVEL", description="Logging level"
+    )
+    log_rich_exceptions: bool = Field(
+        False,
+        alias="LOG_RICH_EXCEPTIONS",
+        description="Log rich exceptions. Enabled this could result in logging secrets.",
+    )
 
     collect_metrics: bool = Field(
         False, description="Enables/disables the collection of metrics to be used with tools like Prometheus"
