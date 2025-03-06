@@ -120,7 +120,7 @@ class MockHandler(Handler):
         self.queue = multiprocessing.Manager().Queue()
         self.exception = exception
 
-    def handle(self, task: BoefjeMeta | NormalizerMeta):
+    def handle(self, task: Task):
         time.sleep(self.sleep_time)
 
         if str(task.id) in ["9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "2071c9fd-2b9f-440f-a524-ef1ca4824fd4"]:
@@ -129,7 +129,7 @@ class MockHandler(Handler):
 
         self.queue.put(task)
 
-    def get_all(self) -> list[BoefjeMeta | NormalizerMeta]:
+    def get_all(self) -> list[Task]:
         return [self.queue.get() for _ in range(self.queue.qsize())]
 
 

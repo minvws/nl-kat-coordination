@@ -11,6 +11,7 @@ from boefjes.job_handler import NormalizerHandler
 from boefjes.worker.job_models import NormalizerMeta
 from boefjes.worker.interfaces import Task, TaskStatus
 from octopoes.models import DeclaredScanProfile
+
 from tests.loading import get_dummy_data
 
 RAW_DATA = json.dumps(
@@ -52,6 +53,7 @@ def test_job_handler_respects_whitelist(normalizer_runner, mocker):
         id=uuid.uuid4().hex,
         scheduler_id="test",
         schedule_id="test",
+        organisation="test",
         priority=1,
         status=TaskStatus.RUNNING,
         type="boefje",

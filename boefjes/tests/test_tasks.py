@@ -59,6 +59,7 @@ def test_handle_boefje_with_exception(mocker):
         id=uuid.uuid4().hex,
         scheduler_id="test",
         schedule_id="test",
+        organisation="test",
         priority=1,
         status=TaskStatus.RUNNING,
         type="boefje",
