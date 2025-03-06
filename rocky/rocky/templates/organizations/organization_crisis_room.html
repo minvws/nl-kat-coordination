@@ -15,7 +15,7 @@
                        role="group"
                        aria-label="{% translate "indemnification warning" %}">
                         {% url "organization_settings" organization.code as organization_settings %}
-                        {% blocktranslate %}
+                        {% blocktranslate trimmed %}
                             <strong>Warning:</strong>
                             Indemnification is not set for this organization.
                             Go to the <a href="{{ organization_settings }}">organization settings page</a> to add one.
