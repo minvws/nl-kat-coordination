@@ -1,4 +1,5 @@
 import ast
+import base64
 import os
 import sys
 import uuid
@@ -14,7 +15,7 @@ from boefjes.worker.job_models import BoefjeMeta, InvalidReturnValueNormalizer, 
 from boefjes.worker.boefje_runner import LocalBoefjeJobRunner
 from boefjes.worker.repository import LocalPluginRepository
 from boefjes.worker.models import Bit, Boefje, Normalizer, PluginType
-from boefjes.worker.interfaces import JobRuntimeError, Task, TaskStatus
+from boefjes.worker.interfaces import JobRuntimeError, Task, TaskStatus, StatusEnum
 from tests.loading import get_dummy_data
 
 boefjes = [
@@ -50,7 +51,7 @@ def test_parse_normalizer_meta_to_json():
 
 
 def test_handle_boefje_with_exception(mocker):
-    mocker.patch("boefjes.job_handler.get_environment_settings", return_value={})
+    mocker.patch("boefjes.clients.scheduler_client.get_environment_settings", return_value={})
     mock_bytes_api_client = mocker.patch("boefjes.job_handler.bytes_api_client")
     mocker.patch("boefjes.job_handler.get_octopoes_api_connector")
 
@@ -79,14 +80,16 @@ def test_handle_boefje_with_exception(mocker):
     with pytest.raises(RuntimeError):  # Bytes still saves exceptions before they are reraised
         BoefjeHandler(LocalBoefjeJobRunner(local_repository), mock_bytes_api_client).handle(task)
 
-    mock_bytes_api_client.save_boefje_meta.assert_called_once_with(task)
-    mock_bytes_api_client.save_raw.assert_called_once()
-    raw_call_args = mock_bytes_api_client.save_raw.call_args
+    mock_bytes_api_client.save_raws.assert_called_once()
+    raw_call_args = mock_bytes_api_client.save_raws.call_args
 
     assert raw_call_args[0][0] == UUID("0dca59db-b339-47c4-bcc9-896fc18e2386")
-    assert "Traceback (most recent call last)" in raw_call_args[0][1]
-    assert "JobRuntimeError: Boefje failed" in raw_call_args[0][1]
-    assert raw_call_args[0][2] == {"error/boefje", "boefje/dummy_boefje_runtime_exception"}
+    assert raw_call_args[0][1].status == StatusEnum.FAILED
+    contents = base64.b64decode(raw_call_args[0][1].files[0].content).decode()
+    assert "Traceback (most recent call last)" in contents
+    assert "JobRuntimeError: Boefje failed" in contents
+    # default mime-types are added through the API
+    assert raw_call_args[0][1].files[0].tags == ["error/boefje"]
 
 
 def test_exception_raised_unsupported_return_type_normalizer(mock_normalizer_runner):
@@ -158,6 +161,6 @@ def test_correct_local_runner_hash(mock_local_repository) -> None:
     assert Path(path / "__pycache__/pytest__init__.cpython-311.pyc").is_file()
     assert Path(path / "__pycache__/pytest_main.cpython-311.pyc").is_file()
 
-    assert boefje_resource_1.runnable_hash == "7450ebc13f6856df925e90cd57f2769468a39723f18ba835749982b484564ec9"
-    assert boefje_resource_2.runnable_hash == "874e154b572a0315cfe4329bd3b756bf9cad77f6a87bb9b9b9bb6296f1d4b520"
-    assert boefje_resource_3.runnable_hash == "70c0b0ad3b2e70fd79e52dcf043096a50ed69db1359df0011499e66ab1510bbe"
+    assert boefje_resource_1.runnable_hash == "7a6de035b9b3f3de1534582df3a1024476d62aad4fce51b7ffa9f13dd92dcbd2"
+    assert boefje_resource_2.runnable_hash == "125d118d21c25ca522fc436cbe1ac8af336b7a973423d23ca02ce287a6c07b2d"
+    assert boefje_resource_3.runnable_hash == "3fceaf2422bd6d3975e73d5d7d297e9c4a70efce60fccfab761235f08b6891b4"

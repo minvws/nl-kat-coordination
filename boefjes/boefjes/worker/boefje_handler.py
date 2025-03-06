@@ -26,7 +26,6 @@ class BoefjeHandler(Handler):
 
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
-        boefje_meta.started_at = datetime.now(timezone.utc)
         boefje_results: list[tuple[set, bytes | str]] = []
         failed = False
 
@@ -39,7 +38,6 @@ class BoefjeHandler(Handler):
 
             raise
         finally:
-            boefje_meta.ended_at = datetime.now(timezone.utc)
             logger.info("Saving to Bytes for boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
             if not boefje_results:
@@ -62,7 +60,7 @@ class BoefjeHandler(Handler):
 
                 files.append(File(
                     content=(b64encode(output) if isinstance(output, bytes) else b64encode(output.encode())).decode(),
-                    tags=valid_mimetypes,
+                    tags=valid_mimetypes,  # default mime-types are added through the API
                 ))
 
             boefje_output = BoefjeOutput(status=StatusEnum.FAILED if failed else StatusEnum.COMPLETED, files=files)
