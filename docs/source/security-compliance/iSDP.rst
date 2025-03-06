@@ -8,6 +8,7 @@ It serves as a security manual that helps developers and product owners understa
 
 Chapter V02 - Authentication
 ============================
+
 Chapter "V02 - Authentication" of ASVS is about making sure only the right people get access to your application.
 It helps you use the best methods to identify users and verify that they are who they say they are.
 
@@ -35,61 +36,155 @@ It helps you use the best methods to identify users and verify that they are who
         classDef Rose stroke-width:1px, stroke-dasharray:none, stroke:#FF5978, fill:#FFDFE5, color:#8E2236
         style n1 stroke:#00C853
 
-2.1.1 - Verify that user set passwords are at least 12 characters in length (after multiple spaces are combined).
------------------------------------------------------------------------------------------------------------------
+|compliant| 2.1.1 - Verify that user set passwords are at least 12 characters in length (after multiple spaces are combined).
+-----------------------------------------------------------------------------------------------------------------------------
 
-PROOF TODO
+In the file ``rocky/rocky/settings.py:256`` you can see that the default minimum length is 12 characters.
 
-2.1.2 - Verify that passwords of at least 64 characters are permitted, and that passwords of more than 128 characters are denied.
----------------------------------------------------------------------------------------------------------------------------------
+.. code-block:: python
 
-PROOF TODO
+    AUTH_PASSWORD_VALIDATORS = [
+        {
+            "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+            "OPTIONS": {"min_length": env.int("PASSWORD_MIN_LENGTH", 12)},
+        }]
 
-2.1.3 - Verify that password truncation is not performed. However, consecutive multiple spaces may be replaced by a single space.
----------------------------------------------------------------------------------------------------------------------------------
+|partial_compliant| |accepted| 2.1.2 - Verify that passwords of at least 64 characters are permitted, and that passwords of more than 128 characters are denied.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-PROOF TODO
+We are compliant with the "At least 64 characters" part of the requirement.
+Currently it is possible to create passwords that are longer than 128 characters.
+As this is removed in the `ASVS 5.0 - 2.1.2 <https://github.com/OWASP/ASVS/blob/master/5.0/en/0x11-V2-Authentication.md#v21-password-security>`_ no fix will be implemented to limit 128 characters.
 
-2.1.4 - Verify that any printable Unicode character, including language neutral characters such as spaces and Emojis are permitted in passwords.
-------------------------------------------------------------------------------------------------------------------------------------------------
+|compliant| 2.1.3 - Verify that password truncation is not performed. However, consecutive multiple spaces may be replaced by a single space.
+---------------------------------------------------------------------------------------------------------------------------------------------
 
-PROOF TODO
+As can be seen in ``rocky/account/forms/account_setup.py:49`` no passwords are truncated.
 
-2.1.5 - Verify users can change their password.
------------------------------------------------
+.. code-block:: python
 
-PROOF TODO
+    password = forms.CharField(
+        label=_("Password"),
+        widget=forms.PasswordInput(
+            attrs={
+                "autocomplete": "off",
+                "placeholder": _("Choose a super secret password"),
+                "aria-describedby": "explanation-password",
+            }
+        ),
+        help_text=get_password_validators_help_texts(),
+        validators=[validate_password],
+    )
 
-2.1.6 - Verify that password change functionality requires the user's current and new password.
------------------------------------------------------------------------------------------------
+|compliant| 2.1.4 - Verify that any printable Unicode character, including language neutral characters such as spaces and Emojis are permitted in passwords.
+------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-PROOF TODO
+As can be seen in ``rocky/account/forms/account_setup.py:49`` no characters are limited.
 
-2.1.7 - Verify that passwords submitted during account registration, login, and password change are checked against a set of breached passwords either locally (such as the top 1,000 or 10,000 most common passwords which match the system's password policy) or using an external API. If using an API a zero knowledge proof or other mechanism should be used to ensure that the plain text password is not sent or used in verifying the breach status of the password. If the password is breached, the application must require the user to set a new non-breached password.
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+.. code-block:: python
 
-PROOF TODO
+    password = forms.CharField(
+        label=_("Password"),
+        widget=forms.PasswordInput(
+            attrs={
+                "autocomplete": "off",
+                "placeholder": _("Choose a super secret password"),
+                "aria-describedby": "explanation-password",
+            }
+        ),
+        help_text=get_password_validators_help_texts(),
+        validators=[validate_password],
+    )
 
-2.1.8 - Verify that a password strength meter is provided to help users set a stronger password.
-------------------------------------------------------------------------------------------------
+Also the example password ``ɶ(◕‿◕)֍֍T!1߷ɶ߷ɶ߷ɶ߷T!2(◕‿◕)`` was successfully used to created an account.
 
-PROOF TODO
+|compliant| 2.1.5 - Verify users can change their password.
+-----------------------------------------------------------
 
-2.1.9 - Verify that there are no password composition rules limiting the type of characters permitted. There should be no requirement for upper or lower case or numbers or special characters.
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-PROOF TODO
+It is possible to request a password reset at the ``https://<URL>/en/password_reset/``, see ``rocky/account/views/password_reset.py`` for the implementation.
 
-2.1.10 - Verify that there are no periodic credential rotation or password history requirements.
-------------------------------------------------------------------------------------------------
-PROOF TODO
+.. image:: img/proof/chapter_2/proof_2.1.5.png
 
-2.1.11 - Verify that "paste" functionality, browser password helpers, and external password managers are permitted.
+|partial_compliant| 2.1.6 - Verify that password change functionality requires the user's current and new password.
 -------------------------------------------------------------------------------------------------------------------
-PROOF TODO
 
-2.1.12 - Verify that the user can choose to either temporarily view the entire masked password, or temporarily view the last typed character of the password on platforms that do not have this as built-in functionality.
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-PROOF TODO
+As can be seen in ``rocky/account/forms/account_setup.py:256`` no password is required to change to a new password.
+
+.. code-block:: python
+
+    class SetPasswordForm(auth_forms.SetPasswordForm):
+        """
+        A form that lets a user change set their password without entering the old
+        password
+        """
+
+        error_messages = {"password_mismatch": _("The two password fields didn’t match.")}
+        new_password1 = forms.CharField(
+            label=_("New password"),
+            widget=forms.PasswordInput(attrs={"autocomplete": "new-password", "placeholder": _("Enter a new password")}),
+            strip=False,
+            help_text=get_password_validators_help_texts,
+            validators=[validate_password],
+        )
+        new_password2 = forms.CharField(
+            label=_("New password confirmation"),
+            strip=False,
+            widget=forms.PasswordInput(attrs={"autocomplete": "new-password", "placeholder": _("Repeat the new password")}),
+            help_text=_("Confirm the new password"),
+            validators=[validate_password],
+        )
+
+Though this password reset is only possible through an email. Which means the requirement is not fully applicable.
+Will be discussed in ``TODO``
+
+|non_compliant| 2.1.7 - Verify that passwords submitted during account registration, login, and password change are checked against a set of breached passwords either locally (such as the top 1,000 or 10,000 most common passwords which match the system's password policy) or using an external API. If using an API a zero knowledge proof or other mechanism should be used to ensure that the plain text password is not sent or used in verifying the breach status of the password. If the password is breached, the application must require the user to set a new non-breached password.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Currently this check is not performed. Will be fixed in ``TODO``
+
+|non_compliant| |accepted| 2.1.8 - Verify that a password strength meter is provided to help users set a stronger password.
+---------------------------------------------------------------------------------------------------------------------------
+
+Although this sounds great on paper it is a responsibility from the organization to be aware of secure passwords. Building a reliable an trustworthy password meter is difficult and it is questionable if it really has the desired effect.
+For this reason in combination with the fact that in `ASVS 5.0 2.1.8 <https://github.com/OWASP/ASVS/blob/master/5.0/en/0x11-V2-Authentication.md#v21-password-security>`_ this requirement is set to ``[DELETED, INSUFFICIENT IMPACT]`` we have accepted to be non compliant with this requirement.
+
+|non_compliant| 2.1.9 - Verify that there are no password composition rules limiting the type of characters permitted. There should be no requirement for upper or lower case or numbers or special characters.
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Currently this check is not performed. Will be fixed in ``TODO``
+
+|compliant|  2.1.10 - Verify that there are no periodic credential rotation or password history requirements.
+-------------------------------------------------------------------------------------------------------------
+
+We use `Django Password Validation <https://docs.djangoproject.com/en/4.2/topics/auth/passwords/#password-validation>`_ to configure passwords.
+This library does not support the expiration of passwords, so by default, we are compliant with the requirement.
+
+|compliant| 2.1.11 - Verify that "paste" functionality, browser password helpers, and external password managers are permitted.
+-------------------------------------------------------------------------------------------------------------------------------
+
+As can be seen in ``rocky/account/forms/account_setup.py:49`` no paste restrictions are set.
+
+.. code-block:: python
+
+    password = forms.CharField(
+        label=_("Password"),
+        widget=forms.PasswordInput(
+            attrs={
+                "autocomplete": "off",
+                "placeholder": _("Choose a super secret password"),
+                "aria-describedby": "explanation-password",
+            }
+        ),
+        help_text=get_password_validators_help_texts(),
+        validators=[validate_password],
+    )
+
+|non_compliant| 2.1.12 - Verify that the user can choose to either temporarily view the entire masked password, or temporarily view the last typed character of the password on platforms that do not have this as built-in functionality.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Currently this check is not performed. Note that in the ASVS 5.0 it is defined as "may allow".
+
+Will be discussed in ``TODO``
 
 2.5.1 - Verify that a system generated initial activation or recovery secret is not sent in clear text to the user.
 -------------------------------------------------------------------------------------------------------------------
@@ -120,3 +215,9 @@ PROOF TODO
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 PROOF TODO
+
+.. |compliant| image:: img/compliant.svg
+.. |non_compliant| image:: img/non_compliant.svg
+.. |partial_compliant| image:: img/partial_compliant.svg
+.. |todo| image:: img/todo.svg
+.. |accepted| image:: img/accepted.svg
