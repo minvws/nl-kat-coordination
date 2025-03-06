@@ -10,17 +10,29 @@ on:
 
 jobs:
   octopoes-tests:
+    permissions:
+      contents: read
     uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@main
   bytes-tests:
+    permissions:
+      contents: read
     uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@main
   mula-tests:
+    permissions:
+      contents: read
     uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@main
   rocky-tests:
+    permissions:
+      contents: read
     uses: minvws/nl-kat-coordination/.github/workflows/rocky-tests.yml@main
   boefjes-tests:
+    permissions:
+      contents: read
     uses: minvws/nl-kat-coordination/.github/workflows/boefjes-tests.yml@main
 
   fix-coverage-reports:
+    permissions:
+      contents: read
     runs-on: ubuntu-24.04
 
     needs:
@@ -58,7 +70,7 @@ jobs:
           path: ${{ matrix.module['name'] }}-coverage-unit
 
       - name: Fix coverage report sources
-        uses: Mudlet/xmlstarlet-action@master
+        uses: Mudlet/xmlstarlet-action@9866e85e774e0fb50bc49de15274d005b5a69f0e # master
         with:
           args: edit --inplace --update "coverage/sources" --value "/github/workspace/${{ matrix.module['name'] }}/" "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
 
@@ -72,6 +84,10 @@ jobs:
           path: "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
 
   sonar-cloud:
+    permissions:
+      contents: read
+      pull-requests: write
+      security-events: write
     runs-on: ubuntu-24.04
 
     needs:
@@ -89,6 +105,6 @@ jobs:
           pattern: "*-coverage-unit-fixed"
 
       - name: SonarCloud
-        uses: SonarSource/sonarcloud-github-action@v4.0.0
+        uses: SonarSource/sonarcloud-github-action@ffc3010689be73b8e5ae0c57ce35968afd7909e8 # v5.0.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

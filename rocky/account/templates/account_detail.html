@@ -63,10 +63,11 @@
                         <div>
                             {% if tcl < 0 %}
                                 <p>
-                                    {% blocktranslate %}
-                            You don't have any clearance to scan objects.<br>
-                            Get in contact with the admin to give you the necessary clearance level.
-                        {% endblocktranslate %}
+                                    {% blocktranslate trimmed %}
+                                        You don't have any clearance to scan objects.
+                                        <br>
+                                        Get in contact with the admin to give you the necessary clearance level.
+                                    {% endblocktranslate %}
                                 </p>
                             {% elif tcl >= 0 and tcl == acl %}
                                 <p>
@@ -77,9 +78,9 @@
                                    aria-label="{% translate "Explanation OOI Clearance" %}">
                                     {% translate "You can withdraw this at anytime you like, but know that you won't be able to change clearance levels anymore when you do." %}
                                 </p>
-                                {% blocktranslate asvar btn_text_withdraw_tcl %}
-                            Withdraw L{{acl}} clearance and responsibility
-                    {% endblocktranslate %}
+                                {% blocktranslate asvar btn_text_withdraw_tcl trimmed %}
+                                    Withdraw L{{ acl }} clearance and responsibility
+                                {% endblocktranslate %}
                                 {% include "partials/single_action_form.html" with btn_text=btn_text_withdraw_tcl action="withdraw_acceptance" key="member_id" value=organization_member.id btn_class="ghost" %}
 
                             {% else %}
@@ -93,9 +94,9 @@
                                         Remember: <strong>with great power comes great responsibility.</strong>
                                     {% endblocktranslate %}
                                 </p>
-                                {% blocktranslate asvar btn_text_accept_tcl %}
-                        Accept level L{{tcl}} clearance and responsibility
-                    {% endblocktranslate %}
+                                {% blocktranslate asvar btn_text_accept_tcl trimmed %}
+                                    Accept level L{{ tcl }} clearance and responsibility
+                                {% endblocktranslate %}
                                 {% include "partials/single_action_form.html" with btn_text=btn_text_accept_tcl action="accept_clearance" key="member_id" value=organization_member.id btn_class="ghost" %}
 
                             {% endif %}
