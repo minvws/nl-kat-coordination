@@ -5,13 +5,13 @@
     <div>
         <h2>{% translate "Object selection" %}</h2>
         <p>
-            {% blocktranslate %}
+            {% blocktranslate trimmed %}
                 Select which objects you want to include in your report. You can either continue
                 with a live set or you can select the objects manually from the table below.
             {% endblocktranslate %}
         </p>
         <p>
-            {% blocktranslate %}
+            {% blocktranslate trimmed %}
                 A live set is a set of objects based on the applied filters.
                 Any object that matches this applied filter (now or in the future) will be used as
                 input for the scheduled report. If your live set filter (e.g. 'hostnames' with
@@ -76,10 +76,8 @@
             {% csrf_token %}
             {% if all_oois_selected %}
                 {% include "forms/report_form_fields.html" %}
-
             {% else %}
                 {% include "forms/report_form_fields.html" with disable_ooi_selection_fields=True %}
-
             {% endif %}
             <div class="horizontal-scroll">
                 <table>

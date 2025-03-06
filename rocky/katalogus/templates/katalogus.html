@@ -22,7 +22,7 @@
                     </p>
                     <p class="emphasized">
                         <strong>{{ object_list|length }}</strong>
-                        {% blocktranslate count counter=object_list|length %}
+                        {% blocktranslate count counter=object_list|length trimmed %}
                             Plugin available
                         {% plural %}
                             Plugins available
