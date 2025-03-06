@@ -109,5 +109,5 @@ def get_date(date_str: str) -> datetime:
 
 @register.filter
 def get_first_seen(occurrences: dict) -> datetime:
-    first_seen_list = [datetime.fromisoformat(occurrence["first_seen"]) for occurrence in occurrences]
-    return min(first_seen_list)
+    first_seen = min(occurrences, key=lambda occurrence: occurrence["first_seen"])["first_seen"]
+    return datetime.fromisoformat(first_seen)
