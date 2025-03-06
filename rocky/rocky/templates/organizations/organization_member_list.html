@@ -11,7 +11,7 @@
         <section>
             <div>
                 <h1>{% translate "Organization:" %} {{ organization.name }}</h1>
-                {% blocktranslate with organization_name=organization.name %}
+                {% blocktranslate with organization_name=organization.name trimmed %}
                     An overview of "{{ organization_name }}" its members.
                 {% endblocktranslate %}
                 <h2>
