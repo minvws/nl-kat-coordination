@@ -76,8 +76,10 @@
             {% csrf_token %}
             {% if all_oois_selected %}
                 {% include "forms/report_form_fields.html" %}
+
             {% else %}
                 {% include "forms/report_form_fields.html" with disable_ooi_selection_fields=True %}
+
             {% endif %}
             <div class="horizontal-scroll">
                 <table>
