@@ -83,6 +83,22 @@ def test_enable_boefje(test_client, organisation, second_organisation):
     assert response.json()["enabled"] is False
 
 
+def test_run_on(test_client, organisation, second_organisation):
+    test_client.patch(f"/v1/organisations/{organisation.id}/plugins/export-to-http-api", json={"enabled": True})
+
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/export-to-http-api")
+    assert response.json()["enabled"] is True
+    assert response.json()["run_on"] == ["create", "update"]
+
+    boefje = Boefje(id="test_run_on", name="Run On", static=False, run_on=["create"])
+    response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
+    assert response.status_code == 201
+
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/test_run_on")
+    assert response.json()["enabled"] is False
+    assert response.json()["run_on"] == [x.value for x in boefje.run_on]
+
+
 def test_cannot_add_static_plugin_with_duplicate_name(test_client, organisation):
     boefje = Boefje(id="test_plugin", name="DNS records", static=False)
     response = test_client.post(f"/v1/organisations/{organisation.id}/plugins", content=boefje.model_dump_json())
@@ -130,7 +146,7 @@ def test_add_normalizer(test_client, organisation):
     assert response.status_code == 201
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/?plugin_type=normalizer")
-    assert len(response.json()) == 57
+    assert len(response.json()) == 58
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/test_normalizer")
     assert response.json() == normalizer.model_dump()

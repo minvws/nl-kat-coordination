@@ -9,20 +9,20 @@ on:
       - "*"
     paths:
       - bytes/**
-      - .github/workflows/bytes_test.yml
+      - .github/workflows/bytes_tests.yml
   pull_request:
     paths:
       - bytes/**
-      - .github/workflows/bytes_test.yml
+      - .github/workflows/bytes_tests.yml
 
 jobs:
   test:
     strategy:
       fail-fast: false
       matrix:
-        version: ["3.10", "3.11"]
+        version: ["3.10", "3.11", "3.12", "3.13"]
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code

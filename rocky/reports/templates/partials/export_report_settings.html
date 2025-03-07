@@ -15,53 +15,29 @@
                     or monthly. If you need the report just for a single occasion, select the one-time option.
                 {% endblocktranslate %}
             </p>
-            <form class="inline" method="post" action="{{ current }}">
-                {% csrf_token %}
-                {% include "forms/report_form_fields.html" %}
-                {% include "partials/form/fieldset.html" with fields=report_schedule_form_recurrence_choice %}
-
-                {% if is_scheduled_report %}
-                    <p>
-                        {% blocktranslate trimmed %}
-                            Please choose a start date, time and recurrence for scheduling your report(s).
-                            If you select a date on the 28th-31st of the month, it will always be scheduled on the last day of the month.
-                        {% endblocktranslate %}
-                    </p>
-                    <p>
-                        {% blocktranslate trimmed %}
-                            The date you select will be the reference date for the data set for your report.
-                            Please allow for up to 24 hours for your report to be ready.
-                        {% endblocktranslate %}
-                    </p>
-                    <div class="column-2">
-                        {% include "partials/form/fieldset.html" with fields=report_schedule_form_start_date %}
-
-                    </div>
-                {% endif %}
-            </form>
             <form id="generate_report" class="inline" method="post" action="{{ next }}">
                 {% csrf_token %}
                 {% include "forms/report_form_fields.html" %}
+                {% include "partials/form/fieldset.html" with fields=report_schedule_form_start_date fieldset_parent_class="column-2" %}
 
-                {% if not is_scheduled_report %}
-                    {% include "partials/report_names_header.html" %}
-                    {% include "partials/report_names_form.html" %}
+                <h2>{% translate "Report name" %}</h2>
+                <p>
+                    {% blocktranslate trimmed %}
+                        When generating reports, it is possible to give the report a name. The name
+                        can be static or dynamic. The default format for a report is '${report_type} for
+                        ${oois_count} objects'. These placeholders automatically adapt based on the report details.
+                        This format could for example return 'Aggregate Report for 15 objects'.
+                        Another placeholder that can be used is '${ooi}', which will show the name of the object when
+                        there is only one object. You can also customize the name by adding prefixes, suffixes,
+                        or other formats like '%W' for the week number, using options from
+                        <a href="https://strftime.org/" target="_blank" rel="noopener">Python strftime code</a>.
+                    {% endblocktranslate %}
+                </p>
+                {% include "partials/form/fieldset.html" with fields=report_name_form %}
 
-                    <button type="submit" form="generate_report">
-                        {% translate "Generate report" %}<span class="icon ti-chevron-right" aria-hidden="true"></span>
-                    </button>
-                {% else %}
-                    {% include "partials/report_names_header.html" with recurrence=True %}
-                    {% include "partials/form/fieldset.html" with fields=report_parent_name_form %}
-
-                    {% if reports|length > 1 %}
-                        {% include "partials/form/fieldset.html" with fields=report_child_name_form %}
-
-                    {% endif %}
-                    <button type="submit" form="generate_report">
-                        {% translate "Generate report" %}<span class="icon ti-chevron-right" aria-hidden="true"></span>
-                    </button>
-                {% endif %}
+                <button type="submit" form="generate_report">
+                    {% translate "Generate report" %}<span class="icon ti-chevron-right" aria-hidden="true"></span>
+                </button>
             </form>
         {% else %}
             {% include "partials/return_button.html" with btn_text="Go back" %}

@@ -114,13 +114,6 @@
         "version": "0.0.1.dev1",
         "additional": null,
         "results": []
-      },
-      {
-        "service": "keiko",
-        "healthy": true,
-        "version": "0.0.1.dev1",
-        "additional": null,
-        "results": []
       }
     ],
     "config_oois": [],

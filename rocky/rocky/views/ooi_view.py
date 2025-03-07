@@ -18,7 +18,7 @@ from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_mandatory_field
 from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.models import OOI, ScanLevel, ScanProfileType
 from octopoes.models.ooi.findings import Finding, FindingType
-from octopoes.models.ooi.reports import Report
+from octopoes.models.ooi.reports import AssetReport, BaseReport, HydratedReport, Report, ReportData, ReportRecipe
 from octopoes.models.types import get_collapsed_types, type_by_name
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import ConnectorFormMixin, OctopoesView, OOIList, SingleOOIMixin, SingleOOITreeMixin
@@ -30,7 +30,9 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
     """
 
     connector_form_class = ObservedAtForm
-    ooi_types = get_collapsed_types().difference({Finding, FindingType, Report})
+    ooi_types = get_collapsed_types().difference(
+        {Finding, FindingType, BaseReport, Report, ReportRecipe, AssetReport, ReportData, HydratedReport}
+    )
     scan_levels = DEFAULT_SCAN_LEVEL_FILTER
     scan_profile_types = DEFAULT_SCAN_PROFILE_TYPE_FILTER
 
@@ -140,7 +142,8 @@ class BaseOOIDetailView(BreadcrumbsMixin, SingleOOITreeMixin, ConnectorFormMixin
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.ooi = self.get_ooi()
+        tree = self.tree
+        self.ooi = tree.store[tree.root.reference]
 
     def get_current_ooi(self) -> OOI | None:
         """
@@ -150,7 +153,7 @@ class BaseOOIDetailView(BreadcrumbsMixin, SingleOOITreeMixin, ConnectorFormMixin
         if self.observed_at.date() == now.date():
             return self.ooi
         try:
-            return self.get_ooi(pk=self.get_ooi_id(), observed_at=now)
+            return self.get_ooi_tree(self.get_ooi_id(), observed_at=now).store[self.get_ooi_id()]
         except Http404:
             return None
 
