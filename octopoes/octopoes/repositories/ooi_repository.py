@@ -271,7 +271,7 @@ class XTDBOOIRepository(OOIRepository):
                     object_cls,
                     error,
                 )
-                errordata = {"original_primary_key": primary_key,
+                errordata = {"original_primary_key": stripped["primary_key"],
                              "message": 
                     """An OOI could not be validated due to a mismatch between the database and the current models.
                     PK: %r on (wanted) type %s. Validation error: %r""" % (stripped["primary_key"], object_cls, error)}
