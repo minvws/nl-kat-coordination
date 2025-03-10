@@ -20,7 +20,7 @@ from octopoes.config.settings import (
 )
 from octopoes.events.events import OOIDBEvent, OperationType
 from octopoes.events.manager import EventManager
-from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
+from octopoes.models import OOI, OOIParseError, Reference, ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
@@ -271,7 +271,11 @@ class XTDBOOIRepository(OOIRepository):
                     object_cls,
                     error,
                 )
-                return False
+                errordata = {"original_primary_key": primary_key,
+                             "message": 
+                    """An OOI could not be validated due to a mismatch between the database and the current models.
+                    PK: %r on (wanted) type %s. Validation error: %r""" % (stripped["primary_key"], object_cls, error)}
+                return OOIParseError.model_validate(errordata)
             raise error
 
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
