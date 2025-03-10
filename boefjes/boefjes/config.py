@@ -8,6 +8,7 @@ from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, Settings
 from pydantic_settings.sources import EnvSettingsSource
 
 from boefjes.models import EncryptionMiddleware
+from boefjes.runtime_interfaces import WorkerManager
 
 BASE_DIR: Path = Path(__file__).parent.resolve()
 
@@ -116,6 +117,20 @@ class Settings(BaseSettings):
     span_export_grpc_endpoint: AnyHttpUrl | None = Field(
         None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
     )
+
+    boefje_reachable_networks: list[str] | None = Field(
+        None,
+        description="List of networks the boefje-runner can reach",
+        examples=[["Network|internet", "Network|dentist"], []],
+    )
+
+    boefje_task_capabilities: list[str] | None = Field(
+        None,
+        description="List of technical requirements the boefje-runner is capable of running",
+        examples=[[], ["ipv4", "wifi-pineapple"]],
+    )
+
+    runner_type: WorkerManager.WorkerType | None = Field(None, examples=["boefje", "normalizer"])
 
     logging_format: Literal["text", "json"] = Field("text", description="Logging format")
 

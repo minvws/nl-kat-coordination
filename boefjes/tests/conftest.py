@@ -31,7 +31,7 @@ from boefjes.local_repository import (
     get_normalizer_resource,
 )
 from boefjes.models import Organisation
-from boefjes.runtime_interfaces import Handler, WorkerManager
+from boefjes.runtime_interfaces import Handler
 from boefjes.sql.config_storage import SQLConfigStorage, create_encrypter
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage, get_organisations_store
