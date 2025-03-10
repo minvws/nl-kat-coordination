@@ -5,6 +5,7 @@ from datetime import datetime
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from jsonschema.validators import Draft202012Validator
+from katalogus.client import Boefje
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.forms.scheduler import OOIDetailTaskFilterForm
 from tools.ooi_helpers import format_display
@@ -66,29 +67,54 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
 
     def get_task_filters(self) -> dict[str, str | datetime | None]:
         filters = super().get_task_filters()
-        filters["input_ooi"] = self.ooi.primary_key  # shows only tasks for this particular ooi
+        filters["filters"]["filters"].append(
+            {"column": "data", "field": "input_ooi", "operator": "==", "value": str(self.ooi)}
+        )
         return filters
+
+    def get_boefjes_filter_form(self):
+        return PossibleBoefjesFilterForm(self.request.GET)
+
+    def get_boefjes_for_ooi(self, boefjes: list[Boefje]) -> list[Boefje]:
+        return [
+            boefje
+            for boefje in boefjes
+            if boefje.enabled
+            and self.ooi.__class__ in boefje.consumes
+            and self.ooi.scan_profile is not None
+            and self.ooi.scan_profile.level >= boefje.scan_level.value
+        ]
+
+    def get_boefjes_exceeding_ooi_clearance_level(self, boefjes: list[Boefje]) -> list[Boefje]:
+        """Get Boefjes that exceeds OOI clearance level"""
+
+        return [
+            boefje
+            for boefje in boefjes
+            if boefje
+            and boefje.enabled
+            and self.ooi.__class__ in boefje.consumes
+            and self.ooi.scan_profile is not None
+            and boefje.scan_level.value > self.ooi.scan_profile.level
+        ]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        filter_form = PossibleBoefjesFilterForm(self.request.GET)
-
-        # List from katalogus
-        boefjes = []
-        if self.indemnification_present:
-            katalogus = self.get_katalogus()
-            boefjes = [boefje for boefje in katalogus.get_enabled_boefjes() if self.ooi.__class__ in boefje.consumes]
-
-        if boefjes:
-            context["enabled_boefjes_available"] = True
-
-        max_level = self.organization_member.max_clearance_level
-        if self.ooi.scan_profile and filter_form.is_valid() and not filter_form.cleaned_data["show_all"]:
-            max_level = min(max_level, self.ooi.scan_profile.level)
-
-        context["boefjes"] = [boefje for boefje in boefjes if boefje.scan_level.value <= max_level]
         context["ooi"] = self.ooi
+
+        enabled_boefjes = self.get_katalogus().get_enabled_boefjes()
+        ooi_boefjes = self.get_boefjes_for_ooi(enabled_boefjes)
+
+        filter_form = self.get_boefjes_filter_form()
+
+        # When a user wants to view boefjes that can't scan ooi, because the ooi does not have enough clearance level.
+        if self.ooi.scan_profile and filter_form.is_valid() and filter_form.cleaned_data["show_all"]:
+            exceeding_boefjes = self.get_boefjes_exceeding_ooi_clearance_level(enabled_boefjes)
+
+            context["boefjes"] = ooi_boefjes + exceeding_boefjes
+        else:
+            context["boefjes"] = ooi_boefjes
 
         context.update(self.get_origins(self.ooi.reference, self.organization))
         if context["inferences"]:
@@ -119,7 +145,7 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
         context["count_findings_per_severity"] = dict(self.count_findings_per_severity())
         context["severity_summary_totals"] = sum(context["count_findings_per_severity"].values())
 
-        context["possible_boefjes_filter_form"] = filter_form
+        context["possible_boefjes_filter_form"] = self.get_boefjes_filter_form()
         context["organization_indemnification"] = self.indemnification_present
 
         if self.request.GET.get("show_clearance_level_inheritance"):

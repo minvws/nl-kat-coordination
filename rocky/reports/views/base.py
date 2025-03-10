@@ -24,7 +24,7 @@ from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, PostRedirect, url_w
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.reports import AssetReport, ReportRecipe
 from octopoes.models.ooi.reports import BaseReport as ReportOOI
-from octopoes.models.types import OOIType
+from octopoes.models.types import OOIType, type_by_name
 from reports.forms import OOITypeMultiCheckboxForReportForm, ReportScheduleStartDateForm
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.concatenated_report.report import ConcatenatedReport
@@ -178,9 +178,10 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         return get_ooi_types_with_report()
 
     def get_ooi_types(self):
+        ooi_types = self.get_report_ooi_types()
         if self.filtered_ooi_types:
-            return super().get_ooi_types()
-        return self.get_report_ooi_types()
+            return {type_by_name(t) for t in self.filtered_ooi_types if type_by_name(t) in ooi_types}
+        return ooi_types
 
     def get_oois(self) -> list[OOI]:
         if self.all_oois_selected():
@@ -290,6 +291,7 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         self, report_name_format: str, report_type: str | None, schedule: str | None
     ) -> ReportRecipe:
         report_recipe = ReportRecipe(
+            user_id=self.request.user.id,
             recipe_id=uuid4(),
             report_name_format=report_name_format,
             input_recipe=self.get_input_recipe(),
@@ -547,6 +549,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         self.report_ooi = self.get_report_ooi()
         self.report_data, self.input_oois, self.report_types, self.plugins = self.get_report_data()
+        self.recipe_ooi = self.get_recipe_ooi(self.report_ooi.report_recipe)
 
     def get(self, request, *args, **kwargs):
         if "json" in self.request.GET and self.request.GET["json"] == "true":
@@ -587,6 +590,9 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         return self.octopoes_api_connector.get_report(
             Reference.from_str(self.request.GET.get("report_id")), valid_time=self.custom_observed_at
         )
+
+    def get_recipe_ooi(self, recipe_id: str) -> ReportRecipe | None:
+        return self.octopoes_api_connector.get(Reference.from_str(recipe_id), valid_time=self.observed_at)
 
     def get_template_names(self):
         if self.report_ooi.report_type and issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
@@ -719,6 +725,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         context = super().get_context_data(**kwargs)
         context["report_data"] = self.report_data
         context["report_ooi"] = self.report_ooi
+        context["recipe_ooi"] = self.recipe_ooi
 
         context["oois"] = self.input_oois
 
