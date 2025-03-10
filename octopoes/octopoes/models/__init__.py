@@ -244,12 +244,15 @@ class OOI(BaseModel):
 
 OOIClassType = TypeVar("OOIClassType")
 
+
 class OOIParseError(OOI):
-    """This object-type represents a placeholder OOI-like error container to singal the user parsing of a speficic OOI failed"""
+    """This object-type represents a placeholder OOI-like error container to signal
+    to the user that parsing of a specific OOI failed"""
+
     object_type: Literal["OOIParseError"] = "OOIParseError"
     original_primary_key: str
     message: str
-    
+
     _natural_key_attrs = ["original_primary_key"]
 
 
