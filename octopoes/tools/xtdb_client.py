@@ -145,7 +145,7 @@ class XTDBClient:
     def submit_tx(self, transactions: list[TransactionType]) -> JsonValue:
         data = {"tx-ops": transactions}
         res = self._client.post("/submit-tx", json=data)
-        breakpoint()
+
         return res.json()
 
     def tx_committed(self, txid: int) -> JsonValue:
