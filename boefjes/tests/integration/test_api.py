@@ -16,13 +16,26 @@ def test_get_local_plugin(test_client, organisation):
 
 
 def test_filter_plugins(test_client, organisation):
-    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/")
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins")
+    assert len(response.json()) > 100
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins", params={"plugin_type": "boefje"})
     assert len(response.json()) > 10
-    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins?plugin_type=boefje")
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins", params={"state": "true"})
     assert len(response.json()) > 10
-    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins?state=true")
-    assert len(response.json()) > 10
-    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins?limit=10")
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins", params={"limit": 10})
+    assert len(response.json()) == 10
+
+    # Test "consumes" and "produces" filters
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins", params={"consumes": "ADRFindingType"})
+    assert len(response.json()) == 1
+    assert response.json()[0]["id"] == "adr-finding-types"
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins", params={"produces": "Finding"})
+    assert len(response.json()) == 27
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins", params={"consumes": "boefje/censys"})
+    assert len(response.json()) == 1
+    response = test_client.get(
+        f"/v1/organisations/{organisation.id}/plugins", params={"consumes": ["ADRFindingType", "Hostname"]}
+    )
     assert len(response.json()) == 10
 
     response = test_client.get(
