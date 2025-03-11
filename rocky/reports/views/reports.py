@@ -18,6 +18,7 @@ from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.reports import AssetReport, HydratedReport, Report, ReportRecipe
 from reports.views.base import ReportBreadcrumbs, get_selection
 from rocky.paginator import RockyPaginator
+from rocky.scheduler import Task
 from rocky.views.mixins import OctopoesView, ReportList
 from rocky.views.scheduler import SchedulerView
 from rocky.views.tasks import ReportsTaskListView
@@ -295,16 +296,19 @@ class ReportOverviewView(BreadcrumbsReportOverviewView, ReportActionsView, ListV
         return context
 
 
+class ReportHistory:
+    task: Task
+    reports: list[HydratedReport]
+
+
 class ReportHistoryView(BreadcrumbsReportOverviewView, ReportsTaskListView):
     """
     Shows all the reports that have ever been generated for the organization.
     """
 
     paginate_by = 30
-    context_object_name = "report_history"
-    paginator = RockyPaginator
+    context_object_name = "report_histories"
     template_name = "reports/report_history.html"
-    task_type = "report"
 
     def get_reports(self, recipe_id: str, valid_time: datetime) -> list[HydratedReport]:
         try:
@@ -313,13 +317,18 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, ReportsTaskListView):
             return []
 
     def get_queryset(self):
-        report_history = {}
-        report_tasks = super().get_queryset()
+        report_tasks = super().get_queryset()  # paginated report tasks
+
+        report_histories = []
 
         for report_task in report_tasks[0 : len(report_tasks)]:  # can only get full result set with slicing using int.
-            hydrated_reports = self.get_reports(report_task.data.report_recipe_id, report_task.modified_at)
-            report_history[report_task] = hydrated_reports
-        return report_history
+            report_history = ReportHistory()
+            report_history.task = report_task
+            report_history.reports = self.get_reports(report_task.data.report_recipe_id, report_task.modified_at)
+
+            report_histories.append(report_history)
+
+        return report_histories
 
 
 class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):

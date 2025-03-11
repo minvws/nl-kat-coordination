@@ -1,1 +1,40 @@
-{{ report_history }}
+{% load i18n %}
+{% load static %}
+
+<p class="de-emphasized">
+    {% blocktranslate with length=reports|length total=total_reports %}Showing {{ length }} of {{ total }} reports{% endblocktranslate %}
+</p>
+<div class="horizontal-scroll sticky-column">
+    <table class="nowrap">
+        <caption class="visually-hidden">{% translate "Reports:" %}</caption>
+        <thead>
+            <tr>
+                <th scope="col">{% translate "History" %}</th>
+                <th scope="col">{% translate "Name" %}</th>
+                <th scope="col">{% translate "Task Status" %}</th>
+                <th scope="col">{% translate "Report type" %}</th>
+                <th scope="col" class="nowrap">{% translate "Input objects" %}</th>
+                <th scope="col" class="nowrap">{% translate "Reference date" %}</th>
+                <th scope="col" class="nowrap">{% translate "Creation date" %}</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report_history in report_histories %}
+                {% for report in report_history.reports %}
+                    <tr>
+                        <td>{{ report.observed_at }}</td>
+                        <td class="report_name">
+                            <a id="report_name_{{ report.reference|slugify }}"
+                               href="{% url "view_report" organization.code %}?report_id={{ report.reference }}&observed_at={{ report.observed_at|date:"Y-m-d H:i:s:u" }}"
+                               title="{% translate "Shows parent report details" %}">{{ report.name }}</a>
+                        </td>
+                        <td>
+                            <i class="icon {{ report_history.task.status.value }}"></i>{{ report_history.task.status.value|capfirst }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
