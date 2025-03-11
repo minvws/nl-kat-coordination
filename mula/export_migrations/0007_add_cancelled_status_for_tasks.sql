@@ -1,0 +1,1 @@
+ALTER TYPE public.taskstatus ADD VALUE 'CANCELLED';

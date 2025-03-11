@@ -39,7 +39,7 @@ def migration_6f99834a4a5a() -> Session:
 
     engine.execute(text(query))
 
-    entries = [(1, "dns-records", True, 1), (2, "nmap-udp", True, 1)]
+    entries = [(1, "dns-records", True, 1), (2, "nmap-udp", True, 1), (3, "kat_dns_normalize", False, 1)]
     query = f"INSERT INTO plugin_state (id, plugin_id, enabled, organisation_pk) values {','.join(map(str, entries))}"  # noqa: S608
     engine.execute(text(query))
 
@@ -51,7 +51,7 @@ def migration_6f99834a4a5a() -> Session:
     engine.execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables]))
 
 
-def test_fail_on_wrong_plugin_ids(migration_6f99834a4a5a):
+def test_migration_compatibility(migration_6f99834a4a5a):
     session = migration_6f99834a4a5a
 
     encrypter = create_encrypter()
@@ -93,8 +93,12 @@ def test_fail_on_wrong_plugin_ids(migration_6f99834a4a5a):
     assert config_storage.get_all_settings("dev1", "nmap-udp") == {}
     assert config_storage.get_all_settings("dev2", "dns-records") == {"key1": "val1", "key2": "val2"}
 
-    assert config_storage.is_enabled_by_id("dns-records", "dev1")
-    assert config_storage.is_enabled_by_id("nmap-udp", "dev1")
+    assert config_storage.get_states_for_organisation("dev1") == {
+        "nmap": False,
+        "dns-records": True,
+        "nmap-udp": True,
+        "kat_dns_normalize": False,
+    }
 
     session.commit()
     session.close()

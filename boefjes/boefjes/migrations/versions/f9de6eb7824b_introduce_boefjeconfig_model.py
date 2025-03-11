@@ -204,6 +204,12 @@ def upgrade() -> None:
             LEFT JOIN boefje_config bc ON bc.boefje_id = b.id WHERE bc.boefje_id IS NULL
         """)  # Add boefjes and set the enabled field for boefjes that to not exist yet
         connection.execute("""
+            INSERT INTO normalizer_config (enabled, normalizer_id, organisation_pk)
+            SELECT p.enabled, n.id, p.organisation_pk FROM plugin_state p
+            JOIN normalizer n ON p.plugin_id = n.plugin_id
+            LEFT JOIN normalizer_config nc ON nc.normalizer_id = n.id WHERE nc.normalizer_id IS NULL
+        """)  # Add normalizers and set the enabled field for normalizers that to not exist yet
+        connection.execute("""
             UPDATE boefje_config bc SET enabled = p.enabled from plugin_state p
             JOIN boefje b ON p.plugin_id = b.plugin_id
             where b.id = bc.boefje_id and p.organisation_pk = bc.organisation_pk

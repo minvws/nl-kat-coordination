@@ -50,7 +50,6 @@ def upgrade():
     op.execute("""UPDATE tasks SET hash = p_item ->> 'hash'""")
 
     op.alter_column("tasks", "data", nullable=False)
-
     op.alter_column("tasks", "scheduler_id", existing_type=sa.VARCHAR(), nullable=False)
     op.alter_column("tasks", "type", existing_type=sa.VARCHAR(), nullable=False)
 
