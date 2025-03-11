@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class Schedule(BaseModel):
@@ -19,6 +19,8 @@ class Schedule(BaseModel):
 
 
 class ScheduleCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     scheduler_id: str
     organisation: str
     data: dict

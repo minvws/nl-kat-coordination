@@ -1,14 +1,13 @@
-import json
 import uuid
 from typing import Any, ClassVar
 
 import mmh3
 import pydantic
+from scheduler import models
+from scheduler.server import serializers
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Query
 
-from scheduler import models
-from scheduler.server import serializers
 from tests import factories
 
 
@@ -42,7 +41,7 @@ def create_task_push(priority: int, organisation: str, data: TestModel | None = 
     return serializers.TaskPush(priority=priority, organisation=organisation, data=data.model_dump())
 
 
-def create_task_push_json(priority: int, organisation: str, data: TestModel | None = None) -> str:
+def create_task_push_dict(priority: int, organisation: str, data: TestModel | None = None) -> dict[str, Any]:
     return create_task_push(priority, organisation, data).model_dump(exclude_none=True)
 
 
