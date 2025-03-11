@@ -4,10 +4,11 @@ from typing import Any, ClassVar
 
 import mmh3
 import pydantic
-from scheduler import models
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Query
 
+from scheduler import models
+from scheduler.server import serializers
 from tests import factories
 
 
@@ -34,11 +35,15 @@ def create_test_model() -> TestModel:
     return TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex)
 
 
-def create_task_in(priority: int, organisation: str, data: TestModel | None = None) -> str:
+def create_task_push(priority: int, organisation: str, data: TestModel | None = None) -> serializers.TaskPush:
     if data is None:
         data = TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex)
 
-    return json.dumps({"priority": priority, "organisation": organisation, "data": data.model_dump()})
+    return serializers.TaskPush(priority=priority, organisation=organisation, data=data.model_dump())
+
+
+def create_task_push_json(priority: int, organisation: str, data: TestModel | None = None) -> str:
+    return create_task_push(priority, organisation, data).model_dump(exclude_none=True)
 
 
 def create_schedule(scheduler_id: str, data: Any | None = None) -> models.Schedule:
