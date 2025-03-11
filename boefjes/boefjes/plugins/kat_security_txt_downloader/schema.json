@@ -1,0 +1,21 @@
+{
+  "title": "Arguments",
+  "type": "object",
+  "properties": {
+    "USERAGENT": {
+      "title": "USERAGENT",
+      "maxLength": 128,
+      "type": "string",
+      "description": "The Useragent used by the downloader.",
+      "default": "OpenKat"
+    },
+    "TIMEOUT": {
+      "title": "TIMEOUT",
+      "maximum": 9999,
+      "minimum": 0,
+      "type": "integer",
+      "description": "The timeout used by the downloader before it fails a url.",
+      "default": 30
+    }
+  }
+}
