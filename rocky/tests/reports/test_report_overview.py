@@ -1,11 +1,11 @@
 from uuid import uuid4
 
 from pytest_django.asserts import assertContains
-from reports.views.report_overview import ReportHistoryView
 
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.reports import HydratedReport
 from octopoes.models.pagination import Paginated
+from rocky.reports.views.reports import ReportHistoryView
 from tests.conftest import setup_request
 
 

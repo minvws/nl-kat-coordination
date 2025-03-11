@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-27 10:26+0000\n"
+"POT-Creation-Date: 2025-03-11 11:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,14 +32,14 @@ msgstr ""
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/tls_report/report.html
 #: reports/templates/partials/report_names_form.html
-#: reports/templates/report_overview/modal_partials/delete_modal.html
-#: reports/templates/report_overview/modal_partials/rename_modal.html
-#: reports/templates/report_overview/modal_partials/rerun_modal.html
-#: reports/templates/report_overview/modal_partials/share_modal.html
-#: reports/templates/report_overview/report_history_table.html
-#: reports/templates/report_overview/scheduled_reports_table.html
-#: reports/templates/report_overview/subreports_table.html
-#: tools/forms/boefje.py rocky/templates/organizations/organization_list.html
+#: reports/templates/reports/modal_partials/delete_modal.html
+#: reports/templates/reports/modal_partials/rename_modal.html
+#: reports/templates/reports/modal_partials/rerun_modal.html
+#: reports/templates/reports/modal_partials/share_modal.html
+#: reports/templates/reports/report_overview_table.html
+#: reports/templates/reports/scheduled_reports_table.html
+#: reports/templates/reports/subreports_table.html tools/forms/boefje.py
+#: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/templates/partials/ooi_detail_related_object.html
 msgid "Name"
@@ -586,8 +586,8 @@ msgstr ""
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/confirmation_clone_settings.html
 #: katalogus/templates/plugin_settings_delete.html
-#: reports/templates/report_overview/modal_partials/enable_disable_schedule_modal.html
 #: reports/templates/report_schedules/delete_recipe_modal.html
+#: reports/templates/reports/modal_partials/enable_disable_schedule_modal.html
 #: rocky/templates/oois/ooi_delete.html
 #: rocky/templates/oois/ooi_mute_finding.html
 #: rocky/templates/organizations/organization_edit.html
@@ -632,14 +632,14 @@ msgstr ""
 #: katalogus/templates/partials/plugin_tile_modal.html
 #: katalogus/templates/plugin_container_image.html
 #: reports/report_types/dns_report/report.html
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/scheduled_reports_table.html
 msgid "Enabled"
 msgstr ""
 
 #: katalogus/forms/katalogus_filter.py
 #: katalogus/templates/partials/plugin_tile_modal.html
 #: katalogus/templates/plugin_container_image.html
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
 msgid "Disabled"
 msgstr ""
@@ -826,7 +826,7 @@ msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
 #: reports/templates/partials/report_ooi_list.html
-#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/reports/report_overview_table.html
 #: reports/templates/summary/ooi_selection.html
 #: rocky/templates/oois/ooi_list.html
 msgid "Object"
@@ -1108,7 +1108,7 @@ msgid "Boefje details"
 msgstr ""
 
 #: katalogus/templates/partials/plugin_tile_modal.html reports/forms.py
-#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/reports/report_overview_table.html
 msgid "Report types"
 msgstr ""
 
@@ -1140,7 +1140,7 @@ msgid "Plugin description"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
-#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/reports/report_overview_table.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Actions"
@@ -1151,7 +1151,7 @@ msgid "Detail page"
 msgstr ""
 
 #: katalogus/templates/partials/plugins_navigation.html
-#: reports/templates/report_overview/report_overview_navigation.html
+#: reports/templates/reports/report_overview_navigation.html
 msgid "Plugins Navigation"
 msgstr ""
 
@@ -1256,7 +1256,7 @@ msgstr ""
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
@@ -1271,7 +1271,7 @@ msgstr ""
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
@@ -1287,10 +1287,10 @@ msgid "Boefje ID"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
-#: reports/templates/report_overview/modal_partials/delete_modal.html
-#: reports/templates/report_overview/modal_partials/rerun_modal.html
-#: reports/templates/report_overview/report_history_table.html
-#: reports/templates/report_overview/subreports_table.html
+#: reports/templates/reports/modal_partials/delete_modal.html
+#: reports/templates/reports/modal_partials/rerun_modal.html
+#: reports/templates/reports/report_overview_table.html
+#: reports/templates/reports/subreports_table.html
 #: reports/templates/tasks/report_tasks_list.html
 msgid "Creation date"
 msgstr ""
@@ -1388,9 +1388,9 @@ msgstr ""
 
 #: katalogus/templates/plugin_settings_delete.html
 #: katalogus/views/plugin_settings_delete.py
-#: reports/templates/report_overview/modal_partials/delete_modal.html
-#: reports/templates/report_overview/report_history_table.html
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/modal_partials/delete_modal.html
+#: reports/templates/reports/report_overview_table.html
+#: reports/templates/reports/scheduled_reports_table.html
 #: rocky/templates/admin/delete_confirmation.html rocky/views/ooi_delete.py
 msgid "Delete"
 msgstr ""
@@ -1862,8 +1862,8 @@ msgid "Choose a report - Introduction"
 msgstr ""
 
 #: onboarding/templates/step_2a_choose_report_info.html
-#: reports/templates/report_overview/report_overview_header.html
-#: reports/views/base.py rocky/templates/header.html
+#: reports/templates/reports/report_overview_header.html reports/views/base.py
+#: rocky/templates/header.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 #: rocky/templates/tasks/report_tasks.html rocky/views/tasks.py
 msgid "Reports"
@@ -2054,8 +2054,8 @@ msgstr ""
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 #: reports/report_types/dns_report/report.html
 #: reports/templates/partials/report_ooi_list.html
-#: reports/templates/report_overview/modal_partials/delete_modal.html
-#: reports/templates/report_overview/modal_partials/rerun_modal.html
+#: reports/templates/reports/modal_partials/delete_modal.html
+#: reports/templates/reports/modal_partials/rerun_modal.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: rocky/templates/oois/ooi_list.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
@@ -2447,8 +2447,7 @@ msgstr ""
 msgid "Start time (UTC)"
 msgstr ""
 
-#: reports/forms.py
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/forms.py reports/templates/reports/scheduled_reports_table.html
 msgid "Recurrence"
 msgstr ""
 
@@ -2526,10 +2525,10 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/plugin_overview_table.html
-#: reports/templates/report_overview/modal_partials/rename_modal.html
-#: reports/templates/report_overview/report_history_table.html
-#: reports/templates/report_overview/scheduled_reports_table.html
-#: reports/templates/report_overview/subreports_table.html
+#: reports/templates/reports/modal_partials/rename_modal.html
+#: reports/templates/reports/report_overview_table.html
+#: reports/templates/reports/scheduled_reports_table.html
+#: reports/templates/reports/subreports_table.html
 #: reports/templates/summary/report_asset_overview.html
 msgid "Report type"
 msgstr ""
@@ -3035,7 +3034,7 @@ msgstr ""
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
@@ -3652,7 +3651,7 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/reports/report_overview_table.html
 msgid "Report name"
 msgstr ""
 
@@ -3671,7 +3670,7 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-#: reports/templates/report_overview/report_overview_header.html
+#: reports/templates/reports/report_overview_header.html
 #: reports/views/generate_report.py
 msgid "Generate report"
 msgstr ""
@@ -3798,7 +3797,7 @@ msgid "Add reference date"
 msgstr ""
 
 #: reports/templates/partials/report_names_form.html
-#: reports/templates/report_overview/modal_partials/rename_modal.html
+#: reports/templates/reports/modal_partials/rename_modal.html
 #: rocky/views/scan_profile.py
 msgid "Reset"
 msgstr ""
@@ -3910,7 +3909,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: reports/templates/partials/report_ooi_list.html
-#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/reports/report_overview_table.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: tools/view_helpers.py rocky/templates/admin/delete_confirmation.html
 #: rocky/templates/admin/delete_selected_confirmation.html
@@ -4098,13 +4097,27 @@ msgstr ""
 msgid "%(btn_text)s"
 msgstr ""
 
-#: reports/templates/report_overview/modal_partials/delete_modal.html
-#: reports/templates/report_overview/modal_partials/share_modal.html
+#: reports/templates/report_schedules/delete_recipe_modal.html
+msgid "Delete report recipe"
+msgstr ""
+
+#: reports/templates/report_schedules/delete_recipe_modal.html
+msgid ""
+"\n"
+"        Deleting this report recipe means it will be permanently deleted.\n"
+"        It will not be possible anymore to see or enable the schedule.\n"
+"        You will find previously generated reports in the report history "
+"tab.\n"
+"  "
+msgstr ""
+
+#: reports/templates/reports/modal_partials/delete_modal.html
+#: reports/templates/reports/modal_partials/share_modal.html
 msgid "Delete the following report(s):"
 msgstr ""
 
-#: reports/templates/report_overview/modal_partials/delete_modal.html
-#: reports/templates/report_overview/modal_partials/share_modal.html
+#: reports/templates/reports/modal_partials/delete_modal.html
+#: reports/templates/reports/modal_partials/share_modal.html
 msgid ""
 "\n"
 "      Deleted reports are removed in the view from the moment of deletion. "
@@ -4113,8 +4126,8 @@ msgid ""
 "  "
 msgstr ""
 
-#: reports/templates/report_overview/modal_partials/delete_modal.html
-#: reports/templates/report_overview/modal_partials/share_modal.html
+#: reports/templates/reports/modal_partials/delete_modal.html
+#: reports/templates/reports/modal_partials/share_modal.html
 msgid ""
 "\n"
 "      It is still possible to generate a new report for same date. If the "
@@ -4123,27 +4136,27 @@ msgid ""
 "  "
 msgstr ""
 
-#: reports/templates/report_overview/modal_partials/delete_modal.html
-#: reports/templates/report_overview/modal_partials/rerun_modal.html
-#: reports/templates/report_overview/report_history_table.html
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/modal_partials/delete_modal.html
+#: reports/templates/reports/modal_partials/rerun_modal.html
+#: reports/templates/reports/report_overview_table.html
+#: reports/templates/reports/scheduled_reports_table.html
 msgid "Input objects"
 msgstr ""
 
-#: reports/templates/report_overview/modal_partials/delete_modal.html
-#: reports/templates/report_overview/modal_partials/rerun_modal.html
-#: reports/templates/report_overview/report_history_table.html
-#: reports/templates/report_overview/scheduled_reports_table.html
-#: reports/templates/report_overview/subreports_table.html
+#: reports/templates/reports/modal_partials/delete_modal.html
+#: reports/templates/reports/modal_partials/rerun_modal.html
+#: reports/templates/reports/report_overview_table.html
+#: reports/templates/reports/scheduled_reports_table.html
+#: reports/templates/reports/subreports_table.html
 msgid "Reference date"
 msgstr ""
 
-#: reports/templates/report_overview/modal_partials/enable_disable_schedule_modal.html
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/modal_partials/enable_disable_schedule_modal.html
+#: reports/templates/reports/scheduled_reports_table.html
 msgid "Disable schedule"
 msgstr ""
 
-#: reports/templates/report_overview/modal_partials/enable_disable_schedule_modal.html
+#: reports/templates/reports/modal_partials/enable_disable_schedule_modal.html
 #, python-format
 msgid ""
 "\n"
@@ -4154,20 +4167,20 @@ msgid ""
 "        "
 msgstr ""
 
-#: reports/templates/report_overview/modal_partials/rename_modal.html
+#: reports/templates/reports/modal_partials/rename_modal.html
 msgid "Rename the following report(s):"
 msgstr ""
 
-#: reports/templates/report_overview/modal_partials/rename_modal.html
-#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/reports/modal_partials/rename_modal.html
+#: reports/templates/reports/report_overview_table.html
 msgid "Rename"
 msgstr ""
 
-#: reports/templates/report_overview/modal_partials/rerun_modal.html
+#: reports/templates/reports/modal_partials/rerun_modal.html
 msgid "Rerun the following report(s):"
 msgstr ""
 
-#: reports/templates/report_overview/modal_partials/rerun_modal.html
+#: reports/templates/reports/modal_partials/rerun_modal.html
 msgid ""
 "\n"
 "      By submitting you're generating the selected reports again, using the "
@@ -4175,49 +4188,61 @@ msgid ""
 "  "
 msgstr ""
 
-#: reports/templates/report_overview/modal_partials/rerun_modal.html
-#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/reports/modal_partials/rerun_modal.html
+#: reports/templates/reports/report_overview_table.html
 msgid "Rerun"
 msgstr ""
 
-#: reports/templates/report_overview/report_history.html
+#: reports/templates/reports/report_overview.html
 msgid "Reports history"
 msgstr ""
 
-#: reports/templates/report_overview/report_history.html
+#: reports/templates/reports/report_overview.html
 msgid ""
 "On this page you can see all the reports that have been generated in the "
 "past. To create a new report, click the 'Generate Report' button."
 msgstr ""
 
-#: reports/templates/report_overview/report_history_table.html
-#: reports/templates/report_overview/subreports.html
+#: reports/templates/reports/report_overview_header.html
+msgid "Overview of reports"
+msgstr ""
+
+#: reports/templates/reports/report_overview_navigation.html
+msgid "Scheduled"
+msgstr ""
+
+#: reports/templates/reports/report_overview_navigation.html
+msgid "History"
+msgstr ""
+
+#: reports/templates/reports/report_overview_table.html
+#: reports/templates/reports/subreports.html
 #, python-format
 msgid "Showing %(length)s of %(total)s reports"
 msgstr ""
 
-#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/reports/report_overview_table.html
 #: reports/templates/tasks/report_tasks_list.html
 msgid "Reports:"
 msgstr ""
 
-#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/reports/report_overview_table.html
 msgid "Shows parent report details"
 msgstr ""
 
-#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/reports/report_overview_table.html
 msgid "Close asset report object details"
 msgstr ""
 
-#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/reports/report_overview_table.html
 msgid "Open asset report object details"
 msgstr ""
 
-#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/reports/report_overview_table.html
 msgid "Asset reports details:"
 msgstr ""
 
-#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/reports/report_overview_table.html
 #, python-format
 msgid ""
 "\n"
@@ -4232,131 +4257,104 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: reports/templates/report_overview/report_history_table.html
-#: reports/templates/report_overview/subreports_header.html
-#: reports/views/report_overview.py
+#: reports/templates/reports/report_overview_table.html
+#: reports/templates/reports/subreports_header.html reports/views/reports.py
 msgid "Asset reports"
 msgstr ""
 
-#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/reports/report_overview_table.html
 msgid "Shows asset report details"
 msgstr ""
 
-#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/reports/report_overview_table.html
 msgid "View all asset reports"
 msgstr ""
 
-#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/reports/report_overview_table.html
 msgid "No reports have been generated yet."
 msgstr ""
 
-#: reports/templates/report_overview/report_overview_header.html
-msgid "Overview of reports"
-msgstr ""
-
-#: reports/templates/report_overview/report_overview_navigation.html
-msgid "Scheduled"
-msgstr ""
-
-#: reports/templates/report_overview/report_overview_navigation.html
-msgid "History"
-msgstr ""
-
-#: reports/templates/report_overview/scheduled_reports.html
+#: reports/templates/reports/scheduled_reports.html
 msgid "Scheduled reports"
 msgstr ""
 
-#: reports/templates/report_overview/scheduled_reports.html
+#: reports/templates/reports/scheduled_reports.html
 msgid ""
 "On this page you can see all the reports that are or have been scheduled. To "
 "schedule a report, select a start date and recurrence while generating a "
 "report."
 msgstr ""
 
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/scheduled_reports_table.html
 #, python-format
 msgid "Showing %(length)s of %(total)s schedules"
 msgstr ""
 
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/scheduled_reports_table.html
 msgid "Scheduled reports:"
 msgstr ""
 
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/scheduled_reports_table.html
 msgid "Scheduled for"
 msgstr ""
 
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/scheduled_reports_table.html
 msgid "Schedule status"
 msgstr ""
 
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/scheduled_reports_table.html
 msgid "Once"
 msgstr ""
 
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/scheduled_reports_table.html
 msgid "Recent reports"
 msgstr ""
 
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/scheduled_reports_table.html
 msgid "Scheduled Reports:"
 msgstr ""
 
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/scheduled_reports_table.html
 msgid "Show report details"
 msgstr ""
 
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/scheduled_reports_table.html
 msgid "objects"
 msgstr ""
 
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/scheduled_reports_table.html
 msgid "Edit report recipe"
 msgstr ""
 
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/scheduled_reports_table.html
 msgid "Enable schedule"
 msgstr ""
 
-#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/reports/scheduled_reports_table.html
 msgid "No scheduled reports have been generated yet."
 msgstr ""
 
-#: reports/templates/report_overview/subreports_header.html
+#: reports/templates/reports/subreports_header.html
 msgid "Back to Reports History"
 msgstr ""
 
-#: reports/templates/report_overview/subreports_header.html
+#: reports/templates/reports/subreports_header.html
 msgid "An overview of all underlying reports of"
 msgstr ""
 
-#: reports/templates/report_overview/subreports_header.html
-#: reports/templates/report_overview/subreports_table.html
+#: reports/templates/reports/subreports_header.html
+#: reports/templates/reports/subreports_table.html
 msgid "Shows report details"
 msgstr ""
 
-#: reports/templates/report_overview/subreports_table.html
+#: reports/templates/reports/subreports_table.html
 msgid "Asset reports:"
 msgstr ""
 
-#: reports/templates/report_overview/subreports_table.html
+#: reports/templates/reports/subreports_table.html
 #: rocky/templates/tasks/boefjes.html
 #: rocky/templates/tasks/plugin_detail_task_list.html
 msgid "Input Object"
-msgstr ""
-
-#: reports/templates/report_schedules/delete_recipe_modal.html
-msgid "Delete report recipe"
-msgstr ""
-
-#: reports/templates/report_schedules/delete_recipe_modal.html
-msgid ""
-"\n"
-"        Deleting this report recipe means it will be permanently deleted.\n"
-"        It will not be possible anymore to see or enable the schedule.\n"
-"        You will find previously generated reports in the report history "
-"tab.\n"
-"  "
 msgstr ""
 
 #: reports/templates/summary/report_asset_overview.html
@@ -4479,66 +4477,66 @@ msgstr ""
 msgid "View report"
 msgstr ""
 
-#: reports/views/report_overview.py
+#: reports/views/reports.py
 msgid "Recipe '{}' deleted successfully"
 msgstr ""
 
-#: reports/views/report_overview.py
+#: reports/views/reports.py
 msgid "Recipe not found."
 msgstr ""
 
-#: reports/views/report_overview.py
+#: reports/views/reports.py
 msgid "No schedule or recipe selected"
 msgstr ""
 
-#: reports/views/report_overview.py
+#: reports/views/reports.py
 msgid "Schedule {}"
 msgstr ""
 
-#: reports/views/report_overview.py
+#: reports/views/reports.py
 msgid ""
 "Schedule disabled successfully. '{}' will not be generated automatically "
 "until the schedule is enabled again."
 msgstr ""
 
-#: reports/views/report_overview.py
+#: reports/views/reports.py
 msgid ""
 "Schedule enabled successfully. '{}' will be generated according to schedule."
 msgstr ""
 
-#: reports/views/report_overview.py
+#: reports/views/reports.py
 msgid "An unexpected error occurred, please check logs for more info."
 msgstr ""
 
-#: reports/views/report_overview.py
+#: reports/views/reports.py
 msgid "Deletion successful."
 msgstr ""
 
-#: reports/views/report_overview.py
+#: reports/views/reports.py
 msgid ""
 "Multi organization reports cannot be rescheduled. It consists of imported "
 "data from different organizations and is not based on newly generated data."
 msgstr ""
 
-#: reports/views/report_overview.py
+#: reports/views/reports.py
 msgid ""
 "Rerun successful. It may take a moment before the new report has been "
 "generated."
 msgstr ""
 
-#: reports/views/report_overview.py
+#: reports/views/reports.py
 msgid "Renaming failed. Empty report name found."
 msgstr ""
 
-#: reports/views/report_overview.py
+#: reports/views/reports.py
 msgid "Report names and reports does not match."
 msgstr ""
 
-#: reports/views/report_overview.py
+#: reports/views/reports.py
 msgid "Reports successfully renamed."
 msgstr ""
 
-#: reports/views/report_overview.py
+#: reports/views/reports.py
 msgid "Report {} could not be renamed."
 msgstr ""
 

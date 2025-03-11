@@ -115,7 +115,7 @@
                                 <div class="horizontal-view toolbar">
                                     <div class="button-container">
                                         {% if schedule.enabled %}
-                                            {% include "report_overview/modal_partials/enable_disable_schedule_modal.html" with modal_id="disable-schedule-modal-"|add:schedule.schedule_id %}
+                                            {% include "reports/modal_partials/enable_disable_schedule_modal.html" with modal_id="disable-schedule-modal-"|add:schedule.schedule_id %}
 
                                             <a class="button ghost"
                                                href="{% ooi_url "ooi_edit" schedule.recipe organization.code %}"><span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit report recipe" %}</a>

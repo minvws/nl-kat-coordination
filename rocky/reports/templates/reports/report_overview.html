@@ -1,0 +1,23 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1" class="katalogus">
+        <section>
+            {% include "reports/header_reports.html" %}
+            {% include "reports/tab_navigation.html" with active="overview" %}
+
+            <h2>{% translate "Reports overview" %}</h2>
+            <p>
+                {% translate "The Reports Overview provides a snapshot of scheduled reports, allowing you to manage and view the results of previously generated reports. To create a new report, click the 'Generate Report' button." %}
+            </p>
+            {% include "reports/report_overview_table.html" %}
+            {% include "partials/list_paginator.html" %}
+
+        </section>
+    </main>
+{% endblock content %}

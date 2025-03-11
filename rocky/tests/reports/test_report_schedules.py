@@ -1,6 +1,5 @@
-from reports.views.report_overview import ScheduledReportsView
-
 from octopoes.models.exception import ObjectNotFoundException
+from rocky.reports.views.reports import ScheduledReportsView
 from rocky.scheduler import SchedulerError
 from tests.conftest import setup_request
 

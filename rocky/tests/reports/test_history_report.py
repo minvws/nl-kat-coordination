@@ -1,10 +1,10 @@
 import pytest
 from django.urls import resolve, reverse
 from pytest_django.asserts import assertContains, assertNotContains
-from reports.views.report_overview import ReportHistoryView, SubreportView
 
 from octopoes.models.ooi.reports import HydratedReport
 from octopoes.models.pagination import Paginated
+from rocky.reports.views.reports import ReportHistoryView, SubreportView
 from tests.conftest import setup_request
 
 

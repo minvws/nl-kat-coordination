@@ -183,7 +183,7 @@ class ClearanceFilterForm(BaseRockyForm):
 _EXCLUDED_OOI_TYPES = (
     "Finding",
     "FindingType",
-    "Report",
+    # "Report",
     "AssetReport",
     "BaseReport",
     "ReportRecipe",

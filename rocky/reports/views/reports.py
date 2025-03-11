@@ -20,6 +20,7 @@ from reports.views.base import ReportBreadcrumbs, get_selection
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import OctopoesView, ReportList
 from rocky.views.scheduler import SchedulerView
+from rocky.views.tasks import ReportsTaskListView
 
 logger = structlog.get_logger(__name__)
 
@@ -41,7 +42,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
     paginate_by = 20
     context_object_name = "reports"
     paginator = RockyPaginator
-    template_name = "report_overview/scheduled_reports.html"
+    template_name = "reports/scheduled_reports.html"
     task_type = "report"
     context_object_name = "scheduled_reports"
 
@@ -123,7 +124,7 @@ class ScheduledReportsEnableDisableView(BreadcrumbsReportOverviewView, Scheduler
     """
 
     task_type = "report"
-    template_name = "report_overview/scheduled_reports.html"
+    template_name = "reports/scheduled_reports.html"
 
     def get_queryset(self) -> ReportList:
         return ReportList(self.octopoes_api_connector, valid_time=self.observed_at)
@@ -165,27 +166,7 @@ class ScheduledReportsEnableDisableView(BreadcrumbsReportOverviewView, Scheduler
         return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 
 
-class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesView, ListView):
-    """
-    Shows all the reports that have ever been generated for the organization.
-    """
-
-    paginate_by = 30
-    context_object_name = "reports"
-    paginator = RockyPaginator
-    template_name = "report_overview/report_history.html"
-    task_type = "report"
-
-    def post(self, request, *args, **kwargs):
-        try:
-            self.run_bulk_actions()
-        except (ObjectNotFoundException, ValidationError):
-            messages.error(request, _("An unexpected error occurred, please check logs for more info."))
-        return self.get(request, *args, **kwargs)
-
-    def get_queryset(self) -> ReportList:
-        return ReportList(self.octopoes_api_connector, valid_time=self.observed_at)
-
+class ReportActionsView(SchedulerView, OctopoesView):
     def get_report_ooi(self, ooi_pk: str) -> HydratedReport:
         return self.octopoes_api_connector.get_report(ooi_pk, valid_time=self.observed_at)
 
@@ -285,11 +266,60 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
 
         return messages.error(self.request, _("Report {} could not be renamed.").format(", ".join(error_reports)))
 
+
+class ReportOverviewView(BreadcrumbsReportOverviewView, ReportActionsView, ListView):
+    """
+    Shows all the reports that have ever been generated for the organization.
+    """
+
+    paginate_by = 30
+    context_object_name = "reports"
+    paginator = RockyPaginator
+    template_name = "reports/report_overview.html"
+    task_type = "report"
+
+    def post(self, request, *args, **kwargs):
+        try:
+            self.run_bulk_actions()
+        except (ObjectNotFoundException, ValidationError):
+            messages.error(request, _("An unexpected error occurred, please check logs for more info."))
+        return self.get(request, *args, **kwargs)
+
+    def get_queryset(self) -> ReportList:
+        return ReportList(self.octopoes_api_connector, valid_time=self.observed_at)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["total_reports"] = len(self.object_list)
         context["selected_reports"] = self.request.GET.getlist("report", [])
         return context
+
+
+class ReportHistoryView(BreadcrumbsReportOverviewView, ReportsTaskListView):
+    """
+    Shows all the reports that have ever been generated for the organization.
+    """
+
+    paginate_by = 30
+    context_object_name = "report_history"
+    paginator = RockyPaginator
+    template_name = "reports/report_history.html"
+    task_type = "report"
+
+    def get_reports(self, recipe_id: str, valid_time: datetime) -> list[HydratedReport]:
+        try:
+            return self.octopoes_api_connector.list_reports(valid_time=valid_time, recipe_id=UUID(recipe_id)).items
+        except (HTTPStatusError, ObjectNotFoundException):
+            return []
+
+    def get_queryset(self):
+        report_history = {}
+        report_tasks = super().get_queryset()
+
+        for report_task in report_tasks[0 : len(report_tasks)]:  # can only get full result set with slicing using int.
+            hydrated_reports = self.get_reports(report_task.data.report_recipe_id, report_task.modified_at)
+            report_history[report_task] = hydrated_reports
+        return report_history
 
 
 class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
@@ -301,7 +331,7 @@ class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     breadcrumbs_step = 2
     context_object_name = "asset_reports"
     paginator = RockyPaginator
-    template_name = "report_overview/subreports.html"
+    template_name = "reports/subreports.html"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)

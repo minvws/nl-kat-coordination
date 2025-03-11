@@ -41,7 +41,7 @@ class TaskListView(SchedulerView, SchedulerListView, PageActionsView):
         context = super().get_context_data(**kwargs)
         context["task_filter_form"] = self.get_task_filter_form()
         context["active_filters_counter"] = self.count_active_task_filters()
-        context["stats"] = self.get_task_statistics()
+
         context["breadcrumbs"] = [
             {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")}
         ]
@@ -54,7 +54,7 @@ class BoefjesTaskListView(TaskListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
+        context["stats"] = self.get_task_statistics()
         context["breadcrumbs"] = [
             {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")},
             {
@@ -71,6 +71,7 @@ class NormalizersTaskListView(TaskListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["stats"] = self.get_task_statistics()
         context["breadcrumbs"] = [
             {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")},
             {
