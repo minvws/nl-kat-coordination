@@ -92,6 +92,8 @@ class DashboardService:
 
                 if report_data:
                     findings_dashboard[organization] = {data: {"report": report, "report_data": report_data}}
+            else:
+                findings_dashboard[organization] = {}
 
         return findings_dashboard
 
