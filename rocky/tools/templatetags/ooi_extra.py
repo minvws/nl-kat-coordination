@@ -116,6 +116,7 @@ def get_first_seen(occurrences: dict) -> datetime:
     return datetime.fromisoformat(first_seen)
 
 
+@register.filter
 def get_user_full_name(ooi: OOI) -> str:
     try:
         return KATUser.objects.get(id=ooi.user_id).get_full_name()
