@@ -75,7 +75,7 @@ def run(input_ooi: dict, raw: bytes | str) -> Iterator[OOI]:
             hostname = Hostname(name=url.netloc, network=network_reference)
             yield hostname
 
-        if ip and ip_ooi:  # These should always be both assigned or neither should be assigned
+        if ip is not None and ip_ooi is not None:  # These should always be both assigned or neither should be assigned
             url_ooi = IPAddressHTTPURL(
                 network=network_reference,
                 scheme=WebScheme(url.scheme),
