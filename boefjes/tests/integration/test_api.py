@@ -16,13 +16,26 @@ def test_get_local_plugin(test_client, organisation):
 
 
 def test_filter_plugins(test_client, organisation):
-    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/")
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins")
+    assert len(response.json()) > 100
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins", params={"plugin_type": "boefje"})
     assert len(response.json()) > 10
-    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins?plugin_type=boefje")
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins", params={"state": "true"})
     assert len(response.json()) > 10
-    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins?state=true")
-    assert len(response.json()) > 10
-    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins?limit=10")
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins", params={"limit": 10})
+    assert len(response.json()) == 10
+
+    # Test "consumes" and "produces" filters
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins", params={"consumes": "ADRFindingType"})
+    assert len(response.json()) == 1
+    assert response.json()[0]["id"] == "adr-finding-types"
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins", params={"produces": "Finding"})
+    assert len(response.json()) == 27
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins", params={"consumes": "boefje/censys"})
+    assert len(response.json()) == 1
+    response = test_client.get(
+        f"/v1/organisations/{organisation.id}/plugins", params={"consumes": ["ADRFindingType", "Hostname"]}
+    )
     assert len(response.json()) == 10
 
     response = test_client.get(
@@ -146,7 +159,7 @@ def test_add_normalizer(test_client, organisation):
     assert response.status_code == 201
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/?plugin_type=normalizer")
-    assert len(response.json()) == 57
+    assert len(response.json()) == 58
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/test_normalizer")
     assert response.json() == normalizer.model_dump()

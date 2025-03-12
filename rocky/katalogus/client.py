@@ -207,7 +207,7 @@ class KATalogusClient:
 
         logger.info("Deleted organization", organization_code=organization_code)
 
-    def get_plugins(self, organization_code: str, **params) -> list[Plugin]:
+    def get_plugins(self, organization_code: str, **params) -> list[Boefje | Normalizer]:
         response = self.session.get(f"/v1/organisations/{quote(organization_code)}/plugins", params=params)
 
         return [parse_plugin(plugin) for plugin in response.json()]
@@ -242,10 +242,10 @@ class KATalogusClient:
 
         return response
 
-    def get_normalizers(self, organization_code: str) -> list[Plugin]:
+    def get_normalizers(self, organization_code: str) -> list[Normalizer]:
         return self.get_plugins(organization_code, plugin_type="normalizer")
 
-    def get_boefjes(self, organization_code: str) -> list[Plugin]:
+    def get_boefjes(self, organization_code: str) -> list[Boefje]:
         return self.get_plugins(organization_code, plugin_type="boefje")
 
     def enable_plugin(self, organization_code: str, plugin: Plugin) -> None:
@@ -366,10 +366,10 @@ class KATalogus:
             self._member.organization.code, to_organization
         )
 
-    def get_normalizers(self) -> list[Plugin]:
+    def get_normalizers(self) -> list[Normalizer]:
         return self._katalogus_client.get_normalizers(self._member.organization.code)
 
-    def get_boefjes(self) -> list[Plugin]:
+    def get_boefjes(self) -> list[Boefje]:
         return self._katalogus_client.get_boefjes(self._member.organization.code)
 
     def enable_plugin(self, plugin: Plugin) -> None:
@@ -390,7 +390,7 @@ class KATalogus:
 
         return self._katalogus_client.disable_plugin(self._member.organization.code, plugin)
 
-    def get_enabled_boefjes(self) -> list[Plugin]:
+    def get_enabled_boefjes(self) -> list[Boefje]:
         return self._katalogus_client.get_plugins(self._member.organization.code, plugin_type="boefje", state=True)
 
     def get_cover(self, plugin_id: str) -> BytesIO:
@@ -459,7 +459,7 @@ def parse_normalizer(normalizer: dict) -> Normalizer:
     )
 
 
-def parse_plugin(plugin: dict) -> Plugin:
+def parse_plugin(plugin: dict) -> Boefje | Normalizer:
     if plugin["type"] == "boefje":
         return parse_boefje(plugin)
     elif plugin["type"] == "normalizer":
