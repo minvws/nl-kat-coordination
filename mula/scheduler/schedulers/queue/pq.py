@@ -95,8 +95,9 @@ class PriorityQueue(abc.ABC):
         self.allow_updates: bool = allow_updates
         self.allow_priority_updates: bool = allow_priority_updates
         self.pq_store: storage.stores.PriorityQueueStore = pq_store
-        self.lock: threading.Lock = threading.Lock()
+        self.lock: threading.RLock = threading.RLock()
 
+    @with_lock
     def pop(self, filters: storage.filters.FilterRequest | None = None) -> tuple[list[models.Task], int]:
         """Remove and return the highest priority item from the queue.
         Optionally apply filters to the queue.
@@ -121,6 +122,7 @@ class PriorityQueue(abc.ABC):
 
         return items, count
 
+    @with_lock
     def push(self, task: models.Task) -> models.Task:
         """Push an item onto the queue.
 
@@ -258,6 +260,7 @@ class PriorityQueue(abc.ABC):
         """Return the size of the queue."""
         return self.pq_store.qsize(self.pq_id)
 
+    @with_lock
     def full(self) -> bool:
         """Return True if the queue is full, False otherwise."""
         current_size = self.qsize()
@@ -266,6 +269,7 @@ class PriorityQueue(abc.ABC):
 
         return current_size >= self.maxsize
 
+    @with_lock
     def is_item_on_queue(self, task: models.Task) -> bool:
         """Check if an item is on the queue.
 
