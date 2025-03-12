@@ -1,0 +1,26 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            {% include "organization_crisis_room_header.html" %}
+
+        </section>
+        <section>
+            <div class="fifty-fifty">
+                <div>
+                    <h2>{{ dashboard.name }}</h2>
+                </div>
+                <div class="horizontal-view toolbar">
+                    <a class="button ghost" href="">{% translate "Add item" %}</a>
+                </div>
+            </div>
+            {% for item in dashboard.dashboard_items %}<h4>{{ item.name }}</h4>{% endfor %}
+        </section>
+    </main>
+{% endblock content %}

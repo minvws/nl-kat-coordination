@@ -1,6 +1,6 @@
 import json
 
-from crisis_room.views import CrisisRoom, DashboardService
+from crisis_room.views import CrisisRoomView, DashboardService
 from pytest_django.asserts import assertContains
 
 from tests.conftest import setup_request
@@ -16,7 +16,7 @@ def test_crisis_room_findings_dashboard(rf, mocker, client_member, findings_dash
     summary(findings_dashboard_mock_data)
 
     request = setup_request(rf.get("crisis_room"), client_member.user)
-    response = CrisisRoom.as_view()(request)
+    response = CrisisRoomView.as_view()(request)
 
     assert response.status_code == 200
     # View should show the 'Findings overview' for all organizations

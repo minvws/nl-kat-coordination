@@ -3,6 +3,7 @@ from typing import Any
 from uuid import UUID
 
 import structlog
+from account.mixins import OrganizationView
 from django.conf import settings
 from django.http.request import HttpRequest
 from django.urls import reverse
@@ -128,7 +129,9 @@ class DashboardService:
         return summary
 
 
-class CrisisRoom(TemplateView):
+class CrisisRoomView(TemplateView):
+    """This is the Crisis Room for all organizations."""
+
     template_name = "crisis_room.html"
 
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
@@ -150,4 +153,27 @@ class CrisisRoom(TemplateView):
         context["breadcrumbs"] = [{"url": reverse("crisis_room"), "text": "Crisis "}]
         context["organizations_dashboards"] = self.organizations_findings
         context["organizations_findings_summary"] = self.organizations_findings_summary
+        return context
+
+
+class OrganizationsCrisisRoomView(OrganizationView, TemplateView):
+    """This is the Crisis Room for a single organization."""
+
+    template_name = "organization_crisis_room.html"
+
+    def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
+        super().setup(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["dashboards"] = [
+            {
+                "name": "TestDashboard1",
+                "dashboard_items": [{"name": "Item1", "template": ""}, {"name": "Item2", "template": ""}],
+            },
+            {
+                "name": "TestDashboard2",
+                "dashboard_items": [{"name": "Item1", "template": ""}, {"name": "Item2", "template": ""}],
+            },
+        ]
         return context
