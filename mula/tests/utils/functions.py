@@ -3,11 +3,11 @@ from typing import Any, ClassVar
 
 import mmh3
 import pydantic
+from scheduler import models
+from scheduler.server import schemas
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Query
 
-from scheduler import models
-from scheduler.server import schemas
 from tests import factories
 
 
