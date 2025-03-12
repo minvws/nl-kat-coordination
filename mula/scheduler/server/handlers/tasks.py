@@ -6,7 +6,7 @@ import structlog
 from fastapi import status
 
 from scheduler import context, storage
-from scheduler.server import serializers, utils
+from scheduler.server import schemas, utils
 from scheduler.server.errors import BadRequestError, NotFoundError
 
 
@@ -37,7 +37,7 @@ class TaskAPI:
             path="/tasks/{task_id}",
             endpoint=self.get,
             methods=["GET"],
-            response_model=serializers.Task,
+            response_model=schemas.Task,
             status_code=status.HTTP_200_OK,
             description="Get a task",
         )
@@ -46,7 +46,7 @@ class TaskAPI:
             path="/tasks/{task_id}",
             endpoint=self.patch,
             methods=["PATCH"],
-            response_model=serializers.Task,
+            response_model=schemas.Task,
             response_model_exclude_unset=True,
             status_code=status.HTTP_200_OK,
             description="Update a task",
@@ -80,13 +80,13 @@ class TaskAPI:
 
         return utils.paginate(request, results, count, offset, limit)
 
-    def get(self, task_id: uuid.UUID) -> serializers.Task:
+    def get(self, task_id: uuid.UUID) -> schemas.Task:
         task = self.ctx.datastores.task_store.get_task(task_id)
         if task is None:
             raise NotFoundError(f"task not found, by task_id: {task_id}")
         return task
 
-    def patch(self, task_id: uuid.UUID, item: serializers.TaskPatch) -> serializers.Task:
+    def patch(self, task_id: uuid.UUID, item: schemas.TaskPatch) -> schemas.Task:
         task_db = self.ctx.datastores.task_store.get_task(task_id)
 
         if task_db is None:

@@ -7,10 +7,10 @@ from unittest import mock
 from urllib.parse import quote
 
 from fastapi.testclient import TestClient
-from scheduler import config, models, server, storage, utils
-from scheduler.server import serializers
-from scheduler.storage import stores
 
+from scheduler import config, models, server, storage, utils
+from scheduler.server import schemas
+from scheduler.storage import stores
 from tests.factories import OrganisationFactory
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
@@ -180,7 +180,7 @@ class APISchedulerEndpointTestCase(APITemplateTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Add the same item again through the api
-        updated_item = serializers.TaskPush(**initial_item)
+        updated_item = schemas.TaskPush(**initial_item)
         response = self.client.post(
             f"/schedulers/{self.scheduler.scheduler_id}/push", json=updated_item.model_dump(exclude_none=True)
         )
@@ -205,7 +205,7 @@ class APISchedulerEndpointTestCase(APITemplateTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Update the item
-        updated_item = serializers.TaskPush(**initial_item)
+        updated_item = schemas.TaskPush(**initial_item)
         updated_item.id = response.json().get("id")
         updated_item.data["name"] = "updated-name"
 
@@ -230,7 +230,7 @@ class APISchedulerEndpointTestCase(APITemplateTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Update the item
-        updated_item = serializers.TaskPush(**initial_item)
+        updated_item = schemas.TaskPush(**initial_item)
         updated_item.id = response.json().get("id")
         updated_item.data["name"] = "updated-name"
 
@@ -260,7 +260,7 @@ class APISchedulerEndpointTestCase(APITemplateTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Update the item
-        updated_item = serializers.TaskPush(**initial_item)
+        updated_item = schemas.TaskPush(**initial_item)
         updated_item.priority = 2
 
         # Try to update the item through the api
@@ -288,7 +288,7 @@ class APISchedulerEndpointTestCase(APITemplateTestCase):
         self.assertEqual(response.status_code, 201)
 
         # Update priority of the item
-        updated_item = serializers.TaskPush(**initial_item)
+        updated_item = schemas.TaskPush(**initial_item)
         updated_item.priority = 1
 
         # Try to update the item through the api
@@ -318,7 +318,7 @@ class APISchedulerEndpointTestCase(APITemplateTestCase):
         self.assertEqual(response.status_code, 201)
 
         # Update priority of the item
-        updated_item = serializers.Task(**initial_item)
+        updated_item = schemas.Task(**initial_item)
         updated_item.id = response.json().get("id")
         updated_item.priority = 2
 

@@ -3,11 +3,11 @@ from typing import Any, ClassVar
 
 import mmh3
 import pydantic
-from scheduler import models
-from scheduler.server import serializers
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Query
 
+from scheduler import models
+from scheduler.server import schemas
 from tests import factories
 
 
@@ -34,11 +34,11 @@ def create_test_model() -> TestModel:
     return TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex)
 
 
-def create_task_push(priority: int, organisation: str, data: TestModel | None = None) -> serializers.TaskPush:
+def create_task_push(priority: int, organisation: str, data: TestModel | None = None) -> schemas.TaskPush:
     if data is None:
         data = TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex)
 
-    return serializers.TaskPush(priority=priority, organisation=organisation, data=data.model_dump())
+    return schemas.TaskPush(priority=priority, organisation=organisation, data=data.model_dump())
 
 
 def create_task_push_dict(priority: int, organisation: str, data: TestModel | None = None) -> dict[str, Any]:
