@@ -49,7 +49,9 @@
         </div>
         {% if report_ooi.report_type == "multi-organization-report" %}
             <p>
-                {% blocktranslate with length=report_data.organizations|length %}This sector contains {{ length }} scanned organizations.{% endblocktranslate %}
+                {% blocktranslate with length=report_data.organizations|length trimmed %}
+                    This sector contains {{ length }} scanned organizations.
+                {% endblocktranslate %}
                 {% if report_data.tags %}
                     {% translate "Of these organizations" %}
                     {% for tag, organizations in report_data.tags.items %}
@@ -65,7 +67,9 @@
                     {% endfor %}
                 {% endif %}
                 {% translate "The basic security scores are around " %}{{ report_data.basic_security_score }}%.
-                {% blocktranslate with total=report_data.total_critical_vulnerabilities %}A total of {{ total }} critical vulnerabilities have been identified.{% endblocktranslate %}
+                {% blocktranslate with total=report_data.total_critical_vulnerabilities trimmed %}
+                    A total of {{ total }} critical vulnerabilities have been identified.
+                {% endblocktranslate %}
             </p>
         {% endif %}
     </div>
