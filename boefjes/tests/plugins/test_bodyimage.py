@@ -21,7 +21,7 @@ def test_website_analysis(boefje_runner, mocker):
 
     output = boefje_runner.run(meta, {})
 
-    assert "openkat-http/response" in output[0][0]
+    assert "application/json+har" in output[0][0]
     assert "openkat-http/headers" in output[1][0]
     assert "openkat-http/body" in output[2][0]
 
@@ -48,7 +48,7 @@ def test_body_image_normalizer(normalizer_runner):
     output = normalizer_runner.run(meta, get_dummy_data("cat_image")).observations[0].results
 
     assert len(output) == 1
-    assert {
+    assert output[0].dict() == {
         "object_type": "ImageMetadata",
         "primary_key": "ImageMetadata|internet|134.209.85.72|tcp|443|https|internet"
         "|mispo.es|https|internet|mispo.es|443|/",
@@ -65,7 +65,7 @@ def test_body_image_normalizer(normalizer_runner):
             "size": (600, 600),
             "width": 600,
         },
-    } == output[0].dict()
+    }
 
 
 def test_body_normalizer(normalizer_runner):

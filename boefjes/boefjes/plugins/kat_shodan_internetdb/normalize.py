@@ -27,28 +27,36 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[OOI]:
         else:
             logging.warning("Unexpected detail: %s", result["detail"])
     else:
-        for hostname in result["hostnames"]:
-            hostname_ooi = Hostname(name=hostname, network=Network(name=input_ooi["network"]["name"]).reference)
-            yield hostname_ooi
-            if hostname.endswith(DNS_PTR_STR):
-                yield DNSPTRRecord(hostname=hostname_ooi.reference, value=hostname, address=input_ooi_reference)
+        if "cdn" in result.get("tags", []):
+            for cpe in result["cpes"]:
+                if "cloudflare" in cpe:
+                    name, version = cpe_to_name_version(cpe=cpe)
+                    software = Software(name=name, version=version, cpe=cpe)
+                    yield software
+                    yield SoftwareInstance(software=software.reference, ooi=input_ooi_reference)
+        else:
+            for hostname in result["hostnames"]:
+                hostname_ooi = Hostname(name=hostname, network=Network(name=input_ooi["network"]["name"]).reference)
+                yield hostname_ooi
+                if hostname.endswith(DNS_PTR_STR):
+                    yield DNSPTRRecord(hostname=hostname_ooi.reference, value=hostname, address=input_ooi_reference)
 
-        # ruff: noqa: ERA001
-        # for port in result["ports"]:
-        #     yield IPPort(address=input_ooi_reference, port=int(port), state=PortState("open"))
+            # ruff: noqa: ERA001
+            # for port in result["ports"]:
+            #     yield IPPort(address=input_ooi_reference, port=int(port), state=PortState("open"))
 
-        for cve in result["vulns"]:
-            finding_type = CVEFindingType(id=cve)
-            finding = Finding(
-                finding_type=finding_type.reference,
-                ooi=input_ooi_reference,
-                proof=f"https://internetdb.shodan.io/{input_ooi_str}",
-            )
-            yield finding_type
-            yield finding
+            for cve in result["vulns"]:
+                finding_type = CVEFindingType(id=cve)
+                finding = Finding(
+                    finding_type=finding_type.reference,
+                    ooi=input_ooi_reference,
+                    proof=f"https://internetdb.shodan.io/{input_ooi_str}",
+                )
+                yield finding_type
+                yield finding
 
-        for cpe in result["cpes"]:
-            name, version = cpe_to_name_version(cpe=cpe)
-            software = Software(name=name, version=version, cpe=cpe)
-            yield software
-            yield SoftwareInstance(software=software.reference, ooi=input_ooi_reference)
+            for cpe in result["cpes"]:
+                name, version = cpe_to_name_version(cpe=cpe)
+                software = Software(name=name, version=version, cpe=cpe)
+                yield software
+                yield SoftwareInstance(software=software.reference, ooi=input_ooi_reference)

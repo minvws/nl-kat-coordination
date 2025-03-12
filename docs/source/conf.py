@@ -67,5 +67,5 @@ autosectionlabel_prefix_document = True
 
 suppress_warnings = [
     f"autosectionlabel.installation-and-deployment/environment-settings/{document}"
-    for document in ("boefjes", "bytes", "keiko", "mula", "octopoes")
+    for document in ("boefjes", "bytes", "mula", "octopoes")
 ]

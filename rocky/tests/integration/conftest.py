@@ -27,7 +27,7 @@ def valid_time():
 
 @pytest.fixture
 def katalogus_mock(mocker):
-    katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
+    katalogus = mocker.patch("katalogus.client.KATalogusClient")
     katalogus().health.return_value = ServiceHealth(service="katalogus", healthy=True)
 
     return katalogus
@@ -240,5 +240,5 @@ def hostname_oois():
             name="example.com",
             dns_zone=Reference("DNSZone|test|example.com"),
             registered_domain=None,
-        )
+        ).reference
     ]

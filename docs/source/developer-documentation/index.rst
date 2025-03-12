@@ -16,6 +16,6 @@ Contains documentation for developers and contributors.
    octopoes
    octopoes-models
    octopoes-research
-   keiko
    reports
    development-tutorial/index
+   qa-test-plan

@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from time import sleep
 from typing import Literal
 
-from django import forms
+from django.forms import Form
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -18,6 +18,7 @@ from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_mandatory_field
 from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.models import OOI, ScanLevel, ScanProfileType
 from octopoes.models.ooi.findings import Finding, FindingType
+from octopoes.models.ooi.reports import AssetReport, BaseReport, HydratedReport, Report, ReportData, ReportRecipe
 from octopoes.models.types import get_collapsed_types, type_by_name
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import ConnectorFormMixin, OctopoesView, OOIList, SingleOOIMixin, SingleOOITreeMixin
@@ -29,7 +30,9 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
     """
 
     connector_form_class = ObservedAtForm
-    ooi_types = get_collapsed_types().difference({Finding, FindingType})
+    ooi_types = get_collapsed_types().difference(
+        {Finding, FindingType, BaseReport, Report, ReportRecipe, AssetReport, ReportData, HydratedReport}
+    )
     scan_levels = DEFAULT_SCAN_LEVEL_FILTER
     scan_profile_types = DEFAULT_SCAN_PROFILE_TYPE_FILTER
 
@@ -139,7 +142,8 @@ class BaseOOIDetailView(BreadcrumbsMixin, SingleOOITreeMixin, ConnectorFormMixin
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.ooi = self.get_ooi()
+        tree = self.tree
+        self.ooi = tree.store[tree.root.reference]
 
     def get_current_ooi(self) -> OOI | None:
         """
@@ -149,7 +153,7 @@ class BaseOOIDetailView(BreadcrumbsMixin, SingleOOITreeMixin, ConnectorFormMixin
         if self.observed_at.date() == now.date():
             return self.ooi
         try:
-            return self.get_ooi(pk=self.get_ooi_id(), observed_at=now)
+            return self.get_ooi_tree(self.get_ooi_id(), observed_at=now).store[self.get_ooi_id()]
         except Http404:
             return None
 
@@ -187,12 +191,12 @@ class BaseOOIDetailView(BreadcrumbsMixin, SingleOOITreeMixin, ConnectorFormMixin
 
 class BaseOOIFormView(SingleOOIMixin, FormView):
     ooi_class: type[OOI]
-    form_class: forms.Form = OOIForm
+    form_class: type[BaseRockyForm] = OOIForm
 
     def get_ooi_class(self):
         return self.ooi.__class__ if hasattr(self, "ooi") else None
 
-    def get_form(self, form_class=None) -> BaseRockyForm:
+    def get_form(self, form_class: type[Form] | None = None) -> BaseRockyForm:
         form = super().get_form(form_class)
 
         # Disable natural key attributes

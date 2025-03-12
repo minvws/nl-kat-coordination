@@ -10,21 +10,21 @@ on:
     paths:
       - boefjes/**
       - octopoes/**
-      - .github/workflows/boefjes_test.yml
+      - .github/workflows/boefjes_tests.yml
   pull_request:
     paths:
       - boefjes/**
       - octopoes/**
-      - .github/workflows/boefjes_test.yml
+      - .github/workflows/boefjes_tests.yml
 
 jobs:
   Tests:
     strategy:
       fail-fast: false
       matrix:
-        version: ["3.10", "3.11"]
+        version: ["3.10", "3.11", "3.12", "3.13"]
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     env:
       COMPOSE_FILE: .ci/docker-compose.yml
 

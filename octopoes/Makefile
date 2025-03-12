@@ -52,6 +52,7 @@ rtest:
 	robot -d reports tests/robot
 
 itest:
+	docker compose --project-directory . -f .ci/docker-compose.yml kill
 	docker compose --project-directory . -f .ci/docker-compose.yml down --remove-orphans
 	docker compose --project-directory . -f .ci/docker-compose.yml build $(build_args)
 	docker compose --project-directory . -f .ci/docker-compose.yml run --rm octopoes_integration

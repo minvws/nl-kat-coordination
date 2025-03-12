@@ -55,10 +55,10 @@
       "summary": {}
     },
     "summary": {
-      "Critical vulnerabilities": 0,
-      "IPs scanned": 1,
-      "Hostnames scanned": 1,
-      "Terms in report": ""
+      "critical_vulnerabilities": 0,
+      "ips_scanned": 1,
+      "hostnames_scanned": 1,
+      "terms_in_report": ""
     },
     "total_findings": 0,
     "total_systems": 1,
@@ -110,13 +110,6 @@
       },
       {
         "service": "bytes",
-        "healthy": true,
-        "version": "0.0.1.dev1",
-        "additional": null,
-        "results": []
-      },
-      {
-        "service": "keiko",
         "healthy": true,
         "version": "0.0.1.dev1",
         "additional": null,

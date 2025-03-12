@@ -3,6 +3,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, TypedDict, TypeVar
 
+from django.utils.functional import Promise
+
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
@@ -32,8 +34,8 @@ def report_plugins_union(report_types: list[type["BaseReport"]]) -> ReportPlugin
 
 class BaseReport:
     id: str
-    name: str
-    description: str
+    name: Promise
+    description: Promise
     template_path: str = "report.html"
     plugins: ReportPlugins
     input_ooi_types: set[type[OOI]]
@@ -41,6 +43,9 @@ class BaseReport:
 
     def __init__(self, octopoes_api_connector: OctopoesAPIConnector):
         self.octopoes_api_connector = octopoes_api_connector
+
+    def collect_data(self, input_oois: Iterable[Reference], valid_time: datetime) -> dict[Reference, dict[str, Any]]:
+        raise NotImplementedError
 
     @classmethod
     def class_attributes(cls) -> dict[str, Any]:
@@ -62,7 +67,7 @@ class Report(BaseReport):
     def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         raise NotImplementedError
 
-    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+    def collect_data(self, input_oois: Iterable[Reference], valid_time: datetime) -> dict[Reference, dict[str, Any]]:
         """Generate data for multiple OOIs. Child classes can override this method to improve performance."""
 
         return {input_ooi: self.generate_data(input_ooi, valid_time) for input_ooi in input_oois}
@@ -93,25 +98,23 @@ class Report(BaseReport):
 
         return Report.group_by_source(query_result)
 
-    def to_hostnames(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, list[Reference]]:
+    def to_hostnames(self, input_oois: Iterable[Reference], valid_time: datetime) -> dict[Reference, list[Reference]]:
         """
         Turn a list of either Hostname and IPAddress references into a list of related hostnames, grouped by input ooi.
 
         If an input ooi is an IP without hostnames, the key will still be present but the list will be empty.
         """
 
-        refs = [Reference.from_str(input_ooi) for input_ooi in input_oois]
-
-        hostnames_by_input_ooi = {str(ref): [ref] if ref.class_type == Hostname else [] for ref in refs}
-        ip_refs = [ref for ref in refs if ref.class_type in (IPAddressV4, IPAddressV6)]
+        hostnames_by_input_ooi = {ref: [ref] if ref.class_type == Hostname else [] for ref in input_oois}
+        ip_refs = [ref for ref in input_oois if ref.class_type in (IPAddressV4, IPAddressV6)]
 
         for input_ooi, ip_hostname in self.octopoes_api_connector.query_many(
             "IPAddress.<address[is ResolvedHostname].hostname", valid_time, ip_refs
         ):
             if input_ooi not in hostnames_by_input_ooi:
-                hostnames_by_input_ooi[input_ooi] = []
+                hostnames_by_input_ooi[Reference.from_str(input_ooi)] = []
 
-            hostnames_by_input_ooi[input_ooi].append(ip_hostname.reference)
+            hostnames_by_input_ooi[Reference.from_str(input_ooi)].append(ip_hostname.reference)
 
         return hostnames_by_input_ooi
 
@@ -132,25 +135,23 @@ class Report(BaseReport):
             for input_ooi, hostnames in hostnames_by_input_ooi.items()
         }
 
-    def to_ips(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, list[Reference]]:
+    def to_ips(self, input_oois: Iterable[Reference], valid_time: datetime) -> dict[Reference, list[Reference]]:
         """
         Turn a list of either Hostname and IPAddress reference strings into a list of related ips.
 
         If an input ooi is a Hostname without ips, the key will still be present but the list will be empty.
         """
 
-        refs = [Reference.from_str(input_ooi) for input_ooi in input_oois]
-
-        ips_by_input_ooi = {str(ref): [ref] if ref.class_type in [IPAddressV4, IPAddressV6] else [] for ref in refs}
-        hostname_refs = [ref for ref in refs if ref.class_type == Hostname]
+        ips_by_input_ooi = {ref: [ref] if ref.class_type in [IPAddressV4, IPAddressV6] else [] for ref in input_oois}
+        hostname_refs = [ref for ref in input_oois if ref.class_type == Hostname]
 
         for input_ooi, hostname_ip in self.octopoes_api_connector.query_many(
             "Hostname.<hostname[is ResolvedHostname].address", valid_time, hostname_refs
         ):
             if input_ooi not in ips_by_input_ooi:
-                ips_by_input_ooi[input_ooi] = []
+                ips_by_input_ooi[Reference.from_str(input_ooi)] = []
 
-            ips_by_input_ooi[input_ooi].append(hostname_ip.reference)
+            ips_by_input_ooi[Reference.from_str(input_ooi)].append(hostname_ip.reference)
 
         return ips_by_input_ooi
 

@@ -18,14 +18,14 @@ def test_onboarding_create_organization(rf, superuser_member, mock_models_katalo
 
 
 def test_onboarding_create_organization_already_exist_katalogus(
-    rf, superuser, mock_models_katalogus, mock_models_octopoes
+    rf, superuser, mock_katalogus_client, mock_models_octopoes
 ):
     request = setup_request(
         rf.post("step_organization_setup", {"name": "Test Organization", "code": "test"}), superuser
     )
 
-    mock_models_katalogus().organization_exists.return_value = True
-    mock_models_katalogus().create_organization.side_effect = HTTPError("")
+    mock_katalogus_client().organization_exists.return_value = True
+    mock_katalogus_client().create_organization.side_effect = HTTPError("")
 
     response = OnboardingOrganizationSetupView.as_view()(request)
     assert response.status_code == 302

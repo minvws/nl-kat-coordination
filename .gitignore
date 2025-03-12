@@ -439,7 +439,6 @@ nl-kat-*
 # Automatically generated markdown files for the environment variables
 docs/source/installation-and-deployment/environment-settings/boefjes.md
 docs/source/installation-and-deployment/environment-settings/bytes.md
-docs/source/installation-and-deployment/environment-settings/keiko.md
 docs/source/installation-and-deployment/environment-settings/mula.md
 docs/source/installation-and-deployment/environment-settings/octopoes.md
 
@@ -449,6 +448,8 @@ docs/source/_static/mermaid.min.js
 # rpki cache
 /boefjes/boefjes/plugins/kat_rpki/rpki.json
 /boefjes/boefjes/plugins/kat_rpki/rpki-meta.json
+/boefjes/boefjes/plugins/kat_rpki/bgp.jsonl
+/boefjes/boefjes/plugins/kat_rpki/bgp-meta.json
 
 *.pstat
 **/.cache*
