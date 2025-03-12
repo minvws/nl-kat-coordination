@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-06 13:51+0000\n"
+"POT-Creation-Date: 2025-03-05 14:32+0000\n"
 "PO-Revision-Date: 2025-02-04 17:02+0000\n"
 "Last-Translator: jan klopper <jan@underdark.nl>\n"
 "Language-Team: Tamil <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -384,18 +384,9 @@ msgstr "OOI இசைவு"
 
 #: account/templates/account_detail.html
 msgid ""
-"\n"
-"                            You don't have any clearance to scan objects."
-"<br>\n"
-"                            Get in contact with the admin to give you the "
-"necessary clearance level.\n"
-"                        "
+"You don't have any clearance to scan objects. <br> Get in contact with the "
+"admin to give you the necessary clearance level."
 msgstr ""
-"\n"
-"                            பொருள்களை ச்கேன் செய்ய உங்களுக்கு எந்த இசைவு இல்லை. "
-"<br>\n"
-" தேவையான இசைவு அளவை உங்களுக்கு வழங்க நிர்வாகியுடன் தொடர்பு கொள்ளுங்கள்.\n"
-"                        "
 
 #: account/templates/account_detail.html
 msgid "You have currently accepted clearance up to level"
@@ -415,14 +406,8 @@ msgstr ""
 
 #: account/templates/account_detail.html
 #, python-format
-msgid ""
-"\n"
-"                            Withdraw L%(acl)s clearance and responsibility\n"
-"                    "
+msgid "Withdraw L%(acl)s clearance and responsibility"
 msgstr ""
-"\n"
-"                            L%(acl)s இசைவு மற்றும் பொறுப்பை திரும்பப் பெறுங்கள்\n"
-"                    "
 
 #: account/templates/account_detail.html
 msgid "Explanation OOI clearance"
@@ -441,15 +426,10 @@ msgstr ""
 "கொள்ளுங்கள்: <strong> பெரும் சக்தியுடன் பெரும் பொறுப்பு வருகிறது. </strong>"
 
 #: account/templates/account_detail.html
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #, python-format
-msgid ""
-"\n"
-"                        Accept level L%(tcl)s clearance and responsibility\n"
-"                    "
+msgid "Accept level L%(tcl)s clearance and responsibility"
 msgstr ""
-"\n"
-"                        நிலை L%(tcl)s இசைவு மற்றும் பொறுப்பை ஏற்றுக்கொள்ளுங்கள்\n"
-"                    "
 
 #: account/templates/password_reset.html
 msgid "Use the form below to reset your password."
@@ -629,6 +609,7 @@ msgstr "மோடல் மூடு"
 #: katalogus/templates/confirmation_clone_settings.html
 #: katalogus/templates/plugin_settings_delete.html
 #: reports/templates/report_overview/modal_partials/enable_disable_schedule_modal.html
+#: reports/templates/report_schedules/delete_recipe_modal.html
 #: rocky/templates/oois/ooi_delete.html
 #: rocky/templates/oois/ooi_mute_finding.html
 #: rocky/templates/organizations/organization_edit.html
@@ -806,20 +787,10 @@ msgstr "போஃப்சே அமைப்பு"
 
 #: katalogus/templates/boefje_setup.html
 msgid ""
-"\n"
-"                        You can create a new Boefje. If you want more "
-"information on this,\n"
-"                        you can check out the <a href=\"https://docs.openkat."
-"nl/developer_documentation/development_tutorial/creating_a_boefje."
-"html\">documentation</a>.\n"
-"                    "
+"You can create a new Boefje. If you want more information on this, you can "
+"check out the <a href=\"https://docs.openkat.nl/developer_documentation/"
+"development_tutorial/creating_a_boefje.html\">documentation</a>."
 msgstr ""
-"\n"
-"                        நீங்கள் ஒரு புதிய போஃப்சேவை உருவாக்கலாம். இது குறித்த "
-"கூடுதல் தகவல்களை நீங்கள் விரும்பினால்,\n"
-" நீங்கள் <a href = \"https://docs.openkat.nl/developer_documentation/"
-"development_tutorial/creating_a_boefje.html\"> ஆவணங்கள் </a> ஐப் பார்க்கலாம்.\n"
-"                    "
 
 #: katalogus/templates/boefje_setup.html
 msgid "Save changes"
@@ -890,7 +861,6 @@ msgid "Selected objects"
 msgstr "தேர்ந்தெடுக்கப்பட்ட பொருள்கள்"
 
 #: katalogus/templates/change_clearance_level.html
-#: reports/templates/partials/report_ooi_list.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/summary/ooi_selection.html
 #: rocky/templates/oois/ooi_list.html
@@ -923,19 +893,10 @@ msgstr "நகலி அமைப்புகள்"
 #: katalogus/templates/clone_settings.html
 #, python-format
 msgid ""
-"\n"
-"        Use the form below to clone the settings from "
-"<i>%(current_organization)s</i> to the selected organization.\n"
-"        This includes both the KAT-alogus settings as well as enabled and "
-"disabled plugins.\n"
-"      "
+"Use the form below to clone the settings from <i>%(current_organization)s</"
+"i> to the selected organization. This includes both the KAT-alogus settings "
+"as well as enabled and disabled plugins."
 msgstr ""
-"\n"
-"        தேர்ந்தெடுக்கப்பட்ட நிறுவனத்திற்கு <i>%(current_organization)s </i> "
-"இலிருந்து அமைப்புகளை நகலி செய்ய கீழே உள்ள படிவத்தைப் பயன்படுத்தவும்.\n"
-" இது கேட்-அலோகச் அமைப்புகள் மற்றும் இயக்கப்பட்ட மற்றும் முடக்கப்பட்ட செருகுநிரல்கள் இரண்டையும் "
-"உள்ளடக்கியது.\n"
-"      "
 
 #: katalogus/templates/confirmation_clone_settings.html
 msgid "Clone"
@@ -946,22 +907,10 @@ msgid "All plugins"
 msgstr "அனைத்து செருகுநிரல்களும்"
 
 #: katalogus/templates/katalogus.html
-msgid ""
-"\n"
-"                            Plugin available\n"
-"                        "
-msgid_plural ""
-"\n"
-"                            Plugins available\n"
-"                        "
+msgid "Plugin available"
+msgid_plural "Plugins available"
 msgstr[0] ""
-"\n"
-"                            சொருகி கிடைக்கிறது\n"
-"                        "
 msgstr[1] ""
-"\n"
-"                            செருகுநிரல்கள் கிடைக்கின்றன\n"
-"                        "
 
 #: katalogus/templates/katalogus_settings.html
 msgid "KAT-alogus Settings"
@@ -1277,17 +1226,9 @@ msgstr "மாறுபாடுகள்"
 
 #: katalogus/templates/plugin_container_image.html
 msgid ""
-"\n"
-"                    Boefje variants that use the same container image. For "
-"more\n"
-"                    information about Boefje variants you can read the "
-"documentation.\n"
-"                "
+"Boefje variants that use the same container image. For more information "
+"about Boefje variants you can read the documentation."
 msgstr ""
-"\n"
-"                    ஒரே கொள்கலன் படத்தைப் பயன்படுத்தும் போஃப்சே வகைகள். மேலும்\n"
-" போஃப்சே வகைகளைப் பற்றிய தகவல்கள் நீங்கள் ஆவணங்களைப் படிக்கலாம்.\n"
-"                "
 
 #: katalogus/templates/plugin_container_image.html
 msgid "Add variant"
@@ -1426,76 +1367,22 @@ msgstr ""
 "customize it பெறுநர் fit your needs."
 
 #: katalogus/templates/plugin_settings_add.html
-msgid ""
-"\n"
-"            Add setting\n"
-"          "
-msgid_plural ""
-"\n"
-"            Add settings\n"
-"          "
+msgid "Add setting"
+msgid_plural "Add settings"
 msgstr[0] ""
-"\n"
-"            கூட்டு setting\n"
-"          "
 msgstr[1] ""
-"\n"
-"            கூட்டு settings\n"
-"          "
 
 #: katalogus/templates/plugin_settings_add.html
-msgid ""
-"\n"
-"            Setting\n"
-"          "
-msgid_plural ""
-"\n"
-"            Settings\n"
-"          "
+msgid "Setting"
+msgid_plural "Settings"
 msgstr[0] ""
-"\n"
-"            அமைத்தல்\n"
-"          "
 msgstr[1] ""
-"\n"
-"            அமைப்புகள்\n"
-"          "
 
 #: katalogus/templates/plugin_settings_add.html
-msgid ""
-"\n"
-"                  Add setting and enable boefje\n"
-"                "
-msgid_plural ""
-"\n"
-"                  Add settings and enable boefje\n"
-"                "
+msgid "Add setting and enable boefje"
+msgid_plural "Add settings and enable boefje"
 msgstr[0] ""
-"\n"
-"                  அமைப்பைச் சேர்த்து போஃப்சேவை இயக்கவும்\n"
-"                "
 msgstr[1] ""
-"\n"
-"                  அமைப்புகளைச் சேர்த்து போஃப்சேவை இயக்கவும்\n"
-"                "
-
-#: katalogus/templates/plugin_settings_add.html
-msgid ""
-"\n"
-"                Add setting\n"
-"              "
-msgid_plural ""
-"\n"
-"                Add settings\n"
-"              "
-msgstr[0] ""
-"\n"
-"                கூட்டு setting\n"
-"              "
-msgstr[1] ""
-"\n"
-"                விளம்பர அமைப்புகள்\n"
-"              "
 
 #: katalogus/templates/plugin_settings_delete.html
 msgid "Delete settings"
@@ -1511,24 +1398,16 @@ msgstr "சொருகி %(plugin_name)s அனைத்து அமைப்
 #: katalogus/views/plugin_settings_delete.py
 #: reports/templates/report_overview/modal_partials/delete_modal.html
 #: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
 #: rocky/templates/admin/delete_confirmation.html rocky/views/ooi_delete.py
 msgid "Delete"
 msgstr "நீக்கு"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid ""
-"\n"
-"                        In the table below the settings for this specific "
-"Boefje can be seen.\n"
-"                        Set or change the value of the variables by editing "
-"the settings.\n"
-"                    "
+"In the table below the settings for this specific Boefje can be seen. Set or "
+"change the value of the variables by editing the settings."
 msgstr ""
-"\n"
-"                        இந்த குறிப்பிட்ட போஃப்சேவுக்கான அமைப்புகளுக்கு கீழே உள்ள "
-"அட்டவணையில் காணலாம்.\n"
-" அமைப்புகளைத் திருத்துவதன் மூலம் மாறிகளின் மதிப்பை அமைக்கவும் அல்லது மாற்றவும்.\n"
-"                    "
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Configure Settings"
@@ -2275,7 +2154,6 @@ msgstr ""
 "உருவாக்கும் செயல்முறையின் மூலம் அது உங்களுக்கு வழிகாட்டும்."
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
-#: reports/templates/partials/report_ooi_list.html
 msgid "Create object"
 msgstr "பொருளை உருவாக்கவும்"
 
@@ -2400,21 +2278,10 @@ msgstr ""
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid ""
-"\n"
-"                    OpenKAT has a permission system that allows "
-"administrators to\n"
-"                    configure which users can set a certain clearance level. "
-"The will make sure\n"
-"                    that only users that are trusted can start the more "
-"aggressive scans.\n"
-"                "
+"OpenKAT has a permission system that allows administrators to configure "
+"which users can set a certain clearance level. The will make sure that only "
+"users that are trusted can start the more aggressive scans."
 msgstr ""
-"\n"
-"                    ஓபன்காட் நிர்வாகிகளை அனுமதிக்கும் இசைவு அமைப்பு உள்ளது\n"
-" எந்த பயனர்கள் ஒரு குறிப்பிட்ட இசைவு அளவை அமைக்க முடியும் என்பதை உள்ளமைக்கவும். உறுதி "
-"செய்யும்\n"
-" நம்பகமான பயனர்கள் மட்டுமே மிகவும் ஆக்ரோசமான ச்கேன்களைத் தொடங்க முடியும்.\n"
-"                "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid "Acknowledge clearance level"
@@ -2422,34 +2289,15 @@ msgstr "இசைவு அளவை ஒப்புக் கொள்ளுங
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid ""
-"\n"
-"                    Before a member is granted the ability to set clearance "
-"levels on an object,\n"
-"                    they must first acknowledge and accept the clearance "
-"level set by the administrators.\n"
-"                    The maximum scanning level permitted for a member is "
-"aligned with the trusted clearance level.\n"
-"                    By acknowledging the trusted clearance level, this "
-"member formally agrees to abide by\n"
-"                    this permission and gains the capability to perform "
-"scans only up to this trusted clearance level.\n"
-"                    This two-step process ensures that the member operates "
-"within authorized boundaries.\n"
-"                "
+"Before a member is granted the ability to set clearance levels on an object, "
+"they must first acknowledge and accept the clearance level set by the "
+"administrators. The maximum scanning level permitted for a member is aligned "
+"with the trusted clearance level. By acknowledging the trusted clearance "
+"level, this member formally agrees to abide by this permission and gains the "
+"capability to perform scans only up to this trusted clearance level. This "
+"two-step process ensures that the member operates within authorized "
+"boundaries."
 msgstr ""
-"\n"
-"                    ஒரு உறுப்பினருக்கு ஒரு பொருளின் மீது இசைவு நிலைகளை "
-"நிர்ணயிக்கும் திறன் வழங்கப்படுவதற்கு முன்பு,\n"
-" நிர்வாகிகள் நிர்ணயித்த இசைவு அளவை அவர்கள் முதலில் ஒப்புக் கொண்டு ஏற்றுக்கொள்ள வேண்டும்.\n"
-" ஒரு உறுப்பினருக்கு அனுமதிக்கப்பட்ட அதிகபட்ச ச்கேனிங் நிலை நம்பகமான இசைவு மட்டத்துடன் "
-"ஒத்துப்போகிறது.\n"
-" நம்பகமான இசைவு அளவை ஒப்புக்கொள்வதன் மூலம், இந்த உறுப்பினர் முறையாக கட்டுப்பட "
-"ஒப்புக்கொள்கிறார்\n"
-" இந்த இசைவு மற்றும் இந்த நம்பகமான இசைவு நிலை வரை மட்டுமே ச்கேன் செய்யும் திறனைப் "
-"பெறுகிறது.\n"
-" இந்த இரண்டு-படி செயல்முறை உறுப்பினர் அங்கீகரிக்கப்பட்ட எல்லைகளுக்குள் செயல்படுவதை உறுதி "
-"செய்கிறது.\n"
-"                "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid "What is my clearance level?"
@@ -2458,75 +2306,29 @@ msgstr "எனது இசைவு நிலை என்ன?"
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #, python-format
 msgid ""
-"\n"
-"                                Unfortunately you cannot continue the "
-"onboarding. </br>\n"
-"                                Your administrator has trusted you with a "
-"clearance level of <strong>L%(tcl)s</strong>.</br>\n"
-"                                You need at least a clearance level of "
+"Unfortunately you cannot continue the onboarding. </br> Your administrator "
+"has trusted you with a clearance level of <strong>L%(tcl)s</strong>. </br> "
+"You need at least a clearance level of "
 "<strong>L%(dns_report_least_clearance_level)s</strong> to scan "
-"<strong>%(ooi)s</strong></br>\n"
-"                                Contact your administrator to receive a "
-"higher clearance.\n"
-"                            "
+"<strong>%(ooi)s</strong> </br> Contact your administrator to receive a "
+"higher clearance."
 msgstr ""
-"\n"
-"                                துரதிர்ச்டவசமாக நீங்கள் ஆன் போர்டிங் தொடர முடியாது. "
-"</br>\n"
-"                                உங்கள் நிர்வாகி <strong> எல்%(tcl)s </strong> இன் "
-"இசைவு மட்டத்துடன் உங்களை நம்பியுள்ளார். </br>\n"
-"                                <strong> "
-"%(dns_report_least_clearance_level)s </strong> இன் இசைவு அளவையாவது உங்களுக்குத் "
-"தேவை <strong>%(ooi)s</strong> ஐ வருடுவதற்கு </br>\n"
-"                                அதிக இசைவு பெற உங்கள் நிர்வாகியைத் தொடர்பு "
-"கொள்ளுங்கள்.\n"
-"                            "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #, python-format
 msgid ""
-"\n"
-"                            Your administrator has trusted you with a "
-"clearance level of <strong>L%(tcl)s</strong>.</br>\n"
-"                            You must first accept this clearance level to "
-"continue.\n"
-"                            "
+"Your administrator has trusted you with a clearance level of "
+"<strong>L%(tcl)s</strong>. </br> You must first accept this clearance level "
+"to continue."
 msgstr ""
-"\n"
-"                            உங்கள் நிர்வாகி <strong> எல்%(tcl)s </strong> இன் "
-"இசைவு மட்டத்துடன் உங்களை நம்பியுள்ளார். </br>\n"
-"                             தொடர இந்த இசைவு அளவை நீங்கள் முதலில் ஏற்றுக்கொள்ள "
-"வேண்டும்.\n"
-"                            "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #, python-format
 msgid ""
-"\n"
-"                            Accept level L%(tcl)s clearance and "
-"responsibility\n"
-"                        "
+"Your administrator has <strong>trusted</strong> you with a clearance level "
+"of <strong>L%(tcl)s</strong>. </br> You have also <strong>acknowledged</"
+"strong> to use this clearance level of <strong>L%(acl)s</strong>."
 msgstr ""
-"\n"
-"                            நிலை L%(tcl)s இசைவு மற்றும் பொறுப்பை ஏற்றுக்கொள்ளுங்கள்\n"
-"                        "
-
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
-#, python-format
-msgid ""
-"\n"
-"                            Your administrator has <strong>trusted</strong> "
-"you with a clearance level of <strong>L%(tcl)s</strong>.</br>\n"
-"                            You have also <strong>acknowledged</strong> to "
-"use this clearance level of <strong>L%(acl)s</strong>.\n"
-"                            "
-msgstr ""
-"\n"
-"                            உங்கள் நிர்வாகி <strong> நம்பகமான </strong> <strong> "
-"எல்%(tcl)s </strong> இன் இசைவு அளவைக் கொண்டுள்ளது. </br>\n"
-" <strong> எல்%(acl)s</strong> இன் இந்த இசைவு அளவைப் பயன்படுத்த நீங்கள் <strong> "
-"ஒப்புக்கொள்ளப்பட்ட </strong> உள்ளது.\n"
-"                            "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #: onboarding/templates/step_3f_set_clearance_level.html
@@ -2996,41 +2798,6 @@ msgstr "RPKI"
 msgid "server"
 msgstr "சேவையகம்"
 
-#: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/templates/partials/report_header.html
-#: rocky/templates/partials/ooi_list_toolbar.html
-msgid "Export"
-msgstr "ஏற்றுமதி"
-
-#: reports/report_types/aggregate_organisation_report/introduction.html
-msgid "Download PDF"
-msgstr "PDF ஐ பதிவிறக்கவும்"
-
-#: reports/report_types/aggregate_organisation_report/introduction.html
-msgid "Download JSON"
-msgstr "சாதொபொகு ஐ பதிவிறக்கவும்"
-
-#: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/templates/partials/report_header.html
-msgid "This is the OpenKAT report for organization"
-msgstr "இது அமைப்புக்கான OpenKAT அறிக்கை"
-
-#: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/templates/partials/report_header.html
-msgid "Created with data from:"
-msgstr "இதிலிருந்து தரவுடன் உருவாக்கப்பட்டது:"
-
-#: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/templates/partials/report_header.html
-msgid "Created on:"
-msgstr "உருவாக்கப்பட்டது:"
-
-#: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/report_types/aggregate_organisation_report/report_design.html
-#: reports/templates/partials/report_header.html
-msgid "Created by:"
-msgstr "உருவாக்கியவர்:"
-
 #: reports/report_types/aggregate_organisation_report/recommendations.html
 #: reports/report_types/multi_organization_report/recommendations.html
 #: reports/templates/partials/report_sidemenu.html
@@ -3136,6 +2903,10 @@ msgstr "மொத்த அமைப்பு அறிக்கை"
 #: reports/report_types/aggregate_organisation_report/report_design.html
 msgid "Observed at:"
 msgstr "இங்கு அனுசரிக்கப்பட்டது:"
+
+#: reports/report_types/aggregate_organisation_report/report_design.html
+msgid "Created by:"
+msgstr "உருவாக்கியவர்:"
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
 #: reports/report_types/aggregate_organisation_report/summary.html
@@ -3389,18 +3160,9 @@ msgstr ""
 
 #: reports/report_types/dns_report/report.html
 msgid ""
-"\n"
-"                    <strong>Disclaimer:</strong>\n"
-"                    Not all DNSRecords are parsed in OpenKAT.\n"
-"                    DNS record types that are parsed and could be displayed "
-"in the table are:\n"
-"                "
+"<strong>Disclaimer:</strong> Not all DNSRecords are parsed in OpenKAT. DNS "
+"record types that are parsed and could be displayed in the table are:"
 msgstr ""
-"\n"
-"                    <strong> மறுப்பு: </strong>\n"
-" அனைத்து DNSRECORD களும் OpenKat இல் பாகுபடுத்தப்படவில்லை.\n"
-" பாகுபடுத்தப்பட்ட மற்றும் அட்டவணையில் காட்டக்கூடிய டிஎன்எச் பதிவு வகைகள்:\n"
-"                "
 
 #: reports/report_types/dns_report/report.html
 msgid "All existing DNS record types can be found here:"
@@ -3664,55 +3426,6 @@ msgstr "பாதுகாப்பான மறைக்குறியீட�
 #: reports/report_types/safe_connections_report/report.html
 msgid "services are compliant"
 msgstr "சேவைகள் இணக்கமானவை"
-
-#: reports/report_types/multi_organization_report/introduction.html
-#: reports/templates/partials/report_header.html
-msgid "Download report"
-msgstr "அறிக்கையைப் பதிவிறக்கவும்"
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "This is the OpenKAT"
-msgstr "இது ஓபன்காட்"
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "Created with date from: "
-msgstr "இதிலிருந்து தேதியுடன் உருவாக்கப்பட்டது: "
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "Created on: "
-msgstr "உருவாக்கப்பட்டது: "
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "Created by: "
-msgstr "உருவாக்கியவர்: "
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "This sector contains"
-msgstr "இந்த துறையில் உள்ளது"
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "scanned organizations."
-msgstr "ச்கேன் செய்யப்பட்ட அமைப்புகள்."
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "Of these organizations"
-msgstr "இந்த அமைப்புகளில்"
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "organizations have tag"
-msgstr "நிறுவனங்கள் குறிச்சொல்லைக் கொண்டுள்ளன"
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "The basic security scores are around "
-msgstr "அடிப்படை பாதுகாப்பு மதிப்பெண்கள் உள்ளன "
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid "A total of "
-msgstr "மொத்தம் "
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid " critical vulnerabilities have been identified."
-msgstr " சிக்கலான பாதிப்புகள் அடையாளம் காணப்பட்டுள்ளன."
 
 #: reports/report_types/multi_organization_report/ipv6.html
 msgid "IPv6"
@@ -4279,12 +3992,63 @@ msgid "Ready"
 msgstr "ஆயத்தம்"
 
 #: reports/templates/partials/report_header.html
+#: rocky/templates/partials/ooi_list_toolbar.html
+msgid "Export"
+msgstr "ஏற்றுமதி"
+
+#: reports/templates/partials/report_header.html
+msgid "Download report"
+msgstr "அறிக்கையைப் பதிவிறக்கவும்"
+
+#: reports/templates/partials/report_header.html
+msgid "This is the OpenKAT report for organization"
+msgstr "இது அமைப்புக்கான OpenKAT அறிக்கை"
+
+#: reports/templates/partials/report_header.html
 msgid ""
 "All selected report types for the selected objects are displayed one below "
 "the other."
 msgstr ""
 "தேர்ந்தெடுக்கப்பட்ட பொருள்களுக்கான தேர்ந்தெடுக்கப்பட்ட அனைத்து அறிக்கை வகைகளும் ஒன்றுக்கு கீழே "
 "காட்டப்படும்."
+
+#: reports/templates/partials/report_header.html
+msgid "Created with data from:"
+msgstr "இதிலிருந்து தரவுடன் உருவாக்கப்பட்டது:"
+
+#: reports/templates/partials/report_header.html
+msgid "Created on:"
+msgstr "உருவாக்கப்பட்டது:"
+
+#: reports/templates/partials/report_header.html
+msgid "Created from recipe:"
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid "Recipe created by:"
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+#, python-format
+msgid "This sector contains %(length)s scanned organizations."
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid "Of these organizations"
+msgstr "இந்த அமைப்புகளில்"
+
+#: reports/templates/partials/report_header.html
+msgid "organizations have tag"
+msgstr "நிறுவனங்கள் குறிச்சொல்லைக் கொண்டுள்ளன"
+
+#: reports/templates/partials/report_header.html
+msgid "The basic security scores are around "
+msgstr "அடிப்படை பாதுகாப்பு மதிப்பெண்கள் உள்ளன "
+
+#: reports/templates/partials/report_header.html
+#, python-format
+msgid "A total of %(total)s critical vulnerabilities have been identified."
+msgstr ""
 
 #: reports/templates/partials/report_introduction.html
 msgid ""
@@ -4354,73 +4118,37 @@ msgid "Multi Report"
 msgstr "பல அறிக்கை"
 
 #: reports/templates/partials/report_ooi_list.html
-#, python-format
-msgid "Select object (%(total_oois)s)"
-msgid_plural "Select objects (%(total_oois)s)"
-msgstr[0] "பொருளைத் தேர்ந்தெடுக்கவும் (%(total_oois)s)"
-msgstr[1] "பொருள்களைத் தேர்ந்தெடுக்கவும் (%(total_oois)s)"
+msgid "Object selection"
+msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
 msgid ""
-"\n"
-"                Select which objects you want to include in your report. You "
-"can either continue\n"
-"                with a live set or you can select the objects manually from "
-"the table below.\n"
-"            "
+"Select which objects you want to include in your report. You can either "
+"continue with a live set or you can select the objects manually from the "
+"table below."
 msgstr ""
-"\n"
-"                உங்கள் அறிக்கையில் நீங்கள் எந்த பொருள்களைச் சேர்க்க விரும்புகிறீர்கள் என்பதைத் "
-"தேர்ந்தெடுக்கவும். நீங்கள் தொடரலாம்\n"
-" ஒரு நேரடி தொகுப்புடன் அல்லது கீழேயுள்ள அட்டவணையில் இருந்து கைமுறையாக பொருட்களைத் "
-"தேர்ந்தெடுக்கலாம்.\n"
-"            "
 
 #: reports/templates/partials/report_ooi_list.html
 msgid ""
-"\n"
-"                A live set is a set of objects based on the applied "
-"filters.\n"
-"                Any object that matches this applied filter (now or in the "
-"future) will be used as\n"
-"                input for the scheduled report. If your live set filter (e."
-"g. 'hostnames' with\n"
-"                'L2 clearance' that are 'declared') shows 2 hostnames that "
-"match the filter today,\n"
-"                the scheduled report will run for those 2 hostnames. If you "
-"add 3 more hostnames\n"
-"                tomorrow (with the same filter criteria), your next "
-"scheduled report will contain\n"
-"                5 hostnames. Your live set will update as you go.\n"
-"            "
+"A live set is a set of objects based on the applied filters. Any object that "
+"matches this applied filter (now or in the future) will be used as input for "
+"the scheduled report. If your live set filter (e.g. 'hostnames' with 'L2 "
+"clearance' that are 'declared') shows 2 hostnames that match the filter "
+"today, the scheduled report will run for those 2 hostnames. If you add 3 "
+"more hostnames tomorrow (with the same filter criteria), your next scheduled "
+"report will contain 5 hostnames. Your live set will update as you go."
 msgstr ""
-"\n"
-"                ஒரு நேரடி தொகுப்பு என்பது பயன்படுத்தப்பட்ட வடிப்பான்களின் அடிப்படையில் "
-"பொருள்களின் தொகுப்பாகும்.\n"
-" இந்த பயன்படுத்தப்பட்ட வடிப்பானுடன் (இப்போது அல்லது எதிர்காலத்தில்) பொருந்தக்கூடிய எந்தவொரு "
-"பொருளும் பயன்படுத்தப்படும்\n"
-" திட்டமிடப்பட்ட அறிக்கைக்கான உள்ளீடு. உங்கள் நேரடி தொகுப்பு வடிகட்டி என்றால் (எ.கா. "
-"'ஓச்ட்பெயம்ச்' உடன்\n"
-" 'அறிவிக்கப்பட்ட' 'எல் 2 அனுமதி') இன்று வடிகட்டியுடன் பொருந்தக்கூடிய 2 ஓச்ட்பெயர்களைக் "
-"காட்டுகிறது,\n"
-" திட்டமிடப்பட்ட அறிக்கை அந்த 2 புரவலன் பெயர்களுக்காக இயங்கும். நீங்கள் மேலும் 3 "
-"ஓச்ட்பெயர்களைச் சேர்த்தால்\n"
-" நாளை (அதே வடிகட்டி அளவுகோல்களுடன்), உங்கள் அடுத்த திட்டமிடப்பட்ட அறிக்கையில் இருக்கும்\n"
-" 5 ஓச்ட்பெயர்கள். நீங்கள் செல்லும்போது உங்கள் நேரடி தொகுப்பு புதுப்பிக்கப்படும்.\n"
-"            "
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Continue with live set"
-msgstr "நேரடி தொகுப்புடன் தொடரவும்"
+#: reports/templates/partials/report_types_selection.html
+msgid "Applied filters:"
+msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-#: reports/templates/summary/report_asset_overview.html
-msgid "No objects found."
-msgstr "பொருள்கள் எதுவும் கிடைக்கவில்லை."
-
-#: reports/templates/partials/report_ooi_list.html
-msgid "Go to the object page"
-msgstr "பொருள் பக்கத்திற்குச் செல்லவும்"
+msgid ""
+"Based on the current dataset, your selected filters result in the following "
+"objects."
+msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "objects selected"
@@ -4455,10 +4183,29 @@ msgid "Objects"
 msgstr "பொருள்கள்"
 
 #: reports/templates/partials/report_ooi_list.html
+msgid "Object name"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html
 #: rocky/templates/oois/ooi_list.html
 msgid "Clearance type"
 msgstr "இசைவு வகை"
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "Report(s) may be empty due to no objects in the selected filters."
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid ""
+"Reports matching the selected filters will be empty at this moment in time. "
+"Future reports may contain data. It is still possible to generate the "
+"(potentially empty) report."
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "Continue with live set"
+msgstr "நேரடி தொகுப்புடன் தொடரவும்"
 
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/partials/report_types_selection.html
@@ -4625,10 +4372,21 @@ msgstr[1] "தேர்ந்தெடுக்கப்பட்ட பொர�
 
 #: reports/templates/partials/report_types_selection.html
 #, python-format
-msgid "You have selected %(total_oois)s object in previous step."
-msgid_plural "You have selected %(total_oois)s objects in previous step."
-msgstr[0] "முந்தைய கட்டத்தில் %(total_oois)s பொருளைத் தேர்ந்தெடுத்துள்ளீர்கள்."
-msgstr[1] "முந்தைய கட்டத்தில் %(total_oois)s பொருள்களைத் தேர்ந்தெடுத்துள்ளீர்கள்."
+msgid ""
+"You have selected a live set in the previous step. Based on the current "
+"dataset, this live set results in %(total_oois)s objects."
+msgstr ""
+
+#: reports/templates/partials/report_types_selection.html
+msgid "No filters applied"
+msgstr ""
+
+#: reports/templates/partials/report_types_selection.html
+#, python-format
+msgid "You have selected %(total_oois)s object in the previous step."
+msgid_plural "You have selected %(total_oois)s objects in the previous step."
+msgstr[0] ""
+msgstr[1] ""
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Change selection"
@@ -4659,32 +4417,18 @@ msgstr "பின்வரும் அறிக்கை (களை) நீக�
 #: reports/templates/report_overview/modal_partials/delete_modal.html
 #: reports/templates/report_overview/modal_partials/share_modal.html
 msgid ""
-"\n"
-"      Deleted reports are removed in the view from the moment of deletion. "
-"The report can still be accessed on timestamps before the deletion. Only the "
-"report is removed from the view, not the data it is based on.\n"
-"  "
+"Deleted reports are removed in the view from the moment of deletion. The "
+"report can still be accessed on timestamps before the deletion. Only the "
+"report is removed from the view, not the data it is based on."
 msgstr ""
-"\n"
-"      நீக்கப்பட்ட தருணத்திலிருந்து நீக்கப்பட்ட அறிக்கைகள் பார்வையில் அகற்றப்படுகின்றன. "
-"நீக்குவதற்கு முன்பு நேர முத்திரைகளில் அறிக்கையை அணுகலாம். அறிக்கை மட்டுமே பார்வையில் "
-"இருந்து அகற்றப்படுகிறது, அது அடிப்படையாகக் கொண்ட தரவு அல்ல.\n"
-"  "
 
 #: reports/templates/report_overview/modal_partials/delete_modal.html
 #: reports/templates/report_overview/modal_partials/share_modal.html
 msgid ""
-"\n"
-"      It is still possible to generate a new report for same date. If the "
-"report is part of a combined report, it will remain available in the "
-"combined report.\n"
-"  "
+"It is still possible to generate a new report for same date. If the report "
+"is part of a combined report, it will remain available in the combined "
+"report."
 msgstr ""
-"\n"
-"      அதே தேதிக்கு ஒரு புதிய அறிக்கையை உருவாக்குவது இன்னும் சாத்தியமாகும். அறிக்கை "
-"ஒருங்கிணைந்த அறிக்கையின் ஒரு பகுதியாக இருந்தால், அது ஒருங்கிணைந்த அறிக்கையில் "
-"கிடைக்கும்.\n"
-"  "
 
 #: reports/templates/report_overview/modal_partials/delete_modal.html
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
@@ -4709,17 +4453,9 @@ msgstr "அட்டவணையை முடக்கு"
 #: reports/templates/report_overview/modal_partials/enable_disable_schedule_modal.html
 #, python-format
 msgid ""
-"\n"
-"            Are you sure you want to disable the schedule for "
-"%(report_name)s?\n"
-"            The recipe will still exist and the schedule can be enabled "
-"later on.\n"
-"        "
+"Are you sure you want to disable the schedule for %(report_name)s? The "
+"recipe will still exist and the schedule can be enabled later on."
 msgstr ""
-"\n"
-"            %(report_name)s க்கான அட்டவணையை முடக்க விரும்புகிறீர்களா?\n"
-" செய்முறை இன்னும் இருக்கும், பின்னர் அட்டவணையை இயக்க முடியும்.\n"
-"        "
 
 #: reports/templates/report_overview/modal_partials/rename_modal.html
 msgid "Rename the following report(s):"
@@ -4736,15 +4472,9 @@ msgstr "பின்வரும் அறிக்கை (களை) மீண�
 
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
 msgid ""
-"\n"
-"      By submitting you're generating the selected reports again, using the "
-"current data.\n"
-"  "
+"By submitting you're generating the selected reports again, using the "
+"current data."
 msgstr ""
-"\n"
-"      சமர்ப்பிப்பதன் மூலம், தற்போதைய தரவைப் பயன்படுத்தி, தேர்ந்தெடுக்கப்பட்ட அறிக்கைகளை "
-"மீண்டும் உருவாக்குகிறீர்கள்.\n"
-"  "
 
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
 #: reports/templates/report_overview/report_history_table.html
@@ -4793,15 +4523,11 @@ msgstr ""
 #: reports/templates/report_overview/report_history_table.html
 #, python-format
 msgid ""
-"\n"
-"                                This report consists of %(counter)s asset "
-"report with the following report type and object:\n"
-"                            "
+"This report consists of %(counter)s asset report with the following report "
+"type and object:"
 msgid_plural ""
-"\n"
-"                                This report consists of %(counter)s asset "
-"reports with the following report types and objects:\n"
-"                            "
+"This report consists of %(counter)s asset reports with the following report "
+"types and objects:"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -4921,6 +4647,17 @@ msgstr ""
 msgid "Input Object"
 msgstr "உள்ளீட்டு பொருள்"
 
+#: reports/templates/report_schedules/delete_recipe_modal.html
+msgid "Delete report recipe"
+msgstr ""
+
+#: reports/templates/report_schedules/delete_recipe_modal.html
+msgid ""
+"Deleting this report recipe means it will be permanently deleted. It will "
+"not be possible anymore to see or enable the schedule. You will find "
+"previously generated reports in the report history tab."
+msgstr ""
+
 #: reports/templates/summary/report_asset_overview.html
 msgid ""
 "The objects listed in the table below were used to generate this report. For "
@@ -4933,6 +4670,10 @@ msgstr ""
 "காட்டுகிறது மற்றும் பொருள் ஒரு பயனரால் ('அறிவிக்கப்பட்ட') சேர்க்கப்பட்டதா இல்லையா அல்லது "
 "மற்றொரு பணி அல்லது அமைப்பு ('மரபுரிமை') மூலம் மறைமுகமாக அடையாளம் காணப்பட்டதா இல்லையா "
 "என்பதைக் காட்டுகிறது."
+
+#: reports/templates/summary/report_asset_overview.html
+msgid "No objects found."
+msgstr "பொருள்கள் எதுவும் கிடைக்கவில்லை."
 
 #: reports/templates/summary/report_asset_overview.html
 msgid ""
@@ -5050,6 +4791,18 @@ msgstr "பல அறிக்கை"
 #: reports/views/multi_report.py
 msgid "View report"
 msgstr "அறிக்கையைக் காண்க"
+
+#: reports/views/report_overview.py
+msgid "Recipe '{}' deleted successfully"
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid "Recipe not found."
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid "No schedule or recipe selected"
+msgstr ""
 
 #: reports/views/report_overview.py
 msgid "Schedule {}"
@@ -5172,7 +4925,7 @@ msgstr ""
 
 #: tools/forms/boefje.py
 msgid ""
-"Choose weather a the Boefje should run after creating and/or changing an "
+"Choose weather the Boefje should run after creating and/or changing an "
 "object. "
 msgstr ""
 
@@ -5653,6 +5406,10 @@ msgstr ""
 #: tools/models.py
 msgid "new"
 msgstr "புதிய"
+
+#: tools/templatetags/ooi_extra.py
+msgid "Unknown user"
+msgstr ""
 
 #: tools/view_helpers.py rocky/templates/header.html
 #: rocky/templates/organizations/organization_member_list.html
@@ -6453,6 +6210,43 @@ msgstr "வகைகளுக்கு நீக்குதல் சாத்�
 msgid "using boefjes"
 msgstr "போஃப்செசைப் பயன்படுத்துதல்"
 
+#: rocky/templates/oois/ooi_detail.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "indemnification warning"
+msgstr "இழப்பீடு எச்சரிக்கை"
+
+#: rocky/templates/oois/ooi_detail.html
+#, python-format
+msgid ""
+"<strong>Warning:</strong> There is no indemnification for this organization. "
+"Go to the <a href=\"%(organization_settings)s\">organization settings page</"
+"a> to add one."
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail.html
+msgid "Permission warning"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail.html
+msgid ""
+"<strong>Warning:</strong> You don't have the proper permission at the "
+"organizational level to scan objects. Contact your administrator."
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail.html
+msgid "Scan warning"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail.html
+#, python-format
+msgid ""
+"<strong>Warning:</strong> You are not allowed to scan this OOI. Your maximum "
+"clearance level is %(member_clearance_level)s and this OOI has level "
+"%(boefje_scan_level)s. Go to your <a href=\"%(account_details)s\">account "
+"details</a> to manage your clearance level."
+msgstr ""
+
 #: rocky/templates/oois/ooi_detail.html rocky/templates/scan.html
 msgid "Boefjes overview"
 msgstr "போஃப்செச் கண்ணோட்டம்"
@@ -6469,6 +6263,14 @@ msgid "Scan profile"
 msgstr "சுயவிவரத்தை ச்கேன் செய்யுங்கள்"
 
 #: rocky/templates/oois/ooi_detail.html
+msgid "Unable to start scan. See the warning for more details."
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail.html
+msgid "Start scan"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail.html
 msgid "There are no boefjes enabled to scan an OOI of type"
 msgstr "ஒரு வகை OOI ஐ ச்கேன் செய்ய போஃப்செச் எதுவும் இயக்கப்படவில்லை"
 
@@ -6479,14 +6281,6 @@ msgstr "பார்க்க"
 #: rocky/templates/oois/ooi_detail.html
 msgid "to find and enable boefjes that can scan within the current level."
 msgstr "தற்போதைய நிலைக்குள் ச்கேன் செய்யக்கூடிய போஃப்ச்களைக் கண்டுபிடித்து இயக்க."
-
-#: rocky/templates/oois/ooi_detail.html
-msgid "There are no boefjes available within the current clearance level of"
-msgstr "தற்போதைய இசைவு நிலைக்குள் போஃப்ச்கள் எதுவும் கிடைக்கவில்லை"
-
-#: rocky/templates/oois/ooi_detail.html
-msgid "Or if you have the authorization, upgrade the clearance level of"
-msgstr "அல்லது உங்களுக்கு ஏற்பு இருந்தால், இசைவு அளவை மேம்படுத்தவும்"
 
 #: rocky/templates/oois/ooi_detail_add_related_object.html
 #: rocky/templates/partials/ooi_detail_related_object.html
@@ -6739,28 +6533,12 @@ msgid "shows the same objects."
 msgstr "அதே பொருள்களைக் காட்டுகிறது."
 
 #: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/organizations/organization_settings.html
-msgid "indemnification warning"
-msgstr "இழப்பீடு எச்சரிக்கை"
-
-#: rocky/templates/organizations/organization_crisis_room.html
 #, python-format
 msgid ""
-"\n"
-"                            <strong>Warning:</strong>\n"
-"                            Indemnification is not set for this "
-"organization.\n"
-"                            Go to the <a "
-"href=\"%(organization_settings)s\">organization settings page</a> to add "
-"one.\n"
-"                        "
+"<strong>Warning:</strong> Indemnification is not set for this organization. "
+"Go to the <a href=\"%(organization_settings)s\">organization settings page</"
+"a> to add one."
 msgstr ""
-"\n"
-"                            <strong> எச்சரிக்கை: </strong>\n"
-"                             இந்த நிறுவனத்திற்கு இழப்பீடு அமைக்கப்படவில்லை.\n"
-"                             ஒன்றைச் சேர்க்க <a "
-"href=\"%(organization_settings)s\"> அமைப்பு அமைப்புகள் பக்கத்திற்குச் செல்லவும்.</a>\n"
-"                        "
 
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid ""
@@ -6856,15 +6634,8 @@ msgstr "அமைப்பு:"
 
 #: rocky/templates/organizations/organization_member_list.html
 #, python-format
-msgid ""
-"\n"
-"                    An overview of \"%(organization_name)s\" its members.\n"
-"                "
+msgid "An overview of \"%(organization_name)s\" its members."
 msgstr ""
-"\n"
-"                    அதன் உறுப்பினர்களின் \"%(organization_name)s\" பற்றிய "
-"கண்ணோட்டம்.\n"
-"                "
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Add member(s)"
@@ -6930,27 +6701,14 @@ msgstr "பதிவேற்றும்"
 #: rocky/templates/organizations/organization_settings.html
 #, python-format
 msgid ""
-"\n"
-"            An overview of \"%(organization_name)s\". This shows general "
-"information and its settings.\n"
-"          "
+"An overview of \"%(organization_name)s\". This shows general information and "
+"its settings."
 msgstr ""
-"\n"
-"            \"%(organization_name)s\" இன் கண்ணோட்டம். இது பொதுவான தகவல்களையும் அதன் "
-"அமைப்புகளையும் காட்டுகிறது.\n"
-"          "
 
 #: rocky/templates/organizations/organization_settings.html
 msgid ""
-"\n"
-"              <strong>Warning:</strong>\n"
-"              Indemnification is not set for this organization.\n"
-"            "
+"<strong>Warning:</strong> Indemnification is not set for this organization."
 msgstr ""
-"\n"
-"              <strong> எச்சரிக்கை: </strong>\n"
-" இந்த அமைப்புக்கு இழப்பீடு அமைக்கப்படவில்லை.\n"
-"            "
 
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/views/indemnification_add.py
@@ -7341,29 +7099,13 @@ msgstr "அறிவிக்கப்பட்டது:"
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 #, python-format
 msgid ""
-"\n"
-"              This means that this object will be scanned by Boefjes with "
-"scan level\n"
-"              %(scan_level)s and lower. Setting the clearance level from "
-"“declared”\n"
-"              to “inherit” means that this object will inherit its level "
-"from neighbouring\n"
-"              objects. This means that the clearance level might stay the "
-"same, increase,\n"
-"              or decrease depending on other declared clearance levels. "
-"Clearance levels\n"
-"              of objects that inherit from this clearance level will also be "
-"recalculated.\n"
-"            "
+"This means that this object will be scanned by Boefjes with scan level "
+"%(scan_level)s and lower. Setting the clearance level from “declared” to "
+"“inherit” means that this object will inherit its level from neighbouring "
+"objects. This means that the clearance level might stay the same, increase, "
+"or decrease depending on other declared clearance levels. Clearance levels "
+"of objects that inherit from this clearance level will also be recalculated."
 msgstr ""
-"\n"
-"              இதன் பொருள் இந்த பொருள் ச்கேன் மட்டத்துடன் போஃப்செசால் ச்கேன் செய்யப்படும்\n"
-" %(scan_level)s மற்றும் கீழ். இசைவு அளவை \"அறிவிக்கப்பட்ட\" இலிருந்து அமைத்தல்\n"
-" \"பரம்பரை\" என்பது இந்த பொருள் அதன் நிலையை அண்டை நாடுகளிலிருந்து பெறும் என்பதாகும்\n"
-" பொருள்கள். இதன் பொருள் இசைவு நிலை அப்படியே இருக்கக்கூடும், அதிகரிப்பு,\n"
-" அல்லது பிற அறிவிக்கப்பட்ட இசைவு நிலைகளைப் பொறுத்து குறைவு. இசைவு நிலைகள்\n"
-" இந்த இசைவு மட்டத்திலிருந்து பெறும் பொருள்களும் மீண்டும் கணக்கிடப்படும்.\n"
-"            "
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Set clearance level to inherit"
@@ -7375,22 +7117,11 @@ msgstr "காலியாக:"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid ""
-"\n"
-"                This object has a clearance level of \"L0\". This means that "
-"this object will not be scanned by any Boefje until that\n"
-"                Boefje is run manually for this object again. Objects with a "
-"clearance level higher than \"L0\" will be scanned automatically by Boefjes "
-"with\n"
-"                corresponding scan levels.\n"
-"            "
+"This object has a clearance level of \"L0\". This means that this object "
+"will not be scanned by any Boefje until that Boefje is run manually for this "
+"object again. Objects with a clearance level higher than \"L0\" will be "
+"scanned automatically by Boefjes with corresponding scan levels."
 msgstr ""
-"\n"
-"                இந்த பொருள் \"L0\" இன் இசைவு அளவைக் கொண்டுள்ளது. இதன் பொருள் இந்த "
-"பொருள் எந்த போஃப்சீயும் ச்கேன் செய்யப்படாது\n"
-" போஃப்சே மீண்டும் இந்த பொருளுக்கு கைமுறையாக இயக்கப்படுகிறது. \"L0\" ஐ விட அதிகமான "
-"இசைவு அளவைக் கொண்ட பொருள்கள் போஃப்செசால் தானாகவே ச்கேன் செய்யப்படும்\n"
-" தொடர்புடைய ச்கேன் நிலைகள்.\n"
-"            "
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html
 msgid "Set clearance level for:"
@@ -7499,14 +7230,10 @@ msgstr "பணி தரவைப் பதிவிறக்கவும்"
 #: rocky/templates/tasks/partials/tasks_overview_header.html
 #, python-format
 msgid ""
-"\n"
-"            An overview of the tasks for %(organization)s. Tasks are divided "
-"in Boefjes, Normalizers and Reports.\n"
-"            Boefjes scan objects and Normalizers dispatch on the output mime-"
-"type. Additionally, there is a Report\n"
-"            tasks. This task aggregates and presents findings from both "
-"Boefjes and Normalizers.\n"
-"        "
+"An overview of the tasks for %(organization)s. Tasks are divided in Boefjes, "
+"Normalizers and Reports. Boefjes scan objects and Normalizers dispatch on "
+"the output mime-type. Additionally, there is a Report tasks. This task "
+"aggregates and presents findings from both Boefjes and Normalizers."
 msgstr ""
 
 #: rocky/templates/tasks/plugin_detail_task_list.html
@@ -8194,6 +7921,568 @@ msgstr "மூல கோப்பை பைட்டுகளில் பதி
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "மூல கோப்பு வெற்றிகரமாக சேர்க்கப்பட்டது."
+
+#, python-format
+#~ msgid "Select object (%(total_oois)s)"
+#~ msgid_plural "Select objects (%(total_oois)s)"
+#~ msgstr[0] "பொருளைத் தேர்ந்தெடுக்கவும் (%(total_oois)s)"
+#~ msgstr[1] "பொருள்களைத் தேர்ந்தெடுக்கவும் (%(total_oois)s)"
+
+#~ msgid "Go to the object page"
+#~ msgstr "பொருள் பக்கத்திற்குச் செல்லவும்"
+
+#, python-format
+#~ msgid "You have selected %(total_oois)s object in previous step."
+#~ msgid_plural "You have selected %(total_oois)s objects in previous step."
+#~ msgstr[0] "முந்தைய கட்டத்தில் %(total_oois)s பொருளைத் தேர்ந்தெடுத்துள்ளீர்கள்."
+#~ msgstr[1] "முந்தைய கட்டத்தில் %(total_oois)s பொருள்களைத் தேர்ந்தெடுத்துள்ளீர்கள்."
+
+#~ msgid ""
+#~ "\n"
+#~ "                            You don't have any clearance to scan objects."
+#~ "<br>\n"
+#~ "                            Get in contact with the admin to give you the "
+#~ "necessary clearance level.\n"
+#~ "                        "
+#~ msgstr ""
+#~ "\n"
+#~ "                            பொருள்களை ச்கேன் செய்ய உங்களுக்கு எந்த இசைவு இல்லை. "
+#~ "<br>\n"
+#~ " தேவையான இசைவு அளவை உங்களுக்கு வழங்க நிர்வாகியுடன் தொடர்பு கொள்ளுங்கள்.\n"
+#~ "                        "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                            Withdraw L%(acl)s clearance and "
+#~ "responsibility\n"
+#~ "                    "
+#~ msgstr ""
+#~ "\n"
+#~ "                            L%(acl)s இசைவு மற்றும் பொறுப்பை திரும்பப் பெறுங்கள்\n"
+#~ "                    "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                        Accept level L%(tcl)s clearance and "
+#~ "responsibility\n"
+#~ "                    "
+#~ msgstr ""
+#~ "\n"
+#~ "                        நிலை L%(tcl)s இசைவு மற்றும் பொறுப்பை ஏற்றுக்கொள்ளுங்கள்\n"
+#~ "                    "
+
+#~ msgid ""
+#~ "\n"
+#~ "                        You can create a new Boefje. If you want more "
+#~ "information on this,\n"
+#~ "                        you can check out the <a href=\"https://docs."
+#~ "openkat.nl/developer_documentation/development_tutorial/creating_a_boefje."
+#~ "html\">documentation</a>.\n"
+#~ "                    "
+#~ msgstr ""
+#~ "\n"
+#~ "                        நீங்கள் ஒரு புதிய போஃப்சேவை உருவாக்கலாம். இது குறித்த "
+#~ "கூடுதல் தகவல்களை நீங்கள் விரும்பினால்,\n"
+#~ " நீங்கள் <a href = \"https://docs.openkat.nl/developer_documentation/"
+#~ "development_tutorial/creating_a_boefje.html\"> ஆவணங்கள் </a> ஐப் பார்க்கலாம்.\n"
+#~ "                    "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "        Use the form below to clone the settings from "
+#~ "<i>%(current_organization)s</i> to the selected organization.\n"
+#~ "        This includes both the KAT-alogus settings as well as enabled and "
+#~ "disabled plugins.\n"
+#~ "      "
+#~ msgstr ""
+#~ "\n"
+#~ "        தேர்ந்தெடுக்கப்பட்ட நிறுவனத்திற்கு <i>%(current_organization)s </i> "
+#~ "இலிருந்து அமைப்புகளை நகலி செய்ய கீழே உள்ள படிவத்தைப் பயன்படுத்தவும்.\n"
+#~ " இது கேட்-அலோகச் அமைப்புகள் மற்றும் இயக்கப்பட்ட மற்றும் முடக்கப்பட்ட செருகுநிரல்கள் "
+#~ "இரண்டையும் உள்ளடக்கியது.\n"
+#~ "      "
+
+#~ msgid ""
+#~ "\n"
+#~ "                            Plugin available\n"
+#~ "                        "
+#~ msgid_plural ""
+#~ "\n"
+#~ "                            Plugins available\n"
+#~ "                        "
+#~ msgstr[0] ""
+#~ "\n"
+#~ "                            சொருகி கிடைக்கிறது\n"
+#~ "                        "
+#~ msgstr[1] ""
+#~ "\n"
+#~ "                            செருகுநிரல்கள் கிடைக்கின்றன\n"
+#~ "                        "
+
+#~ msgid ""
+#~ "\n"
+#~ "                    Boefje variants that use the same container image. "
+#~ "For more\n"
+#~ "                    information about Boefje variants you can read the "
+#~ "documentation.\n"
+#~ "                "
+#~ msgstr ""
+#~ "\n"
+#~ "                    ஒரே கொள்கலன் படத்தைப் பயன்படுத்தும் போஃப்சே வகைகள். மேலும்\n"
+#~ " போஃப்சே வகைகளைப் பற்றிய தகவல்கள் நீங்கள் ஆவணங்களைப் படிக்கலாம்.\n"
+#~ "                "
+
+#~ msgid ""
+#~ "\n"
+#~ "            Add setting\n"
+#~ "          "
+#~ msgid_plural ""
+#~ "\n"
+#~ "            Add settings\n"
+#~ "          "
+#~ msgstr[0] ""
+#~ "\n"
+#~ "            கூட்டு setting\n"
+#~ "          "
+#~ msgstr[1] ""
+#~ "\n"
+#~ "            கூட்டு settings\n"
+#~ "          "
+
+#~ msgid ""
+#~ "\n"
+#~ "            Setting\n"
+#~ "          "
+#~ msgid_plural ""
+#~ "\n"
+#~ "            Settings\n"
+#~ "          "
+#~ msgstr[0] ""
+#~ "\n"
+#~ "            அமைத்தல்\n"
+#~ "          "
+#~ msgstr[1] ""
+#~ "\n"
+#~ "            அமைப்புகள்\n"
+#~ "          "
+
+#~ msgid ""
+#~ "\n"
+#~ "                  Add setting and enable boefje\n"
+#~ "                "
+#~ msgid_plural ""
+#~ "\n"
+#~ "                  Add settings and enable boefje\n"
+#~ "                "
+#~ msgstr[0] ""
+#~ "\n"
+#~ "                  அமைப்பைச் சேர்த்து போஃப்சேவை இயக்கவும்\n"
+#~ "                "
+#~ msgstr[1] ""
+#~ "\n"
+#~ "                  அமைப்புகளைச் சேர்த்து போஃப்சேவை இயக்கவும்\n"
+#~ "                "
+
+#~ msgid ""
+#~ "\n"
+#~ "                Add setting\n"
+#~ "              "
+#~ msgid_plural ""
+#~ "\n"
+#~ "                Add settings\n"
+#~ "              "
+#~ msgstr[0] ""
+#~ "\n"
+#~ "                கூட்டு setting\n"
+#~ "              "
+#~ msgstr[1] ""
+#~ "\n"
+#~ "                விளம்பர அமைப்புகள்\n"
+#~ "              "
+
+#~ msgid ""
+#~ "\n"
+#~ "                        In the table below the settings for this specific "
+#~ "Boefje can be seen.\n"
+#~ "                        Set or change the value of the variables by "
+#~ "editing the settings.\n"
+#~ "                    "
+#~ msgstr ""
+#~ "\n"
+#~ "                        இந்த குறிப்பிட்ட போஃப்சேவுக்கான அமைப்புகளுக்கு கீழே உள்ள "
+#~ "அட்டவணையில் காணலாம்.\n"
+#~ " அமைப்புகளைத் திருத்துவதன் மூலம் மாறிகளின் மதிப்பை அமைக்கவும் அல்லது மாற்றவும்.\n"
+#~ "                    "
+
+#~ msgid ""
+#~ "\n"
+#~ "                    OpenKAT has a permission system that allows "
+#~ "administrators to\n"
+#~ "                    configure which users can set a certain clearance "
+#~ "level. The will make sure\n"
+#~ "                    that only users that are trusted can start the more "
+#~ "aggressive scans.\n"
+#~ "                "
+#~ msgstr ""
+#~ "\n"
+#~ "                    ஓபன்காட் நிர்வாகிகளை அனுமதிக்கும் இசைவு அமைப்பு உள்ளது\n"
+#~ " எந்த பயனர்கள் ஒரு குறிப்பிட்ட இசைவு அளவை அமைக்க முடியும் என்பதை உள்ளமைக்கவும். "
+#~ "உறுதி செய்யும்\n"
+#~ " நம்பகமான பயனர்கள் மட்டுமே மிகவும் ஆக்ரோசமான ச்கேன்களைத் தொடங்க முடியும்.\n"
+#~ "                "
+
+#~ msgid ""
+#~ "\n"
+#~ "                    Before a member is granted the ability to set "
+#~ "clearance levels on an object,\n"
+#~ "                    they must first acknowledge and accept the clearance "
+#~ "level set by the administrators.\n"
+#~ "                    The maximum scanning level permitted for a member is "
+#~ "aligned with the trusted clearance level.\n"
+#~ "                    By acknowledging the trusted clearance level, this "
+#~ "member formally agrees to abide by\n"
+#~ "                    this permission and gains the capability to perform "
+#~ "scans only up to this trusted clearance level.\n"
+#~ "                    This two-step process ensures that the member "
+#~ "operates within authorized boundaries.\n"
+#~ "                "
+#~ msgstr ""
+#~ "\n"
+#~ "                    ஒரு உறுப்பினருக்கு ஒரு பொருளின் மீது இசைவு நிலைகளை "
+#~ "நிர்ணயிக்கும் திறன் வழங்கப்படுவதற்கு முன்பு,\n"
+#~ " நிர்வாகிகள் நிர்ணயித்த இசைவு அளவை அவர்கள் முதலில் ஒப்புக் கொண்டு ஏற்றுக்கொள்ள "
+#~ "வேண்டும்.\n"
+#~ " ஒரு உறுப்பினருக்கு அனுமதிக்கப்பட்ட அதிகபட்ச ச்கேனிங் நிலை நம்பகமான இசைவு மட்டத்துடன் "
+#~ "ஒத்துப்போகிறது.\n"
+#~ " நம்பகமான இசைவு அளவை ஒப்புக்கொள்வதன் மூலம், இந்த உறுப்பினர் முறையாக கட்டுப்பட "
+#~ "ஒப்புக்கொள்கிறார்\n"
+#~ " இந்த இசைவு மற்றும் இந்த நம்பகமான இசைவு நிலை வரை மட்டுமே ச்கேன் செய்யும் திறனைப் "
+#~ "பெறுகிறது.\n"
+#~ " இந்த இரண்டு-படி செயல்முறை உறுப்பினர் அங்கீகரிக்கப்பட்ட எல்லைகளுக்குள் செயல்படுவதை "
+#~ "உறுதி செய்கிறது.\n"
+#~ "                "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                                Unfortunately you cannot continue the "
+#~ "onboarding. </br>\n"
+#~ "                                Your administrator has trusted you with a "
+#~ "clearance level of <strong>L%(tcl)s</strong>.</br>\n"
+#~ "                                You need at least a clearance level of "
+#~ "<strong>L%(dns_report_least_clearance_level)s</strong> to scan "
+#~ "<strong>%(ooi)s</strong></br>\n"
+#~ "                                Contact your administrator to receive a "
+#~ "higher clearance.\n"
+#~ "                            "
+#~ msgstr ""
+#~ "\n"
+#~ "                                துரதிர்ச்டவசமாக நீங்கள் ஆன் போர்டிங் தொடர "
+#~ "முடியாது. </br>\n"
+#~ "                                உங்கள் நிர்வாகி <strong> எல்%(tcl)s </strong> "
+#~ "இன் இசைவு மட்டத்துடன் உங்களை நம்பியுள்ளார். </br>\n"
+#~ "                                <strong> "
+#~ "%(dns_report_least_clearance_level)s </strong> இன் இசைவு அளவையாவது "
+#~ "உங்களுக்குத் தேவை <strong>%(ooi)s</strong> ஐ வருடுவதற்கு </br>\n"
+#~ "                                அதிக இசைவு பெற உங்கள் நிர்வாகியைத் தொடர்பு "
+#~ "கொள்ளுங்கள்.\n"
+#~ "                            "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                            Your administrator has trusted you with a "
+#~ "clearance level of <strong>L%(tcl)s</strong>.</br>\n"
+#~ "                            You must first accept this clearance level to "
+#~ "continue.\n"
+#~ "                            "
+#~ msgstr ""
+#~ "\n"
+#~ "                            உங்கள் நிர்வாகி <strong> எல்%(tcl)s </strong> இன் "
+#~ "இசைவு மட்டத்துடன் உங்களை நம்பியுள்ளார். </br>\n"
+#~ "                             தொடர இந்த இசைவு அளவை நீங்கள் முதலில் ஏற்றுக்கொள்ள "
+#~ "வேண்டும்.\n"
+#~ "                            "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                            Accept level L%(tcl)s clearance and "
+#~ "responsibility\n"
+#~ "                        "
+#~ msgstr ""
+#~ "\n"
+#~ "                            நிலை L%(tcl)s இசைவு மற்றும் பொறுப்பை "
+#~ "ஏற்றுக்கொள்ளுங்கள்\n"
+#~ "                        "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                            Your administrator has <strong>trusted</"
+#~ "strong> you with a clearance level of <strong>L%(tcl)s</strong>.</br>\n"
+#~ "                            You have also <strong>acknowledged</strong> "
+#~ "to use this clearance level of <strong>L%(acl)s</strong>.\n"
+#~ "                            "
+#~ msgstr ""
+#~ "\n"
+#~ "                            உங்கள் நிர்வாகி <strong> நம்பகமான </strong> "
+#~ "<strong> எல்%(tcl)s </strong> இன் இசைவு அளவைக் கொண்டுள்ளது. </br>\n"
+#~ " <strong> எல்%(acl)s</strong> இன் இந்த இசைவு அளவைப் பயன்படுத்த நீங்கள் <strong> "
+#~ "ஒப்புக்கொள்ளப்பட்ட </strong> உள்ளது.\n"
+#~ "                            "
+
+#~ msgid ""
+#~ "\n"
+#~ "                    <strong>Disclaimer:</strong>\n"
+#~ "                    Not all DNSRecords are parsed in OpenKAT.\n"
+#~ "                    DNS record types that are parsed and could be "
+#~ "displayed in the table are:\n"
+#~ "                "
+#~ msgstr ""
+#~ "\n"
+#~ "                    <strong> மறுப்பு: </strong>\n"
+#~ " அனைத்து DNSRECORD களும் OpenKat இல் பாகுபடுத்தப்படவில்லை.\n"
+#~ " பாகுபடுத்தப்பட்ட மற்றும் அட்டவணையில் காட்டக்கூடிய டிஎன்எச் பதிவு வகைகள்:\n"
+#~ "                "
+
+#~ msgid ""
+#~ "\n"
+#~ "                Select which objects you want to include in your report. "
+#~ "You can either continue\n"
+#~ "                with a live set or you can select the objects manually "
+#~ "from the table below.\n"
+#~ "            "
+#~ msgstr ""
+#~ "\n"
+#~ "                உங்கள் அறிக்கையில் நீங்கள் எந்த பொருள்களைச் சேர்க்க விரும்புகிறீர்கள் "
+#~ "என்பதைத் தேர்ந்தெடுக்கவும். நீங்கள் தொடரலாம்\n"
+#~ " ஒரு நேரடி தொகுப்புடன் அல்லது கீழேயுள்ள அட்டவணையில் இருந்து கைமுறையாக பொருட்களைத் "
+#~ "தேர்ந்தெடுக்கலாம்.\n"
+#~ "            "
+
+#~ msgid ""
+#~ "\n"
+#~ "                A live set is a set of objects based on the applied "
+#~ "filters.\n"
+#~ "                Any object that matches this applied filter (now or in "
+#~ "the future) will be used as\n"
+#~ "                input for the scheduled report. If your live set filter "
+#~ "(e.g. 'hostnames' with\n"
+#~ "                'L2 clearance' that are 'declared') shows 2 hostnames "
+#~ "that match the filter today,\n"
+#~ "                the scheduled report will run for those 2 hostnames. If "
+#~ "you add 3 more hostnames\n"
+#~ "                tomorrow (with the same filter criteria), your next "
+#~ "scheduled report will contain\n"
+#~ "                5 hostnames. Your live set will update as you go.\n"
+#~ "            "
+#~ msgstr ""
+#~ "\n"
+#~ "                ஒரு நேரடி தொகுப்பு என்பது பயன்படுத்தப்பட்ட வடிப்பான்களின் "
+#~ "அடிப்படையில் பொருள்களின் தொகுப்பாகும்.\n"
+#~ " இந்த பயன்படுத்தப்பட்ட வடிப்பானுடன் (இப்போது அல்லது எதிர்காலத்தில்) பொருந்தக்கூடிய "
+#~ "எந்தவொரு பொருளும் பயன்படுத்தப்படும்\n"
+#~ " திட்டமிடப்பட்ட அறிக்கைக்கான உள்ளீடு. உங்கள் நேரடி தொகுப்பு வடிகட்டி என்றால் (எ.கா. "
+#~ "'ஓச்ட்பெயம்ச்' உடன்\n"
+#~ " 'அறிவிக்கப்பட்ட' 'எல் 2 அனுமதி') இன்று வடிகட்டியுடன் பொருந்தக்கூடிய 2 ஓச்ட்பெயர்களைக் "
+#~ "காட்டுகிறது,\n"
+#~ " திட்டமிடப்பட்ட அறிக்கை அந்த 2 புரவலன் பெயர்களுக்காக இயங்கும். நீங்கள் மேலும் 3 "
+#~ "ஓச்ட்பெயர்களைச் சேர்த்தால்\n"
+#~ " நாளை (அதே வடிகட்டி அளவுகோல்களுடன்), உங்கள் அடுத்த திட்டமிடப்பட்ட அறிக்கையில் "
+#~ "இருக்கும்\n"
+#~ " 5 ஓச்ட்பெயர்கள். நீங்கள் செல்லும்போது உங்கள் நேரடி தொகுப்பு புதுப்பிக்கப்படும்.\n"
+#~ "            "
+
+#~ msgid ""
+#~ "\n"
+#~ "      Deleted reports are removed in the view from the moment of "
+#~ "deletion. The report can still be accessed on timestamps before the "
+#~ "deletion. Only the report is removed from the view, not the data it is "
+#~ "based on.\n"
+#~ "  "
+#~ msgstr ""
+#~ "\n"
+#~ "      நீக்கப்பட்ட தருணத்திலிருந்து நீக்கப்பட்ட அறிக்கைகள் பார்வையில் அகற்றப்படுகின்றன. "
+#~ "நீக்குவதற்கு முன்பு நேர முத்திரைகளில் அறிக்கையை அணுகலாம். அறிக்கை மட்டுமே பார்வையில் "
+#~ "இருந்து அகற்றப்படுகிறது, அது அடிப்படையாகக் கொண்ட தரவு அல்ல.\n"
+#~ "  "
+
+#~ msgid ""
+#~ "\n"
+#~ "      It is still possible to generate a new report for same date. If the "
+#~ "report is part of a combined report, it will remain available in the "
+#~ "combined report.\n"
+#~ "  "
+#~ msgstr ""
+#~ "\n"
+#~ "      அதே தேதிக்கு ஒரு புதிய அறிக்கையை உருவாக்குவது இன்னும் சாத்தியமாகும். "
+#~ "அறிக்கை ஒருங்கிணைந்த அறிக்கையின் ஒரு பகுதியாக இருந்தால், அது ஒருங்கிணைந்த "
+#~ "அறிக்கையில் கிடைக்கும்.\n"
+#~ "  "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "            Are you sure you want to disable the schedule for "
+#~ "%(report_name)s?\n"
+#~ "            The recipe will still exist and the schedule can be enabled "
+#~ "later on.\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "            %(report_name)s க்கான அட்டவணையை முடக்க விரும்புகிறீர்களா?\n"
+#~ " செய்முறை இன்னும் இருக்கும், பின்னர் அட்டவணையை இயக்க முடியும்.\n"
+#~ "        "
+
+#~ msgid ""
+#~ "\n"
+#~ "      By submitting you're generating the selected reports again, using "
+#~ "the current data.\n"
+#~ "  "
+#~ msgstr ""
+#~ "\n"
+#~ "      சமர்ப்பிப்பதன் மூலம், தற்போதைய தரவைப் பயன்படுத்தி, தேர்ந்தெடுக்கப்பட்ட அறிக்கைகளை "
+#~ "மீண்டும் உருவாக்குகிறீர்கள்.\n"
+#~ "  "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                            <strong>Warning:</strong>\n"
+#~ "                            Indemnification is not set for this "
+#~ "organization.\n"
+#~ "                            Go to the <a "
+#~ "href=\"%(organization_settings)s\">organization settings page</a> to add "
+#~ "one.\n"
+#~ "                        "
+#~ msgstr ""
+#~ "\n"
+#~ "                            <strong> எச்சரிக்கை: </strong>\n"
+#~ "                             இந்த நிறுவனத்திற்கு இழப்பீடு அமைக்கப்படவில்லை.\n"
+#~ "                             ஒன்றைச் சேர்க்க <a "
+#~ "href=\"%(organization_settings)s\"> அமைப்பு அமைப்புகள் பக்கத்திற்குச் செல்லவும்.</"
+#~ "a>\n"
+#~ "                        "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                    An overview of \"%(organization_name)s\" its "
+#~ "members.\n"
+#~ "                "
+#~ msgstr ""
+#~ "\n"
+#~ "                    அதன் உறுப்பினர்களின் \"%(organization_name)s\" பற்றிய "
+#~ "கண்ணோட்டம்.\n"
+#~ "                "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "            An overview of \"%(organization_name)s\". This shows general "
+#~ "information and its settings.\n"
+#~ "          "
+#~ msgstr ""
+#~ "\n"
+#~ "            \"%(organization_name)s\" இன் கண்ணோட்டம். இது பொதுவான தகவல்களையும் "
+#~ "அதன் அமைப்புகளையும் காட்டுகிறது.\n"
+#~ "          "
+
+#~ msgid ""
+#~ "\n"
+#~ "              <strong>Warning:</strong>\n"
+#~ "              Indemnification is not set for this organization.\n"
+#~ "            "
+#~ msgstr ""
+#~ "\n"
+#~ "              <strong> எச்சரிக்கை: </strong>\n"
+#~ " இந்த அமைப்புக்கு இழப்பீடு அமைக்கப்படவில்லை.\n"
+#~ "            "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "              This means that this object will be scanned by Boefjes with "
+#~ "scan level\n"
+#~ "              %(scan_level)s and lower. Setting the clearance level from "
+#~ "“declared”\n"
+#~ "              to “inherit” means that this object will inherit its level "
+#~ "from neighbouring\n"
+#~ "              objects. This means that the clearance level might stay the "
+#~ "same, increase,\n"
+#~ "              or decrease depending on other declared clearance levels. "
+#~ "Clearance levels\n"
+#~ "              of objects that inherit from this clearance level will also "
+#~ "be recalculated.\n"
+#~ "            "
+#~ msgstr ""
+#~ "\n"
+#~ "              இதன் பொருள் இந்த பொருள் ச்கேன் மட்டத்துடன் போஃப்செசால் ச்கேன் செய்யப்படும்\n"
+#~ " %(scan_level)s மற்றும் கீழ். இசைவு அளவை \"அறிவிக்கப்பட்ட\" இலிருந்து அமைத்தல்\n"
+#~ " \"பரம்பரை\" என்பது இந்த பொருள் அதன் நிலையை அண்டை நாடுகளிலிருந்து பெறும் "
+#~ "என்பதாகும்\n"
+#~ " பொருள்கள். இதன் பொருள் இசைவு நிலை அப்படியே இருக்கக்கூடும், அதிகரிப்பு,\n"
+#~ " அல்லது பிற அறிவிக்கப்பட்ட இசைவு நிலைகளைப் பொறுத்து குறைவு. இசைவு நிலைகள்\n"
+#~ " இந்த இசைவு மட்டத்திலிருந்து பெறும் பொருள்களும் மீண்டும் கணக்கிடப்படும்.\n"
+#~ "            "
+
+#~ msgid ""
+#~ "\n"
+#~ "                This object has a clearance level of \"L0\". This means "
+#~ "that this object will not be scanned by any Boefje until that\n"
+#~ "                Boefje is run manually for this object again. Objects "
+#~ "with a clearance level higher than \"L0\" will be scanned automatically "
+#~ "by Boefjes with\n"
+#~ "                corresponding scan levels.\n"
+#~ "            "
+#~ msgstr ""
+#~ "\n"
+#~ "                இந்த பொருள் \"L0\" இன் இசைவு அளவைக் கொண்டுள்ளது. இதன் பொருள் இந்த "
+#~ "பொருள் எந்த போஃப்சீயும் ச்கேன் செய்யப்படாது\n"
+#~ " போஃப்சே மீண்டும் இந்த பொருளுக்கு கைமுறையாக இயக்கப்படுகிறது. \"L0\" ஐ விட அதிகமான "
+#~ "இசைவு அளவைக் கொண்ட பொருள்கள் போஃப்செசால் தானாகவே ச்கேன் செய்யப்படும்\n"
+#~ " தொடர்புடைய ச்கேன் நிலைகள்.\n"
+#~ "            "
+
+#~ msgid "Download PDF"
+#~ msgstr "PDF ஐ பதிவிறக்கவும்"
+
+#~ msgid "Download JSON"
+#~ msgstr "சாதொபொகு ஐ பதிவிறக்கவும்"
+
+#~ msgid "This is the OpenKAT"
+#~ msgstr "இது ஓபன்காட்"
+
+#~ msgid "Created with date from: "
+#~ msgstr "இதிலிருந்து தேதியுடன் உருவாக்கப்பட்டது: "
+
+#~ msgid "Created on: "
+#~ msgstr "உருவாக்கப்பட்டது: "
+
+#~ msgid "Created by: "
+#~ msgstr "உருவாக்கியவர்: "
+
+#~ msgid "This sector contains"
+#~ msgstr "இந்த துறையில் உள்ளது"
+
+#~ msgid "scanned organizations."
+#~ msgstr "ச்கேன் செய்யப்பட்ட அமைப்புகள்."
+
+#~ msgid "A total of "
+#~ msgstr "மொத்தம் "
+
+#~ msgid " critical vulnerabilities have been identified."
+#~ msgstr " சிக்கலான பாதிப்புகள் அடையாளம் காணப்பட்டுள்ளன."
+
+#~ msgid "There are no boefjes available within the current clearance level of"
+#~ msgstr "தற்போதைய இசைவு நிலைக்குள் போஃப்ச்கள் எதுவும் கிடைக்கவில்லை"
+
+#~ msgid "Or if you have the authorization, upgrade the clearance level of"
+#~ msgstr "அல்லது உங்களுக்கு ஏற்பு இருந்தால், இசைவு அளவை மேம்படுத்தவும்"
 
 #~ msgid "Scan frequency"
 #~ msgstr "அதிர்வெண் ச்கேன்"

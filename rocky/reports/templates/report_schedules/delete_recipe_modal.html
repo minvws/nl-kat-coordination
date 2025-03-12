@@ -4,11 +4,11 @@
 {% fill 'header' %}{% translate "Delete report recipe" %}{% endfill %}
 {% fill 'content' %}
 <p>
-    {% blocktranslate %}
+    {% blocktranslate trimmed %}
         Deleting this report recipe means it will be permanently deleted.
         It will not be possible anymore to see or enable the schedule.
         You will find previously generated reports in the report history tab.
-  {% endblocktranslate %}
+    {% endblocktranslate %}
 </p>
 <form id="delete-form" class="inline" method="post">
     {% csrf_token %}
