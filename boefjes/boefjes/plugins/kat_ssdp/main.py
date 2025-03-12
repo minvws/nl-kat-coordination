@@ -16,11 +16,6 @@ def run(_) -> list[tuple[set, bytes | str]]:
     return [
         (
             set(),
-            json.dumps(
-                run_ssdp(
-                    getenv("SEARCHTARGET", SEARCHTARGET_DEFAULT),
-                    int(getenv("TIMEOUT", TIMEOUT_DEFAULT)),
-                )
-            ),
+            json.dumps(run_ssdp(getenv("SEARCHTARGET", SEARCHTARGET_DEFAULT), int(getenv("TIMEOUT", TIMEOUT_DEFAULT)))),
         )
     ]
