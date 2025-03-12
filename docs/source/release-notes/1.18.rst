@@ -359,7 +359,8 @@ To find all your organisation codes, consider checking in Rocky or calling the K
 Script Tor The Debian Packages
 ------------------------------
 
-The same holds for the debian packages, but invoking the script means having to set up the environment first:
+The same holds for the debian packages, but invoking the script means having to set up the environment first.
+Check the `--url` (the XTDB_URI environment variable in a usual setup) and `--node` flags (the organisation code) and run the following command.
 
 .. code-block:: sh
 
