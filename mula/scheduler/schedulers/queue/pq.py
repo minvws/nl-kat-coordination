@@ -280,11 +280,7 @@ class PriorityQueue(abc.ABC):
             True if the item is on the queue, False otherwise.
         """
         identifier = self.create_hash(task)
-        item = self.pq_store.get_item_by_hash(self.pq_id, identifier)
-        if item is None:
-            return False
-
-        return True
+        return self.pq_store.is_item_on_queue_by_hash(self.pq_id, identifier)
 
     @with_lock
     def is_item_on_queue_by_hash(self, item_hash: str) -> bool:
@@ -296,8 +292,7 @@ class PriorityQueue(abc.ABC):
         Returns:
             True if the item is on the queue, False otherwise.
         """
-        item = self.pq_store.get_item_by_hash(self.pq_id, item_hash)
-        return item is not None
+        return self.pq_store.is_item_on_queue_by_hash(self.pq_id, item_hash)
 
     @with_lock
     def get_item_by_identifier(self, task: models.Task) -> models.Task | None:

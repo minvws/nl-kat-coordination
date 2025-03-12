@@ -40,7 +40,7 @@ class BoefjeScheduler(Scheduler):
         """
         super().__init__(ctx=ctx, scheduler_id=self.ID, create_schedule=True, auto_calculate_deadline=True)
         self.ranker = rankers.BoefjeRankerTimeBased(self.ctx)
-        self.rate_limiter = limits.strategies.MovinWindowRateLimiter(limits.storage.MemoryStorage())
+        self.rate_limiter = limits.strategies.MovingWindowRateLimiter(limits.storage.MemoryStorage())
 
     def run(self) -> None:
         """The run method is called when the scheduler is started. It will
