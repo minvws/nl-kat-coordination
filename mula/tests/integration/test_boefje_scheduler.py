@@ -3,11 +3,11 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
+from structlog.testing import capture_logs
+
 from scheduler import clients, config, models, schedulers, storage
 from scheduler.models.ooi import RunOn
 from scheduler.storage import stores
-from structlog.testing import capture_logs
-
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -96,7 +96,12 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.scheduler.run()
 
         # Assert: threads started
-        thread_ids = ["BoefjeScheduler-mutations", "BoefjeScheduler-new_boefjes", "BoefjeScheduler-rescheduling"]
+        thread_ids = [
+            "BoefjeScheduler-mutations",
+            "BoefjeScheduler-new_boefjes",
+            "BoefjeScheduler-rescheduling",
+            "BoefjeScheduler-delayed",
+        ]
         for thread in self.scheduler.threads:
             self.assertIn(thread.name, thread_ids)
             self.assertTrue(thread.is_alive())
@@ -2037,3 +2042,6 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         # Assert: schedule should be disabled
         schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule(schedule.id)
         self.assertFalse(schedule_db_disabled.enabled)
+
+    def test_process_delayed(self):
+        pass
