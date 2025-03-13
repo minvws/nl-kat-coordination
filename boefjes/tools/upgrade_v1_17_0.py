@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Migration script for v1.16.0 due to a bug in the garbage collection. To be removed in later versions.
+"""Migration script for v1.17.0 due to a bug in the garbage collection. To be removed in later versions.
 https://github.com/minvws/nl-kat-coordination/issues/2875"""
 
 import json
