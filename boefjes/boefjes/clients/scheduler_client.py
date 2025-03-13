@@ -67,9 +67,7 @@ class SchedulerClientInterface:
     def pop_item(self, scheduler_id: str) -> Task | None:
         raise NotImplementedError()
 
-    def pop_items(
-        self, scheduler_id: str, filters: dict[str, Any]
-    ) -> PaginatedTasksResponse | None:
+    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
@@ -85,9 +83,7 @@ class SchedulerClientInterface:
 class SchedulerAPIClient(SchedulerClientInterface):
     def __init__(self, base_url: str):
         self._session = Client(
-            base_url=base_url,
-            transport=HTTPTransport(retries=6),
-            timeout=settings.outgoing_request_timeout,
+            base_url=base_url, transport=HTTPTransport(retries=6), timeout=settings.outgoing_request_timeout
         )
 
     @staticmethod
@@ -95,7 +91,6 @@ class SchedulerAPIClient(SchedulerClientInterface):
         response.raise_for_status()
 
     def pop_item(self, scheduler_id: str) -> Task | None:
-
         filters: list[Filter] = []
 
         if settings.runner_type == "boefje":
@@ -103,10 +98,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
             # runner is capable of reaching (e.g. the internet)
             filters.append(
                 Filter(
-                    column="data",
-                    field="network",
-                    operator="<@",
-                    value=json.dumps(settings.boefje_reachable_networks),
+                    column="data", field="network", operator="<@", value=json.dumps(settings.boefje_reachable_networks)
                 )
             )
 
@@ -122,40 +114,30 @@ class SchedulerAPIClient(SchedulerClientInterface):
             )
 
         response = self._session.post(
-            f"/queues/{scheduler_id}/pop",
+            f"/schedulers/{scheduler_id}/pop",
             data=QueuePopRequest(filters=filters).model_dump_json(),
             params={"limit": 1},
         )
-
-        response = self._session.post(f"/schedulers/{scheduler_id}/pop")
         self._verify_response(response)
 
-        page = TypeAdapter(PaginatedTasksResponse | None).validate_json(
-            response.content
-        )
+        page = TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
         if page.count == 0:
             return None
 
-    def pop_items(
-        self, scheduler_id: str, filters: dict[str, Any]
-    ) -> PaginatedTasksResponse | None:
+        return page.results[0]
+
+    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
         response = self._session.post(f"/schedulers/{scheduler_id}/pop", json=filters)
         self._verify_response(response)
 
-        return TypeAdapter(PaginatedTasksResponse | None).validate_json(
-            response.content
-        )
+        return TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
 
     def push_item(self, p_item: Task) -> None:
-        response = self._session.post(
-            f"/schedulers/{p_item.scheduler_id}/push", content=p_item.model_dump_json()
-        )
+        response = self._session.post(f"/schedulers/{p_item.scheduler_id}/push", content=p_item.model_dump_json())
         self._verify_response(response)
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
-        response = self._session.patch(
-            f"/tasks/{task_id}", json={"status": status.value}
-        )
+        response = self._session.patch(f"/tasks/{task_id}", json={"status": status.value})
         self._verify_response(response)
 
     def get_task(self, task_id: uuid.UUID) -> Task:

@@ -1,4 +1,4 @@
-from typing import Literal
+from enum import Enum
 
 from boefjes.job_models import BoefjeMeta, NormalizerMeta, NormalizerResults
 
@@ -19,9 +19,11 @@ class NormalizerJobRunner:
 
 
 class WorkerManager:
-    WorkerType = Literal["boefje", "normalizer"]
+    class Queue(Enum):
+        BOEFJES = "boefje"
+        NORMALIZERS = "normalizer"
 
-    def run(self, queue: WorkerType) -> None:
+    def run(self, queue: Queue) -> None:
         raise NotImplementedError()
 
 
