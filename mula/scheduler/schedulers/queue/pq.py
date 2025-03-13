@@ -99,14 +99,14 @@ class PriorityQueue(abc.ABC):
 
     @with_lock
     def pop(self, filters: storage.filters.FilterRequest | None = None) -> list[models.Task]:
-        """Remove and return the highest priority item from the queue.
+        """Remove and return the highest priority items from the queue.
         Optionally apply filters to the queue.
 
         Args:
             filters: A FilterRequest instance that defines the filters
 
         Returns:
-            The highest priority item from the queue.
+            The highest priority items from the queue.
 
         Raises:
             QueueEmptyError: If the queue is empty.

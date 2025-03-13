@@ -65,7 +65,7 @@ class SchedulerAPI:
         self,
         request: fastapi.Request,
         scheduler_id: str,
-        limit: int = 100,
+        limit: int = 1,
         filters: storage.filters.FilterRequest | None = None,
     ) -> schemas.TaskPop:
         results = self.ctx.datastores.pq_store.pop(scheduler_id=scheduler_id, limit=limit, filters=filters)
