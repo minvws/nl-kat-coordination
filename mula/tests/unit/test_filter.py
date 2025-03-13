@@ -3,10 +3,10 @@ import os
 import unittest
 
 from scheduler.storage.filters import Filter, FilterRequest, apply_filter
-from sqlalchemy import Boolean, Column, Float, Integer, String, create_engine
+from sqlalchemy import Boolean, Column, Float, ForeignKey, Integer, String, create_engine
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import relationship, sessionmaker
 
 Base = declarative_base()
 
@@ -20,6 +20,21 @@ class TestModel(Base):
     is_active = Column(Boolean)
     data = Column(JSONB, nullable=False)
 
+    children = relationship("TestModelChild", back_populates="parent")
+
+
+class TestModelChild(Base):
+    __tablename__ = "test_child"
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    age = Column(Integer)
+    height = Column(Float)
+    is_active = Column(Boolean)
+    data = Column(JSONB, nullable=False)
+
+    parent_id = Column(Integer, ForeignKey("test.id", ondelete="SET NULL"))
+    parent = relationship("TestModel", back_populates="children")
+
 
 # Database setup
 engine = create_engine(f"{os.getenv('SCHEDULER_DB_URI')}")
@@ -31,41 +46,55 @@ session = Session()
 
 class FilteringTestCase(unittest.TestCase):
     def setUp(self):
-        session.add_all(
-            [
-                TestModel(
-                    name="Alice",
-                    age=25,
-                    height=1.8,
-                    is_active=True,
-                    data={"foo": "bar", "score": 15, "nested": {"bar": "baz"}, "list": ["ipv4", "network/local"]},
-                ),
-                TestModel(
-                    name="Bob",
-                    age=30,
-                    height=1.7,
-                    is_active=False,
-                    data={
-                        "foo": "baz",
-                        "score": 25,
-                        "nested": {"bar": "baz"},
-                        "list": ["ipv4", "ipv6", "network/local"],
-                    },
-                ),
-                TestModel(
-                    name="Charlie",
-                    age=28,
-                    height=1.6,
-                    is_active=True,
-                    data={
-                        "foo": "bar",
-                        "score": 35,
-                        "nested": {"bar": "baz"},
-                        "list": ["ipv4", "ipv6", "network/internet"],
-                    },
-                ),
-            ]
+        alice = TestModel(
+            name="Alice",
+            age=25,
+            height=1.8,
+            is_active=True,
+            data={"foo": "bar", "score": 15, "nested": {"bar": "baz"}, "list": ["ipv4", "network/local"]},
         )
+        bob = TestModel(
+            name="Bob",
+            age=30,
+            height=1.7,
+            is_active=False,
+            data={"foo": "baz", "score": 25, "nested": {"bar": "baz"}, "list": ["ipv4", "ipv6", "network/local"]},
+        )
+        charlie = TestModel(
+            name="Charlie",
+            age=28,
+            height=1.6,
+            is_active=True,
+            data={"foo": "bar", "score": 35, "nested": {"bar": "baz"}, "list": ["ipv4", "ipv6", "network/internet"]},
+        )
+
+        session.add_all([alice, bob, charlie])
+
+        # Get ids
+        session.flush()
+
+        david = TestModelChild(
+            name="David",
+            age=12,
+            height=1.2,
+            is_active=True,
+            data={"foo": "bar", "score": 45, "nested": {"bar": "baz"}},
+            parent_id=alice.id,
+        )
+
+        erin = TestModelChild(
+            name="Erin",
+            age=6,
+            height=1.3,
+            is_active=True,
+            data={"foo": "baz", "score": 55, "nested": {"bar": "baz"}},
+            parent_id=alice.id,
+        )
+
+        session.add_all([david, erin])
+
+        self.models = {"alice": alice, "bob": bob, "charlie": charlie, "david": david, "erin": erin}
+
         session.commit()
 
     def tearDown(self):
@@ -743,3 +772,50 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(len(results), 2)
         self.assertEqual(results[0].name, "Alice")
         self.assertEqual(results[1].name, "Bob")
+
+    def test_apply_filter_related(self):
+        filter_request = FilterRequest(
+            filters=[Filter(column="parent", field="name", operator="eq", value=self.models.get("alice").name)]
+        )
+
+        query = session.query(TestModelChild)
+        filtered_query = apply_filter(TestModelChild, query, filter_request)
+
+        results = filtered_query.order_by(TestModelChild.name).all()
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0].name, "David")
+        self.assertEqual(results[1].name, "Erin")
+
+    def test_apply_filter_related_reversed(self):
+        filter_request = FilterRequest(
+            filters=[Filter(column="children", field="name", operator="eq", value=self.models.get("david").name)]
+        )
+        query = session.query(TestModel)
+        filtered_query = apply_filter(TestModel, query, filter_request)
+
+        results = filtered_query.all()
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].name, "Alice")
+
+    def test_apply_filter_related_and_nested__(self):
+        filter_request = FilterRequest(
+            filters=[Filter(column="children", field="data__foo", operator="eq", value="bar")]
+        )
+
+        query = session.query(TestModel)
+        filtered_query = apply_filter(TestModel, query, filter_request)
+
+        results = filtered_query.all()
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].name, "Alice")
+
+    def test_apply_filter_related_and_nested_reversed(self):
+        filter_request = FilterRequest(filters=[Filter(column="parent", field="data__foo", operator="eq", value="bar")])
+
+        query = session.query(TestModelChild)
+        filtered_query = apply_filter(TestModelChild, query, filter_request)
+
+        results = filtered_query.all()
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0].name, "David")
+        self.assertEqual(results[1].name, "Erin")
