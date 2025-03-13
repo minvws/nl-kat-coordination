@@ -27,14 +27,15 @@
                 {% endif %}
                 {% if ooi.scan_profile.scan_profile_type == "declared" %}
                     <p class="explanation">
-                        <span>{% translate "Declared:" %}</span>{% blocktranslate with scan_level=ooi.scan_profile.human_readable %}
-              This means that this object will be scanned by Boefjes with scan level
-              {{ scan_level }} and lower. Setting the clearance level from “declared”
-              to “inherit” means that this object will inherit its level from neighbouring
-              objects. This means that the clearance level might stay the same, increase,
-              or decrease depending on other declared clearance levels. Clearance levels
-              of objects that inherit from this clearance level will also be recalculated.
-            {% endblocktranslate %}
+                        <span>{% translate "Declared:" %}</span>
+                        {% blocktranslate with scan_level=ooi.scan_profile.human_readable trimmed %}
+                            This means that this object will be scanned by Boefjes with scan level
+                            {{ scan_level }} and lower. Setting the clearance level from “declared”
+                            to “inherit” means that this object will inherit its level from neighbouring
+                            objects. This means that the clearance level might stay the same, increase,
+                            or decrease depending on other declared clearance levels. Clearance levels
+                            of objects that inherit from this clearance level will also be recalculated.
+                        {% endblocktranslate %}
                     </p>
                     {% if organization_member.max_clearance_level > -1 and organization_indemnification %}
                         <div class="horizontal-view">
@@ -44,11 +45,12 @@
                     {% endif %}
                 {% elif ooi.scan_profile.scan_profile_type == "empty" %}
                     <p class="explanation">
-                        <span>{% translate "Empty:" %}</span> {% blocktranslate %}
-                This object has a clearance level of "L0". This means that this object will not be scanned by any Boefje until that
-                Boefje is run manually for this object again. Objects with a clearance level higher than "L0" will be scanned automatically by Boefjes with
-                corresponding scan levels.
-            {% endblocktranslate %}
+                        <span>{% translate "Empty:" %}</span>
+                        {% blocktranslate trimmed %}
+                            This object has a clearance level of "L0". This means that this object will not be scanned by any Boefje until that
+                            Boefje is run manually for this object again. Objects with a clearance level higher than "L0" will be scanned automatically by Boefjes with
+                            corresponding scan levels.
+                        {% endblocktranslate %}
                         {% include "partials/explanations.html" %}
 
                     </p>

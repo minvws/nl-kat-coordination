@@ -4,9 +4,9 @@
 {% fill 'header' %}{% translate "Rerun the following report(s):" %}{% endfill %}
 {% fill 'content' %}
 <p>
-    {% blocktranslate %}
-      By submitting you're generating the selected reports again, using the current data.
-  {% endblocktranslate %}
+    {% blocktranslate trimmed %}
+        By submitting you're generating the selected reports again, using the current data.
+    {% endblocktranslate %}
 </p>
 <form id="rerun-form" class="inline layout-wide" method="post">
     {% csrf_token %}
