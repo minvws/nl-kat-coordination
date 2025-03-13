@@ -83,8 +83,13 @@
                                             <span class="{{ hydrated_finding.finding_type.risk_severity.value|lower }}">{{ hydrated_finding.finding_type.risk_severity.value|capfirst }}</span>
                                         </td>
                                         <td>
-                                            <a href="{% ooi_url "ooi_detail" hydrated_finding.finding.primary_key organization.code query=mandatory_fields %}"
-                                               title="{% blocktranslate trimmed with finding=hydrated_finding.finding.finding_type %} Show details for {{ finding }} {% endblocktranslate %}">{{ hydrated_finding.finding.finding_type.human_readable }}</a>
+                                            {% if hydrated_finding.finding_type.name %}
+                                                <a href="{% ooi_url "ooi_detail" hydrated_finding.finding.primary_key organization.code query=mandatory_fields %}"
+                                                   title="{% blocktranslate trimmed with finding=hydrated_finding.finding_type.name %} Show details for {{ finding }} {% endblocktranslate %}">{{ hydrated_finding.finding_type.name }}</a>
+                                            {% else %}
+                                                <a href="{% ooi_url "ooi_detail" hydrated_finding.finding.primary_key organization.code query=mandatory_fields %}"
+                                                   title="{% blocktranslate trimmed with finding=hydrated_finding.finding.finding_type %} Show details for {{ finding }} {% endblocktranslate %}">{{ hydrated_finding.finding.finding_type.human_readable }}</a>
+                                            {% endif %}
                                         </td>
                                         <td>
                                             <a href="{% ooi_url "ooi_detail" hydrated_finding.finding.ooi organization.code query=mandatory_fields %}"
