@@ -84,7 +84,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         if len(popped_tasks.results) == 0:
             return None
 
-        return page.results[0]
+        return popped_tasks.results[0]
 
     def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> TaskPop | None:
         response = self._session.post(f"/schedulers/{scheduler_id}/pop", json=filters)
