@@ -9,6 +9,7 @@ from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+from sqlalchemy.sql.schema import Index
 
 from scheduler.utils import GUID
 
@@ -63,7 +64,7 @@ class TaskDB(Base):
     __tablename__ = "tasks"
 
     id = Column(GUID, primary_key=True)
-    scheduler_id = Column(String, nullable=False)
+    scheduler_id = Column(String, nullable=False, index=True)
     schedule_id = Column(GUID, ForeignKey("schedules.id", ondelete="SET NULL"), nullable=True)
     organisation = Column(String, nullable=False)
     type = Column(String, nullable=False)
@@ -76,6 +77,9 @@ class TaskDB(Base):
 
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     modified_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+
+
+Index("ix_tasks_status_queued", TaskDB.status, postgresql_where=TaskDB.status == TaskStatus.QUEUED)
 
 
 class NormalizerTask(BaseModel):
