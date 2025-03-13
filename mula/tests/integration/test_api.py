@@ -368,7 +368,7 @@ class APISchedulerEndpointTestCase(APITemplateTestCase):
         self.assertEqual(2, self.scheduler.queue.qsize())
 
         # Should get two items, and queue should be empty
-        response = self.client.post(f"/schedulers/{self.scheduler.scheduler_id}/pop")
+        response = self.client.post(f"/schedulers/{self.scheduler.scheduler_id}/pop?limit=2")
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, len(response.json().get("results")))
         self.assertEqual(first_item_id, response.json().get("results")[0].get("id"))
@@ -436,7 +436,7 @@ class APISchedulerEndpointTestCase(APITemplateTestCase):
 
         # Should get two items, and queue should be empty
         response = self.client.post(
-            f"/schedulers/{self.scheduler.scheduler_id}/pop",
+            f"/schedulers/{self.scheduler.scheduler_id}/pop?limit=2",
             json={"filters": [{"column": "data", "field": "name", "operator": "eq", "value": "test"}]},
         )
         self.assertEqual(200, response.status_code)
