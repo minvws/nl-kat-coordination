@@ -33,10 +33,10 @@
                 {% endif %}
             </p>
             <p>
-                {% translate "Created with data from:" %} <strong>{{ report_ooi.observed_at|date }}</strong>
+                {% translate "Created with data from:" %} <strong>{{ report_ooi.observed_at|date:"F j, o" }} {% translate "at" %} {{ report_ooi.observed_at|date:"H:i" }}</strong>
             </p>
             <p>
-                {% translate "Created on:" %} <strong>{{ report_ooi.date_generated|date }}</strong>
+                {% translate "Created on:" %} <strong>{{ report_ooi.date_generated|date:"F j, o" }} {% translate "at" %} {{ report_ooi.date_generated|date:"H:i" }}</strong>
             </p>
             {% if report_ooi.report_type != "multi-organization-report" %}
                 <p>

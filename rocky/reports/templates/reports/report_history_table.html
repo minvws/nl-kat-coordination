@@ -2,7 +2,7 @@
 {% load static %}
 
 <p class="de-emphasized">
-    {% blocktranslate with length=reports|length total=total_reports %}Showing {{ length }} of {{ total }} reports{% endblocktranslate %}
+    {% blocktranslate with length=report_histories|length total=total_report_history %}Showing {{ length }} of {{ total }} reports{% endblocktranslate %}
 </p>
 <div class="horizontal-scroll sticky-column">
     <table class="nowrap">

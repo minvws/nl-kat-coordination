@@ -106,7 +106,7 @@ class ReportsLandingView(ReportBreadcrumbs, TemplateView):
     """
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        return redirect(reverse("report_history", kwargs=self.get_kwargs()))
+        return redirect(reverse("report_overview", kwargs=self.get_kwargs()))
 
 
 def hydrate_plugins(report_types: list[type["BaseReport"]], katalogus: KATalogus) -> dict[str, list[Plugin]]:

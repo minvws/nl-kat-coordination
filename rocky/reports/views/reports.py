@@ -21,7 +21,7 @@ from rocky.paginator import RockyPaginator
 from rocky.scheduler import Task
 from rocky.views.mixins import OctopoesView, ReportList
 from rocky.views.scheduler import SchedulerView
-from rocky.views.tasks import ReportsTaskListView
+from rocky.views.tasks import TaskListView
 
 logger = structlog.get_logger(__name__)
 
@@ -301,14 +301,15 @@ class ReportHistory:
     reports: list[HydratedReport]
 
 
-class ReportHistoryView(BreadcrumbsReportOverviewView, ReportsTaskListView):
+class ReportHistoryView(BreadcrumbsReportOverviewView, TaskListView):
     """
-    Shows all the reports that have ever been generated for the organization.
+    Get reports history from completed tasks (normalizer tasks)
     """
 
     paginate_by = 30
     context_object_name = "report_histories"
     template_name = "reports/report_history.html"
+    task_type = "report"
 
     def get_reports(self, recipe_id: str, valid_time: datetime) -> list[HydratedReport]:
         try:
@@ -329,6 +330,11 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, ReportsTaskListView):
             report_histories.append(report_history)
 
         return report_histories
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["total_report_history"] = len(self.object_list)
+        return context
 
 
 class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
