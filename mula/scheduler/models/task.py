@@ -64,7 +64,7 @@ class TaskDB(Base):
     __tablename__ = "tasks"
 
     id = Column(GUID, primary_key=True)
-    scheduler_id = Column(String, nullable=False, index=True)
+    scheduler_id = Column(String, nullable=False)
     schedule_id = Column(GUID, ForeignKey("schedules.id", ondelete="SET NULL"), nullable=True)
     organisation = Column(String, nullable=False)
     type = Column(String, nullable=False)
@@ -79,7 +79,7 @@ class TaskDB(Base):
     modified_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
 
 
-Index("ix_tasks_status_queued", TaskDB.status, postgresql_where=TaskDB.status == TaskStatus.QUEUED)
+Index("ix_tasks_status_queued", TaskDB.scheduler_id, TaskDB.status, postgresql_where=TaskDB.status == TaskStatus.QUEUED)
 
 
 class NormalizerTask(BaseModel):
