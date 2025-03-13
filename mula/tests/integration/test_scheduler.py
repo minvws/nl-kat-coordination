@@ -176,11 +176,10 @@ class SchedulerTestCase(unittest.TestCase):
         self.scheduler.push_item_to_queue(item)
 
         # Act
-        popped_items, count = self.scheduler.pop_item_from_queue()
+        popped_items = self.scheduler.pop_item_from_queue()
 
         # Assert
         self.assertEqual(0, self.scheduler.queue.qsize())
-        self.assertEqual(1, count)
         self.assertEqual(1, len(popped_items))
         self.assertEqual(popped_items[0].id, item.id)
 
