@@ -10,7 +10,7 @@ import structlog
 
 from scheduler import models, storage
 
-from .errors import InvalidItemError, ItemNotFoundError, NotAllowedError, QueueEmptyError, QueueFullError
+from .errors import InvalidItemError, ItemNotFoundError, NotAllowedError, QueueFullError
 
 
 def with_lock(method):
@@ -107,13 +107,7 @@ class PriorityQueue(abc.ABC):
 
         Returns:
             The highest priority items from the queue.
-
-        Raises:
-            QueueEmptyError: If the queue is empty.
         """
-        if self.empty():
-            raise QueueEmptyError(f"Queue {self.pq_id} is empty.")
-
         items = self.pq_store.pop(self.pq_id, limit, filters)
         if items is None:
             return []

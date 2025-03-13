@@ -68,12 +68,11 @@ class SchedulerAPI:
         limit: int = 1,
         filters: storage.filters.FilterRequest | None = None,
     ) -> schemas.TaskPop:
-        results = self.ctx.datastores.pq_store.pop(scheduler_id=scheduler_id, limit=limit, filters=filters)
+        s = self.schedulers.get(scheduler_id)
+        if s is None:
+            raise NotFoundError(f"Scheduler {scheduler_id} not found")
 
-        # Update status for popped items
-        self.ctx.datastores.pq_store.bulk_update_status(
-            scheduler_id, [item.id for item in results], schemas.TaskStatus.DISPATCHED
-        )
+        results = s.pop_item_from_queue(limit=limit, filters=filters)
 
         return schemas.TaskPop(results=[schemas.Task(**item.dict()) for item in results])
 

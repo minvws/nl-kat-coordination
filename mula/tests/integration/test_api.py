@@ -416,8 +416,7 @@ class APISchedulerEndpointTestCase(APITemplateTestCase):
     def test_pop_queue_not_found(self):
         mock_id = uuid.uuid4()
         response = self.client.post(f"/schedulers/{mock_id}/pop")
-        self.assertEqual(200, response.status_code)
-        self.assertEqual(0, len(response.json().get("results")))
+        self.assertEqual(404, response.status_code)
 
     def test_pop_queue_filters_two_items(self):
         # Add one task to the queue
