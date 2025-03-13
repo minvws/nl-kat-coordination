@@ -1,12 +1,10 @@
-from typing import Any
-
 import fastapi
 import structlog
 from fastapi import status
 
 from scheduler import context, models, schedulers, storage
 from scheduler.schedulers.queue import NotAllowedError, QueueFullError
-from scheduler.server import serializers, utils
+from scheduler.server import schemas, utils
 from scheduler.server.errors import BadRequestError, ConflictError, NotFoundError, TooManyRequestsError
 
 
@@ -21,7 +19,7 @@ class SchedulerAPI:
             path="/schedulers",
             endpoint=self.list,
             methods=["GET"],
-            response_model=list[serializers.Scheduler],
+            response_model=list[schemas.Scheduler],
             status_code=status.HTTP_200_OK,
             description="List all schedulers",
         )
@@ -30,7 +28,7 @@ class SchedulerAPI:
             path="/schedulers/{scheduler_id}",
             endpoint=self.get,
             methods=["GET"],
-            response_model=serializers.Scheduler,
+            response_model=schemas.Scheduler,
             status_code=status.HTTP_200_OK,
             description="Get a scheduler",
         )
@@ -39,7 +37,7 @@ class SchedulerAPI:
             path="/schedulers/{scheduler_id}/push",
             endpoint=self.push,
             methods=["POST"],
-            response_model=models.Task,
+            response_model=schemas.Task,
             status_code=status.HTTP_201_CREATED,
             description="Push a task to a scheduler",
         )
@@ -53,15 +51,15 @@ class SchedulerAPI:
             description="Pop a task from a scheduler",
         )
 
-    def list(self) -> list[serializers.Scheduler]:
-        return [serializers.Scheduler(**s.dict()) for s in self.schedulers.values()]
+    def list(self) -> list[schemas.Scheduler]:
+        return [schemas.Scheduler(**s.dict()) for s in self.schedulers.values()]
 
-    def get(self, scheduler_id: str) -> Any:
+    def get(self, scheduler_id: str) -> schemas.Scheduler:
         s = self.schedulers.get(scheduler_id)
         if s is None:
             raise NotFoundError(f"Scheduler {scheduler_id} not found")
 
-        return serializers.Scheduler(**s.dict())
+        return schemas.Scheduler(**s.dict())
 
     def pop(
         self,
@@ -77,12 +75,12 @@ class SchedulerAPI:
 
         # Update status for popped items
         self.ctx.datastores.pq_store.bulk_update_status(
-            scheduler_id, [item.id for item in results], models.TaskStatus.DISPATCHED
+            scheduler_id, [item.id for item in results], schemas.TaskStatus.DISPATCHED
         )
 
         return utils.paginate(request, results, count, offset, limit)
 
-    def push(self, scheduler_id: str, item: serializers.TaskPush) -> Any:
+    def push(self, scheduler_id: str, item: schemas.TaskPush) -> schemas.Task:
         s = self.schedulers.get(scheduler_id)
         if s is None:
             raise NotFoundError(f"Scheduler {scheduler_id} not found")
