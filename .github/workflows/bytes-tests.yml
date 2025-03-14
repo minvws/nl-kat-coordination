@@ -9,18 +9,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: tree test
-        run: tree -a -L 3
-
       - name: Run unit tests
         run: make utest
         working-directory: bytes/
+
+
+      - name: tree test
+        run: tree -a -L 3
 
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
         with:
           name: bytes-coverage-unit
-          path: "bytes/.coverage"
+          path: "${{ github.workspace }}/bytes/.coverage"
 
   integration-tests:
     runs-on: ubuntu-24.04
@@ -34,12 +35,11 @@ jobs:
       - name: tree test
         run: tree -a -L 3
 
-
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
         with:
           name: bytes-coverage-integration
-          path: "bytes/.coverage"
+          path: "${{ github.workspace }}/bytes/.coverage"
 
   coverage:
     runs-on: ubuntu-24.04
