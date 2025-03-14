@@ -9,26 +9,26 @@ on:
   pull_request:
 
 jobs:
-  octopoes-tests:
-    permissions:
-      contents: read
-    uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@fix/include-integration-tests-coverage
+  # octopoes-tests:
+  #   permissions:
+  #     contents: read
+  #   uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@fix/include-integration-tests-coverage
   bytes-tests:
     permissions:
       contents: read
     uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@fix/include-integration-tests-coverage
-  mula-tests:
-    permissions:
-      contents: read
-    uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@fix/include-integration-tests-coverage
-  rocky-tests:
-    permissions:
-      contents: read
-    uses: minvws/nl-kat-coordination/.github/workflows/rocky-tests.yml@fix/include-integration-tests-coverage
-  boefjes-tests:
-    permissions:
-      contents: read
-    uses: minvws/nl-kat-coordination/.github/workflows/boefjes-tests.yml@fix/include-integration-tests-coverage
+  # mula-tests:
+  #   permissions:
+  #     contents: read
+  #   uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@fix/include-integration-tests-coverage
+  # rocky-tests:
+  #   permissions:
+  #     contents: read
+  #   uses: minvws/nl-kat-coordination/.github/workflows/rocky-tests.yml@fix/include-integration-tests-coverage
+  # boefjes-tests:
+  #   permissions:
+  #     contents: read
+  #   uses: minvws/nl-kat-coordination/.github/workflows/boefjes-tests.yml@fix/include-integration-tests-coverage
 
   fix-coverage-reports:
     permissions:
