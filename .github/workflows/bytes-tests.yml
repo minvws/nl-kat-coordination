@@ -20,7 +20,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bytes-coverage-unit
-          path: ./bytes/.coverage
+          path: .coverage
 
   integration-tests:
     runs-on: ubuntu-24.04
@@ -35,7 +35,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bytes-coverage-integration
-          path: bytes/.coverage
+          path: .coverage
 
   coverage:
     runs-on: ubuntu-24.04
