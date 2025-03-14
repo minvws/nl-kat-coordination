@@ -5,7 +5,8 @@ import json
 import logging
 
 import click
-from xtdb_client import XTDBClient
+
+from .xtdb_client import XTDBClient
 
 logger = logging.getLogger(__name__)
 
@@ -267,6 +268,22 @@ def slowest_queries(ctx: click.Context):
     client: XTDBClient = ctx.obj["client"]
 
     click.echo(json.dumps(client.slowest_queries()))
+
+
+@cli.command(help="Deletes all reports with an evict.")
+@click.pass_context
+def evict_all_reports(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    reports = client.query('{:query {:find [ ?var ] :where [[?var :object_type "Report" ]]}}')
+
+    transactions = []
+
+    for report in reports:
+        transactions.append(("evict", report[0], datetime.datetime.now(tz=datetime.timezone.utc).isoformat()))
+
+    client.submit_tx(transactions)
+    click.echo("Evicted reports")
 
 
 if __name__ == "__main__":
