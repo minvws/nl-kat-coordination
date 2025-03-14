@@ -62,10 +62,10 @@ jobs:
       - name: Merge and generate coverage report
         run: |
           coverage combine **/.coverage
-          coverage xml --output bytes/coverage.xml
+          coverage xml
 
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
         with:
           name: bytes-coverage
-          path: bytes/coverage.xml
+          path: coverage.xml
