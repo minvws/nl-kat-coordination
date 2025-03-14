@@ -17,4 +17,48 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bytes-coverage-unit
+          path: bytes/.coverage
+
+  integration-tests:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run integration tests
+        run: make itest
+        working-directory: bytes/
+
+      - name: Upload coverage as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bytes-coverage-integration
+          path: bytes/.coverage
+
+  coverage:
+    runs-on: ubuntu-24.04
+    needs:
+      - unit-tests
+      - integration-tests
+
+    steps:
+      - name: Download unit coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: bytes-coverage-unit
+
+      - name: Download integration coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: bytes-coverage-integration
+
+      - name: Merge coverage files
+        run: |
+          coverage combine bytes-coverage-unit/.coverage bytes-coverage-integration/.coverage
+          coverage report --show-missing
+          coverage xml --output=bytes/coverage.xml
+
+      - name: Upload coverage as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bytes-coverage
           path: bytes/coverage.xml
