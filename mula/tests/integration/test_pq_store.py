@@ -66,11 +66,11 @@ class PriorityQueueStoreTestCase(unittest.TestCase):
         item.status = models.TaskStatus.QUEUED
         created_item = self.mock_ctx.datastores.pq_store.push(item)
 
-        popped_items, count = self.mock_ctx.datastores.pq_store.pop(item.scheduler_id)
+        popped_items = self.mock_ctx.datastores.pq_store.pop(item.scheduler_id)
 
         # Assert
         self.assertIsNotNone(popped_items)
-        self.assertEqual(count, 1)
+        self.assertEqual(len(popped_items), 1)
         self.assertEqual(popped_items[0].id, created_item.id)
 
     def test_pop_status_not_queued(self):
@@ -79,9 +79,8 @@ class PriorityQueueStoreTestCase(unittest.TestCase):
         item.status = models.TaskStatus.PENDING
         created_item = self.mock_ctx.datastores.pq_store.push(item)
 
-        popped_items, count = self.mock_ctx.datastores.pq_store.pop(item.scheduler_id)
+        popped_items = self.mock_ctx.datastores.pq_store.pop(item.scheduler_id)
 
         # Assert
         self.assertIsNotNone(created_item)
-        self.assertEqual(count, 0)
         self.assertEqual(len(popped_items), 0)

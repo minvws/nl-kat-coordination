@@ -15,7 +15,7 @@ from sqlalchemy.orm import sessionmaker
 
 from boefjes.app import SchedulerWorkerManager
 from boefjes.clients.bytes_client import BytesAPIClient
-from boefjes.clients.scheduler_client import PaginatedTasksResponse, SchedulerClientInterface, Task, TaskStatus
+from boefjes.clients.scheduler_client import SchedulerClientInterface, Task, TaskPop, TaskStatus
 from boefjes.config import Settings, settings
 from boefjes.dependencies.plugins import PluginService, get_plugin_service
 from boefjes.job_handler import bytes_api_client
@@ -76,14 +76,14 @@ class MockSchedulerClient(SchedulerClientInterface):
 
         try:
             if WorkerManager.Queue.BOEFJES.value in queue:
-                response = TypeAdapter(PaginatedTasksResponse).validate_json(self.boefje_responses.pop(0))
+                response = TypeAdapter(TaskPop).validate_json(self.boefje_responses.pop(0))
                 p_item = response.results[0]
                 self._popped_items[str(p_item.id)] = p_item
                 self._tasks[str(p_item.id)] = self._task_from_id(p_item.id)
                 return p_item
 
             if WorkerManager.Queue.NORMALIZERS.value in queue:
-                response = TypeAdapter(PaginatedTasksResponse).validate_json(self.normalizer_responses.pop(0))
+                response = TypeAdapter(TaskPop).validate_json(self.normalizer_responses.pop(0))
                 p_item = response.results[0]
                 self._popped_items[str(p_item.id)] = p_item
                 self._tasks[str(p_item.id)] = self._task_from_id(p_item.id)

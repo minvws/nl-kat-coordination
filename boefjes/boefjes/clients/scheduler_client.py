@@ -41,10 +41,7 @@ class Task(BaseModel):
     modified_at: datetime.datetime
 
 
-class PaginatedTasksResponse(BaseModel):
-    count: int
-    next: str | None = None
-    previous: str | None = None
+class TaskPop(BaseModel):
     results: list[Task]
 
 
@@ -55,7 +52,7 @@ class SchedulerClientInterface:
     def pop_item(self, scheduler_id: str) -> Task | None:
         raise NotImplementedError()
 
-    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
+    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> TaskPop | None:
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
@@ -82,17 +79,18 @@ class SchedulerAPIClient(SchedulerClientInterface):
         response = self._session.post(f"/schedulers/{scheduler_id}/pop?limit=1")
         self._verify_response(response)
 
-        page = TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
-        if page.count == 0:
+        popped_tasks = TypeAdapter(TaskPop | None).validate_json(response.content)
+
+        if len(popped_tasks.results) == 0:
             return None
 
-        return page.results[0]
+        return popped_tasks.results[0]
 
-    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
+    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> TaskPop | None:
         response = self._session.post(f"/schedulers/{scheduler_id}/pop", json=filters)
         self._verify_response(response)
 
-        return TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
+        return TypeAdapter(TaskPop | None).validate_json(response.content)
 
     def push_item(self, p_item: Task) -> None:
         response = self._session.post(f"/schedulers/{p_item.scheduler_id}/push", content=p_item.model_dump_json())
