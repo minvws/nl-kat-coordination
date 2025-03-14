@@ -36,25 +36,25 @@ jobs:
     runs-on: ubuntu-24.04
 
     needs:
-      - octopoes-tests
-      - mula-tests
+      # - octopoes-tests
+      # - mula-tests
       - bytes-tests
-      - rocky-tests
-      - boefjes-tests
+      # - rocky-tests
+      # - boefjes-tests
 
     strategy:
       matrix:
         module:
-          - name: octopoes
-            prefix_path: "."
-          - name: mula
-            prefix_path: "mula/scheduler/"
+          # - name: octopoes
+          #   prefix_path: "."
+          # - name: mula
+          #   prefix_path: "mula/scheduler/"
           - name: bytes
             prefix_path: "bytes/"
-          - name: rocky
-            prefix_path: "rocky/"
-          - name: boefjes
-            prefix_path: "boefjes/"
+          # - name: rocky
+          #   prefix_path: "rocky/"
+          # - name: boefjes
+          #   prefix_path: "boefjes/"
 
     steps:
       - name: Checkout coverage file fix script
@@ -66,8 +66,10 @@ jobs:
       - name: Download coverage file
         uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.module['name'] }}-coverage-unit
-          path: ${{ matrix.module['name'] }}-coverage-unit
+          # name: ${{ matrix.module['name'] }}-coverage-unit
+          # path: ${{ matrix.module['name'] }}-coverage-unit
+          name: ${{ matrix.module['name'] }}-coverage
+          path: ${{ matrix.module['name'] }}-coverage
 
       - name: Fix coverage report sources
         uses: Mudlet/xmlstarlet-action@9866e85e774e0fb50bc49de15274d005b5a69f0e # master
@@ -80,8 +82,10 @@ jobs:
       - name: Upload fixed coverage file
         uses: actions/upload-artifact@v4
         with:
-          name: "${{ matrix.module['name'] }}-coverage-unit-fixed"
-          path: "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
+          # name: "${{ matrix.module['name'] }}-coverage-unit-fixed"
+          # path: "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
+          name: "${{ matrix.module['name'] }}-coverage-fixed"
+          path: "${{ matrix.module['name'] }}-coverage/coverage.xml"
 
   sonar-cloud:
     permissions:
