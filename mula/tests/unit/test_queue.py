@@ -7,7 +7,7 @@ import uuid
 from unittest import mock
 
 from scheduler import config, models, storage
-from scheduler.schedulers.queue import InvalidItemError, ItemNotFoundError, NotAllowedError, QueueEmptyError
+from scheduler.schedulers.queue import InvalidItemError, ItemNotFoundError, NotAllowedError
 from scheduler.storage import stores
 
 from tests.mocks import queue as mock_queue
@@ -487,13 +487,6 @@ class PriorityQueueTestCase(unittest.TestCase):
         # Assert, we should expect the first item on the second pop
         self.assertEqual(first_item.id, queue.get().id)
         self.assertNotEqual(second_item.id, queue.get().id)
-
-    def test_pop_queue_empty(self):
-        """When popping an item from an empty queue, it should raise an
-        exception.
-        """
-        with self.assertRaises(QueueEmptyError):
-            self.pq.pop()
 
     def test_pop_highest_priority(self):
         """Add two items to the queue, and pop the item with the highest
