@@ -1882,8 +1882,7 @@ def reports_task_list():
 @pytest.fixture
 def dashboard_data(client_member, client_member_b):
     # make sure that no dashboards exist to test this particular set
-    DashboardData.objects.all().delete()
-    Dashboard.objects.all().delete()
+    Dashboard.objects.all().delete()  # deleting dashboard deletes DashboardData as well
 
     recipe_id_a = "7ebcdb32-e7f2-4c2d-840a-d7b8e6b37616"
     recipe_id_b = "c41bbf9a-7102-4b6b-b256-b3036e106316"

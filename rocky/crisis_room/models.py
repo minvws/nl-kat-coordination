@@ -44,6 +44,7 @@ class DashboardData(models.Model):
         unique_together = [["dashboard", "position"], ["dashboard", "findings_dashboard"]]
 
     def __str__(self) -> str:
-        if self.dashboard:
+        try:
             return str(self.dashboard)
-        return super().__str__()
+        except Dashboard.DoesNotExist:
+            return super().__str__()
