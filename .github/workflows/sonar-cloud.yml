@@ -74,11 +74,13 @@ jobs:
       - name: Fix coverage report sources
         uses: Mudlet/xmlstarlet-action@9866e85e774e0fb50bc49de15274d005b5a69f0e # master
         with:
-          args: edit --inplace --update "coverage/sources" --value "/github/workspace/${{ matrix.module['name'] }}/" "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
+          # args: edit --inplace --update "coverage/sources" --value "/github/workspace/${{ matrix.module['name'] }}/" "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
+          args: edit --inplace --update "coverage/sources" --value "/github/workspace/${{ matrix.module['name'] }}/" "${{ matrix.module['name'] }}-coverage/coverage.xml"
 
       - name: Fix coverage file
-        run: python "${{ github.workspace }}/.github/scripts/coverage_file_fixer.py" "${{ matrix.module['name'] }}-coverage-unit/coverage.xml" "${{ matrix.module['prefix_path'] }}"
-
+        # run: python "${{ github.workspace }}/.github/scripts/coverage_file_fixer.py" "${{ matrix.module['name'] }}-coverage-unit/coverage.xml" "${{ matrix.module['prefix_path'] }}"
+        run: python "${{ github.workspace }}/.github/scripts/coverage_file_fixer.py" "${{ matrix.module['name'] }}-coverage/coverage.xml" "${{ matrix.module['prefix_path'] }}"
+      
       - name: Upload fixed coverage file
         uses: actions/upload-artifact@v4
         with:
