@@ -48,6 +48,12 @@ jobs:
         with:
           pattern: bytes-coverage-*
 
+      - name: List current directory contents
+        run: ls -la
+
+      - name: List downloaded artifacts directory contents
+        run: ls -la bytes-coverage-unit bytes-coverage-integration
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -62,6 +68,7 @@ jobs:
       - name: Merge coverage files
         run: |
           pwd
+          tree -a -L 2
           find . -name '.coverage'
           coverage combine bytes-coverage-unit/.coverage bytes-coverage-integration/.coverage
           coverage report --show-missing
