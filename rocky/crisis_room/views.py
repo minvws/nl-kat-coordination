@@ -128,6 +128,47 @@ class DashboardService:
 
         return summary
 
+    def get_all_dashboard_names(self, organization):
+        dashboard_names = []
+        dashboards_data = DashboardData.objects.filter(dashboard__organization=organization, display_in_dashboard=True)
+        for data in dashboards_data:
+            dashboard_names.append(data.dashboard.name)
+        return dashboard_names
+
+    def get_dashboard_data(self, dashboard_name, organization):
+        dashboard = {}
+        dashboard_data = []
+
+        dashboard_data = DashboardData.objects.filter(
+            dashboard__name=dashboard_name, dashboard__organization=organization, display_in_dashboard=True
+        )
+
+        for data in dashboard_data:
+            octopoes_client = self.get_octopoes_client(organization.code)
+            bytes_client = get_bytes_client(organization.code)
+
+            # TODO: Check if there's a recipe, object query OR findings query
+            recipe_id = data.recipe
+            # TODO: query_from = data.query_from
+            # TODO: query = data.query
+
+            if recipe_id:
+                reports = self.get_reports(self.observed_at, octopoes_client, recipe_id)
+
+                if reports:
+                    report = reports[0]
+                    report_data_from_bytes = self.get_report_bytes_data(bytes_client, report.data_raw_id)
+                    report_data = self.get_organizations_findings(report_data_from_bytes)
+
+                    if report_data:
+                        dashboard = {"data": data, "report": report, "report_data": report_data}
+            # TODO: elif query_from == "object_list":
+            #     # Do something
+            # TODO: elif query_From == "findings_list":
+            #     # Do something
+
+        return dashboard
+
 
 class CrisisRoomView(TemplateView):
     """This is the Crisis Room for all organizations."""
@@ -164,16 +205,16 @@ class OrganizationsCrisisRoomView(OrganizationView, TemplateView):
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
         super().setup(request, *args, **kwargs)
 
+        # TODO: Get all dashboard names
+
+        dashboard_service = DashboardService()
+        dashboard_name = self.request.GET.get("dashboard")
+        organization = OrganizationMember.objects.filter(user=self.request.user)[0].organization
+        self.get_dashboard_data = dashboard_service.get_dashboard_data(dashboard_name, organization)
+        self.get_all_dashboard_names = dashboard_service.get_all_dashboard_names(organization)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["dashboards"] = [
-            {
-                "name": "TestDashboard1",
-                "dashboard_items": [{"name": "Item1", "template": ""}, {"name": "Item2", "template": ""}],
-            },
-            {
-                "name": "TestDashboard2",
-                "dashboard_items": [{"name": "Item1", "template": ""}, {"name": "Item2", "template": ""}],
-            },
-        ]
+        context["all_dashboard_names"] = self.get_all_dashboard_names
+        context["dashboard"] = self.get_dashboard_data
         return context
