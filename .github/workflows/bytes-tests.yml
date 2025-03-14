@@ -61,6 +61,8 @@ jobs:
 
       - name: Merge coverage files
         run: |
+          pwd
+          find . -name '.coverage'
           coverage combine bytes-coverage-unit/.coverage bytes-coverage-integration/.coverage
           coverage report --show-missing
           coverage xml --output=bytes/coverage.xml
