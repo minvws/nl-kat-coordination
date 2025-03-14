@@ -53,6 +53,13 @@ jobs:
         with:
           name: bytes-coverage-integration
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip" # caching pip dependencies
+
+      - run: pip install coverage
+
       - name: Merge coverage files
         run: |
           coverage combine bytes-coverage-unit/.coverage bytes-coverage-integration/.coverage
