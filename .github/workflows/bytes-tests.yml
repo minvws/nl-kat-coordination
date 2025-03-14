@@ -43,22 +43,18 @@ jobs:
       - integration-tests
 
     steps:
-      - name: Download unit coverage artifacts
+      - name: Download coverage artifacts
         uses: actions/download-artifact@v4
         with:
-          name: bytes-coverage-unit
-
-      - name: Download integration coverage artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: bytes-coverage-integration
+          pattern: bytes-coverage-*
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
           cache: "pip" # caching pip dependencies
 
-      - run: pip install coverage
+      - name: Install coverage
+        run: pip install coverage
 
       - name: Merge coverage files
         run: |
