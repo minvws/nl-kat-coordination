@@ -13,15 +13,12 @@ jobs:
         run: make utest
         working-directory: bytes/
 
-
-      - name: tree test
-        run: tree -a -L 3 && pwd
-
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
         with:
           name: bytes-coverage-unit
-          path: "${{ github.workspace }}/bytes/.coverage"
+          path: bytes/.coverage
+          include-hidden-files: true
 
   integration-tests:
     runs-on: ubuntu-24.04
@@ -32,14 +29,12 @@ jobs:
         run: make itest
         working-directory: bytes/
 
-      - name: tree test
-        run: tree -a -L 3 && pwd
-
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
         with:
           name: bytes-coverage-integration
-          path: "${{ github.workspace }}/bytes/.coverage"
+          path: bytes/.coverage
+          include-hidden-files: true
 
   coverage:
     runs-on: ubuntu-24.04
