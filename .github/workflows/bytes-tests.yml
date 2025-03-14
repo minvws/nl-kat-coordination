@@ -14,13 +14,13 @@ jobs:
         working-directory: bytes/
 
       - name: cat test
-        run: cat bytes/.coverage
+        run: cat bytes/.coverage && pwd
 
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
         with:
           name: bytes-coverage-unit
-          path: bytes/.coverage
+          path: ./bytes/.coverage
 
   integration-tests:
     runs-on: ubuntu-24.04
