@@ -62,7 +62,7 @@ jobs:
       - name: Merge and generate coverage report
         run: |
           coverage combine **/.coverage
-          coverage xml
+          coverage xml --ignore-errors
 
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
