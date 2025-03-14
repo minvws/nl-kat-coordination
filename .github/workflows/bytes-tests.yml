@@ -15,7 +15,7 @@ jobs:
 
 
       - name: tree test
-        run: tree -a -L 3
+        run: tree -a -L 3 && pwd
 
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
@@ -33,7 +33,7 @@ jobs:
         working-directory: bytes/
 
       - name: tree test
-        run: tree -a -L 3
+        run: tree -a -L 3 && pwd
 
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
