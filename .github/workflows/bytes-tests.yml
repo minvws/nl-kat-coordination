@@ -13,6 +13,9 @@ jobs:
         run: make utest
         working-directory: bytes/
 
+      - name: tree
+        run: tree -a -L 4
+
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
         with:
