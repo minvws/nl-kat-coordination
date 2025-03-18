@@ -250,10 +250,10 @@ class OOIParseError(OOI):
     to the user that parsing of a specific OOI failed"""
 
     object_type: Literal["OOIParseError"] = "OOIParseError"
-    original_primary_key: str
+    source: ReferenceField(OOI)
     message: str
 
-    _natural_key_attrs = ["original_primary_key"]
+    _natural_key_attrs = ["source"]
 
 
 def format_id_short(id_: str) -> str:
