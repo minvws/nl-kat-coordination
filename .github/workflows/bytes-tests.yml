@@ -69,4 +69,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bytes-coverage
-          path: coverage.xml
+          path: bytes/coverage.xml
