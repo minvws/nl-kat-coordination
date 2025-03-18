@@ -1,19 +1,28 @@
 {% load i18n %}
 {% load static %}
 
-<div class="fifty-fifty">
+{% if dashboard %}
+    <div class="fifty-fifty">
+        <div>
+            <h2>{{ dashboard.data.dashboard.name }}</h2>
+        </div>
+        <div class="horizontal-view toolbar">
+            <a class="button ghost" href="">{% translate "Add item" %}</a>
+        </div>
+    </div>
     <div>
-        <h2>{{ dashboard.data.dashboard.name }}</h2>
-    </div>
-    <div class="horizontal-view toolbar">
-        <a class="button ghost" href="">{% translate "Add item" %}</a>
-    </div>
-</div>
-<div>
-    {% if dashboard.report %}
-        {% include dashboard.data.template with is_dashboard="yes" %}
+        {% if dashboard.report %}
+            {% include dashboard.data.template with is_dashboard="yes" %}
 
-    {% else %}
-        <p>{% translate "There are no dashboards to display." %}</p>
-    {% endif %}
-</div>
+        {% else %}
+            <p>
+                {% blocktranslate trimmed %}
+                    There are not dashboard items to display here.
+                    Click on the "Add item" button to add items to this dashboard.
+                {% endblocktranslate %}
+            </p>
+        {% endif %}
+    </div>
+{% else %}
+    <p>{% translate "There are no dashboards to display." %}</p>
+{% endif %}
