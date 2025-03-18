@@ -271,13 +271,13 @@ class XTDBOOIRepository(OOIRepository):
                     object_cls,
                     error,
                 )
-                errordata = {
-                    "original_primary_key": stripped["primary_key"],
+                error_data = {
+                    "source": stripped["primary_key"],
                     "message": f"""An OOI could not be validated due to a mismatch between the database
                     and the current models. PK: {stripped["primary_key"]} on (wanted) type {object_cls}.
                     Validation error: {error}""",
                 }
-                return OOIParseError.model_validate(errordata)
+                return OOIParseError.model_validate(error_data)
             raise error
 
     def get(self, reference: Reference, valid_time: datetime) -> OOI | OOIParseError:
