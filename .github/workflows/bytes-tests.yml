@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run unit tests
-        run: make utest
+        run: make -C bytes/ utest
         # working-directory: bytes/
 
       - name: Upload coverage as artifact
