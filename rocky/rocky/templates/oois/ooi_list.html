@@ -10,21 +10,43 @@
 
     <main id="main-content">
         <section>
-            <div>
-                <h1>
-                    {% translate "Object list" %} @
-                    {% if observed_at %}{{ observed_at|date:'DATE_FORMAT' }}{% endif %}
-                </h1>
-                <p>
-                    {% blocktranslate trimmed with organization.name as organization_name %}
-                        An overview of objects found for organization <strong>{{ organization_name }}</strong>.
-                        Objects can be added manually or by running Boefjes.
-                        Click an object for additional information.
-                    {% endblocktranslate %}
-                </p>
-                {% include "partials/ooi_list_toolbar.html" %}
-                {% include "partials/ooi_list_filters.html" %}
+            <div class="fifty-fifty">
+                <div>
+                    <h1>
+                        {% translate "Object list" %} @
+                        {% if observed_at %}{{ observed_at|date:'DATE_FORMAT' }}{% endif %}
+                    </h1>
+                    <p>
+                        {% blocktranslate trimmed with organization.name as organization_name %}
+                            An overview of objects found for organization <strong>{{ organization_name }}</strong>.
+                            Objects can be added manually or by running Boefjes.
+                            Click an object for additional information.
+                        {% endblocktranslate %}
+                    </p>
+                </div>
+                <div class="horizontal-view toolbar">
+                    {% include "partials/ooi_list_toolbar.html" %}
 
+                </div>
+            </div>
+            <div>
+                <div class="fifty-fifty">
+                    <div>
+                        {% include "partials/ooi_list_filters.html" %}
+
+                    </div>
+                    <div class="horizontal-view toolbar">
+                        <form method="post">
+                            {% comment %} TODO: Add dashboard name to input as value {% endcomment %}
+                            <input type="hidden" name="dashboard" value="">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="button ghost"
+                                    name="add_dashboard_item"
+                                    value="object_list">{% translate "Add to dashboard" %}</button>
+                        </form>
+                    </div>
+                </div>
                 <p class="de-emphasized">
                     {% blocktranslate with length=ooi_list|length total=total_oois trimmed %}
                         Showing {{ length }} of {{ total }} objects
