@@ -57,6 +57,12 @@ jobs:
         with:
           pattern: mula-coverage-*
 
+      - name: debug
+        run: |
+          pwd
+          ls -la
+          tree -L 3
+
       - name: Merge and generate coverage report
         run: |
           coverage combine ../**/.coverage
