@@ -1,11 +1,15 @@
+import ast
 from datetime import datetime, timezone
 from typing import Any
+from urllib.parse import urlencode
 from uuid import UUID
 
 import structlog
 from account.mixins import OrganizationView
 from django.conf import settings
+from django.http import HttpResponse
 from django.http.request import HttpRequest
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 from httpx import HTTPStatusError
@@ -13,7 +17,7 @@ from pydantic import TypeAdapter
 from reports.report_types.findings_report.report import SEVERITY_OPTIONS
 from tools.models import Organization, OrganizationMember
 
-from crisis_room.management.commands.dashboards import FINDINGS_DASHBOARD_NAME
+from crisis_room.management.commands.dashboards import FINDINGS_DASHBOARD_NAME, get_or_create_dashboard_data
 from crisis_room.models import DashboardData
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.exception import ObjectNotFoundException
@@ -133,7 +137,7 @@ class DashboardService:
         dashboards_data = DashboardData.objects.filter(dashboard__organization=organization, display_in_dashboard=True)
         for data in dashboards_data:
             dashboard_names.append(data.dashboard.name)
-        return dashboard_names
+        return list(set(dashboard_names))
 
     def get_dashboard_data(self, dashboard_name, organization):
         dashboard = {}
@@ -159,8 +163,9 @@ class DashboardService:
                     report = reports[0]
                     report_data_from_bytes = self.get_report_bytes_data(bytes_client, report.data_raw_id)
                     report_data = self.get_organizations_findings(report_data_from_bytes)
-
-                    if report_data:
+                    if report.name == FINDINGS_DASHBOARD_NAME:
+                        dashboard = {data: {"report": report, "report_data": report_data}}
+                    elif report_data:
                         dashboard = {"data": data, "report": report, "report_data": report_data}
             # TODO: elif query_from == "object_list":
             #     # Do something
@@ -205,16 +210,62 @@ class OrganizationsCrisisRoomView(OrganizationView, TemplateView):
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
         super().setup(request, *args, **kwargs)
 
-        # TODO: Get all dashboard names
-
         dashboard_service = DashboardService()
         dashboard_name = self.request.GET.get("dashboard")
-        organization = OrganizationMember.objects.filter(user=self.request.user)[0].organization
-        self.get_dashboard_data = dashboard_service.get_dashboard_data(dashboard_name, organization)
-        self.get_all_dashboard_names = dashboard_service.get_all_dashboard_names(organization)
+        self.organization = OrganizationMember.objects.filter(user=self.request.user)[0].organization
+        self.get_dashboard_data = dashboard_service.get_dashboard_data(dashboard_name, self.organization)
+        self.get_all_dashboard_names = dashboard_service.get_all_dashboard_names(self.organization)
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        """Go to the selected dashboard or, in case that no dashboard has been selected, go to the first tab."""
+        self.query_params = urlencode({"dashboard": self.get_all_dashboard_names[0]})
+
+        if not self.get_dashboard_data:
+            return redirect(
+                reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
+                + "?"
+                + self.query_params
+            )
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["all_dashboard_names"] = self.get_all_dashboard_names
         context["dashboard"] = self.get_dashboard_data
+        return context
+
+
+class AddDashboardItemView(OrganizationView, TemplateView):
+    """This is the Crisis Room for a single organization."""
+
+    def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
+        super().setup(request, *args, **kwargs)
+        dashboard_name = self.request.GET.get("dashboard")
+        recipe_id = self.request.GET.get("recipe_id")
+        query_from = self.request.GET.get("query_from")
+        query = ast.literal_eval(self.request.GET.get("query"))
+        template = self.request.GET.get("template")
+
+        if query_from == "object_list":
+            template = "oois/ooi_list.html"
+        # TODO: add template for findings list
+
+        self.dashboard_data = get_or_create_dashboard_data(
+            dashboard_name, self.organization, recipe_id, query_from, query, template
+        )
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        """Go to the selected dashboard or, in case that no dashboard has been selected, go to the first tab."""
+        if self.dashboard_data:
+            query_params = urlencode({"dashboard": self.dashboard_data.dashboard.name})
+            return redirect(
+                reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
+                + "?"
+                + query_params
+            )
+
+        return redirect(reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         return context

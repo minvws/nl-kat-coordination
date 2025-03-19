@@ -2,7 +2,6 @@ import json
 import logging
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
 from uuid import uuid4
 
 from crisis_room.models import Dashboard, DashboardData
@@ -17,12 +16,12 @@ from rocky.bytes_client import get_bytes_client
 from rocky.scheduler import ReportTask, ScheduleRequest, scheduler_client
 
 FINDINGS_DASHBOARD_NAME = "Crisis Room Findings Dashboard"
+FINDINGS_DASHBOARD_TEMPLATE = "findings_report/report.html"
 
 
 def get_or_create_default_dashboard(
     organization: Organization, octopoes_client: OctopoesAPIConnector | None = None
 ) -> bool:
-    valid_time = datetime.now(timezone.utc)
     created = False
     path = Path(__file__).parent / "recipe_seeder.json"
 
@@ -30,27 +29,56 @@ def get_or_create_default_dashboard(
         recipe_default = json.load(recipe_seeder)
 
     dashboard, _ = Dashboard.objects.get_or_create(name=FINDINGS_DASHBOARD_NAME, organization=organization)
+    dashboard_data, created = DashboardData.objects.get_or_create(
+        dashboard=dashboard, template=FINDINGS_DASHBOARD_TEMPLATE
+    )
 
-    dashboard_data, created = DashboardData.objects.get_or_create(dashboard=dashboard)
     if created:
-        recipe = create_organization_recipe(octopoes_client, valid_time, organization, recipe_default)
-        dashboard_data.recipe = recipe.recipe_id
-        schedule_request = create_schedule_request(valid_time, organization, recipe)
-        scheduler_client(organization.code).post_schedule(schedule=schedule_request)
+        report_recipe = ReportRecipe(recipe_id=uuid4(), **recipe_default)
+        schedule_recipe(dashboard_data, organization, octopoes_client, report_recipe)
 
     dashboard_data.findings_dashboard = True
+    dashboard_data.display_in_dashboard = True
     dashboard_data.save()
     return created
+
+
+def get_or_create_dashboard_data(
+    dashboard_name: str, organization: Organization, recipe_id: str, query_from: str, query: dict, template: str
+) -> DashboardData:
+    dashboard, _ = Dashboard.objects.get_or_create(name=dashboard_name, organization=organization)
+    # TODO: Check the position, which should be the length of dashboard_datas + 1
+    position = 10  # Just for testing
+
+    # TODO: Check if recipe OR (query_from AND query) are given. Cannot be both.
+    dashboard_data, created = DashboardData.objects.get_or_create(
+        dashboard=dashboard, recipe=recipe_id, query_from=query_from, query=query, template=template, position=position
+    )
+
+    dashboard_data.display_in_dashboard = True
+    dashboard_data.save()
+    return dashboard_data
+
+
+def schedule_recipe(
+    dashboard_data: DashboardData,
+    organization: Organization,
+    octopoes_client: OctopoesAPIConnector,
+    report_recipe: ReportRecipe,
+):
+    valid_time = datetime.now(timezone.utc)
+    recipe = create_organization_recipe(octopoes_client, valid_time, organization, report_recipe)
+    dashboard_data.recipe = recipe.recipe_id
+    schedule_request = create_schedule_request(valid_time, organization, recipe)
+    scheduler_client(organization.code).post_schedule(schedule=schedule_request)
 
 
 def create_organization_recipe(
     octopoes_client: OctopoesAPIConnector | None,
     valid_time: datetime,
     organization: Organization,
-    recipe_default: dict[str, Any],
+    report_recipe: ReportRecipe,
 ) -> ReportRecipe:
-    report_recipe = ReportRecipe(recipe_id=uuid4(), **recipe_default)
-
     if octopoes_client is None:
         octopoes_client = OctopoesAPIConnector(
             settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
