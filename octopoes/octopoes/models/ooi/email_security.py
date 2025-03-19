@@ -42,13 +42,15 @@ class MechanismQualifier(Enum):
     """Represents the SPF Mechanism Qualifiers: allow' fail, softfail or neutral
     to specify how e-mail should be handled.
 
+    Specification: http://www.open-spf.org/SPF_Record_Syntax/#0.1
+
     Possible values
     ---------------
     +, -, ~, ?
 
     Example value
     -------------
-    +a
+    +
     """
 
     ALLOW = "+"
