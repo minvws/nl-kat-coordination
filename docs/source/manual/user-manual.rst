@@ -463,7 +463,7 @@ The scan is an ongoing process, looking for information based on derivation and 
 
 Questions & Configs
 ===================
-OpenKAT can be used to customise OpenKAT to your own company policies and industry standards. This will allow you to set your security more or less strict depending on your needs and wishes. This can be done using the Question objects on the Objects page. By default no policies are applied. In order to set an policy you have to answer the policy questions and apply these. After applying the questions a Config is created which contains all the answers to your Questions. OpenKAT reads the applied Config files and ensures that all observations are measured against your applied policy..
+OpenKAT can be used to customise OpenKAT to your own company policies and industry standards. This will allow you to set your security more or less strict depending on your needs and wishes. This can be done using the Question objects on the Objects page. By default no policies are applied. In order to set a policy you have to answer the policy questions and apply these. After applying the questions a Config is created which contains all the answers to your Questions. OpenKAT reads the applied Config files and ensures that all observations are measured against your applied policy.
 
 The summarize: your personal policy is stored in Configs. In order to create a Config you have to answer the Questions. After answering all questions the Config is automatically generated and applied. Questions consist of a JSON schema, which is rendered as a form in the web interface..
 
