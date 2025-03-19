@@ -60,7 +60,7 @@ pytest-httpx = "^0.30.0"
 [tool.pytest.ini_options]
 addopts = "--cov --cov-report xml --cov-branch --cov-report=term-missing:skip-covered"
 env = [
-#    "XTDB_URI=http://testxtdb:3000",
-#    "QUEUE_URI=amqp://placeholder",
-#    "KATALOGUS_API=http://placeholder:8000",
+    "D:XTDB_URI=http://testxtdb:3000",
+    "D:QUEUE_URI=amqp://placeholder",
+    "D:KATALOGUS_API=http://placeholder:8000",
 ]
