@@ -33,17 +33,17 @@ class TLSReport(Report):
                 valid_time,
                 input_ooi,
             )
-            oois = [ooi for ooi in services if ooi.ooi_type == "IPService"]
+            oois = [ooi.primary_key for ooi in services if ooi.ooi_type == "IPService"]
         elif class_type == IPAddressV4:
             services = self.octopoes_api_connector.query(
                 "IPAddressV4.<address[is IPPort].<ip_port [is IPService]", valid_time, input_ooi
             )
-            oois = [ooi for ooi in services if ooi.ooi_type == "IPService"]
+            oois = [ooi.primary_key for ooi in services if ooi.ooi_type == "IPService"]
         elif class_type == IPAddressV6:
             services = self.octopoes_api_connector.query(
                 "IPAddressV6.<address[is IPPort].<ip_port [is IPService]", valid_time, input_ooi
             )
-            oois = [ooi for ooi in services if ooi.ooi_type == "IPService"]
+            oois = [ooi.primary_key for ooi in services if ooi.ooi_type == "IPService"]
         else:
             oois = [input_ooi]
 
