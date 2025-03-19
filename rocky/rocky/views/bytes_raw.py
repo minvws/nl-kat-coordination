@@ -27,7 +27,7 @@ class BytesRawView(OrganizationView):
                 for raw_meta in raw_metas:
                     raw_meta["raw_file"] = base64.b64encode(
                         self.bytes_client.get_raw(raw_meta["id"])[:sizelimit]
-                    ).decode('ascii')
+                    ).decode("ascii")
                 return HttpResponse(json.dumps(raw_metas), content_type="application/json")
             raws = {raw_meta["id"]: self.bytes_client.get_raw(raw_meta["id"]) for raw_meta in raw_metas}
             return FileResponse(zip_data(raws, raw_metas), filename=f"{boefje_meta_id}.zip")
