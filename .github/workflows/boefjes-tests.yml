@@ -29,14 +29,16 @@ jobs:
       - name: Install Octopoes
         run: cd octopoes && python setup.py bdist_wheel && pip install dist/octopoes*.whl
 
-      - name: Run pytests
-        run: python3 -m pytest --cov boefjes/ --cov-report xml --cov-branch boefjes/tests
+      - name: Run tests
+        # run: python3 -m pytest --cov boefjes/ --cov-report xml --cov-branch boefjes/tests
+        run: python3 -m pytest --cov boefjes/ --cov-report xml --cov-branch tests/
+        working-directory: boefjes/
 
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
         with:
           name: boefjes-coverage-unit
-          path: boefjes/.coverage
+          path: .coverage
           include-hidden-files: true
 
   integration-tests:
