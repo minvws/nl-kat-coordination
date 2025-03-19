@@ -9,7 +9,7 @@
     </p>
 {% endif %}
 {% for ip_service, data in data.items %}
-    <h3>Ciphers for {{ data.input_ooi.primary_key|human_readable }}</h3>
+    <h3>Ciphers for {{ data.input_ooi|human_readable }}</h3>
     {% if data.suites %}
         <p>
             {% blocktranslate trimmed %}
