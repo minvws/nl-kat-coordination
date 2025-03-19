@@ -50,7 +50,7 @@ jobs:
           # - name: mula
           #   prefix_path: "mula/scheduler/"
           # - name: bytes
-            # prefix_path: "bytes/"
+          # prefix_path: "bytes/"
           # - name: rocky
           #   prefix_path: "rocky/"
           - name: boefjes
