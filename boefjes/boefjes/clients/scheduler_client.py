@@ -1,4 +1,5 @@
 import datetime
+import json
 import uuid
 from enum import Enum
 from typing import Any
@@ -41,6 +42,17 @@ class Task(BaseModel):
     modified_at: datetime.datetime
 
 
+class Filter(BaseModel):
+    column: str
+    field: str
+    operator: str
+    value: Any
+
+
+class QueuePopRequest(BaseModel):
+    filters: list[Filter]
+
+
 class PaginatedTasksResponse(BaseModel):
     count: int
     next: str | None = None
@@ -79,7 +91,33 @@ class SchedulerAPIClient(SchedulerClientInterface):
         response.raise_for_status()
 
     def pop_item(self, scheduler_id: str) -> Task | None:
-        response = self._session.post(f"/schedulers/{scheduler_id}/pop?limit=1")
+        filters: list[Filter] = []
+
+        if settings.runner_type == "boefje":
+            # Client should only pop tasks that lie on a network that the
+            # runner is capable of reaching (e.g. the internet)
+            filters.append(
+                Filter(
+                    column="data", field="network", operator="<@", value=json.dumps(settings.boefje_reachable_networks)
+                )
+            )
+
+            # Client should only pop tasks that have requirements that this runner is capable of (e.g. being able
+            # to handle ipv6 requests)
+            filters.append(
+                Filter(
+                    column="data",
+                    field="requirements",
+                    operator="<@",
+                    value=json.dumps(settings.boefje_task_capabilities),
+                )
+            )
+
+        response = self._session.post(
+            f"/schedulers/{scheduler_id}/pop",
+            data=QueuePopRequest(filters=filters).model_dump_json(),
+            params={"limit": 1},
+        )
         self._verify_response(response)
 
         page = TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)

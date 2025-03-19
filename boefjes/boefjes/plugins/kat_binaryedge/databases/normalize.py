@@ -36,7 +36,9 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
             yield ip_ooi
             ip_ref = ip_ooi.reference
 
-        ip_port_ooi = IPPort(address=ip_ref, protocol=Protocol(protocol), port=port_nr, state=PortState("open"))
+        ip_port_ooi = IPPort(
+            address=ip_ref, protocol=Protocol(protocol), port=port_nr, state=PortState("open"), network=network
+        )
         yield ip_port_ooi
 
         software_version = None
@@ -57,9 +59,15 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
             software_version = data["redis_version"]
             # TODO: data.gccversion
 
-        software_ooi = Software(name=module, version=software_version) if software_version else Software(name=module)
+        software_ooi = (
+            Software(name=module, version=software_version, network=network)
+            if software_version
+            else Software(name=module, network=network)
+        )
         yield software_ooi
-        software_instance_ooi = SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
+        software_instance_ooi = SoftwareInstance(
+            ooi=ip_port_ooi.reference, software=software_ooi.reference, network=network
+        )
         yield software_instance_ooi
 
         kat_ooi = KATFindingType(id="KAT-EXPOSED-SOFTWARE")

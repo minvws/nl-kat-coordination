@@ -36,12 +36,16 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
             yield ip_ooi
             ip_ref = ip_ooi.reference
 
-        ip_port_ooi = IPPort(address=ip_ref, protocol=Protocol(protocol), port=port_nr, state=PortState("open"))
+        ip_port_ooi = IPPort(
+            address=ip_ref, protocol=Protocol(protocol), port=port_nr, state=PortState("open"), network=network
+        )
         yield ip_port_ooi
 
-        software_ooi = Software(name=module.capitalize())
+        software_ooi = Software(name=module.capitalize(), network=network)
         yield software_ooi
-        software_instance_ooi = SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
+        software_instance_ooi = SoftwareInstance(
+            ooi=ip_port_ooi.reference, software=software_ooi.reference, network=network
+        )
         yield software_instance_ooi
 
         kat_ooi = KATFindingType(id="KAT-VERIFIED-VULNERABILITY")

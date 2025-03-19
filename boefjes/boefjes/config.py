@@ -51,7 +51,9 @@ class Settings(BaseSettings):
     # Worker configuration
     pool_size: int = Field(2, description="Number of workers to run per queue")
     poll_interval: float = Field(10.0, description="Time to wait before polling for tasks when all queues are empty")
-    worker_heartbeat: float = Field(1.0, description="Seconds to wait before checking the workers when queues are full")
+    worker_heartbeat: float = Field(
+        10.0, description="Seconds to wait before checking the workers when queues are full"
+    )
 
     remote_ns: IPvAnyAddress = Field(
         "1.1.1.1", description="Name server used for remote DNS resolution in the boefje runner"
@@ -116,6 +118,20 @@ class Settings(BaseSettings):
     span_export_grpc_endpoint: AnyHttpUrl | None = Field(
         None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
     )
+
+    boefje_reachable_networks: list[str] | None = Field(
+        None,
+        description="List of networks the boefje-runner can reach",
+        examples=[["Network|internet", "Network|dentist"], []],
+    )
+
+    boefje_task_capabilities: list[str] | None = Field(
+        None,
+        description="List of technical requirements the boefje-runner is capable of running",
+        examples=[[], ["ipv4", "wifi-pineapple"]],
+    )
+
+    runner_type: Literal["boefje", "normalizer"] | None = Field(None, examples=["boefje", "normalizer"])
 
     logging_format: Literal["text", "json"] = Field("text", description="Logging format")
 

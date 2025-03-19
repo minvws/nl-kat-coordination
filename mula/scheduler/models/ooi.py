@@ -26,6 +26,7 @@ class OOI(BaseModel):
     primary_key: str
     object_type: str
     scan_profile: ScanProfile
+    network: str | None = None
 
 
 class ScanProfileMutation(BaseModel):

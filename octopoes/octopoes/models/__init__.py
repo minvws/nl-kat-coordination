@@ -120,6 +120,7 @@ class OOI(BaseModel):
     _traversable: ClassVar[bool] = True
 
     primary_key: str = ""
+    network: str | None = None
 
     def model_post_init(self, __context: Any) -> None:  # noqa: F841
         self.primary_key = self.primary_key or f"{self.get_object_type()}|{self.natural_key}"

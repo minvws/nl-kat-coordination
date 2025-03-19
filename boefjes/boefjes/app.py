@@ -50,7 +50,7 @@ class SchedulerWorkerManager(WorkerManager):
         self.exited = False
 
     def run(self, queue_type: WorkerManager.Queue) -> None:
-        logger.info("Created worker pool for queue '%s'", queue_type.value)
+        logger.info("Created worker pool for queue '%s'", queue_type)
 
         self.workers = [
             ctx.Process(target=_start_working, args=self._worker_args()) for _ in range(self.settings.pool_size)
@@ -245,7 +245,8 @@ def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_leve
     plugin_service = PluginService(create_plugin_storage(session), create_config_storage(session), local_repository)
 
     item_handler: Handler
-    if queue is WorkerManager.Queue.BOEFJES:
+
+    if queue == WorkerManager.Queue.BOEFJES:
         item_handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), plugin_service, bytes_api_client)
     else:
         item_handler = NormalizerHandler(

@@ -743,3 +743,18 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(len(results), 2)
         self.assertEqual(results[0].name, "Alice")
         self.assertEqual(results[1].name, "Bob")
+
+    def test_apply_filter_jsonb_contained_by_list_and_list_contains_jsonb(self):
+        filter_request = FilterRequest(
+            filters=[
+                Filter(column="data", field="list", operator="<@", value=json.dumps(["ipv4", "ipv6", "network/local"])),
+                Filter(column="data", field="foo", operator="<@", value=json.dumps(["baz", "foobar", "qux"])),
+            ]
+        )
+
+        query = session.query(TestModel)
+        filtered_query = apply_filter(TestModel, query, filter_request)
+
+        results = filtered_query.order_by(TestModel.name).all()
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].name, "Bob")
