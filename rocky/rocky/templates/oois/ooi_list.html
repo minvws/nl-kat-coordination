@@ -36,15 +36,11 @@
 
                     </div>
                     <div class="horizontal-view toolbar">
-                        <form method="post">
-                            {% comment %} TODO: Add dashboard name to input as value {% endcomment %}
-                            <input type="hidden" name="dashboard" value="">
-                            {% csrf_token %}
-                            <button type="submit"
-                                    class="button ghost"
-                                    name="add_dashboard_item"
-                                    value="object_list">{% translate "Add to dashboard" %}</button>
-                        </form>
+                        <button type="submit"
+                                class="button ghost"
+                                form="add_to_dashboard"
+                                name="add_dashboard_item"
+                                value="object_list">{% translate "Add to dashboard" %}</button>
                     </div>
                 </div>
                 <p class="de-emphasized">
@@ -142,6 +138,11 @@
 
             </div>
         </section>
+        <form method="post" id="add_to_dashboard">
+            {% comment %} TODO: Add dashboard name to input as value {% endcomment %}
+            <input type="hidden" name="dashboard" value="">
+            {% csrf_token %}
+        </form>
     </main>
 {% endblock content %}
 {% block html_at_end_body %}
