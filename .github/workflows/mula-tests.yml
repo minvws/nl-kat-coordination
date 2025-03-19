@@ -17,7 +17,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mula-coverage-unit
-          path: mula/coverage.xml
+          path: mula/.coverage
 
   integration-tests:
     runs-on: ubuntu-24.04
@@ -32,7 +32,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mula-coverage-integration
-          path: mula/coverage.xml
+          path: mula/.coverage
 
   coverage:
     runs-on: ubuntu-24.04
@@ -56,12 +56,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: mula-coverage-*
-
-      - name: debug
-        run: |
-          pwd
-          ls -la
-          tree -L 3
 
       - name: Merge and generate coverage report
         run: |
