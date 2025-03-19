@@ -19,8 +19,10 @@ class Dashboard(models.Model):
 
 class DashboardData(models.Model):
     dashboard = models.ForeignKey(Dashboard, on_delete=models.SET_NULL, null=True)
-    recipe = models.CharField(blank=False, max_length=126)
-    template = models.CharField(blank=True, max_length=126, default="findings_report/report.html")
+    recipe = models.CharField(blank=True, max_length=126, null=True)
+    query_from = models.CharField(blank=True, max_length=126, null=True)
+    query = models.CharField(blank=True, max_length=126, null=True)
+    template = models.CharField(blank=True, max_length=126)
     position = models.PositiveSmallIntegerField(
         blank=True,
         default=1,
@@ -41,7 +43,7 @@ class DashboardData(models.Model):
     )
 
     class Meta:
-        unique_together = [["dashboard", "position"], ["dashboard", "findings_dashboard"]]
+        unique_together = [["dashboard", "position"]]
 
     def __str__(self) -> str:
         if self.dashboard:
