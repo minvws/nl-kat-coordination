@@ -2,12 +2,23 @@ import datetime
 import uuid
 from typing import Any
 
-from pydantic import BaseModel, Field
+import limits
+from pydantic import BaseModel, Field, field_validator
 
 
 class RateLimit(BaseModel):
     identifier: str
     interval: str
+
+    @field_validator("interval")
+    @classmethod
+    def validate_interval(cls, value: str) -> str:
+        """Custom validation for the field interval."""
+        try:
+            limits.parse(value)
+            return value
+        except Exception as exc:
+            raise ValueError(f"Invalid interval: {value}") from exc
 
 
 class Boefje(BaseModel):

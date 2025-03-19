@@ -1,5 +1,6 @@
 import unittest
 from datetime import datetime, timedelta, timezone
+from logging import raiseExceptions
 from types import SimpleNamespace
 from unittest import mock
 
@@ -2043,5 +2044,12 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule(schedule.id)
         self.assertFalse(schedule_db_disabled.enabled)
 
+
+class DelayedTestCase(BoefjeSchedulerBaseTestCase):
     def test_process_delayed(self):
-        pass
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+
+        rate_limit = models.RateLimit(identifier="org-1/my-secret-api-key", interval="2")
+        boefje = BoefjeFactory()
