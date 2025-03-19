@@ -16,6 +16,8 @@ services:
     build:
       args:
         ENVIRONMENT: dev
+        USER_UID: 1001
+        USER_GID: 1001
       context: .
     command: pytest tests/integration --timeout=300
     depends_on:
