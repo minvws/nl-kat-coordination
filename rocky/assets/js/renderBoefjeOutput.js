@@ -99,10 +99,10 @@ buttons.forEach((button) => {
             rawfile_container.querySelector("pre").innerText = rawdata;
             rawfiles_list.appendChild(rawfile_container);
           });
-          
+
           element.appendChild(rawfiles_list);
         } else {
-          element.innerHTML = 
+          element.innerHTML =
             "<p class='explanation'>Boefje task yielded no raw files.</p>";
         }
       });
