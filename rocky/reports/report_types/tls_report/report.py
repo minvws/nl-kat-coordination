@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from octopoes.models.ooi.service import IPService, TLSCipher
 from reports.report_types.definitions import Report
 
@@ -18,20 +19,34 @@ class TLSReport(Report):
     name = _("TLS Report")
     description: str = _("TLS Report assesses the security of data encryption and transmission protocols.")
     plugins = {"required": {"testssl-sh-ciphers"}, "optional": set()}
-    input_ooi_types = {IPService, Hostname}
+    input_ooi_types = {IPService, Hostname, IPAddressV4, IPAddressV6}
     template_path = "tls_report/report.html"
     label_style = "3-light"
 
     def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         results = {}
         class_type = Reference.from_str(input_ooi).class_type
+
         if class_type == Hostname:
-            tree = self.octopoes_api_connector.get_tree(
-                Reference.from_str(input_ooi), valid_time=valid_time, depth=6, types={IPService}
-            ).store
-            oois = [ooi for pk, ooi in tree.items() if ooi.ooi_type == "IPService"]
+            services = self.octopoes_api_connector.query(
+                "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort].<ip_port [is IPService]",
+                valid_time,
+                input_ooi,
+            )
+            oois = [ooi for ooi in services if ooi.ooi_type == "IPService"]
+        elif class_type == IPAddressV4:
+            services = self.octopoes_api_connector.query(
+                "IPAddressV4.<address[is IPPort].<ip_port [is IPService]", valid_time, input_ooi
+            )
+            oois = [ooi for ooi in services if ooi.ooi_type == "IPService"]
+        elif class_type == IPAddressV6:
+            services = self.octopoes_api_connector.query(
+                "IPAddressV6.<address[is IPPort].<ip_port [is IPService]", valid_time, input_ooi
+            )
+            oois = [ooi for ooi in services if ooi.ooi_type == "IPService"]
         else:
             oois = [input_ooi]
+
         for ooi in oois:
             suites: dict = {}
             findings: list[Finding] = []
