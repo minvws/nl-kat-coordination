@@ -744,6 +744,40 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, len(response.json()["results"]))
 
+    def test_get_tasks_by_schedule(self):
+        # Get tasks based on related schedule attributes
+        response = self.client.post(
+            "/tasks",
+            json={
+                "filters": [
+                    {
+                        "column": "schedule",
+                        "field": "deadline_at",
+                        "operator": "gt",
+                        "value": datetime.now().isoformat(),
+                    }
+                ]
+            },
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, len(response.json()["results"]))
+
+        response = self.client.post(
+            "/tasks",
+            json={
+                "filters": [
+                    {
+                        "column": "schedule",
+                        "field": "deadline_at",
+                        "operator": "lt",
+                        "value": datetime.now().isoformat(),
+                    }
+                ]
+            },
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(0, len(response.json()["results"]))
+
     def test_patch_task(self):
         # Patch a task
         self.assertEqual(models.TaskStatus.QUEUED.value, self.first_item_api.get("status"))
