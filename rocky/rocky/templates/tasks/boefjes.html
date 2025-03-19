@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load static %}
 {% load ooi_extra %}
+{% load compress %}
 
 {% block content %}
     {% include "header.html" %}
@@ -90,3 +91,9 @@
 
     </main>
 {% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    {% compress js %}
+        <script src="{% static "js/renderBoefjeOutput.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
+{% endblock html_at_end_body %}
