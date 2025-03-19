@@ -30,6 +30,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     yield NormalizerAffirmation(
         ooi=KATFindingType(
             id=kat_finding_type_id,
+            name=finding_type_information.get("name", None),
             description=finding_type_information.get("description", None),
             source=finding_type_information.get("source", None),
             impact=finding_type_information.get("impact", None),
