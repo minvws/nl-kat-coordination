@@ -47,11 +47,11 @@ class TLSReport(Report):
         else:
             oois = [input_ooi]
 
-        for ooi in oois:
+        for service in oois:
             suites: dict = {}
             findings: list[Finding] = []
             suites_with_findings = []
-            ref = Reference.from_str(ooi)
+            ref = Reference.from_str(service)
             tree = self.octopoes_api_connector.get_tree(
                 ref, valid_time=valid_time, depth=TREE_DEPTH, types={TLSCipher, Finding}
             ).store
@@ -67,8 +67,8 @@ class TLSReport(Report):
                         if finding.description and suite["cipher_suite_name"] in finding.description:
                             suites_with_findings.append(suite["cipher_suite_name"])
 
-            results[ooi] = {
-                "input_ooi": ooi,
+            results[service] = {
+                "input_ooi": service,
                 "suites": suites,
                 "findings": findings,
                 "suites_with_findings": suites_with_findings,
