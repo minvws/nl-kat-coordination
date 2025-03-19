@@ -22,7 +22,7 @@ buttons.forEach((button) => {
     organization +
     "/bytes/" +
     encodeURI(task_id) +
-    '/raw?format=json';
+    "/raw?format=json";
 
   const getJson = (url, callback) => {
     var xhr = new XMLHttpRequest();
@@ -84,10 +84,10 @@ buttons.forEach((button) => {
           let rawfiles_list = document.createElement("div");
           // Build HTML snippet for every yielded rawfiles.
           data.forEach((rawfile) => {
-            mimetypes = '';
+            mimetypes = "";
             rawfile["mime_types"].forEach((mime_type) => {
-                mimetypes += `<li>${mime_type["value"]}</li>`;
-            })
+              mimetypes += `<li>${mime_type["value"]}</li>`;
+            });
             rawdata = atob(rawfile["raw_file"]);
             let rawfile_container = document.createElement("div");
             rawfile_container.innerHTML = `<h3>${rawfile["id"]}</h3>
@@ -96,13 +96,14 @@ buttons.forEach((button) => {
               <ul>${mimetypes}</ul>
             <h4>Content:</h4>
             <pre></pre>`;
-            rawfile_container.querySelector('pre').innerText = rawdata;
+            rawfile_container.querySelector("pre").innerText = rawdata;
             rawfiles_list.appendChild(rawfile_container);
           });
           
           element.appendChild(rawfiles_list);
         } else {
-          element.innerHTML = "<p class='explanation'>Boefje task yielded no raw files.</p>";
+          element.innerHTML = 
+            "<p class='explanation'>Boefje task yielded no raw files.</p>";
         }
       });
 
