@@ -83,6 +83,7 @@ jobs:
       - name: Merge and generate coverage report
         run: |
           coverage combine ../**/.coverage
+          coverage report
           coverage xml --ignore-errors
         working-directory: boefjes/
 

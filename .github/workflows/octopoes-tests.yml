@@ -30,7 +30,7 @@ jobs:
           name: octopoes-coverage-unit
           path: octopoes/.coverage
           include-hidden-files: true
-  
+
   integration-tests:
     runs-on: ubuntu-24.04
 
