@@ -48,7 +48,7 @@ jobs:
           # - name: octopoes
           #   prefix_path: "octopoes/"
           - name: mula
-            prefix_path: "mula/scheduler/"
+            prefix_path: "mula/"
           # - name: bytes
           #   prefix_path: "bytes/"
           # - name: rocky
