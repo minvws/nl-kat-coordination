@@ -38,7 +38,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: boefjes-coverage-unit
-          path: .coverage
+          path: boefjes/.coverage
           include-hidden-files: true
 
   integration-tests:
