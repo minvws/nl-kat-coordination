@@ -9,18 +9,18 @@ on:
   pull_request:
 
 jobs:
-  octopoes-tests:
-    permissions:
-      contents: read
-    uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@fix/include-integration-tests-coverage
+  # octopoes-tests:
+  #   permissions:
+  #     contents: read
+  #   uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@fix/include-integration-tests-coverage
   # bytes-tests:
   #   permissions:
   #     contents: read
   #   uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@fix/include-integration-tests-coverage
-  # mula-tests:
-  #   permissions:
-  #     contents: read
-  #   uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@fix/include-integration-tests-coverage
+  mula-tests:
+    permissions:
+      contents: read
+    uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@fix/include-integration-tests-coverage
   # rocky-tests:
   #   permissions:
   #     contents: read
@@ -36,8 +36,8 @@ jobs:
     runs-on: ubuntu-24.04
 
     needs:
-      - octopoes-tests
-      # - mula-tests
+      # - octopoes-tests
+      - mula-tests
       # - bytes-tests
       # - rocky-tests
       # - boefjes-tests
@@ -45,16 +45,16 @@ jobs:
     strategy:
       matrix:
         module:
-          - name: octopoes
-            prefix_path: "octopoes/"
-          # - name: mula
-          #   prefix_path: "mula/scheduler/"
+          # - name: octopoes
+          #   prefix_path: "octopoes/"
+          - name: mula
+            prefix_path: "mula/scheduler/"
           # - name: bytes
-          # prefix_path: "bytes/"
+          #   prefix_path: "bytes/"
           # - name: rocky
           #   prefix_path: "rocky/"
           # - name: boefjes
-          #  prefix_path: "boefjes/"
+          #   prefix_path: "boefjes/"
 
     steps:
       - name: Checkout coverage file fix script
