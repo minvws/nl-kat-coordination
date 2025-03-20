@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-20 10:19+0000\n"
+"POT-Creation-Date: 2025-03-20 10:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1026,7 +1026,8 @@ msgstr ""
 #: reports/report_types/vulnerability_report/report.html
 #: reports/templates/partials/report_findings_table.html
 #: reports/templates/summary/report_asset_overview.html tools/forms/boefje.py
-#: tools/forms/finding_type.py rocky/templates/oois/ooi_detail.html
+#: tools/forms/finding_type.py rocky/templates/findings/finding_list.html
+#: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
 msgid "Description"
 msgstr ""
@@ -3320,6 +3321,7 @@ msgstr ""
 
 #: reports/report_types/multi_organization_report/recommendations.html
 #: reports/templates/partials/report_findings_table.html
+#: rocky/templates/findings/finding_list.html
 msgid "Recommendation"
 msgstr ""
 
@@ -3621,6 +3623,7 @@ msgstr ""
 
 #: reports/report_types/vulnerability_report/report.py
 #: reports/templates/partials/report_findings_table.html
+#: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_detail_origins_inference.html
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
@@ -3806,6 +3809,7 @@ msgid "Open in report"
 msgstr ""
 
 #: reports/templates/partials/report_findings_table.html
+#: rocky/templates/findings/finding_list.html
 msgid "Impact"
 msgstr ""
 
@@ -5556,6 +5560,10 @@ msgstr ""
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_list.html
 msgid "column headers with buttons are sortable"
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
+msgid "Location"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
