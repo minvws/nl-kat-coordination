@@ -245,6 +245,17 @@ class OOI(BaseModel):
 OOIClassType = TypeVar("OOIClassType")
 
 
+class OOIParseError(OOI):
+    """This object-type represents a placeholder OOI-like error container to signal
+    to the user that parsing of a specific OOI failed"""
+
+    object_type: Literal["OOIParseError"] = "OOIParseError"
+    source: ReferenceField(OOI)
+    message: str
+
+    _natural_key_attrs = ["source"]
+
+
 def format_id_short(id_: str) -> str:
     """Format the id in a short way. > 33 characters, interpolate with ..."""
     if len(id_) > 33:
