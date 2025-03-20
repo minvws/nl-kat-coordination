@@ -5,6 +5,8 @@ services:
       dockerfile: rocky/Dockerfile
       args:
         ENVIRONMENT: dev
+        USER_UID: 1001
+        USER_GID: 1001
       target: dev
     command: bash /app/run_rocky.sh
     depends_on:
@@ -22,6 +24,8 @@ services:
       dockerfile: rocky/Dockerfile
       args:
         ENVIRONMENT: dev
+        USER_UID: 1001
+        USER_GID: 1001
       target: dev
     command: pytest tests/integration
     depends_on:

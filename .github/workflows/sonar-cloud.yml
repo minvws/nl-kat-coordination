@@ -17,14 +17,14 @@ jobs:
   #   permissions:
   #     contents: read
   #   uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@fix/include-integration-tests-coverage
-  mula-tests:
-    permissions:
-      contents: read
-    uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@fix/include-integration-tests-coverage
-  # rocky-tests:
+  # mula-tests:
   #   permissions:
   #     contents: read
-  #   uses: minvws/nl-kat-coordination/.github/workflows/rocky-tests.yml@fix/include-integration-tests-coverage
+  #   uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@fix/include-integration-tests-coverage
+  rocky-tests:
+    permissions:
+      contents: read
+    uses: minvws/nl-kat-coordination/.github/workflows/rocky-tests.yml@fix/include-integration-tests-coverage
   # boefjes-tests:
   #   permissions:
   #     contents: read
@@ -37,7 +37,7 @@ jobs:
 
     needs:
       # - octopoes-tests
-      - mula-tests
+      # - mula-tests
       # - bytes-tests
       # - rocky-tests
       # - boefjes-tests
@@ -47,12 +47,12 @@ jobs:
         module:
           # - name: octopoes
           #   prefix_path: "octopoes/"
-          - name: mula
-            prefix_path: "mula/"
+          # - name: mula
+          #   prefix_path: "mula/"
           # - name: bytes
           #   prefix_path: "bytes/"
-          # - name: rocky
-          #   prefix_path: "rocky/"
+          - name: rocky
+            prefix_path: "rocky/"
           # - name: boefjes
           #   prefix_path: "boefjes/"
 
