@@ -237,7 +237,7 @@ class SchedulerView(OctopoesView):
                     scheduler_id=task.scheduler_id,
                     organisation=self.organization.code,
                     priority=1,
-                    data=task.data,
+                    data=task.data.model_dump(),
                 )
 
                 self.schedule_task(new_task)
