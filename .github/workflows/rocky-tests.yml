@@ -20,6 +20,7 @@ jobs:
         with:
           name: rocky-coverage-unit
           path: rocky/.coverage
+          include-hidden-files: true
 
   integration-tests:
     runs-on: ubuntu-24.04
@@ -36,6 +37,7 @@ jobs:
         with:
           name: rocky-coverage-integration
           path: rocky/.coverage
+          include-hidden-files: true
 
   coverage:
     runs-on: ubuntu-24.04
