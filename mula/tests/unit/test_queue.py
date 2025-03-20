@@ -9,6 +9,7 @@ from unittest import mock
 from scheduler import config, models, storage
 from scheduler.schedulers.queue import InvalidItemError, ItemNotFoundError, NotAllowedError, QueueEmptyError
 from scheduler.storage import stores
+
 from tests.mocks import queue as mock_queue
 from tests.utils import functions
 
