@@ -253,7 +253,10 @@ class SchedulerView(OctopoesView):
             )
 
             new_task = TaskPush(
-                priority=1, data=normalizer_task, scheduler_id="normalizer", organisation=self.organization.code
+                priority=1,
+                data=normalizer_task.model_dump(),
+                scheduler_id="normalizer",
+                organisation=self.organization.code,
             )
 
             self.schedule_task(new_task)
@@ -269,7 +272,7 @@ class SchedulerView(OctopoesView):
             )
 
             new_task = TaskPush(
-                priority=1, data=boefje_task, scheduler_id="boefje", organisation=self.organization.code
+                priority=1, data=boefje_task.model_dump(), scheduler_id="boefje", organisation=self.organization.code
             )
 
             self.schedule_task(new_task)
