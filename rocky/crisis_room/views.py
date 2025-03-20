@@ -23,8 +23,6 @@ logger = structlog.get_logger(__name__)
 
 
 class DashboardService:
-    observed_at = datetime.now(timezone.utc)  # we can later set any observed_at
-
     @staticmethod
     def get_organizations_findings(report_data: dict[str, Any]) -> dict[str, Any]:
         findings = {}
@@ -83,7 +81,7 @@ class DashboardService:
 
             # get reports with recipe id
             # TODO: change this method to get_report, since there's only one report that belongs to a recipe_id
-            reports = self.get_reports(self.observed_at, octopoes_client, recipe_id)
+            reports = self.get_reports(datetime.now(timezone.utc), octopoes_client, recipe_id)
 
             if reports:
                 report = reports[0]
