@@ -9,26 +9,26 @@ on:
   pull_request:
 
 jobs:
-  # octopoes-tests:
-  #   permissions:
-  #     contents: read
-  #   uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@fix/include-integration-tests-coverage
-  # bytes-tests:
-  #   permissions:
-  #     contents: read
-  #   uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@fix/include-integration-tests-coverage
-  # mula-tests:
-  #   permissions:
-  #     contents: read
-  #   uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@fix/include-integration-tests-coverage
+  octopoes-tests:
+    permissions:
+      contents: read
+    uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@fix/include-integration-tests-coverage
+  bytes-tests:
+    permissions:
+      contents: read
+    uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@fix/include-integration-tests-coverage
+  mula-tests:
+    permissions:
+      contents: read
+    uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@fix/include-integration-tests-coverage
   rocky-tests:
     permissions:
       contents: read
     uses: minvws/nl-kat-coordination/.github/workflows/rocky-tests.yml@fix/include-integration-tests-coverage
-  # boefjes-tests:
-  #   permissions:
-  #     contents: read
-  #   uses: minvws/nl-kat-coordination/.github/workflows/boefjes-tests.yml@fix/include-integration-tests-coverage
+  boefjes-tests:
+    permissions:
+      contents: read
+    uses: minvws/nl-kat-coordination/.github/workflows/boefjes-tests.yml@fix/include-integration-tests-coverage
 
   fix-coverage-reports:
     permissions:
@@ -36,25 +36,25 @@ jobs:
     runs-on: ubuntu-24.04
 
     needs:
-      # - octopoes-tests
-      # - mula-tests
-      # - bytes-tests
+      - octopoes-tests
+      - mula-tests
+      - bytes-tests
       - rocky-tests
-      # - boefjes-tests
+      - boefjes-tests
 
     strategy:
       matrix:
         module:
-          # - name: octopoes
-          #   prefix_path: "octopoes/"
-          # - name: mula
-          #   prefix_path: "mula/"
-          # - name: bytes
-          #   prefix_path: "bytes/"
+          - name: octopoes
+            prefix_path: "octopoes/"
+          - name: mula
+            prefix_path: "mula/"
+          - name: bytes
+            prefix_path: "bytes/"
           - name: rocky
             prefix_path: "rocky/"
-          # - name: boefjes
-          #   prefix_path: "boefjes/"
+          - name: boefjes
+            prefix_path: "boefjes/"
 
     steps:
       - name: Checkout coverage file fix script
@@ -66,26 +66,20 @@ jobs:
       - name: Download coverage file
         uses: actions/download-artifact@v4
         with:
-          # name: ${{ matrix.module['name'] }}-coverage-unit
-          # path: ${{ matrix.module['name'] }}-coverage-unit
           name: ${{ matrix.module['name'] }}-coverage
           path: ${{ matrix.module['name'] }}-coverage
 
       - name: Fix coverage report sources
         uses: Mudlet/xmlstarlet-action@9866e85e774e0fb50bc49de15274d005b5a69f0e # master
         with:
-          # args: edit --inplace --update "coverage/sources" --value "/github/workspace/${{ matrix.module['name'] }}/" "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
           args: edit --inplace --update "coverage/sources" --value "/github/workspace/${{ matrix.module['name'] }}/" "${{ matrix.module['name'] }}-coverage/coverage.xml"
 
       - name: Fix coverage file
-        # run: python "${{ github.workspace }}/.github/scripts/coverage_file_fixer.py" "${{ matrix.module['name'] }}-coverage-unit/coverage.xml" "${{ matrix.module['prefix_path'] }}"
         run: python "${{ github.workspace }}/.github/scripts/coverage_file_fixer.py" "${{ matrix.module['name'] }}-coverage/coverage.xml" "${{ matrix.module['prefix_path'] }}"
 
       - name: Upload fixed coverage file
         uses: actions/upload-artifact@v4
         with:
-          # name: "${{ matrix.module['name'] }}-coverage-unit-fixed"
-          # path: "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
           name: "${{ matrix.module['name'] }}-coverage-fixed"
           path: "${{ matrix.module['name'] }}-coverage/coverage.xml"
 
@@ -108,7 +102,6 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          # pattern: "*-coverage-unit-fixed"
           pattern: "*-coverage-fixed"
 
       - name: SonarCloud

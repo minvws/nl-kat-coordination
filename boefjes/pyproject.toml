@@ -92,6 +92,9 @@ build-backend = "setuptools.build_meta:__legacy__"
 line-length = 120
 transform-concats = true
 
+[tool.coverage.run]
+relative_files = true
+
 [tool.pytest.ini_options]
 markers = ["slow: marks tests as slow"]
 addopts = "--cov --cov-report xml --cov-branch --cov-report=term-missing:skip-covered -m 'not slow'"

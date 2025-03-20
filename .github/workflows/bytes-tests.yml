@@ -52,7 +52,7 @@ jobs:
           cache: "pip" # caching pip dependencies
 
       - name: Install coverage
-        run: pip install coverage
+        run: pip install coverage[toml]
 
       - name: Download coverage artifacts
         uses: actions/download-artifact@v4
