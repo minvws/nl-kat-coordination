@@ -79,6 +79,10 @@ robotframework-postgresqldb = "^2.0.0"
 requires = ["setuptools>=62.2", "wheel"]
 build-backend = "setuptools.build_meta:__legacy__"
 
+[tool.coverage.run]
+relative_files = true
+omit = ["octopoes/*"]
+
 [tool.pytest.ini_options]
 addopts = "--cov --cov-report xml --cov-branch --cov-report=term-missing:skip-covered -m 'not slow' --ignore=tests/integration"
 DJANGO_SETTINGS_MODULE = "rocky.settings_test"
