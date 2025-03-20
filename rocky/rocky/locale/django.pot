@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-14 10:43+0000\n"
+"POT-Creation-Date: 2025-03-20 10:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3735,6 +3735,7 @@ msgid "Report Navigation"
 msgstr ""
 
 #: reports/templates/partials/report_navigation.html
+#: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Generate Report"
 msgstr ""
 
@@ -6417,10 +6418,6 @@ msgstr ""
 
 #: rocky/templates/partials/ooi_detail_related_object.html
 msgid "No related object known for"
-msgstr ""
-
-#: rocky/templates/partials/ooi_detail_toolbar.html
-msgid "Generate Findings Report"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
