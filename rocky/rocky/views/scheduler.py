@@ -5,6 +5,9 @@ from typing import Any
 from django.contrib import messages
 from django.http import Http404, JsonResponse
 from django.utils.translation import gettext_lazy as _
+from octopoes.models import OOI
+from octopoes.models.ooi.reports import ReportRecipe
+
 from katalogus.client import Boefje, Normalizer
 from reports.forms import (
     ReportNameForm,
@@ -12,14 +15,10 @@ from reports.forms import (
     ReportScheduleStartDateChoiceForm,
     ReportScheduleStartDateForm,
 )
-from tools.forms.scheduler import TaskFilterForm
-
-from octopoes.models import OOI
-from octopoes.models.ooi.reports import ReportRecipe
 from rocky.scheduler import Boefje as SchedulerBoefje
+from rocky.scheduler import BoefjeTask, LazyTaskList
+from rocky.scheduler import Normalizer as SchedulerNormalizer
 from rocky.scheduler import (
-    BoefjeTask,
-    LazyTaskList,
     NormalizerTask,
     RawData,
     ReportTask,
@@ -28,10 +27,11 @@ from rocky.scheduler import (
     ScheduleResponse,
     SchedulerTaskNotFound,
     Task,
+    TaskPush,
     scheduler_client,
 )
-from rocky.scheduler import Normalizer as SchedulerNormalizer
 from rocky.views.mixins import OctopoesView
+from tools.forms.scheduler import TaskFilterForm
 
 
 def get_date_time(date: str | None) -> datetime | None:
@@ -202,7 +202,7 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
-    def schedule_task(self, task: Task) -> None:
+    def schedule_task(self, task: TaskPush) -> None:
         if not self.indemnification_present:
             return self.indemnification_error()
         try:
@@ -232,7 +232,7 @@ class SchedulerView(OctopoesView):
                 new_id = uuid.uuid4()
                 task.data.id = new_id
 
-                new_task = Task(
+                new_task = TaskPush(
                     id=new_id,
                     scheduler_id=task.scheduler_id,
                     organisation=self.organization.code,
@@ -252,7 +252,7 @@ class SchedulerView(OctopoesView):
                 normalizer=SchedulerNormalizer.model_validate(katalogus_normalizer.model_dump()), raw_data=raw_data
             )
 
-            new_task = Task(
+            new_task = TaskPush(
                 priority=1, data=normalizer_task, scheduler_id="normalizer", organisation=self.organization.code
             )
 
@@ -268,7 +268,9 @@ class SchedulerView(OctopoesView):
                 organization=self.organization.code,
             )
 
-            new_task = Task(priority=1, data=boefje_task, scheduler_id="boefje", organisation=self.organization.code)
+            new_task = TaskPush(
+                priority=1, data=boefje_task, scheduler_id="boefje", organisation=self.organization.code
+            )
 
             self.schedule_task(new_task)
 
