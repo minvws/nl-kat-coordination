@@ -9,7 +9,6 @@ from unittest import mock
 from scheduler import config, models, storage
 from scheduler.schedulers.queue import InvalidItemError, ItemNotFoundError, NotAllowedError, QueueEmptyError
 from scheduler.storage import stores
-
 from tests.mocks import queue as mock_queue
 from tests.utils import functions
 
@@ -412,9 +411,9 @@ class PriorityQueueTestCase(unittest.TestCase):
             event.wait()
 
             # This should block until the lock is released
-            items, _ = self.pq.pop()
+            item = self.pq.pop()
 
-            queue.put(items[0])
+            queue.put(item)
 
         # Act; with thread 1 we will create a lock on the queue, and then with
         # thread 2 we try to pop an item while the lock is active.
@@ -469,9 +468,9 @@ class PriorityQueueTestCase(unittest.TestCase):
             event.wait()
 
             # This should block until the lock is released
-            items, _ = self.pq.pop()
+            item = self.pq.pop()
 
-            queue.put(items[0])
+            queue.put(item)
 
         # Act; with thread 1 we won't create a lock, and then with thread 2 we
         # try to pop an item while the timeout is active.
