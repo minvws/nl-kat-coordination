@@ -138,7 +138,9 @@
 
             </div>
         </section>
-        <form method="post" id="add_to_dashboard">
+        <form method="post"
+              id="add_to_dashboard"
+              action="{% url "add_dashboard_item" organization_code=organization.code %}">
             {% comment %} TODO: Add dashboard name to input as value {% endcomment %}
             <input type="hidden" name="dashboard" value="">
             {% csrf_token %}

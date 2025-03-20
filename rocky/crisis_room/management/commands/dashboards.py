@@ -45,18 +45,23 @@ def get_or_create_default_dashboard(
 
 def get_or_create_dashboard_data(
     dashboard_name: str, organization: Organization, recipe_id: str, query_from: str, query: dict, template: str
-) -> DashboardData:
+) -> DashboardData | None:
     dashboard, _ = Dashboard.objects.get_or_create(name=dashboard_name, organization=organization)
     # TODO: Check the position, which should be the length of dashboard_datas + 1
     position = 10  # Just for testing
 
-    # TODO: Check if recipe OR (query_from AND query) are given. Cannot be both.
-    dashboard_data, created = DashboardData.objects.get_or_create(
-        dashboard=dashboard, recipe=recipe_id, query_from=query_from, query=query, template=template, position=position
-    )
-
-    dashboard_data.display_in_dashboard = True
-    dashboard_data.save()
+    dashboard_data = None
+    if recipe_id or (query_from and query):
+        dashboard_data, created = DashboardData.objects.get_or_create(
+            dashboard=dashboard,
+            recipe=recipe_id,
+            query_from=query_from,
+            query=query,
+            template=template,
+            position=position,
+        )
+        dashboard_data.display_in_dashboard = True
+        dashboard_data.save()
     return dashboard_data
 
 

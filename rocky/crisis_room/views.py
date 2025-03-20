@@ -1,4 +1,3 @@
-import ast
 from datetime import datetime, timezone
 from typing import Any
 from urllib.parse import urlencode
@@ -23,6 +22,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.reports import HydratedReport
 from rocky.bytes_client import BytesClient, get_bytes_client
+from rocky.views.mixins import OOIList
 
 logger = structlog.get_logger(__name__)
 
@@ -141,20 +141,17 @@ class DashboardService:
 
     def get_dashboard_data(self, dashboard_name, organization):
         dashboard = {}
-        dashboard_data = []
 
-        dashboard_data = DashboardData.objects.filter(
+        dashboard_datas = DashboardData.objects.filter(
             dashboard__name=dashboard_name, dashboard__organization=organization, display_in_dashboard=True
         )
 
-        for data in dashboard_data:
+        for data in dashboard_datas:
             octopoes_client = self.get_octopoes_client(organization.code)
             bytes_client = get_bytes_client(organization.code)
 
-            # TODO: Check if there's a recipe, object query OR findings query
             recipe_id = data.recipe
-            # TODO: query_from = data.query_from
-            # TODO: query = data.query
+            query_from = data.query_from
 
             if recipe_id:
                 reports = self.get_reports(self.observed_at, octopoes_client, recipe_id)
@@ -163,14 +160,11 @@ class DashboardService:
                     report = reports[0]
                     report_data_from_bytes = self.get_report_bytes_data(bytes_client, report.data_raw_id)
                     report_data = self.get_organizations_findings(report_data_from_bytes)
-                    if report.name == FINDINGS_DASHBOARD_NAME:
-                        dashboard = {data: {"report": report, "report_data": report_data}}
-                    elif report_data:
-                        dashboard = {"data": data, "report": report, "report_data": report_data}
-            # TODO: elif query_from == "object_list":
-            #     # Do something
-            # TODO: elif query_From == "findings_list":
-            #     # Do something
+                    if report.name == FINDINGS_DASHBOARD_NAME or report_data:
+                        dashboard[data] = {"report": report, "report_data": report_data}
+            elif query_from == "object_list":
+                ooi_list = OOIList(**data.query)
+                dashboard[data] = {"ooi_data": ooi_list}
 
         return dashboard
 
@@ -240,19 +234,6 @@ class AddDashboardItemView(OrganizationView, TemplateView):
 
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
         super().setup(request, *args, **kwargs)
-        dashboard_name = self.request.GET.get("dashboard")
-        recipe_id = self.request.GET.get("recipe_id")
-        query_from = self.request.GET.get("query_from")
-        query = ast.literal_eval(self.request.GET.get("query"))
-        template = self.request.GET.get("template")
-
-        if query_from == "object_list":
-            template = "oois/ooi_list.html"
-        # TODO: add template for findings list
-
-        self.dashboard_data = get_or_create_dashboard_data(
-            dashboard_name, self.organization, recipe_id, query_from, query, template
-        )
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         """Go to the selected dashboard or, in case that no dashboard has been selected, go to the first tab."""
@@ -265,6 +246,31 @@ class AddDashboardItemView(OrganizationView, TemplateView):
             )
 
         return redirect(reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}))
+
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        """Add dashboard item and return to the selected dashboard."""
+        # TODO: fix query
+        query = {
+            "valid_time": self.observed_at,
+            "ooi_types": self.filtered_ooi_types,
+            "scan_level": self.clearance_levels,
+            "scan_profile_type": self.clearance_types,
+            "search_string": self.search_string,
+            "order_by": self.order_by,
+            "asc_desc": self.sorting_order,
+        }
+        # TODO: replace dashboard_name to 'self.request.GET.get("dashboard")'
+        dashboard_name = "Test Dashboard"
+        recipe_id = self.request.GET.get("recipe_id")
+        query_from = self.request.GET.get("query_from")
+        template = self.request.GET.get("template")
+
+        if query_from == "object_list":
+            template = "oois/ooi_list.html"
+
+        self.dashboard_data = get_or_create_dashboard_data(
+            dashboard_name, self.organization, recipe_id, query_from, query, template
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

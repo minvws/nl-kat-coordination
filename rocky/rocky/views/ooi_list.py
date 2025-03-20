@@ -3,7 +3,6 @@ import json
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any
-from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.http import Http404, HttpRequest, HttpResponse
@@ -61,21 +60,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
         return response
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        """Redirect to add dashboard page or perform bulk action on selected oois."""
-        add_dashboard_item = request.POST.get("add_dashboard_item")
-        dashboard = request.POST.get("dashboard")
-        # TODO: Remove test dashboard name data
-        dashboard = "Test Dashboard"
-
-        if add_dashboard_item:
-            query = self.get_active_filters()
-
-            query_params = urlencode({"dashboard": dashboard, "query_from": add_dashboard_item, "query": query})
-
-            return redirect(
-                reverse("add_dashboard_item", kwargs={"organization_code": self.organization.code}) + "?" + query_params
-            )
-
+        """Perform bulk action on selected oois."""
         selected_oois = request.POST.getlist("ooi")
         if not selected_oois:
             messages.add_message(request, messages.ERROR, _("No OOIs selected."))
