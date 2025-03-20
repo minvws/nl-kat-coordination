@@ -19,8 +19,8 @@
                               class="inline">
                             {% csrf_token %}
                             <input type="hidden" name="ooi" value="{{ ooi_id }}">
-                            <input type="hidden" name="report_type" value="{{ report.0 }}">
-                            <button type="submit" role="option">{{ report.1 }}</button>
+                            <input type="hidden" name="report_type" value="{{ report.id }}">
+                            <button type="submit" role="option">{{ report.name }}</button>
                         </form>
                     </li>
                 {% endfor %}

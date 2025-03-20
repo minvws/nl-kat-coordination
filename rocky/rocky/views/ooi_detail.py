@@ -150,7 +150,7 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
         context["organization_indemnification"] = self.indemnification_present
 
         context["possible_reports"] = [
-            (report.id, report.name) for report in get_report_types_for_ooi(self.ooi.primary_key)
+            report.class_attributes() for report in get_report_types_for_ooi(self.ooi.primary_key)
         ]
 
         if self.request.GET.get("show_clearance_level_inheritance"):
