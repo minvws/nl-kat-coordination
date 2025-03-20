@@ -290,7 +290,7 @@ class SchedulerClient:
         except ConnectError:
             raise SchedulerConnectError()
 
-    def post_schedule_search(self, filters: dict[str, list[dict[str, str]]]) -> PaginatedSchedulesResponse:
+    def post_schedule_search(self, filters: dict[str, list[dict[str, Any]]]) -> PaginatedSchedulesResponse:
         try:
             res = self._client.post("/schedules/search", json=filters)
             res.raise_for_status()
