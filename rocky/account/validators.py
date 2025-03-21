@@ -12,15 +12,39 @@ def get_password_validators_help_texts():
     explanation = _("Your password must contain at least the following:")
     for validator in settings.AUTH_PASSWORD_VALIDATORS:
         validators.update(validator["OPTIONS"])
+
+    # Get possible password restrictions and update help text.
+    # Because restriction not always set, determine if restriction is set before adding to help text.
+    min_length = str(validators.get("min_length", ""))
+    if min_length:
+        min_length += _(" characters")
+    min_length_digit = str(validators.get("min_length_digit", ""))
+    if min_length_digit:
+        min_length_digit += _(" digits")
+    min_length_alpha = str(validators.get("min_length_alpha", ""))
+    if min_length_alpha:
+        min_length_alpha += _(" letters")
+    min_length_alpha = str(validators.get("min_length_alpha", ""))
+    if min_length_alpha:
+        min_length_alpha += _(" letters")
+    min_length_special = str(validators.get("min_length_special", ""))
+    if min_length_special:
+        min_length_special += _(f" special characters such as: {str(validators.get('special_characters',''))}")
+    min_length_lower = str(validators.get("min_length_lower", ""))
+    if min_length_lower:
+        min_length_lower += _(" lower case letters")
+    min_length_upper = str(validators.get("min_length_upper", ""))
+    if min_length_upper:
+        min_length_upper += _(" upper case letters")
     help_texts += [
-        str(validators["min_length"]) + _(" characters"),
-        str(validators["min_length_digit"]) + _(" digits"),
-        str(validators["min_length_alpha"]) + _(" letters"),
-        str(validators["min_length_special"])
-        + _(" special characters such as: ")
-        + str(validators["special_characters"]),
-        str(validators["min_length_lower"]) + _(" lower case letters"),
-        str(validators["min_length_upper"]) + _(" upper case letters"),
+        min_length,
+        min_length_digit,
+        min_length_alpha,
+        min_length_special,
+        min_length_lower,
+        min_length_upper,
     ]
+    # Remove empty strings, because they are not set.
+    help_texts = [help_text for help_text in help_texts if help_text]
     help_text_builder = format_html_join("", "<li>{}</li>", ((help_text,) for help_text in help_texts))
     return format_html("<p>{}</p><ul>{}</ul>", explanation, help_text_builder) if help_text_builder else ""
