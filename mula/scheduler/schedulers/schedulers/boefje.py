@@ -3,6 +3,7 @@ from concurrent import futures
 from datetime import datetime, timedelta, timezone
 from typing import Any, Literal
 
+import limits
 from opentelemetry import trace
 from pydantic import ValidationError
 
@@ -23,6 +24,7 @@ class BoefjeScheduler(Scheduler):
 
     Attributes:
         ranker: The ranker to calculate the priority of a task.
+        rate_limiter: ...
     """
 
     ID: Literal["boefje"] = "boefje"
@@ -38,6 +40,7 @@ class BoefjeScheduler(Scheduler):
         """
         super().__init__(ctx=ctx, scheduler_id=self.ID, create_schedule=True, auto_calculate_deadline=True)
         self.ranker = rankers.BoefjeRankerTimeBased(self.ctx)
+        self.rate_limiter = limits.strategies.MovingWindowRateLimiter(limits.storage.MemoryStorage())
 
     def run(self) -> None:
         """The run method is called when the scheduler is started. It will
@@ -372,6 +375,17 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
+        is_rate_limited = self.has_boefje_task_hit_rate_limit(boefje_task, hit=True)
+        if is_rate_limited:
+            self.logger.debug(
+                "Task is rate limited: %s",
+                boefje_task.hash,
+                task_hash=boefje_task.hash,
+                scheduler_id=self.scheduler_id,
+                caller=caller,
+            )
+            return
+
         is_stalled = self.has_boefje_task_stalled(boefje_task)
         if is_stalled:
             self.logger.debug(
@@ -641,6 +655,44 @@ class BoefjeScheduler(Scheduler):
 
         return True
 
+    def has_boefje_task_hit_rate_limit(self, task: models.BoefjeTask, hit: bool) -> bool:
+        """Check if the boefje task will hit the rate limit.
+
+        Args:
+            task: The BoefjeTask to check.
+            hit: Whether to hit the rate limiter or not.
+
+        Returns:
+            True if the boefje task has hit the rate limit, False otherwise.
+        """
+        if (rate_limit := task.boefje.rate_limit) is None:
+            raise ValueError("Rate limit is not set for boefje")
+
+        parsed_rate_limit = limits.parse(rate_limit.interval)  # type: ignore[union-attr]
+        if parsed_rate_limit is None:
+            raise ValueError(f"Failed to parse rate limit: {rate_limit.interval}")
+
+        can_consume = self.rate_limiter.test(parsed_rate_limit, rate_limit.identifier)
+        if not can_consume:
+            self.logger.debug(
+                "Boefje task has hit rate limit",
+                task_id=task.id,
+                rate_limit=rate_limit.interval,
+                scheduler_id=self.scheduler_id,
+            )
+
+            # TODO: when there is an associated schedule, we should update the
+            # the deadline_at field to the next available time.
+            self.delay_schedule_for_task(task, rate_limit)
+
+            return True
+
+        # When we can consume, we hit the rate limiter
+        if hit:
+            self.rate_limiter.hit(parsed_rate_limit, rate_limit.identifier)
+
+        return False
+
     def get_boefjes_for_ooi(self, ooi: models.OOI, organisation: str) -> list[models.Plugin]:
         """Get available all boefjes (enabled and disabled) for an ooi.
 
@@ -718,3 +770,7 @@ class BoefjeScheduler(Scheduler):
             return datetime.now(timezone.utc) + timedelta(minutes=plugin.interval)
 
         return super().calculate_deadline(task)
+
+    def delay_schedule_for_task(self, task: models.BoefjeTask, rate_limit: limits.RateLimit) -> None:
+        """Delay the schedule for a task based on the rate limit."""
+        pass

@@ -1,13 +1,14 @@
 import unittest
 from datetime import datetime, timedelta, timezone
+from logging import raiseExceptions
 from types import SimpleNamespace
 from unittest import mock
+
+from structlog.testing import capture_logs
 
 from scheduler import clients, config, models, schedulers, storage
 from scheduler.models.ooi import RunOn
 from scheduler.storage import stores
-from structlog.testing import capture_logs
-
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -96,7 +97,12 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.scheduler.run()
 
         # Assert: threads started
-        thread_ids = ["BoefjeScheduler-mutations", "BoefjeScheduler-new_boefjes", "BoefjeScheduler-rescheduling"]
+        thread_ids = [
+            "BoefjeScheduler-mutations",
+            "BoefjeScheduler-new_boefjes",
+            "BoefjeScheduler-rescheduling",
+            "BoefjeScheduler-delayed",
+        ]
         for thread in self.scheduler.threads:
             self.assertIn(thread.name, thread_ids)
             self.assertTrue(thread.is_alive())
@@ -2037,3 +2043,13 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         # Assert: schedule should be disabled
         schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule(schedule.id)
         self.assertFalse(schedule_db_disabled.enabled)
+
+
+class DelayedTestCase(BoefjeSchedulerBaseTestCase):
+    def test_process_delayed(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+
+        rate_limit = models.RateLimit(identifier="org-1/my-secret-api-key", interval="2")
+        boefje = BoefjeFactory()

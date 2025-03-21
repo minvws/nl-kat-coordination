@@ -23,6 +23,9 @@ class TaskStatus(str, enum.Enum):
     # Task has been created but not yet queued
     PENDING = "pending"
 
+    # Task has been delayed, typically due to rate limiting
+    DELAYED = "delayed"
+
     # Task has been pushed onto queue and is ready to be picked up
     QUEUED = "queued"
 

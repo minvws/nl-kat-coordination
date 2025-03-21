@@ -188,6 +188,25 @@ class PriorityQueueStore:
 
     @retry()
     @exception_handler
+    def is_item_on_queue_by_hash(self, scheduler_id: str, item_hash: str) -> bool:
+        with self.dbconn.session.begin() as session:
+            item_orm = (
+                session.query(models.TaskDB)
+                .filter(models.TaskDB.status == models.TaskStatus.QUEUED)
+                .filter(models.TaskDB.status == models.TaskStatus.DELAYED)
+                .order_by(models.TaskDB.created_at.desc())
+                .filter(models.TaskDB.scheduler_id == scheduler_id)
+                .filter(models.TaskDB.hash == item_hash)
+                .first()
+            )
+
+            if item_orm is None:
+                return False
+
+            return True
+
+    @retry()
+    @exception_handler
     def clear(self, scheduler_id: str) -> None:
         with self.dbconn.session.begin() as session:
             (
