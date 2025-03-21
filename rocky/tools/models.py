@@ -45,7 +45,6 @@ DENY_ORGANIZATION_CODES = [
     "kat-alogus",
     "boefjes",
     "mula",
-    "keiko",
     "octopoes",
     "rocky",
 ]

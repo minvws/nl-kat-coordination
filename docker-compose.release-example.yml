@@ -20,7 +20,7 @@ services:
     image: docker.io/library/postgres:15
     shm_size: 256MB
     ports:
-      - "0.0.0.0:5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
@@ -175,15 +175,6 @@ services:
       - normalizer
       - octopoes_api
       - katalogus
-
-  keiko:
-    restart: on-failure
-    image: "ghcr.io/minvws/nl-kat-keiko:${KAT_VERSION}"
-    ports:
-      - "127.0.0.1:8005:8000"
-    env_file:
-      - .env-prod
-      - .env
 
 volumes:
   postgres-data:

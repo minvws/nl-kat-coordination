@@ -7,7 +7,7 @@ def test_rpki_report_no_ip(mock_octopoes_api_connector, valid_time, hostname):
 
     report = RPKIReport(mock_octopoes_api_connector)
 
-    data = report.collect_data([str(hostname.reference)], valid_time)[str(hostname.reference)]
+    data = report.collect_data([hostname.reference], valid_time)[hostname.reference]
 
     assert data["rpki_ips"] == {}
     assert data["number_of_available"] == 0
@@ -23,7 +23,7 @@ def test_rpki_ip_valid(mock_octopoes_api_connector, valid_time, hostname, ipaddr
 
     report = RPKIReport(mock_octopoes_api_connector)
 
-    data = report.collect_data([str(ipaddressv4.reference)], valid_time)[str(ipaddressv4.reference)]
+    data = report.collect_data([ipaddressv4.reference], valid_time)[ipaddressv4.reference]
 
     assert data["number_of_available"] == 1
     assert data["number_of_compliant"] == 1
@@ -43,7 +43,7 @@ def test_rpki_hostname_with_ip_valid(mock_octopoes_api_connector, valid_time, ho
 
     report = RPKIReport(mock_octopoes_api_connector)
 
-    data = report.collect_data([str(hostname.reference)], valid_time)[str(hostname.reference)]
+    data = report.collect_data([hostname.reference], valid_time)[hostname.reference]
 
     assert data["number_of_available"] == 1
     assert data["number_of_compliant"] == 1
@@ -75,7 +75,7 @@ def test_rpki_hostname_with_two_ips_invalid(
 
     report = RPKIReport(mock_octopoes_api_connector)
 
-    data = report.collect_data([str(hostname.reference)], valid_time)[str(hostname.reference)]
+    data = report.collect_data([hostname.reference], valid_time)[hostname.reference]
 
     assert data["rpki_ips"][ipaddressv4.reference] == {"exists": False, "valid": False}
     assert data["rpki_ips"][ipaddressv6.reference] == {"exists": True, "valid": False}

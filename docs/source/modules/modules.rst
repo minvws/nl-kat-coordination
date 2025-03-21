@@ -2,7 +2,7 @@
 Modules
 =======
 
-OpenKAT consists of individual modules, each of which performs a subtask of the system. The modules are specific to OpenKAT. Rocky is the frontend, Mula is the scheduler, Bytes the storage of raw data, Octopoes contains the data model, Keiko is the PDF engine for reports and Boefjes and Whiskers and are separate components stored in the KATalogus. OpenKAT uses Manon for the design in order to easily comply with accessibility and style requirements.
+OpenKAT consists of individual modules, each of which performs a subtask of the system. The modules are specific to OpenKAT. Rocky is the frontend, Mula is the scheduler, Bytes the storage of raw data, Octopoes contains the data model and Boefjes and Whiskers and are separate components stored in the KATalogus. OpenKAT uses Manon for the design in order to easily comply with accessibility and style requirements.
 
 The overarching concept of OpenKAT is explained in the section :doc:`/introduction/how-does-it-work`. The explanation centers around the image below. All modules of OpenKAT can be found there, except for our web interface and styling modules Rocky and Manon.
 
@@ -44,13 +44,6 @@ Boefjes and whiskers - scanners and normalizers
 The KATalog contains all boefjes and whiskers. The KATalog is easy to add new boefjes and normalizers. The general documentation contains some pointers for writing boefjes. The team is happy to help you if you want to get started with these. The readme of `NL-KAT-Coordination repo <https://github.com/minvws/nl-kat-coordination>`_. contains all the ways to contact the team.
 
 `Boefjes <https://github.com/minvws/nl-kat-coordination/tree/main/boefjes>`_ is the folder containing the source code and documentation of Boefjes, Whiskers and Bits.
-
-Keiko - reporting tool
-======================
-
-Keiko is OpenKAT's PDF generator, used for generating reports. The design of the reports is done based on a LaTeX template, making the style of the reports customizable.
-
-`NL-KAT-Keiko <https://github.com/minvws/nl-kat-keiko>`_ is the repository containing Keiko's source code.
 
 Manon - styling
 ===============

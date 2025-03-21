@@ -11,7 +11,7 @@
         <div>
             <h3>{% translate "Variants" %}</h3>
             <p>
-                {% blocktranslate %}
+                {% blocktranslate trimmed %}
                     Boefje variants that use the same container image. For more
                     information about Boefje variants you can read the documentation.
                 {% endblocktranslate %}
@@ -46,7 +46,8 @@
                                     <th scope="col">{% translate "Scan level" %}</th>
                                     <th scope="col">{% translate "Status" %}</th>
                                     <th scope="col">{% translate "Age" %}</th>
-                                    <th scope="col">{% translate "Scan frequency" %}</th>
+                                    <th scope="col">{% translate "Scan interval" %}</th>
+                                    <th scope="col">{% translate "Run on" %}</th>
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
@@ -80,8 +81,19 @@
                                             <span title="{{ variant.interval }}">
                                                 {% if variant.interval %}
                                                     {{ variant.interval }} {% translate "minutes" %}
+                                                {% elif variant.run_on %}
+                                                    -
                                                 {% else %}
                                                     {% translate "Default system scan frequency" %}
+                                                {% endif %}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span title="{{ variant.run_on }}">
+                                                {% if variant.run_on %}
+                                                    {{ variant.run_on|join:", "|capfirst }}
+                                                {% else %}
+                                                    -
                                                 {% endif %}
                                             </span>
                                         </td>

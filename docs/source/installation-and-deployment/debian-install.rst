@@ -43,6 +43,92 @@ After downloading they can be installed as follows:
     tar zvxf kat-*.tar.gz
     sudo apt install --no-install-recommends ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb
 
+Set up RabbitMQ
+===============
+
+Installation
+------------
+
+Use the following steps to set up RabbitMQ and allow kat to use it.
+
+Start by installing RabbitMQ:
+
+.. code-block:: sh
+
+    sudo apt install rabbitmq-server
+
+By default RabbitMQ will listen on all interfaces. For a single node setup this is not what we want.
+To prevent RabbitMQ from being accessed from the internet add the following lines to ``/etc/rabbitmq/rabbitmq-env.conf``:
+
+.. code-block:: sh
+
+    export ERL_EPMD_ADDRESS=127.0.0.1
+    export NODENAME=rabbit@localhost
+
+Stop RabbitMQ and epmd:
+
+.. code-block:: sh
+
+    sudo systemctl stop rabbitmq-server
+    sudo epmd -kill
+
+Create a new file ``/etc/rabbitmq/rabbitmq.conf`` and add the following lines:
+
+.. code-block:: unixconfig
+
+    listeners.tcp.local = 127.0.0.1:5672
+
+Create a new file ``/etc/rabbitmq/advanced.conf`` and add the following lines:
+
+.. code-block:: erlang
+
+    [
+        {kernel,[
+            {inet_dist_use_interface,{127,0,0,1}}
+        ]}
+    ].
+
+Now start RabbitMQ again and check if it only listens on localhost for ports 5672 and 25672:
+
+.. code-block:: sh
+
+    systemctl start rabbitmq-server
+
+Add the 'kat' vhost
+-------------------
+
+Generate a safe password for the KAT user in rabbitmq. You can use the /dev/urandom method again and put it in a shell variable to use it later:
+
+.. code-block:: sh
+
+    rabbitmq_pass=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20)
+
+Now create a KAT user for RabbitMQ, create the virtual host and set the permissions:
+
+.. code-block:: sh
+
+    sudo rabbitmqctl add_user kat ${rabbitmq_pass}
+    sudo rabbitmqctl add_vhost kat
+    sudo rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
+
+Now configure KAT to use the vhost we created and with the kat user. To do this, update ``QUEUE_URI`` in the following files:
+
+ * ``/etc/kat/mula.conf``
+ * ``/etc/kat/rocky.conf``
+ * ``/etc/kat/bytes.conf``
+ * ``/etc/kat/boefjes.conf``
+ * ``/etc/kat/octopoes.conf``
+
+.. code-block:: sh
+
+    QUEUE_URI=amqp://kat:<password>@127.0.0.1:5672/kat
+
+Or use this command to do it for you:
+
+.. code-block:: sh
+
+    sudo sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@127.0.0.1:5672/kat|" /etc/kat/*.conf
+
 Set up the databases
 ====================
 
@@ -171,92 +257,6 @@ Create the default groups and permissions for KAT:
 
     sudo -u kat rocky-cli setup_dev_account
 
-Set up RabbitMQ
-===============
-
-Installation
-------------
-
-Use the following steps to set up RabbitMQ and allow kat to use it.
-
-Start by installing RabbitMQ:
-
-.. code-block:: sh
-
-    sudo apt install rabbitmq-server
-
-By default RabbitMQ will listen on all interfaces. For a single node setup this is not what we want.
-To prevent RabbitMQ from being accessed from the internet add the following lines to ``/etc/rabbitmq/rabbitmq-env.conf``:
-
-.. code-block:: sh
-
-    export ERL_EPMD_ADDRESS=127.0.0.1
-    export NODENAME=rabbit@localhost
-
-Stop RabbitMQ and epmd:
-
-.. code-block:: sh
-
-    sudo systemctl stop rabbitmq-server
-    sudo epmd -kill
-
-Create a new file ``/etc/rabbitmq/rabbitmq.conf`` and add the following lines:
-
-.. code-block:: unixconfig
-
-    listeners.tcp.local = 127.0.0.1:5672
-
-Create a new file ``/etc/rabbitmq/advanced.conf`` and add the following lines:
-
-.. code-block:: erlang
-
-    [
-        {kernel,[
-            {inet_dist_use_interface,{127,0,0,1}}
-        ]}
-    ].
-
-Now start RabbitMQ again and check if it only listens on localhost for ports 5672 and 25672:
-
-.. code-block:: sh
-
-    systemctl start rabbitmq-server
-
-Add the 'kat' vhost
--------------------
-
-Generate a safe password for the KAT user in rabbitmq. You can use the /dev/urandom method again and put it in a shell variable to use it later:
-
-.. code-block:: sh
-
-    rabbitmq_pass=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20)
-
-Now create a KAT user for RabbitMQ, create the virtual host and set the permissions:
-
-.. code-block:: sh
-
-    sudo rabbitmqctl add_user kat ${rabbitmq_pass}
-    sudo rabbitmqctl add_vhost kat
-    sudo rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
-
-Now configure KAT to use the vhost we created and with the kat user. To do this, update ``QUEUE_URI`` in the following files:
-
- * ``/etc/kat/mula.conf``
- * ``/etc/kat/rocky.conf``
- * ``/etc/kat/bytes.conf``
- * ``/etc/kat/boefjes.conf``
- * ``/etc/kat/octopoes.conf``
-
-.. code-block:: sh
-
-    QUEUE_URI=amqp://kat:<password>@127.0.0.1:5672/kat
-
-Or use this command to do it for you:
-
-.. code-block:: sh
-
-    sudo sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@127.0.0.1:5672/kat|" /etc/kat/*.conf
-
 Configure Bytes credentials
 ===========================
 
@@ -292,7 +292,7 @@ After finishing these steps, you should restart KAT to load the new configuratio
 
 .. code-block:: sh
 
-    sudo systemctl restart kat-rocky kat-rocky-worker kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
+    sudo systemctl restart kat-rocky kat-rocky-worker kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-octopoes kat-octopoes-worker
 
 Start KAT on system boot
 ========================
@@ -301,7 +301,7 @@ To start KAT when the system boots, enable all KAT services:
 
 .. code-block:: sh
 
-    sudo systemctl enable kat-rocky kat-rocky-worker kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
+    sudo systemctl enable kat-rocky kat-rocky-worker kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-octopoes kat-octopoes-worker
 
 
 Configure reverse proxy
@@ -423,4 +423,4 @@ Restart all processes:
 
 .. code-block:: sh
 
-    sudo systemctl restart kat-rocky kat-rocky-worker kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
+    sudo systemctl restart kat-rocky kat-rocky-worker kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-octopoes kat-octopoes-worker
