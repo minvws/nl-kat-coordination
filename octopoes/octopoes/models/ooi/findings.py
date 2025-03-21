@@ -58,6 +58,7 @@ class FindingType(OOI):
 
     id: str
 
+    name: str | None = None
     description: str | None = None
     source: AnyUrl | None = None
     impact: str | None = None

@@ -11,7 +11,7 @@ from opentelemetry import trace
 
 from scheduler import clients, context, models, storage, utils
 from scheduler.schedulers.queue import PriorityQueue
-from scheduler.schedulers.queue.errors import InvalidItemError, NotAllowedError, QueueEmptyError, QueueFullError
+from scheduler.schedulers.queue.errors import InvalidItemError, NotAllowedError, QueueFullError
 from scheduler.utils import cron, thread
 
 tracer = trace.get_tracer(__name__)
@@ -335,8 +335,8 @@ class Scheduler(abc.ABC):
         return item
 
     def pop_item_from_queue(
-        self, filters: storage.filters.FilterRequest | None = None
-    ) -> tuple[list[models.Task], int]:
+        self, limit: int = 1, filters: storage.filters.FilterRequest | None = None
+    ) -> list[models.Task]:
         """Pop an item from the queue.
         Args:
             filters: Optional filters to apply when popping an item.
@@ -346,17 +346,13 @@ class Scheduler(abc.ABC):
 
         Raises:
             NotAllowedError: When the scheduler is disabled.
-            QueueEmptyError: When the queue is empty.
         """
-        try:
-            items, count = self.queue.pop(filters)
-        except QueueEmptyError as exc:
-            raise exc
+        items = self.queue.pop(limit, filters)
 
         if items is not None:
             self.logger.debug(
                 "Popped %s item(s) from queue %s",
-                count,
+                len(items),
                 self.queue.pq_id,
                 queue_id=self.queue.pq_id,
                 scheduler_id=self.scheduler_id,
@@ -364,7 +360,7 @@ class Scheduler(abc.ABC):
 
             self.post_pop(items)
 
-        return items, count
+        return items
 
     def post_pop(self, items: list[models.Task]) -> None:
         """After an item is popped from the queue, we execute this function
