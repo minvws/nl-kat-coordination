@@ -7,7 +7,9 @@ def test_tls_report_no_suites_no_findings(mock_octopoes_api_connector, valid_tim
     mock_octopoes_api_connector.tree = {ip_service.reference: ReferenceTree.model_validate(tree_data_no_findings)}
 
     report = TLSReport(mock_octopoes_api_connector)
-    data = report.generate_data(str(ip_service.reference), valid_time)
+    result = report.generate_data(str(ip_service.reference), valid_time)
+
+    data = result[ip_service.primary_key]
 
     assert data["suites"] == {}
     assert data["findings"] == []
@@ -22,7 +24,9 @@ def test_tls_report_multiple_findings_and_suites(
     }
 
     report = TLSReport(mock_octopoes_api_connector)
-    data = report.generate_data(str(ip_service.reference), valid_time)
+    result = report.generate_data(str(ip_service.reference), valid_time)
+
+    data = result[ip_service.primary_key]
 
     assert len(data["suites"]) == 1
     assert list(data["suites"].keys())[0] == "TLSv1"
