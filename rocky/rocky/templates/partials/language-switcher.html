@@ -3,25 +3,24 @@
 {% get_language_info for LANGUAGE_CODE as current_language %}
 <div class="dropdown">
     <button type="button"
+            class="dropdown-button ghost"
             data-open-label="{{ current_language.name_local.title }}"
             data-close-label="{{ current_language.name_local.title }}"
-            data-media="(min-width: 100%)"
             aria-label="{% translate "Language Selector" %}"
-            class="dropdown-button ghost"
-            aria-controls="language-switcher"
+            aria-controls="language-list"
             aria-expanded="false"
-            aria-haspopup="menu"
-            aria-labelledby="language-switcher">
+            aria-haspopup="listbox"
+            aria-labelledby="language-list">
         {{ current_language.name_local.title }}<span class="icon ti-chevron-down"></span>
     </button>
-    <div id="language-switcher" class="dropdown-list">
-        <ul>
+    <div id="language-list" class="dropdown-list">
+        <ul role="listbox" aria-labelledby="language-list" tabindex="-1">
             <form action="{% url "set_language" %}" method="post" class="inline">
                 {% csrf_token %}
                 {% for language in languages %}
                     {% get_language_info for language as language %}
                     {% if language.code != current_language.code %}
-                        <li>
+                        <li role="option">
                             <button type="submit" name="language" value={{ language.code }}>
                                 {{ language.name_local.title }}
                             </button>
