@@ -120,7 +120,7 @@ class BoefjeDetailView(PluginDetailView):
     """Detail view for a specific boefje. Shows boefje settings and consumable oois for scanning."""
 
     template_name = "boefje_detail.html"
-    limit_ooi_list = 9999
+    limit_ooi_list = 150
     plugin: Boefje
     task_type = "boefje"
 
