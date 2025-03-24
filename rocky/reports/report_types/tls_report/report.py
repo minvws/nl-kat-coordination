@@ -7,7 +7,7 @@ from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
-from octopoes.models.ooi.service import IPService, TLSCipher
+from octopoes.models.ooi.service import IPService
 from reports.report_types.definitions import Report
 
 CIPHER_FINDINGS = ["KAT-RECOMMENDATION-BAD-CIPHER", "KAT-MEDIUM-BAD-CIPHER", "KAT-CRITICAL-BAD-CIPHER"]
@@ -52,10 +52,10 @@ class TLSReport(Report):
             findings: list[Finding] = []
             suites_with_findings = []
             ref = Reference.from_str(service)
-            tree = self.octopoes_api_connector.get_tree(
-                ref, valid_time=valid_time, depth=TREE_DEPTH, types={TLSCipher, Finding}
-            ).store
-            for pk, ooi in tree.items():
+            tree = self.octopoes_api_connector.query(
+                "IPService.<ip_service[is TLSCipher].<ooi [is Finding]", valid_time, ref
+            )
+            for ooi in tree:
                 if ooi.ooi_type == "TLSCipher":
                     suites = ooi.suites
                 if ooi.ooi_type == "Finding" and ooi.finding_type.tokenized.id in CIPHER_FINDINGS:
