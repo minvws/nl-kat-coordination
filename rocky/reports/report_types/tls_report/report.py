@@ -57,7 +57,7 @@ class TLSReport(Report):
             if ciphers:
                 suites = ciphers[0].suites
                 finding_query_results = self.octopoes_api_connector.query(
-                    "TLSCipher.<ooi[is Finding]", valid_time, ciphers[0]
+                    "TLSCipher.<ooi[is Finding]", valid_time, ciphers[0].reference
                 )
 
                 findings = [

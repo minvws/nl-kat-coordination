@@ -971,7 +971,6 @@ def query_data_tls_findings_and_suites(cipher):
             description="Fake description...",
             finding_type=KATFindingType(id="KAT-CRITICAL-BAD-CIPHER").reference,
         ),
-        cipher,
     ]
 
 

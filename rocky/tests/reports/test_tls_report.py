@@ -2,9 +2,7 @@ from reports.report_types.tls_report.report import TLSReport
 
 
 def test_tls_report_no_suites_no_findings(mock_octopoes_api_connector, valid_time, ip_service, tree_data_no_findings):
-    mock_octopoes_api_connector.queries = {
-        "IPService.<ip_service[is TLSCipher].<ooi [is Finding]": {ip_service.reference: []}
-    }
+    mock_octopoes_api_connector.queries = {"IPService.<ip_service[is TLSCipher]": {ip_service.reference: []}}
 
     report = TLSReport(mock_octopoes_api_connector)
     result = report.generate_data(str(ip_service.reference), valid_time)
@@ -17,12 +15,11 @@ def test_tls_report_no_suites_no_findings(mock_octopoes_api_connector, valid_tim
 
 
 def test_tls_report_multiple_findings_and_suites(
-    mock_octopoes_api_connector, valid_time, ip_service, query_data_tls_findings_and_suites
+    cipher, mock_octopoes_api_connector, valid_time, ip_service, query_data_tls_findings_and_suites
 ):
     mock_octopoes_api_connector.queries = {
-        "IPService.<ip_service[is TLSCipher].<ooi [is Finding]": {
-            ip_service.reference: query_data_tls_findings_and_suites
-        }
+        "IPService.<ip_service[is TLSCipher]": {ip_service.reference: [cipher]},
+        "TLSCipher.<ooi[is Finding]": {cipher.reference: query_data_tls_findings_and_suites},
     }
 
     report = TLSReport(mock_octopoes_api_connector)
