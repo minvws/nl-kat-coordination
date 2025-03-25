@@ -13,7 +13,6 @@ services:
       - ci_rocky-db
     volumes:
       - ..:/app/rocky
-      - ./run_rocky.sh:/app/run_rocky.sh
       - ../../octopoes/octopoes:/app/rocky/octopoes
     env_file:
       - .env.test
@@ -33,7 +32,6 @@ services:
       - ci_octopoes
     volumes:
       - ..:/app/rocky
-      - ./run_rocky.sh:/app/run_rocky.sh
       - ../../octopoes/octopoes:/app/rocky/octopoes
     env_file:
       - .env.test
