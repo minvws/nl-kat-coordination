@@ -34,7 +34,7 @@ kat: env-if-empty build up
 	@echo "run 'grep 'DJANGO_SUPERUSER_PASSWORD' .env' to find it."
 	@echo
 	@echo "WARNING: This is a development environment, do not use in production!"
-	@echo "See https://docs.openkat.nl/installation_and_deployment/install.html for production"
+	@echo "See https://docs.openkat.nl/installation-and-deployment/containers.html for production"
 	@echo "installation instructions."
 
 # Remove containers, update using git pull and bring up containers
