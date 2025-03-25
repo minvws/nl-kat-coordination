@@ -146,6 +146,14 @@ class Task(BaseModel):
         raise ValueError("No organization found related to task")
 
 
+class TaskPush(BaseModel):
+    id: uuid.UUID | None = None
+    scheduler_id: str | None = None
+    organisation: str
+    priority: int | None = None
+    data: dict
+
+
 class ScheduleRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
