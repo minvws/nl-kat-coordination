@@ -237,3 +237,15 @@ A way to optimize this might be to mark whether an OOI also exists in a
 different organization. This can be done when OOIs are created, updated and
 deleted instead of doing that check on every boefje run. We might also do
 something similar when environment settings are updated.
+
+#### Implementation of algorithm 2
+
+In the katalogus database we store a hash of the environment settings. We will
+add an endpoint in the katalogus or change the existing endpoint so that mula
+can fetch the boefje information together with the environment hashes for each
+organization.
+
+Mula will then add all the organizations to the task. The list of organizations
+will then be passed to the boefje runner when the boefje runner requests tasks.
+After the task is executed the boefje runner will save the raw files for all the
+organizations.
