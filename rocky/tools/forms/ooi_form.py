@@ -115,7 +115,9 @@ def generate_select_ooi_field(
     if field.is_required():
         option_text = _("Please choose {manytext} {option_label}").format(option_label=option_label, manytext=manytext)
     else:
-        option_text = _("Optionally choose {manytext} {option_label}").format(option_label=option_label, manytext=manytext)
+        option_text = _("Optionally choose {manytext} {option_label}").format(
+            option_label=option_label, manytext=manytext
+        )
 
     # Generate select options
     select_options = [("", "-- " + option_text + " --")]
