@@ -57,13 +57,14 @@ class OOIForm(BaseRockyForm):
                 # Hidden ooi fields will have the value of an OOI ID
                 fields[name] = forms.CharField(widget=forms.HiddenInput())
             elif name in get_relations(self.ooi_class):
-                fields[name] = generate_select_ooi_field(
+                select_feld = generate_select_ooi_field(
                     self.api_connector, name, field, get_relations(self.ooi_class)[name], self.initial.get(name, None)
                 )
-                if not fields[name]:
+                if not select_field:
                     continue
+                fields[name] =  select_field
             elif annotation in [IPv4Address, IPv6Address]:
-                fields[name] = generate_ip_field(field)
+                fields[name] = generate_ip_field(name, field)
             elif annotation == AnyUrl:
                 fields[name] = generate_url_field(name, field)
             elif annotation is dict or annotation == list[str] or annotation == dict[str, Any]:
@@ -150,9 +151,11 @@ def generate_select_ooi_type(name: str, enumeration: type[Enum], field: FieldInf
     return forms.CharField(widget=forms.Select(choices=choices), **default_attrs)
 
 
-def generate_ip_field(field: FieldInfo) -> forms.fields.Field:
+def generate_ip_field(name: str, field: FieldInfo) -> forms.fields.Field:
     """IPv4 and IPv6 fields will have a text input"""
     default_attrs = default_field_options("", field)
+    if default_attrs.get("label") == "":
+        default_attrs.update({"label": name})
     protocol = "IPv4" if field.annotation == IPv4Address else "IPv6"
     return forms.GenericIPAddressField(protocol=protocol, **default_attrs)
 
