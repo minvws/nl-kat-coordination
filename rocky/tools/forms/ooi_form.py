@@ -65,7 +65,7 @@ class OOIForm(BaseRockyForm):
             elif annotation in [IPv4Address, IPv6Address]:
                 fields[name] = generate_ip_field(field)
             elif annotation == AnyUrl:
-                fields[name] = generate_url_field(field)
+                fields[name] = generate_url_field(name, field)
             elif annotation is dict or annotation == list[str] or annotation == dict[str, Any]:
                 fields[name] = forms.JSONField(**default_attrs)
             elif annotation is int or (hasattr(annotation, "__args__") and int in annotation.__args__):
@@ -155,11 +155,11 @@ def generate_ip_field(field: FieldInfo) -> forms.fields.Field:
     return forms.GenericIPAddressField(protocol=protocol, **default_attrs)
 
 
-def generate_url_field(field: FieldInfo) -> forms.fields.Field:
+def generate_url_field(name: str, field: FieldInfo) -> forms.fields.Field:
     """URL fields will have a text input"""
     default_attrs = default_field_options("", field)
-    if default_attrs.get("label") == "raw":
-        default_attrs.update({"label": "URL"})
+    if default_attrs.get("label") == "":
+        default_attrs.update({"label": name})
     field = forms.URLField(**default_attrs)
     field.widget.attrs.update({"placeholder": "https://example.org"})
     return field
