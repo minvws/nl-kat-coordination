@@ -41,7 +41,7 @@ class OOIForm(BaseRockyForm):
         fields: dict[str, forms.fields.Field] = {}
 
         for name, field in self.ooi_class.model_fields.items():
-            if name in ("user_id", "user", "primary_key", "scan_profile"):
+            if name in ("user_id", "primary_key", "scan_profile"):
                 continue
 
             annotation = field.annotation
