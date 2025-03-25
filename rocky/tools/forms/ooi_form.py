@@ -113,12 +113,12 @@ def generate_select_ooi_field(
 
     manytext = "one or more:" if is_multiselect else "a"
     if field.is_required():
-        option_text = "-- " + _("Please choose {manytext} {option_label}").format(option_label=option_label, manytext=manytext) + " --"
+        option_text = _("Please choose {manytext} {option_label}").format(option_label=option_label, manytext=manytext)
     else:
-        option_text = "-- " + _("Optionally choose {manytext} {option_label}").format(option_label=option_label, manytext=manytext) + " --"
+        option_text = _("Optionally choose {manytext} {option_label}").format(option_label=option_label, manytext=manytext)
 
     # Generate select options
-    select_options = [("", option_text)]
+    select_options = [("", "-- " + option_text + " --")]
     if initial:
         select_options.append((initial, initial))
 
@@ -127,7 +127,7 @@ def generate_select_ooi_field(
 
     # Remove the selection option when only 1 OOI is available, and required
     if field.is_required() and not initial and len(oois) == 1:
-        del(select_options[0])
+        del select_options[0]
     # Don't show select fields without options if they are not required
     elif not field.is_required() and not len(oois):
         return None
