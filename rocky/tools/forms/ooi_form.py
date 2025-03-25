@@ -39,24 +39,18 @@ class OOIForm(BaseRockyForm):
 
     def generate_form_fields(self, hidden_ooi_fields: dict[str, str] | None = None) -> dict[str, forms.fields.Field]:
         fields: dict[str, forms.fields.Field] = {}
+
         for name, field in self.ooi_class.model_fields.items():
+            if name in ("user_id", "user", "primary_key", "scan_profile"):
+                continue
+
             annotation = field.annotation
             default_attrs = default_field_options(name, field)
             # if annotation is an Union, get the first non-optional type
             optional_type = get_args(annotation)[0] if get_origin(annotation) == Union else None
 
-            if name == "primary_key":
-                continue
-
-            if name == "user_id":
-                continue
-
             # skip literals
             if hasattr(annotation, "__origin__") and annotation.__origin__ == Literal:
-                continue
-
-            # skip scan_profile
-            if name == "scan_profile":
                 continue
 
             if hidden_ooi_fields and name in hidden_ooi_fields:
@@ -66,6 +60,8 @@ class OOIForm(BaseRockyForm):
                 fields[name] = generate_select_ooi_field(
                     self.api_connector, name, field, get_relations(self.ooi_class)[name], self.initial.get(name, None)
                 )
+                if not fields[name]:
+                    continue
             elif annotation in [IPv4Address, IPv6Address]:
                 fields[name] = generate_ip_field(field)
             elif annotation == AnyUrl:
@@ -109,24 +105,32 @@ def generate_select_ooi_field(
     field: FieldInfo,
     related_ooi_type: type[OOI],
     initial: str | None = None,
-) -> forms.fields.Field:
+) -> forms.fields.Field | None:
     # field is a relation, query all objects, and build select
     default_attrs = default_field_options(name, field)
     is_multiselect = getattr(field.annotation, "__origin__", None) is list
     option_label = default_attrs.get("label", _("option"))
 
-    option_text = "-- " + _("Optionally choose a {option_label}").format(option_label=option_label) + " --"
+    manytext = "one or more:" if is_multiselect else "a"
     if field.is_required():
-        option_text = "-- " + _("Please choose a {option_label}").format(option_label=option_label) + " --"
+        option_text = "-- " + _("Please choose {manytext} {option_label}").format(option_label=option_label, manytext=manytext) + " --"
+    else:
+        option_text = "-- " + _("Optionally choose {manytext} {option_label}").format(option_label=option_label, manytext=manytext) + " --"
 
     # Generate select options
-    select_options = [] if is_multiselect else [("", option_text)]
-
+    select_options = [("", option_text)]
     if initial:
         select_options.append((initial, initial))
 
     oois = api_connector.list_objects({related_ooi_type}, datetime.now(timezone.utc)).items
     select_options.extend([(ooi.primary_key, ooi.primary_key) for ooi in oois])
+
+    # Remove the selection option when only 1 OOI is available, and required
+    if field.is_required() and not initial and len(oois) == 1:
+        del(select_options[0])
+    # Don't show select fields without options if they are not required
+    elif not field.is_required() and not len(oois):
+        return None
 
     if is_multiselect:
         return forms.MultipleChoiceField(
