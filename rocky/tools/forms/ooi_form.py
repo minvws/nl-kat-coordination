@@ -57,7 +57,7 @@ class OOIForm(BaseRockyForm):
                 # Hidden ooi fields will have the value of an OOI ID
                 fields[name] = forms.CharField(widget=forms.HiddenInput())
             elif name in get_relations(self.ooi_class):
-                select_feld = generate_select_ooi_field(
+                select_field = generate_select_ooi_field(
                     self.api_connector, name, field, get_relations(self.ooi_class)[name], self.initial.get(name, None)
                 )
                 if not select_field:
