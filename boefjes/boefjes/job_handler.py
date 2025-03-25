@@ -40,8 +40,7 @@ def get_octopoes_api_connector(org_code: str) -> OctopoesAPIConnector:
 @cache
 def boefje_env_variables() -> dict:
     """
-    Return all environment variables that start with BOEFJE_. The returned
-    keys have the BOEFJE_ prefix removed.
+    Return all environment variables that start with BOEFJE_. The returned keys have the BOEFJE_ prefix removed.
     """
 
     boefje_variables = {}
