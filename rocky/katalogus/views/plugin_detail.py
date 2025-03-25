@@ -185,6 +185,9 @@ class BoefjeDetailView(PluginDetailView):
         return self._filter_oois_with_schedules(oois)
 
     def _filter_oois_with_schedules(self, oois: dict[str, OOIType]) -> list[tuple[OOIType, ScheduleResponse]]:
+        if not oois:
+           return []
+
         schedules = self.scheduler_client.post_schedule_search(
             {
                 "filters": [
