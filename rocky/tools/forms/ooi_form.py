@@ -62,7 +62,7 @@ class OOIForm(BaseRockyForm):
                 )
                 if not select_field:
                     continue
-                fields[name] =  select_field
+                fields[name] = select_field
             elif annotation in [IPv4Address, IPv6Address]:
                 fields[name] = generate_ip_field(name, field)
             elif annotation == AnyUrl:
