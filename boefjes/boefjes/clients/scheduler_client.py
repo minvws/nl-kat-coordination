@@ -9,12 +9,12 @@ import structlog
 from httpx import Client, HTTPError, HTTPTransport, Response
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
-from pydantic import BaseModel, TypeAdapter
+from pydantic import TypeAdapter
 
 from boefjes.config import settings
 from boefjes.dependencies.plugins import PluginService
 from boefjes.storage.interfaces import SettingsNotConformingToSchema
-from boefjes.worker.interfaces import Queue, Task, TaskStatus
+from boefjes.worker.interfaces import Task, TaskStatus, SchedulerClientInterface, PaginatedTasksResponse
 from boefjes.worker.job_models import BoefjeMeta
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
@@ -23,31 +23,13 @@ from octopoes.models.exception import ObjectNotFoundException
 logger = structlog.get_logger(__name__)
 
 
-# TODO: refactor to models file
-class PaginatedTasksResponse(BaseModel):
-    count: int
-    next: str | None = None
-    previous: str | None = None
-    results: list[Task]
-
-
-class SchedulerClientInterface:
-    def get_queues(self) -> list[Queue]:
-        raise NotImplementedError()
-
-    def pop_item(self, scheduler_id: str) -> Task | None:
-        raise NotImplementedError()
-
-    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
-        raise NotImplementedError()
-
-
 class SchedulerAPIClient(SchedulerClientInterface):
-    def __init__(self, plugin_service: PluginService, base_url: str):
+    def __init__(self, plugin_service: PluginService, base_url: str, oci_image: str | None):
         self._session = Client(
             base_url=base_url, transport=HTTPTransport(retries=6), timeout=settings.outgoing_request_timeout
         )
         self.plugin_service = plugin_service
+        self.oci_image = oci_image  # TODO: add filter
 
     @staticmethod
     def _verify_response(response: Response) -> None:

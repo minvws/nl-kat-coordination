@@ -123,12 +123,6 @@ def get_task(task_id, scheduler_client):
 
 # The "scheduler proxy" endpoints
 
-
-@app.get("/api/v0/scheduler/queues", response_model=list[Queue], tags=["scheduler"])
-def get_queues(scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client)) -> list[Queue]:
-    return scheduler_client.get_queues()
-
-
 @app.get("/api/v0/scheduler/queues/{queue_id}/pop", response_model=Task | None, tags=["scheduler"])
 def pop_task(queue_id: str, scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client)) -> Task | None:
     return scheduler_client.pop_item(queue_id)

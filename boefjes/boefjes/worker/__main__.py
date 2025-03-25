@@ -42,13 +42,16 @@ logger = structlog.get_logger(__name__)
 
 
 @click.command()
-@click.option("--log-level", type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"]), help="Log level", default="INFO")
-def cli(log_level: str) -> None:
+@click.option("-i", "--image", type=str | None, default=None)
+@click.option(
+    "-l", "--log-level", type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"]), help="Log level", default="INFO"
+)
+def cli(image: str | None, log_level: str) -> None:
     logger.setLevel(log_level)
     logger.info("Starting runtime")
 
     base_url = os.getenv("BOEFJE_API")
-    oci_image = os.getenv("OCI_IMAGE")
+    oci_image = os.getenv("OCI_IMAGE", image)
     pool_size = int(os.getenv("POOL_SIZE", "2"))
     poll_interval = float(os.getenv("POLL_INTERVAL", "10.0"))
     heartbeat = float(os.getenv("WORKER_HEARTBEAT", "1.0"))

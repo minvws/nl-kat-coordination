@@ -1,10 +1,12 @@
 import uuid
+from typing import Any
 
 from httpx import Client, HTTPTransport, Response
 from pydantic import TypeAdapter
 
 # A deliberate relative import to make this module self-contained
-from .interfaces import BoefjeOutput, BoefjeStorageInterface, Queue, SchedulerClientInterface, Task, TaskStatus
+from .interfaces import BoefjeOutput, BoefjeStorageInterface, Queue, SchedulerClientInterface, Task, TaskStatus, \
+    PaginatedTasksResponse
 
 
 class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
@@ -16,22 +18,22 @@ class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
     def _verify_response(response: Response) -> None:
         response.raise_for_status()
 
-    def get_queues(self) -> list[Queue]:
-        # TODO: oci_image filter
-        response = self._session.get("/api/v0/scheduler/queues")
-        self._verify_response(response)
-
-        return TypeAdapter(list[Queue]).validate_json(response.content)
-
     def pop_item(self, queue_id: str) -> Task | None:
         # TODO: oci_image filter
-        response = self._session.post(f"/api/v0/scheduler/queues/{queue_id}/pop")
+        response = self._session.post(f"/api/v0/scheduler/queues/{queue_id}/pop", json={})
         self._verify_response(response)
 
         task = TypeAdapter(Task | None).validate_json(response.content)
 
-        if not task:
-            return None
+        return task
+
+    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
+        response = self._session.post(f"/api/v0/scheduler/queues/{scheduler_id}/pop", json={
+            "filters": [{"column": "data", "field": "oci_image", "operator": "eq", "value": self.oci_image}],
+        })
+        self._verify_response(response)
+
+        task = TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
 
         return task
 

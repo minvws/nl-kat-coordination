@@ -1,6 +1,7 @@
 import datetime
 import uuid
 from enum import Enum
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -64,11 +65,18 @@ class Handler:
         raise NotImplementedError()
 
 
+class PaginatedTasksResponse(BaseModel):
+    count: int
+    next: str | None = None
+    previous: str | None = None
+    results: list[Task]
+
+
 class SchedulerClientInterface:
-    def get_queues(self) -> list[Queue]:
+    def pop_item(self, scheduler_id: str) -> Task | None:
         raise NotImplementedError()
 
-    def pop_item(self, queue_id: str) -> Task | None:
+    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
