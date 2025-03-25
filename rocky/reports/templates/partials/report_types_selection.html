@@ -21,11 +21,32 @@
             {% endblocktranslate %}
         </h2>
         <p>
-            {% blocktranslate trimmed count counter=oois|length %}
-                You have selected {{ total_oois }} object in previous step.
-            {% plural %}
-                You have selected {{ total_oois }} objects in previous step.
-            {% endblocktranslate %}
+            {% if object_selection == "query" %}
+                {% blocktranslate trimmed %}
+                    You have selected a live set in the previous step. Based on the current
+                    dataset, this live set results in {{ total_oois }} objects.
+                {% endblocktranslate %}
+                <div>
+                    <strong>{% translate "Applied filters:" %}</strong>
+                    <ul>
+                        {% if active_filters %}
+                            {% for filter, value in active_filters.items %}
+                                <li>
+                                    <strong>{{ filter }}</strong> {{ value }}
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li>{% translate "No filters applied" %}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            {% else %}
+                {% blocktranslate trimmed count counter=oois|length %}
+                    You have selected {{ total_oois }} object in the previous step.
+                {% plural %}
+                    You have selected {{ total_oois }} objects in the previous step.
+                {% endblocktranslate %}
+            {% endif %}
         </p>
         {% if not all_oois_selected %}
             {% include "summary/ooi_selection.html" %}

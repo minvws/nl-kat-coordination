@@ -405,8 +405,6 @@ CSP_FORM_ACTION = ["'self'"]
 CSP_INCLUDE_NONCE_IN = ["script-src"]
 CSP_CONNECT_SRC = ["'self'"]
 
-CSP_BLOCK_ALL_MIXED_CONTENT = True
-
 # Turn on the browsable API by default if DEBUG is True, but disable by default in production
 BROWSABLE_API = env.bool("BROWSABLE_API", DEBUG)
 
