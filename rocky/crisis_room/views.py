@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timezone
 from typing import Any
 from urllib.parse import urlencode
@@ -6,6 +7,7 @@ from uuid import UUID
 import structlog
 from account.mixins import OrganizationView
 from django.conf import settings
+from django.contrib import messages
 from django.http import HttpResponse
 from django.http.request import HttpRequest
 from django.shortcuts import redirect
@@ -14,15 +16,18 @@ from django.views.generic import TemplateView
 from httpx import HTTPStatusError
 from pydantic import TypeAdapter
 from reports.report_types.findings_report.report import SEVERITY_OPTIONS
+from tools.forms.ooi_form import _EXCLUDED_OOI_TYPES
 from tools.models import Organization, OrganizationMember
 
 from crisis_room.management.commands.dashboards import FINDINGS_DASHBOARD_NAME, get_or_create_dashboard_data
-from crisis_room.models import DashboardData
+from crisis_room.models import Dashboard, DashboardData
+from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.reports import HydratedReport
+from octopoes.models.types import get_collapsed_types, type_by_name
 from rocky.bytes_client import BytesClient, get_bytes_client
-from rocky.views.mixins import OOIList
 
 logger = structlog.get_logger(__name__)
 
@@ -134,24 +139,27 @@ class DashboardService:
 
     def get_all_dashboard_names(self, organization):
         dashboard_names = []
-        dashboards_data = DashboardData.objects.filter(dashboard__organization=organization, display_in_dashboard=True)
-        for data in dashboards_data:
-            dashboard_names.append(data.dashboard.name)
+        dashboards = Dashboard.objects.filter(organization=organization)
+        for dashboard in dashboards:
+            dashboard_names.append(dashboard.name)
         return list(set(dashboard_names))
 
-    def get_dashboard_data(self, dashboard_name, organization):
+    def get_dashboard(self, dashboard_name, organization):
+        return Dashboard.objects.get(organization=organization, name=dashboard_name)
+
+    def get_dashboard_data(self, dashboard_name, organization, list_limit):
         dashboard = {}
 
+        # Collect all the items on the dashboard
         dashboard_datas = DashboardData.objects.filter(
             dashboard__name=dashboard_name, dashboard__organization=organization, display_in_dashboard=True
         )
 
-        for data in dashboard_datas:
-            octopoes_client = self.get_octopoes_client(organization.code)
-            bytes_client = get_bytes_client(organization.code)
-
-            recipe_id = data.recipe
-            query_from = data.query_from
+        for dashboard_data in dashboard_datas:
+            octopoes_client = self.get_octopoes_client(dashboard_data.dashboard.organization.code)
+            bytes_client = get_bytes_client(dashboard_data.dashboard.organization.code)
+            recipe_id = dashboard_data.recipe
+            query_from = dashboard_data.query_from
 
             if recipe_id:
                 reports = self.get_reports(self.observed_at, octopoes_client, recipe_id)
@@ -161,11 +169,44 @@ class DashboardService:
                     report_data_from_bytes = self.get_report_bytes_data(bytes_client, report.data_raw_id)
                     report_data = self.get_organizations_findings(report_data_from_bytes)
                     if report.name == FINDINGS_DASHBOARD_NAME or report_data:
-                        dashboard[data] = {"report": report, "report_data": report_data}
+                        dashboard.update(
+                            {"dashboard_data": dashboard_data, "data": {"report": report, "report_data": report_data}}
+                        )
             elif query_from == "object_list":
-                ooi_list = OOIList(**data.query)
-                dashboard[data] = {"ooi_data": ooi_list}
+                query = json.loads(dashboard_data.query)
+                all_oois = {
+                    ooi_class
+                    for ooi_class in get_collapsed_types()
+                    if ooi_class.get_ooi_type() not in _EXCLUDED_OOI_TYPES
+                }
+                all_scan_levels = DEFAULT_SCAN_LEVEL_FILTER
+                all_scan_profile_types = DEFAULT_SCAN_PROFILE_TYPE_FILTER
 
+                ooi_types = (
+                    {type_by_name(t) for t in query["ooi_types"] if t not in _EXCLUDED_OOI_TYPES}
+                    if query["ooi_types"]
+                    else all_oois
+                )
+                scan_level = (
+                    {ScanLevel(int(cl)) for cl in query["scan_level"]} if query["scan_level"] else all_scan_levels
+                )
+                scan_profile_type = (
+                    {ScanProfileType(ct) for ct in query["scan_profile_type"]}
+                    if query["scan_profile_type"]
+                    else all_scan_profile_types
+                )
+
+                ooi_list = octopoes_client.list_objects(
+                    ooi_types,
+                    valid_time=datetime.now(timezone.utc),
+                    limit=list_limit,
+                    scan_level=scan_level,
+                    scan_profile_type=scan_profile_type,
+                    search_string=query["search_string"],
+                    order_by=query["order_by"],
+                    asc_desc=query["asc_desc"],
+                ).items
+                dashboard.update({"dashboard_data": dashboard_data, "ooi_list": ooi_list})
         return dashboard
 
 
@@ -196,10 +237,11 @@ class CrisisRoomView(TemplateView):
         return context
 
 
-class OrganizationsCrisisRoomView(OrganizationView, TemplateView):
+class OrganizationsCrisisRoomView(TemplateView):
     """This is the Crisis Room for a single organization."""
 
     template_name = "organization_crisis_room.html"
+    list_limit = 20
 
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
         super().setup(request, *args, **kwargs)
@@ -207,14 +249,20 @@ class OrganizationsCrisisRoomView(OrganizationView, TemplateView):
         dashboard_service = DashboardService()
         dashboard_name = self.request.GET.get("dashboard")
         self.organization = OrganizationMember.objects.filter(user=self.request.user)[0].organization
-        self.get_dashboard_data = dashboard_service.get_dashboard_data(dashboard_name, self.organization)
         self.get_all_dashboard_names = dashboard_service.get_all_dashboard_names(self.organization)
+        self.get_dashboard = (
+            dashboard_service.get_dashboard(dashboard_name, self.organization) if dashboard_name else None
+        )
+        self.get_dashboard_data = (
+            dashboard_service.get_dashboard_data(dashboard_name, self.organization, self.list_limit)
+            if dashboard_name
+            else None
+        )
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         """Go to the selected dashboard or, in case that no dashboard has been selected, go to the first tab."""
-        self.query_params = urlencode({"dashboard": self.get_all_dashboard_names[0]})
-
-        if not self.get_dashboard_data:
+        if not self.get_dashboard:
+            self.query_params = urlencode({"dashboard": self.get_all_dashboard_names[0]})
             return redirect(
                 reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
                 + "?"
@@ -225,7 +273,9 @@ class OrganizationsCrisisRoomView(OrganizationView, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["all_dashboard_names"] = self.get_all_dashboard_names
-        context["dashboard"] = self.get_dashboard_data
+        context["dashboard_data"] = self.get_dashboard_data
+        context["dashboard"] = self.get_dashboard
+        context["organization"] = self.organization
         return context
 
 
@@ -249,27 +299,37 @@ class AddDashboardItemView(OrganizationView, TemplateView):
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         """Add dashboard item and return to the selected dashboard."""
-        # TODO: fix query
         query = {
-            "valid_time": self.observed_at,
-            "ooi_types": self.filtered_ooi_types,
-            "scan_level": self.clearance_levels,
-            "scan_profile_type": self.clearance_types,
-            "search_string": self.search_string,
-            "order_by": self.order_by,
-            "asc_desc": self.sorting_order,
+            "ooi_types": request.POST.getlist("ooi_type"),
+            "scan_level": request.POST.getlist("clearance_level"),
+            "scan_profile_type": request.POST.getlist("clearance_type"),
+            "search_string": request.POST.get("search_string"),
+            "order_by": request.POST.get("order_by"),
+            "asc_desc": request.POST.get("sorting_order"),
         }
-        # TODO: replace dashboard_name to 'self.request.GET.get("dashboard")'
-        dashboard_name = "Test Dashboard"
-        recipe_id = self.request.GET.get("recipe_id")
-        query_from = self.request.GET.get("query_from")
-        template = self.request.GET.get("template")
+
+        dashboard_name = request.POST.get("dashboard")
+        recipe_id = request.POST.get("recipe_id")
+        query_from = request.POST.get("query_from")
+        template = request.POST.get("template")
 
         if query_from == "object_list":
-            template = "oois/ooi_list.html"
+            template = "dashboard_ooi_list.html"
 
-        self.dashboard_data = get_or_create_dashboard_data(
+        self.dashboard_data, created = get_or_create_dashboard_data(
             dashboard_name, self.organization, recipe_id, query_from, query, template
+        )
+
+        if created:
+            messages.success(request, "Dashboard item has been created.")
+        else:
+            messages.error(request, "Dashboard item could not be created.")
+
+        query_params = urlencode({"dashboard": dashboard_name})
+        return redirect(
+            reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
+            + "?"
+            + query_params
         )
 
     def get_context_data(self, **kwargs):

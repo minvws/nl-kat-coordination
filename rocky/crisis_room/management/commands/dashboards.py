@@ -45,24 +45,17 @@ def get_or_create_default_dashboard(
 
 def get_or_create_dashboard_data(
     dashboard_name: str, organization: Organization, recipe_id: str, query_from: str, query: dict, template: str
-) -> DashboardData | None:
+) -> tuple[DashboardData | None, bool]:
     dashboard, _ = Dashboard.objects.get_or_create(name=dashboard_name, organization=organization)
-    # TODO: Check the position, which should be the length of dashboard_datas + 1
-    position = 10  # Just for testing
 
     dashboard_data = None
-    if recipe_id or (query_from and query):
+    if recipe_id or query_from:
         dashboard_data, created = DashboardData.objects.get_or_create(
-            dashboard=dashboard,
-            recipe=recipe_id,
-            query_from=query_from,
-            query=query,
-            template=template,
-            position=position,
+            dashboard=dashboard, recipe=recipe_id, query_from=query_from, query=json.dumps(query), template=template
         )
         dashboard_data.display_in_dashboard = True
         dashboard_data.save()
-    return dashboard_data
+    return dashboard_data, created
 
 
 def schedule_recipe(

@@ -20,12 +20,11 @@ class Dashboard(models.Model):
 class DashboardData(models.Model):
     dashboard = models.ForeignKey(Dashboard, on_delete=models.SET_NULL, null=True)
     recipe = models.CharField(blank=True, max_length=126, null=True)
-    query_from = models.CharField(blank=True, max_length=126, null=True)
-    query = models.CharField(blank=True, max_length=126, null=True)
+    query_from = models.CharField(blank=True, max_length=32, null=True)
+    query = models.CharField(blank=True, null=True)
     template = models.CharField(blank=True, max_length=126)
     position = models.PositiveSmallIntegerField(
         blank=True,
-        default=1,
         validators=[MinValueValidator(1), MaxValueValidator(16)],
         help_text=_(
             "Where on the dashboard do you want to show the data? "
@@ -49,3 +48,11 @@ class DashboardData(models.Model):
         if self.dashboard:
             return str(self.dashboard)
         return super().__str__()
+
+    def save(self, *args, **kwargs):
+        if not self.position:
+            self.position = self.count_dashboard_data() + 1
+        super().save(*args, **kwargs)
+
+    def count_dashboard_data(self):
+        return max(DashboardData.objects.filter(dashboard=self.dashboard).values_list("position", flat=True), default=0)
