@@ -240,9 +240,7 @@ class XTDBOOIRepository(OOIRepository):
         return export
 
     @classmethod
-    def deserialize(
-        cls, data: dict[str, Any], to_type: type[OOI] | None = None, skip_errors: bool = False
-    ) -> OOI:
+    def deserialize(cls, data: dict[str, Any], to_type: type[OOI] | None = None, skip_errors: bool = False) -> OOI:
         if "object_type" not in data:
             raise ValueError("Data is missing object_type")
 
