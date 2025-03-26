@@ -7,8 +7,6 @@ from pydantic import BaseModel, GetCoreSchemaHandler, RootModel
 from pydantic_core import CoreSchema, core_schema
 from pydantic_core.core_schema import ValidationInfo
 
-from octopoes.models.persistence import ReferenceField
-
 
 class Reference(str):
     @classmethod
@@ -245,17 +243,6 @@ class OOI(BaseModel):
 
 
 OOIClassType = TypeVar("OOIClassType")
-
-
-class OOIValidationError(OOI):
-    """This object-type represents a placeholder OOI-like error container to signal
-    to the user that parsing of a specific OOI failed"""
-
-    object_type: Literal["OOIValidationError"] = "OOIValidationError"
-    source: Reference = ReferenceField(OOI)
-    message: str
-
-    _natural_key_attrs = ["source"]
 
 
 def format_id_short(id_: str) -> str:
