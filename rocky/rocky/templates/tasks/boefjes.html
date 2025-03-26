@@ -44,8 +44,8 @@
                         </thead>
                         <tbody>
                             {% for task in task_list %}
-                                <tr data-task-id="{{ task.id }}" 
-                                    data-task-type="{{ task.type }}" 
+                                <tr data-task-id="{{ task.id }}"
+                                    data-task-type="{{ task.type }}"
                                     {% if not organization %}data-organization-code="{{ task.data.organization }}"{% endif %}>
                                     {% if not organization.code %}
                                         <td>
