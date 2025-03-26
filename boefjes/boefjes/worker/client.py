@@ -5,12 +5,18 @@ from httpx import Client, HTTPTransport, Response
 from pydantic import TypeAdapter
 
 # A deliberate relative import to make this module self-contained
-from .interfaces import BoefjeOutput, BoefjeStorageInterface, Queue, SchedulerClientInterface, Task, TaskStatus, \
-    PaginatedTasksResponse
+from .interfaces import (
+    BoefjeOutput,
+    BoefjeStorageInterface,
+    PaginatedTasksResponse,
+    SchedulerClientInterface,
+    Task,
+    TaskStatus,
+)
 
 
 class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
-    def __init__(self, base_url: str, outgoing_request_timeout: int, oci_image: str | None):
+    def __init__(self, base_url: str, outgoing_request_timeout: int, oci_image: str | None = None):
         self._session = Client(base_url=base_url, transport=HTTPTransport(retries=6), timeout=outgoing_request_timeout)
         self.oci_image = oci_image
 
@@ -19,23 +25,25 @@ class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
         response.raise_for_status()
 
     def pop_item(self, queue_id: str) -> Task | None:
-        # TODO: oci_image filter
-        response = self._session.post(f"/api/v0/scheduler/queues/{queue_id}/pop", json={})
+        page = self.pop_items(queue_id, limit=1)
+
+        if not page or page.count == 0:
+            return None
+
+        return page.results[0]
+
+    def pop_items(self, queue_id: str, limit: int = 1) -> PaginatedTasksResponse | None:
+        filters = None if not self.oci_image else {
+            "filters": [{"column": "data", "field": "oci_image", "operator": "eq", "value": self.oci_image}]
+        }
+        response = self._session.post(
+            f"/api/v0/scheduler/queues/{queue_id}/pop",
+            json=filters,
+            params={"limit": limit},
+        )
         self._verify_response(response)
 
-        task = TypeAdapter(Task | None).validate_json(response.content)
-
-        return task
-
-    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
-        response = self._session.post(f"/api/v0/scheduler/queues/{scheduler_id}/pop", json={
-            "filters": [{"column": "data", "field": "oci_image", "operator": "eq", "value": self.oci_image}],
-        })
-        self._verify_response(response)
-
-        task = TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
-
-        return task
+        return TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
 
     def push_item(self, p_item: Task) -> None:
         response = self._session.post(

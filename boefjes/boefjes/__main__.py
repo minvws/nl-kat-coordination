@@ -15,7 +15,6 @@ from boefjes.sql.db import get_engine
 from boefjes.sql.plugin_storage import create_plugin_storage
 from boefjes.worker.boefje_handler import BoefjeHandler
 from boefjes.worker.boefje_runner import LocalBoefjeJobRunner
-from boefjes.worker.interfaces import Handler
 from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
 from boefjes.worker.repository import get_local_repository
 

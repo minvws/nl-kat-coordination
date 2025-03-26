@@ -14,7 +14,7 @@ from pydantic import TypeAdapter
 from boefjes.config import settings
 from boefjes.dependencies.plugins import PluginService
 from boefjes.storage.interfaces import SettingsNotConformingToSchema
-from boefjes.worker.interfaces import Task, TaskStatus, SchedulerClientInterface, PaginatedTasksResponse
+from boefjes.worker.interfaces import PaginatedTasksResponse, SchedulerClientInterface, Task, TaskStatus
 from boefjes.worker.job_models import BoefjeMeta
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
@@ -24,36 +24,41 @@ logger = structlog.get_logger(__name__)
 
 
 class SchedulerAPIClient(SchedulerClientInterface):
-    def __init__(self, plugin_service: PluginService, base_url: str, oci_image: str | None):
+    def __init__(self, plugin_service: PluginService, base_url: str, oci_image: str | None = None):
         self._session = Client(
             base_url=base_url, transport=HTTPTransport(retries=6), timeout=settings.outgoing_request_timeout
         )
         self.plugin_service = plugin_service
-        self.oci_image = oci_image  # TODO: add filter
+        self.oci_image = oci_image
 
     @staticmethod
-    def _verify_response(response: Response) -> None:
+    def _verify_response(response: Response, filters: dict[str, Any] | None = None) -> None:
         response.raise_for_status()
 
-    def pop_item(self, scheduler_id: str) -> Task | None:
-        response = self._session.post(f"/schedulers/{scheduler_id}/pop", params={"limit": 1})
-        self._verify_response(response)
+    def pop_item(self, queue_id: str) -> Task | None:
+        page = self.pop_items(queue_id)
 
-        page = TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
-        if page.count == 0:
+        if not page or page.count == 0:
             return None
 
         task = page.results[0]
-        if not task:
-            return None
 
         if isinstance(task.data, BoefjeMeta):
             task.data = self._hydrate_boefje_meta(task.data)
 
         return task
 
-    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
-        response = self._session.post(f"/schedulers/{scheduler_id}/pop", json=filters)
+    def pop_items(self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1) -> PaginatedTasksResponse | None:
+        if not filters and self.oci_image:
+            filters = {"filters": [{"column": "data", "field": "oci_image", "operator": "eq", "value": self.oci_image}]}
+        if filters and self.oci_image:
+            filters["filters"].append({"column": "data", "field": "oci_image", "operator": "eq", "value": self.oci_image})
+
+        response = self._session.post(
+            f"/schedulers/{queue_id}/pop",
+            json=filters,
+            params={"limit": limit}
+        )
         self._verify_response(response)
 
         return TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)

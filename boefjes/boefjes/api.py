@@ -2,10 +2,11 @@ import multiprocessing
 import uuid
 from datetime import datetime, timezone
 from multiprocessing.context import ForkContext, ForkProcess
+from typing import Any
 from uuid import UUID
 
 import structlog
-from fastapi import Depends, FastAPI, HTTPException, Response
+from fastapi import Depends, FastAPI, HTTPException, Query, Response
 from httpx import HTTPError, HTTPStatusError
 from pydantic import BaseModel, ConfigDict
 from uvicorn import Config, Server
@@ -14,7 +15,7 @@ from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient
 from boefjes.config import settings
 from boefjes.dependencies.plugins import get_plugin_service
-from boefjes.worker.interfaces import BoefjeOutput, Queue, StatusEnum, Task, TaskStatus
+from boefjes.worker.interfaces import BoefjeOutput, PaginatedTasksResponse, StatusEnum, Task, TaskStatus
 from boefjes.worker.job_models import BoefjeMeta
 from boefjes.worker.repository import _default_mime_types
 
@@ -123,9 +124,15 @@ def get_task(task_id, scheduler_client):
 
 # The "scheduler proxy" endpoints
 
-@app.get("/api/v0/scheduler/queues/{queue_id}/pop", response_model=Task | None, tags=["scheduler"])
-def pop_task(queue_id: str, scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client)) -> Task | None:
-    return scheduler_client.pop_item(queue_id)
+
+@app.post("/api/v0/scheduler/queues/{queue_id}/pop", response_model=PaginatedTasksResponse, tags=["scheduler"])
+def pop_tasks(
+    queue_id: str,
+    filters: dict[str, Any] = Query(None),
+    limit: int = 1,
+    scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),
+) -> Task | None:
+    return scheduler_client.pop_items(queue_id, filters, limit)
 
 
 @app.post("/api/v0/scheduler/queues/{queue_id}/push", tags=["scheduler"])

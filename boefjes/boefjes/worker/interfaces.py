@@ -73,10 +73,10 @@ class PaginatedTasksResponse(BaseModel):
 
 
 class SchedulerClientInterface:
-    def pop_item(self, scheduler_id: str) -> Task | None:
+    def pop_item(self, queue_id: str) -> Task | None:
         raise NotImplementedError()
 
-    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
+    def pop_items(self, queue_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:

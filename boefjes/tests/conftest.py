@@ -25,7 +25,7 @@ from boefjes.sql.plugin_storage import SQLPluginStorage
 from boefjes.storage.interfaces import OrganisationNotFound
 from boefjes.storage.memory import ConfigStorageMemory, OrganisationStorageMemory, PluginStorageMemory
 from boefjes.worker.boefje_runner import LocalBoefjeJobRunner
-from boefjes.worker.interfaces import Handler, SchedulerClientInterface, Task, TaskStatus, PaginatedTasksResponse
+from boefjes.worker.interfaces import Handler, PaginatedTasksResponse, SchedulerClientInterface, Task, TaskStatus
 from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
 from boefjes.worker.models import Organisation
 from boefjes.worker.repository import (
