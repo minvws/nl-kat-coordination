@@ -245,11 +245,11 @@ class OOI(BaseModel):
 OOIClassType = TypeVar("OOIClassType")
 
 
-class OOIParseError(OOI):
+class OOIValidationError(OOI):
     """This object-type represents a placeholder OOI-like error container to signal
     to the user that parsing of a specific OOI failed"""
 
-    object_type: Literal["OOIParseError"] = "OOIParseError"
+    object_type: Literal["OOIValidationError"] = "OOIValidationError"
     source: ReferenceField(OOI)
     message: str
 
