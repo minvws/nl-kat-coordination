@@ -402,17 +402,6 @@ class BoefjeScheduler(Scheduler):
             task_db.status = models.TaskStatus.FAILED
             self.ctx.datastores.task_store.update_task(task_db)
 
-        if self.is_item_on_queue_by_hash(boefje_task.hash):
-            self.logger.debug(
-                "Task is already on queue: %s",
-                boefje_task.hash,
-                task_hash=boefje_task.hash,
-                scheduler_id=self.scheduler_id,
-                caller=caller,
-                exc_info=True,
-            )
-            return
-
         task = models.Task(
             id=boefje_task.id,
             scheduler_id=self.scheduler_id,

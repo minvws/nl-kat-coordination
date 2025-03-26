@@ -311,7 +311,6 @@ class Scheduler(abc.ABC):
             return item
 
         item.schedule_id = schedule_db.id
-        schedule_db.data = item.data
 
         schedule_db = self.calculate_deadline(schedule_db)
         self.ctx.datastores.schedule_store.update_schedule(schedule_db)
