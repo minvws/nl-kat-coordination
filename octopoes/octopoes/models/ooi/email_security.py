@@ -182,7 +182,7 @@ class DMARCTXTRecord(OOI):
 
 
 class DKIMExists(OOI):
-    """Represents the the DKIM exists object if a DKIM record was identified."""
+    """Represents whether a DKIM can exist by checking the DNS response of _domainkey.hostname."""
 
     object_type: Literal["DKIMExists"] = "DKIMExists"
     hostname: Reference = ReferenceField(Hostname)
@@ -196,7 +196,10 @@ class DKIMExists(OOI):
 
 
 class DKIMSelector(OOI):
-    """Represents the DKIM Selector object if present."""
+    """Represents the DKIM Selector object if present.
+
+    Object is currently unused.
+    """
 
     object_type: Literal["DKIMSelector"] = "DKIMSelector"
     selector: str

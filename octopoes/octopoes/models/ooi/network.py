@@ -83,7 +83,7 @@ class IPAddressV6(IPAddress):
 
 
 class Protocol(Enum):
-    """Represents the protocol used.
+    """Represents the protocol used for ports.
 
     Possible value
     -------------
@@ -100,6 +100,8 @@ class Protocol(Enum):
 
 class PortState(Enum):
     """Represents the state of the identified ports.
+
+    This is deprecated. OpenKAT assumes that all ports are always open.
 
     Possible value
     -------------

@@ -126,7 +126,8 @@ class KATFindingType(FindingType):
 
 
 class Finding(OOI):
-    """Represents the OpenKAT Finding #TODO Update once new findings/finding types are complete."""
+    """Represents all OpenKAT Findings, including CVE's and CWE's.
+    #TODO Update once new findings/finding types are complete."""
 
     object_type: Literal["Finding"] = "Finding"
 
@@ -152,6 +153,8 @@ class Finding(OOI):
 
 class MutedFinding(OOI):
     """Represents muted findings.
+
+    Muted findings can be attached to findings. This will make the findings not show up on the Findings page.
 
     Possible values
     ---------------

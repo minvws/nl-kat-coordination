@@ -9,6 +9,8 @@ from octopoes.models.persistence import ReferenceField
 
 
 class DNSRecord(OOI):
+    """Represents the DNS record"""
+
     hostname: Reference = ReferenceField(Hostname, max_issue_scan_level=0, max_inherit_scan_level=2)
     dns_record_type: Literal["A", "AAAA", "CAA", "CNAME", "MX", "NS", "PTR", "SOA", "SRV", "TXT"]
     value: str
