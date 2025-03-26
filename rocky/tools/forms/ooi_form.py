@@ -132,7 +132,7 @@ def generate_select_ooi_field(
     if field.is_required() and not initial and len(oois) == 1:
         del select_options[0]
     # Don't show select fields without options if they are not required
-    elif not field.is_required() and not len(oois):
+    elif not field.is_required() and not oois:
         return None
 
     if is_multiselect:
