@@ -245,9 +245,11 @@ class OrganizationsCrisisRoomView(TemplateView):
         super().setup(request, *args, **kwargs)
 
         dashboard_service = DashboardService()
-        dashboard_name = self.request.GET.get("dashboard")
         self.organization = OrganizationMember.objects.filter(user=self.request.user)[0].organization
         self.get_all_dashboard_names = dashboard_service.get_all_dashboard_names(self.organization)
+
+        dashboard_name = self.request.GET.get("dashboard", self.get_all_dashboard_names[0])
+
         self.get_dashboard = (
             dashboard_service.get_dashboard(dashboard_name, self.organization) if dashboard_name else None
         )
@@ -256,17 +258,6 @@ class OrganizationsCrisisRoomView(TemplateView):
             if dashboard_name
             else None
         )
-
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        """Go to the selected dashboard or, in case that no dashboard has been selected, go to the first tab."""
-        if not self.get_dashboard:
-            self.query_params = urlencode({"dashboard": self.get_all_dashboard_names[0]})
-            return redirect(
-                reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
-                + "?"
-                + self.query_params
-            )
-        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
