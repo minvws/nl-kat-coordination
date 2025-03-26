@@ -8,8 +8,12 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
 def nibble(input_ooi: X509Certificate, config: Config | None) -> Iterator[OOI]:
-    threshold_very_soon = datetime.timedelta(days=config.config.get("expiring-very-soon-in-days", 7) if config else 7)
-    threshold_soon = datetime.timedelta(days=config.config.get("expiring-soon-in-days", 14) if config else 14)
+    threshold_very_soon = datetime.timedelta(
+        days=config.config.get("expiring-very-soon-in-days", 15) if config and config.config else 15
+    )
+    threshold_soon = datetime.timedelta(
+        days=config.config.get("expiring-soon-in-days", 30) if config and config.config else 30
+    )
 
     # only applies to OOIs referencing the certificate
     if input_ooi.expired:

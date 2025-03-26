@@ -116,7 +116,7 @@ def test_expiring_certificate_expiring_soon(
     ip_service = IPService(ip_port=port.reference, service=service.reference)
     xtdb_octopoes_service.ooi_repository.save(ip_service, valid_time)
 
-    expired_date = datetime.datetime.now() + datetime.timedelta(days=6)
+    expired_date = datetime.datetime.now() + datetime.timedelta(days=14)
     valid_until = datetime.datetime.isoformat(expired_date)
     certificate = X509Certificate(
         valid_from=valid_until,
@@ -144,7 +144,7 @@ def test_expiring_certificate_expiring_soon(
     # we config the nibble to yield soon expiring findings now instead of very soon
     config = Config(
         ooi=network.reference,
-        config={"expiring-very-soon-in-days": 2, "expiring-soon-in-days": 7},
+        config={"expiring-very-soon-in-days": 2, "expiring-soon-in-days": 15},
         bit_id="expiring-certificate",
     )
     xtdb_octopoes_service.ooi_repository.save(config, valid_time)
