@@ -117,12 +117,12 @@
         </table>
     </div>
 {% elif is_dashboard %}
-    <div class="horizontal-scroll">
-        <h5>{% translate "Findings overview" %}</h5>
-        {% include "partials/report_severity_totals_table.html" with show_introduction="yes" data=data.findings.summary %}
+    <div>
+        <h3>{% translate "Findings overview" %}</h3>
+        {% include "partials/report_severity_totals_table.html" with show_introduction="yes" data=data.report_data.findings.summary %}
 
-        <h5>{% translate "Findings" %}</h5>
-        {% include "partials/report_findings_table.html" with show_introduction="yes" finding_types=data.findings.finding_types %}
+        <h3>{% translate "Findings" %}</h3>
+        {% include "partials/report_findings_table.html" with show_introduction="yes" finding_types=data.report_data.findings.finding_types %}
 
     </div>
 {% else %}

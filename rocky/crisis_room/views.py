@@ -148,7 +148,7 @@ class DashboardService:
         return Dashboard.objects.get(organization=organization, name=dashboard_name)
 
     def get_dashboard_data(self, dashboard_name, organization, list_limit):
-        dashboard = {}
+        dashboard_items = {}
 
         # Collect all the items on the dashboard
         dashboard_datas = DashboardData.objects.filter(
@@ -169,9 +169,7 @@ class DashboardService:
                     report_data_from_bytes = self.get_report_bytes_data(bytes_client, report.data_raw_id)
                     report_data = self.get_organizations_findings(report_data_from_bytes)
                     if report.name == FINDINGS_DASHBOARD_NAME or report_data:
-                        dashboard.update(
-                            {"dashboard_data": dashboard_data, "data": {"report": report, "report_data": report_data}}
-                        )
+                        dashboard_items[dashboard_data] = {"report": report, "report_data": report_data}
             elif query_from == "object_list":
                 query = json.loads(dashboard_data.query)
                 all_oois = {
@@ -206,8 +204,8 @@ class DashboardService:
                     order_by=query["order_by"],
                     asc_desc=query["asc_desc"],
                 ).items
-                dashboard.update({"dashboard_data": dashboard_data, "ooi_list": ooi_list})
-        return dashboard
+                dashboard_items[dashboard_data] = {"ooi_list": ooi_list, "query": query}
+        return dashboard_items
 
 
 class CrisisRoomView(TemplateView):

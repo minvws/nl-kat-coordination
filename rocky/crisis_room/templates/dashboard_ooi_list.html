@@ -13,7 +13,7 @@
                 {% endblocktranslate %}
             </p>
         </div>
-        <div>
+        <div class="toolbar">
             <a class="button ghost"
                href="{% url "ooi_list" organization_code=organization.code %}">
                 {% translate "Go to objects" %}
@@ -21,64 +21,62 @@
             </a>
         </div>
     </div>
-    <div>
+    <div class="horizontal-scroll">
         <p class="de-emphasized">
             {% blocktranslate with length=ooi_list|length total=total_oois trimmed %}
                 Showing {{ length }} objects
             {% endblocktranslate %}
         </p>
-        <div class="horizontal-scroll">
-            <table>
-                <caption class="visually-hidden">
-                    {% translate "Objects " %}
-                    <span class="visually-hidden">, {% translate "column headers with buttons are sortable" %}</span>
-                </caption>
-                <thead>
-                    <th>{% translate "Object" %}</th>
-                    <th scope="col"
-                        class="sortable"
-                        {% if order_by == "object_type" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
-                        <button form="ooi_list_settings"
-                                name="order_by"
-                                value="object_type"
-                                class="sort">
-                            {% translate "Type" %}
-                            <span aria-hidden="true"
-                                  class="icon ti-{% if order_by == "object_type" and sorting_order == "asc" %}chevron-up{% elif order_by == "object_type" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
-                        </button>
-                    </th>
-                    <th scope="col"
-                        class="sortable"
-                        {% if order_by == "scan_level" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
-                        <button form="ooi_list_settings"
-                                name="order_by"
-                                value="scan_level"
-                                lass="sort">
-                            {% translate "Clearance level" %}
-                            <span aria-hidden="true"
-                                  class="icon ti-{% if order_by == "scan_level" and sorting_order == "asc" %}chevron-up{% elif order_by == "scan_level" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
-                        </button>
-                    </th>
-                    <th>{% translate "Clearance type" %}</th>
-                </thead>
-                <tbody>
-                    {% for object in ooi_list %}
-                        <tr>
-                            <td>
-                                <a href="{% ooi_url "ooi_detail" object.primary_key organization.code observed_at=observed_at %}">{{ object.human_readable }}</a>
-                            </td>
-                            <td>
-                                <a href="{{ request.path }}?observed_at={{ observed_at|date:"Y-m-d" }}&ooi_type={{ object.ooi_type }}">{{ object.ooi_type }}</a>
-                            </td>
-                            <td>
-                                {% include "partials/scan_level_indicator.html" with value=object.scan_profile.level.value %}
+        <table>
+            <caption class="visually-hidden">
+                {% translate "Objects " %}
+                <span class="visually-hidden">, {% translate "column headers with buttons are sortable" %}</span>
+            </caption>
+            <thead>
+                <th>{% translate "Object" %}</th>
+                <th scope="col"
+                    class="sortable"
+                    {% if order_by == "object_type" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
+                    <button form="ooi_list_settings"
+                            name="order_by"
+                            value="object_type"
+                            class="sort">
+                        {% translate "Type" %}
+                        <span aria-hidden="true"
+                              class="icon ti-{% if order_by == "object_type" and sorting_order == "asc" %}chevron-up{% elif order_by == "object_type" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
+                    </button>
+                </th>
+                <th scope="col"
+                    class="sortable"
+                    {% if order_by == "scan_level" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
+                    <button form="ooi_list_settings"
+                            name="order_by"
+                            value="scan_level"
+                            lass="sort">
+                        {% translate "Clearance level" %}
+                        <span aria-hidden="true"
+                              class="icon ti-{% if order_by == "scan_level" and sorting_order == "asc" %}chevron-up{% elif order_by == "scan_level" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
+                    </button>
+                </th>
+                <th>{% translate "Clearance type" %}</th>
+            </thead>
+            <tbody>
+                {% for object in ooi_list %}
+                    <tr>
+                        <td>
+                            <a href="{% ooi_url "ooi_detail" object.primary_key organization.code observed_at=observed_at %}">{{ object.human_readable }}</a>
+                        </td>
+                        <td>
+                            <a href="{{ request.path }}?observed_at={{ observed_at|date:"Y-m-d" }}&ooi_type={{ object.ooi_type }}">{{ object.ooi_type }}</a>
+                        </td>
+                        <td>
+                            {% include "partials/scan_level_indicator.html" with value=object.scan_profile.level.value %}
 
-                            </td>
-                            <td>{{ object.scan_profile.scan_profile_type|title }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                        </td>
+                        <td>{{ object.scan_profile.scan_profile_type|title }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </section>

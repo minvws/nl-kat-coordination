@@ -30,19 +30,15 @@
                 </div>
             </div>
             <div>
-                <div class="fifty-fifty">
-                    <div>
-                        {% include "partials/ooi_list_filters.html" %}
-
-                    </div>
-                    <div class="horizontal-view toolbar">
-                        <button type="submit"
-                                class="button ghost"
-                                form="add_to_dashboard"
-                                name="add_dashboard_item"
-                                value="object_list">{% translate "Add to dashboard" %}</button>
-                    </div>
+                <div class="toolbar">
+                    <button type="submit"
+                            class="button ghost"
+                            form="add_to_dashboard"
+                            name="add_dashboard_item"
+                            value="object_list">{% translate "Add to dashboard" %}</button>
                 </div>
+                {% include "partials/ooi_list_filters.html" %}
+
                 <p class="de-emphasized">
                     {% blocktranslate with length=ooi_list|length total=total_oois trimmed %}
                         Showing {{ length }} of {{ total }} objects
