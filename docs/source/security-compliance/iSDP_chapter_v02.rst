@@ -130,12 +130,12 @@ As can be seen in ``rocky/account/forms/account_setup.py:256`` no password is re
         )
 
 Though this password reset is only possible through an email. Which means the requirement is not fully applicable.
-Will be discussed in ``TODO``
+Will be discussed in `feature: Option to reset password within the application <https://github.com/minvws/nl-kat-coordination/issues/4173>`_.
 
 |non_compliant| 2.1.7 - Verify that passwords submitted during account registration, login, and password change are checked against a set of breached passwords either locally (such as the top 1,000 or 10,000 most common passwords which match the system's password policy) or using an external API. If using an API a zero knowledge proof or other mechanism should be used to ensure that the plain text password is not sent or used in verifying the breach status of the password. If the password is breached, the application must require the user to set a new non-breached password.
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Currently this check is not performed. Will be fixed in ``TODO``
+Currently this check is not performed. Will be fixed in `ASVS / iSDP: 2.1.7 Verify that passwords submitted during account registration, login, and password change are checked against a set of breached passwords <https://github.com/minvws/nl-kat-coordination/issues/4174>`_.
 
 |non_compliant| |accepted| 2.1.8 - Verify that a password strength meter is provided to help users set a stronger password.
 ---------------------------------------------------------------------------------------------------------------------------
@@ -143,10 +143,18 @@ Currently this check is not performed. Will be fixed in ``TODO``
 Although this sounds great on paper it is a responsibility from the organization to be aware of secure passwords. Building a reliable an trustworthy password meter is difficult and it is questionable if it really has the desired effect.
 For this reason in combination with the fact that in `ASVS 5.0 2.1.8 <https://github.com/OWASP/ASVS/blob/master/5.0/en/0x11-V2-Authentication.md#v21-password-security>`_ this requirement is set to ``[DELETED, INSUFFICIENT IMPACT]`` we have accepted to be non compliant with this requirement.
 
-|non_compliant| 2.1.9 - Verify that there are no password composition rules limiting the type of characters permitted. There should be no requirement for upper or lower case or numbers or special characters.
+|compliant| 2.1.9 - Verify that there are no password composition rules limiting the type of characters permitted. There should be no requirement for upper or lower case or numbers or special characters.
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Currently this check is not performed. Will be fixed in ``TODO``
+In the file ``rocky/rocky/settings.py:256`` you can see that the default specifications only contain a password length.
+
+.. code-block:: python
+
+    AUTH_PASSWORD_VALIDATORS = [
+        {
+            "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+            "OPTIONS": {"min_length": env.int("PASSWORD_MIN_LENGTH", 12)},
+        }]
 
 |compliant|  2.1.10 - Verify that there are no periodic credential rotation or password history requirements.
 -------------------------------------------------------------------------------------------------------------
@@ -179,7 +187,7 @@ As can be seen in ``rocky/account/forms/account_setup.py:49`` no paste restricti
 
 Currently this check is not performed. Note that in the ASVS 5.0 it is defined as "may allow".
 
-Will be discussed in ``TODO``
+Will be discussed in `feature ASVS / iSDP: 2.1.12 Verify that the user can choose to either temporarily view the entire masked password, or temporarily view the last typed character of the password on platforms that do not have this as built-in functionality. <https://github.com/minvws/nl-kat-coordination/issues/4212>`_.
 
 |todo| 2.2.1 - Verify that anti-automation controls are effective at mitigating breached credential testing, brute force, and account lockout attacks. Such controls include blocking the most common breached passwords, soft lockouts, rate limiting, CAPTCHA, ever increasing delays between attempts, IP address restrictions, or risk-based restrictions such as location, first login on a device, recent attempts to unlock the account, or similar. Verify that no more than 100 failed attempts per hour is possible on a single account.
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
