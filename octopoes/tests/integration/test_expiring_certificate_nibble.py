@@ -151,3 +151,7 @@ def test_expiring_certificate_expiring_soon(
     # so the finding should appear again
     result = nibbler.infer([xtdb_certificate], valid_time)
     assert len(result[certificate][expiring_certificate_nibble.id][(xtdb_certificate, xtdb_config)]) == 2
+
+    # test if same results are returned when the nibble is run from the config
+    result = nibbler.infer([xtdb_certificate], valid_time)
+    assert len(result[certificate][expiring_certificate_nibble.id][(xtdb_certificate, xtdb_config)]) == 2
