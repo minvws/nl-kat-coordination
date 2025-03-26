@@ -43,11 +43,13 @@ def list_plugins(
 ) -> list[PluginType]:
     if filter_params.ids:
         try:
-            plugins = plugin_service.by_plugin_ids(filter_params.ids, organisation_id)
+            with plugin_service as service:
+                plugins = service.by_plugin_ids(filter_params.ids, organisation_id)
         except KeyError:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Plugin not found")
     else:
-        plugins = plugin_service.get_all(organisation_id)
+        with plugin_service as service:
+            plugins = service.get_all(organisation_id)
 
     # filter plugins by id, name or description
     if filter_params.q is not None:
@@ -88,7 +90,8 @@ def get_plugin(
     plugin_id: str, organisation_id: str, plugin_service: PluginService = Depends(get_plugin_service)
 ) -> PluginType:
     try:
-        return plugin_service.by_plugin_id(plugin_id, organisation_id)
+        with plugin_service as service:
+            return service.by_plugin_id(plugin_id, organisation_id)
     except KeyError:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plugin not found")
 
@@ -210,7 +213,8 @@ def delete_normalizer(normalizer_id: str, plugin_storage: PluginStorage = Depend
 
 @router.get("/plugins/{plugin_id}/schema.json", include_in_schema=False)
 def get_plugin_schema(plugin_id: str, plugin_service: PluginService = Depends(get_plugin_service)) -> JSONResponse:
-    return JSONResponse(plugin_service.schema(plugin_id))
+    with plugin_service as service:
+        return JSONResponse(service.schema(plugin_id))
 
 
 @router.get("/plugins/{plugin_id}/cover.jpg", include_in_schema=False)
