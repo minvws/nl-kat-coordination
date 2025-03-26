@@ -252,7 +252,7 @@ class OOIValidationError(OOI):
     to the user that parsing of a specific OOI failed"""
 
     object_type: Literal["OOIValidationError"] = "OOIValidationError"
-    source: ReferenceField(OOI)
+    source: Reference = ReferenceField(OOI)
     message: str
 
     _natural_key_attrs = ["source"]
