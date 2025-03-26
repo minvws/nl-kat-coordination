@@ -40,7 +40,7 @@ class BytesRawView(OrganizationView):
                 messages.add_message(request, messages.ERROR, msg)
 
                 return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
-            return HttpResponse(json.dumps({"error": msg}), content_type="application/json", status_code=404)
+            return JsonResponse({"error": msg}, status_code=HTTPStatus.NOT_FOUND)
 
 
 def zip_data(raws: dict[str, bytes], raw_metas: list[dict]) -> BytesIO:
