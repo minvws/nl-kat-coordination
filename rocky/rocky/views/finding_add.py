@@ -104,6 +104,7 @@ class FindingAddView(BaseOOIFormView):
         for f_id in finding_type_ids:
             finding_type = get_finding_type_from_id(f_id)
             finding = Finding(
+                user_id=self.request.user.id,
                 ooi=ooi_ref,
                 finding_type=finding_type.reference,
                 proof=form_data.get("proof"),

@@ -7,7 +7,7 @@ from django import template
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import gettext_lazy as _
 
-from octopoes.models import OOI, Reference, ScanLevel
+from octopoes.models import OOI, Reference, ScanLevel, ScanProfileBase
 from octopoes.models.ooi.findings import Finding, FindingType
 from tools.view_helpers import get_ooi_url
 
@@ -105,8 +105,8 @@ def ooi_type(reference_string: str) -> str:
 
 
 @register.filter
-def get_user_full_name(ooi: OOI) -> str:
+def get_user_full_name(ooi: OOI | ScanProfileBase) -> str:
     try:
         return KATUser.objects.get(id=ooi.user_id).get_full_name()
     except ObjectDoesNotExist:
-        return _("Unknown user")
+        return _("N/A")

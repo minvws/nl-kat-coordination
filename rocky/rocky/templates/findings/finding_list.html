@@ -120,6 +120,12 @@
                                             <div>
                                                 <dl>
                                                     <div>
+                                                        <dt>{% translate "Owner" %}</dt>
+                                                        <dd>
+                                                            {{ hydrated_finding.finding|get_user_full_name }}
+                                                        </dd>
+                                                    </div>
+                                                    <div>
                                                         <dt>{% translate "Finding type" %}</dt>
                                                         <dd>
                                                             <a href="{% ooi_url "ooi_detail" hydrated_finding.finding_type organization.code query=mandatory_fields %}"

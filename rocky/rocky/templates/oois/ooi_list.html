@@ -70,6 +70,7 @@
                                     </button>
                                 </th>
                                 <th>{% translate "Clearance type" %}</th>
+                                <th>{% translate "Owner" %}</th>
                             </thead>
                             <tbody>
                                 {% for object in ooi_list %}
@@ -87,7 +88,11 @@
                                             {% include "partials/scan_level_indicator.html" with value=object.scan_profile.level.value %}
 
                                         </td>
-                                        <td>{{ object.scan_profile.scan_profile_type|title }}</td>
+                                        <td>
+                                            {{ object.scan_profile.scan_profile_type|title }}
+                                            {% if object.scan_profile.user_id %}by: {{ object.scan_profile|get_user_full_name }}{% endif %}
+                                        </td>
+                                        <td>{{ object|get_user_full_name }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

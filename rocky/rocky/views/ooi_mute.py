@@ -60,6 +60,7 @@ class MuteFindingsBulkView(OrganizationPermissionRequiredMixin, SingleOOIMixin):
         else:
             for finding in selected_findings:
                 ooi = self.ooi_class.model_validate({"finding": finding, "reason": reason})
+                ooi.user_id = self.request.user.id
                 create_ooi(
                     self.octopoes_api_connector, self.bytes_client, ooi, datetime.now(timezone.utc), end_valid_time
                 )
