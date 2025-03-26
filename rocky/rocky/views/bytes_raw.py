@@ -23,10 +23,10 @@ class BytesRawView(OrganizationView):
             boefje_meta_id = kwargs["boefje_meta_id"]
             raw_metas = self.bytes_client.get_raw_metas(boefje_meta_id, self.organization.code)
             if request.GET.get("format", False) == "json":
-                sizelimit = request.GET.get("sizelimit", RAWFILE_LIMIT)
+                size_limit = request.GET.get("size_limit", RAW_FILE_LIMIT)
                 for raw_meta in raw_metas:
                     raw_meta["raw_file"] = base64.b64encode(
-                        self.bytes_client.get_raw(raw_meta["id"])[:sizelimit]
+                        self.bytes_client.get_raw(raw_meta["id"])[:size_limit]
                     ).decode("ascii")
                 return HttpResponse(json.dumps(raw_metas), content_type="application/json")
             raws = {raw_meta["id"]: self.bytes_client.get_raw(raw_meta["id"]) for raw_meta in raw_metas}
