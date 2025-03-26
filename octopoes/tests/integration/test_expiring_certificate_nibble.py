@@ -8,6 +8,7 @@ from nibbles.expiring_certificate.nibble import NIBBLE as expiring_certificate_n
 from nibbles.runner import NibblesRunner
 
 from octopoes.core.service import OctopoesService
+from octopoes.models import Reference
 from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.dns.zone import Hostname
@@ -112,7 +113,7 @@ def test_expiring_certificate_expiring_soon(
     ip_service = IPService(ip_port=port.reference, service=service.reference)
     xtdb_octopoes_service.ooi_repository.save(ip_service, valid_time)
 
-    expired_date = datetime.datetime.now() + datetime.timedelta(weeks=1)
+    expired_date = datetime.datetime.now() + datetime.timedelta(days=6)
     valid_until = datetime.datetime.isoformat(expired_date)
     certificate = X509Certificate(
         valid_from=valid_until,
@@ -130,10 +131,37 @@ def test_expiring_certificate_expiring_soon(
     xtdb_certificate = xtdb_octopoes_service.ooi_repository.get(certificate.reference, valid_time)
 
     result = nibbler.infer([xtdb_certificate], valid_time)
-    assert len(result[certificate][expiring_certificate_nibble.id][(xtdb_certificate, None)]) == 2
+
+    result_set = result[certificate][expiring_certificate_nibble.id][(xtdb_certificate, None)]
+    references = [Reference.from_str(ooi) for ooi in list(result_set)]
+
+    assert len(references) == 2
+    assert Reference.from_str("KATFindingType|KAT-CERTIFICATE-EXPIRING-VERY-SOON") in references
+
+    # we config the nibble to yield soon expiring findings now instead of very soon
+    config = Config(
+        ooi=network.reference,
+        config={"expiring-very-soon-in-days": 2, "expiring-soon-in-days": 7},
+        bit_id="expiring-certificate",
+    )
+    xtdb_octopoes_service.ooi_repository.save(config, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+    xtdb_config = xtdb_octopoes_service.ooi_repository.get(config.reference, valid_time)
+
+    result = nibbler.infer([xtdb_certificate], valid_time)
+
+    result_set = result[certificate][expiring_certificate_nibble.id][(xtdb_certificate, xtdb_config)]
+    references = [Reference.from_str(ooi) for ooi in list(result_set)]
+
+    assert len(references) == 2
+    assert Reference.from_str("KATFindingType|KAT-CERTIFICATE-EXPIRING-SOON") in references
 
     # we config the nibble to only yield findings when certs expire in 2 days
-    config = Config(ooi=network.reference, config={"expiring-soon-in-days": 2}, bit_id="expiring-certificate")
+    config = Config(
+        ooi=network.reference,
+        config={"expiring-very-soon-in-days": 2, "expiring-soon-in-days": 2},
+        bit_id="expiring-certificate",
+    )
     xtdb_octopoes_service.ooi_repository.save(config, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
     xtdb_config = xtdb_octopoes_service.ooi_repository.get(config.reference, valid_time)
@@ -143,7 +171,11 @@ def test_expiring_certificate_expiring_soon(
     assert len(result[certificate][expiring_certificate_nibble.id][(xtdb_certificate, xtdb_config)]) == 0
 
     # now we config the nibble to yield findings when certs expire in 20 days
-    config = Config(ooi=network.reference, config={"expiring-soon-in-days": 20}, bit_id="expiring-certificate")
+    config = Config(
+        ooi=network.reference,
+        config={"expiring-very-soon-in-days": 20, "expiring-soon-in-days": 20},
+        bit_id="expiring-certificate",
+    )
     xtdb_octopoes_service.ooi_repository.save(config, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
     xtdb_config = xtdb_octopoes_service.ooi_repository.get(config.reference, valid_time)

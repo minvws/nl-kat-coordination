@@ -356,10 +356,17 @@
     "impact": "Users may not connect over a secured connection to your server.",
     "recommendation": "Check if redirection is setup properly."
   },
-  "KAT-CERTIFICATE-EXPIRING-SOON": {
+  "KAT-CERTIFICATE-EXPIRING-VERY-SOON": {
     "description": "TLS certificate is expiring soon.",
     "source": "https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.5",
     "risk": "medium",
+    "impact": "Expired certificates could result in compromise of confidentiality and integrity of clients that connect to the service.",
+    "recommendation": "Update the certificate to expire on a date further in the future."
+  },
+  "KAT-CERTIFICATE-EXPIRING-SOON": {
+    "description": "TLS certificate is expiring soon.",
+    "source": "https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.5",
+    "risk": "recommendation",
     "impact": "Expired certificates could result in compromise of confidentiality and integrity of clients that connect to the service.",
     "recommendation": "Update the certificate to expire on a date further in the future."
   },
