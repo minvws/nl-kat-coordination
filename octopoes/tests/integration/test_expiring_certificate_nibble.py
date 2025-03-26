@@ -75,8 +75,11 @@ def test_expiring_certificate_expired(
 
     assert (xtdb_certificate, None) in result[certificate][expiring_certificate_nibble.id]
 
-    # should be expired
-    assert len(result[certificate][expiring_certificate_nibble.id][(xtdb_certificate, None)]) == 2
+    result_set = result[certificate][expiring_certificate_nibble.id][(xtdb_certificate, None)]
+    references = [Reference.from_str(ooi) for ooi in list(result_set)]
+
+    assert len(references) == 2
+    assert Reference.from_str("KATFindingType|KAT-CERTIFICATE-EXPIRED") in references
 
 
 def test_expiring_certificate_expiring_soon(
