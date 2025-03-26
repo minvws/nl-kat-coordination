@@ -1,6 +1,12 @@
 {% load i18n %}
 
-<div class="horizontal-view toolbar">
+<div class="horizontal-view toolbar left">
+    <form id="finding-list" method="get" class="help inline">
+        {% include "partials/form/fieldset.html" with fields=observed_at_form %}
+        {% include "findings/filters/severity.html" %}
+        {% include "partials/form/fieldset.html" with fields=finding_search_form %}
+
+    </form>
     <a href="{% url 'finding_add' organization.code %}" class="button ghost">{% translate "Add finding" %}</a>
     <a href="{% url "finding_type_add" organization.code %}"
        class="button ghost">{% translate "Add finding type" %}</a>

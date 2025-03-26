@@ -1,0 +1,41 @@
+{% load i18n %}
+
+<div class="dropdown">
+    <label>{% translate "Findings severity" %}</label>
+    <button type="button"
+            class="dropdown-button ghost"
+            aria-label="{% translate "Findings Severity" %}"
+            aria-controls="findings-severity-list"
+            aria-expanded="false"
+            aria-haspopup="listbox"
+            aria-labelledby="findings-severity-list">
+        {% translate "Select severity" %}<span class="icon ti-chevron-down"></span>
+    </button>
+    <div id="findings-severity-list" class="dropdown-list">
+        <a class="select_all_objects_element">{% translate "Select all" %}</a>
+        <ul role="listbox"
+            aria-labelledby="findings-severity-list"
+            tabindex="-1"
+            aria-multiselectable="true">
+            <form method="get" class="inline">
+                {% csrf_token %}
+                {% for field in severity_filter %}
+                    {% for choice in field %}
+                        <li role="option">
+                            <input type="{% if choice.data.value < 0 %}hidden{% else %}checkbox{% endif %}"
+                                   name="{{ field.name }}"
+                                   value="{{ choice.data.value }}"
+                                   id="id_{{ field.name }}_{{ forloop.counter0 }}"
+                                   {% if choice.data.attrs.disabled %}disabled{% endif %}
+                                   {% if choice.data.selected or choice.data.attrs.checked or choice.data.attrs.required %}checked{% endif %} />
+                            <label for="id_{{ field.name }}_{{ forloop.counter0 }}">{{ choice.choice_label|capfirst }}</label>
+                            {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
+                            {% include "partials/form/field_input_errors.html" with field=field %}
+
+                        </li>
+                    {% endfor %}
+                {% endfor %}
+            </form>
+        </ul>
+    </div>
+</div>
