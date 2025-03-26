@@ -20,7 +20,7 @@ from octopoes.config.settings import (
 )
 from octopoes.events.events import OOIDBEvent, OperationType
 from octopoes.events.manager import EventManager
-from octopoes.models import OOI, OOIParseError, Reference, ScanLevel, ScanProfileType
+from octopoes.models import OOI, OOIValidationError, Reference, ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
@@ -242,7 +242,7 @@ class XTDBOOIRepository(OOIRepository):
     @classmethod
     def deserialize(
         cls, data: dict[str, Any], to_type: type[OOI] | None = None, skip_errors: bool = False
-    ) -> OOI | OOIParseError:
+    ) -> OOI:
         if "object_type" not in data:
             raise ValueError("Data is missing object_type")
 
@@ -277,10 +277,10 @@ class XTDBOOIRepository(OOIRepository):
                     and the current models. PK: {stripped["primary_key"]} on (wanted) type {object_cls}.
                     Validation error: {error}""",
                 }
-                return OOIParseError.model_validate(error_data)
+                return OOIValidationError.model_validate(error_data)
             raise error
 
-    def get(self, reference: Reference, valid_time: datetime) -> OOI | OOIParseError:
+    def get(self, reference: Reference, valid_time: datetime) -> OOI:
         try:
             res = self.session.client.get_entity(str(reference), valid_time)
         except HTTPStatusError as e:
@@ -322,7 +322,7 @@ class XTDBOOIRepository(OOIRepository):
         oois = self.load_bulk_as_list(references, valid_time)
         return {ooi.primary_key: ooi for ooi in oois}
 
-    def load_bulk_as_list(self, references: set[Reference], valid_time: datetime) -> list[OOI | OOIParseError]:
+    def load_bulk_as_list(self, references: set[Reference], valid_time: datetime) -> list[OOI]:
         if not references:
             return []
 
@@ -344,7 +344,7 @@ class XTDBOOIRepository(OOIRepository):
         search_string: str | None = None,
         order_by: Literal["scan_level", "object_type"] = "object_type",
         asc_desc: Literal["asc", "desc"] = "asc",
-    ) -> Paginated[OOI | OOIParseError]:
+    ) -> Paginated[OOI]:
         types = to_concrete(types)
 
         search_statement = (
