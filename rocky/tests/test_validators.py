@@ -25,7 +25,7 @@ def test_password_validators_help_texts_default():
                 "min_length_special": 9,
                 "min_length_lower": 4,
                 "min_length_upper": 7,
-                "special_characters": " ~!@#$%^&*()_+{}\":;'[]",
+                "special_characters": "~!@#$%^&",
             },
         },
     ]
@@ -36,6 +36,6 @@ def test_password_validators_help_texts_all_options():
     assert "12 characters" in help_text
     assert "2 digits" in help_text
     assert "5 letters" in help_text
-    assert "9 special characters such as:" in help_text
+    assert "9 special characters such as: ~!@#$%^&" in help_text
     assert "4 lower case letters" in help_text
     assert "7 upper case letters" in help_text
