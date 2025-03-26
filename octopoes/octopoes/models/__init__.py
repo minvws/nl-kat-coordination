@@ -7,6 +7,8 @@ from pydantic import BaseModel, GetCoreSchemaHandler, RootModel
 from pydantic_core import CoreSchema, core_schema
 from pydantic_core.core_schema import ValidationInfo
 
+from octopoes.models.persistence import ReferenceField
+
 
 class Reference(str):
     @classmethod
