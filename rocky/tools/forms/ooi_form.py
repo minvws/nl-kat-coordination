@@ -60,7 +60,7 @@ class OOIForm(BaseRockyForm):
                 select_field = generate_select_ooi_field(
                     self.api_connector, name, field, get_relations(self.ooi_class)[name], self.initial.get(name, None)
                 )
-                if not select_field:
+                if select_field is None:
                     continue
                 fields[name] = select_field
             elif annotation in [IPv4Address, IPv6Address]:
