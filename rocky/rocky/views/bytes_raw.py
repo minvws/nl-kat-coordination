@@ -13,7 +13,7 @@ from django.utils.translation import gettext_lazy as _
 
 logger = structlog.get_logger(__name__)
 
-RAWFILE_LIMIT = 1024 * 1024
+RAW_FILE_LIMIT = 1024 * 1024
 
 
 class BytesRawView(OrganizationView):
