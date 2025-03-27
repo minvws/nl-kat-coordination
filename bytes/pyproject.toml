@@ -51,5 +51,8 @@ pytest-cov = "^5.0.0"
 requires = ["setuptools>=65", "wheel"]
 build-backend = "setuptools.build_meta:__legacy__"
 
+[tool.coverage.run]
+relative_files = true
+
 [tool.pytest.ini_options]
 addopts = "--cov --cov-report xml --cov-branch --cov-report=term-missing:skip-covered"
