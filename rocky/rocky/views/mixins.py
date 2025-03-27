@@ -82,15 +82,14 @@ class ObservedAtMixin:
 
     @cached_property
     def observed_at(self) -> datetime:
-        observed_at_date = self.request.GET.get("observed_at_date")
-        observed_at_time = self.request.GET.get("observed_at_time")
+        observed_at = self.request.GET.get("observed_at")
 
         now = datetime.now(timezone.utc)
 
-        if not observed_at_date or not observed_at_time:
+        if not observed_at:
             return now
         try:
-            observed_at = datetime.fromisoformat(f"{observed_at_date} {observed_at_time}").replace(tzinfo=timezone.utc)
+            observed_at = datetime.fromisoformat(observed_at).replace(tzinfo=timezone.utc)
             if observed_at > now:
                 messages.warning(self.request, _("The selected date is in the future."))
             return observed_at

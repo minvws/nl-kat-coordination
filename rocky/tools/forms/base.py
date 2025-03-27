@@ -56,35 +56,22 @@ class DataListInput(forms.Select):
 
 
 class ObservedAtForm(BaseRockyForm):
-    observed_at_date = forms.DateField(
-        label=_("Start date"),
-        widget=DateInput(format="%Y-%m-%d"),
-        initial=lambda: datetime.now(tz=timezone.utc).date(),
+    observed_at = forms.DateTimeField(
+        label=_("Observed at (UTC)"),
+        widget=DateTimeInput(format="%Y-%m-%d %H:%M:%S"),
+        initial=lambda: datetime.now(tz=timezone.utc),
         required=True,
-        input_formats=["%Y-%m-%d"],
-    )
-
-    observed_at_time = forms.TimeField(
-        label=_("Start time (UTC)"),
-        widget=forms.TimeInput(format="%H:%M:%S", attrs={"type": "time"}),
-        initial=lambda: datetime.now(tz=timezone.utc).time(),
-        required=True,
-        input_formats=["%H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M:%S"],
     )
 
     def clean(self):
         cleaned_data = super().clean()
         now = datetime.now(tz=timezone.utc)
 
-        observed_at_date = cleaned_data.get("observed_at_date", now.date())
-        observed_at_time = cleaned_data.get("observed_at_time", now.time())
-
-        observed_at = datetime.combine(observed_at_date, observed_at_time).replace(tzinfo=timezone.utc)
+        observed_at = cleaned_data.get("observed_at", now).replace(tzinfo=timezone.utc)
 
         if observed_at > now:
             raise forms.ValidationError(_("The selected date is in the future. Please select a different date."))
-
-        cleaned_data["observed_at"] = observed_at
 
         return cleaned_data
 
