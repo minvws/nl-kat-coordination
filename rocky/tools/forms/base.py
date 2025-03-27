@@ -6,7 +6,7 @@ from django import forms
 from django.forms import Widget
 from django.utils.translation import gettext_lazy as _
 
-from tools.forms.settings import Choices, ChoicesGroups
+from tools.forms.settings import OBSERVED_AT_HELP_TEXT, Choices, ChoicesGroups
 
 
 class BaseRockyModelForm(forms.ModelForm):
@@ -62,6 +62,7 @@ class ObservedAtForm(BaseRockyForm):
         initial=lambda: datetime.now(tz=timezone.utc),
         required=True,
         input_formats=["%Y-%m-%d %H:%M:%S"],
+        help_text=OBSERVED_AT_HELP_TEXT,
     )
 
     def clean(self):
