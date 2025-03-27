@@ -6,7 +6,7 @@ from django import forms
 from django.forms import Widget
 from django.utils.translation import gettext_lazy as _
 
-from tools.forms.settings import OBSERVED_AT_HELP_TEXT, Choices, ChoicesGroups
+from tools.forms.settings import Choices, ChoicesGroups
 
 
 class BaseRockyModelForm(forms.ModelForm):
@@ -56,20 +56,37 @@ class DataListInput(forms.Select):
 
 
 class ObservedAtForm(BaseRockyForm):
-    observed_at = forms.DateField(
-        label=_("Date"),
+    observed_at_date = forms.DateField(
+        label=_("Start date"),
         widget=DateInput(format="%Y-%m-%d"),
         initial=lambda: datetime.now(tz=timezone.utc).date(),
         required=True,
-        help_text=OBSERVED_AT_HELP_TEXT,
+        input_formats=["%Y-%m-%d"],
     )
 
-    def clean_observed_at(self):
-        observed_at = self.cleaned_data["observed_at"]
+    observed_at_time = forms.TimeField(
+        label=_("Start time (UTC)"),
+        widget=forms.TimeInput(format="%H:%M:%S", attrs={"type": "time"}),
+        initial=lambda: datetime.now(tz=timezone.utc).time(),
+        required=True,
+        input_formats=["%H:%M:%S"],
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
         now = datetime.now(tz=timezone.utc)
-        if observed_at > now.date():
+
+        observed_at_date = cleaned_data.get("observed_at_date", now.date())
+        observed_at_time = cleaned_data.get("observed_at_time", now.time())
+
+        observed_at = datetime.combine(observed_at_date, observed_at_time).replace(tzinfo=timezone.utc)
+
+        if observed_at > now:
             raise forms.ValidationError(_("The selected date is in the future. Please select a different date."))
-        return observed_at
+
+        cleaned_data["observed_at"] = observed_at
+
+        return cleaned_data
 
 
 class LabeledCheckboxInput(forms.CheckboxInput):
