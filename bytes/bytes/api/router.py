@@ -223,7 +223,7 @@ def get_raw_meta_by_id(
 
 @router.get("/raw", response_model=list[RawDataMeta], tags=[RAW_TAG])
 def get_raw(
-    organization: str | None = None,
+    organization: list[str] | None = None,
     boefje_meta_id: UUID | None = None,
     normalized: bool | None = None,
     raw_ids: list[UUID] | None = Query(None),
@@ -251,7 +251,7 @@ def get_raw(
 
 @router.get("/raws", response_model=BoefjeOutput, tags=[RAW_TAG])
 def get_raws(
-    organization: str | None = None,
+    organization: list[str] | None = Query(None),
     boefje_meta_id: UUID | None = None,
     raw_ids: list[UUID] | None = Query(None),
     normalized: bool | None = None,
@@ -283,7 +283,7 @@ def get_raws(
 
 @router.get("/mime_types", response_model=dict[str, int], tags=[RAW_TAG])
 def get_raw_count_per_mime_type(
-    organization: str | None = None,
+    organization: list[str] | None = None,
     boefje_meta_id: UUID | None = None,
     normalized: bool | None = None,
     mime_types: list[str] | None = Query(None),
