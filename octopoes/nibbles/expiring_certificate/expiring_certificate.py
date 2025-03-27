@@ -14,7 +14,7 @@ def nibble(input_ooi: X509Certificate, config: Config | None) -> Iterator[OOI]:
 
     if in_percentage:
         # Calculate percentage thresholds based on certificate validity period
-        total_validity = (input_ooi.valid_to - input_ooi.valid_from).days
+        total_validity = (input_ooi.valid_untill - input_ooi.valid_from).days
         threshold_very_soon = datetime.timedelta(days=int(total_validity * expiring_very_soon / 100))
         threshold_soon = datetime.timedelta(days=int(total_validity * expiring_soon / 100))
     else:
