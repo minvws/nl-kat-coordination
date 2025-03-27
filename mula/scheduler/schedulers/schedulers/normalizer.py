@@ -1,6 +1,5 @@
 import uuid
 from concurrent import futures
-from types import SimpleNamespace
 from typing import Any, Literal
 
 from opentelemetry import trace

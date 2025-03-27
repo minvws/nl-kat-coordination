@@ -346,11 +346,16 @@ class Scheduler(abc.ABC):
         self.last_activity = datetime.now(timezone.utc)
 
     def calculate_deadline(self, schedule: models.Schedule) -> models.Schedule:
+        """
+        When the schedule is not set, and the auto_calculate_deadline is
+        not set, we set the deadline to None. This means that the task
+        will not be scheduled and was likely a one-off scheduled task.
+        """
         if schedule.schedule is not None:
             schedule.deadline_at = cron.next_run(schedule.schedule)
         elif self.auto_calculate_deadline:
             schedule.deadline_at = self.calculate_default_deadline(schedule)
-        else:
+        elif schedule.deadline_at is not None and schedule.deadline_at < datetime.now(timezone.utc):
             schedule.deadline_at = None
 
         return schedule

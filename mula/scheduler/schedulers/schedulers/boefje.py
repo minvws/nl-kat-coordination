@@ -388,7 +388,7 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        is_stalled = self.has_boefje_task_stalled(boefje_task, task_db)
+        is_stalled = self.has_boefje_task_stalled(task_db)
         if is_stalled:
             self.logger.debug(
                 "Task is stalled: %s",
@@ -512,7 +512,7 @@ class BoefjeScheduler(Scheduler):
         return True
 
     def has_boefje_task_started_running(
-        self, task: models.BoefjeTask, task_db: models.Task | None, task_bytes: models.BoefjeMeta | None = None
+        self, task: models.BoefjeTask, task_db: models.Task | None, task_bytes: models.BoefjeMeta | None
     ) -> bool:
         """Check if the same task is already running.
 
@@ -561,7 +561,7 @@ class BoefjeScheduler(Scheduler):
 
         return False
 
-    def has_boefje_task_stalled(self, task: models.BoefjeTask, task_db: models.Task | None = None) -> bool:
+    def has_boefje_task_stalled(self, task_db: models.Task | None) -> bool:
         """Check if the same task is stalled.
 
         Args:
@@ -584,7 +584,7 @@ class BoefjeScheduler(Scheduler):
         return False
 
     def has_boefje_task_grace_period_passed(
-        self, task: models.BoefjeTask, task_db: models.Task | None = None, task_bytes: models.BoefjeMeta | None = None
+        self, task: models.BoefjeTask, task_db: models.Task | None, task_bytes: models.BoefjeMeta | None
     ) -> bool:
         """Check if the grace period has passed for a task in both the
         datastore and bytes.
@@ -693,10 +693,7 @@ class BoefjeScheduler(Scheduler):
 
         # Does a boefje have a schedule defined?
         if plugin.cron is not None:
-            schedule.cron = plugin.cron
-
-        # TODO: check if this will work correctly when using the super class
-        # method as well. It will probably set the deadline_at to None
+            schedule.schedule = plugin.cron
 
         # Does the boefje have an interval defined?
         if plugin.interval is not None and plugin.interval > 0:
