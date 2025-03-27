@@ -408,7 +408,7 @@ class ConnectorFormMixin:
     request: HttpRequest
 
     def get_connector_form_kwargs(self) -> dict:
-        if "observed_at_date" in self.request.GET and "observed_at_time" in self.request.GET:
+        if "observed_at" in self.request.GET:
             return {"data": self.request.GET}
         else:
             return {}
