@@ -4,6 +4,7 @@ from typing import Any
 from urllib.parse import urlencode
 from uuid import UUID
 
+from django.db import IntegrityError
 import structlog
 from account.mixins import OrganizationView
 from django.conf import settings
@@ -19,7 +20,7 @@ from reports.report_types.findings_report.report import SEVERITY_OPTIONS
 from tools.forms.ooi_form import _EXCLUDED_OOI_TYPES
 from tools.models import Organization, OrganizationMember
 
-from crisis_room.management.commands.dashboards import FINDINGS_DASHBOARD_NAME, get_or_create_dashboard_data
+from crisis_room.management.commands.dashboards import FINDINGS_DASHBOARD_NAME, get_or_create_dashboard, get_or_create_dashboard_data
 from crisis_room.models import Dashboard, DashboardData
 from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -255,8 +256,27 @@ class OrganizationsCrisisRoomView(TemplateView):
         )
         self.get_dashboard_data = (
             dashboard_service.get_dashboard_data(dashboard_name, self.organization, self.list_limit)
-            if dashboard_name
-            else None
+        )
+        
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        """Create a new dashboard tab."""
+        dashboard_name = request.POST.get("dashboard-name")
+        
+        try:
+            dashboard, created = get_or_create_dashboard(dashboard_name, self.organization)
+            if created:
+                messages.success(request, f"Dashboard '{dashboard.name}' has been created.")
+            else:
+                messages.error(request, f"Dashboard with name '{dashboard.name}' already exists.")
+            
+        except IntegrityError:
+            messages.error(request, "Dashboard could not be created.")
+        
+        query_params = urlencode({"dashboard": dashboard.name})
+        return redirect(
+            reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
+            + "?"
+            + query_params
         )
 
     def get_context_data(self, **kwargs):

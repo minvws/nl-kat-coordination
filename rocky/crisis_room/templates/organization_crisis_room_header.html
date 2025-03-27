@@ -1,4 +1,6 @@
 {% load i18n %}
+{% load static %}
+{% load compress %}
 
 <div>
     <h1>{% translate "Crisis room" %}</h1>
@@ -10,8 +12,14 @@
                 </li>
             {% endfor %}
             <li>
-                <a href="">+ {% translate "New dashboard" %}</a>
+                <a href="#new-dashboard">+ {% translate "New dashboard" %}</a>
             </li>
         </ul>
     </nav>
 </div>
+{% include "new_dashboard_modal.html" %}
+{% block html_at_end_body %}
+    {% compress js %}
+        <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
+    {% endcompress %}
+{% endblock html_at_end_body %}

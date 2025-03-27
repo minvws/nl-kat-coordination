@@ -43,11 +43,16 @@ def get_or_create_default_dashboard(
     return created
 
 
+def get_or_create_dashboard(dashboard_name: str, organization: Organization,) -> tuple[Dashboard, bool]:
+    dashboard, created = Dashboard.objects.get_or_create(name=dashboard_name, organization=organization)
+    return dashboard, created 
+
+
 def get_or_create_dashboard_data(
     dashboard_name: str, organization: Organization, recipe_id: str, query_from: str, query: dict, template: str
 ) -> tuple[DashboardData | None, bool]:
-    dashboard, _ = Dashboard.objects.get_or_create(name=dashboard_name, organization=organization)
-
+    dashboard, _ = get_or_create_dashboard(dashboard_name, organization)
+    
     dashboard_data = None
     if recipe_id or query_from:
         dashboard_data, created = DashboardData.objects.get_or_create(
