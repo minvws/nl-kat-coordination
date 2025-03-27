@@ -88,7 +88,7 @@ class SchedulerWorkerManager(WorkerManager):
 
     def _fill_queue(self, queue_type: WorkerManager.Queue) -> None:
         """Fill the local task queue with tasks from the scheduler.
-        We only sleep for the poll interval if the queue is empty."""
+        We only sleep for the poll interval if the scheduler has no (relevant) tasks in its queue."""
         logger.debug("Popping from queue %s", queue_type.value)
 
         try:
