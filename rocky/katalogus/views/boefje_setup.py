@@ -34,18 +34,6 @@ class BoefjeSetupView(OrganizationPermissionRequiredMixin, OrganizationView, For
             + self.query_params
         )
 
-    def form_valid(self, form):
-        form_data = form.cleaned_data
-        plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
-
-        try:
-            self.get_katalogus().create_plugin(plugin)
-            return super().form_valid(form)
-        except DuplicatePluginError as error:
-            if "name" in error.message:
-                form.add_error("name", ("Boefje with this name does already exist. Please choose another name."))
-            return self.form_invalid(form)
-
 
 class AddBoefjeView(BoefjeSetupView):
     """View where the user can create a new Boefje"""
@@ -62,6 +50,18 @@ class AddBoefjeView(BoefjeSetupView):
         ]
 
         return context
+
+    def form_valid(self, form):
+        form_data = form.cleaned_data
+        plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
+
+        try:
+            self.get_katalogus().create_plugin(plugin)
+            return super().form_valid(form)
+        except DuplicatePluginError as error:
+            if "name" in error.message:
+                form.add_error("name", ("Boefje with this name does already exist. Please choose another name."))
+            return self.form_invalid(form)
 
 
 class AddBoefjeVariantView(BoefjeSetupView):
@@ -97,6 +97,18 @@ class AddBoefjeVariantView(BoefjeSetupView):
             initial["scan_type"] = "run_on"
 
         return initial
+
+    def form_valid(self, form):
+        form_data = form.cleaned_data
+        plugin = create_boefje_with_form_data(form_data, self.plugin_id, self.created)
+
+        try:
+            self.get_katalogus().create_plugin(plugin)
+            return super().form_valid(form)
+        except DuplicatePluginError as error:
+            if "name" in error.message:
+                form.add_error("name", ("Boefje with this name does already exist. Please choose another name."))
+            return self.form_invalid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
