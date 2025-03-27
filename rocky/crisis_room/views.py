@@ -4,11 +4,11 @@ from typing import Any
 from urllib.parse import urlencode
 from uuid import UUID
 
-from django.db import IntegrityError
 import structlog
 from account.mixins import OrganizationView
 from django.conf import settings
 from django.contrib import messages
+from django.db import IntegrityError
 from django.http import HttpResponse
 from django.http.request import HttpRequest
 from django.shortcuts import redirect
@@ -20,7 +20,11 @@ from reports.report_types.findings_report.report import SEVERITY_OPTIONS
 from tools.forms.ooi_form import _EXCLUDED_OOI_TYPES
 from tools.models import Organization, OrganizationMember
 
-from crisis_room.management.commands.dashboards import FINDINGS_DASHBOARD_NAME, get_or_create_dashboard, get_or_create_dashboard_data
+from crisis_room.management.commands.dashboards import (
+    FINDINGS_DASHBOARD_NAME,
+    get_or_create_dashboard,
+    get_or_create_dashboard_data,
+)
 from crisis_room.models import Dashboard, DashboardData
 from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -248,30 +252,29 @@ class OrganizationsCrisisRoomView(TemplateView):
         dashboard_service = DashboardService()
         self.organization = OrganizationMember.objects.filter(user=self.request.user)[0].organization
         self.get_all_dashboard_names = dashboard_service.get_all_dashboard_names(self.organization)
+        dashboard_name = self.request.GET.get("dashboard")
 
-        dashboard_name = self.request.GET.get("dashboard", self.get_all_dashboard_names[0])
+        if dashboard_name not in self.get_all_dashboard_names:
+            dashboard_name = self.get_all_dashboard_names[0]
 
-        self.get_dashboard = (
-            dashboard_service.get_dashboard(dashboard_name, self.organization) if dashboard_name else None
+        self.get_dashboard = dashboard_service.get_dashboard(dashboard_name, self.organization)
+        self.get_dashboard_data = dashboard_service.get_dashboard_data(
+            dashboard_name, self.organization, self.list_limit
         )
-        self.get_dashboard_data = (
-            dashboard_service.get_dashboard_data(dashboard_name, self.organization, self.list_limit)
-        )
-        
+
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         """Create a new dashboard tab."""
         dashboard_name = request.POST.get("dashboard-name")
-        
         try:
             dashboard, created = get_or_create_dashboard(dashboard_name, self.organization)
             if created:
                 messages.success(request, f"Dashboard '{dashboard.name}' has been created.")
             else:
                 messages.error(request, f"Dashboard with name '{dashboard.name}' already exists.")
-            
+
         except IntegrityError:
             messages.error(request, "Dashboard could not be created.")
-        
+
         query_params = urlencode({"dashboard": dashboard.name})
         return redirect(
             reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
@@ -291,23 +294,9 @@ class OrganizationsCrisisRoomView(TemplateView):
 class AddDashboardItemView(OrganizationView, TemplateView):
     """This is the Crisis Room for a single organization."""
 
-    def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
-        super().setup(request, *args, **kwargs)
-
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        """Go to the selected dashboard or, in case that no dashboard has been selected, go to the first tab."""
-        if self.dashboard_data:
-            query_params = urlencode({"dashboard": self.dashboard_data.dashboard.name})
-            return redirect(
-                reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
-                + "?"
-                + query_params
-            )
-
-        return redirect(reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}))
-
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        """Add dashboard item and return to the selected dashboard."""
+        """Add dashboard item and redirect to the selected dashboard."""
+
         query = {
             "ooi_types": request.POST.getlist("ooi_type"),
             "scan_level": request.POST.getlist("clearance_level"),
@@ -325,14 +314,23 @@ class AddDashboardItemView(OrganizationView, TemplateView):
         if query_from == "object_list":
             template = "dashboard_ooi_list.html"
 
-        self.dashboard_data, created = get_or_create_dashboard_data(
-            dashboard_name, self.organization, recipe_id, query_from, query, template
-        )
-
-        if created:
-            messages.success(request, "Dashboard item has been created.")
-        else:
-            messages.error(request, "Dashboard item could not be created.")
+        try:
+            self.dashboard_data, created = get_or_create_dashboard_data(
+                dashboard_name, self.organization, recipe_id, query_from, query, template
+            )
+            if created:
+                messages.success(request, "Dashboard item has been created.")
+            else:
+                messages.warning(
+                    request,
+                    "The dashboard item already exists on the selected dashboard. "
+                    "If it was hidden on the dashboard, it is now visible.",
+                )
+        except IntegrityError:
+            messages.error(
+                request,
+                "Dashboard item could not be created, because this dashboard has reached the maximum of 16 items.",
+            )
 
         query_params = urlencode({"dashboard": dashboard_name})
         return redirect(
@@ -340,7 +338,3 @@ class AddDashboardItemView(OrganizationView, TemplateView):
             + "?"
             + query_params
         )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context

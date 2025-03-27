@@ -51,8 +51,9 @@ class DashboardData(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.position:
-            self.position = self.count_dashboard_data() + 1
+            max_position = self.max_position()
+            self.position = max_position + 1 if max_position <= 16 else max_position
         super().save(*args, **kwargs)
 
-    def count_dashboard_data(self):
+    def max_position(self):
         return max(DashboardData.objects.filter(dashboard=self.dashboard).values_list("position", flat=True), default=0)
