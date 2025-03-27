@@ -28,6 +28,7 @@ from rocky.scheduler import (
     ScheduleResponse,
     SchedulerTaskNotFound,
     Task,
+    TaskPush,
     scheduler_client,
 )
 from rocky.scheduler import Normalizer as SchedulerNormalizer
@@ -202,7 +203,7 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
-    def schedule_task(self, task: Task) -> None:
+    def schedule_task(self, task: TaskPush) -> None:
         if not self.indemnification_present:
             return self.indemnification_error()
         try:
@@ -232,12 +233,12 @@ class SchedulerView(OctopoesView):
                 new_id = uuid.uuid4()
                 task.data.id = new_id
 
-                new_task = Task(
+                new_task = TaskPush(
                     id=new_id,
                     scheduler_id=task.scheduler_id,
                     organisation=self.organization.code,
                     priority=1,
-                    data=task.data,
+                    data=task.data.model_dump(),
                 )
 
                 self.schedule_task(new_task)
@@ -252,8 +253,11 @@ class SchedulerView(OctopoesView):
                 normalizer=SchedulerNormalizer.model_validate(katalogus_normalizer.model_dump()), raw_data=raw_data
             )
 
-            new_task = Task(
-                priority=1, data=normalizer_task, scheduler_id="normalizer", organisation=self.organization.code
+            new_task = TaskPush(
+                priority=1,
+                data=normalizer_task.model_dump(),
+                scheduler_id="normalizer",
+                organisation=self.organization.code,
             )
 
             self.schedule_task(new_task)
@@ -268,7 +272,9 @@ class SchedulerView(OctopoesView):
                 organization=self.organization.code,
             )
 
-            new_task = Task(priority=1, data=boefje_task, scheduler_id="boefje", organisation=self.organization.code)
+            new_task = TaskPush(
+                priority=1, data=boefje_task.model_dump(), scheduler_id="boefje", organisation=self.organization.code
+            )
 
             self.schedule_task(new_task)
 

@@ -10,7 +10,7 @@ import structlog
 
 from scheduler import models, storage
 
-from .errors import InvalidItemError, ItemNotFoundError, NotAllowedError, QueueEmptyError, QueueFullError
+from .errors import InvalidItemError, ItemNotFoundError, NotAllowedError, QueueFullError
 
 
 def with_lock(method):
@@ -98,29 +98,23 @@ class PriorityQueue(abc.ABC):
         self.lock: threading.RLock = threading.RLock()
 
     @with_lock
-    def pop(self, filters: storage.filters.FilterRequest | None = None) -> tuple[list[models.Task], int]:
-        """Remove and return the highest priority item from the queue.
+    def pop(self, limit: int = 1, filters: storage.filters.FilterRequest | None = None) -> list[models.Task]:
+        """Remove and return the highest priority items from the queue.
         Optionally apply filters to the queue.
 
         Args:
             filters: A FilterRequest instance that defines the filters
 
         Returns:
-            The highest priority item from the queue.
-
-        Raises:
-            QueueEmptyError: If the queue is empty.
+            The highest priority items from the queue.
         """
-        if self.empty():
-            raise QueueEmptyError(f"Queue {self.pq_id} is empty.")
-
-        items, count = self.pq_store.pop(self.pq_id, filters)
-        if items is None:
-            return ([], 0)
+        items = self.pq_store.pop(self.pq_id, limit, filters)
+        if not items:
+            return []
 
         self.pq_store.bulk_update_status(self.pq_id, [item.id for item in items], models.TaskStatus.DISPATCHED)
 
-        return items, count
+        return items
 
     @with_lock
     def push(self, task: models.Task) -> models.Task:
