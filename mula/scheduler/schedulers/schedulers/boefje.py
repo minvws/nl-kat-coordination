@@ -6,7 +6,7 @@ from typing import Any, Literal
 from opentelemetry import trace
 from pydantic import ValidationError
 
-from scheduler import clients, context, models, utils
+from scheduler import clients, context, models
 from scheduler.clients.errors import ExternalServiceError
 from scheduler.models import MutationOperationType
 from scheduler.models.ooi import RunOn
@@ -361,7 +361,12 @@ class BoefjeScheduler(Scheduler):
     def push_boefje_task(
         self, boefje_task: models.BoefjeTask, organisation_id: str, create_schedule: bool = True, caller: str = ""
     ) -> None:
-        grace_period_passed = self.has_boefje_task_grace_period_passed(boefje_task)
+        task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(boefje_task.hash)
+        task_bytes = self.ctx.services.bytes.get_last_run_boefje(
+            boefje_id=boefje_task.boefje.id, input_ooi=boefje_task.input_ooi, organization_id=boefje_task.organization
+        )
+
+        grace_period_passed = self.has_boefje_task_grace_period_passed(boefje_task, task_db, task_bytes)
         if not grace_period_passed:
             self.logger.debug(
                 "Task has not passed grace period: %s",
@@ -372,22 +377,7 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        is_stalled = self.has_boefje_task_stalled(boefje_task)
-        if is_stalled:
-            self.logger.debug(
-                "Task is stalled: %s",
-                boefje_task.hash,
-                task_hash=boefje_task.hash,
-                scheduler_id=self.scheduler_id,
-                caller=caller,
-            )
-
-            # Update task in datastore to be failed
-            task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(boefje_task.hash)
-            task_db.status = models.TaskStatus.FAILED
-            self.ctx.datastores.task_store.update_task(task_db)
-
-        is_running = self.has_boefje_task_started_running(boefje_task)
+        is_running = self.has_boefje_task_started_running(boefje_task, task_db, task_bytes)
         if is_running:
             self.logger.debug(
                 "Task is still running: %s",
@@ -398,16 +388,19 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        if self.is_item_on_queue_by_hash(boefje_task.hash):
+        is_stalled = self.has_boefje_task_stalled(task_db)
+        if is_stalled:
             self.logger.debug(
-                "Task is already on queue: %s",
+                "Task is stalled: %s",
                 boefje_task.hash,
                 task_hash=boefje_task.hash,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
-                exc_info=True,
             )
-            return
+
+            # Update task in datastore to be failed
+            task_db.status = models.TaskStatus.FAILED
+            self.ctx.datastores.task_store.update_task(task_db)
 
         task = models.Task(
             id=boefje_task.id,
@@ -419,7 +412,6 @@ class BoefjeScheduler(Scheduler):
         )
 
         task.priority = self.ranker.rank(task)
-
         self.push_item_to_queue_with_timeout(item=task, max_tries=self.max_tries, create_schedule=create_schedule)
 
         self.logger.info(
@@ -435,13 +427,19 @@ class BoefjeScheduler(Scheduler):
 
     def push_item_to_queue(self, item: models.Task, create_schedule: bool = True) -> models.Task:
         """Some boefje scheduler specific logic before pushing the item to the
-        queue."""
+        queue.
+
+        The task.id and the boefje_task.id should be the same, this assumption
+        is made by the task runner. Here we enforce this by setting the
+        boefje_task.id to the task.id if they are not the same.
+        """
         boefje_task = models.BoefjeTask.model_validate(item.data)
 
         # Check if id's are unique and correctly set. Same id's are necessary
         # for the task runner.
-        if item.id != boefje_task.id or self.ctx.datastores.task_store.get_task(item.id):
+        if item.id != boefje_task.id:
             new_id = uuid.uuid4()
+
             boefje_task.id = new_id
             item.id = new_id
             item.data = boefje_task.model_dump()
@@ -513,7 +511,9 @@ class BoefjeScheduler(Scheduler):
 
         return True
 
-    def has_boefje_task_started_running(self, task: models.BoefjeTask) -> bool:
+    def has_boefje_task_started_running(
+        self, task: models.BoefjeTask, task_db: models.Task | None, task_bytes: models.BoefjeMeta | None
+    ) -> bool:
         """Check if the same task is already running.
 
         Args:
@@ -523,17 +523,11 @@ class BoefjeScheduler(Scheduler):
             True if the task is still running, False otherwise.
         """
         # Is task still running according to the datastore?
-        task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
         if task_db is not None and task_db.status not in [models.TaskStatus.FAILED, models.TaskStatus.COMPLETED]:
             self.logger.debug(
                 "Task is still running, according to the datastore", task_id=task_db.id, scheduler_id=self.scheduler_id
             )
             return True
-
-        # Is task running according to bytes?
-        task_bytes = self.ctx.services.bytes.get_last_run_boefje(
-            boefje_id=task.boefje.id, input_ooi=task.input_ooi, organization_id=task.organization
-        )
 
         # Task has been finished (failed, or succeeded) according to
         # the datastore, but we have no results of it in bytes, meaning
@@ -558,6 +552,7 @@ class BoefjeScheduler(Scheduler):
             )
             raise RuntimeError("Task has been finished, but no results found in bytes")
 
+        # Is task running according to bytes?
         if task_bytes is not None and task_bytes.ended_at is None and task_bytes.started_at is not None:
             self.logger.debug(
                 "Task is still running, according to bytes", task_id=task_bytes.id, scheduler_id=self.scheduler_id
@@ -566,7 +561,7 @@ class BoefjeScheduler(Scheduler):
 
         return False
 
-    def has_boefje_task_stalled(self, task: models.BoefjeTask) -> bool:
+    def has_boefje_task_stalled(self, task_db: models.Task | None) -> bool:
         """Check if the same task is stalled.
 
         Args:
@@ -575,7 +570,6 @@ class BoefjeScheduler(Scheduler):
         Returns:
             True if the task is stalled, False otherwise.
         """
-        task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
         if (
             task_db is not None
             and task_db.status == models.TaskStatus.DISPATCHED
@@ -589,7 +583,9 @@ class BoefjeScheduler(Scheduler):
 
         return False
 
-    def has_boefje_task_grace_period_passed(self, task: models.BoefjeTask) -> bool:
+    def has_boefje_task_grace_period_passed(
+        self, task: models.BoefjeTask, task_db: models.Task | None, task_bytes: models.BoefjeMeta | None
+    ) -> bool:
         """Check if the grace period has passed for a task in both the
         datastore and bytes.
 
@@ -609,8 +605,6 @@ class BoefjeScheduler(Scheduler):
         else:
             timeout = timedelta(seconds=self.ctx.config.pq_grace_period)
 
-        task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
-
         # Has grace period passed according to datastore?
         if task_db is not None and datetime.now(timezone.utc) - task_db.modified_at < timeout:
             self.logger.debug(
@@ -620,10 +614,6 @@ class BoefjeScheduler(Scheduler):
                 scheduler_id=self.scheduler_id,
             )
             return False
-
-        task_bytes = self.ctx.services.bytes.get_last_run_boefje(
-            boefje_id=task.boefje.id, input_ooi=task.input_ooi, organization_id=task.organization
-        )
 
         # Did the grace period pass, according to bytes?
         if (
@@ -695,26 +685,18 @@ class BoefjeScheduler(Scheduler):
 
         return oois
 
-    def set_cron(self, item: models.Task) -> str | None:
-        """Override Schedule.set_cron() when a boefje specifies a schedule for
-        execution (cron expression) we schedule for its execution"""
-        # Does a boefje have a schedule defined?
-        plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
-            utils.deep_get(item.data, ["boefje", "id"]), item.organisation
-        )
-        if plugin is None or plugin.cron is None:
-            return super().set_cron(item)
-
-        return plugin.cron
-
-    def calculate_deadline(self, task: models.Task) -> datetime:
+    def calculate_deadline(self, schedule: models.Schedule) -> models.Schedule:
         """Override Scheduler.calculate_deadline() to calculate the deadline
         for a task and based on the boefje interval."""
-        # Does the boefje have an interval defined?
-        plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
-            utils.deep_get(task.data, ["boefje", "id"]), task.organisation
-        )
-        if plugin is not None and plugin.interval is not None and plugin.interval > 0:
-            return datetime.now(timezone.utc) + timedelta(minutes=plugin.interval)
+        boefje_task = models.BoefjeTask.model_validate(schedule.data)
+        plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(boefje_task.boefje.id, schedule.organisation)
 
-        return super().calculate_deadline(task)
+        # Does a boefje have a schedule defined?
+        if plugin.cron is not None:
+            schedule.schedule = plugin.cron
+
+        # Does the boefje have an interval defined?
+        if plugin.interval is not None and plugin.interval > 0:
+            schedule.deadline_at = datetime.now(timezone.utc) + timedelta(minutes=plugin.interval)
+
+        return super().calculate_deadline(schedule)
