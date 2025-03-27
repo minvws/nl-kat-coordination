@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-27 11:02+0000\n"
+"POT-Creation-Date: 2025-03-27 13:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -7010,11 +7010,12 @@ msgid "Indemnification successfully set."
 msgstr ""
 
 #: rocky/views/mixins.py
-msgid "The selected date is in the future."
+msgid "The selected date and time is in the future."
 msgstr ""
 
 #: rocky/views/mixins.py
-msgid "Can not parse date, falling back to show current date."
+msgid ""
+"Can not parse date and time, falling back to show current date and time."
 msgstr ""
 
 #: rocky/views/ooi_add.py

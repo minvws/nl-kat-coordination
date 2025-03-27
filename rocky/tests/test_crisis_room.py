@@ -36,8 +36,7 @@ def test_crisis_room_observed_at_bad_format(rf, client_member, mock_crisis_room_
     request.resolver_match = resolve(reverse("crisis_room"))
     response = CrisisRoomView.as_view()(request)
     assert response.status_code == 200
-    assertContains(response, "Can not parse date, falling back to show current date.")
-    assertContains(response, "Enter a valid date.")
+    assertContains(response, "Can not parse date and time, falling back to show current date and time.")
 
 
 def test_org_finding_count_total():

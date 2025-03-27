@@ -72,7 +72,9 @@ class ObservedAtForm(BaseRockyForm):
         observed_at = cleaned_data.get("observed_at", now).replace(tzinfo=timezone.utc)
 
         if observed_at > now:
-            raise forms.ValidationError(_("The selected date is in the future. Please select a different date."))
+            raise forms.ValidationError(
+                _("The selected date and time is in the future. Please select a different date and time.")
+            )
 
         return cleaned_data
 

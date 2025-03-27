@@ -83,15 +83,15 @@ class ObservedAtMixin:
     @cached_property
     def observed_at(self) -> datetime:
         now = datetime.now(timezone.utc)
-        observed_at_string = self.request.GET.get("observed_at", now.strftime("%Y-%m-%d %H:%M:%S"))
+        observed_at_string = self.request.GET.get("observed_at", now.isoformat())
 
         try:
             observed_at = datetime.fromisoformat(observed_at_string).replace(tzinfo=timezone.utc)
             if observed_at > now:
-                messages.warning(self.request, _("The selected date is in the future."))
+                messages.warning(self.request, _("The selected date and time is in the future."))
             return observed_at
-        except ValueError:
-            messages.error(self.request, _("Can not parse date, falling back to show current date."))
+        except (TypeError, ValueError):
+            messages.error(self.request, _("Can not parse date and time, falling back to show current date and time."))
         return now
 
 
