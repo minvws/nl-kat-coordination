@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-14 10:43+0000\n"
+"POT-Creation-Date: 2025-03-27 11:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4471,7 +4471,7 @@ msgid "3: Export setup"
 msgstr ""
 
 #: tools/forms/base.py
-msgid "Date"
+msgid "Observed at (UTC)"
 msgstr ""
 
 #: tools/forms/base.py tools/forms/scheduler.py
