@@ -86,7 +86,7 @@ class Protocol(Enum):
     """Represents the protocol used for ports.
 
     Possible value
-    -------------
+    --------------
     tcp, udp
 
     Example value
@@ -104,7 +104,7 @@ class PortState(Enum):
     This is deprecated. OpenKAT assumes that all ports are always open.
 
     Possible value
-    -------------
+    --------------
     open, closed, filtered, unfiltered, open|filtered, closed|filtered
 
     Example value
@@ -124,7 +124,7 @@ class IPPort(OOI):
     """Represents the IP-Port combination.
 
     Possible value
-    -------------
+    --------------
     address, protocol, port, port state
 
     Example value
@@ -153,7 +153,7 @@ class AutonomousSystem(OOI):
     """Represents the Autonomous System number object.
 
     Possible value
-    -------------
+    --------------
     number, name
 
     Example value
