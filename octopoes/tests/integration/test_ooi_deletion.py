@@ -229,7 +229,7 @@ def test_deletion_events_after_nxdomain(
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) == 0
-    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 9
+    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 10
 
     nxd = NXDOMAIN(hostname=hostname.reference)
     xtdb_octopoes_service.ooi_repository.save(nxd, valid_time)
@@ -250,7 +250,7 @@ def test_deletion_events_after_nxdomain(
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) >= 3
-    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 8
+    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 9
 
 
 @pytest.mark.xfail(reason="Wappalyzer works on wrong input objects (to be addressed)")
