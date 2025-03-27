@@ -412,7 +412,6 @@ class BoefjeScheduler(Scheduler):
         )
 
         task.priority = self.ranker.rank(task)
-
         self.push_item_to_queue_with_timeout(item=task, max_tries=self.max_tries, create_schedule=create_schedule)
 
         self.logger.info(
@@ -695,6 +694,9 @@ class BoefjeScheduler(Scheduler):
         # Does a boefje have a schedule defined?
         if plugin.cron is not None:
             schedule.cron = plugin.cron
+
+        # TODO: check if this will work correctly when using the super class
+        # method as well. It will probably set the deadline_at to None
 
         # Does the boefje have an interval defined?
         if plugin.interval is not None and plugin.interval > 0:

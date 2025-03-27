@@ -245,16 +245,8 @@ class Scheduler(abc.ABC):
         """
         self.last_activity = datetime.now(timezone.utc)
 
-        if self.create_schedule is False:
-            self.logger.debug(
-                "Not creating schedule for item %s",
-                item.id,
-                item_id=item.id,
-                queue_id=self.queue.pq_id,
-                scheduler_id=self.scheduler_id,
-            )
-            return item
-
+        # We differentiate between the scheduler configuration if we should
+        # create a schedule for the item, and the item configuration if it
         scheduler_create_schedule = self.create_schedule
         if not scheduler_create_schedule:
             self.logger.debug(
@@ -358,6 +350,8 @@ class Scheduler(abc.ABC):
             schedule.deadline_at = cron.next_run(schedule.schedule)
         elif self.auto_calculate_deadline:
             schedule.deadline_at = self.calculate_default_deadline(schedule)
+        else:
+            schedule.deadline_at = None
 
         return schedule
 
