@@ -146,6 +146,14 @@ class Task(BaseModel):
         raise ValueError("No organization found related to task")
 
 
+class TaskPush(BaseModel):
+    id: uuid.UUID | None = None
+    scheduler_id: str | None = None
+    organisation: str
+    priority: int | None = None
+    data: dict
+
+
 class ScheduleRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -294,7 +302,7 @@ class SchedulerClient:
         except ConnectError:
             raise SchedulerConnectError()
 
-    def post_schedule_search(self, filters: dict[str, list[dict[str, str]]]) -> PaginatedSchedulesResponse:
+    def post_schedule_search(self, filters: dict[str, list[dict[str, Any]]]) -> PaginatedSchedulesResponse:
         try:
             res = self._client.post("/schedules/search", json=filters)
             res.raise_for_status()
