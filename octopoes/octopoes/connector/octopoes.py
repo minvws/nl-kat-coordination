@@ -304,6 +304,17 @@ class OctopoesAPIConnector:
 
         return TypeAdapter(Paginated[HydratedReport]).validate_json(res.content)
 
+    def bulk_list_reports(
+        self, valid_time: datetime, reports_filters: list[tuple[str, str]]
+    ) -> dict[UUID, HydratedReport]:
+        """
+        Return HydratedReport over multiple clients.
+        The reports_filter is a list of tuples of (client, recipe_id).
+        """
+        res = self.session.post("/reports", json=reports_filters, params={"valid_time": str(valid_time)})
+
+        return TypeAdapter(dict[UUID, HydratedReport]).validate_json(res.content)
+
     def get_report(self, report_id: str, valid_time: datetime) -> HydratedReport:
         params = {"valid_time": str(valid_time)}
 

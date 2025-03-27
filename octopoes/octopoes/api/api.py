@@ -18,6 +18,7 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from pika.adapters.utils.connection_workflow import AMQPConnectionWorkflowFailed
 
+from octopoes.api.bulk_router import router as bulk_router
 from octopoes.api.models import ServiceHealth
 from octopoes.api.router import router
 from octopoes.config.settings import Settings
@@ -148,3 +149,4 @@ def create_rabbit_mq_connection():
 
 
 app.include_router(router)
+app.include_router(bulk_router)
