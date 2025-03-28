@@ -58,10 +58,10 @@ class DataListInput(forms.Select):
 class ObservedAtForm(BaseRockyForm):
     observed_at = forms.DateTimeField(
         label=_("Observed at (UTC)"),
-        widget=DateTimeInput(format="%Y-%m-%d %H:%M:%S"),
+        widget=DateTimeInput(format="%Y-%m-%d %H:%M"),
         initial=lambda: datetime.now(tz=timezone.utc),
         required=True,
-        input_formats=["%Y-%m-%d %H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M"],
         help_text=OBSERVED_AT_HELP_TEXT,
     )
 

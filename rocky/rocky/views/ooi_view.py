@@ -105,8 +105,10 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["observed_at"] = self.observed_at
+        context["observed_at"] = self.observed_at.strftime("%Y-%m-%d %H:%M")
+        context["observed_at_human_readable"] = self.observed_at.strftime("%B %d, %Y, %H:%M (%Z)")
         context["observed_at_form"] = self.get_connector_form()
+
         context["order_by"] = self.order_by
         context["order_by_form"] = OrderByObjectTypeForm(self.request.GET)
 
@@ -163,7 +165,8 @@ class BaseOOIDetailView(BreadcrumbsMixin, SingleOOITreeMixin, ConnectorFormMixin
         context["ooi"] = self.ooi
         context["ooi_current"] = self.get_current_ooi()
         context["mandatory_fields"] = get_mandatory_fields(self.request)
-        context["observed_at"] = self.observed_at
+        context["observed_at"] = self.observed_at.strftime("%Y-%m-%d %H:%M")
+        context["observed_at_human_readable"] = self.observed_at.strftime("%B %d, %Y, %H:%M (%Z)")
         context["observed_at_form"] = self.get_connector_form()
 
         return context

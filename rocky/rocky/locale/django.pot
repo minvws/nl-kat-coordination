@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-27 13:10+0000\n"
+"POT-Creation-Date: 2025-03-27 15:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4474,8 +4474,10 @@ msgstr ""
 msgid "Observed at (UTC)"
 msgstr ""
 
-#: tools/forms/base.py tools/forms/scheduler.py
-msgid "The selected date is in the future. Please select a different date."
+#: tools/forms/base.py
+msgid ""
+"The selected date and time is in the future. Please select a different date "
+"and time."
 msgstr ""
 
 #: tools/forms/boefje.py
@@ -4747,6 +4749,10 @@ msgstr ""
 
 #: tools/forms/scheduler.py
 msgid "Search by object name"
+msgstr ""
+
+#: tools/forms/scheduler.py
+msgid "The selected date is in the future. Please select a different date."
 msgstr ""
 
 #: tools/forms/settings.py
