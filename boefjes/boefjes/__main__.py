@@ -45,13 +45,13 @@ logger = structlog.get_logger(__name__)
 
 
 def get_runtime_manager(
-    settings: Settings, queue: WorkerManager.Queue, image: str | None, plugins: list[str] | None
+    settings: Settings, queue: WorkerManager.Queue, images: list[str] | None, plugins: list[str] | None
 ) -> WorkerManager:
     local_repository = get_local_repository()
 
     session = sessionmaker(bind=get_engine())()
     plugin_service = PluginService(create_plugin_storage(session), create_config_storage(session), local_repository)
-    scheduler_client = SchedulerAPIClient(plugin_service, str(settings.scheduler_api), image, plugins)
+    scheduler_client = SchedulerAPIClient(plugin_service, str(settings.scheduler_api), images, plugins)
 
     if queue is WorkerManager.Queue.BOEFJES:
         item_handler = CompositeBoefjeHandler(
@@ -70,14 +70,14 @@ def get_runtime_manager(
 
 @click.command()
 @click.argument("queue", type=click.Choice([q.value for q in WorkerManager.Queue]))
-@click.option("-i", "--image", type=str | None, default=None, help="An OCI image to filter on.")
+@click.option("-i", "--image", type=list[str] | None, default=None, help="A list of OCI images to filter on.")
 @click.option("-p", "--plugins", type=list[str] | None, default=None, help="A list of plugin ids to filter on.")
 @click.option("--log-level", type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"]), help="Log level", default="INFO")
-def cli(queue: str, image: str | None, plugins: list[str] | None, log_level: str) -> None:
+def cli(queue: str, images: list[str] | None, plugins: list[str] | None, log_level: str) -> None:
     logger.setLevel(log_level)
-    logger.info("Starting runtime for %s", queue)
+    logger.info("Starting runtime for %s [image_filter=%s, plugin_filter=%s]", queue, images, plugins)
 
-    runtime = get_runtime_manager(settings, WorkerManager.Queue(queue), image, plugins)
+    runtime = get_runtime_manager(settings, WorkerManager.Queue(queue), images, plugins)
 
     if queue == "boefje":
         import boefjes.api

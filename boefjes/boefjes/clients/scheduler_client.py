@@ -24,12 +24,12 @@ logger = structlog.get_logger(__name__)
 
 
 class SchedulerAPIClient(SchedulerClientInterface):
-    def __init__(self, plugin_service: PluginService, base_url: str, oci_image: str | None = None, plugins: list[str] | None = None):
+    def __init__(self, plugin_service: PluginService, base_url: str, oci_images: str | None = None, plugins: list[str] | None = None):
         self._session = Client(
             base_url=base_url, transport=HTTPTransport(retries=6), timeout=settings.outgoing_request_timeout
         )
         self.plugin_service = plugin_service
-        self.oci_image = oci_image
+        self.oci_images = oci_images
         self.plugins = plugins
 
     @staticmethod
@@ -47,8 +47,8 @@ class SchedulerAPIClient(SchedulerClientInterface):
     def pop_items(self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1) -> PaginatedTasksResponse | None:
         if not filters:
             filters = {"filters": []}
-        if self.oci_image:
-            filters = {"filters": [{"column": "data", "field": "oci_image", "operator": "eq", "value": self.oci_image}]}
+        if self.oci_images:
+            filters = {"filters": [{"column": "data", "field": "oci_image", "operator": "in", "value": self.oci_images}]}
         if self.plugins:
             filters["filters"].append({"column": "data", "field": "boefje__id", "operator": "in", "value": self.plugins})
 
@@ -95,7 +95,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         # The octopoes API connector is organization-specific, where the client is generic.
         octopoes_api_connector = get_octopoes_api_connector(boefje_meta.organization)
         input_ooi = boefje_meta.input_ooi
-        boefje_meta.arguments = {"oci_image": plugin.oci_image, "oci_arguments": plugin.oci_arguments}
+        boefje_meta.arguments = {"oci_image": plugin.oci_images, "oci_arguments": plugin.oci_arguments}
         boefje_meta.runnable_hash = plugin.runnable_hash
 
         if input_ooi:

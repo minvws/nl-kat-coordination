@@ -16,9 +16,9 @@ from .interfaces import (
 
 
 class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
-    def __init__(self, base_url: str, outgoing_request_timeout: int, oci_image: str | None = None, plugins: list[str] | None = None):
+    def __init__(self, base_url: str, outgoing_request_timeout: int, oci_images: list[str] | None = None, plugins: list[str] | None = None):
         self._session = Client(base_url=base_url, transport=HTTPTransport(retries=6), timeout=outgoing_request_timeout)
-        self.oci_image = oci_image
+        self.oci_images = oci_images
         self.plugins = plugins
 
     @staticmethod
@@ -36,8 +36,8 @@ class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
     def pop_items(self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1) -> PaginatedTasksResponse | None:
         if not filters:
             filters = {"filters": []}
-        if self.oci_image:
-            filters = {"filters": [{"column": "data", "field": "oci_image", "operator": "eq", "value": self.oci_image}]}
+        if self.oci_images:
+            filters = {"filters": [{"column": "data", "field": "oci_image", "operator": "in", "value": self.oci_images}]}
         if self.plugins:
             filters["filters"].append({"column": "data", "field": "boefje__id", "operator": "in", "value": self.plugins})
 

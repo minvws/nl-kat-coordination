@@ -32,7 +32,7 @@ def migration_f9de6eb7824b(local_repository) -> Session:
             list(sorted(boefje.consumes)),
             list(sorted(boefje.produces)),
             ["RECORD_TYPES", "REMOTE_NS"],
-            boefje.oci_image,
+            boefje.oci_images,
             boefje.oci_arguments,
             boefje.version,
         )
