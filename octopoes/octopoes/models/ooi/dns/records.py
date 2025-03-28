@@ -9,6 +9,8 @@ from octopoes.models.persistence import ReferenceField
 
 
 class DNSRecord(OOI):
+    """Represents the DNS record"""
+
     hostname: Reference = ReferenceField(Hostname, max_issue_scan_level=0, max_inherit_scan_level=2)
     dns_record_type: Literal["A", "AAAA", "CAA", "CNAME", "MX", "NS", "PTR", "SOA", "SRV", "TXT"]
     value: str
@@ -29,6 +31,13 @@ class DNSRecord(OOI):
 
 
 class DNSARecord(DNSRecord):
+    """Represents the DNS A record.
+
+    Example value
+    -------------
+    134.209.85.72
+    """
+
     object_type: Literal["DNSARecord"] = "DNSARecord"
     dns_record_type: Literal["A"] = "A"
 
@@ -38,6 +47,13 @@ class DNSARecord(DNSRecord):
 
 
 class DNSAAAARecord(DNSRecord):
+    """Represents the DNS AAAA record.
+
+    Example value
+    -------------
+    2001:0002:6c::430
+    """
+
     object_type: Literal["DNSAAAARecord"] = "DNSAAAARecord"
     dns_record_type: Literal["AAAA"] = "AAAA"
 
@@ -47,6 +63,8 @@ class DNSAAAARecord(DNSRecord):
 
 
 class DNSMXRecord(DNSRecord):
+    """Represents the DNS MX record."""
+
     object_type: Literal["DNSMXRecord"] = "DNSMXRecord"
     dns_record_type: Literal["MX"] = "MX"
 
@@ -57,6 +75,13 @@ class DNSMXRecord(DNSRecord):
 
 
 class DNSTXTRecord(DNSRecord):
+    """Represents the DNS TXT riecord.
+
+    Example value
+    -------------
+    v=DMARC1;p=none;rua=dmarc@mispo.es;ruf=dmarc@mispo.es
+    """
+
     object_type: Literal["DNSTXTRecord"] = "DNSTXTRecord"
     dns_record_type: Literal["TXT"] = "TXT"
 
@@ -70,6 +95,13 @@ class DNSTXTRecord(DNSRecord):
 
 
 class DNSNSRecord(DNSRecord):
+    """Represents the DNS NS record.
+
+    Example value
+    -------------
+    ns0.transip.net
+    """
+
     object_type: Literal["DNSNSRecord"] = "DNSNSRecord"
     dns_record_type: Literal["NS"] = "NS"
 
@@ -79,6 +111,8 @@ class DNSNSRecord(DNSRecord):
 
 
 class DNSCNAMERecord(DNSRecord):
+    """Represents the DNS CNAME record."""
+
     object_type: Literal["DNSCNAMERecord"] = "DNSCNAMERecord"
     dns_record_type: Literal["CNAME"] = "CNAME"
 
@@ -88,6 +122,13 @@ class DNSCNAMERecord(DNSRecord):
 
 
 class DNSSOARecord(DNSRecord):
+    """Represents the DNS SOA record.
+
+    Example value
+    -------------
+    ns1.domaindiscount24.net. tech.key-systems.net. 2023012324 10800 3600 604800 3600
+    """
+
     object_type: Literal["DNSSOARecord"] = "DNSSOARecord"
     dns_record_type: Literal["SOA"] = "SOA"
 
@@ -109,6 +150,8 @@ class DNSSOARecord(DNSRecord):
 
 
 class NXDOMAIN(OOI):
+    """Represents non-existing domains."""
+
     object_type: Literal["NXDOMAIN"] = "NXDOMAIN"
 
     hostname: Reference = ReferenceField(Hostname)
@@ -122,6 +165,8 @@ class NXDOMAIN(OOI):
 
 
 class DNSPTRRecord(DNSRecord):
+    """Represents DNS PTR records."""
+
     object_type: Literal["DNSPTRRecord"] = "DNSPTRRecord"
     dns_record_type: Literal["PTR"] = "PTR"
     address: Reference | None = ReferenceField(IPAddress)
@@ -136,6 +181,13 @@ class DNSPTRRecord(DNSRecord):
 
 
 class CAATAGS(Enum):
+    """Represents CAA tags.
+
+    Possible values
+    ---------------
+    issue, issuewild, iodef, contactemail, contactphone, issuevmc, issuemail
+    """
+
     ISSUE = "issue"
     ISSUEWILD = "issuewild"
     IODEF = "iodef"
@@ -149,6 +201,13 @@ class CAATAGS(Enum):
 
 
 class DNSCAARecord(DNSRecord):
+    """Represents the DNS CAA record.
+
+    Example value
+    -------------
+    "letsencrypt.org"
+    """
+
     object_type: Literal["DNSCAARecord"] = "DNSCAARecord"
     dns_record_type: Literal["CAA"] = "CAA"
 

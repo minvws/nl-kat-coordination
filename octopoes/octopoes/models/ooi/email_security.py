@@ -10,6 +10,13 @@ from octopoes.models.persistence import ReferenceField
 
 
 class DNSSPFRecord(OOI):
+    """Represents the DNS SPF record.
+
+    Example value
+    -------------
+    v=spf1 a mx ~all
+    """
+
     object_type: Literal["DNSSPFRecord"] = "DNSSPFRecord"
     value: str
     ttl: int | None = None
@@ -32,6 +39,20 @@ class DNSSPFRecord(OOI):
 
 
 class MechanismQualifier(Enum):
+    """Represents the SPF Mechanism Qualifiers: allow' fail, softfail or neutral
+    to specify how e-mail should be handled.
+
+    Specification: http://www.open-spf.org/SPF_Record_Syntax/#0.1
+
+    Possible values
+    ---------------
+    +, -, ~, ?
+
+    Example value
+    -------------
+    +
+    """
+
     ALLOW = "+"
     FAIL = "-"
     SOFTFAIL = "~"
@@ -48,11 +69,29 @@ class MechanismQualifier(Enum):
 
 
 class DNSSPFMechanism(OOI):
+    """Represents the DNS SPF Mechanism
+
+    Example value
+    -------------
+    +a
+    """
+
     spf_record: Reference = ReferenceField(DNSSPFRecord, max_inherit_scan_level=1)
     mechanism: str
 
 
 class DNSSPFMechanismIP(DNSSPFMechanism):
+    """Represents the DNS SPF Mechanism for IPs.
+
+    Possible values
+    ---------------
+    +ip4, +ip6
+
+    Example value
+    -------------
+    +ip4
+    """
+
     object_type: Literal["DNSSPFMechanismIP"] = "DNSSPFMechanismIP"
 
     ip: Reference = ReferenceField(IPAddress)
@@ -71,6 +110,13 @@ class DNSSPFMechanismIP(DNSSPFMechanism):
 
 
 class DNSSPFMechanismHostname(DNSSPFMechanism):
+    """Represents the DNS SPF Mechanism for Hostnames.
+
+    Example value:
+    --------------
+    +a:mispo.es
+    """
+
     object_type: Literal["DNSSPFMechanismHostname"] = "DNSSPFMechanismHostname"
 
     hostname: Reference = ReferenceField(Hostname)
@@ -89,6 +135,13 @@ class DNSSPFMechanismHostname(DNSSPFMechanism):
 
 
 class DNSSPFMechanismNetBlock(DNSSPFMechanism):
+    """Represents the DNS SPF Mechanism for net blocks.
+
+    Example value:
+    --------------
+    +ip4:192.168.0.0/24
+    """
+
     object_type: Literal["DNSSPFMechanismNetBlock"] = "DNSSPFMechanismNetBlock"
 
     netblock: Reference = ReferenceField(NetBlock)
@@ -108,6 +161,13 @@ class DNSSPFMechanismNetBlock(DNSSPFMechanism):
 
 
 class DMARCTXTRecord(OOI):
+    """Represents the DMARC TXT record for a hostname.
+
+    Example value:
+    --------------
+    v=DMARC1;p=none;rua=dmarc@mispo.es;ruf=dmarc@mispo.es
+    """
+
     object_type: Literal["DMARCTXTRecord"] = "DMARCTXTRecord"
     value: str
     ttl: int | None
@@ -122,6 +182,8 @@ class DMARCTXTRecord(OOI):
 
 
 class DKIMExists(OOI):
+    """Represents whether a DKIM can exist by checking the DNS response of _domainkey.hostname."""
+
     object_type: Literal["DKIMExists"] = "DKIMExists"
     hostname: Reference = ReferenceField(Hostname)
 
@@ -134,6 +196,11 @@ class DKIMExists(OOI):
 
 
 class DKIMSelector(OOI):
+    """Represents the DKIM Selector object if present.
+
+    Object is currently unused.
+    """
+
     object_type: Literal["DKIMSelector"] = "DKIMSelector"
     selector: str
     hostname: Reference = ReferenceField(Hostname)
@@ -147,6 +214,8 @@ class DKIMSelector(OOI):
 
 
 class DKIMKey(OOI):
+    """Represents the value of the DKIM key."""
+
     object_type: Literal["DKIMKey"] = "DKIMKey"
     key: str
     dkim_selector: Reference = ReferenceField(DKIMSelector)
