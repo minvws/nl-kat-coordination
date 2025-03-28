@@ -16,9 +16,10 @@ from .interfaces import (
 
 
 class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
-    def __init__(self, base_url: str, outgoing_request_timeout: int, oci_image: str | None = None):
+    def __init__(self, base_url: str, outgoing_request_timeout: int, oci_image: str | None = None, plugins: list[str] | None = None):
         self._session = Client(base_url=base_url, transport=HTTPTransport(retries=6), timeout=outgoing_request_timeout)
         self.oci_image = oci_image
+        self.plugins = plugins
 
     @staticmethod
     def _verify_response(response: Response) -> None:
@@ -32,13 +33,17 @@ class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
 
         return page.results[0]
 
-    def pop_items(self, queue_id: str, limit: int = 1) -> PaginatedTasksResponse | None:
-        filters = None if not self.oci_image else {
-            "filters": [{"column": "data", "field": "oci_image", "operator": "eq", "value": self.oci_image}]
-        }
+    def pop_items(self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1) -> PaginatedTasksResponse | None:
+        if not filters:
+            filters = {"filters": []}
+        if self.oci_image:
+            filters = {"filters": [{"column": "data", "field": "oci_image", "operator": "eq", "value": self.oci_image}]}
+        if self.plugins:
+            filters["filters"].append({"column": "data", "field": "boefje__id", "operator": "in", "value": self.plugins})
+
         response = self._session.post(
             f"/api/v0/scheduler/queues/{queue_id}/pop",
-            json=filters,
+            json=filters if filters["filters"] else None,
             params={"limit": limit},
         )
         self._verify_response(response)

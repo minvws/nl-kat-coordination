@@ -24,12 +24,13 @@ logger = structlog.get_logger(__name__)
 
 
 class SchedulerAPIClient(SchedulerClientInterface):
-    def __init__(self, plugin_service: PluginService, base_url: str, oci_image: str | None = None):
+    def __init__(self, plugin_service: PluginService, base_url: str, oci_image: str | None = None, plugins: list[str] | None = None):
         self._session = Client(
             base_url=base_url, transport=HTTPTransport(retries=6), timeout=settings.outgoing_request_timeout
         )
         self.plugin_service = plugin_service
         self.oci_image = oci_image
+        self.plugins = plugins
 
     @staticmethod
     def _verify_response(response: Response, filters: dict[str, Any] | None = None) -> None:
@@ -41,27 +42,33 @@ class SchedulerAPIClient(SchedulerClientInterface):
         if not page or page.count == 0:
             return None
 
-        task = page.results[0]
-
-        if isinstance(task.data, BoefjeMeta):
-            task.data = self._hydrate_boefje_meta(task.data)
-
-        return task
+        return page.results[0]
 
     def pop_items(self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1) -> PaginatedTasksResponse | None:
-        if not filters and self.oci_image:
+        if not filters:
+            filters = {"filters": []}
+        if self.oci_image:
             filters = {"filters": [{"column": "data", "field": "oci_image", "operator": "eq", "value": self.oci_image}]}
-        if filters and self.oci_image:
-            filters["filters"].append({"column": "data", "field": "oci_image", "operator": "eq", "value": self.oci_image})
+        if self.plugins:
+            filters["filters"].append({"column": "data", "field": "boefje__id", "operator": "in", "value": self.plugins})
 
         response = self._session.post(
             f"/schedulers/{queue_id}/pop",
-            json=filters,
+            json=filters if filters["filters"] else None,
             params={"limit": limit}
         )
         self._verify_response(response)
 
-        return TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
+        page = TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
+
+        if page is None:
+            return None
+
+        for task in page.results:
+            if isinstance(task.data, BoefjeMeta):
+                task.data = self._hydrate_boefje_meta(task.data)
+
+        return page
 
     def push_item(self, p_item: Task) -> None:
         response = self._session.post(f"/schedulers/{p_item.scheduler_id}/push", content=p_item.model_dump_json())
