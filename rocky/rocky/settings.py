@@ -59,13 +59,15 @@ LOGGING = {
         "json_formatter": {"()": structlog.stdlib.ProcessorFormatter, "processor": structlog.processors.JSONRenderer()},
         "plain_console": {
             "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.dev.ConsoleRenderer(colors=True, pad_level=False),
+            "processor": structlog.dev.ConsoleRenderer(
+                colors=True, pad_level=False, exception_formatter=structlog.dev.plain_traceback
+            ),
         },
     },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
-            "formatter": "json_formatter" if LOGGING_FORMAT == "json" else "plain_console",
+            "formatter": ("json_formatter" if LOGGING_FORMAT == "json" else "plain_console"),
         }
     },
     "loggers": {"root": {"handlers": ["console"], "level": env("LOG_LEVEL", default="INFO").upper()}},
