@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-20 09:42+0000\n"
+"POT-Creation-Date: 2025-03-27 15:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4471,11 +4471,13 @@ msgid "3: Export setup"
 msgstr ""
 
 #: tools/forms/base.py
-msgid "Date"
+msgid "Observed at (UTC)"
 msgstr ""
 
-#: tools/forms/base.py tools/forms/scheduler.py
-msgid "The selected date is in the future. Please select a different date."
+#: tools/forms/base.py
+msgid ""
+"The selected date and time is in the future. Please select a different date "
+"and time."
 msgstr ""
 
 #: tools/forms/boefje.py
@@ -4747,6 +4749,10 @@ msgstr ""
 
 #: tools/forms/scheduler.py
 msgid "Search by object name"
+msgstr ""
+
+#: tools/forms/scheduler.py
+msgid "The selected date is in the future. Please select a different date."
 msgstr ""
 
 #: tools/forms/settings.py
@@ -7010,11 +7016,12 @@ msgid "Indemnification successfully set."
 msgstr ""
 
 #: rocky/views/mixins.py
-msgid "The selected date is in the future."
+msgid "The selected date and time is in the future."
 msgstr ""
 
 #: rocky/views/mixins.py
-msgid "Can not parse date, falling back to show current date."
+msgid ""
+"Can not parse date and time, falling back to show current date and time."
 msgstr ""
 
 #: rocky/views/ooi_add.py

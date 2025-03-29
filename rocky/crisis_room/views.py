@@ -93,6 +93,6 @@ class CrisisRoomView(BreadcrumbsMixin, ConnectorFormMixin, ObservedAtMixin, Temp
         context["org_finding_counts_per_severity_critical"] = self.sort_by_severity(org_finding_counts_per_severity)
 
         context["observed_at_form"] = self.get_connector_form()
-        context["observed_at"] = self.observed_at.date()
+        context["observed_at"] = self.observed_at.strftime("%Y-%m-%d %H:%M")
 
         return context

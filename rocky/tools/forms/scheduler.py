@@ -50,7 +50,10 @@ class OOIDetailTaskFilterForm(TaskFilterForm):
     Task filter at OOI detail to pass observed_at and ooi_id values.
     """
 
-    observed_at = forms.CharField(widget=forms.HiddenInput(), required=False)
+    observed_at = forms.CharField(
+        widget=forms.HiddenInput(attrs={"value": datetime.now(tz=timezone.utc).strftime("%Y-%m-%d %H:%M")}),
+        required=False,
+    )
     ooi_id = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     # No need to search for OOI if you are already at the OOI detail page.

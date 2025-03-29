@@ -15,7 +15,7 @@ def test_observed_at_no_value(mocker):
     mock_mixin_datetime = mocker.patch("rocky.views.mixins.datetime")
     mock_request = mocker.Mock()
     mock_request.GET = {}
-    now = datetime(2023, 10, 24, 9, 34, 56, 316699, tzinfo=timezone.utc)
+    now = datetime.now(tz=timezone.utc)
     mock_mixin_datetime.now.return_value = now
 
     observed_at = ObservedAtMixin()
@@ -25,29 +25,22 @@ def test_observed_at_no_value(mocker):
 
 def test_observed_at_date(mocker):
     mock_request = mocker.Mock()
-    mock_request.GET = {"observed_at": "2023-10-24"}
+    now = datetime.now(tz=timezone.utc)
+    mock_request.GET = {"observed_at": now.isoformat()}
 
     observed_at = ObservedAtMixin()
     observed_at.request = mock_request
-    assert observed_at.observed_at == datetime(2023, 10, 24, 23, 59, 59, 999999, tzinfo=timezone.utc)
+    assert observed_at.observed_at == now
 
 
 def test_observed_at_datetime(mocker):
     mock_request = mocker.Mock()
-    mock_request.GET = {"observed_at": "2023-10-24T09:34:56"}
+    chosen_observed_at = datetime(2023, 10, 24, 9, 34, 56, 0, tzinfo=timezone.utc)
+    mock_request.GET = {"observed_at": chosen_observed_at.isoformat()}
 
     observed_at = ObservedAtMixin()
     observed_at.request = mock_request
-    assert observed_at.observed_at == datetime(2023, 10, 24, 9, 34, 56, 0, tzinfo=timezone.utc)
-
-
-def test_observed_at_datetime_with_timezone(mocker):
-    mock_request = mocker.Mock()
-    mock_request.GET = {"observed_at": "2023-10-24T11:34:56+02:00"}
-
-    observed_at = ObservedAtMixin()
-    observed_at.request = mock_request
-    assert observed_at.observed_at == datetime(2023, 10, 24, 9, 34, 56, 0, tzinfo=timezone.utc)
+    assert observed_at.observed_at == chosen_observed_at
 
 
 def test_observed_at_future_date(rf, client_member, mock_organization_view_octopoes):
@@ -67,8 +60,12 @@ def test_observed_at_future_date(rf, client_member, mock_organization_view_octop
     _ = OOIListView.as_view()(request, organization_code=client_member.organization.code)
 
     messages = list(request._messages)
-    assert messages[0].message == "The selected date is in the future."
+    assert messages[0].message == "The selected date and time is in the future."
 
     form = ObservedAtForm(data=request.GET)
+
     assert not form.is_valid()
-    assert "The selected date is in the future. Please select a different date." in form.errors["observed_at"]
+    assert (
+        "The selected date and time is in the future. Please select a different date and time."
+        in form.errors["__all__"]
+    )
