@@ -79,7 +79,7 @@ class OctopoesService:
         self.origin_repository = origin_repository
         self.origin_parameter_repository = origin_parameter_repository
         self.scan_profile_repository = scan_profile_repository
-        self.nibbler = NibblesRunner(ooi_repository, origin_repository, nibble_repository)
+        self.nibbler = NibblesRunner(ooi_repository, origin_repository, scan_profile_repository, nibble_repository)
         self.session = session
 
     @overload

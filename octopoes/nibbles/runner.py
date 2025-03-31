@@ -14,6 +14,7 @@ from octopoes.models.origin import Origin, OriginType
 from octopoes.repositories.nibble_repository import NibbleRepository
 from octopoes.repositories.ooi_repository import OOIRepository
 from octopoes.repositories.origin_repository import OriginRepository
+from octopoes.repositories.scan_profile_repository import ScanProfileRepository
 
 
 def merge_results(
@@ -91,12 +92,17 @@ def nibble_hasher(data: Iterable, additional: str | None = None) -> str:
 
 class NibblesRunner:
     def __init__(
-        self, ooi_repository: OOIRepository, origin_repository: OriginRepository, nibble_repository: NibbleRepository
+        self,
+        ooi_repository: OOIRepository,
+        origin_repository: OriginRepository,
+        scan_profile_repository: ScanProfileRepository,
+        nibble_repository: NibbleRepository,
     ):
         self.ooi_repository = ooi_repository
         self.origin_repository = origin_repository
-        self.cache: dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]] = {}
+        self.scan_profile_repository = scan_profile_repository
         self.nibble_repository = nibble_repository
+        self.cache: dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]] = {}
         self.nibbles: dict[str, NibbleDefinition] = get_nibble_definitions()
         self.federated: bool = False
 
@@ -213,12 +219,20 @@ class NibblesRunner:
             self.ooi_repository.save(source_ooi, valid_time)
             for nibble_id, run_result in results.items():
                 for arg, result in run_result.items():
+                    arg_references = {a.reference for a in arg if isinstance(a, OOI)}
+                    scan_profiles_of_args = self.scan_profile_repository.get_bulk(arg_references, valid_time)
+                    if self.nibbles[nibble_id].check_scan_levels([sp.level.value for sp in scan_profiles_of_args]):
+                        result_references = [ooi.reference for ooi in result]
+                        phantom_result_references = []
+                    else:
+                        result_references = []
+                        phantom_result_references = list(result)
                     nibble_origin = Origin(
                         method=nibble_id,
                         origin_type=OriginType.NIBBLET,
                         source=source_ooi.reference,
-                        result=[ooi.reference for ooi in result],
-                        phantom_result=[],
+                        result=result_references,
+                        phantom_result=phantom_result_references,
                         parameters_hash=nibble_hasher(arg, self.nibbles[nibble_id]._checksum),
                         parameters_references=[a.reference if isinstance(a, OOI) else None for a in arg],
                     )

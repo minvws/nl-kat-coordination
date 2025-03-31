@@ -23,6 +23,7 @@ class NibbleParameter(BaseModel):
     parser: str = "[]"
     optional: bool = False
     additional: set[type[OOI]] = set()
+    min_scan_level: int | None = None
 
     def __eq__(self, other):
         if isinstance(other, NibbleParameter):
@@ -70,6 +71,12 @@ class NibbleDefinition(BaseModel):
     @property
     def triggers(self) -> set[type[OOI]]:
         return set.union(*[sgn.triggers for sgn in self.signature]) | self.additional
+
+    def check_scan_levels(self, scan_levels: list[int]) -> bool:
+        for param, level in zip(self.signature, scan_levels):
+            if param.min_scan_level is not None and level <= param.min_scan_level:
+                return False
+        return True
 
 
 def get_nibble_definitions() -> dict[str, NibbleDefinition]:
