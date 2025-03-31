@@ -26,7 +26,9 @@
                 {% include "partials/ooi_list_filters.html" %}
 
                 <p class="de-emphasized">
-                    {% blocktranslate with length=ooi_list|length total=total_oois %}Showing {{ length }} of {{ total }} objects{% endblocktranslate %}
+                    {% blocktranslate with length=ooi_list|length total=total_oois trimmed %}
+                        Showing {{ length }} of {{ total }} objects
+                    {% endblocktranslate %}
                 </p>
                 <form method="post"
                       id="ooi_list_form"
