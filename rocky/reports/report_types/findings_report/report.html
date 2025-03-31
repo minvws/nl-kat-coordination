@@ -118,11 +118,26 @@
     </div>
 {% elif is_dashboard %}
     <div>
-        <h3>{% translate "Findings overview" %}</h3>
-        {% include "partials/report_severity_totals_table.html" with show_introduction="yes" data=data.report_data.findings.summary %}
+        <div>
+            <h3>{% translate "Findings overview" %}</h3>
+            {% include "partials/report_severity_totals_table.html" with show_introduction="yes" data=data.report_data.findings.summary %}
 
-        <h3>{% translate "Findings" %}</h3>
-        {% include "partials/report_findings_table.html" with show_introduction="yes" finding_types=data.report_data.findings.finding_types %}
+        </div>
+        <div>
+            <h3>
+                {% with total=findings.summary.total_by_severity_per_finding_type %}
+                    {% translate "Critical and high findings" %}
+                {% endwith %}
+            </h3>
+            <p>
+                {% blocktranslate %}
+                This table shows the top 25 critical and high findings that have
+                been identified for this organization, grouped by finding types.
+                A table with all the identified findings can be found in the Findings Report.
+            {% endblocktranslate %}
+            </p>
+        </div>
+        {% include "partials/report_findings_table.html" with finding_types=data.report_data.findings.finding_types %}
 
     </div>
 {% else %}

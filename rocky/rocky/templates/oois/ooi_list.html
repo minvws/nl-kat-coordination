@@ -30,12 +30,12 @@
                 </div>
             </div>
             <div>
+                {% include "partials/new_dashboard_item_modal.html" with item_type="objects" %}
+
                 <div class="toolbar">
-                    <button type="submit"
-                            class="button ghost"
-                            form="add_to_dashboard"
-                            name="add_dashboard_item"
-                            value="object_list">{% translate "Add to dashboard" %}</button>
+                    <a href="#new-dashboard-item-modal"
+                       class="button ghost"
+                       data-modal-id="new-dashboard-item-modal">{% translate "Add to dashboard" %}</a>
                 </div>
                 {% include "partials/ooi_list_filters.html" %}
 
@@ -134,32 +134,12 @@
 
             </div>
         </section>
-        <form method="post"
-              id="add_to_dashboard"
-              action="{% url "add_dashboard_item" organization_code=organization.code %}">
-            {% csrf_token %}
-            {% comment %} TODO: Add dashboard name to input as value {% endcomment %}
-            <input type="hidden" name="dashboard" value="Test Dashboard">
-            <input type="hidden" name="query_from" value="object_list">
-            <input type="hidden"
-                   name="observed_at"
-                   value="{{ observed_at|date:"Y-m-d" }}">
-            {% for ooi_type in ooi_types_selection %}<input type="hidden" name="ooi_type" value="{{ ooi_type }}">{% endfor %}
-            {% for clearance_level in clearance_levels_selection %}
-                <input type="hidden" name="clearance_level" value="{{ clearance_level }}">
-            {% endfor %}
-            {% for clearance_type in clearance_types_selection %}
-                <input type="hidden" name="clearance_type" value="{{ clearance_type }}">
-            {% endfor %}
-            <input type="hidden" name="search_string" value="{{ search }}">
-            <input type="hidden" name="order_by" value="{{ order_by }}">
-            <input type="hidden" name="sorting_order" value="{{ sorting_order }}">
-        </form>
     </main>
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
     {% compress js %}
         <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+        <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
     {% endcompress %}
 {% endblock html_at_end_body %}

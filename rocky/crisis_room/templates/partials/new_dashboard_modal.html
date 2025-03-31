@@ -1,0 +1,25 @@
+{% load i18n %}
+
+{% component "modal" modal_id="new-dashboard" size="dialog-small" %}
+{% fill "header" %}
+{% translate "New dashboard" %}
+{% endfill %}
+{% fill "content" %}
+<form id="new-dashboard-form"
+      class="horizontal-view"
+      action=""
+      method="post">
+    <p class="de-emphasized">{% translate "Name" %}</p>
+    {% csrf_token %}
+    <input type="text" name="dashboard-name">
+</form>
+{% endfill %}
+{% fill "footer_buttons" %}
+<input type="submit"
+       form="new-dashboard-form"
+       class="submit close-modal-button"
+       value="Save">
+<button class="ghost close-modal-button">{% translate "Cancel" %}</button>
+{% endfill %}
+{% endcomponent %}
+{% component_css_dependencies %}

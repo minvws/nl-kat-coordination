@@ -1,0 +1,38 @@
+{% load i18n %}
+
+{% component "modal" modal_id="new-dashboard-item-modal" size="dialog-medium" %}
+{% fill "header" %}
+{% blocktranslate with item_type=item_type %}
+            Add {{ item_type }} to dashboard
+        {% endblocktranslate %}
+{% endfill %}
+{% fill "content" %}
+<form method="post"
+      id="new-dashboard-item-form"
+      action="{% url "add_dashboard_item" organization_code=organization.code %}">
+    {% csrf_token %}
+    {% include "forms/new_dashboard_item_form_fields.html" %}
+
+    <div>
+        <h4>{% translate "Select dashboard" %}</h4>
+        <p>{% translate "Select a dashboard to add this object list to." %}</p>
+    </div>
+    {% include "partials/form/fieldset.html" with fields=select_dashboard_form %}
+
+    <div>
+        <h4>{% translate "List settings" %}</h4>
+        <p>{% translate "These can be edited at any time once your dashboard item is added." %}</p>
+    </div>
+    {% include "partials/form/fieldset.html" with fields=object_list_settings_form %}
+
+</form>
+{% endfill %}
+{% fill "footer_buttons" %}
+<input type="submit"
+       form="new-dashboard-item-form"
+       class="submit close-modal-button"
+       value="Add to dashboard">
+<button class="ghost close-modal-button">{% translate "Cancel" %}</button>
+{% endfill %}
+{% endcomponent %}
+{% component_css_dependencies %}

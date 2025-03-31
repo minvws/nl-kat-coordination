@@ -312,7 +312,7 @@ class AddDashboardItemView(OrganizationView, TemplateView):
         template = request.POST.get("template")
 
         if query_from == "object_list":
-            template = "dashboard_ooi_list.html"
+            template = "partials/dashboard_ooi_list.html"
 
         try:
             self.dashboard_data, created = get_or_create_dashboard_data(
