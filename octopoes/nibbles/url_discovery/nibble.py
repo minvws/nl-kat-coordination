@@ -4,35 +4,53 @@ from octopoes.models.ooi.dns.zone import ResolvedHostname
 from octopoes.models.ooi.network import IPPort
 
 
-def url_query(targets: list[Reference | None]) -> str:
-    links = list(f'"{target}"' if isinstance(target, Reference) else "" for target in targets)
-    return f"""{{
-            :query {{
-                :find [(pull ?var [*])]
-                :where [
-                    (or
-                        (and
-                            [?var :object_type "ResolvedHostname"]
-                            [?var :ResolvedHostname/address ?ip_address]
-                            [?ip_port :IPPort/address ?ip_address]
-                            (or [?ip_port :IPPort/port 443][?ip_port :IPPort/port 80])
-                            [?var :ResolvedHostname/primary_key {links[1]}]
-                            [?resolved_hostname :object_type]
-                        )
-                        (and
-                            [?var :object_type "IPPort"]
-                            [?ip_port :IPPort/address ?ip_address]
-                            (or [?ip_port :IPPort/port 443][?ip_port :IPPort/port 80])
-                            [?resolved_hostname :object_type "ResolvedHostname"]
-                            [?resolved_hostname :ResolvedHostname/address ?ip_address]
-                            [?var :IPPort/primary_key {links[0]}]
-                            [?ip_port :object_type]
-                        )
-                    )
-                ]
-            }}
+def query(targets: list[Reference | None]) -> str:
+    def pull(statements: list[str]) -> str:
+        return f"""
+            {{
+                :query {{
+                    :find [(pull ?ip_port [*])(pull ?resolved_hostname [*])] :where [
+                        [?ip_port :IPPort/address ?ip_address]
+                        (or [?ip_port :IPPort/port 443][?ip_port :IPPort/port 80])
+                        [?resolved_hostname :ResolvedHostname/address ?ip_address]
+                        {" ".join(statements)}
+                    ]
+                }}
             }}
         """
+
+    sgn = "".join(str(int(isinstance(target, Reference))) for target in targets)
+
+    if sgn == "10":
+        return pull(
+            [
+                f"""
+                    [?ip_port :IPPort/primary_key "{str(targets[0])}"]
+                """
+            ]
+        )
+
+    if sgn == "01":
+        return pull(
+            [
+                f"""
+                    [?resolved_hostname :ResolvedHostname/primary_key "{str(targets[1])}"]
+                """
+            ]
+        )
+
+    if sgn == "11":
+        return pull(
+            [
+                f"""
+                    [?ip_port :IPPort/primary_key "{str(targets[0])}"]
+                    [?resolved_hostname :ResolvedHostname/primary_key "{str(targets[1])}"]
+                """
+            ]
+        )
+
+    else:
+        return pull([""])
 
 
 NIBBLE = NibbleDefinition(
@@ -43,5 +61,5 @@ NIBBLE = NibbleDefinition(
             object_type=ResolvedHostname, parser="[*][?object_type == 'ResolvedHostname'][]", optional=True
         ),
     ],
-    query=url_query,
+    query=query,
 )

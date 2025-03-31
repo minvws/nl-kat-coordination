@@ -94,3 +94,30 @@ def test_disallowed_csp_headers_disallow_custom_hostname():
             ooi=http_header_hostname.reference, finding_type=KATFindingType(id="KAT-DISALLOWED-DOMAIN-IN-CSP").reference
         ),
     ]
+
+
+def test_disallowed_csp_headers_disallow_custom_hostname_subdomain():
+    http_header_hostname = HTTPHeaderHostname(
+        hostname=Reference.from_str("Hostname|internet|sub.example.com"),
+        header=Reference.from_str(
+            "HTTPHeader|internet|1.1.1.1|tcp|443|https|internet|example.com|https|internet|example.com|443||Content-Security-Policy"
+        ),
+    )
+
+    results = list(
+        nibble(
+            http_header_hostname,
+            Config(
+                ooi=http_header_hostname.reference,
+                bit_id="disallowed-csp-hostnames",
+                config={"disallowed_hostnames": "example.com"},
+            ),
+        )
+    )
+
+    assert results == [
+        KATFindingType(id="KAT-DISALLOWED-DOMAIN-IN-CSP"),
+        Finding(
+            ooi=http_header_hostname.reference, finding_type=KATFindingType(id="KAT-DISALLOWED-DOMAIN-IN-CSP").reference
+        ),
+    ]

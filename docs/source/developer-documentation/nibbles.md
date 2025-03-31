@@ -90,6 +90,10 @@ Nibbles use caching to improve performance. The flow with cache looks like this:
 
 Currently, this caching step only works for nibbles that have only one nibbleParameter. We want to upgrade nibbles in the future to cache all other nibbles as well.
 
+**Scan Levels**
+Just before saving the results with their origins, we make an octopoes call to check whether all scan levels are higher than the minimum scan level of the parameter.
+Only when this is the case are the OOIs saved in the database.
+
 #### OOI updates
 
 Some (very few) OOIs can be updated, which means that an attribute that is not part of the primary key changes.
@@ -245,6 +249,14 @@ The process of creating a nibble involves the following steps:
 2. **Step 2**: Choosing the right objects
 3. **Step 3**: Defining the nibble
 4. **Step 4**: Writing the nibble query
+   While writing the nibble query, it is important to consider to write all of the following possible combination:
+
+   - Only one of the NibbleParameters is known
+   - All of the NibbleParameters are known
+   - None of the NibbleParameters are known
+
+   Nibble queries should be written for all of these situations.
+
 5. **Step 5**: Writing the Jmespath query
 6. **Step 6**: Writing the nibble code
 
@@ -319,5 +331,4 @@ Unlike bits, which allowed setting minimum scan levels only on the `consumes` fi
 
 Nibbles are designed to listen for every scan level update. However, if a nibble runs its query and processes on each update, it can lead to unnecessary runs. Therefore, we made to optimizations:
 
-1. Every new OOI begins with an empty scan level. When a `nibbleParameter` requires a minimum scan level, the newly created OOI is assumed to have an insufficient scan level, and therefore, no results are immediately saved to the graph. This approach means that when an OOI’s scan level is updated, the system only needs to check that specific OOI instead of all scan levels, saving performance.
-2. When a scan level update occurs, only the scan level changes and nothing else is affected. Rerunning the complete nibble query would be wasteful if the outcome remains the same. To prevent this, the system temporarily stores the results in an attribute called `phantom_results` when the scan level is too low. Once the scan level reaches the required threshold, these `phantom_results` are transferred to the actual results on the graph. Similarly, if the scan level later drops below the threshold, the results are moved back into `phantom_results` until the scan level is sufficient again.
+When a scan level update occurs, only the scan level changes and nothing else is affected. Rerunning the complete nibble query would be wasteful if the outcome remains the same. To prevent this, the system temporarily stores the results in an attribute called `phantom_results` when the scan level is too low. Once the scan level reaches the required threshold, these `phantom_results` are transferred to the actual results on the graph. Similarly, if the scan level later drops below the threshold, the results are moved back into `phantom_results` until the scan level is sufficient again.

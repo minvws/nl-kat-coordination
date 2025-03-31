@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-06 13:51+0000\n"
+"POT-Creation-Date: 2025-02-13 15:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2691,9 +2691,13 @@ msgid "Created on:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/report_types/aggregate_organisation_report/report_design.html
 #: reports/templates/partials/report_header.html
-msgid "Created by:"
+msgid "Created from recipe:"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
+#: reports/templates/partials/report_header.html
+msgid "Recipe created by:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
@@ -2787,6 +2791,10 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
 msgid "Observed at:"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report_design.html
+msgid "Created by:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
@@ -4611,7 +4619,7 @@ msgstr ""
 
 #: tools/forms/boefje.py
 msgid ""
-"Choose weather a the Boefje should run after creating and/or changing an "
+"Choose weather the Boefje should run after creating and/or changing an "
 "object. "
 msgstr ""
 
