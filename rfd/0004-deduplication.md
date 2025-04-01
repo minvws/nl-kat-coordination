@@ -179,13 +179,13 @@ requires the organization and can't be deduplicated.
 This data is stored in bytes and needs to be fetched by the scheduler to
 determine whether the environment settings are the same.
 
-#### Environment settings of to be deduplicated boefje task
+#### Environment settings of the to be deduplicated boefje task
 
-This is a complicated. The scheduler can fetch the current configured
-environment from the katalogus, but this is merged with the environment that is
-passed directly to the boefje runner as environment variables. There is
-currently no easy way to fetch those and adding an API for this to the boefje
-runner doesn't seem to be a good idea.
+This is complicated. The scheduler can fetch the current configured environment
+from the katalogus, but this is merged with the environment that is passed
+directly to the boefje runner as environment variables. There is currently no
+easy way to fetch those and adding an API for this to the boefje runner doesn't
+seem to be a good idea.
 
 The best course of action seems to be to disallow the environment variables
 passed to the boefje runner when deduplication is turned on. If both
@@ -193,7 +193,7 @@ deduplication is turned on and environment variables are passed to the boefje
 runner we need to return an error because the user needs to know that the passed
 variables aren't used.
 
-### Valid time
+#### Valid time
 
 If we deduplicate boefje, we need to add the output which a certain valid time.
 Using the current time doesn't seem right, because the boefje task was run
