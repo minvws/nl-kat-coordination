@@ -96,7 +96,9 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
         recipe_pk = request.POST.get("report_recipe", "")
         schedule_id = request.POST.get("schedule_id", "")
 
-        if recipe_pk and schedule_id:
+        if not self.organization_member.has_perms("tools.can_delete_oois"):
+            messages.error(self.request, _("Not enough permissions"))
+        elif recipe_pk and schedule_id:
             self.delete_report_schedule(schedule_id)
             try:
                 self.octopoes_api_connector.delete(
