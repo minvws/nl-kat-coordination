@@ -14,6 +14,17 @@ severity_order = ["unknown", "pending", "recommendation", "low", "medium", "high
 
 @total_ordering
 class RiskLevelSeverity(Enum):
+    """Represents the risk level severity of findings
+
+    Possible values
+    ---------------
+    critical, high, medium, low, recommendation, pending, unknown
+
+    Example value
+    -------------
+    high
+    """
+
     CRITICAL = "critical"
     HIGH = "high"
     MEDIUM = "medium"
@@ -34,8 +45,20 @@ class RiskLevelSeverity(Enum):
 
 
 class FindingType(OOI):
+    """Represents finding types. #TODO: Update once new structure of findings/finding types is complete.
+
+    Possible values
+    ---------------
+    name, description, source, impact, recommendation, risk_score, risk_severity
+
+    Example value
+    -------------
+    #TODO once new structure is complete.
+    """
+
     id: str
 
+    name: str | None = None
     description: str | None = None
     source: AnyUrl | None = None
     impact: str | None = None
@@ -53,42 +76,59 @@ class FindingType(OOI):
 
 
 class ADRFindingType(FindingType):
+    """Represents the API Design Rules (ADR) Finding Types"""
+
     object_type: Literal["ADRFindingType"] = "ADRFindingType"
 
 
 class CVEFindingType(FindingType):
+    """Represents the CVE Finding Types"""
+
     object_type: Literal["CVEFindingType"] = "CVEFindingType"
 
     id: Annotated[str, StringConstraints(strip_whitespace=True, to_upper=True)]
 
 
 class CWEFindingType(FindingType):
+    """Represents the CWE Finding Types"""
+
     object_type: Literal["CWEFindingType"] = "CWEFindingType"
 
     id: Annotated[str, StringConstraints(strip_whitespace=True, to_upper=True)]
 
 
 class CAPECFindingType(FindingType):
+    """Represents the CAPEC Finding Types"""
+
     object_type: Literal["CAPECFindingType"] = "CAPECFindingType"
 
     id: Annotated[str, StringConstraints(strip_whitespace=True, to_upper=True)]
 
 
 class RetireJSFindingType(FindingType):
+    """Represents the RetireJS Finding Types"""
+
     object_type: Literal["RetireJSFindingType"] = "RetireJSFindingType"
 
 
 class SnykFindingType(FindingType):
+    """Represents the Snyk Finding Types"""
+
     object_type: Literal["SnykFindingType"] = "SnykFindingType"
 
     id: Annotated[str, StringConstraints(strip_whitespace=True, to_upper=True)]
 
 
 class KATFindingType(FindingType):
+    """Represents the OpenKAT Finding Types"""
+
     object_type: Literal["KATFindingType"] = "KATFindingType"
 
 
 class Finding(OOI):
+    """Represents all OpenKAT Findings, including CVE's and CWE's.
+    #TODO Update once new findings/finding types are complete."""
+
     object_type: Literal["Finding"] = "Finding"
 
     finding_type: Reference = ReferenceField(FindingType)
@@ -112,6 +152,15 @@ class Finding(OOI):
 
 
 class MutedFinding(OOI):
+    """Represents muted findings.
+
+    Muted findings can be attached to findings. This will make the findings not show up on the Findings page.
+
+    Possible values
+    ---------------
+    finding, reason
+    """
+
     object_type: Literal["MutedFinding"] = "MutedFinding"
 
     finding: Reference = ReferenceField(Finding)

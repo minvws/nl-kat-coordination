@@ -24,7 +24,7 @@ from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, PostRedirect, url_w
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.reports import AssetReport, ReportRecipe
 from octopoes.models.ooi.reports import BaseReport as ReportOOI
-from octopoes.models.types import OOIType
+from octopoes.models.types import OOIType, type_by_name
 from reports.forms import OOITypeMultiCheckboxForReportForm, ReportScheduleStartDateForm
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.concatenated_report.report import ConcatenatedReport
@@ -178,9 +178,10 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
         return get_ooi_types_with_report()
 
     def get_ooi_types(self):
+        ooi_types = self.get_report_ooi_types()
         if self.filtered_ooi_types:
-            return super().get_ooi_types()
-        return self.get_report_ooi_types()
+            return {type_by_name(t) for t in self.filtered_ooi_types if type_by_name(t) in ooi_types}
+        return ooi_types
 
     def get_oois(self) -> list[OOI]:
         if self.all_oois_selected():
