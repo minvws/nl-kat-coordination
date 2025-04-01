@@ -6,7 +6,7 @@ from typing import Any
 from uuid import UUID
 
 import structlog
-from fastapi import Depends, FastAPI, HTTPException, Query, Response
+from fastapi import Depends, FastAPI, HTTPException, Query, Response, Body
 from httpx import HTTPError, HTTPStatusError
 from pydantic import BaseModel, ConfigDict
 from uvicorn import Config, Server
@@ -128,8 +128,8 @@ def get_task(task_id, scheduler_client):
 @app.post("/api/v0/scheduler/queues/{queue_id}/pop", response_model=PaginatedTasksResponse, tags=["scheduler"])
 def pop_tasks(
     queue_id: str,
-    filters: dict[str, Any] = Query(None),
     limit: int = 1,
+    filters: dict[str, Any] | None = Body(...),
     scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),
 ) -> Task | None:
     return scheduler_client.pop_items(queue_id, filters, limit)

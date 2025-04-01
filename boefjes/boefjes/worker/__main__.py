@@ -42,17 +42,23 @@ logger = structlog.get_logger(__name__)
 
 
 @click.command()
-@click.option("-p", "--plugins", type=list[str] | None, default=None, help="A list of plugin ids to filter on.")
+@click.option("-p", "--plugins", type=str, default=None, multiple=True, help="A list of plugin ids to filter on.")
 @click.option(
     "-l", "--log-level", type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"]), help="Log level", default="INFO"
 )
-def cli(plugins: list[str] | None, log_level: str) -> None:
+def cli(plugins: tuple[str] | None, log_level: str) -> None:
     logger.setLevel(log_level)
     logger.info("Starting runtime")
 
-    base_url = os.getenv("BOEFJE_API")
+    base_url = os.getenv("BOEFJES_API")
     oci_image = os.getenv("OCI_IMAGE")
-    plugins = os.getenv("PLUGINS", ",".join(plugins) if plugins else None).split(",")
+
+    if not plugins:
+        env_plugins = os.getenv("PLUGINS")
+        plugins = env_plugins.split(",") if env_plugins else None
+    else:
+        plugins = list(plugins)
+
     pool_size = int(os.getenv("POOL_SIZE", "2"))
     poll_interval = float(os.getenv("POLL_INTERVAL", "10.0"))
     heartbeat = float(os.getenv("WORKER_HEARTBEAT", "1.0"))
@@ -71,6 +77,10 @@ def cli(plugins: list[str] | None, log_level: str) -> None:
     local_repository = get_local_repository()
     boefje_api = BoefjeAPIClient(base_url, outgoing_request_timeout, [oci_image], plugins)
     handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), boefje_api)
+    logger.info(
+        "Configured BoefjeAPI [base_url=%s, outgoing_request_timeout=%s, images=%s, plugins=%s]",
+        base_url, outgoing_request_timeout, [oci_image], plugins,
+    )
 
     SchedulerWorkerManager(handler, boefje_api, pool_size, poll_interval, heartbeat).run(WorkerManager.Queue.BOEFJES)
 

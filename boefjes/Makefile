@@ -41,6 +41,8 @@ images:  # Build the images for the containerized boefjes
 	docker build -f ./boefjes/plugins/kat_export_http/boefje.Dockerfile -t ghcr.io/minvws/openkat/export-http:latest .
 	docker build -f images/generic.Dockerfile -t ghcr.io/minvws/openkat/generic:latest --build-arg OCI_IMAGE=ghcr.io/minvws/openkat/generic:latest .
 
+worker-images:
+	docker build -f images/generic.Dockerfile --target worker -t ghcr.io/minvws/openkat/generic-worker:latest --build-arg OCI_IMAGE=ghcr.io/minvws/openkat/generic-worker:latest .
 
 ##
 ##|------------------------------------------------------------------------|

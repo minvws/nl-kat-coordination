@@ -88,12 +88,12 @@ class SchedulerWorkerManager(WorkerManager):
         try:
             p_item = self.scheduler_client.pop_item(queue_type.value)
         except (HTTPError, ValueError):
-            logger.exception("Popping task from scheduler failed, sleeping 10 seconds")
-            time.sleep(self.worker_heartbeat)
+            logger.exception("Popping task from scheduler failed, sleeping %s seconds", self.poll_interval)
+            time.sleep(self.poll_interval)
             return
 
         if p_item is None:
-            time.sleep(self.worker_heartbeat)
+            time.sleep(self.poll_interval)
             return
 
         logger.info("Handling task[%s]", p_item.data.id)

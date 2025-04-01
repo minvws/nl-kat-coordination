@@ -70,12 +70,24 @@ def get_runtime_manager(
 
 @click.command()
 @click.argument("queue", type=click.Choice([q.value for q in WorkerManager.Queue]))
-@click.option("-i", "--image", type=list[str] | None, default=None, help="A list of OCI images to filter on.")
-@click.option("-p", "--plugins", type=list[str] | None, default=None, help="A list of plugin ids to filter on.")
+@click.option("-i", "--images", type=str, default=None, multiple=True, help="A list of OCI images to filter on.")
+@click.option("-p", "--plugins", type=str, default=None, multiple=True, help="A list of plugin ids to filter on.")
 @click.option("--log-level", type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"]), help="Log level", default="INFO")
-def cli(queue: str, images: list[str] | None, plugins: list[str] | None, log_level: str) -> None:
+def cli(queue: str, images: tuple[str] | None, plugins: tuple[str] | None, log_level: str) -> None:
     logger.setLevel(log_level)
     logger.info("Starting runtime for %s [image_filter=%s, plugin_filter=%s]", queue, images, plugins)
+
+    if not plugins:
+        env_plugins = settings.plugins
+        plugins = env_plugins.split(",") if env_plugins else None
+    else:
+        plugins = list(plugins)
+
+    if not images:
+        env_images = settings.images
+        images = env_images.split(",") if env_images else None
+    else:
+        images = list(images)
 
     runtime = get_runtime_manager(settings, WorkerManager.Queue(queue), images, plugins)
 
@@ -83,8 +95,8 @@ def cli(queue: str, images: list[str] | None, plugins: list[str] | None, log_lev
         import boefjes.api
 
         boefjes.api.run()
-
-    runtime.run(WorkerManager.Queue(queue))
+    else:
+        runtime.run(WorkerManager.Queue(queue))
 
 
 if __name__ == "__main__":

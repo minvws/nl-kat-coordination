@@ -48,7 +48,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         if not filters:
             filters = {"filters": []}
         if self.oci_images:
-            filters = {"filters": [{"column": "data", "field": "oci_image", "operator": "in", "value": self.oci_images}]}
+            filters["filters"].append({"column": "data", "field": "oci_image", "operator": "in", "value": self.oci_images})
         if self.plugins:
             filters["filters"].append({"column": "data", "field": "boefje__id", "operator": "in", "value": self.plugins})
 
