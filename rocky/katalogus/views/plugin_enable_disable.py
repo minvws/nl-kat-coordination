@@ -1,6 +1,6 @@
 import structlog
 from django.contrib import messages
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
@@ -21,7 +21,10 @@ class PluginEnableDisableView(SinglePluginView):
                 messages.WARNING,
                 _("{} '{}' disabled.").format(self.plugin.type.title(), self.plugin.name),
             )
-            return HttpResponseRedirect(request.POST.get("current_url"))
+            redirecturl = request.POST.get("current_url")
+            if redirecturl.startswith("/"): # we want to stay on the same host.
+                return HttpResponseRedirect(redirecturl)
+            return HttpResponseForbidden()
 
         if self.plugin.can_scan(self.organization_member):
             self.katalogus_client.enable_plugin(self.plugin)
