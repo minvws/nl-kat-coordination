@@ -51,7 +51,7 @@ class Job(BaseModel):
     ended_at: AwareDatetime
 
     def __hash__(self) -> int:
-        return hash(self.id)
+        return self.id.int
 
 
 class Boefje(BaseModel):
