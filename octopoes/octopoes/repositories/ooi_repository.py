@@ -825,11 +825,11 @@ class XTDBOOIRepository(OOIRepository):
             query = query.where(ReportRecipe, recipe_id=str(recipe_id))
             query = query.where(Report, report_recipe=ReportRecipe)
 
-        count = 0
-
         if not ignore_count:
             count_results = self.query(query.count(), valid_time)
-            count = 0 if not count_results else count_results[0]  # type: ignore
+            count = 0 if not count_results else count_results[0]
+        else:
+            count = 0
 
         query = query.pull(Report, fields="[* {:Report/input_oois [*]}]").order_by(date, ascending=False)
 
