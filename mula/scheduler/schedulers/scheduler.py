@@ -246,7 +246,8 @@ class Scheduler(abc.ABC):
         self.last_activity = datetime.now(timezone.utc)
 
         # We differentiate between the scheduler configuration if we should
-        # create a schedule for the item, and the item configuration if it
+        # create a schedule for the item, and or if it was specifically
+        # specified for the item to create a schedule.
         scheduler_create_schedule = self.create_schedule
         if not scheduler_create_schedule:
             self.logger.debug(

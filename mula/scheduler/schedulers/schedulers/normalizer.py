@@ -227,8 +227,6 @@ class NormalizerScheduler(Scheduler):
         Returns:
             True if the task is still running, False otherwise.
         """
-        task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
-
         # Is task still running according to the datastore?
         if task_db is not None and task_db.status not in [models.TaskStatus.COMPLETED, models.TaskStatus.FAILED]:
             self.logger.debug(
