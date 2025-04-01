@@ -40,9 +40,8 @@
                         </thead>
                         <tbody>
                             {% for task in task_list %}
-                                <tr data-task-id="{{ task.id }}" data-task-type="{{ task.type }}">
-                                    {% if not organization %}data-organization-code="{{ task.data.raw_data.boefje_meta.organization }}"{% endif %}
-                                    >
+                                <tr data-task-id="{{ task.id }}" data-task-type="{{ task.type }}"
+                                    {% if not organization %}data-organization-code="{{ task.data.raw_data.boefje_meta.organization }}"{% endif %}>
                                     {% if not organization %}
                                         <td>
                                             <a href="{% url "organization_crisis_room" task.data.raw_data.boefje_meta.organization %}">{{ task.data.raw_data.boefje_meta.organization }}</a>
