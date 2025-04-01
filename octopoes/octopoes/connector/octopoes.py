@@ -29,6 +29,8 @@ from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
 from octopoes.types import DECLARATION_CREATED, OBJECT_DELETED, OBSERVATION_CREATED, ORIGIN_DELETED
 
+HydratedReportTypeAdapter = TypeAdapter(dict[UUID, HydratedReport])
+
 
 class OctopoesAPIConnector:
     """
@@ -313,7 +315,7 @@ class OctopoesAPIConnector:
         """
         res = self.session.post("/reports", json=reports_filters, params={"valid_time": str(valid_time)})
 
-        return TypeAdapter(dict[UUID, HydratedReport]).validate_json(res.content)
+        return HydratedReportTypeAdapter.validate_json(res.content)
 
     def get_report(self, report_id: str, valid_time: datetime) -> HydratedReport:
         params = {"valid_time": str(valid_time)}

@@ -26,24 +26,23 @@ def list_reports(
 ) -> dict[uuid.UUID, HydratedReport]:
     """
     An efficient endpoint for getting reports across organizations
-
-    The reason for creating the event_manager do this in the loop is the '_try_connect()' call in the __init__ possibly
-    slowing this down, while this API was introduced to improve performance. Simply reusing it for all clients works
-    because the event manager is only used in callbacks triggered on a `commit()`, while these queries are read-only and
-    hence don't need a `commit()` as no events would be triggered. (A cleaner solution would perhaps be to extract an
-    interface and pass a new NullManager.)
-
-    The xtdb_http_client is also created outside the loop and the `_client` property changed inside the loop instead,
-    to reuse the httpx Session for all requests.
     """
 
+    # The reason for creating the event_manager do this in the loop is the '_try_connect()' call in the __init__
+    # possibly slowing this down, while this API was introduced to improve performance. Simply reusing it for all
+    # clients works because the event manager is only used in callbacks triggered on a `commit()`, while these queries
+    # are read-only and hence don't need a `commit()` as no events would be triggered. (A cleaner solution would perhaps
+    #  be to extract an interface and pass a new NullManager.)
     event_manager = EventManager("null", str(settings_.queue_uri), celery_app, QUEUE_NAME_OCTOPOES)
+
+    # The xtdb_http_client is also created outside the loop and the `_client` property changed inside the loop instead,
+    # to reuse the httpx Session for all requests.
     xtdb_http_client = get_xtdb_client(str(settings_.xtdb_uri), "")
 
     reports = {}
 
     for client, recipe_id in reports_filters:
-        xtdb_http_client._client = client
+        xtdb_http_client.client = client
         ooi_repository = XTDBOOIRepository(event_manager, XTDBSession(xtdb_http_client))
 
         for report in ooi_repository.list_reports(valid_time, 0, 1, recipe_id, ignore_count=True).items:
