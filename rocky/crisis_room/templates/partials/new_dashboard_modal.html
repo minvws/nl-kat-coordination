@@ -5,20 +5,14 @@
 {% translate "Add dashboard" %}
 {% endfill %}
 {% fill "content" %}
-<form id="new-dashboard-form"
-      class="horizontal-view"
-      action=""
-      method="post">
-    <p class="de-emphasized">{% translate "Name" %}</p>
+<form id="new-dashboard-form" method="post">
     {% csrf_token %}
-    <input type="text" name="dashboard-name">
+    {% include "partials/form/fieldset.html" with fields=add_dashboard_form %}
+
 </form>
 {% endfill %}
 {% fill "footer_buttons" %}
-<input type="submit"
-       form="new-dashboard-form"
-       class="submit close-modal-button"
-       value="Save">
+<button type="submit" form="new-dashboard-form" class="submit">{% translate "Add to dashboard" %}</button>
 <button class="ghost close-modal-button">{% translate "Cancel" %}</button>
 {% endfill %}
 {% endcomponent %}
