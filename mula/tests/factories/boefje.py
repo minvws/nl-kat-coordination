@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from factory import Factory, Faker, LazyFunction, fuzzy
+
 from scheduler.models import Boefje, BoefjeMeta
 
 
@@ -12,9 +13,6 @@ class BoefjeFactory(Factory):
     id: str = Faker("uuid4")
     name: str = Faker("name")
     description: str = Faker("text")
-    scan_level: int = fuzzy.FuzzyInteger(0, 4)
-    consumes: list[str] = LazyFunction(lambda: [])
-    produces: list[str] = LazyFunction(lambda: [])
 
 
 class BoefjeMetaFactory(Factory):
