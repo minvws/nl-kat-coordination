@@ -586,3 +586,75 @@ def migrate_origins(
         session.add((OperationType.DELETE, origin.id, valid_time))
 
     session.commit()  # The save-delete order is important to avoid garbage collection of the results
+
+
+@router.get("/nibbles", tags=["nibbles"])
+def nibbles_list(octopoes: OctopoesService = Depends(octopoes_service)) -> list[str]:
+    return octopoes.nibbler.list_nibbles()
+
+
+@router.get("/nibbles/status", tags=["nibbles"])
+def nibbles_list_enabled(enabled: bool = True, octopoes: OctopoesService = Depends(octopoes_service)) -> list[str]:
+    return [nibble.id for nibble in octopoes.nibbler.nibbles.values() if nibble.enabled == enabled]
+
+
+@router.get("/nibbles/update", tags=["nibbles"])
+def nibbles_update(
+    valid_time: datetime = Depends(extract_valid_time), octopoes: OctopoesService = Depends(octopoes_service)
+) -> list[str]:
+    octopoes.nibbler.update_nibbles(valid_time)
+    return nibbles_list(octopoes)
+
+
+@router.get("/nibbles/disable", tags=["nibbles"])
+def nibbles_disable(octopoes: OctopoesService = Depends(octopoes_service)) -> list[str]:
+    if octopoes.nibbler.federated:
+        octopoes.nibbler.toggle_nibbles(list(octopoes.nibbler.nibbles.keys()), False, datetime.now())
+    octopoes.nibbler.disable()
+    return nibbles_list(octopoes)
+
+
+@router.get("/nibbles/available", tags=["nibbles"])
+def nibbles_available(octopoes: OctopoesService = Depends(octopoes_service)) -> list[str]:
+    return octopoes.nibbler.list_available_nibbles()
+
+
+@router.get("/nibbles/select", tags=["nibbles"])
+def nibbles_toggle(
+    state: bool, nibble_ids: list[str] = Query(), octopoes: OctopoesService = Depends(octopoes_service)
+) -> list[str]:
+    octopoes.nibbler.toggle_nibbles(nibble_ids, state, datetime.now())
+    return nibbles_list_enabled(octopoes)
+
+
+@router.get("/nibbles/checksum", tags=["nibbles"])
+def nibbles_checksum(octopoes: OctopoesService = Depends(octopoes_service)) -> dict[str, str | None]:
+    return {nibble.id: nibble._checksum for nibble in octopoes.nibbler.nibbles.values()}
+
+
+@router.get("/nibbles/federate", tags=["nibbles"])
+def nibbles_federate(octopoes: OctopoesService = Depends(octopoes_service)):
+    octopoes.nibbler.federated = True
+
+
+@router.get("/nibbles/register", tags=["nibbles"])
+def nibbles_register(octopoes: OctopoesService = Depends(octopoes_service)):
+    octopoes.nibbler.register(datetime.now())
+
+
+@router.get("/nibbles/retrieve", tags=["nibbles"])
+def nibble_retrieve(
+    nibble_ids: list[str] | None = Query(None),
+    valid_time: datetime = Depends(extract_valid_time),
+    octopoes: OctopoesService = Depends(octopoes_service),
+) -> dict[str, list[list[Any]]]:
+    return octopoes.nibbler.retrieve(nibble_ids, valid_time)
+
+
+@router.get("/nibbles/yields", tags=["nibbles"])
+def nibble_yields(
+    nibble_ids: list[str] | None = Query(None),
+    valid_time: datetime = Depends(extract_valid_time),
+    octopoes: OctopoesService = Depends(octopoes_service),
+) -> dict[str, dict[tuple[Reference | None, ...], list[Reference]]]:
+    return octopoes.nibbler.yields(nibble_ids, valid_time)
