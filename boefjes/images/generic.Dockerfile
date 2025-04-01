@@ -1,12 +1,12 @@
-FROM python:3.11-slim as base
+FROM openkat/boefje-base:latest
 
-WORKDIR /app
-RUN adduser --disabled-password --gecos '' nonroot
+ARG OCI_IMAGE=ghcr.io/minvws/openkat/generic-worker:latest
+ENV OCI_IMAGE=$OCI_IMAGE
 
 ENV PATH=/home/nonroot/.local/bin:${PATH}
+
 ENV OPENKAT_CACHE_PATH=/home/nonroot/openkat_cache
 RUN mkdir "$OPENKAT_CACHE_PATH" && chown nonroot: "$OPENKAT_CACHE_PATH"
-
 VOLUME /home/nonroot/openkat_cache
 
 COPY boefjes/plugins/kat_adr_finding_types boefjes/plugins/kat_adr_finding_types
@@ -38,33 +38,4 @@ COPY boefjes/plugins/kat_webpage_analysis boefjes/plugins/kat_webpage_analysis
 COPY boefjes/plugins/pdio_subfinder boefjes/plugins/pdio_subfinder
 
 RUN find ./boefjes -name 'requirements.txt' -execdir sh -c "cat {} && echo" \; | sort -u > /tmp/boefjes-requirements.txt
-
-RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip && pip install httpx && \
-    pip install -r /tmp/boefjes-requirements.txt
-
-USER nonroot
-
-
-FROM base as standalone
-
-ENTRYPOINT ["/usr/local/bin/python", "-m", "generic_oci_adapter"]
-COPY ./images/generic_oci_adapter.py .
-
-
-FROM base as worker
-
-ARG OCI_IMAGE
-ENV OCI_IMAGE=$OCI_IMAGE
-
-ENTRYPOINT ["python", "-m", "worker"]
-
-# TODO: move inside the worker module?
-RUN --mount=type=cache,target=/root/.cache pip install structlog
-RUN --mount=type=cache,target=/root/.cache pip install pydantic
-RUN --mount=type=cache,target=/root/.cache pip install jsonschema
-RUN --mount=type=cache,target=/root/.cache pip install croniter
-
-COPY ./boefjes/worker ./worker
-COPY ./boefjes/logging.json logging.json
-
-FROM standalone
+RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip && pip install -r /tmp/boefjes-requirements.txt

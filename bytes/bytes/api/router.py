@@ -244,8 +244,6 @@ def get_raw(
         limit=limit,
     )
 
-    logger.info("mime_types: %s", parsed_mime_types)
-
     return meta_repository.get_raw(query_filter)
 
 
@@ -272,8 +270,6 @@ def get_raws(
         limit=limit,
     )
 
-    logger.info("mime_types: %s", parsed_mime_types)
-
     raws = meta_repository.get_raws(query_filter)
 
     return BoefjeOutput(
@@ -299,8 +295,6 @@ def get_raw_count_per_mime_type(
         offset=None,
         limit=None,
     )
-
-    logger.info("mime_types: %s", parsed_mime_types)
 
     return cached_counts_per_mime_type(meta_repository, query_filter)
 

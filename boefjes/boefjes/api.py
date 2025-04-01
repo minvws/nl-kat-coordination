@@ -51,6 +51,11 @@ class BoefjeInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
+# Model for partial updates, only allowing a status update
+class TaskIn(BaseModel):
+    status: TaskStatus
+
+
 def get_scheduler_client(plugin_service=Depends(get_plugin_service)):
     return SchedulerAPIClient(plugin_service, str(settings.scheduler_api))
 
@@ -144,9 +149,9 @@ def push_item(
 
 @app.patch("/api/v0/scheduler/tasks/{task_id}", tags=["scheduler"])
 def patch_task(
-    task_id: uuid.UUID, status: TaskStatus, scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client)
+    task_id: uuid.UUID, task: TaskIn, scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client)
 ) -> None:
-    return scheduler_client.patch_task(task_id, status)
+    return scheduler_client.patch_task(task_id, task.status)
 
 
 @app.get("/api/v0/scheduler/tasks/{task_id}", response_model=Task, tags=["scheduler"])

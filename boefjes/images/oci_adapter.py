@@ -2,9 +2,9 @@ import os
 import sys
 import traceback
 from base64 import b64encode
+from importlib import import_module
 
 import httpx
-from main import run
 
 
 def main():
@@ -17,6 +17,15 @@ def main():
 
     try:
         os.environ.update(boefje_input["boefje_meta"]["environment"])
+
+        oci_arguments = boefje_input["boefje_meta"]["arguments"]["oci_arguments"]
+
+        if oci_arguments:
+            module_path, *args = oci_arguments
+            run = import_module(f"boefjes.plugins.{module_path}").run
+        else:
+            from main import run
+
         raws = run(boefje_input["boefje_meta"])
         out = {
             "status": "COMPLETED",

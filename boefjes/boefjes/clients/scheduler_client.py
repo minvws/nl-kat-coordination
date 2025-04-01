@@ -48,7 +48,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         if not filters:
             filters = {"filters": []}
         if self.oci_images:
-            filters["filters"].append({"column": "data", "field": "oci_image", "operator": "in", "value": self.oci_images})
+            filters["filters"].append({"column": "data", "field": "boefje__oci_image", "operator": "in", "value": self.oci_images})
         if self.plugins:
             filters["filters"].append({"column": "data", "field": "boefje__id", "operator": "in", "value": self.plugins})
 
@@ -95,7 +95,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         # The octopoes API connector is organization-specific, where the client is generic.
         octopoes_api_connector = get_octopoes_api_connector(boefje_meta.organization)
         input_ooi = boefje_meta.input_ooi
-        boefje_meta.arguments = {"oci_image": plugin.oci_images, "oci_arguments": plugin.oci_arguments}
+        boefje_meta.arguments = {"oci_image": plugin.oci_image, "oci_arguments": plugin.oci_arguments}
         boefje_meta.runnable_hash = plugin.runnable_hash
 
         if input_ooi:
