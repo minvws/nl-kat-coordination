@@ -68,4 +68,4 @@ autosectionlabel_prefix_document = True
 suppress_warnings = [
     f"autosectionlabel.installation-and-deployment/environment-settings/{document}"
     for document in ("boefjes", "bytes", "mula", "octopoes")
-]
+] + ["autosectionlabel.developer-documentation/octopoes-models"]

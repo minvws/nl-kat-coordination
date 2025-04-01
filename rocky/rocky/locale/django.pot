@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-01 07:11+0000\n"
+"POT-Creation-Date: 2025-04-01 12:56+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,8 +27,7 @@ msgstr ""
 msgid "Important dates"
 msgstr ""
 
-#: account/forms/account_setup.py
-#: crisis_room/templates/partials/new_dashboard_modal.html
+#: account/forms/account_setup.py crisis_room/forms.py
 #: katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_container_image.html
 #: reports/report_types/dns_report/report.html
@@ -636,8 +635,12 @@ msgstr ""
 msgid "Dashboard item size"
 msgstr ""
 
-#: crisis_room/forms.py reports/templates/partials/report_ooi_list.html
-msgid "Object name"
+#: crisis_room/forms.py
+msgid "Full width"
+msgstr ""
+
+#: crisis_room/forms.py
+msgid "Half width"
 msgstr ""
 
 #: crisis_room/models.py
@@ -869,6 +872,12 @@ msgstr ""
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
 msgid "These can be edited at any time once your dashboard item is added."
+msgstr ""
+
+#: crisis_room/templates/partials/new_dashboard_item_modal.html
+#: crisis_room/templates/partials/new_dashboard_modal.html
+#: rocky/templates/oois/ooi_list.html
+msgid "Add to dashboard"
 msgstr ""
 
 #: katalogus/client.py
@@ -1164,7 +1173,8 @@ msgstr ""
 #: reports/report_types/vulnerability_report/report.html
 #: reports/templates/partials/report_findings_table.html
 #: reports/templates/summary/report_asset_overview.html tools/forms/boefje.py
-#: tools/forms/finding_type.py rocky/templates/oois/ooi_detail.html
+#: tools/forms/finding_type.py rocky/templates/findings/finding_list.html
+#: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
 msgid "Description"
 msgstr ""
@@ -3439,6 +3449,7 @@ msgstr ""
 
 #: reports/report_types/multi_organization_report/recommendations.html
 #: reports/templates/partials/report_findings_table.html
+#: rocky/templates/findings/finding_list.html
 msgid "Recommendation"
 msgstr ""
 
@@ -3739,6 +3750,7 @@ msgstr ""
 
 #: reports/report_types/vulnerability_report/report.py
 #: reports/templates/partials/report_findings_table.html
+#: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_detail_origins_inference.html
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
@@ -3924,6 +3936,7 @@ msgid "Open in report"
 msgstr ""
 
 #: reports/templates/partials/report_findings_table.html
+#: rocky/templates/findings/finding_list.html
 msgid "Impact"
 msgstr ""
 
@@ -4006,8 +4019,13 @@ msgid "Report names:"
 msgstr ""
 
 #: reports/templates/partials/report_names_form.html
+#: rocky/templates/forms/widgets/checkbox_group_table.html
+#: rocky/templates/oois/ooi_detail_add_related_object.html
 #: rocky/templates/partials/form/field_input.html
-msgid "(Required)"
+#: rocky/templates/partials/form/field_input_checkbox.html
+#: rocky/templates/partials/form/field_input_multiselect.html
+#: rocky/templates/partials/form/field_input_radio.html
+msgid "Required"
 msgstr ""
 
 #: reports/templates/partials/report_names_form.html
@@ -4119,6 +4137,10 @@ msgstr[1] ""
 #: rocky/templates/header.html rocky/views/ooi_add.py rocky/views/ooi_list.py
 #: rocky/views/ooi_view.py rocky/views/upload_csv.py rocky/views/upload_raw.py
 msgid "Objects"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "Object name"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
@@ -4234,7 +4256,7 @@ msgid "There are no optional plugins."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-msgid "Enable plugins and continue"
+msgid "Enable selected plugins and continue"
 msgstr ""
 
 #: reports/templates/partials/report_severity_totals_table.html
@@ -5659,6 +5681,10 @@ msgid "Findings table "
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
+msgid "Location"
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
@@ -5743,10 +5769,6 @@ msgstr ""
 
 #: rocky/templates/footer.html rocky/views/privacy_statement.py
 msgid "Privacy Statement"
-msgstr ""
-
-#: rocky/templates/forms/widgets/checkbox_group_table.html
-msgid "this field is required"
 msgstr ""
 
 #: rocky/templates/graph-d3.html
@@ -6168,10 +6190,6 @@ msgid "Currently no findings have been identified for OOI"
 msgstr ""
 
 #: rocky/templates/oois/ooi_list.html
-msgid "Add to dashboard"
-msgstr ""
-
-#: rocky/templates/oois/ooi_list.html
 msgid "Delete object(s)"
 msgstr ""
 
@@ -6508,11 +6526,6 @@ msgstr ""
 
 #: rocky/templates/partials/form/field_input.html
 msgid "Forgot password"
-msgstr ""
-
-#: rocky/templates/partials/form/field_input_checkbox.html
-#: rocky/templates/partials/form/field_input_radio.html
-msgid "This field is required"
 msgstr ""
 
 #: rocky/templates/partials/form/field_input_errors.html
