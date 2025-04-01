@@ -413,7 +413,7 @@ class Scheduler(abc.ABC):
         if self.queue.maxsize == 0:
             return True
 
-        if self.queue.maxsize  <= self.queue.qsize():
+        if self.queue.maxsize <= self.queue.qsize():
             return False
 
         return True
