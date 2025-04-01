@@ -24,6 +24,7 @@ class ReportRecipeSerializer(serializers.Serializer):
     report_name_format = serializers.CharField()
 
     input_recipe = serializers.DictField()
+    report_type = serializers.CharField()
     asset_report_types = serializers.ListField(child=serializers.CharField())
 
     cron_expression = serializers.CharField()
