@@ -4,6 +4,7 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from katalogus.views.mixins import SinglePluginView
 
@@ -22,7 +23,7 @@ class PluginEnableDisableView(SinglePluginView):
                 _("{} '{}' disabled.").format(self.plugin.type.title(), self.plugin.name),
             )
             redirecturl = request.POST.get("current_url")
-            if redirecturl.startswith("/"): # we want to stay on the same host.
+            if url_has_allowed_host_and_scheme(redirecturl, allowed_hosts=None):
                 return HttpResponseRedirect(redirecturl)
             return HttpResponseForbidden()
 
