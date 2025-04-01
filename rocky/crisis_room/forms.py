@@ -3,6 +3,10 @@ from django.utils.translation import gettext_lazy as _
 from tools.forms.base import BaseRockyForm
 
 
+class AddDashboardForm(BaseRockyForm):
+    dashboard_name = forms.CharField(label=_("Name"), required=True)
+
+
 class SelectDashboardForm(BaseRockyForm):
     dashboard = forms.ChoiceField(required=True, widget=forms.Select, choices=[])
 

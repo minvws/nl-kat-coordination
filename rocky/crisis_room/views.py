@@ -20,6 +20,7 @@ from reports.report_types.findings_report.report import SEVERITY_OPTIONS
 from tools.forms.ooi_form import _EXCLUDED_OOI_TYPES
 from tools.models import Organization, OrganizationMember
 
+from crisis_room.forms import AddDashboardForm
 from crisis_room.management.commands.dashboards import (
     FINDINGS_DASHBOARD_NAME,
     get_or_create_dashboard,
@@ -264,10 +265,12 @@ class OrganizationsCrisisRoomView(TemplateView):
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         """Create a new dashboard tab."""
-        dashboard_name = request.POST.get("dashboard-name")
+        dashboard_name = request.POST.get("dashboard_name")
+        query_params = ""
         try:
             dashboard, created = get_or_create_dashboard(dashboard_name, self.organization)
             if created:
+                query_params = "?" + urlencode({"dashboard": dashboard.name})
                 messages.success(request, f"Dashboard '{dashboard.name}' has been created.")
             else:
                 messages.error(request, f"Dashboard with name '{dashboard.name}' already exists.")
@@ -288,6 +291,7 @@ class OrganizationsCrisisRoomView(TemplateView):
         context["dashboard_data"] = self.get_dashboard_data
         context["dashboard"] = self.get_dashboard
         context["organization"] = self.organization
+        context["add_dashboard_form"] = AddDashboardForm
         return context
 
 
@@ -323,18 +327,20 @@ class AddDashboardItemView(OrganizationView, TemplateView):
             else:
                 messages.warning(
                     request,
-                    "The dashboard item already exists on the selected dashboard. "
+                    "The dashboard item that you were trying to add already exists on the selected dashboard."
                     "If it was hidden on the dashboard, it is now visible.",
                 )
+
+            query_params = urlencode({"dashboard": dashboard_name})
+            return redirect(
+                reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
+                + "?"
+                + query_params
+            )
         except IntegrityError:
             messages.error(
                 request,
                 "Dashboard item could not be created, because this dashboard has reached the maximum of 16 items.",
             )
 
-        query_params = urlencode({"dashboard": dashboard_name})
-        return redirect(
-            reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
-            + "?"
-            + query_params
-        )
+        return redirect(reverse("ooi_list", kwargs={"organization_code": self.organization.code}))
