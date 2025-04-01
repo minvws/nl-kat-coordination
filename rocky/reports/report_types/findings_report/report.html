@@ -27,50 +27,50 @@
                 {% for organization, organization_dashboard in organizations_dashboards.items %}
                     {% for report in organization_dashboard.values %}
                         {% with findings=report.report_data.findings %}
-                            {% if findings %}
-                                <tr>
-                                    <td>
-                                        <a href="{% url "organization_crisis_room" organization.code %}">{{ organization.name }}</a>
-                                    </td>
-                                    <td>
-                                        {% if findings.summary.total_finding_types %}
-                                            {{ findings.summary.total_finding_types }}
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if findings.summary.total_occurrences %}
-                                            {{ findings.summary.total_occurrences }}
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if report.report_data.highest_risk_level %}
-                                            <span class="{{ report.report_data.highest_risk_level }}">{{ report.report_data.highest_risk_level|capfirst }}</span>
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if findings.summary.total_by_severity_per_finding_type %}
-                                            {{ findings.summary.total_by_severity_per_finding_type.critical }}
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </td>
-                                    <td class="actions">
-                                        <button class="expando-button"
-                                                data-icon-open-class="icon ti-chevron-down"
-                                                data-icon-close-class="icon ti-chevron-up"
-                                                data-close-label="{% translate "Close details" %}">
-                                            {% translate "Open details" %}
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr class="expando-row">
-                                    <td colspan="6">
+                            <tr>
+                                <td>
+                                    <a href="{% url "organization_crisis_room" organization.code %}">{{ organization.name }}</a>
+                                </td>
+                                <td>
+                                    {% if findings.summary.total_finding_types %}
+                                        {{ findings.summary.total_finding_types }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if findings.summary.total_occurrences %}
+                                        {{ findings.summary.total_occurrences }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if report.report_data.highest_risk_level %}
+                                        <span class="{{ report.report_data.highest_risk_level }}">{{ report.report_data.highest_risk_level|capfirst }}</span>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if findings.summary.total_by_severity_per_finding_type %}
+                                        {{ findings.summary.total_by_severity_per_finding_type.critical }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td class="actions">
+                                    <button class="expando-button"
+                                            data-icon-open-class="icon ti-chevron-down"
+                                            data-icon-close-class="icon ti-chevron-up"
+                                            data-close-label="{% translate "Close details" %}">
+                                        {% translate "Open details" %}
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="expando-row">
+                                <td colspan="6">
+                                    {% if findings %}
                                         <div>
                                             <h5>{% translate "Findings overview" %}</h5>
                                             <p>
@@ -95,21 +95,23 @@
                                         </div>
                                         {% include "partials/report_findings_table.html" with finding_types=findings.finding_types %}
 
-                                        <div class="horizontal-view toolbar">
-                                            <div class="button-container">
-                                                <a class="button"
-                                                   href="{% url "view_report" organization.code %}?report_id={{ report.report.primary_key }}#findings-table">
-                                                    {% translate "View findings report" %}
-                                                </a>
-                                                <a class="button ghost"
-                                                   href="{% ooi_url "ooi_edit" report.report.report_recipe organization.code %}">
-                                                    <span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit report recipe" %}
-                                                </a>
-                                            </div>
+                                    {% else %}
+                                        <p>{% translate "No findings have been identified. Check report for more details." %}</p>
+                                    {% endif %}
+                                    <div class="horizontal-view toolbar">
+                                        <div class="button-container">
+                                            <a class="button"
+                                               href="{% url "view_report" organization.code %}?report_id={{ report.report.primary_key }}#findings-table">
+                                                {% translate "View findings report" %}
+                                            </a>
+                                            <a class="button ghost"
+                                               href="{% ooi_url "ooi_edit" report.report.report_recipe organization.code %}">
+                                                <span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit report recipe" %}
+                                            </a>
                                         </div>
-                                    </td>
-                                </tr>
-                            {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
                         {% endwith %}
                     {% endfor %}
                 {% endfor %}

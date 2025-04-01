@@ -740,10 +740,9 @@ msgstr ""
 #: crisis_room/templates/crisis_room_findings.html
 msgid ""
 "\n"
-"                There are no organizations yet. After creating an "
-"organization,\n"
-"                the identified findings will be shown here.\n"
-"            "
+"            There are no organizations yet. After creating an organization,\n"
+"            the identified findings will be shown here.\n"
+"        "
 msgstr ""
 
 #: crisis_room/templates/crisis_room_header.html
@@ -3249,6 +3248,10 @@ msgid ""
 "                                                A table with all the "
 "identified findings can be found in the Findings Report.\n"
 "                                            "
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+msgid "No findings have been identified. Check report for more details."
 msgstr ""
 
 #: reports/report_types/findings_report/report.html

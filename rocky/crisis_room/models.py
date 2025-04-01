@@ -18,7 +18,7 @@ class Dashboard(models.Model):
 
 
 class DashboardData(models.Model):
-    dashboard = models.ForeignKey(Dashboard, on_delete=models.SET_NULL, null=True)
+    dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE, null=True)
     recipe = models.CharField(blank=True, max_length=126, null=True)
     query_from = models.CharField(blank=True, max_length=32, null=True)
     query = models.CharField(blank=True, null=True)
@@ -45,9 +45,10 @@ class DashboardData(models.Model):
         unique_together = [["dashboard", "position"]]
 
     def __str__(self) -> str:
-        if self.dashboard:
+        try:
             return str(self.dashboard)
-        return super().__str__()
+        except Dashboard.DoesNotExist:
+            return super().__str__()
 
     def save(self, *args, **kwargs):
         if not self.position:
