@@ -48,7 +48,7 @@ class BoefjeHandler(Handler):
         try:
             logger.debug("Running local boefje plugin")
 
-            boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)  # todo: by image?
+            boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)  # TODO: by image?
 
             if not isinstance(boefje_resource, BoefjeResource):
                 raise JobRuntimeError(f"Not a boefje: {boefje_meta.boefje.id}")
@@ -59,7 +59,7 @@ class BoefjeHandler(Handler):
             with TemporaryEnvironment() as temporary_environment:
                 temporary_environment.update(boefje_meta.environment or {})
                 try:
-                    boefje_results = boefje_resource.module.run(boefje_meta.model_dump())
+                    boefje_results = boefje_resource.module.run(boefje_meta.model_dump())  # TODO: change boefje signature
                 except BaseException as e:  # noqa
                     raise JobRuntimeError("Boefje failed") from e
         except:

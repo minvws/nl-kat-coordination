@@ -20,7 +20,7 @@ from boefjes.storage.interfaces import (
     UniqueViolation,
 )
 from boefjes.worker.models import Boefje, FilterParameters, Normalizer, PaginationParameters, PluginType
-from boefjes.worker.repository import LocalPluginRepository, get_local_repository
+from boefjes.worker.repository import LocalPluginRepository, get_local_repository, BoefjeResource, NormalizerResource
 
 logger = structlog.get_logger(__name__)
 
@@ -112,7 +112,7 @@ class PluginService:
             try:
                 plugin = self.local_repo.by_name(boefje.name)
 
-                if plugin.type == "boefje":
+                if isinstance(plugin, BoefjeResource):
                     raise DuplicatePlugin("name")
                 else:
                     try:
@@ -135,7 +135,7 @@ class PluginService:
             try:
                 plugin = self.local_repo.by_name(normalizer.name)
 
-                if plugin.types == "normalizer":
+                if isinstance(plugin, NormalizerResource):
                     raise DuplicatePlugin(field="name")
                 else:
                     self.plugin_storage.create_normalizer(normalizer)
@@ -153,9 +153,9 @@ class PluginService:
             except KeyError:
                 raise e
 
-            if plugin.type != "boefje":
+            if not isinstance(plugin, BoefjeResource):
                 raise e
-            self.plugin_storage.create_boefje(plugin)
+            self.plugin_storage.create_boefje(plugin.boefje)
 
     def _put_normalizer(self, normalizer_id: str) -> None:
         """Check existence of a normalizer, and insert a database entry if it concerns a local normalizer"""
@@ -168,9 +168,9 @@ class PluginService:
             except KeyError:
                 raise
 
-            if plugin.type != "normalizer":
+            if not isinstance(plugin, NormalizerResource):
                 raise
-            self.plugin_storage.create_normalizer(plugin)
+            self.plugin_storage.create_normalizer(plugin.normalizer)
 
     def delete_settings(self, organisation_id: str, plugin_id: str):
         self.config_storage.delete(organisation_id, plugin_id)
