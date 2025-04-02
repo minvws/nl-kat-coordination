@@ -50,6 +50,7 @@ def test_url_classification_nibble(xtdb_octopoes_service: OctopoesService, event
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.nibbler.scan_profile_repository,
         xtdb_octopoes_service.nibbler.nibble_repository,
     )
     nibble = xtdb_octopoes_service.nibbler.nibbles["url_classification"]
@@ -106,6 +107,7 @@ def test_find_network_url_nibble(xtdb_octopoes_service: OctopoesService, event_m
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.nibbler.scan_profile_repository,
         xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()
@@ -160,6 +162,7 @@ def test_max_length_config_nibble(xtdb_octopoes_service: OctopoesService, event_
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.nibbler.scan_profile_repository,
         xtdb_octopoes_service.nibbler.nibble_repository,
     )
     nibble = xtdb_octopoes_service.nibbler.nibbles["max_url_length_config"]
@@ -289,6 +292,7 @@ def test_parent_type_in_nibble_signature(
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.nibbler.scan_profile_repository,
         xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()

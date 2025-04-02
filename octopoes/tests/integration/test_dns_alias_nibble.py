@@ -23,6 +23,7 @@ def test_dns_alias_nibble_one_of_each_parameter(
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.nibbler.scan_profile_repository,
         xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()
@@ -67,6 +68,7 @@ def test_dns_alias_nibble_no_dns_one_resolved_hostname(
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.nibbler.scan_profile_repository,
         xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()
@@ -100,6 +102,7 @@ def test_dns_alias_nibble_one_dns_no_resolved_hostname(
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.nibbler.scan_profile_repository,
         xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()
@@ -135,6 +138,7 @@ def test_dns_alias_nibble_many_dns_one_resolved_hostname(
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.nibbler.scan_profile_repository,
         xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()
