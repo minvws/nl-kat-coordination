@@ -109,7 +109,7 @@ class PriorityQueue(abc.ABC):
             The highest priority items from the queue.
         """
         items = self.pq_store.pop(self.pq_id, limit, filters)
-        if items is None:
+        if not items:
             return []
 
         self.pq_store.bulk_update_status(self.pq_id, [item.id for item in items], models.TaskStatus.DISPATCHED)

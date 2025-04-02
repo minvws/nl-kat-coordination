@@ -26,6 +26,7 @@ class Boefje(BaseModel):
     id: str
     name: str | None = Field(default=None)
     version: str | None = Field(default=None)
+    oci_image: str | None = Field(default=None)
 
 
 class BoefjeMeta(BaseModel):
@@ -144,6 +145,14 @@ class Task(BaseModel):
             return self.data.organisation_id
 
         raise ValueError("No organization found related to task")
+
+
+class TaskPush(BaseModel):
+    id: uuid.UUID | None = None
+    scheduler_id: str | None = None
+    organisation: str
+    priority: int | None = None
+    data: dict
 
 
 class ScheduleRequest(BaseModel):
@@ -294,7 +303,7 @@ class SchedulerClient:
         except ConnectError:
             raise SchedulerConnectError()
 
-    def post_schedule_search(self, filters: dict[str, list[dict[str, str]]]) -> PaginatedSchedulesResponse:
+    def post_schedule_search(self, filters: dict[str, list[dict[str, Any]]]) -> PaginatedSchedulesResponse:
         try:
             res = self._client.post("/schedules/search", json=filters)
             res.raise_for_status()
