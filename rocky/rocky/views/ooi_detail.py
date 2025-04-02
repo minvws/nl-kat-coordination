@@ -1,6 +1,6 @@
 import json
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
@@ -98,6 +98,12 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
             and boefje.scan_level.value > self.ooi.scan_profile.level
         ]
 
+    def is_ooi_past_due(self) -> bool:
+        """Is past due by minute and not seconds and microseconds."""
+        observed_at = self.observed_at.replace(second=0, microsecond=0)
+        now = datetime.now(tz=timezone.utc).replace(second=0, microsecond=0)
+        return observed_at < now
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -139,7 +145,8 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
         context["ooi_types"] = self.get_ooi_types_input_values(self.ooi)
 
         context["is_question"] = isinstance(self.ooi, Question)
-        context["ooi_past_due"] = context["observed_at"].date() < datetime.utcnow().date()
+
+        context["ooi_past_due"] = self.is_ooi_past_due()
         context["related"] = self.get_related_objects(context["observed_at"])
 
         context["count_findings_per_severity"] = dict(self.count_findings_per_severity())

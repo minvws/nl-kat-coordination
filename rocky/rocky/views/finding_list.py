@@ -99,7 +99,9 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["observed_at_form"] = self.get_connector_form()
-        context["observed_at"] = self.observed_at
+        context["observed_at"] = self.observed_at.strftime("%Y-%m-%d %H:%M")
+        context["observed_at_human_readable"] = self.observed_at.strftime("%B %d, %Y, %H:%M (%Z)")
+
         context["severity_filter"] = FindingSeverityMultiSelectForm({"severity": list(self.severities)})
         context["muted_findings_filter"] = MutedFindingSelectionForm({"muted_findings": self.muted_findings})
         context["finding_search_form"] = FindingSearchForm(self.request.GET)

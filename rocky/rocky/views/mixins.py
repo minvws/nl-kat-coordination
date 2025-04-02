@@ -20,7 +20,7 @@ from tools.forms.base import ObservedAtForm
 from tools.forms.settings import DEPTH_DEFAULT, DEPTH_MAX
 from tools.models import Organization
 from tools.ooi_helpers import get_knowledge_base_data_for_ooi_store
-from tools.view_helpers import convert_date_to_datetime, get_ooi_url
+from tools.view_helpers import get_ooi_url
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
@@ -82,26 +82,17 @@ class ObservedAtMixin:
 
     @cached_property
     def observed_at(self) -> datetime:
-        observed_at = self.request.GET.get("observed_at", None)
-        if not observed_at:
-            return datetime.now(timezone.utc)
+        now = datetime.now(timezone.utc)
+        observed_at_string = self.request.GET.get("observed_at", now.isoformat())
 
         try:
-            datetime_format = "%Y-%m-%d"
-            date_time = convert_date_to_datetime(datetime.strptime(observed_at, datetime_format))
-            if date_time.date() > datetime.now(timezone.utc).date():
-                messages.warning(self.request, _("The selected date is in the future."))
-            return date_time
-        except ValueError:
-            try:
-                ret = datetime.fromisoformat(observed_at)
-                if not ret.tzinfo:
-                    ret = ret.replace(tzinfo=timezone.utc)
-
-                return ret
-            except ValueError:
-                messages.error(self.request, _("Can not parse date, falling back to show current date."))
-                return datetime.now(timezone.utc)
+            observed_at = datetime.fromisoformat(observed_at_string).replace(tzinfo=timezone.utc)
+            if observed_at > now:
+                messages.warning(self.request, _("The selected date and time is in the future."))
+            return observed_at
+        except (TypeError, ValueError):
+            messages.error(self.request, _("Can not parse date and time, falling back to show current date and time."))
+        return now
 
 
 class OctopoesView(ObservedAtMixin, OrganizationView):
