@@ -1309,9 +1309,9 @@ wrapt==1.16.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:f6b2d0c6703c988d334f297aa5df18c45e97b0af3679bb75059e0e0bd8b1069d \
     --hash=sha256:f8212564d49c50eb4565e502814f694e240c55551a5f1bc841d4fcaabb0a9b8a \
     --hash=sha256:ffa565331890b90056c01db69c0fe634a776f8019c143a5ae265f9c6bc4bd6d4
-xlsxwriter==3.2.0 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:9977d0c661a72866a61f9f7a809e25ebbb0fb7036baa3b9fe74afcfca6b3cb8c \
-    --hash=sha256:ecfd5405b3e0e228219bcaf24c2ca0915e012ca9464a14048021d21a995d490e
+xlsxwriter==3.2.2 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:272ce861e7fa5e82a4a6ebc24511f2cb952fde3461f6c6e1a1e81d3272db1471 \
+    --hash=sha256:befc7f92578a85fed261639fb6cde1fd51b79c5e854040847dde59d4317077dc
 zipp==3.20.2 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:a817ac80d6cf4b23bf7f2828b7cabf326f15a001bea8b1f9b49631780ba28350 \
     --hash=sha256:bc9eb26f4506fda01b81bcde0ca78103b6e62f991b381fec825435c836edbc29
