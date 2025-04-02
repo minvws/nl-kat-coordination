@@ -2,6 +2,8 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from tools.forms.base import BaseRockyForm
 
+from crisis_room.models import Dashboard
+
 
 class AddDashboardForm(BaseRockyForm):
     dashboard_name = forms.CharField(label=_("Name"), required=True)
@@ -10,15 +12,29 @@ class AddDashboardForm(BaseRockyForm):
 class SelectDashboardForm(BaseRockyForm):
     dashboard = forms.ChoiceField(required=True, widget=forms.Select, choices=[])
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["dashboard"].choices = self.get_dashboard_selection()
+
+    def get_dashboard_selection(self):
+        return [(dashboard.name, dashboard.name) for dashboard in Dashboard.objects.all()]
+
 
 class ObjectListSettingsForm(BaseRockyForm):
-    report_name = forms.CharField(label=_("Title on dashboard"), required=True)
+    title = forms.CharField(label=_("Title on dashboard"), required=True)
 
-    sorting_by = forms.ChoiceField(
+    order_by = forms.ChoiceField(
         label=_("List sorting by"),
         required=True,
         widget=forms.Select,
-        choices=([("type", _("Type")), ("clearance_level", _("Clearance level"))]),
+        choices=(
+            [
+                ("object_type-asc", _("Type (A-Z)")),
+                ("object_type-desc", _("Type (Z-A)")),
+                ("scan_level-asc", _("Clearance level (High-Low)")),
+                ("scan_level-desc", _("Clearance level (Low-High)")),
+            ]
+        ),
     )
 
     limit = forms.ChoiceField(
@@ -30,13 +46,13 @@ class ObjectListSettingsForm(BaseRockyForm):
     )
 
     columns = forms.MultipleChoiceField(
-        label=_("Show table columns"), required=True, widget=forms.CheckboxSelectMultiple
+        label=_("Show table columns"), required=True, widget=forms.CheckboxSelectMultiple, choices=[("test", "Test")]
     )
 
     size = forms.ChoiceField(
         label=_("Dashboard item size"),
         required=True,
-        widget=forms.RadioSelect(attrs={"class": "submit-on-click"}),
-        choices=(("name", _("Object name")), ("type", _("Type")), ("clearance_level", _("Clearance level"))),
-        initial="type",
+        widget=forms.RadioSelect(),
+        choices=(("1", _("Full width")), ("2", _("Half width"))),
+        initial="1",
     )

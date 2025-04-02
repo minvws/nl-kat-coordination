@@ -2,6 +2,7 @@ import json
 import logging
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 from uuid import uuid4
 
 from crisis_room.models import Dashboard, DashboardData
@@ -49,7 +50,12 @@ def get_or_create_dashboard(dashboard_name: str, organization: Organization) -> 
 
 
 def get_or_create_dashboard_data(
-    dashboard_name: str, organization: Organization, recipe_id: str, query_from: str, query: dict, template: str
+    dashboard_name: str,
+    organization: Organization,
+    recipe_id: str,
+    query_from: str,
+    query: dict[str, Any] | None,
+    template: str,
 ) -> tuple[DashboardData | None, bool]:
     dashboard, _ = get_or_create_dashboard(dashboard_name, organization)
 
