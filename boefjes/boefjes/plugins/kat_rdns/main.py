@@ -1,8 +1,8 @@
+from os import getenv
+
 import dns
 from dns.edns import EDEOption
 from dns.resolver import Answer
-
-from boefjes.config import settings
 
 
 def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
@@ -13,7 +13,7 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     # https://dnspython.readthedocs.io/en/stable/_modules/dns/edns.html
     # enable EDE to get the ServFail return values if the server supports it # codespell-ignore
     resolver.use_edns(options=[EDEOption(15)])
-    resolver.nameservers = [str(settings.remote_ns)]
+    resolver.nameservers = [getenv("REMOTE_NS", "1.1.1.1")]
     reverse_ip = dns.reversename.from_address(ip)
     try:
         answer: Answer = resolver.resolve(reverse_ip, "PTR")

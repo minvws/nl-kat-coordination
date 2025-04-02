@@ -26,9 +26,7 @@ COPY --chown=nonroot boefjes/plugins/kat_fierce boefjes/plugins/kat_fierce
 COPY --chown=nonroot boefjes/plugins/kat_green_hosting boefjes/plugins/kat_green_hosting
 COPY --chown=nonroot boefjes/plugins/kat_kat_finding_types boefjes/plugins/kat_kat_finding_types
 COPY --chown=nonroot boefjes/plugins/kat_leakix boefjes/plugins/kat_leakix
-
-# TODO: fix: uses config
-#COPY --chown=nonroot boefjes/plugins/kat_rdns boefjes/plugins/kat_rdns
+COPY --chown=nonroot boefjes/plugins/kat_rdns boefjes/plugins/kat_rdns
 COPY --chown=nonroot boefjes/plugins/kat_retirejs_finding_types boefjes/plugins/kat_retirejs_finding_types
 COPY --chown=nonroot boefjes/plugins/kat_rpki boefjes/plugins/kat_rpki
 COPY --chown=nonroot boefjes/plugins/kat_security_txt_downloader boefjes/plugins/kat_security_txt_downloader
@@ -39,7 +37,6 @@ COPY --chown=nonroot boefjes/plugins/kat_snyk_finding_types boefjes/plugins/kat_
 COPY --chown=nonroot boefjes/plugins/kat_webpage_analysis boefjes/plugins/kat_webpage_analysis
 
 # TODO: fix, uses docker
-#COPY --chown=nonroot boefjes/plugins/pdio_subfinder boefjes/plugins/pdio_subfinder
 COPY --chown=nonroot boefjes/plugins/__init__.py boefjes/plugins/__init__.py
 COPY --chown=nonroot boefjes/__init__.py boefjes/__init__.py
 

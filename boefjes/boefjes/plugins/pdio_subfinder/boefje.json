@@ -9,9 +9,5 @@
     "SUBFINDER_RATE_LIMIT",
     "SUBFINDER_VERSION"
   ],
-  "scan_level": 1,
-  "oci_image": "ghcr.io/minvws/openkat/generic:latest",
-  "oci_arguments": [
-    "pdio_subfinder.main"
-  ]
+  "scan_level": 1
 }
