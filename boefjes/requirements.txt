@@ -417,9 +417,9 @@ jsonschema-specifications==2023.12.1 ; python_version >= "3.10" and python_versi
 jsonschema==4.23.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:d71497fef26351a33265337fa77ffeb82423f3ea21283cd9467bb03999266bc4 \
     --hash=sha256:fbadb6f8b144a8f8cf9f0b89ba94501d143e50411a1278633f56a7acf7fd5566
-langcodes==3.4.0 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:10a4cc078b8e8937d8485d3352312a0a89a3125190db9f2bb2074250eef654e9 \
-    --hash=sha256:ae5a77d1a01d0d1e91854a671890892b7ce9abb601ab7327fc5c874f899e1979
+langcodes==3.4.1 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:68f686fc3d358f222674ecf697ddcee3ace3c2fe325083ecad2543fd28a20e77 \
+    --hash=sha256:a24879fed238013ac3af2424b9d1124e38b4a38b2044fd297c8ff38e5912e718
 language-data==1.2.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:77d5cab917f91ee0b2f1aa7018443e911cf8985ef734ca2ba3940770f6a3816b \
     --hash=sha256:82a86050bbd677bfde87d97885b17566cfe75dad3ac4f5ce44b52c28f752e773
