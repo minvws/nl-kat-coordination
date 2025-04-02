@@ -1085,9 +1085,9 @@ rpds-py==0.20.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:fcaeb7b57f1a1e071ebd748984359fef83ecb026325b9d4ca847c95bc7311c92 \
     --hash=sha256:fd2d84f40633bc475ef2d5490b9c19543fbf18596dcb1b291e3a12ea5d722f7a \
     --hash=sha256:fdfc3a892927458d98f3d55428ae46b921d1f7543b89382fdb483f5640daaec8
-sectxt==0.9.0 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:c5b113cb37ec5053bf8ea335306a7c68079b53959df2324ffa9991885bec67a8 \
-    --hash=sha256:c81d874a55b96516d13e2b688f3150a6089e0636122237e4710717beafcb26d7
+sectxt==0.9.6 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:a70024289861985cb986d0954bdcb3c800eede8761a8e70577853e29be2310e0 \
+    --hash=sha256:c82317287cac291ddffdb355085ddcb76f067070a7fd9a6efbcd417df913ac92
 selectolax==0.3.28 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:003224c0e33a47993805ad03aa38b94dea266a991add812821df59fb86124af1 \
     --hash=sha256:03de75db7592d51ec93e8cbb6da8c052da6f26f263c530673ae765bd9d8b2700 \
