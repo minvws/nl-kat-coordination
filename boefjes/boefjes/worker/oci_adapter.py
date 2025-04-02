@@ -5,7 +5,7 @@ from uuid import UUID
 import sys
 from httpx import HTTPTransport, Client
 
-from boefjes.worker.repository import LocalPluginRepository
+from .repository import LocalPluginRepository
 from .interfaces import BoefjeStorageInterface, BoefjeOutput, Task
 from .boefje_handler import  BoefjeHandler
 import httpx
@@ -17,7 +17,10 @@ class SimpleStorageClient(BoefjeStorageInterface):
         self.callback_url = callback_url
 
     def save_raws(self, boefje_meta_id: UUID, boefje_output: BoefjeOutput) -> dict[str, UUID]:
-        return self._session.post(self.callback_url, json=boefje_output.model_dump()).json()
+        response =  self._session.post(self.callback_url, json=boefje_output.model_dump())
+        response.raise_for_status()
+
+        return response.json()
 
 
 def main():

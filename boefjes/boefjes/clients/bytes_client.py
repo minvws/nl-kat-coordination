@@ -1,5 +1,6 @@
 import typing
 import uuid
+from base64 import b64encode
 from collections.abc import Callable
 from functools import wraps
 from typing import Any
@@ -107,6 +108,28 @@ class BytesAPIClient(BoefjeStorageInterface):
         self._verify_response(response)
 
         return response.json()
+
+    @retry_with_login
+    def save_raw(self, boefje_meta_id: uuid.UUID, raw: str | bytes, mime_types: set[str] = frozenset()) -> uuid.UUID:
+        file_name = "raw"  # The name provides a key for all ids returned, so this is arbitrary as we only upload 1 file
+
+        response = self._session.post(
+            "/bytes/raw",
+            json={
+                "files": [
+                    {
+                        "name": file_name,
+                        "content": b64encode(raw if isinstance(raw, bytes) else raw.encode()).decode(),
+                        "tags": list(mime_types),
+                    }
+                ]
+            },
+            headers=self.headers,
+            params={"boefje_meta_id": str(boefje_meta_id)},
+        )
+        self._verify_response(response)
+
+        return uuid.UUID(response.json()[file_name])
 
     @retry_with_login
     def get_raw(self, raw_data_id: str) -> bytes:

@@ -15,7 +15,7 @@ from boefjes.dependencies.plugins import PluginService
 from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.db import get_engine
 from boefjes.sql.plugin_storage import create_plugin_storage
-from boefjes.worker.boefje_handler import BoefjeHandler, LocalBoefjeJobRunner
+from boefjes.worker.boefje_handler import BoefjeHandler
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 

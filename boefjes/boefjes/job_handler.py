@@ -65,7 +65,7 @@ class DockerBoefjeHandler(Handler):
             if task.status == TaskStatus.RUNNING:
                 boefje_meta.ended_at = datetime.now(timezone.utc)
                 self.bytes_api_client.save_boefje_meta(boefje_meta)  # The task didn't create a boefje_meta object
-                self.bytes_api_client.save_raw(task_id, container_logs, stderr_mime_types.union({"error/boefje"}))
+                self.bytes_api_client.save_raws(task_id, container_logs, stderr_mime_types.union({"error/boefje"}))
                 self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
 
                 # have to raise exception to prevent _start_working function from setting status to completed
@@ -213,8 +213,8 @@ class CompositeBoefjeHandler(Handler):
         self.boefje_handler = boefje_handler
         self.docker_handler = docker_handler
 
-    def handle(self, task: Task):
-        if isinstance(task.data, BoefjeMeta):
+    def handle(self, task: Task) -> None:
+        if not isinstance(task.data, BoefjeMeta):
             raise RuntimeError("Did not receive boefje task")
 
         if self.docker_handler and task.data.arguments["oci_image"]:
@@ -224,9 +224,9 @@ class CompositeBoefjeHandler(Handler):
                 str(task.data.id),
                 task.data.arguments["oci_image"],
             )
-            self.docker_handler.handle(task)
+            return self.docker_handler.handle(task)
 
         if not self.boefje_handler:
             raise RuntimeError("No handlers defined")
 
-        self.boefje_handler.handle(task)
+        return self.boefje_handler.handle(task)

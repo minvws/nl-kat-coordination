@@ -13,7 +13,7 @@ from boefjes.local.runner import LocalNormalizerJobRunner
 from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.db import get_engine
 from boefjes.sql.plugin_storage import create_plugin_storage
-from boefjes.worker.boefje_handler import BoefjeHandler, LocalBoefjeJobRunner
+from boefjes.worker.boefje_handler import BoefjeHandler
 from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
 from boefjes.worker.repository import get_local_repository
 
@@ -94,8 +94,8 @@ def cli(queue: str, images: tuple[str] | None, plugins: tuple[str] | None, log_l
         import boefjes.api
 
         boefjes.api.run()
-    else:
-        runtime.run(WorkerManager.Queue(queue))
+
+    runtime.run(WorkerManager.Queue(queue))
 
 
 if __name__ == "__main__":

@@ -6,8 +6,7 @@ import structlog
 
 from .interfaces import BoefjeOutput, BoefjeStorageInterface, File, Handler, StatusEnum, Task, JobRuntimeError
 from .job_models import BoefjeMeta
-from .models import Boefje
-from .repository import LocalPluginRepository, BoefjeResource
+from .repository import LocalPluginRepository, BoefjeResource, _default_mime_types
 
 logger = structlog.get_logger(__name__)
 
@@ -96,7 +95,7 @@ class BoefjeHandler(Handler):
                         content=(
                             b64encode(output) if isinstance(output, bytes) else b64encode(output.encode())
                         ).decode(),
-                        tags=valid_mimetypes,  # default mime-types are added through the API
+                        tags=_default_mime_types(boefje_meta.boefje).union(valid_mimetypes),  # default mime-types are added through the API
                     )
                 )
 

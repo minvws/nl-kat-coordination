@@ -1,12 +1,6 @@
-FROM python:3.11-slim
+FROM openkat/boefje-base:latest
 
-WORKDIR /app
-RUN apt-get update && pip install httpx && pip install requests
+ARG OCI_IMAGE=ghcr.io/minvws/openkat/export-http:latest
+ENV OCI_IMAGE=$OCI_IMAGE
 
-ARG BOEFJE_PATH=./boefjes/plugins/kat_export_http
-ENV PYTHONPATH=/app:$BOEFJE_PATH
-
-COPY ./boefjes/worker .
-COPY $BOEFJE_PATH $BOEFJE_PATH
-
-ENTRYPOINT ["/usr/local/bin/python", "-m", "worker.oci_adapter"]
+COPY ./boefjes/plugins/kat_export_http ./kat_export_http
