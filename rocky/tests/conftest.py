@@ -1706,7 +1706,7 @@ def report_list():
         ),
         asset_report("DNS Report for minvws.nl", "dns-report", "dns_report/report.html"),
         asset_report("Name Server Report for minvws.nl", "name-server-report", "name_server_report/report.html"),
-        asset_report("Vulnerability Report for minvws.nl", "vulnerability-report", "vulnerability_report/report.html"),
+        asset_report("CVE Report for minvws.nl", "vulnerability-report", "vulnerability_report/report.html"),
         asset_report("Web System Report for minvws.nl", "web-system-report", "web_system_report/report.html"),
         asset_report("Mail Report for minvws.nl", "mail-report", "mail_report/report.html"),
         asset_report("System Report for minvws.nl", "systems-report", "systems_report/report.html"),

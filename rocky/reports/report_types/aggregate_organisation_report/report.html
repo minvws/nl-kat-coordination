@@ -90,10 +90,10 @@
                 </div>
             </section>
             {% if data.vulnerabilities %}
-                <section id="vulnerabilities">
+                <section id="CVE vulnerabilities">
                     <div>
-                        <h2>{% translate "Vulnerabilities" %}</h2>
-                        <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
+                        <h2>{% translate "CVE vulnerabilities" %}</h2>
+                        <p>{% translate "CVE vulnerabilities found are grouped per system." %}</p>
                         {% if not data.vulnerabilities %}
                             <p>{% translate "No CVEs have been found." %}</p>
                         {% else %}

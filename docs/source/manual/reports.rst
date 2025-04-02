@@ -82,8 +82,8 @@ The table below gives an overview of the 12 reports available. It also describes
      - testssl-sh-ciphers
      -
      - Normal
-   * - Vulnerability
-     - Vulnerabilities found are grouped for each system.
+   * - CVE
+     - CVE vulnerabilities found are grouped for each system.
      - Hostname, IPAddressV4, IPAddressV6
      - dns-records, nmap, webpage-analysis
      - nmap-udp, nmap-ports, shodan
@@ -172,7 +172,7 @@ The table below gives an overview of the elements that can be found in each repo
      - The table shows which TLS protocol versions and TLS ciphers were identified on the system, including the status of the identified data. This means that if outdated protocols (such as SSL3) are identified, the table will show a recommendation such as ‘Phase out’.
      - The aggregate findings of the TLS report can be found under the safe connections checks.
      - This data is aggregated under the safe connections checks.
-   * - Vulnerability
+   * - CVE
      - The table gives an overview of the identified CVE's on the system.
      - The table gives an overview of the identified CVE's on the system.
      - The table gives an overview of the identified CVE's on the system.
@@ -210,7 +210,7 @@ The following placeholders can be used to create dynamic report names:
      - Asset report name format
    * - ${report_type}
      - Results in the report type of the overall report, depending on the flow that has been selected. Eg. 'Concatenated Report', 'Aggregate Report' or 'Multi Report'.
-     - Results in the report type of the asset report. E.g. 'DNS Report', 'Mail Report', 'Vulnerability Report'.
+     - Results in the report type of the asset report. E.g. 'DNS Report', 'Mail Report', 'CVE Report'.
    * - ${ooi}
      - If there's only one input object selected, this will show the input object. If multiple input objects have been selected, this placeholder will remain visible.
      - Always results in the input object of the asset report.
