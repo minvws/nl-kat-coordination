@@ -249,8 +249,10 @@ services:
       COLLECTOR_OTLP_ENABLED: "true"
       SPAN_STORAGE_TYPE: badger
       BADGER_EPHEMERAL: "false"
-      BADGER_DIRECTORY_VALUE: /badger/data
+      BADGER_DIRECTORY_VALUE: /badge;r/data
       BADGER_DIRECTORY_KEY: /badger/key
+      METRICS_STORAGE_TYPE: prometheus
+      PROMETHEUS_SERVER_URL: http://prometheus:9090
     volumes:
       - jaeger-data:/badger
     ports:
