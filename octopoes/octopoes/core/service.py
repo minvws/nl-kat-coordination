@@ -399,8 +399,11 @@ class OctopoesService:
             and not origin.phantom_result
             and origin.result
         ):
-            origin.phantom_result = self.ooi_repository.load_bulk_as_list(set(origin.result), valid_time)
+            refs = set(origin.result)
+            origin.phantom_result = self.ooi_repository.load_bulk_as_list(refs, valid_time)
             origin.result = []
+            for ref in refs:
+                self.ooi_repository.delete(ref, valid_time)
             self.origin_repository.save(origin, valid_time)
 
     def nibblet_dephantomize_result(self, origin: Origin, valid_time: datetime) -> None:
@@ -410,8 +413,10 @@ class OctopoesService:
             and origin.phantom_result
             and not origin.result
         ):
-            origin.phantom_result = []
             origin.result = [result.reference for result in origin.phantom_result]
+            for ooi in origin.phantom_result:
+                self.ooi_repository.save(ooi, valid_time)
+            origin.phantom_result = []
             self.origin_repository.save(origin, valid_time)
 
     def process_event(self, event: DBEvent) -> None:
