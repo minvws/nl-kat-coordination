@@ -48,14 +48,23 @@ class DashboardService:
             settings.OCTOPOES_API, organization_code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
         )
 
-    @staticmethod
-    def get_reports(
-        observed_at: datetime, octopoes_api_connector: OctopoesAPIConnector, recipe_id: str
-    ) -> list[HydratedReport]:
-        try:
-            return octopoes_api_connector.list_reports(valid_time=observed_at, recipe_id=UUID(recipe_id)).items
-        except (HTTPStatusError, ObjectNotFoundException):
-            return []
+    def get_reports(self, valid_time: datetime, dashboards_data) -> dict[UUID, HydratedReport]:
+        """
+        Returns for each recipe ID query'ed, the latest (valid_time) HydratedReport.
+        """
+        report_filters = [(data.dashboard.organization.code, data.recipe) for data in dashboards_data]
+
+        if report_filters:
+            org_code, _ = report_filters[0]
+            # We need at least 1 org connector to fetch reports from all other orgs.
+            connector = OctopoesAPIConnector(
+                settings.OCTOPOES_API, org_code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+            )
+            try:
+                return connector.bulk_list_reports(valid_time, report_filters)
+            except (HTTPStatusError, ObjectNotFoundException):
+                return {}
+        return {}
 
     @staticmethod
     def get_report_bytes_data(bytes_client: BytesClient, data_raw_id: str):
@@ -64,41 +73,32 @@ class DashboardService:
             bytes_client.get_raw(raw_id=data_raw_id)
         )
 
-    def collect_findings_dashboard(
-        self, organizations: list[Organization]
-    ) -> dict[Organization, dict[DashboardData, dict[str, Any]]]:
-        findings_dashboard = {}
+    def collect_findings_dashboard(self, organizations: list[Organization]) -> list[dict[str, Any]]:
+        findings_dashboard = []
 
         dashboards_data = DashboardData.objects.filter(
             dashboard__name=FINDINGS_DASHBOARD_NAME, dashboard__organization__in=organizations, findings_dashboard=True
         )
 
-        for data in dashboards_data:
-            organization = data.dashboard.organization
-            octopoes_client = self.get_octopoes_client(organization.code)
-            bytes_client = get_bytes_client(organization.code)
-            recipe_id = data.recipe
+        reports: dict[UUID, HydratedReport] = self.get_reports(datetime.now(timezone.utc), dashboards_data)
 
-            # get reports with recipe id
-            # TODO: change this method to get_report, since there's only one report that belongs to a recipe_id
-            reports = self.get_reports(datetime.now(timezone.utc), octopoes_client, recipe_id)
+        for _, hydrated_report in reports.items():
+            if hydrated_report:
+                organization = {"name": hydrated_report.organization_name, "code": hydrated_report.organization_code}
 
-            if reports:
-                report = reports[0]
-                report_data_from_bytes = self.get_report_bytes_data(bytes_client, report.data_raw_id)
+                bytes_client = get_bytes_client(hydrated_report.organization_code)
+                report_data_from_bytes = self.get_report_bytes_data(bytes_client, hydrated_report.data_raw_id)
                 report_data = self.get_organizations_findings(report_data_from_bytes)
 
                 if report_data:
-                    findings_dashboard[organization] = {data: {"report": report, "report_data": report_data}}
-            else:
-                findings_dashboard[organization] = {}
+                    findings_dashboard.append(
+                        {"organization": organization, "report": hydrated_report, "report_data": report_data}
+                    )
 
         return findings_dashboard
 
     @staticmethod
-    def get_organizations_findings_summary(
-        organizations_findings: dict[Organization, dict[DashboardData, dict[str, Any]]],
-    ) -> dict[str, Any]:
+    def get_organizations_findings_summary(organizations_findings: list[dict[str, Any]]) -> dict[str, Any]:
         summary: dict[str, Any] = {
             "total_by_severity_per_finding_type": {severity: 0 for severity in SEVERITY_OPTIONS},
             "total_by_severity": {severity: 0 for severity in SEVERITY_OPTIONS},
@@ -108,17 +108,16 @@ class DashboardService:
 
         summary_added = False
 
-        for organization, organizations_data in organizations_findings.items():
-            for data in organizations_data.values():
-                if "findings" in data["report_data"] and "summary" in data["report_data"]["findings"]:
-                    for summary_item, data in data["report_data"]["findings"]["summary"].items():
-                        if isinstance(data, dict):
-                            for severity, total in data.items():
-                                summary[summary_item][severity] += total
-                                summary_added = True
-                        else:
-                            summary[summary_item] += data
+        for data in organizations_findings:
+            if "findings" in data["report_data"] and "summary" in data["report_data"]["findings"]:
+                for summary_item, data in data["report_data"]["findings"]["summary"].items():
+                    if isinstance(data, dict):
+                        for severity, total in data.items():
+                            summary[summary_item][severity] += total
                             summary_added = True
+                    else:
+                        summary[summary_item] += data
+                        summary_added = True
 
         if not summary_added:
             return {}
