@@ -22,9 +22,9 @@ class PluginEnableDisableView(SinglePluginView):
                 messages.WARNING,
                 _("{} '{}' disabled.").format(self.plugin.type.title(), self.plugin.name),
             )
-            redirecturl = request.POST.get("current_url")
-            if url_has_allowed_host_and_scheme(redirecturl, allowed_hosts=None):
-                return HttpResponseRedirect(redirecturl)
+            redirect_url = request.POST.get("current_url")
+            if url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
+                return HttpResponseRedirect(redirect_url)
             return HttpResponseForbidden()
 
         if self.plugin.can_scan(self.organization_member):
