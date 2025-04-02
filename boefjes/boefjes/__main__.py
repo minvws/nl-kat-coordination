@@ -13,8 +13,7 @@ from boefjes.local.runner import LocalNormalizerJobRunner
 from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.db import get_engine
 from boefjes.sql.plugin_storage import create_plugin_storage
-from boefjes.worker.boefje_handler import BoefjeHandler
-from boefjes.worker.boefje_runner import LocalBoefjeJobRunner
+from boefjes.worker.boefje_handler import BoefjeHandler, LocalBoefjeJobRunner
 from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
 from boefjes.worker.repository import get_local_repository
 
@@ -55,7 +54,7 @@ def get_runtime_manager(
 
     if queue is WorkerManager.Queue.BOEFJES:
         item_handler = CompositeBoefjeHandler(
-            BoefjeHandler(LocalBoefjeJobRunner(local_repository), bytes_api_client),
+            BoefjeHandler(local_repository, bytes_api_client),
             DockerBoefjeHandler(scheduler_client, bytes_api_client),
         )
     else:

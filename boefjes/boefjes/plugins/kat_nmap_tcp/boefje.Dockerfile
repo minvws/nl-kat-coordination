@@ -6,4 +6,4 @@ ENV OCI_IMAGE=$OCI_IMAGE
 USER root
 RUN apt-get update && apt-get install -y nmap
 
-COPY ./boefjes/plugins/kat_nmap_tcp .
+COPY ./boefjes/plugins/kat_nmap_tcp ./kat_nmap_tcp

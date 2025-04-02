@@ -7,10 +7,9 @@ import click
 import structlog
 
 from .boefje_handler import BoefjeHandler
-from .boefje_runner import LocalBoefjeJobRunner
 from .client import BoefjeAPIClient
 from .manager import SchedulerWorkerManager, WorkerManager
-from .repository import get_local_repository
+from .repository import LocalPluginRepository
 
 logging_format = os.getenv("LOGGING_FORMAT", "text")
 log_cfg = Path(os.getenv("LOG_CFG", "logging.json"))
@@ -74,9 +73,8 @@ def cli(plugins: tuple[str] | None, log_level: str) -> None:
 
     outgoing_request_timeout = int(os.getenv("OUTGOING_REQUEST_TIMEOUT", "30"))
 
-    local_repository = get_local_repository()
     boefje_api = BoefjeAPIClient(base_url, outgoing_request_timeout, [oci_image], plugins)
-    handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), boefje_api)
+    handler = BoefjeHandler(LocalPluginRepository(Path()), boefje_api)
     logger.info(
         "Configured BoefjeAPI [base_url=%s, outgoing_request_timeout=%s, images=%s, plugins=%s]",
         base_url, outgoing_request_timeout, [oci_image], plugins,

@@ -17,6 +17,7 @@ from boefjes.worker.job_models import BoefjeMeta
 from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference, ScanLevel
+from boefjes.worker.repository import _default_mime_types
 
 logger = structlog.get_logger(__name__)
 
@@ -41,11 +42,7 @@ class DockerBoefjeHandler(Handler):
         if not oci_image:
             raise RuntimeError("Boefje does not have OCI image")
 
-        # local import to prevent circular dependency
-        import boefjes.worker.repository
-
-        stderr_mime_types = boefjes.worker.repository._default_mime_types(boefje_meta.boefje)
-
+        stderr_mime_types = _default_mime_types(boefje_meta.boefje)
         task_id = boefje_meta.id
         boefje_meta.started_at = datetime.now(timezone.utc)
 

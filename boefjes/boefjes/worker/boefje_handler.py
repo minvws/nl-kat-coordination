@@ -1,20 +1,38 @@
+import os
 import traceback
 from base64 import b64encode
 
 import structlog
 
-from .boefje_runner import LocalBoefjeJobRunner
-from .interfaces import BoefjeOutput, BoefjeStorageInterface, File, Handler, StatusEnum, Task
+from .interfaces import BoefjeOutput, BoefjeStorageInterface, File, Handler, StatusEnum, Task, JobRuntimeError
 from .job_models import BoefjeMeta
+from .models import Boefje
+from .repository import LocalPluginRepository, BoefjeResource
 
 logger = structlog.get_logger(__name__)
 
 MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought to be reasonable
 
 
+
+class TemporaryEnvironment:
+    """Context manager that temporarily clears the environment vars and restores it after exiting the context"""
+
+    def __init__(self):
+        self._original_environment = os.environ.copy()
+
+    def __enter__(self):
+        os.environ.clear()
+        return os.environ
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        os.environ.clear()
+        os.environ.update(self._original_environment)
+
+
 class BoefjeHandler(Handler):
-    def __init__(self, job_runner: LocalBoefjeJobRunner, boefje_storage: BoefjeStorageInterface):
-        self.job_runner = job_runner
+    def __init__(self, local_repository: LocalPluginRepository, boefje_storage: BoefjeStorageInterface):
+        self.local_repository = local_repository
         self.boefje_storage = boefje_storage
 
     def handle(self, task: Task) -> None:
@@ -29,7 +47,22 @@ class BoefjeHandler(Handler):
         failed = False
 
         try:
-            boefje_results = self.job_runner.run(boefje_meta, boefje_meta.environment or {})
+            logger.debug("Running local boefje plugin")
+
+            boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)
+
+            if not isinstance(boefje_resource, BoefjeResource):
+                raise JobRuntimeError(f"Not a boefje: {boefje_meta.boefje.id}")
+
+            if not boefje_resource.module:
+                raise JobRuntimeError(f"Not runnable module found")
+
+            with TemporaryEnvironment() as temporary_environment:
+                temporary_environment.update(boefje_meta.environment or {})
+                try:
+                    return boefje_resource.module.run(boefje_meta.model_dump())
+                except BaseException as e:  # noqa
+                    raise JobRuntimeError("Boefje failed") from e
         except:
             logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
             boefje_results = [({"error/boefje"}, traceback.format_exc())]
@@ -59,6 +92,7 @@ class BoefjeHandler(Handler):
 
                 files.append(
                     File(
+                        name=str(len(files)),
                         content=(
                             b64encode(output) if isinstance(output, bytes) else b64encode(output.encode())
                         ).decode(),

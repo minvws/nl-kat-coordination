@@ -2,9 +2,9 @@ import datetime
 import uuid
 from enum import Enum
 from typing import Any
+from uuid import UUID
 
-from pydantic import BaseModel, Field
-
+from pydantic import BaseModel, Field, ConfigDict
 # A deliberate relative import to make this module self-contained
 from .job_models import BoefjeMeta, NormalizerMeta
 
@@ -50,9 +50,15 @@ class StatusEnum(str, Enum):
 
 
 class File(BaseModel):
-    name: str | None = None
+    name: str
     content: str = Field(json_schema_extra={"contentEncoding": "base64"})
     tags: list[str] | None = None
+
+
+class BoefjeInput(BaseModel):
+    output_url: str
+    task: Task
+    model_config = ConfigDict(extra="forbid")
 
 
 class BoefjeOutput(BaseModel):

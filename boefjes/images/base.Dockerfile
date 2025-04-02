@@ -1,5 +1,7 @@
 FROM python:3.11-slim as base
 
+ARG BOEFJES_API=http://boefje:8000
+ENV BOEFJES_API=$BOEFJES_API
 ENV PYTHONPATH=/app/boefje
 
 WORKDIR /app/boefje
@@ -8,12 +10,11 @@ RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip && pip inst
 
 USER nonroot
 
-COPY ./images/oci_adapter.py /app/boefje
 COPY ./boefjes/worker ./worker
 COPY ./boefjes/logging.json logging.json
 
 ENTRYPOINT ["/usr/local/bin/python"]
-CMD ["-m", "oci_adapter"]
+CMD ["-m", "worker.oci_adapter"]
 
 FROM base as builder
 

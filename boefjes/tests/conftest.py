@@ -24,7 +24,6 @@ from boefjes.sql.organisation_storage import SQLOrganisationStorage, get_organis
 from boefjes.sql.plugin_storage import SQLPluginStorage
 from boefjes.storage.interfaces import OrganisationNotFound
 from boefjes.storage.memory import ConfigStorageMemory, OrganisationStorageMemory, PluginStorageMemory
-from boefjes.worker.boefje_runner import LocalBoefjeJobRunner
 from boefjes.worker.interfaces import Handler, PaginatedTasksResponse, SchedulerClientInterface, Task, TaskStatus
 from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
 from boefjes.worker.models import Organisation
@@ -208,19 +207,10 @@ def normalizer_runner(local_repository: LocalPluginRepository):
     return LocalNormalizerJobRunner(local_repository)
 
 
-@pytest.fixture
-def boefje_runner(local_repository: LocalPluginRepository):
-    return LocalBoefjeJobRunner(local_repository)
-
 
 @pytest.fixture
 def mock_normalizer_runner(mock_local_repository: LocalPluginRepository):
     return LocalNormalizerJobRunner(mock_local_repository)
-
-
-@pytest.fixture
-def mock_boefje_runner(mock_local_repository: LocalPluginRepository):
-    return LocalBoefjeJobRunner(mock_local_repository)
 
 
 @pytest.fixture

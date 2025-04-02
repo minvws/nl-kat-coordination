@@ -6,17 +6,16 @@ from typing import Any
 from uuid import UUID
 
 import structlog
-from fastapi import Depends, FastAPI, HTTPException, Query, Response, Body
+from fastapi import Depends, FastAPI, HTTPException, Body
 from httpx import HTTPError, HTTPStatusError
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 from uvicorn import Config, Server
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient
 from boefjes.config import settings
 from boefjes.dependencies.plugins import get_plugin_service
-from boefjes.worker.interfaces import BoefjeOutput, PaginatedTasksResponse, StatusEnum, Task, TaskStatus
-from boefjes.worker.job_models import BoefjeMeta
+from boefjes.worker.interfaces import BoefjeOutput, PaginatedTasksResponse, StatusEnum, Task, TaskStatus, BoefjeInput
 from boefjes.worker.repository import _default_mime_types
 
 app = FastAPI(title="Boefje API")
@@ -42,13 +41,6 @@ def run():
     instance = UvicornServer(config=config)
     instance.start()
     return instance
-
-
-class BoefjeInput(BaseModel):
-    task_id: UUID
-    output_url: str
-    boefje_meta: BoefjeMeta
-    model_config = ConfigDict(extra="forbid")
 
 
 # Model for partial updates, only allowing a status update
@@ -77,7 +69,7 @@ def boefje_input(task_id: UUID, scheduler_client: SchedulerAPIClient = Depends(g
         raise HTTPException(status_code=403, detail="Task does not have status running")
 
     output_url = str(settings.api).rstrip("/") + f"/api/v0/tasks/{task_id}"
-    return BoefjeInput(task_id=task_id, output_url=output_url, boefje_meta=task.data)
+    return BoefjeInput(task=task, output_url=output_url)
 
 
 @app.post("/api/v0/tasks/{task_id}")
@@ -86,7 +78,7 @@ def boefje_output(
     boefje_output: BoefjeOutput,
     scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),
     bytes_client: BytesAPIClient = Depends(get_bytes_client),
-) -> Response:
+) -> dict[str, uuid.UUID]:
     task = get_task(task_id, scheduler_client)
     boefje_meta = task.data
 
@@ -99,20 +91,22 @@ def boefje_output(
     bytes_client.login()
     bytes_client.save_boefje_meta(boefje_meta)
 
+    bytes_response = {}
+
     if boefje_output.files:
         mime_types = _default_mime_types(boefje_meta.boefje)
         for file in boefje_output.files:
             file.tags = mime_types.union(file.tags) if file.tags else mime_types
 
         # when supported, also save file.name to Bytes
-        bytes_client.save_raws(task_id, boefje_output)
+        bytes_response = bytes_client.save_raws(task_id, boefje_output)
 
     if boefje_output.status == StatusEnum.COMPLETED:
         scheduler_client.patch_task(task_id, TaskStatus.COMPLETED)
     elif boefje_output.status == StatusEnum.FAILED:
         scheduler_client.patch_task(task_id, TaskStatus.FAILED)
 
-    return Response(status_code=200)
+    return bytes_response
 
 
 def get_task(task_id, scheduler_client):

@@ -27,7 +27,8 @@ def test_website_analysis(local_repository, mocker):
     assert "openkat-http/body" in output[2][0]
 
 
-def test_website_analysis_for_image(boefje_runner, mocker):
+def test_website_analysis_for_image(
+    mocker):
     do_request_mock = mocker.patch("boefjes.plugins.kat_webpage_analysis.main.do_request", spec=Response)
     meta = BoefjeMeta.model_validate_json(get_dummy_data("webpage-analysis.json"))
 

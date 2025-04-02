@@ -72,7 +72,6 @@ class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
         response = self._session.post(
             f"/api/v0/tasks/{boefje_meta_id}",
             content=boefje_output.model_dump_json(),
-            params={"boefje_meta_id": str(boefje_meta_id)},
         )
         self._verify_response(response)
 

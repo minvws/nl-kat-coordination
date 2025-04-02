@@ -42,7 +42,7 @@ class BoefjeResource:
         self.boefje.produces = self.boefje.produces.union(set(_default_mime_types(self.boefje)))
         self.module: Runnable | None = None
 
-        if self.boefje.oci_image is None and (path / ENTRYPOINT_BOEFJES).exists():
+        if (path / ENTRYPOINT_BOEFJES).exists():
             self.module = get_runnable_module_from_package(package, ENTRYPOINT_BOEFJES, parameter_count=1)
 
         if (path / SCHEMA_FILE).exists():
@@ -73,29 +73,29 @@ class LocalPluginRepository:
         normalizers = [resource.normalizer for resource in self.resolve_normalizers().values()]
         return boefjes + normalizers
 
-    def by_id(self, plugin_id: str) -> PluginType:
+    def by_id(self, plugin_id: str) -> BoefjeResource | NormalizerResource:
         boefjes = self.resolve_boefjes()
 
         if plugin_id in boefjes:
-            return boefjes[plugin_id].boefje
+            return boefjes[plugin_id]
 
         normalizers = self.resolve_normalizers()
 
         if plugin_id in normalizers:
-            return normalizers[plugin_id].normalizer
+            return normalizers[plugin_id]
 
         raise KeyError(f"Can't find plugin {plugin_id}")
 
-    def by_name(self, plugin_name: str) -> PluginType:
+    def by_name(self, plugin_name: str) -> BoefjeResource | NormalizerResource:
         boefjes = {resource.boefje.name: resource for resource in self.resolve_boefjes().values()}
 
         if plugin_name in boefjes:
-            return boefjes[plugin_name].boefje
+            return boefjes[plugin_name]
 
         normalizers = {resource.normalizer.name: resource for resource in self.resolve_normalizers().values()}
 
         if plugin_name in normalizers:
-            return normalizers[plugin_name].normalizer
+            return normalizers[plugin_name]
 
         raise KeyError(f"Can't find plugin {plugin_name}")
 
@@ -206,7 +206,7 @@ def _find_packages_in_path_containing_files(path: Path, required_files: tuple[st
 def create_relative_import_statement_from_cwd(package_dir: Path) -> str:
     relative_path = str(package_dir.absolute()).replace(str(Path.cwd()), "")  # e.g. "/boefjes/plugins"
 
-    return f"{relative_path[1:].replace('/', '.')}."  # Turns into "boefjes.plugins."
+    return f"{relative_path[1:].replace('/', '.')}." if relative_path else ''  # Turns into "boefjes.plugins."
 
 
 @lru_cache(maxsize=200)

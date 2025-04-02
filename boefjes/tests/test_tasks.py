@@ -10,8 +10,7 @@ from uuid import UUID
 
 import pytest
 
-from boefjes.worker.boefje_handler import BoefjeHandler
-from boefjes.worker.boefje_runner import LocalBoefjeJobRunner
+from boefjes.worker.boefje_handler import BoefjeHandler, LocalBoefjeJobRunner
 from boefjes.worker.interfaces import JobRuntimeError, StatusEnum, Task, TaskStatus
 from boefjes.worker.job_models import BoefjeMeta, InvalidReturnValueNormalizer, NormalizerMeta
 from boefjes.worker.models import Bit, Boefje, Normalizer, PluginType
