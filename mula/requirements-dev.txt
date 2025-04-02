@@ -89,9 +89,9 @@ croniter==6.0.0 ; python_version >= "3.10" and python_version < "4.0" \
 decorator==5.1.1 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:637996211036b6385ef91435e4fae22989472f9d571faba8927ba8253acbc330 \
     --hash=sha256:b8c3f85900b9dc423225913c5aace94729fe1fa9763b38939a95226f02d37186
-deprecated==1.2.14 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:6fac8b097794a90302bdbb17b9b815e732d3c4720583ff1b198499d78470466c \
-    --hash=sha256:e5323eb936458dccc2582dc6f9c322c852a775a27065ff2b0c4970b9d53d01b3
+deprecated==1.2.18 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:422b6f6d859da6f2ef57857761bfb392480502a64c3028ca9bbe86085d72115d \
+    --hash=sha256:bd5011788200372a32418f888e326a09ff80d0214bd961147cfed01b5c018eec
 exceptiongroup==1.2.2 ; python_version >= "3.10" and python_version < "3.11" \
     --hash=sha256:3111b9d131c238bec2f8f516e123e14ba243563fb135d3fe885990585aa7795b \
     --hash=sha256:47c2edf7c6738fafb49fd34290706d1a1a2f4d1c6df275526b62cbb4aa5393cc
