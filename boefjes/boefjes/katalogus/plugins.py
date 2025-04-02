@@ -64,7 +64,7 @@ def list_plugins(
     # filter plugins by oci_image
     if filter_params.oci_image is not None:
         plugins = [
-            plugin for plugin in plugins if plugin.type == "boefje" and plugin.oci_images == filter_params.oci_image
+            plugin for plugin in plugins if plugin.type == "boefje" and plugin.oci_image == filter_params.oci_image
         ]
 
     # filter plugins by scan level for boefje plugins
