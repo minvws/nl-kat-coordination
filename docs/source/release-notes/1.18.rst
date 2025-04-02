@@ -328,6 +328,56 @@ version (for example from 1.18.0rc1 to 1.18.0), then the kat-keiko will be
 installed again because the script will update or install all the packages. In 1.19
 this won't happen because the kat-keiko package will not exist anymore.
 
+Deleting Outdated Reports
+=========================
+
+It was possible to test the new reporting feature in v1.17.0.
+However, v1.18.0 introduces newer versions of the Reports that are not compatible with these older models.
+If you have tested this feature in v1.17.0 or get a 500 error on the report (history) page,
+please use the database CLI tool to purge the old reporting data.
+
+Script For The Containers
+-------------------------
+
+The following script should perform this operation.
+Check the `--url` (the XTDB_URI environment variable in a usual setup) and `--node` flags (the organisation code) and run the following command.
+
+.. code-block:: sh
+
+    docker compose run --rm octopoes_api python -m tools.xtdb-cli --url http://crux:3000 --node test evict-all-reports
+
+Note that you should repeat the process for all organizations that face this issue.
+To find all your organisation codes, consider checking in Rocky or calling the KATalogus API:
+
+.. code-block:: sh
+
+    docker compose run --rm -e DATABASE_MIGRATION=0 octopoes_api bash -c 'curl http://katalogus:8000/v1/organisations'
+    # To print only the organisation ids:
+    docker compose run --rm -e DATABASE_MIGRATION=0 octopoes_api bash -c 'curl -s http://katalogus:8000/v1/organisations | python -c "import sys, json; print(list(json.loads(sys.stdin.read()).keys()))"'
+
+
+Script Tor The Debian Packages
+------------------------------
+
+The same holds for the debian packages, but invoking the script means having to set up the environment first.
+Check the `--url` (the XTDB_URI environment variable in a usual setup) and `--node` flags (the organisation code) and run the following command.
+
+.. code-block:: sh
+
+    source /opt/venvs/kat-octopoes/bin/activate
+    export $(cat /usr/lib/kat/octopoes.defaults | grep -v "#") && export $(cat /etc/kat/octopoes.conf | grep -v "#")
+    cd /opt/venvs/kat-octopoes/lib/python3.11/site-packages
+    /opt/venvs/kat-octopoes/bin/python -m tools.xtdb-cli --url $XTDB_URI --node test evict-all-reports
+
+To find all your organisation codes to apply this to multiple organisations,
+consider checking your organisations in Rocky or call the KATalogus API:
+
+.. code-block:: sh
+
+    curl $KATALOGUS_API/v1/organisations
+    # To print only the organisation ids:
+    curl -s $KATALOGUS_API/v1/organisations | /opt/venvs/kat-octopoes/bin/python -c "import sys, json; print(list(json.loads(sys.stdin.read()).keys()))"
+
 
 Full Changelog
 ==============

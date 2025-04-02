@@ -1,13 +1,12 @@
 import datetime
 import uuid
-from typing import Any
 
 import fastapi
 import structlog
 from fastapi import Body
 
 from scheduler import context, models, schedulers, storage
-from scheduler.server import serializers, utils
+from scheduler.server import schemas, utils
 from scheduler.server.errors import BadRequestError, ConflictError, NotFoundError, ValidationError
 
 
@@ -31,7 +30,7 @@ class ScheduleAPI:
             path="/schedules",
             endpoint=self.create,
             methods=["POST"],
-            response_model=models.Schedule,
+            response_model=schemas.Schedule,
             status_code=201,
             description="Create a schedule",
         )
@@ -40,7 +39,7 @@ class ScheduleAPI:
             path="/schedules/{schedule_id}",
             endpoint=self.get,
             methods=["GET"],
-            response_model=models.Schedule,
+            response_model=schemas.Schedule,
             status_code=200,
             description="Get a schedule",
         )
@@ -49,7 +48,7 @@ class ScheduleAPI:
             path="/schedules/{schedule_id}",
             endpoint=self.patch,
             methods=["PATCH"],
-            response_model=models.Schedule,
+            response_model=schemas.Schedule,
             response_model_exclude_unset=True,
             status_code=200,
             description="Update a schedule",
@@ -84,7 +83,7 @@ class ScheduleAPI:
         max_deadline_at: datetime.datetime | None = None,
         min_created_at: datetime.datetime | None = None,
         max_created_at: datetime.datetime | None = None,
-    ) -> Any:
+    ) -> utils.PaginatedResponse:
         if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
             raise BadRequestError("min_created_at must be less than max_created_at")
 
@@ -105,7 +104,7 @@ class ScheduleAPI:
 
         return utils.paginate(request, results, count, offset, limit)
 
-    def create(self, schedule: serializers.ScheduleCreate) -> Any:
+    def create(self, schedule: schemas.ScheduleCreate) -> schemas.Schedule:
         if not (schedule.deadline_at or schedule.schedule):
             raise BadRequestError("Either deadline_at or schedule must be provided")
 
@@ -118,7 +117,7 @@ class ScheduleAPI:
         if s is None:
             raise BadRequestError(f"Scheduler {new_schedule.scheduler_id} not found")
 
-        # Validate data with task type of the scheduler
+        # Validate `data` field with `TASK_TYPE` of the scheduler
         try:
             instance = s.ITEM_TYPE.model_validate(new_schedule.data)
         except ValueError as exc:
@@ -133,16 +132,16 @@ class ScheduleAPI:
             raise ConflictError(f"schedule with the same hash already exists: {new_schedule.hash}")
 
         self.ctx.datastores.schedule_store.create_schedule(new_schedule)
-        return new_schedule
+        return schemas.Schedule(**new_schedule.dict())
 
-    def get(self, schedule_id: uuid.UUID) -> Any:
+    def get(self, schedule_id: uuid.UUID) -> schemas.Schedule:
         schedule = self.ctx.datastores.schedule_store.get_schedule(schedule_id)
         if schedule is None:
             raise NotFoundError(f"schedule not found, by schedule_id: {schedule_id}")
 
-        return schedule
+        return schemas.Schedule(**schedule.dict())
 
-    def patch(self, schedule_id: uuid.UUID, schedule: serializers.SchedulePatch) -> Any:
+    def patch(self, schedule_id: uuid.UUID, schedule: schemas.SchedulePatch) -> schemas.Schedule:
         schedule_db = self.ctx.datastores.schedule_store.get_schedule(schedule_id)
         if schedule_db is None:
             raise NotFoundError(f"schedule not found, by schedule_id: {schedule_id}")
@@ -163,7 +162,7 @@ class ScheduleAPI:
         # Update schedule in database
         self.ctx.datastores.schedule_store.update_schedule(updated_schedule)
 
-        return updated_schedule
+        return schemas.Schedule(**updated_schedule.dict())
 
     def search(
         self,

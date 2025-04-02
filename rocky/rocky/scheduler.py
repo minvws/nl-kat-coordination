@@ -146,6 +146,14 @@ class Task(BaseModel):
         raise ValueError("No organization found related to task")
 
 
+class TaskPush(BaseModel):
+    id: uuid.UUID | None = None
+    scheduler_id: str | None = None
+    organisation: str
+    priority: int | None = None
+    data: dict
+
+
 class ScheduleRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -180,6 +188,10 @@ class PaginatedTasksResponse(BaseModel):
     count: int
     next: str | None = None
     previous: str | None = None
+    results: list[Task]
+
+
+class TaskPop(BaseModel):
     results: list[Task]
 
 
@@ -290,7 +302,7 @@ class SchedulerClient:
         except ConnectError:
             raise SchedulerConnectError()
 
-    def post_schedule_search(self, filters: dict[str, list[dict[str, str]]]) -> PaginatedSchedulesResponse:
+    def post_schedule_search(self, filters: dict[str, list[dict[str, Any]]]) -> PaginatedSchedulesResponse:
         try:
             res = self._client.post("/schedules/search", json=filters)
             res.raise_for_status()
@@ -374,16 +386,16 @@ class SchedulerClient:
         response = self._client.post(f"/schedulers/{scheduler_id}/pop?limit=1")
         response.raise_for_status()
 
-        page = TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
-        if page.count == 0 or len(page.results) == 0:
+        popped_items = TypeAdapter(TaskPop | None).validate_json(response.content)
+        if len(popped_items.results) == 0:
             return None
 
-        return page.results[0]
+        return popped_items.results[0]
 
-    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
+    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> TaskPop | None:
         response = self._client.post(f"/schedulers/{scheduler_id}/pop", json=filters)
 
-        return TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
+        return TypeAdapter(TaskPop | None).validate_json(response.content)
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
         response = self._client.patch(f"/tasks/{task_id}", json={"status": status.value})

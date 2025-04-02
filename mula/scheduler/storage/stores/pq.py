@@ -18,8 +18,8 @@ class PriorityQueueStore:
     @retry()
     @exception_handler
     def pop(
-        self, scheduler_id: str | None = None, offset: int = 0, limit: int = 100, filters: FilterRequest | None = None
-    ) -> tuple[list[models.Task], int]:
+        self, scheduler_id: str | None = None, limit: int = 1, filters: FilterRequest | None = None
+    ) -> list[models.Task]:
         with self.dbconn.session.begin() as session:
             query = session.query(models.TaskDB).filter(models.TaskDB.status == models.TaskStatus.QUEUED)
 
@@ -30,11 +30,9 @@ class PriorityQueueStore:
                 query = apply_filter(models.TaskDB, query, filters)
 
             try:
-                count = query.count()
                 item_orm = (
                     query.order_by(models.TaskDB.priority.asc())
                     .order_by(models.TaskDB.created_at.asc())
-                    .offset(offset)
                     .limit(limit)
                     .all()
                 )
@@ -43,7 +41,7 @@ class PriorityQueueStore:
 
             items = [models.Task.model_validate(item_orm) for item_orm in item_orm]
 
-            return items, count
+            return items
 
     @retry()
     @exception_handler

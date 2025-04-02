@@ -11,7 +11,8 @@ from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
 
 from katalogus.client import Boefje, Normalizer
 from katalogus.views.plugin_settings_list import PluginSettingsListView
-from octopoes.models import OOI
+from octopoes.models import ScanLevel
+from octopoes.models.types import OOIType
 from rocky.scheduler import ScheduleResponse
 from rocky.views.tasks import TaskListView
 
@@ -119,7 +120,7 @@ class BoefjeDetailView(PluginDetailView):
     """Detail view for a specific boefje. Shows boefje settings and consumable oois for scanning."""
 
     template_name = "boefje_detail.html"
-    limit_ooi_list = 9999
+    limit_ooi_list = 150
     plugin: Boefje
     task_type = "boefje"
 
@@ -157,31 +158,52 @@ class BoefjeDetailView(PluginDetailView):
 
         return context
 
-    def get_form_consumable_oois(self):
+    def get_form_consumable_oois(self) -> list[tuple[OOIType, ScheduleResponse]]:
         """Get all available OOIS that plugin can consume."""
-        oois = self.octopoes_api_connector.list_objects(
-            self.plugin.consumes, valid_time=datetime.now(timezone.utc), limit=self.limit_ooi_list
-        ).items
 
-        oois_with_schedule: list[tuple[OOI, ScheduleResponse]] = []
+        oois = {
+            ooi.primary_key: ooi
+            for ooi in self.octopoes_api_connector.list_objects(
+                self.plugin.consumes, valid_time=datetime.now(timezone.utc), limit=self.limit_ooi_list
+            ).items
+        }
 
-        for ooi in oois:
-            schedules = self.scheduler_client.post_schedule_search(
-                {
-                    "filters": [
-                        {"column": "data", "field": "boefje__id", "operator": "eq", "value": self.plugin.id},
-                        {"column": "data", "field": "input_ooi", "operator": "eq", "value": ooi.primary_key},
-                    ]
-                }
-            )
+        return self._filter_oois_with_schedules(oois)
 
-            if schedules.count > 0:
-                schedule: ScheduleResponse = schedules.results[0]
-
-                oois_with_schedule.append((ooi, schedule))
-        return oois_with_schedule
-
-    def get_form_filtered_consumable_oois(self):
+    def get_form_filtered_consumable_oois(self) -> list[tuple[OOIType, ScheduleResponse]]:
         """Return a list of oois that is filtered for oois that meets clearance level."""
-        oois_with_schedule = self.get_form_consumable_oois()
-        return [ooi for ooi in oois_with_schedule if ooi[0].scan_profile.level >= self.plugin.scan_level.value]
+        oois = {
+            ooi.primary_key: ooi
+            for ooi in self.octopoes_api_connector.list_objects(
+                self.plugin.consumes,
+                valid_time=datetime.now(timezone.utc),
+                limit=self.limit_ooi_list,
+                scan_level={level for level in ScanLevel if level.value >= self.plugin.scan_level.value},
+            ).items
+        }
+
+        return self._filter_oois_with_schedules(oois)
+
+    def _filter_oois_with_schedules(self, oois: dict[str, OOIType]) -> list[tuple[OOIType, ScheduleResponse]]:
+        if not oois:
+            return []
+
+        schedules = self.scheduler_client.post_schedule_search(
+            {
+                "filters": [
+                    {"column": "data", "field": "boefje__id", "operator": "eq", "value": self.plugin.id},
+                    {
+                        "column": "data",
+                        "field": "input_ooi",
+                        "operator": "in",
+                        "value": [o.primary_key for o in oois.values()],
+                    },
+                ]
+            }
+        )
+
+        return [
+            (oois[schedule.data["input_ooi"]], schedule)
+            for schedule in schedules.results
+            if "input_ooi" in schedule.data
+        ]
