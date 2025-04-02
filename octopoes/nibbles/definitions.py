@@ -23,7 +23,7 @@ class NibbleParameter(BaseModel):
     parser: str = "[]"
     optional: bool = False
     additional: set[type[OOI]] = set()
-    min_scan_level: int | None = None
+    min_scan_level: ScanLevel | None = None
 
     def __eq__(self, other):
         if isinstance(other, NibbleParameter):
@@ -51,7 +51,6 @@ class NibbleDefinition(BaseModel):
     query: str | Callable[[list[Reference | None]], str] | None = None
     enabled: bool = True
     additional: set[type[OOI]] = set()
-    minimal_scan_level: ScanLevel | None = None
     _payload: MethodType | None = None
     _checksum: str | None = None
 
@@ -72,7 +71,7 @@ class NibbleDefinition(BaseModel):
     def triggers(self) -> set[type[OOI]]:
         return set.union(*[sgn.triggers for sgn in self.signature]) | self.additional
 
-    def check_scan_levels(self, scan_levels: list[int]) -> bool:
+    def check_scan_levels(self, scan_levels: list[ScanLevel]) -> bool:
         for param, level in zip(self.signature, scan_levels):
             if param.min_scan_level is not None and level <= param.min_scan_level:
                 return False

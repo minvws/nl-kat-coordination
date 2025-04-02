@@ -221,7 +221,7 @@ class NibblesRunner:
                 for arg, result in run_result.items():
                     arg_references = {a.reference for a in arg if isinstance(a, OOI)}
                     scan_profiles_of_args = self.scan_profile_repository.get_bulk(arg_references, valid_time)
-                    if self.nibbles[nibble_id].check_scan_levels([sp.level.value for sp in scan_profiles_of_args]):
+                    if self.nibbles[nibble_id].check_scan_levels([sp.level for sp in scan_profiles_of_args]):
                         result_references = [ooi.reference for ooi in result]
                         phantom_result_references = []
                     else:

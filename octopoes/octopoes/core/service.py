@@ -392,15 +392,26 @@ class OctopoesService:
         )
         logger.info("Recalculated scan profiles")
 
-    def nibblet_toggle_phantom_result(self, origin_id: str, valid_time: datetime) -> None:
-        origin = self.origin_repository.get(origin_id, valid_time)
-        if origin.origin_type == OriginType.NIBBLET and origin.phantom_result is not None:
-            if origin.result and not origin.phantom_result:
-                origin.phantom_result = self.ooi_repository.load_bulk_as_list(set(origin.result), valid_time)
-                origin.result = []
-            elif origin.phantom_result and not origin.result:
-                origin.result = [result.reference for result in origin.phantom_result]
-                origin.phantom_result = []
+    def nibblet_phantomize_result(self, origin: Origin, valid_time: datetime) -> None:
+        if (
+            origin.origin_type == OriginType.NIBBLET
+            and origin.phantom_result is not None
+            and not origin.phantom_result
+            and origin.result
+        ):
+            origin.phantom_result = self.ooi_repository.load_bulk_as_list(set(origin.result), valid_time)
+            origin.result = []
+            self.origin_repository.save(origin, valid_time)
+
+    def nibblet_dephantomize_result(self, origin: Origin, valid_time: datetime) -> None:
+        if (
+            origin.origin_type == OriginType.NIBBLET
+            and origin.phantom_result is not None
+            and origin.phantom_result
+            and not origin.result
+        ):
+            origin.phantom_result = []
+            origin.result = [result.reference for result in origin.phantom_result]
             self.origin_repository.save(origin, valid_time)
 
     def process_event(self, event: DBEvent) -> None:
@@ -569,10 +580,19 @@ class OctopoesService:
             pass
 
     def _run_inferences(self, event: ScanProfileDBEvent) -> None:
-        inference_origins = self.origin_repository.list_origins(event.valid_time, source=event.reference)
-        inference_origins = [o for o in inference_origins if o.origin_type == OriginType.INFERENCE]
+        origins = self.origin_repository.list_origins(event.valid_time, source=event.reference)
+        inference_origins = [o for o in origins if o.origin_type == OriginType.INFERENCE]
         for inference_origin in inference_origins:
             self._run_inference(inference_origin, event.valid_time)
+        if event.new_data:
+            nibblets = [o for o in origins if o.origin_type == OriginType.NIBBLET]
+            for nibblet in nibblets:
+                args = {pr for pr in nibblet.parameters_references if pr} if nibblet.parameters_references else set()
+                scan_levels = [sp.level for sp in self.scan_profile_repository.get_bulk(args, event.valid_time)]
+                if self.nibbler.nibbles[nibblet.method].check_scan_levels(scan_levels):
+                    self.nibblet_dephantomize_result(nibblet, event.valid_time)
+                else:
+                    self.nibblet_phantomize_result(nibblet, event.valid_time)
 
     # Scan profile events
     def _on_create_scan_profile(self, event: ScanProfileDBEvent) -> None:
