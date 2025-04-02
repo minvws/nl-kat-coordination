@@ -290,6 +290,12 @@ class OrganizationsCrisisRoomView(TemplateView):
         context["dashboard"] = self.get_dashboard
         context["organization"] = self.organization
         context["add_dashboard_form"] = AddDashboardForm
+        context["breadcrumbs"] = [
+            {
+                "url": reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}),
+                "text": "Crisis Room",
+            }
+        ]
         return context
 
 
@@ -299,22 +305,41 @@ class AddDashboardItemView(OrganizationView, TemplateView):
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         """Add dashboard item and redirect to the selected dashboard."""
 
-        query = {
-            "ooi_types": request.POST.getlist("ooi_type"),
-            "scan_level": request.POST.getlist("clearance_level"),
-            "scan_profile_type": request.POST.getlist("clearance_type"),
-            "search_string": request.POST.get("search_string"),
-            "order_by": request.POST.get("order_by"),
-            "asc_desc": request.POST.get("sorting_order"),
-        }
-
         dashboard_name = request.POST.get("dashboard")
         recipe_id = request.POST.get("recipe_id")
         query_from = request.POST.get("query_from")
+        query = None
         template = request.POST.get("template")
+
+        # Settings:
+        title = request.POST.get("title")
+        sort_by = request.POST.get("sort_by").split("-")
+        order_by = sort_by[0]
+        asc_desc = sort_by[1]
+        limit = request.POST.get("limit")
+        columns = request.POST.get("columns")
+        size = request.POST.get("size")
+
+        logger.error(
+            "Show settings as test: title=%s, sort_by=%s, limit=%s, columns=%s, size=%s",
+            title,
+            sort_by,
+            limit,
+            columns,
+            size,
+        )
 
         if query_from == "object_list":
             template = "partials/dashboard_ooi_list.html"
+            query = {
+                "ooi_types": request.POST.getlist("ooi_type"),
+                "scan_level": request.POST.getlist("clearance_level"),
+                "scan_profile_type": request.POST.getlist("clearance_type"),
+                "search_string": request.POST.get("search_string"),
+                "order_by": order_by,
+                "asc_desc": asc_desc,
+                "limit": limit,
+            }
 
         try:
             self.dashboard_data, created = get_or_create_dashboard_data(
