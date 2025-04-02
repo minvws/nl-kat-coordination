@@ -49,7 +49,7 @@ class BoefjeHandler(Handler):
         try:
             logger.debug("Running local boefje plugin")
 
-            boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)
+            boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)  # todo: by image?
 
             if not isinstance(boefje_resource, BoefjeResource):
                 raise JobRuntimeError(f"Not a boefje: {boefje_meta.boefje.id}")

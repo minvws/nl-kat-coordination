@@ -2,7 +2,7 @@ FROM python:3.11-slim as base
 
 ARG BOEFJES_API=http://boefje:8000
 ENV BOEFJES_API=$BOEFJES_API
-ENV PYTHONPATH=/app/boefje
+ENV PYTHONPATH=/app/boefje:/app
 
 WORKDIR /app/boefje
 RUN adduser --disabled-password --gecos '' nonroot
