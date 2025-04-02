@@ -79,7 +79,7 @@ task_buttons.forEach((button) => {
   button.addEventListener("click", function () {
     // only load the results once, by checking if we are already showing output
     if (
-      !button.closest("tr").querySelector(".yielded-rawfiles, .yielded-objects")
+      !button.closest("tr").nextElementSibling.querySelector(".yielded-rawfiles, .yielded-objects")
     ) {
       // Retrieve JSON containing yielded raw files or oois of task.
       getJson(json_url, function (data) {
