@@ -103,7 +103,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
             self.delete_report_schedule(schedule_id)
             try:
                 self.octopoes_api_connector.delete(
-                    Reference.from_str(f"{recipe_pk}"), valid_time=datetime.now(timezone.utc)
+                    Reference.from_str(recipe_pk), valid_time=datetime.now(timezone.utc)
                 )
                 logger.info(
                     "Schedule and reportRecipe deleted", event_code="0800083", schedule_id=schedule_id, recipe=recipe_pk
