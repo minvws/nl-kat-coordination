@@ -11,7 +11,7 @@ from .boefje_handler import  BoefjeHandler
 import httpx
 
 
-class SimpleStorageClient(BoefjeStorageInterface):
+class CallbackStorageClient(BoefjeStorageInterface):
     def __init__(self, base_url: str, callback_url: str, outgoing_request_timeout: int):
         self._session = Client(base_url=base_url, transport=HTTPTransport(retries=6), timeout=outgoing_request_timeout)
         self.callback_url = callback_url
@@ -33,7 +33,7 @@ def main():
         sys.exit(f"Failed to get input from boefje API: {e}")
 
     parsed = urlparse(input_url)
-    client = SimpleStorageClient(f"{parsed.scheme}://{parsed.netloc}", boefje_input["output_url"], 30)
+    client = CallbackStorageClient(f"{parsed.scheme}://{parsed.netloc}", boefje_input["output_url"], 30)
     handler = BoefjeHandler(LocalPluginRepository(Path()), client)
 
     try:
