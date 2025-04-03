@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-05 14:32+0000\n"
+"POT-Creation-Date: 2025-03-20 09:42+0000\n"
 "PO-Revision-Date: 2025-02-04 17:02+0000\n"
 "Last-Translator: jan klopper <jan@underdark.nl>\n"
 "Language-Team: Tamil <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -952,7 +952,8 @@ msgstr "மதிப்பு"
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/templates/summary/report_asset_overview.html tools/forms/boefje.py
-#: tools/forms/finding_type.py rocky/templates/oois/ooi_detail.html
+#: tools/forms/finding_type.py rocky/templates/findings/finding_list.html
+#: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
 msgid "Description"
 msgstr "விவரம்"
@@ -3276,6 +3277,7 @@ msgstr ""
 
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.py
+#: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_detail_origins_inference.html
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
@@ -3283,11 +3285,13 @@ msgid "Source"
 msgstr "மூலம்"
 
 #: reports/report_types/findings_report/report.html
+#: rocky/templates/findings/finding_list.html
 msgid "Impact"
 msgstr "தாக்கம்"
 
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/multi_organization_report/recommendations.html
+#: rocky/templates/findings/finding_list.html
 msgid "Recommendation"
 msgstr "பரிந்துரை"
 
@@ -4318,8 +4322,8 @@ msgid "There are no optional plugins."
 msgstr "விருப்ப செருகுநிரல்கள் எதுவும் இல்லை."
 
 #: reports/templates/partials/report_setup_scan.html
-msgid "Enable plugins and continue"
-msgstr "செருகுநிரல்களை இயக்கி தொடரவும்"
+msgid "Enable selected plugins and continue"
+msgstr ""
 
 #: reports/templates/partials/report_severity_totals.html
 #: reports/templates/partials/report_severity_totals_table.html
@@ -5880,6 +5884,10 @@ msgstr "கண்டுபிடிப்புகள் அட்டவணை "
 #: rocky/templates/oois/ooi_list.html
 msgid "column headers with buttons are sortable"
 msgstr "பொத்தான்கள் கொண்ட நெடுவரிசை தலைப்புகள் வரிசைப்படுத்தக்கூடியவை"
+
+#: rocky/templates/findings/finding_list.html
+msgid "Location"
+msgstr ""
 
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_page_tabs.html
@@ -7921,6 +7929,9 @@ msgstr "மூல கோப்பை பைட்டுகளில் பதி
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "மூல கோப்பு வெற்றிகரமாக சேர்க்கப்பட்டது."
+
+#~ msgid "Enable plugins and continue"
+#~ msgstr "செருகுநிரல்களை இயக்கி தொடரவும்"
 
 #, python-format
 #~ msgid "Select object (%(total_oois)s)"
