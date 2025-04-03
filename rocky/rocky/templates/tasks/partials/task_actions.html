@@ -1,13 +1,14 @@
 {% load i18n %}
 
-{% if task.type == "normalizer" %}
-    <section>
-        <div id="yielded-objects-{{ task.id }}">
-            <h2>{% translate "Yielded objects" %}</h2>
-        </div>
-    </section>
-    <br>
-{% endif %}
+<section>
+    <p class="explanation">{% translate "Loading..." %}</p>
+    <div id="yielded-objects-{{ task.id }}">
+        <h2>{% translate "Yielded objects" %}</h2>
+    </div>
+    <div id="yielded-rawfiles-{{ task.id }}">
+        <h2>{% translate "Yielded raw files" %}</h2>
+    </div>
+</section>
 <section>
     <div class="button-container">
         {% if task.status.value in "completed,failed" %}
