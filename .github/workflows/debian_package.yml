@@ -97,6 +97,8 @@ jobs:
           path: ${{matrix.package}}/build/${{env.PKG_NAME}}_${{ env.RELEASE_VERSION }}_${{ matrix.package == 'cveapi' && 'all' || 'amd64' }}.deb
 
   add-debian-packages-to-rlease:
+    permissions:
+      contents: write
     needs: build
     runs-on: ubuntu-24.04
     if: startsWith(github.ref, 'refs/tags/')
