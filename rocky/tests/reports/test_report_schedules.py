@@ -50,7 +50,7 @@ def test_delete_schedule_object_not_found(
     mock_organization_view_octopoes().delete.side_effect = ObjectNotFoundException("Not found")
 
     request = setup_request(
-        rf.post("scheduled_reports", {"report_recipe": "recipeNone", "schedule_id": "ScheduleNone"}),
+        rf.post("scheduled_reports", {"report_recipe": "ReportRecipe|recipeNone", "schedule_id": "ScheduleNone"}),
         redteam_member.user,
     )
 
@@ -68,7 +68,7 @@ def test_delete_schedule_schedule_not_found(
     mock_scheduler.delete_schedule.side_effect = SchedulerError
 
     request = setup_request(
-        rf.post("scheduled_reports", {"report_recipe": "recipeNone", "schedule_id": "ScheduleNone"}),
+        rf.post("scheduled_reports", {"report_recipe": "ReportRecipe|recipeNone", "schedule_id": "ScheduleNone"}),
         redteam_member.user,
     )
 
