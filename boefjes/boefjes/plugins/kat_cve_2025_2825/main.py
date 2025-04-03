@@ -29,11 +29,11 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, str | bytes]]:
     if not service["name"].startswith("http"):
         return [({"info/boefje"}, "Skipping because service is not a http(s) service")]
 
-    allow_ports = getenv("PORTS", "")
-    if not allow_ports:
+    ports = getenv("PORTS", "")
+    if not ports:
         allow_ports = DEFAULT_PORTS
     else:
-        allow_ports = [int(port) for port in allow_ports.split(",")]
+        allow_ports = [int(port) for port in ports.split(",")]
 
     if port not in allow_ports:
         return [({"info/boefje"}, "Skipping because port is not known for CrushFTP usage")]
@@ -42,8 +42,12 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, str | bytes]]:
     full_url = urljoin(host, ENDPOINT_PATH)
     for _ in range(0, DEFAULT_TRIES):
         response = requests.get(
-            full_url, headers=HEADERS, verify=False, allow_redirects=False, timeout=int(getenv("REQUEST_TIMEOUT", "30"))
-        )  # noqa: S501
+            full_url,
+            headers=HEADERS,
+            verify=False,  # noqa: S501
+            allow_redirects=False,
+            timeout=int(getenv("REQUEST_TIMEOUT", "30")),
+        )
 
         if response.status_code == 200 and "user_name" in response.content:
             return [
