@@ -58,5 +58,8 @@ def validate_ports(ports: str | None) -> str:
 def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     """Build Nmap arguments and return results to normalizer."""
     return [
-        (set(), run_nmap(build_nmap_arguments(host=boefje_meta["arguments"]["input"]["address"], ports=getenv("PORTS"))))
+        (
+            set(),
+            run_nmap(build_nmap_arguments(host=boefje_meta["arguments"]["input"]["address"], ports=getenv("PORTS"))),
+        )
     ]

@@ -36,18 +36,29 @@ def test_boefje_input_running(api, tmp_path):
     response = api.get("/api/v0/tasks/70da7d4f-f41f-4940-901b-d98a92e9014b")
     assert response.status_code == 200
     assert response.json() == {
-        "task_id": "70da7d4f-f41f-4940-901b-d98a92e9014b",
         "output_url": "http://placeholder:8006/api/v0/tasks/70da7d4f-f41f-4940-901b-d98a92e9014b",
-        "boefje_meta": {
-            "arguments": {},
-            "boefje": {"id": "dns-records", "version": None},
-            "ended_at": None,
-            "environment": None,
+        "task": {
             "id": "70da7d4f-f41f-4940-901b-d98a92e9014b",
-            "input_ooi": "",
-            "organization": "_dev",
-            "runnable_hash": None,
-            "started_at": None,
+            "scheduler_id": "boefje",
+            "schedule_id": None,
+            "organisation": "_dev",
+            "priority": 1,
+            "status": "running",
+            "type": "boefje",
+            "hash": "70da7d4f-f41f-4940-901b-d98a92e9014b",
+            "data": {
+                "id": "70da7d4f-f41f-4940-901b-d98a92e9014b",
+                "started_at": None,
+                "ended_at": None,
+                "boefje": {"id": "dns-records", "version": None, "oci_image": None},
+                "input_ooi": "",
+                "arguments": {},
+                "organization": "_dev",
+                "runnable_hash": None,
+                "environment": None,
+            },
+            "created_at": "2021-06-29T14:00:00",
+            "modified_at": "2021-06-29T14:00:00",
         },
     }
 

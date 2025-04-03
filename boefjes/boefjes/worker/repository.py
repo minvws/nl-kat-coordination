@@ -215,7 +215,7 @@ def _find_packages_in_path_containing_files(path: Path, required_files: tuple[st
 def create_relative_import_statement_from_cwd(package_dir: Path) -> str:
     relative_path = str(package_dir.absolute()).replace(str(Path.cwd()), "")  # e.g. "/boefjes/plugins"
 
-    return f"{relative_path[1:].replace('/', '.')}." if relative_path else ''  # Turns into "boefjes.plugins."
+    return f"{relative_path[1:].replace('/', '.')}." if relative_path else ""  # Turns into "boefjes.plugins."
 
 
 @lru_cache(maxsize=200)

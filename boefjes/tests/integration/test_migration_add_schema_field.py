@@ -21,8 +21,8 @@ def migration_f9de6eb7824b(local_repository) -> Session:
     engine = get_engine()
     session = sessionmaker(bind=engine)()
 
-    dns_records = local_repository.by_id("dns-records")
-    nmap_udp = local_repository.by_id("nmap-udp")
+    dns_records = local_repository.by_id("dns-records").boefje
+    nmap_udp = local_repository.by_id("nmap-udp").boefje
     entries = [
         (
             boefje.id,
@@ -32,7 +32,7 @@ def migration_f9de6eb7824b(local_repository) -> Session:
             list(sorted(boefje.consumes)),
             list(sorted(boefje.produces)),
             ["RECORD_TYPES", "REMOTE_NS"],
-            boefje.oci_images,
+            boefje.oci_image,
             boefje.oci_arguments,
             boefje.version,
         )

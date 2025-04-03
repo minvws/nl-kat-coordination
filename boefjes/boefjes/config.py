@@ -57,7 +57,7 @@ class Settings(BaseSettings):
     poll_interval: float = Field(10.0, description="Time to wait before polling for tasks when all queues are empty")
     worker_heartbeat: float = Field(1.0, description="Seconds to wait before checking the workers when queues are full")
     plugins: list[str] = Field(
-        default_factory=list, description="A list of plugin ids to filter on.", examples=['["dns-records"]'],
+        default_factory=list, description="A list of plugin ids to filter on.", examples=['["dns-records"]']
     )
     images: list[str] = Field(
         default_factory=list,

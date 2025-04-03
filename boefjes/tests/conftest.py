@@ -24,6 +24,7 @@ from boefjes.sql.organisation_storage import SQLOrganisationStorage, get_organis
 from boefjes.sql.plugin_storage import SQLPluginStorage
 from boefjes.storage.interfaces import OrganisationNotFound
 from boefjes.storage.memory import ConfigStorageMemory, OrganisationStorageMemory, PluginStorageMemory
+from boefjes.worker.boefje_handler import BoefjeHandler
 from boefjes.worker.interfaces import Handler, PaginatedTasksResponse, SchedulerClientInterface, Task, TaskStatus
 from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
 from boefjes.worker.models import Organisation
@@ -144,6 +145,11 @@ def item_handler(tmp_path: Path):
 
 
 @pytest.fixture
+def mock_boefje_handler(mock_local_repository: LocalPluginRepository, mocker):
+    return BoefjeHandler(mock_local_repository, mocker.MagicMock())
+
+
+@pytest.fixture
 def manager(item_handler: MockHandler, tmp_path: Path) -> SchedulerWorkerManager:
     scheduler_client = MockSchedulerClient(
         boefje_responses=[
@@ -205,7 +211,6 @@ def mock_local_repository():
 @pytest.fixture
 def normalizer_runner(local_repository: LocalPluginRepository):
     return LocalNormalizerJobRunner(local_repository)
-
 
 
 @pytest.fixture

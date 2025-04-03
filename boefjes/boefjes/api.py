@@ -6,7 +6,7 @@ from typing import Any
 from uuid import UUID
 
 import structlog
-from fastapi import Depends, FastAPI, HTTPException, Body
+from fastapi import Body, Depends, FastAPI, HTTPException
 from httpx import HTTPError, HTTPStatusError
 from pydantic import BaseModel
 from uvicorn import Config, Server
@@ -15,7 +15,7 @@ from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient
 from boefjes.config import settings
 from boefjes.dependencies.plugins import get_plugin_service
-from boefjes.worker.interfaces import BoefjeOutput, PaginatedTasksResponse, StatusEnum, Task, TaskStatus, BoefjeInput
+from boefjes.worker.interfaces import BoefjeInput, BoefjeOutput, PaginatedTasksResponse, StatusEnum, Task, TaskStatus
 from boefjes.worker.repository import _default_mime_types
 
 app = FastAPI(title="Boefje API")

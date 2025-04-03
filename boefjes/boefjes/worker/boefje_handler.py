@@ -4,9 +4,9 @@ from base64 import b64encode
 
 import structlog
 
-from .interfaces import BoefjeOutput, BoefjeStorageInterface, File, Handler, StatusEnum, Task, JobRuntimeError
+from .interfaces import BoefjeOutput, BoefjeStorageInterface, File, Handler, JobRuntimeError, StatusEnum, Task
 from .job_models import BoefjeMeta
-from .repository import LocalPluginRepository, BoefjeResource, _default_mime_types
+from .repository import BoefjeResource, LocalPluginRepository, _default_mime_types
 
 logger = structlog.get_logger(__name__)
 
@@ -51,13 +51,13 @@ class BoefjeHandler(Handler):
                 # TODO: remove/change once all boefjes are oci images. This is now a "fallback".
                 boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)
             except KeyError:
-                boefje_resource = self.local_repository.by_image(boefje_meta.boefje.id)
+                boefje_resource = self.local_repository.by_image(boefje_meta.boefje.oci_image)
 
             if not isinstance(boefje_resource, BoefjeResource):
                 raise JobRuntimeError(f"Not a boefje: {boefje_meta.boefje.id}")
 
             if not boefje_resource.module:
-                raise JobRuntimeError(f"Not runnable module found")
+                raise JobRuntimeError("Not runnable module found")
 
             with TemporaryEnvironment() as temporary_environment:
                 temporary_environment.update(boefje_meta.environment or {})
@@ -98,7 +98,9 @@ class BoefjeHandler(Handler):
                         content=(
                             b64encode(output) if isinstance(output, bytes) else b64encode(output.encode())
                         ).decode(),
-                        tags=_default_mime_types(boefje_meta.boefje).union(valid_mimetypes),  # default mime-types are added through the API
+                        tags=_default_mime_types(boefje_meta.boefje).union(
+                            valid_mimetypes
+                        ),  # default mime-types are added through the API
                     )
                 )
 

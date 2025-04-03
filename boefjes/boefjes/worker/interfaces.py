@@ -2,9 +2,9 @@ import datetime
 import uuid
 from enum import Enum
 from typing import Any
-from uuid import UUID
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+
 # A deliberate relative import to make this module self-contained
 from .job_models import BoefjeMeta, NormalizerMeta
 
@@ -82,7 +82,9 @@ class SchedulerClientInterface:
     def pop_item(self, queue_id: str) -> Task | None:
         raise NotImplementedError()
 
-    def pop_items(self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1) -> PaginatedTasksResponse | None:
+    def pop_items(
+        self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
+    ) -> PaginatedTasksResponse | None:
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:

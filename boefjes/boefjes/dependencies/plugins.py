@@ -20,7 +20,7 @@ from boefjes.storage.interfaces import (
     UniqueViolation,
 )
 from boefjes.worker.models import Boefje, FilterParameters, Normalizer, PaginationParameters, PluginType
-from boefjes.worker.repository import LocalPluginRepository, get_local_repository, BoefjeResource, NormalizerResource
+from boefjes.worker.repository import BoefjeResource, LocalPluginRepository, NormalizerResource, get_local_repository
 
 logger = structlog.get_logger(__name__)
 

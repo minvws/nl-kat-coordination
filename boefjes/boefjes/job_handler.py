@@ -14,10 +14,10 @@ from boefjes.normalizer_interfaces import NormalizerJobRunner
 from boefjes.worker.boefje_handler import BoefjeHandler
 from boefjes.worker.interfaces import Handler, Task, TaskStatus
 from boefjes.worker.job_models import BoefjeMeta
+from boefjes.worker.repository import _default_mime_types
 from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference, ScanLevel
-from boefjes.worker.repository import _default_mime_types
 
 logger = structlog.get_logger(__name__)
 

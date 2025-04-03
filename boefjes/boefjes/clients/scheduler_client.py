@@ -24,7 +24,13 @@ logger = structlog.get_logger(__name__)
 
 
 class SchedulerAPIClient(SchedulerClientInterface):
-    def __init__(self, plugin_service: PluginService, base_url: str, oci_images: str | None = None, plugins: list[str] | None = None):
+    def __init__(
+        self,
+        plugin_service: PluginService,
+        base_url: str,
+        oci_images: str | None = None,
+        plugins: list[str] | None = None,
+    ):
         self._session = Client(
             base_url=base_url, transport=HTTPTransport(retries=6), timeout=settings.outgoing_request_timeout
         )
@@ -44,18 +50,22 @@ class SchedulerAPIClient(SchedulerClientInterface):
 
         return page.results[0]
 
-    def pop_items(self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1) -> PaginatedTasksResponse | None:
+    def pop_items(
+        self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
+    ) -> PaginatedTasksResponse | None:
         if not filters:
             filters = {"filters": []}
         if self.oci_images:
-            filters["filters"].append({"column": "data", "field": "boefje__oci_image", "operator": "in", "value": self.oci_images})
+            filters["filters"].append(
+                {"column": "data", "field": "boefje__oci_image", "operator": "in", "value": self.oci_images}
+            )
         if self.plugins:
-            filters["filters"].append({"column": "data", "field": "boefje__id", "operator": "in", "value": self.plugins})
+            filters["filters"].append(
+                {"column": "data", "field": "boefje__id", "operator": "in", "value": self.plugins}
+            )
 
         response = self._session.post(
-            f"/schedulers/{queue_id}/pop",
-            json=filters if filters["filters"] else None,
-            params={"limit": limit}
+            f"/schedulers/{queue_id}/pop", json=filters if filters["filters"] else None, params={"limit": limit}
         )
         self._verify_response(response)
 

@@ -77,7 +77,10 @@ def cli(plugins: tuple[str] | None, log_level: str) -> None:
     handler = BoefjeHandler(LocalPluginRepository(Path()), boefje_api)
     logger.info(
         "Configured BoefjeAPI [base_url=%s, outgoing_request_timeout=%s, images=%s, plugins=%s]",
-        base_url, outgoing_request_timeout, [oci_image], plugins,
+        base_url,
+        outgoing_request_timeout,
+        [oci_image],
+        plugins,
     )
 
     SchedulerWorkerManager(handler, boefje_api, pool_size, poll_interval, heartbeat).run(WorkerManager.Queue.BOEFJES)

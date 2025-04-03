@@ -1,14 +1,14 @@
+import sys
 from pathlib import Path
 from urllib.parse import urlparse
 from uuid import UUID
 
-import sys
-from httpx import HTTPTransport, Client
-
-from .repository import LocalPluginRepository
-from .interfaces import BoefjeStorageInterface, BoefjeOutput, Task
-from .boefje_handler import  BoefjeHandler
 import httpx
+from httpx import Client, HTTPTransport
+
+from .boefje_handler import BoefjeHandler
+from .interfaces import BoefjeOutput, BoefjeStorageInterface, Task
+from .repository import LocalPluginRepository
 
 
 class CallbackStorageClient(BoefjeStorageInterface):
@@ -17,7 +17,7 @@ class CallbackStorageClient(BoefjeStorageInterface):
         self.callback_url = callback_url
 
     def save_raws(self, boefje_meta_id: UUID, boefje_output: BoefjeOutput) -> dict[str, UUID]:
-        response =  self._session.post(self.callback_url, json=boefje_output.model_dump())
+        response = self._session.post(self.callback_url, json=boefje_output.model_dump())
         response.raise_for_status()
 
         return response.json()

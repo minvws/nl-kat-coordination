@@ -11,11 +11,11 @@ from uuid import UUID
 import pytest
 
 from boefjes.worker.boefje_handler import BoefjeHandler
-from boefjes.worker.interfaces import JobRuntimeError, StatusEnum, Task, TaskStatus
+from boefjes.worker.interfaces import StatusEnum, Task, TaskStatus
 from boefjes.worker.job_models import BoefjeMeta, InvalidReturnValueNormalizer, NormalizerMeta
 from boefjes.worker.models import Bit, Boefje, Normalizer, PluginType
 from boefjes.worker.repository import LocalPluginRepository
-from tests.loading import get_dummy_data
+from tests.loading import get_dummy_data, get_task
 
 boefjes = [
     Boefje(id="test-boefje-1", name="test-boefje-1", consumes={"SomeOOI"}, produces=["test-boef-1", "test/text"]),
@@ -89,7 +89,7 @@ def test_handle_boefje_with_exception(mocker):
     assert "Traceback (most recent call last)" in contents
     assert "JobRuntimeError: Boefje failed" in contents
     # default mime-types are added through the API
-    assert raw_call_args[0][1].files[0].tags == ["error/boefje"]
+    assert set(raw_call_args[0][1].files[0].tags) == {"error/boefje", "boefje/dummy_boefje_runtime_exception"}
 
 
 def test_exception_raised_unsupported_return_type_normalizer(mock_normalizer_runner):
@@ -110,40 +110,23 @@ def test_exception_raised_invalid_return_value(mock_normalizer_runner):
         mock_normalizer_runner.run(meta, b"123")
 
 
-def test_cleared_boefje_env(mock_boefje_runner) -> None:
+def test_cleared_boefje_env(mock_boefje_handler) -> None:
     """This test checks if un-containerized (local) boefjes can only access their explicitly set env vars"""
-
-    arguments = {"ARG1": "value1", "ARG2": "value2"}
-
-    meta = BoefjeMeta(
-        id="b49cd6f5-4d92-4a13-9d21-232993826cd9",
-        boefje={"id": "dummy_boefje_environment"},
-        input_ooi="Network|internet",
-        arguments=arguments,
-        organization="_dev",
-    )
+    task = get_task(boefje_id="dummy_boefje_environment")
+    task.data.environment = {"ARG1": "value1", "ARG2": "value2"}
 
     current_env = os.environ.copy()
-    output = mock_boefje_runner.run(meta, arguments)
-    output_dict = ast.literal_eval(output[0][1].decode())
+    mock_boefje_handler.handle(task)
+
+    output = mock_boefje_handler.boefje_storage.save_raws.mock_calls
+    content = base64.b64decode(output[0][1][1].files[0].content)
+    output_dict = ast.literal_eval(content.decode())
 
     # Assert that there are no overlapping environment keys
     assert not set(current_env.keys()) & set(output_dict.keys())
 
     # Assert that the original environment has been restored correctly
     assert current_env == os.environ
-
-
-def test_cannot_run_local_oci_boefje(mock_boefje_runner) -> None:
-    meta = BoefjeMeta(
-        id="b49cd6f5-4d92-4a13-9d21-232993826cd9",
-        boefje={"id": "dummy_oci_boefje_no_main"},
-        input_ooi="Network|internet",
-        organization="_dev",
-    )
-
-    with pytest.raises(JobRuntimeError):
-        mock_boefje_runner.run(meta, {})
 
 
 def test_correct_local_runner_hash(mock_local_repository) -> None:
@@ -161,6 +144,6 @@ def test_correct_local_runner_hash(mock_local_repository) -> None:
     assert Path(path / "__pycache__/pytest__init__.cpython-311.pyc").is_file()
     assert Path(path / "__pycache__/pytest_main.cpython-311.pyc").is_file()
 
-    assert boefje_resource_1.runnable_hash == "7a6de035b9b3f3de1534582df3a1024476d62aad4fce51b7ffa9f13dd92dcbd2"
-    assert boefje_resource_2.runnable_hash == "125d118d21c25ca522fc436cbe1ac8af336b7a973423d23ca02ce287a6c07b2d"
-    assert boefje_resource_3.runnable_hash == "3fceaf2422bd6d3975e73d5d7d297e9c4a70efce60fccfab761235f08b6891b4"
+    assert boefje_resource_1.boefje.runnable_hash == "7a6de035b9b3f3de1534582df3a1024476d62aad4fce51b7ffa9f13dd92dcbd2"
+    assert boefje_resource_2.boefje.runnable_hash == "125d118d21c25ca522fc436cbe1ac8af336b7a973423d23ca02ce287a6c07b2d"
+    assert boefje_resource_3.boefje.runnable_hash == "3fceaf2422bd6d3975e73d5d7d297e9c4a70efce60fccfab761235f08b6891b4"

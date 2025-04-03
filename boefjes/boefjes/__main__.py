@@ -44,7 +44,7 @@ logger = structlog.get_logger(__name__)
 
 
 def get_runtime_manager(
-    settings: Settings, queue: WorkerManager.Queue, images: list[str] | None, plugins: list[str] | None
+    settings: Settings, queue: WorkerManager.Queue, images: list[str] | None = None, plugins: list[str] | None = None
 ) -> WorkerManager:
     local_repository = get_local_repository()
 
@@ -54,8 +54,7 @@ def get_runtime_manager(
 
     if queue is WorkerManager.Queue.BOEFJES:
         item_handler = CompositeBoefjeHandler(
-            BoefjeHandler(local_repository, bytes_api_client),
-            DockerBoefjeHandler(scheduler_client, bytes_api_client),
+            BoefjeHandler(local_repository, bytes_api_client), DockerBoefjeHandler(scheduler_client, bytes_api_client)
         )
     else:
         item_handler = NormalizerHandler(
@@ -95,7 +94,8 @@ def cli(queue: str, images: tuple[str] | None, plugins: tuple[str] | None, log_l
 
         boefjes.api.run()
 
-    runtime.run(WorkerManager.Queue(queue))
+    else:
+        runtime.run(WorkerManager.Queue(queue))
 
 
 if __name__ == "__main__":
