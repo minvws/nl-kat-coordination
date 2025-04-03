@@ -9,11 +9,15 @@
 
     <main id="main-content">
         <section>
-            <div>
-                <h1>{% translate "Members of" %} {{ organization.name }}</h1>
-                {% blocktranslate with organization_name=organization.name trimmed %}
-                    An overview of "{{ organization_name }}" its members.
-                {% endblocktranslate %}
+            <div class="fifty-fifty">
+                <div>
+                    <h1>{% translate "Members" %}</h1>
+                    <p>
+                        {% blocktranslate with organization_name=organization.name trimmed %}
+                            An overview of "{{ organization_name }}" its members.
+                        {% endblocktranslate %}
+                    </p>
+                </div>
                 {% if perms.tools.add_organizationmember %}
                     <div class="horizontal-view toolbar">
                         <div class="dropdown">
@@ -32,7 +36,9 @@
                             </div>
                         </div>
                     </div>
-                {% endif %}
+                </div>
+            {% endif %}
+            <div>
                 {% include "partials/organization_member_list_filters.html" with checkbox_filters=checkbox_filters %}
 
                 <div class="toolbar">
