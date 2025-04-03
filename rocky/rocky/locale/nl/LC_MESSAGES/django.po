@@ -1,7 +1,7 @@
 # Brenno de Winter <brenno@dewinter.com>, 2023.
 # Darwinkel <Darwinkel@users.noreply.github.com>, 2023.
 # jan klopper <jan@underdark.nl>, 2023, 2024, 2025.
-# LibreTranslate <noreply-mt-libretranslate@weblate.org>, 2023, 2024.
+# LibreTranslate <noreply-mt-libretranslate@weblate.org>, 2023, 2024, 2025.
 # Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2023, 2024, 2025.
 # 跨性别 <github@lgbt.sh>, 2023.
 # Madelon Dohmen <maddohmen@hotmail.com>, 2023, 2024, 2025.
@@ -9,22 +9,23 @@
 # Joost Krapels <joost.krapels@ictinstitute.nl>, 2024.
 # Jeroen Dekkers <jeroen@dekkers.ch>, 2024.
 # Wim Benes <fryskefirefox@gmail.com>, 2024.
+# paulvandenbraken <paul.vandenbraken@ezzenz.nl>, 2025.
 #: reports/forms.py
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-05 14:32+0000\n"
-"PO-Revision-Date: 2025-03-07 10:02+0000\n"
-"Last-Translator: Madelon Dohmen <maddohmen@hotmail.com>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
-"coordination/nl/>\n"
+"POT-Creation-Date: 2025-03-20 09:42+0000\n"
+"PO-Revision-Date: 2025-04-02 22:08+0000\n"
+"Last-Translator: paulvandenbraken <paul.vandenbraken@ezzenz.nl>\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
+"nl-kat-coordination/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.10.3-dev\n"
+"X-Generator: Weblate 5.11-dev\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -396,10 +397,13 @@ msgid "OOI clearance"
 msgstr "OOI-vrijwaringsniveau"
 
 #: account/templates/account_detail.html
+#, fuzzy
 msgid ""
 "You don't have any clearance to scan objects. <br> Get in contact with the "
 "admin to give you the necessary clearance level."
 msgstr ""
+"U hebt geen vrijwaring om objecten te scannen. <br> Neem contact op met de "
+"beheerder om de juiste vrijwaring te verkrijgen."
 
 #: account/templates/account_detail.html
 msgid "You have currently accepted clearance up to level"
@@ -443,7 +447,7 @@ msgstr ""
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #, python-format
 msgid "Accept level L%(tcl)s clearance and responsibility"
-msgstr ""
+msgstr "Accepteer vrijwaringsniveau L%(tcl)s en verantwoordelijkheid"
 
 #: account/templates/password_reset.html
 msgid "Use the form below to reset your password."
@@ -972,7 +976,8 @@ msgstr "Waarde"
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/templates/summary/report_asset_overview.html tools/forms/boefje.py
-#: tools/forms/finding_type.py rocky/templates/oois/ooi_detail.html
+#: tools/forms/finding_type.py rocky/templates/findings/finding_list.html
+#: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
 msgid "Description"
 msgstr "Omschrijving"
@@ -1252,6 +1257,8 @@ msgid ""
 "Boefje variants that use the same container image. For more information "
 "about Boefje variants you can read the documentation."
 msgstr ""
+"Boefje-varianten die dezelfde container image gebruiken. Voor meer "
+"informatie over Boefje Varianten kun je de documentatie lezen."
 
 #: katalogus/templates/plugin_container_image.html
 msgid "Add variant"
@@ -1296,7 +1303,7 @@ msgstr "Scan interval"
 
 #: katalogus/templates/plugin_container_image.html
 msgid "Run on"
-msgstr ""
+msgstr "Draaien op"
 
 #: katalogus/templates/plugin_container_image.html
 msgid "current"
@@ -1392,20 +1399,20 @@ msgstr ""
 #: katalogus/templates/plugin_settings_add.html
 msgid "Add setting"
 msgid_plural "Add settings"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Voeg instelling toe"
+msgstr[1] "Voeg instellingen toe"
 
 #: katalogus/templates/plugin_settings_add.html
 msgid "Setting"
 msgid_plural "Settings"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Instelling"
+msgstr[1] "Instellingen"
 
 #: katalogus/templates/plugin_settings_add.html
 msgid "Add setting and enable boefje"
 msgid_plural "Add settings and enable boefje"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Voeg instelling toe en activeer boefje"
+msgstr[1] "Voeg instellingen toe en activeer boefje"
 
 #: katalogus/templates/plugin_settings_delete.html
 msgid "Delete settings"
@@ -2361,6 +2368,10 @@ msgid ""
 "of <strong>L%(tcl)s</strong>. </br> You have also <strong>acknowledged</"
 "strong> to use this clearance level of <strong>L%(acl)s</strong>."
 msgstr ""
+"De beheerder heeft je <strong>vertrouwd</strong> met vrijwaringsniveau "
+"<strong>L%(tcl)s</strong>. </br> Je hebt het gebruik van dit "
+"vrijwaringsniveau <strong>L%(acl)s</strong> ook "
+"<strong>geaccepteerd</strong>."
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #: onboarding/templates/step_3f_set_clearance_level.html
@@ -3321,6 +3332,7 @@ msgstr ""
 
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.py
+#: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_detail_origins_inference.html
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
@@ -3328,11 +3340,13 @@ msgid "Source"
 msgstr "Bron"
 
 #: reports/report_types/findings_report/report.html
+#: rocky/templates/findings/finding_list.html
 msgid "Impact"
 msgstr "Impact"
 
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/multi_organization_report/recommendations.html
+#: rocky/templates/findings/finding_list.html
 msgid "Recommendation"
 msgstr "Aanbeveling"
 
@@ -4180,7 +4194,7 @@ msgstr "Multi-rapport"
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "Object selection"
-msgstr ""
+msgstr "Object selectie"
 
 #: reports/templates/partials/report_ooi_list.html
 msgid ""
@@ -4199,11 +4213,19 @@ msgid ""
 "more hostnames tomorrow (with the same filter criteria), your next scheduled "
 "report will contain 5 hostnames. Your live set will update as you go."
 msgstr ""
+"Een levende set is een set objecten gebaseerd op de toegepaste filters. Elk "
+"object dat overeenkomt met deze toegepaste filter (Nu of in de toekomst) zal "
+"gebruikt worden als input voor het geplande rapport. Als je live set filter ("
+"e.g. \"Hostnames\" met 'gedeclareerde L2 vrijlating\") en vandaag 2 "
+"hostnames toont zal het rapport deze 2 hostnames gebuiken. Als je morgen nog "
+"drie hostnames toevoegt die aan de filter criteria voldoen, zal je volgende "
+"rapport vijf namen bevatten. Je live set zal elke keer opnieuw uitgevoerd "
+"worden als query."
 
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/partials/report_types_selection.html
 msgid "Applied filters:"
-msgstr ""
+msgstr "Actieve filters:"
 
 #: reports/templates/partials/report_ooi_list.html
 msgid ""
@@ -4256,6 +4278,8 @@ msgstr "Vrijwaringstype"
 #: reports/templates/partials/report_ooi_list.html
 msgid "Report(s) may be empty due to no objects in the selected filters."
 msgstr ""
+"Rapportages kunnen leeg zijn als er geen objecten uit de geselecteerde "
+"filter komen."
 
 #: reports/templates/partials/report_ooi_list.html
 msgid ""
@@ -4313,7 +4337,8 @@ msgid ""
 "that don't have their requirements met will be skipped."
 msgstr ""
 "Bepaalde plug-ins zijn verplicht, omdat ze cruciaal zijn voor een "
-"rapporttype. Rapporten die niet voldoen, zullen worden overgeslagen."
+"rapporttype. Rapporten waarvoor niet aan alle eisen is voldaan, zullen "
+"worden overgeslagen."
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Warning! Before you proceed read the following points:"
@@ -4346,7 +4371,7 @@ msgstr "Dit rapport vereist dat de volgende plug-ins zijn ingeschakeld:"
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Toggle all required plugins"
-msgstr ""
+msgstr "Toggle alle vereiste plug-ins"
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Show enabled plugins"
@@ -4366,7 +4391,7 @@ msgstr "De volgende plug-ins zijn optioneel om het rapport te genereren:"
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Toggle all optional plugins"
-msgstr ""
+msgstr "Toggle alle optionele plug-ins"
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Hide suggested plugins"
@@ -4381,8 +4406,8 @@ msgid "There are no optional plugins."
 msgstr "Er zijn geen optionele plug-ins."
 
 #: reports/templates/partials/report_setup_scan.html
-msgid "Enable plugins and continue"
-msgstr "Plug-ins inschakelen en doorgaan"
+msgid "Enable selected plugins and continue"
+msgstr ""
 
 #: reports/templates/partials/report_severity_totals.html
 #: reports/templates/partials/report_severity_totals_table.html
@@ -5960,6 +5985,10 @@ msgid "column headers with buttons are sortable"
 msgstr "kolomkoppen met knoppen zijn te sorteren"
 
 #: rocky/templates/findings/finding_list.html
+msgid "Location"
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
@@ -6505,7 +6534,7 @@ msgstr "%(display_type)s opslaan"
 
 #: rocky/templates/oois/ooi_findings.html
 msgid "Currently no findings have been identified for OOI"
-msgstr "Er zijn momenteel nog geen bevindingen voor OOI geïdentificeerd"
+msgstr "Er zijn momenteel nog geen bevindingen geïdentificeerd voor OOI"
 
 #: rocky/templates/oois/ooi_list.html
 #, python-format
@@ -7003,7 +7032,7 @@ msgstr "Gerelateerde objecten"
 
 #: rocky/templates/partials/ooi_detail_related_object.html
 msgid "No related object known for"
-msgstr ""
+msgstr "Geen gerelateerd objecten bekend voor"
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Generate Findings Report"
@@ -7275,7 +7304,7 @@ msgstr "Handmatig toegevoegd"
 
 #: rocky/templates/tasks/ooi_detail_task_list.html
 msgid "There have been no tasks"
-msgstr ""
+msgstr "Er zijn geen taken geweest"
 
 #: rocky/templates/tasks/partials/stats.html
 msgid "Task statistics - Last 24 hours"
@@ -7317,6 +7346,11 @@ msgid ""
 "the output mime-type. Additionally, there is a Report tasks. This task "
 "aggregates and presents findings from both Boefjes and Normalizers."
 msgstr ""
+"Een overzicht van de taken voor %(organization)s. Taken zijn onderverdeeld "
+"in Boefjes, Normalizers en Rapporten. Boefjes scannen naar objecten en "
+"Normalizers doen de vervolgafhandeling gebaseerd op de output mime-type. "
+"Aanvullend aggregeert en presenteert de Rapportage taak de bevindingen van "
+"zowel Boefjes als Normalizers."
 
 #: rocky/templates/tasks/plugin_detail_task_list.html
 msgid "There are no tasks for"
@@ -7328,11 +7362,11 @@ msgstr "Takenlijst voor"
 
 #: rocky/templates/tasks/report_tasks.html
 msgid "There are no tasks for reports"
-msgstr ""
+msgstr "Er zijn geen taken voor rapportages"
 
 #: rocky/templates/tasks/report_tasks.html
 msgid "List of tasks for reports"
-msgstr ""
+msgstr "Takenlijst voor rapportages"
 
 #: rocky/templates/two_factor/_wizard_actions.html
 msgid "Log in"
@@ -7670,7 +7704,7 @@ msgstr "Alleen Question-OOI’s kunnen worden beantwoord."
 
 #: rocky/views/ooi_detail.py
 msgid "Question has been answered."
-msgstr "Vraag is beantwoord."
+msgstr "De vraag is beantwoord."
 
 #: rocky/views/ooi_detail_related_object.py
 msgid " (as "
@@ -7927,7 +7961,7 @@ msgstr "{number_of_bits} bits herberekend. Duur: {duration}"
 
 #: rocky/views/page_actions.py
 msgid "Could not process your request, action required."
-msgstr "Kon uw verzoek niet verwerken, actie nodig."
+msgstr "Kon je verzoek niet verwerken, actie nodig."
 
 #: rocky/views/scan_profile.py
 #, python-brace-format
@@ -7942,7 +7976,7 @@ msgstr "Scans"
 
 #: rocky/views/scheduler.py
 msgid "Your report has been scheduled."
-msgstr "Uw rapport is ingepland."
+msgstr "Je rapport is ingepland."
 
 #: rocky/views/scheduler.py
 msgid ""
@@ -8019,6 +8053,9 @@ msgstr "Raw-bestand kan niet naar Bytes worden geüpload: %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Raw-bestand met succes toegevoegd."
+
+#~ msgid "Enable plugins and continue"
+#~ msgstr "Plug-ins inschakelen en doorgaan"
 
 #, python-format
 #~ msgid "Select object (%(total_oois)s)"
