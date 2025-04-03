@@ -13,7 +13,6 @@ logger = structlog.get_logger(__name__)
 MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought to be reasonable
 
 
-
 class TemporaryEnvironment:
     """Context manager that temporarily clears the environment vars and restores it after exiting the context"""
 
@@ -48,7 +47,11 @@ class BoefjeHandler(Handler):
         try:
             logger.debug("Running local boefje plugin")
 
-            boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)  # TODO: by image?
+            try:
+                # TODO: remove/change once all boefjes are oci images. This is now a "fallback".
+                boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)
+            except KeyError:
+                boefje_resource = self.local_repository.by_image(boefje_meta.boefje.id)
 
             if not isinstance(boefje_resource, BoefjeResource):
                 raise JobRuntimeError(f"Not a boefje: {boefje_meta.boefje.id}")

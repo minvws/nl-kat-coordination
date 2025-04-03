@@ -30,6 +30,7 @@ class Boefje(BaseModel):
 
     id: Annotated[str, StringConstraints(min_length=1)]
     version: str | None = Field(default=None)
+    oci_image: str | None = Field(default=None)
 
 
 class BoefjeMeta(Job):

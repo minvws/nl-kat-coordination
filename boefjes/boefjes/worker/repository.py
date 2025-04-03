@@ -86,6 +86,15 @@ class LocalPluginRepository:
 
         raise KeyError(f"Can't find plugin {plugin_id}")
 
+    def by_image(self, image: str) -> BoefjeResource:
+        boefjes = self.resolve_boefjes()
+
+        for boefje in boefjes.values():
+            if boefje.boefje.oci_image == image:
+                return boefje
+
+        raise KeyError(f"Can't find image {image}")
+
     def by_name(self, plugin_name: str) -> BoefjeResource | NormalizerResource:
         boefjes = {resource.boefje.name: resource for resource in self.resolve_boefjes().values()}
 
