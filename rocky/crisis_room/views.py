@@ -70,9 +70,13 @@ class DashboardService:
         """
         Return for each raw id key its bytes content value across all member organizations.
         """
+        # When organization is None, data is fetched across all organizations.
         bytes_client = get_bytes_client(None)
         bytes_client.login()
-        return bytes_client.get_raws_all(raw_ids)
+        try:
+            return bytes_client.get_raws_all(raw_ids)
+        except (HTTPStatusError, ObjectNotFoundException):
+            return {}
 
     def collect_findings_dashboard(self, organizations: list[Organization]) -> list[dict[str, Any]]:
         findings_dashboard = []
@@ -87,8 +91,12 @@ class DashboardService:
         report_data_from_bytes = self.get_report_bytes_data(raw_ids)
 
         for _, hydrated_report in reports.items():
-            report_data = self.get_organizations_findings(report_data_from_bytes[hydrated_report.data_raw_id])
-            findings_dashboard.append({"report": hydrated_report, "report_data": report_data})
+            try:
+                hydrated_report_data = report_data_from_bytes[hydrated_report.data_raw_id]
+                report_data = self.get_organizations_findings(hydrated_report_data)
+                findings_dashboard.append({"report": hydrated_report, "report_data": report_data})
+            except KeyError:
+                continue
 
         return findings_dashboard
 
