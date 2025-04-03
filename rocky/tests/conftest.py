@@ -35,7 +35,7 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
 from octopoes.models.ooi.reports import AssetReport, HydratedReport, Report, ReportData, ReportRecipe
-from octopoes.models.ooi.service import IPService, Service
+from octopoes.models.ooi.service import IPService, Service, TLSCipher
 from octopoes.models.ooi.software import Software
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
 from octopoes.models.origin import Origin, OriginType
@@ -925,61 +925,53 @@ def finding_type_kat_invalid_dnssec() -> KATFindingType:
 
 
 @pytest.fixture
-def tree_data_tls_findings_and_suites():
-    return {
-        "root": {"reference": "", "children": {"ooi": [{"reference": "", "children": {}}]}},
-        "store": {
-            "Finding|Network|testnetwork|KAT-0001": {
-                "object_type": "Finding",
-                "primary_key": "Finding|Network|testnetwork|KAT-0001",
-                "ooi": "Network|testnetwork",
-                "description": "Fake description with cipher_suite_name ECDHE-RSA-AES128-SHA",
-                "finding_type": "KATFindingType|KAT-RECOMMENDATION-BAD-CIPHER",
-            },
-            "Finding|Network|testnetwork|KAT-0002": {
-                "object_type": "Finding",
-                "primary_key": "Finding|Network|testnetwork|KAT-0002",
-                "ooi": "Network|testnetwork",
-                "description": "Fake description with cipher_suite_name ECDHE-RSA-AES256-SHA",
-                "finding_type": "KATFindingType|KAT-MEDIUM-BAD-CIPHER",
-            },
-            "Finding|Network|testnetwork|KAT-0003": {
-                "object_type": "Finding",
-                "primary_key": "Finding|Network|testnetwork|KAT-0003",
-                "ooi": "Network|testnetwork",
-                "description": "Fake description...",
-                "finding_type": "KATFindingType|KAT-CRITICAL-BAD-CIPHER",
-            },
-            "TLSCipher|Network|testnetwork|KAT-0004": {
-                "object_type": "TLSCipher",
-                "primary_key": "TLSCipher|Network|testnetwork|KAT-0004|tcp|443|https",
-                "ip_service": "IPService",
-                "ooi": "Network|testnetwork",
-                "suites": {
-                    "TLSv1": [
-                        {
-                            "cipher_suite_alias": "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
-                            "encryption_algorithm": "AES",
-                            "cipher_suite_name": "ECDHE-RSA-AES128-SHA",
-                            "bits": 128,
-                            "key_size": 256,
-                            "key_exchange_algorithm": "ECDH",
-                            "cipher_suite_code": "xc013",
-                        },
-                        {
-                            "cipher_suite_alias": "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
-                            "encryption_algorithm": "AES",
-                            "cipher_suite_name": "ECDHE-RSA-AES256-SHA",
-                            "bits": 256,
-                            "key_size": 256,
-                            "key_exchange_algorithm": "ECDH",
-                            "cipher_suite_code": "xc014",
-                        },
-                    ]
+def cipher(ip_service: IPService) -> TLSCipher:
+    return TLSCipher(
+        ip_service=ip_service.reference,
+        suites={
+            "TLSv1": [
+                {
+                    "cipher_suite_alias": "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+                    "encryption_algorithm": "AES",
+                    "cipher_suite_name": "ECDHE-RSA-AES128-SHA",
+                    "bits": 128,
+                    "key_size": 256,
+                    "key_exchange_algorithm": "ECDH",
+                    "cipher_suite_code": "xc013",
                 },
-            },
+                {
+                    "cipher_suite_alias": "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
+                    "encryption_algorithm": "AES",
+                    "cipher_suite_name": "ECDHE-RSA-AES256-SHA",
+                    "bits": 256,
+                    "key_size": 256,
+                    "key_exchange_algorithm": "ECDH",
+                    "cipher_suite_code": "xc014",
+                },
+            ]
         },
-    }
+    )
+
+
+@pytest.fixture
+def query_data_tls_findings_and_suites(cipher):
+    return [
+        Finding(
+            ooi=cipher.reference,
+            description="Fake description with cipher_suite_name ECDHE-RSA-AES128-SHA",
+            finding_type=KATFindingType(id="KAT-RECOMMENDATION-BAD-CIPHER").reference,
+        ),
+        Finding(
+            ooi=cipher.reference,
+            description="Fake description with cipher_suite_name ECDHE-RSA-AES256-SHA",
+            finding_type=KATFindingType(id="KAT-MEDIUM-BAD-CIPHER").reference,
+        ),
+        Finding(
+            ooi=cipher.reference,
+            description="Fake description...",
+            finding_type=KATFindingType(id="KAT-CRITICAL-BAD-CIPHER").reference,
+        ),
+    ]
 
 
 @pytest.fixture
