@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-05 14:32+0000\n"
+"POT-Creation-Date: 2025-03-20 09:42+0000\n"
 "PO-Revision-Date: 2023-11-18 13:03+0000\n"
 "Last-Translator: jan klopper <jan@underdark.nl>\n"
 "Language-Team: English (Pirate) <https://hosted.weblate.org/projects/openkat/"
@@ -903,7 +903,8 @@ msgstr ""
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/templates/summary/report_asset_overview.html tools/forms/boefje.py
-#: tools/forms/finding_type.py rocky/templates/oois/ooi_detail.html
+#: tools/forms/finding_type.py rocky/templates/findings/finding_list.html
+#: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
 msgid "Description"
 msgstr ""
@@ -2982,6 +2983,7 @@ msgstr ""
 
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.py
+#: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_detail_origins_inference.html
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
@@ -2989,11 +2991,13 @@ msgid "Source"
 msgstr ""
 
 #: reports/report_types/findings_report/report.html
+#: rocky/templates/findings/finding_list.html
 msgid "Impact"
 msgstr ""
 
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/multi_organization_report/recommendations.html
+#: rocky/templates/findings/finding_list.html
 msgid "Recommendation"
 msgstr ""
 
@@ -3931,7 +3935,7 @@ msgid "There are no optional plugins."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-msgid "Enable plugins and continue"
+msgid "Enable selected plugins and continue"
 msgstr ""
 
 #: reports/templates/partials/report_severity_totals.html
@@ -5406,6 +5410,10 @@ msgstr ""
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_list.html
 msgid "column headers with buttons are sortable"
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
+msgid "Location"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
