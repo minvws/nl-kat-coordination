@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-01 12:50+0000\n"
+"POT-Creation-Date: 2025-04-03 07:58+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,8 +27,7 @@ msgstr ""
 msgid "Important dates"
 msgstr ""
 
-#: account/forms/account_setup.py crisis_room/forms.py
-#: katalogus/templates/katalogus_settings.html
+#: account/forms/account_setup.py katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_container_image.html
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/tls_report/report.html
@@ -588,57 +587,6 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: crisis_room/forms.py
-msgid "Title on dashboard"
-msgstr ""
-
-#: crisis_room/forms.py
-msgid "List sorting by"
-msgstr ""
-
-#: crisis_room/forms.py onboarding/templates/step_3c_setup_scan_ooi_detail.html
-#: reports/report_types/dns_report/report.html
-#: reports/templates/partials/report_ooi_list.html
-#: reports/templates/report_overview/modal_partials/delete_modal.html
-#: reports/templates/report_overview/modal_partials/rerun_modal.html
-#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
-#: rocky/templates/oois/ooi_list.html
-#: rocky/templates/partials/elements/ooi_tree_condensed_table.html
-#: rocky/templates/partials/explanations.html
-#: rocky/templates/partials/ooi_detail_related_object.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Type"
-msgstr ""
-
-#: crisis_room/forms.py katalogus/templates/change_clearance_level.html
-#: onboarding/forms.py reports/templates/partials/report_ooi_list.html
-#: reports/templates/summary/ooi_selection.html tools/forms/boefje.py
-#: tools/forms/ooi.py rocky/templates/oois/ooi_list.html
-#: rocky/templates/oois/ooi_page_tabs.html
-#: rocky/templates/partials/explanations.html
-msgid "Clearance level"
-msgstr ""
-
-#: crisis_room/forms.py
-msgid "Number of objects in list"
-msgstr ""
-
-#: crisis_room/forms.py
-msgid "Show table columns"
-msgstr ""
-
-#: crisis_room/forms.py
-msgid "Dashboard item size"
-msgstr ""
-
-#: crisis_room/forms.py
-msgid "Full width"
-msgstr ""
-
-#: crisis_room/forms.py
-msgid "Half width"
-msgstr ""
-
 #: crisis_room/views.py
 msgid ""
 "Failed to get list of findings for organization {}, check server logs for "
@@ -868,6 +816,15 @@ msgstr ""
 #: reports/templates/summary/ooi_selection.html
 #: rocky/templates/oois/ooi_list.html
 msgid "Object"
+msgstr ""
+
+#: katalogus/templates/change_clearance_level.html onboarding/forms.py
+#: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/ooi_selection.html tools/forms/boefje.py
+#: tools/forms/ooi.py rocky/templates/oois/ooi_list.html
+#: rocky/templates/oois/ooi_page_tabs.html
+#: rocky/templates/partials/explanations.html
+msgid "Clearance level"
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
@@ -2031,6 +1988,20 @@ msgstr ""
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "URL"
+msgstr ""
+
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
+#: reports/report_types/dns_report/report.html
+#: reports/templates/partials/report_ooi_list.html
+#: reports/templates/report_overview/modal_partials/delete_modal.html
+#: reports/templates/report_overview/modal_partials/rerun_modal.html
+#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
+#: rocky/templates/oois/ooi_list.html
+#: rocky/templates/partials/elements/ooi_tree_condensed_table.html
+#: rocky/templates/partials/explanations.html
+#: rocky/templates/partials/ooi_detail_related_object.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Type"
 msgstr ""
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
