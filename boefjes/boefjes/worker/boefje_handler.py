@@ -59,7 +59,7 @@ class BoefjeHandler(Handler):
             with TemporaryEnvironment() as temporary_environment:
                 temporary_environment.update(boefje_meta.environment or {})
                 try:
-                    boefje_results = boefje_resource.module.run(boefje_meta.model_dump())  # TODO: change boefje signature
+                    boefje_results = boefje_resource.module.run(boefje_meta.model_dump())
                 except BaseException as e:  # noqa
                     raise JobRuntimeError("Boefje failed") from e
         except:

@@ -4,7 +4,6 @@ import os
 import docker
 
 from boefjes.plugins.helpers import get_file_from_container
-from boefjes.worker.job_models import BoefjeMeta
 
 IMAGE = "ghcr.io/minvws/nl-kat-masscan-build-image:latest"
 FILE_PATH = "/tmp/output.json"  # noqa: S108
@@ -38,9 +37,9 @@ def run_masscan(target_ip: str) -> bytes:
     return output
 
 
-def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
+def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     """Creates webpage and takes capture using Playwright container."""
-    input_ = boefje_meta.arguments["input"]
+    input_ = boefje_meta["arguments"]["input"]
     ip_range = f"{input_['start_ip']['address']}/{str(input_['mask'])}"
     m_run = run_masscan(target_ip=ip_range)
     logging.info("Received a response with length %d", len(m_run))

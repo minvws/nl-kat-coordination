@@ -1,7 +1,6 @@
 import docker
 
 from boefjes.plugins.helpers import get_file_from_container
-from boefjes.worker.job_models import BoefjeMeta
 
 PLAYWRIGHT_IMAGE = "mcr.microsoft.com/playwright:latest"
 BROWSER = "chromium"
@@ -76,9 +75,9 @@ def run_playwright(webpage: str, browser: str) -> tuple[bytes, bytes, bytes]:
         container.remove()
 
 
-def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
+def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     """Creates webpage and takes capture using Playwright container."""
-    input_ = boefje_meta.arguments["input"]
+    input_ = boefje_meta["arguments"]["input"]
     webpage = f"{input_['scheme']}://{input_['netloc']['name']}{input_['path']}"
 
     image_png, har_zip, storage_json = run_playwright(webpage=webpage, browser=BROWSER)

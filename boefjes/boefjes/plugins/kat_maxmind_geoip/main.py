@@ -13,8 +13,6 @@ from pathlib import Path
 import maxminddb
 import requests
 
-from boefjes.worker.job_models import BoefjeMeta
-
 BASE_PATH = Path(getenv("OPENKAT_CACHE_PATH", Path(__file__).parent))
 
 if BASE_PATH.name != Path(__file__).parent.name:
@@ -29,8 +27,8 @@ HASHFUNC = "sha256"
 REQUEST_TIMEOUT = 30
 
 
-def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
-    input_ = boefje_meta.arguments["input"]
+def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
+    input_ = boefje_meta["arguments"]["input"]
     ip = input_["address"]
     hash_algorithm = getenv("HASHFUNC", HASHFUNC)
 
