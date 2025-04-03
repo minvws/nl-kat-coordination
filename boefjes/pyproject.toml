@@ -70,7 +70,7 @@ opentelemetry-proto = "^1.29.0"
 opentelemetry-semantic-conventions = "^0.50b0"
 opentelemetry-util-http = "^0.50b0"
 fastapi-slim = "^0.115.2"
-structlog = "^24.2.0"
+structlog = "^25.2.0"
 # required by kat_maxmind_geoip
 maxminddb = "^2.6.2"
 # required by kat_wappalyzer
