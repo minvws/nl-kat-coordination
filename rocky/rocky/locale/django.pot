@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-20 09:42+0000\n"
+"POT-Creation-Date: 2025-04-03 08:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -515,7 +515,9 @@ msgid "Verify OpenKAT account on %(site_name)s"
 msgstr ""
 
 #: account/validators.py
-msgid "Your password must contain at least the following:"
+msgid ""
+"Your password must contain at least the following but longer passwords are "
+"recommended:"
 msgstr ""
 
 #: account/validators.py
@@ -531,7 +533,8 @@ msgid " letters"
 msgstr ""
 
 #: account/validators.py
-msgid " special characters such as: "
+msgid ""
+" special characters such as: {str(validators.get('special_characters',''))}"
 msgstr ""
 
 #: account/validators.py
