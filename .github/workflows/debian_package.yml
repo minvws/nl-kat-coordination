@@ -96,7 +96,7 @@ jobs:
           name: ${{env.PKG_NAME}}_${{ env.RELEASE_VERSION }}_${{ matrix.dist }}.deb
           path: ${{matrix.package}}/build/${{env.PKG_NAME}}_${{ env.RELEASE_VERSION }}_${{ matrix.package == 'cveapi' && 'all' || 'amd64' }}.deb
 
-  add-debian-packages-to-rlease:
+  add-debian-packages-to-release:
     permissions:
       contents: write
     needs: build
