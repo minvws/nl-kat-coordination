@@ -13,7 +13,7 @@
                 <h1>{% translate "Settings" %}</h1>
                 <p>
                     {% blocktranslate with organization_name=organization.name trimmed %}
-                        An overview of "{{ organization_name }}". This shows general information and its settings.
+                        An overview of general information and settings for <strong>{{ organization_name }}</strong>.
                     {% endblocktranslate %}
                 </p>
                 {% if not indemnification_present %}
