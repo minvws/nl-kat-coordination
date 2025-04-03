@@ -8,7 +8,6 @@ from django.http.request import HttpRequest
 from django.urls import reverse
 from django.views.generic import TemplateView
 from httpx import HTTPStatusError
-from pydantic import TypeAdapter
 from reports.report_types.findings_report.report import SEVERITY_OPTIONS
 from tools.models import Organization, OrganizationMember
 
@@ -17,7 +16,7 @@ from crisis_room.models import DashboardData
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.reports import HydratedReport
-from rocky.bytes_client import BytesClient, get_bytes_client
+from rocky.bytes_client import get_bytes_client
 
 logger = structlog.get_logger(__name__)
 
@@ -67,11 +66,13 @@ class DashboardService:
         return {}
 
     @staticmethod
-    def get_report_bytes_data(bytes_client: BytesClient, data_raw_id: str):
+    def get_report_bytes_data(raw_ids: list[str]) -> dict[str, dict[str, Any]]:
+        """
+        Return for each raw id key its bytes content value across all member organizations.
+        """
+        bytes_client = get_bytes_client(None)
         bytes_client.login()
-        return TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
-            bytes_client.get_raw(raw_id=data_raw_id)
-        )
+        return bytes_client.get_raws_all(raw_ids)
 
     def collect_findings_dashboard(self, organizations: list[Organization]) -> list[dict[str, Any]]:
         findings_dashboard = []
@@ -82,18 +83,12 @@ class DashboardService:
 
         reports: dict[UUID, HydratedReport] = self.get_reports(datetime.now(timezone.utc), dashboards_data)
 
+        raw_ids = [hydrated_report.data_raw_id for _, hydrated_report in reports.items() if hydrated_report]
+        report_data_from_bytes = self.get_report_bytes_data(raw_ids)
+
         for _, hydrated_report in reports.items():
-            if hydrated_report:
-                organization = {"name": hydrated_report.organization_name, "code": hydrated_report.organization_code}
-
-                bytes_client = get_bytes_client(hydrated_report.organization_code)
-                report_data_from_bytes = self.get_report_bytes_data(bytes_client, hydrated_report.data_raw_id)
-                report_data = self.get_organizations_findings(report_data_from_bytes)
-
-                if report_data:
-                    findings_dashboard.append(
-                        {"organization": organization, "report": hydrated_report, "report_data": report_data}
-                    )
+            report_data = self.get_organizations_findings(report_data_from_bytes[hydrated_report.data_raw_id])
+            findings_dashboard.append({"report": hydrated_report, "report_data": report_data})
 
         return findings_dashboard
 
