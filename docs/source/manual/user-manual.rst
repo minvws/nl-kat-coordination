@@ -437,6 +437,18 @@ L4: Intensive scan
 
 The premise of the test profile is to verify whether an attacker can exploit vulnerabilities to give himself more extensive access to the tested environment. Thus, known exploit code is applied in this level.
 
+
+Object origin types
+-------------------
+Each object in OpenKAT has an origin type. The origin type defines how the object was added to the database and depending on the origin type, this also affects the garbage collection of that object. There are 4 different origin types:
+
+* **Declaration**: declared objects are added by the user. This is often a hostname, URL or IP-address that was added and is scanned by boefjes.
+* **Observation**: observed objects are confirmed by boefjes and/or normalizers. Observed objects always required an input object, otherwise the boefje or normalizer cannot run. Observations are proved as long as the object exists.
+* **Inference**: inferred objects come from bits/nibbles. If object A exists, then object B must also exist. If one of these input objects is removed, then we do not have proof for inference, and as a result the object is removed.
+* **Affirmation**: when a boefje ran it gathers data, however this doesn't prove that the object exists. As an example: if an observation for a CVE object is created, the CVE finding requires additional data (such as a description and score). This extra data are affirmed objects. If the observation for the CVE object disappears (e.g. the CVE is resolved), the description and score belonging to this CVE object should also be removed.
+
+
+
 Bits
 ====
 
