@@ -99,7 +99,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
             messages.error(self.request, _("Not enough permissions"))
             return self.get(request, *args, **kwargs)
 
-        if recipe_pk and schedule_id and Reference.from_str(f"ReportRecipe|{recipe_pk}").class_type == ReportRecipe:
+        if recipe_pk and schedule_id and Reference.from_str(recipe_pk).class_type == ReportRecipe:
             self.delete_report_schedule(schedule_id)
             try:
                 self.octopoes_api_connector.delete(
