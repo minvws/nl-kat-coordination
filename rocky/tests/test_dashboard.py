@@ -81,7 +81,7 @@ def test_get_organizations_findings(findings_report_bytes_data):
     """Test if the highest risk level is collected, only critical and high finding types are returned."""
     dashboard_service = DashboardService()
     report_data = list(findings_report_bytes_data.values())[0]
-    print(report_data)
+
     report_data["findings"]["finding_types"] = [
         {"finding_type": {"risk_severity": "critical"}, "occurrences": {}},
         {"finding_type": {"risk_severity": "high"}, "occurrences": {}},
