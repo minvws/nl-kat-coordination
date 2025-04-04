@@ -1958,218 +1958,208 @@ def findings_reports(client_member, client_member_b):
         has_parent=False,
     )
 
-    reports = [report_a, report_b]
-
-    return Paginated(count=len(reports), items=reports)
+    return {UUID(recipe_id_a): report_a, UUID(recipe_id_b): report_b}
 
 
 @pytest.fixture
 def findings_report_bytes_data():
-    report_data_a = {
-        "systems": {"services": {}},
-        "services": {},
-        "recommendations": [],
-        "recommendation_counts": {},
-        "open_ports": {},
-        "ipv6": {},
-        "vulnerabilities": {},
-        "findings": {
-            "finding_types": [],
-            "summary": {
-                "total_by_severity_per_finding_type": {
-                    "critical": 0,
-                    "high": 0,
-                    "medium": 3,
-                    "low": 1,
-                    "recommendation": 0,
-                    "pending": 0,
-                    "unknown": 0,
-                },
-                "total_by_severity": {
-                    "critical": 0,
-                    "high": 0,
-                    "medium": 4,
-                    "low": 3,
-                    "recommendation": 0,
-                    "pending": 0,
-                    "unknown": 0,
-                },
-                "total_finding_types": 4,
-                "total_occurrences": 7,
-            },
-        },
-        "basic_security": {
-            "rpki": {},
-            "system_specific": {"Mail": [], "Web": [], "DNS": []},
-            "safe_connections": {},
-            "summary": {},
-        },
-        "summary": {"critical_vulnerabilities": 0, "ips_scanned": 0, "hostnames_scanned": 0, "terms_in_report": ""},
-        "total_findings": 0,
-        "total_systems": 0,
-        "total_hostnames": 0,
-        "total_systems_basic_security": 0,
-        "health": [
-            {"service": "rocky", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
-            {"service": "octopoes", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
-            {
-                "service": "xtdb",
-                "healthy": True,
-                "version": "1.24.4",
-                "additional": {
-                    "version": "1.24.4",
-                    "revision": "b46e92df67699cb25f3b21a61742c79da564b3b0",
-                    "indexVersion": 22,
-                    "consumerState": None,
-                    "kvStore": "xtdb.rocksdb.RocksKv",
-                    "estimateNumKeys": 56338,
-                    "size": 93781419,
-                },
-                "results": [],
-            },
-            {
-                "service": "katalogus",
-                "healthy": True,
-                "version": "0.0.1-development",
-                "additional": None,
-                "results": [],
-            },
-            {"service": "scheduler", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
-            {"service": "bytes", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
-            {"service": "keiko", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
-        ],
-        "config_oois": [],
-        "input_data": {
-            "input_oois": ["Hostname|internet|mispo.es"],
-            "report_types": ["systems-report", "findings-report"],
-            "plugins": {
-                "required": [
-                    "nmap",
-                    "webpage-analysis",
-                    "ssl-certificates",
-                    "nmap-udp",
-                    "ssl-version",
-                    "testssl-sh-ciphers",
-                    "dns-records",
-                ],
-                "optional": ["leakix", "snyk", "service_banner", "shodan"],
-            },
-        },
-    }
+    bytes_raw_id_a = "62258c3d-89b2-4fde-a2e0-d78715a174e6"
+    bytes_raw_id_b = "1b887350-0afb-4786-b587-4323cd8e4180"
 
-    report_data_b = {
-        "systems": {"services": {}},
-        "services": {},
-        "recommendations": [],
-        "recommendation_counts": {},
-        "open_ports": {},
-        "ipv6": {},
-        "vulnerabilities": {},
-        "findings": {
-            "finding_types": [],
-            "summary": {
-                "total_by_severity_per_finding_type": {
-                    "critical": 1,
-                    "high": 2,
-                    "medium": 4,
-                    "low": 2,
-                    "recommendation": 1,
-                    "pending": 1,
-                    "unknown": 1,
+    return {
+        bytes_raw_id_a: {
+            "systems": {"services": {}},
+            "services": {},
+            "recommendations": [],
+            "recommendation_counts": {},
+            "open_ports": {},
+            "ipv6": {},
+            "vulnerabilities": {},
+            "findings": {
+                "finding_types": [],
+                "summary": {
+                    "total_by_severity_per_finding_type": {
+                        "critical": 0,
+                        "high": 0,
+                        "medium": 3,
+                        "low": 1,
+                        "recommendation": 0,
+                        "pending": 0,
+                        "unknown": 0,
+                    },
+                    "total_by_severity": {
+                        "critical": 0,
+                        "high": 0,
+                        "medium": 4,
+                        "low": 3,
+                        "recommendation": 0,
+                        "pending": 0,
+                        "unknown": 0,
+                    },
+                    "total_finding_types": 4,
+                    "total_occurrences": 7,
                 },
-                "total_by_severity": {
-                    "critical": 3,
-                    "high": 3,
-                    "medium": 5,
-                    "low": 3,
-                    "recommendation": 1,
-                    "pending": 1,
-                    "unknown": 1,
-                },
-                "total_finding_types": 12,
-                "total_occurrences": 17,
             },
-        },
-        "basic_security": {
-            "rpki": {},
-            "system_specific": {"Mail": [], "Web": [], "DNS": []},
-            "safe_connections": {},
-            "summary": {},
-        },
-        "summary": {"critical_vulnerabilities": 0, "ips_scanned": 0, "hostnames_scanned": 0, "terms_in_report": ""},
-        "total_findings": 0,
-        "total_systems": 0,
-        "total_hostnames": 0,
-        "total_systems_basic_security": 0,
-        "health": [
-            {"service": "rocky", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
-            {"service": "octopoes", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
-            {
-                "service": "xtdb",
-                "healthy": True,
-                "version": "1.24.4",
-                "additional": {
+            "basic_security": {
+                "rpki": {},
+                "system_specific": {"Mail": [], "Web": [], "DNS": []},
+                "safe_connections": {},
+                "summary": {},
+            },
+            "summary": {"critical_vulnerabilities": 0, "ips_scanned": 0, "hostnames_scanned": 0, "terms_in_report": ""},
+            "total_findings": 0,
+            "total_systems": 0,
+            "total_hostnames": 0,
+            "total_systems_basic_security": 0,
+            "health": [
+                {"service": "rocky", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+                {"service": "octopoes", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+                {
+                    "service": "xtdb",
+                    "healthy": True,
                     "version": "1.24.4",
-                    "revision": "b46e92df67699cb25f3b21a61742c79da564b3b0",
-                    "indexVersion": 22,
-                    "consumerState": None,
-                    "kvStore": "xtdb.rocksdb.RocksKv",
-                    "estimateNumKeys": 54693,
-                    "size": 91850532,
+                    "additional": {
+                        "version": "1.24.4",
+                        "revision": "b46e92df67699cb25f3b21a61742c79da564b3b0",
+                        "indexVersion": 22,
+                        "consumerState": None,
+                        "kvStore": "xtdb.rocksdb.RocksKv",
+                        "estimateNumKeys": 56338,
+                        "size": 93781419,
+                    },
+                    "results": [],
                 },
-                "results": [],
+                {
+                    "service": "katalogus",
+                    "healthy": True,
+                    "version": "0.0.1-development",
+                    "additional": None,
+                    "results": [],
+                },
+                {"service": "scheduler", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+                {"service": "bytes", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+                {"service": "keiko", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+            ],
+            "config_oois": [],
+            "input_data": {
+                "input_oois": ["Hostname|internet|mispo.es"],
+                "report_types": ["systems-report", "findings-report"],
+                "plugins": {
+                    "required": [
+                        "nmap",
+                        "webpage-analysis",
+                        "ssl-certificates",
+                        "nmap-udp",
+                        "ssl-version",
+                        "testssl-sh-ciphers",
+                        "dns-records",
+                    ],
+                    "optional": ["leakix", "snyk", "service_banner", "shodan"],
+                },
             },
-            {
-                "service": "katalogus",
-                "healthy": True,
-                "version": "0.0.1-development",
-                "additional": None,
-                "results": [],
+        },
+        bytes_raw_id_b: {
+            "systems": {"services": {}},
+            "services": {},
+            "recommendations": [],
+            "recommendation_counts": {},
+            "open_ports": {},
+            "ipv6": {},
+            "vulnerabilities": {},
+            "findings": {
+                "finding_types": [],
+                "summary": {
+                    "total_by_severity_per_finding_type": {
+                        "critical": 1,
+                        "high": 2,
+                        "medium": 4,
+                        "low": 2,
+                        "recommendation": 1,
+                        "pending": 1,
+                        "unknown": 1,
+                    },
+                    "total_by_severity": {
+                        "critical": 3,
+                        "high": 3,
+                        "medium": 5,
+                        "low": 3,
+                        "recommendation": 1,
+                        "pending": 1,
+                        "unknown": 1,
+                    },
+                    "total_finding_types": 12,
+                    "total_occurrences": 17,
+                },
             },
-            {"service": "scheduler", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
-            {"service": "bytes", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
-            {"service": "keiko", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
-        ],
-        "config_oois": [],
-        "input_data": {
-            "input_oois": ["Hostname|internet|mispo.es"],
-            "report_types": ["systems-report", "findings-report"],
-            "plugins": {
-                "required": [
-                    "nmap",
-                    "webpage-analysis",
-                    "ssl-certificates",
-                    "nmap-udp",
-                    "ssl-version",
-                    "testssl-sh-ciphers",
-                    "dns-records",
-                ],
-                "optional": ["leakix", "snyk", "service_banner", "shodan"],
+            "basic_security": {
+                "rpki": {},
+                "system_specific": {"Mail": [], "Web": [], "DNS": []},
+                "safe_connections": {},
+                "summary": {},
+            },
+            "summary": {"critical_vulnerabilities": 0, "ips_scanned": 0, "hostnames_scanned": 0, "terms_in_report": ""},
+            "total_findings": 0,
+            "total_systems": 0,
+            "total_hostnames": 0,
+            "total_systems_basic_security": 0,
+            "health": [
+                {"service": "rocky", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+                {"service": "octopoes", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+                {
+                    "service": "xtdb",
+                    "healthy": True,
+                    "version": "1.24.4",
+                    "additional": {
+                        "version": "1.24.4",
+                        "revision": "b46e92df67699cb25f3b21a61742c79da564b3b0",
+                        "indexVersion": 22,
+                        "consumerState": None,
+                        "kvStore": "xtdb.rocksdb.RocksKv",
+                        "estimateNumKeys": 54693,
+                        "size": 91850532,
+                    },
+                    "results": [],
+                },
+                {
+                    "service": "katalogus",
+                    "healthy": True,
+                    "version": "0.0.1-development",
+                    "additional": None,
+                    "results": [],
+                },
+                {"service": "scheduler", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+                {"service": "bytes", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+                {"service": "keiko", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+            ],
+            "config_oois": [],
+            "input_data": {
+                "input_oois": ["Hostname|internet|mispo.es"],
+                "report_types": ["systems-report", "findings-report"],
+                "plugins": {
+                    "required": [
+                        "nmap",
+                        "webpage-analysis",
+                        "ssl-certificates",
+                        "nmap-udp",
+                        "ssl-version",
+                        "testssl-sh-ciphers",
+                        "dns-records",
+                    ],
+                    "optional": ["leakix", "snyk", "service_banner", "shodan"],
+                },
             },
         },
     }
-    return [report_data_a, report_data_b]
 
 
 @pytest.fixture
-def findings_dashboard_mock_data(dashboard_data, findings_reports, findings_report_bytes_data):
-    dashboard_data_a = dashboard_data[0]
-    dashboard_data_b = dashboard_data[1]
+def findings_dashboard_mock_data(findings_reports, findings_report_bytes_data):
+    findings_dashboard = []
 
-    report_a = findings_reports.items[0]
-    report_b = findings_reports.items[1]
+    for recipe_id, report in findings_reports.items():
+        findings_dashboard.append({"report": report, "report_data": findings_report_bytes_data[report.data_raw_id]})
 
-    report_data_a = findings_report_bytes_data[0]
-    report_data_b = findings_report_bytes_data[1]
-
-    return {
-        dashboard_data_a.dashboard.organization: {
-            dashboard_data_a: {"report": report_a, "report_data": report_data_a, "highest_risk_level": "medium"}
-        },
-        dashboard_data_b.dashboard.organization: {
-            dashboard_data_b: {"report": report_b, "report_data": report_data_b, "highest_risk_level": "medium"}
-        },
-    }
+    return findings_dashboard
 
 
 @pytest.fixture

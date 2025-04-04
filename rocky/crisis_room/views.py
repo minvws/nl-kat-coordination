@@ -41,12 +41,6 @@ class DashboardService:
         findings = report_data | {"highest_risk_level": highest_risk_level}
         return findings
 
-    @staticmethod
-    def get_octopoes_client(organization_code: str) -> OctopoesAPIConnector:
-        return OctopoesAPIConnector(
-            settings.OCTOPOES_API, organization_code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
-        )
-
     def get_reports(self, valid_time: datetime, dashboards_data) -> dict[UUID, HydratedReport]:
         """
         Returns for each recipe ID query'ed, the latest (valid_time) HydratedReport.
