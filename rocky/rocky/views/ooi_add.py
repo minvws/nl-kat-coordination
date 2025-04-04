@@ -1,5 +1,3 @@
-import logging
-
 from account.mixins import OrganizationView
 from django.http import Http404
 from django.shortcuts import redirect
@@ -10,14 +8,31 @@ from tools.ooi_helpers import OOI_TYPES_WITHOUT_FINDINGS
 from tools.view_helpers import existing_ooi_type
 
 from octopoes.models import OOI
+from octopoes.models.ooi.monitoring import Incident
+from octopoes.models.ooi.question import Question
+from octopoes.models.ooi.reports import AssetReport, BaseReport, HydratedReport, Report, ReportData
+from octopoes.models.ooi.web import RESTAPI, ImageMetadata
 from octopoes.models.types import type_by_name
 from rocky.views.ooi_view import BaseOOIFormView
 
-logger = logging.getLogger(__name__)
+EXCLUDE_OOI_TYPES = [
+    ooi_type.get_object_type()
+    for ooi_type in [
+        Question,
+        RESTAPI,
+        Incident,
+        ImageMetadata,
+        Report,
+        ReportData,
+        BaseReport,
+        AssetReport,
+        HydratedReport,
+    ]
+]
 
 
 def ooi_type_input_choices():
-    ooi_types = OOI_TYPES_WITHOUT_FINDINGS
+    ooi_types = [ooi_type for ooi_type in OOI_TYPES_WITHOUT_FINDINGS if ooi_type not in EXCLUDE_OOI_TYPES]
     ooi_types.sort()
     return [{"value": ooi_type, "text": ooi_type} for ooi_type in ooi_types]
 
@@ -61,9 +76,18 @@ class OOIAddView(BaseOOIFormView):
 
     def get_ooi_class(self) -> type[OOI]:
         try:
-            return type_by_name(self.kwargs["ooi_type"])
+            ooi_type = self.kwargs["ooi_type"]
+            if ooi_type in EXCLUDE_OOI_TYPES:
+                raise KeyError
+            return type_by_name(ooi_type)
         except KeyError:
-            raise Http404("OOI not found")
+            raise Http404("OOI-type not found")
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user_id"] = self.request.user.id
+
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

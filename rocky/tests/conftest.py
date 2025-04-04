@@ -1,6 +1,8 @@
 import binascii
 import json
 import logging
+import uuid
+from collections.abc import Iterator
 from datetime import datetime, timezone
 from ipaddress import IPv4Address, IPv6Address
 from os import urandom
@@ -9,6 +11,7 @@ from unittest.mock import MagicMock, patch
 from uuid import UUID
 
 import pytest
+import structlog
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission
 from django.contrib.messages.middleware import MessageMiddleware
@@ -17,7 +20,8 @@ from django.utils.translation import activate, deactivate
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from httpx import Response
-from katalogus.client import parse_plugin
+from katalogus.client import Boefje, parse_plugin
+from tools.enums import SCAN_LEVEL
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 
 from octopoes.config.settings import (
@@ -26,11 +30,12 @@ from octopoes.config.settings import (
     DEFAULT_SCAN_LEVEL_FILTER,
     DEFAULT_SCAN_PROFILE_TYPE_FILTER,
 )
-from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel, ScanProfileType
+from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Reference, ScanLevel, ScanProfileType
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
-from octopoes.models.ooi.service import IPService, Service
+from octopoes.models.ooi.reports import AssetReport, HydratedReport, Report, ReportData, ReportRecipe
+from octopoes.models.ooi.service import IPService, Service, TLSCipher
 from octopoes.models.ooi.software import Software
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
 from octopoes.models.origin import Origin, OriginType
@@ -38,12 +43,24 @@ from octopoes.models.pagination import Paginated
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
-from rocky.scheduler import Task
+from rocky.health import ServiceHealth
+from rocky.scheduler import PaginatedTasksResponse, ReportTask, ScheduleResponse, Task, TaskStatus
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
 
 # Quiet faker locale messages down in tests.
 logging.getLogger("faker").setLevel(logging.INFO)
+
+
+# Copied from https://www.structlog.org/en/stable/testing.html
+@pytest.fixture
+def log_output():
+    return structlog.testing.LogCapture()
+
+
+@pytest.fixture(autouse=True)
+def fixture_configure_structlog(log_output):
+    structlog.configure(processors=[log_output])
 
 
 @pytest.fixture
@@ -75,17 +92,14 @@ def create_user(django_user_model, email, password, name, device_name, superuser
 
 
 def create_organization(name, organization_code):
-    katalogus_client = "katalogus.client.KATalogusClientV1"
-    octopoes_node = "tools.models.OctopoesAPIConnector"
+    katalogus_client = "katalogus.client.KATalogusClient"
+    octopoes_node = "rocky.signals.OctopoesAPIConnector"
     with patch(katalogus_client), patch(octopoes_node):
         return Organization.objects.create(name=name, code=organization_code)
 
 
 def create_member(user, organization):
-    Indemnification.objects.create(
-        user=user,
-        organization=organization,
-    )
+    Indemnification.objects.create(user=user, organization=organization)
 
     return OrganizationMember.objects.create(
         user=user,
@@ -132,9 +146,7 @@ def add_redteam_group_permissions(member):
 def add_client_group_permissions(member):
     group = Group.objects.get(name=GROUP_CLIENT)
     member.groups.add(group)
-    client_permissions = [
-        Permission.objects.get(codename="can_scan_organization").id,
-    ]
+    client_permissions = [Permission.objects.get(codename="can_scan_organization").id]
     group.permissions.set(client_permissions)
 
 
@@ -213,22 +225,8 @@ def redteamuser(django_user_model):
 
 
 @pytest.fixture
-def redteamuser_b(django_user_model):
-    return create_user(
-        django_user_model, "redteamerB@openkat.nl", "RedteamBRedteamB123!!", "Redteam B name", "default_redteam_b"
-    )
-
-
-@pytest.fixture
 def redteam_member(redteamuser, organization):
     member = create_member(redteamuser, organization)
-    add_redteam_group_permissions(member)
-    return member
-
-
-@pytest.fixture
-def redteam_member_b(redteamuser_b, organization_b):
-    member = create_member(redteamuser_b, organization_b)
     add_redteam_group_permissions(member)
     return member
 
@@ -298,12 +296,7 @@ def blocked_member(django_user_model, organization):
 
 @pytest.fixture
 def mock_models_katalogus(mocker):
-    return mocker.patch("tools.models.get_katalogus")
-
-
-@pytest.fixture
-def mock_views_katalogus(mocker):
-    return mocker.patch("rocky.views.ooi_report.get_katalogus")
+    return mocker.patch("katalogus.client.get_katalogus_client")
 
 
 @pytest.fixture
@@ -313,7 +306,7 @@ def mock_bytes_client(mocker):
 
 @pytest.fixture
 def mock_models_octopoes(mocker):
-    return mocker.patch("tools.models.OctopoesAPIConnector")
+    return mocker.patch("rocky.signals.OctopoesAPIConnector")
 
 
 @pytest.fixture
@@ -327,54 +320,43 @@ def mock_crisis_room_octopoes(mocker):
 
 
 @pytest.fixture
-def lazy_task_list_empty() -> MagicMock:
-    mock = MagicMock()
-    mock.__getitem__.return_value = []
-    mock.count.return_value = 0
-    return mock
-
-
-@pytest.fixture
 def task() -> Task:
     return Task.model_validate(
         {
             "id": "1b20f85f-63d5-4baa-be9e-f3f19d6e3fae",
             "hash": "19ed51514b37d42f79c5e95469956b05",
             "scheduler_id": "boefje-test",
+            "schedule_id": None,
+            "organisation": "test",
             "type": "boefje",
-            "p_item": {
-                "id": "1b20f85f-63d5-4baa-be9e-f3f19d6e3fae",
-                "hash": "19ed51514b37d42f79c5e95469956b05",
-                "priority": 1,
-                "data": {
-                    "id": "1b20f85f63d54baabe9ef3f19d6e3fae",
-                    "boefje": {
-                        "id": "test-boefje",
-                        "name": "TestBoefje",
-                        "description": "Fetch the DNS record(s) of a hostname",
-                        "repository_id": None,
-                        "version": None,
-                        "scan_level": 1,
-                        "consumes": ["Hostname"],
-                        "produces": [
-                            "DNSNSRecord",
-                            "DNSARecord",
-                            "DNSCNAMERecord",
-                            "DNSMXRecord",
-                            "DNSZone",
-                            "Hostname",
-                            "DNSAAAARecord",
-                            "IPAddressV4",
-                            "DNSSOARecord",
-                            "DNSTXTRecord",
-                            "IPAddressV6",
-                            "Network",
-                            "NXDOMAIN",
-                        ],
-                    },
-                    "input_ooi": "Hostname|internet|mispo.es",
-                    "organization": "test",
+            "priority": 1,
+            "data": {
+                "id": "1b20f85f63d54baabe9ef3f19d6e3fae",
+                "boefje": {
+                    "id": "test-boefje",
+                    "name": "TestBoefje",
+                    "description": "Fetch the DNS record(s) of a hostname",
+                    "version": None,
+                    "scan_level": 1,
+                    "consumes": ["Hostname"],
+                    "produces": [
+                        "DNSNSRecord",
+                        "DNSARecord",
+                        "DNSCNAMERecord",
+                        "DNSMXRecord",
+                        "DNSZone",
+                        "Hostname",
+                        "DNSAAAARecord",
+                        "IPAddressV4",
+                        "DNSSOARecord",
+                        "DNSTXTRecord",
+                        "IPAddressV6",
+                        "Network",
+                        "NXDOMAIN",
+                    ],
                 },
+                "input_ooi": "Hostname|internet|mispo.es",
+                "organization": "test",
             },
             "status": "completed",
             "created_at": "2022-08-09 11:53:41.378292",
@@ -448,7 +430,6 @@ def url(network) -> URL:
         scan_profile=DeclaredScanProfile(
             scan_profile_type="declared", reference=Reference("URL|testnetwork|http://example.com/"), level=ScanLevel.L1
         ),
-        primary_key="URL|testnetwork|http://example.com/",
         network=network.reference,
         raw="http://example.com",
         web_url=Reference("HostnameHTTPURL|http|testnetwork|example.com|80|/"),
@@ -482,10 +463,7 @@ def hostname(network) -> Hostname:
 
 @pytest.fixture
 def website(ip_service: IPService, hostname: Hostname):
-    return Website(
-        ip_service=ip_service.reference,
-        hostname=hostname.reference,
-    )
+    return Website(ip_service=ip_service.reference, hostname=hostname.reference)
 
 
 @pytest.fixture
@@ -642,8 +620,8 @@ def no_rpki_finding_type() -> KATFindingType:
 
 
 @pytest.fixture
-def expired_rpki_finding_type() -> KATFindingType:
-    return KATFindingType(id="KAT-EXPIRED-RPKI")
+def invalid_rpki_finding_type() -> KATFindingType:
+    return KATFindingType(id="KAT-INVALID-RPKI")
 
 
 @pytest.fixture
@@ -797,17 +775,6 @@ def tree_data_dns_findings():
 
 
 @pytest.fixture
-def finding_type_kat_no_caa() -> KATFindingType:
-    return KATFindingType(
-        id="KAT-NO-CAA",
-        description="Fake description...",
-        recommendation="Fake recommendation...",
-        risk_score=9.5,
-        risk_severity=RiskLevelSeverity.CRITICAL,
-    )
-
-
-@pytest.fixture
 def finding_type_kat_invalid_spf() -> KATFindingType:
     return KATFindingType(
         id="KAT-INVALID-SPF",
@@ -958,79 +925,91 @@ def finding_type_kat_invalid_dnssec() -> KATFindingType:
 
 
 @pytest.fixture
-def tree_data_tls_findings_and_suites():
-    return {
-        "root": {
-            "reference": "",
-            "children": {"ooi": [{"reference": "", "children": {}}]},
-        },
-        "store": {
-            "Finding|Network|testnetwork|KAT-0001": {
-                "object_type": "Finding",
-                "primary_key": "Finding|Network|testnetwork|KAT-0001",
-                "ooi": "Network|testnetwork",
-                "description": "Fake description with cipher_suite_name ECDHE-RSA-AES128-SHA",
-                "finding_type": "KATFindingType|KAT-RECOMMENDATION-BAD-CIPHER",
-            },
-            "Finding|Network|testnetwork|KAT-0002": {
-                "object_type": "Finding",
-                "primary_key": "Finding|Network|testnetwork|KAT-0002",
-                "ooi": "Network|testnetwork",
-                "description": "Fake description with cipher_suite_name ECDHE-RSA-AES256-SHA",
-                "finding_type": "KATFindingType|KAT-MEDIUM-BAD-CIPHER",
-            },
-            "Finding|Network|testnetwork|KAT-0003": {
-                "object_type": "Finding",
-                "primary_key": "Finding|Network|testnetwork|KAT-0003",
-                "ooi": "Network|testnetwork",
-                "description": "Fake description...",
-                "finding_type": "KATFindingType|KAT-CRITICAL-BAD-CIPHER",
-            },
-            "TLSCipher|Network|testnetwork|KAT-0004": {
-                "object_type": "TLSCipher",
-                "primary_key": "TLSCipher|Network|testnetwork|KAT-0004|tcp|443|https",
-                "ip_service": "IPService",
-                "ooi": "Network|testnetwork",
-                "suites": {
-                    "TLSv1": [
-                        {
-                            "cipher_suite_alias": "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
-                            "encryption_algorithm": "AES",
-                            "cipher_suite_name": "ECDHE-RSA-AES128-SHA",
-                            "bits": 128,
-                            "key_size": 256,
-                            "key_exchange_algorithm": "ECDH",
-                            "cipher_suite_code": "xc013",
-                        },
-                        {
-                            "cipher_suite_alias": "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
-                            "encryption_algorithm": "AES",
-                            "cipher_suite_name": "ECDHE-RSA-AES256-SHA",
-                            "bits": 256,
-                            "key_size": 256,
-                            "key_exchange_algorithm": "ECDH",
-                            "cipher_suite_code": "xc014",
-                        },
-                    ],
+def cipher(ip_service: IPService) -> TLSCipher:
+    return TLSCipher(
+        ip_service=ip_service.reference,
+        suites={
+            "TLSv1": [
+                {
+                    "cipher_suite_alias": "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+                    "encryption_algorithm": "AES",
+                    "cipher_suite_name": "ECDHE-RSA-AES128-SHA",
+                    "bits": 128,
+                    "key_size": 256,
+                    "key_exchange_algorithm": "ECDH",
+                    "cipher_suite_code": "xc013",
                 },
-            },
+                {
+                    "cipher_suite_alias": "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
+                    "encryption_algorithm": "AES",
+                    "cipher_suite_name": "ECDHE-RSA-AES256-SHA",
+                    "bits": 256,
+                    "key_size": 256,
+                    "key_exchange_algorithm": "ECDH",
+                    "cipher_suite_code": "xc014",
+                },
+            ]
         },
-    }
+    )
 
 
 @pytest.fixture
-def plugin_details():
+def query_data_tls_findings_and_suites(cipher):
+    return [
+        Finding(
+            ooi=cipher.reference,
+            description="Fake description with cipher_suite_name ECDHE-RSA-AES128-SHA",
+            finding_type=KATFindingType(id="KAT-RECOMMENDATION-BAD-CIPHER").reference,
+        ),
+        Finding(
+            ooi=cipher.reference,
+            description="Fake description with cipher_suite_name ECDHE-RSA-AES256-SHA",
+            finding_type=KATFindingType(id="KAT-MEDIUM-BAD-CIPHER").reference,
+        ),
+        Finding(
+            ooi=cipher.reference,
+            description="Fake description...",
+            finding_type=KATFindingType(id="KAT-CRITICAL-BAD-CIPHER").reference,
+        ),
+    ]
+
+
+@pytest.fixture
+def plugin_details(plugin_schema):
     return parse_plugin(
         {
             "id": "test-boefje",
             "type": "boefje",
             "name": "TestBoefje",
+            "created": "2023-05-09T09:37:20.909069+00:00",
             "description": "Meows to the moon",
-            "repository_id": "test-repository",
             "scan_level": 1,
             "consumes": ["Network"],
             "produces": ["Network"],
             "enabled": True,
+            "boefje_schema": plugin_schema,
+            "oci_image": None,
+            "oci_arguments": ["-test", "-arg"],
+        }
+    )
+
+
+@pytest.fixture
+def plugin_details_with_container(plugin_schema):
+    return parse_plugin(
+        {
+            "id": "test-boefje",
+            "type": "boefje",
+            "name": "TestBoefje",
+            "created": "2023-05-09T09:37:20.909069+00:00",
+            "description": "Meows to the moon",
+            "scan_level": 1,
+            "consumes": ["Network"],
+            "produces": ["Network"],
+            "enabled": True,
+            "boefje_schema": plugin_schema,
+            "oci_image": "ghcr.io/test/image:123",
+            "oci_arguments": ["-test", "-arg"],
         }
     )
 
@@ -1082,6 +1061,154 @@ def plugin_schema_no_required():
     }
 
 
+recipe = ReportRecipe(
+    report_type="concatenated-report",
+    recipe_id=uuid.uuid4(),
+    report_name_format="test",
+    cron_expression="* * * *",
+    input_recipe={},
+    asset_report_types=[],
+)
+
+parent_report = HydratedReport(
+    report_recipe=recipe.reference,
+    primary_key="Report|e821aaeb-a6bd-427f-b064-e46837911a5d",
+    name="Test Parent Report",
+    report_type="concatenated-report",
+    template="report.html",
+    date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+    reference_date=datetime(2024, 1, 1, 23, 59, 59, 999999),
+    input_oois=[],
+    organization_code="test_organization",
+    organization_name="Test Organization",
+    organization_tags=[],
+    data_raw_id="a5ccf97b-d4e9-442d-85bf-84e739b6d3ed",
+    observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+)
+
+
+def create_asset_report(
+    name,
+    report_type,
+    template,
+    uuid_iterator: Iterator,
+    input_ooi="Hostname|internet|example.com",
+    organization_code: str = "test",
+    organization_name: str = "Test Organization",
+) -> AssetReport:
+    return AssetReport(
+        report_recipe=recipe.reference,
+        name=name,
+        report_type=report_type,
+        template=template,
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        reference_date=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_ooi=input_ooi,
+        organization_code=organization_code,
+        organization_name=organization_name,
+        organization_tags=[],
+        data_raw_id=str(next(uuid_iterator)),
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+    )
+
+
+def create_report(
+    name, report_type, template, asset_reports: list[AssetReport] | None, uuid_iterator: Iterator | None
+) -> HydratedReport:
+    if asset_reports is None:
+        asset_reports = []
+
+    return HydratedReport(
+        report_recipe=recipe.reference,
+        name=name,
+        report_type=report_type,
+        template=template,
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        reference_date=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_oois=asset_reports,
+        organization_code="test",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id=str(next(uuid_iterator)),
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+    )
+
+
+ids = iter(
+    [
+        UUID("acbd2250-85f4-471a-ab70-ba1750280194"),
+        UUID("ba2d86b8-aca8-4009-adc0-e3d59ea34904"),
+        UUID("3d2ea955-13c1-46f6-81f3-edfe72d8af0b"),
+        UUID("fe4d0f5d-5447-47d3-952d-74544c8a9d8d"),
+        UUID("3ca35c20-1139-4bf4-a11a-a0b83f3c48ff"),
+        UUID("1e419bee-672f-4561-b3b9-f47bd6ce60b7"),
+        UUID("1e419bee-672f-4561-b3b9-f47bd6ce60b7"),
+    ]
+)
+
+
+assets = [
+    create_asset_report("RPKI Report", "rpki-report", "rpki_report/report.html", ids),
+    create_asset_report(
+        "Safe Connections Report", "safe-connections-report", "safe_connections_report/report.html", ids
+    ),
+    create_asset_report("System Report", "systems-report", "systems_report/report.html", ids),
+    create_asset_report("Mail Report", "mail-report", "mail_report/report.html", ids),
+    create_asset_report("IPv6 Report", "ipv6-report", "ipv6_report/report.html", ids),
+    create_asset_report("Web System Report", "web-system-report", "web_system_report/report.html", ids),
+    create_asset_report("Web System Report", "web-system-report", "web_system_report/report.html", ids),
+]
+
+dns_report = create_asset_report(
+    "DNS Report", "dns-report", "dns_report/report.html", iter(["a5ccf97b-d4e9-442d-85bf-84e739b63da9s"])
+)
+
+
+@pytest.fixture
+def report_list_one_asset_report():
+    uuids = iter(["acbd2250-85f4-471a-ab70-ba17502801e"])
+    return [create_report("Concatenated test report", "concatenated-report", "report.html", [assets[0]], uuids)]
+
+
+@pytest.fixture
+def report_list_two_asset_reports():
+    uuids = iter(["acbd2250-85f4-471a-ab70-ba17502801a"])
+    return [
+        create_report("Concatenated test report", "concatenated-report", "report.html", [assets[5], assets[6]], uuids)
+    ]
+
+
+@pytest.fixture
+def report_list_six_asset_reports():
+    uuids = iter(["acbd2250-85f4-471a-ab70-ba17502801a"])
+    asset_reports = [assets[0], assets[1], assets[2], assets[3], assets[4], assets[5]]
+    return [create_report("Concatenated test report", "concatenated-report", "report.html", asset_reports, uuids)]
+
+
+@pytest.fixture
+def get_asset_reports() -> list[tuple[str, Report]]:
+    return [
+        (parent_report.primary_key, assets[0]),
+        (parent_report.primary_key, assets[1]),
+        (parent_report.primary_key, assets[2]),
+        (parent_report.primary_key, assets[3]),
+        (parent_report.primary_key, assets[4]),
+        (parent_report.primary_key, assets[5]),
+    ]
+
+
+@pytest.fixture
+def report_recipe():
+    return ReportRecipe(
+        report_type="concatenated-report",
+        recipe_id="744d054e-9c70-4f18-ad27-122cfc1b7903",
+        report_name_format="Test Report Name Format",
+        input_recipe={"input_oois": ["Hostname|internet|mispo.es"]},
+        asset_report_types=["dns-report"],
+        cron_expression="0 0 * * *",
+    )
+
+
 def setup_request(request, user):
     request = SessionMiddleware(lambda r: r)(request)
     request.session[DEVICE_ID_SESSION_KEY] = user.staticdevice_set.get().persistent_id
@@ -1095,7 +1222,7 @@ def setup_request(request, user):
 
 @pytest.fixture
 def mock_scheduler(mocker):
-    return mocker.patch("rocky.views.ooi_detail.scheduler.client")
+    return mocker.patch("rocky.views.scheduler.scheduler_client")()
 
 
 def get_stub_path(file_name: str) -> Path:
@@ -1110,18 +1237,42 @@ def get_normalizers_data() -> list[dict]:
     return json.loads(get_stub_path("katalogus_normalizers.json").read_text())
 
 
+def get_aggregate_report_data():
+    return json.loads(get_stub_path("aggregate_report_data.json").read_text())
+
+
+@pytest.fixture()
+def get_multi_report_data_minvws():
+    return json.loads(get_stub_path("multi_report_data_minvws.json").read_text())
+
+
+@pytest.fixture()
+def get_multi_report_data_mispoes():
+    return json.loads(get_stub_path("multi_report_data_mispoes.json").read_text())
+
+
+@pytest.fixture()
+def get_multi_report_post_processed_data():
+    return json.loads(get_stub_path("multi_report_post_processed_data.json").read_text())
+
+
 def get_plugins_data() -> list[dict]:
     return get_boefjes_data() + get_normalizers_data()
 
 
 @pytest.fixture()
 def mock_mixins_katalogus(mocker):
-    return mocker.patch("katalogus.views.mixins.get_katalogus")
+    return mocker.patch("account.mixins.OrganizationView.get_katalogus")
+
+
+@pytest.fixture()
+def mock_katalogus_client(mocker):
+    return mocker.patch("katalogus.client.KATalogusClient")
 
 
 @pytest.fixture
-def mock_scheduler_client_task_list(mocker):
-    mock_scheduler_client_session = mocker.patch("rocky.scheduler.client._client")
+def mock_scheduler_client_task_list(mock_scheduler):
+    mock_scheduler_session = mock_scheduler._client
     response = Response(
         200,
         content=(
@@ -1133,22 +1284,17 @@ def mock_scheduler_client_task_list(mocker):
                     "results": [
                         {
                             "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
+                            "hash": "416aa907e0b2a16c1b324f7d3261c5a4",
                             "scheduler_id": "boefje-test",
+                            "schedule_id": None,
                             "type": "boefje",
-                            "p_item": {
-                                "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
-                                "scheduler_id": "boefje-test",
-                                "hash": "416aa907e0b2a16c1b324f7d3261c5a4",
-                                "priority": 631,
-                                "data": {
-                                    "id": "2e757dd366c746b899877cd18252cc6d",
-                                    "boefje": {"id": "test-plugin", "version": None},
-                                    "input_ooi": "Hostname|internet|example.com",
-                                    "organization": "test",
-                                    "dispatches": [],
-                                },
-                                "created_at": "2023-05-09T09:37:20.899668+00:00",
-                                "modified_at": "2023-05-09T09:37:20.899675+00:00",
+                            "priority": 631,
+                            "data": {
+                                "id": "2e757dd366c746b899877cd18252cc6d",
+                                "boefje": {"id": "test-plugin", "version": None},
+                                "input_ooi": "Hostname|internet|example.com",
+                                "organization": "test",
+                                "dispatches": [],
                             },
                             "status": "completed",
                             "created_at": "2023-05-09T09:37:20.909069+00:00",
@@ -1160,9 +1306,9 @@ def mock_scheduler_client_task_list(mocker):
         ),
     )
 
-    mock_scheduler_client_session.get.return_value = response
+    mock_scheduler_session.get.return_value = response
 
-    return mock_scheduler_client_session
+    return mock_scheduler_session
 
 
 class MockOctopoesAPIConnector:
@@ -1182,20 +1328,12 @@ class MockOctopoesAPIConnector:
         return self.tree[reference]
 
     def query(
-        self,
-        path: str,
-        valid_time: datetime,
-        source: Reference | str | None = None,
-        offset: int = 0,
-        limit: int = 50,
+        self, path: str, valid_time: datetime, source: Reference | str | None = None, offset: int = 0, limit: int = 50
     ) -> list[OOI]:
         return self.queries[path][source]
 
     def query_many(
-        self,
-        path: str,
-        valid_time: datetime,
-        sources: list[OOI | Reference | str],
+        self, path: str, valid_time: datetime, sources: list[OOI | Reference | str]
     ) -> list[tuple[str, OOIType]]:
         result = []
 
@@ -1252,4 +1390,532 @@ def listed_hostnames(network) -> list[Hostname]:
         Hostname(network=network.reference, name="d.example.com"),
         Hostname(network=network.reference, name="e.example.com"),
         Hostname(network=network.reference, name="f.example.com"),
+    ]
+
+
+@pytest.fixture
+def paginated_task_list(task):
+    return PaginatedTasksResponse(count=1, next="", previous=None, results=[task])
+
+
+@pytest.fixture
+def reports_more_input_oois():
+    uuids = iter([f"acbd2250-85f4-471a-ab70-ba175028019{i}" for i in range(1, 9)])
+    references = [f"Hostname|internet|example{i}.com" for i in range(1, 9)]
+    sc_name = "Safe Connections Report"
+
+    return create_report(
+        "Test Parent Report",
+        "concatenated-report",
+        "report.html",
+        [
+            create_asset_report("RPKI Report", "rpki-report", "rpki_report/report.html", uuids, references[0]),
+            create_asset_report("RPKI Report", "rpki-report", "rpki_report/report.html", uuids, references[1]),
+            create_asset_report("RPKI Report", "rpki-report", "rpki_report/report.html", uuids, references[2]),
+            create_asset_report("RPKI Report", "rpki-report", "rpki_report/report.html", uuids, references[3]),
+            create_asset_report(
+                sc_name, "safe-connections-report", "safe_connections_report/report.html", uuids, references[4]
+            ),
+            create_asset_report(
+                sc_name, "safe-connections-report", "safe_connections_report/report.html", uuids, references[5]
+            ),
+            create_asset_report(
+                sc_name, "safe-connections-report", "safe_connections_report/report.html", uuids, references[6]
+            ),
+            create_asset_report(
+                sc_name, "safe-connections-report", "safe_connections_report/report.html", uuids, references[7]
+            ),
+        ],
+        iter(["a5ccf97b-d4e9-442d-85bf-84e739b6d3ed"]),
+    )
+
+
+@pytest.fixture
+def rocky_health():
+    ServiceHealth(
+        service="rocky",
+        healthy=True,
+        version="0.0.1.dev1",
+        additional=None,
+        results=[
+            ServiceHealth(
+                service="octopoes",
+                healthy=True,
+                version="0.0.1.dev1",
+                additional=None,
+                results=[
+                    ServiceHealth(
+                        service="xtdb",
+                        healthy=True,
+                        version="1.24.1",
+                        additional={
+                            "version": "1.24.1",
+                            "revision": "1164f9a3c7e36edbc026867945765fd4366c1731",
+                            "indexVersion": 22,
+                            "consumerState": None,
+                            "kvStore": "xtdb.rocksdb.RocksKv",
+                            "estimateNumKeys": 24552,
+                            "size": 24053091,
+                        },
+                        results=[],
+                    )
+                ],
+            ),
+            ServiceHealth(service="katalogus", healthy=True, version="0.0.1-development", additional=None, results=[]),
+            ServiceHealth(service="scheduler", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
+            ServiceHealth(service="bytes", healthy=True, version="0.0.1.dev1", additional=None, results=[]),
+        ],
+    )
+
+
+@pytest.fixture
+def boefje_dns_records():
+    return Boefje(
+        type="boefje",
+        id="dns-records",
+        name="DnsRecords",
+        description="Fetch the DNS record(s) of a hostname",
+        enabled=True,
+        scan_level=SCAN_LEVEL.L1,
+        consumes={Hostname},
+        produces={"boefje/dns-records"},
+        boefje_schema={},
+        oci_image="ghcr.io/test/image:123",
+        oci_arguments=["-test", "-arg"],
+    )
+
+
+@pytest.fixture
+def boefje_nmap_tcp():
+    return Boefje(
+        type="boefje",
+        id="nmap",
+        name="Nmap TCP",
+        description="Defaults to top 250 TCP ports. Includes service detection.",
+        enabled=True,
+        scan_level=SCAN_LEVEL.L2,
+        consumes={IPAddressV4, IPAddressV6},
+        produces={"boefje/nmap"},
+        boefje_schema={},
+        oci_image="ghcr.io/test/image:123",
+        oci_arguments=["-test", "-arg"],
+    )
+
+
+@pytest.fixture
+def drf_admin_client(create_drf_client, admin_user):
+    client = create_drf_client(admin_user)
+    # We need to set this so that the test client doesn't throw an
+    # exception, but will return error in the API we can test
+    client.raise_request_exception = False
+    return client
+
+
+@pytest.fixture
+def drf_redteam_client(create_drf_client, redteamuser):
+    client = create_drf_client(redteamuser)
+    # We need to set this so that the test client doesn't throw an
+    # exception, but will return error in the API we can test
+    client.raise_request_exception = False
+    return client
+
+
+@pytest.fixture
+def get_aggregate_report_ooi():
+    return HydratedReport(
+        scan_profile=EmptyScanProfile(
+            scan_profile_type="empty",
+            reference=Reference("Report|6a073ba0-46d3-451c-a7f8-46923c2b841b"),
+            level=ScanLevel.L0,
+        ),
+        name="Aggregate Report",
+        report_type="aggregate-organisation-report",
+        template="aggregate_organisation_report/report.html",
+        date_generated=datetime(2024, 9, 3, 14, 14, 46, 999999),
+        input_oois=[],
+        organization_code="_test",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="250cf43e-bfe2-4249-b493-a12921cb79f6",
+        observed_at=datetime(2024, 9, 3, 14, 14, 45, 999999),
+        reference_date=datetime(2024, 9, 3, 14, 14, 45, 999999),
+        report_recipe=recipe.reference,
+    )
+
+
+@pytest.fixture
+def get_aggregate_report_from_bytes():
+    data = {
+        "systems": {
+            "services": {
+                "IPAddressV4|internet|134.209.85.72": {"hostnames": ["Hostname|internet|mispo.es"], "services": []}
+            }
+        },
+        "services": {},
+        "recommendations": [],
+        "recommendation_counts": {},
+        "open_ports": {"134.209.85.72": {"ports": {}, "hostnames": ["mispo.es"], "services": {}}},
+        "ipv6": {"mispo.es": {"enabled": False, "systems": []}},
+        "vulnerabilities": {
+            "IPAddressV4|internet|134.209.85.72": {
+                "hostnames": "(mispo.es)",
+                "vulnerabilities": {},
+                "summary": {"total_findings": 0, "total_criticals": 0, "terms": [], "recommendations": []},
+                "title": "134.209.85.72",
+            }
+        },
+        "basic_security": {
+            "rpki": {},
+            "system_specific": {"Mail": [], "Web": [], "DNS": []},
+            "safe_connections": {},
+            "summary": {},
+        },
+        "summary": {"critical_vulnerabilities": 0, "ips_scanned": 1, "hostnames_scanned": 1, "terms_in_report": ""},
+        "total_findings": 0,
+        "total_systems": 1,
+        "total_hostnames": 1,
+        "total_systems_basic_security": 0,
+        "health": [
+            {"service": "rocky", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+            {"service": "octopoes", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+            {
+                "service": "xtdb",
+                "healthy": True,
+                "version": "1.24.1",
+                "additional": {
+                    "version": "1.24.1",
+                    "revision": "1164f9a3c7e36edbc026867945765fd4366c1731",
+                    "indexVersion": 22,
+                    "consumerState": None,
+                    "kvStore": "xtdb.rocksdb.RocksKv",
+                    "estimateNumKeys": 36846,
+                    "size": 33301692,
+                },
+                "results": [],
+            },
+            {
+                "service": "katalogus",
+                "healthy": True,
+                "version": "0.0.1-development",
+                "additional": None,
+                "results": [],
+            },
+            {"service": "scheduler", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+            {"service": "bytes", "healthy": True, "version": "0.0.1.dev1", "additional": None, "results": []},
+        ],
+        "config_oois": [],
+        "input_data": {
+            "input_oois": ["Hostname|internet|mispo.es"],
+            "report_types": [
+                "ipv6-report",
+                "mail-report",
+                "name-server-report",
+                "open-ports-report",
+                "rpki-report",
+                "safe-connections-report",
+                "systems-report",
+                "vulnerability-report",
+                "web-system-report",
+            ],
+            "plugins": {"required": [], "optional": []},
+        },
+    }
+    return json.dumps(data).encode("utf-8")
+
+
+@pytest.fixture
+def report_data_ooi_org_a(organization, get_multi_report_data_minvws):
+    return ReportData(
+        scan_profile=EmptyScanProfile(
+            scan_profile_type="empty", reference=Reference(f"ReportData|{organization.code}"), level=ScanLevel.L0
+        ),
+        organization_code=organization.code,
+        organization_name=organization.name,
+        organization_tags=[],
+        data=get_multi_report_data_minvws,
+    )
+
+
+@pytest.fixture
+def report_data_ooi_org_b(organization_b, get_multi_report_data_mispoes):
+    return ReportData(
+        scan_profile=EmptyScanProfile(
+            scan_profile_type="empty", reference=Reference(f"ReportData|{organization_b.code}"), level=ScanLevel.L0
+        ),
+        organization_code=organization_b.code,
+        organization_name=organization_b.name,
+        organization_tags=[],
+        data=get_multi_report_data_mispoes,
+    )
+
+
+@pytest.fixture
+def multi_report_ooi(report_data_ooi_org_a, report_data_ooi_org_b):
+    reports = [
+        create_asset_report("test", "test", "test", iter(["7b305f0d-c0a7-4ad5-af1e-31f81fc229c2"])),
+        create_asset_report("test", "test", "test", iter(["7b305f0d-c0a7-4ad5-af1e-31f81fc229c3"])),
+    ]
+    return HydratedReport(
+        name="Sector Report",
+        report_type="multi-organization-report",
+        template="multi_organization_report/report.html",
+        date_generated=datetime(2024, 10, 18, 14, 14, 46, 999999),
+        input_oois=reports,
+        organization_code=report_data_ooi_org_a.organization_code,
+        organization_name=report_data_ooi_org_a.organization_name,
+        organization_tags=[],
+        data_raw_id="bb4d5271-b273-4af4-a25a-83ba0c4fed63",
+        observed_at=datetime(2024, 10, 18, 14, 14, 45, 999999),
+        reference_date=datetime(2024, 10, 18, 14, 14, 45, 999999),
+        report_recipe=recipe.reference,
+    )
+
+
+@pytest.fixture
+def report_list():
+    asset_ids = iter(
+        [
+            "27e8fa60-4675-4c22-b7a7-76152fc520b8",
+            "775d62df-edf9-4c19-91cc-2cc1586a8111",
+            "6ea4268f-f8c9-4ccd-9f81-efb2bf60b215",
+            "fa648efe-7724-41cd-96c0-2c0d48b631bc",
+            "d2623e9f-3f56-4c4f-b01c-abf4a6f5794d",
+            "ba8e864a-770f-4a18-90d4-d7b8fba054ac",
+            "771190cb-a570-4ddf-bf10-2b7cb6d7b852",
+            "ef007438-6266-40c5-981b-a59a5e59d2a4",
+            "e545a488-de8a-4750-8056-6a3b354d011f",
+            "af8c8999-530d-45d5-a8b8-c823ee3c24b7",
+            "7b305f0d-c0a7-4ad5-af1e-31f81fc229c2",
+        ]
+    )
+
+    def asset_report(name, report_type, template):
+        return create_asset_report(name, report_type, template, asset_ids, "Hostname|internet|minvws.nl")
+
+    asset_reports = [
+        asset_report(
+            "Safe Connections Report for minvws.nl", "safe-connections-report", "safe_connections_report/report.html"
+        ),
+        asset_report("DNS Report for minvws.nl", "dns-report", "dns_report/report.html"),
+        asset_report("Name Server Report for minvws.nl", "name-server-report", "name_server_report/report.html"),
+        asset_report("Vulnerability Report for minvws.nl", "vulnerability-report", "vulnerability_report/report.html"),
+        asset_report("Web System Report for minvws.nl", "web-system-report", "web_system_report/report.html"),
+        asset_report("Mail Report for minvws.nl", "mail-report", "mail_report/report.html"),
+        asset_report("System Report for minvws.nl", "systems-report", "systems_report/report.html"),
+        asset_report("IPv6 Report for minvws.nl", "ipv6-report", "ipv6_report/report.html"),
+        asset_report("Open Ports Report for minvws.nl", "open-ports-report", "open_ports_report/report.html"),
+        asset_report("Findings Report for minvws.nl", "findings-report", "findings_report/report.html"),
+        asset_report("RPKI Report for minvws.nl", "rpki-report", "rpki_report/report.html"),
+    ]
+
+    return Paginated(
+        count=3,
+        items=[
+            create_report(
+                "Concatenated Report for minvws.nl",
+                "concatenated-report",
+                "report.html",
+                [
+                    create_asset_report(
+                        "Findings Report for minvws.nl",
+                        "findings-report",
+                        "findings_report/report.html",
+                        iter(["3300354d-530f-4ecf-8485-e120f43ba3f1"]),
+                        "Hostname|internet|minvws.nl",
+                    )
+                ],
+                iter(["3300354d-530f-4ecf-8485-e120f43ba3f1"]),
+            ),
+            create_report(
+                "Aggregate Report",
+                "aggregate-organisation-report",
+                "aggregate_organisation_report/report.html",
+                [],
+                iter(["7e888ca9-cebc-4d6e-9f2c-5b45fa7101d4"]),
+            ),
+            create_report(
+                "Concatenated Report for minvws.nl",
+                "concatenated-report",
+                "report.html",
+                asset_reports,
+                iter(["eb5c1226-7ab0-4e3f-8b41-7ab7016fa3fd"]),
+            ),
+        ],
+    )
+
+
+@pytest.fixture
+def get_report_input_data_from_bytes():
+    input_data = {
+        "input_data": {
+            "input_oois": ["Hostname|internet|minvws.nl"],
+            "report_types": [
+                "ipv6-report",
+                "mail-report",
+                "name-server-report",
+                "open-ports-report",
+                "rpki-report",
+                "safe-connections-report",
+                "systems-report",
+                "vulnerability-report",
+                "web-system-report",
+            ],
+            "plugins": {
+                "required": [
+                    "rpki",
+                    "webpage-analysis",
+                    "ssl-certificates",
+                    "security_txt_downloader",
+                    "testssl-sh-ciphers",
+                    "dns-records",
+                    "dns-sec",
+                    "ssl-version",
+                    "nmap",
+                ],
+                "optional": ["masscan", "shodan", "nmap-ip-range", "nmap-udp", "nmap-ports"],
+            },
+        }
+    }
+    return json.dumps(input_data).encode("utf-8")
+
+
+@pytest.fixture
+def aggregate_report_with_sub_reports():
+    ids = iter(
+        [
+            "a534b4d5-5dba-4ddc-9b77-970675ae4b1c",
+            "0bdea8eb-7ac0-46ef-ad14-ea3b0bfe1030",
+            "53d5452c-9e67-42d2-9cb0-3b684d8967a2",
+            "a218ca79-47de-4473-a93d-54d14baadd98",
+            "3779f5b0-3adf-41c8-9630-8eed8a857ae6",
+            "851feeab-7036-48f6-81ef-599467c52457",
+            "1e259fce-3cd7-436f-b233-b4ae24a8f11b",
+            "50a9e4df-3b69-4ad8-b798-df626162db5a",
+            "5faa3364-c8b2-4b9c-8cc8-99d8f19ccf8a",
+        ]
+    )
+
+    def asset_report(name: str, report_type: str, template: str):
+        return create_asset_report(name, report_type, template, ids, "Hostname|internet|mispo.es", "_rieven", "Rieven")
+
+    aggregate_report = HydratedReport(
+        name="Aggregate Report",
+        report_type="aggregate-organisation-report",
+        template="aggregate_organisation_report/report.html",
+        date_generated=datetime(2024, 11, 21, 10, 7, 7, 441137),
+        input_oois=[
+            asset_report("Mail Report", "mail-report", "mail_report/report.html"),
+            asset_report("IPv6 Report", "ipv6-report", "ipv6_report/report.html"),
+            asset_report("RPKI Report", "rpki-report", "rpki_report/report.html"),
+            asset_report("Web System Report", "web-system-report", "web_system_report/report.html"),
+            asset_report("Open Ports Report", "open-ports-report", "open_ports_report/report.html"),
+            asset_report("Vulnerability Report", "vulnerability-report", "vulnerability_report/report.html"),
+            asset_report("System Report", "systems-report", "systems_report/report.html"),
+            asset_report("Name Server Report", "name-server-report", "name_server_report/report.html"),
+        ],
+        organization_code="_rieven",
+        organization_name="Rieven",
+        organization_tags=[],
+        data_raw_id="3a362cd7-6348-4e91-8a6f-4cd83f9f6a83",
+        observed_at=datetime(2024, 11, 21, 10, 7, 7, 441043),
+        reference_date=datetime(2024, 11, 21, 10, 7, 7, 441043),
+        report_recipe=recipe.reference,
+    )
+
+    return Paginated(count=1, items=[aggregate_report])
+
+
+@pytest.fixture
+def reports_task_list():
+    return PaginatedTasksResponse(
+        count=2,
+        next=None,
+        previous=None,
+        results=[
+            Task(
+                id=UUID("7f9d5b00-dbab-45f3-93a6-dd44cc20c359"),
+                scheduler_id="report-_rieven",
+                schedule_id="86032b20-f7ae-4a48-9093-87ec5a56e939",
+                organisation="test",
+                priority=1738747928,
+                status=TaskStatus.FAILED,
+                type="report",
+                hash="8f73ee4346118b7814711eba8ebb13d8",
+                data=ReportTask(
+                    type="report", organisation_id="_rieven", report_recipe_id="3f5c1a46-1969-49b7-b402-4676fb59ca4b"
+                ),
+                created_at=datetime(2025, 2, 5, 9, 32, 8, 325523),
+                modified_at=datetime(2025, 2, 5, 9, 32, 8, 325526),
+            ),
+            Task(
+                id=UUID("9e23611d-36c2-4972-82f0-077bcb1a8941"),
+                scheduler_id="report-_rieven",
+                schedule_id="bd821e6e-6680-4215-8557-e049deeb0175",
+                organisation="test 2",
+                priority=1738684879,
+                status=TaskStatus.COMPLETED,
+                type="report",
+                hash="5fc17aa4a8ff4874203446a106b4d5bb",
+                data=ReportTask(
+                    type="report", organisation_id="_rieven", report_recipe_id="451a676d-91f8-4366-ac24-d1a47205181d"
+                ),
+                created_at=datetime(2025, 2, 4, 16, 1, 19, 951925),
+                modified_at=datetime(2025, 2, 4, 16, 1, 19, 951927),
+            ),
+        ],
+    )
+
+
+@pytest.fixture
+def scheduled_report_recipe():
+    return ReportRecipe(
+        object_type="ReportRecipe",
+        scan_profile=EmptyScanProfile(
+            scan_profile_type="empty",
+            reference=Reference("ReportRecipe|3fed7d00-6261-4ad1-b08f-9b91434aa41e"),
+            level=ScanLevel.L0,
+            user_id=None,
+        ),
+        user_id=None,
+        primary_key="ReportRecipe|3fed7d00-6261-4ad1-b08f-9b91434aa41e",
+        recipe_id=UUID("3fed7d00-6261-4ad1-b08f-9b91434aa41e"),
+        report_name_format="${report_type} for ${oois_count} objects",
+        input_recipe={"input_oois": ["Hostname|internet|mispo.es"]},
+        report_type="concatenated-report",
+        asset_report_types=[
+            "dns-report",
+            "findings-report",
+            "ipv6-report",
+            "mail-report",
+            "name-server-report",
+            "open-ports-report",
+            "rpki-report",
+            "safe-connections-report",
+            "systems-report",
+            "vulnerability-report",
+            "web-system-report",
+        ],
+        cron_expression=None,
+    )
+
+
+@pytest.fixture
+def scheduled_reports_list():
+    return [
+        ScheduleResponse(
+            id=UUID("7706ebc1-b24b-44fb-a7b3-9a44d80b2644"),
+            scheduler_id="report",
+            organisation="test",
+            hash="bb5708d2f82e11cc5cda3aef54190f2e",
+            data={
+                "type": "report",
+                "organisation_id": "_rieven",
+                "report_recipe_id": "3fed7d00-6261-4ad1-b08f-9b91434aa41e",
+            },
+            enabled=True,
+            schedule=None,
+            deadline_at=None,
+            created_at=datetime(2025, 2, 12, 16, 1, 19, 951925),
+            modified_at=datetime(2025, 2, 12, 16, 1, 19, 951925),
+        )
     ]

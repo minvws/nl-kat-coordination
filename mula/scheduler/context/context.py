@@ -7,9 +7,9 @@ import structlog
 from prometheus_client import CollectorRegistry, Gauge, Info
 
 import scheduler
-from scheduler import storage
+from scheduler import clients, storage
 from scheduler.config import settings
-from scheduler.connectors import services
+from scheduler.storage import stores
 from scheduler.utils import remove_trailing_slash
 
 
@@ -34,6 +34,9 @@ class AppContext:
             the schedulers.
     """
 
+    metrics_qsize: Gauge
+    metrics_task_status_counts: Gauge
+
     def __init__(self) -> None:
         """Initializer of the AppContext class."""
         self.config: settings.Settings = settings.Settings()
@@ -43,7 +46,7 @@ class AppContext:
             logging.config.dictConfig(json.load(f))
 
         # Check if we enabled structured logging in the configuration
-        if self.config.json_logging:
+        if self.config.logging_format == "json":
             structlog.configure(
                 processors=[
                     # If log level is too low, abort pipeline and throw away log entry.
@@ -55,7 +58,7 @@ class AppContext:
                     # Perform %-style formatting.
                     structlog.stdlib.PositionalArgumentsFormatter(),
                     # Add a timestamp in ISO 8601 format.
-                    structlog.processors.TimeStamper(fmt="iso"),
+                    structlog.processors.TimeStamper(fmt="iso", utc=False),
                     # If the "stack_info" key in the event dict is true, remove it
                     # and render the current stack trace in the "stack" key.
                     structlog.processors.StackInfoRenderer(),
@@ -98,8 +101,8 @@ class AppContext:
                     structlog.processors.StackInfoRenderer(),
                     structlog.dev.set_exc_info,
                     structlog.stdlib.PositionalArgumentsFormatter(),
-                    structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S", utc=False),
-                    structlog.dev.ConsoleRenderer(),
+                    structlog.processors.TimeStamper("iso", utc=False),
+                    structlog.dev.ConsoleRenderer(pad_level=False, exception_formatter=structlog.dev.plain_traceback),
                 ],
                 context_class=dict,
                 # `logger_factory` is used to create wrapped loggers that are used
@@ -113,16 +116,17 @@ class AppContext:
                 cache_logger_on_first_use=True,
             )
 
+        self.logger: structlog.BoundLogger = structlog.get_logger(__name__)
+
         # Services
-        katalogus_service = services.Katalogus(
+        katalogus_service = clients.Katalogus(
             host=remove_trailing_slash(str(self.config.host_katalogus)),
             source=f"scheduler/{scheduler.__version__}",
             timeout=self.config.katalogus_request_timeout,
             pool_connections=self.config.katalogus_pool_connections,
-            cache_ttl=self.config.katalogus_cache_ttl,
         )
 
-        bytes_service = services.Bytes(
+        bytes_service = clients.Bytes(
             host=remove_trailing_slash(str(self.config.host_bytes)),
             source=f"scheduler/{scheduler.__version__}",
             user=self.config.host_bytes_user,
@@ -131,7 +135,7 @@ class AppContext:
             pool_connections=self.config.bytes_pool_connections,
         )
 
-        octopoes_service = services.Octopoes(
+        octopoes_service = clients.Octopoes(
             host=remove_trailing_slash(str(self.config.host_octopoes)),
             source=f"scheduler/{scheduler.__version__}",
             timeout=self.config.octopoes_request_timeout,
@@ -143,18 +147,29 @@ class AppContext:
         # notation
         self.services: SimpleNamespace = SimpleNamespace(
             **{
-                services.Katalogus.name: katalogus_service,
-                services.Octopoes.name: octopoes_service,
-                services.Bytes.name: bytes_service,
+                clients.Katalogus.name: katalogus_service,
+                clients.Octopoes.name: octopoes_service,
+                clients.Bytes.name: bytes_service,
             }
         )
 
+        # Database connection
+        try:
+            dbconn = storage.DBConn(dsn=str(self.config.db_uri), pool_size=self.config.db_connection_pool_size)
+            dbconn.connect()
+        except storage.errors.StorageError:
+            self.logger.exception("Failed to connect to database")
+            raise
+        except Exception:
+            self.logger.exception("Failed to connect to database")
+            raise
+
         # Datastores, SimpleNamespace allows us to use dot notation
-        dbconn = storage.DBConn(str(self.config.db_uri))
         self.datastores: SimpleNamespace = SimpleNamespace(
             **{
-                storage.TaskStore.name: storage.TaskStore(dbconn),
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(dbconn),
+                stores.ScheduleStore.name: stores.ScheduleStore(dbconn),
+                stores.TaskStore.name: stores.TaskStore(dbconn),
+                stores.PriorityQueueStore.name: stores.PriorityQueueStore(dbconn),
             }
         )
 
@@ -162,15 +177,12 @@ class AppContext:
         self.metrics_registry: CollectorRegistry = CollectorRegistry()
 
         Info(
-            name="app_settings",
-            documentation="Scheduler configuration settings",
-            registry=self.metrics_registry,
+            name="app_settings", documentation="Scheduler configuration settings", registry=self.metrics_registry
         ).info(
             {
                 "pq_maxsize": str(self.config.pq_maxsize),
                 "pq_grace_period": str(self.config.pq_grace_period),
                 "pq_max_random_objects": str(self.config.pq_max_random_objects),
-                "katalogus_cache_ttl": str(self.config.katalogus_cache_ttl),
                 "monitor_organisations_interval": str(self.config.monitor_organisations_interval),
             }
         )

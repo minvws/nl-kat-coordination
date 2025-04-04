@@ -2,10 +2,10 @@
 
 <section>
     <div>
-        <h2>{% translate "Stats - Last 24 hours" %}</h2>
+        <h2>{% translate "Task statistics - Last 24 hours" %}</h2>
         {% if not stats_error %}
-            <div id="stats-graph">
-                <table class="charts-css column hide-data show-heading show-labels show-primary-axis show-3-secondary-axes data-spacing-10 multiple stacked">
+            <div class="horizontal-scroll">
+                <table>
                     <caption>{% translate "All times in UTC, blocks of 1 hour." %}</caption>
                     <thead>
                         <tr>
@@ -22,26 +22,26 @@
                     <tbody>
                         {% for timestamp, values in stats.items %}
                             <tr>
-                                <th scope="row">{{ timestamp }}:</th>
-                                <td style="--size: calc({{ values.pending }} / 150);">
+                                <th scope="row" class="nowrap">{{ timestamp }}:</th>
+                                <td>
                                     <span class="data">{{ values.pending }}</span>
                                 </td>
-                                <td style="--size: calc({{ values.queued }} / 150);">
+                                <td>
                                     <span class="data">{{ values.queued }}</span>
                                 </td>
-                                <td style="--size: calc({{ values.dispatched }} / 150);">
+                                <td>
                                     <span class="data">{{ values.dispatched }}</span>
                                 </td>
-                                <td style="--size: calc({{ values.running }} / 150);">
+                                <td>
                                     <span class="data">{{ values.running }}</span>
                                 </td>
-                                <td style="--size: calc({{ values.completed }} / 150);">
+                                <td>
                                     <span class="data">{{ values.completed }}</span>
                                 </td>
-                                <td style="--size: calc({{ values.failed }} / 150);">
+                                <td>
                                     <span class="data">{{ values.failed }}</span>
                                 </td>
-                                <td style="--size: calc({{ values.cancelled }} / 150);">
+                                <td>
                                     <span class="data">{{ values.cancelled }}</span>
                                 </td>
                             </tr>

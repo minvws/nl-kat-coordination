@@ -9,13 +9,11 @@ def test_update_clearance_level(rf, client_member, httpx_mock):
     httpx_mock.add_response(
         json={
             "id": "binaryedge",
-            "repository_id": "LOCAL",
             "name": "BinaryEdge",
             "version": None,
             "authors": None,
             "created": None,
             "description": "Use BinaryEdge to find open ports with vulnerabilities that are found on that port",
-            "environment_keys": ["BINARYEDGE_API"],
             "related": None,
             "enabled": True,
             "type": "boefje",

@@ -1,11 +1,13 @@
 import logging
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
-from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath, IPvAnyAddress, PostgresDsn, conint
+from pydantic import AnyHttpUrl, Field, FilePath, IPvAnyAddress, PostgresDsn, conint
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 from pydantic_settings.sources import EnvSettingsSource
+
+from boefjes.models import EncryptionMiddleware
 
 BASE_DIR: Path = Path(__file__).parent.resolve()
 
@@ -21,6 +23,9 @@ class BackwardsCompatibleEnvSettings(EnvSettingsSource):
         "BOEFJE_API": "BOEFJES_API",
         "BOEFJE_DOCKER_NETWORK": "BOEFJES_DOCKER_NETWORK",
         "LOG_CFG": "BOEFJES_LOG_CFG",
+        "ENCRYPTION_MIDDLEWARE": "BOEFJES_ENCRYPTION_MIDDLEWARE",
+        "KATALOGUS_PRIVATE_KEY_B64": "BOEFJES_KATALOGUS_PRIVATE_KEY",
+        "KATALOGUS_PUBLIC_KEY_B64": "BOEFJES_KATALOGUS_PUBLIC_KEY",
     }
 
     def __call__(self) -> dict[str, Any]:
@@ -58,9 +63,6 @@ class Settings(BaseSettings):
         examples=['{"kat_external_db_normalize": 3, "kat_dns_normalize": 1}'],
     )
 
-    # Queue configuration
-    queue_uri: AmqpDsn = Field(..., description="KAT queue URI", examples=["amqp://"], validation_alias="QUEUE_URI")
-
     katalogus_db_uri: PostgresDsn = Field(
         ...,
         examples=["postgresql://xx:xx@host:5432/katalogus"],
@@ -82,23 +84,12 @@ class Settings(BaseSettings):
         ..., examples=["http://localhost:8001"], description="Octopoes API URL", validation_alias="OCTOPOES_API"
     )
     api: AnyHttpUrl = Field(
-        ...,
-        examples=["http://boefje:8000"],
-        description="The URL on which the boefjes API is available",
+        ..., examples=["http://boefje:8000"], description="The URL on which the boefjes API is available"
     )
     # Boefje server settings
-    api_host: str = Field(
-        "0.0.0.0",
-        description="Host address of the Boefje API server",
-    )
-    api_port: int = Field(
-        8000,
-        description="Host port of the Boefje API server",
-    )
-    docker_network: str = Field(
-        "bridge",
-        description="Docker network to run Boefjes in",
-    )
+    api_host: str = Field("0.0.0.0", description="Host address of the Boefje API server")
+    api_port: int = Field(8000, description="Host port of the Boefje API server")
+    docker_network: str = Field("bridge", description="Docker network to run Boefjes in")
     bytes_api: AnyHttpUrl = Field(
         ..., examples=["http://localhost:8002"], description="Bytes API URL", validation_alias="BYTES_API"
     )
@@ -109,9 +100,26 @@ class Settings(BaseSettings):
         ..., examples=["secret"], description="Bytes JWT login password", validation_alias="BYTES_PASSWORD"
     )
 
+    encryption_middleware: EncryptionMiddleware = Field(
+        EncryptionMiddleware.IDENTITY,
+        description="Toggle used to configure the encryption strategy",
+        examples=["IDENTITY", "NACL_SEALBOX"],
+    )
+
+    katalogus_private_key: str = Field(
+        "", description="Base64 encoded private key used for asymmetric encryption of settings"
+    )
+    katalogus_public_key: str = Field(
+        "", description="Base64 encoded public key used for asymmetric encryption of settings"
+    )
+
     span_export_grpc_endpoint: AnyHttpUrl | None = Field(
         None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
     )
+
+    logging_format: Literal["text", "json"] = Field("text", description="Logging format")
+
+    outgoing_request_timeout: int = Field(30, description="Timeout for outgoing HTTP requests")
 
     model_config = SettingsConfigDict(env_prefix="BOEFJES_")
 

@@ -3,8 +3,7 @@ disable_existing_loggers: 0
 
 formatters:
   default:
-    format: "%(asctime)s [%(process)d] [%(levelname)s] [%(module)s] %(message)s"
-    datefmt: "[%Y-%m-%d %H:%M:%S %z]"
+    format: "%(message)s"
 
 handlers:
   console:
@@ -39,6 +38,10 @@ loggers:
     handlers: [console]
     propagate: 0
   celery:
+    level: WARNING
+    handlers: [console]
+    propagate: 0
+  celery.worker:
     level: WARNING
     handlers: [console]
     propagate: 0

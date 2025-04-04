@@ -1,36 +1,25 @@
-import datetime
-import logging
 from collections.abc import Iterable
-from enum import Enum
 from functools import cached_property
-from typing import cast
 
+import structlog
 import tagulous.models
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models.signals import post_save, pre_save
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from httpx import HTTPError
-from katalogus.client import KATalogusClientV1, get_katalogus
-from katalogus.exceptions import KATalogusDownException, KATalogusException, KATalogusUnhealthyException
 
-from octopoes.api.models import Declaration
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models.ooi.web import Network
-from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesUnhealthyException
 from tools.add_ooi_information import SEPARATOR, get_info
-from tools.enums import SCAN_LEVEL
+from tools.enums import MAX_SCAN_LEVEL
 from tools.fields import LowerCaseSlugField
 
 GROUP_ADMIN = "admin"
 GROUP_REDTEAM = "redteam"
 GROUP_CLIENT = "clients"
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 ORGANIZATION_CODE_LENGTH = 32
 DENY_ORGANIZATION_CODES = [
@@ -56,7 +45,6 @@ DENY_ORGANIZATION_CODES = [
     "kat-alogus",
     "boefjes",
     "mula",
-    "keiko",
     "octopoes",
     "rocky",
 ]
@@ -79,6 +67,7 @@ class OrganizationTag(tagulous.models.TagTreeModel):
 
 
 class Organization(models.Model):
+    id: int
     name = models.CharField(max_length=126, unique=True, help_text=_("The name of the organisation"))
     code = LowerCaseSlugField(
         max_length=ORGANIZATION_CODE_LENGTH,
@@ -91,7 +80,9 @@ class Organization(models.Model):
     )
     tags = tagulous.models.TagField(to=OrganizationTag, blank=True)
 
-    def __str__(self):
+    EVENT_CODES = {"created": 900201, "updated": 900202, "deleted": 900203}
+
+    def __str__(self) -> str:
         return str(self.name)
 
     class Meta:
@@ -99,37 +90,18 @@ class Organization(models.Model):
             ("can_switch_organization", "Can switch organization"),
             ("can_scan_organization", "Can scan organization"),
             ("can_enable_disable_boefje", "Can enable or disable boefje"),
+            ("can_add_boefje", "Can add new or duplicate boefjes"),
             ("can_set_clearance_level", "Can set clearance level"),
             ("can_delete_oois", "Can delete oois"),
             ("can_mute_findings", "Can mute findings"),
             ("can_view_katalogus_settings", "Can view KAT-alogus settings"),
             ("can_set_katalogus_settings", "Can set KAT-alogus settings"),
             ("can_recalculate_bits", "Can recalculate bits"),
+            ("can_access_all_organizations", "Can access all organizations"),
         )
 
     def get_absolute_url(self):
         return reverse("organization_settings", args=[self.pk])
-
-    def delete(self, *args, **kwargs):
-        katalogus_client = self._get_healthy_katalogus(self.code)
-        octopoes_client = self._get_healthy_octopoes(self.code)
-
-        try:
-            octopoes_client.delete_node()
-        except Exception as e:
-            raise OctopoesException("Failed deleting organization in Octopoes") from e
-
-        try:
-            katalogus_client.delete_organization()
-        except Exception as e:
-            try:
-                octopoes_client.create_node()
-            except Exception as second_exception:
-                raise OctopoesException("Failed creating organization in Octopoes") from second_exception
-
-            raise KATalogusException("Failed deleting organization in the Katalogus") from e
-
-        super().delete(*args, **kwargs)
 
     def clean(self):
         if self.code in DENY_ORGANIZATION_CODES:
@@ -142,69 +114,6 @@ class Organization(models.Model):
                 }
             )
 
-    @classmethod
-    def pre_create(cls, sender, instance, *args, **kwargs):
-        instance.clean()
-        katalogus_client = cls._get_healthy_katalogus(instance.code)
-        octopoes_client = cls._get_healthy_octopoes(instance.code)
-
-        try:
-            if not katalogus_client.organization_exists():
-                katalogus_client.create_organization(instance.name)
-        except Exception as e:
-            raise KATalogusException("Failed creating organization in the Katalogus") from e
-
-        try:
-            octopoes_client.create_node()
-        except Exception as e:
-            try:
-                katalogus_client.delete_organization()
-            except Exception as second_exception:
-                raise KATalogusException("Failed deleting organization in the Katalogus") from second_exception
-
-            raise OctopoesException("Failed creating organization in Octopoes") from e
-
-    @classmethod
-    def post_create(cls, sender, instance, *args, **kwargs):
-        octopoes_client = cls._get_healthy_octopoes(instance.code)
-
-        try:
-            valid_time = datetime.datetime.now(datetime.timezone.utc)
-            octopoes_client.save_declaration(Declaration(ooi=Network(name="internet"), valid_time=valid_time))
-        except Exception:
-            logger.exception("Could not seed internet for organization %s", sender)
-
-    @staticmethod
-    def _get_healthy_katalogus(organization_code: str) -> KATalogusClientV1:
-        katalogus_client = get_katalogus(organization_code)
-
-        try:
-            health = katalogus_client.health()
-        except HTTPError as e:
-            raise KATalogusDownException from e
-
-        if not health.healthy:
-            raise KATalogusUnhealthyException
-
-        return katalogus_client
-
-    @staticmethod
-    def _get_healthy_octopoes(organization_code: str) -> OctopoesAPIConnector:
-        octopoes_client = OctopoesAPIConnector(settings.OCTOPOES_API, client=organization_code)
-        try:
-            health = octopoes_client.root_health()
-        except HTTPError as e:
-            raise OctopoesDownException from e
-
-        if not health.healthy:
-            raise OctopoesUnhealthyException
-
-        return octopoes_client
-
-
-pre_save.connect(Organization.pre_create, sender=Organization)
-post_save.connect(Organization.post_create, sender=Organization)
-
 
 class OrganizationMember(models.Model):
     # New is the status after an e-mail invite has been created for a member but the invite hasn't been accepted yet.
@@ -214,8 +123,6 @@ class OrganizationMember(models.Model):
         ACTIVE = "active", _("active")
         NEW = "new", _("new")
 
-    scan_levels = [scan_level.value for scan_level in cast(type[Enum], SCAN_LEVEL)]
-
     user = models.ForeignKey("account.KATUser", on_delete=models.PROTECT, related_name="members")
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="members")
     groups = models.ManyToManyField(Group, blank=True)
@@ -223,11 +130,13 @@ class OrganizationMember(models.Model):
     blocked = models.BooleanField(default=False)
     onboarded = models.BooleanField(default=False)
     trusted_clearance_level = models.IntegerField(
-        default=-1, validators=[MinValueValidator(-1), MaxValueValidator(max(scan_levels))]
+        default=-1, validators=[MinValueValidator(-1), MaxValueValidator(MAX_SCAN_LEVEL)]
     )
     acknowledged_clearance_level = models.IntegerField(
-        default=-1, validators=[MinValueValidator(-1), MaxValueValidator(max(scan_levels))]
+        default=-1, validators=[MinValueValidator(-1), MaxValueValidator(MAX_SCAN_LEVEL)]
     )
+
+    EVENT_CODES = {"created": 900211, "updated": 900212, "deleted": 900213}
 
     @cached_property
     def all_permissions(self) -> set[str]:
@@ -255,10 +164,33 @@ class OrganizationMember(models.Model):
     def has_perms(self, perm_list: Iterable[str]) -> bool:
         return all(self.has_perm(perm) for perm in perm_list)
 
+    @property
+    def max_clearance_level(self) -> int:
+        """The maximum clearance level the user has for this organization.
+
+        When the user has an organization specific clearance level that is lower
+        than the global clearance level this will overrule the global clearance
+        level.
+
+        For the organization specific clearance level we take the minimum
+        of the trusted clearance level and acknowledged clearance level. If the
+        user did not acknowledge a changed clearance level, we need to use the
+        level that was previously. If an admin lowered the users clearance
+        level, we also need to use that level instead of the previously
+        acknowledged level.
+        """
+        if self.trusted_clearance_level == -1 and self.acknowledged_clearance_level == -1:
+            return self.user.clearance_level
+        else:
+            return min(self.trusted_clearance_level, self.acknowledged_clearance_level)
+
+    def has_clearance_level(self, level: int) -> bool:
+        return level <= self.max_clearance_level
+
     class Meta:
         unique_together = ["user", "organization"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.user)
 
 
@@ -266,12 +198,16 @@ class Indemnification(models.Model):
     user = models.ForeignKey("account.KATUser", on_delete=models.SET_NULL, null=True)
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
 
+    EVENT_CODES = {"created": 900221, "updated": 900222, "deleted": 900223}
+
 
 class OOIInformation(models.Model):
     id = models.CharField(max_length=256, primary_key=True)
     last_updated = models.DateTimeField(auto_now=True)
     data = models.JSONField(null=True)
     consult_api = models.BooleanField(default=False)
+
+    EVENT_CODES = {"created": 900231, "updated": 900232, "deleted": 900233}
 
     def save(self, *args, **kwargs):
         if self.data is None:
@@ -304,5 +240,5 @@ class OOIInformation(models.Model):
             self.data[key] = value
         self.save()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.id

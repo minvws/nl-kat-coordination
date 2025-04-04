@@ -27,6 +27,6 @@ body > main > section {
   }
 
   &.dividing-line {
-    border-top: 1px solid #cccccc;
+    border-top: 1px solid var(--colors-grey-200);
   }
 }

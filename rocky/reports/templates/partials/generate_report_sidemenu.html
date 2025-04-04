@@ -1,9 +1,10 @@
 {% load i18n %}
+{% load ooi_extra %}
 
-<nav data-open-label="Zijbalknavigatie"
-     data-close-label="Sluit zijbalknavigatie"
-     aria-label="Zijbalknavigatie">
-    <div>
+<div class="sticky-container" id="sticky-container">
+    <nav data-open-label="Zijbalknavigatie"
+         data-close-label="Sluit zijbalknavigatie"
+         aria-label="Zijbalknavigatie">
         <h2 class="heading-large">{% translate "Table of contents" %}</h2>
         <ol class="chapter-numbers">
             <li>
@@ -13,11 +14,11 @@
                 {% for ooi,data in report.items %}
                     {% if data.data %}
                         <li>
-                            <a href="#{{ report_type }}-{{ ooi }}">{{ report_type }} {% translate "for" %} {{ data.ooi_human_readable }}</a>
+                            <a href="#{{ report_type }}-{{ ooi }}">{{ data.report_name }}</a>
                         </li>
                     {% endif %}
                 {% endfor %}
             {% endfor %}
         </ol>
-    </div>
-</nav>
+    </nav>
+</div>

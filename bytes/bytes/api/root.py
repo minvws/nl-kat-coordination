@@ -1,7 +1,7 @@
-import logging
 from typing import Any
 
 import prometheus_client
+import structlog
 from fastapi import APIRouter, Depends, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.requests import Request
@@ -16,7 +16,7 @@ from bytes.repositories.meta_repository import MetaDataRepository
 from bytes.version import __version__
 
 router = APIRouter()
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class ServiceHealth(BaseModel):
@@ -32,12 +32,7 @@ ServiceHealth.update_forward_refs()
 
 def validation_exception_handler(_: Request, exc: RequestValidationError | ValidationError) -> JSONResponse:
     logger.critical(exc)
-    return JSONResponse(
-        {
-            "value": str(exc),
-        },
-        status.HTTP_422_UNPROCESSABLE_ENTITY,
-    )
+    return JSONResponse({"value": str(exc)}, status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 
 @router.get("/", include_in_schema=False)
@@ -52,7 +47,7 @@ def health() -> ServiceHealth:
 
 
 @router.get("/metrics", dependencies=[Depends(authenticate_token)])
-def metrics(meta_repository: MetaDataRepository = Depends(create_meta_data_repository)):
+def metrics(meta_repository: MetaDataRepository = Depends(create_meta_data_repository)) -> Response:
     collector_registry = get_registry(meta_repository)
     data = prometheus_client.generate_latest(collector_registry)
 
@@ -63,8 +58,4 @@ def metrics(meta_repository: MetaDataRepository = Depends(create_meta_data_repos
 def login(form_data: OAuth2PasswordRequestForm = Depends()) -> TokenResponse:
     access_token, expire_time = get_access_token(form_data)
 
-    return TokenResponse(
-        access_token=access_token,
-        token_type="bearer",
-        expires_at=expire_time.isoformat(),
-    )
+    return TokenResponse(access_token=access_token, token_type="bearer", expires_at=expire_time.isoformat())

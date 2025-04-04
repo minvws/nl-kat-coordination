@@ -47,7 +47,7 @@ $normalizer-bg: #e17000;
 
     .tile-label {
       background-color: #262431;
-      color: #ffffff;
+      color: var(--colors-white);
       font-size: 1.125rem;
       margin: 0;
       padding: 0.25rem 1rem;
@@ -94,21 +94,5 @@ $normalizer-bg: #e17000;
 
   .tile-description {
     font-size: var(--tile-font-size);
-  }
-
-  button,
-  a.button {
-    min-width: auto;
-    min-height: auto;
-    font-weight: 700;
-    line-height: var(--form-button-line-height);
-
-    &.plugin-disabled {
-      color: var(--color-alert-negative);
-
-      &.plugin-disabled:hover {
-        border-color: var(--color-alert-negative);
-      }
-    }
   }
 }

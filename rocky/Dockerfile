@@ -6,6 +6,7 @@ WORKDIR /app
 
 COPY rocky/package.json rocky/yarn.lock .
 COPY rocky/assets assets
+COPY rocky/components components
 
 RUN yarn --ignore-engines && yarn build
 
@@ -19,8 +20,8 @@ ARG USER_GID=1000
 
 ENTRYPOINT ["/app/rocky/entrypoint.sh"]
 
-RUN groupadd --gid $USER_GID rocky
-RUN adduser --disabled-password --gecos '' --uid $USER_UID --gid $USER_GID rocky
+RUN groupadd --gid "$USER_GID" rocky
+RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" rocky
 
 WORKDIR /app/rocky
 
@@ -41,10 +42,10 @@ RUN --mount=type=cache,target=/root/.cache \
     pip install --upgrade pip \
     && if [ "$ENVIRONMENT" = "dev" ]; \
     then \
-    grep -v git+https:// requirements-dev.txt | pip install -r /dev/stdin ; \
+    grep -v git+https:// requirements-dev.txt | pip install -r /dev/stdin && \
     grep git+https:// requirements-dev.txt | pip install -r /dev/stdin ; \
     else \
-    grep -v git+https:// requirements.txt | pip install -r /dev/stdin ;\
+    grep -v git+https:// requirements.txt | pip install -r /dev/stdin && \
     grep git+https:// requirements.txt | pip install -r /dev/stdin ; \
     fi
 
@@ -63,13 +64,10 @@ COPY --link --from=node_builder /app/assets/dist assets/dist
 # without it
 
 RUN export SECRET_KEY="secret" BYTES_API="http://bytes:8000" BYTES_PASSWORD="password" \
-    BYTES_USERNAME="username" KATALOGUS_API="http://katalogus:8000" KEIKO_API="http://keiko:8000" \
+    BYTES_USERNAME="username" KATALOGUS_API="http://katalogus:8000" \
     OCTOPOES_API="http://octopoes_api:80" SCHEDULER_API="http://scheduler:8000" \
     && python manage.py collectstatic -l && python manage.py compress && python manage.py compilemessages
 
 USER rocky
-
-# Workaround for https://github.com/emmett-framework/granian/issues/287
-ENV GRANIAN_HTTP=1
 
 CMD ["granian", "--interface", "wsgi", "rocky.wsgi:application", "--host", "0.0.0.0"]

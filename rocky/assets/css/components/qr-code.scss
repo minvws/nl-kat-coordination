@@ -2,6 +2,6 @@
 form.horizontal-view > fieldset > div > .qr-code-image {
   max-width: 15rem;
   float: left;
-  background-color: #ffffff;
+  background-color: var(--colors-white);
   margin-left: var(--form-horizontal-view-gap);
 }

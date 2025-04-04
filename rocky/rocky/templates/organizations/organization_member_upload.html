@@ -8,7 +8,7 @@
 
     <main id="main-content">
         <section>
-            <div>
+            <div class="layout-form">
                 <h1>{% translate "Upload a csv file with members for organisation" %} "{{ organization }}"</h1>
                 <p class="emphasized">
                     <a href="{% url 'download_organization_member_template' organization_code=organization.code %}">
@@ -20,10 +20,7 @@
                 <ul>
                     {% for criterion in criteria %}<li>{{ criterion }}</li>{% endfor %}
                 </ul>
-                <form novalidate
-                      method="post"
-                      class="horizontal-view help"
-                      enctype="multipart/form-data">
+                <form novalidate method="post" class="help" enctype="multipart/form-data">
                     {% csrf_token %}
                     {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
 

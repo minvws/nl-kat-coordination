@@ -36,10 +36,10 @@ def get_ip_ports_and_service(ip_with_ports: dict, network: Network, netblock: Re
 def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     """Parse Masscan JSON and yield relevant network, IPs and ports."""
     try:
-        raw = json.loads(raw) if raw else []
+        results = json.loads(raw) if raw else []
     except json.decoder.JSONDecodeError:
         # Masscan tends to forget to close the json with "]" if the wait window passed.
-        raw = json.loads(raw.decode() + "]") if raw else []
+        results = json.loads(raw.decode() + "]") if raw else []
 
     # Relevant network object is received from the normalizer_meta.
     network = Network(name=input_ooi["network"]["name"])
@@ -47,5 +47,5 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     netblock_ref = Reference.from_str(input_ooi["primary_key"])
 
     logging.info("Parsing %d Masscan IPs for %s.", len(raw), network)
-    for ip_with_ports in raw:
+    for ip_with_ports in results:
         yield from get_ip_ports_and_service(ip_with_ports=ip_with_ports, network=network, netblock=netblock_ref)

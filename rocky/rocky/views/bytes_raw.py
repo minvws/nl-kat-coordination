@@ -1,8 +1,8 @@
 import json
-import logging
 import zipfile
 from io import BytesIO
 
+import structlog
 from account.mixins import OrganizationView
 from django.contrib import messages
 from django.http import FileResponse, Http404
@@ -10,7 +10,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class BytesRawView(OrganizationView):
@@ -21,10 +21,7 @@ class BytesRawView(OrganizationView):
             raw_metas = self.bytes_client.get_raw_metas(boefje_meta_id, self.organization.code)
             raws = {raw_meta["id"]: self.bytes_client.get_raw(raw_meta["id"]) for raw_meta in raw_metas}
 
-            return FileResponse(
-                zip_data(raws, raw_metas),
-                filename=f"{boefje_meta_id}.zip",
-            )
+            return FileResponse(zip_data(raws, raw_metas), filename=f"{boefje_meta_id}.zip")
         except Http404 as e:
             msg = _("Getting raw data failed.")
             logger.error(msg)

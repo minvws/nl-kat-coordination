@@ -1,12 +1,13 @@
 import json
 from collections.abc import Iterable
+from typing import Any
 
 from boefjes.job_models import NormalizerOutput
 from octopoes.models import Reference
 from octopoes.models.ooi.service import TLSCipher
 
 
-def parse_cipher(cipher: dict) -> dict | None:
+def parse_cipher(cipher: dict) -> dict[str, Any] | None:
     if cipher["id"].startswith("cipher-tls"):
         parts = cipher["finding"].split()
 
@@ -30,20 +31,18 @@ def parse_cipher(cipher: dict) -> dict | None:
             )
         else:
             cipher_dict[parts[0]].update(
-                {
-                    "encryption_algorithm": parts[4],
-                    "bits": int(parts[5]),
-                    "cipher_suite_alias": parts[6],
-                }
+                {"encryption_algorithm": parts[4], "bits": int(parts[5]), "cipher_suite_alias": parts[6]}
             )
 
         return cipher_dict
+    else:
+        return None
 
 
 def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     ip_service_reference = Reference.from_str(input_ooi["primary_key"])
     output = json.loads(raw)
-    tls_dict = {}
+    tls_dict: dict[str, list] = {}
     for item in output:
         cipher = parse_cipher(item)
         if cipher:

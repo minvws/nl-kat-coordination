@@ -23,14 +23,8 @@ class PasswordResetView(auth_views.PasswordResetView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
-            {
-                "url": reverse("login"),
-                "text": _("Login"),
-            },
-            {
-                "url": reverse("password_reset"),
-                "text": _("Reset password"),
-            },
+            {"url": reverse("login"), "text": _("Login")},
+            {"url": reverse("password_reset"), "text": _("Reset password")},
         ]
 
         return context
@@ -43,10 +37,7 @@ class PasswordResetView(auth_views.PasswordResetView):
         return super().form_valid(form)
 
     def is_smtp_valid(self):
-        smtp_credentials = [
-            settings.EMAIL_HOST,
-            settings.EMAIL_PORT,
-        ]
+        smtp_credentials = [settings.EMAIL_HOST, settings.EMAIL_PORT]
         return not ("" in smtp_credentials or None in smtp_credentials)
 
     def add_error_notification(self):

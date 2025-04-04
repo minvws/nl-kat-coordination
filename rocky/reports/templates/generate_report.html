@@ -21,8 +21,8 @@
                         {% if data.data %}
                             <section id="{{ report_type }}-{{ ooi }}">
                                 <div>
-                                    <h2>{{ report_type }} {% translate "for" %} {{ data.ooi_human_readable }}</h2>
-                                    {% include data.template with data=data.data generate_report="yes" %}
+                                    <h2>{{ data.report_name }}</h2>
+                                    {% include data.template with data=data.data show_introduction="yes" %}
 
                                 </div>
                             </section>

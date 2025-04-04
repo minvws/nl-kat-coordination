@@ -1,7 +1,7 @@
-import logging
 from datetime import datetime, timedelta, timezone
 
 import jwt
+import structlog
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt import InvalidTokenError
@@ -11,7 +11,7 @@ from starlette import status
 
 from bytes.config import get_settings
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -65,10 +65,7 @@ def _create_access_token(
     form_data: OAuth2PasswordRequestForm, secret: str, access_token_expire_minutes: float
 ) -> tuple[str, datetime]:
     expire_time = _get_expire_time(access_token_expire_minutes)
-    data = {
-        "sub": form_data.username,
-        "exp": expire_time,
-    }
+    data = {"sub": form_data.username, "exp": expire_time}
 
     access_token = jwt.encode(data.copy(), secret, algorithm=ALGORITHM)
 

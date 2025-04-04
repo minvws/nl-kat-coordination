@@ -1,10 +1,10 @@
 import json
-import logging
 import threading
 import uuid
 from collections.abc import Callable
 
 import pika
+import structlog
 from celery import Celery
 from pika.adapters.blocking_connection import BlockingChannel
 from pika.exceptions import StreamLostError
@@ -13,7 +13,7 @@ from pydantic import BaseModel
 from octopoes.events.events import DBEvent, OperationType, ScanProfileDBEvent
 from octopoes.models import ScanProfile, format_id_short
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class AbstractOOI(BaseModel):
@@ -26,6 +26,7 @@ class ScanProfileMutation(BaseModel):
     operation: OperationType
     primary_key: str
     value: AbstractOOI | None = None
+    client_id: str
 
 
 thread_local = threading.local()
@@ -81,7 +82,7 @@ class EventManager:
         # schedule celery event processor
         self.celery_app.send_task(
             "octopoes.tasks.tasks.handle_event",
-            (json.loads(event.json()),),
+            (json.loads(event.model_dump_json()),),
             queue=self.celery_queue_name,
             task_id=str(uuid.uuid4()),
         )
@@ -108,7 +109,7 @@ class EventManager:
                 {
                     "primary_key": event.reference,
                     "object_type": event.reference.class_,
-                    "scan_profile": event.new_data.dict(),  # type: ignore[union-attr]
+                    "scan_profile": event.new_data.model_dump(),  # type: ignore[union-attr]
                 }
             )
 
@@ -126,7 +127,9 @@ class EventManager:
             )
 
         # publish mutations
-        mutation = ScanProfileMutation(operation=event.operation_type, primary_key=event.primary_key)
+        mutation = ScanProfileMutation(
+            operation=event.operation_type, primary_key=event.primary_key, client_id=event.client
+        )
 
         if event.operation_type != OperationType.DELETE:
             mutation.value = AbstractOOI(
@@ -137,8 +140,8 @@ class EventManager:
 
         self.channel.basic_publish(
             "",
-            f"{event.client}__scan_profile_mutations",
-            mutation.json().encode(),
+            "scan_profile_mutations",
+            mutation.model_dump_json().encode(),
             properties=pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent),
         )
 
@@ -165,4 +168,4 @@ class EventManager:
     def _connect(self) -> None:
         self.channel = self.channel_factory(self.queue_uri)
         self.channel.queue_declare(queue=f"{self.client}__scan_profile_increments", durable=True)
-        self.channel.queue_declare(queue=f"{self.client}__scan_profile_mutations", durable=True)
+        self.channel.queue_declare(queue="scan_profile_mutations", durable=True)

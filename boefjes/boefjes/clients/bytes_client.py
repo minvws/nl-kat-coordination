@@ -1,16 +1,19 @@
-import logging
 import typing
-from collections.abc import Callable
+import uuid
+from base64 import b64encode
+from collections.abc import Callable, Set
 from functools import wraps
 from typing import Any
 from uuid import UUID
 
+import structlog
 from httpx import Client, HTTPStatusError, HTTPTransport, Response
 
+from boefjes.config import settings
 from boefjes.job_models import BoefjeMeta, NormalizerMeta, RawDataMeta
 
 BYTES_API_CLIENT_VERSION = "0.3"
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 ClientSessionMethod = Callable[..., Any]
 
@@ -36,12 +39,10 @@ class BytesAPIClient:
             base_url=base_url,
             headers={"User-Agent": f"bytes-api-client/{BYTES_API_CLIENT_VERSION}"},
             transport=(HTTPTransport(retries=6)),
+            timeout=settings.outgoing_request_timeout,
         )
 
-        self.credentials = {
-            "username": username,
-            "password": password,
-        }
+        self.credentials = {"username": username, "password": password}
         self.headers: dict[str, str] = {}
 
     def login(self) -> None:
@@ -63,16 +64,14 @@ class BytesAPIClient:
 
     def _get_token(self) -> str:
         response = self._session.post(
-            "/token",
-            data=self.credentials,
-            headers={"content-type": "application/x-www-form-urlencoded"},
+            "/token", data=self.credentials, headers={"content-type": "application/x-www-form-urlencoded"}
         )
 
         return str(response.json()["access_token"])
 
     @retry_with_login
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
-        response = self._session.post("/bytes/boefje_meta", content=boefje_meta.json(), headers=self.headers)
+        response = self._session.post("/bytes/boefje_meta", content=boefje_meta.model_dump_json(), headers=self.headers)
 
         self._verify_response(response)
 
@@ -85,23 +84,40 @@ class BytesAPIClient:
 
     @retry_with_login
     def save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
-        response = self._session.post("/bytes/normalizer_meta", content=normalizer_meta.json(), headers=self.headers)
+        response = self._session.post(
+            "/bytes/normalizer_meta", content=normalizer_meta.model_dump_json(), headers=self.headers
+        )
 
         self._verify_response(response)
 
     @retry_with_login
-    def save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: frozenset[str] = frozenset()) -> UUID:
-        headers = {"content-type": "application/octet-stream"}
-        headers.update(self.headers)
+    def get_normalizer_meta(self, normalizer_meta_id: uuid.UUID) -> NormalizerMeta:
+        response = self._session.get(f"/bytes/normalizer_meta/{normalizer_meta_id}", headers=self.headers)
+        self._verify_response(response)
+
+        return NormalizerMeta.model_validate_json(response.content)
+
+    @retry_with_login
+    def save_raw(self, boefje_meta_id: str, raw: str | bytes, mime_types: Set[str] = frozenset()) -> UUID:
+        file_name = "raw"  # The name provides a key for all ids returned, so this is arbitrary as we only upload 1 file
+
         response = self._session.post(
             "/bytes/raw",
-            content=raw,
-            headers=headers,
-            params={"mime_types": list(mime_types), "boefje_meta_id": boefje_meta_id},
+            json={
+                "files": [
+                    {
+                        "name": file_name,
+                        "content": b64encode(raw if isinstance(raw, bytes) else raw.encode()).decode(),
+                        "tags": list(mime_types),
+                    }
+                ]
+            },
+            headers=self.headers,
+            params={"boefje_meta_id": str(boefje_meta_id)},
         )
-
         self._verify_response(response)
-        return UUID(response.json()["id"])
+
+        return UUID(response.json()[file_name])
 
     @retry_with_login
     def get_raw(self, raw_data_id: str) -> bytes:

@@ -19,17 +19,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     try:
         output = client.containers.run(
             OPENSSL_IMAGE,
-            [
-                "s_client",
-                "-host",
-                ip_address,
-                "-port",
-                port,
-                "-prexit",
-                "-showcerts",
-                "-servername",
-                hostname,
-            ],
+            ["s_client", "-host", ip_address, "-port", port, "-prexit", "-showcerts", "-servername", hostname],
             remove=True,
         )
     except docker.errors.ContainerError as e:

@@ -1,6 +1,6 @@
 import time
 
-from scheduler.connectors import listeners
+from scheduler.clients.amqp import listeners
 
 
 class MockListener(listeners.Listener):
@@ -9,3 +9,7 @@ class MockListener(listeners.Listener):
 
     def stop(self) -> None:
         pass
+
+
+class MockRabbitMQ(listeners.RabbitMQ):
+    pass

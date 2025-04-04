@@ -7,7 +7,7 @@
                     <input type="checkbox"
                            name="report_type"
                            value="{{ report_type.id }}"
-                           {% if report_type.id in request.GET.urlencode %}checked{% endif %} />
+                           {% if report_type.id in selected_report_types %}checked{% endif %} />
                 {% else %}
                     <input type="hidden" name="report_type" value="{{ report_type.id }}" />
                 {% endif %}

@@ -1,3 +1,4 @@
+# NOTE: This file is DEPRECATED
 import unittest
 import uuid
 from unittest import mock
@@ -33,9 +34,7 @@ class SimulationTestCase(unittest.TestCase):
             allow_priority_updates=True,
         )
 
-        normalizer_ranker = rankers.NormalizerRanker(
-            ctx=self.mock_ctx,
-        )
+        normalizer_ranker = rankers.NormalizerRanker(ctx=self.mock_ctx)
 
         return schedulers.NormalizerScheduler(
             ctx=self.mock_ctx,
@@ -53,9 +52,7 @@ class SimulationTestCase(unittest.TestCase):
             allow_priority_updates=True,
         )
 
-        boefje_ranker = rankers.BoefjeRanker(
-            ctx=self.mock_ctx,
-        )
+        boefje_ranker = rankers.BoefjeRanker(ctx=self.mock_ctx)
 
         return schedulers.BoefjeScheduler(
             ctx=self.mock_ctx,
@@ -121,9 +118,7 @@ class SimulationTestCase(unittest.TestCase):
                 queues.PrioritizedItem(
                     0,
                     models.NormalizerTask(
-                        id=uuid.uuid4(),
-                        normalizer=PluginFactory(type="normalizer"),
-                        boefje_meta=raw_file.boefje_meta,
+                        id=uuid.uuid4(), normalizer=PluginFactory(type="normalizer"), boefje_meta=raw_file.boefje_meta
                     ),
                 )
             ]

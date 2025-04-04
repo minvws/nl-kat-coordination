@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 
+from pydantic.fields import FieldInfo
+
 from octopoes.models import OOI, Reference
 from octopoes.models.exception import TypeNotFound
 from octopoes.models.ooi.certificate import (
@@ -46,6 +48,7 @@ from octopoes.models.ooi.findings import (
     RetireJSFindingType,
     SnykFindingType,
 )
+from octopoes.models.ooi.geography import GeographicPoint
 from octopoes.models.ooi.monitoring import Application, Incident
 from octopoes.models.ooi.network import (
     AutonomousSystem,
@@ -58,7 +61,8 @@ from octopoes.models.ooi.network import (
     Network,
 )
 from octopoes.models.ooi.question import Question
-from octopoes.models.ooi.reports import ReportData
+from octopoes.models.ooi.reports import AssetReport, HydratedReport, Report, ReportData, ReportRecipe
+from octopoes.models.ooi.scans import ExternalScan
 from octopoes.models.ooi.service import IPService, Service, TLSCipher
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import (
@@ -136,6 +140,7 @@ EmailSecurityType = (
 MonitoringType = Application | Incident
 ConfigType = Config
 ReportsType = ReportData
+ScanType = ExternalScan
 
 ConcreteOOIType = (
     CertificateType
@@ -157,6 +162,12 @@ ConcreteOOIType = (
     | ConfigType
     | Question
     | ReportsType
+    | ScanType
+    | Report
+    | HydratedReport
+    | AssetReport
+    | GeographicPoint
+    | ReportRecipe
 )
 
 OOIType = ConcreteOOIType | NetworkType | FindingTypeType
@@ -206,14 +217,14 @@ def to_concrete(object_types: set[type[OOI]]) -> set[type[OOI]]:
     return concrete_types
 
 
-def type_by_name(type_name: str):
+def type_by_name(type_name: str) -> type[OOI]:
     try:
         return next(t for t in ALL_TYPES if t.__name__ == type_name)
     except StopIteration:
         raise TypeNotFound
 
 
-def related_object_type(field) -> type[OOI]:
+def related_object_type(field: FieldInfo) -> type[OOI]:
     object_type: str | type[OOI] = field.json_schema_extra["object_type"]
     if isinstance(object_type, str):
         return type_by_name(object_type)

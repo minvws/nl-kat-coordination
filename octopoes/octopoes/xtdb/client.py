@@ -1,5 +1,4 @@
 import functools
-import logging
 from collections.abc import Callable
 from datetime import datetime, timezone
 from enum import Enum
@@ -7,14 +6,17 @@ from json import JSONDecodeError
 from typing import Any
 
 import httpx
+import structlog
 from httpx import HTTPError, HTTPStatusError, Response, codes
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
+from octopoes.config.settings import Settings
 from octopoes.models.transaction import TransactionRecord
 from octopoes.xtdb.exceptions import NodeNotFound, XTDBException
 from octopoes.xtdb.query import Query
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
+settings = Settings()
 
 
 class OperationType(Enum):
@@ -46,13 +48,16 @@ class XTDBStatus(BaseModel):
 @functools.cache
 def _get_xtdb_http_session(base_url: str) -> httpx.Client:
     return httpx.Client(
-        base_url=base_url, headers={"Accept": "application/json"}, transport=(httpx.HTTPTransport(retries=3))
+        base_url=base_url,
+        headers={"Accept": "application/json"},
+        transport=httpx.HTTPTransport(retries=3),
+        timeout=settings.outgoing_request_timeout,
     )
 
 
 class XTDBHTTPClient:
-    def __init__(self, base_url, client: str):
-        self._client = client
+    def __init__(self, base_url: str, client: str):
+        self.client = client
         self._session = _get_xtdb_http_session(base_url)
 
     @staticmethod
@@ -68,7 +73,7 @@ class XTDBHTTPClient:
             raise e
 
     def client_url(self) -> str:
-        return f"/{self._client}"
+        return f"/{self.client}"
 
     def status(self) -> XTDBStatus:
         res = self._session.get(f"{self.client_url()}/status")
@@ -123,7 +128,7 @@ class XTDBHTTPClient:
         res = self._session.post(
             f"{self.client_url()}/query",
             params={"valid-time": valid_time.isoformat()},
-            content=str(query),
+            content=" ".join(str(query).split()),
             headers={"Content-Type": "application/edn"},
         )
         self._verify_response(res)
@@ -136,7 +141,7 @@ class XTDBHTTPClient:
     def submit_transaction(self, operations: list[Operation]) -> None:
         res = self._session.post(
             f"{self.client_url()}/submit-tx",
-            content=Transaction(operations=operations).json(by_alias=True),
+            content=Transaction(operations=operations).model_dump_json(by_alias=True),
             headers={"Content-Type": "application/json"},
         )
 
@@ -145,7 +150,7 @@ class XTDBHTTPClient:
 
     def create_node(self) -> None:
         try:
-            res = self._session.post("/create-node", json={"node": self._client})
+            res = self._session.post("/create-node", json={"node": self.client})
             self._verify_response(res)
         except HTTPError as e:
             logger.exception("Failed creating node")
@@ -153,7 +158,7 @@ class XTDBHTTPClient:
 
     def delete_node(self) -> None:
         try:
-            res = self._session.post("/delete-node", json={"node": self._client})
+            res = self._session.post("/delete-node", json={"node": self.client})
             self._verify_response(res)
         except HTTPError as e:
             if isinstance(e, HTTPStatusError) and e.response.status_code == codes.NOT_FOUND:
@@ -163,12 +168,12 @@ class XTDBHTTPClient:
 
             raise XTDBException("Could not delete node") from e
 
-    def export_transactions(self) -> Any:
+    def export_transactions(self):
         res = self._session.get(f"{self.client_url()}/tx-log?with-ops?=true", headers={"Accept": "application/json"})
         self._verify_response(res)
         return res.json()
 
-    def sync(self, timeout: int | None = None):
+    def sync(self, timeout: int | None = None) -> Any:
         params = {}
 
         if timeout is not None:
@@ -193,10 +198,10 @@ class XTDBSession:
     def __exit__(self, _exc_type: type[Exception], _exc_value: str, _exc_traceback: str) -> None:
         self.commit()
 
-    def add(self, operation: Operation):
+    def add(self, operation: Operation) -> None:
         self._operations.append(operation)
 
-    def put(self, document: str | dict[str, Any], valid_time: datetime):
+    def put(self, document: str | dict[str, Any], valid_time: datetime) -> None:
         self.add((OperationType.PUT, document, valid_time))
 
     def commit(self) -> None:
@@ -214,5 +219,5 @@ class XTDBSession:
         logger.info("Called %s callbacks after committing XTDBSession", len(self.post_commit_callbacks))
         self.post_commit_callbacks = []
 
-    def listen_post_commit(self, callback: Callable[[], None]):
+    def listen_post_commit(self, callback: Callable[[], None]) -> None:
         self.post_commit_callbacks.append(callback)

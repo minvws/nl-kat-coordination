@@ -11,20 +11,33 @@
             <div>
                 {% include "partials/ooi_head.html" with ooi=ooi view="scan_profile_detail" %}
 
-                <h1 rf-selector="clearance-header">{% translate "Clearance level:" %}</h1>
-                <p>{{ ooi.scan_profile.human_readable }}, {{ ooi.scan_profile.scan_profile_type }}</p>
+                <h2 rf-selector="clearance-header">{% translate "Current clearance level" %}</h2>
+                {% if scan_profile_user %}
+                    <p>
+                        {{ ooi.scan_profile.human_readable }}, {{ ooi.scan_profile.scan_profile_type }} (by user "
+                        {% if not scan_profile_user.is_active %}
+                            <s title="{% translate "Inactive" %}">{{ scan_profile_user }}</s>
+                        {% else %}
+                            {{ scan_profile_user }}
+                        {% endif %}
+                        ")
+                    </p>
+                {% else %}
+                    <p>{{ ooi.scan_profile.human_readable }}, {{ ooi.scan_profile.scan_profile_type }}</p>
+                {% endif %}
                 {% if ooi.scan_profile.scan_profile_type == "declared" %}
                     <p class="explanation">
-                        <span>{% translate "Declared:" %}</span>{% blocktranslate with scan_level=ooi.scan_profile.human_readable %}
-              This means that this object will be scanned by Boefjes with scan level
-              {{ scan_level }} and lower. Setting the clearance level from “declared”
-              to “inherit” means that this object will inherit its level from neighbouring
-              objects. This means that the clearance level might stay the same, increase,
-              or decrease depending on other declared clearance levels. Clearance levels
-              of objects that inherit from this clearance level will also be recalculated.
-            {% endblocktranslate %}
+                        <span>{% translate "Declared:" %}</span>
+                        {% blocktranslate with scan_level=ooi.scan_profile.human_readable trimmed %}
+                            This means that this object will be scanned by Boefjes with scan level
+                            {{ scan_level }} and lower. Setting the clearance level from “declared”
+                            to “inherit” means that this object will inherit its level from neighbouring
+                            objects. This means that the clearance level might stay the same, increase,
+                            or decrease depending on other declared clearance levels. Clearance levels
+                            of objects that inherit from this clearance level will also be recalculated.
+                        {% endblocktranslate %}
                     </p>
-                    {% if user.acknowledged_clearance_level > -1 and organization_indemnification and user.trusted_clearance_level > -1 %}
+                    {% if organization_member.max_clearance_level > -1 and organization_indemnification %}
                         <div class="horizontal-view">
                             <a href="{% ooi_url "scan_profile_reset" ooi.reference organization.code query=mandatory_fields %}"
                                class="button">{% translate "Set clearance level to inherit" %}</a>
@@ -32,11 +45,12 @@
                     {% endif %}
                 {% elif ooi.scan_profile.scan_profile_type == "empty" %}
                     <p class="explanation">
-                        <span>{% translate "Empty:" %}</span> {% blocktranslate %}
-                This object has a clearance level of "L0". This means that this object will not be scanned by any Boefje until that
-                Boefje is run manually for this object again. Objects with a clearance level higher than "L0" will be scanned automatically by Boefjes with
-                corresponding scan levels.
-            {% endblocktranslate %}
+                        <span>{% translate "Empty:" %}</span>
+                        {% blocktranslate trimmed %}
+                            This object has a clearance level of "L0". This means that this object will not be scanned by any Boefje until that
+                            Boefje is run manually for this object again. Objects with a clearance level higher than "L0" will be scanned automatically by Boefjes with
+                            corresponding scan levels.
+                        {% endblocktranslate %}
                         {% include "partials/explanations.html" %}
 
                     </p>
@@ -44,13 +58,13 @@
                     {% include "partials/explanations.html" %}
 
                 {% endif %}
-                {% if user.acknowledged_clearance_level > -1 and organization_indemnification and user.trusted_clearance_level > -1 %}
-                    <h2>{% translate "Set clearance level:" %}</h2>
+                {% if organization_member.max_clearance_level > -1 and organization_indemnification %}
+                    <h2>{% translate "Set clearance level" %}</h2>
                     <form id="set_clearance_level"
                           novalidate
                           action="{% ooi_url "scan_profile_detail" ooi.primary_key organization.code %}#set_clearance_level"
                           method="post"
-                          class="horizontal-view help">
+                          class="help">
                         {% csrf_token %}
                         {% translate "Set clearance level" as fieldset_legend %}
                         <input type="hidden" name="action" value="change_clearance_level">

@@ -1,6 +1,6 @@
 /* Text colors */
 
 :root {
-  --text-color-dark: #3b3b3b;
-  --text-color-light: #ffffff;
+  --text-color-dark: var(--colors-grey-900);
+  --text-color-light: var(--colors-white);
 }

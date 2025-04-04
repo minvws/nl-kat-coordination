@@ -1,14 +1,14 @@
-class UnsupportedTypeError(Exception):
-    pass
-
-
-class MismatchedTypeError(Exception):
-    pass
-
-
-class ArgumentError(Exception):
-    pass
-
-
 class FilterError(Exception):
+    pass
+
+
+class UnsupportedTypeError(FilterError):
+    pass
+
+
+class MismatchedTypeError(FilterError):
+    pass
+
+
+class ArgumentError(FilterError):
     pass

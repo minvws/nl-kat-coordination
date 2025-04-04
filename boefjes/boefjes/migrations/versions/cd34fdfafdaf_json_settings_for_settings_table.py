@@ -13,8 +13,8 @@ from alembic import op
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import sessionmaker
 
+from boefjes.sql.config_storage import create_encrypter
 from boefjes.sql.db import get_engine
-from boefjes.sql.setting_storage import create_encrypter
 
 # revision identifiers, used by Alembic.
 revision = "cd34fdfafdaf"
@@ -42,7 +42,7 @@ def upgrade() -> None:
     # ### end Alembic commands ###
 
 
-def upgrade_encrypted_settings(conn: Connection):
+def upgrade_encrypted_settings(conn: Connection) -> None:
     encrypter = create_encrypter()
 
     with conn.begin():
@@ -90,7 +90,7 @@ def downgrade() -> None:
     # ### end Alembic commands ###
 
 
-def downgrade_encrypted_settings(conn: Connection):
+def downgrade_encrypted_settings(conn: Connection) -> None:
     encrypter = create_encrypter()
 
     with conn.begin():

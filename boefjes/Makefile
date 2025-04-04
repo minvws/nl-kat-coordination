@@ -33,16 +33,15 @@ help: ## Show this help.
 ##			Development
 ##|------------------------------------------------------------------------|
 
-build: seed images
-
-seed:  # Seed the katalogus database
-	-docker compose run --rm katalogus python -m boefjes.seed
+build: images
 
 images:  # Build the images for the containerized boefjes
   # Dns-records is disabled for now, see the discussion in https://github.com/minvws/nl-kat-coordination/pull/2709
-	# docker build -f images/base.Dockerfile -t openkat/dns-records --build-arg BOEFJE_PATH=./boefjes/plugins/kat_dns .
-	docker build -f ./boefjes/plugins/kat_dnssec/boefje.Dockerfile -t openkat/dns-sec .
-	docker build -f ./boefjes/plugins/kat_nmap_tcp/boefje.Dockerfile -t openkat/nmap  .
+	# docker build -f images/base.Dockerfile -t ghcr.io/minvws/openkat/dns-records --build-arg BOEFJE_PATH=./boefjes/plugins/kat_dns .
+	docker build -f ./boefjes/plugins/kat_dnssec/boefje.Dockerfile -t ghcr.io/minvws/openkat/dns-sec:latest .
+	docker build -f ./boefjes/plugins/kat_nmap_tcp/boefje.Dockerfile -t ghcr.io/minvws/openkat/nmap:latest  .
+	docker build -f ./boefjes/plugins/kat_nikto/boefje.Dockerfile -t openkat/nikto .
+	docker build -f ./boefjes/plugins/kat_export_http/boefje.Dockerfile -t ghcr.io/minvws/openkat/export-http:latest .
 
 
 ##
@@ -78,7 +77,20 @@ itest: ## Run the integration tests.
 	$(ci-docker-compose) build
 	$(ci-docker-compose) down --remove-orphans
 	$(ci-docker-compose) run --rm katalogus_integration
-	$(ci-docker-compose) down
+	$(ci-docker-compose) stop
+
+migration_bench:  ## Run the migration benchmark.
+	$(ci-docker-compose) build
+	$(ci-docker-compose) down --remove-orphans
+	$(ci-docker-compose) run --rm migration_bench
+	$(ci-docker-compose) stop
+
+bench:  ## Run the other benchmarks
+	$(ci-docker-compose) build
+	$(ci-docker-compose) down --remove-orphans
+	$(ci-docker-compose) run --rm katalogus_integration \
+	python -m cProfile -o .ci/bench_$$(date +%Y_%m_%d-%H:%M:%S).pstat -m pytest -m slow --no-cov tests/integration
+	$(ci-docker-compose) stop
 
 debian12:
 	docker run --rm \

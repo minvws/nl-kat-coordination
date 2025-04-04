@@ -3,6 +3,7 @@ import socket
 from logging import config
 from pathlib import Path
 
+import structlog
 import yaml
 from fastapi import FastAPI, HTTPException, status
 from fastapi.exceptions import RequestValidationError
@@ -17,6 +18,7 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from pika.adapters.utils.connection_workflow import AMQPConnectionWorkflowFailed
 
+from octopoes.api.bulk_router import router as bulk_router
 from octopoes.api.models import ServiceHealth
 from octopoes.api.router import router
 from octopoes.config.settings import Settings
@@ -38,8 +40,28 @@ try:
 except FileNotFoundError:
     logger.warning("No log config found at: %s", settings.log_cfg)
 
-
-app = FastAPI()
+structlog.configure(
+    processors=[
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.add_log_level,
+        structlog.processors.StackInfoRenderer(),
+        structlog.dev.set_exc_info,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.TimeStamper("iso", utc=False),
+        (
+            structlog.dev.ConsoleRenderer(
+                colors=True, pad_level=False, exception_formatter=structlog.dev.plain_traceback
+            )
+            if settings.logging_format == "text"
+            else structlog.processors.JSONRenderer()
+        ),
+    ],
+    context_class=dict,
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    wrapper_class=structlog.stdlib.BoundLogger,
+    cache_logger_on_first_use=True,
+)
+app = FastAPI(title="Octopoes API")
 
 # Set up OpenTelemetry instrumentation
 if settings.span_export_grpc_endpoint is not None:
@@ -112,11 +134,7 @@ def uncaught_exception_handler(_: Request, exc: Exception) -> None:
 
 @app.get("/health")
 def root_health() -> ServiceHealth:
-    return ServiceHealth(
-        service="octopoes",
-        healthy=True,
-        version=__version__,
-    )
+    return ServiceHealth(service="octopoes", healthy=True, version=__version__)
 
 
 @app.on_event("shutdown")
@@ -133,3 +151,4 @@ def create_rabbit_mq_connection():
 
 
 app.include_router(router)
+app.include_router(bulk_router)

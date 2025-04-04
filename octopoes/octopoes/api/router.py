@@ -3,10 +3,11 @@ import uuid
 from collections import Counter
 from collections.abc import Generator
 from datetime import datetime
-from logging import getLogger
 from operator import itemgetter
-from typing import Any
+from typing import Any, Literal
 
+import structlog
+from asgiref.sync import sync_to_async
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
 from httpx import HTTPError
 from pydantic import AwareDatetime
@@ -26,19 +27,21 @@ from octopoes.models import OOI, Reference, ScanLevel, ScanProfile, ScanProfileB
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
+from octopoes.models.ooi.reports import HydratedReport
 from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Path as ObjectPath
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
+from octopoes.repositories.origin_repository import XTDBOriginRepository
 from octopoes.version import __version__
 from octopoes.xtdb.client import Operation, OperationType, XTDBSession
 from octopoes.xtdb.exceptions import XTDBException
 from octopoes.xtdb.query import Aliased
 from octopoes.xtdb.query import Query as XTDBQuery
 
-logger = getLogger(__name__)
+logger = structlog.get_logger(__name__)
 router = APIRouter(prefix="/{client}")
 
 
@@ -86,30 +89,16 @@ def octopoes_service(
 
 # Endpoints
 @router.get("/health")
-def health(
-    xtdb_session_: XTDBSession = Depends(xtdb_session),
-) -> ServiceHealth:
+def health(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> ServiceHealth:
     try:
         xtdb_status = xtdb_session_.client.status()
-        xtdb_health = ServiceHealth(
-            service="xtdb",
-            healthy=True,
-            version=xtdb_status.version,
-            additional=xtdb_status,
-        )
+        xtdb_health = ServiceHealth(service="xtdb", healthy=True, version=xtdb_status.version, additional=xtdb_status)
     except HTTPError as ex:
         xtdb_health = ServiceHealth(
-            service="xtdb",
-            healthy=False,
-            additional="Cannot connect to XTDB at. Service possibly down",
+            service="xtdb", healthy=False, additional="Cannot connect to XTDB at. Service possibly down"
         )
         logger.exception(ex)
-    return ServiceHealth(
-        service="octopoes",
-        healthy=xtdb_health.healthy,
-        version=__version__,
-        results=[xtdb_health],
-    )
+    return ServiceHealth(service="octopoes", healthy=xtdb_health.healthy, version=__version__, results=[xtdb_health])
 
 
 # OOI-related endpoints
@@ -122,8 +111,13 @@ def list_objects(
     scan_profile_type: set[ScanProfileType] = Query(DEFAULT_SCAN_PROFILE_TYPE_FILTER),
     offset: int = 0,
     limit: int = 20,
+    search_string: str | None = None,
+    order_by: Literal["scan_level", "object_type"] = "object_type",
+    asc_desc: Literal["asc", "desc"] = "asc",
 ):
-    return octopoes.list_ooi(types, valid_time, offset, limit, scan_level, scan_profile_type)
+    return octopoes.list_ooi(
+        types, valid_time, offset, limit, scan_level, scan_profile_type, search_string, order_by, asc_desc
+    )
 
 
 @router.get("/query", tags=["Objects"])
@@ -216,7 +210,7 @@ def get_object_history(
     has_doc: bool | None = None,
     offset: int = 0,
     limit: int | None = None,
-    indices: list[int] | None = None,
+    indices: list[int] | None = Query(None),
     octopoes: OctopoesService = Depends(octopoes_service),
 ) -> list[TransactionRecord]:
     return octopoes.get_ooi_history(
@@ -250,6 +244,17 @@ def delete_object(
     octopoes.commit()
 
 
+@router.delete("/origins", tags=["Origins"])
+def delete_origin(
+    origin_id: str,
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+) -> None:
+    origin = octopoes.origin_repository.get(origin_id, valid_time)
+    octopoes.origin_repository.delete(origin, valid_time)
+    octopoes.commit()
+
+
 @router.post("/objects/delete_many", tags=["Objects"])
 def delete_many(
     octopoes: OctopoesService = Depends(octopoes_service),
@@ -270,28 +275,29 @@ def get_tree(
     reference: Reference = Depends(extract_reference),
     depth: int = 1,
 ) -> ReferenceTree:
-    return octopoes.get_ooi_tree(
-        reference,
-        valid_time,
-        types,
-        depth,
-    )
+    return octopoes.get_ooi_tree(reference, valid_time, types, depth)
 
 
 @router.get("/origins", tags=["Origins"])
 def list_origins(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
+    offset: int = 0,
+    limit: int | None = None,
     source: Reference | None = Query(None),
     result: Reference | None = Query(None),
+    method: str | list[str] | None = Query(None),
     task_id: uuid.UUID | None = Query(None),
     origin_type: OriginType | None = Query(None),
 ) -> list[Origin]:
     return octopoes.origin_repository.list_origins(
         valid_time,
         task_id=task_id,
+        offset=offset,
+        limit=limit,
         source=source,
         result=result,
+        method=method,
         origin_type=origin_type,
     )
 
@@ -306,14 +312,12 @@ def list_origin_parameters(
 
 
 @router.post("/observations", tags=["Origins"])
-def save_observation(
-    observation: ValidatedObservation,
-    octopoes: OctopoesService = Depends(octopoes_service),
-) -> None:
+def save_observation(observation: ValidatedObservation, octopoes: OctopoesService = Depends(octopoes_service)) -> None:
     origin = Origin(
         origin_type=OriginType.OBSERVATION,
         method=observation.method,
         source=observation.source,
+        source_method=observation.source_method,
         result=[ooi.reference for ooi in observation.result],
         task_id=observation.task_id,
     )
@@ -322,30 +326,44 @@ def save_observation(
 
 
 @router.post("/declarations", tags=["Origins"])
-def save_declaration(
-    declaration: ValidatedDeclaration,
-    octopoes: OctopoesService = Depends(octopoes_service),
-) -> None:
+def save_declaration(declaration: ValidatedDeclaration, octopoes: OctopoesService = Depends(octopoes_service)) -> None:
     origin = Origin(
         origin_type=OriginType.DECLARATION,
         method=declaration.method if declaration.method else "manual",
         source=declaration.ooi.reference,
+        source_method=declaration.source_method,
         result=[declaration.ooi.reference],
         task_id=declaration.task_id if declaration.task_id else uuid.uuid4(),
     )
-    octopoes.save_origin(origin, [declaration.ooi], declaration.valid_time)
+    octopoes.save_origin(origin, [declaration.ooi], declaration.valid_time, declaration.end_valid_time)
+    octopoes.commit()
+
+
+@router.post("/declarations/save_many", tags=["Origins"])
+def save_many_declarations(
+    declarations: list[ValidatedDeclaration], octopoes: OctopoesService = Depends(octopoes_service)
+) -> None:
+    for declaration in declarations:
+        origin = Origin(
+            origin_type=OriginType.DECLARATION,
+            method=declaration.method if declaration.method else "manual",
+            source=declaration.ooi.reference,
+            source_method=declaration.source_method,
+            result=[declaration.ooi.reference],
+            task_id=declaration.task_id if declaration.task_id else uuid.uuid4(),
+        )
+        octopoes.save_origin(origin, [declaration.ooi], declaration.valid_time, declaration.end_valid_time)
+
     octopoes.commit()
 
 
 @router.post("/affirmations", tags=["Origins"])
-def save_affirmation(
-    affirmation: ValidatedAffirmation,
-    octopoes: OctopoesService = Depends(octopoes_service),
-) -> None:
+def save_affirmation(affirmation: ValidatedAffirmation, octopoes: OctopoesService = Depends(octopoes_service)) -> None:
     origin = Origin(
         origin_type=OriginType.AFFIRMATION,
         method=affirmation.method if affirmation.method else "hydration",
         source=affirmation.ooi.reference,
+        source_method=affirmation.source_method,
         result=[affirmation.ooi.reference],
         task_id=affirmation.task_id if affirmation.task_id else uuid.uuid4(),
     )
@@ -397,8 +415,7 @@ def save_many(
 
 @router.get("/scan_profiles/recalculate", tags=["Scan Profiles"])
 def recalculate_scan_profiles(
-    octopoes: OctopoesService = Depends(octopoes_service),
-    valid_time: datetime = Depends(extract_valid_time),
+    octopoes: OctopoesService = Depends(octopoes_service), valid_time: datetime = Depends(extract_valid_time)
 ) -> None:
     octopoes.recalculate_scan_profiles(valid_time)
     octopoes.commit()
@@ -426,26 +443,43 @@ def get_scan_profile_inheritance(
 def list_findings(
     exclude_muted: bool = True,
     only_muted: bool = False,
-    offset=DEFAULT_OFFSET,
-    limit=DEFAULT_LIMIT,
+    offset: int = DEFAULT_OFFSET,
+    limit: int = DEFAULT_LIMIT,
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     severities: set[RiskLevelSeverity] = Query(DEFAULT_SEVERITY_FILTER),
+    search_string: str | None = None,
+    order_by: Literal["score", "finding_type"] = "score",
+    asc_desc: Literal["asc", "desc"] = "desc",
 ) -> Paginated[Finding]:
     return octopoes.ooi_repository.list_findings(
-        severities,
-        valid_time,
-        exclude_muted,
-        only_muted,
-        offset,
-        limit,
+        severities, valid_time, exclude_muted, only_muted, offset, limit, search_string, order_by, asc_desc
     )
+
+
+@router.get("/reports", tags=["Reports"])
+def list_reports(
+    offset: int = DEFAULT_OFFSET,
+    limit: int = DEFAULT_LIMIT,
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+    recipe_id: uuid.UUID | None = Query(None),
+) -> Paginated[HydratedReport]:
+    return octopoes.ooi_repository.list_reports(valid_time, offset, limit, recipe_id)
+
+
+@router.get("/reports/{report_id}", tags=["Reports"])
+def get_report(
+    report_id: str,
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+) -> HydratedReport:
+    return octopoes.ooi_repository.get_report(valid_time, report_id)
 
 
 @router.get("/findings/count_by_severity", tags=["Findings"])
 def get_finding_type_count(
-    octopoes: OctopoesService = Depends(octopoes_service),
-    valid_time: datetime = Depends(extract_valid_time),
+    octopoes: OctopoesService = Depends(octopoes_service), valid_time: datetime = Depends(extract_valid_time)
 ) -> Counter:
     return octopoes.ooi_repository.count_findings_by_severity(valid_time)
 
@@ -470,7 +504,12 @@ def delete_node(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> None:
 
 @router.post("/bits/recalculate", tags=["Bits"])
 def recalculate_bits(octopoes: OctopoesService = Depends(octopoes_service)) -> int:
-    inference_count = octopoes.recalculate_bits()
+    try:
+        inference_count = octopoes.recalculate_bits()
+    except ObjectNotFoundException:
+        logger.exception("Failed to recalculate bits")
+        raise
+
     octopoes.commit()
 
     return inference_count
@@ -481,6 +520,7 @@ def exporter(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> Any:
     return xtdb_session_.client.export_transactions()
 
 
+@sync_to_async
 def importer(data: bytes, xtdb_session_: XTDBSession, reset: bool = False) -> dict[str, int]:
     try:
         ops: list[dict[str, Any]] = list(map(itemgetter("txOps"), json.loads(data)))
@@ -494,25 +534,18 @@ def importer(data: bytes, xtdb_session_: XTDBSession, reset: bool = False) -> di
             xtdb_session_.commit()
         except XTDBException as e:
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Error recreating nodes",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error recreating nodes"
             ) from e
     for op in ops:
         try:
             operations: list[Operation] = [
-                (
-                    OperationType(x[0]),
-                    x[1],
-                    datetime.strptime(x[2], "%Y-%m-%dT%H:%M:%SZ"),
-                )
-                for x in op
+                (OperationType(x[0]), x[1], datetime.strptime(x[2], "%Y-%m-%dT%H:%M:%SZ")) for x in op
             ]
             xtdb_session_.client.submit_transaction(operations)
         except Exception as e:
             logger.debug("Error importing objects", exc_info=True)
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Error importing object {op}",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error importing object {op}"
             ) from e
     return {"detail": len(ops)}
 
@@ -523,7 +556,7 @@ async def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xt
         data = await request.body()
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
-    return importer(data, xtdb_session_)
+    return await importer(data, xtdb_session_)
 
 
 @router.post("/io/import/new", tags=["io"])
@@ -532,4 +565,24 @@ async def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xt
         data = await request.body()
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
-    return importer(data, xtdb_session_, True)
+    return await importer(data, xtdb_session_, True)
+
+
+@router.post("/origins/migrate", tags=["Origins"])
+def migrate_origins(
+    origins: list[Origin],
+    session: XTDBSession = Depends(xtdb_session),
+    valid_time: datetime = Depends(extract_valid_time),
+) -> None:
+    for origin in origins:
+        if origin.source_method is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Only origins with a new source method can be migrated"
+            )
+
+        session.add((OperationType.PUT, XTDBOriginRepository.serialize(origin), valid_time))
+
+        origin.source_method = None  # To ensure the id property has the original pk value that we want to delete
+        session.add((OperationType.DELETE, origin.id, valid_time))
+
+    session.commit()  # The save-delete order is important to avoid garbage collection of the results

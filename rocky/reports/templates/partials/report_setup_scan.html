@@ -3,12 +3,12 @@
 
 <section>
     <div>
-        <h1>{% translate "Configuration" %}</h1>
-        <p class="emphasized">{% translate "Set up the required plugins for this report." %}</p>
-        {% if selected_oois and selected_report_types %}
-            <a href="{{ previous }}" class="button ghost">
-                <span class="icon ti-chevron-left"></span>{% translate "Change selection" %}
-            </a>
+        <h2>{% translate "Configuration" %}</h2>
+        <p>{% translate "Set up the required plugins for this report." %}</p>
+        {% if selected_report_types %}
+            {% include "partials/return_button.html" with btn_text="Change selection" %}
+            {% include "partials/plugin_overview_table.html" %}
+
             <h2>{% translate "Plugins" %}</h2>
             <p>
                 <strong>{% translate "KAT will be able to generate a full report when all the required and suggested boefjes are enabled." %}</strong>
@@ -36,13 +36,13 @@
                     Enabling them just before report generation will likely result in inaccurate reports, as plugins have not finished collecting data.
                 {% endblocktranslate %}
             </p>
-            {% include "partials/plugin_overview_table.html" %}
-
             <h3>{% translate "Required plugins" %}</h3>
-            <p>{% translate "This report type requires the following plugins to be enabled:" %}</p>
-            {% if all_plugins_enabled.required %}
+            {% if enabled_plugins.required %}
                 <p>{% translate "Good job! All required plugins are enabled." %}</p>
-            {% else %}
+            {% elif plugins.required %}
+                <p>{% translate "This report type requires the following plugins to be enabled:" %}</p>
+                <a class="toggle-all toggle-on"
+                   data-toggle-target=".required-plugins input[name=plugin]">{% translate "Toggle all required plugins" %}</a>
                 <div class="required-plugin-container">
                     <div class="toolbar">
                         <div class="checkbox">
@@ -52,21 +52,28 @@
                             <label for="checkbox-for-enabled-required-plugins">{% translate "Show enabled plugins" %}</label>
                         </div>
                     </div>
-                    <div class="column-4 tiles plugins images-cover">
+                    <div class="column-4 tiles plugins images-cover required-plugins">
                         {% for required_plugin in plugins.required|dictsort:"enabled" %}
-                            {% include "partials/plugin_tile.html" with plugin=required_plugin show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types %}
+                            {% if required_plugin.enabled %}
+                                {% include "partials/plugin_tile.html" with form_id="continue-to-configuration" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin=required_plugin remove_action_buttons="yes" add_checkbox="yes" %}
 
+                            {% else %}
+                                {% include "partials/plugin_tile.html" with form_id="continue-to-configuration" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin=required_plugin remove_action_buttons="yes" add_checkbox="yes" checked="yes" %}
+
+                            {% endif %}
                         {% endfor %}
                     </div>
                 </div>
+            {% else %}
+                <p>{% translate "There are no required plugins." %}</p>
             {% endif %}
             <h3>{% translate "Suggested plugins" %}</h3>
-            <p>
-                {% translate "This report requires at least one of the following plugins to be enabled to generate the report:" %}
-            </p>
-            {% if all_plugins_enabled.optional %}
-                <p>{% translate "Good job! All suggested plugins are enabled" %}</p>
-            {% else %}
+            {% if enabled_plugins.optional %}
+                <p>{% translate "Good job! All suggested plugins are enabled." %}</p>
+            {% elif plugins.optional %}
+                <p>{% translate "The following plugins are optional to generate the report:" %}</p>
+                <a class="toggle-all"
+                   data-toggle-target=".optional-plugins input[name=plugin]">{% translate "Toggle all optional plugins" %}</a>
                 <div class="optional-plugin-container hide-overflow">
                     <div class="toolbar">
                         <div class="checkbox">
@@ -76,12 +83,10 @@
                             <label for="checkbox-for-enabled-optional-plugins">{% translate "Show enabled plugins" %}</label>
                         </div>
                     </div>
-                    <div class="column-4 tiles plugins images-cover">
+                    <div class="column-4 tiles plugins images-cover optional-plugins">
                         {% for optional_plugin in plugins.optional|dictsort:"enabled" %}
-                            {% if optional_plugin not in plugins.required %}
-                                {% include "partials/plugin_tile.html" with plugin=optional_plugin form_id="generate_report" show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types %}
+                            {% include "partials/plugin_tile.html" with form_id="continue-to-configuration" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin=optional_plugin remove_action_buttons="yes" add_checkbox="yes" %}
 
-                            {% endif %}
                         {% endfor %}
                     </div>
                     <div class="toolbar">
@@ -91,21 +96,23 @@
                                 data-show-text="{% translate "Show more suggested plugins" %}"></button>
                     </div>
                 </div>
+            {% else %}
+                <p>{% translate "There are no optional plugins." %}</p>
             {% endif %}
-            <form id="generate_report" class="inline" method="get" action="{{ next }}">
+            <form id="continue-to-configuration"
+                  class="inline"
+                  method="post"
+                  action="{{ next }}">
+                {% csrf_token %}
                 {% include "forms/report_form_fields.html" %}
 
-                {% for report_type in selected_report_types %}
-                    <input type="hidden" name="report_type" value={{ report_type }}>
-                {% endfor %}
                 <button type="submit">
-                    {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
+                    {% translate "Enable selected plugins and continue" %}<span class="icon ti-chevron-right"></span>
                 </button>
             </form>
         {% else %}
-            <a class="button ghost" href="{{ previous }}">
-                <span class="icon ti-chevron-left"></span>{% translate "Go back" %}
-            </a>
+            {% include "partials/return_button.html" with btn_text="Go back" %}
+
         {% endif %}
     </div>
 </section>
