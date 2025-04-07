@@ -223,16 +223,16 @@ class NibblesRunner:
                     scan_profiles_of_args = self.scan_profile_repository.get_bulk(arg_references, valid_time)
                     if self.nibbles[nibble_id].check_scan_levels([sp.level for sp in scan_profiles_of_args]):
                         result_references = [ooi.reference for ooi in result]
-                        phantom_result_references = []
+                        phantom_result = []
                     else:
                         result_references = []
-                        phantom_result_references = list(result)
+                        phantom_result = list(result)
                     nibble_origin = Origin(
                         method=nibble_id,
                         origin_type=OriginType.NIBBLET,
                         source=source_ooi.reference,
                         result=result_references,
-                        phantom_result=phantom_result_references,
+                        phantom_result=phantom_result,
                         parameters_hash=nibble_hasher(arg, self.nibbles[nibble_id]._checksum),
                         parameters_references=[a.reference if isinstance(a, OOI) else None for a in arg],
                     )

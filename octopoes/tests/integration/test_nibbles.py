@@ -10,8 +10,9 @@ from nibbles.runner import NibblesRunner, nibble_hasher
 
 from octopoes.core.service import OctopoesService
 from octopoes.events.events import OOIDBEvent, OperationType, OriginDBEvent
-from octopoes.models import OOI, Reference
+from octopoes.models import OOI, Reference, ScanLevel
 from octopoes.models.ooi.config import Config
+from octopoes.models.ooi.dns.zone import DNSZone, Hostname
 from octopoes.models.ooi.findings import Finding, FindingType, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import Network
 from octopoes.models.ooi.web import URL
@@ -405,3 +406,38 @@ def test_nibble_origin_deletion_propagation(
 
     assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 1
     assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).items == [config]
+
+
+def dnszone_dummy(dnszone: DNSZone) -> list[DNSZone | Hostname] | None:
+    if len(dnszone.hostname.tokenized.name) < MAX_NETWORK_NAME_LENGTH:
+        new_name = dnszone.hostname.tokenized.name + "l"
+        hostname = Hostname(network=Network(name=dnszone.hostname.tokenized.network.name).reference, name=new_name)
+        yield hostname
+        yield DNSZone(hostname=hostname.reference, parent=dnszone.reference)
+
+
+dnszone_dummy_params = [NibbleParameter(object_type=DNSZone)]
+dnszone_dummy_nibble = NibbleDefinition(id="dummy", signature=dnszone_dummy_params)
+dnszone_dummy_nibble._payload = getattr(sys.modules[__name__], "dnszone_dummy")
+
+
+def test_min_scan_level_dummy_nibble(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
+    xtdb_octopoes_service.nibbler.nibbles = {dnszone_dummy_nibble.id: dnszone_dummy_nibble}
+    xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].signature[0].min_scan_level = ScanLevel.L1
+    network = Network(name="internet")
+    hostname = Hostname(network=network.reference, name="openkat.nl")
+    dnszone = DNSZone(hostname=hostname.reference)
+    xtdb_octopoes_service.ooi_repository.save(network, valid_time)
+    xtdb_octopoes_service.ooi_repository.save(hostname, valid_time)
+    xtdb_octopoes_service.ooi_repository.save(dnszone, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    assert xtdb_octopoes_service.ooi_repository.list_oois({DNSZone}, valid_time).count == 4
+
+    sp = xtdb_octopoes_service.scan_profile_repository.get(dnszone.reference, valid_time)
+    spnew = sp.model_copy()
+    spnew.level = ScanLevel.L2
+    xtdb_octopoes_service.scan_profile_repository.save(sp, spnew, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    assert xtdb_octopoes_service.ooi_repository.list_oois({DNSZone}, valid_time).count == 4
