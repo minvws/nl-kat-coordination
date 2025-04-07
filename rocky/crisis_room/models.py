@@ -19,7 +19,7 @@ class Dashboard(models.Model):
 
 class DashboardData(models.Model):
     dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE, null=True)
-    recipe = models.CharField(blank=False, max_length=126)
+    recipe = models.UUIDField(blank=False, null=True)
     template = models.CharField(blank=True, max_length=126, default="findings_report/report.html")
     position = models.PositiveSmallIntegerField(
         blank=True,

@@ -45,7 +45,7 @@ class DashboardService:
         """
         Returns for each recipe ID query'ed, the latest (valid_time) HydratedReport.
         """
-        report_filters = [(data.dashboard.organization.code, data.recipe) for data in dashboards_data]
+        report_filters = [(data.dashboard.organization.code, str(data.recipe)) for data in dashboards_data]
 
         if report_filters:
             org_code, _ = report_filters[0]
