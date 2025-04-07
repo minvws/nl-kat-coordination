@@ -26,6 +26,7 @@ class Boefje(BaseModel):
     id: str
     name: str | None = Field(default=None)
     version: str | None = Field(default=None)
+    oci_image: str | None = Field(default=None)
 
 
 class BoefjeMeta(BaseModel):
