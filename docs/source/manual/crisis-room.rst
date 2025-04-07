@@ -54,8 +54,8 @@ Create a Findings Dashboard for Your Organization
 
 OpenKAT automates the process of creating findings dashboards for your organization.
 
-Steps to Create a Findings Dashboard:
---------------------------------------
+Steps to Create a Findings Dashboard in Development:
+----------------------------------------------------
 
 1. **Install OpenKAT or Add a New Organization:**
    Ensure that you have OpenKAT installed or a new organization has been added to your setup.
@@ -81,8 +81,26 @@ Steps to Create a Findings Dashboard:
 
       make dashboards
 
-What Happens After Running the Command:
----------------------------------------
+Steps to Create a Findings Dashboard in Production:
+---------------------------------------------------
+1. **Run Django Migrations:**
+   Run Django migrations for crisis_room app:
+
+   .. code-block:: bash
+
+      python manage.py makemigrations
+      python manage.py migrate
+
+2. **Re-run Django migrations:**
+   If something happens and later you still want to run the migration script do:
+
+   .. code-block:: bash
+
+      python manage.py migrate --fake crisis_room 0001_initial
+      python manage.py migrate crisis_room 0002_create_findings_dashboards
+
+What Happens After Running the Command or migrations:
+-----------------------------------------------------
 
 - The system will automatically search for all installed organizations.
 - A **recipe** for the findings dashboard will be generated.
