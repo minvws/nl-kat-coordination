@@ -6,7 +6,7 @@ from tools.models import Organization
 from crisis_room.management.commands.dashboards import get_or_create_default_dashboard
 
 
-def create_findings_dashboard_for_all_orgs(apps, schema_editor):
+def create_findings_dashboard_for_all_orgs(_apps, _schema_editor):
     for organization in Organization.objects.all():
         get_or_create_default_dashboard(organization)
 
