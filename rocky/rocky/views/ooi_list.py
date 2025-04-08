@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Any
 
-from crisis_room.forms import ObjectListSettingsForm, SelectDashboardForm
+from crisis_room.forms import ObjectListSettingsForm
 from django.contrib import messages
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect
@@ -43,7 +43,6 @@ class OOIListView(BaseOOIListView, OctopoesView):
 
         context["ooi_type_form"] = OOITypeMultiCheckboxForm(self.request.GET)
         context["ooi_search_form"] = OOISearchForm(self.request.GET)
-        context["select_dashboard_form"] = SelectDashboardForm
         context["object_list_settings_form"] = ObjectListSettingsForm
         context["mandatory_fields"] = get_mandatory_fields(self.request, params=["observed_at"])
         context["member"] = self.organization_member

@@ -7,22 +7,17 @@
         {% endblocktranslate %}
 {% endfill %}
 {% fill "content" %}
+<p>
+    {% blocktranslate with item_type=item_type %}
+        Add these {{ item_type }} with the selected filters
+        to the dashboard of your choice.
+    {% endblocktranslate %}
+</p>
 <form method="post"
       id="new-dashboard-item-form"
       action="{% url "add_dashboard_item" organization_code=organization.code %}">
     {% csrf_token %}
     {% include "forms/new_dashboard_item_form_fields.html" %}
-
-    <div>
-        <h4>{% translate "Select dashboard" %}</h4>
-        <p>{% translate "Select a dashboard to add this object list to." %}</p>
-    </div>
-    {% include "partials/form/fieldset.html" with fields=select_dashboard_form %}
-
-    <div>
-        <h4>{% translate "List settings" %}</h4>
-        <p>{% translate "These can be edited at any time once your dashboard item is added." %}</p>
-    </div>
     {% include "partials/form/fieldset.html" with fields=object_list_settings_form %}
 
 </form>

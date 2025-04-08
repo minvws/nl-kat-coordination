@@ -9,18 +9,9 @@ class AddDashboardForm(BaseRockyForm):
     dashboard_name = forms.CharField(label=_("Name"), required=True)
 
 
-class SelectDashboardForm(BaseRockyForm):
+class ObjectListSettingsForm(BaseRockyForm):
     dashboard = forms.ChoiceField(required=True, widget=forms.Select, choices=[])
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["dashboard"].choices = self.get_dashboard_selection()
-
-    def get_dashboard_selection(self):
-        return [(dashboard.name, dashboard.name) for dashboard in Dashboard.objects.all()]
-
-
-class ObjectListSettingsForm(BaseRockyForm):
     title = forms.CharField(label=_("Title on dashboard"), required=True)
 
     order_by = forms.ChoiceField(
@@ -56,3 +47,10 @@ class ObjectListSettingsForm(BaseRockyForm):
         choices=(("1", _("Full width")), ("2", _("Half width"))),
         initial="1",
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["dashboard"].choices = self.get_dashboard_selection()
+
+    def get_dashboard_selection(self):
+        return [(dashboard.name, dashboard.name) for dashboard in Dashboard.objects.all()]

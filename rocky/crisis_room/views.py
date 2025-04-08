@@ -14,12 +14,13 @@ from django.http.request import HttpRequest
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import TemplateView
+from django.views.generic.edit import FormView
 from httpx import HTTPStatusError
 from reports.report_types.findings_report.report import SEVERITY_OPTIONS
 from tools.forms.ooi_form import _EXCLUDED_OOI_TYPES
 from tools.models import Organization, OrganizationMember
 
-from crisis_room.forms import AddDashboardForm
+from crisis_room.forms import AddDashboardForm, ObjectListSettingsForm
 from crisis_room.management.commands.dashboards import (
     FINDINGS_DASHBOARD_NAME,
     get_or_create_dashboard,
@@ -308,71 +309,63 @@ class OrganizationsCrisisRoomView(TemplateView):
         return context
 
 
-class AddDashboardItemView(OrganizationView, TemplateView):
+class AddDashboardItemView(OrganizationView, TemplateView, FormView):
     """This is the Crisis Room for a single organization."""
+
+    form_class = ObjectListSettingsForm
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         """Add dashboard item and redirect to the selected dashboard."""
 
-        dashboard_name = request.POST.get("dashboard")
-        recipe_id = request.POST.get("recipe_id")
-        query_from = request.POST.get("query_from")
-        query = None
-        template = request.POST.get("template")
+        form = self.get_form()
+        if form.is_valid():
+            form_data = form.cleaned_data
+            dashboard_name = form_data["dashboard"]
+            recipe_id = request.POST.get("recipe_id")
+            query_from = request.POST.get("query_from")
+            query = None
+            template = request.POST.get("template")
 
-        # Settings:
-        title = request.POST.get("title")
-        sort_by = request.POST.get("sort_by").split("-")
-        order_by = sort_by[0]
-        asc_desc = sort_by[1]
-        limit = request.POST.get("limit")
-        columns = request.POST.get("columns")
-        size = request.POST.get("size")
+            if query_from == "object_list":
+                template = "partials/dashboard_ooi_list.html"
+                sort_by = form_data["order_by"].split("-")
+                order_by = sort_by[0]
+                asc_desc = sort_by[1]
+                query = {
+                    "ooi_types": request.POST.getlist("ooi_type"),
+                    "scan_level": request.POST.getlist("clearance_level"),
+                    "scan_profile_type": request.POST.getlist("clearance_type"),
+                    "search_string": request.POST.get("search_string"),
+                    "order_by": order_by,
+                    "asc_desc": asc_desc,
+                    "limit": form_data["limit"],
+                }
 
-        logger.error(
-            "Show settings as test: title=%s, sort_by=%s, limit=%s, columns=%s, size=%s",
-            title,
-            sort_by,
-            limit,
-            columns,
-            size,
-        )
+            try:
+                self.dashboard_data, created = get_or_create_dashboard_data(
+                    dashboard_name, self.organization, recipe_id, query_from, query, template
+                )
+                if created:
+                    messages.success(request, "Dashboard item has been created.")
+                else:
+                    messages.warning(
+                        request,
+                        "The dashboard item that you were trying to add already exists on the selected dashboard."
+                        "If it was hidden on the dashboard, it is now visible.",
+                    )
 
-        if query_from == "object_list":
-            template = "partials/dashboard_ooi_list.html"
-            query = {
-                "ooi_types": request.POST.getlist("ooi_type"),
-                "scan_level": request.POST.getlist("clearance_level"),
-                "scan_profile_type": request.POST.getlist("clearance_type"),
-                "search_string": request.POST.get("search_string"),
-                "order_by": order_by,
-                "asc_desc": asc_desc,
-                "limit": limit,
-            }
-
-        try:
-            self.dashboard_data, created = get_or_create_dashboard_data(
-                dashboard_name, self.organization, recipe_id, query_from, query, template
-            )
-            if created:
-                messages.success(request, "Dashboard item has been created.")
-            else:
-                messages.warning(
+                query_params = urlencode({"dashboard": dashboard_name})
+                return redirect(
+                    reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
+                    + "?"
+                    + query_params
+                )
+            except IntegrityError:
+                messages.error(
                     request,
-                    "The dashboard item that you were trying to add already exists on the selected dashboard."
-                    "If it was hidden on the dashboard, it is now visible.",
+                    "Dashboard item could not be created, because this dashboard has reached the maximum of 16 items.",
                 )
 
-            query_params = urlencode({"dashboard": dashboard_name})
-            return redirect(
-                reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
-                + "?"
-                + query_params
-            )
-        except IntegrityError:
-            messages.error(
-                request,
-                "Dashboard item could not be created, because this dashboard has reached the maximum of 16 items.",
-            )
-
-        return redirect(reverse("ooi_list", kwargs={"organization_code": self.organization.code}))
+            return redirect(reverse("ooi_list", kwargs={"organization_code": self.organization.code}))
+        else:
+            return self.form_invalid(form)
