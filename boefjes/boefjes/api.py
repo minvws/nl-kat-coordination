@@ -63,7 +63,7 @@ async def root():
 
 @app.get("/api/v0/tasks/{task_id}", response_model=BoefjeInput)
 def boefje_input(task_id: UUID, scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client)) -> BoefjeInput:
-    task = get_task(task_id, scheduler_client)
+    task = get_task_from_scheduler(task_id, scheduler_client)
 
     if task.status is not TaskStatus.RUNNING:
         raise HTTPException(status_code=403, detail="Task does not have status running")
@@ -79,7 +79,7 @@ def boefje_output(
     scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),
     bytes_client: BytesAPIClient = Depends(get_bytes_client),
 ) -> dict[str, uuid.UUID]:
-    task = get_task(task_id, scheduler_client)
+    task = get_task_from_scheduler(task_id, scheduler_client)
     boefje_meta = task.data
 
     if task.status is not TaskStatus.RUNNING:
@@ -96,7 +96,7 @@ def boefje_output(
     if boefje_output.files:
         mime_types = _default_mime_types(boefje_meta.boefje)
         for file in boefje_output.files:
-            file.tags = mime_types.union(file.tags) if file.tags else mime_types
+            file.tags = list(mime_types.union(file.tags)) if file.tags else list(mime_types)
 
         # when supported, also save file.name to Bytes
         bytes_response = bytes_client.save_raws(task_id, boefje_output)
@@ -109,7 +109,7 @@ def boefje_output(
     return bytes_response
 
 
-def get_task(task_id, scheduler_client):
+def get_task_from_scheduler(task_id: UUID, scheduler_client: SchedulerAPIClient):
     try:
         task = scheduler_client.get_task(task_id)
     except HTTPError as e:
@@ -150,4 +150,4 @@ def patch_task(
 
 @app.get("/api/v0/scheduler/tasks/{task_id}", response_model=Task, tags=["scheduler"])
 def get_task(task_id: uuid.UUID, scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client)) -> Task:
-    return scheduler_client.get_task(task_id)
+    return get_task_from_scheduler(task_id, scheduler_client)

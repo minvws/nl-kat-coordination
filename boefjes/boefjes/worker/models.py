@@ -3,12 +3,7 @@ from enum import Enum
 from functools import total_ordering
 from typing import Literal
 
-try:
-    #
-    from croniter import croniter
-except ImportError:
-    croniter = lambda x: None
-
+from croniter import croniter
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import BaseModel, Field, field_validator

@@ -77,14 +77,12 @@ def cli(queue: str, worker: bool, images: tuple[str] | None, plugins: tuple[str]
     logger.info("Starting runtime for %s [image_filter=%s, plugin_filter=%s]", queue, images, plugins)
 
     if not plugins:
-        env_plugins = settings.plugins
-        plugins = env_plugins.split(",") if env_plugins else None
+        plugins = settings.plugins or None
     else:
         plugins = list(plugins)
 
     if not images:
-        env_images = settings.images
-        images = env_images.split(",") if env_images else None
+        images = settings.images or None
     else:
         images = list(images)
 

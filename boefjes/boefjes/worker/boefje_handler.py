@@ -1,7 +1,7 @@
 import os
 import traceback
 from base64 import b64encode
-from datetime import timezone, datetime
+from datetime import datetime, timezone
 
 import structlog
 
@@ -52,6 +52,9 @@ class BoefjeHandler(Handler):
                 # TODO: remove/change once all boefjes are oci images. This is now a "fallback".
                 boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)
             except KeyError:
+                if not boefje_meta.boefje.oci_image:
+                    raise
+
                 boefje_resource = self.local_repository.by_image(boefje_meta.boefje.oci_image)
 
             if not isinstance(boefje_resource, BoefjeResource):
@@ -82,7 +85,7 @@ class BoefjeHandler(Handler):
                 logger.info("No results for boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
                 return None
 
-            files = []
+            files: list[File] = []
 
             for boefje_added_mime_types, output in boefje_results:
                 valid_mimetypes = set()

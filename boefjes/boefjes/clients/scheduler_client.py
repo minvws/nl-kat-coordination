@@ -28,7 +28,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         self,
         plugin_service: PluginService,
         base_url: str,
-        oci_images: str | None = None,
+        oci_images: list[str] | None = None,
         plugins: list[str] | None = None,
     ):
         self._session = Client(

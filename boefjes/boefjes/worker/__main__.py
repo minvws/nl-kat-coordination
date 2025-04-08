@@ -6,10 +6,10 @@ from pathlib import Path
 import click
 import structlog
 
-from .oci_adapter import run_with_callback
 from .boefje_handler import BoefjeHandler
 from .client import BoefjeAPIClient
 from .manager import SchedulerWorkerManager, WorkerManager
+from .oci_adapter import run_with_callback
 from .repository import LocalPluginRepository
 
 logging_format = os.getenv("LOGGING_FORMAT", "text")
