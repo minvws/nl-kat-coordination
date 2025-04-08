@@ -1,7 +1,13 @@
-=======
 Reports
 =======
 
+OpenKAT displays all findings in the crisis room, the entry point for all current information from the system. In addition, OpenKAT can create thematic reports and display findings per object. The reports are available in the front end and as PDF, based on a LaTeX parser. The organization's house style can also be incorporated. It is also possible to link to other reporting and alerting systems.
+
+.. image:: img/report.png
+  :alt: Report
+
+Report types
+------------
 With the Reports functionality you can create reports with a specific focus.
 
 There are 3 different kinds of reports available. These are:

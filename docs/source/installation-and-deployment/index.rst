@@ -9,7 +9,8 @@ Contains documentation for developers and contributors.
 
    install
    containers
-   debian-install
+   production-docker-environment
+   production-debian-environment
    scripts
    hardening
    local-install

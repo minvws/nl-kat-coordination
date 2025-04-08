@@ -8,5 +8,8 @@ Contains introduction into OpenKAT
    :caption: Contents
 
    intro
-   how-does-it-work
-   make-your-own
+   faq
+   ux-design/index
+   release-notes/index
+   guidelines/index
+   templates/index

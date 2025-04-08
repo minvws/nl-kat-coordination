@@ -1,4 +1,6 @@
-# Production: Container deployment
+================================
+Production: Container deployment
+================================
 
 OpenKAT can be deployed using containers. We aim to support both simple docker /
 docker compose setups and container orchestration systems like Kubernetes and
@@ -7,7 +9,8 @@ Nomad.
 There is a docker-compose.release-example.yml in the root directory that can be
 used as an example how to deploy using docker-compose.
 
-## Container images
+Container images
+================
 
 The container images can be found here:
 
@@ -17,7 +20,8 @@ The container images can be found here:
 - https://github.com/minvws/nl-kat-octopoes/pkgs/container/nl-kat-octopoes
 - https://github.com/minvws/nl-kat-rocky/pkgs/container/nl-kat-rocky
 
-## Setup
+Setup
+=====
 
 To set up an installation with pre-built containers, you can pull the repository using:
 
@@ -78,14 +82,15 @@ With docker compose you would run this as:
 docker compose --env-file .env-prod -f docker-compose.release-example.yml exec rocky python3 manage.py setup_dev_account
 ```
 
-## IPv6 support
+IPv6 support
+============
 
 In order to perform scans against IPv6 addresses you need to manually enable IPv6 support in Dockerized setups. Add the following snippet to the file `/etc/docker/daemon.json`. If this file doesn't exist yet, you can create it and save it with the following configuration:
 
-```
+```shell
 {
-  "experimental": true,
-  "ip6tables": true
+    "experimental": true,
+    "ip6tables": true
 }
 ```
 
@@ -97,7 +102,8 @@ $ sudo systemctl restart docker
 
 By default OpenKAT has an IPv6 subnet configured. This configuration (step 4 and onwards from the official Docker documentation as listed below) can be found in the `docker-compose.yml` file. For more information on IPv6 support within Docker look at the [Docker documentation](https://docs.docker.com/config/daemon/ipv6/).
 
-## Container commands
+Container commands
+==================
 
 We have three container images that are used to run multiple containers. What the container runs is be specified by overriding the CMD of the container.
 
@@ -114,7 +120,8 @@ We have three container images that are used to run multiple containers. What th
 
 (Upgrading_Containers)=
 
-## Upgrading
+Upgrading
+=========
 
 When deploying new container images the database migrations are automatically
 run in the entrypoint. The OOI_database_seed.json file needs to be loaded
