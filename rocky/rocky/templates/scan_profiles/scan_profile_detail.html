@@ -66,7 +66,6 @@
                           method="post"
                           class="help">
                         {% csrf_token %}
-                        {% translate "Set clearance level" as fieldset_legend %}
                         <input type="hidden" name="action" value="change_clearance_level">
                         {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
 
