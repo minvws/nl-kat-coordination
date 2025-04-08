@@ -96,8 +96,7 @@ Steps to Create a Findings Dashboard in Production:
 
    .. code-block:: bash
 
-      python manage.py migrate --fake crisis_room 0001_initial
-      python manage.py migrate crisis_room 0002_create_findings_dashboards
+      python manage.py dashboards
 
 What Happens After Running the Command or migrations:
 -----------------------------------------------------
