@@ -3699,8 +3699,13 @@ msgid "Report names:"
 msgstr ""
 
 #: reports/templates/partials/report_names_form.html
+#: rocky/templates/forms/widgets/checkbox_group_table.html
+#: rocky/templates/oois/ooi_detail_add_related_object.html
 #: rocky/templates/partials/form/field_input.html
-msgid "(Required)"
+#: rocky/templates/partials/form/field_input_checkbox.html
+#: rocky/templates/partials/form/field_input_multiselect.html
+#: rocky/templates/partials/form/field_input_radio.html
+msgid "Required"
 msgstr ""
 
 #: reports/templates/partials/report_names_form.html
@@ -5508,10 +5513,6 @@ msgstr ""
 msgid "Privacy Statement"
 msgstr ""
 
-#: rocky/templates/forms/widgets/checkbox_group_table.html
-msgid "this field is required"
-msgstr ""
-
 #: rocky/templates/graph-d3.html
 msgid ""
 "Click a circle to collapse / expand the tree, click the text to view the "
@@ -6316,11 +6317,6 @@ msgstr ""
 
 #: rocky/templates/partials/form/field_input.html
 msgid "Forgot password"
-msgstr ""
-
-#: rocky/templates/partials/form/field_input_checkbox.html
-#: rocky/templates/partials/form/field_input_radio.html
-msgid "This field is required"
 msgstr ""
 
 #: rocky/templates/partials/form/field_input_errors.html
