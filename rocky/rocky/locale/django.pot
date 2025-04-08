@@ -1214,7 +1214,8 @@ msgid "Disable"
 msgstr ""
 
 #: katalogus/templates/partials/enable_disable_plugin.html
-msgid "You don't have permission to enable"
+#, python-format
+msgid "You don't have permission to enable this %(plugin)s"
 msgstr ""
 
 #: katalogus/templates/partials/katalogus_filter.html
