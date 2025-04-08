@@ -180,6 +180,17 @@ class ScheduleResponse(BaseModel):
     modified_at: datetime.datetime
 
 
+class SchedulerResponse(BaseModel):
+    id: str
+    enabled: bool
+    priority_queue: dict[str, Any]
+    last_activity: str | None
+
+
+class SchedulerNoResponse(BaseModel):
+    detail: str
+
+
 class Queue(BaseModel):
     id: str
     size: int
@@ -328,8 +339,12 @@ class SchedulerClient:
             logger.info("Schedule created", event_code=800081, schedule=schedule)
 
             return ScheduleResponse.model_validate_json(res.content)
-        except (ValidationError, HTTPStatusError, ConnectError):
+        except ValidationError:
             raise SchedulerValidationError(extra_message="Report schedule failed: ")
+        except HTTPStatusError:
+            raise SchedulerHTTPError()
+        except ConnectError:
+            raise SchedulerConnectError()
 
     def delete_schedule(self, schedule_id: str) -> None:
         try:
