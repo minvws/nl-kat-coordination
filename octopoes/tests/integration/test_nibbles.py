@@ -432,7 +432,7 @@ def test_min_scan_level_dummy_nibble(xtdb_octopoes_service: OctopoesService, eve
     xtdb_octopoes_service.ooi_repository.save(dnszone, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
 
-    assert xtdb_octopoes_service.ooi_repository.list_oois({DNSZone}, valid_time).count == 4
+    assert xtdb_octopoes_service.ooi_repository.list_oois({DNSZone}, valid_time).count == 1
 
     sp = xtdb_octopoes_service.scan_profile_repository.get(dnszone.reference, valid_time)
     spnew = sp.model_copy()
@@ -440,4 +440,4 @@ def test_min_scan_level_dummy_nibble(xtdb_octopoes_service: OctopoesService, eve
     xtdb_octopoes_service.scan_profile_repository.save(sp, spnew, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
 
-    assert xtdb_octopoes_service.ooi_repository.list_oois({DNSZone}, valid_time).count == 4
+    assert xtdb_octopoes_service.ooi_repository.list_oois({DNSZone}, valid_time).count == 2

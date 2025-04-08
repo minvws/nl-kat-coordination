@@ -412,6 +412,8 @@ class OctopoesService:
             and not origin.result
         ):
             origin.result = [result.reference for result in origin.phantom_result]
+            for ooi in origin.phantom_result:
+                self.ooi_repository.save(ooi, valid_time)
             origin.phantom_result = []
             self.origin_repository.save(origin, valid_time)
 
@@ -544,12 +546,6 @@ class OctopoesService:
 
         dereferenced_oois = event.old_data - event.new_data
         for reference in dereferenced_oois:
-            if (
-                event.new_data.origin_type == OriginType.NIBBLET
-                and event.new_data.phantom_result
-                and any(reference == ooi.reference for ooi in event.new_data.phantom_result)
-            ):
-                continue
             self._delete_ooi(reference, event.valid_time)
 
     def _on_delete_origin(self, event: OriginDBEvent) -> None:
