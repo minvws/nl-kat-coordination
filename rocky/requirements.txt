@@ -736,9 +736,9 @@ pydantic==2.10.4 ; python_version >= "3.10" and python_version < "4.0" \
 pydyf==0.11.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:0aaf9e2ebbe786ec7a78ec3fbffa4cdcecde53fd6f563221d53c6bc1328848a3 \
     --hash=sha256:394dddf619cca9d0c55715e3c55ea121a9bf9cbc780cdc1201a2427917b86b64
-pyparsing==3.1.1 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:32c7c0b711493c72ff18a981d24f28aaf9c1fb7ed5e9667c9e84e3db623bdbfb \
-    --hash=sha256:ede28a1a32462f5a9705e07aea48001a08f7cf81a021585011deba701581a0db
+pyparsing==3.1.4 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:a6a7ee4235a3f944aa1fa2249307708f893fe5717dc603503c6c7969c070fb7c \
+    --hash=sha256:f86ec8d1a83f11977c9a6ea7598e8c27fc5cddfa5b07ea2241edbbde1d7bc032
 pyphen==0.14.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:414c9355958ca3c6a3ff233f65678c245b8ecb56418fb291e2b93499d61cd510 \
     --hash=sha256:596c8b3be1c1a70411ba5f6517d9ccfe3083c758ae2b94a45f2707346d8e66fa
