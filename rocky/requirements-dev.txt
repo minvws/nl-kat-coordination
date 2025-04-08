@@ -1408,9 +1408,9 @@ uvloop==0.21.0 ; sys_platform != "win32" and platform_python_implementation == "
 wcwidth==0.2.13 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:3da69048e4540d84af32131829ff948f1e022c1c6bdb8d6102117aac784f6859 \
     --hash=sha256:72ea0c06399eb286d978fdedb6923a9eb47e1c486ce63e9b4e64fc18303972b5
-weasyprint==64.1 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:28b02f2c6409bafce1b1220d9d76a7345875bd3bd08c4f6dfbf510bb92a94757 \
-    --hash=sha256:f7c88ea8ce0ce0c527cbb9c802689e035fae50016d7efc5dfdaba4b75abf68f4
+weasyprint==65.0 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:0c7822c0c30e998da069d7e2fc33ea2685086e79f0e1e3212b4b90bf373492b2 \
+    --hash=sha256:3c679de96a7c871ae00f08cd1e77200f33e2a49d35e209c721159327578df988
 webencodings==0.5.1 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78 \
     --hash=sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923
