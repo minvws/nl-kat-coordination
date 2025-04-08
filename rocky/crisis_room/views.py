@@ -65,9 +65,9 @@ class DashboardService:
         """
 
         if organization:
-            report_filters = [(organization.code, dashboards_data.recipe)]
+            report_filters = [(organization.code, str(dashboards_data.recipe))]
         else:
-            report_filters = [(data.dashboard.organization.code, data.recipe) for data in dashboards_data]
+            report_filters = [(data.dashboard.organization.code, str(data.recipe)) for data in dashboards_data]
 
         if report_filters:
             org_code, _ = report_filters[0]
