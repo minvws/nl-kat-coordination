@@ -968,9 +968,9 @@ pytest-assert-utils==0.3.1 ; python_version >= "3.10" and python_version < "4.0"
 pytest-common-subject==1.0.6 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:3717bb80359513dd679744805fc39bf34ed48c872be9cbe616c69291bff54f1c \
     --hash=sha256:e3cd860c7e6e4481f29a47f80b41a0c186d146f529a2f346b8a9f3ed4e113f6c
-pytest-cov==4.1.0 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:3904b13dfbfec47f003b8e77fd5b589cd11904a21ddf1ab38a64f204d6a10ef6 \
-    --hash=sha256:6ba70b9e97e69fcc3fb45bfeab2d0a138fb65c4d0d6a41ef33983ad114be8c3a
+pytest-cov==6.1.1 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:46935f7aaefba760e716c2ebfbe1c216240b9592966e7da99ea8292d4d3e2a0a \
+    --hash=sha256:bddf29ed2d0ab6f4df17b4c55b0a657287db8684af9c42ea546b21b1041b3dde
 pytest-django==4.8.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:5d054fe011c56f3b10f978f41a8efb2e5adfc7e680ef36fb571ada1f24779d90 \
     --hash=sha256:ca1ddd1e0e4c227cf9e3e40a6afc6d106b3e70868fd2ac5798a22501271cd0c7
