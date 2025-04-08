@@ -257,7 +257,8 @@ class OrganizationsCrisisRoomView(TemplateView):
         super().setup(request, *args, **kwargs)
 
         dashboard_service = DashboardService()
-        self.organization = OrganizationMember.objects.filter(user=self.request.user)[0].organization
+        organization_code = kwargs["organization_code"]
+        self.organization = Organization.objects.get(code=organization_code)
         self.get_all_dashboard_names = dashboard_service.get_all_dashboard_names(self.organization)
         dashboard_name = self.request.GET.get("dashboard")
 
