@@ -367,7 +367,7 @@ Check the `--url` (the XTDB_URI environment variable in a usual setup) and `--no
     source /opt/venvs/kat-octopoes/bin/activate
     export $(cat /usr/lib/kat/octopoes.defaults | grep -v "#") && export $(cat /etc/kat/octopoes.conf | grep -v "#")
     cd /opt/venvs/kat-octopoes/lib/python3.11/site-packages
-    tools/xtdb-cli.py --url $XTDB_URI --node test evict-all-reports
+    /opt/venvs/kat-octopoes/bin/python tools/xtdb-cli.py --url $XTDB_URI --node test evict-all-reports
 
 To find all your organisation codes to apply this to multiple organisations,
 consider checking your organisations in Rocky or call the KATalogus API:
