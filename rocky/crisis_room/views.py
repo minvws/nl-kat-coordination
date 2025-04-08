@@ -57,17 +57,20 @@ class DashboardService:
         findings = report_data | {"highest_risk_level": highest_risk_level}
         return findings
 
-    def get_reports(
-        self, valid_time: datetime, dashboards_data, organization: Organization | None = None
-    ) -> dict[UUID, HydratedReport]:
+    def get_reports(self, valid_time: datetime, dashboards_data) -> dict[DashboardData, HydratedReport]:
         """
         Returns for each recipe ID query'ed, the latest (valid_time) HydratedReport.
         """
 
-        if organization:
-            report_filters = [(organization.code, str(dashboards_data.recipe))]
-        else:
-            report_filters = [(data.dashboard.organization.code, str(data.recipe)) for data in dashboards_data]
+        dashboard_items = {}
+        reports = {}
+        report_filters = []
+
+        for dashboard_data in dashboards_data:
+            if dashboard_data.recipe:
+                # collect them to prepare for 1 octopoes call to later rejoin dashboard data by recipe id
+                report_filters.append((dashboard_data.dashboard.organization.code, str(dashboard_data.recipe)))
+                dashboard_items[dashboard_data] = dashboard_data.recipe
 
         if report_filters:
             org_code, _ = report_filters[0]
@@ -76,7 +79,14 @@ class DashboardService:
                 settings.OCTOPOES_API, org_code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
             )
             try:
-                return connector.bulk_list_reports(valid_time, report_filters)
+                reports_per_recipe: dict[UUID, HydratedReport] = connector.bulk_list_reports(valid_time, report_filters)
+
+                for dashboard_data, recipe_id in dashboard_items.items():
+                    try:
+                        reports[dashboard_data] = reports_per_recipe[recipe_id]
+                    except KeyError:
+                        continue
+                return reports
             except (HTTPStatusError, ObjectNotFoundException):
                 return {}
         return {}
@@ -101,7 +111,7 @@ class DashboardService:
             dashboard__name=FINDINGS_DASHBOARD_NAME, dashboard__organization__in=organizations, findings_dashboard=True
         )
 
-        reports: dict[UUID, HydratedReport] = self.get_reports(datetime.now(timezone.utc), dashboards_data)
+        reports: dict[DashboardData, HydratedReport] = self.get_reports(datetime.now(timezone.utc), dashboards_data)
 
         raw_ids = [hydrated_report.data_raw_id for _, hydrated_report in reports.items() if hydrated_report]
         report_data_from_bytes = self.get_report_bytes_data(raw_ids)
@@ -143,7 +153,7 @@ class DashboardService:
 
         return summary
 
-    def get_all_dashboard_names(self, organization):
+    def get_dashboard_navigation(self, organization):
         dashboard_names = []
         dashboards = Dashboard.objects.filter(organization=organization)
         for dashboard in dashboards:
@@ -153,70 +163,68 @@ class DashboardService:
     def get_dashboard(self, dashboard_name, organization):
         return Dashboard.objects.get(organization=organization, name=dashboard_name)
 
-    def get_dashboard_data(self, dashboard_name, organization, list_limit):
-        dashboard_items = {}
+    def get_ooi_list(self, dashboard_data):
+        query = json.loads(dashboard_data.query)
+        list_limit = 20
+        ooi_list = []
 
-        # Collect all the items on the dashboard
-        dashboard_datas = DashboardData.objects.filter(
+        if dashboard_data.query_from == "object_list":
+            all_oois = {
+                ooi_class for ooi_class in get_collapsed_types() if ooi_class.get_ooi_type() not in _EXCLUDED_OOI_TYPES
+            }
+            all_scan_levels = DEFAULT_SCAN_LEVEL_FILTER
+            all_scan_profile_types = DEFAULT_SCAN_PROFILE_TYPE_FILTER
+
+            ooi_types = (
+                {type_by_name(t) for t in query["ooi_types"] if t not in _EXCLUDED_OOI_TYPES}
+                if query["ooi_types"]
+                else all_oois
+            )
+            scan_level = {ScanLevel(int(cl)) for cl in query["scan_level"]} if query["scan_level"] else all_scan_levels
+            scan_profile_type = (
+                {ScanProfileType(ct) for ct in query["scan_profile_type"]}
+                if query["scan_profile_type"]
+                else all_scan_profile_types
+            )
+
+            octopoes_client = OctopoesAPIConnector(
+                settings.OCTOPOES_API,
+                dashboard_data.dashboard.organization.code,
+                timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT,
+            )
+
+            ooi_list = octopoes_client.list_objects(
+                ooi_types,
+                valid_time=datetime.now(timezone.utc),
+                limit=list_limit,
+                scan_level=scan_level,
+                scan_profile_type=scan_profile_type,
+                search_string=query["search_string"],
+                order_by=query["order_by"],
+                asc_desc=query["asc_desc"],
+            ).items
+
+        return ooi_list
+
+    def get_dashboard_data(self, dashboard_name, organization):
+        dashboard_items = {}
+        data = {}
+
+        report_dashboards = []
+        dashboards_data = DashboardData.objects.filter(
             dashboard__name=dashboard_name, dashboard__organization=organization, display_in_dashboard=True
         )
 
-        for dashboard_data in dashboard_datas:
-            octopoes_client = OctopoesAPIConnector(
-                settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
-            )
-            recipe_id = dashboard_data.recipe
-            query_from = dashboard_data.query_from
+        for dashboard_data in dashboards_data:
+            if not dashboard_data.recipe:
+                data = {"ooi_list": self.get_ooi_list(dashboard_data), "query": dashboard_data.query}
+                dashboard_items[dashboard_data] = data
+            else:
+                report_dashboards.append(dashboard_data)
 
-            if recipe_id:
-                reports = self.get_reports(datetime.now(timezone.utc), dashboard_data, organization)
+        if report_dashboards:
+            self.get_reports(datetime.now(timezone.utc), report_dashboards)
 
-                raw_ids = [hydrated_report.data_raw_id for _, hydrated_report in reports.items() if hydrated_report]
-                report_data_from_bytes = self.get_report_bytes_data(raw_ids)
-
-                for _, hydrated_report in reports.items():
-                    try:
-                        hydrated_report_data = report_data_from_bytes[hydrated_report.data_raw_id]
-                        report_data = self.get_organizations_findings(hydrated_report_data)
-                        dashboard_items[dashboard_data] = {"report": hydrated_report, "report_data": report_data}
-                    except KeyError:
-                        continue
-
-            elif query_from == "object_list":
-                query = json.loads(dashboard_data.query)
-                all_oois = {
-                    ooi_class
-                    for ooi_class in get_collapsed_types()
-                    if ooi_class.get_ooi_type() not in _EXCLUDED_OOI_TYPES
-                }
-                all_scan_levels = DEFAULT_SCAN_LEVEL_FILTER
-                all_scan_profile_types = DEFAULT_SCAN_PROFILE_TYPE_FILTER
-
-                ooi_types = (
-                    {type_by_name(t) for t in query["ooi_types"] if t not in _EXCLUDED_OOI_TYPES}
-                    if query["ooi_types"]
-                    else all_oois
-                )
-                scan_level = (
-                    {ScanLevel(int(cl)) for cl in query["scan_level"]} if query["scan_level"] else all_scan_levels
-                )
-                scan_profile_type = (
-                    {ScanProfileType(ct) for ct in query["scan_profile_type"]}
-                    if query["scan_profile_type"]
-                    else all_scan_profile_types
-                )
-
-                ooi_list = octopoes_client.list_objects(
-                    ooi_types,
-                    valid_time=datetime.now(timezone.utc),
-                    limit=list_limit,
-                    scan_level=scan_level,
-                    scan_profile_type=scan_profile_type,
-                    search_string=query["search_string"],
-                    order_by=query["order_by"],
-                    asc_desc=query["asc_desc"],
-                ).items
-                dashboard_items[dashboard_data] = {"ooi_list": ooi_list, "query": query}
         return dashboard_items
 
 
@@ -247,28 +255,23 @@ class CrisisRoomView(TemplateView):
         return context
 
 
-class OrganizationsCrisisRoomView(TemplateView):
+class OrganizationsCrisisRoomView(TemplateView, OrganizationView):
     """This is the Crisis Room for a single organization."""
 
     template_name = "organization_crisis_room.html"
-    list_limit = 20
+    dashboard_service = DashboardService()
 
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
         super().setup(request, *args, **kwargs)
 
-        dashboard_service = DashboardService()
-        organization_code = kwargs["organization_code"]
-        self.organization = Organization.objects.get(code=organization_code)
-        self.get_all_dashboard_names = dashboard_service.get_all_dashboard_names(self.organization)
-        dashboard_name = self.request.GET.get("dashboard")
+        # Default is the findings dashboard
+        self.dashboard_name = self.request.GET.get("dashboard", FINDINGS_DASHBOARD_NAME)
 
-        if dashboard_name not in self.get_all_dashboard_names:
-            dashboard_name = self.get_all_dashboard_names[0]
+        # Create the dashboard tabs
+        self.get_dashboard_navigation = self.dashboard_service.get_dashboard_navigation(self.organization)
 
-        self.get_dashboard = dashboard_service.get_dashboard(dashboard_name, self.organization)
-        self.get_dashboard_data = dashboard_service.get_dashboard_data(
-            dashboard_name, self.organization, self.list_limit
-        )
+        self.get_dashboard = self.dashboard_service.get_dashboard(self.dashboard_name, self.organization)
+        self.get_dashboard_data = self.dashboard_service.get_dashboard_data(self.dashboard_name, self.organization)
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         """Create a new dashboard tab."""
@@ -294,7 +297,7 @@ class OrganizationsCrisisRoomView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["all_dashboard_names"] = self.get_all_dashboard_names
+        context["all_dashboard_names"] = self.get_dashboard_navigation
         context["dashboard_data"] = self.get_dashboard_data
         context["dashboard"] = self.get_dashboard
         context["organization"] = self.organization

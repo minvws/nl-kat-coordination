@@ -2,6 +2,7 @@
 {% load static %}
 
 {% if dashboard %}
+    {{ findings_dashboard }}
     <div>
         <h2>{{ dashboard.name }}</h2>
         {% if dashboard_data %}
