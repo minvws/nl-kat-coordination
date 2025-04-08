@@ -98,5 +98,5 @@ class SchedulerClientInterface:
 
 
 class BoefjeStorageInterface:
-    def save_raws(self, boefje_meta_id: uuid.UUID, boefje_output: BoefjeOutput) -> dict[str, uuid.UUID]:
+    def save_output(self, boefje_meta: BoefjeMeta, boefje_output: BoefjeOutput) -> dict[str, uuid.UUID]:
         raise NotImplementedError()

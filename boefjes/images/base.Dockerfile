@@ -13,7 +13,8 @@ USER nonroot
 COPY ./boefjes/worker ./worker
 COPY ./boefjes/logging.json logging.json
 
-ENTRYPOINT ["/usr/local/bin/python", "-m", "worker.oci_adapter"]
+ENTRYPOINT ["/usr/local/bin/python", "-m", "worker"]
+CMD []
 
 FROM base as builder
 

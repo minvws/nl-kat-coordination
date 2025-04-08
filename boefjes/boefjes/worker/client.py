@@ -13,6 +13,7 @@ from .interfaces import (
     Task,
     TaskStatus,
 )
+from .job_models import BoefjeMeta
 
 
 class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
@@ -80,8 +81,8 @@ class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
 
         return task
 
-    def save_raws(self, boefje_meta_id: uuid.UUID, boefje_output: BoefjeOutput) -> dict[str, uuid.UUID]:
-        response = self._session.post(f"/api/v0/tasks/{boefje_meta_id}", content=boefje_output.model_dump_json())
+    def save_output(self, boefje_meta: BoefjeMeta, boefje_output: BoefjeOutput) -> dict[str, uuid.UUID]:
+        response = self._session.post(f"/api/v0/tasks/{boefje_meta.id}", content=boefje_output.model_dump_json())
         self._verify_response(response)
 
         return response.json()

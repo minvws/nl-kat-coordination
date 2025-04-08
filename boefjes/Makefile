@@ -36,13 +36,15 @@ help: ## Show this help.
 build: images
 
 base-image:
-	docker build -f images/base.Dockerfile -t openkat/boefje-base:latest .
+	docker build -f **/base.Dockerfile -t openkat/boefje-base:latest .
+
+export REGISTRY=ghcr.io/minvws/openkat
 
 images: base-image # Build the images for the containerized boefjes
-	docker build -f ./boefjes/plugins/kat_dnssec/boefje.Dockerfile -t ghcr.io/minvws/openkat/dns-sec:latest .
-	docker build -f ./boefjes/plugins/kat_nmap_tcp/boefje.Dockerfile -t ghcr.io/minvws/openkat/nmap:latest  .
-	docker build -f ./boefjes/plugins/kat_export_http/boefje.Dockerfile -t ghcr.io/minvws/openkat/export-http:latest .
-	docker build -f images/generic.Dockerfile -t ghcr.io/minvws/openkat/generic:latest .
+	docker build -f **/kat_dnssec/boefje.Dockerfile -t $(REGISTRY)/dns-sec:latest -t openkat/dns-sec .
+	docker build -f **/kat_nmap_tcp/boefje.Dockerfile -t $(REGISTRY)/nmap:latest -t openkat/nmap .
+	docker build -f **/kat_export_http/boefje.Dockerfile -t $(REGISTRY)/export-http:latest -t openkat/export-http .
+	docker build -f **/generic.Dockerfile -t $(REGISTRY)/generic:latest -t openkat/generic .
 
 ##
 ##|------------------------------------------------------------------------|

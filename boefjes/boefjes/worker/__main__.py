@@ -6,6 +6,7 @@ from pathlib import Path
 import click
 import structlog
 
+from .oci_adapter import run_with_callback
 from .boefje_handler import BoefjeHandler
 from .client import BoefjeAPIClient
 from .manager import SchedulerWorkerManager, WorkerManager
@@ -45,9 +46,13 @@ logger = structlog.get_logger(__name__)
 @click.option(
     "-l", "--log-level", type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"]), help="Log level", default="INFO"
 )
-def cli(plugins: tuple[str] | None, log_level: str) -> None:
+@click.argument("input_url", default="")
+def cli(plugins: tuple[str] | None, log_level: str, input_url: str) -> None:
     logger.setLevel(log_level)
     logger.info("Starting runtime")
+
+    if input_url:
+        return run_with_callback(input_url)
 
     base_url = os.getenv("BOEFJES_API")
     oci_image = os.getenv("OCI_IMAGE")

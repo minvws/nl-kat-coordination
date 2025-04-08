@@ -1,6 +1,7 @@
 import os
 import traceback
 from base64 import b64encode
+from datetime import timezone, datetime
 
 import structlog
 
@@ -62,7 +63,10 @@ class BoefjeHandler(Handler):
             with TemporaryEnvironment() as temporary_environment:
                 temporary_environment.update(boefje_meta.environment or {})
                 try:
+                    # Until we fully switch over to the Boefje API, we need the start and end time here as a fallback.
+                    boefje_meta.started_at = datetime.now(timezone.utc)
                     boefje_results = boefje_resource.module.run(boefje_meta.model_dump())
+                    boefje_meta.ended_at = datetime.now(timezone.utc)
                 except BaseException as e:  # noqa
                     raise JobRuntimeError("Boefje failed") from e
         except:
@@ -105,7 +109,7 @@ class BoefjeHandler(Handler):
                 )
 
             boefje_output = BoefjeOutput(status=StatusEnum.FAILED if failed else StatusEnum.COMPLETED, files=files)
-            raw_file_ids = self.boefje_storage.save_raws(boefje_meta.id, boefje_output)
+            raw_file_ids = self.boefje_storage.save_output(boefje_meta, boefje_output)
 
             logger.info(
                 "Saved %s raw files for boefje %s[%s]", len(raw_file_ids), boefje_meta.boefje.id, boefje_meta.id

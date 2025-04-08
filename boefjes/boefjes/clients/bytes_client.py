@@ -98,6 +98,12 @@ class BytesAPIClient(BoefjeStorageInterface):
         return NormalizerMeta.model_validate_json(response.content)
 
     @retry_with_login
+    def save_output(self, boefje_meta: BoefjeMeta, boefje_output: BoefjeOutput) -> dict[str, uuid.UUID]:
+        self.save_boefje_meta(boefje_meta)
+
+        return self.save_raws(boefje_meta.id, boefje_output)
+
+    @retry_with_login
     def save_raws(self, boefje_meta_id: uuid.UUID, boefje_output: BoefjeOutput) -> dict[str, uuid.UUID]:
         response = self._session.post(
             "/bytes/raw",

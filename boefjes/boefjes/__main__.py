@@ -68,10 +68,11 @@ def get_runtime_manager(
 
 @click.command()
 @click.argument("queue", type=click.Choice([q.value for q in WorkerManager.Queue]))
+@click.option("--worker/--no-worker", "-w/-n", default=True, help="Whether to start a worker.")
 @click.option("-i", "--images", type=str, default=None, multiple=True, help="A list of OCI images to filter on.")
 @click.option("-p", "--plugins", type=str, default=None, multiple=True, help="A list of plugin ids to filter on.")
 @click.option("--log-level", type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"]), help="Log level", default="INFO")
-def cli(queue: str, images: tuple[str] | None, plugins: tuple[str] | None, log_level: str) -> None:
+def cli(queue: str, worker: bool, images: tuple[str] | None, plugins: tuple[str] | None, log_level: str) -> None:
     logger.setLevel(log_level)
     logger.info("Starting runtime for %s [image_filter=%s, plugin_filter=%s]", queue, images, plugins)
 
@@ -94,7 +95,10 @@ def cli(queue: str, images: tuple[str] | None, plugins: tuple[str] | None, log_l
 
         boefjes.api.run()
 
-    runtime.run(WorkerManager.Queue(queue))
+        if worker:
+            runtime.run(WorkerManager.Queue(queue))
+    else:
+        runtime.run(WorkerManager.Queue(queue))
 
 
 if __name__ == "__main__":
