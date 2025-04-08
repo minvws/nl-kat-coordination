@@ -94,8 +94,7 @@ def cli(queue: str, images: tuple[str] | None, plugins: tuple[str] | None, log_l
 
         boefjes.api.run()
 
-    else:
-        runtime.run(WorkerManager.Queue(queue))
+    runtime.run(WorkerManager.Queue(queue))
 
 
 if __name__ == "__main__":
