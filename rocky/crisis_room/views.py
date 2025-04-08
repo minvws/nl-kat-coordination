@@ -57,11 +57,17 @@ class DashboardService:
         findings = report_data | {"highest_risk_level": highest_risk_level}
         return findings
 
-    def get_reports(self, valid_time: datetime, dashboards_data) -> dict[UUID, HydratedReport]:
+    def get_reports(
+        self, valid_time: datetime, dashboards_data, organization: Organization | None = None
+    ) -> dict[UUID, HydratedReport]:
         """
         Returns for each recipe ID query'ed, the latest (valid_time) HydratedReport.
         """
-        report_filters = [(data.dashboard.organization.code, data.recipe) for data in dashboards_data]
+
+        if organization:
+            report_filters = [(organization.code, dashboards_data.recipe)]
+        else:
+            report_filters = [(data.dashboard.organization.code, data.recipe) for data in dashboards_data]
 
         if report_filters:
             org_code, _ = report_filters[0]
@@ -159,9 +165,24 @@ class DashboardService:
             octopoes_client = OctopoesAPIConnector(
                 settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
             )
+            recipe_id = dashboard_data.recipe
             query_from = dashboard_data.query_from
 
-            if query_from == "object_list":
+            if recipe_id:
+                reports = self.get_reports(datetime.now(timezone.utc), dashboard_data, organization)
+
+                raw_ids = [hydrated_report.data_raw_id for _, hydrated_report in reports.items() if hydrated_report]
+                report_data_from_bytes = self.get_report_bytes_data(raw_ids)
+
+                for _, hydrated_report in reports.items():
+                    try:
+                        hydrated_report_data = report_data_from_bytes[hydrated_report.data_raw_id]
+                        report_data = self.get_organizations_findings(hydrated_report_data)
+                        dashboard_items[dashboard_data] = {"report": hydrated_report, "report_data": report_data}
+                    except KeyError:
+                        continue
+
+            elif query_from == "object_list":
                 query = json.loads(dashboard_data.query)
                 all_oois = {
                     ooi_class
