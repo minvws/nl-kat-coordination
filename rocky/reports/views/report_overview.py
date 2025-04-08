@@ -82,7 +82,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
                     "enabled": schedule["enabled"],
                     "recipe": report_recipe,
                     "cron": schedule["schedule"],
-                    "deadline_at": datetime.fromisoformat(schedule_datetime) if schedule_datetime else "asap",
+                    "deadline_at": datetime.strptime(schedule_datetime, "%Y-%m-%dT%H:%M:%SZ") if schedule_datetime else "asap",
                     "reports": reports,
                     "total_oois": len(
                         {asset_report.input_ooi for report in reports for asset_report in report.input_oois}
