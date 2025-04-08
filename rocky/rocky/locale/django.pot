@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-05 14:32+0000\n"
+"POT-Creation-Date: 2025-04-03 08:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -515,7 +515,9 @@ msgid "Verify OpenKAT account on %(site_name)s"
 msgstr ""
 
 #: account/validators.py
-msgid "Your password must contain at least the following:"
+msgid ""
+"Your password must contain at least the following but longer passwords are "
+"recommended:"
 msgstr ""
 
 #: account/validators.py
@@ -531,7 +533,8 @@ msgid " letters"
 msgstr ""
 
 #: account/validators.py
-msgid " special characters such as: "
+msgid ""
+" special characters such as: {str(validators.get('special_characters',''))}"
 msgstr ""
 
 #: account/validators.py
@@ -902,7 +905,8 @@ msgstr ""
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/templates/summary/report_asset_overview.html tools/forms/boefje.py
-#: tools/forms/finding_type.py rocky/templates/oois/ooi_detail.html
+#: tools/forms/finding_type.py rocky/templates/findings/finding_list.html
+#: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
 msgid "Description"
 msgstr ""
@@ -2814,7 +2818,7 @@ msgstr ""
 msgid ""
 "Multiple hostnames that resolve to one IP address where at least one of the "
 "hostnames or the IP address has a declared scan level that is at least L1. "
-"Type systemen zijn webservers, mailservers, en nameservers (DNS)."
+"Type systems are web servers, mail servers and name servers (DNS)."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/term_overview.html
@@ -2981,6 +2985,7 @@ msgstr ""
 
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.py
+#: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_detail_origins_inference.html
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
@@ -2988,11 +2993,13 @@ msgid "Source"
 msgstr ""
 
 #: reports/report_types/findings_report/report.html
+#: rocky/templates/findings/finding_list.html
 msgid "Impact"
 msgstr ""
 
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/multi_organization_report/recommendations.html
+#: rocky/templates/findings/finding_list.html
 msgid "Recommendation"
 msgstr ""
 
@@ -3692,8 +3699,13 @@ msgid "Report names:"
 msgstr ""
 
 #: reports/templates/partials/report_names_form.html
+#: rocky/templates/forms/widgets/checkbox_group_table.html
+#: rocky/templates/oois/ooi_detail_add_related_object.html
 #: rocky/templates/partials/form/field_input.html
-msgid "(Required)"
+#: rocky/templates/partials/form/field_input_checkbox.html
+#: rocky/templates/partials/form/field_input_multiselect.html
+#: rocky/templates/partials/form/field_input_radio.html
+msgid "Required"
 msgstr ""
 
 #: reports/templates/partials/report_names_form.html
@@ -3930,7 +3942,7 @@ msgid "There are no optional plugins."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-msgid "Enable plugins and continue"
+msgid "Enable selected plugins and continue"
 msgstr ""
 
 #: reports/templates/partials/report_severity_totals.html
@@ -5408,6 +5420,10 @@ msgid "column headers with buttons are sortable"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
+msgid "Location"
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
@@ -5495,10 +5511,6 @@ msgstr ""
 
 #: rocky/templates/footer.html rocky/views/privacy_statement.py
 msgid "Privacy Statement"
-msgstr ""
-
-#: rocky/templates/forms/widgets/checkbox_group_table.html
-msgid "this field is required"
 msgstr ""
 
 #: rocky/templates/graph-d3.html
@@ -6305,11 +6317,6 @@ msgstr ""
 
 #: rocky/templates/partials/form/field_input.html
 msgid "Forgot password"
-msgstr ""
-
-#: rocky/templates/partials/form/field_input_checkbox.html
-#: rocky/templates/partials/form/field_input_radio.html
-msgid "This field is required"
 msgstr ""
 
 #: rocky/templates/partials/form/field_input_errors.html
