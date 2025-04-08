@@ -25,9 +25,9 @@
                     <h2>{% translate "Normalizers" %}</h2>
                     <p>{% translate "List of tasks for normalizers." %}</p>
                 </div>
-                {% include "tasks/partials/task_filter.html" %}
-
                 <div class="horizontal-scroll sticky-column">
+                    {% include "tasks/partials/task_filter.html" %}
+
                     <table rf-selector="table-scan-history" class="nowrap">
                         <thead>
                             <tr>
