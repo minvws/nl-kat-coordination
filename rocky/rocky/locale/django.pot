@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-20 09:42+0000\n"
+"POT-Creation-Date: 2025-04-03 08:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -515,7 +515,9 @@ msgid "Verify OpenKAT account on %(site_name)s"
 msgstr ""
 
 #: account/validators.py
-msgid "Your password must contain at least the following:"
+msgid ""
+"Your password must contain at least the following but longer passwords are "
+"recommended:"
 msgstr ""
 
 #: account/validators.py
@@ -531,7 +533,8 @@ msgid " letters"
 msgstr ""
 
 #: account/validators.py
-msgid " special characters such as: "
+msgid ""
+" special characters such as: {str(validators.get('special_characters',''))}"
 msgstr ""
 
 #: account/validators.py
@@ -2815,7 +2818,7 @@ msgstr ""
 msgid ""
 "Multiple hostnames that resolve to one IP address where at least one of the "
 "hostnames or the IP address has a declared scan level that is at least L1. "
-"Type systemen zijn webservers, mailservers, en nameservers (DNS)."
+"Type systems are web servers, mail servers and name servers (DNS)."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/term_overview.html
@@ -3696,8 +3699,13 @@ msgid "Report names:"
 msgstr ""
 
 #: reports/templates/partials/report_names_form.html
+#: rocky/templates/forms/widgets/checkbox_group_table.html
+#: rocky/templates/oois/ooi_detail_add_related_object.html
 #: rocky/templates/partials/form/field_input.html
-msgid "(Required)"
+#: rocky/templates/partials/form/field_input_checkbox.html
+#: rocky/templates/partials/form/field_input_multiselect.html
+#: rocky/templates/partials/form/field_input_radio.html
+msgid "Required"
 msgstr ""
 
 #: reports/templates/partials/report_names_form.html
@@ -5505,10 +5513,6 @@ msgstr ""
 msgid "Privacy Statement"
 msgstr ""
 
-#: rocky/templates/forms/widgets/checkbox_group_table.html
-msgid "this field is required"
-msgstr ""
-
 #: rocky/templates/graph-d3.html
 msgid ""
 "Click a circle to collapse / expand the tree, click the text to view the "
@@ -6313,11 +6317,6 @@ msgstr ""
 
 #: rocky/templates/partials/form/field_input.html
 msgid "Forgot password"
-msgstr ""
-
-#: rocky/templates/partials/form/field_input_checkbox.html
-#: rocky/templates/partials/form/field_input_radio.html
-msgid "This field is required"
 msgstr ""
 
 #: rocky/templates/partials/form/field_input_errors.html
