@@ -10,13 +10,10 @@ If you are stuck, or believe the docs are incorrect, you can make a ticket on `o
    :maxdepth: 4
    :caption: Contents
 
-   introduction/index
-   manual/index
-   modules/index
+   quick-start/index
+   basics/index
+   user-interface/index
    installation-and-deployment/index
    developer-documentation/index
    security-compliance/index
-   ux-design/index
-   release-notes/index
-   guidelines/index
-   templates/index
+   about-openkat/index
