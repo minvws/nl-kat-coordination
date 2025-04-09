@@ -1,7 +1,9 @@
+.. _basics-bits:
+
 Bits
 ====
 
-Bits are businessrules that assess objects. These can be disabled or enabled using environment variables. The parameters of a Bit can be configured using config objects, which are explained in detail in :ref:`introduction/make-your-own:Bits: businessrules`.
+Bits are businessrules that assess objects. These can be disabled or enabled using environment variables. The parameters of a Bit can be configured using config objects, which are explained in detail in :ref:`make-your-own-bits`.
 
 Almost all bits are enabled by default and be disabled by adding the bit to `BITS_DISABLED`. The disabled bits can be enabled using `BITS_ENABLED`. For example:
 

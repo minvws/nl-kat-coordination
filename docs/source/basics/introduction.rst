@@ -1,3 +1,5 @@
+.. _basics-of-openkat:
+
 =================
 Basics of OpenKAT
 =================

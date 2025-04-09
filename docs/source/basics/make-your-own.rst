@@ -1,3 +1,5 @@
+.. _make-your-own-bits:
+
 ===============================================
 Plugins for OpenKAT: boefjes, whiskers and bits
 ===============================================

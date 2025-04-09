@@ -1,3 +1,5 @@
+.. _scan-levels-clearance-indemnities:
+
 Scan levels, clearance & indemnities
 ====================================
 

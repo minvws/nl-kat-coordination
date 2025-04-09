@@ -1,3 +1,5 @@
+.. _users-and-organizations:
+
 Users and organizations
 =======================
 
@@ -7,6 +9,8 @@ Organizations
 -------------
 
 Organizations own the systems for which KAT is deployed. From KAT, multiple organizations can be monitored simultaneously, each with its own settings. The superuser can add new organizations and each organization has its own users.
+
+.. _users-and-organisations_users:
 
 Users
 -----
@@ -97,13 +101,13 @@ A user is recognized by their full name and email address.
 
 *User type:*
 
-Through the CSV upload you can add the usertypes client, admin and redteam. Read about users and roles in the :ref:`manual/user-manual:Users` section.
+Through the CSV upload you can add the usertypes client, admin and redteam. Read about users and roles in the :ref:`users-and-organisations_users` section.
 
 * account_type : client, admin or redteam
 
 *User clearance:*
 
-Clearance levels are related to the scan level of the Boefjes a user is able to dispatch. Read about this in the :ref:`manual/user-manual:Scan levels, clearance & indemnities` section.
+Clearance levels are related to the scan level of the Boefjes a user is able to dispatch. Read about this in the :ref:`scan-levels-clearance-indemnities` section.
 
 The trusted_clearance_level is the level a user receives from the organization. It is the maximum level available for this user, based on the decision of the admin or superuser. The acknowledged_clearance_level is the level accepted by the user. Both can be added in the CSV file. The accepted level can be changed by the user.
 
