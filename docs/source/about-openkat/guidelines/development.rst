@@ -1,3 +1,5 @@
+.. _about-openkat-development:
+
 Development
 ###########
 
@@ -13,7 +15,7 @@ Developers are encouraged to write their code as strictly compliant as possible.
 Tools
 =====
 
-To make development and validation easier, we adopted :ref:`guidelines/development:pre-commit` hooks to automate most of this.
+To make development and validation easier, we adopted :ref:`about-openkat-precommit` hooks to automate most of this.
 This will help identify broken/bad code, improve consistency and save time during code reviews.
 Some tools and hooks have been adopted for both local development as well as in our CI/CD pipeline as GitHub actions.
 
@@ -32,6 +34,9 @@ For the frontend there are a few more tasks in the CI/CD pipeline:
 
 - Compiling messages/language files
 - ``robotidy`` for tidying up Robot tests
+
+
+.. _about-openkat-precommit:
 
 Pre-commit
 ----------
@@ -54,6 +59,8 @@ not work. After pre-commit is installed, run::
 
 from the root directory of a repository. Now all of the checks will be run each time you commit changes without your needing to run each one manually.
 In addition, using pre-commit will also allow you to more easily remain up-to-date with our code checks as they change.
+
+.. _about-openkat-signed-commits:
 
 Signed commits
 ==============
