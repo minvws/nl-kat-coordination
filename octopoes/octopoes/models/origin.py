@@ -6,6 +6,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from octopoes.models import Reference
+from octopoes.models.types import OOIType
 
 
 class OriginType(Enum):
@@ -22,6 +23,7 @@ class Origin(BaseModel):
     source: Reference
     source_method: str | None = None  # None for bits and normalizers
     result: list[Reference] = Field(default_factory=list)
+    phantom_result: list[OOIType] | None = None  # None for anything other than nibblet
     parameters_hash: str | None = None  # None for anything other than nibblet
     parameters_references: list[Reference | None] | None = None  # None for anything other than nibblet
     task_id: UUID | None = None
