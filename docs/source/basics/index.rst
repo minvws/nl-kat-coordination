@@ -8,6 +8,7 @@ Contains references to the documentations of the Basics of OpenKAT
    :caption: Contents
 
    introduction
+   modules
    scan-levels-and-indemnification
    objects
    boefjes
@@ -15,3 +16,5 @@ Contains references to the documentations of the Basics of OpenKAT
    normalizers
    questions-and-configs
    users-and-organisations
+   make-your-own
+   verify-timestamps

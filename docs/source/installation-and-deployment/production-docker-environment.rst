@@ -89,18 +89,18 @@ In order to perform scans against IPv6 addresses you need to manually enable IPv
 
 ```shell
 {
-    "experimental": true,
-    "ip6tables": true
+"experimental": true,
+"ip6tables": true
 }
 ```
 
 Restart the Docker daemon for your changes to take effect.
 
-```
+```shell
 $ sudo systemctl restart docker
 ```
 
-By default OpenKAT has an IPv6 subnet configured. This configuration (step 4 and onwards from the official Docker documentation as listed below) can be found in the `docker-compose.yml` file. For more information on IPv6 support within Docker look at the [Docker documentation](https://docs.docker.com/config/daemon/ipv6/).
+By default OpenKAT has an IPv6 subnet configured. This configuration (step 4 and onwards from the official Docker documentation as listed below) can be found in the `docker-compose.yml` file. For more information on IPv6 support within Docker look at the `Docker documentation <https://docs.docker.com/config/daemon/ipv6/>`_.
 
 Container commands
 ==================

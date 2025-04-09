@@ -12,7 +12,7 @@ If you are stuck, or believe the docs are incorrect, you can make a ticket on `o
 
    quick-start/index
    basics/index
-   userinterface/index
+   user-interface/index
    installation-and-deployment/index
    developer-documentation/index
    about-openkat/index
