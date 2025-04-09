@@ -1,3 +1,5 @@
+.. _release-notes-1.13:
+
 ============
 OpenKAT 1.13
 ============
@@ -93,8 +95,7 @@ those installations use Granian by default. Do not put any other configuration
 in this file because it will be automatically removed when upgrading to 1.14.
 
 If you were previously accessing OpenKAT using https on port 8443 you need to
-change the configuration as described on the :ref:`Debian installation page <installation-and-deployment/debian-install:Configure
-reverse proxy>`.
+change the configuration as described on the :ref:`debian_prod_configure_reverse_proxy`.
 
 
 Full Changelog

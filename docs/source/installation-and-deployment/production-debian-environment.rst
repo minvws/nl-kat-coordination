@@ -303,6 +303,7 @@ To start KAT when the system boots, enable all KAT services:
 
     sudo systemctl enable kat-rocky kat-rocky-worker kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-octopoes kat-octopoes-worker
 
+.. _debian_prod_configure_reverse_proxy:
 
 Configure reverse proxy
 =======================
