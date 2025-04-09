@@ -35,10 +35,8 @@ COPY --chown=nonroot boefjes/plugins/kat_shodan boefjes/plugins/kat_shodan
 COPY --chown=nonroot boefjes/plugins/kat_snyk boefjes/plugins/kat_snyk
 COPY --chown=nonroot boefjes/plugins/kat_snyk_finding_types boefjes/plugins/kat_snyk_finding_types
 COPY --chown=nonroot boefjes/plugins/kat_webpage_analysis boefjes/plugins/kat_webpage_analysis
-
-# TODO: fix, uses docker
 COPY --chown=nonroot boefjes/plugins/__init__.py boefjes/plugins/__init__.py
 COPY --chown=nonroot boefjes/__init__.py boefjes/__init__.py
 
 RUN find ./boefjes -name 'requirements.txt' -execdir sh -c "cat {} && echo" \; | sort -u > /tmp/boefjes-requirements.txt
-RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip && pip install -r /tmp/boefjes-requirements.txt
+RUN --mount=type=cache,target=/root/.cache pip install setuptools==78.1.0 && pip install -r /tmp/boefjes-requirements.txt
