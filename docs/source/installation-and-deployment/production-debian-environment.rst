@@ -1,3 +1,5 @@
+.. _debian-install:
+
 ===========================
 Production: Debian packages
 ===========================
