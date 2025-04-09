@@ -87,12 +87,13 @@ IPv6 support
 
 In order to perform scans against IPv6 addresses you need to manually enable IPv6 support in Dockerized setups. Add the following snippet to the file `/etc/docker/daemon.json`. If this file doesn't exist yet, you can create it and save it with the following configuration:
 
-```shell
-{
-"experimental": true,
-"ip6tables": true
-}
-```
+.. code-block:: JSON
+
+ {
+    "experimental": true,
+    "ip6tables": true
+ }
+
 
 Restart the Docker daemon for your changes to take effect.
 
@@ -118,7 +119,7 @@ We have three container images that are used to run multiple containers. What th
 | octopoes        | worker-beat | Celery worker running beat. There must only be exactly one container of this type |
 | octopoes        | worker      | Celery worker. Use this if you need to more than one work container for scaling   |
 
-(Upgrading_Containers)=
+.. _Upgrading_Containers:
 
 Upgrading
 =========

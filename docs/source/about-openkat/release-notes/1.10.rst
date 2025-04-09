@@ -67,8 +67,8 @@ environment variables provided to the boefje process prepended with `BOEFJE_`.
 See environment variables section of the :doc:`/installation-and-deployment/environment-settings/boefjes` documentation for more
 information.
 
-The normal instructions for upgrading :ref:`Debian packages<Upgrading Debian>`
-or upgrading :ref:`installation-and-deployment/production-docker-environment <Upgrading_Containers>` should be followed.
+The normal instructions for upgrading :ref:`Upgrading Debian`
+or upgrading :ref:`Upgrading_Containers` should be followed.
 
 Full Changelog
 ==============
