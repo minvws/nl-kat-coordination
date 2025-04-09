@@ -24,7 +24,7 @@ version has also been updated to version 4.2.
 This release also provides packages for Debian 12 (bookworm). We recommend
 everyone to upgrade their machines to Debian 12 because the included Python 3.11
 will give a big performance boost. Debian 11 packages will still be provided
-until December 2023 as described in :ref:`installation-and-deployment/debian-install:Supported distributions`.
+until December 2023 as described in :ref:`installation-and-deployment/production-debian-environment:Supported distributions`.
 
 New Features
 ============
@@ -68,7 +68,7 @@ See environment variables section of the :doc:`/installation-and-deployment/envi
 information.
 
 The normal instructions for upgrading :ref:`Debian packages<Upgrading Debian>`
-or upgrading :ref:`containers <Upgrading_Containers>` should be followed.
+or upgrading :ref:`installation-and-deployment/production-docker-environment <Upgrading_Containers>` should be followed.
 
 Full Changelog
 ==============
