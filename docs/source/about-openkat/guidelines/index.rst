@@ -1,3 +1,5 @@
+.. _guidelines-index:
+
 Project Guidelines
 ##################
 

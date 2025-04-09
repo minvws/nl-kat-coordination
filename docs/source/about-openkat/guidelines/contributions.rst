@@ -98,7 +98,7 @@ The new language should be automatically picked up by both Weblate and Django.
 
 Contributor Social Contract
 ===========================
-All contributors (including, but not limited to, developers and issue reporters) promise to do their best to adhere to the guidelines in :doc:`/guidelines/index`.
+All contributors (including, but not limited to, developers and issue reporters) promise to do their best to adhere to the guidelines in :ref:`guidelines-index`.
 Everyone is encouraged to politely and constructively point out guidelines violations to others.
 Actively enforcing these guidelines makes that the entire project benefits in quality control.
 
