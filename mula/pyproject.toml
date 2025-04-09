@@ -61,5 +61,8 @@ omit = [
     "scheduler/__main__.py",
 ]
 
+[tool.coverage.xml]
+output = "/tmp/coverage.xml"
+
 [tool.pytest.ini_options]
 addopts = "--cov scheduler/ --cov-config=pyproject.toml --cov-report xml --cov-branch --cov-report=term-missing:skip-covered"
