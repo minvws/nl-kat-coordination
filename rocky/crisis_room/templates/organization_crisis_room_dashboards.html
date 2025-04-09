@@ -2,12 +2,11 @@
 {% load static %}
 
 {% if dashboard %}
-    {{ findings_dashboard }}
     <div>
         <h2>{{ dashboard.name }}</h2>
-        {% if dashboard_data %}
-            {% for dashboard, data in dashboard_data.items %}
-                {% include dashboard.template with data=data ooi_list=data.ooi_list is_dashboard="yes" %}
+        {% if dashboard_items %}
+            {% for dashboard_item in dashboard_items %}
+                {% include dashboard_item.item.template with data=dashboard_item.data is_dashboard=dashboard_item.item.display_in_dashboard %}
 
             {% endfor %}
         {% else %}

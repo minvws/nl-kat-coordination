@@ -24,11 +24,11 @@
                 </tr>
             </thead>
             <tbody>
-                {% for dashboard_data in organizations_dashboards %}
-                    {% with findings=dashboard_data.report_data.findings %}
+                {% for dashboard_item in dashboard_items %}
+                    {% with findings=dashboard_item.data.report_data.findings %}
                         <tr>
                             <td>
-                                <a href="{% url "organization_crisis_room" dashboard_data.report.organization_code %}">{{ dashboard_data.report.organization_name }}</a>
+                                <a href="{% url "organization_crisis_room" dashboard_item.data.report.organization_code %}">{{ dashboard_item.data.report.organization_name }}</a>
                             </td>
                             <td>
                                 {% if findings.summary.total_finding_types %}
@@ -45,8 +45,8 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% if dashboard_data.report_data.highest_risk_level %}
-                                    <span class="{{ dashboard_data.report_data.highest_risk_level }}">{{ dashboard_data.report_data.highest_risk_level|capfirst }}</span>
+                                {% if dashboard_item.data.report_data.highest_risk_level %}
+                                    <span class="{{ dashboard_item.data.report_data.highest_risk_level }}">{{ dashboard_item.data.report_data.highest_risk_level|capfirst }}</span>
                                 {% else %}
                                     -
                                 {% endif %}
@@ -100,11 +100,11 @@
                                 <div class="horizontal-view toolbar">
                                     <div class="button-container">
                                         <a class="button"
-                                           href="{% url "view_report" dashboard_data.report.organization_code %}?report_id={{ dashboard_data.report.primary_key }}#findings-table">
+                                           href="{% url "view_report" dashboard_item.data.report.organization_code %}?report_id={{ dashboard_item.data.report.primary_key }}#findings-table">
                                             {% translate "View findings report" %}
                                         </a>
                                         <a class="button ghost"
-                                           href="{% ooi_url "ooi_edit" dashboard_data.report.report_recipe dashboard_data.report.organization_code %}">
+                                           href="{% ooi_url "ooi_edit" dashboard_item.data.report.report_recipe dashboard_item.data.report.organization_code %}">
                                             <span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit report recipe" %}
                                         </a>
                                     </div>
