@@ -187,12 +187,12 @@ As can be seen in ``rocky/account/forms/account_setup.py:49`` no paste restricti
 
 Currently this check is not performed. Note that in the ASVS 5.0 it is defined as "may allow".
 
-Will be discussed in `feature ASVS / iSDP: 2.1.12 Verify that the user can choose to either temporarily view the entire masked password, or temporarily view the last typed character of the password on platforms that do not have this as built-in functionality. <https://github.com/minvws/nl-kat-coordination/issues/4212>`_.
+Will be discussed in `discussion ASVS / iSDP: 2.1.12 Verify that the user can choose to either temporarily view the entire masked password, or temporarily view the last typed character of the password on platforms that do not have this as built-in functionality. <https://github.com/minvws/nl-kat-coordination/issues/4212>`_.
 
-|todo| 2.2.1 - Verify that anti-automation controls are effective at mitigating breached credential testing, brute force, and account lockout attacks. Such controls include blocking the most common breached passwords, soft lockouts, rate limiting, CAPTCHA, ever increasing delays between attempts, IP address restrictions, or risk-based restrictions such as location, first login on a device, recent attempts to unlock the account, or similar. Verify that no more than 100 failed attempts per hour is possible on a single account.
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|non_compliant| 2.2.1 - Verify that anti-automation controls are effective at mitigating breached credential testing, brute force, and account lockout attacks. Such controls include blocking the most common breached passwords, soft lockouts, rate limiting, CAPTCHA, ever increasing delays between attempts, IP address restrictions, or risk-based restrictions such as location, first login on a device, recent attempts to unlock the account, or similar. Verify that no more than 100 failed attempts per hour is possible on a single account.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-TODO Discuss with team, is this something that should be in the application or be done by ops?
+Will be discussed in `discussion ASVS / iSDP: 2.2.1 - Verify that anti-automation controls are effective at mitigating breached credential testing, brute force, and account lockout attacks.... <https://github.com/minvws/nl-kat-coordination/issues/4306>`_.
 
 |compliant| 2.2.2 - Verify that the use of weak authenticators (such as SMS and email) is limited to secondary verification and transaction approval and not as a replacement for more secure authentication methods. Verify that stronger methods are offered before weak methods, users are aware of the risks, or that proper measures are in place to limit the risks of account compromise.
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -201,15 +201,15 @@ Secondary authentication is performed with secure authentication tokens, email o
 
 .. image:: img/proof/chapter_2/proof_2.2.2.png
 
-|todo| 2.2.3 - Verify that secure notifications are sent to users after updates to authentication details, such as credential resets, email or address changes, logging in from unknown or risky locations. The use of push notifications - rather than SMS or email - is preferred, but in the absence of push notifications, SMS or email is acceptable as long as no sensitive information is disclosed in the notification.
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|non_compliant| 2.2.3 - Verify that secure notifications are sent to users after updates to authentication details, such as credential resets, email or address changes, logging in from unknown or risky locations. The use of push notifications - rather than SMS or email - is preferred, but in the absence of push notifications, SMS or email is acceptable as long as no sensitive information is disclosed in the notification.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-TODO discuss Is this an available option?
+Currently no notifications are send, this Will be fixed in `ASVS / iSDP: 2.2.3 - Verify that secure notifications are sent to users after updates to authentication details, such as credential resets, email or address changes, logging in from unknown or risky locations. The use of push notifications - rather than SMS or email - is preferred, but in the absence of push notifications, SMS or email is acceptable as long as no sensitive information is disclosed in the notification <https://github.com/minvws/nl-kat-coordination/issues/4307>`_.
 
-|todo| 2.5.1 - Verify that a system generated initial activation or recovery secret is not sent in clear text to the user.
---------------------------------------------------------------------------------------------------------------------------
+|accepted| 2.5.1 - Verify that a system generated initial activation or recovery secret is not sent in clear text to the user.
+------------------------------------------------------------------------------------------------------------------------------
 
-TODO discuss with team, how are passwords shared?
+As this is not the responsibility of the OpenKAT project but of the organization using the product, we have accepted this requirement.
 
 |compliant| 2.5.2 - Verify password hints or knowledge-based authentication (so-called "secret questions") are not present.
 ---------------------------------------------------------------------------------------------------------------------------
@@ -245,10 +245,10 @@ As can be seen from the email below, no password is shared when performing a pas
 
 In ``.env-dist`` accounts can be configured to not use default naming. By default unique names are used, with exception for the postgres account..
 
-|todo| 2.5.5 - Verify that if an authentication factor is changed or replaced, that the user is notified of this event.
------------------------------------------------------------------------------------------------------------------------
+|non_compliant| 2.5.5 - Verify that if an authentication factor is changed or replaced, that the user is notified of this event.
+--------------------------------------------------------------------------------------------------------------------------------
 
-TODO discuss with team, is this done?
+Currently no notifications are send, this Will be fixed in `ASVS / iSDP: Verify that if an authentication factor is changed or replaced, that the user is notified of this event. <https://github.com/minvws/nl-kat-coordination/issues/4310>`_.
 
 |non_compliant| 2.5.6 - Verify forgotten password, and other recovery paths use a secure recovery mechanism, such as time-based OTP (TOTP) or other soft token, mobile push, or another offline recovery mechanism.
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -263,7 +263,7 @@ As can be seen from the following code sample in ``rocky/account/views/password_
         device = TOTPDevice.objects.get(user=self.user.pk)
         device.delete()
 
-Currently this requirement is not met. Will be fixed in ``TODO``
+Currently this requirement is not met. Will be fixed in https://github.com/minvws/nl-kat-coordination/issues/4311
 
 |compliant| 2.7.1 - Verify that clear text out of band (NIST "restricted") authenticators, such as SMS or PSTN, are not offered by default, and stronger alternatives such as push notifications are offered first.
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -343,5 +343,4 @@ The out of band verifier is set to refresh after every 30 seconds and by default
 .. |compliant| image:: img/compliant.svg
 .. |non_compliant| image:: img/non_compliant.svg
 .. |partial_compliant| image:: img/partial_compliant.svg
-.. |todo| image:: img/todo.svg
 .. |accepted| image:: img/accepted.svg
