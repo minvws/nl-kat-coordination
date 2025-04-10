@@ -402,6 +402,11 @@ class BoefjeScheduler(Scheduler):
             task_db.status = models.TaskStatus.FAILED
             self.ctx.datastores.task_store.update_task(task_db)
 
+        # Do we have this task in another organisation?
+        organisations = self.get_organisations_for_same_task()
+        if organisations:
+            boefje_task.organisations = organisations
+
         task = models.Task(
             id=boefje_task.id,
             scheduler_id=self.scheduler_id,
@@ -684,6 +689,16 @@ class BoefjeScheduler(Scheduler):
             oois.append(ooi)
 
         return oois
+
+    # TODO: implement this method
+    def get_organisations_for_same_task(self) -> list[str] | None:
+        """Get the organisations that have the same task.
+
+        Returns:
+            A list of organisations that have the same task.
+        """
+        organisations = None
+        return organisations
 
     def calculate_deadline(self, schedule: models.Schedule) -> models.Schedule:
         """Override Scheduler.calculate_deadline() to calculate the deadline
