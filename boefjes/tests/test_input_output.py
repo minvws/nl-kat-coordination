@@ -48,13 +48,9 @@ def _extract_plugin_id_from_path(path: Path, base_path: Path) -> str:
 def get_run_method(normalizer_id: str, plugins_path: Path = None) -> Callable:
     if plugins_path is None:
         plugins_path = Path()
-    # normalizer = import_module(str(Path(normalizer_id).with_suffix("")).replace("/", "."))
+
     normalizer = import_module(plugins_path.joinpath(normalizer_id).as_posix().replace("/", ".") + ".normalize")
     return getattr(normalizer, "run")
-
-
-# todo: write a get_test_inputs method that returns a list of test inputs (matches against the tests input dir + 'test-' + filename + '.raw')
-# todo: write a get_test_outputs method that returns a list of test outputs
 
 
 def get_normalizer_modules(plugins_path: Path) -> list[Path]:
@@ -89,7 +85,7 @@ def get_test_output_files(test_outputs_path: Path) -> list[Path]:
 
 
 # Maps plugin IDs to run methods
-def _map_plugin_id_to_run_method(plugins_path: Path) -> dict[str, Callable]:
+def _map_plugin_id_to_normalizer_function(plugins_path: Path) -> dict[str, Callable]:
     """Maps plugin IDs to their run methods"""
     plugins = {}
 
@@ -214,7 +210,7 @@ def test_input_output(plugin_id, test_input, expected_output, input_object_file,
             input_object = json.load(input_file)
 
     input_data = get_dummy_data(test_input)
-    test_output = list(run_method(input_object, input_data))
+    test_output = _serialize_output(run_method(input_object, input_data))
 
     with expected_output.open("rb") as output_file:
         expected_output_data = json.load(output_file)
@@ -226,8 +222,29 @@ def test_input_output(plugin_id, test_input, expected_output, input_object_file,
     # todo: fix and generalize
     # todo: make OOI comparable with dict (using a custom __eq__ method or a wrapped ooi object suitable for comparison)
     if strategy == "matches":
-        # assert len(test_output) == len(expected_output_data)
-        assert test_output == expected_output_data
+        assert len(test_output) == len(expected_output_data)
+        for i, obj in enumerate(test_output):
+            _compare_objects(expected_output_data[i], obj)
+
+    elif strategy == "contains":
+        missing = []
+        for i, obj in enumerate(expected_output_data):
+            found = False
+            for actual_output_object in test_output:
+                try:
+                    # Check if the object is in the test output
+                    _compare_objects(obj, actual_output_object)
+                    found = True
+                    break
+                except AssertionError:
+                    pass
+
+            if not found:
+                missing.append(obj)
+
+        if missing:
+            pytest.fail(f"Expected objects not found in test output: {missing}")
+
     else:
         pytest.fail(f"Unknown strategy: {strategy}")
 
@@ -241,5 +258,26 @@ def test_input_output(plugin_id, test_input, expected_output, input_object_file,
     #     assert not extra_in_expected
 
 
-# input_ooi: dict, raw: bytes
-plugin_map: dict[str, Callable[[dict, bytes], Iterable[NormalizerOutput]]] = _map_plugin_id_to_run_method(PLUGINS_PATH)
+plugin_map: dict[str, Callable[[dict, bytes], Iterable[NormalizerOutput]]] = _map_plugin_id_to_normalizer_function(
+    PLUGINS_PATH)
+
+
+def _serialize_output(objects: Iterable[NormalizerOutput]) -> list[dict]:
+    return list(map(lambda x: x.serialize(), objects))
+
+
+def _compare_objects(expected: dict | str, actual: dict) -> None:
+    """Compare two objects and return True if they are equal."""
+
+    if isinstance(expected, str):
+        # If expected is a string, compare it with the actual object's primary key
+        assert expected == actual["primary_key"], f"Expected {expected}, got {actual['primary_key']}"
+    else:
+        # Compare the object types
+        assert expected["object_type"] == actual[
+            "object_type"], f"Expected {expected['object_type']}, got {actual['object_type']}"
+
+        # Compare the object data
+        for key in expected.keys():
+            assert key in actual, f"Key {key} not found in actual object"
+            assert expected[key] == actual[key], f"Expected {expected[key]}, got {actual[key]} for key {key}"
