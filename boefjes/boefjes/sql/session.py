@@ -61,5 +61,3 @@ class SessionMixin:
 
             if isinstance(self._session, sessionmaker):
                 self.session.close()
-
-            self.session = None
