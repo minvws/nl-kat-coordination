@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"], "max_content_width": 120, "show_default": True})
-@click.option("-n", "--node", default="0", help="XTDB node")
+@click.option("-n", "--node", default="0", help="XTDB node, or Organization code")
 @click.option("-u", "--url", default="http://localhost:3000", help="XTDB server base url")
 @click.option("-t", "--timeout", type=int, default=5000, help="XTDB request timeout (in ms)")
 @click.option("-v", "--verbosity", count=True, help="Increase the verbosity level")
@@ -44,7 +44,7 @@ def status(ctx: click.Context):
 
 
 @cli.command(help='EDN Query (default: "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}")')
-@click.option("--tx-id", type=int, help="In UTC, defaulting to latest transaction id (integer)")
+@click.option("--tx-id", type=int, help="Defaulting to latest transaction id (integer)")
 @click.option("--tx-time", type=click.DateTime(), help="In UTC, defaulting to latest transaction time (date)")
 @click.option("--valid-time", type=click.DateTime(), help="In UTC, defaulting to now (date)")
 @click.argument("edn", required=False)
@@ -81,7 +81,7 @@ def list_values(ctx: click.Context):
 
 
 @cli.command(help="Returns the document map for a particular entity.")
-@click.option("--tx-id", type=int, help="In UTC, defaulting to latest transaction id (integer)")
+@click.option("--tx-id", type=int, help="Defaulting to latest transaction id (integer)")
 @click.option("--tx-time", type=click.DateTime(), help="In UTC, defaulting to latest transaction time (date)")
 @click.option("--valid-time", type=click.DateTime(), help="In UTC, defaulting to now (date)")
 @click.argument("key")
@@ -119,7 +119,7 @@ def history(ctx: click.Context, key: str, with_corrections: bool, with_docs: boo
 
 
 @cli.command(help="Returns the transaction details for an entity - returns a map containing the tx-id and tx-time.")
-@click.option("--tx-id", type=int, help="In UTC, defaulting to the latest transaction id (integer)")
+@click.option("--tx-id", type=int, help="Defaulting to the latest transaction id (integer)")
 @click.option("--tx-time", type=click.DateTime(), help="In UTC, defaulting to the latest transaction time (date)")
 @click.option("--valid-time", type=click.DateTime(), help="In UTC, defaulting to now (date)")
 @click.argument("key")
