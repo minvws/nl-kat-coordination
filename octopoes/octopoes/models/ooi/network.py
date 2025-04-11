@@ -22,7 +22,7 @@ class Network(OOI):
 
     object_type: Literal["Network"] = "Network"
 
-    name: str
+    name: Annotated[str, StringConstraints(to_lower=True)]
 
     _natural_key_attrs = ["name"]
     _traversable = False
@@ -158,13 +158,13 @@ class AutonomousSystem(OOI):
 
     Example value
     -------------
-    AS1000
+    AS1000, Organisation Y
     """
 
     object_type: Literal["AutonomousSystem"] = "AutonomousSystem"
 
     number: str
-    name: str | None
+    name: str 
     _natural_key_attrs = ["number"]
 
 
